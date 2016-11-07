@@ -2,7 +2,6 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
 {% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=None) %}
-    {% set is_management = context_track is none %}
     {% if abstracts %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -57,9 +56,7 @@
                                     {{- abstract.friendly_id -}}
                                 </td>
                                 <td class="i-table" data-searchable="{{ abstract.title | lower }}">
-                                    {% set url = url_for('.manage_abstract' if is_management else '.display_abstract',
-                                                         abstract) %}
-                                    <a class="js-mathjax" href="{{ url }}">
+                                    <a class="js-mathjax" href="{{ url_for('.display_abstract', abstract) }}">
                                         {{- abstract.title -}}
                                     </a>
                                 </td>

@@ -27,7 +27,7 @@ from indico.modules.events.abstracts.controllers.base import (RHAbstractBase, RH
                                                               DisplayAbstractListMixin,
                                                               CustomizeAbstractListMixin, AbstractsExportPDFMixin,
                                                               AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
-                                                              AbstractsExportExcel, AbstractPageMixin)
+                                                              AbstractsExportExcel)
 from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm,
                                                    AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm, BulkAbstractJudgmentForm)
@@ -50,7 +50,6 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHAbstractListBase(RHManageAbstractsBase):
@@ -77,22 +76,6 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
         RHAbstractListBase._checkParams(self, params)
         ids = map(int, request.form.getlist('abstract_id'))
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
-
-
-class RHManageAbstract(AbstractPageMixin, RHConferenceModifBase):  # TODO
-    """Display abstract management page"""
-
-    CSRF_ENABLED = True
-    management = True
-    view_class = WPManageAbstracts
-
-    def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
-        AbstractPageMixin._checkProtection(self)
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        AbstractPageMixin._checkParams(self)
 
 
 class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
@@ -134,8 +117,8 @@ class RHAbstractExportPDF(RHAbstractBase):
 
     def _process(self):
         pdf = ConfManagerAbstractToPDF(self.abstract)
-        file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
-        return send_file(file_name, pdf.generate(), 'application/pdf')
+        filename = secure_filename('abstract-{}-reviews.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
+        return send_file(filename, pdf.generate(), 'application/pdf')
 
 
 class RHAbstractsDashboard(RHManageAbstractsBase):
