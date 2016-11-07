@@ -60,6 +60,12 @@ class RHAbstractsBase(RHConferenceBaseDisplay):
     CSRF_ENABLED = True
     EVENT_FEATURE = 'abstracts'
 
+    def _checkProtection(self):
+        RHConferenceBaseDisplay._checkProtection(self)
+        # Only let event managers access the management versions.
+        if self.management and not self.event_new.can_manage(session.user):
+            raise Forbidden
+
     @property
     def management(self):
         """Whether the RH is currently used in the management area"""
@@ -79,6 +85,9 @@ class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
 
     def _checkProtection(self):
         RHModificationBaseProtected._checkProtection(self)
+        # Only let event managers access the management versions.
+        if self.management and not self.event_new.can_manage(session.user):
+            raise Forbidden
 
 
 class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
