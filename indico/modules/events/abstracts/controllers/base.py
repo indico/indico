@@ -29,7 +29,7 @@ from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF
+from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, AbstractsToPDF
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -152,7 +152,8 @@ class AbstractsExportPDFMixin:
 
     def _process(self):
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        pdf = ConfManagerAbstractsToPDF(self.event_new, sorted_abstracts)
+        cls = ConfManagerAbstractsToPDF if self.management else AbstractsToPDF
+        pdf = cls(self.event_new, sorted_abstracts)
         return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
