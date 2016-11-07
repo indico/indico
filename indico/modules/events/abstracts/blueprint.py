@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.abstracts.controllers import (abstract_list, boa, common, display, email_templates,
+from indico.modules.events.abstracts.controllers import (abstract, abstract_list, boa, display, email_templates,
                                                          management, reviewing)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -118,18 +118,19 @@ _bp.add_url_rule('/manage/abstracts/email-templates/<email_tpl_id>',
 for prefix, is_management in (('/manage/abstracts', True), ('/abstracts', False)):
     defaults = {'management': is_management}
     # Abstract display
-    _bp.add_url_rule(prefix + '/<int:abstract_id>/', 'display_abstract', common.RHDisplayAbstract, defaults=defaults)
+    _bp.add_url_rule(prefix + '/<int:abstract_id>/', 'display_abstract', abstract.RHDisplayAbstract, defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/attachments/<file_id>/<filename>', 'download_attachment',
-                     common.RHAbstractsDownloadAttachment, defaults=defaults)
+                     abstract.RHAbstractsDownloadAttachment, defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/abstract-reviews.pdf', 'manage_abstract_pdf_export',
-                     common.RHAbstractExportFullPDF, defaults=defaults)
+                     abstract.RHAbstractExportFullPDF, defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/abstract.pdf', 'display_abstract_pdf_export',
-                     common.RHAbstractExportPDF, defaults=defaults)
+                     abstract.RHAbstractExportPDF, defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/notifications', 'notification_log',
-                     common.RHAbstractNotificationLog, defaults=defaults)
+                     abstract.RHAbstractNotificationLog, defaults=defaults)
     # Abstract actions
     _bp.add_url_rule(prefix + '/<int:abstract_id>/edit', 'edit_abstract',
-                     common.RHEditAbstract, methods=('GET', 'POST'), defaults=defaults)
+                     abstract.RHEditAbstract, methods=('GET', 'POST'), defaults=defaults)
+    # Reviewing/judgment actions
     _bp.add_url_rule(prefix + '/<int:abstract_id>/withdraw', 'withdraw_abstract',
                      reviewing.RHWithdrawAbstract, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reset', 'reset_abstract_state',
@@ -138,7 +139,6 @@ for prefix, is_management in (('/manage/abstracts', True), ('/abstracts', False)
                      reviewing.RHJudgeAbstract, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reviewing-tracks', 'edit_review_tracks',
                      reviewing.RHEditReviewedForTrackList, methods=('POST',), defaults=defaults)
-    # Abstract reviewing
     _bp.add_url_rule(prefix + '/<int:abstract_id>/review/track/<int:track_id>', 'review_abstract',
                      reviewing.RHReviewAbstractForTrack, methods=('POST',), defaults=defaults)
     # Abstract comments
