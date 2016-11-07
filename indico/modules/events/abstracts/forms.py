@@ -260,7 +260,7 @@ class AbstractReviewForm(IndicoForm):
         abstract = kwargs.pop('abstract')
         super(AbstractReviewForm, self).__init__(*args, **kwargs)
         self.event = abstract.event_new
-        self.proposed_related_abstract.abstract = abstract
+        self.proposed_related_abstract.excluded_abstract_ids = {abstract.id}
         self.proposed_contribution_type.query = (ContributionType.query
                                                  .with_parent(self.event)
                                                  .order_by(ContributionType.name))
