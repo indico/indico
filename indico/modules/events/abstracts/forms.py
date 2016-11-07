@@ -31,6 +31,7 @@ from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
@@ -388,7 +389,7 @@ class AbstractForm(IndicoForm):
     description = IndicoMarkdownField(_('Content'), [DataRequired()], editor=True, mathjax=True)
     submitted_contrib_type = QuerySelectField(_("Type"), get_label='name', allow_blank=True,
                                               blank_text=_("No type selected"))
-    person_links = AbstractPersonLinkListField(_("People"), [DataRequired()])
+    person_links = AbstractPersonLinkListField(_("People"), [DataRequired()], default_author_type=AuthorType.primary)
     submission_comment = TextAreaField(_("Comments"))
     attachments = FileField(_('Attachments'), param_name='attachments', multiple_files=True, lightweight=True)
 
