@@ -343,11 +343,17 @@ class RH(RequestHandlerBase):
             if key in request.view_args:
                 new_view_args[key] = getter(self)
         # Retrieve the expected values from locators
+        prev_locator_args = {}
         for getter in spec['locators']:
             value = getter(self)
             if value is None:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
-            new_view_args.update(get_locator(value))
+            locator_args = get_locator(value)
+            reused_keys = set(locator_args) & prev_locator_args.viewkeys()
+            if any(locator_args[k] != prev_locator_args[k] for k in reused_keys):
+                raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
+            new_view_args.update(locator_args)
+            prev_locator_args.update(locator_args)
         # Get all default values provided by the url map for the endpoint
         defaults = set(itertools.chain.from_iterable(r.defaults
                                                      for r in current_app.url_map.iter_rules(request.endpoint)
