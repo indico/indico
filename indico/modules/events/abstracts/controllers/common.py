@@ -17,9 +17,8 @@
 from __future__ import unicode_literals
 
 from flask import flash, session, request
-from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.reviewing import RHAbstractReviewBase
+from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import update_abstract
 from indico.modules.events.abstracts.util import make_abstract_form
@@ -28,11 +27,9 @@ from indico.util.i18n import _
 from indico.web.util import jsonify_data, jsonify_form
 
 
-class RHEditAbstract(RHAbstractReviewBase):
-    def _checkProtection(self):
-        RHAbstractReviewBase._checkProtection(self)
-        if not self.abstract.can_edit(session.user):
-            raise Forbidden
+class RHEditAbstract(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_edit(session.user)
 
     def _process(self):
         abstract_form_class = make_abstract_form(self.event_new)
@@ -46,7 +43,7 @@ class RHEditAbstract(RHAbstractReviewBase):
         return jsonify_form(form, disabled_fields=disabled_fields)
 
 
-class RHAbstractsDownloadAttachment(RHAbstractReviewBase):
+class RHAbstractsDownloadAttachment(RHAbstractBase):
     """Download an attachment file belonging to an abstract."""
 
     normalize_url_spec = {
@@ -56,7 +53,7 @@ class RHAbstractsDownloadAttachment(RHAbstractReviewBase):
     }
 
     def _checkParams(self, params):
-        RHAbstractReviewBase._checkParams(self, params)
+        RHAbstractBase._checkParams(self, params)
         self.abstract_file = AbstractFile.get_one(request.view_args['file_id'])
 
     def _process(self):

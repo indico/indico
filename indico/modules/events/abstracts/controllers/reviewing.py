@@ -20,7 +20,8 @@ from flask import flash, request, session, jsonify
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import (AbstractMixin, DisplayAbstractListMixin,
+from indico.modules.events.abstracts.controllers.base import (RHAbstractBase, RHAbstractsBase,
+                                                              DisplayAbstractListMixin,
                                                               AbstractsExportPDFMixin,
                                                               AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
                                                               AbstractsExportExcel,
@@ -41,35 +42,15 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-
-
-class RHAbstractsBase(RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
-    EVENT_FEATURE = 'abstracts'
-
-
-class RHAbstractReviewBase(AbstractMixin, RHAbstractsBase):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.abstract
-        }
-    }
-
-    def _checkProtection(self):
-        RHAbstractsBase._checkProtection(self)
-        AbstractMixin._checkProtection(self)
-
-    def _checkParams(self, params):
-        RHAbstractsBase._checkParams(self, params)
-        AbstractMixin._checkParams(self)
-        self.management = request.view_args.get('management', False)
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
     """AJAX endpoint that lists all abstracts in the event (dict representation)."""
 
-    CSRF_ENABLED = True
+    def _checkProtection(self):
+        if not session.user:
+            raise Forbidden
+        RHAbstractsBase._checkProtection(self)
 
     def _checkParams(self, params):
         RHAbstractsBase._checkParams(self, params)
@@ -92,11 +73,9 @@ class RHListOtherAbstracts(RHAbstractsBase):
         return jsonify(result)
 
 
-class RHJudgeAbstract(RHAbstractReviewBase):
-    def _checkProtection(self):
-        if not self.abstract.can_judge(session.user, check_state=True):
-            raise Forbidden
-        RHAbstractReviewBase._checkProtection(self)
+class RHJudgeAbstract(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_judge(session.user, check_state=True)
 
     def _process(self):
         form = AbstractJudgmentForm(abstract=self.abstract)
@@ -108,17 +87,15 @@ class RHJudgeAbstract(RHAbstractReviewBase):
         return jsonify_data(box_html=tpl.render_decision_box(self.abstract, form, management=self.management))
 
 
-class RHResetAbstractState(RHAbstractReviewBase):
-    def _checkProtection(self):
+class RHResetAbstractState(RHAbstractBase):
+    def _check_abstract_protection(self):
         if self.abstract.state == AbstractState.submitted:
-            raise Forbidden
-        # only let pass through
-        # - judges (when abstract is not in withdrawn state)
-        # - managers (all states except for 'submitted')
-        if not self.abstract.can_judge(session.user) or self.abstract.state == AbstractState.withdrawn:
-            if not self.event_new.can_manage(session.user):
-                raise Forbidden
-        RHAbstractReviewBase._checkProtection(self)
+            return False
+        # manages can always reset
+        if self.event_new.can_manage(session.user):
+            return True
+        # judges can reset if the abstract has not been withdrawn
+        return self.abstract.can_judge(session.user) and self.abstract.state != AbstractState.withdrawn
 
     def _process(self):
         if self.abstract.state != AbstractState.submitted:
@@ -128,11 +105,9 @@ class RHResetAbstractState(RHAbstractReviewBase):
         return jsonify_data(display_html=html, management_html=html)
 
 
-class RHWithdrawAbstract(RHAbstractReviewBase):
-    def _checkProtection(self):
-        if not self.abstract.can_withdraw(session.user, check_state=True):
-            raise Forbidden
-        RHAbstractReviewBase._checkProtection(self)
+class RHWithdrawAbstract(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_withdraw(session.user, check_state=True)
 
     def _process(self):
         if self.abstract.state != AbstractState.withdrawn:
@@ -161,7 +136,9 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
             raise Forbidden
 
 
-class RHReviewAbstractForTrack(RHAbstractReviewBase):
+class RHReviewAbstractForTrack(RHAbstractBase):
+    """Review an abstract in a specific track"""
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.abstract,
@@ -169,13 +146,11 @@ class RHReviewAbstractForTrack(RHAbstractReviewBase):
         }
     }
 
-    def _checkProtection(self):
-        if not self.abstract.can_review(session.user, check_state=True):
-            raise Forbidden
-        RHAbstractReviewBase._checkProtection(self)
+    def _check_abstract_protection(self):
+        return self.abstract.can_review(session.user, check_state=True)
 
     def _checkParams(self, params):
-        RHAbstractReviewBase._checkParams(self, params)
+        RHAbstractBase._checkParams(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
         reviews = self.abstract.get_reviews(user=session.user, track=self.track)
         self.review = reviews[0] if reviews else None
@@ -192,7 +167,7 @@ class RHReviewAbstractForTrack(RHAbstractReviewBase):
         return jsonify_data(box_html=tpl.render_review_box(form, self.abstract, self.track, management=self.management))
 
 
-class RHSubmitAbstractComment(RHAbstractReviewBase):
+class RHSubmitAbstractComment(RHAbstractBase):
     def _process(self):
         form = AbstractCommentForm(abstract=self.abstract, user=session.user)
         if form.validate_on_submit():
@@ -202,7 +177,7 @@ class RHSubmitAbstractComment(RHAbstractReviewBase):
         return jsonify_data(form_html=tpl.render_comment_form(form, self.abstract))
 
 
-class RHAbstractCommentBase(RHAbstractReviewBase):
+class RHAbstractCommentBase(RHAbstractBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.comment
@@ -210,11 +185,11 @@ class RHAbstractCommentBase(RHAbstractReviewBase):
     }
 
     def _checkParams(self, params):
-        RHAbstractReviewBase._checkParams(self, params)
+        RHAbstractBase._checkParams(self, params)
         self.comment = AbstractComment.get_one(request.view_args['comment_id'])
 
     def _checkProtection(self):
-        RHAbstractReviewBase._checkProtection(self)
+        RHAbstractBase._checkProtection(self)
         if not self.comment.can_edit(session.user):
             raise Forbidden
 
@@ -237,13 +212,12 @@ class RHDeleteAbstractComment(RHAbstractCommentBase):
 
 class RHDisplayReviewableTracks(RHAbstractsBase):
     def _checkProtection(self):
-        RHAbstractsBase._checkProtection(self)
         if not session.user:
             raise Forbidden
+        RHAbstractsBase._checkProtection(self)
 
     def _process(self):
         track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event_new, session.user)
-
         return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self._conf, event=self.event_new,
                                                            abstract_count=track_reviewer_abstract_count,
                                                            tracks=get_user_tracks(self.event_new, session.user))
@@ -286,11 +260,9 @@ class RHDisplayAbstractsExportExcel(AbstractsExportExcel, RHDisplayAbstractsActi
     pass
 
 
-class RHEditReviewedForTrackList(RHAbstractReviewBase):
-    def _checkProtection(self):
-        RHAbstractReviewBase._checkProtection(self)
-        if not self.abstract.can_judge(session.user, check_state=True):
-            raise Forbidden
+class RHEditReviewedForTrackList(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_judge(session.user, check_state=True)
 
     def _process(self):
         form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)

@@ -33,6 +33,8 @@ from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF
+from MaKaC.webinterface.rh.base import RHModificationBaseProtected
+from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def build_review_form(abstract, track):
@@ -67,6 +69,76 @@ def render_abstract_page(abstract, view_class=None, management=False):
         return view_class.render_template('abstract.html', abstract.event_new.as_legacy, **params)
     else:
         return render_template('events/abstracts/abstract.html', no_javascript=True, **params)
+
+
+class SpecificAbstractMixin:
+    """Mixin for RHs that deal with a specific abstract"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.abstract
+        }
+    }
+
+    def _checkParams(self):
+        self.abstract = Abstract.get_one(request.view_args['abstract_id'], is_deleted=False)
+
+    def _checkProtection(self):
+        if not self._check_abstract_protection():
+            raise Forbidden
+
+    def _check_abstract_protection(self):
+        raise NotImplementedError
+
+
+class RHAbstractsBase(RHConferenceBaseDisplay):
+    """Base class for all abstract-related RHs"""
+
+    CSRF_ENABLED = True
+    EVENT_FEATURE = 'abstracts'
+
+    @property
+    def management(self):
+        """Whether the RH is currently used in the management area"""
+        return request.view_args.get('management', False)
+
+
+class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
+    """
+    Base class for all abstract-related RHs that require full event
+    management permissions
+    """
+
+    @property
+    def management(self):
+        """Whether the RH is currently used in the management area"""
+        return request.view_args.get('management', True)
+
+    def _checkProtection(self):
+        RHModificationBaseProtected._checkProtection(self)
+
+
+class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
+    """
+    Base class for all abstract-related RHs that require read access
+    to the associated abstract.
+    """
+
+    def _checkParams(self, params):
+        RHAbstractsBase._checkParams(self, params)
+        SpecificAbstractMixin._checkParams(self)
+
+    def _checkProtection(self):
+        RHAbstractsBase._checkProtection(self)
+        SpecificAbstractMixin._checkProtection(self)
+
+    def _check_abstract_protection(self):
+        """Perform a permission check on the current abstract.
+
+        Override this in case you want to check for more specific
+        privileges than the generic "can access".
+        """
+        return self.abstract.can_access(session.user)
 
 
 class AbstractMixin:

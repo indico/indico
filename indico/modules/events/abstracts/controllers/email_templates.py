@@ -21,7 +21,7 @@ from flask import request
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
-from indico.modules.events.abstracts.controllers.management import RHManageAbstractsBase
+from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import (EditEmailTemplateRuleForm, EditEmailTemplateTextForm,
                                                    CreateEmailTemplateForm)
 from indico.modules.events.abstracts.models.abstracts import AbstractState
@@ -52,6 +52,17 @@ class RHAddEmailTemplate(RHManageAbstractsBase):
             db.session.flush()
             return _render_notification_list(self.event_new)
         return jsonify_template('events/abstracts/management/notification_tpl_form.html', form=form)
+
+
+class RHSortEmailTemplates(RHManageAbstractsBase):
+    """Sort e-mail templates according to the order provided by the client."""
+
+    def _process(self):
+        sort_order = request.json['sort_order']
+        tpls = {s.id: s for s in self.event_new.abstract_email_templates}
+        for position, tpl_id in enumerate(sort_order, 1):
+            if tpl_id in tpls:
+                tpls[tpl_id].position = position
 
 
 class RHEditEmailTemplateBase(RHManageAbstractsBase):
@@ -90,17 +101,6 @@ class RHEditEmailTemplateText(RHEditEmailTemplateBase):
         return jsonify_template('events/abstracts/management/notification_tpl_text_form.html', form=form, is_edit=True)
 
 
-class RHSortEmailTemplates(RHManageAbstractsBase):
-    """Sort e-mail templates according to the order provided by the client."""
-
-    def _process(self):
-        sort_order = request.json['sort_order']
-        tpls = {s.id: s for s in self.event_new.abstract_email_templates}
-        for position, tpl_id in enumerate(sort_order, 1):
-            if tpl_id in tpls:
-                tpls[tpl_id].position = position
-
-
 class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
     """Delete an e-mail template."""
 
@@ -110,7 +110,7 @@ class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
 
 
 class RHEmailTemplateREST(RHEditEmailTemplateBase):
-    """Enable or disable stop on match of a notification template"""
+    """Perform RESTful actions on an email template."""
 
     def _process_PATCH(self):
         if request.json is None:

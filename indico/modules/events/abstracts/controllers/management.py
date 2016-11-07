@@ -21,10 +21,10 @@ from operator import attrgetter
 
 from flask import redirect, flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
-from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.controllers.base import (AbstractMixin, DisplayAbstractListMixin,
+from indico.modules.events.abstracts.controllers.base import (RHAbstractBase, RHManageAbstractsBase,
+                                                              DisplayAbstractListMixin,
                                                               CustomizeAbstractListMixin, AbstractsExportPDFMixin,
                                                               AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
                                                               AbstractsExportExcel, AbstractPageMixin)
@@ -50,34 +50,11 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
-from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHManageAbstractsBase(RHConferenceModifBase):
-    """Base class for all abstracts management RHs"""
-
-    CSRF_ENABLED = True
-    EVENT_FEATURE = 'abstracts'
-
-    def _process(self):
-        return RH._process(self)
-
-
-class RHManageAbstractBase(AbstractMixin, RHManageAbstractsBase):
-    """Base class for all abstract management RHs"""
-
-    def _checkParams(self, params):
-        RHManageAbstractsBase._checkParams(self, params)
-        AbstractMixin._checkParams(self)
-
-    def _checkProtection(self):
-        RHManageAbstractsBase._checkProtection(self)
-        AbstractMixin._checkProtection(self)
-
-
 class RHAbstractListBase(RHManageAbstractsBase):
-    """Base class for all abstract list operations"""
+    """Base class for all RHs using the abstract list generator"""
 
     def _checkParams(self, params):
         RHManageAbstractsBase._checkParams(self, params)
@@ -85,7 +62,7 @@ class RHAbstractListBase(RHManageAbstractsBase):
 
 
 class RHManageAbstractsActionsBase(RHAbstractListBase):
-    """Base class for classes performing actions on abstract"""
+    """Base class for RHs performing actions on selected abstracts"""
 
     _abstract_query_options = ()
 
@@ -102,7 +79,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 
 
-class RHManageAbstract(AbstractPageMixin, RHConferenceModifBase):
+class RHManageAbstract(AbstractPageMixin, RHConferenceModifBase):  # TODO
     """Display abstract management page"""
 
     CSRF_ENABLED = True
@@ -143,26 +120,28 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
         return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
 
 
-class RHAbstractNotificationLog(RHManageAbstractBase):
-    def _checkProtection(self):
-        RHManageAbstractBase._checkProtection(self)
-        if not self.abstract.can_judge(session.user, check_state=False):
-            raise Forbidden
+class RHAbstractNotificationLog(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_judge(session.user)
 
     def _process(self):
         return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
 
 
-class RHAbstractExportPDF(RHManageAbstractBase):
+class RHAbstractExportPDF(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_see_reviews(session.user)
+
     def _process(self):
         pdf = ConfManagerAbstractToPDF(self.abstract)
         file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
         return send_file(file_name, pdf.generate(), 'application/pdf')
 
 
-class RHAbstracts(RHManageAbstractsBase):
-    """Display abstracts management page"""
+class RHAbstractsDashboard(RHManageAbstractsBase):
+    """Dashboard of the abstracts module"""
 
+    # Allow access even if the feature is disabled
     EVENT_FEATURE = None
 
     def _process(self):
