@@ -16,91 +16,41 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
-from operator import attrgetter
-
-from flask import redirect, flash, jsonify, request, session
-from sqlalchemy.orm import joinedload, subqueryload
+from flask import redirect, flash, session
 
 from indico.modules.events.abstracts import logger
-from indico.modules.events.abstracts.controllers.base import (RHAbstractBase, RHManageAbstractsBase,
-                                                              DisplayAbstractListMixin,
-                                                              CustomizeAbstractListMixin, AbstractsExportPDFMixin,
-                                                              AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
-                                                              AbstractsExportExcel)
-from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm,
-                                                   AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
-                                                   AbstractsScheduleForm, BulkAbstractJudgmentForm)
-from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
-from indico.modules.events.abstracts.models.persons import AbstractPersonLink
+from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHManageAbstractsBase
+from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm, AbstractReviewingRolesForm,
+                                                   AbstractReviewingSettingsForm, AbstractsScheduleForm)
+from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, schedule_cfa, open_cfa,
-                                                        close_cfa, judge_abstract)
-from indico.modules.events.abstracts.schemas import abstracts_schema
+from indico.modules.events.abstracts.operations import schedule_cfa, open_cfa, close_cfa
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
-from indico.modules.events.abstracts.util import (make_abstract_form, get_roles_for_event,
-                                                  AbstractListGeneratorManagement)
+from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
-from indico.modules.events.contributions.models.persons import AuthorType
-from indico.modules.events.util import get_field_values, update_object_principals
+from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF
 
 
-class RHAbstractListBase(RHManageAbstractsBase):
-    """Base class for all RHs using the abstract list generator"""
+class RHAbstractsDashboard(RHManageAbstractsBase):
+    """Dashboard of the abstracts module"""
 
-    def _checkParams(self, params):
-        RHManageAbstractsBase._checkParams(self, params)
-        self.list_generator = AbstractListGeneratorManagement(event=self.event_new)
-
-
-class RHManageAbstractsActionsBase(RHAbstractListBase):
-    """Base class for RHs performing actions on selected abstracts"""
-
-    _abstract_query_options = ()
-
-    @property
-    def _abstract_query(self):
-        query = Abstract.query.with_parent(self.event_new)
-        if self._abstract_query_options:
-            query = query.options(*self._abstract_query_options)
-        return query
-
-    def _checkParams(self, params):
-        RHAbstractListBase._checkParams(self, params)
-        ids = map(int, request.form.getlist('abstract_id'))
-        self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
-
-
-class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
-    """Perform bulk judgment operations on selected abstracts"""
+    # Allow access even if the feature is disabled
+    EVENT_FEATURE = None
 
     def _process(self):
-        form = BulkAbstractJudgmentForm(event=self.event_new, abstract_id=[a.id for a in self.abstracts],
-                                        judgment=request.form.get('judgment'))
-        if form.validate_on_submit():
-            judgment_data, abstract_data = form.split_data
-            submitted_abstracts = {abstract for abstract in self.abstracts if abstract.state == AbstractState.submitted}
-            for abstract in submitted_abstracts:
-                judge_abstract(abstract, abstract_data, judge=session.user, **judgment_data)
-            num_judged_abstracts = len(submitted_abstracts)
-            num_prejudged_abstracts = len(self.abstracts) - num_judged_abstracts
-            if num_judged_abstracts:
-                flash(ngettext("One abstract has been judged.",
-                               "{num} abstracts have been judged.",
-                               num_judged_abstracts).format(num=num_judged_abstracts), 'success')
-            if num_prejudged_abstracts:
-                flash(ngettext("One abstract has been skipped since it is already judged.",
-                               "{num} abstracts have been skipped since they are already judged.",
-                               num_prejudged_abstracts).format(num=num_prejudged_abstracts), 'warning')
-            return jsonify_data(**self.list_generator.render_list())
-        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
+        if not self.event_new.has_feature('abstracts'):
+            return WPManageAbstracts.render_template('management/disabled.html', self._conf, event=self.event_new)
+        else:
+            abstracts_count = Abstract.query.with_parent(self.event_new).count()
+            return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
+                                                     abstracts_count=abstracts_count, cfa=self.event_new.cfa)
 
 
 class RHAbstractNotificationLog(RHAbstractBase):
@@ -119,21 +69,6 @@ class RHAbstractExportPDF(RHAbstractBase):
         pdf = ConfManagerAbstractToPDF(self.abstract)
         filename = secure_filename('abstract-{}-reviews.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
         return send_file(filename, pdf.generate(), 'application/pdf')
-
-
-class RHAbstractsDashboard(RHManageAbstractsBase):
-    """Dashboard of the abstracts module"""
-
-    # Allow access even if the feature is disabled
-    EVENT_FEATURE = None
-
-    def _process(self):
-        if not self.event_new.has_feature('abstracts'):
-            return WPManageAbstracts.render_template('management/disabled.html', self._conf, event=self.event_new)
-        else:
-            abstracts_count = Abstract.query.with_parent(self.event_new).count()
-            return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
-                                                     abstracts_count=abstracts_count, cfa=self.event_new.cfa)
 
 
 class RHScheduleCFA(RHManageAbstractsBase):
@@ -209,115 +144,6 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
         self.commit = False
         disabled_fields = form.RATING_FIELDS if has_ratings else ()
         return jsonify_form(form, disabled_fields=disabled_fields)
-
-
-class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
-    template = 'management/abstract_list.html'
-    view_class = WPManageAbstracts
-
-
-class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
-    view_class = WPManageAbstracts
-
-
-class RHAbstractListStaticURL(RHAbstractListBase):
-    """Generate a static URL for the configuration of the abstract list"""
-
-    def _process(self):
-        return jsonify(url=self.list_generator.generate_static_url())
-
-
-class RHCreateAbstract(RHAbstractListBase):
-    def _process(self):
-        abstract_form_class = make_abstract_form(self.event_new)
-        form = abstract_form_class(event=self.event_new)
-        if form.validate_on_submit():
-            data = form.data
-            abstract = create_abstract(self.event_new, *get_field_values(data))
-            flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
-            tpl_components = self.list_generator.render_list(abstract)
-            if tpl_components.get('hide_abstract'):
-                self.list_generator.flash_info_message(abstract)
-            return jsonify_data(**tpl_components)
-        return jsonify_template('events/abstracts/forms/abstract.html', event=self.event_new, form=form)
-
-
-class RHDeleteAbstracts(RHManageAbstractsActionsBase):
-    def _process(self):
-        delete_contribs = request.values.get('delete_contribs') == '1'
-        deleted_contrib_count = 0
-        for abstract in self.abstracts:
-            if delete_contribs and abstract.contribution:
-                deleted_contrib_count += 1
-            delete_abstract(abstract, delete_contribs)
-        deleted_abstract_count = len(self.abstracts)
-        flash(ngettext("The abstract has been deleted.",
-                       "{count} abstracts have been deleted.", deleted_abstract_count)
-              .format(count=deleted_abstract_count), 'success')
-        if deleted_contrib_count:
-            flash(ngettext("The linked contribution has been deleted.",
-                           "{count} linked contributions have been deleted.", deleted_contrib_count)
-                  .format(count=deleted_contrib_count), 'success')
-        return jsonify_data(**self.list_generator.render_list())
-
-
-class RHAbstractPersonList(RHManageAbstractsActionsBase):
-    """List of persons somehow related to abstracts (co-authors, speakers...)"""
-
-    @property
-    def _membership_filter(self):
-        abstract_ids = {abstract.id for abstract in self.abstracts}
-        return Abstract.id.in_(abstract_ids)
-
-    def _process(self):
-        submitters = {abstract.submitter for abstract in self.abstracts}
-        abstract_persons = AbstractPersonLink.find_all(AbstractPersonLink.abstract.has(self._membership_filter))
-        abstract_persons_dict = defaultdict(lambda: {'speaker': False, 'submitter': False, 'primary_author': False,
-                                                     'secondary_author': False})
-        for abstract_person in abstract_persons:
-            dict_key = abstract_person.person.user if abstract_person.person.user else abstract_person.person
-            person_roles = abstract_persons_dict[dict_key]
-            person_roles['speaker'] |= abstract_person.is_speaker
-            person_roles['primary_author'] |= abstract_person.author_type == AuthorType.primary
-            person_roles['secondary_author'] |= abstract_person.author_type == AuthorType.secondary
-        for submitter in submitters:
-            abstract_persons_dict[submitter]['submitter'] |= True
-        return jsonify_template('events/management/contribution_person_list.html',
-                                event_persons=abstract_persons_dict, event=self.event_new, include_submitters=True)
-
-
-class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsActionsBase):
-    pass
-
-
-class RHAbstractsExportPDF(AbstractsExportPDFMixin, RHManageAbstractsActionsBase):
-    pass
-
-
-class RHAbstractsExportCSV(AbstractsExportCSV, RHManageAbstractsActionsBase):
-    pass
-
-
-class RHAbstractsExportExcel(AbstractsExportExcel, RHManageAbstractsActionsBase):
-    pass
-
-
-class RHAbstractsExportJSON(RHManageAbstractsActionsBase):
-    _abstract_query_options = (joinedload('submitter'),
-                               joinedload('accepted_track'),
-                               joinedload('accepted_contrib_type'),
-                               joinedload('submitted_contrib_type'),
-                               subqueryload('field_values'),
-                               subqueryload('submitted_for_tracks'),
-                               subqueryload('reviewed_for_tracks'),
-                               subqueryload('person_links'),
-                               subqueryload('reviews').joinedload('ratings'))
-
-    def _process(self):
-        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        response = jsonify(version=1, abstracts=abstracts_schema.dump(sorted_abstracts).data)
-        response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
-        return response
 
 
 class RHManageReviewingRoles(RHManageAbstractsBase):
