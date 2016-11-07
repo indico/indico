@@ -97,7 +97,7 @@
                                        data-ajax></a>
                                     <a class="i-button-icon icon-cross js-delete-comment"
                                        title="{% trans %}Remove comment{% endtrans %}"
-                                       data-method="POST"
+                                       data-method="DELETE"
                                        data-href="{{ url_for('.delete_abstract_comment', comment) }}"
                                        data-title="{% trans %}Remove comment{% endtrans %}"
                                        data-confirm="{% trans %}Are you sure you want to remove this comment?{% endtrans %}"
