@@ -58,7 +58,7 @@ i.info-helper {
 .multiple-items-widget {
     .sort-handle {
         cursor: move;
-        @include icon-before('icon-grid2');
+        @include icon-before('icon-handle');
     }
     .ui-sortable-helper {
         display: table;
