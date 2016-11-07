@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.abstracts.controllers import boa, common, display, email_templates, management, reviewing
+from indico.modules.events.abstracts.controllers import (abstract_list, boa, common, display, email_templates,
+                                                         management, reviewing)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -70,28 +71,29 @@ _bp.add_url_rule('/manage/abstracts/teams', 'manage_reviewing_roles', management
                  methods=('GET', 'POST'))
 
 # Abstract list (management)
-_bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', management.RHAbstractList)
-_bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', management.RHAbstractListCustomize,
+_bp.add_url_rule('/manage/abstracts/list/', 'manage_abstract_list', abstract_list.RHAbstractList)
+_bp.add_url_rule('/manage/abstracts/list/customize', 'customize_abstract_list', abstract_list.RHAbstractListCustomize,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', management.RHAbstractListStaticURL,
+_bp.add_url_rule('/manage/abstracts/list/static-url', 'generate_static_url', abstract_list.RHAbstractListStaticURL,
                  methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/abstracts.pdf', 'abstracts_pdf_export', management.RHAbstractsExportPDF,
+_bp.add_url_rule('/manage/abstracts/abstracts.pdf', 'abstracts_pdf_export', abstract_list.RHAbstractsExportPDF,
                  methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/abstracts.csv', 'abstracts_csv_export', management.RHAbstractsExportCSV,
+_bp.add_url_rule('/manage/abstracts/abstracts.csv', 'abstracts_csv_export', abstract_list.RHAbstractsExportCSV,
                  methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/abstracts.xlsx', 'abstracts_xlsx_export', management.RHAbstractsExportExcel,
+_bp.add_url_rule('/manage/abstracts/abstracts.xlsx', 'abstracts_xlsx_export', abstract_list.RHAbstractsExportExcel,
                  methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/abstracts.json', 'abstracts_json_export', management.RHAbstractsExportJSON,
+_bp.add_url_rule('/manage/abstracts/abstracts.json', 'abstracts_json_export', abstract_list.RHAbstractsExportJSON,
                  methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', management.RHCreateAbstract,
+_bp.add_url_rule('/manage/abstracts/create', 'manage_create_abstract', abstract_list.RHCreateAbstract,
                  methods=('GET', 'POST'))
 
 # Bulk abstract actions (management)
-_bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', management.RHDeleteAbstracts, methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/person-list', 'person_list', management.RHAbstractPersonList, methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/attachments', 'download_attachments', management.RHAbstractsDownloadAttachments,
+_bp.add_url_rule('/manage/abstracts/delete', 'manage_delete_abstracts', abstract_list.RHDeleteAbstracts,
                  methods=('POST',))
-_bp.add_url_rule('/manage/abstracts/judge', 'manage_judge_abstracts', management.RHBulkAbstractJudgment,
+_bp.add_url_rule('/manage/abstracts/person-list', 'person_list', abstract_list.RHAbstractPersonList, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/attachments', 'download_attachments', abstract_list.RHAbstractsDownloadAttachments,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/judge', 'manage_judge_abstracts', abstract_list.RHBulkAbstractJudgment,
                  methods=('POST',))
 
 # E-mail templates
