@@ -18,10 +18,10 @@ from __future__ import unicode_literals
 
 from flask import flash, session, request
 
-from indico.modules.events.abstracts.controllers.base import RHAbstractBase, render_abstract_page
+from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import update_abstract
-from indico.modules.events.abstracts.util import make_abstract_form
+from indico.modules.events.abstracts.util import make_abstract_form, render_abstract_page
 from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPManageAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _

@@ -19,56 +19,19 @@ from __future__ import unicode_literals
 import os
 from operator import attrgetter
 
-from flask import render_template, redirect, request, session
+from flask import redirect, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm, make_review_form,
-                                                   AbstractReviewedForTracksForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstracts
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
-from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
 from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-
-
-def build_review_form(abstract, track):
-    review_form_class = make_review_form(abstract.event_new)
-    reviews_for_track = abstract.get_reviews(user=session.user, track=track)
-    review_for_track = reviews_for_track[0] if reviews_for_track else None
-
-    if review_for_track:
-        answers = {'question_{}'.format(rating.question.id): rating.value
-                   for rating in review_for_track.ratings}
-        defaults = FormDefaults(obj=review_for_track, **answers)
-    else:
-        defaults = FormDefaults()
-
-    return review_form_class(prefix="track-{}".format(track.id), obj=defaults, abstract=abstract)
-
-
-def render_abstract_page(abstract, view_class=None, management=False):
-    comment_form = AbstractCommentForm(abstract=abstract, user=session.user, formdata=None)
-    review_forms = {track.id: build_review_form(abstract, track)
-                    for track in abstract.reviewed_for_tracks
-                    if track.can_review_abstracts(session.user)}
-    judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
-    review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event_new, obj=abstract, formdata=None)
-    params = {'abstract': abstract,
-              'comment_form': comment_form,
-              'review_forms': review_forms,
-              'review_track_list_form': review_track_list_form,
-              'judgment_form': judgment_form,
-              'management': management}
-    if view_class:
-        return view_class.render_template('abstract.html', abstract.event_new.as_legacy, **params)
-    else:
-        return render_template('events/abstracts/abstract.html', no_javascript=True, **params)
 
 
 class SpecificAbstractMixin:

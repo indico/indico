@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict, defaultdict, namedtuple
 
-from flask import request, flash
+from flask import request, flash, session, render_template
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.config import Config
@@ -469,6 +469,27 @@ def get_track_reviewer_abstract_counts(event, user):
              .group_by(Track.id))
     return {track: {'total': total, 'reviewed': reviewed, 'unreviewed': unreviewed}
             for track, total, reviewed, unreviewed in query}
+
+
+def render_abstract_page(abstract, view_class=None, management=False):
+    from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
+                                                       AbstractReviewedForTracksForm, build_review_form)
+    comment_form = AbstractCommentForm(abstract=abstract, user=session.user, formdata=None)
+    review_forms = {track.id: build_review_form(abstract, track)
+                    for track in abstract.reviewed_for_tracks
+                    if track.can_review_abstracts(session.user)}
+    judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
+    review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event_new, obj=abstract, formdata=None)
+    params = {'abstract': abstract,
+              'comment_form': comment_form,
+              'review_forms': review_forms,
+              'review_track_list_form': review_track_list_form,
+              'judgment_form': judgment_form,
+              'management': management}
+    if view_class:
+        return view_class.render_template('abstract.html', abstract.event_new.as_legacy, **params)
+    else:
+        return render_template('events/abstracts/abstract.html', no_javascript=True, **params)
 
 
 def create_boa(event):
