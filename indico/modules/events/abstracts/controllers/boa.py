@@ -18,8 +18,7 @@ from __future__ import unicode_literals
 
 from flask import flash
 
-from indico.modules.events.abstracts.controllers.display import RHDisplayAbstractsBase
-from indico.modules.events.abstracts.controllers.management import RHManageAbstractsBase
+from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase, RHAbstractsBase
 from indico.modules.events.abstracts.forms import BOASettingsForm
 from indico.modules.events.abstracts.settings import boa_settings
 from indico.modules.events.abstracts.util import clear_boa_cache, create_boa
@@ -42,7 +41,7 @@ class RHManageBOA(RHManageAbstractsBase):
         return jsonify_form(form)
 
 
-class RHExportBOA(RHDisplayAbstractsBase):
+class RHExportBOA(RHAbstractsBase):
     """Export the book of abstracts"""
 
     def _process(self):

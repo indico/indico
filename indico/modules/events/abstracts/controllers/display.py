@@ -21,7 +21,7 @@ from operator import attrgetter
 from flask import session, flash, redirect, request
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import AbstractPageMixin
+from indico.modules.events.abstracts.controllers.base import AbstractPageMixin, RHAbstractsBase, RHAbstractBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
 from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts, WPSubmitAbstract
@@ -31,49 +31,43 @@ from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
 from MaKaC.PDFinterface.conference import AbstractToPDF, AbstractsToPDF
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-class RHDisplayAbstractsBase(RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
-    EVENT_FEATURE = 'abstracts'
-
-
-class RHDisplayAbstract(AbstractPageMixin, RHDisplayAbstractsBase):
+class RHDisplayAbstract(AbstractPageMixin, RHAbstractsBase):
     management = False
     view_class = WPDisplayAbstracts
 
     def _checkParams(self, params):
-        RHDisplayAbstractsBase._checkParams(self, params)
+        RHAbstractsBase._checkParams(self, params)
         AbstractPageMixin._checkParams(self)
 
     def _checkProtection(self):
-        RHDisplayAbstractsBase._checkProtection(self)
+        RHAbstractsBase._checkProtection(self)
         AbstractPageMixin._checkProtection(self)
 
 
-class RHDisplayAbstractExportPDF(RHDisplayAbstract):
+class RHDisplayAbstractExportPDF(RHAbstractBase):
     def _process(self):
         pdf = AbstractToPDF(self.abstract)
         file_name = secure_filename('abstract-{}.pdf'.format(self.abstract.friendly_id), 'abstract.pdf')
         return send_file(file_name, pdf.generate(), 'application/pdf')
 
 
-class RHMyAbstractsBase(RHDisplayAbstractsBase):
-    """Base RH concerning the list of current user abstracts"""
+class RHMyAbstractsBase(RHAbstractsBase):
+    """Base class for RHs related to the list of the user's abstract"""
 
     def _checkParams(self, params):
-        RHDisplayAbstractsBase._checkParams(self, params)
+        RHAbstractsBase._checkParams(self, params)
         self.abstracts = get_user_abstracts(self.event_new, session.user)
 
     def _checkProtection(self):
-        RHDisplayAbstractsBase._checkProtection(self)
         if not session.user:
             raise Forbidden
+        RHAbstractsBase._checkProtection(self)
 
 
 class RHMyAbstracts(RHMyAbstractsBase):
-    """Display the list of current user abstracts"""
+    """Display the list of the user's abstracts"""
 
     def _process(self):
         return WPMyAbstracts.render_template('display/user_abstract_list.html', self._conf, event=self.event_new,
@@ -81,13 +75,15 @@ class RHMyAbstracts(RHMyAbstractsBase):
 
 
 class RHMyAbstractsExportPDF(RHMyAbstractsBase):
+    """Export the list of the user's abstracts as PDF"""
+
     def _process(self):
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
         pdf = AbstractsToPDF(self.event_new, sorted_abstracts)
         return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHSubmitAbstract(RHDisplayAbstractsBase):
+class RHSubmitAbstract(RHAbstractsBase):
     def _process(self):
         if not self.event_new.cfa.can_submit_abstracts(session.user):
             return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
