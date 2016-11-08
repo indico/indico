@@ -275,7 +275,12 @@
             $.ajax({
                 url: build_url(Indico.Urls.Categories.info, {category_id: categoryId}),
                 dataType: 'json',
-                error: handleAjaxError,
+                error: function(xhr) {
+                    // XXX: Re-enable error handling once we skip retrieving protected parents
+                    if (xhr.status !== 403) {
+                        handleAjaxError(xhr);
+                    }
+                },
                 success: function(data) {
                     _categories[categoryId] = data;
                 }

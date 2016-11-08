@@ -553,7 +553,12 @@
                     self._toggleLoading(false, true);
                     self._currentCategoryRequest = null;
                 },
-                error: handleAjaxError,
+                error: function(xhr) {
+                    // XXX: Re-enable error handling once we skip retrieving protected parents
+                    if (xhr.status !== 403) {
+                        handleAjaxError(xhr);
+                    }
+                },
                 success: function(data) {
                     if (data && self._isInDOM()) {
                         self._fillCache(data);
@@ -573,7 +578,9 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    exclude: _.map(_.keys(self._subcategories), function(n) { return +n; })
+                    exclude: _.map(_.keys(self._subcategories), function(n) {
+                        return +n;
+                    })
                 }),
                 success: function(data) {
                     if (data) {
