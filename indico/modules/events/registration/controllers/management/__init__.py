@@ -20,9 +20,9 @@ from flask import request
 from sqlalchemy.orm import contains_eager, defaultload
 
 from indico.modules.events.registration.controllers import RegistrationFormMixin
+from indico.modules.events.registration.lists import RegistrationListGenerator
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.registration.util import RegistrationListGenerator
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
