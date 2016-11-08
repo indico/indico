@@ -32,6 +32,7 @@ from indico.modules.events.contributions.controllers.common import ContributionL
 from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
                                                        ContributionStartDateForm, ContributionDurationForm,
                                                        ContributionTypeForm)
+from indico.modules.events.contributions.lists import ContributionListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
@@ -40,8 +41,8 @@ from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
                                                             delete_contribution, create_subcontribution,
                                                             update_subcontribution, delete_subcontribution)
-from indico.modules.events.contributions.util import (ContributionListGenerator, contribution_type_row,
-                                                      make_contribution_form, generate_spreadsheet_from_contributions)
+from indico.modules.events.contributions.util import (contribution_type_row, make_contribution_form,
+                                                      generate_spreadsheet_from_contributions)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
