@@ -134,6 +134,11 @@ def _extend_event_menu(sender, **kwargs):
             return False
         return bool(get_user_tracks(conf.as_event, session.user))
 
+    def _submit_abstract_visible(conf):
+        if not session.user or not conf.has_feature('abstracts'):
+            return False
+        return conf.as_event.cfa.can_submit_abstracts(session.user)
+
     yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
                         position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
 
@@ -145,5 +150,5 @@ def _extend_event_menu(sender, **kwargs):
                         position=2, parent='call_for_abstracts',
                         visible=_reviewing_area_visible)
     yield MenuEntryData(title=_("Submit Abstract"), name='abstract_submission',
-                        visible=lambda event: event.has_feature('abstracts'),
-                        endpoint='abstracts.submit', position=1, parent='call_for_abstracts')
+                        endpoint='abstracts.submit', position=1, parent='call_for_abstracts',
+                        visible=_submit_abstract_visible)
