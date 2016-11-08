@@ -19,6 +19,7 @@ from __future__ import unicode_literals, division
 from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
 
@@ -153,6 +154,10 @@ class AbstractReview(db.Model):
 
     # relationship backrefs:
     # - ratings (AbstractReviewRating.review)
+
+    @locator_property
+    def locator(self):
+        return dict(self.abstract.locator, review_id=self.id, track_id=self.track.id)
 
     @return_ascii
     def __repr__(self):
