@@ -395,7 +395,8 @@ class AbstractForm(IndicoForm):
         self.submitted_contrib_type.query = self.event.contribution_types
         if not self.submitted_contrib_type.query.count():
             del self.submitted_contrib_type
-        if not abstracts_settings.get(self.event, 'allow_attachments'):
+        # Attachments are handled separately when editing
+        if self.abstract or not abstracts_settings.get(self.event, 'allow_attachments'):
             del self.attachments
         self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
         self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
