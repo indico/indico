@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
 from itertools import count, chain
 
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import joinedload, load_only
 from werkzeug.urls import url_parse
 
 from indico.core import signals
@@ -31,7 +32,7 @@ from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, T
 from indico.util.caching import memoize_request
 from indico.util.event import unify_event_args
 from indico.util.signals import named_objects_from_signal
-from indico.util.string import crc32
+from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
 
 import MaKaC
@@ -124,64 +125,164 @@ class MenuEntryData(object):
     def visible(self, event):
         return self._visible(event) if self._visible else True
 
+    @return_ascii
+    def __repr__(self):
+        parent = ''
+        if self.parent:
+            parent = ', parent={}'.format(self.parent)
+        return '<MenuEntryData({}{}): "{}">'.format(self.name, parent, self.title)
 
-@memoize_request
-def menu_entries_for_event(event):
-    from indico.core.plugins import plugin_engine
 
-    custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
-    entries = MenuEntry.get_for_event(event) if custom_menu_enabled else []
+def _get_split_signal_entries():
+    """Get the top-level and child menu entry data"""
     signal_entries = get_menu_entries_from_signal()
+    top_data = OrderedDict((name, data)
+                           for name, data in sorted(signal_entries.iteritems(),
+                                                    key=lambda (name, data): _menu_entry_key(data))
+                           if not data.parent)
+    child_data = defaultdict(list)
+    for name, data in signal_entries.iteritems():
+        if data.parent is not None:
+            child_data[data.parent].append(data)
+    for parent, entries in child_data.iteritems():
+        entries.sort(key=_menu_entry_key)
+    return top_data, child_data
 
+
+def _get_menu_cache_data(event):
+    from indico.core.plugins import plugin_engine
     cache_key = unicode(event.id)
     plugin_hash = crc32(','.join(sorted(plugin_engine.get_active_plugins())))
     cache_version = '{}:{}'.format(MaKaC.__version__, plugin_hash)
-    processed = entries and _cache.get(cache_key) == cache_version
+    return cache_key, cache_version
 
-    if not processed:
-        # menu entries from signal
-        pos_gen = count(start=(entries[-1].position + 1) if entries else 0)
-        entry_names = {entry.name for entry in entries}
 
-        # Keeping only new entries from the signal
-        new_entry_names = signal_entries.viewkeys() - entry_names
+def _menu_needs_recheck(event):
+    """Check whether the menu needs to be checked for missing items"""
+    cache_key, cache_version = _get_menu_cache_data(event)
+    return _cache.get(cache_key) != cache_version
 
-        # Mapping children data to their parent
-        children = defaultdict(list)
-        for name, data in signal_entries.iteritems():
-            if name in new_entry_names and data.parent is not None:
-                children[data.parent].append(data)
 
-        # Building the entries
-        new_entries = [_build_menu_entry(event, custom_menu_enabled, data, next(pos_gen),
-                                         children=children.get(data.name))
-                       for (name, data) in sorted(signal_entries.iteritems(),
-                                                  key=lambda (name, data): _menu_entry_key(data))
-                       if name in new_entry_names and data.parent is None]
+def _set_menu_checked(event):
+    """Mark the menu as up to date"""
+    cache_key, cache_version = _get_menu_cache_data(event)
+    _cache.set(cache_key, cache_version)
 
-        if custom_menu_enabled:
-            with db.tmp_session() as sess:
-                sess.add_all(new_entries)
-                try:
-                    sess.commit()
-                except IntegrityError as e:
-                    # If there are two parallel requests trying to insert a new menu
-                    # item one of them will fail with an error due to the unique index.
-                    # If the IntegrityError involves that index, we assume it's just the
-                    # race condition and ignore it.
-                    sess.rollback()
-                    if 'ix_uq_menu_entries_event_id_name' not in unicode(e.message):
-                        raise
-                else:
-                    _cache.set(cache_key, cache_version)
-            entries = MenuEntry.get_for_event(event)
+
+def _save_menu_entries(entries):
+    """Save new menu entries using a separate SA session"""
+    with db.tmp_session() as sess:
+        sess.add_all(entries)
+        try:
+            sess.commit()
+        except IntegrityError as e:
+            # If there are two parallel requests trying to insert a new menu
+            # item one of them will fail with an error due to the unique index.
+            # If the IntegrityError involves that index, we assume it's just the
+            # race condition and ignore it.
+            sess.rollback()
+            if 'ix_uq_menu_entries_event_id_name' not in unicode(e.message):
+                raise
+            return False
         else:
-            entries = new_entries
-
-    return entries
+            return True
 
 
-def _build_menu_entry(event, custom_menu_enabled, data, position, children=None):
+def _rebuild_menu(event):
+    """Create all menu entries in the database"""
+    top_data, child_data = _get_split_signal_entries()
+    pos_gen = count()
+    entries = [_build_menu_entry(event, True, data, next(pos_gen), children=child_data.get(data.name))
+               for name, data in top_data.iteritems()]
+    return _save_menu_entries(entries)
+
+
+def _check_menu(event):
+    """Create missing menu items in the database"""
+    top_data, child_data = _get_split_signal_entries()
+
+    query = (MenuEntry.query
+             .filter(MenuEntry.event_id == int(event.id))
+             .options(load_only('id', 'parent_id', 'name', 'position'),
+                      joinedload('parent').load_only('id', 'parent_id', 'name', 'position'),
+                      joinedload('children').load_only('id', 'parent_id', 'name', 'position')))
+
+    existing = {entry.name: entry for entry in query}
+    pos_gen = count(start=(max(x.position for x in existing.itervalues() if not x.parent)))
+    entries = []
+    top_created = set()
+    for name, data in top_data.iteritems():
+        if name in existing:
+            continue
+        entries.append(_build_menu_entry(event, True, data, next(pos_gen), child_data.get(name)))
+        top_created.add(name)
+
+    child_pos_gens = {}
+    for name, entry in existing.iteritems():
+        if entry.parent is not None:
+            continue
+        child_pos_gens[name] = count(start=(max(x.position for x in entry.children) + 1 if entry.children else 0))
+
+    for parent_name, data_list in child_data.iteritems():
+        if parent_name in top_created:
+            # adding a missing parent element also adds its children
+            continue
+        for data in data_list:
+            if data.name in existing:
+                continue
+            parent = existing[parent_name]
+            # use the parent id, not the object itself since we don't want to
+            # connect the new objects here to the main sqlalchemy session
+            entries.append(_build_menu_entry(event, True, data, next(child_pos_gens[parent.name]), parent_id=parent.id))
+
+    return _save_menu_entries(entries)
+
+
+def _build_menu(event):
+    """Fetch the customizable menu data from the database."""
+    entries = MenuEntry.get_for_event(event)
+    if not entries:
+        # empty menu, just build the whole structure without checking
+        # for existing menu entries
+        if _rebuild_menu(event):
+            _set_menu_checked(event)
+        return MenuEntry.get_for_event(event)
+    elif _menu_needs_recheck(event):
+        # menu items found, but maybe something new has been added
+        if _check_menu(event):
+            _set_menu_checked(event)
+        # For some reason SQLAlchemy uses old data for the children
+        # relationships even when querying the entries again below.
+        # Expire them explicitly to avoid having to reload the page
+        # after missing menu items have been created.
+        for entry in entries:
+            db.session.expire(entry, ('children',))
+        return MenuEntry.get_for_event(event)
+    else:
+        # menu is assumed up to date
+        return entries
+
+
+def _build_transient_menu(event):
+    """Build the transient event menu from the signal data.
+
+    This is used to check for missing items if customization is
+    enabled or for the actual menu if no customization is used
+    """
+    top_data, child_data = _get_split_signal_entries()
+    pos_gen = count()
+    return [_build_menu_entry(event, False, data, next(pos_gen), children=child_data.get(data.name))
+            for name, data in top_data.iteritems()
+            if data.parent is None]
+
+
+@memoize_request
+def menu_entries_for_event(event):
+    custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
+    return _build_menu(event) if custom_menu_enabled else _build_transient_menu(event)
+
+
+def _build_menu_entry(event, custom_menu_enabled, data, position, children=None, parent_id=None):
     entry_cls = MenuEntry if custom_menu_enabled else TransientMenuEntry
     entry = entry_cls(
         event_id=event.getId(),
@@ -192,6 +293,9 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None)
                   for i, entry_data in enumerate(sorted(children or [], key=_menu_entry_key))]
     )
 
+    if parent_id is not None:
+        # only valid for non-transient menu entries
+        entry.parent_id = parent_id
     if data.plugin:
         entry.type = MenuEntryType.plugin_link
         entry.plugin = data.plugin.name
@@ -204,7 +308,7 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None)
 @unify_event_args(legacy=True)
 def get_menu_entry_by_name(name, event):
     entries = menu_entries_for_event(event)
-    return next(e for e in chain(entries, *(e.children for e in entries)) if e.name == name)
+    return next((e for e in chain(entries, *(e.children for e in entries)) if e.name == name), None)
 
 
 def get_images_for_event(event):
