@@ -33,8 +33,8 @@ from indico.modules.events.abstracts.operations import (judge_abstract, reset_ab
                                                         update_abstract_comment, create_abstract_review,
                                                         update_abstract_review, update_reviewed_for_tracks)
 from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
-                                                  get_user_tracks, render_abstract_page)
-from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing
+                                                  get_user_tracks)
+from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing, render_abstract_page
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
