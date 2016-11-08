@@ -31,7 +31,6 @@ from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import serialize_person_link
 from indico.modules.users import User
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
@@ -144,14 +143,6 @@ def create_mock_abstract(event):
                         judgment_comment='Vague but interesting!')
 
     return abstract
-
-
-def serialize_abstract_person_link(person_link):
-    """Serialize AbstractPersonLink to JSON-like object"""
-    data = serialize_person_link(person_link)
-    data['isSpeaker'] = person_link.is_speaker
-    data['authorType'] = person_link.author_type.value
-    return data
 
 
 def make_abstract_form(event):

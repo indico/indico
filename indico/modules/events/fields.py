@@ -206,6 +206,9 @@ class PersonLinkListFieldBase(EventPersonListField):
     def _serialize_person_link(self, principal, extra_data=None):
         raise NotImplementedError
 
+    def _value(self):
+        return [self._serialize_person_link(person_link) for person_link in self.data] if self.data else []
+
 
 class EventPersonLinkListField(PersonLinkListFieldBase):
     """A field to manage event's chairpersons"""
