@@ -84,6 +84,9 @@
                                 {% trans name=comment.user.name, date=comment.created_dt|format_date -%}
                                     <strong>{{ name }}</strong> commented on {{ date }}
                                 {%- endtrans %}
+                                {% if comment.visibility.name != 'contributors' %}
+                                    <i class="abstract-comment-visibility {{ comment.visibility.name }} icon-shield" title="{{ comment.visibility.title }}"></i>
+                                {% endif %}
                                 {% if comment.modified_dt %}
                                     {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
                                 {% endif %}
