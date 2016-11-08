@@ -60,6 +60,12 @@
         var $buttonAlphaOrder = $fieldDisplay.find('.alpha-order-switch');
         var $form = $field.closest('form');
         var customOrder = !$buttonAlphaOrder.hasClass('active');
+        var maxNewPersonID = 0;
+
+        function setNewPersonID(person) {
+            person.id = 'new-' + maxNewPersonID;
+            maxNewPersonID++;
+        }
 
         function updatePersonOrder() {
             var people = _.map($fieldDisplay.find('.person-row'), function(e) {
@@ -205,6 +211,9 @@
             }
             if (person.isSubmitter === undefined) {
                 person.isSubmitter = options.defaults.isSubmitter;
+            }
+            if (person.id === undefined) {
+                setNewPersonID(person);
             }
         }
 
