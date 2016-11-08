@@ -20,12 +20,10 @@ from flask import flash, request, session, jsonify
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.controllers.base import (RHAbstractBase, RHAbstractsBase,
-                                                              DisplayAbstractListMixin,
-                                                              AbstractsExportPDFMixin,
-                                                              AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
-                                                              AbstractsExportExcel,
-                                                              CustomizeAbstractListMixin)
+from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
+from indico.modules.events.abstracts.controllers.common import (DisplayAbstractListMixin, CustomizeAbstractListMixin,
+                                                                AbstractsExportPDFMixin, AbstractsExportCSV,
+                                                                AbstractsExportExcel, AbstractsDownloadAttachmentsMixin)
 from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
                                                    AbstractReviewedForTracksForm, build_review_form)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState

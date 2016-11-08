@@ -22,10 +22,10 @@ from operator import attrgetter
 from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
-from indico.modules.events.abstracts.controllers.base import (RHManageAbstractsBase, DisplayAbstractListMixin,
-                                                              CustomizeAbstractListMixin, AbstractsExportPDFMixin,
-                                                              AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
-                                                              AbstractsExportExcel)
+from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
+from indico.modules.events.abstracts.controllers.common import (DisplayAbstractListMixin, CustomizeAbstractListMixin,
+                                                                AbstractsExportPDFMixin, AbstractsExportCSV,
+                                                                AbstractsExportExcel, AbstractsDownloadAttachmentsMixin)
 from indico.modules.events.abstracts.forms import (BulkAbstractJudgmentForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
