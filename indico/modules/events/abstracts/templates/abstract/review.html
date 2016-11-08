@@ -145,7 +145,8 @@
 
 {% macro render_comment_form(form, abstract, comment=none) %}
     {% set url = url_for('.edit_abstract_comment', comment) if comment else url_for('.comment_abstract', abstract) %}
-    {{ form_header(form, orientation='vertical') }}
+    {% set form_class = 'edit-comment' if comment else 'new-comment unfocused' %}
+    {{ form_header(form, orientation='vertical', classes=form_class) }}
     {{ form_rows(form, skip_labels=true) }}
     {% call form_footer(form) %}
         <button class="i-button big highlight text-color js-comment"
