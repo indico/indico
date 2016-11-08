@@ -19,8 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from datetime import timedelta
 
-from flask import flash, session, request
-from pytz import timezone
+from flask import flash, request
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
@@ -28,7 +27,6 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.util import ListGeneratorBase
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 class ContributionListGenerator(ListGeneratorBase):
@@ -157,6 +155,5 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
         contribs = contrib_list_kwargs['contribs']
         tpl = get_template_module('events/contributions/display/_contribution_list.html')
         tpl_lists = get_template_module('events/management/_lists.html')
-        tz = timezone(DisplayTZ(session.user, self.event.as_legacy).getDisplayTZ())
-        return {'html': tpl.render_contribution_list(self.event, tz, contribs),
+        return {'html': tpl.render_contribution_list(self.event, self.event.display_tzinfo, contribs),
                 'counter': tpl_lists.render_displayed_entries_fragment(len(contribs), total_entries)}

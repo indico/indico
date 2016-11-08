@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import session, request, jsonify
-from pytz import timezone
 from sqlalchemy.orm import load_only, joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
@@ -36,8 +35,6 @@ from indico.modules.events.paper_reviewing.legacy import get_reviewing_status
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.events.views import WPEventDisplay
 from indico.web.flask.util import send_file, jsonify_data
-
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.PDFinterface.conference import ContribToPDF, ContribsToPDF
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -106,9 +103,9 @@ class RHContributionList(RHDisplayProtectionBase):
         self.list_generator = ContributionDisplayListGenerator(event=self.event_new)
 
     def _process(self):
-        tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
         return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event_new,
-                                               timezone=tz, **self.list_generator.get_list_kwargs())
+                                               timezone=self.event_new.display_tzinfo,
+                                               **self.list_generator.get_list_kwargs())
 
 
 class RHContributionDisplay(RHContributionDisplayBase):
