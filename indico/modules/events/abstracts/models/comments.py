@@ -31,12 +31,12 @@ class AbstractCommentVisibility(TitledIntEnum):
                   _("Visible only to judges"),
                   _("Visible to conveners and judges"),
                   _("Visible to reviewers, conveners, and judges"),
-                  _("Visible to submitters, reviewers, conveners, and judges"),
+                  _("Visible to contributors, reviewers, conveners, and judges"),
                   _("Visible to all users")]
     judges = 1
     conveners = 2
     reviewers = 3
-    submitters = 4
+    contributors = 4
     users = 5
 
 
@@ -83,7 +83,7 @@ class AbstractComment(db.Model):
     visibility = db.Column(
         PyIntEnum(AbstractCommentVisibility),
         nullable=False,
-        default=AbstractCommentVisibility.judges
+        default=AbstractCommentVisibility.contributors
     )
     is_deleted = db.Column(
         db.Boolean,
@@ -146,6 +146,8 @@ class AbstractComment(db.Model):
                              AbstractCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
                              AbstractCommentVisibility.reviewers: [self.abstract.can_judge, self.abstract.can_convene,
                                                                    self.abstract.can_review],
-                             AbstractCommentVisibility.submitters: [self.abstract.can_judge, self.abstract.can_convene,
-                                                                    self.abstract.can_review, self.abstract.user_owns]}
+                             AbstractCommentVisibility.contributors: [self.abstract.can_judge,
+                                                                      self.abstract.can_convene,
+                                                                      self.abstract.can_review,
+                                                                      self.abstract.user_owns]}
         return any(fn(user) for fn in visibility_checks[self.visibility])

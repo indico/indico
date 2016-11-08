@@ -165,6 +165,9 @@ class RHReviewAbstractForTrack(RHAbstractBase):
 
 
 class RHSubmitAbstractComment(RHAbstractBase):
+    def _check_abstract_protection(self):
+        return self.abstract.can_comment(session.user)
+
     def _process(self):
         form = AbstractCommentForm(abstract=self.abstract, user=session.user)
         if form.validate_on_submit():

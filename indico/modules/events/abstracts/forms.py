@@ -140,12 +140,16 @@ class AbstractReviewingSettingsForm(IndicoForm):
 
     RATING_FIELDS = ('scale_lower', 'scale_upper')
 
-    scale_lower = IntegerField(_('Scale (from)'), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
-    scale_upper = IntegerField(_('Scale (to)'), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
-    allow_convener_judgment = BooleanField(_('Allow track conveners to judge'), widget=SwitchWidget(),
-                                           description=_('Enabling this allows track conveners to make a judgment '
-                                                         'such as accepting or rejecting an abstract.'))
-    abstract_review_questions = AbstractReviewQuestionsField(_('Review questions'))
+    scale_lower = IntegerField(_("Scale (from)"), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
+    scale_upper = IntegerField(_("Scale (to)"), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
+    allow_convener_judgment = BooleanField(_("Allow track conveners to judge"), widget=SwitchWidget(),
+                                           description=_("Enabling this allows track conveners to make a judgment "
+                                                         "such as accepting or rejecting an abstract."))
+    allow_contributors_in_comments = BooleanField(_("Allow contributors in comments"),
+                                                  widget=SwitchWidget(),
+                                                  description=_("Enabling this allows submitters, authors, and "
+                                                                "speakers to participate in the comments section."))
+    abstract_review_questions = AbstractReviewQuestionsField(_("Review questions"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -476,17 +480,19 @@ class AbstractsScheduleForm(IndicoForm):
 class AbstractCommentForm(IndicoForm):
     text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment...")})
     visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=AbstractCommentVisibility,
-                                       skip={AbstractCommentVisibility.submitters, AbstractCommentVisibility.users})
+                                       skip={AbstractCommentVisibility.users})
 
     def __init__(self, *args, **kwargs):
         comment = kwargs.get('obj')
         user = comment.user if comment else kwargs.pop('user')
         abstract = kwargs.pop('abstract')
         super(IndicoForm, self).__init__(*args, **kwargs)
+        if not abstract.event_new.cfa.allow_contributors_in_comments:
+            self.visibility.skip.add(AbstractCommentVisibility.contributors)
         if not abstract.can_judge(user) and not abstract.can_convene(user):
             self.visibility.skip.add(AbstractCommentVisibility.judges)
-        elif not abstract.can_review(user):
-            del self.visibility
+            if not abstract.can_review(user):
+                del self.visibility
 
 
 class AbstractReviewedForTracksForm(IndicoForm):
