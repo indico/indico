@@ -132,6 +132,20 @@
         }).on('click', '#edit-reviewed-for-track-list', function(evt) {
             evt.preventDefault();
             $(this).closest('.i-timeline-item').find('.i-box-footer').toggleClass('hidden');
+        }).on('focus', '.new-comment textarea', function() {
+            var $commentForm = $(this).closest('form');
+            $commentForm.find('.form-group').show('fast');
+            $commentForm.removeClass('unfocused');
+        }).on('click', '.new-comment', function(evt) {
+            evt.stopPropagation();
+        });
+
+        $(window).on('click', function() {
+            var $commentForm = $('form.new-comment');
+            if (!$commentForm.find('textarea').val().trim().length) {
+                $commentForm.addClass('unfocused');
+                $commentForm.find('.form-group ~ .form-group').hide('fast');
+            }
         });
     };
 
