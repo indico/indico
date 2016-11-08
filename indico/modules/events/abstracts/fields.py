@@ -27,10 +27,10 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
-from indico.modules.events.abstracts.util import serialize_abstract_person_link
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.events.util import serialize_person_link
 from indico.modules.users.models.users import User
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
@@ -157,7 +157,11 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
         return super(AbstractPersonLinkListField, self)._get_person_link(data, extra_data)
 
     def _serialize_person_link(self, principal, extra_data=None):
-        return serialize_abstract_person_link(principal)
+        extra_data = extra_data or {}
+        data = dict(extra_data, **serialize_person_link(principal))
+        data['isSpeaker'] = principal.is_speaker
+        data['authorType'] = principal.author_type.value
+        return data
 
     def pre_validate(self, form):
         super(AbstractPersonLinkListField, self).pre_validate(form)
