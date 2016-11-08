@@ -14,13 +14,13 @@
         {{ render_comments_section(abstract, comment_form) }}
         {% if abstract.reviews %}
             {{ render_abstract_reviews(abstract, review_forms, management=management) }}
-            <div class="i-timeline-separator"></div>
         {% endif %}
 
         {% set can_review = abstract.can_review(session.user, check_state=true) %}
         {% set can_judge = abstract.can_judge(session.user, check_state=true) %}
 
         {% if can_review or can_judge %}
+            <div class="i-timeline-separator"></div>
             <div class="i-timeline-connect-up"></div>
         {% endif %}
 
