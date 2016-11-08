@@ -22,10 +22,11 @@ from sqlalchemy.orm import load_only, joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
+from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.contributions.util import (ContributionDisplayListGenerator, get_contribution_ical_file,
+from indico.modules.events.contributions.util import (get_contribution_ical_file,
                                                       get_contributions_with_user_as_submitter)
 from indico.modules.events.contributions.views import WPMyContributions, WPContributions, WPAuthorList, WPSpeakerList
 from indico.modules.events.layout.util import is_menu_entry_enabled
