@@ -127,6 +127,20 @@
     }
 }
 
+.abstract-comment-visibility {
+    &.judges {
+        color: $red;
+    }
+
+    &.conveners {
+        color: $yellow;
+    }
+
+    &.reviewers {
+        color: $dark-gray;
+    }
+}
+
 .abstract-comment-badges {
     align-self: flex-end;
     color: $gray;
@@ -160,7 +174,6 @@
 }
 
 .submission-info {
-
     .info-line {
         margin-top: 1em;
 
@@ -183,7 +196,6 @@
 }
 
 .submitted-data {
-
     .field-separator {
         @include border-top;
         margin: 0 -10px;
