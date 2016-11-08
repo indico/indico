@@ -449,6 +449,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def can_comment(self, user):
         if not user:
             return False
+        if self.user_owns(user) and self.event_new.cfa.allow_contributors_in_comments:
+            return True
         return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
 
     def can_convene(self, user):

@@ -32,6 +32,10 @@ class CallForAbstracts(object):
         return '<CallForAbstracts({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
 
     @property
+    def allow_contributors_in_comments(self):
+        return abstracts_reviewing_settings.get(self.event, 'allow_contributors_in_comments')
+
+    @property
     def allow_convener_judgment(self):
         return abstracts_reviewing_settings.get(self.event, 'allow_convener_judgment')
 
