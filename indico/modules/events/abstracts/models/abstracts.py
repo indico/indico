@@ -510,10 +510,12 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def can_withdraw(self, user, check_state=False):
         if not user:
             return False
-        elif self.event_new.can_manage(user):
-            return not check_state or self.state != AbstractPublicState.withdrawn
-        elif user == self.submitter:
-            return not check_state or self.public_state == AbstractPublicState.awaiting
+        elif self.event_new.can_manage(user) and (not check_state or self.state != AbstractState.withdrawn):
+            return True
+        elif user == self.submitter and (not check_state or self.state == AbstractState.submitted):
+            return True
+        else:
+            return False
 
     def can_see_reviews(self, user):
         return self.can_judge(user) or self.can_convene(user)
@@ -541,8 +543,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def get_reviews(self, track=None, user=None):
         """Get all reviews on a particular track and/or by a particular user.
 
-           :param track: will show only reviews for the given track
-           :param user: will show only review by the given user
+        :param track: will show only reviews for the given track
+        :param user: will show only review by the given user
         """
         reviews = self.reviews[:]
         if track:
