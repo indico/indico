@@ -127,6 +127,42 @@
     }
 }
 
+#abstract-comment-box .new-comment {
+    margin-top: 0;
+
+    .form-field {
+        margin-top: 0;
+
+        textarea {
+            @include transition(height .2s);
+            height: 5em;
+            width: 100%;
+        }
+    }
+
+    &.unfocused {
+        > .form-group {
+            .form-field {
+                @include transition(margin-bottom .2s);
+                margin-bottom: 0;
+
+                textarea {
+                    resize: none;
+                    height: 2.6em;
+                }
+            }
+
+            & ~ .form-group {
+                display: none;
+
+                .form-field {
+                    margin-bottom: 0.7em;
+                }
+            }
+        }
+    }
+}
+
 .abstract-comment-visibility {
     &.judges {
         color: $red;
