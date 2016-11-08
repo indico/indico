@@ -26,14 +26,14 @@ from indico.modules.events.abstracts.controllers.common import (DisplayAbstractL
                                                                 AbstractsExportExcel, AbstractsDownloadAttachmentsMixin)
 from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
                                                    AbstractReviewedForTracksForm, build_review_form)
+from indico.modules.events.abstracts.lists import AbstractListGeneratorDisplay
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
                                                         create_abstract_comment, delete_abstract_comment,
                                                         update_abstract_comment, create_abstract_review,
                                                         update_abstract_review, update_reviewed_for_tracks)
-from indico.modules.events.abstracts.util import (AbstractListGeneratorDisplay, get_track_reviewer_abstract_counts,
-                                                  get_user_tracks)
+from indico.modules.events.abstracts.util import get_track_reviewer_abstract_counts, get_user_tracks
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing, render_abstract_page
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _

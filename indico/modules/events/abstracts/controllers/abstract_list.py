@@ -27,11 +27,12 @@ from indico.modules.events.abstracts.controllers.common import (DisplayAbstractL
                                                                 AbstractsExportPDFMixin, AbstractsExportCSV,
                                                                 AbstractsExportExcel, AbstractsDownloadAttachmentsMixin)
 from indico.modules.events.abstracts.forms import (BulkAbstractJudgmentForm)
+from indico.modules.events.abstracts.lists import AbstractListGeneratorManagement
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, judge_abstract)
 from indico.modules.events.abstracts.schemas import abstracts_schema
-from indico.modules.events.abstracts.util import (make_abstract_form, AbstractListGeneratorManagement)
+from indico.modules.events.abstracts.util import make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.util import get_field_values
