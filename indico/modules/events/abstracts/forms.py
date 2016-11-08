@@ -278,6 +278,8 @@ class AbstractReviewForm(IndicoForm):
         self.proposed_contribution_type.query = (ContributionType.query
                                                  .with_parent(self.event)
                                                  .order_by(ContributionType.name))
+        if not self.proposed_contribution_type.query.count():
+            del self.proposed_contribution_type
         self.proposed_tracks.query = (Track.query
                                       .with_parent(self.event)
                                       .filter(Track.id.notin_(track.id for track in abstract.reviewed_for_tracks))
