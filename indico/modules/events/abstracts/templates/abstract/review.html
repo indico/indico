@@ -210,15 +210,20 @@
                     </div>
                 {% endif %}
             </div>
-            {% set contribution_type = review.proposed_contribution_type %}
-            {% if review.proposed_action.name == 'accept' and contribution_type %}
+            {% if review.proposed_action.name == 'accept' %}
                 <div class="i-box-content">
-                    {% set contribution_type -%}
-                        <strong>{{ contribution_type.name|escape }}</strong>
-                    {%- endset %}
-                    {% trans type=contribution_type|safe -%}
-                        Proposed to accept as {{ type }}
-                    {%- endtrans %}
+                    {% if review.proposed_contribution_type %}
+                        {% set contribution_type -%}
+                            <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
+                        {%- endset %}
+                        {% trans type=contribution_type|safe -%}
+                            Proposed to accept as {{ type }}
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans -%}
+                            Proposed to accept
+                        {%- endtrans %}
+                    {% endif %}
                 </div>
             {% elif review.proposed_action.name == 'change_tracks' %}
                 <div class="i-box-content">
