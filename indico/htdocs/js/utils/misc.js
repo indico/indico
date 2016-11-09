@@ -164,4 +164,9 @@
     global.uniqueId = function uniqueId() {
         return '' + Math.round(new Date().getTime() + (Math.random() * 100));
     };
+
+    global.countWords = function countWords(value) {
+        value = value.trim();
+        return value ? value.split(/\s+/).length : 0;
+    };
 })(window);

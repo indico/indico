@@ -20,7 +20,7 @@ import re
 from datetime import timedelta
 from types import NoneType
 
-from wtforms.validators import StopValidation, ValidationError, EqualTo, Regexp
+from wtforms.validators import StopValidation, ValidationError, EqualTo, Regexp, Length
 
 from indico.util.date_time import as_utc, format_datetime, format_time, now_utc, format_human_timedelta
 from indico.util.i18n import _, ngettext
@@ -271,7 +271,7 @@ class WordCount(object):
         self.max = max
 
     def __call__(self, form, field):
-        count = len(re.findall(r'\w+', field.data)) if field.data else 0
+        count = len(re.split(r'\s+', field.data, flags=re.UNICODE)) if field.data else 0
         if count < self.min or self.max != -1 and count > self.max:
             if self.max == -1:
                 message = ngettext('Field must contain at least {min} word.',
@@ -280,7 +280,7 @@ class WordCount(object):
                 message = ngettext('Field cannot contain more than {max} word.',
                                    'Field cannot contain more than {max} words.', self.max)
             else:
-                message = _('Field must have between {min} and {max} words.')
+                message = _('Field must contain between {min} and {max} words.')
             raise ValidationError(message.format(min=self.min, max=self.max, length=count))
 
 
@@ -294,3 +294,14 @@ class IndicoRegexp(Regexp):
     def __init__(self, *args, **kwargs):
         self.client_side = kwargs.pop('client_side', True)
         super(IndicoRegexp, self).__init__(*args, **kwargs)
+
+
+class SoftLength(Length):
+    """
+    Like the WTForms `Length` validator, but allows typing beyond the
+    limit and just fails validation once the limit has been exceeded.
+
+    The client-side implementation also skips leading/trailing
+    whitespace which is in line with the behavior in all our forms
+    where surrounding whitespace is stripped before validation.
+    """

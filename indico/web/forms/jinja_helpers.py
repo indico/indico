@@ -25,7 +25,7 @@ from wtforms.validators import Length, NumberRange
 from indico.util.struct.enum import TitledEnum
 from indico.web.forms.fields import (IndicoSelectMultipleCheckboxField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoEnumRadioField)
-from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp
+from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, WordCount, SoftLength
 from indico.web.forms.widgets import SelectizeWidget
 
 
@@ -44,7 +44,18 @@ def is_single_line_field(field):
 def _attrs_for_validators(field, validators):
     attrs = {}
     for validator in validators:
-        if isinstance(validator, Length):
+        if isinstance(validator, WordCount):
+            if validator.min >= 0:
+                attrs['data-min-words'] = validator.min
+            if validator.max >= 0:
+                attrs['data-max-words'] = validator.max
+        elif isinstance(validator, SoftLength):
+            # XXX: SoftLength is a Length subclass so it must be checked first
+            if validator.min >= 0:
+                attrs['data-min-length'] = validator.min
+            if validator.max >= 0:
+                attrs['data-max-length'] = validator.max
+        elif isinstance(validator, Length):
             if validator.min >= 0:
                 attrs['minlength'] = validator.min
             if validator.max >= 0:
