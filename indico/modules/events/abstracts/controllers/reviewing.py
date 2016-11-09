@@ -161,7 +161,8 @@ class RHReviewAbstractForTrack(RHAbstractBase):
                 create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify_data(box_html=tpl.render_review_box(form, self.abstract, self.track, management=self.management))
+        return jsonify_data(form_html=tpl.render_review_form(form, self.abstract, self.track, review=self.review,
+                            management=self.management))
 
 
 class RHSubmitAbstractComment(RHAbstractBase):

@@ -39,7 +39,7 @@
     };
 
     global.setupAbstractPage = function setupAbstractPage() {
-        $('body').on('indico:confirmed', '.js-comment', function(evt) {
+        $('body').on('indico:confirmed', '.js-comment, .js-review', function(evt) {
             evt.preventDefault();
 
             var $this = $(this);
@@ -89,7 +89,7 @@
                     showFormErrors($box);
                 }
             });
-        }).on('indico:confirmed', '.js-review, #save-reviewing-tracks-list', function(evt) {
+        }).on('indico:confirmed', '#save-reviewing-tracks-list', function(evt) {
             var $this = $(this);
             var $box = $this.closest('.i-timeline-item');
             var $form = $box.find('form');
@@ -115,23 +115,17 @@
                     showFormErrors($page);
                 }
             });
-        }).on('click', '.js-change-review', function(evt) {
-            evt.preventDefault();
-
-            var $reviewDisplay = $(this).closest('.i-timeline-item');
-            var $reviewBox = $reviewDisplay.next('.abstract-review-box');
-            $reviewDisplay.hide();
-            $reviewBox.show();
         }).on('declarative:success', '.js-delete-comment', function() {
             $(this).parents('.i-timeline-item').remove();
-        }).on('declarative:success', '.js-edit-comment', function(evt, data) {
+        }).on('declarative:success', '.js-edit-comment, .js-edit-review', function(evt, data) {
             var $oldContent = $(this).parents('.i-timeline-item').find('.i-box-content');
             var $newContent = $(data.form_html);
             $oldContent.replaceWith($newContent);
-            $newContent.find('.js-edit-comment-cancel').on('indico:confirmed', function(evt_) {
+            $newContent.find('.js-edit-cancel').on('indico:confirmed', function(evt_) {
                 evt_.preventDefault();
                 $newContent.replaceWith($oldContent);
             });
+            initForms($newContent);
         }).on('indico:htmlUpdated', function() {
             initForms($(this));
             showFormErrors($(this));

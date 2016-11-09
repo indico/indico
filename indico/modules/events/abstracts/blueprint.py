@@ -140,7 +140,7 @@ for prefix, is_management in (('/manage/abstracts', True), ('/abstracts', False)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reviewing-tracks', 'edit_review_tracks',
                      reviewing.RHEditReviewedForTrackList, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/review/track/<int:track_id>', 'review_abstract',
-                     reviewing.RHReviewAbstractForTrack, methods=('POST',), defaults=defaults)
+                     reviewing.RHReviewAbstractForTrack, methods=('GET', 'POST'), defaults=defaults)
     # Abstract comments
     _bp.add_url_rule(prefix + '/<int:abstract_id>/comment', 'comment_abstract',
                      reviewing.RHSubmitAbstractComment, methods=('POST',), defaults=defaults)

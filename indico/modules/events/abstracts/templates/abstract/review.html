@@ -48,24 +48,34 @@
                 </div>
             </div>
             <div class="i-box-footer">
-                {{ form_header(form, orientation='vertical', id=('track-review-form-' + track.id|string)) }}
-                {{ form_rows(form, skip=form._order) }}
-                {{ form_rows(form, fields=form._order) }}
-                {% set form_id = '#track-review-form-' + track.id|string %}
-                {% call form_footer(form, skip_label=skip_labels) %}
-                    <button class="i-button big highlight js-review"
-                            data-method="POST"
-                            data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}">
-                        {% if edit %}
-                            {% trans %}Change{% endtrans %}
-                        {% else %}
-                            {% trans %}Review{% endtrans %}
-                        {% endif %}
-                    </button>
-                {% endcall %}
+                {{ render_review_form(form, abstract, track, management) }}
             </div>
         </div>
     </div>
+{% endmacro %}
+
+{% macro render_review_form(form, abstract, track, management=false, review=none) %}
+    {{ form_header(form, orientation='vertical', id=('track-review-form-' + track.id|string)) }}
+    {{ form_rows(form, skip=form._order) }}
+    {{ form_rows(form, fields=form._order) }}
+    {% set form_id = '#track-review-form-' + track.id|string %}
+    {% call form_footer(form) %}
+        <button class="i-button big highlight text-color js-review"
+                data-method="POST"
+                data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}">
+            {% if review %}
+                {% trans %}Change review{% endtrans %}
+            {% else %}
+                {% trans %}Submit review{% endtrans %}
+            {% endif %}
+        </button>
+        {% if review %}
+            <button class="i-button big text-color danger js-edit-cancel"
+                    data-confirm="{% trans %}Do you want to discard the changes to this review?{% endtrans %}">
+                {% trans %}Cancel{% endtrans %}
+            </button>
+        {% endif %}
+    {% endcall %}
 {% endmacro %}
 
 {% macro render_comments_section(abstract, form=none) %}
@@ -148,7 +158,7 @@
             {% endif %}
         </button>
         {% if comment %}
-            <button class="i-button big text-color danger js-edit-comment-cancel"
+            <button class="i-button big text-color danger js-edit-cancel"
                     data-confirm="{% trans %}Do you want to discard the changes to this comment?{% endtrans %}">
                 {% trans %}Cancel{% endtrans %}
             </button>
@@ -208,83 +218,88 @@
                 </div>
                 {% if can_change_review %}
                     <div>
-                        <a class="i-button-icon icon-edit js-change-review"
-                           title="{% trans %}Change review{% endtrans %}"></a>
+                        <a class="i-button-icon icon-edit js-edit-review"
+                           title="{% trans %}Change review{% endtrans %}"
+                           data-href="{{ url_for('.review_abstract', review, management=management) }}"
+                           data-method="GET"
+                           data-ajax></a>
                     </div>
                 {% endif %}
             </div>
-            {% if review.proposed_action.name == 'accept' %}
-                <div class="i-box-content">
-                    {% if review.proposed_contribution_type %}
-                        {% set contribution_type -%}
-                            <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
+            <div class="i-box-content">
+                {% if review.proposed_action.name == 'accept' %}
+                    <div class="">
+                        {% if review.proposed_contribution_type %}
+                            {% set contribution_type -%}
+                                <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
+                            {%- endset %}
+                            {% trans type=contribution_type|safe -%}
+                                Proposed to accept as {{ type }}
+                            {%- endtrans %}
+                        {% else %}
+                            {% trans -%}
+                                Proposed to accept
+                            {%- endtrans %}
+                        {% endif %}
+                    </div>
+                {% elif review.proposed_action.name == 'change_tracks' %}
+                    <div class="">
+                        {% set tracks -%}
+                            {% for track in review.proposed_tracks -%}
+                                <span class="abstract-track">{{ track.title|escape }}</span>
+                                {%- if not loop.last -%}, {% endif -%}
+                            {% endfor %}
                         {%- endset %}
-                        {% trans type=contribution_type|safe -%}
-                            Proposed to accept as {{ type }}
+                        {% trans count=review.proposed_tracks|length, tracks=tracks|safe -%}
+                            Possible destination track: {{ tracks }}
+                        {%- pluralize -%}
+                            Possible destination tracks: {{ tracks }}
                         {%- endtrans %}
-                    {% else %}
-                        {% trans -%}
-                            Proposed to accept
-                        {%- endtrans %}
-                    {% endif %}
-                </div>
-            {% elif review.proposed_action.name == 'change_tracks' %}
-                <div class="i-box-content">
-                    {% set tracks -%}
-                        {% for track in review.proposed_tracks -%}
-                            <span class="abstract-track">{{ track.title|escape }}</span>
-                            {%- if not loop.last -%}, {% endif -%}
-                        {% endfor %}
-                    {%- endset %}
-                    {% trans count=review.proposed_tracks|length, tracks=tracks|safe -%}
-                        Possible destination track: {{ tracks }}
-                    {%- pluralize -%}
-                        Possible destination tracks: {{ tracks }}
-                    {%- endtrans %}
-                </div>
-            {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
-                <div class="i-box-content">
-                    {% set other_abstract = review.proposed_related_abstract %}
-                    {% set abstract_link -%}
-                        <a href="{{ url_for('.display_abstract', other_abstract) }}">
-                            {{ other_abstract.title|escape }}
-                        </a>
-                    {%- endset %}
-                    {% if review.proposed_action.name == 'merge' %}
-                        {% trans title=abstract_link|safe -%}
-                            Proposed to be merged into {{ title }}
-                        {%- endtrans %}
-                    {% elif review.proposed_action.name == 'mark_as_duplicate' %}
-                        {% trans title=abstract_link|safe -%}
-                            Proposed as duplicate of {{ title }}
-                        {%- endtrans %}
-                    {% endif %}
-                </div>
-            {% endif %}
-            {% if review.ratings %}
-                <div class="titled-rule">
-                    {% trans %}Ratings{% endtrans %}
-                </div>
-                {% for rating in review.ratings|sort(attribute='question.position') %}
-                    <ul class="abstract-question-list">
-                        <li>
-                            <label>{{ rating.question.text }}</label>
-                            <span class="value">
-                                {{ _render_rating(cfa, rating.value) }}
-                                <span class="number">{{ rating.value }}</span>
-                            </span>
-                        </li>
-                    </ul>
-                {% endfor %}
-            {% endif %}
-            {% if review.comment %}
-                <div class="titled-rule">
-                    {% trans %}Comment{% endtrans %}
-                </div>
-                <div class="i-box-content">
-                    {{ review.comment }}
-                </div>
-            {% endif %}
+                    </div>
+                {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
+                    <div class="">
+                        {% set other_abstract = review.proposed_related_abstract %}
+                        {% set abstract_link -%}
+                            <a href="{{ url_for('.display_abstract', other_abstract) }}">
+                                {{ other_abstract.title|escape }}
+                            </a>
+                        {%- endset %}
+                        {% if review.proposed_action.name == 'merge' %}
+                            {% trans title=abstract_link|safe -%}
+                                Proposed to be merged into {{ title }}
+                            {%- endtrans %}
+                        {% elif review.proposed_action.name == 'mark_as_duplicate' %}
+                            {% trans title=abstract_link|safe -%}
+                                Proposed as duplicate of {{ title }}
+                            {%- endtrans %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {% if review.ratings %}
+                    <div class="titled-rule">
+                        {% trans %}Ratings{% endtrans %}
+                    </div>
+                    {% for rating in review.ratings|sort(attribute='question.position') %}
+                        <ul class="abstract-question-list">
+                            <li>
+                                <label>{{ rating.question.text }}</label>
+                                <span class="value">
+                                    {{ _render_rating(cfa, rating.value) }}
+                                    <span class="number">{{ rating.value }}</span>
+                                </span>
+                            </li>
+                        </ul>
+                    {% endfor %}
+                {% endif %}
+                {% if review.comment %}
+                    <div class="titled-rule">
+                        {% trans %}Comment{% endtrans %}
+                    </div>
+                    <div class="">
+                        {{ review.comment }}
+                    </div>
+                {% endif %}
+            </div>
         </div>
     </div>
     {% if can_change_review %}
