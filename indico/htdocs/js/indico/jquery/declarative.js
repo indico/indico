@@ -63,7 +63,8 @@
     function setupConfirmPopup() {
         $('body').on('click', '[data-confirm]:not(button[data-href]):not(input:button[data-href]):not(a[data-method][data-href]):not(a[data-ajax-dialog][data-href])', function() {
             var $this = $(this);
-            confirmPrompt($(this).data('confirm'), $(this).data('title')).then(function() {
+
+            function performAction() {
                 var evt = $.Event('indico:confirmed');
                 $this.trigger(evt);
 
@@ -77,7 +78,17 @@
                 } else {
                     window.location = $this.attr('href');
                 }
-            });
+            }
+
+            var evtBefore = $.Event('indico:beforeConfirmed');
+            $this.trigger(evtBefore);
+
+            if (evtBefore.isDefaultPrevented()) {
+                performAction();
+            } else {
+                confirmPrompt($(this).data('confirm'), $(this).data('title')).then(performAction);
+            }
+
             return false;
         });
     }
