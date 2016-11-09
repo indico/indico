@@ -9,9 +9,7 @@
             <div class="wmd-panel">
                 <div id="wmd-button-bar-f_{{ field.orig_id }}" class="wmd-button-bar"></div>
                 {% if max_length or max_words %}
-                    <div class="max-length-info">
-                        <div id="{{ field.id }}-max-length-info" class="right"></div>
-                    </div>
+                    <div class="max-length-info" id="{{ field.id }}-max-length-info"></div>
                 {% endif %}
                 <textarea id="{{ field.id }}"
                           name="{{ field.name }}"

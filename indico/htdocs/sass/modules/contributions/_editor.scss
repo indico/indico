@@ -22,8 +22,6 @@ $editor-preview-bg-color: $light-gray;
 
 .wmd-input {
     @extend %font-family-monospace;
-    @include border-all($gray);
-    @include single-box-shadow();
     @include single-transition(height, .25s, ease-out);
 
     &:focus {
@@ -39,7 +37,6 @@ $editor-preview-bg-color: $light-gray;
 }
 
 .wmd-panel {
-    @include single-box-shadow();
     max-width: 800px;
 }
 
@@ -202,7 +199,5 @@ $editor-preview-bg-color: $light-gray;
 
 .md-preview-wrapper.edit {
     max-width: 800px;
-    @include border-all($gray);
-    @include single-box-shadow();
     @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }

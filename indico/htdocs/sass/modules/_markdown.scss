@@ -67,6 +67,10 @@ $display-preview-bg-color: white;
     @include transition-property(height, background-color, color);
     @include transition-duration(.25s, 1s, 1s);
     @include transition-timing-function(ease-out, ease-in, ease-in);
+    @include border-all();
+    @include border-bottom-right-radius();
+    @include border-bottom-left-radius();
+    @include border-top($width: 0);
     @extend %font-family-serif;
 
     background-color: $background-color;
@@ -109,11 +113,12 @@ $display-preview-bg-color: white;
     @include md-preview-wrapper-mixin($display-preview-bg-color, none);
 }
 
-.wmd-input {
+.wmd-input, .wmd-input:focus {
     @extend %font-family-monospace;
-    @include border-all($gray);
-    @include single-box-shadow();
     @include single-transition(height, .25s, ease-out);
+    @include box-shadow(none);
+    @include border-all($width: 0);
+    @include border-bottom(white, solid, 2em);
 
     min-height: 200px;
     width: 100%;
@@ -123,8 +128,17 @@ $display-preview-bg-color: white;
 }
 
 .wmd-panel {
-    @include single-box-shadow();
+    @include border-all();
+    @include border-top-right-radius();
+    @include border-top-left-radius();
+    @include box-shadow(none);
+    position: relative;
     max-width: 800px;
+
+    &.focused {
+        @include single-transition(border);
+        @include border-all($blue);
+    }
 }
 
 .wmd-button-row {
@@ -285,7 +299,6 @@ $display-preview-bg-color: white;
 
 .md-preview-wrapper.edit {
     max-width: 800px;
-    @include single-box-shadow();
     @include md-preview-wrapper-mixin($editor-preview-bg-color);
 }
 
@@ -301,10 +314,12 @@ $display-preview-bg-color: white;
 }
 
 .max-length-info {
-    background-color: $light-gray;
     padding: .5em;
     height: 2em;
     margin: 0;
+    position: absolute;
+    bottom: 0;
+    right: 0;
 
     span {
         color: $gray;
