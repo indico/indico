@@ -399,21 +399,17 @@
     position: fixed;
     top: 0;
     left: 0;
-    height: 30px;
     width: 100%;
     background-color: $black;
     color: white;
-    padding: 10px 0 10px 0;
+    padding: 10px;
     z-index: 10;
+    box-sizing: border-box;
+    align-items: center;
 
     .attachment-title {
-        left: 20px;
-        position: absolute;
-        white-space: nowrap;
-
         > span {
             font-size: 1.1em;
-            line-height: 30px;
 
             &:before {
                 margin-right: 0.5em;
@@ -422,27 +418,17 @@
     }
 
     .attachment-preview-close {
-        right: 20px;
-        position: absolute;
-
         > a {
             font-size: 1.5em;
-            line-height: 30px;
-            color: white;
-            vertical-align: middle;
+            color: darken($light-gray, 5%);
         }
     }
 
     .attachment-actions {
-        right: 50px;
-        position: absolute;
+        margin-right: 0.5em;
 
         > a {
             font-size: 1.3em;
-        }
-
-        > .attachment-download {
-            color: white;
         }
     }
 }
