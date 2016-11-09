@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from flask import request, flash
+from sqlalchemy.orm import subqueryload
 
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.tracks.forms import TrackForm
@@ -111,8 +112,12 @@ class RHDisplayTracks(RHConferenceBaseDisplay):
     def _process(self):
         page_title = get_menu_entry_by_name('program', self._conf).localized_title
         program = track_settings.get(self.event_new, 'program')
+        tracks = (Track.query.with_parent(self.event_new)
+                  .options(subqueryload('conveners'),
+                           subqueryload('abstract_reviewers'))
+                  .all())
         return WPDisplayTracks.render_template('display.html', self._conf, event=self.event_new, page_title=page_title,
-                                               program=program)
+                                               program=program, tracks=tracks)
 
 
 class RHTracksPDF(RHConferenceBaseDisplay):
