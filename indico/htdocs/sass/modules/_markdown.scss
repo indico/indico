@@ -115,7 +115,7 @@ $display-preview-bg-color: white;
     @include single-box-shadow();
     @include single-transition(height, .25s, ease-out);
 
-    height: 200px !important;
+    min-height: 200px;
     width: 100%;
     max-width: 800px;
     padding: 1em;
