@@ -22,9 +22,10 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events.abstracts.clone import AbstractSettingsCloner
+from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import EventType, Event
-from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
+from indico.modules.events.timetable.models.breaks import Break
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
 from indico.web.flask.util import url_for
@@ -44,6 +45,9 @@ logger = Logger.get('events.abstracts')
 @signals.event.times_changed.connect
 def _clear_boa_cache(sender, obj=None, **kwargs):
     from indico.modules.events.abstracts.util import clear_boa_cache
+    if isinstance(obj, Break):
+        # breaks do not show up in the BoA
+        return
     event = (obj or sender).event_new
     clear_boa_cache(event)
 
