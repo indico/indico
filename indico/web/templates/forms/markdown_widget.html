@@ -1,10 +1,18 @@
 {% extends 'forms/base_widget.html' %}
 
+{% set max_length = input_args.get('data-max-length', 0) %}
+{% set max_words = input_args.get('data-max-words', 0) %}
+
 {% block html %}
     {% if field.use_editor %}
         <div data-field-id="{{ field.orig_id }}">
             <div class="wmd-panel">
                 <div id="wmd-button-bar-f_{{ field.orig_id }}" class="wmd-button-bar"></div>
+                {% if max_length or max_words %}
+                    <div class="max-length-info">
+                        <div id="{{ field.id }}-max-length-info" class="right"></div>
+                    </div>
+                {% endif %}
                 <textarea id="{{ field.id }}"
                           name="{{ field.name }}"
                           rows="{{ rows }}"
@@ -91,7 +99,9 @@
     <script>
         setupMarkdownWidget({
             fieldId: {{ field.id | tojson }},
-            useMarkdownEditor: {{ field.use_editor | tojson }}
+            useMarkdownEditor: {{ field.use_editor | tojson }},
+            maxLength: {{ max_length | tojson }},
+            maxWords: {{ max_words | tojson }}
         });
     </script>
 {% endblock %}
