@@ -62,7 +62,8 @@
     {% call form_footer(form) %}
         <button class="i-button big highlight text-color js-review"
                 data-method="POST"
-                data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}">
+                data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}"
+                data-disabled-until-change>
             {% if review %}
                 {% trans %}Change review{% endtrans %}
             {% else %}
@@ -71,7 +72,8 @@
         </button>
         {% if review %}
             <button class="i-button big text-color danger js-edit-cancel"
-                    data-confirm="{% trans %}Do you want to discard the changes to this review?{% endtrans %}">
+                    data-confirm="{% trans %}Do you want to discard the changes to this review?{% endtrans %}"
+                    data-confirm-if-change>
                 {% trans %}Cancel{% endtrans %}
             </button>
         {% endif %}
@@ -151,7 +153,8 @@
     {% call form_footer(form) %}
         <button class="i-button big highlight text-color js-comment"
                 data-method="POST"
-                data-href="{{ url }}">
+                data-href="{{ url }}"
+                data-disabled-until-change>
             {% if comment %}
                 {% trans %}Update comment{% endtrans %}
             {% else %}
@@ -160,7 +163,8 @@
         </button>
         {% if comment %}
             <button class="i-button big text-color danger js-edit-cancel"
-                    data-confirm="{% trans %}Do you want to discard the changes to this comment?{% endtrans %}">
+                    data-confirm="{% trans %}Do you want to discard the changes to this comment?{% endtrans %}"
+                    data-confirm-if-change>
                 {% trans %}Cancel{% endtrans %}
             </button>
         {% endif %}
@@ -220,7 +224,7 @@
                 {% if can_change_review %}
                     <div>
                         <a class="i-button-icon icon-edit js-edit-review"
-                           title="{% trans %}Change review{% endtrans %}"
+                           title="{% trans %}Edit review{% endtrans %}"
                            data-href="{{ url_for('.review_abstract', review, management=management) }}"
                            data-method="GET"
                            data-ajax></a>
