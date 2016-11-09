@@ -21,7 +21,7 @@ from datetime import time
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
-from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
+from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired, Length
 from wtforms.widgets import Select
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
@@ -42,7 +42,7 @@ from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, 
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
                                      IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime
+from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime, WordCount
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 
@@ -386,7 +386,7 @@ class CreateEmailTemplateForm(EditEmailTemplateRuleForm):
 
 class AbstractForm(IndicoForm):
     title = StringField(_("Title"), [DataRequired()])
-    description = IndicoMarkdownField(_('Content'), [DataRequired()], editor=True, mathjax=True)
+    description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
     submitted_contrib_type = QuerySelectField(_("Type"), get_label='name', allow_blank=True,
                                               blank_text=_("No type selected"))
     person_links = AbstractPersonLinkListField(_("People"), [DataRequired()], default_author_type=AuthorType.primary)
@@ -396,6 +396,10 @@ class AbstractForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         self.abstract = kwargs.pop('abstract', None)
+        description_settings = abstracts_settings.get(self.event, 'description_settings')
+        description_validators = self._get_description_validators(description_settings)
+        if description_validators:
+            inject_validators(self, 'description', description_validators)
         if abstracts_settings.get(self.event, 'contrib_type_required'):
             inject_validators(self, 'submitted_contrib_type', [DataRequired()])
         super(AbstractForm, self).__init__(*args, **kwargs)
@@ -405,8 +409,20 @@ class AbstractForm(IndicoForm):
         # Attachments are handled separately when editing
         if self.abstract or not abstracts_settings.get(self.event, 'allow_attachments'):
             del self.attachments
+        if not description_settings['is_active']:
+            del self.description
         self.person_links.require_speaker_author = abstracts_settings.get(self.event, 'speakers_required')
         self.person_links.allow_speakers = abstracts_settings.get(self.event, 'allow_speakers')
+
+    def _get_description_validators(self, description_settings):
+        validators = []
+        if description_settings['is_required']:
+            validators.append(DataRequired())
+        if description_settings['max_length']:
+            validators.append(Length(max=description_settings['max_length']))
+        if description_settings['max_words']:
+            validators.append(WordCount(max=description_settings['max_words']))
+        return validators
 
 
 class NoTrackMixin(object):
