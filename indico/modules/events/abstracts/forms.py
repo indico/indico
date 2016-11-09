@@ -21,7 +21,7 @@ from datetime import time
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
-from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired, Length
+from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 from wtforms.widgets import Select
 
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
@@ -42,7 +42,7 @@ from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, 
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
                                      IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime, WordCount
+from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime, WordCount, SoftLength
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 
@@ -419,7 +419,7 @@ class AbstractForm(IndicoForm):
         if description_settings['is_required']:
             validators.append(DataRequired())
         if description_settings['max_length']:
-            validators.append(Length(max=description_settings['max_length']))
+            validators.append(SoftLength(max=description_settings['max_length']))
         if description_settings['max_words']:
             validators.append(WordCount(max=description_settings['max_words']))
         return validators

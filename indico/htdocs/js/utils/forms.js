@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global countWords:false */
+
 (function(global) {
     'use strict';
 
@@ -41,6 +43,46 @@
             } else if (!field.data('initiallyDisabled')) {
                 field.prop('disabled', !active);
             }
+        });
+    }
+
+    function validateLength($field) {
+        if (!('setCustomValidity' in $field[0])) {
+            return;
+        }
+
+        var minChars = $field.data('min-length');
+        var maxChars = $field.data('max-length');
+        var minWords = $field.data('min-words');
+        var maxWords = $field.data('max-words');
+
+        $field.on('change input', function() {
+            var msg = '';
+            var charCount = $field.val().trim().length;
+            var wordCount = countWords($field.val());
+
+            if ((minChars && charCount < minChars) || (maxChars && charCount > maxChars)) {
+                if (!maxChars) {
+                    msg = $T.ngettext('Field must be at least {0} character long.',
+                                      'Field must be at least {0} characters long.', minChars).format(minChars);
+                } else if (!minChars) {
+                    msg = $T.ngettext('Field cannot be longer than {0} character.',
+                                      'Field cannot be longer than {0} characters.', maxChars).format(maxChars);
+                } else {
+                    msg = $T.gettext('Field must be between {0} and {1} characters long.').format(minChars, maxChars);
+                }
+            } else if ((minWords && wordCount < minWords) || (maxWords && wordCount > maxWords)) {
+                if (!maxWords) {
+                    msg = $T.ngettext('Field must contain at least {0} word.',
+                                      'Field must contain at least {0} words.', minWords).format(minWords);
+                } else if (!minWords) {
+                    msg = $T.ngettext('Field cannot contain more than {0} word.',
+                                      'Field cannot contain more than {0} words.', maxWords).format(maxWords);
+                } else {
+                    msg = $T.gettext('Field must contain between {0} and {1} words.').format(minWords, maxWords);
+                }
+            }
+            $field[0].setCustomValidity(msg);
         });
     }
 
@@ -86,6 +128,12 @@
             var conditionField = $(this.form).find(':input[name="{0}"]'.format(data.field));
             hideFieldUnless(field, conditionField, data.values, data.checked_only);
             conditionField.triggerHandler('change');
+        });
+
+        // SoftLength/WordCount validators
+        var selectors = '[data-min-words], [data-max-words], [data-min-length], [data-max-length]';
+        forms.find('input, textarea').filter(selectors).each(function() {
+            validateLength($(this));
         });
 
         // track modifications
