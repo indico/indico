@@ -133,8 +133,14 @@
     background-color: transparent;
 }
 
-.event-location .text {
-    @extend %highlighted-header-data;
+.event-location {
+    .text {
+        @extend %highlighted-header-data;
+    }
+
+    .icon-location {
+        vertical-align: middle;
+    }
 }
 
 .event-location, .event-chairs, .event-date {

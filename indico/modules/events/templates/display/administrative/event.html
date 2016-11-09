@@ -36,7 +36,7 @@
                 <br>
                 {% block location_time %}
                     {% if event.has_location_info %}
-                        {{ render_location(event) }}
+                        {{ render_location(event, header=true) }}
                     {% endif %}
                     {{ render_event_time(event, timezone=timezone) }}
                 {% endblock %}
