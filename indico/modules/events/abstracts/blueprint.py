@@ -30,6 +30,7 @@ _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', templ
                       virtual_template_folder='events/abstracts')
 
 # Display pages (not related to any specific abstract)
+_bp.add_url_rule('/abstracts/', 'call_for_abstracts', display.RHDisplayCallForAbstracts)
 _bp.add_url_rule('/abstracts/mine', 'my_abstracts', display.RHMyAbstracts)
 _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', display.RHMyAbstractsExportPDF)
 _bp.add_url_rule('/abstracts/submit', 'submit', display.RHSubmitAbstract, methods=('GET', 'POST'))

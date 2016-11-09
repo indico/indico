@@ -59,6 +59,10 @@ class CallForAbstracts(object):
     def rating_range(self):
         return tuple(abstracts_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
 
+    @property
+    def announcement(self):
+        return abstracts_settings.get(self.event, 'announcement')
+
     def can_submit_abstracts(self, user):
         return self.is_open or abstracts_settings.acls.contains_user(self.event, 'authorized_submitters', user)
 

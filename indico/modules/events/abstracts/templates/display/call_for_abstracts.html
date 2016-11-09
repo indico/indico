@@ -1,0 +1,83 @@
+{% extends 'layout/conference_page_base.html' %}
+
+{% block title %}
+    {%- trans %}Call for Abstracts{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <div class="call-for-abstracts">
+    {% set cfa = event.cfa %}
+    {% set tz = event.display_tzinfo %}
+        {% if cfa.is_open %}
+            <div class="dates">
+                <div class="date-group">
+                    <div class="label">
+                        <strong>{% trans %}Abstract submission opening day{% endtrans %}</strong>
+                    </div>
+                    <div class="value">
+                        <time datetime="{{ cfa.start_dt.isoformat() }}">
+                            {{- cfa.start_dt|format_datetime(timezone=tz) -}}
+                        </time>
+                    </div>
+                </div>
+                {% if cfa.end_dt %}
+                    <div class="date-group">
+                        <div class="label">
+                            <strong>{% trans %}Abstract submission deadline{% endtrans %}</strong>
+                        </div>
+                        <div class="value">
+                            <time datetime="{{ cfa.end_dt.isoformat() }}">
+                                {{- cfa.end_dt|format_datetime(timezone=tz) -}}
+                            </time>
+                        </div>
+                    </div>
+                {% endif %}
+                {% if cfa.modification_end_dt %}
+                    <div class="date-group">
+                        <div class="label">
+                            <strong>{% trans %}Abstract modification deadline{% endtrans %}</strong>
+                        </div>
+                        <div class="value">
+                            <time datetime="{{ cfa.modification_end_dt.isoformat() }}">
+                                {{- cfa.modification_end_dt|format_datetime(timezone=tz) -}}
+                            </time>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+            {% if cfa.announcement %}
+                <div class="announcement">
+                    {{ cfa.announcement }}
+                </div>
+            {% endif %}
+            <div class="actions">
+                <a class="i-button icon-plus highlight submit-abstract-btn" href="{{ url_for('.submit', event)}}">
+                    {%- trans %}Submit a new abstract{% endtrans -%}
+                </a>
+            </div>
+        {% else %}
+            <div class="info-message-box">
+                <span class="icon"></span>
+                <div class="message-text">
+                    {%- trans start_dt=cfa.start_dt|format_human_date, end_dt=cfa.end_dt|format_human_date,
+                              start_dt_iso=cfa.start_dt.isoformat(), end_dt_iso=cfa.end_dt.isoformat() -%}
+                        The call for abstracts is closed.<br>
+                        Submission period: <time datetime="{{ start_dt_iso }}">
+                        <strong>{{ start_dt }}</strong></time> to <time datetime="{{ end_dt_iso }}">
+                        <strong>{{ end_dt }}</strong></time>
+                    {%- endtrans -%}
+                    {% if cfa.modification_end_dt and not cfa.modification_ended -%}
+                        <div>
+                            {%- trans date=cfa.modification_end_dt|format_date(timezone=tz),
+                                      time=cfa.modification_end_dt|format_time(timezone=tz),
+                                      dt_iso=cfa.modification_end_dt.isoformat() -%}
+                                Modifications possible until <time datetime="{{ dt_iso }}"><strong>{{ date }}</strong>
+                                at <strong>{{ time }}</strong></time>
+                            {%- endtrans -%}
+                        </div>
+                    {%- endif %}
+                </div>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
