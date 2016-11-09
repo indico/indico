@@ -19,3 +19,9 @@
         <em>{% trans %}None{% endtrans %}</em>
     {% endfor %}
 {% endmacro %}
+
+{% macro render_visibility_hint(visibility) %}
+    {% if visibility.name != 'contributors' %}
+        <i class="abstract-comment-visibility {{ visibility.name }} icon-shield" title="{{ visibility.title }}"></i>
+    {% endif %}
+{% endmacro %}

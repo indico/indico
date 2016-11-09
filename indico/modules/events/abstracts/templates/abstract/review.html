@@ -1,5 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_tracks %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_visibility_hint, render_tracks %}
 
 {% macro render_abstract_reviews(abstract, review_forms, management=false) %}
     <div id="abstract-reviews" class="i-timeline">
@@ -93,12 +93,13 @@
                     <div class="i-timeline-item-box header-indicator">
                         <div class="i-box-header flex">
                             <div class="stretch">
-                                {% trans name=comment.user.name, date=comment.created_dt|format_date -%}
-                                    <strong>{{ name }}</strong> commented on {{ date }}
+                                {% trans name=comment.user.name -%}
+                                    <strong>{{ name }}</strong> left a comment
                                 {%- endtrans %}
-                                {% if comment.visibility.name != 'contributors' %}
-                                    <i class="abstract-comment-visibility {{ comment.visibility.name }} icon-shield" title="{{ comment.visibility.title }}"></i>
-                                {% endif %}
+                                {{ render_visibility_hint(comment.visibility) }}
+                                <time datetime="{{ comment.created_dt.isoformat() }}">
+                                    {{- comment.created_dt|format_human_date -}}
+                                </time>
                                 {% if comment.modified_dt %}
                                     {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
                                 {% endif %}
@@ -198,14 +199,15 @@
             <div class="i-box-header flex">
                 <div class="stretch">
                     {% trans name=review.user.name -%}
-                        <strong>{{ name }}</strong> reviewed this abstract
+                        <strong>{{ name }}</strong> left a review
                     {%- endtrans %}
-                    {% if review.modified_dt %}
-                        {{ render_edited_hint(review.modified_dt) }}
-                    {% endif %}
+                    {{ render_visibility_hint(review.visibility) }}
                     <time datetime="{{ review.created_dt.isoformat() }}">
                         {{- review.created_dt|format_human_date -}}
                     </time>
+                    {% if review.modified_dt %}
+                        {{ render_edited_hint(review.modified_dt) }}
+                    {% endif %}
                 </div>
                 <div class="abstract-comment-badges">
                     <span>
