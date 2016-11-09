@@ -17,6 +17,7 @@
 from __future__ import unicode_literals, division
 
 from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
+from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -169,3 +170,7 @@ class AbstractReview(db.Model):
         if not ratings:
             return None
         return sum(x.value for x in ratings) / len(ratings)
+
+    @property
+    def visibility(self):
+        return AbstractCommentVisibility.reviewers
