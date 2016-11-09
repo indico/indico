@@ -299,3 +299,27 @@ $display-preview-bg-color: white;
         }
     }
 }
+
+.max-length-info {
+    background-color: $light-gray;
+    padding: .5em;
+    height: 2em;
+    margin: 0;
+
+    span {
+        color: $gray;
+
+        &.limit-close {
+            color: $yellow;
+        }
+
+        &.limit-exceeded {
+            color: $red;
+        }
+
+        & + span:before {
+            content: ' | ';
+            color: $gray;
+        }
+    }
+}
