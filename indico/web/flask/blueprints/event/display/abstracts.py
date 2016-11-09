@@ -19,7 +19,6 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # Call for abstracts
-event.add_url_rule('/call-for-abstracts-old/', 'conferenceCFA', CFADisplay.RHConferenceCFA)
 event.add_url_rule('/call-for-abstracts-old/my-abstracts', 'userAbstracts', CFADisplay.RHUserAbstracts)
 event.add_url_rule('/call-for-abstracts-old/my-abstracts.pdf', 'userAbstracts-pdf', CFADisplay.RHUserAbstractsPDF)
 

@@ -140,14 +140,11 @@ def _extend_event_menu(sender, **kwargs):
 
     yield MenuEntryData(title=_("Book of Abstracts"), name='abstracts_book', endpoint='abstracts.export_boa',
                         position=9, visible=lambda event: event.has_feature('abstracts'), static_site=True)
-
-    yield MenuEntryData(title=_("Call for Abstracts"), name='call_for_abstracts', endpoint='event.conferenceCFA',
-                        position=2, visible=lambda event: event.has_feature('abstracts'))
+    yield MenuEntryData(title=_("Call for Abstracts"), name='call_for_abstracts',
+                        endpoint='abstracts.call_for_abstracts', position=2,
+                        visible=lambda event: event.has_feature('abstracts'))
     yield MenuEntryData(title=_("My Abstracts"), name='user_abstracts', visible=_my_abstracts_visible,
                         endpoint='abstracts.my_abstracts', position=0, parent='call_for_abstracts')
     yield MenuEntryData(title=_("Reviewing Area"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
-                        position=2, parent='call_for_abstracts',
+                        position=1, parent='call_for_abstracts',
                         visible=_reviewing_area_visible)
-    yield MenuEntryData(title=_("Submit Abstract"), name='abstract_submission',
-                        visible=lambda event: event.has_feature('abstracts'),
-                        endpoint='abstracts.submit', position=1, parent='call_for_abstracts')

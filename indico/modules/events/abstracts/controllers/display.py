@@ -24,7 +24,7 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
-from indico.modules.events.abstracts.views import WPMyAbstracts, WPSubmitAbstract
+from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
@@ -43,6 +43,12 @@ class RHMyAbstractsBase(RHAbstractsBase):
         if not session.user:
             raise Forbidden
         RHAbstractsBase._checkProtection(self)
+
+
+class RHDisplayCallForAbstracts(RHAbstractsBase):
+    def _process(self):
+        return WPDisplayAbstracts.render_template('display/call_for_abstracts.html', self._conf,
+                                                  event=self.event_new)
 
 
 class RHMyAbstracts(RHMyAbstractsBase):
@@ -65,8 +71,8 @@ class RHMyAbstractsExportPDF(RHMyAbstractsBase):
 class RHSubmitAbstract(RHAbstractsBase):
     def _process(self):
         if not self.event_new.cfa.can_submit_abstracts(session.user):
-            return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
-                                                    form=None)
+            return redirect(url_for('.call_for_abstracts', self.event_new))
+
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
@@ -79,5 +85,5 @@ class RHSubmitAbstract(RHAbstractsBase):
                 return jsonify_data(flash=False, redirect=url)
             else:
                 return redirect(url)
-        return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
-                                                form=form)
+        return WPDisplayAbstracts.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
+                                                  form=form)
