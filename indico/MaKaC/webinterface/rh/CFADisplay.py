@@ -60,14 +60,6 @@ class RHBaseCFA( RHConferenceBaseDisplay ):
             return self._processIfActive()
 
 
-class RHConferenceCFA( RHBaseCFA ):
-    _uh = urlHandlers.UHConferenceCFA
-
-    def _processIfActive( self ):
-        p = abstracts.WPConferenceCFA( self, self._target )
-        return p.display()
-
-
 class RHAbstractSubmissionBase(RHBaseCFA):
 
     def _checkProtection(self):

@@ -110,56 +110,6 @@ class WPCFAClosed(WPConferenceDefaultDisplayBase):
         return wc.getHTML({'is_modif': self._is_modif})
 
 
-class WConfCFA(WConfDisplayBodyBase):
-
-    _linkname = 'call_for_abstracts'
-
-    def __init__(self, aw, conf):
-        self._conf = conf
-        self._aw = aw
-
-    def _getActionsHTML(self):
-        html = ""
-        cfa = self._conf.getAbstractMgr()
-        if nowutc() < cfa.getStartSubmissionDate():
-            return html
-        else:
-            submitOpt = ""
-            if cfa.inSubmissionPeriod():
-                submitOpt = i18nformat("""<li><a href="%s"> _("Submit a new abstract")</a></li>""") % (
-                    urlHandlers.UHAbstractSubmission.getURL(self._conf))
-            html = i18nformat("""
-            <b> _("Possible actions you can carry out"):</b>
-            <ul>
-                %s
-                <li><a href="%s"> _("View or modify your already submitted abstracts")</a></li>
-            </ul>
-                   """) % (submitOpt, urlHandlers.UHUserAbstracts.getURL(self._conf))
-        return html
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        cfa = self._conf.getAbstractMgr()
-        if cfa.inSubmissionPeriod():
-            wvars["status"] = _("OPENED")
-        else:
-            wvars["status"] = _("CLOSED")
-        wvars["startDate"] = cfa.getStartSubmissionDate().strftime("%d %B %Y")
-        wvars["endDate"] = cfa.getEndSubmissionDate().strftime("%d %B %Y")
-        wvars["actions"] = self._getActionsHTML()
-        wvars["announcement"] = cfa.getAnnouncement()
-        wvars["body_title"] = self._getTitle()
-        return wvars
-
-
-class WPConferenceCFA( WPConferenceDefaultDisplayBase ):
-    menu_entry_name = 'call_for_abstracts'
-
-    def _getBody(self, params):
-        wc = WConfCFA(self._getAW(), self._conf)
-        return wc.getHTML()
-
-
 class WPAbstractSubmission( WPConferenceDefaultDisplayBase ):
     menu_entry_name ='abstract_submission'
 
