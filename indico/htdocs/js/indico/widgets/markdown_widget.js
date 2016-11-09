@@ -61,14 +61,15 @@
             maxWords: 0
         }, options);
 
+
         if (options.useMarkdownEditor) {
-            var field = $('#' + options.fieldId);
-            var container = field.closest('[data-field-id]');
-            field.pagedown();
+            var $field = $('#' + options.fieldId);
+            var container = $field.closest('[data-field-id]');
+            $field.pagedown();
 
             if (options.maxLength || options.maxWords) {
-                updateLimits(field, options);
-                field.on('change input', function() {
+                updateLimits($field, options);
+                $field.on('change input', function() {
                     updateLimits($(this), options);
                 });
             }
@@ -89,6 +90,10 @@
                 }).on('click', function(evt) {
                     evt.preventDefault();
                 });
+            });
+
+            $field.bind('focusin focusout', function() {
+                $field.parent().toggleClass('focused');
             });
         }
     };
