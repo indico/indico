@@ -30,6 +30,7 @@ $toolbar-thin-height: 1.9em;
     margin-bottom: 0.5em;
     padding: 3px 0;
     vertical-align: middle;
+    display: flex;
 
     &.inline {
         margin-bottom: 0;
@@ -73,7 +74,6 @@ $toolbar-thin-height: 1.9em;
 
     .i-button {
         display: block;
-        float: left;
         height: $toolbar-height;
         line-height: $toolbar-button-height;
         padding: 0.2em 0.7em 0.1em 0.7em !important;
@@ -148,6 +148,7 @@ $toolbar-thin-height: 1.9em;
     display: inline-block;
     padding-right: 0.3rem;
     margin-bottom: 0.2rem;
+    display: flex;
 
     &:last-child,
     &.right:first-child {
