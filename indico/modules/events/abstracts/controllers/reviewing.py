@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, request, session, jsonify
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
@@ -57,7 +57,9 @@ class RHListOtherAbstracts(RHAbstractsBase):
         query = (Abstract
                  .query.with_parent(self.event_new)
                  .filter(Abstract.state.notin_({AbstractState.duplicate, AbstractState.merged}))
-                 .options(joinedload('submitter').lazyload('*'))
+                 .options(joinedload('submitter').lazyload('*'),
+                          subqueryload('reviewed_for_tracks'),
+                          subqueryload('person_links').joinedload('person').joinedload('user'))
                  .order_by(Abstract.friendly_id))
 
         if self.excluded_ids:
