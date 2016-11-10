@@ -1,3 +1,6 @@
+{% from 'events/display/indico/_common.html' import render_users %}
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+
 {% extends 'layout/conference_page_base.html' %}
 
 {% block title %}
@@ -5,7 +8,7 @@
 {% endblock %}
 
 {% macro render_timestamp(label, date, completed=false, alternative_text=none) %}
-    <li{% if completed %} class="completed"{% endif %}>
+    <li class="{{ 'completed' if completed }}">
         <div class="label">{{ label }}</div>
         <div class="timestamp">
             {% if date %}
@@ -19,59 +22,133 @@
     </li>
 {% endmacro %}
 
-{% macro render_timeline(cfa) %}
-    <ul class="cfa-timeline">
-        {{ render_timestamp(_("Opening day"), cfa.start_dt, cfa.has_started) }}
-        {{ render_timestamp(_("Submission deadline"), cfa.end_dt, cfa.has_ended, _("No deadline")) }}
-        {% if cfa.modification_end_dt %}
-            {{ render_timestamp(_("Modification deadline"), cfa.modification_end_dt, cfa.modification_ended) }}
-        {% endif %}
-    </ul>
+{% macro render_timeline_section(cfa) %}
+    <section>
+        <ul class="cfa-timeline">
+            {{ render_timestamp(_("Opening day"), cfa.start_dt, cfa.has_started) }}
+            {{ render_timestamp(_("Submission deadline"), cfa.end_dt, cfa.has_ended, _("No deadline")) }}
+            {% if cfa.modification_end_dt %}
+                {{ render_timestamp(_("Modification deadline"), cfa.modification_end_dt, cfa.modification_ended) }}
+            {% endif %}
+        </ul>
+    </section>
+{% endmacro %}
+
+{% macro render_user_abstract_list_section(event, abstracts, cfa) %}
+    <section>
+        <div class="header">
+            <div class="header-row">
+                <h3>{% trans %}My abstracts{% endtrans %}</h3>
+                <div class="toolbar thin">
+                    <div class="group">
+                        <span class="i-button label">Download</span>
+                        <a href="{{ url_for('abstracts.my_abstracts_pdf', event) }}"
+                           title="{% trans %}Export to PDF{% endtrans %}"
+                           class="i-button icon-file-pdf"></a>
+                    </div>
+                    <!-- TODO: Filtering
+                    <div class="group" id="counter">
+                        {{- render_displayed_entries_fragment(abstracts|length, abstracts|length) -}}
+                    </div>
+                    <div class="group">
+                        <span class="i-button label icon-search"></span>
+                        <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                    </div>
+                    -->
+                </div>
+            </div>
+        </div>
+        <div id="display-contribution-list" class="contribution-list">
+            {% set mapping = {'under_review': 'highlight',
+                              'withdrawn': 'outline dashed',
+                              'accepted': 'success',
+                              'rejected': 'error',
+                              'merged': 'visited',
+                              'duplicate': 'strong'} %}
+            {% for abstract in abstracts -%}
+                <div class="contribution-row" data-friendly-id="{{ abstract.friendly_id }}">
+                    <div class="contrib-title info">
+                        <span class="value">
+                            <a class="js-mathjax" href="{{ url_for('abstracts.display_abstract', abstract) }}">
+                                <span class="contrib-id">{{ abstract.friendly_id }}.</span>
+                                {{- abstract.title -}}
+                            </a>
+                        </span>
+                    </div>
+                    <div class="speaker-list icon-user">
+                        {{ render_users(abstract.speakers|sort(attribute='display_order_key'),
+                                        span_class='speaker-item-inline') }}
+                    </div>
+                    <div class="contrib-time icon-time">
+                        {% set dt = abstract.modified_dt or abstract.submitted_dt %}
+                        <span>{% trans %}Last modified:{% endtrans %}</span>
+                        <time datetime="{{ dt.isoformat() }}">{{ dt | format_human_date }}</time>
+                    </div>
+                    <div>
+                        <div class="contrib-state small i-tag {{ mapping[abstract.public_state.name] }}">
+                            {{- abstract.state.title -}}
+                        </div>
+                        {% if abstract.accepted_track -%}
+                            <div class="contrib-track small">
+                                {{- abstract.accepted_track.title -}}
+                            </div>
+                        {%- endif %}
+                        {% if abstract.accepted_contrib_type -%}
+                            <div class="contrib-type small">
+                                {{- abstract.accepted_contrib_type.name -}}
+                            </div>
+                        {%- endif %}
+                    </div>
+                    {% if abstract.description -%}
+                        <a href="{{ url_for('abstracts.display_abstract', abstract) }}">
+                            <div class="description js-mathjax">
+                                {{- abstract.description|truncate(400) -}}
+                            </div>
+                        </a>
+                    {%- endif %}
+                </div>
+            {%- endfor %}
+        </div>
+    </section>
 {% endmacro %}
 
 {% block content %}
     <div class="call-for-abstracts">
-    {% set cfa = event.cfa %}
-    {% set tz = event.display_tzinfo %}
-        {% if cfa.is_open %}
-            {{ render_timeline(cfa) }}
-            {% if cfa.announcement %}
-                <div class="announcement">
-                    {{ cfa.announcement }}
-                </div>
-            {% endif %}
-            <div class="actions">
-                <a class="i-button icon-plus highlight submit-abstract-btn js-submit-abstract"
-                   data-href="{{ url_for('.submit', event) }}"
-                   data-method="GET"
-                   data-ajax>
-                    {%- trans %}Submit a new abstract{% endtrans -%}
-                </a>
-            </div>
-            <div class="submit-abstract-form"></div>
-        {% else %}
-            <div class="info-message-box">
-                <span class="icon"></span>
-                <div class="message-text">
-                    {%- trans start_dt=cfa.start_dt|format_human_date, end_dt=cfa.end_dt|format_human_date,
-                              start_dt_iso=cfa.start_dt.isoformat(), end_dt_iso=cfa.end_dt.isoformat() -%}
-                        The call for abstracts is closed.<br>
-                        Submission period: <time datetime="{{ start_dt_iso }}">
-                        <strong>{{ start_dt }}</strong></time> to <time datetime="{{ end_dt_iso }}">
-                        <strong>{{ end_dt }}</strong></time>
-                    {%- endtrans -%}
-                    {% if cfa.modification_end_dt and not cfa.modification_ended -%}
+        {% set cfa = event.cfa %}
+        {% set tz = event.display_tzinfo %}
+        {{ render_timeline_section(cfa) }}
+        {% if cfa.is_open and cfa.announcement %}
+            <section>
+                <div class="cfa-announcement">{{ cfa.announcement }}</div>
+            </section>
+        {% endif %}
+        <section class="cfa-infoline-section">
+            <div class="infoline announcement">
+                <div class="text">
+                    {%- if cfa.is_open %}
+                        <div class="label">{%- trans %}The call for abstracts is open{% endtrans -%}</div>
                         <div>
-                            {%- trans date=cfa.modification_end_dt|format_date(timezone=tz),
-                                      time=cfa.modification_end_dt|format_time(timezone=tz),
-                                      dt_iso=cfa.modification_end_dt.isoformat() -%}
-                                Modifications possible until <time datetime="{{ dt_iso }}"><strong>{{ date }}</strong>
-                                at <strong>{{ time }}</strong></time>
-                            {%- endtrans -%}
+                            {%- trans %}Your submitted abstract will be subject to the reviewing process.{% endtrans -%}
                         </div>
-                    {%- endif %}
+                        <div class="toolbar right">
+                            <a class="i-button icon-plus highlight js-submit-abstract"
+                               data-href="{{ url_for('.submit', event) }}"
+                               data-method="GET"
+                               data-ajax>
+                                {%- trans %}Submit new abstract{% endtrans -%}
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="label">{% trans %}The call for abstracts is closed{% endtrans %}</div>
+                    {% endif -%}
                 </div>
             </div>
+        </section>
+        {% if abstracts | length %}
+            {{ render_user_abstract_list_section(event, abstracts, cfa) }}
+        {% endif %}
+        {% if cfa.is_open %}
+            <section class="submit-abstract-form-section"></section>
         {% endif %}
     </div>
     <script>

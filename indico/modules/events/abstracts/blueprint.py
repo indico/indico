@@ -31,7 +31,6 @@ _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', templ
 
 # Display pages (not related to any specific abstract)
 _bp.add_url_rule('/abstracts/', 'call_for_abstracts', display.RHDisplayCallForAbstracts)
-_bp.add_url_rule('/abstracts/mine', 'my_abstracts', display.RHMyAbstracts)
 _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', display.RHMyAbstractsExportPDF)
 _bp.add_url_rule('/abstracts/submit', 'submit', display.RHSubmitAbstract, methods=('GET', 'POST'))
 
@@ -167,7 +166,8 @@ def _add_management_flag(endpoint, values):
 # Legacy URLs - display
 _compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<int:confId>')
 _compat_bp.add_url_rule('/call-for-abstracts/', 'cfa', make_compat_redirect_func(_bp, 'call_for_abstracts'))
-_compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'mine', make_compat_redirect_func(_bp, 'my_abstracts'))
+_compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'mine',
+                        make_compat_redirect_func(_bp, 'call_for_abstracts'))
 _compat_bp.add_url_rule('/call-for-abstracts/my-abstracts.pdf', 'mine_pdf',
                         make_compat_redirect_func(_bp, 'my_abstracts_pdf'))
 _compat_bp.add_url_rule('/call-for-abstracts/submit', 'submit', make_compat_redirect_func(_bp, 'call_for_abstracts'))

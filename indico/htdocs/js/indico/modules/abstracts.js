@@ -128,7 +128,7 @@
 
     global.setupCallForAbstractsPage = function setupCallForAbstractsPage() {
         $('body').on('declarative:success', '.js-submit-abstract', function(evt, data) {
-            var $submitAbstractForm = $('.submit-abstract-form');
+            var $submitAbstractForm = $('.submit-abstract-form-section');
             $submitAbstractForm.html(data.form_html);
             if (data.js) {
                 $('body').append(data.js);
