@@ -144,3 +144,11 @@ body > * {
 .stretch {
     flex: 1;
 }
+
+.flex-right {
+    justify-content: flex-end;
+}
+
+.flex-center {
+    justify-content: center;
+}
