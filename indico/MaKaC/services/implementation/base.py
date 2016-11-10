@@ -231,7 +231,6 @@ class ServiceBase(RequestHandlerBase):
                 answer = result[0]
                 rep = Config.getInstance().getTempDir()
                 stats = pstats.Stats(proffilename)
-                stats.strip_dirs()
                 stats.sort_stats('cumulative', 'time', 'calls')
                 stats.dump_stats(os.path.join(rep, "IndicoServiceRequestProfile.log"))
                 os.remove(proffilename)

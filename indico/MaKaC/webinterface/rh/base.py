@@ -740,7 +740,6 @@ class RH(RequestHandlerBase):
         if profile and os.path.isfile(profile_name):
             rep = Config.getInstance().getTempDir()
             stats = pstats.Stats(profile_name)
-            stats.strip_dirs()
             stats.sort_stats('cumulative', 'time', 'calls')
             stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))
             output = StringIO.StringIO()
