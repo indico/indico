@@ -158,7 +158,7 @@ class AbstractReview(db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.abstract.locator, review_id=self.id, track_id=self.track.id)
+        return dict(self.abstract.locator, review_id=self.id)
 
     @return_ascii
     def __repr__(self):

@@ -29,6 +29,7 @@ from indico.modules.events.abstracts.forms import (AbstractCommentForm, Abstract
 from indico.modules.events.abstracts.lists import AbstractListGeneratorDisplay
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
                                                         create_abstract_comment, delete_abstract_comment,
                                                         update_abstract_comment, create_abstract_review,
@@ -135,7 +136,7 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
             raise Forbidden
 
 
-class RHReviewAbstractForTrack(RHAbstractBase):
+class RHSubmitAbstractReview(RHAbstractBase):
     """Review an abstract in a specific track"""
 
     normalize_url_spec = {
@@ -146,25 +147,45 @@ class RHReviewAbstractForTrack(RHAbstractBase):
     }
 
     def _check_abstract_protection(self):
+        if self.abstract.get_reviews(user=session.user, track=self.track):
+            return False
         return self.abstract.can_review(session.user, check_state=True)
 
     def _checkParams(self, params):
         RHAbstractBase._checkParams(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
-        reviews = self.abstract.get_reviews(user=session.user, track=self.track)
-        self.review = reviews[0] if reviews else None
 
     def _process(self):
-        form = build_review_form(self.abstract, self.track, self.review)
+        form = build_review_form(self.abstract, self.track)
         if form.validate_on_submit():
-            if self.review:
-                update_abstract_review(self.review, **form.split_data)
-            else:
-                create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
+            create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify_data(form_html=tpl.render_review_form(form, self.abstract, self.track, review=self.review,
-                            management=self.management))
+        return jsonify_data(form_html=tpl.render_review_form(form, self.abstract, self.track,
+                                                             management=self.management))
+
+
+class RHEditAbstractReview(RHAbstractBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.review
+        }
+    }
+
+    def _check_abstract_protection(self):
+        return self.review.can_edit(session.user, check_state=True)
+
+    def _checkParams(self, params):
+        RHAbstractBase._checkParams(self, params)
+        self.review = AbstractReview.get_one(request.view_args['review_id'])
+
+    def _process(self):
+        form = build_review_form(review=self.review)
+        if form.validate_on_submit():
+            update_abstract_review(self.review, **form.split_data)
+            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+        tpl = get_template_module('events/abstracts/abstract/review.html')
+        return jsonify_data(form_html=tpl.render_review_form(form, review=self.review, management=self.management))
 
 
 class RHSubmitAbstractComment(RHAbstractBase):
