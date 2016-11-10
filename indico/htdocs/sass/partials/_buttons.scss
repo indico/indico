@@ -54,7 +54,13 @@ $i-button-background-color: darken($light-gray, 5%);
 
 @mixin _i-button-outlines($color, $dark-color) {
     &.text-color {
-        color: $color;
+        &:not(.color-on-hover) {
+            color: $color;
+        }
+
+        &.color-on-hover:hover {
+            color: $color;
+        }
 
         &:hover,
         &:active {
