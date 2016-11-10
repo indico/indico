@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from functools import update_wrapper
-from functools import partial
+from functools import update_wrapper, partial
+from operator import attrgetter
 
 from flask import has_request_context, g
 
@@ -161,3 +161,45 @@ class SettingsProxyBase(object):
         except AttributeError:
             g.settings_cache = rv = {}
             return rv
+
+
+class SettingProperty(object):
+    """Expose a SettingsProxy value as a property.
+
+    Override `attr` in a subclass for settings proxies that are tied
+    to specific objects (such as `EventSettigsProxy`)
+
+    :param proxy: An instance of a settings proxy
+    :param name: The name of the setting
+    :param default: The default value in case the setting is not set
+    :param attr: If `proxy` expects an object before the name, e.g.
+                 for event settings, this is the name of the attribute
+                 on the class containing the property from which the
+                 object will be taken.
+    """
+
+    attr = None
+
+    def __init__(self, proxy, name, default=SettingsProxyBase.default_sentinel, attr=None):
+        self.proxy = proxy
+        self.name = name
+        self.default = default
+        attr = attr or self.attr
+        self.attrgetter = attrgetter(attr) if attr else None
+
+    def _make_args(self, obj, *args):
+        if self.attrgetter is not None:
+            return (self.attrgetter(obj),) + args
+        else:
+            return args
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        return self.proxy.get(*self._make_args(obj, self.name, self.default))
+
+    def __set__(self, obj, value):
+        self.proxy.set(*self._make_args(obj, self.name, value))
+
+    def __delete__(self, obj):
+        self.proxy.delete(*self._make_args(obj, self.name))
