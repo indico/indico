@@ -118,13 +118,16 @@ $display-preview-bg-color: white;
     @include single-transition(height, .25s, ease-out);
     @include box-shadow(none);
     @include border-all($width: 0);
-    @include border-bottom(white, solid, 2em);
 
     min-height: 200px;
     width: 100%;
     max-width: 800px;
     padding: 1em;
     font-size: 0.9em;
+
+    &.has-length-info {
+        @include border-bottom(white, solid, 2em);
+    }
 }
 
 .wmd-panel {
@@ -320,6 +323,7 @@ $display-preview-bg-color: white;
     position: absolute;
     bottom: 0;
     right: 0;
+    pointer-events: none;
 
     span {
         color: $gray;
