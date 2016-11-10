@@ -1,0 +1,82 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base';
+
+ul.cfa-timeline {
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    color: $light-black;
+
+    li {
+        flex-grow: 1;
+        flex-basis: 0;
+
+        &.completed {
+            .timestamp {
+                border-top-color: $indico-blue;
+
+                &:before {
+                    background-color: $indico-blue;
+                    border-color: $indico-blue;
+                }
+
+                time {
+                    color: $indico-blue;
+                }
+            }
+        }
+    }
+
+    .label {
+        @extend %font-family-title-light;
+        margin-bottom: 20px;
+        padding: 0px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: $light-black;
+        font-size: 1.1em;
+    }
+
+    .timestamp {
+        padding: 0px 40px;
+        display: flex;
+        justify-content: center;
+        border-top: 3px solid $pastel-gray;
+        position: relative;
+        font-weight: bold;
+
+        &:before {
+            @include border-all($pastel-gray, solid, 2px);
+            @include border-radius(25px);
+            content: '';
+            width: 25px;
+            height: 25px;
+            background-color: white;
+            position: absolute;
+            top: -16px;
+        }
+
+        time, span {
+            margin-top: 20px;
+        }
+    }
+}

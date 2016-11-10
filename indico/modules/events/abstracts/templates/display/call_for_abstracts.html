@@ -4,47 +4,37 @@
     {%- trans %}Call for Abstracts{% endtrans -%}
 {% endblock %}
 
+{% macro render_timestamp(label, date, completed=false, alternative_text=none) %}
+    <li{% if completed %} class="completed"{% endif %}>
+        <div class="label">{{ label }}</div>
+        <div class="timestamp">
+            {% if date %}
+                <time datetime="{{ date.isoformat() }}">
+                    {{- date|format_datetime(timezone=tz) -}}
+                </time>
+            {% elif alternative_text %}
+                <span>{{ alternative_text }}</span>
+            {% endif %}
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro render_timeline(cfa) %}
+    <ul class="cfa-timeline">
+        {{ render_timestamp(_("Opening day"), cfa.start_dt, cfa.has_started) }}
+        {{ render_timestamp(_("Submission deadline"), cfa.end_dt, cfa.has_ended, _("No deadline")) }}
+        {% if cfa.modification_end_dt %}
+            {{ render_timestamp(_("Modification deadline"), cfa.modification_end_dt, cfa.modification_ended) }}
+        {% endif %}
+    </ul>
+{% endmacro %}
+
 {% block content %}
     <div class="call-for-abstracts">
     {% set cfa = event.cfa %}
     {% set tz = event.display_tzinfo %}
         {% if cfa.is_open %}
-            <div class="dates">
-                <div class="date-group">
-                    <div class="label">
-                        <strong>{% trans %}Abstract submission opening day{% endtrans %}</strong>
-                    </div>
-                    <div class="value">
-                        <time datetime="{{ cfa.start_dt.isoformat() }}">
-                            {{- cfa.start_dt|format_datetime(timezone=tz) -}}
-                        </time>
-                    </div>
-                </div>
-                {% if cfa.end_dt %}
-                    <div class="date-group">
-                        <div class="label">
-                            <strong>{% trans %}Abstract submission deadline{% endtrans %}</strong>
-                        </div>
-                        <div class="value">
-                            <time datetime="{{ cfa.end_dt.isoformat() }}">
-                                {{- cfa.end_dt|format_datetime(timezone=tz) -}}
-                            </time>
-                        </div>
-                    </div>
-                {% endif %}
-                {% if cfa.modification_end_dt %}
-                    <div class="date-group">
-                        <div class="label">
-                            <strong>{% trans %}Abstract modification deadline{% endtrans %}</strong>
-                        </div>
-                        <div class="value">
-                            <time datetime="{{ cfa.modification_end_dt.isoformat() }}">
-                                {{- cfa.modification_end_dt|format_datetime(timezone=tz) -}}
-                            </time>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
+            {{ render_timeline(cfa) }}
             {% if cfa.announcement %}
                 <div class="announcement">
                     {{ cfa.announcement }}
