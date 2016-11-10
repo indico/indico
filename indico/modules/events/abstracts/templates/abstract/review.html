@@ -33,7 +33,7 @@
 
 {% macro render_review_box(form, abstract, track, edit=false, management=false) %}
     <div id="abstract-review-box-{{ track.id }}"
-         class="i-timeline-item abstract-review-box {{'weak-hidden' if edit else ''}}">
+         class="i-timeline-item abstract-review-box">
         <div class="i-timeline-item-label action icon-checkmark"></div>
         <div class="i-timeline-item-box content-indicator">
             <div class="i-box-content">
@@ -48,30 +48,33 @@
                 </div>
             </div>
             <div class="i-box-footer">
-                {{ render_review_form(form, abstract, track, management) }}
+                {{ render_review_form(form, abstract=abstract, track=track, management=management) }}
             </div>
         </div>
     </div>
 {% endmacro %}
 
-{% macro render_review_form(form, abstract, track, management=false, review=none) %}
+{% macro render_review_form(form, abstract=none, track=none, review=none, management=false) %}
     {{ form_header(form, orientation='vertical', id=('track-review-form-' + track.id|string)) }}
     {{ form_rows(form, skip=form._order) }}
     {{ form_rows(form, fields=form._order, skip_labels=true) }}
     {% set form_id = '#track-review-form-' + track.id|string %}
     {% call form_footer(form) %}
-        <button class="i-button big highlight text-color js-review"
-                data-method="POST"
-                data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}"
-                data-disabled-until-change>
-            {% if review %}
+        {% if not review %}
+            <button class="i-button big highlight text-color js-review"
+                    data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}"
+                    data-method="POST"
+                    data-disabled-until-change>
+                    {% trans %}Submit review{% endtrans %}
+            </button>
+        {% else %}
+            <button class="i-button big highlight text-color js-review"
+                    data-href="{{ url_for('.edit_review', review, management=management) }}"
+                    data-method="POST"
+                    data-disabled-until-change>
                 {% trans %}Change review{% endtrans %}
-            {% else %}
-                {% trans %}Submit review{% endtrans %}
-            {% endif %}
-        </button>
-        {% if review %}
-            <button class="i-button big text-color danger js-edit-cancel"
+            </button>
+            <button class="i-button big text-color color-on-hover danger js-edit-cancel"
                     data-confirm="{% trans %}Do you want to discard the changes to this review?{% endtrans %}"
                     data-confirm-if-change>
                 {% trans %}Cancel{% endtrans %}
@@ -219,11 +222,11 @@
                         {{ render_score(review.score, review.abstract.event_new.cfa) }}
                     {% endif %}
                 </div>
-                {% if can_change_review %}
+                {% if review.can_edit(session.user, check_state=true) %}
                     <div>
                         <a class="i-button-icon icon-edit js-edit-review"
                            title="{% trans %}Edit review{% endtrans %}"
-                           data-href="{{ url_for('.review_abstract', review, management=management) }}"
+                           data-href="{{ url_for('.edit_review', review, management=management) }}"
                            data-method="GET"
                            data-ajax></a>
                     </div>
@@ -305,9 +308,6 @@
             </div>
         </div>
     </div>
-    {% if can_change_review %}
-        {{ render_review_box(form, review.abstract, review.track, edit=true, management=management) }}
-    {% endif %}
 {% endmacro %}
 
 {% macro render_reviewed_for_tracks_box(abstract, form, management=false) %}
