@@ -145,15 +145,19 @@ def create_mock_abstract(event):
     return abstract
 
 
-def make_abstract_form(event):
+def make_abstract_form(event, notification_option=False):
     """Extends the abstract WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
     :param event: The `Event` for which to create the abstract form.
+    :param notification_option: Whether to add a field to the form to
+                                disable triggering notifications for
+                                the abstract submission.
     :return: An `AbstractForm` subclass.
     """
-    from indico.modules.events.abstracts.forms import AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin
+    from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin,
+                                                       SendNotificationsMixin)
 
     mixins = []
     if not event.tracks:
@@ -162,6 +166,8 @@ def make_abstract_form(event):
         mixins.append(MultiTrackMixin)
     else:
         mixins.append(SingleTrackMixin)
+    if notification_option:
+        mixins.append(SendNotificationsMixin)
     form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field

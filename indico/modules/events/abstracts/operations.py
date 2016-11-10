@@ -52,7 +52,7 @@ def _update_tracks(abstract, tracks, only_reviewed_for=False):
         abstract.reviewed_for_tracks = tracks
 
 
-def create_abstract(event, abstract_data, custom_fields_data=None):
+def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False):
     abstract = Abstract(event_new=event, submitter=session.user)
     tracks = abstract_data.pop('submitted_for_tracks', None)
     files = abstract_data.pop('attachments', [])
@@ -68,6 +68,8 @@ def create_abstract(event, abstract_data, custom_fields_data=None):
         abstract_file.save(f.file)
         db.session.flush()
     signals.event.abstract_created.send(abstract)
+    if send_notifications:
+        send_abstract_notifications(abstract)
     logger.info('Abstract %s created by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
                            'Abstract "{}" has been created'.format(abstract.title), session.user)
@@ -114,7 +116,7 @@ def delete_abstract(abstract, delete_contrib=False):
 
 
 def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
-                   send_notification=False):
+                   send_notifications=False):
     abstract.judge = judge
     abstract.judgment_dt = now_utc()
     abstract.judgment_comment = abstract_data['judgment_comment']
@@ -135,7 +137,7 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
         if merge_persons:
             _merge_person_links(abstract.merged_into, abstract)
     db.session.flush()
-    if send_notification:
+    if send_notifications:
         send_abstract_notifications(abstract)
     logger.info('Abstract %s judged by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
