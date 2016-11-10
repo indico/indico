@@ -44,7 +44,7 @@
     color: $light-black;
 }
 
-.conference-page.item-summary {
+.conference-page {
     @extend %font-family-modern-body;
 
     .item-text {
@@ -114,6 +114,62 @@
 
                 a {
                     padding: 5px;
+                }
+            }
+        }
+    }
+
+    section {
+        margin-top: 2.5em;
+
+        &:first-child {
+            margin-top: 0;
+        }
+
+        .header {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 1.5em;
+
+            .toolbar {
+                margin-bottom: 0;
+                padding: 0;
+                min-height: 0;
+            }
+
+            .group {
+                margin-bottom: 0;
+            }
+
+            > * {
+                &:first-child {
+                    margin-top: 0;
+                    margin-bottom: 0;
+                }
+            }
+        }
+
+        .header-row {
+            display: flex;
+            flex-direction: row;
+
+            > * {
+                margin: 0;
+            }
+
+            &.centered {
+                align-self: center;
+            }
+
+            h3 {
+                flex-grow: 1;
+                color: $orange;
+                font-size: 1.5em;
+                font-weight: normal;
+
+                &[class^="icon-"]:before,
+                &[class*=" icon-"]:before {
+                    margin-right: 5px;
                 }
             }
         }
