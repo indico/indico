@@ -1,5 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_visibility_hint, render_tracks %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint, render_tracks %}
 
 {% macro render_abstract_reviews(abstract, review_forms, management=false) %}
     <div id="abstract-reviews" class="i-timeline">
@@ -15,7 +15,7 @@
                     {%- endtrans %}
                 </h3>
                 {% for review in reviews %}
-                    {{ _render_review(abstract.event_new.cfa, review, review_forms[track.id], management=management) }}
+                    {{ _render_review(review, review_forms[track.id], management=management) }}
                 {% endfor %}
             {% endif %}
         {% endfor %}
@@ -191,7 +191,7 @@
     </span>
 {% endmacro %}
 
-{% macro _render_review(cfa, review, form, management=false) %}
+{% macro _render_review(review, form, management=false) %}
     {% set can_change_review = review.user == session.user and review.abstract.public_state.name == 'under_review' %}
     <div class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
@@ -216,11 +216,7 @@
                         {% endtrans %}
                     </span>
                     {% if review.score %}
-                        {% set score = review.score %}
-                        {% set max_score = cfa.rating_range[1]|round(1) %}
-                        <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
-                            {{ score }}
-                        </span>
+                        {{ render_score(review.score, review.abstract.event_new.cfa) }}
                     {% endif %}
                 </div>
                 {% if can_change_review %}
@@ -291,7 +287,7 @@
                             <li>
                                 <label>{{ rating.question.text }}</label>
                                 <span class="value">
-                                    {{ _render_rating(cfa, rating.value) }}
+                                    {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
                                     <span class="number">{{ rating.value }}</span>
                                 </span>
                             </li>
