@@ -23,7 +23,7 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
-from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstracts
+from indico.modules.events.abstracts.views import WPDisplayAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
@@ -45,18 +45,10 @@ class RHMyAbstractsBase(RHAbstractsBase):
         RHAbstractsBase._checkProtection(self)
 
 
-class RHDisplayCallForAbstracts(RHAbstractsBase):
+class RHDisplayCallForAbstracts(RHMyAbstractsBase):
     def _process(self):
         return WPDisplayAbstracts.render_template('display/call_for_abstracts.html', self._conf,
-                                                  event=self.event_new)
-
-
-class RHMyAbstracts(RHMyAbstractsBase):
-    """Display the list of the user's abstracts"""
-
-    def _process(self):
-        return WPMyAbstracts.render_template('display/user_abstract_list.html', self._conf, event=self.event_new,
-                                             abstracts=self.abstracts)
+                                                  event=self.event_new, abstracts=self.abstracts)
 
 
 class RHMyAbstractsExportPDF(RHMyAbstractsBase):
@@ -80,7 +72,7 @@ class RHSubmitAbstract(RHAbstractsBase):
             flash(_("Your abstract with title '{}' has been successfully submitted. It is registered with the number "
                     "#{}. You will be notified by email with the submission details.")
                   .format(abstract.title, abstract.friendly_id), 'success')
-            url = url_for('.my_abstracts', self.event_new)
+            url = url_for('.call_for_abstracts', self.event_new)
             if request.is_xhr:
                 return jsonify_data(flash=False, redirect=url)
             else:
