@@ -1,5 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint, render_tracks %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint %}
 
 {% macro render_abstract_reviews(abstract, review_forms, management=false) %}
     <div id="abstract-reviews" class="i-timeline">
@@ -310,44 +310,6 @@
                     </div>
                 {% endif %}
             </div>
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro render_reviewed_for_tracks_box(abstract, form, management=false) %}
-    <div id="abstract-reviewed-for-tracks-box" class="i-timeline-item">
-        <div class="i-timeline-item-label action icon-list"></div>
-        <div class="i-timeline-item-box content-indicator">
-            <div class="i-box-content">
-                <div class="flex">
-                    <div class="stretch">
-                        <div class="info-line">
-                            <label>
-                                {% trans count=abstract.reviewed_for_tracks|length -%}
-                                    Reviewing for track:
-                                {%- pluralize -%}
-                                    Reviewing for tracks:
-                                {%- endtrans -%}
-                            </label>
-                            {{ render_tracks(abstract.reviewed_for_tracks) }}
-                        </div>
-                    </div>
-                    {% if abstract.edit_track_mode.name != 'none' %}
-                        <div>
-                            <a href="#"
-                               data-href="{{ url_for('.edit_review_tracks', abstract, management=management) }}"
-                               data-form-container="#edit-reviewed-for-track-list"
-                               data-update=".management-page"
-                               data-replace-update
-                               data-hide-trigger
-                               data-ajax-form>
-                                {%- trans %}Edit track list{% endtrans -%}
-                            </a>
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-            <div class="i-box-footer hidden-if-empty" id="edit-reviewed-for-track-list"></div>
         </div>
     </div>
 {% endmacro %}
