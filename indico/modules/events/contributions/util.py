@@ -155,14 +155,23 @@ def contribution_type_row(contrib_type):
     return jsonify_data(html_row=html, flash=False)
 
 
-@memoize_request
+def _query_contributions_with_user_as_submitter(event, user):
+    return (Contribution.query.with_parent(event)
+            .filter(Contribution.acl_entries.any(db.and_(ContributionPrincipal.has_management_role('submit'),
+                                                         ContributionPrincipal.user == user))))
+
+
 def get_contributions_with_user_as_submitter(event, user):
     """Get a list of contributions in which the `user` has submission rights"""
-    contribs = (Contribution.query.with_parent(event)
-                .options(joinedload('acl_entries'))
-                .filter(Contribution.acl_entries.any(ContributionPrincipal.has_management_role('submit')))
-                .all())
-    return {c for c in contribs if any(user in entry.principal for entry in iter_acl(c.acl_entries))}
+    return (_query_contributions_with_user_as_submitter(event, user)
+            .options(joinedload('acl_entries'))
+            .order_by(db.func.lower(Contribution.title))
+            .all())
+
+
+def has_contributions_with_user_as_submitter(event, user):
+    query = _query_contributions_with_user_as_submitter(event, user)
+    return db.session.query(query.exists()).one()[0]
 
 
 def serialize_contribution_for_ical(contrib):

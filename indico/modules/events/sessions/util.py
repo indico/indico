@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from io import BytesIO
-from flask import session
 
+from flask import session
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
 from reportlab.lib.pagesizes import landscape, A4
@@ -27,6 +27,7 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Table, TableStyle
 from sqlalchemy.orm import joinedload, load_only, contains_eager, noload
 
+from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
@@ -148,13 +149,22 @@ def get_events_with_linked_sessions(user, from_dt=None, to_dt=None):
     return data
 
 
+def _query_sessions_for_user(event, user):
+    return (Session.query.with_parent(event)
+            .filter(Session.acl_entries.any(db.and_(SessionPrincipal.has_management_role('coordinate'),
+                                                    SessionPrincipal.user == user))))
+
+
 def get_sessions_for_user(event, user):
-    sessions = (Session.query.with_parent(event)
-                .options(joinedload('acl_entries'))
-                .filter(Session.acl_entries.any(SessionPrincipal.has_management_role('coordinate')),
-                        ~Session.is_deleted)
-                .all())
-    return {sess for sess in sessions if any(user in entry.principal for entry in iter_acl(sess.acl_entries))}
+    return (_query_sessions_for_user(event, user)
+            .options(joinedload('acl_entries'))
+            .order_by(db.func.lower(Session.title))
+            .all())
+
+
+def has_sessions_for_user(event, user):
+    query = _query_sessions_for_user(event, user)
+    return db.session.query(query.exists()).one()[0]
 
 
 def serialize_session_for_ical(sess):

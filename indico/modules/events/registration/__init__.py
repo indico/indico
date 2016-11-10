@@ -105,11 +105,12 @@ def _extend_event_menu(sender, **kwargs):
             return True
         if not session.user:
             return False
-        return bool(Registration.find(Registration.user == session.user,
-                                      Registration.event_id == int(event.id),
-                                      ~Registration.is_deleted,
-                                      ~RegistrationForm.is_deleted,
-                                      _join=Registration.registration_form).count())
+        query = Registration.find(Registration.user == session.user,
+                                  Registration.event_id == int(event.id),
+                                  ~Registration.is_deleted,
+                                  ~RegistrationForm.is_deleted,
+                                  _join=Registration.registration_form)
+        return db.session.query(query.exists()).one()[0]
 
     def _visible_participant_list(event):
         return event.has_feature('registration')

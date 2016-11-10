@@ -22,7 +22,7 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole, check_roles
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import get_sessions_for_user
+from indico.modules.events.sessions.util import has_sessions_for_user
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _, ngettext
 from indico.web.flask.util import url_for
@@ -100,7 +100,7 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_sessions(event):
-        return session.user and bool(get_sessions_for_user(event.as_event, session.user))
+        return session.user and has_sessions_for_user(event.as_event, session.user)
 
     yield MenuEntryData(title=_("My Sessions"), name='my_sessions', endpoint='sessions.my_sessions', position=1,
                         parent='my_conference', visible=_visible_my_sessions)

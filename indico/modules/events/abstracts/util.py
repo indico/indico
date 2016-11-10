@@ -198,22 +198,38 @@ def get_roles_for_event(event):
     return roles
 
 
-@memoize_request
-def get_user_abstracts(event, user):
+def _query_user_abstracts(event, user):
     return (Abstract.query.with_parent(event)
             .filter(db.or_(Abstract.submitter == user,
-                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
-            .all())
+                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user)))))
 
 
-@memoize_request
-def get_user_tracks(event, user):
+def get_user_abstracts(event, user):
     """Get the list of tracks where the user is a reviewer/convener"""
+    return _query_user_abstracts(event, user).order_by(Abstract.friendly_id).all()
+
+
+def has_user_abstracts(event, user):
+    query = _query_user_abstracts(event, user)
+    return db.session.query(query.exists()).one()[0]
+
+
+def _query_user_tracks(event, user):
     query = Track.query.with_parent(event)
     if user not in event.global_abstract_reviewers and user not in event.global_conveners:
         query = query.filter(db.or_(Track.conveners.any(User.id == user.id),
                                     Track.abstract_reviewers.any(User.id == user.id)))
-    return query.all()
+    return query
+
+
+def get_user_tracks(event, user):
+    """Get the list of tracks where the user is a reviewer/convener"""
+    return _query_user_tracks(event, user).order_by(Track.title).all()
+
+
+def has_user_tracks(event, user):
+    query = _query_user_tracks(event, user)
+    return db.session.query(query.exists()).one()[0]
 
 
 def get_track_reviewer_abstract_counts(event, user):

@@ -105,11 +105,11 @@ class SubmitterRole(ManagementRole):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.contributions.util import get_contributions_with_user_as_submitter
+    from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_contributions(conf):
-        return session.user and bool(get_contributions_with_user_as_submitter(conf.as_event, session.user))
+        return session.user and has_contributions_with_user_as_submitter(conf.as_event, session.user)
 
     def _visible_list_of_contributions(conf):
         return bool(Contribution.query.with_entities(literal(True))
