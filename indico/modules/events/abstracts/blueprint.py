@@ -16,8 +16,11 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+
 from flask import current_app, g
 
+from indico.modules.events.abstracts.compat import compat_abstract
 from indico.modules.events.abstracts.controllers import (abstract, abstract_list, boa, display, email_templates,
                                                          management, reviewing)
 from indico.web.flask.util import make_compat_redirect_func
@@ -158,7 +161,33 @@ def _add_management_flag(endpoint, values):
         values['management'] = g.rh.management
 
 
-# Legacy URLs
-_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<event_id>')
-_compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'my_abstracts',
-                        make_compat_redirect_func(_bp, 'my_abstracts', view_args_conv={'event_id': 'confId'}))
+# Legacy URLs - display
+_compat_bp = IndicoBlueprint('compat_abstracts', __name__, url_prefix='/event/<int:confId>')
+_compat_bp.add_url_rule('/call-for-abstracts/', 'cfa', make_compat_redirect_func(_bp, 'call_for_abstracts'))
+_compat_bp.add_url_rule('/call-for-abstracts/my-abstracts', 'mine', make_compat_redirect_func(_bp, 'my_abstracts'))
+_compat_bp.add_url_rule('/call-for-abstracts/my-abstracts.pdf', 'mine_pdf',
+                        make_compat_redirect_func(_bp, 'my_abstracts_pdf'))
+_compat_bp.add_url_rule('/call-for-abstracts/submit', 'submit', make_compat_redirect_func(_bp, 'call_for_abstracts'))
+_compat_bp.add_url_rule('/call-for-abstracts/<int:friendly_id>/', 'abstract',
+                        partial(compat_abstract, 'display_abstract'))
+_compat_bp.add_url_rule('/call-for-abstracts/<int:friendly_id>/Abstract.pdf', 'abstract_pdf',
+                        partial(compat_abstract, 'display_abstract_pdf_export'))
+_compat_bp.add_url_rule('/abstract-book.pdf', 'boa', make_compat_redirect_func(_bp, 'export_boa'))
+
+# Legacy URLs - management
+_compat_bp.add_url_rule('/manage/call-for-abstracts/abstracts/', 'manage_cfa',
+                        make_compat_redirect_func(_bp, 'manage_abstract_list'))
+_compat_bp.add_url_rule('/manage/call-for-abstracts/abstracts/<int:friendly_id>/', 'manage_abstract',
+                        partial(compat_abstract, 'display_abstract', management=True))
+_compat_bp.add_url_rule('/manage/call-for-abstracts/abstracts/<int:friendly_id>/abstract.pdf',
+                        'manage_abstract_pdf_export', partial(compat_abstract, 'manage_abstract_pdf_export',
+                                                              management=True))
+
+# Legacy URLs - reviewing
+_compat_bp.add_url_rule('/manage/program/tracks/<int:track_id>/abstracts/',
+                        'track_abstracts', make_compat_redirect_func(_bp, 'display_reviewable_tracks',
+                                                                     view_args_conv={'track_id': None}))
+_compat_bp.add_url_rule('/manage/program/tracks/<int:track_id>/abstracts/<int:friendly_id>/', 'track_abstract',
+                        partial(compat_abstract, 'display_abstract'))
+_compat_bp.add_url_rule('/manage/program/tracks/<int:track_id>/abstracts/<int:friendly_id>/abstract.pdf',
+                        'track_abstract_pdf', partial(compat_abstract, 'display_abstract_pdf_export'))

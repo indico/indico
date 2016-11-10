@@ -19,144 +19,145 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 
 # Setup
-event_mgmt.add_url_rule('/call-for-abstracts/setup/', 'confModifCFA', conferenceModif.RHConfModifCFA)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/toggle', 'confModifCFA-changeStatus',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/', 'confModifCFA', conferenceModif.RHConfModifCFA)
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/toggle', 'confModifCFA-changeStatus',
                         conferenceModif.RHConfModifCFAStatus, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/setup/modify', 'confModifCFA-modifyData',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/modify', 'confModifCFA-modifyData',
                         conferenceModif.RHCFADataModification, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/setup/modify/save', 'confModifCFA-performModifyData',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/modify/save', 'confModifCFA-performModifyData',
                         conferenceModif.RHCFAPerformDataModification, methods=('POST',))
 
 # Setup: misc options
-event_mgmt.add_url_rule('/call-for-abstracts/setup/options/attach-files', 'confModifCFA-switchAttachFiles',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/options/attach-files', 'confModifCFA-switchAttachFiles',
                         conferenceModif.RHConfModifCFASwitchAttachFiles)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/options/multiple-tracks', 'confModifCFA-switchMultipleTracks',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/options/multiple-tracks', 'confModifCFA-switchMultipleTracks',
                         conferenceModif.RHConfModifCFASwitchMultipleTracks)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/options/mandatory-speaker',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/options/mandatory-speaker',
                         'confModifCFA-switchSelectSpeakerMandatory',
                         conferenceModif.RHConfModifCFASwitchSelectSpeakerMandatory)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/options/show-attachments', 'confModifCFA-switchShowAttachedFiles',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/options/show-attachments',
+                        'confModifCFA-switchShowAttachedFiles',
                         conferenceModif.RHConfModifCFASwitchShowAttachedFilesContribList)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/options/select-speaker', 'confModifCFA-switchShowSelectSpeaker',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/options/select-speaker', 'confModifCFA-switchShowSelectSpeaker',
                         conferenceModif.RHConfModifCFASwitchShowSelectAsSpeaker)
-event_mgmt.add_url_rule('/call-for-abstracts/setup/options/mandatory-tracks', 'confModifCFA-makeTracksMandatory',
+event_mgmt.add_url_rule('/call-for-abstracts-old/setup/options/mandatory-tracks', 'confModifCFA-makeTracksMandatory',
                         conferenceModif.RHConfModifCFAMakeTracksMandatory)
 
 # Preview
-event_mgmt.add_url_rule('/call-for-abstracts/preview', 'confModifCFA-preview', conferenceModif.RHConfModifCFAPreview,
-                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/call-for-abstracts-old/preview', 'confModifCFA-preview',
+                        conferenceModif.RHConfModifCFAPreview, methods=('GET', 'POST'))
 
 # List of abstracts
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/', 'abstractsManagment', conferenceModif.RHAbstractList,
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/', 'abstractsManagment', conferenceModif.RHAbstractList,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/direct-access', 'abstractManagment-directAccess',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/direct-access', 'abstractManagment-directAccess',
                         abstractModif.RHAbstractDirectAccess, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/new', 'abstractsManagment-newAbstract',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/new', 'abstractsManagment-newAbstract',
                         conferenceModif.RHNewAbstract, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/perform-action', 'abstractsManagment-abstractsActions',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/perform-action', 'abstractsManagment-abstractsActions',
                         conferenceModif.RHAbstractsActions, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/merge', 'abstractsManagment-mergeAbstracts',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/merge', 'abstractsManagment-mergeAbstracts',
                         conferenceModif.RHAbstractsMerge, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/participants', 'abstractsManagment-participantList',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/participants', 'abstractsManagment-participantList',
                         conferenceModif.RHAbstractsParticipantList, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/accept', 'abstractManagment-acceptMultiple',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/accept', 'abstractManagment-acceptMultiple',
                         conferenceModif.RHAbstractManagmentAcceptMultiple, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/reject', 'abstractManagment-rejectMultiple',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/reject', 'abstractManagment-rejectMultiple',
                         conferenceModif.RHAbstractManagmentRejectMultiple, methods=('POST',))
 
 # Abstract: main
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/', 'abstractManagment',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/', 'abstractManagment',
                         abstractModif.RHAbstractManagment, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/abstract.pdf', 'abstractManagment-abstractToPDF',
-                        abstractModif.RHAbstractToPDF)
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/abstract.xml', 'abstractManagment-xml',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/abstract.pdf',
+                        'abstractManagment-abstractToPDF', abstractModif.RHAbstractToPDF)
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/abstract.xml', 'abstractManagment-xml',
                         abstractModif.RHAbstractToXML)
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/modify', 'abstractManagment-editData',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/modify', 'abstractManagment-editData',
                         abstractModif.RHEditData, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/change-track', 'abstractManagment-changeTrack',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/change-track', 'abstractManagment-changeTrack',
                         abstractModif.RHAbstractManagmentChangeTrack, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/reset-status', 'abstractManagment-backToSubmitted',
-                        abstractModif.RHBackToSubmitted)
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/accept', 'abstractManagment-accept',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/reset-status',
+                        'abstractManagment-backToSubmitted', abstractModif.RHBackToSubmitted)
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/accept', 'abstractManagment-accept',
                         abstractModif.RHAbstractManagmentAccept, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/reject', 'abstractManagment-reject',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/reject', 'abstractManagment-reject',
                         abstractModif.RHAbstractManagmentReject, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/dupe', 'abstractManagment-markAsDup',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/dupe', 'abstractManagment-markAsDup',
                         abstractModif.RHMarkAsDup, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/dupe/undo', 'abstractManagment-unMarkAsDup',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/dupe/undo', 'abstractManagment-unMarkAsDup',
                         abstractModif.RHUnMarkAsDup, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/merge', 'abstractManagment-mergeInto',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/merge', 'abstractManagment-mergeInto',
                         abstractModif.RHMergeInto, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/merge/undo', 'abstractManagment-unmerge',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/merge/undo', 'abstractManagment-unmerge',
                         abstractModif.RHUnMerge, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/propose/accept', 'abstractManagment-propToAcc',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/propose/accept', 'abstractManagment-propToAcc',
                         abstractModif.RHPropToAcc, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/propose/reject', 'abstractManagment-propToRej',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/propose/reject', 'abstractManagment-propToRej',
                         abstractModif.RHPropToRej, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/withdraw', 'abstractManagment-withdraw',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/withdraw', 'abstractManagment-withdraw',
                         abstractModif.RHWithdraw, methods=('POST',))
 
 # Abstract: Track judgments
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/tracks/judgements',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/tracks/judgements',
                         'abstractManagment-trackProposal', abstractModif.RHAbstractTrackManagment,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/tracks/ratings', 'abstractManagment-orderByRating',
-                        abstractModif.RHAbstractTrackOrderByRating)
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/tracks/ratings',
+                        'abstractManagment-orderByRating', abstractModif.RHAbstractTrackOrderByRating)
 
 # Abstract: Internal comments
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/comments/', 'abstractManagment-comments',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/comments/', 'abstractManagment-comments',
                         abstractModif.RHIntComments)
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/comments/add', 'abstractManagment-newComment',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/comments/add', 'abstractManagment-newComment',
                         abstractModif.RHNewIntComment, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/comments/<intCommentId>/edit',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/comments/<intCommentId>/edit',
                         'abstractManagment-editComment', abstractModif.RHIntCommentEdit, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/comments/<intCommentId>/delete',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/comments/<intCommentId>/delete',
                         'abstractManagment-remComment', abstractModif.RHIntCommentRem, methods=('POST',))
 
 # Abstract: Notification log
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/notifications', 'abstractManagment-notifLog',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/notifications', 'abstractManagment-notifLog',
                         abstractModif.RHNotifLog)
 
 # Abstract: Tools
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/tools/', 'abstractTools', abstractModif.RHTools)
-event_mgmt.add_url_rule('/call-for-abstracts/abstracts/<abstractId>/tools/delete', 'abstractTools-delete',
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/tools/', 'abstractTools', abstractModif.RHTools)
+event_mgmt.add_url_rule('/call-for-abstracts-old/abstracts/<abstractId>/tools/delete', 'abstractTools-delete',
                         abstractModif.RHAbstractDelete, methods=('GET', 'POST'))
 
 # Book of abstracts
-event_mgmt.add_url_rule('/call-for-abstracts/book/', 'confModBOA', conferenceModif.RHAbstractBook,
+event_mgmt.add_url_rule('/call-for-abstracts-old/book/', 'confModBOA', conferenceModif.RHAbstractBook,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/book/options/show-ids', 'confModBOA-toogleShowIds',
+event_mgmt.add_url_rule('/call-for-abstracts-old/book/options/show-ids', 'confModBOA-toogleShowIds',
                         conferenceModif.RHAbstractBookToogleShowIds)
 
 # Reviewing: setup
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/setup', 'abstractReviewing-reviewingSetup',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/setup', 'abstractReviewing-reviewingSetup',
                         abstractReviewing.RHAbstractReviewingSetup)
 
 # Reviewing: team
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/team', 'abstractReviewing-reviewingTeam',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/team', 'abstractReviewing-reviewingTeam',
                         abstractReviewing.RHAbstractReviewingTeam)
 
 
 # Reviewing: notification templates
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/', 'abstractReviewing-notifTpl',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/', 'abstractReviewing-notifTpl',
                         abstractReviewing.RHNotifTpl)
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/add', 'abstractReviewing-notifTplNew',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/add', 'abstractReviewing-notifTplNew',
                         abstractReviewing.RHCFANotifTplNew, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/remove', 'abstractReviewing-notifTplRem',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/remove', 'abstractReviewing-notifTplRem',
                         abstractReviewing.RHCFANotifTplRem, methods=('POST',))
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/',
                         'abstractReviewing-notifTplDisplay', abstractReviewing.RHCFANotifTplDisplay)
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/down',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/down',
                         'abstractReviewing-notifTplDown', abstractReviewing.RHCFANotifTplDown)
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/up', 'abstractReviewing-notifTplUp',
-                        abstractReviewing.RHCFANotifTplUp)
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/modify',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/up',
+                        'abstractReviewing-notifTplUp', abstractReviewing.RHCFANotifTplUp)
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/modify',
                         'abstractReviewing-notifTplEdit', abstractReviewing.RHCFANotifTplEdit, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/preview',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/preview',
                         'abstractReviewing-notifTplPreview', abstractReviewing.RHCFANotifTplPreview)
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/condition/add',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/condition/add',
                         'abstractReviewing-notifTplCondNew', abstractReviewing.RHNotifTplConditionNew,
                         methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/call-for-abstracts/reviewing/notifications/<notifTplId>/condition/remove',
+event_mgmt.add_url_rule('/call-for-abstracts-old/reviewing/notifications/<notifTplId>/condition/remove',
                         'abstractReviewing-notifTplCondRem', abstractReviewing.RHNotifTplConditionRem,
                         methods=('GET', 'POST'))
