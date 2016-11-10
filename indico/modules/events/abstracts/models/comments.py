@@ -47,6 +47,7 @@ class AbstractComment(RenderModeMixin, db.Model):
 
     __tablename__ = 'abstract_comments'
     __table_args__ = {'schema': 'event_abstracts'}
+    TIMELINE_TYPE = 'comment'
 
     id = db.Column(
         db.Integer,
