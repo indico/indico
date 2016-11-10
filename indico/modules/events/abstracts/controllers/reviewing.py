@@ -153,7 +153,7 @@ class RHReviewAbstractForTrack(RHAbstractBase):
         self.review = reviews[0] if reviews else None
 
     def _process(self):
-        form = build_review_form(self.abstract, self.track)
+        form = build_review_form(self.abstract, self.track, self.review)
         if form.validate_on_submit():
             if self.review:
                 update_abstract_review(self.review, **form.split_data)
