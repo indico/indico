@@ -32,18 +32,18 @@ _bp.add_url_rule('/abstracts/mine.pdf', 'my_abstracts_pdf', display.RHMyAbstract
 _bp.add_url_rule('/abstracts/submit', 'submit', display.RHSubmitAbstract, methods=('GET', 'POST'))
 
 # Reviewing pages (display area, not related to any specific abstract)
-_bp.add_url_rule('/call-for-abstracts/reviewing/', 'display_reviewable_tracks', reviewing.RHDisplayReviewableTracks)
-_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/', 'display_reviewable_track_abstracts',
+_bp.add_url_rule('/abstracts/reviewing/', 'display_reviewable_tracks', reviewing.RHDisplayReviewableTracks)
+_bp.add_url_rule('/abstracts/reviewing/<int:track_id>/', 'display_reviewable_track_abstracts',
                  reviewing.RHDisplayReviewableTrackAbstracts)
-_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/customize', 'display_customize_abstract_list',
+_bp.add_url_rule('/abstracts/reviewing/<int:track_id>/customize', 'display_customize_abstract_list',
                  reviewing.RHDisplayAbstractListCustomize, methods=('GET', 'POST'))
-_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/attachments', 'display_download_attachments',
+_bp.add_url_rule('/abstracts/reviewing/<int:track_id>/attachments', 'display_download_attachments',
                  reviewing.RHDisplayAbstractsDownloadAttachments, methods=('POST',))
-_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/abstracts.pdf', 'display_abstracts_pdf_export',
+_bp.add_url_rule('/abstracts/reviewing/<int:track_id>/abstracts.pdf', 'display_abstracts_pdf_export',
                  reviewing.RHDisplayAbstractsExportPDF, methods=('POST',))
-_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/abstracts.csv', 'display_abstracts_csv_export',
+_bp.add_url_rule('/abstracts/reviewing/<int:track_id>/abstracts.csv', 'display_abstracts_csv_export',
                  reviewing.RHDisplayAbstractsExportCSV, methods=('POST',))
-_bp.add_url_rule('/call-for-abstracts/reviewing/<int:track_id>/abstracts.xlsx', 'display_abstracts_xlsx_export',
+_bp.add_url_rule('/abstracts/reviewing/<int:track_id>/abstracts.xlsx', 'display_abstracts_xlsx_export',
                  reviewing.RHDisplayAbstractsExportExcel, methods=('POST',))
 
 # Book of Abstracts
