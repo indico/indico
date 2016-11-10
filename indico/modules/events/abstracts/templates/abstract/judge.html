@@ -1,4 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'events/abstracts/abstract/_common.html' import render_score %}
 
 {% macro _render_abstract_reviewing_state(abstract) %}
     {% if abstract.reviewed_for_tracks > 1 %}
@@ -54,12 +55,8 @@
                     {% trans state=_render_abstract_reviewing_state(abstract) -%}
                         Reviews are {{ state }}
                     {%- endtrans %}
-                    {% if abstract.score %}
-                        {% set score = abstract.score|round(1) %}
-                        {# TODO: show max score #}
-                        <span class="i-tag highlight" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
-                            {{ score }}
-                        </span>
+                    {% if abstract.score is not none %}
+                        {{ render_score(abstract.score, abstract.event_new.cfa) }}
                     {% endif %}
                 </div>
             </div>
@@ -72,10 +69,7 @@
                         {{ _render_abstract_track_reviewing_state(abstract, track) }}
                         {% set score = abstract.get_track_score(track) %}
                         {% if score is not none %}
-                            {% set score = score|round(1) %}
-                            <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }}/...{% endtrans %}">
-                                {{ score }}
-                            </span>
+                            {{ render_score(score, abstract.event_new.cfa) }}
                         {% endif %}
                     </div>
                 </div>

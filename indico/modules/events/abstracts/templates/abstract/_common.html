@@ -11,6 +11,14 @@
     {% endif %}
 {% endmacro %}
 
+{% macro render_score(score, cfa) %}
+    {% set score = score|round(1) %}
+    {% set max_score = cfa.rating_range[1]|round(1) %}
+    <span class="i-tag highlight outline" title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
+        {{ score }}
+    </span>
+{% endmacro %}
+
 {% macro render_tracks(tracks) %}
     {% for track in tracks %}
         <span class="abstract-track">{{ track.title }}</span>
