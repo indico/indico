@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.modules.events.layout.util import MenuEntryData
-from indico.modules.events.contributions.util import get_contributions_with_user_as_submitter
+from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
 from indico.util.i18n import _
 from MaKaC.paperReviewing import ConferencePaperReview
 
@@ -34,7 +34,7 @@ def _visibility_paper_review(event):
 
 def _visibility_paper_review_transfer(event):
     return (session.user and _visibility_paper_review(event) and
-            bool(get_contributions_with_user_as_submitter(event.as_event, session.user)))
+            has_contributions_with_user_as_submitter(event.as_event, session.user))
 
 
 def _visibility_role(event, role):
