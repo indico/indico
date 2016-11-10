@@ -57,7 +57,7 @@
 {% macro render_review_form(form, abstract, track, management=false, review=none) %}
     {{ form_header(form, orientation='vertical', id=('track-review-form-' + track.id|string)) }}
     {{ form_rows(form, skip=form._order) }}
-    {{ form_rows(form, fields=form._order) }}
+    {{ form_rows(form, fields=form._order, skip_labels=true) }}
     {% set form_id = '#track-review-form-' + track.id|string %}
     {% call form_footer(form) %}
         <button class="i-button big highlight text-color js-review"

@@ -70,7 +70,7 @@ def make_review_form(event):
     return form_class
 
 
-def build_review_form(abstract, track):
+def build_review_form(abstract, track, review=None):
     review_form_class = make_review_form(abstract.event_new)
     reviews_for_track = abstract.get_reviews(user=session.user, track=track)
     review_for_track = reviews_for_track[0] if reviews_for_track else None
@@ -82,7 +82,8 @@ def build_review_form(abstract, track):
     else:
         defaults = FormDefaults()
 
-    return review_form_class(prefix='track-{}'.format(track.id), obj=defaults, abstract=abstract)
+    return review_form_class(prefix='track-{}'.format(track.id), obj=defaults, abstract=abstract,
+                             edit=review is not None)
 
 
 class AbstractContentSettingsForm(IndicoForm):
@@ -275,10 +276,12 @@ class AbstractReviewForm(IndicoForm):
         [HiddenUnless('proposed_action', AbstractAction.change_tracks), DataRequired()],
         collection_class=set, get_label='title')
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, edit=False, *args, **kwargs):
         abstract = kwargs.pop('abstract')
         super(AbstractReviewForm, self).__init__(*args, **kwargs)
         self.event = abstract.event_new
+        if not edit:
+            self.proposed_action.none = _("Propose an action...")
         self.proposed_related_abstract.excluded_abstract_ids = {abstract.id}
         self.proposed_contribution_type.query = (ContributionType.query
                                                  .with_parent(self.event)
