@@ -223,7 +223,7 @@ class AbstractJudgmentFormBase(IndicoForm):
         abstract_data = self.data
         judgment_data = {
             'judgment': abstract_data.pop('judgment'),
-            'send_notification': abstract_data.pop('send_notifications'),
+            'send_notifications': abstract_data.pop('send_notifications'),
             'contrib_session': abstract_data.pop('contrib_session', None),
             'merge_persons': abstract_data.pop('merge_persons', None)
         }
@@ -477,6 +477,10 @@ class MultiTrackMixin(object):
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(MultiTrackMixin, self).__init__(*args, **kwargs)
         self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
+
+
+class SendNotificationsMixin(object):
+    send_notifications = BooleanField(_("Send email notifications"), default=True)
 
 
 class AbstractsScheduleForm(IndicoForm):

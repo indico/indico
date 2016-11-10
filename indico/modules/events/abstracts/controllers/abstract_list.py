@@ -109,11 +109,12 @@ class RHAbstractListStaticURL(RHAbstractListBase):
 
 class RHCreateAbstract(RHAbstractListBase):
     def _process(self):
-        abstract_form_class = make_abstract_form(self.event_new)
+        abstract_form_class = make_abstract_form(self.event_new, notification_option=True)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
             data = form.data
-            abstract = create_abstract(self.event_new, *get_field_values(data))
+            send_notifications = data.pop('send_notifications')
+            abstract = create_abstract(self.event_new, *get_field_values(data), send_notifications=send_notifications)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):
