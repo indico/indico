@@ -17,6 +17,36 @@
 
 @import 'base';
 
+.call-for-abstracts {
+    .announcement {
+        color: $light-black;
+        padding: 20px 0 10px;
+    }
+
+    .actions {
+        margin-top: 20px;
+    }
+
+    .info-message-box {
+        align-items: center;
+    }
+
+    .message-text {
+        line-height: 1.3em;
+        padding-left: 5px;
+    }
+
+    .submit-abstract-btn {
+        font-weight: bold;
+    }
+
+    .submit-abstract-form {
+        header {
+            margin-top: 20px;
+        }
+    }
+}
+
 ul.cfa-timeline {
     list-style-type: none;
     display: flex;

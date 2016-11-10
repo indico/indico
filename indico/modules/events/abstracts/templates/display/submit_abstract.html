@@ -1,12 +1,11 @@
 {% from 'events/display/indico/_common.html' import render_users %}
 {% from 'forms/_form.html' import simple_form %}
 
-{% extends 'layout/conference_page_base.html' %}
-
-{% block title -%}
-    {% trans %}Submit abstract{% endtrans %}
-{%- endblock %}
-
-{%- block content %}
+{% macro render_abstract_submit_form(form, event) %}
+    <header>
+        <div class="title">
+            <h3>{%- trans %}Submit abstract{% endtrans -%}</h3>
+        </div>
+    </header>
     {{ simple_form(form, form_header_kwargs={'action': url_for('.submit', event)}) }}
-{% endblock %}
+{% endmacro %}
