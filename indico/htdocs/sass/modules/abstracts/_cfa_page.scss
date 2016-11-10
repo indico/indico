@@ -18,7 +18,7 @@
 @import 'base';
 
 .call-for-abstracts {
-    .announcement {
+    .cfa-announcement {
         color: $light-black;
         padding: 20px 0 10px;
     }
@@ -40,9 +40,9 @@
         font-weight: bold;
     }
 
-    .submit-abstract-form {
-        header {
-            margin-top: 20px;
+    .cfa-infoline-section {
+        .infoline {
+            float: none;
         }
     }
 }

@@ -78,10 +78,6 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
     menu_entry_name = 'call_for_abstracts'
 
 
-class WPMyAbstracts(WPDisplayAbstractsBase):
-    menu_entry_name = 'user_abstracts'
-
-
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
     menu_entry_name = 'user_tracks'
 
