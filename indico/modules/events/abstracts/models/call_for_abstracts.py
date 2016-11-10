@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
+from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 
@@ -31,13 +32,12 @@ class CallForAbstracts(object):
     def __repr__(self):
         return '<CallForAbstracts({}, start_dt={}, end_dt={})>'.format(self.event.id, self.start_dt, self.end_dt)
 
-    @property
-    def allow_contributors_in_comments(self):
-        return abstracts_reviewing_settings.get(self.event, 'allow_contributors_in_comments')
-
-    @property
-    def allow_convener_judgment(self):
-        return abstracts_reviewing_settings.get(self.event, 'allow_convener_judgment')
+    start_dt = EventSettingProperty(abstracts_settings, 'start_dt')
+    end_dt = EventSettingProperty(abstracts_settings, 'end_dt')
+    modification_end_dt = EventSettingProperty(abstracts_settings, 'modification_end_dt')
+    allow_contributors_in_comments = EventSettingProperty(abstracts_reviewing_settings,
+                                                          'allow_contributors_in_comments')
+    allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
 
     @property
     def has_started(self):
@@ -54,18 +54,6 @@ class CallForAbstracts(object):
     @property
     def modification_ended(self):
         return self.modification_end_dt is not None and self.modification_end_dt <= now_utc()
-
-    @property
-    def start_dt(self):
-        return abstracts_settings.get(self.event, 'start_dt')
-
-    @property
-    def end_dt(self):
-        return abstracts_settings.get(self.event, 'end_dt')
-
-    @property
-    def modification_end_dt(self):
-        return abstracts_settings.get(self.event, 'modification_end_dt') or self.end_dt
 
     @property
     def rating_range(self):
