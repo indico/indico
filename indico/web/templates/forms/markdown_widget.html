@@ -14,7 +14,7 @@
                 <textarea id="{{ field.id }}"
                           name="{{ field.name }}"
                           rows="{{ rows }}"
-                          class="wmd-input"
+                          class="wmd-input {{ 'has-length-info' if max_length or max_words }}"
                           style="width: 100%;"
                           {% if not field.use_mathjax %}data-no-mathjax{% endif %}
                           {{ input_args|html_params }}>
