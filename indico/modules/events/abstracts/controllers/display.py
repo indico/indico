@@ -17,8 +17,7 @@
 from __future__ import unicode_literals
 
 from operator import attrgetter
-
-from flask import session, flash, redirect, request
+from flask import session, flash, redirect, request, jsonify
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
@@ -28,7 +27,8 @@ from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPMyAbstra
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_data
+from indico.web.flask.templating import get_template_module
+from indico.web.util import jsonify_data, _pop_injected_js
 from MaKaC.PDFinterface.conference import AbstractsToPDF
 
 
@@ -85,5 +85,5 @@ class RHSubmitAbstract(RHAbstractsBase):
                 return jsonify_data(flash=False, redirect=url)
             else:
                 return redirect(url)
-        return WPDisplayAbstracts.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
-                                                  form=form)
+        tpl = get_template_module('events/abstracts/display/submit_abstract.html')
+        return jsonify(form_html=tpl.render_abstract_submit_form(form, self.event_new), js=_pop_injected_js())

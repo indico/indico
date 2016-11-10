@@ -41,10 +41,14 @@
                 </div>
             {% endif %}
             <div class="actions">
-                <a class="i-button icon-plus highlight submit-abstract-btn" href="{{ url_for('.submit', event)}}">
+                <a class="i-button icon-plus highlight submit-abstract-btn js-submit-abstract"
+                   data-href="{{ url_for('.submit', event) }}"
+                   data-method="GET"
+                   data-ajax>
                     {%- trans %}Submit a new abstract{% endtrans -%}
                 </a>
             </div>
+            <div class="submit-abstract-form"></div>
         {% else %}
             <div class="info-message-box">
                 <span class="icon"></span>
@@ -70,4 +74,7 @@
             </div>
         {% endif %}
     </div>
+    <script>
+        setupCallForAbstractsPage();
+    </script>
 {% endblock %}

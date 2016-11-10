@@ -35,6 +35,7 @@ class CallForAbstracts(object):
     start_dt = EventSettingProperty(abstracts_settings, 'start_dt')
     end_dt = EventSettingProperty(abstracts_settings, 'end_dt')
     modification_end_dt = EventSettingProperty(abstracts_settings, 'modification_end_dt')
+    announcement = EventSettingProperty(abstracts_settings, 'announcement')
     allow_contributors_in_comments = EventSettingProperty(abstracts_reviewing_settings,
                                                           'allow_contributors_in_comments')
     allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
@@ -58,10 +59,6 @@ class CallForAbstracts(object):
     @property
     def rating_range(self):
         return tuple(abstracts_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
-
-    @property
-    def announcement(self):
-        return abstracts_settings.get(self.event, 'announcement')
 
     def can_submit_abstracts(self, user):
         return self.is_open or abstracts_settings.acls.contains_user(self.event, 'authorized_submitters', user)
