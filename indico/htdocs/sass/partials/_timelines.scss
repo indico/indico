@@ -19,8 +19,22 @@
     @extend .i-box-group;
     @extend .i-box-group.vert;
 
+    position: relative;
+
     & .i-timeline {
         margin-left: 51px;
+    }
+
+    .with-line:before {
+        background-color: $pastel-gray;
+        content: "";
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 19px;
+        display: block;
+        width: 2px;
+        z-index: -1;
     }
 }
 
@@ -36,6 +50,7 @@
         @include border-radius();
         @include box-sizing(border-box);
         margin-right: 12px;
+        outline: 2px solid white;
         // To match i-box-header height
         height: 39px;
         width: 39px;
@@ -90,16 +105,22 @@
 
 .i-timeline-connect-down {
     @include border-left($width: 2px);
-    margin-left: 71px;
-    margin-bottom: -2em;
+    margin-left: 19px;
     height: 2em;
+
+    &.to-separator {
+        margin-bottom: -2em;
+    }
 }
 
 .i-timeline-connect-up {
     @include border-left($width: 2px);
-    margin-left: 71px;
-    margin-top: -2em;
+    margin-left: 19px;
     height: 2em;
+
+    &.from-separator {
+        margin-top: -2em;
+    }
 
     & + .i-timeline-item {
         margin-top: 0;
