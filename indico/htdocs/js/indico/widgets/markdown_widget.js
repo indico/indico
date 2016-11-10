@@ -53,6 +53,27 @@
         }
     }
 
+    function setupHelpTooltips($field) {
+        var $container = $field.closest('[data-field-id]');
+        ['markdown-info', 'latex-info', 'wmd-help-button'].forEach(function(name) {
+            var content = $container.find('.{0}-text'.format(name));
+            $container.find('.' + name).qtip({
+                content: content.html(),
+                hide: {
+                    event: 'unfocus'
+                },
+                show: {
+                    solo: true
+                },
+                style: {
+                    classes: 'informational markdown-help-qtip'
+                }
+            }).on('click', function(evt) {
+                evt.preventDefault();
+            });
+        });
+    }
+
     global.setupMarkdownWidget = function setupMarkdownWidget(options) {
         options = $.extend(true, {
             fieldId: null,
@@ -64,7 +85,6 @@
 
         if (options.useMarkdownEditor) {
             var $field = $('#' + options.fieldId);
-            var container = $field.closest('[data-field-id]');
             $field.pagedown();
 
             if (options.maxLength || options.maxWords) {
@@ -74,27 +94,13 @@
                 });
             }
 
-            ['markdown-info', 'latex-info', 'wmd-help-button'].forEach(function(name) {
-                var content = container.find('.{0}-text'.format(name));
-                container.find('.' + name).qtip({
-                    content: content.html(),
-                    hide: {
-                        event: 'unfocus'
-                    },
-                    show: {
-                        solo: true
-                    },
-                    style: {
-                        classes: 'informational markdown-help-qtip'
-                    }
-                }).on('click', function(evt) {
-                    evt.preventDefault();
-                });
+            $field.on('focusin', function() {
+                $field.parent().addClass('focused');
+            }).on('focusout', function() {
+                $field.parent().removeClass('focused');
             });
 
-            $field.bind('focusin focusout', function() {
-                $field.parent().toggleClass('focused');
-            });
+            setupHelpTooltips($field);
         }
     };
 })(window);
