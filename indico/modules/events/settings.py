@@ -21,6 +21,7 @@ from functools import wraps
 import yaml
 
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
+from indico.core.settings.proxy import SettingProperty
 from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
 from indico.modules.events import Event
 from indico.modules.events.models.settings import EventSettingPrincipal, EventSetting
@@ -185,6 +186,10 @@ class EventSettingsProxy(SettingsProxyBase):
         EventSetting.delete_all(self.module, event_id=event)
         EventSettingPrincipal.delete_all(self.module, event_id=event)
         self._flush_cache()
+
+
+class EventSettingProperty(SettingProperty):
+    attr = 'event'
 
 
 class ThemeSettingsProxy(object):
