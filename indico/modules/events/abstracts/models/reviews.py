@@ -49,6 +49,7 @@ class AbstractReview(RenderModeMixin, db.Model):
                                          .format(AbstractAction.mark_as_duplicate, AbstractAction.merge),
                                          name='prop_abstract_id_only_duplicate_merge'),
                       {'schema': 'event_abstracts'})
+    TIMELINE_TYPE = 'review'
 
     id = db.Column(
         db.Integer,
