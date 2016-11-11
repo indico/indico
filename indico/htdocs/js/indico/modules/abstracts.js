@@ -91,7 +91,7 @@
             });
         }).on('declarative:success', '.js-delete-comment', function() {
             $(this).parents('.i-timeline-item').remove();
-        }).on('declarative:success', '.js-edit-comment, .js-edit-review', function(evt, data) {
+        }).on('declarative:success', '.js-edit-review', function(evt, data) {
             var $oldContent = $(this).parents('.i-timeline-item').find('.i-box-content');
             var $newContent = $(data.form_html);
             $oldContent.replaceWith($newContent);

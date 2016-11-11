@@ -112,8 +112,11 @@
                                     <a class="i-button-icon icon-edit js-edit-comment"
                                        title="{% trans %}Edit comment{% endtrans %}"
                                        data-href="{{ url_for('.edit_abstract_comment', comment) }}"
-                                       data-method="GET"
-                                       data-ajax></a>
+                                       data-form-container="#comment-{{ comment.id }}"
+                                       data-update=".management-page"
+                                       data-replace-update
+                                       data-confirm-close-unsaved
+                                       data-ajax-form></a>
                                     <a class="i-button-icon icon-cross js-delete-comment"
                                        title="{% trans %}Remove comment{% endtrans %}"
                                        data-method="DELETE"
@@ -125,7 +128,7 @@
                                 </div>
                             {% endif %}
                         </div>
-                        <div class="i-box-content">
+                        <div class="i-box-content" id="comment-{{ comment.id }}">
                             {{ comment.text }}
                         </div>
                     </div>
@@ -155,9 +158,11 @@
     {{ form_header(form, orientation='vertical', classes=form_class) }}
     {{ form_rows(form, skip_labels=true) }}
     {% call form_footer(form) %}
-        <button class="i-button big highlight text-color js-comment"
-                data-method="POST"
-                data-href="{{ url }}"
+        <button type="submit" class="i-button big highlight text-color js-comment"
+                {% if not comment %}
+                    data-method="POST"
+                    data-href="{{ url }}"
+                {% endif %}
                 data-disabled-until-change>
             {% if comment %}
                 {% trans %}Update comment{% endtrans %}
@@ -166,9 +171,7 @@
             {% endif %}
         </button>
         {% if comment %}
-            <button class="i-button big text-color danger js-edit-cancel"
-                    data-confirm="{% trans %}Do you want to discard the changes to this comment?{% endtrans %}"
-                    data-confirm-if-change>
+            <button type="button" class="i-button big text-color danger js-edit-cancel" data-button-back>
                 {% trans %}Cancel{% endtrans %}
             </button>
         {% endif %}
