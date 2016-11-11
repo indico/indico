@@ -126,9 +126,10 @@
                 $newContent.replaceWith($oldContent);
             });
             initForms($newContent);
-        }).on('indico:htmlUpdated', function() {
-            initForms($(this));
-            showFormErrors($(this));
+        }).on('indico:htmlUpdated', function(evt) {
+            var $target = $(evt.target);
+            initForms($target.find('form'));
+            showFormErrors($target);
         }).on('click', '#edit-reviewed-for-track-list', function(evt) {
             evt.preventDefault();
             $(this).closest('.i-timeline-item').find('.i-box-footer').toggleClass('hidden');
