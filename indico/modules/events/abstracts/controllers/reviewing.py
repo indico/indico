@@ -223,9 +223,9 @@ class RHEditAbstractComment(RHAbstractCommentBase):
         form = AbstractCommentForm(obj=self.comment, abstract=self.abstract, user=session.user)
         if form.validate_on_submit():
             update_abstract_comment(self.comment, form.data)
-            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
+            return jsonify_data(html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify_data(form_html=tpl.render_comment_form(form, self.abstract, comment=self.comment))
+        return jsonify(html=tpl.render_comment_form(form, self.abstract, comment=self.comment))
 
 
 class RHDeleteAbstractComment(RHAbstractCommentBase):
