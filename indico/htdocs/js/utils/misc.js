@@ -169,4 +169,33 @@
         value = value.trim();
         return value ? value.split(/\s+/).length : 0;
     };
+
+    function _doUpdateHtml(target, html, replace, highlight) {
+        target = $(target);
+        if (replace) {
+            var $html = $($.parseHTML(html));
+            target.replaceWith($html);
+            target = $html;
+        } else {
+            target.html(html);
+        }
+        target.trigger('indico:htmlUpdated');
+        if (highlight) {
+            target.effect('highlight', {color: '#5D95EA'});
+        }
+    }
+
+    global.updateHtml = function updateHtml(target, data, replace, highlight) {
+        if ($.isPlainObject(target)) {
+            for (var key in target) {
+                if (!(key in data)) {
+                    console.error('Invalid key: ' + key);  // eslint-disable-line no-console
+                } else {
+                    _doUpdateHtml(target[key], data[key], replace, highlight);
+                }
+            }
+        } else {
+            _doUpdateHtml(target, data.html, replace, highlight);
+        }
+    };
 })(window);
