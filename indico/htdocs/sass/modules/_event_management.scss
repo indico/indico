@@ -161,8 +161,7 @@
 }
 
 .menu-entries {
-    width: 370px;
-    padding: 5px 10px 5px 5px;
+    padding: 5px 10px;
     margin-top: 0;
 
     list-style: none;
@@ -176,6 +175,7 @@
                 @include border-bottom-radius(0);
             }
             > .i-label {
+                margin: 0;
                 width: 100%;
                 text-align: left;
                 font-weight: bold;
@@ -321,8 +321,7 @@
         @include border-all(darken($pastel-gray, $light-color-variation));
         @include border-bottom-radius();
 
-        width: 333px;
-        margin: 0 20px;
+        margin-left: 20px;
         padding-right: 10px;
         padding-left: 10px;
 
