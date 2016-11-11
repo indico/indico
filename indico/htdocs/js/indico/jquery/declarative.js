@@ -16,13 +16,14 @@
  */
 
 /* eslint-disable max-len */
-/* global getParamsFromSelectors:false */
+/* global getParamsFromSelectors:false, inlineAjaxForm:false */
 
 (function(global) {
     'use strict';
 
     $(document).ready(function() {
         setupActionLinks();
+        setupAjaxForms();
         setupConfirmPopup();
         setupMathJax();
         setupSelectAllNone();
@@ -234,6 +235,47 @@
                 confirmed = confirmPrompt(promptMsg, $(this).data('title') || $T('Confirm action'));
             }
             confirmed.then(execute);
+        });
+    }
+
+    function setupAjaxForms() {
+        $('body').on('click', 'button[data-ajax-form], a[data-ajax-form]', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            if ($this.hasClass('disabled')) {
+                return;
+            }
+
+            inlineAjaxForm({
+                context: $this,
+                load: {
+                    url: $this.data('href')
+                },
+                formContainer: $this.data('form-container'),
+                confirmCloseUnsaved: $this.data('confirm-close-unsaved') !== undefined,
+                update: {
+                    element: $this.data('update'),
+                    replace: $this.data('replace-update') !== undefined,
+                    highlight: $this.data('highlight-update') !== undefined
+                }
+            });
+
+            function toggleDisabled(disabled) {
+                if ($this.data('hide-trigger') !== undefined) {
+                    $this.toggle(!disabled);
+                }
+                if ($this.is('a')) {
+                    $this.toggleClass('disabled', disabled);
+                } else {
+                    $this.prop('disabled', disabled);
+                }
+            }
+
+            $this.on('ajaxForm:show', function() {
+                toggleDisabled(true);
+            }).on('ajaxForm:hide', function() {
+                toggleDisabled(false);
+            });
         });
     }
 

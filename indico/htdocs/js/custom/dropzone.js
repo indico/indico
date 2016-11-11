@@ -21,7 +21,7 @@
 (function(global) {
     'use strict';
 
-    $(document).ready(function(){
+    $(document).ready(function() {
         Dropzone.autoDiscover = false;
     });
 
@@ -108,7 +108,7 @@
                     }
                 });
 
-                self.on('sendingmultiple', function() {
+                self.on(options.uploadMultiple ? 'sendingmultiple' : 'sending', function() {
                     $form.trigger('ajaxDialog:beforeSubmit');
                 });
 
@@ -151,11 +151,11 @@
                 csrf_token: $form.find('#csrf_token').val()
             };
             $dz.dropzone(options);
-        }
-        else {
+        } else {
             $form.dropzone(options);
         }
 
+        $form.data('dropzoneField', $dz[0]);
         $form.on('ajaxDialog:success', function(evt, data) {
             if (data.redirect) {
                 IndicoUI.Dialogs.Util.progress();
