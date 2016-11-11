@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global showFormErrors:false */
+
 (function(global) {
     'use strict';
 
@@ -366,14 +368,14 @@
 
 
         $form.on('submit', function(evt) {
-            var e = $.Event('ajaxDialog:validateBeforeSubmit');
+            var e = $.Event('ajaxForm:validateBeforeSubmit');
             $(this).trigger(e);
             if (e.isDefaultPrevented()) {
                 evt.preventDefault();
             }
         });
 
-        $field.closest('form').on('ajaxDialog:validateBeforeSubmit', function(evt) {
+        $field.closest('form').on('ajaxForm:validateBeforeSubmit', function(evt) {
             var $this = $(this);
             var req = options.require;
 

@@ -64,7 +64,7 @@
                 }
 
                 $form.on('submit', function(e) {
-                    var evt = $.Event('ajaxDialog:validateBeforeSubmit');
+                    var evt = $.Event('ajaxForm:validateBeforeSubmit');
                     $(this).trigger(evt);
                     if (!evt.isDefaultPrevented()) {
                         $button.prop('disabled', true);
@@ -109,7 +109,7 @@
                 });
 
                 self.on(options.uploadMultiple ? 'sendingmultiple' : 'sending', function() {
-                    $form.trigger('ajaxDialog:beforeSubmit');
+                    $form.trigger('ajaxForm:beforeSubmit');
                 });
 
                 self.on('success', function(e, response) {
@@ -123,12 +123,12 @@
                     $dz.data('value', response.content);
                     $form.find('.change-trigger').val($dz.data('value') ? 'uploaded-file' : 'no-file');
                     $form.trigger('indico:fieldsSaved', response);
-                    $form.trigger('ajaxDialog:success', [response]);
+                    $form.trigger('ajaxForm:success', [response]);
                 });
 
                 self.on('error', function(e, msg, xhr) {
                     if (xhr) {
-                        var evt = $.Event('ajaxDialog:error');
+                        var evt = $.Event('ajaxForm:error');
                         $form.trigger(evt, [xhr]);
                         if (!evt.isDefaultPrevented()) {
                             handleAjaxError(xhr);
@@ -156,7 +156,7 @@
         }
 
         $form.data('dropzoneField', $dz[0]);
-        $form.on('ajaxDialog:success', function(evt, data) {
+        $form.on('ajaxForm:success', function(evt, data) {
             if (data.redirect) {
                 IndicoUI.Dialogs.Util.progress();
                 location.href = data.redirect;
