@@ -173,7 +173,7 @@
         });
 
         // Remove corner message when 'Save' button is visible on screen
-        $(window).on('scroll', _.debounce(function() {
+        $(window).off('scroll.initForms').on('scroll.initForms', _.debounce(function() {
             var $form = forms.find('[data-save-reminder]').closest('form');
             if ($form.length) {
                 var $cornerMessage = $('.save-corner-message');
