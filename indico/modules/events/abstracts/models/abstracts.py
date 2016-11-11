@@ -473,7 +473,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def can_convene(self, user):
         if not user:
             return False
-        elif not self.event_new.can_manage(user, role='track_convener'):
+        elif not self.event_new.can_manage(user, role='track_convener', explicit_role=True):
             return False
         elif self.event_new in user.global_convener_for_events:
             return True
