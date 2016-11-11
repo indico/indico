@@ -191,20 +191,20 @@
             initForms(forms);
             forms.each(function() {
                 var $this = $(this);
-                $this.on('ajaxDialog:beforeSubmit', function() {
+                $this.on('ajaxForm:beforeSubmit', function() {
                     killProgress = IndicoUI.Dialogs.Util.progress();
                     // save files from dropzone fields so we can re-populate in case of failure
                     var dropzoneField = $this.data('dropzoneField');
                     if (dropzoneField) {
                         savedFiles[dropzoneField.id] = $this[0].dropzone.getUploadingFiles();
                     }
-                }).on('ajaxDialog:error', function(evt, xhr) {
+                }).on('ajaxForm:error', function(evt, xhr) {
                     if (killProgress) {
                         killProgress();
                     }
                     evt.preventDefault();
                     handleAjaxError(xhr);
-                }).on('ajaxDialog:success', function(evt, data) {
+                }).on('ajaxForm:success', function(evt, data) {
                     if (killProgress) {
                         killProgress();
                     }
@@ -239,18 +239,18 @@
                     url: $this.attr('action') || formUrl,
                     dataType: 'json',
                     beforeSubmit: function() {
-                        var evt = $.Event('ajaxDialog:validateBeforeSubmit');
+                        var evt = $.Event('ajaxForm:validateBeforeSubmit');
                         $this.trigger(evt);
                         if (evt.isDefaultPrevented()) {
                             return false;
                         }
-                        $this.trigger('ajaxDialog:beforeSubmit');
+                        $this.trigger('ajaxForm:beforeSubmit');
                     },
                     error: function(xhr) {
-                        $this.trigger('ajaxDialog:error', [xhr]);
+                        $this.trigger('ajaxForm:error', [xhr]);
                     },
                     success: function(data) {
-                        $this.trigger('ajaxDialog:success', [data]);
+                        $this.trigger('ajaxForm:success', [data]);
                     }
                 });
             });

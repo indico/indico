@@ -212,8 +212,7 @@
                 if (onCloseResult === false) {
                     ignoreOnBeforeUnload = false;
                     return;
-                }
-                else if (!onCloseResult || onCloseResult === true) {
+                } else if (!onCloseResult || onCloseResult === true) {
                     onCloseResult = $.Deferred().resolve();
                 }
                 onCloseResult.then(function() {
@@ -266,9 +265,9 @@
             initForms(forms);
             forms.each(function() {
                 var $this = $(this);
-                $this.on('ajaxDialog:beforeSubmit', function() {
+                $this.on('ajaxForm:beforeSubmit', function() {
                     killProgress = IndicoUI.Dialogs.Util.progress();
-                }).on('ajaxDialog:error', function(e, xhr) {
+                }).on('ajaxForm:error', function(e, xhr) {
                     if (killProgress) {
                         killProgress();
                     }
@@ -278,7 +277,7 @@
                     } else {
                         handleAjaxError(xhr);
                     }
-                }).on('ajaxDialog:success', function(e, data) {
+                }).on('ajaxForm:success', function(e, data) {
                     if (killProgress) {
                         killProgress();
                     }
@@ -308,18 +307,18 @@
                     dataType: 'json',
                     data: options.getExtraData.call(this, options.trigger),
                     beforeSubmit: function() {
-                        var evt = $.Event('ajaxDialog:validateBeforeSubmit');
+                        var evt = $.Event('ajaxForm:validateBeforeSubmit');
                         $this.trigger(evt);
                         if (evt.isDefaultPrevented()) {
                             return false;
                         }
-                        $this.trigger('ajaxDialog:beforeSubmit');
+                        $this.trigger('ajaxForm:beforeSubmit');
                     },
                     error: function(xhr) {
-                        $this.trigger('ajaxDialog:error', [xhr]);
+                        $this.trigger('ajaxForm:error', [xhr]);
                     },
                     success: function(data) {
-                        $this.trigger('ajaxDialog:success', [data]);
+                        $this.trigger('ajaxForm:success', [data]);
                     }
                 });
             });
