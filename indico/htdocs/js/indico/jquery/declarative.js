@@ -16,7 +16,7 @@
  */
 
 /* eslint-disable max-len */
-/* global getParamsFromSelectors:false, inlineAjaxForm:false */
+/* global getParamsFromSelectors:false, inlineAjaxForm:false, updateHtml:false */
 
 (function(global) {
     'use strict';
@@ -122,28 +122,6 @@
                 params = $.extend({}, getParamsFromSelectors(paramsSelector), params);
             }
 
-            function updateHtml(selector, html) {
-                var elem = $(selector);
-                elem.html(html).trigger('indico:htmlUpdated');
-                if (highlightUpdate) {
-                    elem.effect('highlight', {color: '#5D95EA'});
-                }
-            }
-
-            function handleHtmlUpdate(data) {
-                if (typeof update === 'string') {
-                    updateHtml(update, data.html);
-                } else {
-                    for (var key in update) {
-                        if (!(key in data)) {
-                            console.error('Invalid key: ' + key);  // eslint-disable-line no-console
-                        } else {
-                            updateHtml(update[key], data[key]);
-                        }
-                    }
-                }
-            }
-
             function execute() {
                 var evt = $.Event('indico:confirmed');
                 $this.trigger(evt);
@@ -171,7 +149,7 @@
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
-                                    handleHtmlUpdate(data);
+                                    updateHtml(update, data, false, highlightUpdate);
                                 } else if (reload !== undefined && reload !== 'customData') {
                                     IndicoUI.Dialogs.Util.progress();
                                     location.reload();
@@ -201,7 +179,7 @@
                             }
                             if (update) {
                                 handleFlashes(data, true, $this);
-                                handleHtmlUpdate(data);
+                                updateHtml(update, data, false, highlightUpdate);
                             } else if (reload !== undefined) {
                                 IndicoUI.Dialogs.Util.progress();
                                 location.reload();

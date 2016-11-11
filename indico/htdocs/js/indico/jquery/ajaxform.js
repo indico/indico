@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global showFormErrors:false, initForms:false, confirmPrompt:false */
+/* global showFormErrors:false, initForms:false, confirmPrompt:false, updateHtml:false */
 
 (function(global) {
     'use strict';
@@ -24,37 +24,6 @@
         'upload', 'status', 'previewElement', 'previewTemplate', '_removeLink',
         'accepted', 'width', 'height', 'processing', 'xhr'
     ];
-
-    // TODO: maybe move those into a util module, they are also used in declarative
-    function updateHtml(target, html, replace, highlight) {
-        target = $(target);
-        // TODO: preserve form data in updated elements
-        if (replace) {
-            var $html = $($.parseHTML(html));
-            target.replaceWith($html);
-            target = $html;
-        } else {
-            target.html(html);
-        }
-        target.trigger('indico:htmlUpdated');
-        if (highlight) {
-            target.effect('highlight', {color: '#5D95EA'});
-        }
-    }
-
-    function handleHtmlUpdate(target, data, replace, highlight) {
-        if ($.isPlainObject(target)) {
-            for (var key in target) {
-                if (!(key in data)) {
-                    console.error('Invalid key: ' + key);  // eslint-disable-line no-console
-                } else {
-                    updateHtml(target[key], data[key], replace, highlight);
-                }
-            }
-        } else {
-            updateHtml(target, data.html, replace, highlight);
-        }
-    }
 
     global.inlineAjaxForm = function inlineAjaxForm(options) {
         options = $.extend(true, {
@@ -213,7 +182,7 @@
                         savedFiles = {};
                         hideForm();
                         var updateOpts = options.update;
-                        handleHtmlUpdate(updateOpts.element, data, updateOpts.replace, updateOpts.highlight);
+                        updateHtml(updateOpts.element, data, updateOpts.replace, updateOpts.highlight);
                         if (data.redirect) {
                             IndicoUI.Dialogs.Util.progress();
                             location.href = data.redirect;
