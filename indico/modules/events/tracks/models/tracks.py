@@ -112,7 +112,7 @@ class Track(DescriptionMixin, db.Model):
     def can_review_abstracts(self, user):
         if not user:
             return False
-        elif not self.event_new.can_manage(user, role='abstract_reviewer'):
+        elif not self.event_new.can_manage(user, role='abstract_reviewer', explicit_role=True):
             return False
         elif user in self.event_new.global_abstract_reviewers:
             return True
@@ -124,7 +124,7 @@ class Track(DescriptionMixin, db.Model):
     def can_convene(self, user):
         if not user:
             return False
-        elif not self.event_new.can_manage(user, role='track_convener'):
+        elif not self.event_new.can_manage(user, role='track_convener', explicit_role=True):
             return False
         elif user in self.event_new.global_conveners:
             return True
