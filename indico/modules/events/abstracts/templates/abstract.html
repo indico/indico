@@ -2,27 +2,23 @@
 
 {% from 'events/abstracts/abstract/public.html' import render_abstract_public %}
 {% from 'events/abstracts/abstract/judge.html' import render_decision_box, render_reviewed_for_tracks_box %}
-{% from 'events/abstracts/abstract/review.html' import render_abstract_reviews, render_comments_section, render_review_boxes %}
+{% from 'events/abstracts/abstract/review.html' import render_review_boxes %}
+{% from 'events/abstracts/abstract/timeline.html' import render_timeline %}
 
 {% block content %}
     {{ render_abstract_public(abstract, management=management) }}
-    <div class="i-timeline-connect-down"></div>
     <div id="abstract-private" class="i-timeline">
-        {% if abstract.comments or abstract.reviews %}
-            <div class="i-timeline-connect-down"></div>
-        {% endif %}
-        <div class="i-timeline-separator"></div>
-        {{ render_comments_section(abstract, comment_form) }}
-        {% if abstract.reviews %}
-            {{ render_abstract_reviews(abstract, review_forms, management=management) }}
-        {% endif %}
+        {{ render_timeline(abstract, comment_form) }}
 
         {% set can_review = abstract.can_review(session.user, check_state=true) %}
         {% set can_judge = abstract.can_judge(session.user, check_state=true) %}
 
         {% if can_review or can_judge %}
+            <div class="i-timeline">
+                {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
+                <div class="i-timeline-connect-down to-separator"></div>
+            </div>
             <div class="i-timeline-separator"></div>
-            <div class="i-timeline-connect-up"></div>
         {% endif %}
 
         {% if can_review %}
