@@ -1,0 +1,4 @@
+{% from 'forms/_form.html' import simple_form %}
+
+<span>{% trans %}The abstract is being reviewed for the following tracks:{% endtrans %}</span>
+{{ simple_form(form, back=_('Cancel'), skip_labels=true) }}

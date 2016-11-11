@@ -39,7 +39,7 @@ from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing, r
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
@@ -290,9 +290,7 @@ class RHEditReviewedForTrackList(RHAbstractBase):
 
     def _process(self):
         form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)
-        if form.validate_on_submit:
+        if form.validate_on_submit():
             update_reviewed_for_tracks(self.abstract, form.reviewed_for_tracks.data)
-            return jsonify_data(page_html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify_data(box_html=tpl.render_reviewed_for_tracks_box(self.abstract, form=form,
-                                                                        management=self.management))
+            return jsonify_data(html=render_abstract_page(self.abstract, management=self.management))
+        return jsonify_template('events/abstracts/forms/edit_review_tracks.html', form=form)

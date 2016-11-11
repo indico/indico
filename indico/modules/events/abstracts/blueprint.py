@@ -141,7 +141,7 @@ for prefix, is_management in (('/manage/abstracts', True), ('/abstracts', False)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/judge', 'judge_abstract',
                      reviewing.RHJudgeAbstract, methods=('POST',), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reviewing-tracks', 'edit_review_tracks',
-                     reviewing.RHEditReviewedForTrackList, methods=('POST',), defaults=defaults)
+                     reviewing.RHEditReviewedForTrackList, methods=('GET', 'POST'), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/review/track/<int:track_id>', 'review_abstract',
                      reviewing.RHSubmitAbstractReview, methods=('GET', 'POST'), defaults=defaults)
     _bp.add_url_rule(prefix + '/<int:abstract_id>/reviews/<int:review_id>/edit', 'edit_review',
