@@ -330,26 +330,20 @@
                     </div>
                     {% if abstract.edit_track_mode.name != 'none' %}
                         <div>
-                            <a href="#" id="edit-reviewed-for-track-list">
+                            <a href="#"
+                               data-href="{{ url_for('.edit_review_tracks', abstract, management=management) }}"
+                               data-form-container="#edit-reviewed-for-track-list"
+                               data-update=".management-page"
+                               data-replace-update
+                               data-hide-trigger
+                               data-ajax-form>
                                 {%- trans %}Edit track list{% endtrans -%}
                             </a>
                         </div>
                     {% endif %}
                 </div>
             </div>
-            <div class="i-box-footer hidden">
-                <span>{% trans %}The abstract is being reviewed for the following tracks:{% endtrans %}</span>
-                {{ form_header(form) }}
-                {{ form_rows(form, skip_labels=true) }}
-                {% call form_footer(form, skip_label=true) %}
-                    <button class="i-button big highlight"
-                            id="save-reviewing-tracks-list"
-                            data-method="POST"
-                            data-href="{{ url_for('.edit_review_tracks', abstract, management=management) }}">
-                        {%- trans %}Save{% endtrans -%}
-                    </button>
-                {% endcall %}
-            </div>
+            <div class="i-box-footer hidden-if-empty" id="edit-reviewed-for-track-list"></div>
         </div>
     </div>
 {% endmacro %}

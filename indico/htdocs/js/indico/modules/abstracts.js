@@ -89,32 +89,6 @@
                     showFormErrors($box);
                 }
             });
-        }).on('indico:confirmed', '#save-reviewing-tracks-list', function(evt) {
-            var $this = $(this);
-            var $box = $this.closest('.i-timeline-item');
-            var $form = $box.find('form');
-
-            evt.preventDefault();
-
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                data: getFormParams($form),
-                success: function(data) {
-                    var $page = $('.management-page');
-                    if (data.page_html) {
-                        var $newPage = $(data.page_html);
-                        $page.replaceWith($newPage);
-                        $page = $newPage;
-                    } else {
-                        $box.replaceWith(data.box_html);
-                    }
-                    initForms($page);
-                    showFormErrors($page);
-                }
-            });
         }).on('declarative:success', '.js-delete-comment', function() {
             $(this).parents('.i-timeline-item').remove();
         }).on('declarative:success', '.js-edit-comment, .js-edit-review', function(evt, data) {
@@ -130,9 +104,6 @@
             var $target = $(evt.target);
             initForms($target.find('form'));
             showFormErrors($target);
-        }).on('click', '#edit-reviewed-for-track-list', function(evt) {
-            evt.preventDefault();
-            $(this).closest('.i-timeline-item').find('.i-box-footer').toggleClass('hidden');
         }).on('focus', '.new-comment textarea', function() {
             var $commentForm = $(this).closest('form');
             $commentForm.find('.form-group').show('fast');
