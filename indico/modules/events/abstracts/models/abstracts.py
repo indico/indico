@@ -564,6 +564,12 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return AbstractReviewingState.mixed
 
+    def get_reviewed_for_tracks_by_user(self, user):
+        if self.event_new in user.global_abstract_reviewer_for_events:
+            return self.reviewed_for_tracks
+        else:
+            return self.reviewed_for_tracks & user.abstract_reviewer_for_tracks
+
     def get_reviews(self, track=None, user=None):
         """Get all reviews on a particular track and/or by a particular user.
 
