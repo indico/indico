@@ -16,6 +16,9 @@
 
 from __future__ import unicode_literals, division
 
+from itertools import chain
+from operator import attrgetter
+
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -535,6 +538,11 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
 
     def can_see_reviews(self, user):
         return self.can_judge(user) or self.can_convene(user)
+
+    def get_timeline(self, user=None):
+        comments = [each for each in self.comments if each.can_view(user)] if user else self.comments
+        reviews = [each for each in self.reviews if each.can_view(user)] if user else self.reviews
+        return sorted(chain(comments, reviews), key=attrgetter('created_dt'))
 
     def get_track_reviewing_state(self, track):
         if track not in self.reviewed_for_tracks:

@@ -148,7 +148,7 @@ class AbstractComment(RenderModeMixin, db.Model):
             return False
         elif user == self.user:
             return True
-        elif self.visibility == AbstractCommentVisibility.public:
+        elif self.visibility == AbstractCommentVisibility.users:
             return True
         visibility_checks = {AbstractCommentVisibility.judges: [self.abstract.can_judge],
                              AbstractCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
