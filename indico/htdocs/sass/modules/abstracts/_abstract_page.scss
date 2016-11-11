@@ -184,8 +184,7 @@
 }
 
 #abstract-submission-details,
-#abstract-comments,
-#abstract-reviews {
+#abstract-timeline {
     .i-timeline-item-label {
         @include icon-before('icon-user');
         border-color: $default-border-color !important;

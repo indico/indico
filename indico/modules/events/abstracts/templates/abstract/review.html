@@ -1,37 +1,17 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint %}
 
-{% macro render_abstract_reviews(abstract, review_forms, management=false) %}
-    <div id="abstract-reviews" class="i-timeline">
-        {% for track in abstract.reviewed_for_tracks %}
-            {% set reviews = abstract.reviews|selectattr('track', 'equalto', track)|list %}
-            {% if not abstract.can_see_reviews(session.user) %}
-                {% set reviews = reviews|selectattr('user', 'equalto', session.user)|list %}
-            {% endif %}
-            {% if reviews %}
-                <h3>
-                    {% trans title=track.title -%}
-                        Track: {{ title }}
-                    {%- endtrans %}
-                </h3>
-                {% for review in reviews %}
-                    {{ _render_review(review, review_forms[track.id], management=management) }}
-                {% endfor %}
-            {% endif %}
-        {% endfor %}
-    </div>
-{% endmacro %}
 
 {% macro render_review_boxes(abstract, review_forms, management=false) %}
     {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
         {% set user_reviewed = abstract.get_reviews(track=track)|selectattr('user', 'equalto', session.user)|list %}
         {% if not user_reviewed and track.can_review_abstracts(session.user) %}
-            {{ render_review_box(review_forms[track.id], abstract, track, management=management) }}
+            {{ _render_review_box(review_forms[track.id], abstract, track, management=management) }}
         {% endif %}
     {% endfor %}
 {% endmacro %}
 
-{% macro render_review_box(form, abstract, track, edit=false, management=false) %}
+
+{% macro _render_review_box(form, abstract, track, edit=false, management=false) %}
     <div id="abstract-review-box-{{ track.id }}" class="i-timeline-item abstract-review-box">
         <div class="i-timeline-item-label action icon-checkmark"></div>
         <div class="i-timeline-item-box content-indicator">
@@ -52,6 +32,7 @@
         </div>
     </div>
 {% endmacro %}
+
 
 {% macro render_review_form(form, abstract=none, track=none, review=none, management=false) %}
     {% set url = url_for('.review_abstract', abstract, track, management=management) if not review else
@@ -81,67 +62,10 @@
     {% endcall %}
 {% endmacro %}
 
-{% macro render_comments_section(abstract, form=none) %}
-    {% set can_comment = abstract.can_comment(session.user) %}
-    {% if abstract.comments or can_comment %}
-        <div id="abstract-comments" class="i-timeline">
-            <h3>
-                {%- trans %}Comments{% endtrans -%}
-            </h3>
-            {% for comment in abstract.comments %}
-                <div class="i-timeline-item">
-                    <div class="i-timeline-item-label action"></div>
-                    <div class="i-timeline-item-box header-indicator">
-                        <div class="i-box-header flex">
-                            <div class="stretch">
-                                {% trans name=comment.user.name -%}
-                                    <strong>{{ name }}</strong> left a comment
-                                {%- endtrans %}
-                                {{ render_visibility_hint(comment.visibility) }}
-                                <time datetime="{{ comment.created_dt.isoformat() }}">
-                                    {{- comment.created_dt|format_human_date -}}
-                                </time>
-                                {% if comment.modified_dt %}
-                                    {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
-                                {% endif %}
-                            </div>
-                            {% if comment.can_edit(session.user) %}
-                                <div class="abstract-comment-badges">
-                                    <a class="i-button-icon icon-edit js-edit-comment"
-                                       title="{% trans %}Edit comment{% endtrans %}"
-                                       data-href="{{ url_for('.edit_abstract_comment', comment) }}"
-                                       data-form-container="#comment-{{ comment.id }}"
-                                       data-update=".management-page"
-                                       data-replace-update
-                                       data-confirm-close-unsaved
-                                       data-ajax-form></a>
-                                    <a class="i-button-icon icon-cross js-delete-comment"
-                                       title="{% trans %}Remove comment{% endtrans %}"
-                                       data-method="DELETE"
-                                       data-href="{{ url_for('.delete_abstract_comment', comment) }}"
-                                       data-title="{% trans %}Remove comment{% endtrans %}"
-                                       data-confirm="{% trans %}Are you sure you want to remove this comment?{% endtrans %}"
-                                       data-ajax>
-                                    </a>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="i-box-content" id="comment-{{ comment.id }}">
-                            {{ comment.text }}
-                        </div>
-                    </div>
-                </div>
-            {% endfor %}
-            {% if can_comment %}
-                {{ render_comment_box(abstract, form) }}
-            {% endif %}
-        </div>
-    {% endif %}
-{% endmacro %}
 
 {% macro render_comment_box(abstract, form) %}
     <div id="abstract-comment-box" class="i-timeline-item">
-        <div class="i-timeline-item-label action icon-file"></div>
+        <div class="i-timeline-item-label action"></div>
         <div class="i-timeline-item-box footer-only header-indicator">
             <div class="i-box-footer js-form-container">
                 {{ render_comment_form(form, abstract) }}
@@ -150,6 +74,7 @@
     </div>
 {% endmacro %}
 
+
 {% macro render_comment_form(form, abstract, comment=none) %}
     {% set url = url_for('.edit_abstract_comment', comment) if comment else url_for('.comment_abstract', abstract) %}
     {% set form_class = 'edit-comment' if comment else 'new-comment unfocused' %}
@@ -157,6 +82,7 @@
         data-form-container="#abstract-comment-box .js-form-container"
         data-update=".management-page"
         data-replace-update
+        data-confirm-close-unsaved
         data-ajax-form
     {% endcall %}
     {{ form_rows(form, skip_labels=true) }}
@@ -169,147 +95,9 @@
             {% endif %}
         </button>
         {% if comment %}
-            <button type="button" class="i-button big text-color danger js-edit-cancel" data-button-back>
+            <button type="button" class="i-button big text-color color-on-hover danger js-edit-cancel" data-button-back>
                 {% trans %}Cancel{% endtrans %}
             </button>
         {% endif %}
     {% endcall %}
-{% endmacro %}
-
-{% macro _render_review_state(review) %}
-    {% set mapping = {'accept': 'success',
-                      'reject': 'error',
-                      'merge': 'visited',
-                      'mark_as_duplicate': 'strong',
-                      'change_tracks': 'warning'} %}
-    <span class="i-tag outline {{ mapping[review.proposed_action.name] }}">
-        {{ review.proposed_action.title -}}
-    </span>
-{% endmacro %}
-
-{% macro _render_rating(cfa, value) %}
-    <span class="rating">
-        {%- for bullet in range(cfa.rating_range[0], cfa.rating_range[1] + 1) -%}
-            <span class="bullet {{ 'full' if bullet <= value else '' }}"></span>
-        {%- endfor -%}
-    </span>
-{% endmacro %}
-
-{% macro _render_review(review, form, management=false) %}
-    {% set can_change_review = review.user == session.user and review.abstract.public_state.name == 'under_review' %}
-    <div class="i-timeline-item">
-        <div class="i-timeline-item-label action abstract-comment-pic"></div>
-        <div class="i-timeline-item-box header-indicator review-results"
-             id="abstract-review-results-{{ review.track.id }}">
-            <div class="i-box-header flex">
-                <div class="stretch">
-                    {% trans name=review.user.name -%}
-                        <strong>{{ name }}</strong> left a review
-                    {%- endtrans %}
-                    {{ render_visibility_hint(review.visibility) }}
-                    <time datetime="{{ review.created_dt.isoformat() }}">
-                        {{- review.created_dt|format_human_date -}}
-                    </time>
-                    {% if review.modified_dt %}
-                        {{ render_edited_hint(review.modified_dt) }}
-                    {% endif %}
-                </div>
-                <div class="abstract-comment-badges">
-                    <span>
-                        {% trans action=_render_review_state(review) %}
-                            Proposes to {{ action }}
-                        {% endtrans %}
-                    </span>
-                    {% if review.score %}
-                        {{ render_score(review.score, review.abstract.event_new.cfa) }}
-                    {% endif %}
-                </div>
-                {% if review.can_edit(session.user, check_state=true) %}
-                    <div>
-                        <a class="i-button-icon icon-edit"
-                           title="{% trans %}Edit review{% endtrans %}"
-                           data-href="{{ url_for('.edit_review', review, management=management) }}"
-                           data-form-container="#abstract-review-results-{{ review.track.id }} .js-form-container"
-                           data-update=".management-page"
-                           data-replace-update
-                           data-ajax-form></a>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="i-box-content js-form-container">
-                {% if review.proposed_action.name == 'accept' %}
-                    <div class="">
-                        {% if review.proposed_contribution_type %}
-                            {% set contribution_type -%}
-                                <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
-                            {%- endset %}
-                            {% trans type=contribution_type|safe -%}
-                                Proposed to accept as {{ type }}
-                            {%- endtrans %}
-                        {% else %}
-                            {% trans -%}
-                                Proposed to accept
-                            {%- endtrans %}
-                        {% endif %}
-                    </div>
-                {% elif review.proposed_action.name == 'change_tracks' %}
-                    <div class="">
-                        {% set tracks -%}
-                            {% for track in review.proposed_tracks -%}
-                                <span class="abstract-track">{{ track.title|escape }}</span>
-                                {%- if not loop.last -%}, {% endif -%}
-                            {% endfor %}
-                        {%- endset %}
-                        {% trans count=review.proposed_tracks|length, tracks=tracks|safe -%}
-                            Possible destination track: {{ tracks }}
-                        {%- pluralize -%}
-                            Possible destination tracks: {{ tracks }}
-                        {%- endtrans %}
-                    </div>
-                {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
-                    <div class="">
-                        {% set other_abstract = review.proposed_related_abstract %}
-                        {% set abstract_link -%}
-                            <a href="{{ url_for('.display_abstract', other_abstract) }}">
-                                {{ other_abstract.title|escape }}
-                            </a>
-                        {%- endset %}
-                        {% if review.proposed_action.name == 'merge' %}
-                            {% trans title=abstract_link|safe -%}
-                                Proposed to be merged into {{ title }}
-                            {%- endtrans %}
-                        {% elif review.proposed_action.name == 'mark_as_duplicate' %}
-                            {% trans title=abstract_link|safe -%}
-                                Proposed as duplicate of {{ title }}
-                            {%- endtrans %}
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {% if review.ratings %}
-                    <div class="titled-rule">
-                        {% trans %}Ratings{% endtrans %}
-                    </div>
-                    {% for rating in review.ratings|sort(attribute='question.position') %}
-                        <ul class="abstract-question-list">
-                            <li>
-                                <label>{{ rating.question.text }}</label>
-                                <span class="value">
-                                    {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
-                                    <span class="number">{{ rating.value }}</span>
-                                </span>
-                            </li>
-                        </ul>
-                    {% endfor %}
-                {% endif %}
-                {% if review.comment %}
-                    <div class="titled-rule">
-                        {% trans %}Comment{% endtrans %}
-                    </div>
-                    <div class="">
-                        {{ review.comment }}
-                    </div>
-                {% endif %}
-            </div>
-        </div>
-    </div>
 {% endmacro %}
