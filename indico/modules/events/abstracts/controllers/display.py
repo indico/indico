@@ -16,8 +16,7 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-from flask import session, flash, redirect, request, jsonify
+from flask import session, flash
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
@@ -27,55 +26,47 @@ from indico.modules.events.abstracts.views import WPDisplayAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
-from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_data, _pop_injected_js
+from indico.web.util import jsonify_template, jsonify_data
 from MaKaC.PDFinterface.conference import AbstractsToPDF
 
 
-class RHMyAbstractsBase(RHAbstractsBase):
-    """Base class for RHs related to the list of the user's abstract"""
+class RHCallForAbstracts(RHAbstractsBase):
+    """Show the main CFA page"""
 
-    def _checkParams(self, params):
-        RHAbstractsBase._checkParams(self, params)
-        self.abstracts = get_user_abstracts(self.event_new, session.user)
+    def _process(self):
+        abstracts = get_user_abstracts(self.event_new, session.user) if session.user else []
+        return WPDisplayAbstracts.render_template('display/call_for_abstracts.html', self._conf,
+                                                  event=self.event_new, abstracts=abstracts)
+
+
+class RHMyAbstractsExportPDF(RHAbstractsBase):
+    """Export the list of the user's abstracts as PDF"""
 
     def _checkProtection(self):
         if not session.user:
             raise Forbidden
         RHAbstractsBase._checkProtection(self)
 
-
-class RHDisplayCallForAbstracts(RHMyAbstractsBase):
     def _process(self):
-        return WPDisplayAbstracts.render_template('display/call_for_abstracts.html', self._conf,
-                                                  event=self.event_new, abstracts=self.abstracts)
-
-
-class RHMyAbstractsExportPDF(RHMyAbstractsBase):
-    """Export the list of the user's abstracts as PDF"""
-
-    def _process(self):
-        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        pdf = AbstractsToPDF(self.event_new, sorted_abstracts)
+        pdf = AbstractsToPDF(self.event_new, get_user_abstracts(self.event_new, session.user))
         return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHSubmitAbstract(RHAbstractsBase):
-    def _process(self):
-        if not self.event_new.cfa.can_submit_abstracts(session.user):
-            return redirect(url_for('.call_for_abstracts', self.event_new))
+    """Submit a new abstract."""
 
+    def _checkProtection(self):
+        if not session.user or not self.event_new.cfa.can_submit_abstracts(session.user):
+            raise Forbidden
+        RHAbstractsBase._checkProtection(self)
+
+    def _process(self):
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
             abstract = create_abstract(self.event_new, *get_field_values(form.data), send_notifications=True)
-            flash(_("Your abstract with title '{}' has been successfully submitted. It is registered with the number "
+            flash(_("Your abstract '{}' has been successfully submitted. It is registered with the number "
                     "#{}. You will be notified by email with the submission details.")
                   .format(abstract.title, abstract.friendly_id), 'success')
-            url = url_for('.call_for_abstracts', self.event_new)
-            if request.is_xhr:
-                return jsonify_data(flash=False, redirect=url)
-            else:
-                return redirect(url)
-        tpl = get_template_module('events/abstracts/display/submit_abstract.html')
-        return jsonify(form_html=tpl.render_abstract_submit_form(form, self.event_new), js=_pop_injected_js())
+            return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event_new))
+        return jsonify_template('events/abstracts/display/submit_abstract.html', form=form)

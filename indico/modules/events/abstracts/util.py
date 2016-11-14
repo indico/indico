@@ -198,20 +198,13 @@ def get_roles_for_event(event):
     return roles
 
 
-def _query_user_abstracts(event, user):
-    return (Abstract.query.with_parent(event)
-            .filter(db.or_(Abstract.submitter == user,
-                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user)))))
-
-
 def get_user_abstracts(event, user):
     """Get the list of tracks where the user is a reviewer/convener"""
-    return _query_user_abstracts(event, user).order_by(Abstract.friendly_id).all()
-
-
-def has_user_abstracts(event, user):
-    query = _query_user_abstracts(event, user)
-    return db.session.query(query.exists()).one()[0]
+    return (Abstract.query.with_parent(event)
+            .filter(db.or_(Abstract.submitter == user,
+                           Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
+            .order_by(Abstract.friendly_id)
+            .all())
 
 
 def _query_user_tracks(event, user):

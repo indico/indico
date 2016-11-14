@@ -125,13 +125,8 @@ def _get_notification_placeholders(sender, **kwargs):
 
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
-    from indico.modules.events.abstracts.util import has_user_abstracts, has_user_tracks
+    from indico.modules.events.abstracts.util import has_user_tracks
     from indico.modules.events.layout.util import MenuEntryData
-
-    def _my_abstracts_visible(conf):
-        if not session.user or not conf.has_feature('abstracts'):
-            return False
-        return has_user_abstracts(conf.as_event, session.user)
 
     def _reviewing_area_visible(conf):
         if not session.user or not conf.has_feature('abstracts'):

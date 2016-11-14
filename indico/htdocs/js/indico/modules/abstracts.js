@@ -127,15 +127,11 @@
     };
 
     global.setupCallForAbstractsPage = function setupCallForAbstractsPage() {
-        $('body').on('declarative:success', '.js-submit-abstract', function(evt, data) {
-            var $submitAbstractForm = $('.submit-abstract-form-section');
-            $submitAbstractForm.html(data.form_html);
-            if (data.js) {
-                $('body').append(data.js);
-            }
-            $('body').animate({
-                scrollTop: $submitAbstractForm.offset().top
-            }, 'slow');
-        });
+        // show the form after login when using the submit button as a guest
+        if (location.hash === '#submit-abstract') {
+            $(document).ready(function() {
+                $('.js-show-abstract-form').trigger('click');
+            });
+        }
     };
 })(window);
