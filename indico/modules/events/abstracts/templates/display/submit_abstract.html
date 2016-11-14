@@ -1,12 +1,8 @@
-{% from 'events/display/indico/_common.html' import render_users %}
 {% from 'forms/_form.html' import simple_form %}
 
-{% macro render_abstract_submit_form(form, event) %}
-    <div class="header">
-        <div class="header-row">
-            <h3>{%- trans %}Submit abstract{% endtrans -%}</h3>
-        </div>
+<div class="header">
+    <div class="header-row">
+        <h3>{% trans %}Submit abstract{% endtrans %}</h3>
     </div>
-    {{ simple_form(form, back_button=false, submit=_("Submit"),
-                   form_header_kwargs={'action': url_for('.submit', event)}) }}
-{% endmacro %}
+</div>
+{{ simple_form(form, submit=_("Submit"), back=_("Cancel"), form_header_kwargs={'action': request.relative_url}) }}
