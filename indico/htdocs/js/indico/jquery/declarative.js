@@ -217,18 +217,20 @@
     }
 
     function setupAjaxForms() {
-        $('body').on('click', 'button[data-ajax-form], a[data-ajax-form]', function(evt) {
+        function _handleEvent(evt) {
             evt.preventDefault();
             var $this = $(this);
             if ($this.hasClass('disabled')) {
                 return;
             }
 
+            var isSubmit = (evt.type === 'submit');
             inlineAjaxForm({
                 context: $this,
-                load: {
+                load: isSubmit ? null : {
                     url: $this.data('href')
                 },
+                submit: isSubmit ? $this : null,
                 formContainer: $this.data('form-container'),
                 confirmCloseUnsaved: $this.data('confirm-close-unsaved') !== undefined,
                 update: {
@@ -254,7 +256,10 @@
             }).on('ajaxForm:hide', function() {
                 toggleDisabled(false);
             });
-        });
+        }
+
+        $('body').on('click', 'button[data-ajax-form], a[data-ajax-form]', _handleEvent);
+        $('body').on('submit', 'form[data-ajax-form]', _handleEvent);
     }
 
     function setupMathJax() {
