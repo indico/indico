@@ -60,6 +60,7 @@
         @include box-sizing(border-box);
         margin-right: 12px;
         outline: 2px solid white;
+        flex-shrink: 0;
         // To match i-box-header height
         height: 39px;
         width: 39px;
@@ -68,8 +69,9 @@
     .i-timeline-item-box {
         @extend .i-box;
         @extend .i-box.no-shadow;
-        flex: 1;
+        flex-grow: 1;
         position: relative;
+        min-width: 0;
 
         .i-box-header {
             @extend %time-information;
