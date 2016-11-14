@@ -29,6 +29,8 @@
         }, options);
 
         var inputs = $('input[name=' + options.fieldName + '][id^=' + options.fieldId + ']');
+        var $enableAclLink = $('.enable-acl-link');
+        var $aclListField = $('.acl-list-field');
 
         inputs.on('change', function() {
             var $this = $(this);
@@ -38,7 +40,6 @@
                 $('#form-group-protected-{0} .protection-message'.format(options.fieldId)).hide();
                 $('#form-group-protected-{0} .{1}-protection-message'.format(options.fieldId, $this.val())).show();
 
-                toggleAclField($('#' + options.aclFieldId), !isProtected);
                 if (options.aclMessageUrl && options.hasInheritedAcl) {
                     $.ajax({
                         url: options.aclMessageUrl,
@@ -49,7 +50,14 @@
                         }
                     });
                 }
+                $aclListField.toggleClass('hidden', !isProtected);
+                $enableAclLink.toggleClass('hidden', isProtected);
             }
+        });
+
+        $enableAclLink.on('click', function(evt) {
+            evt.preventDefault();
+            $('input[name="protection_mode"][value="protected"]').trigger('click');
         });
 
         _.defer(function() {
