@@ -24,6 +24,7 @@ from wtforms.fields import BooleanField, IntegerField, SelectField, StringField,
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 from wtforms.widgets import Select
 
+from indico.core.db import db
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
                                                     AbstractPersonLinkListField, AbstractField, TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
@@ -217,10 +218,16 @@ class AbstractJudgmentFormBase(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(AbstractJudgmentFormBase, self).__init__(*args, **kwargs)
         self.session.query = Session.query.with_parent(self.event).order_by(Session.title)
+        if not self.session.query.count():
+            del self.session
         self.accepted_track.query = Track.query.with_parent(self.event).order_by(Track.title)
+        if not self.accepted_track.query.count():
+            del self.accepted_track
         self.accepted_contrib_type.query = (ContributionType.query
                                             .with_parent(self.event)
                                             .order_by(ContributionType.name))
+        if not self.accepted_contrib_type.query.count():
+            del self.accepted_contrib_type
 
     @property
     def split_data(self):

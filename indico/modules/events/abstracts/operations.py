@@ -122,8 +122,8 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
     abstract.judgment_comment = abstract_data['judgment_comment']
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted
-        abstract.accepted_track = abstract_data['accepted_track']
-        abstract.accepted_contrib_type = abstract_data['accepted_contrib_type']
+        abstract.accepted_track = abstract_data.get('accepted_track')
+        abstract.accepted_contrib_type = abstract_data.get('accepted_contrib_type')
         if not abstract.contribution:
             abstract.contribution = create_contribution_from_abstract(abstract, contrib_session)
     elif judgment == AbstractAction.reject:
