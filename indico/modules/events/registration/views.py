@@ -68,7 +68,8 @@ class DisplayRegistrationFormMixin(WPJinjaMixin):
     def getCSSFiles(self):
         return (self.base_class.getCSSFiles(self) +
                 self._asset_env['registration_sass'].urls() +
-                self._asset_env['payment_sass'].urls())
+                self._asset_env['payment_sass'].urls() +
+                self._asset_env['event_display_sass'].urls())
 
 
 class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDefaultDisplayBase):
