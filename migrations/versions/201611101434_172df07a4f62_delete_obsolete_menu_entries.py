@@ -16,7 +16,7 @@ down_revision = '8b5ab7da2d5'
 def upgrade():
     op.execute("""
         DELETE FROM events.menu_entries
-        WHERE type = 2 AND name IN ('my_tracks', 'program_my_tracks')
+        WHERE type = 2 AND name IN ('my_tracks', 'program_my_tracks', 'abstract_submission')
     """)
 
 

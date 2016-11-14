@@ -78,14 +78,6 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
     menu_entry_name = 'call_for_abstracts'
 
 
-class WPMyAbstracts(WPDisplayAbstractsBase):
-    menu_entry_name = 'user_abstracts'
-
-
-class WPSubmitAbstract(WPDisplayAbstractsBase):
-    menu_entry_name = 'abstract_submission'
-
-
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
     menu_entry_name = 'user_tracks'
 

@@ -17,18 +17,18 @@
 from __future__ import unicode_literals
 
 from operator import attrgetter
-
-from flask import session, flash, redirect, request
+from flask import session, flash, redirect, request, jsonify
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
-from indico.modules.events.abstracts.views import WPMyAbstracts, WPSubmitAbstract
+from indico.modules.events.abstracts.views import WPDisplayAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_data
+from indico.web.flask.templating import get_template_module
+from indico.web.util import jsonify_data, _pop_injected_js
 from MaKaC.PDFinterface.conference import AbstractsToPDF
 
 
@@ -45,12 +45,10 @@ class RHMyAbstractsBase(RHAbstractsBase):
         RHAbstractsBase._checkProtection(self)
 
 
-class RHMyAbstracts(RHMyAbstractsBase):
-    """Display the list of the user's abstracts"""
-
+class RHDisplayCallForAbstracts(RHMyAbstractsBase):
     def _process(self):
-        return WPMyAbstracts.render_template('display/user_abstract_list.html', self._conf, event=self.event_new,
-                                             abstracts=self.abstracts)
+        return WPDisplayAbstracts.render_template('display/call_for_abstracts.html', self._conf,
+                                                  event=self.event_new, abstracts=self.abstracts)
 
 
 class RHMyAbstractsExportPDF(RHMyAbstractsBase):
@@ -65,8 +63,8 @@ class RHMyAbstractsExportPDF(RHMyAbstractsBase):
 class RHSubmitAbstract(RHAbstractsBase):
     def _process(self):
         if not self.event_new.cfa.can_submit_abstracts(session.user):
-            return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
-                                                    form=None)
+            return redirect(url_for('.call_for_abstracts', self.event_new))
+
         abstract_form_class = make_abstract_form(self.event_new)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
@@ -74,10 +72,10 @@ class RHSubmitAbstract(RHAbstractsBase):
             flash(_("Your abstract with title '{}' has been successfully submitted. It is registered with the number "
                     "#{}. You will be notified by email with the submission details.")
                   .format(abstract.title, abstract.friendly_id), 'success')
-            url = url_for('.my_abstracts', self.event_new)
+            url = url_for('.call_for_abstracts', self.event_new)
             if request.is_xhr:
                 return jsonify_data(flash=False, redirect=url)
             else:
                 return redirect(url)
-        return WPSubmitAbstract.render_template('display/submit_abstract.html', self._conf, event=self.event_new,
-                                                form=form)
+        tpl = get_template_module('events/abstracts/display/submit_abstract.html')
+        return jsonify(form_html=tpl.render_abstract_submit_form(form, self.event_new), js=_pop_injected_js())
