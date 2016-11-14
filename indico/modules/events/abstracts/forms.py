@@ -298,10 +298,17 @@ class AbstractReviewForm(IndicoForm):
                                                  .order_by(ContributionType.name))
         if not self.proposed_contribution_type.query.count():
             del self.proposed_contribution_type
+        reviewed_for_track_ids = {t.id for t in abstract.reviewed_for_tracks}
+        existing_prop_track_cond = (Track.id.in_(t.id for t in self.proposed_tracks.object_data)
+                                    if self.proposed_tracks.object_data else False)
         self.proposed_tracks.query = (Track.query
                                       .with_parent(self.event)
-                                      .filter(Track.id.notin_(track.id for track in abstract.reviewed_for_tracks))
+                                      .filter(db.or_(Track.id.notin_(reviewed_for_track_ids),
+                                                     existing_prop_track_cond))
                                       .order_by(Track.title))
+        if not self.proposed_tracks.query.count():
+            del self.proposed_tracks
+            self.proposed_action.skip.add(AbstractAction.change_tracks)
 
     @property
     def split_data(self):
