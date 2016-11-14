@@ -558,3 +558,30 @@ th.i-table {
         }
     }
 }
+
+.recipients {
+    display: flex;
+    justify-content: space-between;
+
+    .static-text-widget {
+        width: inherit;
+    }
+
+    .static-text-widget p {
+        max-height: 200px;
+        overflow-y: auto;
+        white-space: normal;
+    }
+
+    a {
+        height: 30px;
+    }
+}
+
+.truncate {
+    .static-text-widget p {
+        @include ellipsis;
+
+        max-height: 30px;
+    }
+}
