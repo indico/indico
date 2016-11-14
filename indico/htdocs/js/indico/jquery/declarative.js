@@ -218,15 +218,16 @@
 
     function setupAjaxForms() {
         function _getOptions($elem, extra) {
+            var updateOpts = $elem.data('update');
             return $.extend({
                 context: $elem,
                 formContainer: $elem.data('form-container'),
                 confirmCloseUnsaved: $elem.data('confirm-close-unsaved') !== undefined,
-                update: {
+                update: updateOpts ? {
                     element: $elem.data('update'),
                     replace: $elem.data('replace-update') !== undefined,
                     highlight: $elem.data('highlight-update') !== undefined
-                }
+                } : null
             }, extra);
         }
 
@@ -240,7 +241,8 @@
             inlineAjaxForm(_getOptions($this, {
                 load: {
                     url: $this.data('href')
-                }
+                },
+                scrollToForm: $this.data('scroll-to-form') !== undefined
             }));
 
             function toggleDisabled(disabled) {
