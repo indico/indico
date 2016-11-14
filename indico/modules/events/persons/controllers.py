@@ -41,7 +41,7 @@ from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form
+from indico.web.util import jsonify_form, jsonify_template
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -169,7 +169,8 @@ class RHEmailEventPersons(RHConferenceModifBase):
             num = len(recipients)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data(flash=False)
-        return jsonify_form(form, submit=_('Send'), disabled_until_change=disabled_until_change)
+        return jsonify_template('events/persons/email_dialog.html', form=form,
+                                disabled_until_change=disabled_until_change, emails_count=len(recipients))
 
     def _send_emails(self, form, recipients):
         for recipient in recipients:
