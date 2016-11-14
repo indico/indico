@@ -41,6 +41,8 @@
                 method: 'GET',
                 data: {}
             },
+            // whether to scroll to the form after showing it
+            scrollToForm: false,
             // the element whose contents will be replaced with the form after
             // loading it.  may also be a selector.
             formContainer: null,
@@ -50,7 +52,8 @@
             // ask the user to confirm closing the form (or navigating away)
             // when there are unsaved changes
             confirmCloseUnsaved: false,
-            // settings on what should be updated on successful submission
+            // settings on what should be updated on successful submission.
+            // set to null to not update anything.
             update: {
                 // the element to update with html received after successfully
                 // submitting the form.  may also be a selector.
@@ -135,6 +138,11 @@
             }
             if (triggerShow) {
                 triggerEvent('ajaxForm:show');
+                if (options.scrollToForm) {
+                    $('body, html').animate({
+                        scrollTop: formContainer.offset().top
+                    });
+                }
             }
         }
 
@@ -173,8 +181,9 @@
                     savedFiles = {};
                     hideForm();
                     var updateOpts = options.update;
-                    updateHtml(updateOpts.element, data, updateOpts.replace, updateOpts.highlight);
-                    if (data.redirect) {
+                    if (updateOpts) {
+                        updateHtml(updateOpts.element, data, updateOpts.replace, updateOpts.highlight);
+                    } else if (data.redirect) {
                         IndicoUI.Dialogs.Util.progress();
                         location.href = data.redirect;
                     }
