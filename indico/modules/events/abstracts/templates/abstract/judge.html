@@ -76,12 +76,15 @@
             {% endfor %}
         </div>
         <div class="i-box-footer">
-            {{ form_header(form, orientation='vertical') }}
+            {% set url = url_for('.judge_abstract', abstract, management=management) %}
+            {% call form_header(form, action=url, orientation='vertical') %}
+                data-form-container="#abstract-decision-box"
+                data-update=".management-page"
+                data-ajax-form
+            {% endcall %}
             {{ form_rows(form, fields=form._order, skip_labels=true) }}
             {% call form_footer(form) %}
-                <button class="i-button big highlight js-judge"
-                        data-method="POST"
-                        data-href="{{ url_for('.judge_abstract', abstract, management=management) }}">
+                <button class="i-button big highlight">
                     {% trans %}Judge{% endtrans %}
                 </button>
             {% endcall %}

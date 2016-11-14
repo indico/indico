@@ -32,8 +32,7 @@
 {% endmacro %}
 
 {% macro render_review_box(form, abstract, track, edit=false, management=false) %}
-    <div id="abstract-review-box-{{ track.id }}"
-         class="i-timeline-item abstract-review-box">
+    <div id="abstract-review-box-{{ track.id }}" class="i-timeline-item abstract-review-box">
         <div class="i-timeline-item-label action icon-checkmark"></div>
         <div class="i-timeline-item-box content-indicator">
             <div class="i-box-content">
@@ -47,7 +46,7 @@
                     </div>
                 </div>
             </div>
-            <div class="i-box-footer">
+            <div class="i-box-footer js-form-container">
                 {{ render_review_form(form, abstract=abstract, track=track, management=management) }}
             </div>
         </div>
@@ -55,28 +54,27 @@
 {% endmacro %}
 
 {% macro render_review_form(form, abstract=none, track=none, review=none, management=false) %}
-    {{ form_header(form, orientation='vertical', id=('track-review-form-' + track.id|string)) }}
+    {% set url = url_for('.review_abstract', abstract, track, management=management) if not review else
+                 url_for('.edit_review', review, management=management) %}
+    {% call form_header(form, action=url, orientation='vertical', id=('track-review-form-%s'|format(track.id))) %}
+        data-form-container="#abstract-review-box-{{ track.id }} .js-form-container"
+        data-update=".management-page"
+        data-replace-update
+        data-ajax-form
+    {% endcall %}
     {{ form_rows(form, skip=form._order) }}
     {{ form_rows(form, fields=form._order, skip_labels=true) }}
     {% set form_id = '#track-review-form-' + track.id|string %}
     {% call form_footer(form) %}
         {% if not review %}
-            <button class="i-button big highlight text-color js-review"
-                    data-href="{{ url_for('.review_abstract', abstract, track, management=management) }}"
-                    data-method="POST"
-                    data-disabled-until-change>
-                    {% trans %}Submit review{% endtrans %}
+            <button class="i-button big highlight text-color" data-disabled-until-change>
+                {% trans %}Submit review{% endtrans %}
             </button>
         {% else %}
-            <button class="i-button big highlight text-color js-review"
-                    data-href="{{ url_for('.edit_review', review, management=management) }}"
-                    data-method="POST"
-                    data-disabled-until-change>
+            <button class="i-button big highlight text-color" data-disabled-until-change>
                 {% trans %}Change review{% endtrans %}
             </button>
-            <button class="i-button big text-color color-on-hover danger js-edit-cancel"
-                    data-confirm="{% trans %}Do you want to discard the changes to this review?{% endtrans %}"
-                    data-confirm-if-change>
+            <button class="i-button big text-color color-on-hover danger" data-button-back>
                 {% trans %}Cancel{% endtrans %}
             </button>
         {% endif %}
@@ -145,7 +143,7 @@
     <div id="abstract-comment-box" class="i-timeline-item">
         <div class="i-timeline-item-label action icon-file"></div>
         <div class="i-timeline-item-box footer-only header-indicator">
-            <div class="i-box-footer">
+            <div class="i-box-footer js-form-container">
                 {{ render_comment_form(form, abstract) }}
             </div>
         </div>
@@ -155,15 +153,15 @@
 {% macro render_comment_form(form, abstract, comment=none) %}
     {% set url = url_for('.edit_abstract_comment', comment) if comment else url_for('.comment_abstract', abstract) %}
     {% set form_class = 'edit-comment' if comment else 'new-comment unfocused' %}
-    {{ form_header(form, orientation='vertical', classes=form_class) }}
+    {% call form_header(form, action=url, orientation='vertical', classes=form_class) %}
+        data-form-container="#abstract-comment-box .js-form-container"
+        data-update=".management-page"
+        data-replace-update
+        data-ajax-form
+    {% endcall %}
     {{ form_rows(form, skip_labels=true) }}
     {% call form_footer(form) %}
-        <button type="submit" class="i-button big highlight text-color js-comment"
-                {% if not comment %}
-                    data-method="POST"
-                    data-href="{{ url }}"
-                {% endif %}
-                data-disabled-until-change>
+        <button type="submit" class="i-button big highlight text-color" data-disabled-until-change>
             {% if comment %}
                 {% trans %}Update comment{% endtrans %}
             {% else %}
@@ -201,7 +199,8 @@
     {% set can_change_review = review.user == session.user and review.abstract.public_state.name == 'under_review' %}
     <div class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
-        <div class="i-timeline-item-box header-indicator review-results">
+        <div class="i-timeline-item-box header-indicator review-results"
+             id="abstract-review-results-{{ review.track.id }}">
             <div class="i-box-header flex">
                 <div class="stretch">
                     {% trans name=review.user.name -%}
@@ -230,12 +229,14 @@
                         <a class="i-button-icon icon-edit js-edit-review"
                            title="{% trans %}Edit review{% endtrans %}"
                            data-href="{{ url_for('.edit_review', review, management=management) }}"
-                           data-method="GET"
-                           data-ajax></a>
+                           data-form-container="#abstract-review-results-{{ review.track.id }} .js-form-container"
+                           data-update=".management-page"
+                           data-replace-update
+                           data-ajax-form></a>
                     </div>
                 {% endif %}
             </div>
-            <div class="i-box-content">
+            <div class="i-box-content js-form-container">
                 {% if review.proposed_action.name == 'accept' %}
                     <div class="">
                         {% if review.proposed_contribution_type %}
