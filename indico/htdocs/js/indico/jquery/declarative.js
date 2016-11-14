@@ -217,28 +217,31 @@
     }
 
     function setupAjaxForms() {
-        function _handleEvent(evt) {
+        function _getOptions($elem, extra) {
+            return $.extend({
+                context: $elem,
+                formContainer: $elem.data('form-container'),
+                confirmCloseUnsaved: $elem.data('confirm-close-unsaved') !== undefined,
+                update: {
+                    element: $elem.data('update'),
+                    replace: $elem.data('replace-update') !== undefined,
+                    highlight: $elem.data('highlight-update') !== undefined
+                }
+            }, extra);
+        }
+
+        function _handleClick(evt) {
             evt.preventDefault();
             var $this = $(this);
             if ($this.hasClass('disabled')) {
                 return;
             }
 
-            var isSubmit = (evt.type === 'submit');
-            inlineAjaxForm({
-                context: $this,
-                load: isSubmit ? null : {
+            inlineAjaxForm(_getOptions($this, {
+                load: {
                     url: $this.data('href')
-                },
-                submit: isSubmit ? $this : null,
-                formContainer: $this.data('form-container'),
-                confirmCloseUnsaved: $this.data('confirm-close-unsaved') !== undefined,
-                update: {
-                    element: $this.data('update'),
-                    replace: $this.data('replace-update') !== undefined,
-                    highlight: $this.data('highlight-update') !== undefined
                 }
-            });
+            }));
 
             function toggleDisabled(disabled) {
                 if ($this.data('hide-trigger') !== undefined) {
@@ -258,8 +261,19 @@
             });
         }
 
-        $('body').on('click', 'button[data-ajax-form], a[data-ajax-form]', _handleEvent);
-        $('body').on('submit', 'form[data-ajax-form]', _handleEvent);
+        function _handleHtmlUpdate($elem) {
+            $elem.find('form[data-ajax-form]').each(function() {
+                inlineAjaxForm(_getOptions($(this), {
+                    load: null
+                }));
+            });
+        }
+
+        $('body').on('click', 'button[data-ajax-form], a[data-ajax-form]', _handleClick);
+        $('body').on('indico:htmlUpdated', function(evt) {
+            _handleHtmlUpdate($(evt.target));
+        });
+        _handleHtmlUpdate($('body'));
     }
 
     function setupMathJax() {
