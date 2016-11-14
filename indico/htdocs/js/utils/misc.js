@@ -173,11 +173,11 @@
     function _doUpdateHtml(target, html, replace, highlight) {
         target = $(target);
         if (replace) {
-            var $html = $($.parseHTML(html));
+            var $html = $($.parseHTML(html, document, true));
             target.replaceWith($html);
             target = $html;
         } else {
-            target.html(html);
+            target.html($.parseHTML(html, document, true));
         }
         target.trigger('indico:htmlUpdated');
         if (highlight) {
