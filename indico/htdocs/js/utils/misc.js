@@ -48,7 +48,7 @@
 
     global.alertPopup = function alertPopup(message, title) {
         var dfd = $.Deferred();
-        new AlertPopup(title, message, function(){
+        new AlertPopup(title, message, function() {
             dfd.resolve();
         }).open();
         return dfd;
@@ -107,6 +107,8 @@
             class: '' // a class that will be added to the message box (warning, error, success or highlight)
         }, options);
 
+        var box;
+
         function _disappear(when) {
             return setTimeout(function() {
                 box.fadeOut(function() {
@@ -115,14 +117,14 @@
             }, when);
         }
 
-        var container = $('#corner-message-container'),
-            disappearHandler = options.duration ? _disappear(options.duration) : null;
+        var container = $('#corner-message-container');
+        var disappearHandler = options.duration ? _disappear(options.duration) : null;
 
         if (!container.length) {
             container = $('<div id="corner-message-container">').appendTo('body');
         }
 
-        var box = $('<div class="corner-message">').text(options.message).prependTo(container);
+        box = $('<div class="corner-message">').text(options.message).prependTo(container);
 
         if (options.class) {
             box.addClass(options.class);
@@ -171,17 +173,17 @@
     };
 
     function _doUpdateHtml(target, html, replace, highlight) {
-        target = $(target);
+        var $target = $(target);
         if (replace) {
             var $html = $($.parseHTML(html, document, true));
-            target.replaceWith($html);
-            target = $html;
+            $target.replaceWith($html);
+            $target = $html;
         } else {
-            target.html($.parseHTML(html, document, true));
+            $target.html($.parseHTML(html, document, true));
         }
-        target.trigger('indico:htmlUpdated');
+        $target.trigger('indico:htmlUpdated');
         if (highlight) {
-            target.effect('highlight', {color: '#5D95EA'});
+            $target.effect('highlight', {color: '#5D95EA'});
         }
     }
 
