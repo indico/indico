@@ -16,14 +16,10 @@
  */
 
 /* global showFormErrors:false, initForms:false, confirmPrompt:false, updateHtml:false */
+/* global getDropzoneFiles:false, setDropzoneFiles:false */
 
 (function(global) {
     'use strict';
-
-    var DROPZONE_FILE_KEYS = [
-        'upload', 'status', 'previewElement', 'previewTemplate', '_removeLink',
-        'accepted', 'width', 'height', 'processing', 'xhr'
-    ];
 
     global.inlineAjaxForm = function inlineAjaxForm(options) {
         options = $.extend(true, {
@@ -161,10 +157,7 @@
             $form.on('ajaxForm:beforeSubmit', function() {
                 killProgress = IndicoUI.Dialogs.Util.progress();
                 // save files from dropzone fields so we can re-populate in case of failure
-                var dropzoneField = $form.data('dropzoneField');
-                if (dropzoneField) {
-                    savedFiles[dropzoneField.id] = $form[0].dropzone.getUploadingFiles();
-                }
+                $.extend(savedFiles, getDropzoneFiles($form));
             }).on('ajaxForm:error', function(evt, xhr) {
                 if (killProgress) {
                     killProgress();
@@ -189,15 +182,7 @@
                     showForm(data);
                     // restore files in dropzone fields
                     $.each(savedFiles, function(id, files) {
-                        var dropzone = $('#' + id).closest('form')[0].dropzone;
-                        _.defer(function() {
-                            files.forEach(function(file) {
-                                DROPZONE_FILE_KEYS.forEach(function(key) {
-                                    delete file[key];
-                                });
-                                dropzone.addFile(file);
-                            });
-                        });
+                        setDropzoneFiles($('#' + id), files);
                     });
                     savedFiles = {};
                 }

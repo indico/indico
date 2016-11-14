@@ -393,6 +393,32 @@
         };
     };
 
+    global.getDropzoneFiles = function getDropzoneFiles($form) {
+        var files = {};
+        var dropzoneField = $form.data('dropzoneField');
+        if (dropzoneField) {
+            files[dropzoneField.id] = $form[0].dropzone.getUploadingFiles();
+        }
+        return files;
+    };
+
+    var DROPZONE_FILE_KEYS = [
+        'upload', 'status', 'previewElement', 'previewTemplate', '_removeLink',
+        'accepted', 'width', 'height', 'processing', 'xhr'
+    ];
+
+    global.setDropzoneFiles = function setDropzoneFiles($field, files) {
+        var dropzone = $field.closest('form')[0].dropzone;
+        _.defer(function() {
+            files.forEach(function(file) {
+                DROPZONE_FILE_KEYS.forEach(function(key) {
+                    delete file[key];
+                });
+                dropzone.addFile(file);
+            });
+        });
+    };
+
     $(document).ready(function() {
         initForms($('form'));
 
