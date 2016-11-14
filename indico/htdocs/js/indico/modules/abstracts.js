@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false, initForms:false, showFormErrors:false, getFormParams:false */
+/* global setupListGenerator:false, initForms:false, showFormErrors:false */
 
 (function(global) {
     'use strict';
@@ -39,67 +39,8 @@
     };
 
     global.setupAbstractPage = function setupAbstractPage() {
-        $('body').on('indico:confirmed', '.js-comment, .js-review', function(evt) {
-            evt.preventDefault();
-
-            var $this = $(this);
-            var $box = $this.parents('.i-timeline-item');
-            var $form = $box.find('form');
-            var $page = $('.management-page');
-
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                data: getFormParams($form),
-                success: function(data) {
-                    if (data.page_html) {
-                        var $newPage = $(data.page_html);
-                        $page.replaceWith($newPage);
-                        $page = $newPage;
-                    } else {
-                        $form.replaceWith(data.form_html);
-                    }
-                    initForms($page);
-                    showFormErrors($page);
-                }
-            });
-        }).on('indico:confirmed', '.js-judge', function(evt) {
-            var $box = $('#abstract-decision-box');
-            var $this = $(this);
-            var $form = $box.find('form');
-
-            evt.preventDefault();
-
-            $.ajax({
-                url: $this.data('href'),
-                method: $this.data('method'),
-                complete: IndicoUI.Dialogs.Util.progress(),
-                error: handleAjaxError,
-                data: getFormParams($form),
-                success: function(data) {
-                    if (data.page_html) {
-                        $('.management-page').replaceWith(data.page_html);
-                        $box = $('#abstract-decision-box');
-                    } else {
-                        $box.html(data.box_html);
-                    }
-                    initForms($box);
-                    showFormErrors($box);
-                }
-            });
-        }).on('declarative:success', '.js-delete-comment', function() {
-            $(this).parents('.i-timeline-item').remove();
-        }).on('declarative:success', '.js-edit-review', function(evt, data) {
-            var $oldContent = $(this).parents('.i-timeline-item').find('.i-box-content');
-            var $newContent = $(data.form_html);
-            $oldContent.replaceWith($newContent);
-            $newContent.find('.js-edit-cancel').on('indico:confirmed', function(evt_) {
-                evt_.preventDefault();
-                $newContent.replaceWith($oldContent);
-            });
-            initForms($newContent);
+        $('body').on('declarative:success', '.js-delete-comment', function() {
+            $(this).closest('.i-timeline-item').remove();
         }).on('indico:htmlUpdated', function(evt) {
             var $target = $(evt.target);
             initForms($target.find('form'));
