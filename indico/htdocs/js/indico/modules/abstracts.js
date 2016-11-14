@@ -77,6 +77,8 @@
             var $this = $(this);
             $this.toggleClass('open');
             $this.closest('.ratings-switch').siblings('.ratings-details').toggle();
+        }).on('click', '.js-highlight-review', function() {
+            $($(this).attr('href') + ' .i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
         });
     };
 

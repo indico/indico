@@ -20,6 +20,7 @@ from itertools import chain
 from operator import attrgetter
 
 from sqlalchemy import inspect
+from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -27,7 +28,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.caching import memoize_request
@@ -570,6 +573,26 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
                 return AbstractReviewingState.conflicting
         else:
             return AbstractReviewingState.mixed
+
+    def get_avg_per_question_per_track(self):
+        ratings = {}
+        abstract_ratings = (AbstractReviewRating.query
+                            .join(AbstractReviewRating.review)
+                            .join(AbstractReviewRating.question)
+                            .options(contains_eager('review'), contains_eager('question'))
+                            .filter(AbstractReview.abstract == self,
+                                    ~AbstractReviewQuestion.is_deleted)
+                            .all())
+        for rating in abstract_ratings:
+            if rating.question.no_score:
+                continue
+            ratings.setdefault(rating.review.track_id, {})
+            question_avg_rating = ratings[rating.review.track_id].get(rating.question)
+            if question_avg_rating:
+                ratings[rating.review.track_id][rating.question] = (question_avg_rating + rating.value) / 2
+            else:
+                ratings[rating.review.track_id][rating.question] = rating.value
+        return ratings
 
     def get_reviewed_for_tracks_by_user(self, user, include_reviewed=False):
         already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()

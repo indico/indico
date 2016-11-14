@@ -19,15 +19,14 @@
                             'negative': _("No reviewer proposed to accept this abstract"),
                             'mixed': _("Not all reviewers proposed to accept this abstract")} %}
     {% set state = abstract.reviewing_state %}
-    <span class="i-tag {{ mapping_class[state.name] }}" title="{{ mapping_title[state.name] }}">
+    <span class="reviewing-state i-tag {{ mapping_class[state.name] }}"
+          title="{{ mapping_title[state.name] }}">
         {{- state.title -}}
     </span>
 {% endmacro %}
 
-
-{% macro _render_abstract_track_reviewing_state(abstract, track) %}
+{% macro _render_abstract_track_reviewing_state_icon(abstract, track) %}
     {% set mapping_class = {'positive': 'success',
-                            'conflicting': 'visited',
                             'negative': 'error',
                             'mixed': 'warning'} %}
     {% set mapping_title = {'not_started': _("No reviewer has reviewed this abstract yet"),
@@ -36,10 +35,16 @@
                                              "but as different contribution types"),
                             'negative': _("No reviewer proposed to accept this abstract"),
                             'mixed': _("Not all reviewers proposed to accept this abstract")} %}
+    {% set mapping_icon = {'positive': 'icon-checkmark',
+                           'conflicting': 'icon-checkmark',
+                           'negative': 'icon-cross',
+                           'mixed': 'icon-cross',
+                           'not_started': 'icon-circle-small'} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
-    <span class="i-tag outline {{ mapping_class[state.name] }}" title="{{ mapping_title[state.name] }}">
-        {{ state.title -}}
-    </span>
+    <div class="state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
+         title="{{ mapping_title[state.name] }}">
+        <span class="{{ mapping_icon[state.name] }}"></span>
+    </div>
 {% endmacro %}
 
 
@@ -47,34 +52,87 @@
     {% set event = abstract.event_new %}
     <div class="i-timeline-item-label action icon-hammer"></div>
     <div class="i-timeline-item-box content-indicator">
-        <div class="i-box-content">
-            <div class="flexrow">
-                <div class="f-self-grow">
+        <div class="i-box-content track-reviews-wrapper">
+            <div class="tracks-review-summary flexrow f-a-center">
+                <div class="f-self-stretch">
                     <strong>
-                        {% trans %}Review summary{% endtrans %}
+                        {%- trans %}Review summary{% endtrans -%}
                     </strong>
                 </div>
-                <div class="abstract-comment-badges">
-                    {% trans state=_render_abstract_reviewing_state(abstract) -%}
-                        Reviews are {{ state }}
-                    {%- endtrans %}
+                <div class="abstract-comment-badges flexrow f-a-center">
+                    <span class="review-state-pretext">{% trans %}Reviews are{% endtrans %}</span>
+                    {{ _render_abstract_reviewing_state(abstract) }}
                     {% if abstract.score is not none %}
-                        {{ render_score(abstract.score, event.cfa) }}
+                        {{ render_score(abstract.score, event.cfa, final=true) }}
                     {% endif %}
                 </div>
             </div>
+            {% set ratings = abstract.get_avg_per_question_per_track() %}
             {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
-                <div class="track-review flexrow">
-                    <div class="f-self-grow">
-                        {{ track.full_title }}
-                    </div>
-                    <div>
-                        {{ _render_abstract_track_reviewing_state(abstract, track) }}
+                {% set has_reviews = track.id in ratings %}
+                <div class="track-review">
+                    <div class="track-review-summary flexrow f-a-center">
+                        {{ _render_abstract_track_reviewing_state_icon(abstract, track) }}
+                        <div class="f-self-stretch truncate-text">
+                            {{- track.title -}}
+                        </div>
                         {% set score = abstract.get_track_score(track) %}
+                        {% if has_reviews %}
+                            <a href="#" class="track-review-details-link"
+                               data-toggle="#review-list-{{ track.id }}"
+                               data-accordion=".track-reviews-wrapper"
+                               data-show-text="{% trans %}Show reviews{% endtrans %}"
+                               data-hide-text="{% trans %}Hide reviews{% endtrans %}">
+                                {%- trans %}Show reviews{% endtrans -%}
+                            </a>
+                            {% if score is not none %}
+                                <a href="#" class="track-review-details-link"
+                                   data-toggle="#question-list-{{ track.id }}"
+                                   data-accordion=".track-reviews-wrapper"
+                                   data-show-text="{% trans %}Show questions{% endtrans %}"
+                                   data-hide-text="{% trans %}Hide questions{% endtrans %}">
+                                    {%- trans %}Show questions{% endtrans -%}
+                                </a>
+                            {% endif %}
+                        {% endif %}
                         {% if score is not none %}
                             {{ render_score(score, event.cfa) }}
                         {% endif %}
                     </div>
+                    {% if has_reviews %}
+                        <div class="track-review-details">
+                            <div id="question-list-{{ track.id }}" class="details-content weak-hidden">
+                                <div class="details-content-inner">
+                                    {% for question, score in ratings[track.id].iteritems() %}
+                                        <div class="details-content-row flexrow f-a-center">
+                                            <div class="question-text f-self-stretch">{{ question.text }}</div>
+                                            {{ render_score(score, abstract.event_new.cfa) }}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div id="review-list-{{ track.id }}" class="details-content weak-hidden">
+                                <div class="details-content-inner">
+                                    {% for review in abstract.get_reviews(track=track) %}
+                                        <div class="details-content-row flexrow f-a-center">
+                                            <div class="f-self-stretch">
+                                                {%- trans name=review.user.name, action=review.proposed_action.title -%}
+                                                    <strong>{{ name }}</strong> proposes to {{ action }}
+                                                {%- endtrans %}
+                                            </div>
+                                            <a href="#abstract-review-{{ review.id }}"
+                                               class="track-review-details-link js-highlight-review">
+                                                {%- trans %}See review{% endtrans -%}
+                                            </a>
+                                            {% if review.score is not none %}
+                                                {{ render_score(review.score, abstract.event_new.cfa) }}
+                                            {% endif %}
+                                        </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
@@ -109,7 +167,7 @@
         <div class="i-timeline-item-box content-indicator">
             <div class="i-box-content">
                 <div class="flexrow">
-                    <div class="f-self-grow">
+                    <div class="f-self-stretch">
                         <div class="info-line">
                             <label>
                                 {% trans count=abstract.reviewed_for_tracks|length -%}

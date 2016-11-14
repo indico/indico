@@ -212,6 +212,10 @@
     margin-left: 0.5em;
 }
 
+.reviewing-state {
+    margin-right: 5px;
+}
+
 #abstract-submission-details,
 #abstract-timeline {
     .i-timeline-item-label {
@@ -232,8 +236,62 @@
         @extend %i-box-cancel-horizontal-margin;
         @extend %i-box-horizontal-padding;
         @include border-top();
-        margin-top: 10px;
-        padding-top: 10px;
+        padding: 0;
+    }
+
+    .state-icon {
+        @extend %semantic-outline;
+        border: none !important;
+        margin-right: 10px;
+
+        > span {
+            display: flex;
+
+            &::before {
+                line-height: normal;
+            }
+        }
+    }
+
+    .tracks-review-summary {
+        margin-top: -5px;
+        margin-bottom: 5px;
+    }
+
+    .track-review-summary {
+        padding: 5px 10px;
+        min-height: 2em;
+        min-width: 0;
+    }
+
+    .track-review-details {
+        background-color: $light-gray;
+
+        .details-content-row {
+            padding: 5px 10px 5px calc(20px + 1em);
+
+            &:not(:first-child) {
+                @include border-top($style: dashed);
+            }
+        }
+    }
+
+    .track-review-details-link {
+        font-size: small;
+        margin-right: 10px;
+        flex-shrink: 0;
+    }
+
+    .review-state-pretext {
+        margin-right: 5px;
+    }
+
+    .i-box-footer {
+        margin-top: 0px;
+    }
+
+    .details-content-inner {
+        box-shadow: inset 0px 15px 20px -20px $gray;
     }
 }
 

@@ -306,7 +306,7 @@
     }
 
     function setupToggleLinks() {
-        $('[data-toggle]:not([data-toggle=dropdown])').on('click', function(evt) {
+        $('body').on('click', '[data-toggle]:not([data-toggle=dropdown])', function(evt) {
             evt.preventDefault();
             var $elem = $(this);
             var accordion = $elem.data('accordion');
