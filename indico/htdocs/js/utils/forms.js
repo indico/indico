@@ -195,9 +195,9 @@
         forms.find('fieldset.collapsible > legend').on('click', function(evt) {
             evt.preventDefault();
             var $this = $(this);
-            var collapseIcon = $this.find('div > span');
+            var $collapseIcon = $this.find('div > span');
             $this.next('.fieldset-content').slideToggle();
-            collapseIcon.toggleClass('icon-next icon-expand');
+            $collapseIcon.toggleClass('icon-next icon-expand');
         });
 
         forms.find('fieldset.collapsible.initially-collapsed').each(function() {
