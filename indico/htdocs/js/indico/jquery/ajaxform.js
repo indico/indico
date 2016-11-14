@@ -38,10 +38,6 @@
             // an element that triggers loading the form when clicked. if not set,
             // the form will be loaded immediately.
             trigger: null,
-            // to support declarative-style ajax submission of forms already on
-            // the page this may be set to a form (within `formContainer`) which
-            // will be submitted immediately
-            submit: null,
             // settings related to loading the form, can be set to null if the
             // form is already available on the page
             load: {
@@ -147,25 +143,22 @@
         }
 
         function hideForm() {
+            if (options.confirmCloseUnsaved) {
+                $(window).off('beforeunload', onBeforeUnload);
+            }
             if (!formVisible || !options.load) {
                 return;
             }
             formVisible = false;
             formContainer.html(oldContent);
             oldContent = null;
-            if (options.confirmCloseUnsaved) {
-                $(window).off('beforeunload', onBeforeUnload);
-            }
             triggerEvent('ajaxForm:hide');
         }
 
         function _bindEvents($form) {
             var killProgress;
 
-            $form.on('submit', function(evt) {
-                // prevent additional submission
-                evt.stopPropagation();
-            }).on('ajaxForm:beforeSubmit', function() {
+            $form.on('ajaxForm:beforeSubmit', function() {
                 killProgress = IndicoUI.Dialogs.Util.progress();
                 // save files from dropzone fields so we can re-populate in case of failure
                 var dropzoneField = $form.data('dropzoneField');
@@ -258,11 +251,11 @@
             }
         }
 
-        if (options.submit) {
-            var $form = $(options.submit);
-            _bindEvents($form);
-            context.ajaxSubmit(_getAjaxFormArgs($form));
-        } else if (!options.load) {
+        if (!options.load) {
+            // we don't go through showForm for an immediately-visible form
+            if (options.confirmCloseUnsaved) {
+                $(window).on('beforeunload', onBeforeUnload);
+            }
             ajaxifyForms(true);
         } else if (options.trigger) {
             options.trigger.on('click', function(evt) {
