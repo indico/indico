@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false, initForms:false, showFormErrors:false */
+/* global setupListGenerator:false */
 
 (function(global) {
     'use strict';
@@ -41,10 +41,6 @@
     global.setupAbstractPage = function setupAbstractPage() {
         $('body').on('declarative:success', '.js-delete-comment', function() {
             $(this).closest('.i-timeline-item').remove();
-        }).on('indico:htmlUpdated', function(evt) {
-            var $target = $(evt.target);
-            initForms($target.find('form'));
-            showFormErrors($target);
         }).on('focus', '.new-comment textarea', function() {
             var $commentForm = $(this).closest('form');
             $commentForm.find('.form-group').show('fast');
