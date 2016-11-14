@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global countWords:false, initForms:false, showFormErrors:false */
+/* global countWords:false, initForms:false, showFormErrors:false, toggleAclField:false */
 
 (function(global) {
     'use strict';
@@ -23,7 +23,7 @@
     function validatePasswordConfirmation(passwordField, confirmField) {
         if ('setCustomValidity' in confirmField[0]) {
             passwordField.add(confirmField).on('change input', function() {
-                if (passwordField.val() != confirmField.val()) {
+                if (passwordField.val() !== confirmField.val()) {
                     confirmField[0].setCustomValidity($T('The passwords do not match.'));
                 } else {
                     confirmField[0].setCustomValidity('');
@@ -194,8 +194,8 @@
 
         forms.find('fieldset.collapsible > legend').on('click', function(evt) {
             evt.preventDefault();
-            var $this = $(this),
-                collapseIcon = $this.find('div > span');
+            var $this = $(this);
+            var collapseIcon = $this.find('div > span');
             $this.next('.fieldset-content').slideToggle();
             collapseIcon.toggleClass('icon-next icon-expand');
         });
@@ -215,7 +215,8 @@
                 .find('.PluginOptionPeopleListDiv').toggleClass('disabled', state);
     };
 
-    global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection, folderField, folderProtection) {
+    global.aclIfProtected = function aclIfProtected(protectionField, aclField, selfProtection, inheritedProtection,
+                                                    folderField, folderProtection) {
         protectionField.on('change', function() {
             toggleAclField(aclField, !this.checked);
 
@@ -224,8 +225,7 @@
                 inheritedProtection.toggle(!this.checked);
                 if (folderField) {
                     folderField.triggerHandler('change');
-                }
-                else {
+                } else {
                     folderProtection.hide();
                 }
             }
@@ -238,7 +238,9 @@
         });
     };
 
-    global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo, selfProtection, inheritedProtection, folderProtection) {
+    global.messageIfFolderProtected = function messageIfFolderProtected(protectionField, folderField, protectionInfo,
+                                                                        selfProtection, inheritedProtection,
+                                                                        folderProtection) {
         folderField.on('change', function() {
             var selectedFolder = $(this);
             if (protectionInfo[selectedFolder.val()] && !protectionField.prop('checked')) {
@@ -246,8 +248,7 @@
                 inheritedProtection.hide();
                 folderProtection.find('.folder-name').html(selectedFolder.children('option:selected').text());
                 folderProtection.show();
-            }
-            else {
+            } else {
                 folderProtection.hide();
                 selfProtection.toggle(protectionField.prop('checked'));
                 inheritedProtection.toggle(!protectionField.prop('checked'));
@@ -263,9 +264,11 @@
      * - checkboxContainer: Element or jQuery object containing the checkboxes to consider
      * - checkboxSelector: Selector to find the checkboxes inside the containers
      * - buttonSelector: Selector, jQuery object or element corresponding to the button(s) to be enabled/disabled
-     * - extraCheckCallback: Function called with the checkboxes as argument. If it returns false the buttons will be disabled.
+     * - extraCheckCallback: Function called with the checkboxes as argument.
+     *                       If it returns false the buttons will be disabled.
      */
-    global.enableIfChecked = function enableIfChecked(checkboxContainer, checkboxSelector, buttonSelector, extraCheckCallback) {
+    global.enableIfChecked = function enableIfChecked(checkboxContainer, checkboxSelector, buttonSelector,
+                                                      extraCheckCallback) {
         function _update(force) {
             var $checkboxes = $(checkboxContainer).find(checkboxSelector).filter(':checked');
             var checked = force || !!$checkboxes.length;
