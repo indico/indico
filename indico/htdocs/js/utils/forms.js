@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global countWords:false */
+/* global countWords:false, initForms:false, showFormErrors:false */
 
 (function(global) {
     'use strict';
@@ -392,5 +392,14 @@
 
     $(document).ready(function() {
         initForms($('form'));
+
+        $('body').on('indico:htmlUpdated', function(evt) {
+            var $target = $(evt.target);
+            var $forms = $target.find('form');
+            if ($forms.length) {
+                initForms($forms);
+                showFormErrors($target);
+            }
+        });
     });
 })(window);
