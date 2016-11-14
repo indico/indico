@@ -140,6 +140,12 @@
         forms.find('[data-disabled-until-change]').prop('disabled', true);
         forms.each(function() {
             var $this = $(this);
+
+            if ($this.data('initialized')) {
+                console.warn('re-initialized form', this);  // eslint-disable-line no-console
+            }
+            $this.data('initialized', true);
+
             function _resetData() {
                 $this.data('initialData', $this.serialize());
                 $this.data('fieldsChanged', false);
