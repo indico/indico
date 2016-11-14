@@ -242,4 +242,4 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         duration = (self.event_new.end_dt - self.event_new.start_dt).days
         for offset in xrange(duration + 1):
             day = (self.event_new.start_dt + timedelta(days=offset)).date()
-            yield day.isoformat(), format_date(day, 'short')
+            yield day.isoformat(), format_date(day, 'short').decode('utf-8')
