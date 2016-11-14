@@ -39,51 +39,36 @@
 
             <script type="text/html" class="markdown-info-text">
                 <p>
-                    {% trans -%}
+                    {%- trans link_start='<a href="http://commonmark.org/help/">'|safe, link_end='</a>'|safe -%}
                         Markdown is a lightweight markup language that makes it easier to write rich text content.
-                        Here are some examples:
-                    {%- endtrans %}
-                </p>
-                <ul>
-                    <li><span class="mono">*apples*</span> - <em>apples</em></li>
-                    <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
-                    <li><span class="mono">[Google][https://www.google.com]</span> - <a href="http://www.google.com">Google</a></li>
-                </ul>
-                <p>
-                    {% trans link='<a href="https://daringfireball.net/projects/markdown/syntax">'|safe, link_end='</a>'|safe -%}
-                        Check the icon bar for more options, or consult the {{ link }}language reference{{ link_end }}.
-                    {%- endtrans %}
+                        Check the {{ link_start }}language reference{{ link_end }} for more information.
+                    {%- endtrans -%}
                 </p>
             </script>
 
             <script type="text/html" class="latex-info-text">
                 <p>
-                    {% trans link='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">'|safe,
+                    {%- trans link_start='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">'|safe,
                              link_end='</a>'|safe -%}
-                        You may write formulae using {{ link }}LaTeX{{ link_end }} (math mode only) by surrounding
+                        You may write formulae using {{ link_start }}LaTeX{{ link_end }} (math mode only) by surrounding
                         them in <code>$...$</code>.
-                    {%- endtrans %}
+                    {%- endtrans -%}
                 </p>
             </script>
 
             <script type="text/html" class="wmd-help-button-text">
                 <p>
-                    {% if field.use_mathjax %}
-                        {% trans markdown='<a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>'|safe,
-                                 latex='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a>'|safe -%}
-                            You can use {{ markdown }} and {{ latex }}.
-                        {%- endtrans %}
+                    {%- if field.use_mathjax %}
+                        {%- trans markdown='<a href="http://commonmark.org/help/">Markdown</a>'|safe,
+                                  latex='<a href="https://docs.mathjax.org/en/latest/tex.html#supported-latex-commands">LaTeX</a>'|safe -%}
+                            You can use {{ markdown }} and {{ latex }} formulae.
+                        {%- endtrans -%}
                     {% else %}
-                        {% trans markdown='<a href="https://daringfireball.net/projects/markdown/syntax">Markdown</a>'|safe -%}
+                        {%- trans markdown='<a href="http://commonmark.org/help/">Markdown</a>'|safe -%}
                             You can use {{ markdown }}.
-                        {%- endtrans %}
-                    {% endif %}
+                        {%- endtrans -%}
+                    {% endif -%}
                 </p>
-                <p>{% trans %}Here are some nice examples:{% endtrans %}</p>
-                <ul>
-                    <li><span class="mono">**oranges**</span> - <strong>oranges</strong></li>
-                    <li><span class="mono">![A logo](https://is.gd/VBDpT0)</span> - <img src="https://indico.cern.ch/images/indico.ico" title="A logo"></li>
-                </ul>
             </script>
         </div>
     {% else %}
