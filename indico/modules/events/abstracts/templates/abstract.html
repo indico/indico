@@ -6,6 +6,7 @@
 
 {% block content %}
     {{ render_abstract_public(abstract, management=management) }}
+    <div class="i-timeline-connect-down"></div>
     <div id="abstract-private" class="i-timeline">
         {% if abstract.comments or abstract.reviews %}
             <div class="i-timeline-connect-down"></div>
