@@ -1,9 +1,10 @@
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint %}
-{% from 'events/abstracts/abstract/review.html' import render_comment_box %}
+{% from 'events/abstracts/abstract/review.html' import render_comment_form %}
 
 
-{% macro render_timeline(abstract, form=none) %}
+{% macro render_timeline(abstract, comment_form=none) %}
     {% set can_comment = abstract.can_comment(session.user) %}
+    {% set can_review = abstract.can_review(session.user) %}
     {% if abstract.comments or can_comment %}
         <div id="abstract-timeline" class="i-timeline with-line">
             <div class="i-timeline-connect-up"></div>
@@ -14,8 +15,8 @@
                     {{ _render_review(item, form=form) }}
                 {% endif %}
             {% endfor %}
-            {% if can_comment %}
-                {{ render_comment_box(abstract, form) }}
+            {% if can_comment or can_review %}
+                {{ _render_input(abstract, comment_form) }}
             {% endif %}
         </div>
     {% endif %}
@@ -23,7 +24,7 @@
 
 
 {% macro _render_comment(comment) %}
-    <div class="i-timeline-item">
+    <div id="abstract-comment-{{ comment.id }}" class="i-timeline-item">
         <div class="i-timeline-item-label action"></div>
         <div class="i-timeline-item-box header-indicator">
             <div class="i-box-header flex">
@@ -44,7 +45,7 @@
                         <a class="i-button-icon icon-edit js-edit-comment"
                            title="{% trans %}Edit comment{% endtrans %}"
                            data-href="{{ url_for('.edit_abstract_comment', comment) }}"
-                           data-form-container="#comment-{{ comment.id }}"
+                           data-form-container="#abstract-comment-{{ comment.id }} .js-form-container"
                            data-update=".management-page"
                            data-replace-update
                            data-confirm-close-unsaved
@@ -60,7 +61,7 @@
                     </div>
                 {% endif %}
             </div>
-            <div id="comment-{{ comment.id }}" class="i-box-content">
+            <div class="i-box-content js-form-container">
                 {{ comment.text }}
             </div>
         </div>
@@ -69,9 +70,9 @@
 
 
 {% macro _render_review(review, form, management=false) %}
-    <div class="i-timeline-item">
+    <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
-        <div class="i-timeline-item-box header-indicator review-results">
+        <div class="i-timeline-item-box header-indicator">
             <div class="i-box-header flex">
                 <div class="stretch">
                     {% trans name=review.user.name -%}
@@ -87,9 +88,9 @@
                 </div>
                 <div class="abstract-comment-badges">
                     <span>
-                        {% trans action=_render_review_state(review) %}
+                        {% trans action=_render_review_state(review) -%}
                             Proposes to {{ action }}
-                        {% endtrans %}
+                        {%- endtrans %}
                     </span>
                     {% if review.score %}
                         {{ render_score(review.score, review.abstract.event_new.cfa) }}
@@ -100,9 +101,10 @@
                         <a class="i-button-icon icon-edit js-edit-review"
                            title="{% trans %}Edit review{% endtrans %}"
                            data-href="{{ url_for('.edit_review', review, management=management) }}"
-                           data-form-container="#abstract-review-results-{{ review.track.id }} .js-form-container"
+                           data-form-container="#abstract-review-{{ review.id }} .js-form-container"
                            data-update=".management-page"
                            data-replace-update
+                           data-confirm-close-unsaved
                            data-ajax-form></a>
                     </div>
                 {% endif %}
@@ -204,4 +206,80 @@
     <span class="i-tag outline {{ mapping[review.proposed_action.name] }}">
         {{ review.proposed_action.title -}}
     </span>
+{% endmacro %}
+
+
+{% macro _render_input(abstract, comment_form) %}
+    <div id="abstract-timeline-input" class="i-timeline-item">
+        <div class="i-timeline-item-label action"></div>
+        <div class="i-timeline-item-box footer-only header-indicator">
+            <div class="i-box-footer js-form-container">
+                <div class="flex">
+                    <div class="stretch">
+                        {{ render_comment_form(comment_form, abstract) }}
+                    </div>
+                    {% if abstract.can_review(session.user, check_state=true) %}
+                        {{ _render_review_trigger(abstract) }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_review_trigger(abstract) %}
+    {% set tracks = abstract.get_reviewed_for_tracks_by_user(session.user, include_reviewed=true)|sort(attribute='title') %}
+    {% set reviews = abstract.get_reviews(user=session.user) %}
+    {% set reviewed = reviews|map(attribute='track') %}
+    <div class="review-trigger flex">
+        <span class="comment-or-review">
+            {%- trans %}or{% endtrans -%}
+        </span>
+        {% if tracks|length == 1%}
+            {% set track = tracks[0] %}
+            {% if track in reviewed %}
+                {% set review = reviews|selectattr('track', 'equalto', track)|first %}
+                <button class="i-button big highlight text-color js-new-edit-review" data-review-id="{{ review.id }}">
+                    {%- trans %}Change review{% endtrans -%}
+                </button>
+            {% else %}
+                <button class="i-button big highlight text-color"
+                        data-href="{{ url_for('.review_abstract', abstract, tracks|first) }}"
+                        data-form-container="#abstract-timeline-input .js-form-container"
+                        data-update=".management-page"
+                        data-replace-update
+                        data-confirm-close-unsaved
+                        data-ajax-form>
+                    {%- trans %}Review{% endtrans -%}
+                </button>
+            {% endif %}
+        {% else %}
+            <button class="i-button big highlight text-color arrow js-dropdown" data-toggle="dropdown">
+                {%- trans %}Review{% endtrans -%}
+            </button>
+            <ul class="dropdown">
+                {% for track in tracks %}
+                    <li>
+                        {% if track in reviewed %}
+                            {% set review = reviews|selectattr('track', 'equalto', track)|first %}
+                            <a class="js-new-edit-review" data-review-id="{{ review.id }}">
+                                {{ track.title }}
+                                <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>
+                            </a>
+                        {% else %}
+                            <a data-href="{{ url_for('.review_abstract', abstract, track) }}"
+                               data-form-container="#abstract-timeline-input .js-form-container"
+                               data-update=".management-page"
+                               data-replace-update
+                               data-confirm-close-unsaved
+                               data-ajax-form>
+                                {{ track.title }}
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 {% endmacro %}

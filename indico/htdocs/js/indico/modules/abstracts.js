@@ -16,6 +16,7 @@
  */
 
 /* global setupListGenerator:false */
+/* global Palette:false */
 
 (function(global) {
     'use strict';
@@ -46,19 +47,27 @@
         }).on('ajaxForm:hide', '.js-edit-comment', function() {
             $(this).closest('.abstract-comment-badges').show();
         }).on('focus', '.new-comment textarea', function() {
+            var $box = $(this).closest('#abstract-timeline-input');
+            var $reviewTrigger = $box.find('.review-trigger').hide('blind', {direction: 'left'}, 'fast');
             var $commentForm = $(this).closest('form');
             $commentForm.find('.form-group').show('fast');
             $commentForm.removeClass('unfocused');
-        }).on('click', '.new-comment', function(evt) {
-            evt.stopPropagation();
-        });
-
-        $(window).on('click', function() {
-            var $commentForm = $('form.new-comment');
-            if (!$commentForm.find('textarea').val().trim().length) {
+            $commentForm.on('click', '.js-new-cancel', function(evt) {
+                // TODO: fix unload confirmation
+                evt.preventDefault();
+                $commentForm[0].reset();
                 $commentForm.addClass('unfocused');
-                $commentForm.find('.form-group ~ .form-group').hide('fast');
-            }
+                $commentForm.find('.form-group ~ .form-group').hide('fast', function() {
+                    $reviewTrigger.show('blind', {direction: 'left'}, 'fast');
+                });
+            });
+        }).on('click', '.js-new-edit-review', function() {
+            var reviewId = $(this).data('reviewId');
+            var $reviewBox = $('#abstract-review-{0}'.format(reviewId));
+            $reviewBox.find('.js-edit-review').click();
+            $('body, html').animate({scrollTop: $reviewBox.offset().top}, 'fast');
+            $reviewBox.scrollTop();
+            $reviewBox.find('.i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
         });
     };
 
