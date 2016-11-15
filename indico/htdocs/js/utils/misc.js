@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false */
+/* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false, Palette:false */
 
 (function(global) {
     'use strict';
@@ -183,7 +183,7 @@
         }
         $target.trigger('indico:htmlUpdated');
         if (highlight) {
-            $target.effect('highlight', {color: '#5D95EA'});
+            $target.effect('highlight', {color: Palette.highlight});
         }
     }
 
