@@ -18,14 +18,15 @@ from __future__ import unicode_literals
 
 from flask import session
 
-from indico.modules.events.layout.util import MenuEntryData
+from indico.modules.events.layout.util import MenuEntryData, get_menu_entry_by_name
 from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
 from indico.util.i18n import _
 from MaKaC.paperReviewing import ConferencePaperReview
 
 
 def _visibility_my_conference(event):
-    return session.user is not None
+    return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
+                             get_menu_entry_by_name('my_sessions', event).is_visible)
 
 
 def _visibility_paper_review(event):
