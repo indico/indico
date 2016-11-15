@@ -15,44 +15,16 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// when changing a color in here don't forget to check palette.js
-// whether it is used in there too and update it if necessary.
+/* global Palette:false */
 
-$darker-blue: #005272;
-$dark-blue: #007CAC;
-$blue: #5D95EA;
-$pastel-blue: #CDE1FF;
-$light-blue: #EDF3FD;
+(function(global) {
+    'use strict';
 
-$red: #AF0000;
-$dark-red: #A76766;
-$pastel-red: #A76766;
-$light-red: #F2DEDE;
+    // base colors (must match entries in _palette.scss)
+    global.Palette = {
+        blue: '#5d95ea'
+    };
 
-$dark-gray: #999;
-$gray: #bbb;
-$pastel-gray: #dfdfdf;
-$light-gray: #f9f9f9;
-
-$black: #555;
-$light-black: #777;
-
-$dark-green: #67A766;
-$green: #6cc644;
-$pastel-green: #67A766;
-$light-green: #DEF2DE;
-
-$dark-yellow: #9C793B;
-$yellow: #E99E18;
-$postit-yellow: #FFFFA5;
-$light-yellow: #FFE6BA;
-
-$orange: #B14300;
-$bright-orange: #E25300;
-
-$purple: #6E5494;
-
-$separator-color: #EBEBEB;
-
-$link: #0b63a5;
-$indico-blue: #00A4E4;
+    // colors for specific purposes
+    Palette.highlight = Palette.blue;
+})(window);

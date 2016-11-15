@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global Palette:false */
+/* eslint-disable max-len */
+
 (function($) {
     'use strict';
 
@@ -179,7 +182,7 @@
             });
             self.element.on('click', '.js-search', function() {
                 self.$searchInput.focus();
-                self.$searchInput.effect('highlight', {color: '#5D95EA'});
+                self.$searchInput.effect('highlight', {color: Palette.highlight});
             });
             self.element.on('click', '.js-clear-search', function() {
                 self._clearSearch();
@@ -573,7 +576,9 @@
                 dataType: 'json',
                 contentType: 'application/json',
                 data: JSON.stringify({
-                    exclude: _.map(_.keys(self._subcategories), function(n) { return +n; })
+                    exclude: _.map(_.keys(self._subcategories), function(n) {
+                        return +n;
+                    })
                 }),
                 success: function(data) {
                     if (data) {

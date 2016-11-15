@@ -236,6 +236,8 @@ taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
 fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
 typewatch_js = rjs_bundle('typewatch_js', 'js/lib/jquery.typewatch.js')
 
+palette = rjs_bundle('palette', 'js/palette.js')
+
 jquery = rjs_bundle('jquery', *filter(None, [
     'js/lib/underscore.js',
     'js/lib/jquery.js',
@@ -423,7 +425,7 @@ widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
                                               'synced_input_widget.js',
                                               'typeahead_widget.js'))
 
-base_js = Bundle(jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
+base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
                  indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
                  widgets_js, module_js['event_creation'])
 
