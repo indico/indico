@@ -41,6 +41,10 @@
     global.setupAbstractPage = function setupAbstractPage() {
         $('body').on('declarative:success', '.js-delete-comment', function() {
             $(this).closest('.i-timeline-item').remove();
+        }).on('ajaxForm:show', '.js-edit-comment', function() {
+            $(this).closest('.abstract-comment-badges').hide();
+        }).on('ajaxForm:hide', '.js-edit-comment', function() {
+            $(this).closest('.abstract-comment-badges').show();
         }).on('focus', '.new-comment textarea', function() {
             var $commentForm = $(this).closest('form');
             $commentForm.find('.form-group').show('fast');
