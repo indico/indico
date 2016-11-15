@@ -32,7 +32,6 @@ from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
-from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
