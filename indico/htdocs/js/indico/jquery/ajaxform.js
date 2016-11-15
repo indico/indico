@@ -41,6 +41,13 @@
                 method: 'GET',
                 data: {}
             },
+            // only applicable if the form is not loaded with ajax.  setting it
+            // to true will assume that the form is not visible/editable at the
+            // beginning and thus not bind e.g. the onbeforeunload event.  when
+            // using this you most likely want to trigger `ajaxForm:externalShow`
+            // and `ajaxForm:externalHide` on the `context` element when the form
+            // becomes visible/accessible and/or hidden again
+            initiallyHidden: false,
             // whether to scroll to the form after showing it
             scrollToForm: false,
             // the element whose contents will be replaced with the form after
@@ -245,9 +252,36 @@
             }
         }
 
+        if (context) {
+            context.on('ajaxForm:externalShow', function() {
+                if (options.confirmCloseUnsaved) {
+                    $(window).on('beforeunload', onBeforeUnload);
+                }
+            });
+            context.on('ajaxForm:externalHide', function(evt, deferred) {
+                var msg;
+                if (!options.confirmCloseUnsaved) {
+                    deferred.resolve();
+                } else if ((msg = onBeforeUnload()) === undefined) {
+                    deferred.resolve();
+                } else {
+                    confirmPrompt(msg, $T.gettext('Unsaved changes')).then(function() {
+                        deferred.resolve();
+                    }, function() {
+                        deferred.reject();
+                    });
+                }
+                if (options.confirmCloseUnsaved) {
+                    deferred.then(function() {
+                        $(window).off('beforeunload', onBeforeUnload);
+                    });
+                }
+            });
+        }
+
         if (!options.load) {
             // we don't go through showForm for an immediately-visible form
-            if (options.confirmCloseUnsaved) {
+            if (options.confirmCloseUnsaved && !options.initiallyHidden) {
                 $(window).on('beforeunload', onBeforeUnload);
             }
             ajaxifyForms(true);

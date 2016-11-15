@@ -265,8 +265,10 @@
 
         function _handleHtmlUpdate($elem) {
             $elem.find('form[data-ajax-form]').each(function() {
-                inlineAjaxForm(_getOptions($(this), {
-                    load: null
+                var $this = $(this);
+                inlineAjaxForm(_getOptions($this, {
+                    load: null,
+                    initiallyHidden: $this.data('initially-hidden') !== undefined
                 }));
             });
         }
