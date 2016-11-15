@@ -117,6 +117,12 @@ def get_linked_events(user, dt, limit=None):
                                             get_events_with_linked_event_persons)
 
     links = avatar_links.get_links(user, dt) if redis_client else OrderedDict()
+    allowed_redis_links = {'conference_editor', 'conference_paperReviewManager', 'conference_referee',
+                           'conference_reviewer'}
+    for event_id, event_links in links.items():
+        event_links &= allowed_redis_links
+        if not event_links:
+            del links[event_id]
     for event_id in get_events_registered(user, dt):
         links.setdefault(str(event_id), set()).add('registration_registrant')
     for event_id in get_events_with_submitted_surveys(user, dt):
@@ -135,6 +141,9 @@ def get_linked_events(user, dt, limit=None):
         links.setdefault(str(event_id), set()).update(roles)
     for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
         links.setdefault(str(event_id), set()).update(roles)
+
+    if not links:
+        return OrderedDict()
 
     query = (Event.query
              .filter(~Event.is_deleted,
