@@ -1,8 +1,0 @@
-{% from 'forms/_form.html' import simple_form %}
-
-<div class="header">
-    <div class="header-row">
-        <h3>{% trans %}Submit abstract{% endtrans %}</h3>
-    </div>
-</div>
-{{ simple_form(form, submit=_("Submit"), back=_("Cancel"), form_header_kwargs={'action': request.relative_url}) }}
