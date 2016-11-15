@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, flash
+from flask import request, session, flash
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
@@ -26,7 +26,7 @@ from indico.modules.events.abstracts.views import WPDisplayAbstracts
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
-from indico.web.util import jsonify_template, jsonify_data
+from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.PDFinterface.conference import AbstractsToPDF
 
 
@@ -69,4 +69,5 @@ class RHSubmitAbstract(RHAbstractsBase):
                     "#{}. You will be notified by email with the submission details.")
                   .format(abstract.title, abstract.friendly_id), 'success')
             return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event_new))
-        return jsonify_template('events/abstracts/display/submit_abstract.html', form=form)
+        return jsonify_form(form, submit=_("Submit"), back=_("Cancel"),
+                            form_header_kwargs={'action': request.relative_url})

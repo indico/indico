@@ -137,10 +137,10 @@
                         <div class="toolbar right">
                             {% if session.user %}
                                 <a class="i-button icon-plus highlight js-show-abstract-form"
+                                   data-title="{% trans %}Submit new abstract{% endtrans %}"
                                    data-href="{{ url_for('.submit', event) }}"
-                                   data-form-container="#submit-abstract-form-container"
                                    data-confirm-close-unsaved
-                                   data-ajax-form>
+                                   data-ajax-dialog>
                                     {%- trans %}Submit new abstract{% endtrans -%}
                                 </a>
                             {% else %}
@@ -161,9 +161,6 @@
                 </div>
             </div>
         </section>
-        {% if can_submit_abstracts %}
-            <section id="submit-abstract-form-container"></section>
-        {% endif %}
         {% if abstracts %}
             {{ render_user_abstract_list_section(event, abstracts, cfa) }}
         {% endif %}
