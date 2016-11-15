@@ -107,6 +107,8 @@ def get_linked_events(user, dt, limit=None):
     :param dt: Only include events taking place on/after that date
     :param limit: Max number of events
     """
+    from indico.modules.events.abstracts.util import (get_events_with_abstract_reviewer_convener,
+                                                      get_events_with_abstract_persons)
     from indico.modules.events.contributions.util import get_events_with_linked_contributions
     from indico.modules.events.registration.util import get_events_registered
     from indico.modules.events.sessions.util import get_events_with_linked_sessions
@@ -129,6 +131,10 @@ def get_linked_events(user, dt, limit=None):
         links.setdefault(str(event_id), set()).update(principal_roles)
     for event_id in get_events_with_linked_event_persons(user, dt):
         links.setdefault(str(event_id), set()).add('conference_chair')
+    for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).iteritems():
+        links.setdefault(str(event_id), set()).update(roles)
+    for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
+        links.setdefault(str(event_id), set()).update(roles)
 
     query = (Event.query
              .filter(~Event.is_deleted,

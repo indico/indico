@@ -100,9 +100,10 @@ class RHUserDashboard(RHUserBase):
     management_roles = {'conference_creator', 'conference_chair', 'conference_manager', 'session_manager',
                         'session_coordinator', 'contribution_manager'}
     reviewer_roles = {'conference_paperReviewManager', 'conference_referee', 'conference_editor', 'conference_reviewer',
-                      'contribution_referee', 'contribution_editor', 'contribution_reviewer', 'track_coordinator'}
-    attendance_roles = {'contributor', 'contribution_submission', 'abstract_submitter', 'registration_registrant',
-                        'survey_submitter'}
+                      'contribution_referee', 'contribution_editor', 'contribution_reviewer', 'abstract_reviewer',
+                      'track_convener'}
+    attendance_roles = {'contributor', 'contribution_submission', 'abstract_submitter', 'abstract_person',
+                        'registration_registrant', 'survey_submitter'}
 
     def _process(self):
         self.user.settings.set('suggest_categories', True)
