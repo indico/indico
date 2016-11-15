@@ -564,7 +564,7 @@ class ZipGeneratorMixin:
                 name = self._prepare_folder_structure(item)
                 self.used_filenames.add(name)
                 with item.storage.get_local_path(item.storage_file_id) as filepath:
-                    zip_handler.write(filepath, name)
+                    zip_handler.write(filepath.encode('utf-8'), name)
 
         # Delete the temporary file after some time.  Even for a large file we don't
         # need a higher delay since the webserver will keep it open anyway until it's
