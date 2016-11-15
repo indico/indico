@@ -41,7 +41,7 @@
                 </div>
                 {% if comment.can_edit(session.user) %}
                     <div class="abstract-comment-badges">
-                        <a class="i-button-icon icon-edit"
+                        <a class="i-button-icon icon-edit js-edit-comment"
                            title="{% trans %}Edit comment{% endtrans %}"
                            data-href="{{ url_for('.edit_abstract_comment', comment) }}"
                            data-form-container="#comment-{{ comment.id }}"
