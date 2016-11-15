@@ -57,7 +57,8 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
     tracks = abstract_data.pop('submitted_for_tracks', None)
     files = abstract_data.pop('attachments', [])
     abstract.populate_from_dict(abstract_data)
-    _update_tracks(abstract, tracks)
+    if tracks is not None:
+        _update_tracks(abstract, tracks)
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
@@ -78,7 +79,7 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
 
 def update_abstract(abstract, abstract_data, custom_fields_data=None):
     tracks = abstract_data.pop('submitted_for_tracks', None)
-    if abstract.edit_track_mode == EditTrackMode.both:
+    if tracks is not None and abstract.edit_track_mode == EditTrackMode.both:
         _update_tracks(abstract, tracks)
     abstract.populate_from_dict(abstract_data)
     if custom_fields_data:
