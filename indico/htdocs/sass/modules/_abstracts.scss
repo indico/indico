@@ -15,9 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'abstracts/abstract_page';
 @import 'abstracts/abstract_list';
+@import 'abstracts/abstract_page';
+@import 'abstracts/cfa_page';
 @import 'abstracts/email_templates';
 @import 'abstracts/notification_logs';
 @import 'abstracts/roles';
-@import 'abstracts/cfa_page';
