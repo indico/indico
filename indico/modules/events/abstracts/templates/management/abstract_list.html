@@ -38,6 +38,7 @@
                        data-title="{% trans %}Add new abstract{% endtrans %}"
                        data-href="{{ url_for('.manage_create_abstract', event) }}"
                        data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
+                       data-confirm-close-unsaved
                        data-ajax-dialog>
                         {% trans %}New abstract{% endtrans %}
                     </a>
