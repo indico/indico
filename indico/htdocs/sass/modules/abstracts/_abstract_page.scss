@@ -127,7 +127,13 @@
     }
 }
 
-#abstract-comment-box .new-comment {
+#abstract-timeline {
+    textarea {
+        width: 100%;
+    }
+}
+
+#abstract-timeline-input .new-comment {
     margin-top: 0;
 
     .form-field {
@@ -136,7 +142,6 @@
         textarea {
             @include transition(height .2s);
             height: 5em;
-            width: 100%;
         }
     }
 
@@ -340,5 +345,27 @@
 
     .i-timeline-item-box .i-box-footer {
         overflow: visible;
+    }
+}
+
+#abstract-timeline-input {
+    .comment-or-review {
+        align-self: center;
+        color: $gray;
+        font-size: 1.1em;
+        font-weight: bold;
+        padding-right: 1em;
+    }
+
+    .review-trigger {
+        white-space: nowrap;
+
+        .i-button {
+            height: 2.1rem;
+
+            &::after {
+                vertical-align: bottom;
+            }
+        }
     }
 }

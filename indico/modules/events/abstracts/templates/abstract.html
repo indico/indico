@@ -2,7 +2,6 @@
 
 {% from 'events/abstracts/abstract/public.html' import render_abstract_public %}
 {% from 'events/abstracts/abstract/judge.html' import render_decision_box, render_reviewed_for_tracks_box %}
-{% from 'events/abstracts/abstract/review.html' import render_review_boxes %}
 {% from 'events/abstracts/abstract/timeline.html' import render_timeline %}
 
 {% block content %}
@@ -19,10 +18,6 @@
                 <div class="i-timeline-connect-down to-separator"></div>
             </div>
             <div class="i-timeline-separator"></div>
-        {% endif %}
-
-        {% if can_review %}
-            {{ render_review_boxes(abstract, review_forms, management=management) }}
         {% endif %}
 
         {% if can_judge %}
