@@ -47,15 +47,23 @@
         }).on('ajaxForm:hide', '.js-edit-comment', function() {
             $(this).closest('.abstract-comment-badges').show();
         }).on('focus', '.new-comment textarea', function() {
-            var $box = $(this).closest('#abstract-timeline-input');
-            var $reviewTrigger = $box.find('.review-trigger').hide('blind', {direction: 'left'}, 'fast');
-            var $commentForm = $(this).closest('form');
+            var $box = $('#abstract-timeline-input');
+            var $commentForm = $box.find('form');
+            $box.find('.review-trigger').hide('blind', {direction: 'left'}, 'fast');
             $commentForm.find('.form-group').show('fast');
             $commentForm.removeClass('unfocused');
-            $commentForm.on('click', '.js-new-cancel', function(evt) {
-                // TODO: fix unload confirmation
-                evt.preventDefault();
+            $commentForm.trigger('ajaxForm:externalShow');
+        }).on('click', '.new-comment .js-new-cancel', function(evt) {
+            evt.preventDefault();
+            var $this = $(this);
+            var $commentForm = $this.closest('form');
+            var $box = $this.closest('#abstract-timeline-input');
+            var $reviewTrigger = $box.find('.review-trigger');
+            var deferred = $.Deferred();
+            $commentForm.trigger('ajaxForm:externalHide', [deferred]);
+            deferred.then(function() {
                 $commentForm[0].reset();
+                $commentForm.trigger('change');
                 $commentForm.addClass('unfocused');
                 $commentForm.find('.form-group ~ .form-group').hide('fast', function() {
                     $reviewTrigger.show('blind', {direction: 'left'}, 'fast');
