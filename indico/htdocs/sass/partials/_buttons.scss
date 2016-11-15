@@ -374,7 +374,7 @@ a.i-button-icon {
     &:disabled,
     &.disabled {
         @extend %button-disabled;
-        background: inherit;
+        background: inherit !important;
     }
 }
 
