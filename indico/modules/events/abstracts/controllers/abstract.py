@@ -26,6 +26,7 @@ from indico.modules.events.abstracts.views import WPDisplayAbstracts, WPManageAb
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF, AbstractToPDF
 
@@ -45,7 +46,9 @@ class RHEditAbstract(RHAbstractBase):
 
     def _process(self):
         abstract_form_class = make_abstract_form(self.event_new)
-        form = abstract_form_class(obj=self.abstract, abstract=self.abstract, event=self.event_new)
+        custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
+        form = abstract_form_class(obj=FormDefaults(self.abstract, **custom_field_values), abstract=self.abstract,
+                                   event=self.event_new)
         if form.validate_on_submit():
             update_abstract(self.abstract, *get_field_values(form.data))
             flash(_("Abstract modified successfully"), 'success')
