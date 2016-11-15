@@ -32,7 +32,6 @@ from indico.modules.events import Event
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.util.i18n import _
-from indico.util.user import iter_acl
 from indico.web.flask.util import url_for
 from MaKaC.PDFinterface.base import PDFBase, Paragraph
 
