@@ -21,7 +21,6 @@ from collections import OrderedDict, defaultdict, namedtuple
 
 from sqlalchemy.orm import joinedload, load_only
 
-from MaKaC.PDFinterface.conference import AbstractBook
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -39,6 +38,7 @@ from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
+from MaKaC.PDFinterface.conference import AbstractBook
 
 
 def build_default_email_template(event, tpl_type):
