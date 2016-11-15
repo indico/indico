@@ -409,7 +409,7 @@ class AbstractForm(IndicoForm):
     description = IndicoMarkdownField(_('Content'), editor=True, mathjax=True)
     submitted_contrib_type = QuerySelectField(_("Type"), get_label='name', allow_blank=True,
                                               blank_text=_("No type selected"))
-    person_links = AbstractPersonLinkListField(_("People"), [DataRequired()], default_author_type=AuthorType.primary)
+    person_links = AbstractPersonLinkListField(_("Authors"), [DataRequired()], default_author_type=AuthorType.primary)
     submission_comment = TextAreaField(_("Comments"))
     attachments = FileField(_('Attachments'), param_name='attachments', multiple_files=True, lightweight=True)
 
