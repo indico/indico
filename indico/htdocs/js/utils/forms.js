@@ -156,12 +156,6 @@
                 _resetData();
                 $this.find('[data-disabled-until-change]').prop('disabled', true);
             });
-
-            $this.on('indico:beforeConfirmed', '[data-confirm-if-change]', function(evt) {
-                if (!$this.data('fieldsChanged')) {
-                    evt.preventDefault();
-                }
-            });
         }).on('change input', function() {
             var $this = $(this);
             var untouched = $this.serialize() === $this.data('initialData');
