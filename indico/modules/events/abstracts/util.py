@@ -19,17 +19,19 @@ from __future__ import unicode_literals
 import os
 from collections import OrderedDict, defaultdict, namedtuple
 
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, load_only
 
 from MaKaC.PDFinterface.conference import AbstractBook
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
+from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
 from indico.util.date_time import format_datetime
@@ -277,3 +279,68 @@ def clear_boa_cache(event):
     if path:
         os.remove(path)
         boa_settings.delete(event, 'cache_path')
+
+
+def get_events_with_abstract_reviewer_convener(user, dt=None):
+    """
+    Return a dict of event ids and the abstract reviewing related
+    roles the user has in that event.
+
+    :param user: A `User`
+    :param dt: Only include events taking place on/after that date
+    """
+    data = defaultdict(set)
+    # global reviewer/convener
+    mapping = {'global_abstract_reviewer_for_events': 'abstract_reviewer',
+               'global_convener_for_events': 'track_convener'}
+    for rel, role in mapping.iteritems():
+        query = (Event.query.with_parent(user, rel)
+                 .filter(Event.ends_after(dt), ~Event.is_deleted)
+                 .options(load_only('id')))
+        for event in query:
+            data[event.id].add(role)
+    # track reviewer/convener
+    mapping = {'abstract_reviewer_for_tracks': 'abstract_reviewer',
+               'convener_for_tracks': 'track_convener'}
+    for rel, role in mapping.iteritems():
+        query = (Track.query.with_parent(user, rel)
+                 .join(Track.event_new)
+                 .filter(Event.ends_after(dt), ~Event.is_deleted)
+                 .options(load_only('event_id')))
+        for track in query:
+            data[track.event_id].add(role)
+    return data
+
+
+def get_events_with_abstract_persons(user, dt=None):
+    """
+    Return a dict of event ids and the abstract submission related
+    roles the user has in that event.
+
+    :param user: A `User`
+    :param dt: Only include events taking place on/after that date
+    """
+    data = defaultdict(set)
+    bad_states = {AbstractState.withdrawn, AbstractState.rejected}
+    # submitter
+    query = (Abstract.query
+             .filter(~Event.is_deleted,
+                     ~Abstract.is_deleted,
+                     ~Abstract.state.in_(bad_states),
+                     Event.ends_after(dt),
+                     Abstract.submitter == user)
+             .join(Abstract.event_new)
+             .options(load_only('event_id')))
+    for abstract in query:
+        data[abstract.event_id].add('abstract_submitter')
+    # person
+    abstract_criterion = db.and_(~Abstract.state.in_(bad_states), ~Abstract.is_deleted)
+    query = (user.event_persons
+             .filter(~Event.is_deleted,
+                     Event.ends_after(dt),
+                     EventPerson.abstract_links.any(AbstractPersonLink.abstract.has(abstract_criterion)))
+             .join(EventPerson.event_new)
+             .options(load_only('event_id')))
+    for person in query:
+        data[person.event_id].add('abstract_person')
+    return data
