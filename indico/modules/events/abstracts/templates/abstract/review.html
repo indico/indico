@@ -226,7 +226,7 @@
                 </div>
                 {% if review.can_edit(session.user, check_state=true) %}
                     <div>
-                        <a class="i-button-icon icon-edit js-edit-review"
+                        <a class="i-button-icon icon-edit"
                            title="{% trans %}Edit review{% endtrans %}"
                            data-href="{{ url_for('.edit_review', review, management=management) }}"
                            data-form-container="#abstract-review-results-{{ review.track.id }} .js-form-container"
