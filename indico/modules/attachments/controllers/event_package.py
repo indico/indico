@@ -29,7 +29,7 @@ from indico.core.db.sqlalchemy.links import LinkType
 from indico.util.date_time import format_date, format_time
 from indico.util.i18n import _
 from indico.util.fs import secure_filename
-from indico.util.string import natural_sort_key
+from indico.util.string import natural_sort_key, to_unicode
 from indico.web.forms.base import FormDefaults
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
@@ -166,9 +166,8 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
                 if isinstance(obj, SubContribution):
                     paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), ''))
                 else:
-                    paths.append(secure_filename('{}_{}'.format(format_time(start_date, format='HHmm',
-                                                                            timezone=self.event_new.timezone),
-                                                                obj.title), ''))
+                    time = format_time(start_date, format='HHmm', timezone=self.event_new.timezone)
+                    paths.append(secure_filename('{}_{}'.format(to_unicode(time), obj.title), ''))
             else:
                 if isinstance(obj, SubContribution):
                     paths.append(secure_filename('{}){}'.format(obj.position, obj.title), unicode(obj.id)))
