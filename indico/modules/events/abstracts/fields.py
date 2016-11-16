@@ -134,6 +134,7 @@ class AbstractPersonLinkListField(PersonLinkListFieldBase):
 
     person_link_cls = AbstractPersonLink
     linked_object_attr = 'abstract'
+    default_sort_alpha = False
     widget = JinjaWidget('events/contributions/forms/contribution_person_link_widget.html', allow_empty_email=True)
 
     def __init__(self, *args, **kwargs):
