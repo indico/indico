@@ -126,7 +126,6 @@ class WAdminFrame(wcomponents.WTemplated):
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["imgGestionGrey"] = Config.getInstance().getSystemIconURL( "gestionGrey" )
         vars["titleTabPixels"] = self.getTitleTabPixels()
         vars["intermediateVTabPixels"] = self.getIntermediateVTabPixels()
         return vars
