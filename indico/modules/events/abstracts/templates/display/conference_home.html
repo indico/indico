@@ -1,0 +1,5 @@
+{% from 'events/abstracts/display/_common.html' import render_cfa_infoline %}
+
+{% if not g.static_site %}
+    {{ render_cfa_infoline(event, event.cfa, redirect_first=true) }}
+{% endif %}
