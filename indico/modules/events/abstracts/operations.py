@@ -82,7 +82,7 @@ def delete_abstract_files(abstract, files):
 def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False):
     abstract = Abstract(event_new=event, submitter=session.user)
     tracks = abstract_data.pop('submitted_for_tracks', None)
-    files = abstract_data.pop('attachments', [])
+    attachments = abstract_data.pop('attachments', [])
     abstract.populate_from_dict(abstract_data)
     if tracks is not None:
         _update_tracks(abstract, tracks)
@@ -90,7 +90,7 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
 
-    add_abstract_files(abstract, files, log_action=False)
+    add_abstract_files(abstract, attachments['added'], log_action=False)
     signals.event.abstract_created.send(abstract)
 
     if send_notifications:
