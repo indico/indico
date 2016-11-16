@@ -24,15 +24,15 @@
     <ul class="programme">
         {% for track in tracks %}
             <li>
-                {% if track.can_convene(session.user) or track.can_review_abstracts(session.user) %}
-                    <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}" class="title">
-                        {{- track.title -}}
-                    </a>
-                {% else %}
-                    <span class="title">
-                        {{- track.title -}}
-                    </span>
-                {% endif %}
+                <div class="title">
+                    <span>{{ track.title }}</span>
+                    {% if track.can_convene(session.user) or track.can_review_abstracts(session.user) %}
+                        <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}"
+                           class="i-button-icon track-link icon-file-check"
+                           title="{%- trans %}Review abstracts in this track{% endtrans -%}">
+                        </a>
+                    {% endif %}
+                </div>
                 <div class="description">
                     {{- track.description -}}
                 </div>

@@ -427,7 +427,8 @@ ul.programme li {
 }
 
 ul.programme li .title {
-    display: block;
+    display: flex;
+    justify-content: space-between;
     font-size: 1.3em;
     margin-bottom: 0.6em;
 }
