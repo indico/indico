@@ -274,8 +274,8 @@
             placeholder: '#filter-placeholder'
         };
 
-        applySearchFilters();
         setupListGenerator(filterConfig);
+        applySearchFilters();
     };
 
     global.setupEventDisplayAuthorList = function setupEventDisplayAuthorList() {
