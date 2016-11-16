@@ -29,7 +29,7 @@ from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.i18n import _
 from indico.util.i18n import i18nformat
 from indico.util.date_time import format_time, format_date
-from MaKaC.common.timezoneUtils import nowutc, getAdjustedDate, DisplayTZ
+from MaKaC.common.timezoneUtils import getAdjustedDate, DisplayTZ
 from MaKaC.common.fossilize import fossilize
 from MaKaC.review import AbstractStatusSubmitted
 from MaKaC.common.TemplateExec import render
@@ -840,10 +840,6 @@ class WAbstractManagmentAccept( wcomponents.WTemplated ):
             vars["acceptURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentAccept.getURL(self._abstract)))
             vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
             vars["trackTitle"] = ""
-        else:
-            vars["acceptURL"] = quoteattr(str(urlHandlers.UHTrackAbstractAccept.getURL(self._track, self._abstract)))
-            vars["cancelURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModif.getURL(self._track, self._abstract)))
-            vars["trackTitle"] = self._track.getTitle()
         return vars
 
 class WAbstractManagmentAcceptMultiple( wcomponents.WTemplated):
@@ -969,10 +965,6 @@ class WAbstractManagmentReject( wcomponents.WTemplated ):
             vars["rejectURL"] = quoteattr(str(urlHandlers.UHAbstractManagmentReject.getURL(self._abstract)))
             vars["cancelURL"] = quoteattr(str(urlHandlers.UHAbstractManagment.getURL(self._abstract)))
             vars["trackTitle"] = ""
-        else:
-            vars["rejectURL"] = quoteattr(str(urlHandlers.UHTrackAbstractReject.getURL(self._track, self._abstract)))
-            vars["cancelURL"] = quoteattr(str(urlHandlers.UHTrackAbstractModif.getURL(self._track, self._abstract)))
-            vars["trackTitle"] = self._track.getTitle()
         return vars
 
 
@@ -1224,8 +1216,6 @@ class WAbstractTrackManagment(wcomponents.WTemplated):
         if res.getEmail() != "":
             mailtoSubject = _("[%s] Abstract %s: %s")%( self._conf.getTitle(), self._abstract.getId(), self._abstract.getTitle() )
             mailtoBody=""
-            if track is not None:
-                mailtoBody = _("You can access the abstract at [%s]")%str( urlHandlers.UHTrackAbstractModif.getURL( track, self._abstract ) )
             mailtoURL = "mailto:%s?subject=%s&body=%s"%( res.getEmail(), \
                                             urllib.quote( mailtoSubject ), \
                                             urllib.quote( mailtoBody ) )

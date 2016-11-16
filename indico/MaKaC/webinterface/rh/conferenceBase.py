@@ -65,15 +65,6 @@ class RHFileBase(RHConferenceSite):
         self._conf = self._file.getConference()
 
 
-class RHTrackBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setTrack( params )
-        self._track = self._target = l.getObject()
-        self._conf = self._track.getConference()
-
-
 class RHAbstractBase( RHConferenceSite ):
 
     def _checkParams( self, params ):

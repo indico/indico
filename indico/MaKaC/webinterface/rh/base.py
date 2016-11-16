@@ -263,18 +263,6 @@ class RH(RequestHandlerBase):
     def getRequestParams(self):
         return self._getRequestParams()
 
-    def _disableCaching(self):
-        """Disables caching"""
-
-        # IE doesn't seem to like 'no-cache' Cache-Control headers...
-        if request.user_agent.browser == 'msie':
-            # actually, the only way to safely disable caching seems to be this one
-            self._responseUtil.headers["Cache-Control"] = "private"
-            self._responseUtil.headers["Expires"] = "-1"
-        else:
-            self._responseUtil.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
-            self._responseUtil.headers["Pragma"] = "no-cache"
-
     def _redirect(self, targetURL, status=303):
         if isinstance(targetURL, Response):
             status = targetURL.status_code

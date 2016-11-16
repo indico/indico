@@ -19,7 +19,6 @@ import posixpath
 import re
 from collections import OrderedDict
 from datetime import datetime
-from operator import itemgetter
 from xml.sax.saxutils import quoteattr
 
 from flask import session, render_template, request
@@ -45,7 +44,6 @@ from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface.pages import main
 from MaKaC.webinterface.pages import base
 import MaKaC.common.info as info
-from indico.core.db import db
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events.models.events import EventType, Event
 from indico.util.i18n import i18nformat, _
@@ -594,55 +592,6 @@ class WConfDisplayBodyBase(wcomponents.WTemplated):
     def _getTitle(self):
         entry = get_menu_entry_by_name(self._linkname, self._conf)
         return entry.localized_title
-
-
-class WConfProgram(WConfDisplayBodyBase):
-
-    _linkname = 'program'
-
-    def __init__(self, aw, conf):
-        self._conf = conf
-        self._aw = aw
-
-    def buildTrackData(self, track):
-        """
-        Returns a dict representing the data of the track and its Sub-tracks
-        should it have any.
-        """
-        description = track.getDescription()
-
-        formattedTrack = {
-            'title': track.getTitle(),
-            'description': description
-        }
-
-        if track.getConference().getAbstractMgr().isActive() and \
-           track.getConference().hasEnabledSection("cfa") and \
-           track.canCoordinate(self._aw):
-
-            if track.getConference().canModify(self._aw):
-                formattedTrack['url'] = urlHandlers.UHTrackModification.getURL(track)
-            else:
-                formattedTrack['url'] = urlHandlers.UHTrackModifAbstracts.getURL(track)
-
-        return formattedTrack
-
-    def getVars(self):
-        pvars = wcomponents.WTemplated.getVars(self)
-        pvars["body_title"] = self._getTitle()
-        pvars['description'] = self._conf.getProgramDescription()
-        pvars['program'] = [self.buildTrackData(t) for t in self._conf.getTrackList()]
-        pvars['pdf_url'] = urlHandlers.UHConferenceProgramPDF.getURL(self._conf)
-
-        return pvars
-
-
-class WPConferenceProgram(WPConferenceDefaultDisplayBase):
-    menu_entry_name = 'program'
-
-    def _getBody(self, params):
-        wc = WConfProgram(self._getAW(), self._conf)
-        return wc.getHTML()
 
 
 class WPConferenceModifBase(main.WPMainBase):
@@ -1238,47 +1187,6 @@ class WPCFADataModification(WPConferenceModifAbstractBase):
         return p.getHTML()
 
 
-class WConfModifProgram(wcomponents.WTemplated):
-
-    def __init__( self, conference ):
-        self._conf = conference
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["deleteItemsURL"]=urlHandlers.UHConfDelTracks.getURL(self._conf)
-        vars["addTrackURL"]=urlHandlers.UHConfAddTrack.getURL( self._conf )
-        vars["conf"] = self._conf
-        return vars
-
-
-class WPConfModifProgram( WPConferenceModifBase ):
-
-    sidemenu_option = 'program_old'
-
-    def _getPageContent( self, params ):
-        wc = WConfModifProgram( self._conf )
-        return wc.getHTML()
-
-
-class WTrackCreation( wcomponents.WTemplated ):
-
-    def __init__( self, targetConf ):
-        self.__conf = targetConf
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['title'] = ''
-        vars['description'] = ''
-        return vars
-
-
-class WPConfAddTrack( WPConfModifProgram ):
-
-    def _getPageContent( self, params ):
-        p = WTrackCreation( self._conf )
-        pars = {"postURL": urlHandlers.UHConfPerformAddTrack.getURL(self._conf)}
-        return p.getHTML( pars )
-
 class WFilterCriteriaAbstracts(wcomponents.WFilterCriteria):
     """
     Draws the options for a filter criteria object
@@ -1732,58 +1640,6 @@ _("You can now close this window.")</b>
 </td></tr></table>
 
 """)
-
-
-class WConfMyStuffMyTracks(WConfDisplayBodyBase):
-
-    _linkname = 'my_tracks'
-
-    def __init__(self, aw, conf):
-        self._aw = aw
-        self._conf = conf
-
-    def _getTracksHTML(self):
-        if self._aw.getUser() is None or not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
-            return ""
-        lt = self._conf.getCoordinatedTracks(self._aw.getUser())
-        if len(lt) <= 0:
-            return ""
-        res = []
-        for t in lt:
-            modURL = urlHandlers.UHTrackModifAbstracts.getURL(t)
-            res.append("""
-                <tr class="infoTR">
-                    <td class="infoTD" width="100%%">%s</td>
-                    <td nowrap class="infoTD"><a href=%s>%s</a></td>
-                </tr>""" % (self.htmlText(t.getTitle()),
-                            quoteattr(str(modURL)),
-                            _("Edit")))
-        return """
-            <table class="infoTable" cellspacing="0" width="100%%">
-                <tr>
-                    <td nowrap class="tableHeader"> %s </td>
-                    <td nowrap class="tableHeader" style="text-align:right;"> %s </td>
-                </tr>
-                <tr>
-                    <td>%s</td>
-                </tr>
-            </table>
-            """ % (_("Track"),
-                   _("Actions"),
-                   "".join(res))
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["body_title"] = self._getTitle()
-        wvars["items"] = self._getTracksHTML()
-        return wvars
-
-class WPConfMyStuffMyTracks(WPConferenceDefaultDisplayBase):
-    menu_entry_name = 'my_tracks'
-
-    def _getBody(self,params):
-        wc=WConfMyStuffMyTracks(self._getAW(),self._conf)
-        return wc.getHTML()
 
 
 class WConfMyStuff(WConfDisplayBodyBase):

@@ -24,7 +24,6 @@ class WebLocator:
         self.__confId = None
         self.__materialId = None
         self.__resId = None
-        self.__trackId = None
         self.__abstractId = None
         self.__notifTplId = None
 
@@ -61,15 +60,6 @@ class WebLocator:
         else:
             self.__abstractId = params["abstractId"]
 
-    def setTrack( self, params, mustExist=1 ):
-        self.setConference( params )
-        if not ("trackId" in params.keys()) or \
-           params["trackId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("track id not set"))
-        else:
-            self.__trackId = params["trackId"]
-
     def setMaterial(self, params, mustExist=1):
         if "confId" in params and params["confId"] is not None and "abstractId" in params:
             self.setAbstract(params, mustExist)
@@ -94,9 +84,6 @@ class WebLocator:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
         if self.__notifTplId:
             obj = obj.getAbstractMgr().getNotificationTplById(self.__notifTplId)
-            return obj
-        if self.__trackId:
-            obj = obj.getTrackById(self.__trackId)
             return obj
         if self.__abstractId:
             obj = obj.getAbstractMgr().getAbstractById(self.__abstractId)
