@@ -18,6 +18,7 @@ from __future__ import unicode_literals, division
 
 from sqlalchemy import inspect
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
@@ -29,7 +30,7 @@ from indico.modules.events.contributions.models.contributions import _get_next_f
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import TitledIntEnum, IndicoEnum
 
 
@@ -173,7 +174,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         index=True,
         nullable=True
     )
-    judgment_comment = db.Column(
+    _judgment_comment = db.Column(
+        'judgment_comment',
         db.Text,
         nullable=False,
         default=''
@@ -430,6 +432,18 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, abstract_id=self.id)
+
+    @hybrid_property
+    def judgment_comment(self):
+        return MarkdownText(self._judgment_comment)
+
+    @judgment_comment.setter
+    def judgment_comment(self, value):
+        self._judgment_comment = value
+
+    @judgment_comment.expression
+    def judgment_comment(cls):
+        return cls._judgment_comment
 
     @return_ascii
     def __repr__(self):
