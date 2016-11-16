@@ -78,11 +78,3 @@ class IAvatarFossil(IAvatarMinimalFossil):
 
     def getAddress( self ):
         """ Avatar address """
-
-class IAvatarAllDetailsFossil(IAvatarFossil):
-
-    def getSecondaryEmails( self ):
-        """ Avatar secondary emails """
-
-    def getTelephone( self ):
-        """ Avatar telephone """
