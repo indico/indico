@@ -27,7 +27,7 @@ __all__ = ('EventTitlePlaceholder', 'EventURLPlaceholder', 'AbstractIDPlaceholde
            'PrimaryAuthorsPlaceholder', 'CoAuthorsPlaceholder', 'SubmitterNamePlaceholder',
            'SubmitterFirstNamePlaceholder', 'SubmitterLastNamePlaceholder', 'SubmitterTitlePlaceholder',
            'TargetAbstractIDPlaceholder', 'TargetAbstractTitlePlaceholder', 'TargetSubmitterNamePlaceholder',
-           'TargetSubmitterFirstNamePlaceholder', 'TargetSubmitterLastNamePlaceholder', 'CommentsPlaceholder',
+           'TargetSubmitterFirstNamePlaceholder', 'TargetSubmitterLastNamePlaceholder', 'JudgmentCommentPlaceholder',
            'ContributionTypePlaceholder', 'ContributionURLPlaceholder')
 
 
@@ -227,8 +227,8 @@ class TargetSubmitterLastNamePlaceholder(Placeholder):
         return abstract.submitter.last_name
 
 
-class CommentsPlaceholder(Placeholder):
-    name = 'comments'
+class JudgmentCommentPlaceholder(Placeholder):
+    name = 'judgment_comment'
     description = _('Comments written by event organizer (upon final decision)')
 
     @classmethod
