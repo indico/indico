@@ -28,7 +28,6 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import track_time_changes
-from indico.util.string import to_unicode
 from indico.util.i18n import _
 
 from MaKaC import conference as conference
@@ -61,7 +60,7 @@ def _serialize_contribution(contrib):
         'endDate': Conversion.datetime(contrib.end_dt),
         'duration': Conversion.duration(contrib.duration),
         'description': contrib.description,
-        'track': to_unicode(contrib.track.title) if contrib.track else None,
+        'track': contrib.track.title if contrib.track else None,
         'session': contrib.session.title if contrib.session else None,
         'type': contrib.type.name if contrib.type else None,
         'address': contrib.address,
