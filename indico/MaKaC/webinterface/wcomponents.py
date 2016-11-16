@@ -745,19 +745,6 @@ class WAbstractBannerModif(WBannerModif):
         title=target.getTitle()
         WBannerModif.__init__(self, path, itemType, title)
 
-class WTrackBannerModif(WBannerModif):
-
-    def __init__( self, track, abstract=None, isManager = False ):
-        path = []
-        target = track
-        if abstract:
-            path.append({"url": urlHandlers.UHTrackModifAbstracts.getURL(track), "title":_("Abstract list")})
-        if isManager:
-            path.append({"url": urlHandlers.UHConfModifProgram.getURL(track.getConference()), "title":_("Track list")})
-        itemType=type(target).__name__
-        title=target.getTitle()
-        WBannerModif.__init__(self, path, itemType, title)
-
 
 class WConferenceModifFrame(WTemplated):
 

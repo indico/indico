@@ -23,21 +23,17 @@ app = make_app()
 with app.test_request_context():
     mod_errors = []
     func_errors = []
+    endpoint_errors = []
     for attr in dir(uhs):
         if attr[:2] != 'UH':
             continue
         uh = getattr(uhs, attr)
         if getattr(uh, '_endpoint', None) is None:
-            if getattr(uh, '_relativeURL', None) is None:
-                pass  # print 'UH with no ep/ru: %r' % uh
             continue
         if uh._endpoint not in app.url_map._rules_by_endpoint:
-            #print 'UH with invalid endpoint: %r' % uh
-            try:
-                assert uh._endpoint.startswith('legacy.')
-            except AssertionError:
-                print uh._endpoint
-                raise
+            if not uh._endpoint.startswith('legacy.'):
+                endpoint_errors.append('%s references invalid endpoint %s' % (uh.__name__, uh._endpoint))
+                continue
             ep = uh._endpoint.split('.', 1)[1]
             module_name, _, funcname = ep.partition('-')
             if not funcname:
@@ -59,3 +55,5 @@ with app.test_request_context():
     print '\n'.join(sorted(mod_errors))
     print
     print '\n'.join(sorted(func_errors))
+    print
+    print '\n'.join(sorted(endpoint_errors))

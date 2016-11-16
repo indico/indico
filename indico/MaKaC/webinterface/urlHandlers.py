@@ -265,10 +265,6 @@ class UHConfPerformDataModif(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-dataPerform'
 
 
-class UHConfModifProgram(URLHandler):
-    _endpoint = 'event_mgmt.confModifProgram'
-
-
 class UHConfModifCFA(URLHandler):
     _endpoint = 'event_mgmt.confModifCFA'
 
@@ -409,87 +405,6 @@ class UHAbstractSubmissionDisplay(URLHandler):
     _endpoint = 'event.abstractSubmission'
 
 
-class UHConfAddTrack(URLHandler):
-    _endpoint = 'event_mgmt.confModifProgram-addTrack'
-
-
-class UHConfDelTracks(URLHandler):
-    _endpoint = 'event_mgmt.confModifProgram-deleteTracks'
-
-
-class UHConfPerformAddTrack(URLHandler):
-    _endpoint = 'event_mgmt.confModifProgram-performAddTrack'
-
-
-class UHTrackModification(URLHandler):
-    _endpoint = 'event_mgmt.trackModification'
-
-
-class UHTrackModifAbstracts(URLHandler):
-    _endpoint = 'event_mgmt.trackModifAbstracts'
-
-
-class UHTrackAbstractBase(URLHandler):
-    @classmethod
-    def getURL(cls, track, abstract):
-        url = cls._getURL()
-        url.setParams(track.getLocator())
-        url.addParam('abstractId', abstract.getId())
-        return url
-
-
-class UHTrackAbstractModif(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif'
-
-
-class UHAbstractTrackManagerDisplayPDF(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-abstractToPDF'
-
-
-class UHAbstractsTrackManagerAction(URLHandler):
-    _endpoint = 'event_mgmt.trackAbstractModif-abstractAction'
-
-
-class UHTrackAbstractPropToAcc(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-proposeToBeAcc'
-
-
-class UHTrackAbstractPropToRej(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-proposeToBeRej'
-
-
-class UHTrackAbstractAccept(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-accept'
-
-
-class UHTrackAbstractReject(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-reject'
-
-
-class UHTrackAbstractDirectAccess(URLHandler):
-    _endpoint = 'event_mgmt.trackAbstractModif-directAccess'
-
-
-class UHTrackAbstractPropForOtherTrack(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-proposeForOtherTracks'
-
-
-class UHTrackModifCoordination(URLHandler):
-    _endpoint = 'event_mgmt.trackModifCoordination'
-
-
-class UHTrackDataModif(URLHandler):
-    _endpoint = 'event_mgmt.trackModification-modify'
-
-
-class UHTrackPerformDataModification(URLHandler):
-    _endpoint = 'event_mgmt.trackModification-performModify'
-
-
-class UHTrackAbstractModIntComments(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-comments'
-
-
 class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 
@@ -546,18 +461,6 @@ class UHGeneralInfoPerformModification(URLHandler):
     _endpoint = 'admin.generalInfoModification-update'
 
 
-class UHConferenceProgram(URLHandler):
-    _endpoint = 'event.conferenceProgram'
-
-
-class UHConferenceProgramPDF(URLHandler):
-    _endpoint = 'event.conferenceProgram-pdf'
-
-    @classmethod
-    def getStaticURL(cls, target, **params):
-        return "files/generatedPdf/Programme.pdf"
-
-
 class UHConferenceCFA(URLHandler):
     _endpoint = 'event.conferenceCFA'
 
@@ -572,14 +475,6 @@ class UHAbstractWithdraw(URLHandler):
 
 class UHAbstractRecovery(URLHandler):
     _endpoint = 'event.abstractWithdraw-recover'
-
-
-class UHTrackModMoveUp(URLHandler):
-    _endpoint = 'event_mgmt.confModifProgram-moveTrackUp'
-
-
-class UHTrackModMoveDown(URLHandler):
-    _endpoint = 'event_mgmt.confModifProgram-moveTrackDown'
 
 
 class UHAbstractModEditData(URLHandler):
@@ -600,27 +495,6 @@ class UHAbstractModIntCommentEdit(URLHandler):
 
 class UHAbstractModIntCommentRem(URLHandler):
     _endpoint = 'event_mgmt.abstractManagment-remComment'
-
-
-class UHTrackAbstractModIntCommentNew(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-commentNew'
-
-
-class UHTrackAbstractModCommentBase(URLHandler):
-    @classmethod
-    def getURL(cls, track, comment):
-        url = cls._getURL()
-        url.setParams(comment.getLocator())
-        url.addParam("trackId", track.getId())
-        return url
-
-
-class UHTrackAbstractModIntCommentEdit(UHTrackAbstractModCommentBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-commentEdit'
-
-
-class UHTrackAbstractModIntCommentRem(UHTrackAbstractModCommentBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-commentRem'
 
 
 class UHAbstractReviewingNotifTpl(URLHandler):
@@ -645,14 +519,6 @@ class UHAbstractModNotifTplDisplay(URLHandler):
 
 class UHAbstractModNotifTplPreview(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-notifTplPreview'
-
-
-class UHTrackAbstractModMarkAsDup(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-markAsDup'
-
-
-class UHTrackAbstractModUnMarkAsDup(UHTrackAbstractBase):
-    _endpoint = 'event_mgmt.trackAbstractModif-unMarkAsDup'
 
 
 class UHAbstractModMarkAsDup(URLHandler):
@@ -723,16 +589,8 @@ class UHConfModCFANotifTplDown(URLHandler):
     _endpoint = 'event_mgmt.abstractReviewing-notifTplDown'
 
 
-class UHTrackModContribList(URLHandler):
-    _endpoint = 'event_mgmt.trackModContribList'
-
-
 class UHConfMyStuff(URLHandler):
     _endpoint = 'event.myconference'
-
-
-class UHConfMyStuffMyTracks(URLHandler):
-    _endpoint = 'event.myconference-myTracks'
 
 
 class UHConfAbstractBook(URLHandler):
@@ -1155,7 +1013,6 @@ class UHHelper(object):
     modifUHs = {
         "Conference": UHConferenceModification,
         "DefaultConference": UHConferenceModification,
-        "Track": UHTrackModification,
         "Abstract": UHAbstractModify
     }
 

@@ -24,7 +24,6 @@ import MaKaC.webinterface.rh.base as base
 import MaKaC.webinterface.rh.conferenceBase as conferenceBase
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.pages.errors import WPError404
 from indico.core.config import Config
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
@@ -41,7 +40,6 @@ from indico.core import signals
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.legacy import XMLEventSerializer
-from indico.util.i18n import set_best_lang
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
 
@@ -159,29 +157,6 @@ class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
             return p.display()
 
 
-class RHConferenceProgram(RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConferenceProgram
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._xs = self._normaliseListParam(params.get("xs", []))
-
-    def _process(self):
-        p = conferences.WPConferenceProgram(self, self._target)
-        return p.display(xs=self._xs)
-
-
-class RHConferenceProgramPDF(RHConferenceBaseDisplay):
-
-    def _process(self):
-        set_best_lang()  # prevents from having a _LazyString when generating a pdf without session.lang set
-        tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
-        filename = "%s - Programme.pdf" % self._target.getTitle()
-        from MaKaC.PDFinterface.conference import ProgrammeToPDF
-        pdf = ProgrammeToPDF(self._target, tz=tz)
-        return send_file(filename, StringIO(pdf.getPDFBin()), 'PDF')
-
-
 class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
     _uh=urlHandlers.UHConfMyStuff
 
@@ -191,22 +166,6 @@ class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
     def _process(self):
         p=conferences.WPMyStuff(self,self._target)
         return p.display()
-
-
-class RHConfMyStuffMyTracks(RHConferenceBaseDisplay,base.RHProtected):
-    _uh=urlHandlers.UHConfMyStuffMyTracks
-
-    def _checkProtection(self):
-        base.RHProtected._checkProtection(self)
-
-    def _process(self):
-        ltracks = self._target.getCoordinatedTracks(self._aw.getUser())
-
-        if len(ltracks) == 1:
-            self._redirect(urlHandlers.UHTrackModifAbstracts.getURL(ltracks[0]))
-        else:
-            p = conferences.WPConfMyStuffMyTracks(self, self._target)
-            return p.display()
 
 
 class RHAbstractBook(RHConferenceBaseDisplay):

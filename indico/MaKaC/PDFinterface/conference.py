@@ -36,22 +36,11 @@ from reportlab.platypus import Table, TableStyle
 from reportlab.pdfgen import canvas
 from MaKaC.common.timezoneUtils import DisplayTZ,nowutc
 import MaKaC.webinterface.urlHandlers as urlHandlers
-import MaKaC.review as review
 import MaKaC.conference as conference
 from MaKaC.badge import BadgeTemplateItem
 from MaKaC.poster import PosterTemplateItem
 from MaKaC.PDFinterface.base import (PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, FileDummy,
                                      setTTFonts, PDFSizes, modifiedFontSize)
-from MaKaC.webinterface.pages.tracks import (
-    AbstractStatusTrackViewFactory,
-    _ASTrackViewPFOT,
-    _ASTrackViewPA,
-    _ASTrackViewDuplicated,
-    _ASTrackViewMerged,
-    _ASTrackViewIC,
-    _ASTrackViewAcceptedForOther
-)
-from MaKaC.webinterface.common.abstractStatusWrapper import AbstractStatusList
 from MaKaC.errors import NoReportError
 from reportlab.lib.pagesizes import landscape, A4
 from MaKaC.badgeDesignConf import BadgeDesignConfiguration
@@ -265,61 +254,6 @@ class ConfManagerAbstractsToPDF(AbstractsToPDF):
             'doc_type': 'abstract_manager',
             'get_status': ConfManagerAbstractToPDF._get_status,
             'get_track_judgements': ConfManagerAbstractToPDF._get_track_reviewing_states
-        })
-
-
-class TrackManagerAbstractToPDF(AbstractToPDF):
-
-    def __init__(self, abstract, track, tz=None):
-        super(TrackManagerAbstractToPDF, self).__init__(abstract, tz=tz)
-        self._track = track
-
-        self._args.update({
-            'doc_type': 'abstract_track_manager',
-            'track_view': self._get_abstract_track_view(track, abstract)
-        })
-
-    @staticmethod
-    def _get_abstract_track_view(track, abstract):
-        status = AbstractStatusTrackViewFactory.getStatus(track, abstract)
-        comments = escape(status.getComment())
-        st = status.getLabel().upper()
-
-        if isinstance(status, _ASTrackViewPFOT):
-            tracks = [(track.getId(), escape(track.getTitle())) for track in status.getProposedTrackList()]
-            return (st, tracks)
-
-        elif isinstance(status, _ASTrackViewPA):
-            ctype = status.getContribType()
-            conflicts = [
-                (jud.getTrack().getTitle(), jud.getResponsible().getFullName())
-                for jud in status.getConflicts()]
-            return (st, conflicts)
-
-        elif isinstance(status, _ASTrackViewAcceptedForOther):
-            return (st, status.getTrack())
-
-        elif isinstance(status, _ASTrackViewIC):
-            return (st, None)
-
-        elif isinstance(status, _ASTrackViewDuplicated):
-            return (st, status.getOriginal())
-
-        elif isinstance(status, _ASTrackViewMerged):
-            return (st, status.getTarget())
-
-        else:
-            return (st, None)
-
-
-class TrackManagerAbstractsToPDF(AbstractsToPDF):
-    def __init__(self, conf, track, abstract_ids, tz=None):
-        super(TrackManagerAbstractsToPDF, self).__init__(conf, abstract_ids, tz)
-
-        self._args.update({
-            'track': track,
-            'doc_type': 'abstract_track_manager',
-            'get_track_view': TrackManagerAbstractToPDF._get_abstract_track_view
         })
 
 
