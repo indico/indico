@@ -159,5 +159,5 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
         contribs = contrib_list_kwargs['contribs']
         tpl = get_template_module('events/contributions/display/_contribution_list.html')
         tpl_lists = get_template_module('events/management/_lists.html')
-        return {'html': tpl.render_contribution_list(self.event, self.event.display_tzinfo, contribs),
+        return {'html': tpl.render_contribution_list(self.event, self.event.display_tzinfo, contribs, total_entries),
                 'counter': tpl_lists.render_displayed_entries_fragment(len(contribs), total_entries)}

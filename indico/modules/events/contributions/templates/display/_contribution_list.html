@@ -1,54 +1,67 @@
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'message_box.html' import message_box %}
 
-{% macro render_contribution_list(event, timezone, contributions, with_session_info=true) %}
-    {% for contrib in contributions -%}
-        <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
-            <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
-                <span class="value">
-                    <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
-                        <span class="contrib-id">{{ contrib.friendly_id }}.</span>
-                        {{ contrib.title }}
+{% macro render_contribution_list(event, timezone, contributions, total_entries, with_session_info=true) %}
+    {% if contributions %}
+        {% for contrib in contributions -%}
+            <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
+                <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
+                    <span class="value">
+                        <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                            <span class="contrib-id">{{ contrib.friendly_id }}.</span>
+                            {{ contrib.title }}
+                        </a>
+                    </span>
+                </div>
+                {% if contrib.speakers -%}
+                    <div class="speaker-list icon-user" data-searchable="{{ contrib.speakers|lower }}">
+                        {{ render_users(contrib.speakers|sort(attribute='display_order_key'),
+                                        span_class='speaker-item-inline') }}
+                    </div>
+                {%- endif %}
+                {% if contrib.timetable_entry -%}
+                    <div class="contrib-time icon-time">
+                        {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
+                    </div>
+                {%- endif %}
+                <div class="">
+                    {% if contrib.track -%}
+                        <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
+                            {{ contrib.track.title }}
+                        </div>
+                    {%- endif %}
+                    {% if contrib.type -%}
+                        <div class="contrib-type small" data-searchable="{{ contrib.type.name|lower }}">
+                            {{ contrib.type.name }}
+                        </div>
+                    {%- endif %}
+                    {% if contrib.session and with_session_info -%}
+                        <div class="contrib-session small" data-searchable="{{ contrib.session.title|lower }}"
+                             style="{{ contrib.session.colors.css }}">
+                            <a href="{{ url_for('sessions.display_session', contrib.session) }}"
+                               style="color: #{{ contrib.session.colors.text }}">{{ contrib.session.title }}</a>
+                            <span class="session-bg-color" style="background: #{{ contrib.session.colors.background }};"></span>
+                        </div>
+                    {%- endif %}
+                </div>
+                {% if contrib.description -%}
+                    <a href="{{ url_for('contributions.display_contribution', contrib) }}">
+                        <div class="description js-mathjax">
+                            {{ contrib.description|truncate(400) }}
+                        </div>
                     </a>
-                </span>
-            </div>
-            {% if contrib.speakers -%}
-                <div class="speaker-list icon-user">
-                    {{ render_users(contrib.speakers|sort(attribute='display_order_key'),
-                                    span_class='speaker-item-inline') }}
-                </div>
-            {%- endif %}
-            {% if contrib.timetable_entry -%}
-                <div class="contrib-time icon-time">
-                    {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
-                </div>
-            {%- endif %}
-            <div class="">
-                {% if contrib.track -%}
-                    <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
-                        {{ contrib.track.title }}
-                    </div>
-                {%- endif %}
-                {% if contrib.type -%}
-                    <div class="contrib-type small" data-searchable="{{ contrib.type.name|lower }}">
-                        {{ contrib.type.name }}
-                    </div>
-                {%- endif %}
-                {% if contrib.session and with_session_info -%}
-                    <div class="contrib-session small" data-searchable="{{ contrib.session.title|lower }}"
-                         style="{{ contrib.session.colors.css }}">
-                        <a href="{{ url_for('sessions.display_session', contrib.session) }}"
-                           style="color: #{{ contrib.session.colors.text }}">{{ contrib.session.title }}</a>
-                        <span class="session-bg-color" style="background: #{{ contrib.session.colors.background }};"></span>
-                    </div>
                 {%- endif %}
             </div>
-            {% if contrib.description -%}
-                <a href="{{ url_for('contributions.display_contribution', contrib) }}">
-                    <div class="description js-mathjax">
-                        {{ contrib.description|truncate(400) }}
-                    </div>
-                </a>
+        {%- endfor %}
+    {%- else %}
+        {%- call message_box('info') %}
+            {%- if total_entries %}
+                {%- trans -%}
+                    The filtering criteria do not match with any of the existing contributions. Try to clear the filters.
+                {%- endtrans %}
+            {%- else %}
+                {%- trans %}There are no contributions yet.{% endtrans %}
             {%- endif %}
-        </div>
-    {%- endfor %}
+        {%- endcall %}
+    {%- endif %}
 {% endmacro %}
