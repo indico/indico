@@ -22,10 +22,6 @@ from MaKaC.i18n import _
 class WebLocator:
     def __init__(self):
         self.__confId = None
-        self.__materialId = None
-        self.__resId = None
-        self.__abstractId = None
-        self.__notifTplId = None
 
     def setConference( self, params ):
         if not ("confId" in params.keys()) and "confid" in params.keys():
@@ -43,53 +39,10 @@ class WebLocator:
     def getConference( self ):
         return conference.ConferenceHolder().getById( self.__confId )
 
-    def setNotificationTemplate( self, params, mustExist=1 ):
-        self.setConference(params)
-        if not ("notifTplId" in params.keys()) or params["notifTplId"].strip == "":
-            if mustExist:
-                raise errors.MaKaCError( _("notificationTemplate id not set"))
-        else:
-            self.__notifTplId = params["notifTplId"]
-
-    def setAbstract( self, params, mustExist=1  ):
-        self.setConference( params )
-        if not ("abstractId" in params.keys()) or \
-           params["abstractId"].strip()=="":
-            if mustExist:
-                raise errors.MaKaCError( _("abstract id not set"))
-        else:
-            self.__abstractId = params["abstractId"]
-
-    def setMaterial(self, params, mustExist=1):
-        if "confId" in params and params["confId"] is not None and "abstractId" in params:
-            self.setAbstract(params, mustExist)
-
-    def setResource(self, params, mustExist=1):
-        if "resId" not in params and "resourceId" in params:
-            params["resId"] = params["resourceId"]
-
-        if not params.get("resId", '').strip():
-            self.setMaterial(params, mustExist)
-            if mustExist:
-                raise errors.MaKaCError(_("material id not set"))
-        else:
-            self.setMaterial(params, 1)
-            self.__resId = params["resId"]
-
     def getObject(self):
         if not self.__confId:
             return None
         obj = conference.ConferenceHolder().getById(self.__confId)
         if obj is None:
             raise errors.NoReportError("The event you are trying to access does not exist or has been deleted")
-        if self.__notifTplId:
-            obj = obj.getAbstractMgr().getNotificationTplById(self.__notifTplId)
-            return obj
-        if self.__abstractId:
-            obj = obj.getAbstractMgr().getAbstractById(self.__abstractId)
-            if obj == None:
-                raise errors.NoReportError("The abstract you are trying to access does not exist or has been deleted")
-            if self.__resId:
-                return obj.getAttachmentById(self.__resId)
-        if not self.__materialId:
-            return obj
+        return obj

@@ -16,8 +16,6 @@
 
 from indico.util.caching import memoize_request
 from indico.util.contextManager import ContextManager
-from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
 from MaKaC.webinterface import locators
 from MaKaC.webinterface.rh.base import RH
 
@@ -52,25 +50,3 @@ class RHConferenceSite(RHCustomizable):
 
 class RHConferenceBase(RHConferenceSite):
     pass
-
-
-class RHFileBase(RHConferenceSite):
-
-    def _checkParams(self, params):
-        l = locators.WebLocator()
-        l.setResource(params)
-        self._file = self._target = l.getObject()
-#        if not isinstance(self._file, LocalFile):
-#            raise MaKaCError("No file found, %s found instead"%type(self._file))
-        self._conf = self._file.getConference()
-
-
-class RHAbstractBase( RHConferenceSite ):
-
-    def _checkParams( self, params ):
-        l = locators.WebLocator()
-        l.setAbstract( params )
-        self._abstract = self._target = l.getObject()
-        if self._abstract is None:
-            raise MaKaCError( _("The abstract you are trying to access does not exist"))
-        self._conf = self._abstract.getOwner().getOwner()

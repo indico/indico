@@ -141,7 +141,7 @@ class AbsURLTplVar(TplVar):
     _description=""
 
     def getValue(cls,abstract):
-        return str(urlHandlers.UHAbstractDisplay.getURL(abstract))
+        return ''
     getValue=classmethod(getValue)
 
 class ContribURLTplVar(TplVar):

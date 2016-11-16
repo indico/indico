@@ -14,34 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-import pytz
-from datetime import datetime
+from cStringIO import StringIO
+
 from flask import Response, flash, request, session
 from werkzeug.exceptions import Forbidden
-
-import MaKaC.webinterface.rh.base as base
-import MaKaC.webinterface.rh.conferenceBase as conferenceBase
-import MaKaC.webinterface.pages.conferences as conferences
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from indico.core.config import Config
-from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.errors import MaKaCError
-from MaKaC.PDFinterface.conference import AbstractBook
-import zipfile
-from cStringIO import StringIO
-from MaKaC.i18n import _
-
-import MaKaC.common.timezoneUtils as timezoneUtils
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 
 from indico.core import signals
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.legacy import XMLEventSerializer
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
+from MaKaC.webinterface import urlHandlers
+from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
+from MaKaC.webinterface.pages import conferences
+from MaKaC.webinterface.rh import base, conferenceBase
+from MaKaC.webinterface.rh.base import RHDisplayBaseProtected
+from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 
 
 class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
@@ -168,48 +158,6 @@ class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
         return p.display()
 
 
-class RHAbstractBook(RHConferenceBaseDisplay):
-    _uh=urlHandlers.UHConfAbstractBook
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self._noCache = params.get('cache') == '0'
-
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
-        if not self._conf.getAbstractMgr().isActive() or not self._conf.hasEnabledSection("cfa"):
-            raise MaKaCError( _("The Call For Abstracts was disabled by the conference managers"))
-
-    def _getCacheFileName(self):
-        dir = os.path.join(Config().getInstance().getXMLCacheDir(), "abstract_books")
-        if not os.path.exists(dir):
-            os.makedirs(dir)
-        return os.path.join(dir, '%s.pdf' % self._conf.getId())
-
-    def _process(self):
-        boaConfig = self._conf.getBOAConfig()
-        pdfFilename = "%s - Book of abstracts.pdf" % cleanHTMLHeaderFilename(self._target.getTitle())
-        cacheFile = self._getCacheFileName()
-        if os.path.isfile(cacheFile):
-            mtime = pytz.utc.localize(datetime.utcfromtimestamp(os.path.getmtime(cacheFile)))
-        else:
-            mtime = None
-
-        if boaConfig.isCacheEnabled() and not self._noCache and mtime and mtime > boaConfig.lastChanged:
-            return send_file(pdfFilename, cacheFile, 'PDF')
-        else:
-            tz = timezoneUtils.DisplayTZ(self._aw, self._target).getDisplayTZ()
-            pdf = AbstractBook(self._target, self.getAW(), tz=tz)
-            fname = pdf.generate()
-
-            with open(fname, 'rb') as f:
-                data = f.read()
-            with open(cacheFile, 'wb') as f:
-                f.write(data)
-
-            return send_file(pdfFilename, cacheFile, 'PDF')
-
-
 class RHConferenceToXML(RHConferenceBaseDisplay):
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
@@ -233,50 +181,3 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         outgen.confToXMLMarc21(self._target.getConference())
         xmlgen.closeTag("marc:record")
         return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
-
-
-class RHConferenceLatexPackage(RHConferenceBaseDisplay):
-
-    def _process(self):
-        filename = "%s-BookOfAbstracts.zip" % self._target.getTitle()
-        zipdata = StringIO()
-        zip = zipfile.ZipFile(zipdata, "w")
-        for cont in self._target.as_event.contributions:
-            f = []
-            f.append("""\\section*{%s}""" % cont.title)
-            f.append(" ")
-            l = []
-            affil = {}
-            i = 1
-            for pa in cont.primary_authors:
-                if pa.affiliation in affil.keys():
-                    num = affil[pa.affiliation]
-                else:
-                    affil[pa.affiliation] = i
-                    num = i
-                    i += 1
-
-                l.append("""\\noindent \\underline{%s}$^%d$""" % (pa.full_name, num))
-
-            for ca in cont.secondary_authors:
-                if ca.affiliation in affil.keys():
-                    num = affil[ca.affiliation]
-                else:
-                    affil[ca.affiliation] = i
-                    num = i
-                    i += 1
-                l.append("""%s$^%d$""" % (ca.full_name, num))
-
-            f.append(",\n".join(l))
-            f.append("\n")
-            l = []
-            for key in affil.keys():
-                l.append("""$^%d$%s""" % (affil[key], key))
-            f.append("\\noindent " + ",\n".join(l))
-            f.append("\n")
-            f.append("""\\noindent %s""" % cont.description)
-            zip.writestr("contribution-%s" % cont.id, "\n".join(f))
-        zip.close()
-        zipdata.seek(0)
-
-        return send_file(filename, zipdata, 'ZIP', inline=False)
