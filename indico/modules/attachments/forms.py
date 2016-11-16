@@ -29,9 +29,10 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_default_folder_names
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (IndicoSelectMultipleCheckboxField, IndicoRadioField, AccessControlListField,
-                                     FileField)
+                                     FileField, EditableFileField)
 from indico.web.forms.validators import UsedIf, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
@@ -66,9 +67,19 @@ class AddAttachmentFilesForm(AttachmentFormBase):
     files = FileField(_("Files"), multiple_files=True)
 
 
+def _get_file_data(attachment):
+    file = attachment.file
+    return {
+        'url': url_for('attachments.download', attachment, filename=file.filename, from_preview='1'),
+        'filename': file.filename,
+        'size': file.size,
+        'content_type': file.content_type
+    }
+
+
 class EditAttachmentFileForm(EditAttachmentFormBase):
-    file = FileField(_("File"), add_remove_links=False,
-                     description=_("Already uploaded file. Replace it by adding a new file."))
+    file = EditableFileField(_("File"), add_remove_links=False, get_metadata=_get_file_data,
+                             description=_("Already uploaded file. Replace it by adding a new file."))
 
 
 class AttachmentLinkFormMixin(object):

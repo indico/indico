@@ -127,23 +127,13 @@ class AddAttachmentLinkMixin:
                                 folders_protection_info=_get_folders_protection_info(self.object))
 
 
-def _file_data(attachment):
-    file = attachment.file
-    return {
-        'url': url_for('attachments.download', attachment, filename=file.filename, from_preview='1'),
-        'filename': file.filename,
-        'size': file.size,
-        'content_type': file.content_type
-    }
-
-
 class EditAttachmentMixin(SpecificAttachmentMixin):
     """Edit an attachment"""
 
     def _process(self):
         defaults = FormDefaults(self.attachment, protected=self.attachment.is_self_protected, skip_attrs={'file'})
         if self.attachment.type == AttachmentType.file:
-            form = EditAttachmentFileForm(linked_object=self.object, obj=defaults, file=_file_data(self.attachment))
+            form = EditAttachmentFileForm(linked_object=self.object, obj=defaults, file=self.attachment)
         else:
             form = EditAttachmentLinkForm(linked_object=self.object, obj=defaults)
 
@@ -167,8 +157,6 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
             signals.attachments.attachment_updated.send(self.attachment, user=session.user)
             flash(_("The attachment \"{name}\" has been updated").format(name=self.attachment.title), 'success')
             return jsonify_data(attachment_list=_render_attachment_list(self.object))
-        else:
-            form.file.get_metadata = lambda __: _file_data(self.attachment)
 
         template = ('attachments/upload.html' if self.attachment.type == AttachmentType.file else
                     'attachments/add_link.html')

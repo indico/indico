@@ -22,9 +22,10 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import Config
+from indico.modules.events.layout.util import get_logo_data, get_css_file_data
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import FileField
+from indico.web.forms.fields import EditableFileField, FileField
 from indico.web.forms.validators import UsedIf, HiddenUnless
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget, ColorPickerWidget
 
@@ -79,13 +80,14 @@ class LayoutForm(IndicoForm):
 
 
 class LogoForm(IndicoForm):
-    logo = FileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', add_remove_links=False,
-                     handle_flashes=True,
-                     description=_("Logo to be displayed next to the event's title"))
+    logo = EditableFileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                             add_remove_links=False, handle_flashes=True, get_metadata=get_logo_data,
+                             description=_("Logo to be displayed next to the event's title"))
 
 
 class CSSForm(IndicoForm):
-    css_file = FileField(_("Custom CSS file"), accepted_file_types='.css', add_remove_links=False, handle_flashes=True)
+    css_file = EditableFileField(_("Custom CSS file"), accepted_file_types='.css', add_remove_links=False,
+                                 get_metadata=get_css_file_data, handle_flashes=True)
 
     def __init__(self, *args, **kwargs):
         super(CSSForm, self).__init__(*args, **kwargs)

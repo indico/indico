@@ -192,3 +192,14 @@ def get_visibility_options(category_or_event, allow_invisible=True):
                         '({} \N{RIGHTWARDS ARROW} {})'.format(_category_above_message(category_or_event.visibility),
                                                               _("Everywhere"))))
     return options
+
+
+def get_image_data(image_type, category):
+    url = getattr(category, image_type + '_url')
+    metadata = getattr(category, image_type + '_metadata')
+    return {
+        'url': url,
+        'filename': metadata['filename'],
+        'size': metadata['size'],
+        'content_type': metadata['content_type']
+    }

@@ -31,6 +31,7 @@ from indico.modules.categories.forms import (CategoryIconForm, CategoryLogoForm,
                                              CategorySettingsForm, CreateCategoryForm, SplitCategoryForm)
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.operations import create_category, delete_category, move_category, update_category
+from indico.modules.categories.util import get_image_data
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
 from indico.modules.events.operations import delete_event
@@ -45,17 +46,6 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)
 MAX_CATEGORY_LOGO_DIMENSIONS = (200, 200)
-
-
-def _get_image_data(category, image_type):
-    url = getattr(category, image_type + '_url')
-    metadata = getattr(category, image_type + '_metadata')
-    return {
-        'url': url,
-        'filename': metadata['filename'],
-        'size': metadata['size'],
-        'content_type': metadata['content_type']
-    }
 
 
 class RHManageCategoryContent(RHManageCategoryBase):
@@ -107,9 +97,9 @@ class RHManageCategorySettings(RHManageCategoryBase):
             return redirect(url_for('.manage_settings', self.category))
         else:
             if self.category.icon_metadata:
-                icon_form.icon.get_metadata = lambda __: _get_image_data(self.category, 'icon')
+                icon_form.icon.data = self.category
             if self.category.logo_metadata:
-                logo_form.logo.get_metadata = lambda __: _get_image_data(self.category, 'logo')
+                logo_form.logo.data = self.category
         return WPCategoryManagement.render_template('management/settings.html', self.category, 'settings', form=form,
                                                     icon_form=icon_form, logo_form=logo_form)
 
@@ -153,7 +143,7 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         self._set_image(content, metadata)
         flash(self.SAVED_FLASH_MSG, 'success')
         logger.info("New {} '%s' uploaded by %s (%s)".format(self.IMAGE_TYPE), f.filename, session.user, self.category)
-        return jsonify_data(content=_get_image_data(self.category, self.IMAGE_TYPE))
+        return jsonify_data(content=get_image_data(self.IMAGE_TYPE, self.category))
 
     def _process_DELETE(self):
         self._set_image(None, None)

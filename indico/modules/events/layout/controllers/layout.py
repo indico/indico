@@ -25,8 +25,8 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import (LayoutForm, LogoForm, CSSForm, CSSSelectionForm)
-from indico.modules.events.layout.util import get_css_url
+from indico.modules.events.layout.forms import LayoutForm, LogoForm, CSSForm, CSSSelectionForm
+from indico.modules.events.layout.util import get_css_url, get_logo_data, get_css_file_data
 from indico.modules.events.layout.views import WPLayoutEdit
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -37,23 +37,6 @@ from indico.web.util import jsonify_data
 from MaKaC.webinterface.pages.conferences import WPConfModifPreviewCSS
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-
-
-def _logo_data(event):
-    return {
-        'url': event.logo_url,
-        'filename': event.logo_metadata['filename'],
-        'size': event.logo_metadata['size'],
-        'content_type': event.logo_metadata['content_type']
-    }
-
-
-def _css_file_data(event):
-    return {
-        'filename': event.stylesheet_metadata['filename'],
-        'size': event.stylesheet_metadata['size'],
-        'content_type': 'text/css'
-    }
 
 
 class RHLayoutBase(RHConferenceModifBase):
@@ -85,9 +68,9 @@ class RHLayoutEdit(RHLayoutBase):
             return redirect(url_for('event_layout.index', self._conf))
         else:
             if self.event.logo_metadata:
-                logo_form.logo.get_metadata = lambda __: _logo_data(self.event)
+                logo_form.logo.data = self.event
             if self.event.has_stylesheet:
-                css_form.css_file.get_metadata = lambda __: _css_file_data(self.event)
+                css_form.css_file.data = self.event
         return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self._conf,
                                             logo_form=logo_form, css_form=css_form)
 
@@ -120,7 +103,7 @@ class RHLayoutLogoUpload(RHLayoutBase):
         }
         flash(_('New logo saved'), 'success')
         logger.info("New logo '%s' uploaded by %s (%s)", f.filename, session.user, self.event)
-        return jsonify_data(content=_logo_data(self.event))
+        return jsonify_data(content=get_logo_data(self.event))
 
 
 class RHLayoutLogoDelete(RHLayoutBase):
@@ -145,7 +128,7 @@ class RHLayoutCSSUpload(RHLayoutBase):
         flash(_('New CSS file saved. Do not forget to enable it ("Use custom CSS") after verifying that it is correct '
                 'using the preview.'), 'success')
         logger.info('CSS file for %s uploaded by %s', self.event, session.user)
-        return jsonify_data(content=_css_file_data(self.event))
+        return jsonify_data(content=get_css_file_data(self.event))
 
 
 class RHLayoutCSSDelete(RHLayoutBase):

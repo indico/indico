@@ -16,20 +16,22 @@
 
 from __future__ import unicode_literals
 
+from functools import partial
+
 from flask import request
 from wtforms.fields import BooleanField, SelectField, StringField, HiddenField, IntegerField
 from wtforms.validators import DataRequired, Optional, InputRequired, NumberRange, ValidationError
 
 from indico.modules.categories.models.categories import EventMessageMode, Category
-from indico.modules.categories.util import get_visibility_options
+from indico.modules.categories.util import get_visibility_options, get_image_data
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
-                                     IndicoEnumSelectField, IndicoTimezoneSelectField, EmailListField, FileField,
-                                     HiddenFieldList, MultipleItemsField, IndicoMarkdownField)
+                                     IndicoEnumSelectField, IndicoTimezoneSelectField, EmailListField,
+                                     EditableFileField, HiddenFieldList, MultipleItemsField, IndicoMarkdownField)
 from indico.web.forms.widgets import SwitchWidget, HiddenCheckbox
 
 
@@ -82,18 +84,19 @@ class CategorySettingsForm(IndicoForm):
 
 
 class CategoryIconForm(IndicoForm):
-    icon = FileField("Icon", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', add_remove_links=False,
-                     handle_flashes=True,
-                     description=_("Small icon that will show up next to category names in overview pages. Will be "
-                                   "automatically resized to 16x16 pixels. This may involve loss of image quality, "
-                                   "so try to upload images as close as possible to those dimensions."))
+    icon = EditableFileField("Icon", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                             add_remove_links=False, handle_flashes=True, get_metadata=partial(get_image_data, 'icon'),
+                             description=_("Small icon that will show up next to category names in overview pages. "
+                                           "Will be automatically resized to 16x16 pixels. This may involve loss of "
+                                           "image quality, so try to upload images as close as possible to those "
+                                           "dimensions."))
 
 
 class CategoryLogoForm(IndicoForm):
-    logo = FileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif', add_remove_links=False,
-                     handle_flashes=True,
-                     description=_("Logo that will show up next to the category description. Will be "
-                                   "automatically resized to at most 200x200 pixels."))
+    logo = EditableFileField("Logo", accepted_file_types='image/jpeg,image/jpg,image/png,image/gif',
+                             add_remove_links=False, handle_flashes=True, get_metadata=partial(get_image_data, 'logo'),
+                             description=_("Logo that will show up next to the category description. Will be "
+                                           "automatically resized to at most 200x200 pixels."))
 
 
 class CategoryProtectionForm(IndicoForm):

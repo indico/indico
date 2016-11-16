@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals, absolute_import
 
+from flask import json
+from werkzeug.datastructures import FileStorage
 from wtforms import Field
 
 from indico.core.config import Config
@@ -32,13 +34,11 @@ class FileField(Field):
         'multiple_files': False,
         'max_files': 10,
         'add_remove_links': True,
-        'param_name': 'file',
         'handle_flashes': False,
         'lightweight': False
     }
 
     def __init__(self, *args, **kwargs):
-        self.get_metadata = kwargs.pop('get_metadata', None)
         self.lightweight = kwargs.pop('lightweight', self.default_options['lightweight'])
 
         config = Config.getInstance()
@@ -54,7 +54,6 @@ class FileField(Field):
             'maxFiles': kwargs.pop('max_files', self.default_options['max_files']) if self.allow_multiple_files else 1,
             'addRemoveLinks': kwargs.pop('add_remove_links', self.default_options['add_remove_links']),
             'acceptedFiles': kwargs.pop('accepted_file_types', None),
-            'paramName': kwargs.pop('param_name', self.default_options['param_name']),
             'parallelUploads': kwargs.pop('max_files', self.default_options['max_files']),
             'handleFlashes': kwargs.pop('handle_flashes', self.default_options['handle_flashes'])
         }
@@ -65,6 +64,7 @@ class FileField(Field):
             self.widget_options['dictRemoveFile'] = tpl.remove_icon()
 
         super(FileField, self).__init__(*args, **kwargs)
+        self.widget_options['paramName'] = self.name
 
     def process_formdata(self, valuelist):
         self.data = None
@@ -74,4 +74,37 @@ class FileField(Field):
             self.data = valuelist[0]
 
     def _value(self):
-        return self.get_metadata(self) if self.get_metadata else None
+        return None
+
+
+def get_file_metadata(file_):
+    return {'id': file_.id, 'filename': file_.filename, 'content_type': file_.content_type, 'size': file_.size}
+
+
+class EditableFileField(FileField):
+    """A dropzone field that displays its current state and keeps track of deletes."""
+
+    def __init__(self, *args, **kwargs):
+        self.get_metadata = kwargs.pop('get_metadata', get_file_metadata)
+        super(EditableFileField, self).__init__(*args, **kwargs)
+        self.widget_options['editable'] = True
+
+    def process_formdata(self, valuelist):
+        uploaded = []
+        deleted = []
+
+        for value in valuelist:
+            if isinstance(value, FileStorage):
+                uploaded.append(value)
+            else:
+                deleted = json.loads(value)
+        self.data = {
+            'added': uploaded,
+            'deleted': deleted
+        }
+
+    def _value(self):
+        if self.allow_multiple_files:
+            return [self.get_metadata(f) for f in self.data] if self.data else []
+        else:
+            return self.get_metadata(self.data) if self.data else None
