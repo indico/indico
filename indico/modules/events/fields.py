@@ -165,6 +165,8 @@ class PersonLinkListFieldBase(EventPersonListField):
     person_link_cls = None
     #: name of the attribute on the form containing the linked object
     linked_object_attr = None
+    #: If set to `True`, will be sorted alphabetically by default
+    default_sort_alpha = True
 
     widget = None
 

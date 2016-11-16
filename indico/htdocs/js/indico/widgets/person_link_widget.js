@@ -327,7 +327,7 @@
             onAdd: function(people) {
                 people.forEach(function(person) {
                     if (person.authorType === undefined) {
-                        var maxOrder = _.max(people, _.iteratee('displayOrder')).displayOrder;
+                        var maxOrder = _.max(people, _.iteratee('displayOrder')).displayOrder || 0;
                         setPersonDefaults(person);
                         person.displayOrder = customOrder ? (maxOrder + 1) : 0;
                     }
