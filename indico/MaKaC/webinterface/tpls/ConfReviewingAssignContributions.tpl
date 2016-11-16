@@ -90,10 +90,10 @@
                         <td><input type="checkbox" id="trackShowNoValue" name="selTracks" value="not specified" checked/></td>
                         <td> --${ _("not specified")}--</td>
                     </tr>
-                    % for t in Conference.getTrackList():
+                    % for t in Conference.as_event.tracks:
                         <tr>
-                            <td><input type="checkbox" name="selTracks" value="${t.getId()}" checked></td>
-                            <td>${ t.getTitle() }</td>
+                            <td><input type="checkbox" name="selTracks" value="${t.id}" checked></td>
+                            <td>${ t.title }</td>
                         </tr>
                     % endfor
                 </table>

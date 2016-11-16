@@ -189,7 +189,6 @@ class WContributionReviewing(wcomponents.WTemplated):
         vars["CanEditDueDates"] = canAssignReferee
         vars["IsReferee"] = review_manager.isReferee(self._rh._getUser())
         vars["Review"] = review_manager.getLastReview()
-        vars["TrackList"] = self._conf.getTrackList()
 
         return vars
 
@@ -257,7 +256,6 @@ class WContributionReviewingJudgements(WContributionReviewingBase):
         vars["AdviceList"] = review_manager.getLastReview().getSubmittedReviewerJudgement()
         vars["IsReferee"] = review_manager.isReferee(self._rh._getUser())
         vars["Review"] = review_manager.getLastReview()
-        vars["TrackList"] = self._conf.getTrackList()
         vars["getStatusClass"] = lambda judgement: self._getStatusClass(judgement)
         vars["getStatusText"] = lambda judgement: self._getStatusText(judgement)
 

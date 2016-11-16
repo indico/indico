@@ -46,13 +46,11 @@ class TrackFilterField( filters.FilterField ):
     """
     _id = "track"
 
-    def satisfies( self, contribution ):
-        """
-        """
-        if len(self._conf.getTrackList()) == len(self._values) and contribution.track:
+    def satisfies(self, contribution):
+        if len(self._conf.as_event.tracks) == len(self._values) and contribution.track:
             return True
         elif contribution.track:
-            if contribution.track.getId() in self._values:
+            if str(contribution.track.id) in self._values:
                 return True
         else:
             return self._showNoValue
@@ -71,10 +69,8 @@ class SessionFilterField( filters.FilterField ):
     """
     _id = "session"
 
-    def satisfies( self, contribution ):
-        """
-        """
-        if len(self._conf.sessions) == len(self._values) and contribution.session:
+    def satisfies(self, contribution):
+        if len(self._conf.as_event.sessions) == len(self._values) and contribution.session:
             return True
         elif contribution.session:
             if str(contribution.session.id) in self._values:

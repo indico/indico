@@ -56,6 +56,7 @@ from indico.modules.events.abstracts.settings import boa_settings, BOASortField,
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
+from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
@@ -127,7 +128,7 @@ class ProgrammeToPDF(PDFBase):
             story = self._story
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
-        p = Paragraph(escape(self._conf.getProgramDescription()), style)
+        p = Paragraph(escape(track_settings.get(self._event, 'program').encode('utf-8')), style)
         story.append(p)
         story.append(Spacer(1, 0.4*inch))
         for track in self._event.tracks:
@@ -377,6 +378,7 @@ class AbstractBook(ContributionBook):
         sort_by = boa_settings.get(event, 'sort_by')
 
         super(AbstractBook, self).__init__(event, None, sort_by=sort_by)
+        self._args['show_ids'] = boa_settings.get(event, 'show_abstract_ids')
 
         del self._args["url"]
 
