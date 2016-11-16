@@ -876,7 +876,7 @@ class Conference(CommonObjectBase):
     def getDefaultStyle(self):
         return self.as_event.theme
 
-    def clone(self, startDate, options, eventManager=None, userPerformingClone=None):
+    def clone(self, startDate):
         # startDate is in the timezone of the event
         old_event = self.as_event
         start_dt = old_event.tzinfo.localize(startDate).astimezone(utc)
@@ -896,10 +896,6 @@ class Conference(CommonObjectBase):
         conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
-        # Tracks in a conference
-        if options.get('tracks', False):
-            for tr in self.getTrackList():
-                conf.addTrack(tr.clone(conf))
         conf.notifyModification()
 
         # Run the new modular cloning system
