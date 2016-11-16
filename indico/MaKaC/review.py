@@ -26,12 +26,6 @@ from persistent.list import PersistentList
 from pytz import timezone
 
 from indico.core.config import Config
-from indico.modules.events.abstracts.legacy import (contribution_from_abstract,
-                                                    AbstractFieldManagerAdapter,
-                                                    AbstractJudgmentLegacyMixin,
-                                                    AbstractLegacyMixin,
-                                                    AbstractManagerLegacyMixin,
-                                                    AbstractStatusAcceptedLegacyMixin)
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.util.string import safe_slice, safe_upper
 
@@ -462,7 +456,7 @@ class _AuthEmailIdx(_AuthIdx):
         return auth.getEmail().lower()
 
 
-class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
+class AbstractMgr(Persistent):
 
     def __init__(self, owner):
         self._owner = owner
@@ -549,7 +543,7 @@ class AbstractMgr(AbstractManagerLegacyMixin, Persistent):
         self._showAttachedFilesContribList = showshowAttachedFilesContribList
 
     def getAbstractFieldsMgr(self):
-        return AbstractFieldManagerAdapter(self._owner.as_event)
+        raise NotImplementedError
 
     def clone(self, conference):
         # XXX: Couldn't find any calls of this, but raise an exception just in case...
@@ -1073,7 +1067,7 @@ class Comment(Persistent):
             len(conf.getConference().getCoordinatedTracks(user)) > 0)
 
 
-class Abstract(AbstractLegacyMixin, Persistent):
+class Abstract(Persistent):
 
     def __init__(self, owner, id, submitter, **abstractData):
         self._setOwner( owner )
@@ -1696,9 +1690,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
         if destTrack is not None:
             destTrack.addAbstract(self)
 
-        contrib = contribution_from_abstract(self, session)
-        self.as_new.contribution = contrib
-
     def reject(self, responsible, comments=""):
         """
         """
@@ -2220,7 +2211,7 @@ class Abstract(AbstractLegacyMixin, Persistent):
         return self.getAttachments().get(id, None)
 
 
-class AbstractJudgement(AbstractJudgmentLegacyMixin, Persistent):
+class AbstractJudgement(Persistent):
     """This class represents each of the judgements made by a track about a
         certain abstract. Each track for which an abstract is proposed can
         make a judgement proposing the abstract to be accepted or rejected.
@@ -2549,7 +2540,7 @@ class AbstractStatusSubmitted( AbstractStatus ):
         AbstractStatus.update( self )
 
 
-class AbstractStatusAccepted(AbstractStatusAcceptedLegacyMixin, AbstractStatus):
+class AbstractStatusAccepted(AbstractStatus):
     """
     """
     def __init__(self, abstract, responsible, comments=""):
