@@ -90,6 +90,11 @@
     &:not(first-child) {
         margin-left: 0.1em;
     }
+
+    .affiliation {
+        color: $dark-gray;
+        font-size: 0.9em;
+    }
 }
 
 .user-search-results {

@@ -256,15 +256,20 @@
             margin-top: 0;
         }
 
+        label {
+            display: block;
+        }
+
         .author-list {
             font-size: 0.95em;
             list-style-type: none;
             margin: 0.2em 0 0 1em;
             padding: 0;
+            display: inline-block;
 
             li {
-                display: inline-block;
                 background-color: $light-gray;
+                display: block;
             }
         }
     }
