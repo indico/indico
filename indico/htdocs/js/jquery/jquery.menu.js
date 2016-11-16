@@ -44,7 +44,7 @@
         _close_all: function(effect) {
             var self = this;
 
-            this.element.find('a').each(function() {
+            this.element.find('a, button').each(function() {
                 self._close($(this), effect);
             });
         },
