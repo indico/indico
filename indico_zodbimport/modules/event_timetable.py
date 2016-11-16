@@ -33,9 +33,9 @@ from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.session import update_session_options
-from indico.modules.events.abstracts.models.legacy import LegacyAbstract
+# from indico.modules.events.abstracts.models.legacy import LegacyAbstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
-from indico.modules.events.abstracts.models.judgments import Judgment
+# from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
