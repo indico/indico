@@ -8,7 +8,6 @@
 
 {% block content -%}
     <div class="toolbar flex-right">
-        <!-- TODO: Filtering
         <div id="counter" class="group">
             {{- render_displayed_entries_fragment(contribs|length, total_entries) -}}
         </div>
@@ -16,7 +15,6 @@
             <span class="i-button label icon-search"></span>
             <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
         </div>
-        -->
         {% if not g.static_site %}
             <div class="group">
                 <button class="i-button icon-filter js-dialog-action"
@@ -41,7 +39,7 @@
         </div>
     </div>
     <div id="display-contribution-list" class="contribution-list">
-        {{ render_contribution_list(event, timezone, contribs) }}
+        {{ render_contribution_list(event, timezone, contribs, total_entries) }}
     </div>
     <script>
         setupEventDisplayContributionList();
