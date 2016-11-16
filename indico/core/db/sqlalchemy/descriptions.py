@@ -41,21 +41,11 @@ RENDER_MODE_WRAPPER_MAP = {
 }
 
 
-class DescriptionMixin(object):
-    """Mixin to add an html-enabled description column."""
+class RenderModeMixin(object):
+    """Mixin to add a  plaintext/html/markdown-enabled column."""
 
     possible_render_modes = {RenderMode.plain_text}
     default_render_mode = RenderMode.plain_text
-    marshmallow_aliases = {'_description': 'description'}
-
-    @declared_attr
-    def _description(cls):
-        return db.Column(
-            'description',
-            db.Text,
-            nullable=False,
-            default=''
-        )
 
     @declared_attr
     def render_mode(cls):
@@ -70,18 +60,49 @@ class DescriptionMixin(object):
         else:
             return cls.default_render_mode
 
-    @hybrid_property
-    def description(self):
-        selected_mode = (self.default_render_mode
-                         if len(self.possible_render_modes) == 1 or self.render_mode is None
-                         else self.render_mode)
-        description_wrapper = RENDER_MODE_WRAPPER_MAP[selected_mode]
-        return description_wrapper(self._description)
+    @classmethod
+    def _render_getter(cls, attr_name):
+        def _getter(self):
+            selected_mode = (self.default_render_mode
+                             if len(self.possible_render_modes) == 1 or self.render_mode is None
+                             else self.render_mode)
+            description_wrapper = RENDER_MODE_WRAPPER_MAP[selected_mode]
+            return description_wrapper(getattr(self, attr_name))
+        return _getter
 
-    @description.setter
-    def description(self, value):
-        self._description = value
+    @classmethod
+    def _render_setter(cls, attr_name):
+        def _setter(self, value):
+            setattr(self, attr_name, value)
+        return _setter
 
-    @description.expression
-    def description(cls):
-        return cls._description
+    @classmethod
+    def _render_expression(cls, attr_name):
+        def _expression(cls):
+            return getattr(cls, attr_name)
+        return _expression
+
+    @classmethod
+    def create_hybrid_property(cls, attr_name):
+        """Create a hybrid property that does the rendering of the column.
+
+        :param attr_name: a name for the attribute the unprocessed value can be
+                          accessed through (e.g. `_description`).
+        """
+        return hybrid_property(cls._render_getter(attr_name), fset=cls._render_setter(attr_name),
+                               expr=cls._render_expression(attr_name))
+
+
+class DescriptionMixin(RenderModeMixin):
+    marshmallow_aliases = {'_description': 'description'}
+
+    @declared_attr
+    def _description(cls):
+        return db.Column(
+            'description',
+            db.Text,
+            nullable=False,
+            default=''
+        )
+
+    description = RenderModeMixin.create_hybrid_property('_description')
