@@ -16,6 +16,7 @@
  */
 
 (function($) {
+    'use strict';
 
     $.widget('ui.dropdown', {
         options: {
@@ -62,21 +63,21 @@
             sibl.position($.extend({of: positionReference}, this.options.positioning[sibl.data('level')] ||
                                    {my: 'left top', at: 'left bottom', offset: '0px 0px'}));
             this.element.find('a').each(function() {
-                if (this != elem.get(0)) {
+                if (this !== elem.get(0)) {
                     self._close($(this));
                 }
             });
         },
 
-        _menuize: function(elem, selector) {
+        _menuize: function(elem) {
             var self = this;
 
             elem.find(this.options.selector).each(function() {
                 var $this = $(this);
-                if (!$this.attr('href') || $this.attr('href') == "#" || $this.data('ignore-href') !== undefined ||
+                if (!$this.attr('href') || $this.attr('href') === "#" || $this.data('ignore-href') !== undefined ||
                         self.options.always_listen) {
                     $this.click(function(e) {
-                        if ($this.data('toggle') == 'dropdown') {
+                        if ($this.data('toggle') === 'dropdown') {
                             if ($this.data('on')) {
                                 self._close($this);
                             } else if (!$this.hasClass('disabled')) {
@@ -96,11 +97,11 @@
 
             elem.find('ul.dropdown > li > a').each(function() {
                 var $this = $(this);
-                if (!$this.attr('href') || $this.attr('href') == "#" || $this.data('ignore-href') !== undefined ||
+                if (!$this.attr('href') || $this.attr('href') === "#" || $this.data('ignore-href') !== undefined ||
                         self.options.always_listen) {
                     $this.click(function(e) {
                         var result = $this.triggerHandler('menu_select', self.element);
-                        if(!result) {
+                        if (!result) {
                             self._close_all();
                         }
                         e.preventDefault();
@@ -111,10 +112,10 @@
             elem.find('ul.dropdown > li.toggle').each(function() {
                 var li = $(this);
                 var link = $('<a>', {
-                    'href': '#',
-                    'text': li.text(),
-                    'class': 'icon-checkmark ' + (li.data('state') ? '' : 'inactive'),
-                    'click': function(e) {
+                    href: '#',
+                    text: li.text(),
+                    class: 'icon-checkmark ' + (li.data('state') ? '' : 'inactive'),
+                    click: function(e) {
                         e.preventDefault();
                         var $this = $(this);
                         var newState = !li.data('state');
@@ -130,9 +131,9 @@
         _create: function() {
             var self = this;
             this._menuize(this.element);
-            $(document).on('click', function(e){
+            $(document).on('click', function(e) {
                 // click outside? close menus.
-                if ($(self.element).has(e.target).length == 0) {
+                if ($(self.element).has(e.target).length === 0) {
                     self._close_all();
                 }
             });
@@ -144,11 +145,9 @@
             if (func === null) {
                 // no pretty effects
                 elem.hide();
-            }
-            else if (typeof func == 'function') {
+            } else if (typeof func == 'function') {
                 func.call(elem, this);
-            }
-            else {
+            } else {
                 elem[func].call(elem, this.options['time_' + st]);
             }
         },
