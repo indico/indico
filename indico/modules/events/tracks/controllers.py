@@ -115,6 +115,7 @@ class RHDisplayTracks(RHConferenceBaseDisplay):
         tracks = (Track.query.with_parent(self.event_new)
                   .options(subqueryload('conveners'),
                            subqueryload('abstract_reviewers'))
+                  .order_by(Track.position)
                   .all())
         return WPDisplayTracks.render_template('display.html', self._conf, event=self.event_new, page_title=page_title,
                                                program=program, tracks=tracks)
