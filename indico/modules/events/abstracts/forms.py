@@ -40,7 +40,7 @@ from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm, FormDefaults
 from indico.web.forms.fields import IndicoQuerySelectMultipleField
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
-                                     IndicoQuerySelectMultipleCheckboxField, EmailListField, FileField,
+                                     IndicoQuerySelectMultipleCheckboxField, EmailListField, EditableFileField,
                                      IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime, WordCount, SoftLength
@@ -411,7 +411,7 @@ class AbstractForm(IndicoForm):
                                               blank_text=_("No type selected"))
     person_links = AbstractPersonLinkListField(_("Authors"), [DataRequired()], default_author_type=AuthorType.primary)
     submission_comment = TextAreaField(_("Comments"))
-    attachments = FileField(_('Attachments'), param_name='attachments', multiple_files=True, lightweight=True)
+    attachments = EditableFileField(_('Attachments'), multiple_files=True, lightweight=True)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -426,8 +426,7 @@ class AbstractForm(IndicoForm):
         self.submitted_contrib_type.query = self.event.contribution_types
         if not self.submitted_contrib_type.query.count():
             del self.submitted_contrib_type
-        # Attachments are handled separately when editing
-        if self.abstract or not abstracts_settings.get(self.event, 'allow_attachments'):
+        if not self.event.cfa.allow_attachments:
             del self.attachments
         if not description_settings['is_active']:
             del self.description

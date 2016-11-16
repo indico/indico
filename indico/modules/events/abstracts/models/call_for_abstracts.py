@@ -35,10 +35,11 @@ class CallForAbstracts(object):
     start_dt = EventSettingProperty(abstracts_settings, 'start_dt')
     end_dt = EventSettingProperty(abstracts_settings, 'end_dt')
     modification_end_dt = EventSettingProperty(abstracts_settings, 'modification_end_dt')
-    announcement = EventSettingProperty(abstracts_settings, 'announcement')
+    allow_attachments = EventSettingProperty(abstracts_settings, 'allow_attachments')
     allow_contributors_in_comments = EventSettingProperty(abstracts_reviewing_settings,
                                                           'allow_contributors_in_comments')
     allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
+    announcement = EventSettingProperty(abstracts_settings, 'announcement')
 
     @property
     def has_started(self):
