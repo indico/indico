@@ -23,10 +23,19 @@ from .simple import (IndicoSelectMultipleCheckboxField, IndicoRadioField, JSONFi
 from .colors import IndicoPalettePickerField
 from .datetime import TimeDeltaField, IndicoDateTimeField, OccurrencesField, IndicoTimezoneSelectField
 from .enums import IndicoEnumSelectField, IndicoEnumRadioField, HiddenEnumField
-from .files import FileField
+from .files import FileField, EditableFileField
 from .itemlists import MultiStringField, MultipleItemsField, OverrideMultipleItemsField
 from .location import IndicoLocationField
 from .markdown import IndicoMarkdownField
 from .principals import PrincipalListField, PrincipalField, AccessControlListField
 from .protection import IndicoProtectionField
 from .sqlalchemy import IndicoQuerySelectMultipleField, IndicoQuerySelectMultipleCheckboxField
+
+__all__ = ('IndicoSelectMultipleCheckboxField', 'IndicoRadioField', 'JSONField', 'HiddenFieldList', 'TextListField',
+           'EmailListField', 'IndicoPasswordField', 'IndicoStaticTextField', 'IndicoTagListField',
+           'IndicoPalettePickerField', 'TimeDeltaField', 'IndicoDateTimeField', 'OccurrencesField',
+           'IndicoTimezoneSelectField', 'IndicoEnumSelectField', 'IndicoEnumRadioField', 'HiddenEnumField', 'FileField',
+           'MultiStringField', 'MultipleItemsField', 'OverrideMultipleItemsField', 'PrincipalListField',
+           'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField', 'EditableFileField'
+           'IndicoQuerySelectMultipleCheckboxField', 'IndicoLocationField', 'IndicoMarkdownField',
+           'IndicoProtectionField')

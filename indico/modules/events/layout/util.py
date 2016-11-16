@@ -341,6 +341,23 @@ def get_css_url(event, force_theme=None, for_preview=False):
         return '{}/{}'.format(css_base, layout_settings.get(event, 'theme'))
 
 
+def get_logo_data(event):
+    return {
+        'url': event.logo_url,
+        'filename': event.logo_metadata['filename'],
+        'size': event.logo_metadata['size'],
+        'content_type': event.logo_metadata['content_type']
+    }
+
+
+def get_css_file_data(event):
+    return {
+        'filename': event.stylesheet_metadata['filename'],
+        'size': event.stylesheet_metadata['size'],
+        'content_type': 'text/css'
+    }
+
+
 def is_menu_entry_enabled(entry_name, event):
     """Check whether the MenuEntry is enabled"""
     return get_menu_entry_by_name(entry_name, event).is_enabled
