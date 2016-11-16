@@ -15,12 +15,13 @@
 {% endmacro %}
 
 {% block html %}
-    {% set custom_display_order = field._value()|selectattr('displayOrder')|list|length > 0 %}
+    {% set list_in_custom_order = field._value()|selectattr('displayOrder')|list|length > 0 %}
+    {% set use_custom_order = list_in_custom_order if field._value() else not field.default_sort_alpha %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
     <div id="people-list-{{ field.id }}" class="person-link-list {% if field.allow_authors %}no-border-top{% endif %}" data-tooltip-anchor>
         {% block sections %}{% endblock %}
         <div class="i-box-footer">
-            <span class="alpha-order-switch i-button label icon-only icon-sort-alpha-asc {% if not custom_display_order %}active{% endif %}">
+            <span class="alpha-order-switch i-button label icon-only icon-sort-alpha-asc {% if not use_custom_order %}active{% endif %}">
             </span>
             <div class="right">
                 <span id="add-existing-{{ field.id }}" class="i-button highlight">
