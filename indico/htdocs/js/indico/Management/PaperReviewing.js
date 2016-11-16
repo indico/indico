@@ -16,6 +16,7 @@
  */
 
 
+// XXX: used in PAPER reviewing
 
 /* Widget to add, remove, edit and show question in the abstract reviewing
 @param methods: get, add, remove, edit

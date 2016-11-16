@@ -113,7 +113,7 @@ indico_management = rjs_bundle(
     *namespace('js/indico/Management',
 
                'RoomBooking.js',
-               'AbstractReviewing.js',
+               'PaperReviewing.js',
                'NotificationTPL.js',
                'CFA.js',
                'RoomBookingMapOfRooms.js'))
