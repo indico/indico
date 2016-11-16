@@ -18,7 +18,7 @@
 (function($) {
     'use strict';
 
-    $.widget('ui.dropdown', {
+    $.widget('indico.dropdown', {
         options: {
             selector: '.i-button',
             effect_on: 'slideDown',
