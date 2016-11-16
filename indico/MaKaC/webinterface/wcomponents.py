@@ -28,8 +28,6 @@ from xml.sax.saxutils import escape, quoteattr
 from MaKaC.i18n import _
 from MaKaC.common import info
 from MaKaC.webinterface import urlHandlers
-from MaKaC.common.url import URL
-from indico.core.config import Config
 from MaKaC.conference import Conference
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common import utils
@@ -39,6 +37,7 @@ from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
+from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
@@ -51,11 +50,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 
-MIN_PRESENT_EVENTS = 6
-OPTIMAL_PRESENT_EVENTS = 10
 
-
-class WTemplated():
+class WTemplated:
     """This class provides a basic implementation of a web component (an
        object which generates HTML related to a certain feature or
        functionality) which relies in a template file for generating the
@@ -729,23 +725,6 @@ class WListOfPapersToReview(WBannerModif):
         WBannerModif.__init__(self, path, itemType, title)
 
 
-class WNotifTplBannerModif(WBannerModif):
-
-    def __init__( self, target ):
-        path = [{"url": urlHandlers.UHAbstractReviewingNotifTpl.getURL(target), "title":_("Notification template list")}]
-        itemType="Notification Template"
-        title=target.getName()
-        WBannerModif.__init__(self, path, itemType, title)
-
-class WAbstractBannerModif(WBannerModif):
-
-    def __init__( self, target ):
-        path = [{"url": urlHandlers.UHConfAbstractManagment.getURL(target), "title":_("Abstracts list")}]
-        itemType="Abstract"
-        title=target.getTitle()
-        WBannerModif.__init__(self, path, itemType, title)
-
-
 class WConferenceModifFrame(WTemplated):
 
     def __init__( self, conference, aw,):
@@ -979,118 +958,6 @@ class WTabControl(WTemplated):
 
         return vars
 
-
-class WAdminCreated(WTemplated):
-
-    def __init__(self, av):
-        self._av = av
-
-
-class WAbstractModIntCommentEdit(WTemplated):
-
-    def __init__(self,comment):
-        self._comment=comment
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["content"]=self.htmlText(self._comment.getContent())
-        return vars
-
-
-class WAbstractModNewIntComment(WTemplated):
-
-    def __init__(self,aw,abstract):
-        self._aw=aw
-        self._abstract=abstract
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        return vars
-
-
-class WAbstractModIntComments(WTemplated):
-
-    def __init__(self,aw,abstract):
-        self._aw=aw
-        self._abstract=abstract
-
-    def _getCommentsHTML(self,commentEditURLGen,commentRemURLGen):
-        res=[]
-        commentList = self._abstract.getIntCommentList()
-        for c in commentList:
-            mailtoSubject="[Indico] Abstract %s: %s"%(self._abstract.getId(), self._abstract.getTitle())
-            mailtoURL=URL("mailto:%s"%c.getResponsible().getEmail())
-            mailtoURL.addParam("subject", mailtoSubject)
-            responsible="""<a href=%s>%s</a>"""%(quoteattr(str(mailtoURL)),self.htmlText(c.getResponsible().getFullName()))
-            date=self.htmlText(c.getCreationDate().strftime("%Y-%m-%d %H:%M"))
-            buttonMod,buttonRem="",""
-            if self._aw.getUser()==c.getResponsible():
-                buttonMod= i18nformat("""
-                    <form action=%s method="POST">
-                    <td valign="bottom">
-                        <input type="submit" class="btn" value="_("modify")">
-                    </td>
-                    </form>
-                        """)%quoteattr(str(commentEditURLGen(c)))
-                buttonRem= i18nformat("""
-                    <form action=%s method="POST">
-                    <td valign="bottom">
-                        <input type="submit" class="btn" value="_("remove")">
-                    </td>
-                    </form>
-                        """)%quoteattr(str(commentRemURLGen(c)))
-            res.append("""
-                <tr>
-                    <td bgcolor="white" style="border-top:1px solid #777777;border-bottom:1px solid #777777;">
-                        <table>
-                            <tr>
-                                <td width="100%%">%s on %s</td>
-                            </tr>
-                            <tr>
-                                <td>%s</td>
-                                %s
-                                %s
-                            </tr>
-                        </table>
-                    </td>
-                </tr>"""%(responsible,date,c.getContent(),buttonMod,buttonRem))
-        if res == []:
-            res.append( i18nformat("""<tr><td align=\"center\" style=\"color:black\"><br>--_("no internal comments")--<br><br></td></tr>"""))
-        return "".join(res)
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["comments"]=self._getCommentsHTML(vars["commentEditURLGen"],vars["commentRemURLGen"])
-        vars["newCommentURL"]=quoteattr(str(vars["newCommentURL"]))
-        return vars
-
-
-class WAbstractModMarkAsDup(WTemplated):
-
-    def __init__(self,abstract):
-        self._abstract=abstract
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["duplicateURL"]=quoteattr(str(vars["duplicateURL"]))
-        vars["cancelURL"]=quoteattr(str(vars["cancelURL"]))
-        return vars
-
-
-class WAbstractModUnMarkAsDup(WTemplated):
-
-    def __init__(self,abstract):
-        self._abstract=abstract
-
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["unduplicateURL"]=quoteattr(str(vars["unduplicateURL"]))
-        vars["cancelURL"]=quoteattr(str(vars["cancelURL"]))
-        return vars
-
-
-#--------------------------------------------------------------------------------------
 
 class WConfModMoveContribsToSessionConfirmation(WTemplated):
 

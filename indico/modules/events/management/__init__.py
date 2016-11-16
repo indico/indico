@@ -53,7 +53,6 @@ def _sidemenu_items(sender, event, **kwargs):
 
     can_modify = event.can_manage(session.user)
     rb_active = Config.getInstance().getIsRoomBookingActive()
-    cfa_enabled = event.as_legacy.hasEnabledSection('cfa')
 
     event_type = event.as_legacy.getType()
     is_conference = event_type == 'conference'
@@ -71,10 +70,6 @@ def _sidemenu_items(sender, event, **kwargs):
                                50,
                                icon='location')
     if is_conference:
-        if can_modify and cfa_enabled:
-            yield SideMenuItem('abstracts_old', _('Abstracts (Old)'),
-                               url_for('event_mgmt.confModifCFA', event),
-                               section='organization')
         if can_modify or is_review_staff:
             yield SideMenuItem('paper_reviewing', _('Paper Reviewing'),
                                url_for('event_mgmt.confModifReviewing-access', event),
