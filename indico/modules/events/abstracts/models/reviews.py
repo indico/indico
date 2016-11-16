@@ -17,6 +17,7 @@
 from __future__ import unicode_literals, division
 
 from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
 from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -34,8 +35,11 @@ class AbstractAction(TitledIntEnum):
     merge = 5
 
 
-class AbstractReview(db.Model):
+class AbstractReview(RenderModeMixin, db.Model):
     """Represents an abstract review, emitted by a reviewer"""
+
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
@@ -77,7 +81,8 @@ class AbstractReview(db.Model):
         UTCDateTime,
         nullable=True
     )
-    comment = db.Column(
+    _comment = db.Column(
+        'comment',
         db.Text,
         nullable=False,
         default=''
@@ -155,6 +160,8 @@ class AbstractReview(db.Model):
 
     # relationship backrefs:
     # - ratings (AbstractReviewRating.review)
+
+    comment = RenderModeMixin.create_hybrid_property('_comment')
 
     @locator_property
     def locator(self):
