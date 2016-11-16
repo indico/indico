@@ -434,22 +434,6 @@ class ContributionsReviewingFilterCrit(filters.FilterCriteria):
     }
 
 
-#############################
-# Conference cretion        #
-#############################
-
-
-class ConferenceProgramDescriptionModification( ConferenceHTMLModificationBase ):
-    """
-    Conference program description modification
-    """
-    def _handleSet(self):
-        self._target.setProgramDescription(self._value)
-
-    def _handleGet(self):
-        return self._target.getProgramDescription()
-
-
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
     "main.changeSupport": ConferenceSupportModification,
@@ -463,6 +447,5 @@ methodMap = {
     "main.changeDates": ConferenceStartEndDateTimeModification,
     "main.changeShortURL": ConferenceShortURLModification,
     "main.changeTimezone": ConferenceTimezoneModification,
-    "program.changeDescription": ConferenceProgramDescriptionModification,
     "contributions.list": ConferenceListContributionsReview
 }
