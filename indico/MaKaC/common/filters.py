@@ -74,8 +74,6 @@ class SortingCriteria:
             self._sortingField = self._sortingFields[0]
 
     def _createField( self, fieldKlass ):
-        """
-        """
         return fieldKlass()
 
     def getFields( self ):
@@ -193,8 +191,8 @@ class FilterCriteria:
 
         self._conf=conf
         self._fields = {}
-        #Match the criteria keys with the allowed fields and construct the
-        #   field classes according to the _availableFields attribute
+        # Match the criteria keys with the allowed fields and construct the
+        # field classes according to the _availableFields attribute
         for fieldName in criteria.keys():
             cfieldName = fieldName.strip().lower()
             if self._availableFields.has_key( cfieldName ):
@@ -222,21 +220,9 @@ class FilterCriteria:
         """
         return self._fields.get( fieldId.strip().lower(), None )
 
-    def satisfies( self, abstract ):
-        """Tells whether an abstract satisfies the current criteria.
-
-            Abstract is checked against the different fields which compose
-            the ciriteria and if it satifies each of them it returns True.
-
-            Return value: True if the abstract satisfies the current criteria,
-                False in any other case.
-
-            Arguments:
-                abstract -- (MaKaC.review.Abstract) abstract which has to be
-                    checked if it satisfies the current criteria.
-        """
+    def satisfies(self, contrib):
         for field in self._fields.values():
-            if not field.satisfies( abstract ):
+            if not field.satisfies(contrib):
                 return False
         return True
 
@@ -250,19 +236,13 @@ class FilterCriteria:
 
 
 class SimpleFilter:
-    """Performs filtering and sorting over a list of abstracts.
-    """
+    """Perform filtering and sorting over a list."""
 
-    def __init__(self,filterCrit,sortingCrit):
-        """
-        """
+    def __init__(self, filterCrit, sortingCrit):
         self._filter = filterCrit
         self._sorting = sortingCrit
 
     def apply(self,targetList):
-        """
-        """
-        result = []
         if self._filter:
             result = [item for item in targetList if self._filter.satisfies( item )]
         else:

@@ -297,7 +297,6 @@ def serialize_entry_update(entry, with_timetable=False, session_=None):
 def serialize_event_info(event):
     conf = event.as_legacy
     event_info = fossilize(conf, IConferenceEventInfoFossil, tz=conf.tz)
-    event_info['isCFAEnabled'] = conf.getAbstractMgr().isActive()
     event_info['sessions'] = {sess.id: serialize_session(sess) for sess in event.sessions}
     return event_info
 

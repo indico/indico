@@ -1,7 +1,6 @@
 <%
 from MaKaC.webinterface.urlHandlers import UHHelper
-from MaKaC.conference import Conference, Track
-from MaKaC.review import Abstract
+from MaKaC.conference import Conference
 from indico.modules.categories.models.categories import Category
 
 l = []
@@ -32,17 +31,8 @@ while target_ != None:
 
     if isinstance(target_, Conference):
         target_ = target_.as_event.category
-    elif not isinstance(target_, Abstract):
-        target_ = target_.getOwner()
     else:
-        if track:
-            if isModif:
-                url = UHHelper.getModifUH(Track).getURL(track)
-            else:
-                url = UHHelper.getDisplayUH(Track).getURL(track)
-            l.append( (track.getTitle(), url) )
-        target_ = target_.getOwner().getOwner()
-
+        target_ = target_.getOwner()
 
 l.reverse()
 

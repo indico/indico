@@ -45,16 +45,6 @@ def _extend_event_menu(sender, **kwargs):
                          static_site=True)
 
 
-@signals.acl.can_access.connect_via(Event)
-def _can_access_event(cls, obj, user, authorized, **kwargs):
-    """Give track reviewers access to the event"""
-    if not user or authorized is None or authorized:
-        return
-    avatar = user.as_avatar
-    if any(track.isCoordinator(avatar) for track in obj.as_legacy.getTrackList()):
-        return True
-
-
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     target.abstract_reviewer_for_tracks |= source.abstract_reviewer_for_tracks

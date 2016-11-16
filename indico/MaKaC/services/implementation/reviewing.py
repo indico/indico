@@ -55,7 +55,6 @@ class ConferenceReviewingBase(ConferenceModifBase):
         ConferenceModifBase._checkParams(self)
         self._event = self._conf.as_event
         self._confPaperReview = self._conf.getConfPaperReview()
-        self._confAbstractReview = self._conf.getConfAbstractReview()
 
 class ConferenceReviewingPRMBase(ConferenceReviewingBase):
     """ This base class verifies that the user is a PRM

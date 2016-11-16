@@ -29,7 +29,6 @@ from BTrees import OOBTree
 from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.util.i18n import _
-from MaKaC.review import Abstract
 
 
 class MaterialLocalRepository(Persistent):
@@ -120,18 +119,12 @@ class MaterialLocalRepository(Persistent):
             id = self._getNewFileId()
 
         conf = newFile.getConference()
-        abstract = None
-        if isinstance(newFile.getOwner(), Abstract):
-            abstract = newFile.getOwner()
 
         try:
             year = str(conf.getCreationDate().year)
         except:
             year = str(datetime.datetime.now().year)
         interPath = os.path.join(year, "C%s" % conf.getId())
-        if abstract:
-            # the file is attach to an abstract. Then create a directory for the abstract
-            interPath = os.path.join(interPath, "abs%s" % abstract.getId())
         from MaKaC.common import info
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         volume = minfo.getArchivingVolume()
