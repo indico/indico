@@ -92,23 +92,6 @@
                 {{ abstract.submission_comment }}
             </div>
         {% endif %}
-        {% if abstract.files %}
-            <div class="files field-separator">
-                <table class="tree" id="paper-files">
-                    {% for file in abstract.files %}
-                        <tr>
-                            <td>
-                                <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
-                                    <a href="{{ url_for('.download_attachment', file, management=management) }}">
-                                        {{ file.filename }}
-                                    </a>
-                                </span>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </table>
-            </div>
-        {% endif %}
     </div>
 {% endmacro %}
 
@@ -214,6 +197,26 @@
             {% endif %}
         </div>
     </div>
+{% endmacro %}
+
+{% macro render_attachments(abstract, management) %}
+    {% if abstract.files %}
+        <div class="files field-separator">
+            <table class="tree">
+                {% for file in abstract.files %}
+                    <tr>
+                        <td>
+                            <span class="{{ icon_from_mimetype(file.content_type, 'icon-file-filled') }}">
+                                <a href="{{ url_for('.download_attachment', file) }}" target="_blank">
+                                    {{ file.filename }}
+                                </a>
+                            </span>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro _render_field_value(value) %}
@@ -399,6 +402,11 @@
                     </div>
                     <div class="i-box-content submission-info">
                         {{ _render_submission_info(abstract, management) }}
+                        {% if abstract.event_new.cfa.allow_attachments %}
+                            <div class="attachment-list">
+                                {{ render_attachments(abstract, management) }}
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>

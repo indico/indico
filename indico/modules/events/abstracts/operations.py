@@ -36,6 +36,7 @@ from indico.modules.events.contributions.operations import delete_contribution, 
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
+from indico.util.i18n import ngettext
 from indico.util.fs import secure_filename
 
 
@@ -52,6 +53,32 @@ def _update_tracks(abstract, tracks, only_reviewed_for=False):
         abstract.reviewed_for_tracks = tracks
 
 
+def add_abstract_files(abstract, files, log_action=True):
+    for f in files:
+        filename = secure_filename(f.filename, 'attachment')
+        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+        abstract_file = AbstractFile(filename=filename, content_type=content_type, abstract=abstract)
+        abstract_file.save(f.file)
+        db.session.flush()
+    if log_action and files:
+        logger.info('%d abstract file(s) added to %s by %s', len(files), abstract, session.user)
+        message = ngettext('Added file to abstract "{title}"', 'Added {number} files to abstract "{title}"', len(files))
+        abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
+                               message.format(title=abstract.title, number=len(files)),
+                               session.user, data={'Files': ', '.join(f.filename for f in files)})
+
+
+def delete_abstract_files(abstract, files):
+    for file_ in files:
+        db.session.delete(file_)
+    logger.info('%d abstract file(s) deleted from %s by %s', len(files), abstract, session.user)
+    message = ngettext('Deleted file from abstract "{title}"', 'Deleted {number} files from abstract "{title}"',
+                       len(files))
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
+                           message.format(title=abstract.title, number=len(files)),
+                           session.user, data={'Files': ', '.join(f.filename for f in files)})
+
+
 def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False):
     abstract = Abstract(event_new=event, submitter=session.user)
     tracks = abstract_data.pop('submitted_for_tracks', None)
@@ -62,13 +89,10 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
-    for f in files:
-        filename = secure_filename(f.filename, 'attachment')
-        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-        abstract_file = AbstractFile(filename=filename, content_type=content_type, abstract=abstract)
-        abstract_file.save(f.file)
-        db.session.flush()
+
+    add_abstract_files(abstract, files, log_action=False)
     signals.event.abstract_created.send(abstract)
+
     if send_notifications:
         send_abstract_notifications(abstract)
     logger.info('Abstract %s created by %s', abstract, session.user)
@@ -77,10 +101,20 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
     return abstract
 
 
-def update_abstract(abstract, abstract_data, custom_fields_data=None):
+def update_abstract(abstract, abstract_data, custom_fields_data=None, **kwargs):
+    abstract_data = abstract_data.copy()
+    abstract_data.update(kwargs)
     tracks = abstract_data.pop('submitted_for_tracks', None)
+    attachments = abstract_data.pop('attachments', {})
+
     if tracks is not None and abstract.edit_track_mode == EditTrackMode.both:
         _update_tracks(abstract, tracks)
+
+    deleted_files = {f for f in abstract.files if f.id in attachments['deleted']}
+    abstract.files = list(set(abstract.files) - deleted_files)
+    delete_abstract_files(abstract, deleted_files)
+    add_abstract_files(abstract, attachments['added'])
+
     abstract.populate_from_dict(abstract_data)
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)

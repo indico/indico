@@ -47,15 +47,15 @@ class RHEditAbstract(RHAbstractBase):
     def _process(self):
         abstract_form_class = make_abstract_form(self.event_new)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
-        form = abstract_form_class(obj=FormDefaults(self.abstract, **custom_field_values), abstract=self.abstract,
-                                   event=self.event_new)
+        defaults = FormDefaults(self.abstract, attachments=self.abstract.files, **custom_field_values)
+        form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event_new)
         if form.validate_on_submit():
-            update_abstract(self.abstract, *get_field_values(form.data))
+            update_abstract(self.abstract, attachments=form.data['attachments'], *get_field_values(form.data))
             flash(_("Abstract modified successfully"), 'success')
             return jsonify_data(flash=False)
         self.commit = False
         disabled_fields = ('submitted_for_tracks',) if form.track_field_disabled else ()
-        return jsonify_form(form, disabled_fields=disabled_fields)
+        return jsonify_form(form, disabled_fields=disabled_fields, form_header_kwargs={'action': request.relative_url})
 
 
 class RHAbstractsDownloadAttachment(RHAbstractBase):
