@@ -16,11 +16,8 @@
 
 from indico.util.caching import memoize_request
 from indico.util.contextManager import ContextManager
-from MaKaC.webinterface import locators
+from MaKaC.conference import ConferenceHolder
 from MaKaC.webinterface.rh.base import RH
-
-
-BYTES_1MB = 1024 * 1024
 
 
 class RHCustomizable(RH):
@@ -37,9 +34,8 @@ class RHCustomizable(RH):
 
 class RHConferenceSite(RHCustomizable):
     def _checkParams(self, params):
-        l = locators.WebLocator()
-        l.setConference( params )
-        self._conf = self._target = l.getObject()
+        # getById raises a NotFoundError if the event doesn't exist
+        self._conf = self._target = ConferenceHolder().getById(params['confId'])
         ContextManager.set("currentConference", self._conf)
 
     @property
