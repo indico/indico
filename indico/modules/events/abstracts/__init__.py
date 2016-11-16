@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import render_template, session
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -28,6 +28,7 @@ from indico.modules.events.models.events import EventType, Event
 from indico.modules.events.timetable.models.breaks import Break
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
+from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
@@ -141,3 +142,11 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(title=_("Reviewing Area"), name='user_tracks', endpoint='abstracts.display_reviewable_tracks',
                         position=0, parent='call_for_abstracts',
                         visible=_reviewing_area_visible)
+
+
+@template_hook('conference-home-info')
+def _inject_cfa_announcement(event, **kwargs):
+    event = event.as_event
+    if (event.has_feature('abstracts') and
+            (event.cfa.is_open or (session.user and event.cfa.can_submit_abstracts(session.user)))):
+        return render_template('events/abstracts/display/conference_home.html', event=event)
