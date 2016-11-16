@@ -1304,10 +1304,8 @@ class Abstract(AbstractLegacyMixin, Persistent):
             raise MaKaCError( _("An abstract must have a submitter"))
         if self._submitter:
             self.getOwner().unregisterParticipation( self._submitter )
-            self._submitter.getUser().unlinkTo(self, "submitter")
             self._submitter.delete()
         self._submitter=Submitter( self, av )
-        av.linkTo(self, "submitter")
         self.getOwner().registerParticipation( self._submitter )
         self._notifyModification()
 
@@ -1662,7 +1660,6 @@ class Abstract(AbstractLegacyMixin, Persistent):
     def delete(self):
         if self._owner:
             self.getOwner().unregisterParticipation(self._submitter)
-            self._submitter.getUser().unlinkTo(self, "submitter")
             self._submitter.delete()
             self._submitter = None
             self.clearAuthors()

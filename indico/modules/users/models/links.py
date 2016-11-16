@@ -68,11 +68,7 @@ class UserLink(db.Model):
         from MaKaC.webinterface.locators import WebLocator
 
         mapping = {
-            'category': 'setCategory',
-            'conference': 'setConference',
-            'track': 'setTrack',
-            'resource': 'setResource',
-            'abstract': 'setAbstract',
+            'conference': 'setConference'
         }
 
         try:
@@ -132,12 +128,7 @@ class UserLink(db.Model):
     @classmethod
     def _link_map(cls):
         import MaKaC.conference
-        import MaKaC.review
         return {
             'conference': {'cls': MaKaC.conference.Conference,
-                           'roles': {'abstractSubmitter', 'editor', 'paperReviewManager', 'referee', 'reviewer'}},
-            'track': {'cls': MaKaC.conference.Track,
-                      'roles': {'coordinator'}},
-            'abstract': {'cls': MaKaC.review.Abstract,
-                         'roles': {'submitter'}},
+                           'roles': {'editor', 'paperReviewManager', 'referee', 'reviewer'}}
         }
