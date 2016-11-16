@@ -21,9 +21,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.events.abstracts.models.legacy import LegacyAbstract
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
-from indico.modules.events.abstracts.models.judgments import Judgment
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
