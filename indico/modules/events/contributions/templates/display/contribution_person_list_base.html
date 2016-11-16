@@ -37,7 +37,7 @@
 
 {% macro _render_person_list(authors, rendering) %}
     {% call(user_data) render_users(authors, separator='') %}
-        <li>
+        <li class="speaker-list-item">
             <span class="speaker-item" data-searchable="{{ user_data.display_full_name | lower }}">
                 <span class="name">
                     {{ user_data.display_full_name }}

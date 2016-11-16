@@ -34,6 +34,11 @@
                 {% for user in abstract.primary_authors|sort(attribute='display_order_key') -%}
                     <li class="event-user">
                         {{ user.full_name }}
+                        {% if user.affiliation %}
+                            <span class="affiliation">
+                                (<span class="text">{{ user.affiliation }}</span>)
+                            </span>
+                        {% endif %}
                     </li>
                 {%- endfor %}
             </ul>
@@ -52,6 +57,11 @@
                 {% for user in abstract.secondary_authors|sort(attribute='display_order_key') -%}
                     <li class="event-user">
                         {{ user.full_name }}
+                        {% if user.affiliation %}
+                            <span class="affiliation">
+                                (<span class="text">{{ user.affiliation }}</span>)
+                            </span>
+                        {% endif %}
                     </li>
                 {%- endfor %}
             </ul>
@@ -70,6 +80,11 @@
                 {% for user in abstract.speakers -%}
                     <li class="event-user">
                         {{ user.full_name }}
+                        {% if user.affiliation %}
+                            <span class="affiliation">
+                                (<span class="text">{{ user.affiliation }}</span>)
+                            </span>
+                        {% endif %}
                     </li>
                 {%- endfor %}
             </ul>
