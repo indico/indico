@@ -20,10 +20,8 @@ from sqlalchemy.dialects.postgresql import JSON
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
-from indico.core.errors import IndicoError
 from indico.util.decorators import cached_classproperty
 from indico.util.string import return_ascii
-from MaKaC.errors import MaKaCError
 
 # TODO: remove this whole thing once all linked objects are in SQL
 
@@ -64,19 +62,10 @@ class UserLink(db.Model):
 
     @cached_property
     def object(self):
-        """Retrieves the linked object"""
-        from MaKaC.webinterface.locators import WebLocator
-
-        mapping = {
-            'conference': 'setConference'
-        }
-
-        try:
-            loc = WebLocator()
-            getattr(loc, mapping[self.type])(self.data['locator'])
-            return loc.getObject()
-        except (IndicoError, MaKaCError):
-            return None
+        """Retrieve the linked object"""
+        from MaKaC.conference import ConferenceHolder
+        assert self.type == 'conference'
+        return ConferenceHolder().getById(self.data['locator']['confId'], True)
 
     @classmethod
     def get_links(cls, user, type_, role):
