@@ -338,35 +338,9 @@ h2.menutitle {
     color: #523D04;
 }
 
-.contentCellTD {
-    color: black;
-}
-
-.abstractLeftDataCell {
-    padding-right:5px;
-    border-bottom: 1px solid #888888;
-    border-left: 5px solid #FFFFFF;
-    vertical-align: top;
-}
-
-.abstractDataCell {
-    padding:5px;
-    border-bottom: 1px solid #888888;
-    vertical-align: top;
-}
-
-
 .buttonBar {
    background: #F0F0F0;
    padding: 1px;
-}
-
-.trackDisplayTitle {
-   font-size: 14px;
-   font-weight: bold;
-   color: #5294CC;
-   padding: 3px;
-   vertical-align: bottom;
 }
 
 .displayField {
@@ -1676,7 +1650,6 @@ table.groupTable {
 
 /* This assures the spacing between table rows */
 table.groupTable .blacktext,
-table.groupTable .contentCellTD,
 table.groupTable .dataCaptionTD,
 table.groupTable .titleCellTD  {
     padding-bottom: 10px;
@@ -2129,20 +2102,6 @@ table.infoQuestionsTable td.dataBold {
     padding-top:10px;
     padding-bottom: 5px;
     margin-left: 20px;
-}
-
-.questionPreview {
-    padding-left: 10px;
-    padding-right: 25px;
-    padding-top: 15px;
-    padding-bottom: 15px;
-}
-
-.changeScaleWarning {
-    font-weight: bold;
-    color: #881122;
-    padding: 5px 0px 5px 5px;
-    max-width: 270px;
 }
 
 .subGroupTitle {
@@ -2699,12 +2658,6 @@ div#sdlw-actions {
     line-height: 17px;
 }
 
-.abstractListAbstractItem {
-    border-bottom: 1px solid #EBEBEB;
-    padding-bottom: 5px;
-    margin-top: 5px;
-}
-
 .sessionTitle {
     font-size: 18px;
     font-weight: bold;
@@ -2716,7 +2669,7 @@ div#sdlw-actions {
 }
 
 
-.contributionReviewingStatus, .abstractStatus {
+.contributionReviewingStatus {
     border-radius: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
@@ -2726,23 +2679,23 @@ div#sdlw-actions {
     font-weight: bold;
 }
 
-.contributionReviewingStatusRejected, .abstractStatusRejected, .abstractStatusDuplicated, .abstractStatusWithdrawn {
+.contributionReviewingStatusRejected {
     background: none repeat scroll 0 0 #B93725;
 }
 
-.contributionReviewingStatusAccepted, .abstractStatusAccepted {
+.contributionReviewingStatusAccepted {
     background: none repeat scroll 0 0 #9AC33A;
 }
 
-.contributionReviewingStatusPending, .abstractStatusUnderReview {
+.contributionReviewingStatusPending {
     background: none repeat scroll 0 0 #A4CCC9;
 }
 
-.contributionReviewingStatusCorrected, .abstractStatusMerged {
+.contributionReviewingStatusCorrected {
     background: none repeat scroll 0 0 #D8B81A;
 }
 
-.contributionReviewingStatusNotSubmitted, .abstractStatusSubmitted {
+.contributionReviewingStatusNotSubmitted {
     background: none repeat scroll 0 0 #BCB8A3;
 }
 
