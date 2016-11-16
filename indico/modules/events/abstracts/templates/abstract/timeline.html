@@ -111,52 +111,46 @@
             </div>
             <div class="i-box-content js-form-container">
                 {% if review.proposed_action.name == 'accept' %}
-                    <div class="">
-                        {% if review.proposed_contribution_type %}
-                            {% set contribution_type -%}
-                                <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
-                            {%- endset %}
-                            {% trans type=contribution_type|safe -%}
-                                Proposed to accept as {{ type }}
-                            {%- endtrans %}
-                        {% else %}
-                            {% trans -%}
-                                Proposed to accept
-                            {%- endtrans %}
-                        {% endif %}
-                    </div>
-                {% elif review.proposed_action.name == 'change_tracks' %}
-                    <div class="">
-                        {% set tracks -%}
-                            {% for track in review.proposed_tracks -%}
-                                <span class="abstract-track">{{ track.title|escape }}</span>
-                                {%- if not loop.last -%}, {% endif -%}
-                            {% endfor %}
+                    {% if review.proposed_contribution_type %}
+                        {% set contribution_type -%}
+                            <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
                         {%- endset %}
-                        {% trans count=review.proposed_tracks|length, tracks=tracks|safe -%}
-                            Possible destination track: {{ tracks }}
-                        {%- pluralize -%}
-                            Possible destination tracks: {{ tracks }}
+                        {% trans type=contribution_type|safe -%}
+                            Proposed to accept as {{ type }}
                         {%- endtrans %}
-                    </div>
+                    {% else %}
+                        {% trans -%}
+                            Proposed to accept
+                        {%- endtrans %}
+                    {% endif %}
+                {% elif review.proposed_action.name == 'change_tracks' %}
+                    {% set tracks -%}
+                        {% for track in review.proposed_tracks -%}
+                            <span class="abstract-track">{{ track.title|escape }}</span>
+                            {%- if not loop.last -%}, {% endif -%}
+                        {% endfor %}
+                    {%- endset %}
+                    {% trans count=review.proposed_tracks|length, tracks=tracks|safe -%}
+                        Possible destination track: {{ tracks }}
+                    {%- pluralize -%}
+                        Possible destination tracks: {{ tracks }}
+                    {%- endtrans %}
                 {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
-                    <div class="">
-                        {% set other_abstract = review.proposed_related_abstract %}
-                        {% set abstract_link -%}
-                            <a href="{{ url_for('.display_abstract', other_abstract) }}">
-                                {{ other_abstract.title|escape }}
-                            </a>
-                        {%- endset %}
-                        {% if review.proposed_action.name == 'merge' %}
-                            {% trans title=abstract_link|safe -%}
-                                Proposed to be merged into {{ title }}
-                            {%- endtrans %}
-                        {% elif review.proposed_action.name == 'mark_as_duplicate' %}
-                            {% trans title=abstract_link|safe -%}
-                                Proposed as duplicate of {{ title }}
-                            {%- endtrans %}
-                        {% endif %}
-                    </div>
+                    {% set other_abstract = review.proposed_related_abstract %}
+                    {% set abstract_link -%}
+                        <a href="{{ url_for('.display_abstract', other_abstract) }}">
+                            {{ other_abstract.title|escape }}
+                        </a>
+                    {%- endset %}
+                    {% if review.proposed_action.name == 'merge' %}
+                        {% trans title=abstract_link|safe -%}
+                            Proposed to be merged into {{ title }}
+                        {%- endtrans %}
+                    {% elif review.proposed_action.name == 'mark_as_duplicate' %}
+                        {% trans title=abstract_link|safe -%}
+                            Proposed as duplicate of {{ title }}
+                        {%- endtrans %}
+                    {% endif %}
                 {% endif %}
                 {% if review.ratings %}
                     <div class="titled-rule">
@@ -178,9 +172,7 @@
                     <div class="titled-rule">
                         {% trans %}Comment{% endtrans %}
                     </div>
-                    <div class="">
-                        {{ review.comment }}
-                    </div>
+                    {{ review.comment }}
                 {% endif %}
             </div>
         </div>
