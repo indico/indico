@@ -1,5 +1,6 @@
 {% extends 'layout/conference_page_base.html' %}
 
+{% from 'events/abstracts/display/_common.html' import render_cfa_infoline %}
 {% from 'events/display/indico/_common.html' import render_users %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
@@ -113,7 +114,6 @@
 {% block content %}
     <div class="call-for-abstracts">
         {% set cfa = event.cfa %}
-        {% set can_submit_abstracts = cfa.is_open or (session.user and cfa.can_submit_abstracts(session.user)) %}
         {{ render_timeline_section(cfa) }}
         {% if cfa.announcement %}
             <section>
@@ -121,45 +121,7 @@
             </section>
         {% endif %}
         <section class="cfa-infoline-section">
-            <div class="infoline announcement">
-                <div class="text">
-                    {%- if can_submit_abstracts %}
-                        <div class="label">
-                            {% if cfa.is_open %}
-                                {%- trans %}The call for abstracts is open{% endtrans -%}
-                            {% else %}
-                                {%- trans %}You have been authorized to submit abstracts{% endtrans -%}
-                            {% endif %}
-                        </div>
-                        <div>
-                            {%- trans %}Your submitted abstract will be subject to the reviewing process.{% endtrans -%}
-                        </div>
-                        <div class="toolbar right">
-                            {% if session.user %}
-                                <a class="i-button icon-plus highlight js-show-abstract-form"
-                                   data-title="{% trans %}Submit new abstract{% endtrans %}"
-                                   data-href="{{ url_for('.submit', event) }}"
-                                   data-confirm-close-unsaved
-                                   data-ajax-dialog>
-                                    {%- trans %}Submit new abstract{% endtrans -%}
-                                </a>
-                            {% else %}
-                                <a class="i-button icon-plus highlight"
-                                   href="{{ url_for_login(url_for('.call_for_abstracts', event, _anchor='submit-abstract')) }}">
-                                    {%- trans %}Submit new abstract{% endtrans -%}
-                                </a>
-                            {% endif %}
-                        </div>
-                    {% else %}
-                        <div class="label">{% trans %}The call for abstracts is closed.{% endtrans %}</div>
-                        {% if cfa.modification_end_dt and not cfa.modification_ended and abstracts %}
-                            <div>
-                                {%- trans %}You may still modify your abstracts.{% endtrans -%}
-                            </div>
-                        {% endif %}
-                    {% endif -%}
-                </div>
-            </div>
+            {{ render_cfa_infoline(event, cfa, show_icon=false) }}
         </section>
         {% if abstracts %}
             {{ render_user_abstract_list_section(event, abstracts, cfa) }}
