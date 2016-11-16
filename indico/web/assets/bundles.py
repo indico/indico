@@ -114,8 +114,6 @@ indico_management = rjs_bundle(
 
                'RoomBooking.js',
                'PaperReviewing.js',
-               'NotificationTPL.js',
-               'CFA.js',
                'RoomBookingMapOfRooms.js'))
 
 indico_room_booking = rjs_bundle(
@@ -354,15 +352,6 @@ jqplot_css = Bundle(
 mathjax_js = rjs_bundle('mathjax', 'js/lib/mathjax/MathJax.js', 'js/custom/pagedown_mathjax.js')
 contributions_js = rjs_bundle('contributions', 'js/indico/Display/contributions.js')
 
-abstracts_js = rjs_bundle(
-    'abstracts',
-    contributions_js,
-    'js/indico/Management/abstracts.js',
-    *namespace('js/lib/pagedown',
-               'Markdown.Converter.js',
-               'Markdown.Editor.js',
-               'Markdown.Sanitizer.js'))
-
 markdown_js = rjs_bundle(
     'markdown',
     *namespace('js/lib/pagedown',
@@ -490,7 +479,6 @@ def register_all_js(env):
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('statistics_js', statistics_js)
-    env.register('abstracts_js', abstracts_js)
     env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
     env.register('markdown_js', markdown_js)
