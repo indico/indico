@@ -22,6 +22,8 @@ from __future__ import absolute_import
 
 import binascii
 import functools
+from operator import attrgetter
+
 import re
 import string
 import unicodedata
@@ -618,7 +620,8 @@ class PlainText(Markup):
         return u'<div class="preformatted">{}</div>'.format(escape(unicode(self)))
 
 
-def handle_legacy_description(field, obj):
+def handle_legacy_description(field, obj, get_render_mode=attrgetter('render_mode'),
+                              get_value=attrgetter('_description')):
     """Check if the object in question is using an HTML description and convert it.
 
        The description will be automatically converted to Markdown and a warning will
@@ -629,11 +632,11 @@ def handle_legacy_description(field, obj):
     """
     from indico.core.db.sqlalchemy.descriptions import RenderMode
     from indico.util.i18n import _
-    if obj.render_mode == RenderMode.html:
-        field.warning = _(u"This description has been automatically converted from HTML to Markdown. "
+    if get_render_mode(obj) == RenderMode.html:
+        field.warning = _(u"This text has been automatically converted from HTML to Markdown. "
                           u"Please double-check that it's properly displayed.")
         ht = HTML2Text(bodywidth=0)
-        desc = obj._description
+        desc = get_value(obj)
         if RichMarkup(desc)._preformatted:
             desc = desc.replace(u'\n', u'<br>\n')
         field.data = ht.handle(desc)
