@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block page_actions %}
-    <div class="toolbar right">
+    <div class="toolbar flex-right">
         <div class="group">
             <a href="{{ url_for('.program_pdf', event) }}"
                class="i-button icon-file-pdf"
@@ -16,15 +16,15 @@
 
 {% block content %}
     {% if program %}
-        <div class="quotation programme">
+        <div class="quotation tracks">
             {{- program -}}
         </div>
     {% endif %}
 
-    <ul class="programme">
+    <ul class="tracks">
         {% for track in tracks %}
             <li>
-                <div class="title">
+                <h3>
                     <span>{{ track.title }}</span>
                     {% if track.can_convene(session.user) or track.can_review_abstracts(session.user) %}
                         <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}"
@@ -32,7 +32,7 @@
                            title="{%- trans %}Review abstracts in this track{% endtrans -%}">
                         </a>
                     {% endif %}
-                </div>
+                </h3>
                 <div class="description">
                     {{- track.description -}}
                 </div>
