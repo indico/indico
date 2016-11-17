@@ -68,27 +68,29 @@
 {% endmacro %}
 
 {% macro render_events_list(category, page, order_column, direction, events) %}
-    <div class="toolbar event-management-toolbar">
-        <div class="group">
-            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-            <ul class="dropdown">
-                <li>
-                    <a href="#" data-select-all="#event-management input:checkbox[name=event_id]">
-                        {% trans %}All{% endtrans %}
-                    </a>
-                </li>
-                <li>
-                    <a href="#" data-select-none="#event-management input:checkbox[name=event_id]">
-                        {% trans %}None{% endtrans %}
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="group">
-            {{ create_event_button(category, classes='icon-plus highlight', text=_("Create event")) }}
+    <div class="flex space-between">
+        <div class="toolbar">
+            <div class="group">
+                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" data-select-all="#event-management input:checkbox[name=event_id]">
+                            {% trans %}All{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none="#event-management input:checkbox[name=event_id]">
+                            {% trans %}None{% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="group">
+                {{ create_event_button(category, classes='icon-plus highlight', text=_("Create event")) }}
+            </div>
         </div>
         {% if events.total %}
-            <div class="right">
+            <div class="toolbar js-event-management-toolbar">
                 <div class="group">
                     {{ render_pagination_entries_fragment(events) }}
                 </div>
@@ -115,8 +117,8 @@
                 </div>
             </div>
         {% endif %}
-        <div id="selection-message" class="action-box highlight"></div>
     </div>
+    <div id="selection-message" class="action-box highlight"></div>
     <div id="event-management" data-total="{{ events.total }}">
         <input type="checkbox" name="all_selected" style="display: none;" value="1">
         {% if events.total %}
