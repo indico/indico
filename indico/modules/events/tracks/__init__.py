@@ -41,8 +41,14 @@ def _sidemenu_items(sender, event, **kwargs):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
+    from indico.modules.events.tracks.settings import track_settings
+
+    def _program_visible(conf):
+        event = conf.as_event
+        return bool(track_settings.get(event, 'program').strip() or event.tracks)
+
     return MenuEntryData(title=_("Scientific Programme"), name='program', endpoint='tracks.program', position=1,
-                         static_site=True)
+                         visible=_program_visible, static_site=True)
 
 
 @signals.users.merged.connect
