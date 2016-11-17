@@ -540,8 +540,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         return self.can_judge(user) or self.can_convene(user)
 
     def get_timeline(self, user=None):
-        comments = [each for each in self.comments if each.can_view(user)] if user else self.comments
-        reviews = [each for each in self.reviews if each.can_view(user)] if user else self.reviews
+        comments = [x for x in self.comments if x.can_view(user)] if user else self.comments
+        reviews = [x for x in self.reviews if x.can_view(user)] if user else self.reviews
         return sorted(chain(comments, reviews), key=attrgetter('created_dt'))
 
     def get_track_reviewing_state(self, track):
@@ -565,11 +565,10 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return AbstractReviewingState.mixed
 
     def get_reviewed_for_tracks_by_user(self, user, include_reviewed=False):
+        already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
         if self.event_new in user.global_abstract_reviewer_for_events:
-            return self.reviewed_for_tracks
-        tracks = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
-        tracks |= self.reviewed_for_tracks & user.abstract_reviewer_for_tracks
-        return tracks
+            return self.reviewed_for_tracks | already_reviewed
+        return (self.reviewed_for_tracks & user.abstract_reviewer_for_tracks) | already_reviewed
 
     def get_reviews(self, track=None, user=None):
         """Get all reviews on a particular track and/or by a particular user.

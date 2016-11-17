@@ -30,9 +30,7 @@
     {% set url = url_for('.edit_abstract_comment', comment) if comment else url_for('.comment_abstract', abstract) %}
     {% set form_class = 'edit-comment' if comment else 'new-comment unfocused' %}
     {% call form_header(form, action=url, orientation='vertical', classes=form_class) %}
-        {% if comment %}
-            data-form-container="#abstract-comment-{{ comment.id }} .js-form-container"
-        {% else %}
+        {% if not comment %}
             data-form-container="#abstract-timeline-input .js-form-container"
             data-update=".management-page"
             data-replace-update

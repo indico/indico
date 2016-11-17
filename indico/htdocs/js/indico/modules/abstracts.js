@@ -55,9 +55,8 @@
             $commentForm.trigger('ajaxForm:externalShow');
         }).on('click', '.new-comment .js-new-cancel', function(evt) {
             evt.preventDefault();
-            var $this = $(this);
-            var $commentForm = $this.closest('form');
-            var $box = $this.closest('#abstract-timeline-input');
+            var $box = $('#abstract-timeline-input');
+            var $commentForm = $box.find('form');
             var $reviewTrigger = $box.find('.review-trigger');
             var deferred = $.Deferred();
             $commentForm.trigger('ajaxForm:externalHide', [deferred]);
@@ -72,9 +71,8 @@
         }).on('click', '.js-new-edit-review', function() {
             var reviewId = $(this).data('reviewId');
             var $reviewBox = $('#abstract-review-{0}'.format(reviewId));
-            $reviewBox.find('.js-edit-review').click();
+            $reviewBox.find('.js-edit-review').trigger('click');
             $('body, html').animate({scrollTop: $reviewBox.offset().top}, 'fast');
-            $reviewBox.scrollTop();
             $reviewBox.find('.i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
         });
     };
