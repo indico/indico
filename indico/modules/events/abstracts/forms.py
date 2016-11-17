@@ -151,10 +151,14 @@ class AbstractReviewingSettingsForm(IndicoForm):
     allow_convener_judgment = BooleanField(_("Allow track conveners to judge"), widget=SwitchWidget(),
                                            description=_("Enabling this allows track conveners to make a judgment "
                                                          "such as accepting or rejecting an abstract."))
+    allow_comments = BooleanField(_("Allow comments"), widget=SwitchWidget(),
+                                  description=_("Enabling this allows judges, conveners and reviewers to leave "
+                                                "comments on abstracts."))
     allow_contributors_in_comments = BooleanField(_("Allow contributors in comments"),
+                                                  [HiddenUnless('allow_comments', preserve_data=True)],
                                                   widget=SwitchWidget(),
                                                   description=_("Enabling this allows submitters, authors, and "
-                                                                "speakers to participate in the comments section."))
+                                                                "speakers to also participate in the comments."))
     abstract_review_questions = AbstractReviewQuestionsField(_("Review questions"))
 
     def __init__(self, *args, **kwargs):

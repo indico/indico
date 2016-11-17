@@ -36,6 +36,7 @@ class CallForAbstracts(object):
     end_dt = EventSettingProperty(abstracts_settings, 'end_dt')
     modification_end_dt = EventSettingProperty(abstracts_settings, 'modification_end_dt')
     allow_attachments = EventSettingProperty(abstracts_settings, 'allow_attachments')
+    allow_comments = EventSettingProperty(abstracts_reviewing_settings, 'allow_comments')
     allow_contributors_in_comments = EventSettingProperty(abstracts_reviewing_settings,
                                                           'allow_contributors_in_comments')
     allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
