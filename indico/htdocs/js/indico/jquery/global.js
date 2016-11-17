@@ -176,11 +176,19 @@ $(document).ready(function() {
         }
     });
 
-    $('.js-dropdown').each(function() {
-        $(this).parent().dropdown({
-            selector: '.js-dropdown'
+    function initDropdowns($container) {
+        $container.find('.js-dropdown').each(function() {
+            $(this).parent().dropdown({
+                selector: '.js-dropdown'
+            });
         });
+    }
+
+    $('body').on('indico:htmlUpdated', function(evt) {
+        initDropdowns($(evt.target));
     });
+    initDropdowns($('body'));
+
 
     if (navigator.userAgent.match(/Trident\/7\./)) {
         // Silly IE11 will clear the second password field if
