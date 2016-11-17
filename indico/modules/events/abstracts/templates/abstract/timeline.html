@@ -1,11 +1,11 @@
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint %}
-{% from 'events/abstracts/abstract/review.html' import render_comment_form %}
+{% from 'events/abstracts/abstract/review.html' import render_comment_form, render_review_form %}
 
 
-{% macro render_timeline(abstract, comment_form=none) %}
+{% macro render_timeline(abstract, comment_form, review_form=none) %}
     {% set can_comment = abstract.can_comment(session.user) %}
     {% set can_review = abstract.can_review(session.user) %}
-    {% if abstract.comments or can_comment %}
+    {% if abstract.comments or can_comment or can_review %}
         <div id="abstract-timeline" class="i-timeline with-line">
             <div class="i-timeline-connect-up"></div>
             {% for item in abstract.get_timeline(session.user) %}
@@ -16,7 +16,7 @@
                 {% endif %}
             {% endfor %}
             {% if can_comment or can_review %}
-                {{ _render_input(abstract, comment_form) }}
+                {{ _render_input(abstract, comment_form, review_form) }}
             {% endif %}
         </div>
     {% endif %}
@@ -201,17 +201,21 @@
 {% endmacro %}
 
 
-{% macro _render_input(abstract, comment_form) %}
+{% macro _render_input(abstract, comment_form, review_form=none) %}
     <div id="abstract-timeline-input" class="i-timeline-item">
         <div class="i-timeline-item-label action"></div>
         <div class="i-timeline-item-box footer-only header-indicator">
             <div class="i-box-footer js-form-container">
                 <div class="flex">
-                    <div class="stretch">
-                        {{ render_comment_form(comment_form, abstract) }}
-                    </div>
-                    {% if abstract.can_review(session.user, check_state=true) %}
-                        {{ _render_review_trigger(abstract) }}
+                    {% if abstract.can_comment(session.user) %}
+                        <div class="stretch">
+                            {{ render_comment_form(comment_form, abstract) }}
+                        </div>
+                        {% if abstract.can_review(session.user, check_state=true) %}
+                            {{ _render_review_trigger(abstract) }}
+                        {% endif %}
+                    {% elif abstract.can_review(session.user, check_state=true) %}
+                        {{ _render_input_no_comment(abstract, review_form) }}
                     {% endif %}
                 </div>
             </div>
@@ -220,18 +224,66 @@
 {% endmacro %}
 
 
-{% macro _render_review_trigger(abstract) %}
-    {% set tracks = abstract.get_reviewed_for_tracks_by_user(session.user, include_reviewed=true)|sort(attribute='title') %}
-    {% set reviews = abstract.get_reviews(user=session.user) %}
-    {% set reviewed = reviews|map(attribute='track') %}
+{% macro _render_input_no_comment(abstract, review_form=none) %}
+    {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
+    {% if reviewer_data.tracks|length == 1 and not reviewer_data.reviews %}
+        {{ render_review_form(review_form, abstract, reviewer_data.tracks|first) }}
+    {% else %}
+        {% set missing_tracks = reviewer_data.missing_tracks|length %}
+        {% if missing_tracks %}
+            {% if not reviewer_data.reviews %}
+                {% set no_comments_title %}
+                    {%- trans count=missing_tracks -%}
+                        You can review this abstract in one track
+                    {%- pluralize -%}
+                        You can review this abstract in {{ missing_tracks }} tracks
+                    {%- endtrans -%}
+                {% endset %}
+            {% else %}
+                {% set no_comments_title %}
+                    {%- trans count=missing_tracks -%}
+                        You can review this abstract in one more track
+                    {%- pluralize -%}
+                        You can review this abstract in {{ missing_tracks }} more tracks
+                    {%- endtrans -%}
+                {% endset %}
+            {% endif %}
+            {% set no_comments_description %}
+                {%- trans %}You can do it until a final judgment is casted{% endtrans -%}
+            {% endset %}
+        {% else %}
+            {% set no_comments_title %}
+                {%- trans %}You have already reviewed this abstract in all your tracks{% endtrans -%}
+            {% endset %}
+            {% set no_comments_description %}
+                {%- trans %}You can still make up your mind{% endtrans -%}
+            {% endset %}
+        {% endif %}
+        <div class="stretch">
+            <div class="empty-input-title">
+                {{- no_comments_title -}}
+            </div>
+            <div class="empty-input-description">
+                {{- no_comments_description -}}
+            </div>
+        </div>
+        {{ _render_review_trigger(abstract, exclusive=true) }}
+    {% endif %}
+{% endmacro %}
+
+
+{% macro _render_review_trigger(abstract, exclusive=false) %}
+    {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
     <div class="review-trigger flex">
-        <span class="comment-or-review">
-            {%- trans %}or{% endtrans -%}
-        </span>
-        {% if tracks|length == 1%}
-            {% set track = tracks[0] %}
-            {% if track in reviewed %}
-                {% set review = reviews|selectattr('track', 'equalto', track)|first %}
+        {% if not exclusive %}
+            <span class="comment-or-review">
+                {%- trans %}or{% endtrans -%}
+            </span>
+        {% endif %}
+        {% if reviewer_data.tracks|length == 1 %}
+            {% set track = reviewer_data.tracks|first %}
+            {% if track in reviewer_data.reviewed_tracks %}
+                {% set review = reviewer_data.reviews[track] %}
                 <button class="i-button big highlight text-color js-new-edit-review" data-review-id="{{ review.id }}">
                     {%- trans %}Change review{% endtrans -%}
                 </button>
@@ -248,13 +300,17 @@
             {% endif %}
         {% else %}
             <button class="i-button big highlight text-color arrow js-dropdown" data-toggle="dropdown">
-                {%- trans %}Review{% endtrans -%}
+                {% if reviewer_data.tracks.issubset(reviewer_data.reviewed_tracks) %}
+                    {%- trans %}Change reviews{% endtrans -%}
+                {% else %}
+                    {%- trans %}Review{% endtrans -%}
+                {% endif %}
             </button>
             <ul class="dropdown">
-                {% for track in tracks %}
+                {% for track in reviewer_data.tracks|sort(attribute='title') %}
                     <li>
-                        {% if track in reviewed %}
-                            {% set review = reviews|selectattr('track', 'equalto', track)|first %}
+                        {% if track in reviewer_data.reviewed_tracks %}
+                            {% set review = reviewer_data.reviews[track] %}
                             <a class="js-new-edit-review" data-review-id="{{ review.id }}">
                                 {{ track.title }}
                                 <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>

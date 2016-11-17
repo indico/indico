@@ -466,6 +466,8 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def can_comment(self, user):
         if not user:
             return False
+        if not self.event_new.cfa.allow_comments:
+            return False
         if self.user_owns(user) and self.event_new.cfa.allow_contributors_in_comments:
             return True
         return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
@@ -569,6 +571,16 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         if self.event_new in user.global_abstract_reviewer_for_events:
             return self.reviewed_for_tracks | already_reviewed
         return (self.reviewed_for_tracks & user.abstract_reviewer_for_tracks) | already_reviewed
+
+    def get_reviewer_render_data(self, user):
+        tracks = self.get_reviewed_for_tracks_by_user(user, include_reviewed=True)
+        reviews = {x.track: x for x in self.get_reviews(user=user)}
+        reviewed_tracks = {x.track for x in reviews.itervalues() if x.track in tracks}
+        missing_tracks = tracks - reviewed_tracks
+        return {'tracks': tracks,
+                'reviewed_tracks': reviewed_tracks,
+                'missing_tracks': missing_tracks,
+                'reviews': reviews}
 
     def get_reviews(self, track=None, user=None):
         """Get all reviews on a particular track and/or by a particular user.

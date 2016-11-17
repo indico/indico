@@ -95,14 +95,15 @@ def render_abstract_page(abstract, view_class=None, management=False):
     from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
                                                        AbstractReviewedForTracksForm, build_review_form)
     comment_form = AbstractCommentForm(abstract=abstract, user=session.user, formdata=None)
-    review_forms = {track.id: build_review_form(abstract, track)
-                    for track in abstract.reviewed_for_tracks
-                    if track.can_review_abstracts(session.user)}
+    review_form = None
+    reviewed_for_tracks = list(abstract.get_reviewed_for_tracks_by_user(session.user))
+    if len(reviewed_for_tracks) == 1:
+        review_form = build_review_form(abstract, reviewed_for_tracks[0])
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
     review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event_new, obj=abstract, formdata=None)
     params = {'abstract': abstract,
               'comment_form': comment_form,
-              'review_forms': review_forms,
+              'review_form': review_form,
               'review_track_list_form': review_track_list_form,
               'judgment_form': judgment_form,
               'management': management}
