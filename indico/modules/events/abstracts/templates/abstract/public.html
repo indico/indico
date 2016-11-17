@@ -281,7 +281,7 @@
                 <div class="group">
                     {% if abstract.can_withdraw(session.user, check_state=true) %}
                         <a title="{% trans %}Withdraw abstract{% endtrans %}"
-                           class="i-button text-color danger icon-cross"
+                           class="i-button text-color color-on-hover danger"
                            data-href="{{ url_for('.withdraw_abstract', abstract, management=management) }}"
                            data-method="POST"
                            data-update='{"display_html": ".mainContent .col2", "management_html": ".management-page"}'
