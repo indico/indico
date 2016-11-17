@@ -221,7 +221,7 @@
             _moveEvents(_categories[categoryId], $(this).data('href'));
         });
 
-        $('.event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
+        $('.js-event-management-toolbar .js-move-events-to-subcategory').on('click', function(evt) {
             evt.preventDefault();
 
             if ($(this).hasClass('disabled')) {
