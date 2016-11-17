@@ -66,7 +66,7 @@ def make_review_form(event):
                            validators=[DataRequired()],
                            choices=[(unicode(n), unicode(n)) for n in range(range_[0], range_[1] + 1)],
                            widget=JinjaWidget('events/abstracts/forms/rating_widget.html',
-                                              question=question, cfa=event.cfa))
+                                              question=question, cfa=event.cfa, inline_js=True))
         setattr(form_class, name, field)
     return form_class
 
