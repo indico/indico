@@ -37,3 +37,6 @@ class WPDisplayTracks(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
+
+    def getCSSFiles(self):
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['tracks_sass'].urls()

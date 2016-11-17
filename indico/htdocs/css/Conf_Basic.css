@@ -270,7 +270,6 @@ li:hover ul, li.over ul { display: block; } /* For dynamic */
 
 .conferenceDetails .description {
     color: #777;
-    font-family: Georgia, Times, Serif;
     font-size: 1.2em;
     margin: 1em 0 2em 0;
 }
@@ -408,31 +407,4 @@ ul.chair_list {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
-}
-
-.programme {
-    font-size: 1.2em;
-    font-family: Georgia, Times, Serif;
-}
-
-ul.programme {
-    margin-top: 4em;
-    list-style-type: none;
-    padding-left: 10px;
-}
-
-ul.programme li {
-    color: #444;
-    margin-top: 2em;
-}
-
-ul.programme li .title {
-    display: flex;
-    justify-content: space-between;
-    font-size: 1.3em;
-    margin-bottom: 0.6em;
-}
-
-ul.programme li .description {
-    color: #777;
 }
