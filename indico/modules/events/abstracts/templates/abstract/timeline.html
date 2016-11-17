@@ -92,7 +92,7 @@
                             Proposes to {{ action }}
                         {%- endtrans %}
                     </span>
-                    {% if review.score %}
+                    {% if review.score is not none %}
                         {{ render_score(review.score, review.abstract.event_new.cfa) }}
                     {% endif %}
                 </div>
