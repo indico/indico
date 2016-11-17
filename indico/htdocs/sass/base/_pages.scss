@@ -79,6 +79,7 @@
 
         .page-description {
             @extend %font-family-title-light;
+            @extend .fixed-width;
             color: $dark-gray;
             font-size: 1.2em;
             margin-top: $separator-margin;
