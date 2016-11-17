@@ -7,7 +7,7 @@
 {% block content %}
     {{ render_abstract_public(abstract, management=management) }}
     <div id="abstract-private" class="i-timeline">
-        {{ render_timeline(abstract, comment_form) }}
+        {{ render_timeline(abstract, comment_form, review_form) }}
 
         {% set can_review = abstract.can_review(session.user, check_state=true) %}
         {% set can_judge = abstract.can_judge(session.user, check_state=true) %}

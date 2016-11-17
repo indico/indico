@@ -355,6 +355,15 @@
 }
 
 #abstract-timeline-input {
+    .empty-input-title {
+        color: $blue;
+        font-weight: bold;
+    }
+
+    .empty-input-description {
+        color: $dark-gray;
+    }
+
     .comment-or-review {
         align-self: center;
         color: $gray;
