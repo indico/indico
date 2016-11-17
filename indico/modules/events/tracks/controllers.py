@@ -17,19 +17,23 @@
 from __future__ import unicode_literals
 
 from io import BytesIO
+from operator import itemgetter
 
 from flask import request, flash
 from sqlalchemy.orm import subqueryload
 
+from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.modules.events.layout.util import get_menu_entry_by_name
-from indico.modules.events.tracks.forms import TrackForm
+from indico.modules.events.tracks.forms import TrackForm, ProgramForm
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.tracks.operations import create_track, update_track, delete_track
+from indico.modules.events.tracks.operations import create_track, update_track, delete_track, update_program
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.tracks.views import WPManageTracks, WPDisplayTracks
 from indico.util.i18n import _
+from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_data
 from MaKaC.PDFinterface.conference import ProgrammeToPDF
 from MaKaC.webinterface.rh.base import RH
@@ -69,6 +73,20 @@ class RHManageTracks(RHManageTracksBase):
     def _process(self):
         tracks = self.event_new.tracks
         return WPManageTracks.render_template('management.html', self._conf, event=self.event_new, tracks=tracks)
+
+
+class RHEditProgram(RHManageTracksBase):
+    def _process(self):
+        settings = track_settings.get_all(self.event_new)
+        form = ProgramForm(obj=FormDefaults(**settings))
+        if form.validate_on_submit():
+            update_program(self.event_new, form.data)
+            flash(_("The program has been updated."))
+            return jsonify_data()
+        elif not form.is_submitted():
+            handle_legacy_description(form.program, settings, get_render_mode=itemgetter('program_render_mode'),
+                                      get_value=itemgetter('program'))
+        return jsonify_form(form)
 
 
 class RHCreateTrack(RHManageTracksBase):
@@ -112,6 +130,8 @@ class RHDisplayTracks(RHConferenceBaseDisplay):
     def _process(self):
         page_title = get_menu_entry_by_name('program', self._conf).localized_title
         program = track_settings.get(self.event_new, 'program')
+        render_mode = track_settings.get(self.event_new, 'program_render_mode')
+        program = RENDER_MODE_WRAPPER_MAP[render_mode](program)
         tracks = (Track.query.with_parent(self.event_new)
                   .options(subqueryload('conveners'),
                            subqueryload('abstract_reviewers'))

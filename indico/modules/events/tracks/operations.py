@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.tracks import logger
 from indico.modules.events.tracks.models.tracks import Track
+from indico.modules.events.tracks.settings import track_settings
 
 
 def create_track(event, data):
@@ -45,3 +46,9 @@ def update_track(track, data):
 def delete_track(track):
     db.session.delete(track)
     logger.info('Track deleted by %r: %r', session.user, track)
+
+
+def update_program(event, data):
+    track_settings.set_multi(event, data)
+    logger.info('Program of %r updated by %r', event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.change, 'Tracks', 'The program has been updated', session.user)

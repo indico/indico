@@ -16,9 +16,14 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db.sqlalchemy.descriptions import RenderMode
+from indico.core.settings.converters import EnumConverter
 from indico.modules.events.settings import EventSettingsProxy
 
 
 track_settings = EventSettingsProxy('tracks', {
-    'program': ''
+    'program': '',
+    'program_render_mode': RenderMode.markdown
+}, converters={
+    'program_render_mode': EnumConverter(RenderMode)
 })

@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import (RHManageTracks, RHCreateTrack, RHEditTrack,
+from indico.modules.events.tracks.controllers import (RHManageTracks, RHEditProgram, RHCreateTrack, RHEditTrack,
                                                       RHSortTracks, RHDeleteTrack, RHDisplayTracks, RHTracksPDF)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -25,6 +25,7 @@ _bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_t
                       url_prefix='/event/<confId>')
 
 _bp.add_url_rule('/manage/tracks/', 'manage', RHManageTracks)
+_bp.add_url_rule('/manage/tracks/program', 'edit_program', RHEditProgram, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/tracks/create', 'create_track', RHCreateTrack, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/tracks/sort', 'sort_tracks', RHSortTracks, methods=('POST',))
 _bp.add_url_rule('/manage/tracks/<int:track_id>', 'edit_track', RHEditTrack, methods=('GET', 'POST'))
