@@ -16,27 +16,45 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.abstracts.views import _MathjaxMixin
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
-class WPManageTracks(WPJinjaMixin, WPConferenceModifBase):
+class WPManageTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_tracks_js'].urls()
+        return (WPConferenceModifBase.getJSFiles(self) +
+                self._asset_env['markdown_js'].urls() +
+                self._asset_env['modules_tracks_js'].urls())
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['tracks_sass'].urls()
+        return (WPConferenceModifBase.getCSSFiles(self) +
+                self._asset_env['markdown_sass'].urls() +
+                self._asset_env['tracks_sass'].urls())
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayTracks(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPDisplayTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/tracks/'
     menu_entry_name = 'program'
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
+    def getJSFiles(self):
+        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
+                self._asset_env['markdown_js'].urls() +
+                self._asset_env['modules_tracks_js'].urls())
+
     def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['tracks_sass'].urls()
+        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) +
+                self._asset_env['markdown_sass'].urls() +
+                self._asset_env['tracks_sass'].urls())
+
+    def _getHeadContent(self):
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)

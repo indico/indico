@@ -5,6 +5,23 @@
     {%- trans %}Programme{% endtrans -%}
 {% endblock %}
 
+{% block title_actions %}
+    <a class="i-button borderless icon-settings arrow js-dropdown" data-toggle="dropdown"></a>
+    <ul class="dropdown">
+        <li>
+            <a href="#"
+               title="{% trans %}Edit programme{% endtrans %}"
+               data-href="{{ url_for('.edit_program', event) }}"
+               data-title="{% trans %}Edit programme{% endtrans %}"
+               data-qtip-position="right"
+               data-reload-after
+               data-ajax-dialog>
+                {% trans %}Edit programme{% endtrans %}
+            </a>
+        </li>
+    </ul>
+{% endblock %}
+
 {% block description %}
     {%- trans -%}
         Tracks represent the subject matter of the conference.

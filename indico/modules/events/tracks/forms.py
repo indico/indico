@@ -19,11 +19,21 @@ from __future__ import unicode_literals
 from wtforms.fields import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.util.i18n import _
-from indico.web.forms.base import IndicoForm
+from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.fields import IndicoMarkdownField
 
 
 class TrackForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     code = StringField(_('Code'))
     description = TextAreaField(_('Description'), render_kw={'rows': 10})
+
+
+class ProgramForm(IndicoForm):
+    program = IndicoMarkdownField(_('Programme'), editor=True, mathjax=True)
+
+    @generated_data
+    def program_render_mode(self):
+        return RenderMode.markdown

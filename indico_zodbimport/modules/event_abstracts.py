@@ -30,6 +30,7 @@ from werkzeug.utils import cached_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events import Event
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
@@ -215,7 +216,7 @@ class AbstractMigration(object):
     def _migrate_tracks(self):
         program = convert_to_unicode(getattr(self.conf, 'programDescription', ''))
         if program:
-            track_settings.set(self.event, 'program', program)
+            track_settings.set_multi(self.event, {'program_render_mode': RenderMode.html, 'program': program})
         for pos, old_track in enumerate(self.conf.program, 1):
             track = Track(title=convert_to_unicode(old_track.title),
                           description=convert_to_unicode(old_track.description),
