@@ -189,3 +189,10 @@ class AbstractReview(RenderModeMixin, db.Model):
         if check_state and self.abstract.public_state.name != 'under_review':
             return False
         return self.user == user
+
+    def can_view(self, user):
+        if user is None:
+            return False
+        elif user == self.user:
+            return True
+        return self.abstract.can_judge(user) or self.abstract.can_convene(user)
