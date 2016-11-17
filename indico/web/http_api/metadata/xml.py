@@ -14,14 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# external library imports
-from lxml import etree
 from datetime import datetime
 
-# module imports
+import dateutil.parser
+from lxml import etree
+from pytz import timezone, utc
+
+from indico.core.logger import Logger
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.core.logger import Logger
+
+
+def _deserialize_date(date_dict):
+    dt = datetime.combine(dateutil.parser.parse(date_dict['date']).date(),
+                          dateutil.parser.parse(date_dict['time']).time())
+    return timezone(date_dict['tz']).localize(dt).astimezone(utc)
 
 
 class XMLSerializer(Serializer):
@@ -68,6 +75,8 @@ class XMLSerializer(Serializer):
         for k, v in fossil.iteritems():
             if k not in ['_fossil', '_type', 'id']:
                 elem = etree.SubElement(felement, k)
+                if isinstance(v, dict) and v.viewkeys() == {'date', 'time', 'tz'}:
+                    v = _deserialize_date(v)
                 if isinstance(v, (list, tuple)):
                     onlyDicts = all(type(subv) == dict for subv in v)
                     if onlyDicts:
