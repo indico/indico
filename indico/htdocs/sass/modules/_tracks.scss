@@ -81,3 +81,24 @@
         }
     }
 }
+
+ul.tracks {
+    list-style-type: none;
+    padding-left: 10px;
+
+    li {
+        color: $black;
+        margin-top: 2em;
+
+        h3 {
+            @include border-bottom($separator-color);
+
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .description {
+            color: $light-black;
+        }
+    }
+}
