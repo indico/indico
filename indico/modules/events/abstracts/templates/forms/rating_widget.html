@@ -13,13 +13,13 @@
                 <i class="question-required" title="{% trans %}Rating this question is mandatory{% endtrans %}">*</i>
             {% endif -%}
         </div>
-        <div id="{{ field.id }}" class="rating-widget">
-            <span class="rating-value">{{ '-' if field.object_data is none else field.data }}</span>
+        <div id="{{ field.id }}" class="rating-scale">
+            <span class="score">{{ '-' if field.object_data is none else field.data }}</span>
             {% for bullet in range(cfa.rating_range[1], cfa.rating_range[0] - 1, -1) %}
                 {% set radio_id = '%s-%d'|format(field.id, bullet) %}
                 <input type="radio" id="{{ radio_id }}" name="{{ field.name }}" value="{{ bullet }}"
                        {{ 'checked' if field.data == bullet|string }}>
-                <label class="bullet" title="{{ bullet }}" for="{{ radio_id }}"></label>
+                <label class="bullet" for="{{ radio_id }}" data-value="{{ bullet }}"></label>
             {% endfor %}
         </div>
     </div>
@@ -29,8 +29,18 @@
     <script>
         $('#{{ field.id }} input[type="radio"]').on('click', function() {
             var $this = $(this);
-            var $widget = $this.closest('.rating-widget');
-            $widget.find('.rating-value').text($this.val());
+            var $widget = $this.closest('.rating-scale');
+            $widget.find('.score').text($this.val());
+        });
+
+        $('#{{ field.id }} label').on('mouseenter', function() {
+            var $this = $(this);
+            var $widget = $this.closest('.rating-scale');
+            $widget.find('.score').text($this.data('value'));
+        }).on('mouseleave', function() {
+            var $this = $(this);
+            var $widget = $this.closest('.rating-scale');
+            $widget.find('.score').text($widget.find(':checked').val() || '-');
         });
     </script>
 {% endblock %}

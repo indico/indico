@@ -20,20 +20,6 @@
 @import 'partials/boxes';
 @import 'partials/icons';
 
-%rating-bullet {
-    display: inline-block;
-    vertical-align: middle;
-    width: 0.8em;
-    height: 1.2em;
-    margin-right: 0.2em;
-    border-radius: 1em;
-    background-color: $pastel-gray;
-}
-
-%rating-bullet-selected {
-    background-color: $blue;
-}
-
 .abstract-page {
     @extend %font-family-body;
 
@@ -331,40 +317,88 @@
     padding-left: 0;
     margin: 0;
 
-    > li {
-        &:not(:first-child) {
-            margin-top: 1em;
+    %rating-bullet-selected {
+        background-color: $blue;
+    }
+
+    li,
+    .form-group {
+        .form-field {
+            margin: 0;
         }
 
-        .value {
+        .rating-scale {
             display: flex;
             align-items: center;
 
-            .number {
-                vertical-align: middle;
-                color: $light-black;
+            .score {
                 margin-left: 0.25em;
-                font-size: 1.2em;
-                width: 0.5em;
+                color: $light-black;
+                width: 1em;
+                text-align: right;
             }
 
             .bullet {
-                @extend %rating-bullet;
+                display: inline-block;
+                vertical-align: middle;
+                padding-right: 0.2em;
+                background-color: white;
 
-                &.full {
+                &:after {
+                    background-color: $pastel-gray;
+                    content: '';
+                    display: block;
+                    width: 0.8em;
+                    height: 1.2em;
+                    border-radius: 1em;
+                }
+
+                &.full:after {
                     @extend %rating-bullet-selected;
                 }
             }
         }
     }
 
-    .form-group {
-        .form-field {
-            margin: 0;
+    li:not(:first-child),
+    .form-group:not(:first-child) .form-field {
+        margin-top: 1em;
+    }
+
+    .form-group .rating-scale {
+        flex-direction: row-reverse;
+
+        input[type="radio"] {
+            display: none;
         }
 
-        &:not(:first-child) .form-field {
-            margin-top: 1em;
+        input:checked ~ label.bullet:after {
+            @extend %rating-bullet-selected;
+            border: none;
+        }
+
+        &:not(:checked) > label.bullet:hover:after,
+        &:not(:checked) > label.bullet:hover ~ label.bullet:after {
+            background-image: linear-gradient(300deg, $blue, $blue 48%, $pastel-gray 52%);
+            background-repeat: no-repeat;
+            border: none;
+        }
+
+        input:checked + label.bullet:hover:after,
+        input:checked ~ label.bullet:hover:after,
+        label.bullet:hover ~ input:checked ~ label.bullet:after,
+        input:checked ~ label.bullet:hover ~ label.bullet:after {
+            background-image: linear-gradient(300deg, $blue, $blue 48%, $pastel-blue 52%);
+            background-repeat: no-repeat;
+        }
+
+        .bullet {
+            cursor: pointer;
+
+            &:after {
+                @include border-all($color: $pastel-gray, $width: 2px);
+                background: transparent;
+            }
         }
     }
 }
@@ -392,31 +426,6 @@
 
     .question-required {
         color: $red;
-    }
-}
-
-.rating-widget {
-    user-select: none;
-    display: flex;
-    align-items: center;
-    flex-direction: row-reverse;
-
-    input[type="radio"] {
-        display: none;
-
-        &:checked ~ label.bullet {
-            @extend %rating-bullet-selected;
-        }
-    }
-    .bullet {
-        @extend %rating-bullet;
-        cursor: pointer;
-    }
-
-    .rating-value {
-        margin-left: 0.25em;
-        font-size: 1.2em;
-        width: 0.5em;
     }
 }
 
