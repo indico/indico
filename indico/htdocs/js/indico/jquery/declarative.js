@@ -97,7 +97,8 @@
     function setupActionLinks() {
         var selectors = [
             'button[data-href][data-method]', 'input:button[data-href][data-method]', 'a[data-href][data-method]',
-            'button[data-href][data-ajax-dialog]', 'input:button[data-href][data-ajax-dialog]', 'a[data-href][data-ajax-dialog]'
+            'button[data-href][data-ajax-dialog]', 'input:button[data-href][data-ajax-dialog]', 'a[data-href][data-ajax-dialog]',
+            'button[data-content][data-ajax-dialog]', 'input:button[data-content][data-ajax-dialog]', 'a[data-content][data-ajax-dialog]'
         ];
         $('body').on('click', selectors.join(', '), function(e) {
             e.preventDefault();
@@ -114,6 +115,8 @@
             var highlightUpdate = $this.data('highlight-update') !== undefined;
             var dialog = $this.data('ajax-dialog') !== undefined;
             var reload = $this.data('reload-after');
+            var content = $this.data('content');
+
             if (!$.isPlainObject(params)) {
                 throw new Error('Invalid params. Must be valid JSON if set.');
             }
@@ -139,6 +142,7 @@
                         url: url,
                         method: method,
                         data: params,
+                        content: $(content).html(),
                         title: $this.data('title'),
                         subtitle: $this.data('subtitle'),
                         closeButton: closeButton === undefined ? false : (closeButton || true),
