@@ -86,28 +86,30 @@
                         {{ render_edited_hint(review.modified_dt) }}
                     {% endif %}
                 </div>
-                <div class="abstract-comment-badges">
-                    <span>
-                        {% trans action=_render_review_state(review) -%}
-                            Proposes to {{ action }}
-                        {%- endtrans %}
-                    </span>
-                    {% if review.score is not none %}
-                        {{ render_score(review.score, review.abstract.event_new.cfa) }}
+                <div class="abstract-comment-badges flex">
+                    <div class="stretch">
+                        <span>
+                            {% trans action=_render_review_state(review) -%}
+                                Proposes to {{ action }}
+                            {%- endtrans %}
+                        </span>
+                        {% if review.score is not none %}
+                            {{ render_score(review.score, review.abstract.event_new.cfa) }}
+                        {% endif %}
+                    </div>
+                    {% if review.can_edit(session.user, check_state=true) %}
+                        <div>
+                            <a class="i-button-icon icon-edit js-edit-review"
+                               title="{% trans %}Edit review{% endtrans %}"
+                               data-href="{{ url_for('.edit_review', review, management=management) }}"
+                               data-form-container="#abstract-review-{{ review.id }} .js-form-container"
+                               data-update=".management-page"
+                               data-replace-update
+                               data-confirm-close-unsaved
+                               data-ajax-form></a>
+                        </div>
                     {% endif %}
                 </div>
-                {% if review.can_edit(session.user, check_state=true) %}
-                    <div>
-                        <a class="i-button-icon icon-edit js-edit-review"
-                           title="{% trans %}Edit review{% endtrans %}"
-                           data-href="{{ url_for('.edit_review', review, management=management) }}"
-                           data-form-container="#abstract-review-{{ review.id }} .js-form-container"
-                           data-update=".management-page"
-                           data-replace-update
-                           data-confirm-close-unsaved
-                           data-ajax-form></a>
-                    </div>
-                {% endif %}
             </div>
             <div class="i-box-content js-form-container">
                 {% if review.proposed_action.name == 'accept' %}
