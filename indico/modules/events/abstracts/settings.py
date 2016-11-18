@@ -68,7 +68,8 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'allow_attachments': False,
     'allow_speakers': True,
     'speakers_required': True,
-    'contrib_type_required': False
+    'contrib_type_required': False,
+    'submission_instructions': ''
 }, acls={
     'authorized_submitters'
 }, converters={
@@ -83,7 +84,9 @@ abstracts_reviewing_settings = EventSettingsProxy('abstracts_reviewing', {
     'scale_upper': 5,
     'allow_comments': True,
     'allow_convener_judgment': False,  # whether track conveners can make a judgment (e.g. accept/reject)
-    'allow_contributors_in_comments': False
+    'allow_contributors_in_comments': False,
+    'reviewing_instructions': '',
+    'judgment_instructions': ''
 })
 
 

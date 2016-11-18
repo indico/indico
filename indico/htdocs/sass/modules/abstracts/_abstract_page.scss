@@ -482,3 +482,11 @@
 .ratings-switch {
     text-align: right;
 }
+
+.instructions-warning.warning-message-box {
+    margin: 0 0 1em 0;
+
+    .message-box-content {
+        font-size: 0.85em;
+    }
+}

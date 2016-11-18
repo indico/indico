@@ -1,3 +1,5 @@
+{% from 'message_box.html' import message_box %}
+
 {% macro render_edited_hint(dt, user=None) %}
     {% if user %}
         <span class="abstract-comment-edited"
@@ -50,5 +52,24 @@
 {% macro render_visibility_hint(visibility) %}
     {% if visibility.name != 'contributors' %}
         <i class="abstract-comment-visibility {{ visibility.name }} icon-shield" title="{{ visibility.title }}"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_instruction_box(container_id, instructions, title) %}
+    {% if instructions %}
+        {% set link %}
+            <a data-title="{{ title }}"
+               data-content="#{{ container_id }} .hidden-instructions"
+               data-close-button
+               data-ajax-dialog>
+        {% endset %}
+        {% set endlink='</a>' %}
+        {% set text = caller(link|safe, endlink|safe) %}
+        {% call message_box('warning', classes='instructions-warning') %}
+            {{ text }}
+            <div class="hidden-instructions weak-hidden">
+                {{ instructions | markdown }}
+            </div>
+        {% endcall %}
     {% endif %}
 {% endmacro %}

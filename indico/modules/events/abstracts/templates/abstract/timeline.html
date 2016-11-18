@@ -1,4 +1,5 @@
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint, render_tracks, render_track %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint,
+                                                        render_tracks, render_track, render_instruction_box %}
 {% from 'events/abstracts/abstract/review.html' import render_comment_form, render_review_form %}
 
 
@@ -232,18 +233,18 @@
         <div class="i-timeline-item-label action"></div>
         <div class="i-timeline-item-box footer-only header-indicator-left">
             <div class="i-box-footer js-form-container">
-                <div class="flex">
-                    {% if abstract.can_comment(session.user) %}
+                {% if abstract.can_comment(session.user) %}
+                    <div class="flex">
                         <div class="stretch">
                             {{ render_comment_form(comment_form, abstract) }}
                         </div>
                         {% if abstract.can_review(session.user, check_state=true) %}
                             {{ _render_review_trigger(abstract) }}
                         {% endif %}
-                    {% elif abstract.can_review(session.user, check_state=true) %}
-                        {{ _render_input_no_comment(abstract, review_form) }}
-                    {% endif %}
-                </div>
+                    </div>
+                {% elif abstract.can_review(session.user, check_state=true) %}
+                    {{ _render_input_no_comment(abstract, review_form) }}
+                {% endif %}
             </div>
         </div>
     </div>

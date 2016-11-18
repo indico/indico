@@ -127,6 +127,9 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     authorized_submitters = PrincipalListField(_("Authorized submitters"),
                                                description=_("These users may always submit abstracts, even outside "
                                                              "the regular submission period."))
+    submission_instructions = IndicoMarkdownField(_('Instructions'), editor=True,
+                                                  description=_("These instructions will be displayed right before the "
+                                                                "submission form."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -156,6 +159,12 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                   description=_("Enabling this allows submitters, authors, and "
                                                                 "speakers to also participate in the comments."))
     abstract_review_questions = AbstractReviewQuestionsField(_("Review questions"))
+    reviewing_instructions = IndicoMarkdownField(_('Reviewing Instructions'), editor=True,
+                                                 description=_("These instructions will be displayed right before the "
+                                                               "reviewing form."))
+    judgment_instructions = IndicoMarkdownField(_('Judgment Instructions'), editor=True,
+                                                  description=_("These instructions will be displayed right before the "
+                                                                "decision box."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

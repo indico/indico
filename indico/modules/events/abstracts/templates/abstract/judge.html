@@ -1,5 +1,5 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-{% from 'events/abstracts/abstract/_common.html' import render_score, render_tracks %}
+{% from 'events/abstracts/abstract/_common.html' import render_score, render_tracks, render_instruction_box %}
 
 {% macro _render_abstract_reviewing_state(abstract) %}
     {% if abstract.reviewed_for_tracks > 1 %}
@@ -44,6 +44,7 @@
 
 
 {% macro render_decision_box(abstract, form, management=false) %}
+    {% set event = abstract.event_new %}
     <div class="i-timeline-item-label action icon-hammer"></div>
     <div class="i-timeline-item-box content-indicator">
         <div class="i-box-content">
@@ -58,7 +59,7 @@
                         Reviews are {{ state }}
                     {%- endtrans %}
                     {% if abstract.score is not none %}
-                        {{ render_score(abstract.score, abstract.event_new.cfa) }}
+                        {{ render_score(abstract.score, event.cfa) }}
                     {% endif %}
                 </div>
             </div>
@@ -71,7 +72,7 @@
                         {{ _render_abstract_track_reviewing_state(abstract, track) }}
                         {% set score = abstract.get_track_score(track) %}
                         {% if score is not none %}
-                            {{ render_score(score, abstract.event_new.cfa) }}
+                            {{ render_score(score, event.cfa) }}
                         {% endif %}
                     </div>
                 </div>
@@ -79,10 +80,17 @@
         </div>
         <div class="i-box-footer">
             {% set url = url_for('.judge_abstract', abstract, management=management) %}
-            {% call form_header(form, action=url, orientation='vertical') %}
+            {% set form_id = 'judgment-form' %}
+
+            {% call form_header(form, action=url, orientation='vertical', id=form_id) %}
                 data-form-container="#abstract-decision-box"
                 data-update=".management-page"
                 data-ajax-form
+            {% endcall %}
+            {% call(link, endlink) render_instruction_box(form_id, event.cfa.judgment_instructions, _("Judgment instructions")) %}
+                {% trans -%}
+                    Please don't forget to read the {{ link }}judgment instructions{{ endlink }} before taking your decision.
+                {%- endtrans %}
             {% endcall %}
             {{ form_rows(form, fields=form._order, skip_labels=true) }}
             {% call form_footer(form) %}

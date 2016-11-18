@@ -1,3 +1,12 @@
+{% from 'events/abstracts/abstract/_common.html' import render_instruction_box %}
 {% from 'forms/_form.html' import simple_form %}
 
+<div id="submission-instructions">
+    {% call(link, endlink) render_instruction_box('submission-instructions', event.cfa.submission_instructions,
+                                                  _("Submission instructions")) %}
+        {% trans -%}
+            Please don't forget to read the {{ link }}submission instructions{{ endlink }} before submitting an abstract.
+        {%- endtrans %}
+    {% endcall %}
+</div>
 {{ simple_form(form, form_header_kwargs={'action': request.relative_url}, submit=_("Submit"), back=_("Cancel")) }}
