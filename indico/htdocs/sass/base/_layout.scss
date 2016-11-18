@@ -156,3 +156,70 @@ body > * {
 .flex-center {
     justify-content: center;
 }
+
+
+/* Flexbox layout */
+.flexrow {
+    flex-flow: row nowrap;
+}
+
+.flexcol {
+    flex-flow: column nowrap;
+}
+
+.flexrow,
+.flexcol {
+    display: flex !important;
+
+    &.f-j-start {
+        justify-content: flex-start;
+    }
+
+    &.f-j-end {
+        justify-content: flex-end;
+    }
+
+    &.f-j-center {
+        justify-content: center;
+    }
+
+    &.f-j-space-between {
+        justify-content: space-between;
+    }
+
+    &.f-j-space-around {
+        justify-content: space-around;
+    }
+
+    &.f-a-start {
+        align-items: flex-start;
+    }
+
+    &.f-a-end {
+        align-items: flex-end;
+    }
+
+    &.f-a-center {
+        align-items: center;
+    }
+
+    &.f-a-stretch {
+        align-items: stretch
+    }
+
+    &.f-a-baseline {
+        align-items: baseline;
+    }
+
+    &.f-wrap {
+        flex-wrap: wrap;
+    }
+}
+
+.f-self-grow {
+    flex-grow: 1;
+}
+
+.f-self-shrink {
+    flex-shrink: 1;
+}
