@@ -291,17 +291,9 @@
 
 .abstract-question-list {
     list-style-type: none;
+    padding-left: 0;
 
     > li {
-        label {
-            @include border-right($width: 2px);
-            color: $dark-gray;
-            font-weight: normal;
-            font-style: italic;
-
-            padding-right: 0.5em;
-        }
-
         .value {
             .number {
                 vertical-align: middle;
@@ -316,6 +308,27 @@
                 }
             }
         }
+    }
+}
+
+.abstract-question-list,
+.abstract-reivew-form {
+    .question-index {
+        font-weight: bold;
+        background: $pastel-gray;
+        color: $light-black;
+        padding: 1px 6px;
+    }
+
+    .question-text {
+        color: $dark-gray;
+        font-style: italic;
+        padding: 0 1em;
+        word-break: break-word;
+    }
+
+    .question-required {
+        color: $red;
     }
 }
 
