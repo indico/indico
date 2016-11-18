@@ -92,9 +92,21 @@ ul.tracks {
 
         h3 {
             @include border-bottom($separator-color);
-
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end;
+
+            .track-title {
+                margin-right: auto;
+            }
+
+            .track-code {
+                font-size: 0.9em;
+                color: $dark-yellow;
+            }
+
+            .track-link {
+                margin-left: 0.5em;
+            }
         }
 
         .description {
