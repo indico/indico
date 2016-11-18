@@ -41,6 +41,9 @@ class CallForAbstracts(object):
                                                           'allow_contributors_in_comments')
     allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
     announcement = EventSettingProperty(abstracts_settings, 'announcement')
+    submission_instructions = EventSettingProperty(abstracts_settings, 'submission_instructions')
+    reviewing_instructions = EventSettingProperty(abstracts_reviewing_settings, 'reviewing_instructions')
+    judgment_instructions = EventSettingProperty(abstracts_reviewing_settings, 'judgment_instructions')
 
     @property
     def has_started(self):
