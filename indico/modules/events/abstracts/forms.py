@@ -195,11 +195,11 @@ class AbstractJudgmentFormBase(IndicoForm):
                                       description=_("The abstract will be accepted in this track"))
     accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept)],
                                              get_label=lambda x: x.name.title(), allow_blank=True,
-                                             blank_text=_("Choose the contribution type..."),
+                                             blank_text=_("You may choose a contribution type..."),
                                              description=_("The abstract will be converted "
                                                            "into a contribution of this type"))
     session = QuerySelectField(_("Session"), [HiddenUnless('judgment', AbstractAction.accept)],
-                               get_label='title', allow_blank=True, blank_text=_("Choose a session..."),
+                               get_label='title', allow_blank=True, blank_text=_("You may choose a session..."),
                                description=_("The generated contribution will be allocated in this session"))
     duplicate_of = AbstractField(_("Duplicate of"),
                                  [HiddenUnless('judgment', AbstractAction.mark_as_duplicate), DataRequired()],
@@ -264,14 +264,12 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
 class AbstractReviewForm(IndicoForm):
     """Form for reviewing an abstract"""
 
-    _order = ('comment', 'proposed_action', 'proposed_contribution_type', 'proposed_related_abstract',
-              'proposed_tracks')
+    _order = ('proposed_action', 'proposed_contribution_type', 'proposed_related_abstract', 'proposed_tracks',
+              'comment')
 
-    comment = TextAreaField(_("Comments"))
-    proposed_action = IndicoEnumSelectField(
-        _("Proposed Action"),
-        [DataRequired()],
-        enum=AbstractAction)
+    comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("You may leave a comment (only visible to "
+                                                                      "conveners and judges)...")})
+    proposed_action = IndicoEnumSelectField(_("Proposed Action"), [DataRequired()], enum=AbstractAction)
     proposed_related_abstract = AbstractField(
         _("Target Abstract"),
         [HiddenUnless('proposed_action', {AbstractAction.mark_as_duplicate, AbstractAction.merge}), DataRequired()],
@@ -280,7 +278,7 @@ class AbstractReviewForm(IndicoForm):
     proposed_contribution_type = QuerySelectField(
         _("Contribution type"),
         [HiddenUnless('proposed_action', AbstractAction.accept)],
-        get_label=lambda x: x.name.title(), allow_blank=True, blank_text=_("Choose the contribution type..."))
+        get_label=lambda x: x.name.title(), allow_blank=True, blank_text=_("You may propose a contribution type..."))
     proposed_tracks = IndicoQuerySelectMultipleCheckboxField(
         _("Propose for tracks"),
         [HiddenUnless('proposed_action', AbstractAction.change_tracks), DataRequired()],
