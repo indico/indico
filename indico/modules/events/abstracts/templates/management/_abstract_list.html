@@ -1,6 +1,34 @@
 {% from 'message_box.html' import message_box %}
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 
+{% macro _get_track_full_title(track, searchable=false) -%}
+    {% if track.code -%}
+        {{ track.code }} {% if not searchable %}- {% endif %}
+    {%- endif -%}
+    {{ track.title }}
+{%- endmacro %}
+
+{% macro _get_track_titles(tracks, searchable=false) -%}
+    {% for track in tracks -%}
+        {{ _get_track_full_title(track, searchable=searchable) }}
+        {%- if not loop.last -%}
+            {% if searchable %} {% else %}, {% endif %}
+        {%- endif %}
+    {%- endfor %}
+{%- endmacro %}
+
+{% macro _render_multi_track_column(tracks) -%}
+    <td class="i-table" data-text="{{ _get_track_titles(tracks) }}"
+        data-searchable="{{ _get_track_titles(tracks, searchable=true) | lower }}">
+        {%- for track in tracks | sort(attribute='title') -%}
+            <div class="truncate-text">{{ track.short_title }}</div>
+        {%- endfor %}
+        {%- if not tracks %}
+            {%- trans %}No track{% endtrans %}
+        {%- endif -%}
+    </td>
+{%- endmacro %}
+
 {% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=None) %}
     {% if abstracts %}
         <form method="POST">
@@ -37,7 +65,7 @@
                                    abstract.accepted_track != context_track) %}
                                 {% set accepted_other = true %}
                                 {% set accepted_other_msg -%}
-                                    {%- trans other_track=abstract.accepted_track.title -%}
+                                    {%- trans other_track=abstract.accepted_track.full_title -%}
                                         This abstract has already been accepted for the track "{{ other_track }}"
                                     {%- endtrans -%}
                                 {%- endset %}
@@ -101,35 +129,24 @@
                                             {%- endif -%}
                                         </td>
                                     {% elif item.id == 'submitted_for_tracks' %}
-                                        {% set tracks = abstract.submitted_for_tracks %}
-                                        {% set track_titles = tracks | join(', ', attribute='title') %}
-                                        <td class="i-table" data-text="{{ track_titles }}"
-                                            data-searchable="{{ track_titles | lower }}">
-                                            {%- for track in tracks | sort(attribute='title') -%}
-                                                <div class="truncate-text">{{ track.title }}</div>
-                                            {%- endfor %}
-                                            {%- if not tracks %}
-                                                {%- trans %}No track{% endtrans %}
-                                            {%- endif -%}
-                                        </td>
+                                        {{ _render_multi_track_column(abstract.submitted_for_tracks) }}
                                     {% elif item.id == 'reviewed_for_tracks' %}
-                                        {% set tracks = abstract.reviewed_for_tracks %}
-                                        {% set track_titles = tracks | join(', ', attribute='title') %}
-                                        <td class="i-table" data-text="{{ track_titles }}"
-                                            data-searchable="{{ track_titles | lower }}">
-                                            {%- for track in tracks | sort(attribute='title') -%}
-                                                <div class="truncate-text">{{ track.title }}</div>
-                                            {%- endfor %}
-                                            {%- if not tracks %}
-                                                {%- trans %}No track{% endtrans %}
-                                            {%- endif -%}
-                                        </td>
+                                        {{ _render_multi_track_column(abstract.reviewed_for_tracks) }}
                                     {% elif item.id == 'accepted_track' %}
-                                        {% set track = abstract.accepted_track.title if abstract.accepted_track else '' %}
-                                        <td class="i-table" data-text="{{ track }}"
-                                            data-searchable="{{ track | lower }}">
+                                        {% set track = abstract.accepted_track %}
+                                        {% if track %}
+                                            {% set track_text = track.short_title %}
+                                            {% set track_full = _get_track_full_title(track) %}
+                                            {% set track_searchable = _get_track_full_title(track, searchable=true) | lower %}
+                                        {% else %}
+                                            {% set track_text = '' %}
+                                            {% set track_full = '' %}
+                                            {% set track_searchable = '' %}
+                                        {% endif %}
+                                        <td class="i-table" data-text="{{ track_full }}"
+                                            data-searchable="{{ track_searchable }}">
                                             {%- if track %}
-                                                {{- track }}
+                                                {{- track_text }}
                                             {%- else %}
                                                 {%- trans %}No track{% endtrans %}
                                             {%- endif -%}
