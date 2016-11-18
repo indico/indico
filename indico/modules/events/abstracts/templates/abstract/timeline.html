@@ -160,12 +160,19 @@
                     </div>
                     {% for rating in review.ratings|sort(attribute='question.position') %}
                         <ul class="abstract-question-list">
-                            <li>
-                                <label>{{ rating.question.text }}</label>
-                                <span class="value">
-                                    {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
-                                    <span class="number">{{ rating.value }}</span>
-                                </span>
+                            <li class="flex">
+                                <div>
+                                    <span class="question-index">{{ loop.index }}</span>
+                                </div>
+                                <div class="question-text stretch">
+                                    {{ rating.question.text }}
+                                </div>
+                                <div>
+                                    <span class="value">
+                                        {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
+                                        <span class="number">{{ rating.value }}</span>
+                                    </span>
+                                </div>
                             </li>
                         </ul>
                     {% endfor %}

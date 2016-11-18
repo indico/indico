@@ -20,7 +20,7 @@ from datetime import time
 
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, IntegerField, SelectField, StringField, TextAreaField, HiddenField
+from wtforms.fields import BooleanField, IntegerField, RadioField, SelectField, StringField, TextAreaField, HiddenField
 from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
 from wtforms.widgets import Select
 
@@ -55,18 +55,14 @@ def make_review_form(event):
     :param event: The `Event` for which to create the abstract form.
     :return: An `AbstractForm` subclass.
     """
-    from wtforms.fields import RadioField
-    from wtforms.validators import DataRequired
-
     form_class = type(b'_AbstractReviewForm', (AbstractReviewForm,), {})
-    for question in event.abstract_review_questions:
+    for idx, question in enumerate(event.abstract_review_questions, start=1):
         name = 'question_{}'.format(question.id)
         range_ = event.cfa.rating_range
-        field = RadioField(question.text,
-                           validators=[DataRequired()],
+        field = RadioField(question.text, validators=[DataRequired()],
                            choices=[(unicode(n), unicode(n)) for n in range(range_[0], range_[1] + 1)],
                            widget=JinjaWidget('events/abstracts/forms/rating_widget.html',
-                                              question=question, cfa=event.cfa, inline_js=True))
+                                              question=question, cfa=event.cfa, inline_js=True, question_idx=idx))
         setattr(form_class, name, field)
     return form_class
 
