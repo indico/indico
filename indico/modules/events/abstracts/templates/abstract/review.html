@@ -39,12 +39,15 @@
             {%- endtrans %}
         {% endif %}
     </div>
-
-    <div class="titled-rule">Ratings</div>
+    <div class="titled-rule">
+        {%- trans %}Ratings{% endtrans -%}
+    </div>
     <div class="abstract-question-list">
         {{ form_rows(form, skip=form._order, skip_labels=true) }}
     </div>
-    <div class="titled-rule">Proposal</div>
+    <div class="titled-rule">
+        {%- trans %}Proposal{% endtrans -%}
+    </div>
     {{ form_rows(form, fields=form._order, skip_labels=true) }}
     {% set form_id = '#track-review-form-' + track.id|string %}
     {% call form_footer(form) %}
