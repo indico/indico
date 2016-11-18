@@ -4,9 +4,23 @@
 {% macro render_review_form(form, abstract=none, track=none, review=none, management=false) %}
     {% set url = url_for('.review_abstract', abstract, track, management=management) if not review else
                  url_for('.edit_review', review, management=management) %}
+    {% set track = track or review.track %}
     {{ form_header(form, action=url, orientation='vertical', id=('track-review-form-%s'|format(track.id)),
                    classes='abstract-reivew-form') }}
+    <div class="abstract-review-form-preface">
+        {% if review %}
+            {% trans title=track.title -%}
+                Changing your review in track <span class="abstract-track">{{ title }}</span>
+            {%- endtrans %}
+        {% else %}
+            {% trans title=track.title -%}
+                Reviewing abstract in track <span class="abstract-track">{{ title }}</span>
+            {%- endtrans %}
+        {% endif %}
+    </div>
+    <div class="titled-rule">Ratings</div>
     {{ form_rows(form, skip=form._order, skip_labels=true) }}
+    <div class="titled-rule">Proposal</div>
     {{ form_rows(form, fields=form._order, skip_labels=true) }}
     {% set form_id = '#track-review-form-' + track.id|string %}
     {% call form_footer(form) %}
