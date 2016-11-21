@@ -19,7 +19,9 @@
         {% endif %}
     </div>
     <div class="titled-rule">Ratings</div>
-    {{ form_rows(form, skip=form._order, skip_labels=true) }}
+    <div class="abstract-question-list">
+        {{ form_rows(form, skip=form._order, skip_labels=true) }}
+    </div>
     <div class="titled-rule">Proposal</div>
     {{ form_rows(form, fields=form._order, skip_labels=true) }}
     {% set form_id = '#track-review-form-' + track.id|string %}

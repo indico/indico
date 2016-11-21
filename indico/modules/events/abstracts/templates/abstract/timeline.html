@@ -62,7 +62,9 @@
                 {% endif %}
             </div>
             <div class="i-box-content js-form-container">
-                {{ comment.text }}
+                <div class="markdown-text">
+                    {{ comment.text }}
+                </div>
             </div>
         </div>
     </div>
@@ -158,30 +160,32 @@
                     <div class="titled-rule">
                         {% trans %}Ratings{% endtrans %}
                     </div>
+                    <ul class="abstract-question-list">
                     {% for rating in review.ratings|sort(attribute='question.position') %}
-                        <ul class="abstract-question-list">
-                            <li class="flex">
-                                <div>
-                                    <span class="question-index">{{ loop.index }}</span>
-                                </div>
-                                <div class="question-text stretch">
-                                    {{ rating.question.text }}
-                                </div>
-                                <div>
-                                    <span class="value">
-                                        {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
-                                        <span class="number">{{ rating.value }}</span>
-                                    </span>
-                                </div>
-                            </li>
-                        </ul>
+                        <li class="flex">
+                            <div>
+                                <span class="question-index">{{ loop.index }}</span>
+                            </div>
+                            <div class="question-text stretch">
+                                {{ rating.question.text }}
+                            </div>
+                            <div>
+                                <span class="value">
+                                    {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
+                                    <span class="number">{{ rating.value }}</span>
+                                </span>
+                            </div>
+                        </li>
                     {% endfor %}
+                    </ul>
                 {% endif %}
                 {% if review.comment %}
                     <div class="titled-rule">
                         {% trans %}Comment{% endtrans %}
                     </div>
-                    {{ review.comment }}
+                    <div class="markdown-text">
+                        {{ review.comment }}
+                    </div>
                 {% endif %}
             </div>
         </div>

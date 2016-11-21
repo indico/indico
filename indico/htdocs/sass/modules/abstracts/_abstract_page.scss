@@ -36,6 +36,29 @@
 
 .abstract-page {
     @extend %font-family-body;
+
+    .i-form {
+        margin-top: 0;
+    }
+
+    .form-group:first-of-type .form-field {
+        margin-top: 0;
+    }
+
+    .form-field {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    .markdown-text {
+        p:first-child {
+            margin-top: 0;
+        }
+
+        p:last-child {
+            margin-bottom: 0;
+        }
+    }
 }
 
 #abstract-title {
@@ -292,8 +315,13 @@
 .abstract-question-list {
     list-style-type: none;
     padding-left: 0;
+    margin: 0;
 
     > li {
+        &:not(:first-child) {
+            margin-top: 1em;
+        }
+
         .value {
             .number {
                 vertical-align: middle;
@@ -309,11 +337,20 @@
             }
         }
     }
+
+    .form-group {
+        .form-field {
+            margin: 0;
+        }
+
+        &:not(:first-child) .form-field {
+            margin-top: 1em;
+        }
+    }
 }
 
 
 .abstract-review-form-preface {
-    padding-left: 10px;
     font-weight: bold;
 }
 
@@ -388,6 +425,7 @@
         color: $gray;
         font-size: 1.1em;
         font-weight: bold;
+        padding-left: 1em;
         padding-right: 1em;
     }
 
