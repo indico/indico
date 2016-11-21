@@ -64,7 +64,7 @@ def make_diff_log(changes, fields, types=None):
             type_ = 'bool'
         else:
             type_ = 'text'
-            change = map(unicode, change)
+            change = map(unicode, map(orig_string, change))
         data[title] = list(change) + [type_]
     return data
 
