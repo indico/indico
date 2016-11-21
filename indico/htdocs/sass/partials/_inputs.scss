@@ -107,15 +107,34 @@ select {
     @extend %text-input-base;
     background: white;
 
+    @mixin no-value {
+        font-style: italic;
+        color: $dark-gray;
+    }
+
+    &.no-value {
+        @include no-value;
+    }
+
     &:-moz-focusring {
         color: transparent !important;
         text-shadow: 0 0 0 $black !important;
     }
 
-    option[disabled] {
-        color: #888;
-        background-color: #eee;
+    option {
+        font-style: normal;
+        color: $black;
+
+        &[value='__None'] {
+            @include no-value;
+        }
+
+        &[disabled] {
+            color: $dark-gray;
+            background-color: $light-gray;
+        }
     }
+
 }
 
 select, ul {
@@ -173,7 +192,7 @@ span[contenteditable] {
         }
 
         &:checked + label:hover,
-        &:checked + label:active, {
+        &:checked + label:active {
             @extend .i-button.highlight.open;
         }
     }

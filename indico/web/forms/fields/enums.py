@@ -27,7 +27,7 @@ from indico.web.forms.widgets import JinjaWidget
 class _EnumFieldMixin(object):
     def process_formdata(self, valuelist):
         if valuelist:
-            if not valuelist[0] and self.none is not None:
+            if valuelist[0] in ('', '__None') and self.none is not None:
                 self.data = None
             else:
                 try:
@@ -56,7 +56,7 @@ class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
         if self.sorted:
             items = sorted(items, key=attrgetter('title'))
         if self.none is not None:
-            yield ('', self.none, self.data is None)
+            yield ('__None', self.none, self.data is None)
         for item in items:
             title = item.title if self.titles is None else self.titles[item]
             yield (item.name, title, item == self.data)
