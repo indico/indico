@@ -36,7 +36,9 @@ def make_diff_log(changes, fields, types=None):
 
     :param: a dict mapping attributes to ``(old, new)`` tuples
     :param: a dict mapping attributes to human-friendly titles
-    :param: a dict overriding type information for attributes
+    :param: a dict overriding type information for attributes. can be
+            a string or a function that takes a tuple with the old/new
+            value and returns a ``(type, changes)`` tuple
     """
     data = {'_diff': True}
     for key, title in fields.iteritems():
@@ -46,11 +48,20 @@ def make_diff_log(changes, fields, types=None):
             continue
         if types and key in types:
             type_ = types[key]
+            if callable(type_):
+                type_, change = type_(change)
         elif all(isinstance(x, Enum) for x in change):
             type_ = 'enum'
             change = [orig_string(getattr(x, 'title', x.name)) for x in change]
         elif all(isinstance(x, (int, long, float)) for x in change):
             type_ = 'number'
+        elif all(isinstance(x, (list, tuple)) for x in change):
+            type_ = 'list'
+        elif all(isinstance(x, set) for x in change):
+            type_ = 'list'
+            change = map(sorted, change)
+        elif all(isinstance(x, bool) for x in change):
+            type_ = 'bool'
         else:
             type_ = 'text'
             change = map(unicode, change)
@@ -65,10 +76,12 @@ def render_changes(a, b, type_):
     :param b: new value
     :param type_: the type determining how the values should be compared
     """
-    if type_ in ('number', 'enum', 'string'):
+    if type_ in ('number', 'enum', 'string', 'bool'):
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a, b)
+    elif type_ == 'list':
+        return _diff_list(a, b)
     elif type_ == 'text':
-        return _diff(a, b)
+        return _diff_text(a, b)
     else:
         raise NotImplementedError('Unexpected diff type: {}'.format(type_))
 
@@ -83,11 +96,13 @@ def _clean(strings, _linebreak_re=re.compile(r'\A(\n*)(.*?)(\n*)\Z', re.DOTALL))
                             _linebreak_symbol * len(trailing_nl)))
 
 
-def _diff(a, b, _noword_re=re.compile(r'(\W)')):
+def _diff_text(a, b, _noword_re=re.compile(r'(\W)')):
     # split the strings into words so we don't get changes involving
     # partial words.  this makes the diff much more readable to humans
     # as you don't end up with large deletions/insertions inside a word
-    seqm = SequenceMatcher(a=_noword_re.split(a), b=_noword_re.split(b))
+    a = _noword_re.split(a)
+    b = _noword_re.split(b)
+    seqm = SequenceMatcher(a=a, b=b)
     output = []
     for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
         if opcode == 'equal':
@@ -106,3 +121,25 @@ def _diff(a, b, _noword_re=re.compile(r'(\W)')):
         else:
             raise RuntimeError('unexpected opcode: ' + opcode)
     return Markup('').join(output)
+
+
+def _diff_list(a, b):
+    seqm = SequenceMatcher(a=a, b=b)
+    output = []
+    for opcode, a0, a1, b0, b1 in seqm.get_opcodes():
+        if opcode == 'equal':
+            output += seqm.a[a0:a1]
+        elif opcode == 'insert':
+            inserted = seqm.b[b0:b1]
+            output += map(Markup('<ins>{}</ins>').format, inserted)
+        elif opcode == 'delete':
+            deleted = seqm.a[a0:a1]
+            output += map(Markup('<del>{}</del>').format, deleted)
+        elif opcode == 'replace':
+            deleted = seqm.a[a0:a1]
+            inserted = seqm.b[b0:b1]
+            output += map(Markup('<del>{}</del>').format, deleted)
+            output += map(Markup('<ins>{}</ins>').format, inserted)
+        else:
+            raise RuntimeError('unexpected opcode: ' + opcode)
+    return Markup(', ').join(output)
