@@ -5,23 +5,6 @@
     {%- trans %}Programme{% endtrans -%}
 {% endblock %}
 
-{% block title_actions %}
-    <a class="i-button borderless icon-settings arrow js-dropdown" data-toggle="dropdown"></a>
-    <ul class="dropdown">
-        <li>
-            <a href="#"
-               title="{% trans %}Edit programme{% endtrans %}"
-               data-href="{{ url_for('.edit_program', event) }}"
-               data-title="{% trans %}Edit programme{% endtrans %}"
-               data-qtip-position="right"
-               data-reload-after
-               data-ajax-dialog>
-                {% trans %}Edit programme{% endtrans %}
-            </a>
-        </li>
-    </ul>
-{% endblock %}
-
 {% block description %}
     {%- trans -%}
         Tracks represent the subject matter of the conference.
@@ -31,13 +14,44 @@
 {% endblock %}
 
 {% block content %}
-    <a class="i-button highlight icon-plus"
-       data-href="{{ url_for('.create_track', event) }}"
-       data-title="{% trans %}Add new track{% endtrans %}"
-       data-update="#track-list-container"
-       data-ajax-dialog>
-        {% trans %}Add track{% endtrans %}
-    </a>
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-file-text"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Programme{% endtrans %}
+                </div>
+                {% trans -%}Configure the conference page displaying the scientific programme.{%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a href="#" class="i-button icon-settings"
+                       data-href="{{ url_for('.edit_program', event) }}"
+                       data-title="{% trans %}Configure programme{% endtrans %}"
+                       data-qtip-position="right"
+                       data-reload-after
+                       data-ajax-dialog>
+                        {% trans %}Configure{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {# TODO: Use new flex classes instead of the inline CSS once they are available #}
+    <div class="flex" style="flex-direction: row;">
+        <h3 style="flex-grow: 1; margin-bottom: 0;">{% trans %}List of tracks{% endtrans %}</h3>
+        <div style="margin: 1em 0 0 0;">
+            <a class="i-button highlight icon-plus"
+               data-href="{{ url_for('.create_track', event) }}"
+               data-title="{% trans %}Add new track{% endtrans %}"
+               data-update="#track-list-container"
+               data-ajax-dialog>
+                {% trans %}Add track{% endtrans %}
+            </a>
+        </div>
+    </div>
+
     <div id="track-list-container">
         {{ render_track_list(event) }}
     </div>
