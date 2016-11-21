@@ -36,6 +36,7 @@ from indico.modules.events.contributions.operations import delete_contribution, 
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
+from indico.util.i18n import orig_string
 from indico.util.fs import secure_filename
 
 
@@ -163,29 +164,38 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
     abstract.judge = judge
     abstract.judgment_dt = now_utc()
     abstract.judgment_comment = abstract_data['judgment_comment']
+    log_data = {'Judgment': orig_string(judgment.title)}
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted
         abstract.accepted_track = abstract_data.get('accepted_track')
         abstract.accepted_contrib_type = abstract_data.get('accepted_contrib_type')
         if not abstract.contribution:
             abstract.contribution = create_contribution_from_abstract(abstract, contrib_session)
+        if abstract.accepted_track:
+            log_data['Track'] = abstract.accepted_track.title
+        if abstract.accepted_contrib_type:
+            log_data['Type'] = abstract.accepted_contrib_type.name
     elif judgment == AbstractAction.reject:
         abstract.state = AbstractState.rejected
     elif judgment == AbstractAction.mark_as_duplicate:
         abstract.state = AbstractState.duplicate
         abstract.duplicate_of = abstract_data['duplicate_of']
+        log_data['Duplicate of'] = '#{}: {}'.format(abstract.duplicate_of.friendly_id, abstract.duplicate_of.title)
     elif judgment == AbstractAction.merge:
         abstract.state = AbstractState.merged
         abstract.merged_into = abstract_data['merged_into']
+        log_data['Merged into'] = '#{}: {}'.format(abstract.merged_into.friendly_id, abstract.merged_into.title)
+        log_data['Merge authors'] = merge_persons
         if merge_persons:
             _merge_person_links(abstract.merged_into, abstract)
     db.session.flush()
+    log_data['Sent notifications'] = send_notifications
     if send_notifications:
         send_abstract_notifications(abstract)
     logger.info('Abstract %s judged by %s', abstract, judge)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                            'Abstract #{} ({}) has been judged'.format(abstract.friendly_id, abstract.title),
-                           judge)
+                           judge, data=log_data)
 
 
 def _merge_person_links(target_abstract, source_abstract):
