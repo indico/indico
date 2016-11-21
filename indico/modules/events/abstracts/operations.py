@@ -36,7 +36,6 @@ from indico.modules.events.contributions.operations import delete_contribution, 
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
-from indico.util.i18n import ngettext
 from indico.util.fs import secure_filename
 
 
@@ -62,21 +61,26 @@ def add_abstract_files(abstract, files, log_action=True):
         db.session.flush()
     if log_action and files:
         logger.info('%d abstract file(s) added to %s by %s', len(files), abstract, session.user)
-        message = ngettext('Added file to abstract "{title}"', 'Added {number} files to abstract "{title}"', len(files))
-        abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
-                               message.format(title=abstract.title, number=len(files)),
-                               session.user, data={'Files': ', '.join(f.filename for f in files)})
+        num = len(files)
+        if num == 1:
+            msg = 'Added file to abstract #{} ({})'.format(abstract.friendly_id, abstract.title)
+        else:
+            msg = 'Added {} files to abstract #{} ({})'.format(num, abstract.friendly_id, abstract.title)
+        abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts', msg, session.user,
+                               data={'Files': ', '.join(f.filename for f in files)})
 
 
 def delete_abstract_files(abstract, files):
+    num = len(files)
     for file_ in files:
         db.session.delete(file_)
-    logger.info('%d abstract file(s) deleted from %s by %s', len(files), abstract, session.user)
-    message = ngettext('Deleted file from abstract "{title}"', 'Deleted {number} files from abstract "{title}"',
-                       len(files))
-    abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
-                           message.format(title=abstract.title, number=len(files)),
-                           session.user, data={'Files': ', '.join(f.filename for f in files)})
+    logger.info('%d abstract files deleted from %s by %s', num, abstract, session.user)
+    if num == 1:
+        msg = 'Deleted file from abstract #{} ({})'.format(abstract.friendly_id, abstract.title)
+    else:
+        msg = 'Deleted {} files from abstract #{} ({})'.format(num, abstract.friendly_id, abstract.title)
+    abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts', msg, session.user,
+                           data={'Files': ', '.join(f.filename for f in files)})
 
 
 def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False):
@@ -98,7 +102,8 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
         send_abstract_notifications(abstract)
     logger.info('Abstract %s created by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
-                           'Abstract "{}" has been created'.format(abstract.title), session.user)
+                           'Abstract #{} ({}) has been created'.format(abstract.friendly_id, abstract.title),
+                           session.user)
     return abstract
 
 
@@ -121,7 +126,8 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
     db.session.flush()
     logger.info('Abstract %s modified by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'Abstract "{}" has been modified'.format(abstract.title), session.user)
+                           'Abstract #{} ({}) has been modified'.format(abstract.friendly_id, abstract.title),
+                           session.user)
 
 
 def withdraw_abstract(abstract, delete_contrib=False):
@@ -134,7 +140,8 @@ def withdraw_abstract(abstract, delete_contrib=False):
     signals.event.abstract_state_changed.send(abstract)
     logger.info('Abstract %s withdrawn by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
-                           'Abstract "{}" has been withdrawn'.format(abstract.title), session.user)
+                           'Abstract #{} ({}) has been withdrawn'.format(abstract.friendly_id, abstract.title),
+                           session.user)
 
 
 def delete_abstract(abstract, delete_contrib=False):
@@ -147,7 +154,8 @@ def delete_abstract(abstract, delete_contrib=False):
     signals.event.abstract_deleted.send(abstract)
     logger.info('Abstract %s deleted by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
-                           'Abstract "{}" has been deleted'.format(abstract.title), session.user)
+                           'Abstract #{} ({}) has been deleted'.format(abstract.friendly_id, abstract.title),
+                           session.user)
 
 
 def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=None, merge_persons=False,
@@ -174,9 +182,10 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
     db.session.flush()
     if send_notifications:
         send_abstract_notifications(abstract)
-    logger.info('Abstract %s judged by %s', abstract, session.user)
+    logger.info('Abstract %s judged by %s', abstract, judge)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'Abstract "{}" has been judged'.format(abstract.title), session.user)
+                           'Abstract #{} ({}) has been judged'.format(abstract.friendly_id, abstract.title),
+                           judge)
 
 
 def _merge_person_links(target_abstract, source_abstract):
@@ -223,8 +232,8 @@ def update_reviewed_for_tracks(abstract, tracks):
     db.session.flush()
     logger.info('The list of tracks the abstract %s is reviewed for has been updated by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'The list of tracks the abstract "{}" is reviewed for has been updated'
-                           .format(abstract.title), session.user)
+                           'The list of tracks the abstract #{} ({}) is reviewed for has been updated'
+                           .format(abstract.friendly_id, abstract.title), session.user)
 
 
 def reset_abstract_state(abstract):
@@ -232,7 +241,8 @@ def reset_abstract_state(abstract):
     db.session.flush()
     logger.info('Abstract %s state reset by %s', abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'State of abstract "{}" has been reset'.format(abstract.title), session.user)
+                           'State of abstract #{} ({}) has been reset'.format(abstract.friendly_id, abstract.title),
+                           session.user)
 
 
 def create_abstract_comment(abstract, comment_data):
@@ -242,7 +252,8 @@ def create_abstract_comment(abstract, comment_data):
     db.session.flush()
     logger.info("Abstract %s received a comment from %s", abstract, session.user)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
-                           'Abstract "{}" has received a comment'.format(abstract.title), session.user)
+                           'Abstract #{} ({}) has received a comment'.format(abstract.friendly_id, abstract.title),
+                           session.user)
 
 
 def update_abstract_comment(comment, comment_data):
@@ -252,7 +263,9 @@ def update_abstract_comment(comment, comment_data):
     db.session.flush()
     logger.info("Abstract comment %s modified by %s", comment, session.user)
     comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                                   'Abstract comment "{}" was modified'.format(comment.id), session.user)
+                                   'Comment on abstract #{} ({}) was modified'.format(comment.abstract.friendly_id,
+                                                                                      comment.abstract.title),
+                                   session.user)
 
 
 def delete_abstract_comment(comment):
@@ -260,7 +273,9 @@ def delete_abstract_comment(comment):
     db.session.flush()
     logger.info("Abstract comment %s deleted by %s", comment, session.user)
     comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
-                                   'Abstract comment "{}" was removed'.format(comment.id), session.user)
+                                   'Comment on abstract #{} ({}) was removed'.format(comment.abstract.friendly_id,
+                                                                                     comment.abstract.title),
+                                   session.user)
 
 
 def create_abstract_review(abstract, track, user, review_data, questions_data):
@@ -272,7 +287,7 @@ def create_abstract_review(abstract, track, user, review_data, questions_data):
     db.session.flush()
     logger.info("Abstract %s received a review by %s for track %s", abstract, user, track)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
-                           'Abstract "{}" received a review'.format(abstract.title), user)
+                           'Abstract #{} ({}) received a review'.format(abstract.friendly_id, abstract.title), user)
     return review
 
 
@@ -286,7 +301,9 @@ def update_abstract_review(review, review_data, questions_data):
     db.session.flush()
     logger.info("Abstract review %s modified", review)
     event.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-              'Review "{}" for abstract "{}" was modified'.format(review.id, review.abstract.title), session.user)
+              'Review "{}" for abstract #{} ({}) was modified'.format(review.id, review.abstract.friendly_id,
+                                                                      review.abstract.title),
+              session.user)
 
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
