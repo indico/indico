@@ -19,14 +19,27 @@
     </span>
 {% endmacro %}
 
-{% macro render_tracks(tracks) %}
-    {% for track in tracks %}
-        <span class="abstract-track">{{ track.title }}</span>
+{% macro render_track(track, full_title=false) -%}
+    {% set title = track.full_title if full_title else track.short_title %}
+    {% if track.can_review_abstracts(session.user) or track.can_convene(session.user) %}
+        <a href="{{ url_for('.display_reviewable_track_abstracts', track) }}"
+           class="abstract-track"
+           title="{{ track.full_title if not full_title }}">
+            {{ title }}
+        </a>
+    {% else %}
+        <span class="abstract-track" title="{{ track.full_title if not full_title }}">{{ title }}</span>
+    {% endif %}
+{%- endmacro %}
+
+{% macro render_tracks(tracks, full_title=false) -%}
+    {% for track in tracks -%}
+        {{ render_track(track, full_title=full_title) -}}
         {%- if not loop.last -%},{% endif %}
     {% else %}
         <em>{% trans %}None{% endtrans %}</em>
     {% endfor %}
-{% endmacro %}
+{%- endmacro %}
 
 {% macro render_visibility_hint(visibility) %}
     {% if visibility.name != 'contributors' %}
