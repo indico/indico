@@ -1,4 +1,4 @@
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_tracks %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_track, render_tracks %}
 
 {% macro _render_submission_info(abstract, management) %}
     {% if abstract.submitted_contrib_type %}
@@ -18,7 +18,7 @@
                     Tracks:
                 {%- endtrans -%}
             </label>
-            {{ render_tracks(abstract.submitted_for_tracks) }}
+            {{ render_tracks(abstract.submitted_for_tracks, full_title=true) }}
         </div>
     {% endif %}
     {% if abstract.primary_authors %}
@@ -155,9 +155,9 @@
                     {% if abstract.accepted_contrib_type and abstract.accepted_track %}
                         {% trans name=abstract.submitter.name,
                             type=abstract.accepted_contrib_type.name,
-                            track=abstract.accepted_track.title -%}
+                            track=render_track(abstract.accepted_track, full_title=true) -%}
                             <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
-                            for track <span class="abstract-track">{{ track }}</span>
+                            for track {{ track }}
                             as <span class="abstract-contribution-type">{{ type }}</span>.
                         {% endtrans %}
                     {% elif abstract.accepted_contrib_type %}
@@ -168,9 +168,9 @@
                         {% endtrans %}
                     {% elif abstract.accepted_track %}
                         {% trans name=abstract.submitter.name,
-                            track=abstract.accepted_track.title -%}
+                            track=render_track(abstract.accepted_track, full_title=true) -%}
                             <strong>{{ name }}</strong> submitted this abstract and it was finally accepted
-                            for track <span class="abstract-track">{{ track }}</span>.
+                            for track {{ track }}.
                         {% endtrans %}
                     {% else %}
                         {% trans name=abstract.submitter.name -%}
@@ -456,11 +456,11 @@
                                     {% set link_end = '' %}
                                 {% endif %}
                                 {% if abstract.accepted_contrib_type and abstract.accepted_track %}
-                                    {% trans type=abstract.accepted_contrib_type.name, track=abstract.accepted_track.title -%}
+                                    {% trans type=abstract.accepted_contrib_type.name, track=render_track(abstract.accepted_track, full_title=true) -%}
                                         The abstract was accepted
                                         as <span class="abstract-contribution-type">{{ type }}</span>
-                                        for track <span class="abstract-track">{{ track }}</span>
-                                        and a {{ link_start }}contribution{{ link_end }} was created in the event.
+                                        for track {{ track }} and a {{ link_start }}contribution{{ link_end }} was
+                                        created in the event.
                                     {%- endtrans %}
                                 {% elif abstract.accepted_contrib_type %}
                                     {% trans type=abstract.accepted_contrib_type.name -%}
@@ -469,10 +469,10 @@
                                         and a {{ link_start }}contribution{{ link_end }} was created in the event.
                                     {%- endtrans %}
                                 {% elif abstract.accepted_track %}
-                                    {% trans track=abstract.accepted_track.title -%}
+                                    {% trans track=render_track(abstract.accepted_track, full_title=true)  -%}
                                         The abstract was accepted
-                                        for track <span class="abstract-track">{{ track }}</span>
-                                        and a {{ link_start }}contribution{{ link_end }} was created in the event.
+                                        for track {{ track }} and a {{ link_start }}contribution{{ link_end }}
+                                        was created in the event.
                                     {%- endtrans %}
                                 {% else %}
                                     {% trans -%}
