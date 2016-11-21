@@ -34,6 +34,28 @@
     }
 }
 
+@mixin _indicator-top-base($background-color, $border-color) {
+    &::after,
+    &::before {
+        border-color: transparent;
+        border-style: solid outset solid;
+        content: '';
+        position: absolute;
+        top: -15px;
+    }
+
+    &::after {
+        margin-top: 1px;
+        border-width: 7px;
+        border-bottom-color: $background-color;
+    }
+
+    &::before {
+        border-width: 7px;
+        border-bottom-color: $border-color;
+    }
+}
+
 @mixin indicator-left($background-color: white, $border-color: $default-border-color, $top: 10px) {
     @include _indicator-base($top);
 
@@ -69,5 +91,27 @@
 
     &::before {
         border-left-color: $border-color;
+    }
+}
+
+@mixin indicator-top-left($background-color: white, $border-color: $default-border-color, $left: 10px) {
+    @include _indicator-top-base($background-color, $border-color);
+
+    &::after,
+    &::before {
+        left: $left;
+    }
+
+    &::after {
+        margin-right: 2px;
+    }
+}
+
+@mixin indicator-top-right($background-color: white, $border-color: $default-border-color, $right: 10px) {
+    @include _indicator-top-base($background-color, $border-color);
+
+    &::after,
+    &::before {
+        right: $right;
     }
 }
