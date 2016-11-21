@@ -34,6 +34,7 @@ from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.contributions.operations import delete_contribution, create_contribution_from_abstract
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
 from indico.util.i18n import orig_string
@@ -43,14 +44,25 @@ from indico.util.fs import secure_filename
 def _update_tracks(abstract, tracks, only_reviewed_for=False):
     edit_track_mode = abstract.edit_track_mode
     if edit_track_mode == EditTrackMode.none:
-        return
+        return {}
 
+    changes = {}
+    old_submitted_for_tracks = new_submitted_for_tracks = set(abstract.submitted_for_tracks)
+    old_reviewed_for_tracks = new_reviewed_for_tracks = set(abstract.reviewed_for_tracks)
     if edit_track_mode == EditTrackMode.both:
         if not only_reviewed_for:
             abstract.submitted_for_tracks = tracks
+            new_submitted_for_tracks = tracks
         abstract.reviewed_for_tracks = tracks
+        new_reviewed_for_tracks = tracks
     elif edit_track_mode == EditTrackMode.reviewed_for:
         abstract.reviewed_for_tracks = tracks
+        new_reviewed_for_tracks = tracks
+    if old_submitted_for_tracks != new_submitted_for_tracks:
+        changes['submitted_for_tracks'] = (old_submitted_for_tracks, new_submitted_for_tracks)
+    if old_reviewed_for_tracks != new_reviewed_for_tracks:
+        changes['reviewed_for_tracks'] = (old_reviewed_for_tracks, new_reviewed_for_tracks)
+    return changes
 
 
 def add_abstract_files(abstract, files, log_action=True):
@@ -114,9 +126,10 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
 def update_abstract(abstract, abstract_data, custom_fields_data=None):
     tracks = abstract_data.pop('submitted_for_tracks', None)
     attachments = abstract_data.pop('attachments', None)
+    changes = {}
 
     if tracks is not None and abstract.edit_track_mode == EditTrackMode.both:
-        _update_tracks(abstract, tracks)
+        changes.update(_update_tracks(abstract, tracks))
 
     if attachments:
         deleted_files = {f for f in abstract.files if f.id in attachments['deleted']}
@@ -124,13 +137,25 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
         delete_abstract_files(abstract, deleted_files)
         add_abstract_files(abstract, attachments['added'])
 
-    abstract.populate_from_dict(abstract_data)
+    changes.update(abstract.populate_from_dict(abstract_data))
     if custom_fields_data:
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
     logger.info('Abstract %s modified by %s', abstract, session.user)
+    log_fields = {
+        'title': 'Title',
+        'description': 'Content',
+        'submission_comment': 'Comment',
+        'submitted_for_tracks': 'Tracks',
+        'submitted_contrib_type': 'Contribution type'
+    }
+    log_types = {
+        'submitted_for_tracks': lambda change: ('list', [sorted(t.title for t in x) for x in change]),
+        'submitted_contrib_type': lambda change: ('string', [t.name for t in change])
+    }
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-                           'Abstract #{} ({}) modified'.format(abstract.friendly_id, abstract.title), session.user)
+                           'Abstract #{} ({}) modified'.format(abstract.friendly_id, abstract.title), session.user,
+                           data={'Changes': make_diff_log(changes, log_fields, log_types)})
 
 
 def withdraw_abstract(abstract, delete_contrib=False):
@@ -267,7 +292,7 @@ def create_abstract_comment(abstract, comment_data):
 
 
 def update_abstract_comment(comment, comment_data):
-    comment.populate_from_dict(comment_data)
+    changes = comment.populate_from_dict(comment_data)
     comment.modified_by = session.user
     comment.modified_dt = now_utc()
     db.session.flush()
@@ -275,7 +300,9 @@ def update_abstract_comment(comment, comment_data):
     comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                                    'Comment on abstract #{} ({}) modified'.format(comment.abstract.friendly_id,
                                                                                   comment.abstract.title),
-                                   session.user)
+                                   session.user,
+                                   data={'Changes': make_diff_log(changes, {'text': 'Text',
+                                                                            'visibility': 'Visibility'})})
 
 
 def delete_abstract_comment(comment):
@@ -296,24 +323,52 @@ def create_abstract_review(abstract, track, user, review_data, questions_data):
         review.ratings.append(AbstractReviewRating(question=question, value=value))
     db.session.flush()
     logger.info("Abstract %s received a review by %s for track %s", abstract, user, track)
+    log_data = {
+        'Track': track.title,
+        'Action': orig_string(review.proposed_action.title),
+        'Comment': review.comment
+    }
+    if review.proposed_action == AbstractAction.accept:
+        log_data['Contribution type'] = (review.proposed_contribution_type.name if review.proposed_contribution_type
+                                         else None)
+    elif review.proposed_action == AbstractAction.change_tracks:
+        log_data['Other tracks'] = sorted(t.title for t in review.proposed_tracks)
+    elif review.proposed_action in {AbstractAction.mark_as_duplicate, AbstractAction.merge}:
+        log_data['Other abstract'] = '#{0.friendly_id} ({0.title})'.format(review.proposed_related_abstract)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts',
-                           'Abstract #{} ({}) reviewed'.format(abstract.friendly_id, abstract.title), user)
+                           'Abstract #{} ({}) reviewed'.format(abstract.friendly_id, abstract.title), user,
+                           data=log_data)
     return review
 
 
 def update_abstract_review(review, review_data, questions_data):
     event = review.abstract.event_new
-    review.populate_from_dict(review_data)
+    changes = review.populate_from_dict(review_data)
     review.modified_dt = now_utc()
     for question in event.abstract_review_questions:
         rating = question.get_review_rating(review, allow_create=True)
         rating.value = int(questions_data['question_{}'.format(question.id)])
     db.session.flush()
     logger.info("Abstract review %s modified", review)
+    log_fields = {
+        'proposed_action': 'Action',
+        'comment': 'Comment'
+    }
+    log_types = {}
+    if review.proposed_action in {AbstractAction.mark_as_duplicate, AbstractAction.merge}:
+        log_fields['proposed_related_abstract'] = 'Other abstract'
+        log_types['proposed_related_abstract'] = \
+            lambda change: ('string', ['#{} ({})'.format(x.friendly_id, x.title) if x else None for x in change])
+    elif review.proposed_action == AbstractAction.accept:
+        log_fields['proposed_contribution_type'] = 'Contribution type'
+        log_types['proposed_contribution_type'] = lambda change: ('string', [x.name if x else None for x in change])
+    elif review.proposed_action == AbstractAction.change_tracks:
+        log_fields['proposed_tracks'] = 'Other tracks'
+        log_types['proposed_tracks'] = lambda change: ('list', [sorted(t.title for t in x) for x in change])
     event.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
-              'Review "{}" for abstract #{} ({}) modified'.format(review.id, review.abstract.friendly_id,
-                                                                  review.abstract.title),
-              session.user)
+              'Review for abstract #{} ({}) modified'.format(review.abstract.friendly_id, review.abstract.title),
+              session.user, data={'Track': review.track.title,
+                                  'Changes': make_diff_log(changes, log_fields, log_types)})
 
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
