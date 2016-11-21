@@ -412,6 +412,11 @@ class User(PersonMixin, db.Model):
     as_legacy = as_avatar
 
     @property
+    def avatar_css(self):
+        from indico.modules.users.util import get_color_for_username
+        return 'background-color: {};'.format(get_color_for_username(self.full_name))
+
+    @property
     def external_identities(self):
         """The external identities of the user"""
         return {x for x in self.identities if x.provider != 'indico'}
