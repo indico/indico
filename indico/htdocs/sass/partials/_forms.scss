@@ -263,6 +263,10 @@ $i-form-button-line-height: 1.8;
         @extend %form-field-button;
         line-height: 1 !important;
     }
+
+    .form-field {
+        margin-bottom: 0;
+    }
 }
 
 .i-form fieldset {
