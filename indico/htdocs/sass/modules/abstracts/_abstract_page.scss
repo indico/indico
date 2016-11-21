@@ -219,15 +219,9 @@
 #abstract-submission-details,
 #abstract-timeline {
     .i-timeline-item-label {
-        @include icon-before('icon-user');
-        border-color: $default-border-color !important;
-        background: white !important;
-        color: $light-black !important;
-        justify-content: flex-end !important;
-
-        &:before {
-            font-size: 2.5em !important;
-        }
+        color: rgba(#fff, 0.8);
+        font-size: 1.65em;
+        border-radius: 50%;
     }
 }
 

@@ -26,7 +26,9 @@
 
 {% macro _render_comment(comment) %}
     <div id="abstract-comment-{{ comment.id }}" class="i-timeline-item">
-        <div class="i-timeline-item-label action"></div>
+        <div class="i-timeline-item-label action" style="{{ comment.user.avatar_css }}">
+            {{- comment.user.name[0] -}}
+        </div>
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-box header-indicator-left">
                 <div class="i-box-header flexrow">
@@ -76,7 +78,9 @@
 
 {% macro _render_review(review, form) %}
     <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
-        <div class="i-timeline-item-label action abstract-comment-pic"></div>
+        <div class="i-timeline-item-label action abstract-comment-pic" style="{{ review.user.avatar_css }}">
+            {{- review.user.name[0] -}}
+        </div>
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-metadata">
                 <div class="f-self-stretch">
@@ -233,7 +237,9 @@
     {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
     {% if can_comment or reviewer_data.tracks %}
         <div id="abstract-timeline-input" class="i-timeline-item">
-            <div class="i-timeline-item-label action"></div>
+            <div class="i-timeline-item-label action" style="{{ session.user.avatar_css }}">
+                {{- session.user.name[0] -}}
+            </div>
             <div class="i-timeline-item-box footer-only header-indicator-left">
                 <div class="i-box-footer js-form-container">
                     {% if can_comment %}

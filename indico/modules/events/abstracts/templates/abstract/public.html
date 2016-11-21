@@ -402,8 +402,10 @@
 
         <div id="abstract-submission-details" class="i-timeline">
             <div class="i-timeline-item">
-                <div class="i-timeline-item-label action"></div>
-                <div class="i-timeline-item-box header-indicator-left">
+                <div class="i-timeline-item-label action" style="{{ abstract.submitter.avatar_css }}">
+                    {{- abstract.submitter.name[0] -}}
+                </div>
+                <div class="i-timeline-item-box header-indicator">
                     <div class="i-box-header">
                         {% trans name=abstract.submitter.name -%}
                             <strong>{{ name }}</strong> submitted this abstract
@@ -428,7 +430,9 @@
 
             {% if abstract.state.name not in ('submitted', 'withdrawn') %}
                 <div class="i-timeline-item">
-                    <div class="i-timeline-item-label action"></div>
+                    <div class="i-timeline-item-label action" style="{{ abstract.judge.avatar_css }}">
+                        {{- abstract.judge.name[0] -}}
+                    </div>
                     <div class="i-timeline-item-box header-indicator-left">
                         <div class="i-box-header flexrow">
                             <div class="f-self-stretch">
