@@ -18,6 +18,8 @@ from __future__ import unicode_literals
 
 from flask import render_template
 
+from indico.modules.events.logs.util import render_changes
+
 
 class EventLogRendererBase(object):
     """Base class for event log renderers."""
@@ -28,6 +30,8 @@ class EventLogRendererBase(object):
     plugin = None
     #: template used to render the log entry
     template_name = None
+    #: extra kwargs passed to `render_template`
+    template_kwargs = {}
 
     @classmethod
     def render_entry(cls, entry):
@@ -36,7 +40,7 @@ class EventLogRendererBase(object):
         :param entry: A :class:`.EventLogEntry`
         """
         template = '{}:{}'.format(cls.plugin.name, cls.template_name) if cls.plugin is not None else cls.template_name
-        return render_template(template, entry=entry, data=cls.get_data(entry))
+        return render_template(template, entry=entry, data=cls.get_data(entry), **cls.template_kwargs)
 
     @classmethod
     def get_data(cls, entry):
@@ -53,6 +57,7 @@ class EventLogRendererBase(object):
 class SimpleRenderer(EventLogRendererBase):
     name = 'simple'
     template_name = 'events/logs/entry_simple.html'
+    template_kwargs = {'compare': render_changes}
 
     @classmethod
     def get_data(cls, entry):

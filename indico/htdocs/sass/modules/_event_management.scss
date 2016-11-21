@@ -144,6 +144,18 @@
     .email-body p:first-child {
         margin-top: 0;
     }
+
+    .diff {
+        ins {
+            background: $light-green;
+            text-decoration: none;
+        }
+
+        del {
+            background: $light-red;
+            text-decoration: none;
+        }
+    }
 }
 
 %enabled-action {
