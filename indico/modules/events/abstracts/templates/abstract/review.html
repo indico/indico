@@ -18,11 +18,11 @@
     {% endcall %}
     <div class="abstract-review-form-preface">
         {% if review %}
-            {% trans title=track.title -%}
+            {% trans title=track.full_title -%}
                 Changing your review in track <span class="abstract-track">{{ title }}</span>
             {%- endtrans %}
         {% else %}
-            {% trans title=track.title -%}
+            {% trans title=track.full_title -%}
                 Reviewing abstract in track <span class="abstract-track">{{ title }}</span>
             {%- endtrans %}
         {% endif %}
