@@ -54,13 +54,15 @@ def _update_tracks(abstract, tracks, only_reviewed_for=False):
 
 
 def add_abstract_files(abstract, files, log_action=True):
+    if not files:
+        return
     for f in files:
         filename = secure_filename(f.filename, 'attachment')
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         abstract_file = AbstractFile(filename=filename, content_type=content_type, abstract=abstract)
         abstract_file.save(f.file)
         db.session.flush()
-    if log_action and files:
+    if log_action:
         logger.info('%d abstract file(s) added to %s by %s', len(files), abstract, session.user)
         num = len(files)
         if num == 1:
@@ -72,6 +74,8 @@ def add_abstract_files(abstract, files, log_action=True):
 
 
 def delete_abstract_files(abstract, files):
+    if not files:
+        return
     num = len(files)
     for file_ in files:
         db.session.delete(file_)
