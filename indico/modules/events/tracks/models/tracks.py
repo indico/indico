@@ -98,6 +98,14 @@ class Track(DescriptionMixin, db.Model):
     # - contributions (Contribution.track)
     # - proposed_abstract_reviews (AbstractReview.proposed_tracks)
 
+    @property
+    def short_title(self):
+        return self.code if self.code else self.title
+
+    @property
+    def full_title(self):
+        return '{} - {}'.format(self.code, self.title) if self.code else self.title
+
     @locator_property
     def locator(self):
         return dict(self.event_new.locator, track_id=self.id)
