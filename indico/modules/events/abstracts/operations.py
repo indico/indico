@@ -146,16 +146,18 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
         'title': 'Title',
         'description': 'Content',
         'submission_comment': 'Comment',
-        'submitted_for_tracks': 'Tracks',
-        'submitted_contrib_type': 'Contribution type'
-    }
-    log_types = {
-        'submitted_for_tracks': lambda change: ('list', [sorted(t.title for t in x) for x in change]),
-        'submitted_contrib_type': lambda change: ('string', [t.name for t in change])
+        'submitted_for_tracks': {
+            'title': 'Tracks',
+            'convert': lambda change: [sorted(t.title for t in x) for x in change]
+        },
+        'submitted_contrib_type': {
+            'title': 'Contribution type',
+            'convert': lambda change: [t.name for t in change]
+        }
     }
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                            'Abstract #{} ({}) modified'.format(abstract.friendly_id, abstract.title), session.user,
-                           data={'Changes': make_diff_log(changes, log_fields, log_types)})
+                           data={'Changes': make_diff_log(changes, log_fields)})
 
 
 def withdraw_abstract(abstract, delete_contrib=False):
@@ -354,21 +356,26 @@ def update_abstract_review(review, review_data, questions_data):
         'proposed_action': 'Action',
         'comment': 'Comment'
     }
-    log_types = {}
     if review.proposed_action in {AbstractAction.mark_as_duplicate, AbstractAction.merge}:
-        log_fields['proposed_related_abstract'] = 'Other abstract'
-        log_types['proposed_related_abstract'] = \
-            lambda change: ('string', ['#{} ({})'.format(x.friendly_id, x.title) if x else None for x in change])
+        log_fields['proposed_related_abstract'] = {
+            'title': 'Other abstract',
+            'type': 'string',
+            'convert': lambda change: ['#{} ({})'.format(x.friendly_id, x.title) if x else None for x in change]
+        }
     elif review.proposed_action == AbstractAction.accept:
-        log_fields['proposed_contribution_type'] = 'Contribution type'
-        log_types['proposed_contribution_type'] = lambda change: ('string', [x.name if x else None for x in change])
+        log_fields['proposed_contribution_type'] = {
+            'title': 'Contribution type',
+            'type': 'string',
+            'convert': lambda change: [x.name if x else None for x in change]
+        }
     elif review.proposed_action == AbstractAction.change_tracks:
-        log_fields['proposed_tracks'] = 'Other tracks'
-        log_types['proposed_tracks'] = lambda change: ('list', [sorted(t.title for t in x) for x in change])
+        log_fields['proposed_tracks'] = {
+            'title': 'Other tracks',
+            'convert': lambda change: [sorted(t.title for t in x) for x in change]
+        }
     event.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
               'Review for abstract #{} ({}) modified'.format(review.abstract.friendly_id, review.abstract.title),
-              session.user, data={'Track': review.track.title,
-                                  'Changes': make_diff_log(changes, log_fields, log_types)})
+              session.user, data={'Track': review.track.title, 'Changes': make_diff_log(changes, log_fields)})
 
 
 def schedule_cfa(event, start_dt, end_dt, modification_end_dt):
