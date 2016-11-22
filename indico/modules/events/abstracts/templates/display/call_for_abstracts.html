@@ -3,6 +3,7 @@
 {% from 'events/abstracts/display/_common.html' import render_cfa_infoline %}
 {% from 'events/display/indico/_common.html' import render_users %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}
     {%- trans %}Call for Abstracts{% endtrans -%}
@@ -33,27 +34,26 @@
     </section>
 {% endmacro %}
 
-{% macro render_user_abstract_list_section(event, abstracts, cfa) %}
+{% macro render_user_abstract_list(event, abstracts) %}
     <section>
         <div class="header">
             <div class="header-row">
                 <h3>{% trans %}My abstracts{% endtrans %}</h3>
                 <div class="toolbar thin">
                     <div class="group">
-                        <span class="i-button label">Download</span>
+                        <div id="filter-statistics" class="group">
+                            {{- render_displayed_entries_fragment(abstracts|length, abstracts|length) -}}
+                        </div>
+                        <div class="group">
+                            <span class="i-button label icon-search"></span>
+                            <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                        </div>
+                    </div>
+                    <div class="group">
                         <a href="{{ url_for('abstracts.my_abstracts_pdf', event) }}"
                            title="{% trans %}Export to PDF{% endtrans %}"
                            class="i-button icon-file-pdf"></a>
                     </div>
-                    <!-- TODO: Filtering
-                    <div class="group" id="counter">
-                        {{- render_displayed_entries_fragment(abstracts|length, abstracts|length) -}}
-                    </div>
-                    <div class="group">
-                        <span class="i-button label icon-search"></span>
-                        <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
-                    </div>
-                    -->
                 </div>
             </div>
         </div>
@@ -66,7 +66,7 @@
                               'duplicate': 'strong'} %}
             {% for abstract in abstracts -%}
                 <div class="contribution-row" data-friendly-id="{{ abstract.friendly_id }}">
-                    <div class="contrib-title info">
+                    <div class="contrib-title info" data-searchable="{{ abstract.title|lower }}">
                         <span class="value">
                             <a class="js-mathjax" href="{{ url_for('abstracts.display_abstract', abstract) }}">
                                 <span class="contrib-id">{{ abstract.friendly_id }}.</span>
@@ -74,7 +74,7 @@
                             </a>
                         </span>
                     </div>
-                    <div class="speaker-list icon-user">
+                    <div class="speaker-list icon-user" data-searchable="{{ abstract.speakers|map(attribute='name')|join(', ')|lower }}">
                         {{ render_users(abstract.speakers|sort(attribute='display_order_key'),
                                         span_class='speaker-item-inline') }}
                     </div>
@@ -88,19 +88,19 @@
                             {{- abstract.state.title -}}
                         </div>
                         {% if abstract.accepted_track -%}
-                            <div class="contrib-track small">
+                            <div class="contrib-track small" data-searchable="{{ abstract.accepted_track.title|lower }}">
                                 {{- abstract.accepted_track.title -}}
                             </div>
                         {%- endif %}
                         {% if abstract.accepted_contrib_type -%}
-                            <div class="contrib-type small">
+                            <div class="contrib-type small" data-searchable="{{ abstract.accepted_contrib_type.name|lower }}">
                                 {{- abstract.accepted_contrib_type.name -}}
                             </div>
                         {%- endif %}
                     </div>
                     {% if abstract.description -%}
                         <a href="{{ url_for('abstracts.display_abstract', abstract) }}">
-                            <div class="description js-mathjax">
+                            <div class="description js-mathjax" data-searchable="{{ abstract.description|lower }}">
                                 {{- abstract.description|truncate(400) -}}
                             </div>
                         </a>
@@ -124,10 +124,11 @@
             {{ render_cfa_infoline(event, cfa, show_icon=false) }}
         </section>
         {% if abstracts %}
-            {{ render_user_abstract_list_section(event, abstracts, cfa) }}
+            {{ render_user_abstract_list(event, abstracts) }}
         {% endif %}
     </div>
     <script>
+        setupMyAbstractsList();
         setupCallForAbstractsPage();
     </script>
 {% endblock %}
