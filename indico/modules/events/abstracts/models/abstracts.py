@@ -449,6 +449,10 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def judgment_comment(cls):
         return cls._judgment_comment
 
+    @property
+    def verbose_title(self):
+        return '#{} ({})'.format(self.friendly_id, self.title)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
