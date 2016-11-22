@@ -334,16 +334,18 @@ def delete_abstract_comment(comment):
 def create_abstract_review(abstract, track, user, review_data, questions_data):
     review = AbstractReview(abstract=abstract, track=track, user=user)
     review.populate_from_dict(review_data)
+    log_data = {}
     for question in abstract.event_new.abstract_review_questions:
         value = int(questions_data['question_{}'.format(question.id)])
         review.ratings.append(AbstractReviewRating(question=question, value=value))
+        log_data[question.text] = value
     db.session.flush()
     logger.info("Abstract %s received a review by %s for track %s", abstract, user, track)
-    log_data = {
+    log_data.update({
         'Track': track.title,
         'Action': orig_string(review.proposed_action.title),
         'Comment': review.comment
-    }
+    })
     if review.proposed_action == AbstractAction.accept:
         log_data['Contribution type'] = (review.proposed_contribution_type.name if review.proposed_contribution_type
                                          else None)
@@ -361,15 +363,24 @@ def update_abstract_review(review, review_data, questions_data):
     event = review.abstract.event_new
     changes = review.populate_from_dict(review_data)
     review.modified_dt = now_utc()
+    log_fields = {}
     for question in event.abstract_review_questions:
+        field_name = 'question_{}'.format(question.id)
         rating = question.get_review_rating(review, allow_create=True)
-        rating.value = int(questions_data['question_{}'.format(question.id)])
+        old_value = rating.value
+        rating.value = int(questions_data[field_name])
+        if old_value != rating.value:
+            changes[field_name] = (old_value, rating.value)
+            log_fields[field_name] = {
+                'title': question.text,
+                'type': 'number'
+            }
     db.session.flush()
     logger.info("Abstract review %s modified", review)
-    log_fields = {
+    log_fields.update({
         'proposed_action': 'Action',
         'comment': 'Comment'
-    }
+    })
     if review.proposed_action in {AbstractAction.mark_as_duplicate, AbstractAction.merge}:
         log_fields['proposed_related_abstract'] = {
             'title': 'Other abstract',
