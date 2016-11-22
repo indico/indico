@@ -229,25 +229,29 @@
 
 
 {% macro _render_input(abstract, comment_form, review_form=none) %}
-    <div id="abstract-timeline-input" class="i-timeline-item">
-        <div class="i-timeline-item-label action"></div>
-        <div class="i-timeline-item-box footer-only header-indicator-left">
-            <div class="i-box-footer js-form-container">
-                {% if abstract.can_comment(session.user) %}
-                    <div class="flex">
-                        <div class="stretch">
-                            {{ render_comment_form(comment_form, abstract) }}
+    {% set can_comment = abstract.can_comment(session.user) %}
+    {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
+    {% if can_comment or reviewer_data.tracks %}
+        <div id="abstract-timeline-input" class="i-timeline-item">
+            <div class="i-timeline-item-label action"></div>
+            <div class="i-timeline-item-box footer-only header-indicator-left">
+                <div class="i-box-footer js-form-container">
+                    {% if can_comment %}
+                        <div class="flex">
+                            <div class="stretch">
+                                {{ render_comment_form(comment_form, abstract) }}
+                            </div>
+                            {% if reviewer_data.tracks and abstract.can_review(session.user, check_state=true) %}
+                                {{ _render_review_trigger(abstract) }}
+                            {% endif %}
                         </div>
-                        {% if abstract.can_review(session.user, check_state=true) %}
-                            {{ _render_review_trigger(abstract) }}
-                        {% endif %}
-                    </div>
-                {% elif abstract.can_review(session.user, check_state=true) %}
-                    {{ _render_input_no_comment(abstract, review_form) }}
-                {% endif %}
+                    {% elif abstract.can_review(session.user, check_state=true) %}
+                        {{ _render_input_no_comment(abstract, review_form) }}
+                    {% endif %}
+                </div>
             </div>
         </div>
-    </div>
+    {% endif %}
 {% endmacro %}
 
 
@@ -286,15 +290,17 @@
                 {%- trans %}You can still make up your mind{% endtrans -%}
             {% endset %}
         {% endif %}
-        <div class="stretch">
-            <div class="empty-input-title">
-                {{- no_comments_title -}}
+        <div class="flex">
+            <div class="stretch">
+                <div class="empty-input-title">
+                    {{- no_comments_title -}}
+                </div>
+                <div class="empty-input-description">
+                    {{- no_comments_description -}}
+                </div>
             </div>
-            <div class="empty-input-description">
-                {{- no_comments_description -}}
-            </div>
+            {{ _render_review_trigger(abstract, exclusive=true) }}
         </div>
-        {{ _render_review_trigger(abstract, exclusive=true) }}
     {% endif %}
 {% endmacro %}
 
