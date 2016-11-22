@@ -46,7 +46,7 @@
                     {% endif %}
                 </tr>
             </thead>
-            <tbody>
+            <tbody class="scroll">
                 {% for event_person, person_roles in event_persons.iteritems() -%}
                     {% set is_speaker = person_roles.speaker %}
                     <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">

@@ -502,8 +502,11 @@ th.i-table {
 
     tbody {
         display: block;
-        max-height: 50em;
-        overflow: auto;
+
+        &.scroll {
+            max-height: 50em;
+            overflow: auto;
+        }
     }
 
     .name-column, .affiliation-column, .email-column {
