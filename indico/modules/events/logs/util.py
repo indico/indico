@@ -88,8 +88,10 @@ def render_changes(a, b, type_):
     :param b: new value
     :param type_: the type determining how the values should be compared
     """
-    if type_ in ('number', 'enum', 'string', 'bool'):
+    if type_ in ('number', 'enum', 'bool'):
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a, b)
+    elif type_ == 'string':
+        return '{} \N{RIGHTWARDS ARROW} {}'.format(a or '\N{EMPTY SET}', b or '\N{EMPTY SET}')
     elif type_ == 'list':
         return _diff_list(a, b)
     elif type_ == 'text':
