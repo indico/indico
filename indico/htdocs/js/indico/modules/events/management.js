@@ -19,8 +19,8 @@
     'use strict';
 
     global.refreshPersonFilters = function refreshPersonFilters() {
-        var personRows = $('#persons-list tr[data-person-roles]');
-        var filters = $('#persons-list [data-filter]:checked').map(function() {
+        var personRows = $('#person-list tr[data-person-roles]');
+        var filters = $('#person-list [data-filter]:checked').map(function() {
             return $(this).data('filter');
         }).get();
 
@@ -32,31 +32,31 @@
             });
         });
 
-        personRows.hide();
-        visibleEntries.show();
-        $('#persons-list').trigger('indico:syncEnableIfChecked');
+        personRows.addClass('hidden');
+        visibleEntries.removeClass('hidden');
+        $('#person-list').trigger('indico:syncEnableIfChecked');
     };
 
     global.setupEventPersonsList = function setupEventPersonsList() {
-        enableIfChecked('#persons-list', '.select-row:visible', '#persons-list .js-requires-selected-row');
-        $('#persons-list [data-toggle=dropdown]').closest('.group').dropdown();
-        $('#persons-list [data-filter]').on('click', refreshPersonFilters);
+        enableIfChecked('#person-list', '.select-row:visible', '#person-list .js-requires-selected-row');
+        $('#person-list [data-toggle=dropdown]').closest('.group').dropdown();
+        $('#person-list [data-filter]').on('click', refreshPersonFilters);
 
-        $('#persons-list td').on('mouseenter', function() {
+        $('#person-list td').on('mouseenter', function() {
             var $this = $(this);
             if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
                 $this.attr('title', $this.text());
             }
         });
 
-        $('#persons-list .tablesorter').tablesorter({
+        $('#person-list .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
             headerTemplate: '',
             sortList: [[1, 0]]
         });
 
-        $('#persons-list .js-count-label:not(.no-role)').qbubble({
+        $('#person-list .js-count-label:not(.no-role)').qbubble({
             show: {
                 event: 'mouseover'
             },
