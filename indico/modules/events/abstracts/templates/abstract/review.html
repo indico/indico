@@ -1,12 +1,21 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 
-{% macro render_review_form(form, abstract=none, track=none, review=none, management=false) %}
+{% macro render_review_form(form, abstract=none, track=none, review=none, management=false, on_pageload=false) %}
     {% set url = url_for('.review_abstract', abstract, track, management=management) if not review else
                  url_for('.edit_review', review, management=management) %}
     {% set track = track or review.track %}
-    {{ form_header(form, action=url, orientation='vertical', id=('track-review-form-%s'|format(track.id)),
-                   classes='abstract-reivew-form') }}
+    {% call form_header(form, action=url, orientation='vertical', id=('track-review-form-%s'|format(track.id)),
+                   classes='abstract-reivew-form') %}
+        {% if on_pageload %}
+            data-href="{{ url_for('.review_abstract', abstract, track) }}"
+            data-form-container="#abstract-timeline-input .js-form-container"
+            data-update=".management-page"
+            data-replace-update
+            data-confirm-close-unsaved
+            data-ajax-form
+        {% endif %}
+    {% endcall %}
     <div class="abstract-review-form-preface">
         {% if review %}
             {% trans title=track.title -%}
@@ -35,10 +44,12 @@
                 {% trans %}Change review{% endtrans %}
             </button>
         {% endif %}
-        <button class="i-button big text-color color-on-hover danger {% if review %}js-edit-cancel{% else %}js-new-cancel{% endif %}"
-                data-button-back>
-            {% trans %}Cancel{% endtrans %}
-        </button>
+        {% if not on_pageload %}
+            <button class="i-button big text-color color-on-hover danger {% if review %}js-edit-cancel{% else %}js-new-cancel{% endif %}"
+                    data-button-back>
+                {% trans %}Cancel{% endtrans %}
+            </button>
+        {% endif %}
     {% endcall %}
 {% endmacro %}
 
