@@ -15,6 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+%time-information {
+    time {
+        &:before {
+            content: '\00B7\00a0';  // bullet+nbsp
+        }
+        color: $gray;
+    }
+}
+
 .i-timeline {
     @extend .i-box-group;
     @extend .i-box-group.vert;
@@ -63,24 +72,34 @@
         position: relative;
 
         .i-box-header {
+            @extend %time-information;
             // To match i-timeline-item-label height
             min-height: $min-height;
-
-            time {
-                &:before {
-                    content: '\00B7\00a0';  // bullet+nbsp
-                }
-                color: $gray;
-            }
         }
 
-        &.header-indicator {
+        &.header-indicator-top {
+            @include indicator-top-left($background-color: $light-gray);
+        }
+
+        &.header-indicator-left {
             @include indicator-left($background-color: $light-gray);
         }
 
         &.content-indicator {
             @include indicator-left();
         }
+    }
+
+    .i-timeline-item-content {
+        flex-direction: column;
+        flex: 1;
+    }
+
+    .i-timeline-item-metadata {
+        @extend %time-information;
+        padding: 7px 0 5px 0;
+        color: $light-black;
+        min-height: 19px;
     }
 }
 

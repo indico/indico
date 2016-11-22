@@ -43,9 +43,9 @@
         $('body').on('declarative:success', '.js-delete-comment', function() {
             $(this).closest('.i-timeline-item').remove();
         }).on('ajaxForm:show', '.js-edit-comment, .js-edit-review', function() {
-            $(this).closest('.abstract-comment-badges').hide();
+            $(this).closest('.i-box-header').hide();
         }).on('ajaxForm:hide', '.js-edit-comment, .js-edit-review', function() {
-            $(this).closest('.abstract-comment-badges').show();
+            $(this).closest('.i-box-header').show();
         }).on('focus', '.new-comment textarea', function() {
             var $box = $('#abstract-timeline-input');
             var $commentForm = $box.find('form');
@@ -74,6 +74,10 @@
             $reviewBox.find('.js-edit-review').trigger('click');
             $('body, html').animate({scrollTop: $reviewBox.offset().top}, 'fast');
             $reviewBox.find('.i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
+        }).on('click', '.ratings-switch .i-button', function() {
+            var $this = $(this);
+            $this.toggleClass('open');
+            $this.closest('.ratings-switch').siblings('.ratings-details').toggle();
         });
     };
 

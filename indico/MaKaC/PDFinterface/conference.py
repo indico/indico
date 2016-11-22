@@ -170,10 +170,10 @@ class AbstractToPDF(PDFLaTeXBase):
     def _get_track_classification(abstract):
         if abstract.state == AbstractState.accepted:
             if abstract.accepted_track:
-                return escape(abstract.accepted_track.title)
+                return escape(abstract.accepted_track.full_title)
         else:
             tracks = sorted(abstract.submitted_for_tracks | abstract.reviewed_for_tracks, key=attrgetter('position'))
-            return u'; '.join(escape(t.title) for t in tracks)
+            return u'; '.join(escape(t.full_title) for t in tracks)
 
     @staticmethod
     def _get_contrib_type(abstract):

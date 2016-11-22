@@ -6,7 +6,7 @@
                  url_for('.edit_review', review, management=management) %}
     {% set track = track or review.track %}
     {% call form_header(form, action=url, orientation='vertical', id=('track-review-form-%s'|format(track.id)),
-                   classes='abstract-reivew-form') %}
+                   classes='abstract-review-form') %}
         {% if on_pageload %}
             data-href="{{ url_for('.review_abstract', abstract, track) }}"
             data-form-container="#abstract-timeline-input .js-form-container"
@@ -18,11 +18,11 @@
     {% endcall %}
     <div class="abstract-review-form-preface">
         {% if review %}
-            {% trans title=track.title -%}
+            {% trans title=track.full_title -%}
                 Changing your review in track <span class="abstract-track">{{ title }}</span>
             {%- endtrans %}
         {% else %}
-            {% trans title=track.title -%}
+            {% trans title=track.full_title -%}
                 Reviewing abstract in track <span class="abstract-track">{{ title }}</span>
             {%- endtrans %}
         {% endif %}
