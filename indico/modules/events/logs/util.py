@@ -93,9 +93,9 @@ def render_changes(a, b, type_):
     elif type_ == 'string':
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a or '\N{EMPTY SET}', b or '\N{EMPTY SET}')
     elif type_ == 'list':
-        return _diff_list(a, b)
+        return _diff_list(a or [], b or [])
     elif type_ == 'text':
-        return _diff_text(a, b)
+        return _diff_text(a or '', b or '')
     else:
         raise NotImplementedError('Unexpected diff type: {}'.format(type_))
 
