@@ -335,7 +335,7 @@ class ListGeneratorBase(object):
         raise NotImplementedError
 
 
-def get_base_ical_parameters(user, object, detail, path):
+def get_base_ical_parameters(user, detail, path, params=None):
     """Returns a dict of all parameters expected by iCal template"""
 
     from indico.web.http_api.util import generate_public_auth_request
@@ -346,8 +346,8 @@ def get_base_ical_parameters(user, object, detail, path):
     persistent_user_enabled = api_key.is_persistent_allowed if api_key else None
     tpl = get_template_module('api/_messages.html')
     persistent_agreement = tpl.get_ical_persistent_msg()
-    top_urls = generate_public_auth_request(api_key, path)
-    urls = generate_public_auth_request(api_key, path, {'detail': detail})
+    top_urls = generate_public_auth_request(api_key, path, params)
+    urls = generate_public_auth_request(api_key, path, dict(params or {}, detail=detail))
     request_urls = {
         'publicRequestURL': top_urls['publicRequestURL'],
         'authRequestURL': top_urls['authRequestURL'],

@@ -188,7 +188,8 @@ class RHAPIBuildURLs(RH):
             event = self.object.event_new
             urls = generate_public_auth_request(api_key, url_format.format(event.id, 'session', self.object.id))
         elif isinstance(self.object, Category):
-            urls = generate_public_auth_request(api_key, '/export/categ/{0}.ics'.format(self.object.id))
+            urls = generate_public_auth_request(api_key, '/export/categ/{0}.ics'.format(self.object.id),
+                                                {'from': '-31d'})
         elif isinstance(self.object, Event):
             urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id))
             event_urls = generate_public_auth_request(api_key, '/export/event/{0}.ics'.format(self.object.id),

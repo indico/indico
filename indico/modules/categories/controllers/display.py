@@ -334,8 +334,8 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'past_threshold': past_threshold.strftime(threshold_format),
                   'atom_feed_url': url_for('.export_atom', self.category),
                   'atom_feed_title': _('Events of "{}"').format(self.category.title)}
-        params.update(get_base_ical_parameters(session.user, self.category, 'category',
-                                               '/export/categ/{0}.ics'.format(self.category.id)))
+        params.update(get_base_ical_parameters(session.user, 'category',
+                                               '/export/categ/{0}.ics'.format(self.category.id), {'from': '-31d'}))
 
         if not self.category.is_root:
             return WPCategory.render_template('display/category.html', self.category, **params)
