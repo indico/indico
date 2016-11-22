@@ -166,28 +166,6 @@
                         {%- pluralize -%}
                             Possible destination tracks: {{ tracks }}
                         {%- endtrans %}
-                    {% if review.ratings %}
-                        <div class="titled-rule">
-                            {% trans %}Ratings{% endtrans %}
-                        </div>
-                        <ul class="abstract-question-list">
-                        {% for rating in review.ratings|sort(attribute='question.position') %}
-                            <li class="flex">
-                                <div>
-                                    <span class="question-index">{{ loop.index }}</span>
-                                </div>
-                                <div class="question-text stretch">
-                                    {{ rating.question.text }}
-                                </div>
-                                <div>
-                                    <span class="value">
-                                        {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
-                                        <span class="number">{{ rating.value }}</span>
-                                    </span>
-                                </div>
-                            </li>
-                        {% endfor %}
-                        </ul>
                     {% endif %}
                     {% if review.comment %}
                         <div class="titled-rule">
@@ -195,6 +173,34 @@
                         </div>
                         <div class="markdown-text">
                             {{ review.comment }}
+                        </div>
+                    {% endif %}
+                    {% if review.ratings %}
+                        <div class="ratings-switch">
+                            <a class="i-button" title="{% trans %}Show detailed ratings{% endtrans %}">...</a>
+                        </div>
+                        <div class="ratings-details weak-hidden">
+                            <div class="titled-rule">
+                                {% trans %}Ratings{% endtrans %}
+                            </div>
+                            <ul class="abstract-question-list">
+                                {% for rating in review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
+                                    <li class="flex">
+                                        <div>
+                                            <span class="question-index">{{ loop.index }}</span>
+                                        </div>
+                                        <div class="question-text stretch">
+                                            {{ rating.question.text }}
+                                        </div>
+                                        <div>
+                                            <span class="value">
+                                                {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
+                                                <span class="number">{{ rating.value }}</span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
                         </div>
                     {% endif %}
                 </div>
