@@ -43,9 +43,9 @@
         $('body').on('declarative:success', '.js-delete-comment', function() {
             $(this).closest('.i-timeline-item').remove();
         }).on('ajaxForm:show', '.js-edit-comment, .js-edit-review', function() {
-            $(this).closest('.abstract-comment-badges').hide();
+            $(this).closest('.i-box-header').hide();
         }).on('ajaxForm:hide', '.js-edit-comment, .js-edit-review', function() {
-            $(this).closest('.abstract-comment-badges').show();
+            $(this).closest('.i-box-header').show();
         }).on('focus', '.new-comment textarea', function() {
             var $box = $('#abstract-timeline-input');
             var $commentForm = $box.find('form');
