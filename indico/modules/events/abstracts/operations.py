@@ -82,7 +82,7 @@ def delete_abstract_files(abstract, files):
 def create_abstract(event, abstract_data, custom_fields_data=None, send_notifications=False):
     abstract = Abstract(event_new=event, submitter=session.user)
     tracks = abstract_data.pop('submitted_for_tracks', None)
-    attachments = abstract_data.pop('attachments', [])
+    attachments = abstract_data.pop('attachments', None)
     abstract.populate_from_dict(abstract_data)
     if tracks is not None:
         _update_tracks(abstract, tracks)
@@ -90,7 +90,8 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
         set_custom_fields(abstract, custom_fields_data)
     db.session.flush()
 
-    add_abstract_files(abstract, attachments['added'], log_action=False)
+    if attachments:
+        add_abstract_files(abstract, attachments['added'], log_action=False)
     signals.event.abstract_created.send(abstract)
 
     if send_notifications:
@@ -101,19 +102,18 @@ def create_abstract(event, abstract_data, custom_fields_data=None, send_notifica
     return abstract
 
 
-def update_abstract(abstract, abstract_data, custom_fields_data=None, **kwargs):
-    abstract_data = abstract_data.copy()
-    abstract_data.update(kwargs)
+def update_abstract(abstract, abstract_data, custom_fields_data=None):
     tracks = abstract_data.pop('submitted_for_tracks', None)
-    attachments = abstract_data.pop('attachments', {})
+    attachments = abstract_data.pop('attachments', None)
 
     if tracks is not None and abstract.edit_track_mode == EditTrackMode.both:
         _update_tracks(abstract, tracks)
 
-    deleted_files = {f for f in abstract.files if f.id in attachments['deleted']}
-    abstract.files = list(set(abstract.files) - deleted_files)
-    delete_abstract_files(abstract, deleted_files)
-    add_abstract_files(abstract, attachments['added'])
+    if attachments:
+        deleted_files = {f for f in abstract.files if f.id in attachments['deleted']}
+        abstract.files = list(set(abstract.files) - deleted_files)
+        delete_abstract_files(abstract, deleted_files)
+        add_abstract_files(abstract, attachments['added'])
 
     abstract.populate_from_dict(abstract_data)
     if custom_fields_data:
