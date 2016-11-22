@@ -30,6 +30,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
+from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -572,10 +573,11 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             return self.reviewed_for_tracks | already_reviewed
         return (self.reviewed_for_tracks & user.abstract_reviewer_for_tracks) | already_reviewed
 
+    @memoize_request
     def get_reviewer_render_data(self, user):
         tracks = self.get_reviewed_for_tracks_by_user(user, include_reviewed=True)
         reviews = {x.track: x for x in self.get_reviews(user=user)}
-        reviewed_tracks = {x.track for x in reviews.itervalues() if x.track in tracks}
+        reviewed_tracks = {x.track for x in reviews.itervalues()}
         missing_tracks = tracks - reviewed_tracks
         return {'tracks': tracks,
                 'reviewed_tracks': reviewed_tracks,
