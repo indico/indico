@@ -74,6 +74,10 @@
             $reviewBox.find('.js-edit-review').trigger('click');
             $('body, html').animate({scrollTop: $reviewBox.offset().top}, 'fast');
             $reviewBox.find('.i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
+        }).on('click', '.ratings-switch .i-button', function() {
+            var $this = $(this);
+            $this.toggleClass('open');
+            $this.closest('.ratings-switch').siblings('.ratings-details').toggle();
         });
     };
 
