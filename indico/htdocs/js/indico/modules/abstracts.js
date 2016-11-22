@@ -157,4 +157,17 @@
             });
         }
     };
+
+    global.setupMyAbstractsList = function setupMyAbstractsList() {
+        var filterConfig = {
+            itemHandle: 'div.contribution-row',
+            listItems: '#display-contribution-list div.contribution-row',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
+        };
+
+        setupSearchBox(filterConfig);
+        applySearchFilters();
+    };
 })(window);
