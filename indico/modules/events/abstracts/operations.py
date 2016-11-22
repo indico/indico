@@ -139,7 +139,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
 
     changes.update(abstract.populate_from_dict(abstract_data))
     if custom_fields_data:
-        set_custom_fields(abstract, custom_fields_data)
+        changes.update(set_custom_fields(abstract, custom_fields_data))
     db.session.flush()
     logger.info('Abstract %s modified by %s', abstract, session.user)
     log_fields = {
@@ -155,6 +155,20 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
             'convert': lambda change: [t.name for t in change]
         }
     }
+    for field_name, change in changes.iteritems():
+        # we skip skip None -> '' changes (editing an abstract that
+        # did not have a value for a new field yet without filling
+        # it out)
+        if not field_name.startswith('custom_') or not any(changes):
+            continue
+        field_id = int(field_name[7:])
+        field = abstract.event_new.get_contribution_field(field_id)
+        field_impl = field.field
+        log_fields[field_name] = {
+            'title': field.title,
+            'type': field_impl.log_type,
+            'convert': lambda change, field_impl=field_impl: map(field_impl.get_friendly_value, change)
+        }
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                            'Abstract #{} ({}) modified'.format(abstract.friendly_id, abstract.title), session.user,
                            data={'Changes': make_diff_log(changes, log_fields)})

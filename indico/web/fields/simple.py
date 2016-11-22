@@ -43,6 +43,10 @@ class TextField(object):
     config_form = TextConfigForm
 
     @property
+    def log_type(self):
+        return 'text' if self.object.field_data.get('multiline') else 'string'
+
+    @property
     def wtf_field_class(self):
         return TextAreaField if self.object.field_data.get('multiline') else StringField
 

@@ -72,6 +72,7 @@ class SingleChoiceField(_ChoiceFieldBase):
     name = 'single_choice'
     friendly_name = _('Single Choice')
     config_form = SingleChoiceConfigForm
+    log_type = 'string'
 
     def create_wtf_field(self):
         field_options = {'coerce': lambda x: x}
@@ -128,6 +129,7 @@ class MultiSelectField(_ChoiceFieldBase):
     friendly_name = _('Select multiple')
     config_form = MultiSelectConfigForm
     wtf_field_class = IndicoSelectMultipleCheckboxField
+    log_type = 'list'
 
     @property
     def validators(self):
