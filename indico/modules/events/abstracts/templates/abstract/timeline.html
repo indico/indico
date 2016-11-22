@@ -194,11 +194,9 @@
 
 
 {% macro _render_rating(cfa, value) %}
-    <span class="rating">
-        {%- for bullet in range(cfa.rating_range[0], cfa.rating_range[1] + 1) -%}
-            <span class="bullet {{ 'full' if bullet <= value else '' }}"></span>
-        {%- endfor -%}
-    </span>
+    {%- for bullet in range(cfa.rating_range[0], cfa.rating_range[1] + 1) -%}
+        <span class="bullet {{ 'full' if bullet <= value else '' }}"></span>
+    {%- endfor -%}
 {% endmacro %}
 
 

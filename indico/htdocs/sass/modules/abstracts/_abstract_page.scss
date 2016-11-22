@@ -328,14 +328,20 @@
         }
 
         .value {
+            display: flex;
+            align-items: center;
+
             .number {
                 vertical-align: middle;
-                margin-left: 0.5em;
                 color: $light-black;
+                margin-left: 0.25em;
+                font-size: 1.2em;
+                width: 0.5em;
             }
 
-            .rating .bullet {
+            .bullet {
                 @extend %rating-bullet;
+
                 &.full {
                     @extend %rating-bullet-selected;
                 }
@@ -383,6 +389,7 @@
 .rating-widget {
     user-select: none;
     display: flex;
+    align-items: center;
     flex-direction: row-reverse;
 
     input[type="radio"] {
@@ -400,7 +407,6 @@
     .rating-value {
         margin-left: 0.25em;
         font-size: 1.2em;
-        line-height: 1.1;
         width: 0.5em;
     }
 }
