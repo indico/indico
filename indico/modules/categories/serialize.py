@@ -27,6 +27,7 @@ from flask import session
 from pyatom import AtomFeed
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 
+from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
 from indico.web.flask.util import url_for
@@ -64,13 +65,21 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
     it = iter(query)
     if event_filter_fn:
         it = ifilter(event_filter_fn, it)
-    it = (e for e in it if e.can_access(user))
+    events = list(it)
+    # make sure the parent categories are in sqlalchemy's identity cache.
+    # this avoids query spam from `protection_parent` lookups
+    _parent_categs = (Category._get_chain_query(Category.id.in_({e.category_id for e in events}))
+                      .options(load_only('id', 'parent_id', 'protection_mode'),
+                               joinedload('acl_entries'))
+                      .all())
     cal = ical.Calendar()
     cal.add('version', '2.0')
     cal.add('prodid', '-//CERN//INDICO//EN')
 
     now = now_utc(False)
-    for event in it:
+    for event in events:
+        if not event.can_access(user):
+            continue
         url = url_for('event.conferenceDisplay', confId=event.id, _external=True)
         location = ('{} ({})'.format(event.room_name, event.venue_name)
                     if event.venue_name and event.room_name
