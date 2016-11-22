@@ -120,6 +120,19 @@
 .abstract-contribution-type,
 .abstract-track {
     @include border-bottom($style: dashed);
+    max-width: 10em;
+}
+
+.abstract-track-tag {
+    display: flex;
+    max-width: 15em;
+    overflow: hidden;
+    white-space: nowrap;
+
+    .text {
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .abstract-content {
@@ -217,10 +230,23 @@
     }
 }
 
-.abstract-comment-badges {
-    align-self: flex-end;
+.abstract-review-badges {
+    flex-grow: 1;
     color: $gray;
-    margin-left: 1em;
+}
+
+.i-timeline-item-metadata {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+
+    .abstract-metadata-action {
+        flex-grow: 1;
+    }
+}
+
+.abstract-comment-actions {
+    margin-left: 0.5em;
 }
 
 #abstract-submission-details,
