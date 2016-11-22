@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 from datetime import timedelta
+from operator import attrgetter
 
 from flask import flash, request
 from sqlalchemy.orm import joinedload, subqueryload
@@ -42,9 +43,12 @@ class ContributionListGenerator(ListGeneratorBase):
         session_empty = {None: 'No session'}
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
-        session_choices = {unicode(s.id): s.title for s in self.event.sessions}
-        track_choices = {unicode(t.id): t.title for t in self.event.tracks}
-        type_choices = {unicode(t.id): t.name for t in self.event.contribution_types}
+        session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
+                                                                               key=attrgetter('title')))
+        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
+                                                                             key=attrgetter('title')))
+        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
+                                                                           key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('session', {'title': _('Session'),
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),

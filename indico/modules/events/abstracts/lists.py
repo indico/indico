@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from operator import attrgetter
 
 from flask import request, flash
 from sqlalchemy.orm import joinedload, subqueryload
@@ -45,8 +46,10 @@ class AbstractListGeneratorBase(ListGeneratorBase):
         }
         track_empty = {None: 'No track'}
         type_empty = {None: 'No type'}
-        track_choices = {unicode(track.id): track.title for track in event.tracks}
-        type_choices = {unicode(t.id): t.name for t in self.event.contribution_types}
+        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
+                                                                             key=attrgetter('title')))
+        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
+                                                                           key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('state', {'title': _('State'), 'filter_choices': {state.value: state.title for state in AbstractState}}),
             ('submitter', {'title': _('Submitter')}),
