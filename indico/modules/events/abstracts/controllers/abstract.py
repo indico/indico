@@ -50,7 +50,7 @@ class RHEditAbstract(RHAbstractBase):
         defaults = FormDefaults(self.abstract, attachments=self.abstract.files, **custom_field_values)
         form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event_new)
         if form.validate_on_submit():
-            update_abstract(self.abstract, attachments=form.data['attachments'], *get_field_values(form.data))
+            update_abstract(self.abstract, *get_field_values(form.data))
             flash(_("Abstract modified successfully"), 'success')
             return jsonify_data(flash=False)
         self.commit = False
