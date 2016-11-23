@@ -17,13 +17,7 @@
 
 
 %badges-list {
-    //TODO replace with flexbox mixin once Compass is updated
-    display: block;
-    display: -webkit-flex;
-    -webkit-flex-direction: row;
-    -webkit-flex-wrap: wrap;
-    display: flex;
-    flex-direction: row;
+    @extend .flexrow;
     flex-wrap: wrap;
 
     margin-top: -0.8em;

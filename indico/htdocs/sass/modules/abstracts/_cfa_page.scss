@@ -49,9 +49,6 @@
 
 ul.cfa-timeline {
     list-style-type: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     padding: 0;
     color: $light-black;
 
@@ -79,9 +76,6 @@ ul.cfa-timeline {
         @extend %font-family-title-light;
         margin-bottom: 20px;
         padding: 0 40px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
         color: $light-black;
         font-size: 1.1em;
     }
@@ -90,8 +84,6 @@ ul.cfa-timeline {
         @include border-top($width: 3px);
 
         padding: 0 40px;
-        display: flex;
-        justify-content: center;
         position: relative;
         font-weight: bold;
 

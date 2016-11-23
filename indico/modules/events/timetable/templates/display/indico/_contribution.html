@@ -12,8 +12,8 @@
             {{ render_time(contrib, timezone=timezone, hide_end_time=hide_end_time) }}
         </span>
 
-        <div class="timetable-item-body">
-            <div class="timetable-item-header">
+        <div class="timetable-item-body flexcol">
+            <div class="timetable-item-header flexrow">
                 <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ anchor }}">
                     {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
                     {{- contrib.title | safe -}}

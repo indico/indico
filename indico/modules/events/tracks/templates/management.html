@@ -38,18 +38,15 @@
         </div>
     </div>
 
-    {# TODO: Use new flex classes instead of the inline CSS once they are available #}
-    <div class="flex" style="flex-direction: row;">
-        <h3 style="flex-grow: 1; margin-bottom: 0;">{% trans %}List of tracks{% endtrans %}</h3>
-        <div style="margin: 1em 0 0 0;">
-            <a class="i-button highlight icon-plus"
-               data-href="{{ url_for('.create_track', event) }}"
-               data-title="{% trans %}Add new track{% endtrans %}"
-               data-update="#track-list-container"
-               data-ajax-dialog>
-                {% trans %}Add track{% endtrans %}
-            </a>
-        </div>
+    <div class="flexrow f-a-center">
+        <h3 class="f-self-grow">{% trans %}List of tracks{% endtrans %}</h3>
+        <a class="i-button highlight icon-plus"
+           data-href="{{ url_for('.create_track', event) }}"
+           data-title="{% trans %}Add new track{% endtrans %}"
+           data-update="#track-list-container"
+           data-ajax-dialog>
+            {%- trans %}Add track{% endtrans -%}
+        </a>
     </div>
 
     <div id="track-list-container">

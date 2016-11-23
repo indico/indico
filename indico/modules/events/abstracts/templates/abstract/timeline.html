@@ -27,10 +27,10 @@
 {% macro _render_comment(comment) %}
     <div id="abstract-comment-{{ comment.id }}" class="i-timeline-item">
         <div class="i-timeline-item-label action"></div>
-        <div class="flex i-timeline-item-content">
+        <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-box header-indicator-left">
-                <div class="i-box-header flex">
-                    <div class="stretch">
+                <div class="i-box-header flexrow">
+                    <div class="f-self-grow">
                         {% trans name=comment.user.name -%}
                             <strong>{{ name }}</strong> left a comment
                         {%- endtrans %}
@@ -77,9 +77,9 @@
 {% macro _render_review(review, form, management=false) %}
     <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
-        <div class="flex i-timeline-item-content">
+        <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-metadata">
-                <div class="stretch">
+                <div class="f-self-grow">
                     {% trans name=review.user.name -%}
                         <strong>{{ name }}</strong> left a review
                     {%- endtrans %}
@@ -96,7 +96,7 @@
                 </div>
             </div>
             <div class="i-timeline-item-box header-indicator-top">
-                <div class="i-box-header flex">
+                <div class="i-box-header flexrow">
                     <div class="abstract-review-badges">
                         {% set action = _render_review_state(review) %}
                         {% set endaction = '</span>'|safe %}
@@ -186,15 +186,15 @@
                             </div>
                             <ul class="abstract-question-list">
                                 {% for rating in review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
-                                    <li class="flex">
+                                    <li class="flexrow">
                                         <div>
                                             <span class="question-index">{{ loop.index }}</span>
                                         </div>
-                                        <div class="question-text stretch">
+                                        <div class="question-text f-self-grow">
                                             {{ rating.question.text }}
                                         </div>
                                         <div>
-                                            <span class="rating-scale">
+                                            <span class="rating-scale flexrow f-a-center">
                                                 {{ _render_rating(review.abstract.event_new.cfa, rating.value) }}
                                                 <span class="score">{{ rating.value }}</span>
                                             </span>
@@ -237,8 +237,8 @@
             <div class="i-timeline-item-box footer-only header-indicator-left">
                 <div class="i-box-footer js-form-container">
                     {% if can_comment %}
-                        <div class="flex">
-                            <div class="stretch">
+                        <div class="flexrow">
+                            <div class="f-self-grow">
                                 {{ render_comment_form(comment_form, abstract) }}
                             </div>
                             {% if reviewer_data.tracks and abstract.can_review(session.user, check_state=true) %}
@@ -290,8 +290,8 @@
                 {%- trans %}You can still make up your mind{% endtrans -%}
             {% endset %}
         {% endif %}
-        <div class="flex">
-            <div class="stretch">
+        <div class="flexrow">
+            <div class="f-self-grow">
                 <div class="empty-input-title">
                     {{- no_comments_title -}}
                 </div>
@@ -307,7 +307,7 @@
 
 {% macro _render_review_trigger(abstract, exclusive=false) %}
     {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
-    <div class="review-trigger flex">
+    <div class="review-trigger flexrow">
         {% if not exclusive %}
             <span class="comment-or-review">
                 {%- trans %}or{% endtrans -%}

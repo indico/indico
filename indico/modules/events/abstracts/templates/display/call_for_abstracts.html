@@ -11,8 +11,8 @@
 
 {% macro render_timestamp(label, date, tz, completed=false, alternative_text=none) %}
     <li class="{{ 'completed' if completed }}">
-        <div class="label">{{ label }}</div>
-        <div class="timestamp">
+        <div class="label flexcol f-a-center">{{ label }}</div>
+        <div class="timestamp flexrow f-j-center">
             {% if date %}
                 <time datetime="{{ date.isoformat() }}">
                     {{- date|format_datetime(timezone=tz) -}}
@@ -27,7 +27,7 @@
 {% macro render_timeline_section(cfa) %}
     {% set tz = cfa.event.display_tzinfo %}
     <section>
-        <ul class="cfa-timeline">
+        <ul class="cfa-timeline flexrow f-a-center f-j-center">
             {{ render_timestamp(_("Opening day"), cfa.start_dt, tz, cfa.has_started) }}
             {{ render_timestamp(_("Submission deadline"), cfa.end_dt, tz, cfa.has_ended, _("No deadline")) }}
         </ul>

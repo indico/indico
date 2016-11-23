@@ -19,14 +19,14 @@ $default-spacing: 5px;
 
 %message-box {
     @include border-radius();
-    display: flex;
-    flex-flow: row wrap;
+    @extend .flexrow;
+    flex-wrap: wrap;
     color: $light-black;
     padding: $default-spacing;
     margin-bottom: 18px;
 
     .message-box-content {
-        display: flex;
+        @extend .flexrow;
     }
 
     .message-text {

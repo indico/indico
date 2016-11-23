@@ -1,19 +1,19 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="flex">
+    <div class="flexrow">
         <div>
             <span class="question-index">
                 {{- question_idx -}}
             </span>
         </div>
-        <div class="question-text stretch">
+        <div class="question-text f-self-grow">
             {{ field.label.text }}
             {%- if field.flags.required %}
                 <i class="question-required" title="{% trans %}Rating this question is mandatory{% endtrans %}">*</i>
             {% endif -%}
         </div>
-        <div id="{{ field.id }}" class="rating-scale">
+        <div id="{{ field.id }}" class="rating-scale flexrow f-a-center">
             <span class="score">{{ '-' if field.object_data is none else field.data }}</span>
             {% for bullet in range(cfa.rating_range[1], cfa.rating_range[0] - 1, -1) %}
                 {% set radio_id = '%s-%d'|format(field.id, bullet) %}

@@ -5,9 +5,9 @@
 {% endblock %}
 
 {% block content %}
-    <div class="follow-scroll">
+    <div class="follow-scroll flexrow f-j-space-between">
         <div class="toolbar">
-            <div class="group i-selection left {% if realms|length <= 1 %}hidden{% endif %}">
+            <div class="group i-selection {% if realms|length <= 1 %}hidden{% endif %}">
                 <span class="i-button label">
                     {% trans %}Show{% endtrans %}
                 </span>
@@ -16,7 +16,7 @@
                     <label for="realm-{{ realm.name }}" class="i-button">{{ realm.title }}</label>
                 {% endfor %}
             </div>
-            <div class="group left">
+            <div class="group">
                 <a href="#" id="expand-all" class="i-button" title="{% trans %}Expand all{% endtrans %}">
                     <span class="icon-stack-plus"></span>
                 </a>
@@ -24,7 +24,9 @@
                     <span class="icon-stack-minus"></span>
                 </a>
             </div>
-            <div class="group right">
+        </div>
+        <div class="toolbar">
+            <div class="group">
                 <span class="i-button label">
                     <span class="icon-search"></span>
                 </span>

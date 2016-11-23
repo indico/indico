@@ -26,8 +26,7 @@
 
 .categorynav {
     @extend %categorynav-sizing;
-    display: flex;
-    flex-direction: column;
+    @extend .flexcol;
 
     input[type='search'] {
         @extend %form-field-input;
@@ -53,10 +52,9 @@
     @extend .i-box.no-shadow;
     @extend .i-box.just-group-list;
     @extend .i-box.just-group-list.with-hover-effect;
+    @extend .flexcol;
 
     background: $light-gray;
-    display: flex;
-    flex-direction: column;
     flex-grow: 1;
     margin-top: 10px;
 
@@ -88,7 +86,7 @@
     }
 
     .spinner-wrapper {
-        display: flex;
+        @extend .flexrow;
         align-items: center;
         align-self: center;
         flex-grow: 1;
@@ -97,9 +95,9 @@
 }
 
 .categorynav .category-list .item {
-    background: white;
-    display: flex;
+    @extend .flex-row;
     align-items: center;
+    background: white;
 
     &:last-child {
         border-bottom: 1px solid lighten($gray, $color-variation);
@@ -122,8 +120,8 @@
     }
 
     .button-wrapper {
+        @extend .flexrow;
         align-items: center;
-        display: flex;
         flex-shrink: 0;
         margin-left: auto;
 
@@ -217,14 +215,14 @@
 }
 
 .categorynav .category-list .item.subcategory {
-    display: flex !important;
+    @extend .flexrow;
 
     &.can-access {
         cursor: pointer;
     }
 
     .icon-wrapper {
-        display: flex;
+        @extend .flexrow;
 
         i {
             @include border-radius(50%);
@@ -261,10 +259,10 @@
 }
 
 .categorynav .category-list .placeholder {
+    @extend .flexrow;
     align-items: center;
     align-self: center;
     color: $gray;
-    display: flex;
     flex-grow: 1;
     text-align: center;
 
@@ -284,10 +282,10 @@
 }
 
 .categorynav .category-list .search-result-info {
+    @extend .flexrow;
+    align-items: center;
     border-bottom: 1px solid lighten($gray, $color-variation);
     background-color: $light-gray;
-    display: flex;
-    align-items: center;
     margin: 0 -10px;
     padding: 5px 10px;
     color: $light-black;

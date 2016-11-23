@@ -300,7 +300,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .i-radio, .i-checkbox {
-    display: flex;
+    @extend .flexrow;
 
     input {
         flex-shrink: 0;
@@ -359,8 +359,8 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 
 .i-has-action {
     @extend %toolbar-group;
+    @extend .flexrow;
     padding: 0;
-    display: flex;
 
     > input,
     > textarea {

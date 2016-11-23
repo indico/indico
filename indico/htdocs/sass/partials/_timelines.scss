@@ -50,8 +50,8 @@
 .i-timeline-item {
     $min-height: 19px;
 
-    display: flex;
-    align-items: flex-start;
+    @extend .flexrow;
+    align-items: start;
     margin-top: 1rem;
 
     .i-timeline-item-label {
@@ -97,12 +97,11 @@
 
     .i-timeline-item-metadata {
         @extend %time-information;
-        display: flex;
-        flex-direction: row;
+        @extend .flexrow;
+        align-items: center;
         color: $light-black;
         // Matches .i-timeline-item-label height
         // Also keeps correct v-alignment and separation with i-timeline-item-box on multiline
-        align-items: flex-start;
         min-height: 19px;
         padding: 10px 0;
     }
@@ -113,10 +112,10 @@
     color: white;
     background: $dark-gray;
     // Icon centering
-    display: flex;
+    @extend .flexcol;
     align-items: center;
     justify-content: center;
-    flex-direction: column;
+
     &:before {
         font-size: 2em;
     }
