@@ -74,6 +74,7 @@ def generate_csv(headers, rows):
     :return: an `io.BytesIO` containing the CSV data
     """
     buf = BytesIO()
+    buf.write(b'\xef\xbb\xbf')
     writer = csv.writer(buf)
     writer.writerow(map(_prepare_header_utf8, headers))
     header_positions = {name: i for i, name in enumerate(headers)}
