@@ -15,8 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false */
-/* global Palette:false */
+/* global setupListGenerator:false, setupSearchBox:false, applySearchFilters:false, Palette:false */
 
 (function(global) {
     'use strict';
@@ -149,25 +148,29 @@
         });
     };
 
-    global.setupCallForAbstractsPage = function setupCallForAbstractsPage() {
+    global.setupCallForAbstractsPage = function setupCallForAbstractsPage(options) {
+        options = $.extend({
+            hasAbstracts: false
+        }, options);
+
         // show the form after login when using the submit button as a guest
         if (location.hash === '#submit-abstract') {
             $(document).ready(function() {
                 $('.js-show-abstract-form').trigger('click');
             });
         }
-    };
 
-    global.setupMyAbstractsList = function setupMyAbstractsList() {
-        var filterConfig = {
-            itemHandle: 'div.contribution-row',
-            listItems: '#display-contribution-list div.contribution-row',
-            term: '#search-input',
-            state: '#filtering-state',
-            placeholder: '#filter-placeholder'
-        };
+        if (options.hasAbstracts) {
+            var filterConfig = {
+                itemHandle: 'div.contribution-row',
+                listItems: '#display-contribution-list div.contribution-row',
+                term: '#search-input',
+                state: '#filtering-state',
+                placeholder: '#filter-placeholder'
+            };
 
-        setupSearchBox(filterConfig);
-        applySearchFilters();
+            setupSearchBox(filterConfig);
+            applySearchFilters();
+        }
     };
 })(window);
