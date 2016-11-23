@@ -195,15 +195,16 @@ class EventPerson(PersonMixin, db.Model):
         return None
 
     @classmethod
-    def create_from_user(cls, user, event=None):
+    def create_from_user(cls, user, event=None, is_pending=False):
         return EventPerson(user=user, event_new=event, first_name=user.first_name, last_name=user.last_name,
-                           email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone)
+                           email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone,
+                           is_pending=is_pending)
 
     @classmethod
-    def for_user(cls, user, event=None):
+    def for_user(cls, user, event=None, is_pending=False):
         """Return EventPerson for a matching User in Event creating if needed"""
         person = event.persons.filter_by(user=user).first() if event else None
-        return person or cls.create_from_user(user, event)
+        return person or cls.create_from_user(user, event, is_pending=is_pending)
 
     @classmethod
     def link_user_by_email(cls, user):
