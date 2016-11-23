@@ -61,7 +61,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     :param static_item_ids: The abstract properties to be used as columns
     :param dynamic_items: Contribution fields as extra columns
     """
-    field_names = ['ID', 'Title']
+    field_names = ['Id', 'Title']
     static_item_mapping = OrderedDict([
         ('state', ('State', lambda x: x.state.title)),
         ('submitter', ('Submitter', lambda x: x.submitter.full_name)),
@@ -85,7 +85,7 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
     for abstract in abstracts:
         data = abstract.data_by_field
         abstract_dict = {
-            'ID': abstract.friendly_id,
+            'Id': abstract.friendly_id,
             'Title': abstract.title
         }
         for item in dynamic_items:
