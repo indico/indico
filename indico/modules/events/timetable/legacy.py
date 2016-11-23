@@ -34,6 +34,7 @@ class TimetableSerializer(object):
         self.management = management
 
     def serialize_timetable(self, event, days=None, hide_weekends=False, strip_empty_days=False):
+        tzinfo = event.tzinfo if self.management else event.display_tzinfo
         event.preload_all_acl_entries()
         timetable = {}
         for day in iterdays(event.start_dt_local, event.end_dt_local, skip_weekends=hide_weekends, day_whitelist=days):
@@ -48,7 +49,7 @@ class TimetableSerializer(object):
                  .options(*query_options)
                  .order_by(TimetableEntry.type != TimetableEntryType.SESSION_BLOCK))
         for entry in query:
-            day = entry.start_dt.astimezone(event.tzinfo).date()
+            day = entry.start_dt.astimezone(tzinfo).date()
             date_str = day.strftime('%Y%m%d')
             if date_str not in timetable:
                 continue
