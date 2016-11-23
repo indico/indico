@@ -99,9 +99,12 @@
         @extend %time-information;
         display: flex;
         flex-direction: row;
-        align-items: center;
         color: $light-black;
-        min-height: 39px;
+        // Matches .i-timeline-item-label height
+        // Also keeps correct v-alignment and separation with i-timeline-item-box on multiline
+        align-items: flex-start;
+        min-height: 19px;
+        padding: 10px 0;
     }
 }
 
