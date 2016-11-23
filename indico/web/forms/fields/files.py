@@ -104,7 +104,14 @@ class EditableFileField(FileField):
         }
 
     def _value(self):
+        # If form validation fails we still have the dict from `process_formdata`
+        # in `self.data` which cannot be serialized so we fallback to the default
+        # data (if there is any, i.e. if we were editing something)
+        # It would be cleaner to still take e.g. 'deleted' into account and
+        # save/restore the selected files with JavaScript but in most cases our
+        # client-side validation should not fail anyway...
+        data = self.object_data if isinstance(self.data, dict) else self.data
         if self.allow_multiple_files:
-            return [self.get_metadata(f) for f in self.data] if self.data else []
+            return [self.get_metadata(f) for f in data] if data else []
         else:
-            return self.get_metadata(self.data) if self.data else None
+            return self.get_metadata(data) if data else None
