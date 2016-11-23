@@ -2,6 +2,12 @@
     <div class="{% block page_class %}management-page{% endblock %}">
         {% if self.title() %}
             <header>
+                {% if self.back_button_url()|trim %}
+                    <a href="{% filter trim %}{% block back_button_url %}{% endblock %}{% endfilter %}"
+                       class="icon-prev back-button"
+                       title="{% if self.back_button_title() %}{% block back_button_title %}{% endblock %}{% else %}{% trans %}Back{% endtrans %}{% endif %}">
+                    </a>
+                {% endif %}
                 <div class="title">
                     <div class="text">
                         <div class="title-with-actions">

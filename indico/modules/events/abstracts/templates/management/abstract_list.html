@@ -2,6 +2,14 @@
 {% from 'events/abstracts/management/_abstract_list.html' import render_abstract_list %}
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
+{% block back_button_url -%}
+    {{ url_for('.management', event) }}
+{%- endblock %}
+
+{% block back_button_title -%}
+    {%- trans %}Back to Call for Abstracts{% endtrans -%}
+{% endblock %}
+
 {% block title %}
     {%- trans %}Abstracts{% endtrans -%}
 {% endblock %}
