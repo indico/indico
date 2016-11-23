@@ -352,7 +352,6 @@ class User(PersonMixin, db.Model):
     # - _all_settings (UserSetting.user)
     # - abstract_comments (AbstractComment.user)
     # - abstract_email_log_entries (AbstractEmailLogEntry.user)
-    # - abstract_judgments (Judgment.judge)
     # - abstract_reviewer_for_tracks (Track.abstract_reviewers)
     # - abstract_reviews (AbstractReview.user)
     # - abstracts (Abstract.submitter)

@@ -38,7 +38,6 @@ class AbstractFieldValue(ContributionFieldValueBase):
 
     # relationship backrefs:
     # - abstract (Abstract.field_values)
-    # - legacy_abstract (LegacyAbstract.field_values)
 
     @return_ascii
     def __repr__(self):
