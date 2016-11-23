@@ -126,13 +126,6 @@
 .abstract-track-tag {
     display: flex;
     max-width: 15em;
-    overflow: hidden;
-    white-space: nowrap;
-
-    .text {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
 }
 
 .abstract-content {
@@ -233,16 +226,6 @@
 .abstract-review-badges {
     flex-grow: 1;
     color: $gray;
-}
-
-.i-timeline-item-metadata {
-    display: flex;
-    flex-direction: row;
-    align-items: baseline;
-
-    .abstract-metadata-action {
-        flex-grow: 1;
-    }
 }
 
 .abstract-comment-actions {
