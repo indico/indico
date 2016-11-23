@@ -381,7 +381,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - contributions (Contribution.event_new)
     # - custom_pages (EventPage.event_new)
     # - layout_images (ImageFile.event_new)
-    # - legacy_abstracts (LegacyAbstract.event_new)
     # - legacy_contribution_mappings (LegacyContributionMapping.event_new)
     # - legacy_mapping (LegacyEventMapping.event_new)
     # - legacy_session_block_mappings (LegacySessionBlockMapping.event_new)
