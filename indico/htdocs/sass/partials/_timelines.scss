@@ -97,9 +97,11 @@
 
     .i-timeline-item-metadata {
         @extend %time-information;
-        padding: 7px 0 5px 0;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
         color: $light-black;
-        min-height: 19px;
+        min-height: 39px;
     }
 }
 

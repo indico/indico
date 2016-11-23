@@ -79,7 +79,7 @@
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
         <div class="flex i-timeline-item-content">
             <div class="i-timeline-item-metadata">
-                <span class="abstract-metadata-action">
+                <div class="stretch">
                     {% trans name=review.user.name -%}
                         <strong>{{ name }}</strong> left a review
                     {%- endtrans %}
@@ -90,10 +90,10 @@
                     {% if review.modified_dt %}
                         {{ render_edited_hint(review.modified_dt) }}
                     {% endif %}
-                </span>
-                <span class="abstract-metadata-context">
+                </div>
+                <div>
                     {{ render_track(review.track, classes='abstract-track-tag i-tag outline') }}
-                </span>
+                </div>
             </div>
             <div class="i-timeline-item-box header-indicator-top">
                 <div class="i-box-header flex">
