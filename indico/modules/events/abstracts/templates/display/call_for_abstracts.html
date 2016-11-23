@@ -128,7 +128,8 @@
         {% endif %}
     </div>
     <script>
-        setupMyAbstractsList();
-        setupCallForAbstractsPage();
+        setupCallForAbstractsPage({
+            hasAbstracts: {{ abstracts|bool|tojson }}
+        });
     </script>
 {% endblock %}
