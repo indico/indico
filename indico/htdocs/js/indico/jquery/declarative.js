@@ -28,6 +28,7 @@
         setupMathJax();
         setupSelectAllNone();
         setupAnchorLinks();
+        setupToggleLinks();
     });
 
     global.getParamsFromSelectors = function getParamsFromSelectors() {
@@ -301,6 +302,31 @@
                 href: '#' + fragment,
                 title: $T.gettext('Direct link to this item')
             }).html('&para;').appendTo($elem);
+        });
+    }
+
+    function setupToggleLinks() {
+        $('[data-toggle]:not([data-toggle=dropdown])').on('click', function(evt) {
+            evt.preventDefault();
+            var $elem = $(this);
+            var accordion = $elem.data('accordion');
+            var isVisible = $elem.hasClass('js-details-visible');
+
+            function toggleDetails($trigger) {
+                var $target = $($trigger.data('toggle'));
+                var wasVisible = $trigger.hasClass('js-details-visible');
+                $target.slideToggle('fast');
+                $trigger.toggleClass('js-details-visible');
+                $trigger.text(wasVisible ? $trigger.data('show-text') : $trigger.data('hide-text'));
+            }
+
+            if (!isVisible && accordion !== undefined) {
+                $(accordion).find('.js-details-visible').each(function() {
+                    toggleDetails($(this));
+                });
+            }
+
+            toggleDetails($elem);
         });
     }
 })(window);
