@@ -29,7 +29,7 @@
 
     > .section {
         @include clearfix();
-        display: flex;
+        @extend .flexrow;
         align-items: center;
 
         > .toolbar {

@@ -572,7 +572,7 @@ th.i-table {
 }
 
 .recipients {
-    display: flex;
+    @extend .flexrow;
     justify-content: space-between;
 
     .static-text-widget {

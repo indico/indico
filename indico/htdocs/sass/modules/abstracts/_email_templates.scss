@@ -20,19 +20,15 @@
 @import 'partials/icons';
 
 .rule-list {
-    display: flex;
-    flex-direction: column;
     list-style-type: none;
     padding-left: 0;
 
     .rule {
-        display: flex;
-        flex-direction: row;
+        @extend .flexrow;
         margin-top: 1em;
 
         .rule-condition {
-            display: flex;
-            flex-direction: row;
+            @extend .flexrow;
             margin-right: 1em;
 
             label {

@@ -48,11 +48,8 @@
 }
 
 #abstract-title {
-    display: flex;
-
     h3 {
         color: $blue;
-        flex: 1;
         font-size: 1.4em;
         margin: 0;
     }
@@ -86,9 +83,7 @@
 }
 
 .abstract-summary {
-    display: flex;
     margin-top: 0.5rem;
-    align-items: baseline;
 
     .abstract-summary-badge {
         margin-right: 1rem;
@@ -99,7 +94,6 @@
 
     .abstract-summary-content {
         color: $black;
-        flex: 1;
     }
 }
 
@@ -110,7 +104,7 @@
 }
 
 .abstract-track-tag {
-    display: flex;
+    @extend .flexrow;
     max-width: 15em;
     margin: -0.35em 0;
     margin-left: 1em;
@@ -124,8 +118,6 @@
     margin-top: 1rem;
 
     .abstract-authorship-block {
-        display: flex;
-        justify-content: center;
         margin-top: 0.5em;
 
         &:first-child {
@@ -330,9 +322,6 @@
         }
 
         .rating-scale {
-            display: flex;
-            align-items: center;
-
             .score {
                 margin-left: 0.25em;
                 color: $light-black;

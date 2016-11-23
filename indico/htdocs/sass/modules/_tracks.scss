@@ -84,28 +84,27 @@
 
 ul.tracks {
     list-style-type: none;
-    padding-left: 10px;
+    padding-left: 0;
 
     li {
         color: $black;
         margin-top: 2em;
 
-        h3 {
+        .track-title {
             @include border-bottom($separator-color);
-            display: flex;
-            justify-content: flex-end;
-
-            .track-title {
-                margin-right: auto;
-            }
+            margin-bottom: 1em;
 
             .track-code {
-                font-size: 0.9em;
                 color: $dark-yellow;
             }
 
             .track-link {
                 margin-left: 0.5em;
+                font-size: 1.5em;
+            }
+
+            h3 {
+                margin: 0;
             }
         }
 

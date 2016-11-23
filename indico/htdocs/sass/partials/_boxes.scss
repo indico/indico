@@ -427,15 +427,15 @@ $i-box-padding: 10px;
 
         /* Sortable row with handle on the left */
         &.ui-sortable {
-            display: flex;
+            @extend .flexrow;
             margin: 0;
 
             > .ui-sortable-handle {
                 @extend %i-box-sortable-handle-background;
+                @extend .flexrow;
+                align-items: center;
                 visibility: hidden;
                 width: 1em;
-                display: flex;
-                align-items: center;
 
                 > .handle {
                     @extend %i-box-sortable-handle-grip;

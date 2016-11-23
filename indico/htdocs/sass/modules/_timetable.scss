@@ -169,9 +169,6 @@
     }
 
     .days {
-        display: flex;
-        align-items: center;
-
         &.scrollable-container {
             height: 70px;
         }
@@ -247,9 +244,6 @@
     }
 
     .item {
-        display: flex;
-        align-items: center;
-
         &:not(.selected) {
             cursor: pointer;
         }

@@ -35,7 +35,7 @@
 {% endmacro %}
 
 <div class="side-menu" id="side-menu-{{ menu_id }}">
-    <ul class="menu-items">
+    <ul class="menu-items flexcol">
         {% for item in items %}
             {% if item.is_section %}
                 {{ _side_menu_section(item) }}

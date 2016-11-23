@@ -127,21 +127,19 @@
     position: relative;
 
     .list-column {
+        @extend .flexrow;
         margin: 5px;
         width: 14.2em;
-        display: flex;
-        float: left;
 
         > .filter {
+            @extend .flexrow;
+            align-items: center;
             cursor: pointer;
             padding: 0;
-            display: flex;
-            align-items: center;
 
             > a {
                 color: $light-black;
                 padding: $i-label-vertical-padding $i-label-horizontal-padding;
-                float: left;
             }
 
             .dropdown {
@@ -225,7 +223,7 @@
         box-sizing: border-box;
 
         > li {
-            display: flex;
+            @extend .flexrow;
             align-items: center;
 
             > label {

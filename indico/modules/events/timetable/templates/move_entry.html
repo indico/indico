@@ -1,6 +1,6 @@
 <div id="move-timetable-entry-dialog">
     <div class="section-title">{% trans %}Choose day:{% endtrans %}</div>
-    <div class="days {%- if top_level_entries | length > 6 %} scrollable-container{% endif %}">
+    <div class="days flexrow f-a-center{%- if top_level_entries | length > 6 %} scrollable-container{% endif %}">
         {% if top_level_entries | length > 6 %}
             <span class="scroll-btn scroll-left"></span>
         {% endif %}
@@ -27,7 +27,8 @@
         <div class="i-box-content">
             {% for day, tt_entries in top_level_entries.iteritems() %}
                 <ul class="group-list blocks-list" data-show-for="{{ day }}">
-                    <li class="item top-level {%- if parent_entry is none and day == current_day %} selected{% endif %}"
+                    <li class="item top-level flexrow f-a-center
+                               {{ 'selected' if parent_entry is none and day == current_day }}"
                         data-title="{% trans %}Move entry{% endtrans %}"
                         data-item-id="{{ day }}-top-level">
                         <span class="item-icon"></span>
@@ -46,7 +47,7 @@
                     </li>
                     {% for tt_entry in tt_entries %}
                         {% set block = tt_entry.session_block %}
-                        <li class="item block {%- if tt_entry == parent_entry %} selected{% endif %}"
+                        <li class="item block flexrow f-a-center {%- if tt_entry == parent_entry %} selected{% endif %}"
                             data-entry-id="{{ tt_entry.id }}"
                             data-item-id="{{ tt_entry.id }}"
                             data-title="{% trans %}Move entry{% endtrans %}">

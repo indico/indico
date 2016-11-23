@@ -13,7 +13,7 @@
 
     <div id="person-list">
         <div class="flashed-messages"></div>
-        <div>
+        <div class="flexrow f-j-space-between">
             <div class="toolbar form-group">
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
@@ -31,7 +31,7 @@
                     </ul>
                 </div>
                 <div class="group">
-                    <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row send-mails-btn"
+                    <a href="#" class="i-button icon-mail highlight disabled js-requires-selected-row send-mails-btn"
                        data-href="{{ url_for('persons.email_event_persons', event) }}"
                        data-title="{% trans %}Send email{% endtrans %}"
                        data-method="POST"
@@ -120,27 +120,27 @@
                         {% endif %}
                     </ul>
                 </div>
-                <div class="right">
-                    <div id="person-filters" class="group i-selection">
-                        <span class="i-button label">{% trans %}Show{% endtrans %}</span>
-                        <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
-                        <label for="filter-chairpersons" class="i-button">
-                            {%- if event.type == 'lecture' -%}
-                                {%- trans %}Speakers{% endtrans -%}
-                            {%- else -%}
-                                {%- trans %}Chairpersons{% endtrans -%}
-                            {%- endif -%}
-                        </label>
-                        {% if event.type != 'lecture' %}
-                            <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
-                            <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
-                            <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
-                            <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
-                        {% endif %}
-                        <span class="i-button label">{% trans %}or{% endtrans %}</span>
-                        <input type="checkbox" id="filter-no-account" data-filter="no_account">
-                        <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
-                    </div>
+            </div>
+            <div class="toolbar">
+                <div id="person-filters" class="group i-selection">
+                    <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+                    <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
+                    <label for="filter-chairpersons" class="i-button">
+                        {%- if event.type == 'lecture' -%}
+                            {%- trans %}Speakers{% endtrans -%}
+                        {%- else -%}
+                            {%- trans %}Chairpersons{% endtrans -%}
+                        {%- endif -%}
+                    </label>
+                    {% if event.type != 'lecture' %}
+                        <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+                        <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
+                        <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
+                        <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
+                    {% endif %}
+                    <span class="i-button label">{% trans %}or{% endtrans %}</span>
+                    <input type="checkbox" id="filter-no-account" data-filter="no_account">
+                    <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
                 </div>
             </div>
         </div>

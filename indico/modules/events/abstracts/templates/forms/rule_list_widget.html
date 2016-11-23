@@ -8,8 +8,8 @@
         {%- endtrans -%}
     </div>
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}">
-    <div id="rule-widget-{{ field.id }}"class="js-rule-list-widget">
-        <ul class="rule-list"></ul>
+    <div id="rule-widget-{{ field.id }}" class="js-rule-list-widget">
+        <ul class="rule-list flexcol"></ul>
         {% call message_box('info', classes='no-rules-placeholder') %}
             {% trans %}No rules have been added{% endtrans%}
         {% endcall %}

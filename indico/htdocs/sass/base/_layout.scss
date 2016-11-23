@@ -18,8 +18,7 @@
 @import "compass/css3/box-sizing";
 
 body {
-    display: flex;
-    flex-direction: column;
+    @extend .flexcol;
 }
 
 body > .main {
@@ -87,7 +86,7 @@ body > * {
 }
 
 .layout-side-menu {
-    display: flex;
+    @extend .flexrow;
     min-height: 100%;
     margin-left: 30px;
     margin-right: 30px;
@@ -136,27 +135,6 @@ body > * {
         width: 0;
     }
 }
-
-.flex {
-    display: flex;
-
-    &.space-between {
-        justify-content: space-between;
-    }
-}
-
-.stretch {
-    flex: 1;
-}
-
-.flex-right {
-    justify-content: flex-end;
-}
-
-.flex-center {
-    justify-content: center;
-}
-
 
 /* Flexbox layout */
 .flexrow {

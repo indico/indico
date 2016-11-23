@@ -123,11 +123,11 @@
 {% endmacro %}
 
 {% macro _render_abstract_summary(abstract, management=false) %}
-    <div class="abstract-summary">
+    <div class="abstract-summary flexrow f-a-baseline">
         <div class="abstract-summary-badge">
             {{ _render_summary_state(abstract) }}
         </div>
-        <div class="abstract-summary-content">
+        <div class="abstract-summary-content f-self-grow">
             {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
                 <div>
                     {% if abstract.submitted_contrib_type %}
@@ -283,8 +283,8 @@
 {% endmacro %}
 
 {% macro render_abstract_public(abstract, management=false) %}
-    <div id="abstract-title">
-        <h3 class="abstract-title">
+    <div id="abstract-title" class="flexrow">
+        <h3 class="abstract-title f-self-grow">
             {{ abstract.title }}
             <span class="abstract-id">
                 #{{ abstract.friendly_id }}
@@ -368,7 +368,7 @@
     <div id="abstract-public">
         {{ _render_abstract_summary(abstract, management) }}
         <div class="abstract-content js-mathjax">
-            <div class="abstract-authorship-block">
+            <div class="abstract-authorship-block flexrow f-j-center">
                 <div class="abstract-authorship-label">
                     {% trans count=abstract.primary_authors|length -%}
                         Author:
@@ -381,7 +381,7 @@
                 </div>
             </div>
             {% if abstract.secondary_authors %}
-                <div class="abstract-authorship-block">
+                <div class="abstract-authorship-block flexrow f-j-center">
                     <div class="abstract-authorship-label">
                         {% trans count=abstract.secondary_authors|length -%}
                             Co-author:
@@ -427,8 +427,8 @@
                 <div class="i-timeline-item">
                     <div class="i-timeline-item-label action"></div>
                     <div class="i-timeline-item-box header-indicator-left">
-                        <div class="i-box-header flex">
-                            <div class="stretch">
+                        <div class="i-box-header flexrow">
+                            <div class="f-self-grow">
                                 {{ _render_judgment_action(abstract) }}
                                 <time datetime="{{ abstract.judgment_dt.isoformat() }}">
                                     {{- abstract.judgment_dt|format_human_date -}}
