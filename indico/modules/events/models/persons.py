@@ -145,6 +145,12 @@ class EventPerson(PersonMixin, db.Model):
         UTCDateTime,
         nullable=True
     )
+    is_pending = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+
     event_new = db.relationship(
         'Event',
         lazy=True,
@@ -178,7 +184,7 @@ class EventPerson(PersonMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', _text=self.full_name)
+        return format_repr(self, 'id', is_pending=False, _text=self.full_name)
 
     @property
     def principal(self):
