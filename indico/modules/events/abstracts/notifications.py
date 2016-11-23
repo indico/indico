@@ -111,7 +111,7 @@ class StateCondition(EmailNotificationCondition):
 
 
 class ContributionTypeCondition(EmailNotificationCondition):
-    """"A condition that matches a particular contribution type."""
+    """A condition that matches a particular contribution type."""
 
     name = 'contribution_type'
     description = _("Contribution Type")

@@ -84,7 +84,7 @@ class GroupProxy(object):
 
     @cached_property
     def as_principal(self):
-        """"The serializable principal identifier of this group"""
+        """The serializable principal identifier of this group"""
         raise NotImplementedError
 
     @cached_property
