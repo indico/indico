@@ -157,10 +157,7 @@ def serialize_event_person(person):
 
 def serialize_person_link(person_link):
     """Serialize PersonLink to JSON-like object"""
-    return {'_type': 'PersonLink',
-            'id': person_link.person.id,
-            'personId': person_link.person.id,
-            'email': person_link.person.email,
+    data = {'email': person_link.person.email,
             'name': person_link.full_name,
             'fullName': person_link.full_name,
             'firstName': person_link.first_name,
@@ -170,6 +167,18 @@ def serialize_person_link(person_link):
             'phone': person_link.phone,
             'address': person_link.address,
             'displayOrder': person_link.display_order}
+    if person_link.person.id is not None:
+        # In case of a newly added person we only serialize the data again
+        # if the form's validation failed and the field needs to be displayed
+        # with the same data.  However, now we don't have a person ID since
+        # the person was never created, so if we send an ID/type in the
+        # serialized data it'll be sent back and cause an error as it'll appear
+        # as an existing person instead of a new one when submitting the form
+        # again.
+        data.update({'_type': 'PersonLink',
+                     'id': person_link.person.id,
+                     'personId': person_link.person.id})
+    return data
 
 
 def update_object_principals(obj, new_principals, read_access=False, full_access=False, role=None):
