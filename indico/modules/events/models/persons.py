@@ -473,3 +473,10 @@ def _mapper_configured():
             target.person.event_new = value
         else:
             assert target.person.event_new == value
+
+    @listens_for(EventPerson.event_links, 'append')
+    @listens_for(EventPerson.session_block_links, 'append')
+    @listens_for(EventPerson.contribution_links, 'append')
+    @listens_for(EventPerson.subcontribution_links, 'append')
+    def _mark_not_pending(target, value, *unused):
+        target.is_pending = False
