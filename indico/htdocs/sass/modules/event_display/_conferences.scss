@@ -127,8 +127,7 @@
         }
 
         .header {
-            display: flex;
-            flex-direction: column;
+            @extend .flexcol;
             margin-bottom: 1.5em;
 
             .toolbar {
@@ -150,8 +149,7 @@
         }
 
         .header-row {
-            display: flex;
-            flex-direction: row;
+            @extend .flexrow;
 
             > * {
                 margin: 0;

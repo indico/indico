@@ -1,8 +1,8 @@
 {% macro render_entry(entry) %}
     {% set legacy = entry.data._legacy %}
     <div class="log-entry">
-        <div class="metadata flex {% if legacy %}legacy{% endif %}">
-            <div class="subject stretch text-truncate">
+        <div class="metadata flexrow {% if legacy %}legacy{% endif %}">
+            <div class="subject f-self-grow text-truncate">
                 {% if legacy %}
                     {%- trans name=entry.data.template_name -%}
                         Template: <span class="template">{{ name }}</span>
@@ -18,12 +18,12 @@
         {% if not legacy %}
             <div class="content">
                 <div class="metadata">
-                    <div class="flex">
+                    <div class="flexrow">
                         {%- trans recipients=entry.recipients|sort|join(', ') -%}
                             <strong>Recipients:</strong> <span class="recipients">{{ recipients }}</span>
                         {%- endtrans -%}
                     </div>
-                    <div class="flex">
+                    <div class="flexrow">
                         {%- trans name=entry.data.template_name -%}
                             <strong>Template:</strong> <span class="template">{{ name }}</span>
                         {%- endtrans -%}

@@ -44,9 +44,9 @@
 
     .person-row {
         @extend %i-box-horizontal-padding;
+        @extend .flexrow;
+        @extend .f-a-center;
         @include single-transition(background-color);
-        display: flex;
-        align-items: center;
 
         .name {
             @include ellipsis;

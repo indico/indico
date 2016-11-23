@@ -572,8 +572,8 @@ th.i-table {
 }
 
 .recipients {
-    display: flex;
-    justify-content: space-between;
+    @extend .flexrow;
+    @extend .f-j-space-between;
 
     .static-text-widget {
         width: inherit;

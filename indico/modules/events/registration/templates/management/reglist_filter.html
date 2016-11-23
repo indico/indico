@@ -33,8 +33,8 @@
 {% endmacro %}
 
 {% macro _render_regform_item_col_selector(section) %}
-    <div class="clearfix">
-        <h3>{{ section.title }}</h3>
+    <h3>{{ section.title }}</h3>
+    <div class="flexrow f-wrap">
         {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
             {% set filter_choices = child_item.field_impl.filter_choices %}
             {{ _render_column_selector(child_item.id, child_item, filter_choices) }}
@@ -81,9 +81,8 @@
 <form class="list-filter" method="POST">
     <input id="visible-items" type="hidden" name="visible_items"
            value="{{ visible_items | tojson | forceescape }}">
-    <div class="clearfix">
-        <h3>{% trans %}General registration info{% endtrans %}</h3>
-
+    <h3>{% trans %}General registration info{% endtrans %}</h3>
+    <div class="flexrow f-wrap">
         {% for item_id, item in static_items.iteritems() %}
             {% set filter_choices = item.get('filter_choices') %}
             {{ _render_column_selector(item_id, item, filter_choices, is_static_item=true) }}

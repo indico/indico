@@ -49,8 +49,8 @@
         }
 
         .title {
-            display: flex;
-            align-items: baseline;
+            @extend .flexrow;
+            @extend .f-a-baseline;
 
             padding-top: 0.4rem;
             min-height: 2rem;
@@ -118,7 +118,7 @@
     $banner-title-color: $orange;
     $banner-subtitle-color: $dark-gray;
 
-    display: flex;
+    @extend .flexrow;
     color: $banner-color;
     max-width: 800px;
 

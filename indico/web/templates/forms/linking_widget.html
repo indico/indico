@@ -5,7 +5,8 @@
 {% block html %}
     <div id="{{ field.id }}">
         {% for subfield in field %}
-            <div class="i-radio i-linking form-subfield{% if has_error[subfield.data] %} has-error{% endif %}">
+            <div class="i-radio i-linking form-subfield flexrow f-a-center
+                        {{ 'has-error' if has_error[subfield.data] }}">
                 {% set dropdown = form[subfield.data] if subfield.data in form.conditional_fields %}
                 {% set disabled = dropdown is defined and dropdown.choices|length <= 1 %}
                 {{ subfield(disabled=disabled) }}

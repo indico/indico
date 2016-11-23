@@ -7,8 +7,8 @@
     {% set contrib = subcontrib.contribution %}
     {% set anchor = slugify('sc', contrib.friendly_id, subcontrib.friendly_id, subcontrib.title, maxlen=30) %}
     <li class="timetable-subcontrib timetable-item" id="{{ anchor }}">
-        <div class="timetable-item-body">
-            <div class="timetable-item-header">
+        <div class="timetable-item-body flexcol">
+            <div class="timetable-item-header flexrow">
                 <span class="timetable-title" data-anchor="{{ anchor }}">
                     {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
                     {{- subcontrib.title | safe -}}

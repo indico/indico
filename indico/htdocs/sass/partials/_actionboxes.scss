@@ -29,8 +29,8 @@
 
     > .section {
         @include clearfix();
-        display: flex;
-        align-items: center;
+        @extend .flexrow;
+        @extend .f-a-center;
 
         > .toolbar {
             margin: 0;

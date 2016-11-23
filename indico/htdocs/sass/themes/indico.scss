@@ -144,7 +144,7 @@
 }
 
 .event-location, .event-chairs, .event-date {
-    display: flex;
+    @extend .flexrow;
 
     &.event-location, &.event-chairs {
         margin-top: 0.5em;
@@ -282,8 +282,7 @@ div.event-header {
     }
 
     .timetable-item {
-        display: flex;
-        flex-direction: row;
+        @extend .flexrow;
 
         &:not(:first-child) {
             margin-top: 1em;
@@ -306,8 +305,6 @@ div.event-header {
 
 .timetable-item-body {
     flex: auto;
-    display: flex;
-    flex-direction: column;
     padding-bottom: 0.5rem;
 
     /* Without the following IE11 doesn't correctly compute the width of the element. */
@@ -323,9 +320,7 @@ div.event-header {
     }
 
     .timetable-item-header {
-        display: flex;
         flex: auto;
-        flex-direction: row;
 
         .timetable-title {
             font-weight: bold;
@@ -520,8 +515,6 @@ a.lecture-series-link {
     @include border-radius;
     background-color: white;
     margin-top: 10px;
-    display: flex;
-    align-items: center;
     flex-grow: 1;
     color: $gray;
     text-align: center;

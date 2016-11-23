@@ -112,7 +112,7 @@ $dropzone-border-width: 2;
         }
 
         .dz-preview {
-            display: flex;
+            @extend .flexrow;
             min-height: initial;
             margin: 0 0 5px 0;
 

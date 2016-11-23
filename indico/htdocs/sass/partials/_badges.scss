@@ -22,9 +22,8 @@
     display: -webkit-flex;
     -webkit-flex-direction: row;
     -webkit-flex-wrap: wrap;
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
+    @extend .flexrow;
+    @extend .f-wrap;
 
     margin-top: -0.8em;
     margin-bottom: 0.8em;

@@ -33,9 +33,9 @@
         list-style-type: none;
 
         li {
+            @extend .flexrow;
             margin: 0px;
             padding: 10px;
-            display: flex;
 
             &.draggable {
                 cursor: move;
@@ -111,7 +111,7 @@
     }
 
    &.two-columns {
-       display: flex;
+       @extend .flexrow;
 
        > div {
            flex-grow: 1;

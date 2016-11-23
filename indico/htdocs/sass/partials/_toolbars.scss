@@ -25,12 +25,12 @@ $toolbar-thin-height: 1.9em;
 .toolbar {
     $toolbar-button-height: 1.7em;
 
+    @extend .flexrow;
     overflow: hidden;
     min-height: $toolbar-height;
     margin-bottom: 0.5em;
     padding: 3px 0;
     vertical-align: middle;
-    display: flex;
 
     &.inline {
         margin-bottom: 0;
@@ -145,10 +145,10 @@ $toolbar-thin-height: 1.9em;
     @extend %toolbar-group-inputs;
     @extend %toolbar-group-datepicker;
     @extend %toolbar-group-slider;
+    @extend .flexrow;
     display: inline-block;
     padding-right: 0.3rem;
     margin-bottom: 0.2rem;
-    display: flex;
 
     &:last-child,
     &.right:first-child {

@@ -41,13 +41,13 @@ table.palette-picker {
         }
 
         .background-box {
-            display: flex;
+            @extend .flexrow;
+            @extend .f-j-center;
+            @extend .f-a-center;
             width: 22px;
             height: 22px;
             border-radius: 15px;
             border: 2px solid transparent;
-            align-items: center;
-            justify-content: center;
         }
 
         &.selected {

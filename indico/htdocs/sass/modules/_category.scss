@@ -84,7 +84,6 @@
 .category-info {
     @extend %font-family-modern-body;
 
-    display: flex;
     color: #888;
     font-size: 1.2em;
     min-height: 0.3em;
@@ -436,9 +435,6 @@ ul.category-resource-qtip {
 
 .category-overview {
     > .title {
-        display: flex;
-        justify-content: center;
-        align-items: center;
         height: 30px;
 
         .text {

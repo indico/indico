@@ -61,7 +61,6 @@
 #contribution-list {
     .subcontribution-count {
         max-width: 70%;
-        display: flex;
 
         .label {
             @include ellipsis;
