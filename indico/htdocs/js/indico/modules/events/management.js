@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global strnatcmp:false */
+
 (function(global) {
     'use strict';
 
@@ -75,8 +77,10 @@
             },
             content: {
                 text: function() {
-                    var items = $(this).data('items');
                     var html = $('<ul class="qbubble-item-list">');
+                    var items = _.values($(this).data('items')).sort(function(a, b) {
+                        return strnatcmp(a.title.toLowerCase(), b.title.toLowerCase());
+                    });
 
                     $.each(items, function() {
                         var item = $('<li>');
