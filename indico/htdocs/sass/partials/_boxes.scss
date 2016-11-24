@@ -133,11 +133,11 @@ $i-box-padding: 10px;
 }
 
 .i-box {
+    @extend %i-box-padding;
+    @include border-all();
     @include border-radius();
     @include box-sizing(border-box);
-    @include border-all();
     @include single-box-shadow();
-    @extend %i-box-padding;
 
     background: white;
     color: $black;
@@ -279,6 +279,36 @@ $i-box-padding: 10px;
     .i-box-header {
         background-color: $light-blue;
         border-bottom-color: $pastel-blue;
+    }
+}
+
+.i-box {
+    @include transition;
+    @include single-transition(padding-bottom);
+
+    .i-box-header {
+        @include transition;
+        @include single-transition(margin-bottom);
+    }
+
+    @mixin header-only-sizing {
+        padding-bottom: 0;
+
+        .i-box-header {
+            margin-bottom: 0;
+        }
+    }
+
+    &.header-only {
+        @include header-only-sizing;
+
+        .i-box-header {
+            border-bottom: 0;
+        }
+    }
+
+    &.header-only-transition {
+        @include header-only-sizing;
     }
 }
 
