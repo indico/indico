@@ -112,6 +112,7 @@
             var paramsSelector = $this.data('params-selector');
             var update = $this.data('update');
             var ajax = $this.data('ajax') !== undefined;
+            var replaceUpdate = $this.data('replace-update') !== undefined;
             var highlightUpdate = $this.data('highlight-update') !== undefined;
             var dialog = $this.data('ajax-dialog') !== undefined;
             var reload = $this.data('reload-after');
@@ -153,7 +154,7 @@
                             if (data) {
                                 handleFlashes(data, true, $this);
                                 if (update) {
-                                    updateHtml(update, data, false, highlightUpdate);
+                                    updateHtml(update, data, replaceUpdate, highlightUpdate);
                                 } else if (reload !== undefined && reload !== 'customData') {
                                     IndicoUI.Dialogs.Util.progress();
                                     location.reload();
@@ -183,7 +184,7 @@
                             }
                             if (update) {
                                 handleFlashes(data, true, $this);
-                                updateHtml(update, data, false, highlightUpdate);
+                                updateHtml(update, data, replaceUpdate, highlightUpdate);
                             } else if (reload !== undefined) {
                                 IndicoUI.Dialogs.Util.progress();
                                 location.reload();
