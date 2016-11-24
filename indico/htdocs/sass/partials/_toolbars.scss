@@ -146,7 +146,6 @@ $toolbar-thin-height: 1.9em;
     @extend %toolbar-group-datepicker;
     @extend %toolbar-group-slider;
     @extend .flexrow;
-    display: inline-block;
     padding-right: 0.3rem;
     margin-bottom: 0.2rem;
 

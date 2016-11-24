@@ -60,6 +60,8 @@
 
 #contribution-list {
     .subcontribution-count {
+        // TODO: Make all .i-labels flexbox and remove the following line
+        display: flex;
         max-width: 70%;
 
         .label {

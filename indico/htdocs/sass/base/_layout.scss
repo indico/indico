@@ -147,7 +147,7 @@ body > * {
 
 .flexrow,
 .flexcol {
-    display: flex !important;
+    display: flex;
 
     &.f-j-start {
         justify-content: flex-start;
