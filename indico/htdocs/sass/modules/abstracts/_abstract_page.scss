@@ -56,9 +56,11 @@
     }
 }
 
-#abstract-title {
+.abstract-title {
+    margin-right: 0.5em;
+
     h3 {
-        color: $blue;
+        color: $blue !important;
         font-size: 1.4em;
         margin: 0;
     }
