@@ -1,5 +1,7 @@
-{% macro render_time_and_location(obj, editable) %}
+{% macro render_time_and_location(obj, editable, use_event_tz) %}
     {% set tt_entry = obj.timetable_entry %}
+    {% set event = tt_entry.event_new %}
+    {% set tz = event.tzinfo if use_event_tz else event.display_tzinfo %}
     <dl class="i-data-list">
         {% if editable %}
             <dt>
@@ -10,16 +12,16 @@
                 <div class="duration">
                     <a class="js-edit-time"
                        title="{% trans %}Change time{% endtrans %}">
-                        {{- tt_entry.start_dt | format_time(timezone=tt_entry.event_new.timezone) }} -
-                        {{ tt_entry.end_dt | format_time(timezone=tt_entry.event_new.timezone) -}}
+                        {{- tt_entry.start_dt | format_time(timezone=tz) }} -
+                        {{ tt_entry.end_dt | format_time(timezone=tz) -}}
                     </a>
                 </div>
             </dd>
         {% else %}
             <dt class="icon-time"></dt>
             <dd>
-                {{- tt_entry.start_dt | format_time(timezone=tt_entry.event_new.timezone) }} -
-                {{ tt_entry.end_dt | format_time(timezone=tt_entry.event_new.timezone) -}}
+                {{- tt_entry.start_dt | format_time(timezone=tz) }} -
+                {{ tt_entry.end_dt | format_time(timezone=tz) -}}
             </dd>
         {% endif %}
         {% if obj.venue_name %}

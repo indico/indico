@@ -22,5 +22,5 @@
         {% endif %}
     </div>
     <div class="description">{{ break_.description }}</div>
-    {{ render_time_and_location(break_, editable) }}
+    {{ render_time_and_location(break_, editable=editable, use_event_tz=editable) }}
 </div>
