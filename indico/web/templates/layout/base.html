@@ -1,5 +1,6 @@
 {% block page %}
-    <div class="{% block page_class %}management-page{% endblock %}">
+    <div class="{% block page_class %}management-page{% endblock %}"
+         {% if self.page_id()|trim %}id="{% filter trim %}{% block page_id %}{% endblock %}{% endfilter %}"{% endif %}>
         {% if self.title() %}
             <header>
                 {% if self.back_button_url()|trim %}

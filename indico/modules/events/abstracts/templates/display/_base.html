@@ -1,5 +1,8 @@
 {% extends 'layout/conference_page_base.html' %}
 
+{% block page_class %}{{ super() }} abstract-page{% endblock %}
+{% block page_id %}abstract-page{% endblock %}
+
 {% block title %}
     {% trans %}Call for Abstracts{% endtrans %}
 {% endblock %}
