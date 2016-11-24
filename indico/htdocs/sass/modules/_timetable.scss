@@ -244,6 +244,8 @@
     }
 
     .item {
+        @extend .flexrow;
+
         &:not(.selected) {
             cursor: pointer;
         }

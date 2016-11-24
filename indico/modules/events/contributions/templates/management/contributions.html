@@ -38,8 +38,8 @@
 
 {% block content %}
     <div class="list-section">
-        <div class="clearfix">
-            <div class="toolbar left">
+        <div class="flexrow f-j-space-between">
+            <div class="toolbar">
                 <div class="group">
                     <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                     <ul class="dropdown">
@@ -129,7 +129,7 @@
                     </ul>
                 </div>
             </div>
-            <div class="toolbar right">
+            <div class="toolbar">
                 <div class="group" id="filter-statistics">
                     {{ render_filter_statistics(contribs|length, total_entries, total_duration) }}
                 </div>
