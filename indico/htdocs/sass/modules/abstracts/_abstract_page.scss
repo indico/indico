@@ -22,6 +22,7 @@
 
 .abstract-page {
     @extend %font-family-body;
+    position: relative;
 
     .i-form {
         margin-top: 0;
@@ -45,6 +46,14 @@
             margin-bottom: 0;
         }
     }
+
+    .open-abstract-notification-log {
+        margin-top: 5px;
+        margin-right: 10px;
+        position: absolute;
+        right: 0;
+        z-index: 1;
+    }
 }
 
 #abstract-title {
@@ -67,18 +76,6 @@
             display: inline-flex;
             margin-bottom: 0;
         }
-    }
-}
-
-#abstract-public {
-    position: relative;
-
-    .open-abstract-notification-log {
-        margin-top: 5px;
-        margin-right: 10px;
-        position: absolute;
-        right: 0;
-        z-index: 1;
     }
 }
 
