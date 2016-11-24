@@ -77,6 +77,7 @@
 
 
 {% macro _render_review(review, form) %}
+    {% set no_content = not review.comment and not review.ratings %}
     <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic" style="{{ review.user.avatar_css }}">
             {{- review.user.name[0] -}}
@@ -96,10 +97,11 @@
                     {% endif %}
                 </div>
                 <div>
-                    {{ render_track(review.track, classes='abstract-track-tag i-tag outline') }}
+                    {{ render_track(review.track) }}
                 </div>
             </div>
-            <div class="i-timeline-item-box header-indicator-top">
+            <div class="i-timeline-item-box header-indicator-top {% if not review.comment %}header-only{% endif %}"
+                 {% if not review.comment %}data-no-comment{% endif %}>
                 <div class="i-box-header flexrow">
                     <div class="abstract-review-badges">
                         {% set action = _render_review_state(review) %}
@@ -144,11 +146,16 @@
                                 {%- endtrans %}
                             {% endif %}
                         {% endif %}
-                    </div>
-                    <div class="abstract-comment-score">
                         {% if review.score is not none %}
-                            {{ render_score(review.score, review.abstract.event_new.cfa) }}
+                            · score {{ render_score(review.score, review.abstract.event_new.cfa, classes='bold semantic-text') }}
+                            (<a class="js-ratings-toggle">{#--#}
+                                <span class="js-show-ratings">{% trans %}show ratings{% endtrans %}</span>{#--#}
+                                <span class="weak-hidden js-hide-ratings">{% trans %}hide ratings{% endtrans %}</span>{#--#}
+                            </a>)
                         {% endif %}
+                    </div>
+                    <div class="ratings-switch">
+
                     </div>
                     {% if review.can_edit(session.user, check_state=true) %}
                         <div class="abstract-comment-actions">
@@ -164,30 +171,8 @@
                     {% endif %}
                 </div>
                 <div class="i-box-content js-form-container">
-                    {% if review.proposed_action.name == 'change_tracks' %}
-                        {% set tracks = render_tracks(review.proposed_tracks) %}
-                        {% trans count=review.proposed_tracks|length -%}
-                            Possible destination track: {{ tracks }}
-                        {%- pluralize -%}
-                            Possible destination tracks: {{ tracks }}
-                        {%- endtrans %}
-                    {% endif %}
-                    {% if review.comment %}
-                        <div class="titled-rule">
-                            {% trans %}Comment{% endtrans %}
-                        </div>
-                        <div class="markdown-text">
-                            {{ review.comment }}
-                        </div>
-                    {% endif %}
                     {% if review.ratings %}
-                        <div class="ratings-switch">
-                            <a class="i-button" title="{% trans %}Show detailed ratings{% endtrans %}">...</a>
-                        </div>
                         <div class="ratings-details weak-hidden">
-                            <div class="titled-rule">
-                                {% trans %}Ratings{% endtrans %}
-                            </div>
                             <ul class="abstract-question-list">
                                 {% for rating in review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
                                     <li class="flexrow">
@@ -206,6 +191,35 @@
                                     </li>
                                 {% endfor %}
                             </ul>
+                            {% if review.proposed_action.name == 'change_tracks' %}
+                                <div class="titled-rule">
+                                    {% trans %}Proposed tracks{% endtrans %}
+                                </div>
+                            {% elif review.comment %}
+                                <div class="titled-rule">
+                                    {% trans %}Comment{% endtrans %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% if review.proposed_action.name == 'change_tracks' %}
+                        <div>
+                            {% set tracks = render_tracks(review.proposed_tracks) %}
+                            {% trans count=review.proposed_tracks|length -%}
+                                Possible destination track: {{ tracks }}
+                            {%- pluralize -%}
+                                Possible destination tracks: {{ tracks }}
+                            {%- endtrans %}
+                        </div>
+                        {% if review.comment %}
+                            <div class="titled-rule">
+                                {% trans %}Comment{% endtrans %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                    {% if review.comment %}
+                        <div class="markdown-text">
+                            {{ review.comment }}
                         </div>
                     {% endif %}
                 </div>
@@ -228,7 +242,7 @@
                       'merge': 'visited',
                       'mark_as_duplicate': 'strong',
                       'change_tracks': 'warning'} %}
-    <span class="i-tag outline {{ mapping[review.proposed_action.name] }}">
+    <span class="bold underline semantic-text {{ mapping[review.proposed_action.name] }}">
 {% endmacro %}
 
 
