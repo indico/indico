@@ -2,7 +2,7 @@
     {% set legacy = entry.data._legacy %}
     <div class="log-entry">
         <div class="metadata flexrow {% if legacy %}legacy{% endif %}">
-            <div class="subject f-self-grow text-truncate">
+            <div class="subject f-self-stretch text-truncate">
                 {% if legacy %}
                     {%- trans name=entry.data.template_name -%}
                         Template: <span class="template">{{ name }}</span>
