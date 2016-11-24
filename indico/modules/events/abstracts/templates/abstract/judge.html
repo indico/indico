@@ -63,7 +63,7 @@
                     <span class="review-state-pretext">{% trans %}Reviews are{% endtrans %}</span>
                     {{ _render_abstract_reviewing_state(abstract) }}
                     {% if abstract.score is not none %}
-                        {{ render_score(abstract.score, event.cfa, final=true) }}
+                        {{ render_score(abstract.score, event.cfa, classes='i-tag') }}
                     {% endif %}
                 </div>
             </div>

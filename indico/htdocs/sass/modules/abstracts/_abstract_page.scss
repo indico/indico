@@ -102,13 +102,6 @@
     max-width: 10em;
 }
 
-.abstract-track-tag {
-    @extend .flexrow;
-    max-width: 15em;
-    margin: -0.35em 0;
-    margin-left: 1em;
-}
-
 .abstract-content {
     @extend .i-box;
     @extend .i-box.no-shadow;
@@ -205,6 +198,15 @@
 .abstract-review-badges {
     flex-grow: 1;
     color: $gray;
+
+    .js-ratings-toggle {
+        color: $gray;
+        user-select: none;
+
+        &:hover {
+            color: $dark-gray;
+        }
+    }
 }
 
 .abstract-comment-actions {
@@ -443,7 +445,7 @@
         font-weight: bold;
         background: $pastel-gray;
         color: $light-black;
-        padding: 1px 6px;
+        padding: 0 6px;
     }
 
     .question-text {

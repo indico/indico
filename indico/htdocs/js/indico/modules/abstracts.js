@@ -73,10 +73,25 @@
             $reviewBox.find('.js-edit-review').trigger('click');
             $('body, html').animate({scrollTop: $reviewBox.offset().top}, 'fast');
             $reviewBox.find('.i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
-        }).on('click', '.ratings-switch .i-button', function() {
+        }).on('click', '.js-ratings-toggle', function() {
             var $this = $(this);
+            $this.find('.js-show-ratings, .js-hide-ratings').toggleClass('weak-hidden');
+            var $reviewBox = $this.closest('.i-timeline-item-box');
+            if ($reviewBox.data('no-comment') !== undefined) {
+                if ($reviewBox.hasClass('header-only')) {
+                    $reviewBox.removeClass('header-only');
+                    $reviewBox.find('.ratings-details').slideToggle('fast');
+                } else {
+                    $reviewBox.addClass('header-only-transition');
+                    $reviewBox.find('.ratings-details').slideToggle('fast', function() {
+                        $reviewBox.removeClass('header-only-transition');
+                        $reviewBox.addClass('header-only');
+                    });
+                }
+            } else {
+                $reviewBox.find('.ratings-details').slideToggle('fast');
+            }
             $this.toggleClass('open');
-            $this.closest('.ratings-switch').siblings('.ratings-details').toggle();
         }).on('click', '.js-highlight-review', function() {
             $($(this).attr('href') + ' .i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
         });
