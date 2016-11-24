@@ -128,7 +128,7 @@
         <div class="abstract-summary-badge">
             {{ _render_summary_state(abstract) }}
         </div>
-        <div class="abstract-summary-content f-self-grow">
+        <div class="abstract-summary-content f-self-stretch">
             {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
                 <div>
                     {% if abstract.submitted_contrib_type %}
@@ -285,7 +285,7 @@
 
 {% macro render_abstract_public(abstract) %}
     <div id="abstract-title" class="flexrow">
-        <h3 class="abstract-title f-self-grow">
+        <h3 class="abstract-title f-self-stretch">
             {{ abstract.title }}
             <span class="abstract-id">
                 #{{ abstract.friendly_id }}
@@ -431,7 +431,7 @@
                     <div class="i-timeline-item-label action"></div>
                     <div class="i-timeline-item-box header-indicator-left">
                         <div class="i-box-header flexrow">
-                            <div class="f-self-grow">
+                            <div class="f-self-stretch">
                                 {{ _render_judgment_action(abstract) }}
                                 <time datetime="{{ abstract.judgment_dt.isoformat() }}">
                                     {{- abstract.judgment_dt|format_human_date -}}

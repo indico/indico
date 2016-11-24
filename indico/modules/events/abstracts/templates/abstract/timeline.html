@@ -30,7 +30,7 @@
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-box header-indicator-left">
                 <div class="i-box-header flexrow">
-                    <div class="f-self-grow">
+                    <div class="f-self-stretch">
                         {% trans name=comment.user.name -%}
                             <strong>{{ name }}</strong> left a comment
                         {%- endtrans %}
@@ -79,7 +79,7 @@
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-metadata">
-                <div class="f-self-grow">
+                <div class="f-self-stretch">
                     {% trans name=review.user.name -%}
                         <strong>{{ name }}</strong> left a review
                     {%- endtrans %}
@@ -190,7 +190,7 @@
                                         <div>
                                             <span class="question-index">{{ loop.index }}</span>
                                         </div>
-                                        <div class="question-text f-self-grow">
+                                        <div class="question-text f-self-stretch">
                                             {{ rating.question.text }}
                                         </div>
                                         <div>
@@ -238,7 +238,7 @@
                 <div class="i-box-footer js-form-container">
                     {% if can_comment %}
                         <div class="flexrow">
-                            <div class="f-self-grow">
+                            <div class="f-self-stretch">
                                 {{ render_comment_form(comment_form, abstract) }}
                             </div>
                             {% if reviewer_data.tracks and abstract.can_review(session.user, check_state=true) %}
@@ -291,7 +291,7 @@
             {% endset %}
         {% endif %}
         <div class="flexrow">
-            <div class="f-self-grow">
+            <div class="f-self-stretch">
                 <div class="empty-input-title">
                     {{- no_comments_title -}}
                 </div>

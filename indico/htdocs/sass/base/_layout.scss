@@ -194,10 +194,11 @@ body > * {
     }
 }
 
-.f-self-grow {
+.f-self-stretch {
     flex-grow: 1;
+    flex-basis: 0%;
 }
 
-.f-self-shrink {
-    flex-shrink: 1;
+.f-self-no-shrink {
+    flex-shrink: 0;
 }
