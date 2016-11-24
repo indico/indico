@@ -48,7 +48,7 @@
                                title="{% trans %}Edit comment{% endtrans %}"
                                data-href="{{ url_for('.edit_abstract_comment', comment) }}"
                                data-form-container="#abstract-comment-{{ comment.id }} .js-form-container"
-                               data-update=".management-page"
+                               data-update="#abstract-page"
                                data-replace-update
                                data-confirm-close-unsaved
                                data-ajax-form></a>
@@ -152,7 +152,7 @@
                                title="{% trans %}Edit review{% endtrans %}"
                                data-href="{{ url_for('.edit_review', review, management=management) }}"
                                data-form-container="#abstract-review-{{ review.id }} .js-form-container"
-                               data-update=".management-page"
+                               data-update="#abstract-page"
                                data-replace-update
                                data-confirm-close-unsaved
                                data-ajax-form></a>
@@ -324,7 +324,7 @@
                 <button class="i-button big highlight text-color"
                         data-href="{{ url_for('.review_abstract', abstract, track) }}"
                         data-form-container="#abstract-timeline-input .js-form-container"
-                        data-update=".management-page"
+                        data-update="#abstract-page"
                         data-replace-update
                         data-confirm-close-unsaved
                         data-ajax-form>
@@ -351,7 +351,7 @@
                         {% else %}
                             <a data-href="{{ url_for('.review_abstract', abstract, track) }}"
                                data-form-container="#abstract-timeline-input .js-form-container"
-                               data-update=".management-page"
+                               data-update="#abstract-page"
                                data-replace-update
                                data-confirm-close-unsaved
                                data-ajax-form>

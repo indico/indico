@@ -84,7 +84,7 @@
 
             {% call form_header(form, action=url, orientation='vertical', id=form_id) %}
                 data-form-container="#abstract-decision-box"
-                data-update=".management-page"
+                data-update="#abstract-page"
                 data-ajax-form
             {% endcall %}
             {% call(link, endlink) render_instruction_box(form_id, event.cfa.judgment_instructions, _("Judgment instructions")) %}
@@ -126,7 +126,7 @@
                             <a href="#"
                                data-href="{{ url_for('.edit_review_tracks', abstract, management=management) }}"
                                data-form-container="#edit-reviewed-for-track-list"
-                               data-update=".management-page"
+                               data-update="#abstract-page"
                                data-replace-update
                                data-hide-trigger
                                data-ajax-form>
