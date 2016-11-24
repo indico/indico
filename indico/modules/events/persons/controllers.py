@@ -49,6 +49,9 @@ class RHPersonsBase(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def get_persons(self):
+        abstract_strategy = joinedload('abstract_links')
+        abstract_strategy.joinedload('abstract')
+        abstract_strategy.joinedload('person').joinedload('user')
         contribution_strategy = joinedload('contribution_links')
         contribution_strategy.joinedload('contribution')
         contribution_strategy.joinedload('person').joinedload('user')
@@ -62,17 +65,33 @@ class RHPersonsBase(RHConferenceModifBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event_new.person_links}
-        persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
-                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(lambda: False)})
+        persons = defaultdict(lambda: {'session_blocks': defaultdict(dict),
+                                       'contributions': defaultdict(dict),
+                                       'subcontributions': defaultdict(dict),
+                                       'abstracts': defaultdict(dict),
+                                       'roles': defaultdict(lambda: False)})
 
-        event_persons_query = (self.event_new.persons.options(event_strategy, contribution_strategy,
-                                                              subcontribution_strategy, session_block_strategy).all())
+        event_persons_query = (self.event_new.persons
+                               .options(abstract_strategy,
+                                        event_strategy,
+                                        contribution_strategy,
+                                        subcontribution_strategy,
+                                        session_block_strategy)
+                               .all())
 
         for event_person in event_persons_query:
             data = persons[event_person.email or event_person.id]
 
             data['person'] = event_person
             data['roles']['chairperson'] = event_person in chairpersons
+
+            for person_link in event_person.abstract_links:
+                if person_link.abstract.is_deleted:
+                    continue
+
+                url = url_for('abstracts.display_abstract', person_link.abstract, management=True)
+                data['abstracts'][person_link.abstract_id] = {'title': person_link.abstract.verbose_title, 'url': url}
+                data['roles']['author'] = True
 
             for person_link in event_person.session_block_links:
                 if person_link.session_block.session.is_deleted:

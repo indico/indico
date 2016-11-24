@@ -137,6 +137,12 @@
                         <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
                         <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
                         <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
+                        {% if event.has_feature('abstracts') %}
+                            <input type="checkbox" id="filter-abstract-author" data-filter="author" checked>
+                            <label for="filter-abstract-author" class="i-button">
+                                {%- trans %}Abstract authors{% endtrans -%}
+                            </label>
+                        {% endif %}
                     {% endif %}
                     <span class="i-button label">{% trans %}or{% endtrans %}</span>
                     <input type="checkbox" id="filter-no-account" data-filter="no_account">
@@ -168,6 +174,9 @@
                             <th class="i-table" data-sorter="false"></th>
                             <th class="i-table" data-sorter="false"></th>
                             <th class="i-table" data-sorter="false"></th>
+                            {% if event.has_feature('abstracts') %}
+                                <th class="i-table" data-sorter="false"></th>
+                            {% endif %}
                         {% endif %}
                         <th class="i-table" data-sorter="false"></th>
                         <th class="i-table" data-sorter="false"></th>
@@ -183,7 +192,7 @@
                         </tr>
                     {%- else -%}
                         <tr class="i-table">
-                            <td colspan="{{ 8 if event.type == 'lecture' else 11 }}">
+                            <td colspan="{{ 8 if event.type == 'lecture' else (11 + event.has_feature('abstracts')) }}">
                                 {%- trans %}No persons{% endtrans -%}
                             </td>
                         </tr>
