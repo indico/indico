@@ -2,9 +2,9 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 
-{% macro render_review_form(form, abstract=none, track=none, review=none, management=false, on_pageload=false) %}
-    {% set url = url_for('.review_abstract', abstract, track, management=management) if not review else
-                 url_for('.edit_review', review, management=management) %}
+{% macro render_review_form(form, abstract=none, track=none, review=none, on_pageload=false) %}
+    {% set url = url_for('.review_abstract', abstract, track) if not review else
+                 url_for('.edit_review', review) %}
     {% set form_id = 'track-review-form-%s'|format(track.id) %}
     {% set track = track or review.track %}
     {% set event = abstract.event_new %}

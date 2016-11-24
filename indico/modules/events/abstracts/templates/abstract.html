@@ -17,7 +17,7 @@
 {% endblock %}
 
 {% block content %}
-    {{ render_abstract_public(abstract, management=management) }}
+    {{ render_abstract_public(abstract) }}
     <div id="abstract-private" class="i-timeline">
         {{ render_timeline(abstract, comment_form, review_form) }}
 
@@ -34,10 +34,10 @@
 
         {% if can_judge %}
             {% if abstract.event_new.tracks %}
-                {{ render_reviewed_for_tracks_box(abstract, review_track_list_form, management=management) }}
+                {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
             {% endif %}
             <div id="abstract-decision-box" class="i-timeline-item">
-                {{ render_decision_box(abstract, judgment_form, management=management) }}
+                {{ render_decision_box(abstract, judgment_form) }}
             </div>
         {% endif %}
     </div>

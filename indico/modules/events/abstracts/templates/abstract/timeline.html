@@ -74,7 +74,7 @@
 {% endmacro %}
 
 
-{% macro _render_review(review, form, management=false) %}
+{% macro _render_review(review, form) %}
     <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
         <div class="i-timeline-item-label action abstract-comment-pic"></div>
         <div class="flexrow i-timeline-item-content">
@@ -150,7 +150,7 @@
                         <div class="abstract-comment-actions">
                             <a class="i-button-icon icon-edit js-edit-review"
                                title="{% trans %}Edit review{% endtrans %}"
-                               data-href="{{ url_for('.edit_review', review, management=management) }}"
+                               data-href="{{ url_for('.edit_review', review) }}"
                                data-form-container="#abstract-review-{{ review.id }} .js-form-container"
                                data-update="#abstract-page"
                                data-replace-update

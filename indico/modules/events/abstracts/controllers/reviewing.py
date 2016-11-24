@@ -84,7 +84,7 @@ class RHJudgeAbstract(RHAbstractBase):
             judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/judge.html')
-        return jsonify(html=tpl.render_decision_box(self.abstract, form, management=self.management))
+        return jsonify(html=tpl.render_decision_box(self.abstract, form))
 
 
 class RHResetAbstractState(RHAbstractBase):
@@ -159,7 +159,7 @@ class RHSubmitAbstractReview(RHAbstractBase):
             create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify(html=tpl.render_review_form(form, self.abstract, self.track, management=self.management))
+        return jsonify(html=tpl.render_review_form(form, self.abstract, self.track))
 
 
 class RHEditAbstractReview(RHAbstractBase):
@@ -182,7 +182,7 @@ class RHEditAbstractReview(RHAbstractBase):
             update_abstract_review(self.review, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/abstracts/abstract/review.html')
-        return jsonify(html=tpl.render_review_form(form, review=self.review, management=self.management))
+        return jsonify(html=tpl.render_review_form(form, review=self.review))
 
 
 class RHSubmitAbstractComment(RHAbstractBase):
