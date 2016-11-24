@@ -357,7 +357,7 @@
 
         &:not(:checked) > label.bullet:hover:after,
         &:not(:checked) > label.bullet:hover ~ label.bullet:after {
-            background-image: linear-gradient(300deg, $blue, $blue 48%, $pastel-gray 52%);
+            background-image: linear-gradient(300deg, $blue, $blue 45%, $pastel-gray 55%);
             background-repeat: no-repeat;
             border: none;
         }
@@ -366,7 +366,7 @@
         input:checked ~ label.bullet:hover:after,
         label.bullet:hover ~ input:checked ~ label.bullet:after,
         input:checked ~ label.bullet:hover ~ label.bullet:after {
-            background-image: linear-gradient(300deg, $blue, $blue 48%, $pastel-blue 52%);
+            background-image: linear-gradient(300deg, $blue, $blue 45%, $pastel-blue 55%);
             background-repeat: no-repeat;
         }
 
