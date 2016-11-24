@@ -239,10 +239,8 @@
 
 .submission-info {
     .info-line {
-        margin-top: 1em;
-
-        &:first-child {
-            margin-top: 0;
+        &:not(:first-child) {
+            margin-top: 1em;
         }
 
         label {
@@ -262,24 +260,14 @@
             }
         }
     }
-}
 
-.submitted-data {
-    .field-separator {
-        @include border-top;
-        margin: 0 -10px;
-        padding: 1em 10px;
-    }
-
-    .comment {
-        @extend .text-not-important;
-        margin-bottom: 1em;
-    }
-
-    dl.custom-field-values {
+    .custom-field-values {
+        margin: 0;
 
         .field-value {
-            margin-bottom: 0.5em;
+            &:not(:first-child) {
+                margin-top: 0.5em;
+            }
 
             > * {
                 display: block;

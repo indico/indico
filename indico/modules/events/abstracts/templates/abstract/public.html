@@ -4,7 +4,7 @@
     {% if abstract.submitted_contrib_type %}
         <div class="info-line">
             <label>
-                {% trans %}Contribution type:{% endtrans %}
+                {% trans %}As contribution type:{% endtrans %}
             </label>
             {{ abstract.submitted_contrib_type.name }}
         </div>
@@ -13,9 +13,9 @@
         <div class="info-line">
             <label>
                 {% trans count=abstract.submitted_for_tracks|length -%}
-                    Track:
+                    For track:
                 {%- pluralize -%}
-                    Tracks:
+                    For tracks:
                 {%- endtrans -%}
             </label>
             {{ render_tracks(abstract.submitted_for_tracks, full_title=true) }}
@@ -25,9 +25,9 @@
         <div class="info-line">
             <label>
                 {% trans count=abstract.primary_authors|length -%}
-                    Author
+                    Author:
                 {%- pluralize -%}
-                    Authors
+                    Authors:
                 {%- endtrans %}
             </label>
             <ul class="author-list">
@@ -48,9 +48,9 @@
         <div class="info-line">
             <label>
                 {% trans count=abstract.secondary_authors|length -%}
-                    Co-author
+                    Co-author:
                 {%- pluralize -%}
-                    Co-authors
+                    Co-authors:
                 {%- endtrans %}
             </label>
             <ul class="author-list">
@@ -71,9 +71,9 @@
         <div class="info-line">
             <label>
                 {% trans count=abstract.speakers|length -%}
-                    Speaker
+                    Speaker:
                 {%- pluralize -%}
-                    Speakers
+                    Speakers:
                 {%- endtrans %}
             </label>
             <ul class="author-list">
@@ -90,24 +90,25 @@
             </ul>
         </div>
     {% endif %}
-    <div class="info-line submitted-data">
-        {% if abstract.field_values %}
-            <dl class="custom-field-values field-separator">
-                {% for value in abstract.field_values|sort(attribute='contribution_field.position')
-                   if value.contribution_field.is_active %}
-                    {{ _render_field_value(value) }}
-                {% endfor %}
-            </dl>
-        {% endif %}
-        {% if abstract.submission_comment %}
-            <div class="comment">
-                <div class="titled-rule">
-                    {% trans %}Comment{% endtrans %}
-                </div>
-                {{ abstract.submission_comment }}
-            </div>
-        {% endif %}
-    </div>
+    {% set field_values = abstract.field_values|selectattr('contribution_field.is_active')|list %}
+    {% if field_values %}
+        <div class="titled-rule">
+            {%- trans %}More information{% endtrans -%}
+        </div>
+        <dl class="custom-field-values">
+            {% for value in field_values|sort(attribute='contribution_field.position') %}
+                {{ _render_field_value(value) }}
+            {% endfor %}
+        </dl>
+    {% endif %}
+    {% if abstract.submission_comment %}
+        <div class="titled-rule">
+            {% trans %}Comment{% endtrans %}
+        </div>
+        <div class="text-not-important">
+            {{- abstract.submission_comment -}}
+        </div>
+    {% endif %}
 {% endmacro %}
 
 {% macro _render_summary_state(abstract) %}
@@ -236,7 +237,7 @@
 
 {% macro _render_field_value(value) %}
         <div class="field-value {{ 'single-choice 'if value.contribution_field.field_type == 'single_choice' else ''}}">
-            <label>{{ value.contribution_field.title }}</label>
+            <label>{{ value.contribution_field.title }}:</label>
             {% if value.friendly_data %}
                 <span class="value">{{ value.friendly_data }}</span>
             {% else %}
