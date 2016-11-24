@@ -509,19 +509,5 @@
                 </div>
             {% endif %}
         </div>
-
-        {% if abstract.email_logs and abstract.can_judge(session.user, check_state=false) %}
-            <a class="open-abstract-notification-log"
-               data-href="{{ url_for('.notification_log', abstract) }}"
-               data-title="{% trans %}Sent notifications{% endtrans %}"
-               data-subtitle="{% trans %}Log of notifications sent to submitter and authors of this abstract{% endtrans %}"
-               data-ajax-dialog>
-                {% trans count=abstract.email_logs|length -%}
-                    1 notification sent
-                {%- pluralize -%}
-                    {{ count }} notifications sent
-                {%- endtrans %}
-            </a>
-        {% endif %}
     </div>
 {% endmacro %}
