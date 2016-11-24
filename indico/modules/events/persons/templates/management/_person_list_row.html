@@ -49,6 +49,17 @@
                 </span>
             </span>
         </td>
+        {% if person.event_new.has_feature('abstracts') %}
+            <td class="i-table">
+                <span class="i-label js-count-label {{ 'no-role' if not person_data.abstracts }}"
+                      data-items="{{ person_data.abstracts | tojson | forceescape }}">
+                    {% trans %}Abstract author{% endtrans %}
+                    <span class="badge">
+                        {{ person_data.abstracts | length }}
+                    </span>
+                </span>
+            </td>
+        {% endif %}
     {% endif %}
     <td class="i-table">
         {% if person_data.roles.no_account %}
