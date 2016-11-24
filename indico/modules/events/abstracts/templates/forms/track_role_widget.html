@@ -16,25 +16,24 @@
             {% endif %}
             {% for role_id, users in role_data.viewitems() %}
                 <div class="js-role-container reviewer-container" data-role-id="{{ role_id }}">
-                    <div class="role-description">
-                        <div class="actions right">
-                            <input type="hidden" class="js-user-data">
-                            <a class="add-user i-button borderless icon-plus icon-only"
-                               href="">
-                                {% trans %}Add{% endtrans %}
-                            </a>
-                        </div>
+                    <div class="role-description flexrow f-a-center">
                         {% if role_id == 'reviewer' %}
-                            <span class="icon-user-reading title"
+                            <span class="icon-user-reading title f-self-stretch"
                                   title="{% trans %}Reviewers can emit their opinion on abstracts{% endtrans %}">
-                                {% trans %}Reviewers{% endtrans %}
+                                {%- trans %}Reviewers{% endtrans -%}
                             </span>
                         {% else %}
-                            <span class="icon-user-chairperson title"
+                            <span class="icon-user-chairperson title f-self-stretch"
                                   title="{% trans %}Conveners can consult the reviewing status{% endtrans %}">
-                                {% trans %}Conveners{% endtrans %}
+                                {%- trans %}Conveners{% endtrans -%}
                             </span>
                         {% endif %}
+                        <div class="actions">
+                            <input type="hidden" class="js-user-data">
+                            <a class="add-user i-button borderless icon-plus">
+                                {%- trans %}Add{% endtrans -%}
+                            </a>
+                        </div>
                     </div>
                     <div class="placeholder text-superfluous italic {{ 'weak-hidden' if users else '' }}">
                         {% trans %}No users added so far.{% endtrans %}

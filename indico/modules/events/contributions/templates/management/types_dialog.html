@@ -2,7 +2,7 @@
 {% from 'events/contributions/management/_types_table.html' import types_table_row %}
 
 <div class="manage-contribution-types">
-    <div class="toolbar">
+    <div class="toolbar space-after">
         <button id="js-new-contribution-type" class="i-button icon-plus highlight" data-ajax-dialog
                 data-href="{{ url_for('.create_type', event) }}"
                 data-title="{% trans %}Add new contribution type{% endtrans %}">
@@ -33,10 +33,8 @@
         {%- endcall %}
     {% endif %}
 
-    <div class="toolbar">
-        <div class="group right">
-            <button class="i-button big" data-button-back>{% trans %}Close{% endtrans %}</button>
-        </div>
+    <div class="toolbar f-j-end">
+        <button class="i-button big" data-button-back>{% trans %}Close{% endtrans %}</button>
     </div>
 </div>
 

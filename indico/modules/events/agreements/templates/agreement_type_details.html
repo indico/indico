@@ -119,23 +119,19 @@
         <div class="agreement-list i-box{% if not (not_sent or pending) %} titled{% endif %}">
             {% if not_sent %}
                 <div class="toolbar">
-                    <div class="group">
-                        <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-                        <ul class="dropdown">
-                            <li><a href="#" id="select-new">
-                                {% trans %}All{% endtrans %}
-                            </a></li>
-                            <li><a href="#" id="select-new-none">
-                                {% trans %}None{% endtrans %}
-                            </a></li>
-                        </ul>
-                    </div>
-                    <div class="group">
-                        <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send" href="#"
-                           data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
-                            {% trans %}Send new{% endtrans %}
-                        </a>
-                    </div>
+                    <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" id="select-new">{% trans %}All{% endtrans %}</a>
+                        </li>
+                        <li>
+                            <a href="#" id="select-new-none">{% trans %}None{% endtrans %}</a>
+                        </li>
+                    </ul>
+                    <a id="send-new" class="i-button icon-mail disabled js-ajax-dialog-send" href="#"
+                       data-href="{{ url_for('.event_agreements_details_send', event, definition=definition.name) }}">
+                        {%- trans %}Send new{% endtrans -%}
+                    </a>
                 </div>
                 <div class="titled-rule">
                     {% trans %}Agreements requests to be sent{% endtrans %}
@@ -184,23 +180,19 @@
 
             {% if pending %}
                 <div class="toolbar">
-                    <div class="group">
-                        <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-                        <ul class="dropdown">
-                            <li><a href="#" id="select-pending">
-                                {% trans %}All{% endtrans %}
-                            </a></li>
-                            <li><a href="#" id="select-pending-none">
-                                {% trans %}None{% endtrans %}
-                            </a></li>
-                        </ul>
-                    </div>
-                    <div class="group">
-                        <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind" href="#"
-                           data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
-                            {% trans %}Remind pending{% endtrans %}
-                        </a>
-                    </div>
+                    <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" id="select-pending">{% trans %}All{% endtrans %}</a>
+                        </li>
+                        <li>
+                            <a href="#" id="select-pending-none">{% trans %}None{% endtrans %}</a>
+                        </li>
+                    </ul>
+                    <a id="send-pending" class="i-button icon-alarm disabled js-ajax-dialog-remind" href="#"
+                       data-href="{{ url_for('.event_agreements_details_remind', event, definition=definition.name) }}">
+                        {%- trans %}Remind pending{% endtrans -%}
+                    </a>
                 </div>
                 <div class="titled-rule">
                     {% trans %}Pending agreements{% endtrans %}

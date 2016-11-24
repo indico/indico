@@ -49,9 +49,8 @@
         }
 
         .title {
-            @extend .flexrow;
-            align-items: baseline;
-
+            display: flex;
+            align-items: flex-start;
             padding-top: 0.4rem;
             min-height: 2rem;
             border-bottom: 1px solid $separator-color;
@@ -77,16 +76,6 @@
                 flex-grow: 0;
                 flex-shrink: 0;
                 white-space: nowrap;
-
-                .toolbar {
-                    margin-bottom: -10px;
-                    margin-top: 3px;
-                    padding: 0;
-
-                    .group {
-                        margin-bottom: 0;
-                    }
-                }
             }
         }
 

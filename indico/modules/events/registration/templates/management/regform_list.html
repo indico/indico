@@ -108,12 +108,10 @@
         {% endfor %}
     </div>
 
-    <div class="toolbar">
-        <div class="group right">
-            <a href="{{ url_for('.create_regform', event) }}" class="i-button icon-plus">
-                {% trans %}Create form{% endtrans %}
-            </a>
-        </div>
+    <div class="toolbar f-j-end">
+        <a href="{{ url_for('.create_regform', event) }}" class="i-button icon-plus">
+            {%- trans %}Create form{% endtrans -%}
+        </a>
     </div>
 
     <script>

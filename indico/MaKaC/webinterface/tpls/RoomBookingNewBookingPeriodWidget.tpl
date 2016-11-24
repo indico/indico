@@ -5,7 +5,7 @@
 <div id="timerange"></div>
 
 <!-- Repeatibility options -->
-<div class="toolbar thin">
+<div class="toolbar thin space-before space-after">
     <div id="repeatability" class="group i-selection">
         <span class="i-button label">${ _('Frequency') }</span>
         % for option in form.repeat_frequency:

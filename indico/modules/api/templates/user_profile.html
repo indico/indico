@@ -10,7 +10,7 @@
                     {%- trans %}API Key{% endtrans -%}
                 </div>
                 {% if key and can_modify %}
-                    <div class="i-box-buttons toolbar right">
+                    <div class="i-box-buttons toolbar">
                         <div class="group">
                             <button type="button" class="i-button warning icon-plus" data-href="{{ url_for('.key_create') }}" data-method="post"
                                     data-params='{"force": "1"}'
@@ -98,7 +98,7 @@
                         {%- trans %}Administration{% endtrans -%}
                     </div>
                     {% if key %}
-                        <div class="i-box-buttons toolbar right">
+                        <div class="i-box-buttons toolbar">
                             <div class="group">
                                 {% if key.is_blocked %}
                                     <button type="button" class="i-button accept" data-href="{{ url_for('.key_block') }}"

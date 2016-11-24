@@ -13,7 +13,7 @@
 
 <div id="bookedForInfo">
     % for field in fields:
-        <div class="toolbar thin">
+        <div class="toolbar thin space-before space-after">
             <div class="group">
                 % if not form[field].short_name == 'booking_reason':
                     <span class="i-button label heavy">

@@ -1,8 +1,22 @@
 {% from 'events/management/_create_event_button.html' import create_event_button %}
 
 <div class="category-container">
-    <div class="category-header">
-        <div id="category-toolbar" class="toolbar right">
+    <div class="category-header flexrow">
+        {% if category.is_root or category.attachment_count or category.can_manage(session.user) %}
+            {% set category_title_classes = 'sidebar-padding' %}
+        {% endif %}
+        <h1 class="category-title f-self-stretch {{ category_title_classes }}">
+            {% block title %}
+                {% if category.is_root and category.children %}
+                    {% trans %}Main categories{% endtrans %}
+                {% elif category.is_root %}
+                    {% trans %}All events{% endtrans %}
+                {% else %}
+                    {{ category.title }}
+                {% endif %}
+            {% endblock %}
+        </h1>
+        <div id="category-toolbar" class="toolbar">
             <div class="group">
                 {{ create_event_button(category, classes="highlight", text=_("Create event"), with_tooltip=false) }}
             </div>
@@ -51,21 +65,6 @@
                 </div>
             {% endif %}
         </div>
-
-        {% if category.is_root or category.attachment_count or category.can_manage(session.user) %}
-            {% set category_title_classes = 'sidebar-padding' %}
-        {% endif %}
-        <h1 class="category-title {{ category_title_classes }}">
-            {% block title %}
-                {% if category.is_root and category.children %}
-                    {% trans %}Main categories{% endtrans %}
-                {% elif category.is_root %}
-                    {% trans %}All events{% endtrans %}
-                {% else %}
-                    {{ category.title }}
-                {% endif %}
-            {% endblock %}
-        </h1>
     </div>
 
     {% if self.sidebar() %}

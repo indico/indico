@@ -16,6 +16,7 @@
  */
 
 $i-button-background-color: darken($light-gray, 5%);
+$i-button-spacing: 0.3rem;
 
 %button {
     @include user-select(none);
@@ -147,9 +148,16 @@ $i-button-background-color: darken($light-gray, 5%);
     @include _i-button-states($i-button-background-color, $default-border-color, $gray, $light-black, $black, false);
     @include _i-button-borderless($light-black, $black);
     @include _i-button-outlines($light-black, $black);
-    line-height: 1em;
     margin: 0;
     padding: 4px 10px 4px;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+
+    & ~ .i-button,
+    & ~ .group {
+        margin-left: $i-button-spacing;
+    }
 
     &:hover {
         box-shadow: 1px 1px 4px rgba(20, 20, 20, 0.1);
@@ -168,7 +176,6 @@ $i-button-background-color: darken($light-gray, 5%);
     &[class*="icon-"] {
         &:before {
             font-size: 1.2em;
-            vertical-align: -15%;
         }
 
         &:not(:empty):before {
@@ -214,6 +221,22 @@ $i-button-background-color: darken($light-gray, 5%);
         &.clickable {
             cursor: pointer;
         }
+    }
+}
+
+// Fix for Firefox
+button.i-button {
+    line-height: 1em;
+    display: initial;
+
+    &[class*="icon-"] {
+        &:before {
+            vertical-align: -15%;
+        }
+    }
+
+    &.arrow:after {
+        vertical-align: -10%;
     }
 }
 
@@ -380,10 +403,6 @@ a.i-button-icon {
 
 a.arrow, .i-button.arrow {
     @include icon-after('icon-arrow-down');
-
-    &:after {
-        vertical-align: -10%;
-    }
 }
 
 .i-button.color-button {

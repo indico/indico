@@ -19,7 +19,7 @@
             ${ _('Timespan') }
         </h2>
 
-        <div class="toolbar thin">
+        <div class="toolbar thin space-after">
             <div class="group with-datepicker">
                 <span class="i-button label heavy">
                     ${ _('Start Date') }
@@ -47,7 +47,7 @@
             ${ _('Booking details') }
         </h2>
 
-        <div class="toolbar thin">
+        <div class="toolbar thin space-after">
             <div class="group">
                 <span class="i-button label">
                     ${ _('Booked for') }
@@ -56,7 +56,7 @@
                     placeholder="${ _('Enter name...') }" />
             </div>
         </div>
-        <div class="toolbar thin">
+        <div class="toolbar thin space-after">
             <div class="group">
                 <span class="i-button label">
                     ${ _('Reason') }
@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <div class="toolbar thin table">
+        <div class="toolbar thin space-after table">
             <div class="group i-selection">
                 <span class="i-button label">
                     ${ _('Booked') }
@@ -84,7 +84,7 @@
             </div>
         </div>
 
-        <div class="toolbar thin table">
+        <div class="toolbar thin space-after table">
             <div class="group i-selection">
                 <span class="i-button label">
                     ${ _('Type') }
@@ -102,7 +102,7 @@
             </div>
         </div>
 
-        <div class="toolbar thin table">
+        <div class="toolbar thin space-after table">
             <div class="group i-selection">
                 <span class="i-button label">
                     ${ _('State') }
@@ -125,7 +125,7 @@
             </div>
         </div>
 
-        <div class="toolbar thin table">
+        <div class="toolbar thin space-after table">
             <div class="group i-selection">
                 <span class="i-button label">
                     ${ _('Services') }

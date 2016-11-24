@@ -4,31 +4,27 @@
     <div class="flashed-messages"></div>
     <div id="subcontribution-list">
         <div>
-            <div class="toolbar form-group">
-                <div class="group left">
-                    <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#" data-select-all="#subcontribution-list input.select-row:visible">
-                                {% trans %}All{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-select-none="#subcontribution-list input.select-row:visible">
-                                {% trans %}None{% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="group left">
-                    <button class="i-button highlight icon-plus"
-                            data-title="{% trans %}Add new subcontribution{% endtrans %}"
-                            data-href="{{ url_for('.manage_create_subcontrib', contrib) }}"
-                            data-update="#subcontribution-list"
-                            data-ajax-dialog>
-                        {% trans %}Add new subcontribution{% endtrans %}
-                    </button>
-                </div>
+            <div class="toolbar form-group space-after">
+                <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" data-select-all="#subcontribution-list input.select-row:visible">
+                            {%- trans %}All{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none="#subcontribution-list input.select-row:visible">
+                            {%- trans %}None{% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
+                <button class="i-button highlight icon-plus"
+                        data-title="{% trans %}Add new subcontribution{% endtrans %}"
+                        data-href="{{ url_for('.manage_create_subcontrib', contrib) }}"
+                        data-update="#subcontribution-list"
+                        data-ajax-dialog>
+                    {%- trans %}Add new subcontribution{% endtrans -%}
+                </button>
                 <button class="i-button js-enable-if-checked icon-remove" disabled
                         title="{% trans %}Remove{% endtrans %}"
                         data-method="POST"

@@ -95,12 +95,10 @@
         {% endif %}
     </div>
     {% if agreement.pending %}
-        <div class="toolbar">
-            <div class="group right">
-                <button id="agreement-submit" class="i-button big highlight" disabled>
-                    {% trans %}Submit{% endtrans %}
-                </button>
-            </div>
+        <div class="toolbar f-j-end">
+            <button id="agreement-submit" class="i-button big highlight" disabled>
+                {% trans %}Submit{% endtrans %}
+            </button>
         </div>
     {% endif %}
 {{ form_footer(form, i_form=false) }}

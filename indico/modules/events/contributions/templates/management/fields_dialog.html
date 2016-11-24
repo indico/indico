@@ -2,7 +2,7 @@
 {% from '_sortable_list.html' import sortable_list %}
 
 <div class="manage-contribution-fields">
-    <div class="toolbar">
+    <div class="toolbar space-after">
         <a class="i-button arrow icon-plus highlight" data-toggle="dropdown">
             {%- trans %}Add new field{% endtrans -%}
         </a>
@@ -47,10 +47,8 @@
         {%- endcall %}
     {% endif %}
 
-    <div class="toolbar">
-        <div class="group right">
-            <button class="i-button big" data-button-back>{% trans %}Close{% endtrans %}</button>
-        </div>
+    <div class="toolbar f-j-end">
+        <button class="i-button big" data-button-back>{% trans %}Close{% endtrans %}</button>
     </div>
 </div>
 

@@ -1,22 +1,20 @@
 <div class="i-form no-max-width event-person-list js-event-person-list">
     <div class="flashed-messages"></div>
     <div>
-        <div class="toolbar">
-            <div class="group">
-                <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
-                <ul class="dropdown">
-                    <li>
-                        <a href="#" data-select-all="#person-list-table input.select-row:visible">
-                            {% trans %}All{% endtrans %}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" data-select-none="#person-list-table input.select-row:visible">
-                            {% trans %}None{% endtrans %}
-                        </a>
-                    </li>
-                </ul>
-            </div>
+        <div class="toolbar space-after">
+            <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                <li>
+                    <a href="#" data-select-all="#person-list-table input.select-row:visible">
+                        {% trans %}All{% endtrans %}
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-select-none="#person-list-table input.select-row:visible">
+                        {% trans %}None{% endtrans %}
+                    </a>
+                </li>
+            </ul>
             <div class="group i-selection">
                 <span class="i-button label">{% trans %}Show{% endtrans %}</span>
                 <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
