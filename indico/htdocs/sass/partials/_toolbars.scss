@@ -125,6 +125,17 @@ $toolbar-thin-height: 1.9em;
     }
 }
 
+.toolbars {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    flex-wrap: wrap;
+
+    > .toolbar:not(:last-child) {
+        margin-right: 0.5em;
+    }
+}
+
 .toolbar.table {
     display: table;
     table-layout: fixed;
