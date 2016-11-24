@@ -43,7 +43,7 @@
 {% endmacro %}
 
 
-{% macro render_decision_box(abstract, form, management=false) %}
+{% macro render_decision_box(abstract, form) %}
     {% set event = abstract.event_new %}
     <div class="i-timeline-item-label action icon-hammer"></div>
     <div class="i-timeline-item-box content-indicator">
@@ -79,7 +79,7 @@
             {% endfor %}
         </div>
         <div class="i-box-footer">
-            {% set url = url_for('.judge_abstract', abstract, management=management) %}
+            {% set url = url_for('.judge_abstract', abstract) %}
             {% set form_id = 'judgment-form' %}
 
             {% call form_header(form, action=url, orientation='vertical', id=form_id) %}
@@ -103,7 +103,7 @@
 {% endmacro %}
 
 
-{% macro render_reviewed_for_tracks_box(abstract, form, management=false) %}
+{% macro render_reviewed_for_tracks_box(abstract, form) %}
     <div id="abstract-reviewed-for-tracks-box" class="i-timeline-item">
         <div class="i-timeline-item-label action icon-list"></div>
         <div class="i-timeline-item-box content-indicator">
@@ -124,7 +124,7 @@
                     {% if abstract.edit_track_mode.name != 'none' %}
                         <div>
                             <a href="#"
-                               data-href="{{ url_for('.edit_review_tracks', abstract, management=management) }}"
+                               data-href="{{ url_for('.edit_review_tracks', abstract) }}"
                                data-form-container="#edit-reviewed-for-track-list"
                                data-update="#abstract-page"
                                data-replace-update

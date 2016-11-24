@@ -1,6 +1,6 @@
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_track, render_tracks %}
 
-{% macro _render_submission_info(abstract, management) %}
+{% macro _render_submission_info(abstract) %}
     {% if abstract.submitted_contrib_type %}
         <div class="info-line">
             <label>
@@ -122,7 +122,7 @@
     </div>
 {% endmacro %}
 
-{% macro _render_abstract_summary(abstract, management=false) %}
+{% macro _render_abstract_summary(abstract) %}
     <div class="abstract-summary flexrow f-a-baseline">
         <div class="abstract-summary-badge">
             {{ _render_summary_state(abstract) }}
@@ -214,7 +214,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_attachments(abstract, management) %}
+{% macro render_attachments(abstract) %}
     {% if abstract.files %}
         <div class="files field-separator">
             <table class="tree">
@@ -282,7 +282,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_abstract_public(abstract, management=false) %}
+{% macro render_abstract_public(abstract) %}
     <div id="abstract-title" class="flexrow">
         <h3 class="abstract-title f-self-grow">
             {{ abstract.title }}
@@ -297,7 +297,7 @@
                     {% if abstract.can_withdraw(session.user, check_state=true) %}
                         <a title="{% trans %}Withdraw abstract{% endtrans %}"
                            class="i-button text-color color-on-hover danger"
-                           data-href="{{ url_for('.withdraw_abstract', abstract, management=management) }}"
+                           data-href="{{ url_for('.withdraw_abstract', abstract) }}"
                            data-method="POST"
                            data-update="#abstract-page"
                            data-replace-update
@@ -307,7 +307,7 @@
                         </a>
                     {% elif abstract.state.name == 'withdrawn' and can_manage %}
                         <a title="{% trans %}This abstract has been withdrawn but can be restored using this option{% endtrans %}"
-                           data-href="{{ url_for('.reset_abstract_state', abstract, management=management) }}"
+                           data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
                            data-update="#abstract-page"
                            data-replace-update
@@ -324,7 +324,7 @@
                     {% if abstract.can_edit(session.user) %}
                         <a href="#" class="i-button icon-edit"
                            title="{% trans %}Edit abstract{% endtrans %}"
-                           data-href="{{ url_for('.edit_abstract', abstract, management=management) }}"
+                           data-href="{{ url_for('.edit_abstract', abstract) }}"
                            data-title="{% trans %}Edit abstract{% endtrans %}"
                            data-ajax-dialog
                            data-reload-after></a>
@@ -368,7 +368,7 @@
     </div>
 
     <div id="abstract-public">
-        {{ _render_abstract_summary(abstract, management) }}
+        {{ _render_abstract_summary(abstract) }}
         <div class="abstract-content js-mathjax">
             <div class="abstract-authorship-block flexrow f-j-center">
                 <div class="abstract-authorship-label">
@@ -415,10 +415,10 @@
                         {% endif %}
                     </div>
                     <div class="i-box-content submission-info">
-                        {{ _render_submission_info(abstract, management) }}
+                        {{ _render_submission_info(abstract) }}
                         {% if abstract.event_new.cfa.allow_attachments %}
                             <div class="attachment-list">
-                                {{ render_attachments(abstract, management) }}
+                                {{ render_attachments(abstract) }}
                             </div>
                         {% endif %}
                     </div>
@@ -440,7 +440,7 @@
                                 <div>
                                     <a class="i-button-icon icon-remove"
                                        title="{% trans %}Reset judgement{% endtrans %}"
-                                       data-href="{{ url_for('.reset_abstract_state', abstract, management=management) }}"
+                                       data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                                        data-method="POST"
                                        data-update="#abstract-page"
                                        data-replace-update
