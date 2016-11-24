@@ -202,6 +202,8 @@ def get_roles_for_event(event):
 def get_user_abstracts(event, user):
     """Get the list of abstracts where the user is a reviewer/convener"""
     return (Abstract.query.with_parent(event)
+            .options(joinedload('reviews'),
+                     joinedload('person_links'))
             .filter(db.or_(Abstract.submitter == user,
                            Abstract.person_links.any(AbstractPersonLink.person.has(user=user))))
             .order_by(Abstract.friendly_id)
