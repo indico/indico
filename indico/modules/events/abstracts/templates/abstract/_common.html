@@ -13,20 +13,20 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_score(score, cfa, final=false) %}
+{% macro render_score(score, cfa, no_tag=false, classes='i-tag outline') %}
     {% set score = score|round(1) %}
     {% set max_score = cfa.rating_range[1]|round(1) %}
-    <span class="rating i-tag highlight {{ 'outline' if not final }}"
+    <span class="highlight {{ classes }}"
           title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
         {{ score }}
     </span>
 {% endmacro %}
 
-{% macro render_track(track, full_title=false, classes='abstract-track') -%}
+{% macro render_track(track, full_title=false) -%}
     {% set title = track.full_title if full_title else track.short_title %}
     {% if track.can_review_abstracts(session.user) or track.can_convene(session.user) %}
         <a href="{{ url_for('.display_reviewable_track_abstracts', track) }}"
-           class="{{ classes }}"
+           class="abstract-track"
            title="{{ track.full_title if not full_title }}">
             <span class="truncate-text">
                {{ title }}
