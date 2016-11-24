@@ -185,7 +185,8 @@
                 </thead>
                 <tbody>
                     {% for person_data in persons -%}
-                        <tr id="person-{{ person_data.person.id }}" class="i-table"
+                        <tr id="person-{{ person_data.person.id }}"
+                            class="i-table {{ 'pending' if person_data.person.is_pending }}"
                             data-person-roles="{{ person_data.roles | tojson | forceescape }}"
                             {{ 'data-no-account' if person_data.roles.no_account }}>
                             {{ render_person_row(person_data) }}

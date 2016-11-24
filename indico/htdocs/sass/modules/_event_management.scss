@@ -513,6 +513,14 @@ th.i-table {
         }
     }
 
+    .pending {
+        background-color: $light-gray;
+
+        td {
+            color: $dark-gray;
+        }
+    }
+
     thead {
         @include border-bottom();
         display: block;
