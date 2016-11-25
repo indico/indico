@@ -38,7 +38,7 @@
     {% set mapping_icon = {'positive': 'icon-checkmark',
                            'conflicting': 'icon-checkmark',
                            'negative': 'icon-cross',
-                           'mixed': 'icon-cross',
+                           'mixed': 'icon-tilde',
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
     <div class="state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
