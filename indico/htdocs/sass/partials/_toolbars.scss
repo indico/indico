@@ -25,7 +25,8 @@ $toolbar-thin-height: 1.9em;
 .toolbar {
     $toolbar-button-height: 1.7em;
 
-    @extend .flexrow;
+    display: flex;
+    flex-shrink: 0;
     overflow: hidden;
     min-height: $toolbar-height;
     margin-bottom: 0.5em;

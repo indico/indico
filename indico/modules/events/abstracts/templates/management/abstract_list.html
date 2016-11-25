@@ -20,8 +20,8 @@
 
 {% block content %}
     <div class="list abstracts">
-        <div class="clearfix">
-            <div class="toolbar left">
+        <div class="toolbars">
+            <div class="toolbar">
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow left icon-only" aria-hidden="true" href="#"
                        data-toggle="dropdown"></a>
@@ -184,7 +184,7 @@
                     <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>
                 </div>
             </div>
-            <div class="toolbar right">
+            <div class="toolbar">
                 <div class="group">
                     <a class="i-button icon-link js-static-url"
                        data-href="{{ url_for('.generate_static_url', event) }}"
