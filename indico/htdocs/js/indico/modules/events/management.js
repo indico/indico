@@ -19,8 +19,8 @@
     'use strict';
 
     function refreshPersonFilters() {
-        var personRows = $('#person-list tr[data-person-roles]');
-        var filters = $('#person-list [data-filter]:checked').map(function() {
+        var personRows = $('.js-event-person-list tr[data-person-roles]');
+        var filters = $('.js-event-person-list [data-filter]:checked').map(function() {
             return $(this).data('filter');
         }).get();
 
@@ -34,7 +34,7 @@
 
         personRows.addClass('hidden');
         visibleEntries.removeClass('hidden');
-        $('#person-list').trigger('indico:syncEnableIfChecked');
+        $('.js-event-person-list').trigger('indico:syncEnableIfChecked');
     }
 
     global.setupEventPersonsList = function setupEventPersonsList(options) {
@@ -42,25 +42,25 @@
             hasNoAccountFilter: false
         }, options);
 
-        enableIfChecked('#person-list', '.select-row:visible', '#person-list .js-requires-selected-row');
-        $('#person-list [data-toggle=dropdown]').closest('.group').dropdown();
-        $('#person-list [data-filter]').on('click', refreshPersonFilters);
+        enableIfChecked('.js-event-person-list', '.select-row:visible', '.js-event-person-list .js-requires-selected-row');
+        $('.js-event-person-list [data-toggle=dropdown]').closest('.group').dropdown();
+        $('.js-event-person-list [data-filter]').on('click', refreshPersonFilters);
 
-        $('#person-list td').on('mouseenter', function() {
+        $('.js-event-person-list td').on('mouseenter', function() {
             var $this = $(this);
             if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
                 $this.attr('title', $this.text());
             }
         });
 
-        $('#person-list .tablesorter').tablesorter({
+        $('.js-event-person-list .tablesorter').tablesorter({
             cssAsc: 'header-sort-asc',
             cssDesc: 'header-sort-desc',
             headerTemplate: '',
             sortList: [[1, 0]]
         });
 
-        $('#person-list .js-count-label:not(.no-role)').qbubble({
+        $('.js-event-person-list .js-count-label:not(.no-role)').qbubble({
             show: {
                 event: 'mouseover'
             },
@@ -94,13 +94,13 @@
         });
 
         if (options.hasNoAccountFilter) {
-            $('#person-list [data-filter]:not(#filter-no-account)').on('change', function() {
+            $('.js-event-person-list [data-filter]:not(#filter-no-account)').on('change', function() {
                 $('#filter-no-account').prop('checked', false);
                 refreshPersonFilters();
             });
             $('#filter-no-account').on('change', function() {
                 if (this.checked) {
-                    $('#person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
+                    $('.js-event-person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
                 }
                 refreshPersonFilters();
             });
