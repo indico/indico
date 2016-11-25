@@ -263,6 +263,7 @@
         background-color: $light-gray;
 
         .details-content-row {
+            color: $dark-gray;
             padding: 5px 10px 5px calc(20px + 1em);
 
             &:not(:first-child) {
@@ -287,6 +288,10 @@
 
     .details-content-inner {
         box-shadow: inset 0px 15px 20px -20px $gray;
+
+        .i-tag {
+            border-color: transparent;
+        }
     }
 }
 

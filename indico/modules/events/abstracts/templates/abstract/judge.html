@@ -102,9 +102,12 @@
                     {% if has_reviews %}
                         <div class="track-review-details">
                             <div id="question-list-{{ track.id }}" class="details-content weak-hidden">
-                                <div class="details-content-inner">
+                                <div class="details-content-inner abstract-question-list">
                                     {% for question, score in ratings[track.id].iteritems() %}
                                         <div class="details-content-row flexrow f-a-center">
+                                            <div>
+                                                <span class="question-index">{{ loop.index }}</span>
+                                            </div>
                                             <div class="question-text f-self-stretch">{{ question.text }}</div>
                                             {{ render_score(score, abstract.event_new.cfa) }}
                                         </div>
