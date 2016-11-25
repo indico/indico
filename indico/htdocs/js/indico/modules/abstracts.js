@@ -93,7 +93,7 @@
             }
             $this.toggleClass('open');
         }).on('click', '.js-highlight-review', function() {
-            $($(this).attr('href') + ' .i-timeline-item-box').effect('highlight', {color: Palette.highlight}, 'slow');
+            $($(this).attr('href') + ' .i-box-header').effect('highlight', {color: Palette.highlight}, 'slow');
         });
     };
 
