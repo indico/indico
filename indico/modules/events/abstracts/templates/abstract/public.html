@@ -427,87 +427,87 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+{% endmacro %}
 
-            {% if abstract.state.name not in ('submitted', 'withdrawn') %}
-                <div class="i-timeline-item">
-                    <div class="i-timeline-item-label action" style="{{ abstract.judge.avatar_css }}">
-                        {{- abstract.judge.name[0] -}}
-                    </div>
-                    <div class="i-timeline-item-box header-indicator-left">
-                        <div class="i-box-header flexrow">
-                            <div class="f-self-stretch">
-                                {{ _render_judgment_action(abstract) }}
-                                <time datetime="{{ abstract.judgment_dt.isoformat() }}">
-                                    {{- abstract.judgment_dt|format_human_date -}}
-                                </time>
-                            </div>
-                            {% if abstract.event_new.can_manage(session.user) %}
-                                <div>
-                                    <a class="i-button-icon icon-remove"
-                                       title="{% trans %}Reset judgement{% endtrans %}"
-                                       data-href="{{ url_for('.reset_abstract_state', abstract) }}"
-                                       data-method="POST"
-                                       data-update="#abstract-page"
-                                       data-replace-update
-                                       data-title="{% trans %}Reset judgment{% endtrans %}"
-                                       data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></a>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="i-box-content">
-                            {% if abstract.state.name == 'accepted' %}
-                                {% if abstract.contribution %}
-                                    {% set link_start = '<a href="%s">'|safe|format(url_for('contributions.display_contribution', abstract.contribution)) %}
-                                    {% set link_end = '</a>'|safe %}
-                                {% else %}
-                                    {% set link_start = '' %}
-                                    {% set link_end = '' %}
-                                {% endif %}
-                                {% if abstract.accepted_contrib_type and abstract.accepted_track %}
-                                    {% trans type=abstract.accepted_contrib_type.name, track=render_track(abstract.accepted_track, full_title=true) -%}
-                                        The abstract was accepted
-                                        as <span class="abstract-contribution-type">{{ type }}</span>
-                                        for track {{ track }} and a {{ link_start }}contribution{{ link_end }} was
-                                        created in the event.
-                                    {%- endtrans %}
-                                {% elif abstract.accepted_contrib_type %}
-                                    {% trans type=abstract.accepted_contrib_type.name -%}
-                                        The abstract was accepted
-                                        as <span class="abstract-contribution-type">{{ type }}</span>
-                                        and a {{ link_start }}contribution{{ link_end }} was created in the event.
-                                    {%- endtrans %}
-                                {% elif abstract.accepted_track %}
-                                    {% trans track=render_track(abstract.accepted_track, full_title=true)  -%}
-                                        The abstract was accepted
-                                        for track {{ track }} and a {{ link_start }}contribution{{ link_end }}
-                                        was created in the event.
-                                    {%- endtrans %}
-                                {% else %}
-                                    {% trans -%}
-                                        The abstract was accepted and a {{ link_start }}contribution{{ link_end }} was created in the event.
-                                    {%- endtrans %}
-                                {% endif %}
-                            {% elif abstract.state.name == 'rejected' %}
-                                {% trans %}The abstract was rejected.{% endtrans %}
-                            {% elif abstract.state.name == 'merged' %}
-                                {% trans url=url_for('.display_abstract', abstract.merged_into), other=abstract.merged_into.title -%}
-                                    The abstract was merged into {{ link_start }}{{ other }}{{ link_end }}.
-                                {%- endtrans %}
-                            {% elif abstract.state.name == 'duplicate'%}
-                                {% trans url=url_for('.display_abstract', abstract.duplicate_of), other=abstract.duplicate_of.title -%}
-                                    The abstract was marked as a duplicate of {{ link_start }}{{ other }}{{ link_end }}
-                                {%- endtrans %}
-                            {% endif %}
-                            {% if abstract.judgment_comment %}
-                                <div class="titled-rule">
-                                    {% trans %}Comment{% endtrans %}
-                                </div>
-                                {{ abstract.judgment_comment }}
-                            {% endif %}
-                        </div>
-                    </div>
+{% macro render_judgment(abstract) %}
+    <div id="abstract-judgment-details" class="i-timeline-item">
+        <div class="i-timeline-item-label action" style="{{ abstract.judge.avatar_css }}">
+            {{- abstract.judge.name[0] -}}
+        </div>
+        <div class="i-timeline-item-box header-indicator-left">
+            <div class="i-box-header flexrow">
+                <div class="f-self-stretch">
+                    {{ _render_judgment_action(abstract) }}
+                    <time datetime="{{ abstract.judgment_dt.isoformat() }}">
+                        {{- abstract.judgment_dt|format_human_date -}}
+                    </time>
                 </div>
-            {% endif %}
+                {% if abstract.event_new.can_manage(session.user) %}
+                    <div>
+                        <a class="i-button-icon icon-remove"
+                           title="{% trans %}Reset judgement{% endtrans %}"
+                           data-href="{{ url_for('.reset_abstract_state', abstract) }}"
+                           data-method="POST"
+                           data-update="#abstract-page"
+                           data-replace-update
+                           data-title="{% trans %}Reset judgment{% endtrans %}"
+                           data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></a>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="i-box-content">
+                {% if abstract.state.name == 'accepted' %}
+                    {% if abstract.contribution %}
+                        {% set link_start = '<a href="%s">'|safe|format(url_for('contributions.display_contribution', abstract.contribution)) %}
+                        {% set link_end = '</a>'|safe %}
+                    {% else %}
+                        {% set link_start = '' %}
+                        {% set link_end = '' %}
+                    {% endif %}
+                    {% if abstract.accepted_contrib_type and abstract.accepted_track %}
+                        {% trans type=abstract.accepted_contrib_type.name, track=render_track(abstract.accepted_track, full_title=true) -%}
+                            The abstract was accepted
+                            as <span class="abstract-contribution-type">{{ type }}</span>
+                            for track {{ track }} and a {{ link_start }}contribution{{ link_end }} was
+                            created in the event.
+                        {%- endtrans %}
+                    {% elif abstract.accepted_contrib_type %}
+                        {% trans type=abstract.accepted_contrib_type.name -%}
+                            The abstract was accepted
+                            as <span class="abstract-contribution-type">{{ type }}</span>
+                            and a {{ link_start }}contribution{{ link_end }} was created in the event.
+                        {%- endtrans %}
+                    {% elif abstract.accepted_track %}
+                        {% trans track=render_track(abstract.accepted_track, full_title=true)  -%}
+                            The abstract was accepted
+                            for track {{ track }} and a {{ link_start }}contribution{{ link_end }}
+                            was created in the event.
+                        {%- endtrans %}
+                    {% else %}
+                        {% trans -%}
+                            The abstract was accepted and a {{ link_start }}contribution{{ link_end }} was created in the event.
+                        {%- endtrans %}
+                    {% endif %}
+                {% elif abstract.state.name == 'rejected' %}
+                    {% trans %}The abstract was rejected.{% endtrans %}
+                {% elif abstract.state.name == 'merged' %}
+                    {% trans url=url_for('.display_abstract', abstract.merged_into), other=abstract.merged_into.title -%}
+                        The abstract was merged into {{ link_start }}{{ other }}{{ link_end }}.
+                    {%- endtrans %}
+                {% elif abstract.state.name == 'duplicate' %}
+                    {% trans url=url_for('.display_abstract', abstract.duplicate_of), other=abstract.duplicate_of.title -%}
+                        The abstract was marked as a duplicate of {{ link_start }}{{ other }}{{ link_end }}
+                    {%- endtrans %}
+                {% endif %}
+                {% if abstract.judgment_comment %}
+                    <div class="titled-rule">
+                        {% trans %}Comment{% endtrans %}
+                    </div>
+                    {{ abstract.judgment_comment }}
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endmacro %}

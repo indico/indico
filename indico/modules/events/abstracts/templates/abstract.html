@@ -1,6 +1,6 @@
 {% extends 'events/abstracts/management/_base.html' if management else 'events/abstracts/display/_base.html' %}
 
-{% from 'events/abstracts/abstract/public.html' import render_abstract_public %}
+{% from 'events/abstracts/abstract/public.html' import render_abstract_public, render_judgment %}
 {% from 'events/abstracts/abstract/judge.html' import render_decision_box, render_reviewed_for_tracks_box %}
 {% from 'events/abstracts/abstract/timeline.html' import render_timeline %}
 
@@ -20,19 +20,7 @@
     {{ render_abstract_public(abstract) }}
     <div id="abstract-private" class="i-timeline">
         {{ render_timeline(abstract, comment_form, review_form) }}
-
-        {% set can_review = abstract.can_review(session.user, check_state=true) %}
-        {% set can_judge = abstract.can_judge(session.user, check_state=true) %}
-
-        {% if can_review or can_judge %}
-            <div class="i-timeline">
-                {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
-                <div class="i-timeline-connect-down to-separator"></div>
-            </div>
-            <div class="i-timeline-separator"></div>
-        {% endif %}
-
-        {% if can_judge %}
+        {% if abstract.can_judge(session.user, check_state=true) %}
             {% if abstract.event_new.tracks %}
                 {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
             {% endif %}
@@ -40,21 +28,25 @@
                 {{ render_decision_box(abstract, judgment_form) }}
             </div>
         {% endif %}
-
-        {% if abstract.email_logs and abstract.can_judge(session.user, check_state=false) %}
-            <a class="open-abstract-notification-log"
-               data-href="{{ url_for('.notification_log', abstract) }}"
-               data-title="{% trans %}Sent notifications{% endtrans %}"
-               data-subtitle="{% trans %}Log of notifications sent to submitter and authors of this abstract{% endtrans %}"
-               data-ajax-dialog>
-                {% trans count=abstract.email_logs|length -%}
-                    1 notification sent
-                {%- pluralize -%}
-                    {{ count }} notifications sent
-                {%- endtrans %}
-            </a>
-        {% endif %}
     </div>
+
+    {% if abstract.state.name not in ('submitted', 'withdrawn') %}
+        {{ render_judgment(abstract) }}
+    {% endif %}
+
+    {% if abstract.email_logs and abstract.can_judge(session.user, check_state=false) %}
+        <a class="open-abstract-notification-log"
+           data-href="{{ url_for('.notification_log', abstract) }}"
+           data-title="{% trans %}Sent notifications{% endtrans %}"
+           data-subtitle="{% trans %}Log of notifications sent to submitter and authors of this abstract{% endtrans %}"
+           data-ajax-dialog>
+            {% trans count=abstract.email_logs|length -%}
+                1 notification sent
+            {%- pluralize -%}
+                {{ count }} notifications sent
+            {%- endtrans %}
+        </a>
+    {% endif %}
 
     {% if not no_javascript %}
         <script>
