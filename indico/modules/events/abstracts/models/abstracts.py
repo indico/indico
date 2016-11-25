@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals, division
 
+from collections import defaultdict
 from itertools import chain
 from operator import attrgetter
 
 from sqlalchemy import inspect
-from sqlalchemy.orm import contains_eager
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 
@@ -574,25 +574,20 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
         else:
             return AbstractReviewingState.mixed
 
-    def get_avg_per_question_per_track(self):
-        ratings = {}
-        abstract_ratings = (AbstractReviewRating.query
-                            .join(AbstractReviewRating.review)
-                            .join(AbstractReviewRating.question)
-                            .options(contains_eager('review'), contains_eager('question'))
-                            .filter(AbstractReview.abstract == self,
-                                    ~AbstractReviewQuestion.is_deleted)
-                            .all())
-        for rating in abstract_ratings:
-            if rating.question.no_score:
-                continue
-            ratings.setdefault(rating.review.track_id, {})
-            question_avg_rating = ratings[rating.review.track_id].get(rating.question)
-            if question_avg_rating:
-                ratings[rating.review.track_id][rating.question] = (question_avg_rating + rating.value) / 2
-            else:
-                ratings[rating.review.track_id][rating.question] = rating.value
-        return ratings
+    def get_track_question_scores(self):
+        query = (db.session.query(AbstractReview.track_id,
+                                  AbstractReviewQuestion,
+                                  db.func.avg(AbstractReviewRating.value))
+                 .join(AbstractReviewRating.review)
+                 .join(AbstractReviewRating.question)
+                 .filter(AbstractReview.abstract == self,
+                         ~AbstractReviewQuestion.is_deleted,
+                         ~AbstractReviewQuestion.no_score)
+                 .group_by(AbstractReview.track_id, AbstractReviewQuestion.id))
+        scores = defaultdict(lambda: defaultdict(lambda: None))
+        for track_id, question, score in query:
+            scores[track_id][question] = score
+        return scores
 
     def get_reviewed_for_tracks_by_user(self, user, include_reviewed=False):
         already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
