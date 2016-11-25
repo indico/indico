@@ -6,10 +6,11 @@
 {% macro render_timeline(abstract, comment_form, review_form=none) %}
     {% set can_comment = abstract.can_comment(session.user) %}
     {% set can_review = abstract.can_review(session.user, check_state=true) %}
-    {% if abstract.comments or can_comment or can_review %}
+    {% set timeline = abstract.get_timeline(session.user) %}
+    {% if timeline or can_comment or can_review %}
         <div id="abstract-timeline" class="i-timeline with-line">
             <div class="i-timeline-connect-up"></div>
-            {% for item in abstract.get_timeline(session.user) %}
+            {% for item in timeline %}
                 {% if item.TIMELINE_TYPE == 'comment' %}
                     {{ _render_comment(item) }}
                 {% elif item.TIMELINE_TYPE == 'review' %}
@@ -20,6 +21,11 @@
                 {{ _render_input(abstract, comment_form, review_form) }}
             {% endif %}
         </div>
+        <div class="i-timeline">
+            {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
+            <div class="i-timeline-connect-down to-separator"></div>
+        </div>
+        <div class="i-timeline-separator"></div>
     {% endif %}
 {% endmacro %}
 
