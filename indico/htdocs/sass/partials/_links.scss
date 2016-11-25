@@ -15,6 +15,20 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+a:link,
+a:visited {
+   text-decoration: none;
+}
+
+a:not(.i-button) {
+    color: $blue;
+
+    &:hover {
+        color: $orange;
+        cursor: pointer;
+    }
+}
+
 a.discreet-link {
     color: inherit;
 
