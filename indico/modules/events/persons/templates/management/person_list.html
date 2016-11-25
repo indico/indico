@@ -11,20 +11,20 @@
     {%- set has_no_account = persons|selectattr('roles.no_account')|any -%}
     {%- set has_uninvited = persons|selectattr('roles.no_account')|selectattr('person.invited_dt', 'none')|any -%}
 
-    <div id="person-list">
+    <div class="event-roles js-event-person-list">
         <div class="flashed-messages"></div>
         <div class="toolbars">
-            <div class="toolbar form-group">
+            <div class="toolbar">
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
                     <ul class="dropdown">
                         <li>
-                            <a href="#" data-select-all="#person-list input.select-row:visible:not(:disabled)">
+                            <a href="#" data-select-all="#event-roles-list input.select-row:visible:not(:disabled)">
                                 {% trans %}All{% endtrans %}
                             </a>
                         </li>
                         <li>
-                            <a href="#" data-select-none="#person-list input.select-row:visible">
+                            <a href="#" data-select-none="#event-roles-list input.select-row:visible">
                                 {% trans %}None{% endtrans %}
                             </a>
                         </li>
@@ -35,7 +35,7 @@
                        data-href="{{ url_for('persons.email_event_persons', event) }}"
                        data-title="{% trans %}Send email{% endtrans %}"
                        data-method="POST"
-                       data-params-selector="#person-list input[name=person_id]:checkbox:checked:visible"
+                       data-params-selector="#event-roles-list input[name=person_id]:checkbox:checked:visible"
                        data-ajax-dialog
                        data-reload-after>
                         {%- trans %}Send emails{% endtrans -%}
@@ -94,7 +94,7 @@
                             <a href="#"
                                title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
                                data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
-                               data-params-selector="#person-list [data-no-account] input[name=person_id]:checkbox"
+                               data-params-selector="#event-roles-list [data-no-account] input[name=person_id]:checkbox"
                                data-title="{% trans %}Send email{% endtrans %}"
                                data-method="POST"
                                data-ajax-dialog
@@ -109,7 +109,7 @@
                                          received an invitation email yet{% endtrans %}"
                                    data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
                                                           not_invited_only=true) }}"
-                                   data-params-selector="#person-list [data-no-account] input[name=person_id]:checkbox"
+                                   data-params-selector="#event-roles-list [data-no-account] input[name=person_id]:checkbox"
                                    data-title="{% trans %}Send email{% endtrans %}"
                                    data-method="POST"
                                    data-ajax-dialog
@@ -144,7 +144,7 @@
                 </div>
             </div>
         </div>
-        <div class="form-group">
+        <div id="event-roles-list">
             {% if num_no_account %}
                 {% call message_box('warning') %}
                     {% trans count = num_no_account -%}
@@ -156,7 +156,7 @@
                     {%- endtrans -%}
                 {% endcall %}
             {% endif %}
-            <table id="person-list" class="i-table-widget tablesorter">
+            <table class="i-table-widget tablesorter">
                 <thead>
                     <tr class="i-table">
                         <th class="i-table thin-column" data-sorter="false"></th>
