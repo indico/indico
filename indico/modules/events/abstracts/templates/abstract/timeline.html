@@ -132,7 +132,7 @@
                             {%- endtrans %}
                         {% elif review.proposed_action.name == 'change_tracks' %}
                             {% trans -%}
-                                Proposed to {{ action }}change Tracks{{ endaction }}
+                                Proposed to {{ action }}change tracks{{ endaction }}
                             {%- endtrans %}
                         {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
                             {% set other_abstract = review.proposed_related_abstract %}
