@@ -96,10 +96,15 @@
     }
 }
 
-.abstract-contribution-type,
-.abstract-track {
+.abstract-track,
+.abstract-contribution-type {
     @include border-bottom($style: dashed);
-    max-width: 10em;
+}
+
+.abstract-track {
+    max-width: 15em;
+    display: inline-block;
+    vertical-align: text-top;
 }
 
 .abstract-content {
