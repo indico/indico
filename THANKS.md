@@ -76,6 +76,8 @@ jQuery placeholder (https://github.com/mathiasbynens/jquery-placeholder) is a MI
 
 [Contract icon](http://thenounproject.com/term/contract/59244/) designed by [Michael Wohlwend](http://thenounproject.com/michael.wohlwend/) from The Noun Project.
 
+[Tilde icon](https://thenounproject.com/term/flex/195062/) designed by [Karine Shahnazaryan](https://thenounproject.com/karine.shahnazaryan/) from the Noun Project.
+
 Simple Toogle switch CSS (http://www.cssflow.com) is freely distributed under MIT license.
 
 See also the AUTHORS and ChangeLog files.
