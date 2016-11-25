@@ -1,4 +1,4 @@
-{% from 'events/abstracts/abstract/_common.html' import render_instruction_box %}
+{% from 'events/abstracts/abstract/_common.html' import render_instruction_box, render_track %}
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 
 
@@ -30,12 +30,13 @@
 
     <div class="abstract-review-form-preface">
         {% if review %}
-            {% trans title=track.full_title -%}
-                Changing your review in track <span class="abstract-track">{{ title }}</span>
+            {% set track_title = render_track(track) %}
+            {% trans -%}
+                Changing your review in track {{ track_title }}
             {%- endtrans %}
         {% else %}
-            {% trans title=track.full_title -%}
-                Reviewing abstract in track <span class="abstract-track">{{ title }}</span>
+            {% trans -%}
+                Reviewing abstract in track {{ track_title }}
             {%- endtrans %}
         {% endif %}
     </div>
