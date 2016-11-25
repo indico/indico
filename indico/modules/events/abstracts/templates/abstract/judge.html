@@ -67,7 +67,7 @@
                     {% endif %}
                 </div>
             </div>
-            {% set ratings = abstract.get_avg_per_question_per_track() %}
+            {% set ratings = abstract.get_track_question_scores() %}
             {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
                 {% set has_reviews = track.id in ratings %}
                 <div class="track-review">
