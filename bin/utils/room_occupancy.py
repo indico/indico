@@ -35,11 +35,12 @@ def _main(location):
     else:
         rooms = Room.find_all(Location.name.in_(location), _join=Location)
 
-    print 'Month\tYear\tRoom'
+    print 'Month\tYear\tPublic?\tRoom'
     for room in rooms:
-        print '{1:.3f}\t{2:.3f}\t{0}'.format(room.full_name,
-                                             calculate_rooms_occupancy([room], past_month, yesterday) * 100,
-                                             calculate_rooms_occupancy([room], past_year, yesterday) * 100)
+        print '{2:.2f}%\t{3:.2f}%\t{1}\t{0}'.format(room.full_name,
+                                                    "Y" if room.is_public else "N",
+                                                    calculate_rooms_occupancy([room], past_month, yesterday) * 100,
+                                                    calculate_rooms_occupancy([room], past_year, yesterday) * 100)
 
 
 @click.command()
