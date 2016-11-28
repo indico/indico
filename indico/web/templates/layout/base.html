@@ -43,7 +43,7 @@
                 {% endif %}
             </header>
         {% endif %}
-        <div class="page-content">
+        <div class="{% block page_content_class %}page-content{% endblock %}">
             {% block content %}{% endblock %}
         </div>
     </div>
