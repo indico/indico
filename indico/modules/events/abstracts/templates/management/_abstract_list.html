@@ -29,7 +29,7 @@
     </td>
 {%- endmacro %}
 
-{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=None) %}
+{% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=none, reviewed_abstracts=none) %}
     {% if abstracts %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -56,7 +56,12 @@
                             {% for item in dynamic_columns %}
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
-                            <th class="i-table thin-column"></th>
+                            {% if reviewed_abstracts is not none %}
+                                <th class="i-table centered">
+                                    {%- trans %}Reviewed{% endtrans -%}
+                                </th>
+                            {% endif %}
+                            <th class="i-table thin-column" data-sorter="false"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -171,6 +176,16 @@
                                         {{- friendly_data if friendly_data else '-' -}}
                                     </td>
                                 {% endfor %}
+                                {% if reviewed_abstracts is not none %}
+                                    {% set is_reviewed = abstract in reviewed_abstracts %}
+                                    <td class="text-center" data-text="{{ 1 if is_reviewed else 0 }}">
+                                        {% if is_reviewed %}
+                                            <span class="icon-file-check"
+                                                  title="{% trans %}You have reviewed this abstract{% endtrans %}">
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
                                 <td class="i-table">
                                     {% if abstract.state.name == 'accepted' and abstract.contribution %}
                                         <a class="icon-arrow-right"

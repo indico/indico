@@ -73,6 +73,10 @@ table.i-table {
         padding: 10px 5px;
         font-weight: bold;
         text-align: left;
+
+        &.centered {
+            text-align: center;
+        }
     }
 }
 
