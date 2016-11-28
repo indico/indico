@@ -44,6 +44,7 @@ from indico.modules.events.contributions.util import (ContributionListGenerator,
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
@@ -182,7 +183,10 @@ class RHCreateContribution(RHManageContributionsBase):
         contrib_form_class = make_contribution_form(self.event_new)
         form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
         if form.validate_on_submit():
-            contrib = create_contribution(self.event_new, *_get_field_values(form.data))
+            # Create empty contribution so it can be compared to the new one in flash_if_unregistered
+            contrib = Contribution()
+            with flash_if_unregistered(self.event_new, lambda: contrib.person_links):
+                contrib = create_contribution(self.event_new, *_get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.list_generator.render_list(contrib)
             if tpl_components['hide_contrib']:
@@ -201,13 +205,13 @@ class RHEditContribution(RHManageContributionBase):
                                                    **custom_field_values),
                                   event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
         if form.validate_on_submit():
-            with track_time_changes():
+            with track_time_changes(), flash_if_unregistered(self.event_new, lambda: self.contrib.person_links):
                 update_contribution(self.contrib, *_get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)
             if tpl_components['hide_contrib']:
                 self.list_generator.flash_info_message(self.contrib)
-            return jsonify_data(**tpl_components)
+            return jsonify_data(flash=(request.args.get('flash') == '1'), **tpl_components)
         elif not form.is_submitted():
             handle_legacy_description(form.description, self.contrib)
         self.commit = False

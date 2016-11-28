@@ -34,7 +34,9 @@ from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.views import WPManagePersons
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
+from indico.util.date_time import now_utc
 from indico.util.i18n import ngettext, _
+from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.forms.base import FormDefaults
@@ -104,11 +106,6 @@ class RHPersonsBase(RHConferenceModifBase):
 
 
 class RHPersonsList(RHPersonsBase):
-    @classmethod
-    def get_person_list(cls):
-        persons = defaultdict(lambda: {'session_blocks': defaultdict(dict), 'contributions': defaultdict(dict),
-                                       'subcontributions': defaultdict(dict), 'roles': defaultdict(dict)})
-        return sorted(persons.viewvalues(), key=lambda x: x['person'].get_full_name(last_name_first=True).lower())
 
     def _process(self):
         event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
@@ -147,23 +144,47 @@ class RHEmailEventPersons(RHConferenceModifBase):
 
     def _checkParams(self, params):
         self._doNotSanitizeFields.append('from_address')
+        self.no_account = request.args.get('no_account') == '1'
         RHConferenceModifBase._checkParams(self, params)
 
     def _process(self):
         person_ids = request.form.getlist('person_id')
-        recipients = {p.email for p in self._find_event_persons(person_ids) if p.email}
-        form = EmailEventPersonsForm(person_id=person_ids, recipients=', '.join(recipients))
+        recipients = self._find_event_persons(person_ids, request.args.get('not_invited_only') == '1')
+        default_body = ''
+        default_subject = ''
+        disabled_until_change = True
+        if self.no_account:
+            tpl = get_template_module('events/persons/management/invitation.html', event=self.event_new)
+            default_body = tpl.get_html_body()
+            default_subject = tpl.get_subject()
+            disabled_until_change = False
+        recipients_emails = {p.email for p in recipients if p.email}
+        form = EmailEventPersonsForm(person_id=person_ids, recipients=', '.join(recipients_emails), body=default_body,
+                                     subject=default_subject, register_link=self.no_account)
         if form.validate_on_submit():
-            for recipient in recipients:
-                email = make_email(to_list=recipient, from_address=form.from_address.data,
-                                   subject=form.subject.data, body=form.body.data, html=True)
-                send_email(email, self.event_new, 'Event Persons')
+            self._send_emails(form, recipients)
             num = len(recipients)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
-            return jsonify_data()
-        return jsonify_form(form, submit=_('Send'))
+            return jsonify_data(flash=False)
+        return jsonify_form(form, submit=_('Send'), disabled_until_change=disabled_until_change)
 
-    def _find_event_persons(self, person_ids):
+    def _send_emails(self, form, recipients):
+        for recipient in recipients:
+            if self.no_account:
+                recipient.invited_dt = now_utc()
+            email_body = replace_placeholders('event-persons-email', form.body.data, person=recipient,
+                                              event=self.event_new, register_link=self.no_account)
+            email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
+                                                 event=self.event_new, register_link=self.no_account)
+            email = make_email(to_list=recipient.email, from_address=form.from_address.data,
+                               body=email_body, subject=email_subject, html=True)
+            send_email(email, self.event_new, 'Event Persons')
+
+    def _find_event_persons(self, person_ids, not_invited_only):
+        if not_invited_only:
+            return (self.event_new.persons
+                    .filter(EventPerson.id.in_(person_ids), EventPerson.email != '', EventPerson.invited_dt.is_(None))
+                    .all())
         return (self.event_new.persons
                 .filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
                 .all())

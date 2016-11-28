@@ -32,11 +32,8 @@ from sqlalchemy.orm import load_only, noload
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.errors import UserValueError
-from indico.core.notifications import send_email, make_email
 from indico.modules.api import settings as api_settings
-from indico.modules.auth.util import url_for_register
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -140,27 +137,6 @@ def get_random_color(event):
     used_colors = {s.colors for s in event.sessions} | {b.colors for b in breaks}
     unused_colors = set(get_colors()) - used_colors
     return random.choice(tuple(unused_colors) or get_colors())
-
-
-def notify_pending(acl_entry):
-    """Sends a notification to a user with an email-based ACL entry
-
-    :param acl_entry: An email-based EventPrincipal
-    """
-    assert acl_entry.type == PrincipalType.email
-    if acl_entry.full_access:
-        template_name = 'events/emails/pending_manager.txt'
-        endpoint = 'event_mgmt.conferenceModification-managementAccess'
-    elif acl_entry.has_management_role('submit', explicit=True):
-        template_name = 'events/emails/pending_submitter.txt'
-        endpoint = 'event.conferenceDisplay'
-    else:
-        return
-    event = acl_entry.event_new
-    email = acl_entry.principal.email
-    template = get_template_module(template_name, event=event, email=email,
-                                   url=url_for_register(url_for(endpoint, event), email=email))
-    send_email(make_email(to_list={email}, template=template), event.as_legacy, module='Protection')
 
 
 def serialize_event_person(person):

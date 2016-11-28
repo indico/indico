@@ -27,7 +27,6 @@ from indico.modules.events.cloning import get_event_cloners
 from indico.modules.events.logs import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.util import notify_pending
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 from indico.web.flask.templating import template_hook, get_template_module
@@ -88,13 +87,6 @@ def _convert_email_principals(user, **kwargs):
 def _convert_email_person_links(user, **kwargs):
     from indico.modules.events.models.persons import EventPerson
     EventPerson.link_user_by_email(user)
-
-
-@signals.acl.entry_changed.connect_via(Event)
-def _notify_pending(sender, obj, principal, entry, is_new, quiet, **kwargs):
-    if quiet or entry is None or not is_new or principal.principal_type != PrincipalType.email:
-        return
-    notify_pending(entry)
 
 
 @signals.acl.entry_changed.connect_via(Event)
