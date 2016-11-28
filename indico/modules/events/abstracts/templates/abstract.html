@@ -27,7 +27,7 @@
 
         {% if abstract.can_see_reviews(session.user) %}
             <div id="abstract-review-summary-box" class="i-timeline-item">
-                {{ render_review_summary_box(abstract, judgment_form) }}
+                {{ render_review_summary_box(abstract, session.user, convener_tracks) }}
             </div>
         {% endif %}
 

@@ -210,6 +210,13 @@ def get_user_abstracts(event, user):
             .all())
 
 
+def get_convener_tracks(event, user):
+    query = Track.query.with_parent(event)
+    if user not in event.global_conveners:
+        query = query.filter(Track.conveners.any(User.id == user.id))
+    return query
+
+
 def _query_user_tracks(event, user):
     query = Track.query.with_parent(event)
     if user not in event.global_abstract_reviewers and user not in event.global_conveners:
