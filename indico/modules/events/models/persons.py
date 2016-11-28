@@ -145,7 +145,7 @@ class EventPerson(PersonMixin, db.Model):
         UTCDateTime,
         nullable=True
     )
-    is_pending = db.Column(
+    is_untrusted = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -184,7 +184,7 @@ class EventPerson(PersonMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', is_pending=False, _text=self.full_name)
+        return format_repr(self, 'id', is_untrusted=False, _text=self.full_name)
 
     @property
     def principal(self):
@@ -195,16 +195,16 @@ class EventPerson(PersonMixin, db.Model):
         return None
 
     @classmethod
-    def create_from_user(cls, user, event=None, is_pending=False):
+    def create_from_user(cls, user, event=None, is_untrusted=False):
         return EventPerson(user=user, event_new=event, first_name=user.first_name, last_name=user.last_name,
                            email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone,
-                           is_pending=is_pending)
+                           is_untrusted=is_untrusted)
 
     @classmethod
-    def for_user(cls, user, event=None, is_pending=False):
+    def for_user(cls, user, event=None, is_untrusted=False):
         """Return EventPerson for a matching User in Event creating if needed"""
         person = event.persons.filter_by(user=user).first() if event else None
-        return person or cls.create_from_user(user, event, is_pending=is_pending)
+        return person or cls.create_from_user(user, event, is_untrusted=is_untrusted)
 
     @classmethod
     def link_user_by_email(cls, user):
@@ -478,5 +478,5 @@ def _mapper_configured():
     @listens_for(EventPerson.session_block_links, 'append')
     @listens_for(EventPerson.contribution_links, 'append')
     @listens_for(EventPerson.subcontribution_links, 'append')
-    def _mark_not_pending(target, value, *unused):
-        target.is_pending = False
+    def _mark_not_untrusted(target, value, *unused):
+        target.is_untrusted = False

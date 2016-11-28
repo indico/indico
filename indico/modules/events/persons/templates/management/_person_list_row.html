@@ -5,13 +5,14 @@
     </td>
     <td class="i-table name-column">
         {{ person.display_full_name }}
-        {% if person.is_pending %}
-            {% set pending_tooltip -%}
+        {% if person.is_untrusted %}
+            {% set untrusted_tooltip -%}
                 {%- trans -%}
                     This person is currently just an author of an abstract with no other ties to the event.
+                    Their data may have been provided by the submitter of the abstract.
                 {%- endtrans -%}
             {%- endset %}
-            <span class="icon-question" title="{{ pending_tooltip }}"></span>
+            <span class="icon-question" title="{{ untrusted_tooltip }}"></span>
         {% endif %}
     </td>
     <td class="i-table email-column">
