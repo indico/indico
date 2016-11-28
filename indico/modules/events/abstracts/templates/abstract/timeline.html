@@ -1,5 +1,6 @@
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint,
-                                                        render_tracks, render_track, render_instruction_box %}
+                                                        render_tracks, render_track, render_instruction_box,
+                                                        render_user_icon %}
 {% from 'events/abstracts/abstract/review.html' import render_comment_form, render_review_form %}
 
 
@@ -32,9 +33,7 @@
 
 {% macro _render_comment(comment) %}
     <div id="abstract-comment-{{ comment.id }}" class="i-timeline-item">
-        <div class="i-timeline-item-label action" style="{{ comment.user.avatar_css }}">
-            {{- comment.user.name[0] -}}
-        </div>
+        {{ render_user_icon(comment.user) }}
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-box header-indicator-left">
                 <div class="i-box-header flexrow">
@@ -85,9 +84,7 @@
 {% macro _render_review(review, form) %}
     {% set no_content = not review.comment and not review.ratings %}
     <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
-        <div class="i-timeline-item-label action abstract-comment-pic" style="{{ review.user.avatar_css }}">
-            {{- review.user.name[0] -}}
-        </div>
+        {{ render_user_icon(review.user, 'abstract-comment-pic') }}
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-metadata">
                 <div class="f-self-stretch">
@@ -254,9 +251,7 @@
     {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
     {% if can_comment or reviewer_data.tracks %}
         <div id="abstract-timeline-input" class="i-timeline-item">
-            <div class="i-timeline-item-label action" style="{{ session.user.avatar_css }}">
-                {{- session.user.name[0] -}}
-            </div>
+            {{ render_user_icon(session.user) }}
             <div class="i-timeline-item-box footer-only header-indicator-left">
                 <div class="i-box-footer js-form-container">
                     {% if can_comment %}

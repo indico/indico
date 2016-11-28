@@ -1,5 +1,6 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
-{% from 'events/abstracts/abstract/_common.html' import render_score, render_tracks, render_instruction_box %}
+{% from 'events/abstracts/abstract/_common.html' import render_score, render_tracks, render_instruction_box,
+                                                        render_user_icon %}
 
 {% macro _render_abstract_reviewing_state(abstract) %}
     {% if abstract.reviewed_for_tracks > 1 %}
@@ -49,9 +50,7 @@
 
 {% macro render_decision_box(abstract, form, user) %}
     {% set event = abstract.event_new %}
-    <div class="i-timeline-item-label action" style="{{ user.avatar_css }}">
-        {{- user.name[0] -}}
-    </div>
+    {{ render_user_icon(user) }}
     <div class="i-timeline-item-box footer-only header-indicator-left">
         <div class="i-box-footer">
             {% set url = url_for('.judge_abstract', abstract) %}
