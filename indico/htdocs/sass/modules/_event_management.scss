@@ -503,9 +503,7 @@ th.i-table {
         max-width: 20em;
         min-width: 20em;
     }
-}
 
-.event-person-list {
     .no-role {
         opacity: 0.25;
         .badge {
@@ -520,7 +518,9 @@ th.i-table {
             color: $dark-gray;
         }
     }
+}
 
+.event-person-list {
     thead {
         @include border-bottom();
         display: block;
