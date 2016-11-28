@@ -19,12 +19,13 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import attrgetter
 
-from flask import request, flash
+from flask import request, flash, session
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.fields import AbstractFieldValue
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import ListGeneratorBase
@@ -251,3 +252,16 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
     def _build_query(self):
         return (super(AbstractListGeneratorDisplay, self)._build_query()
                 .filter(Abstract.reviewed_for_tracks.contains(self.track)))
+
+    def get_user_reviewed_abstracts_for_track(self, user, track):
+        return (Abstract.query
+                .join(Abstract.reviews)
+                .filter(AbstractReview.user == user,
+                        Abstract.reviewed_for_tracks.contains(track),
+                        ~Abstract.is_deleted)
+                .all())
+
+    def get_list_kwargs(self):
+        kwargs = super(AbstractListGeneratorDisplay, self).get_list_kwargs()
+        kwargs['reviewed_abstracts'] = self.get_user_reviewed_abstracts_for_track(session.user, self.track)
+        return kwargs
