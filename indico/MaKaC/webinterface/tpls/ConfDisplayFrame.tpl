@@ -30,10 +30,10 @@ else:
            </div>
         </div>
         <div class="confSubTitleBox" ${ bgColorStyle }>
-            <div class="confSubTitleContent">
-                ${ template_hook('conference-header', event=conf) }
-                <div class="confSubTitle" ${ textColorStyle }>
-                   <div class="datePlace">
+            <div class="confSubTitleContent flexrow">
+                <div class="confSubTitle f-self-stretch" ${ textColorStyle }>
+                    ${ template_hook('conference-header', event=conf) }
+                    <div class="datePlace">
                         <div class="date">${ confDateInterval }</div>
                         <div class="place">${ confLocation }</div>
                         <div class="timezone">${ timezone } timezone</div>
@@ -41,6 +41,7 @@ else:
                     ${ template_hook('now-happening', event=conf.as_event, text_color=textColorStyle) }
                     ${ template_hook('conference-header-subtitle', event=conf) }
                 </div>
+                ${ template_hook('conference-header-right-column', event=conf) }
             </div>
         </div>
         % if simpleTextAnnouncement:

@@ -72,7 +72,6 @@
 .confSubTitleContent {
     width: 950px;
     margin: 0 auto;
-    font-family: Verdana;
     font-size: 11pt;
     color: #24425a;
 }
@@ -81,7 +80,6 @@
     Style for links in the lower part of the header
 */
 .confSubTitle a {
-    font-family: Verdana;
     font-size: 11pt;
 }
 
@@ -89,25 +87,7 @@
     Styles for the date and place information.
 */
 .datePlace {
-    font-family: verdana,arial,sans-serif;
     font-size: 12pt;
-}
-
-/*
-    Styles for the searchbox
-*/
-.confSearchBox {
-    float: right;
-    background: transparent url("../../images/conf/sprites_blue.png") no-repeat 0 0;
-    width: 250px;
-    height: 24px;
-    margin-top: 10px;
-}
-.confSearchBox .searchButton {
-    color: white;
-}
-.confSearchBox .searchField {
-    color: black;
 }
 
 /*
@@ -140,9 +120,9 @@
     By default centered with a fix width.
 */
 #confSectionsBox {
-    padding-top: 30px;
     width: 950px;
     margin: 0 auto;
+    margin-top: 30px;
 }
 
 
