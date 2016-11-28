@@ -76,7 +76,7 @@
     </div>
 {% endmacro %}
 
-{% macro render_review_summary_box(abstract, form) %}
+{% macro render_review_summary_box(abstract, user, convener_tracks) %}
     {% set event = abstract.event_new %}
     <div class="i-timeline-item-label action icon-file-check"></div>
     <div class="i-timeline-item-box content-indicator">
@@ -96,7 +96,8 @@
                 </div>
             </div>
             {% set ratings = abstract.get_track_question_scores() %}
-            {% for track in abstract.reviewed_for_tracks|sort(attribute='title') %}
+            {% for track in abstract.reviewed_for_tracks|sort(attribute='title')
+               if abstract.can_judge(user, check_state=true) or track in convener_tracks %}
                 {% set has_reviews = track.id in ratings %}
                 <div class="track-review">
                     <div class="track-review-summary flexrow f-a-center">

@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import render_template, session
 
+from indico.modules.events.abstracts.util import get_convener_tracks
 from MaKaC.common.TemplateExec import render
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
@@ -112,6 +113,7 @@ def render_abstract_page(abstract, view_class=None, management=False):
               'review_form': review_form,
               'review_track_list_form': review_track_list_form,
               'judgment_form': judgment_form,
+              'convener_tracks': get_convener_tracks(abstract.event_new, session.user),
               'management': management}
     if view_class:
         return view_class.render_template('abstract.html', abstract.event_new.as_legacy, **params)
