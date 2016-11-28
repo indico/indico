@@ -136,7 +136,14 @@ body > * {
     }
 }
 
-/* Flexbox layout */
+
+// -- Flexbox layout -----------------------------------------------------------
+
+.flexrow,
+.flexcol {
+    display: flex;
+}
+
 .flexrow {
     flex-flow: row nowrap;
 }
@@ -145,53 +152,48 @@ body > * {
     flex-flow: column nowrap;
 }
 
-.flexrow,
-.flexcol {
-    display: flex;
+.f-j-start {
+    justify-content: flex-start;
+}
 
-    &.f-j-start {
-        justify-content: flex-start;
-    }
+.f-j-end {
+    justify-content: flex-end;
+}
 
-    &.f-j-end {
-        justify-content: flex-end;
-    }
+.f-j-center {
+    justify-content: center;
+}
 
-    &.f-j-center {
-        justify-content: center;
-    }
+.f-j-space-between {
+    justify-content: space-between;
+}
 
-    &.f-j-space-between {
-        justify-content: space-between;
-    }
+.f-j-space-around {
+    justify-content: space-around;
+}
 
-    &.f-j-space-around {
-        justify-content: space-around;
-    }
+.f-a-start {
+    align-items: flex-start;
+}
 
-    &.f-a-start {
-        align-items: flex-start;
-    }
+.f-a-end {
+    align-items: flex-end;
+}
 
-    &.f-a-end {
-        align-items: flex-end;
-    }
+.f-a-center {
+    align-items: center;
+}
 
-    &.f-a-center {
-        align-items: center;
-    }
+.f-a-stretch {
+    align-items: stretch
+}
 
-    &.f-a-stretch {
-        align-items: stretch
-    }
+.f-a-baseline {
+    align-items: baseline;
+}
 
-    &.f-a-baseline {
-        align-items: baseline;
-    }
-
-    &.f-wrap {
-        flex-wrap: wrap;
-    }
+.f-wrap {
+    flex-wrap: wrap;
 }
 
 .f-self-stretch {
