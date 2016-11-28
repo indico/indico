@@ -85,8 +85,8 @@ class EventPersonListField(PrincipalListField):
     """
 
     #: Whether new event persons created by the field should be
-    #: marked as pending
-    create_pending_persons = False
+    #: marked as untrusted
+    create_untrusted_persons = False
 
     def __init__(self, *args, **kwargs):
         self.event_person_conversions = {}
@@ -104,13 +104,13 @@ class EventPersonListField(PrincipalListField):
         person = EventPerson(event_new=self.event, email=data.get('email', '').lower(), _title=title,
                              first_name=data.get('firstName'), last_name=data['familyName'],
                              affiliation=data.get('affiliation'), address=data.get('address'),
-                             phone=data.get('phone'), is_pending=self.create_pending_persons)
+                             phone=data.get('phone'), is_untrusted=self.create_untrusted_persons)
         # Keep the original data to cancel the conversion if the person is not persisted to the db
         self.event_person_conversions[person] = data
         return person
 
     def _get_event_person_for_user(self, user):
-        person = EventPerson.for_user(user, self.event, is_pending=self.create_pending_persons)
+        person = EventPerson.for_user(user, self.event, is_untrusted=self.create_untrusted_persons)
         # Keep a reference to the user to cancel the conversion if the person is not persisted to the db
         self.event_person_conversions[person] = user
         return person

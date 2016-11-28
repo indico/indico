@@ -1,4 +1,4 @@
-"""Add EventPerson.is_pending
+"""Add EventPerson.is_untrusted
 
 Revision ID: 4f426059ddd1
 Revises: ccd9d0858ff
@@ -15,10 +15,10 @@ down_revision = 'ccd9d0858ff'
 
 
 def upgrade():
-    op.add_column('persons', sa.Column('is_pending', sa.Boolean(), nullable=False, server_default='false'),
+    op.add_column('persons', sa.Column('is_untrusted', sa.Boolean(), nullable=False, server_default='false'),
                   schema='events')
-    op.alter_column('persons', 'is_pending', server_default=None, schema='events')
+    op.alter_column('persons', 'is_untrusted', server_default=None, schema='events')
 
 
 def downgrade():
-    op.drop_column('persons', 'is_pending', schema='events')
+    op.drop_column('persons', 'is_untrusted', schema='events')
