@@ -362,13 +362,6 @@ label, .label {
     font-weight: bold;
 }
 
-
-div.UIForm
-{
-    padding-top: 5px;
-    width: 100%;
-}
-
 /* ListWidget, list of users styles */
 
 .selectedListItem {

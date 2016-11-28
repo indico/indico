@@ -79,25 +79,16 @@
 .confSubTitleContent {
     width: 950px;
     margin: 0 auto;
-    font-family: Verdana;
     font-size: 11pt;
     color: #24425a;
 }
 
-.confSubTitle {
-    padding-top: 10px;
-}
-
 .confSubTitle a {
-    font-family: Verdana;
     font-size: 11pt;
 }
 
 .datePlace {
-    font-family: verdana,arial,sans-serif;
     font-size: 12pt;
-    padding-right: 250px;
-    margin-bottom: 5px;
 }
 
 div.datePlace > div.timezone {
@@ -108,9 +99,9 @@ div.datePlace > div.timezone {
 /* ------Main content------ */
 
 #confSectionsBox {
-	padding-top:30px;
-	width: 950px;
-	margin: 0 auto;
+    width: 950px;
+    margin: 0 auto;
+    margin-top: 30px;
 }
 
 /* ------Menu------ */
@@ -300,40 +291,6 @@ pre {
     margin: 0;
     color: #444;
     font-size: 11pt;
-}
-
-    /* Styles for the searchbox */
-
-.confSearchBox {
-    width: 250px;
-    float: right;
-    height: 24px;
-    background: transparent url("../images/conf/sprites_blue.png") no-repeat 0 0;
-    margin-top: 10px;
-}
-
-.confSearchBox input {
-    border: none;
-    background: transparent;
-}
-
-.confSearchBox .searchButton {
-    float: right;
-    width: 60px;
-    height: 24px;
-    color: white;
-    font-family: Arial, Verdana;
-    font-size: 9pt;
-    padding-bottom: 2px;
-    font-weight: bold;
-}
-
-.confSearchBox .searchField {
-    color: black;
-    width: 170px;
-    padding: 4px 7px;
-    font-family: Arial, Verdana;
-    font-size: 10pt;
 }
 
 .nowHappening {
