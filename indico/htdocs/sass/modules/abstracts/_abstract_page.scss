@@ -224,6 +224,7 @@
 
 #abstract-submission-details,
 #abstract-judgment-details,
+#abstract-decision-box,
 #abstract-timeline {
     .i-timeline-item-label {
         color: rgba(#fff, 0.8);
@@ -232,7 +233,7 @@
     }
 }
 
-#abstract-decision-box {
+#abstract-review-summary-box {
     .track-review {
         @extend %i-box-cancel-horizontal-margin;
         @extend %i-box-horizontal-padding;
@@ -298,6 +299,10 @@
         .i-tag {
             border-color: transparent;
         }
+    }
+
+    .i-timeline-item-box {
+        padding-bottom: 0;
     }
 }
 
