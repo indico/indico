@@ -22,6 +22,7 @@ import sys
 from datetime import date
 from subprocess import check_output, CalledProcessError
 
+from indico.util.console import cformat
 
 HEADER = """
  {comment_start} This file is part of Indico.
@@ -101,22 +102,17 @@ def gen_header(data, end_year):
 
 
 def _update_header(file_path, year, substring, regex, data):
-    modified = False
     with open(file_path, 'r') as file_read:
-        content = file_read.read()
+        content = orig_content = file_read.read()
         if not content.strip():
-            print('{0} - empty'.format(file_path))
             return
         for match in regex.finditer(content):
             if substring in match.group():
-                print('{0}[{1}-{2}]'.format(file_path, match.start(), match.end()))
                 content = content[:match.start()] + gen_header(data, year) + content[match.end():]
-                modified = True
-        if modified:
-            with open(file_path + '.tmp', 'w') as file_write:
-                file_write.write(content)
-    if modified:
-        os.rename(file_path + '.tmp', file_path)
+    if content != orig_content:
+        print(cformat('%{green}Updating header of %{green!}{}').format(os.path.relpath(file_path)))
+        with open(file_path, 'w') as file_write:
+            file_write.write(content)
 
 
 def update_header(file_path, year):
@@ -147,27 +143,29 @@ def _process_args(args):
 
 def main():
     if '-h' in sys.argv or '--help' in sys.argv:
-        print(sys.argv)
         print(USAGE)
         sys.exit(1)
 
     year, path, file_ = _process_args(sys.argv[1:])
 
     if path is not None:
-        print("updating headers to the year {year} for all the files in {path}...".format(year=year, path=path))
+        print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all the files in "
+                      "%{yellow!}{path}%{reset}...").format(year=year, path=path))
         for root, _, filenames in os.walk(path):
             for filename in filenames:
                 update_header(os.path.join(root, filename), year)
     elif file_ is not None:
-        print("updating headers to the year {year} for the file {file}...".format(year=year, file=file_))
+        print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for the file "
+                      "%{yellow!}{file}%{reset}...").format(year=year, file=file_))
         update_header(file_, year)
     else:
-        print("updating headers to the year {year} for all git-tracked files...".format(year=year))
+        print(cformat("Updating headers to the year %{yellow!}{year}%{reset} for all "
+                      "git-tracked files...").format(year=year))
         try:
             for path in check_output(['git', 'ls-files']).splitlines():
                 update_header(os.path.abspath(path), year)
         except CalledProcessError:
-            print('[ERROR] you must be within a git repository to run this script.\n', file=sys.stderr)
+            print(cformat('%{red!}[ERROR] you must be within a git repository to run this script.'), file=sys.stderr)
             print(USAGE)
             sys.exit(1)
 
