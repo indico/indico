@@ -136,8 +136,13 @@ def handler(prefix, path):
     logger = Logger.get('httpapi')
     if request.method == 'POST':
         # Convert POST data to a query string
-        queryParams = dict((key, value.encode('utf-8')) for key, value in request.form.iteritems())
-        query = urllib.urlencode(queryParams)
+        queryParams = [(key, [x.encode('utf-8') for x in values]) for key, values in request.form.iterlists()]
+        query = urllib.urlencode(queryParams, doseq=1)
+        # we only need/keep multiple values so we can properly validate the signature.
+        # the legacy code below expects a dict with just the first value.
+        # if you write a new api endpoint that needs multiple values get them from
+        # ``request.values.getlist()`` directly
+        queryParams = {key: values[0] for key, values in queryParams}
     else:
         # Parse the actual query string
         queryParams = dict((key, value.encode('utf-8')) for key, value in request.args.iteritems())
