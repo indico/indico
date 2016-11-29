@@ -27,7 +27,6 @@
 .i-badges-list {
     @extend %badges-list;
     text-align: center;
-    -webkit-justify-content: space-around;
     justify-content: space-around;
 
     > .i-badge:first-child {
@@ -37,25 +36,16 @@
 
 .i-badges-list.left {
     @extend %badges-list;
-
     float: none; // disable default .left style
-
     text-align: left;
-
-    //TODO replace with justify-content mixin once Compass is updated
-    -webkit-justify-content: flex-start;
-            justify-content: flex-start;
+    justify-content: flex-start;
 }
 
 .i-badges-list.center {
     @extend %badges-list;
-
     margin: -0.8em 0 0.8em 0; // disable default .center style
-
     text-align: center;
-
-    -webkit-justify-content: center;
-            justify-content: center;
+    justify-content: center;
 }
 
 
@@ -76,12 +66,16 @@
             height: 7em;
 
             &:first-child {
-               height: 8.8em;
+                height: 8.8em;
             }
 
-            & > .i-badge-title { font-size: 1em; }
+            & > .i-badge-title {
+                font-size: 1em;
+            }
 
-            & .i-badge-img > img { max-height: 4em; }
+            & .i-badge-img > img {
+                max-height: 4em;
+            }
         }
     }
 }
@@ -101,17 +95,23 @@
     padding: 0;
     vertical-align: top;
     text-align: center;
-    box-shadow: 0 2px 1px 0px $gray;
+    box-shadow: 0 2px 1px 0 $gray;
     background-color: $dark-blue;
 
-    &, & * { color: $light-blue; }
+    &, & * {
+        color: $light-blue;
+    }
 
     &.i-badge-gray {
         background-color: $light-gray;
 
-        &, & * { color: $light-black; }
+        &, & * {
+            color: $light-black;
+        }
 
-        & > .i-badge-legend { border-color: $gray; }
+        & > .i-badge-legend {
+            border-color: $gray;
+        }
     }
 
     &.i-badge-disabled {
@@ -123,14 +123,9 @@
         position: relative;
         margin: 0 auto;
 
-        //TODO replace with flexbox mixin once Compass is updated
-        display: block;
         text-align: center;
-        display: -webkit-inline-flex;
         display: inline-flex;
-        -webkit-flex-direction: column;
         flex-direction: column;
-        -webkit-justify-content: space-around;
         justify-content: space-around;
 
         width: 80%;
@@ -191,15 +186,19 @@
         bottom: 0;
         left: 0;
         right: 0;
-        display: block;
         margin: 0 0 0.5em;
         padding: 0.4em 0.6em 0;
         font-size: 1em;
         height: 1em;
         border-top: 1px solid $light-blue;
 
-        & > .i-badge-legend-left { float: left; }
-        & > .i-badge-legend-right { float: right; }
+        & > .i-badge-legend-left {
+            float: left;
+        }
+
+        & > .i-badge-legend-right {
+            float: right;
+        }
     }
 }
 
