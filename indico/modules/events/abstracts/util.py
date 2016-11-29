@@ -210,11 +210,12 @@ def get_user_abstracts(event, user):
             .all())
 
 
-def get_convener_tracks(event, user):
-    query = Track.query.with_parent(event)
-    if user not in event.global_conveners:
-        query = query.filter(Track.conveners.any(User.id == user.id))
-    return query
+def get_visible_reviewed_for_tracks(abstract, user):
+    event = abstract.event_new
+    if abstract.can_judge(user, check_state=True) or user in event.global_conveners:
+        return abstract.reviewed_for_tracks
+    convener_tracks = {track for track in event.tracks if track.can_convene(user)}
+    return abstract.reviewed_for_tracks & convener_tracks
 
 
 def _query_user_tracks(event, user):
