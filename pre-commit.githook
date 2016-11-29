@@ -1,0 +1,89 @@
+#!/bin/bash
+# vim: et ts=4 sw=4 ft=sh
+
+# Interesting post on max line length:
+# http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
+
+PEP8_CMD='pep8'
+PEP8_OPTIONS='--max-line-length=120'
+ESLINT_CMD='eslint'
+SASSLINT_CMD='sass-lint'
+
+
+RED=$(echo -e $"\033[1;31m")
+YELLOW=$(echo -e $"\033[0;33m")
+CYAN=$(echo -e $"\033[0;36m")
+RESET=$(echo -e $"\033[0;0m")
+BRIGHTYELLOW=$(echo -e $"\033[1;33m")
+WHITE=$(echo -e $"\033[1;37m")
+
+RE="s/\([^:]*\):\([0-9]*\):\([0-9]*\): \([EW][0-9]*\) \(.*\)/$WHITE[$CYAN\1$RESET $BRIGHTYELLOW\2:\3$WHITE] $RED\4 $YELLOW\5$RESET/g"
+STATUS=0
+
+_get_files() {
+    local i
+    unset FILES
+    while IFS= read -r -d $'\0' file; do
+        FILES[i++]="$file"
+    done < <(git diff --name-only --diff-filter=ACMR --staged -z "$1")
+}
+
+# Most spammy checks first so the most likely useful ones are at the
+# bottom and thus less likely to scroll out of view immediately
+
+# SASSLint
+_get_files '*.scss'
+if [[ ${#FILES[@]} -ne 0 ]]; then
+    if ! RESULT=$(FORCE_COLOR=1 $SASSLINT_CMD -vq "${FILES[@]}"); then
+        STATUS=1
+        echo "${RED}There are SCSS errors in your code:${RESET}"
+        echo "$RESULT"
+    elif [[ -n "$RESULT" ]] ; then
+        STATUS=1
+        echo "${BRIGHTYELLOW}There are SCSS warnings in your code:${RESET}"
+        echo "$RESULT"
+    fi
+fi
+
+
+# ESLint
+_get_files '*.js'
+if [[ ${#FILES[@]} -ne 0 ]]; then
+    if ! RESULT=$($ESLINT_CMD --color "${FILES[@]}"); then
+        STATUS=1
+        echo "${RED}There are JS errors in your code:${RESET}"
+        echo "$RESULT"
+    elif [[ -n "$RESULT" ]] ; then
+        STATUS=1
+        echo "${BRIGHTYELLOW}There are JS warnings in your code:${RESET}"
+        echo "$RESULT"
+    fi
+fi
+
+
+# PEP8
+if ! RESULT=$(git diff -U0 --staged | $PEP8_CMD --diff $PEP8_OPTIONS); then
+    echo "${RED}There are PEP8 issues in your code:${RESET}"
+    STATUS=1
+fi
+if [[ -n "$RESULT" ]] ; then
+    echo "$RESULT" | sed -e "$RE"
+    echo
+fi
+
+
+if [[ $STATUS != 0 ]] ; then
+    # claim stdin back
+    exec < /dev/tty
+    echo
+    read -r -p "${RED}Do you wish to commit it anyway ${CYAN}[${WHITE}y${CYAN}/${WHITE}N${CYAN}]${RESET}? " yn
+    case $yn in
+        [Yy]* ) exit 0;;
+        [Nn]* ) exit $STATUS;;
+        * ) exit $STATUS;;
+    esac
+    # close stdin
+    exec <&-
+fi
+
+exit $STATUS 
