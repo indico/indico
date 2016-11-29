@@ -218,9 +218,6 @@
     margin-left: 0.5em;
 }
 
-.reviewing-state {
-    margin-right: 5px;
-}
 
 #abstract-submission-details,
 #abstract-judgment-details,
@@ -241,10 +238,11 @@
         padding: 0;
     }
 
-    .state-icon {
+    .track-state-icon {
         @extend %semantic-outline;
         border: none !important;
         margin-right: 10px;
+        width: calc(2em + 2px);  // Align with header icon by adding its width and border
 
         > span {
             display: flex;
@@ -256,8 +254,26 @@
     }
 
     .tracks-review-summary {
-        margin-top: -5px;
-        margin-bottom: 5px;
+        margin-bottom: 10px;
+        color: $light-black;
+
+        .reviewing-state-icon {
+            @extend %semantic-background;
+            align-self: flex-start;
+            margin-right: 10px;
+            border-radius: 50%;
+            width: 2em;
+            height: 2em;
+        }
+
+        .summary-title {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .summary-description {
+            color: $light-black;
+        }
     }
 
     .track-review-summary {

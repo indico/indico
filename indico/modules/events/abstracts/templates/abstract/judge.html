@@ -10,7 +10,6 @@
                                     "but as different contribution types") %}
     {% endif %}
     {% set mapping_class = {'positive': 'success',
-                            'conflicting': 'visited',
                             'negative': 'error',
                             'mixed': 'warning'} %}
     {% set mapping_title = {'not_started': _("No reviewer has reviewed this abstract yet"),
@@ -19,11 +18,20 @@
                             'conflicting': conflicting_msg,
                             'negative': _("No reviewer proposed to accept this abstract"),
                             'mixed': _("Not all reviewers proposed to accept this abstract")} %}
+    {% set mapping_icon = {'positive': 'icon-checkmark',
+                           'conflicting': 'icon-checkmark',
+                           'negative': 'icon-cross',
+                           'mixed': 'icon-tilde',
+                           'in_progress': 'icon-circle-small',
+                           'not_started': 'icon-circle-small'} %}
     {% set state = abstract.reviewing_state %}
-    <span class="reviewing-state i-tag {{ mapping_class[state.name] }}"
-          title="{{ mapping_title[state.name] }}">
-        {{- state.title -}}
+    <span class="reviewing-state-icon flexrow f-a-center f-j-center {{ mapping_class[state.name] }}">
+        <span class=" flexrow {{ mapping_icon[state.name] }}"></span>
     </span>
+    <div class="f-self-stretch flexcol">
+        <div class="summary-title semantic-text {{ mapping_class[state.name] }}">{{ state.title }}</div>
+        <div class="summary-description">{{ mapping_title[state.name] }}</div>
+    </div>
 {% endmacro %}
 
 {% macro _render_abstract_track_reviewing_state_icon(abstract, track) %}
@@ -42,7 +50,7 @@
                            'mixed': 'icon-tilde',
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
-    <div class="state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
+    <div class="track-state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
          title="{{ mapping_title[state.name] }}">
         <span class="{{ mapping_icon[state.name] }}"></span>
     </div>
@@ -76,28 +84,30 @@
     </div>
 {% endmacro %}
 
-{% macro render_review_summary_box(abstract, user, convener_tracks) %}
+{% macro render_review_summary_box(abstract, user, visible_tracks) %}
     {% set event = abstract.event_new %}
+    {% set can_judge = abstract.can_judge(user, check_state=true) %}
     <div class="i-timeline-item-label action icon-file-check"></div>
     <div class="i-timeline-item-box content-indicator">
         <div class="i-box-content track-reviews-wrapper">
-            <div class="tracks-review-summary flexrow f-a-center">
-                <div class="f-self-stretch">
-                    <strong>
-                        {%- trans %}Review summary{% endtrans -%}
-                    </strong>
-                </div>
-                <div class="abstract-comment-badges flexrow f-a-center">
-                    <span class="review-state-pretext">{% trans %}Reviews are{% endtrans %}</span>
+            {% if can_judge or visible_tracks.issuperset(abstract.reviewed_for_tracks) %}
+                <div class="tracks-review-summary flexrow f-a-center">
                     {{ _render_abstract_reviewing_state(abstract) }}
-                    {% if abstract.score is not none %}
-                        {{ render_score(abstract.score, event.cfa, classes='i-tag') }}
-                    {% endif %}
+                    <div class="abstract-comment-badges flexrow f-a-center">
+                        {% if abstract.score is not none %}
+                            {{ render_score(abstract.score, event.cfa, classes='i-tag') }}
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
+            {% else %}
+                <div class="tracks-review-summary flexrow f-a-center">
+                    <div class="summary-title">
+                        {%- trans %}Review summary{% endtrans -%}
+                    </div>
+                </div>
+            {% endif %}
             {% set ratings = abstract.get_track_question_scores() %}
-            {% for track in abstract.reviewed_for_tracks|sort(attribute='title')
-               if abstract.can_judge(user, check_state=true) or track in convener_tracks %}
+            {% for track in visible_tracks %}
                 {% set has_reviews = track.id in ratings %}
                 <div class="track-review">
                     <div class="track-review-summary flexrow f-a-center">
