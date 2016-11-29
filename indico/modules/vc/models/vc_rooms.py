@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from functools import partial
 from itertools import chain
 
-from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.event import listen
 from sqlalchemy.ext.hybrid import hybrid_property, Comparator
 
@@ -108,7 +108,7 @@ class VCRoom(db.Model):
     )
     #: videoconference plugin-specific data
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 
@@ -195,7 +195,7 @@ class VCRoomEventAssociation(db.Model):
     )
     #: videoconference plugin-specific data
     data = db.Column(
-        JSON,
+        JSONB,
         nullable=False
     )
 
