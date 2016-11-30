@@ -276,6 +276,7 @@ def _build_transient_menu(event):
 
 
 @memoize_request
+@unify_event_args(legacy=True)
 def menu_entries_for_event(event):
     custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
     return _build_menu(event) if custom_menu_enabled else _build_transient_menu(event)
