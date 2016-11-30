@@ -987,7 +987,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.warningArea = this._createInfoArea();
         this.warningArea.dom.style.display = 'none';
 
-        this.menu = $('<div class="group right"/>');
+        this.menu = $('<div class="group"/>');
 
         if (this.isSessionTimetable && this.isTopLevel) {
             if (this.canManageBlocks) {
@@ -1020,7 +1020,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var ret = $('<div/>').append(
             this.warningArea.dom,
-            $('<div id="headPanel" class="ui-follow-scroll"></div>').append($('<div class="clearfix toolbar" id="tt_menu"/>').
+            $('<div id="headPanel" class="ui-follow-scroll"></div>').append($('<div class="toolbar f-j-end" id="tt_menu"/>').
                 append(this.menu.dropdown({effect_on: 'slideDown'}),
                         tt_status_info, this.infoBox.dom)),
             tt_hour_tip);
