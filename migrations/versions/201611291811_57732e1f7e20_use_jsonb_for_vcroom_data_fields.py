@@ -15,8 +15,12 @@ down_revision = '3bbcba10f5b1'
 def upgrade():
     op.execute('ALTER TABLE events.vc_rooms ALTER COLUMN data TYPE jsonb USING data::jsonb')
     op.execute('ALTER TABLE events.vc_room_events ALTER COLUMN data TYPE jsonb USING data::jsonb')
+    op.create_index(None, 'vc_rooms', ['data'], postgresql_using='gin', schema='events')
+    op.create_index(None, 'vc_room_events', ['data'], postgresql_using='gin', schema='events')
 
 
 def downgrade():
+    op.drop_index('ix_vc_rooms_data', 'vc_rooms', schema='events')
+    op.drop_index('ix_vc_room_events_data', 'vc_room_events', schema='events')
     op.execute('ALTER TABLE events.vc_rooms ALTER COLUMN data TYPE json USING data::json')
     op.execute('ALTER TABLE events.vc_room_events ALTER COLUMN data TYPE json USING data::json')
