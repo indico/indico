@@ -26,5 +26,5 @@ _bp = IndicoBlueprint('event_reminders', __name__, template_folder='templates',
 _bp.add_url_rule('/', 'list', RHListReminders)
 _bp.add_url_rule('/add', 'add', RHAddReminder, methods=('GET', 'POST'))
 _bp.add_url_rule('/preview', 'preview', RHPreviewReminder, methods=('POST',))
-_bp.add_url_rule('/<int:id>/', 'edit', RHEditReminder, methods=('GET', 'POST'))
-_bp.add_url_rule('/<int:id>/delete', 'delete', RHDeleteReminder, methods=('POST',))
+_bp.add_url_rule('/<int:reminder_id>/', 'edit', RHEditReminder, methods=('GET', 'POST'))
+_bp.add_url_rule('/<int:reminder_id>/delete', 'delete', RHDeleteReminder, methods=('POST',))

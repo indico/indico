@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from babel.dates import get_timezone
 from flask import request, session, redirect, flash, jsonify, render_template
 
 from indico.core.db import db
@@ -27,19 +26,15 @@ from indico.modules.events.reminders.util import make_reminder_email
 from indico.modules.events.reminders.views import WPReminders
 from indico.util.date_time import format_datetime
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHRemindersBase(RHConferenceModifBase):
     CSRF_ENABLED = True
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event = self._conf
 
 
 class RHSpecificReminderBase(RHRemindersBase):
@@ -53,17 +48,15 @@ class RHSpecificReminderBase(RHRemindersBase):
 
     def _checkParams(self, params):
         RHRemindersBase._checkParams(self, params)
-        self.reminder = EventReminder.find_one(id=request.view_args['id'])
+        self.reminder = EventReminder.get_one(request.view_args['reminder_id'])
 
 
 class RHListReminders(RHRemindersBase):
     """Shows the list of event reminders"""
 
     def _process(self):
-        reminders = EventReminder.find(event_id=self.event.id).order_by(EventReminder.scheduled_dt.desc()).all()
-        tz = get_timezone(DisplayTZ(conf=self.event).getDisplayTZ())
-        return WPReminders.render_template('reminders.html', self.event, event=self.event, reminders=reminders,
-                                           timezone=tz)
+        reminders = EventReminder.query.with_parent(self.event_new).order_by(EventReminder.scheduled_dt.desc()).all()
+        return WPReminders.render_template('reminders.html', self._conf, event=self.event_new, reminders=reminders)
 
 
 class RHDeleteReminder(RHSpecificReminderBase):
@@ -75,9 +68,9 @@ class RHDeleteReminder(RHSpecificReminderBase):
         else:
             db.session.delete(self.reminder)
             logger.info('Reminder deleted by %s: %s', session.user, self.reminder)
-            flash(_("The reminder at {} has been deleted.").format(format_datetime(self.reminder.scheduled_dt)),
-                  'success')
-        return redirect(url_for('.list', self.event))
+            flash(_("The reminder at {} has been deleted.")
+                  .format(to_unicode(format_datetime(self.reminder.scheduled_dt))), 'success')
+        return redirect(url_for('.list', self.event_new))
 
 
 def _send_reminder(reminder):
@@ -97,8 +90,7 @@ class RHEditReminder(RHSpecificReminderBase):
                                'relative_delta': reminder.event_start_delta}
         else:
             # Use the user's preferred event timezone
-            tz = get_timezone(DisplayTZ(conf=self.event).getDisplayTZ())
-            dt = reminder.scheduled_dt.astimezone(tz)
+            dt = reminder.scheduled_dt.astimezone(self.event_new.display_tzinfo)
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_date': dt.date(),
                                'absolute_time': dt.time()}
@@ -106,7 +98,7 @@ class RHEditReminder(RHSpecificReminderBase):
 
     def _process(self):
         reminder = self.reminder
-        form = ReminderForm(obj=self._get_defaults(), event=self.event)
+        form = ReminderForm(obj=self._get_defaults(), event=self.event_new)
         if form.validate_on_submit():
             if reminder.is_sent:
                 flash(_("This reminder has already been sent and cannot be modified anymore."), 'error')
@@ -116,11 +108,11 @@ class RHEditReminder(RHSpecificReminderBase):
                 _send_reminder(reminder)
             else:
                 logger.info('Reminder modified by %s: %s', session.user, reminder)
-                flash(_("The reminder at {} has been modified.").format(format_datetime(reminder.scheduled_dt)),
-                      'success')
+                flash(_("The reminder at {} has been modified.")
+                      .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
             return jsonify_data(flash=False)
 
-        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=reminder,
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event_new, reminder=reminder,
                                 form=form)
 
 
@@ -128,9 +120,9 @@ class RHAddReminder(RHRemindersBase):
     """Adds a new reminder"""
 
     def _process(self):
-        form = ReminderForm(event=self.event, schedule_type='relative')
+        form = ReminderForm(event=self.event_new, schedule_type='relative')
         if form.validate_on_submit():
-            reminder = EventReminder(creator=session.user, event=self.event)
+            reminder = EventReminder(creator=session.user, event_new=self.event_new)
             form.populate_obj(reminder, existing_only=True)
             db.session.add(reminder)
             db.session.flush()
@@ -138,10 +130,11 @@ class RHAddReminder(RHRemindersBase):
                 _send_reminder(reminder)
             else:
                 logger.info('Reminder created by %s: %s', session.user, reminder)
-                flash(_("A reminder at {} has been created.").format(format_datetime(reminder.scheduled_dt)), 'success')
+                flash(_("A reminder at {} has been created.")
+                      .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
             return jsonify_data(flash=False)
 
-        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=None, form=form,
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event_new, reminder=None, form=form,
                                 widget_attrs=form.default_widget_attrs)
 
 

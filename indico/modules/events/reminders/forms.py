@@ -19,18 +19,17 @@ from __future__ import unicode_literals
 from datetime import datetime, date
 
 import pytz
-from babel.dates import get_timezone
 from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 from wtforms_components import TimeField
 
+from indico.modules.events.models.events import EventType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import EmailListField, IndicoRadioField, TimeDeltaField
 from indico.web.forms.validators import HiddenUnless
-from MaKaC.common.timezoneUtils import DisplayTZ
 
 
 class ReminderForm(IndicoForm):
@@ -64,10 +63,10 @@ class ReminderForm(IndicoForm):
         self.event = kwargs.pop('event')
         super(ReminderForm, self).__init__(*args, **kwargs)
         self.absolute_time.description = _('Your active timezone is {tz}.').format(tz=self.timezone)
-        self.reply_to_address.choices = (self.event.as_event
+        self.reply_to_address.choices = (self.event
                                          .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
                                          .items())
-        if self.event.getType() == 'simple_event':
+        if self.event.type_ == EventType.lecture:
             del self.include_summary
 
     def validate_recipients(self, field):
@@ -93,7 +92,7 @@ class ReminderForm(IndicoForm):
 
     @property
     def timezone(self):
-        return DisplayTZ(conf=self.event).getDisplayTZ()
+        return self.event.display_tzinfo
 
     @generated_data
     def scheduled_dt(self):
@@ -101,11 +100,11 @@ class ReminderForm(IndicoForm):
             if self.absolute_date.data is None or self.absolute_time.data is None:
                 return None
             dt = datetime.combine(self.absolute_date.data, self.absolute_time.data)
-            return get_timezone(self.timezone).localize(dt).astimezone(pytz.utc)
+            return self.timezone.localize(dt).astimezone(pytz.utc)
         elif self.schedule_type.data == 'relative':
             if self.relative_delta.data is None:
                 return None
-            return self.event.getStartDate() - self.relative_delta.data
+            return self.event.start_dt - self.relative_delta.data
         elif self.schedule_type.data == 'now':
             return now_utc()
 

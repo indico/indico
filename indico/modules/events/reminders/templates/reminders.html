@@ -1,6 +1,7 @@
 {% extends 'layout/base.html' %}
 {% set pending_reminders = reminders|rejectattr('is_sent')|list %}
 {% set sent_reminders = reminders|selectattr('is_sent')|list %}
+{% set timezone = event.display_tzinfo %}
 
 {% block title %}
     {% trans %}Reminders{% endtrans %}

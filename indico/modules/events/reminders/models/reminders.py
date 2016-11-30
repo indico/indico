@@ -26,7 +26,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.util import make_reminder_email
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, format_repr
 
 
 class EventReminder(db.Model):
@@ -128,18 +128,8 @@ class EventReminder(db.Model):
     )
 
     @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id), True)
-
-    @event.setter
-    def event(self, event):
-        self.event_id = int(event.getId())
-
-    @property
     def locator(self):
-        return {'confId': self.event_id,
-                'id': self.id}
+        return dict(self.event_new.locator, reminder_id=self.id)
 
     @property
     def all_recipients(self):
@@ -150,8 +140,7 @@ class EventReminder(db.Model):
         """
         recipients = set(self.recipients)
         if self.send_to_participants:
-            event = self.event
-            recipients.update(reg.email for reg in Registration.get_all_for_event(event))
+            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event_new))
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
@@ -170,16 +159,15 @@ class EventReminder(db.Model):
 
     def send(self):
         """Sends the reminder to its recipients."""
-        event = self.event_new
         self.is_sent = True
         recipients = self.all_recipients
         if not recipients:
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
-        email_tpl = make_reminder_email(event, self.include_summary, self.message)
+        email_tpl = make_reminder_email(self.event_new, self.include_summary, self.message)
         email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
-        send_email(email, event, 'Reminder', self.creator)
+        send_email(email, self.event_new, 'Reminder', self.creator)
 
     @return_ascii
     def __repr__(self):
-        return '<EventReminder({}, {}, {}, {})>'.format(self.id, self.event_id, self.scheduled_dt, self.is_sent)
+        return format_repr(self, 'id', 'event_id', 'scheduled_dt', is_sent=False)

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.models.events import EventType
 from indico.web.flask.templating import get_template_module
 
 
@@ -26,7 +27,7 @@ def make_reminder_email(event, with_agenda, note):
     :param with_agenda: If the event's agenda should be included
     :param note: A custom message to include in the email
     """
-    if event.type == 'lecture':
+    if event.type_ == EventType.lecture:
         with_agenda = False
     return get_template_module('events/reminders/emails/event_reminder.txt', event=event,
                                url=event.as_legacy.getURL(), note=note, with_agenda=with_agenda,
