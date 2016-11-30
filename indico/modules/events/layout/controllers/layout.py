@@ -77,7 +77,7 @@ class RHLayoutEdit(RHLayoutBase):
 
 class RHLayoutLogoUpload(RHLayoutBase):
     def _process(self):
-        f = request.files['file']
+        f = request.files['logo']
         try:
             img = Image.open(f)
         except IOError:
@@ -117,7 +117,7 @@ class RHLayoutLogoDelete(RHLayoutBase):
 
 class RHLayoutCSSUpload(RHLayoutBase):
     def _process(self):
-        f = request.files['file']
+        f = request.files['css_file']
         self.event.stylesheet = to_unicode(f.read()).strip()
         self.event.stylesheet_metadata = {
             'hash': crc32(self.event.stylesheet),

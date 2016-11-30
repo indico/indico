@@ -55,7 +55,7 @@ class RHUploadPaperFiles(RHPaperSubmissionBase):
     """Upload paper file."""
 
     def _process(self):
-        files = request.files.getlist('file')
+        files = request.files.getlist('paper_file')
         for f in files:
             filename = secure_filename(f.filename, 'paper')
             content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'

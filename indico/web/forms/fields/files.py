@@ -28,7 +28,7 @@ from indico.web.forms.widgets import JinjaWidget
 class FileField(Field):
     """A dropzone field"""
 
-    widget = JinjaWidget('forms/dropzone_widget.html')
+    widget = JinjaWidget('forms/dropzone_widget.html', editable=False)
 
     default_options = {
         'multiple_files': False,
@@ -83,6 +83,8 @@ def get_file_metadata(file_):
 
 class EditableFileField(FileField):
     """A dropzone field that displays its current state and keeps track of deletes."""
+
+    widget = JinjaWidget('forms/dropzone_widget.html', editable=True)
 
     def __init__(self, *args, **kwargs):
         self.get_metadata = kwargs.pop('get_metadata', get_file_metadata)

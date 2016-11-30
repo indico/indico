@@ -55,7 +55,7 @@ class RHImages(RHManageImagesBase):
 
 class RHImageUpload(RHManageImagesBase):
     def _process(self):
-        files = request.files.getlist('file')
+        files = request.files.getlist('image')
         for f in files:
             filename = secure_filename(f.filename, 'image')
             data = BytesIO()

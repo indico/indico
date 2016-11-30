@@ -21,7 +21,7 @@ import json
 from flask import request, flash, session, jsonify
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug import MultiDict
+from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
@@ -114,7 +114,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
         form = ImportQuestionnaireForm()
         if form.validate_on_submit():
             try:
-                data = json.load(request.files['file'].file)
+                data = json.load(form.json_file.data.file)
                 self._import_data(data)
             except ValueError as exception:
                 logger.info('%s tried to import an invalid JSON file: %s', session.user, exception.message)
