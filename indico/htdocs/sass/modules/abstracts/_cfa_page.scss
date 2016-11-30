@@ -78,6 +78,7 @@ ul.cfa-timeline {
         padding: 0 40px;
         color: $light-black;
         font-size: 1.1em;
+        text-align: center;
     }
 
     .timestamp {
@@ -95,12 +96,11 @@ ul.cfa-timeline {
             width: 25px;
             height: 25px;
             background-color: white;
-            position: absolute;
-            top: -16px;
+            margin-top: -16px;
         }
 
         time, span {
-            margin-top: 20px;
+            margin-top: 10px;
         }
     }
 }
