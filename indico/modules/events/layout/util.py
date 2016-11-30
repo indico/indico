@@ -27,7 +27,6 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
 from indico.util.event import unify_event_args
@@ -309,12 +308,6 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None,
 def get_menu_entry_by_name(name, event):
     entries = menu_entries_for_event(event)
     return next((e for e in chain(entries, *(e.children for e in entries)) if e.name == name), None)
-
-
-def get_images_for_event(event):
-    """Return all non-deleted images uploaded to a specific event
-    """
-    return ImageFile.find_all(event_id=event.id)
 
 
 def get_css_url(event, force_theme=None, for_preview=False):

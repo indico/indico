@@ -21,14 +21,12 @@ from io import BytesIO
 
 from flask import flash, request, session, render_template
 from PIL import Image
-from werkzeug.exceptions import NotFound
 
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.layout import logger
 from indico.modules.events.layout.forms import AddImagesForm
 from indico.modules.events.layout.models.images import ImageFile
-from indico.modules.events.layout.util import get_images_for_event
 from indico.modules.events.layout.views import WPImages
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -38,7 +36,8 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _render_image_list(event):
-    return render_template('events/layout/image_list.html', images=get_images_for_event(event))
+    images = ImageFile.query.with_parent(event).all()
+    return render_template('events/layout/image_list.html', images=images)
 
 
 class RHManageImagesBase(RHConferenceModifBase):
@@ -49,8 +48,8 @@ class RHManageImagesBase(RHConferenceModifBase):
 class RHImages(RHManageImagesBase):
     def _process(self):
         form = AddImagesForm()
-        return WPImages.render_template('images.html', self._conf, images=get_images_for_event(self._conf),
-                                        event=self._conf, form=form)
+        images = ImageFile.query.with_parent(self.event_new).all()
+        return WPImages.render_template('images.html', self._conf, images=images, event=self.event_new, form=form)
 
 
 class RHImageUpload(RHManageImagesBase):
@@ -77,21 +76,21 @@ class RHImageUpload(RHManageImagesBase):
             signals.event_management.image_created.send(image, user=session.user)
         flash(ngettext("The image has been uploaded", "{count} images have been uploaded", len(files))
               .format(count=len(files)), 'success')
-        return jsonify_data(image_list=_render_image_list(self._conf))
+        return jsonify_data(image_list=_render_image_list(self.event_new))
 
 
 class RHImageDelete(RHManageImagesBase):
     def _checkParams(self, params):
         RHManageImagesBase._checkParams(self, params)
-        self.image = ImageFile.find_first(id=request.view_args['image_id'], event_id=self._conf.getId())
-        if not self.image:
-            raise NotFound
+        self.image = (ImageFile.query.with_parent(self.event_new)
+                      .filter_by(id=request.view_args['image_id'])
+                      .first_or_404())
 
     def _process(self):
         signals.event_management.image_deleted.send(self.image, user=session.user)
         db.session.delete(self.image)
         flash(_("The image '{}' has been deleted").format(self.image.filename), 'success')
-        return jsonify_data(image_list=_render_image_list(self._conf))
+        return jsonify_data(image_list=_render_image_list(self.event_new))
 
 
 class RHImageDisplay(RHConferenceBaseDisplay):
