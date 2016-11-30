@@ -1506,6 +1506,9 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
             printCSS += '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=self._kwargs['css_url'])
         return printCSS
 
+    def get_extra_css_files(self):
+        return []
+
 
 class WPreviewPage( wcomponents.WTemplated ):
     pass

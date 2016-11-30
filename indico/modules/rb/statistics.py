@@ -37,8 +37,10 @@ def calculate_rooms_booked_time(rooms, start_date=None, end_date=None):
                                     ReservationOccurrence.is_valid,
                                     _join=ReservationOccurrence)
     # Take into account only working hours
-    earliest_time = greatest(cast(ReservationOccurrence.start_dt, TIME), Location.working_time_start)
-    latest_time = least(cast(ReservationOccurrence.end_dt, TIME), Location.working_time_end)
+    earliest_time = least(greatest(cast(ReservationOccurrence.start_dt, TIME), Location.working_time_start),
+                          Location.working_time_end)
+    latest_time = greatest(least(cast(ReservationOccurrence.end_dt, TIME), Location.working_time_end),
+                           Location.working_time_start)
     booked_time = reservations.with_entities(func.sum(latest_time - earliest_time)).scalar()
     return (booked_time or timedelta()).total_seconds()
 

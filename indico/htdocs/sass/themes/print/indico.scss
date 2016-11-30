@@ -51,7 +51,10 @@ body {
     display: none !important;
 }
 
-.timetable-duration, .dayList .day, .participant-list-wrapper {
+.timetable-duration,
+.dayList .day,
+.dayList .day-title,
+.participant-list-wrapper {
     @extend %black-and-white;
 }
 

@@ -8,7 +8,7 @@
 {% endset %}
 
 {% call confirmation_dialog('danger', message=confirmation_message, ok_text=_('Delete event')) %}
-    {% trans event_title=event.title %}
+    {% trans event_title=event.title -%}
         You are about to <strong>delete</strong> the whole event "<strong>{{ event_title }}</strong>"!
-    {% endtrans %}
+    {%- endtrans %}
 {% endcall %}

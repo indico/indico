@@ -30,7 +30,7 @@
                {% elif registration.transaction.status.name == 'pending' %}
                    {% trans %}Awaiting payment confirmation.{% endtrans %}
                {% endif %}
-               <a href="#payment" class="js-highlight-payment">
+               <a href="#payment-summary" class="js-highlight-payment">
                    {%- trans %}Check it out here{% endtrans -%}
                </a>.
            {% endif %}

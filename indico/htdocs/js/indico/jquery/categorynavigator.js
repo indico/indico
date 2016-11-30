@@ -556,7 +556,12 @@
                     self._toggleLoading(false, true);
                     self._currentCategoryRequest = null;
                 },
-                error: handleAjaxError,
+                error: function(xhr) {
+                    // XXX: Re-enable error handling once we skip retrieving protected parents
+                    if (xhr.status !== 403) {
+                        handleAjaxError(xhr);
+                    }
+                },
                 success: function(data) {
                     if (data && self._isInDOM()) {
                         self._fillCache(data);
