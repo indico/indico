@@ -62,7 +62,7 @@ class ReminderForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(ReminderForm, self).__init__(*args, **kwargs)
-        self.absolute_time.description = _('Your active timezone is {tz}.').format(tz=self.timezone)
+        self.absolute_time.description = _("The event's timezone is {tz}.").format(tz=self.event.tzinfo)
         self.reply_to_address.choices = (self.event
                                          .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
                                          .items())
@@ -90,17 +90,13 @@ class ReminderForm(IndicoForm):
         if self.schedule_type.data == 'absolute' and field.data < date.today():
             raise ValidationError(_('The specified date is in the past'))
 
-    @property
-    def timezone(self):
-        return self.event.display_tzinfo
-
     @generated_data
     def scheduled_dt(self):
         if self.schedule_type.data == 'absolute':
             if self.absolute_date.data is None or self.absolute_time.data is None:
                 return None
             dt = datetime.combine(self.absolute_date.data, self.absolute_time.data)
-            return self.timezone.localize(dt).astimezone(pytz.utc)
+            return self.event.tzinfo.localize(dt).astimezone(pytz.utc)
         elif self.schedule_type.data == 'relative':
             if self.relative_delta.data is None:
                 return None

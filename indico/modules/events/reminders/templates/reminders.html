@@ -1,7 +1,7 @@
 {% extends 'layout/base.html' %}
 {% set pending_reminders = reminders|rejectattr('is_sent')|list %}
 {% set sent_reminders = reminders|selectattr('is_sent')|list %}
-{% set timezone = event.display_tzinfo %}
+{% set tzinfo = event.tzinfo %}
 
 {% block title %}
     {% trans %}Reminders{% endtrans %}
@@ -19,11 +19,11 @@
                         {%- if reminder.is_relative -%}
                             {{ reminder.event_start_delta|format_human_timedelta('hours') }} before the event
                         {%- else -%}
-                            {{ reminder.scheduled_dt|format_datetime(timezone=timezone) }} <small>({{ timezone }})</small>
+                            {{ reminder.scheduled_dt|format_datetime(timezone=tzinfo) }} <small>({{ tzinfo }})</small>
                         {%- endif -%}
                     </a>
                     {% if reminder.is_relative %}
-                        <i class="icon-alarm" title="{{ reminder.scheduled_dt|format_datetime(timezone=timezone) }} ({{ timezone }})"></i>
+                        <i class="icon-alarm" title="{{ reminder.scheduled_dt|format_datetime(timezone=tzinfo) }} ({{ tzinfo }})"></i>
                     {% endif %}
                 </strong>
                 {% if not reminder.is_sent %}

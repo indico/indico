@@ -90,7 +90,7 @@ class RHEditReminder(RHSpecificReminderBase):
                                'relative_delta': reminder.event_start_delta}
         else:
             # Use the user's preferred event timezone
-            dt = reminder.scheduled_dt.astimezone(self.event_new.display_tzinfo)
+            dt = reminder.scheduled_dt.astimezone(self.event_new.tzinfo)
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_date': dt.date(),
                                'absolute_time': dt.time()}
