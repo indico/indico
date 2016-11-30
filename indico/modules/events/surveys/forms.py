@@ -61,16 +61,16 @@ class SurveyForm(IndicoForm):
                                            description=_('Email addresses to notify when a new submission is made'))
 
     def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event', None)
+        self.event = kwargs.pop('event')
         super(IndicoForm, self).__init__(*args, **kwargs)
 
     def validate_title(self, field):
-        query = Survey.find(Survey.event_id == self.event.id,
-                            db.func.lower(Survey.title) == field.data.lower(),
-                            Survey.title != field.object_data,
-                            ~Survey.is_deleted)
+        query = (Survey.query.with_parent(self.event)
+                 .filter(db.func.lower(Survey.title) == field.data.lower(),
+                         Survey.title != field.object_data,
+                         ~Survey.is_deleted))
         if query.count():
-            raise ValidationError(_("There is already an survey named \"{}\" on this event".format(escape(field.data))))
+            raise ValidationError(_('There is already a survey named "{}" on this event'.format(escape(field.data))))
 
     def post_validate(self):
         if not self.anonymous.data:
@@ -91,7 +91,7 @@ class ScheduleSurveyForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         survey = kwargs.pop('survey')
         self.allow_reschedule_start = kwargs.pop('allow_reschedule_start')
-        self.timezone = survey.event.getTimezone()
+        self.timezone = survey.event_new.timezone
         super(IndicoForm, self).__init__(*args, **kwargs)
         if not survey.start_notification_sent or not self.allow_reschedule_start:
             del self.resend_start_notification

@@ -2,14 +2,14 @@
 {% set survey = submission.survey %}
 
 {% block subject -%}
-    New survey submission for "{{ survey.title }}" on the event "{{ survey.event.title }}"
+    New survey submission for "{{ survey.title }}" on the event "{{ survey.event_new.title }}"
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        A new submission has been made for the survey "{{ survey.title }}" on the event "{{ survey.event.title }}"
+        A new submission has been made for the survey "{{ survey.title }}" on the event "{{ survey.event_new.title }}"
         {%- if submission.user %} by {{ submission.user.full_name }}{% endif -%}.
 
         You can access all the submissions by clicking on the link below:
@@ -22,5 +22,5 @@
 {%- endblock %}
 
 {% block footer_url -%}
-    {{ url_for('event.conferenceDisplay', survey.event, _external=true) }}
+    {{ url_for('event.conferenceDisplay', survey.event_new, _external=true) }}
 {%- endblock %}

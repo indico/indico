@@ -18,14 +18,14 @@
             {% for survey in surveys %}
                 <tr>
                     <td>
-                        {% if event.as_event.can_manage(session.user, 'surveys') %}
+                        {% if event.can_manage(session.user, 'surveys') %}
                             <a href="{{ url_for('.manage_survey', survey) }}">{{ survey.title }}</a>
                         {% else %}
                             {{ survey.title }}
                         {% endif %}
                     </td>
-                    <td>{{ survey.start_dt | format_datetime(timezone=event.as_event.display_tzinfo) if survey.start_dt else _('Not started') }}</td>
-                    <td>{{ survey.end_dt | format_datetime(timezone=event.as_event.display_tzinfo) if survey.end_dt else _('No deadline') }}</td>
+                    <td>{{ survey.start_dt | format_datetime(timezone=event.display_tzinfo) if survey.start_dt else _('Not started') }}</td>
+                    <td>{{ survey.end_dt | format_datetime(timezone=event.display_tzinfo) if survey.end_dt else _('No deadline') }}</td>
                     <td class="survey-actions">
                         {% if was_survey_submitted(survey) %}
                             <a class="i-button highlight disabled"
@@ -53,7 +53,7 @@
             {% endfor %}
         </tbody>
     </table>
-    {% if event.getType() != 'conference' %}
+    {% if event.type != 'conference' %}
         <p>
             <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
                 {%- trans %}Back to the event{% endtrans -%}

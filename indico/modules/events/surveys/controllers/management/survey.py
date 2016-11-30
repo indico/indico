@@ -35,16 +35,19 @@ class RHManageSurveys(RHManageSurveysBase):
     """Survey management overview (list of surveys)"""
 
     def _process(self):
-        surveys = Survey.find(event_id=self.event.id, is_deleted=False).order_by(db.func.lower(Survey.title)).all()
+        surveys = (Survey.query.with_parent(self.event_new)
+                   .filter(~Survey.is_deleted)
+                   .order_by(db.func.lower(Survey.title))
+                   .all())
         return WPManageSurvey.render_template('management/survey_list.html',
-                                              self.event, event=self.event, surveys=surveys)
+                                              self._conf, event=self.event_new, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
     """Specific survey management (overview)"""
 
     def _process(self):
-        return WPManageSurvey.render_template('management/survey.html', self.event, survey=self.survey)
+        return WPManageSurvey.render_template('management/survey.html', self._conf, survey=self.survey)
 
 
 class RHEditSurvey(RHManageSurveyBase):
@@ -54,14 +57,14 @@ class RHEditSurvey(RHManageSurveyBase):
         return FormDefaults(self.survey, limit_submissions=self.survey.submission_limit is not None)
 
     def _process(self):
-        form = SurveyForm(event=self.event, obj=self._get_form_defaults())
+        form = SurveyForm(event=self.event_new, obj=self._get_form_defaults())
         if form.validate_on_submit():
             form.populate_obj(self.survey)
             db.session.flush()
             flash(_('Survey modified'), 'success')
             logger.info('Survey %s modified by %s', self.survey, session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event, form=form,
+        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event_new, form=form,
                                 survey=self.survey)
 
 
@@ -72,14 +75,14 @@ class RHDeleteSurvey(RHManageSurveyBase):
         self.survey.is_deleted = True
         flash(_('Survey deleted'), 'success')
         logger.info('Survey %s deleted by %s', self.survey, session.user)
-        return redirect(url_for('.manage_survey_list', self.event))
+        return redirect(url_for('.manage_survey_list', self.event_new))
 
 
 class RHCreateSurvey(RHManageSurveysBase):
     """Create a new survey"""
 
     def _process(self):
-        form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
+        form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event_new)
         if form.validate_on_submit():
             survey = Survey(event_new=self.event_new)
             # add a default section so people can start adding questions right away
@@ -90,7 +93,8 @@ class RHCreateSurvey(RHManageSurveysBase):
             flash(_('Survey created'), 'success')
             logger.info('Survey %s created by %s', survey, session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event, form=form, survey=None)
+        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event_new, form=form,
+                                survey=None)
 
 
 class RHScheduleSurvey(RHManageSurveyBase):

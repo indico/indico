@@ -23,7 +23,6 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.models.events import EventType
-from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
@@ -40,10 +39,6 @@ def _can_redirect_to_single_survey(surveys):
 
 
 class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self.event = self._conf
-
     @property
     def view_class(self):
         mapping = {EventType.conference: WPDisplaySurveyConference,
@@ -54,13 +49,16 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
 
 class RHSurveyList(RHSurveyBaseDisplay):
     def _process(self):
-        surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id),
-                                  _eager=(Survey.questions, Survey.submissions))
+        surveys = (Survey.query.with_parent(self.event_new)
+                   .filter(Survey.is_visible)
+                   .options(joinedload('questions'),
+                            joinedload('submissions'))
+                   .all())
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
-        return self.view_class.render_template('display/survey_list.html', self.event, surveys=surveys,
-                                               event=self.event, states=SurveyState,
+        return self.view_class.render_template('display/survey_list.html', self._conf, surveys=surveys,
+                                               event=self.event_new, states=SurveyState,
                                                was_survey_submitted=was_survey_submitted)
 
 
@@ -81,18 +79,18 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
 
     def _checkParams(self, params):
         RHSurveyBaseDisplay._checkParams(self, params)
-        self.survey = (Survey
-                       .find(Survey.id == request.view_args['survey_id'], Survey.is_visible)
-                       .options(joinedload(Survey.submissions))
-                       .options(joinedload(Survey.sections).joinedload(SurveySection.children))
+        self.survey = (Survey.query
+                       .filter(Survey.id == request.view_args['survey_id'], Survey.is_visible)
+                       .options(joinedload('submissions'),
+                                joinedload('sections').joinedload('children'))
                        .one())
 
         if not self.survey.is_active:
             flash(_('This survey is not active'), 'error')
-            return redirect(url_for('.display_survey_list', self.event))
+            return redirect(url_for('.display_survey_list', self.event_new))
         elif was_survey_submitted(self.survey):
             flash(_('You have already answered this survey'), 'error')
-            return redirect(url_for('.display_survey_list', self.event))
+            return redirect(url_for('.display_survey_list', self.event_new))
 
     def _process(self):
         form = make_survey_form(self.survey)()
@@ -101,17 +99,17 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
             save_submitted_survey_to_session(submission)
             self.survey.send_submission_notification(submission)
             flash(_('Your answers has been saved'), 'success')
-            return redirect(url_for('.display_survey_list', self.event))
+            return redirect(url_for('.display_survey_list', self.event_new))
 
-        surveys = Survey.find_all(Survey.is_visible, Survey.event_id == int(self.event.id))
+        surveys = Survey.query.with_parent(self.event_new).filter(Survey.is_visible).all()
         if not _can_redirect_to_single_survey(surveys):
             back_button_endpoint = '.display_survey_list'
-        elif self.event.getType() != 'conference':
+        elif self.event_new.type_ != EventType.conference:
             back_button_endpoint = 'event.conferenceDisplay'
         else:
             back_button_endpoint = None
-        return self.view_class.render_template('display/survey_questionnaire.html', self.event, form=form,
-                                               event=self.event, survey=self.survey,
+        return self.view_class.render_template('display/survey_questionnaire.html', self._conf, form=form,
+                                               event=self.event_new, survey=self.survey,
                                                back_button_endpoint=back_button_endpoint)
 
     def _save_answers(self, form):

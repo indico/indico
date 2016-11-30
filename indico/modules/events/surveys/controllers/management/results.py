@@ -29,7 +29,7 @@ from indico.modules.events.surveys.util import generate_spreadsheet_from_survey
 from indico.modules.events.surveys.views import WPSurveyResults, WPManageSurvey
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
-from indico.web.flask.util import url_for, send_file
+from indico.web.flask.util import url_for
 
 
 class RHSurveyResults(RHManageSurveyBase):
@@ -38,13 +38,13 @@ class RHSurveyResults(RHManageSurveyBase):
     def _checkParams(self, params):
         RHManageSurveysBase._checkParams(self, params)
         # include all the sections and children to avoid querying them in a loop
-        self.survey = (Survey
-                       .find(id=request.view_args['survey_id'], is_deleted=False)
+        self.survey = (Survey.query
+                       .filter_by(id=request.view_args['survey_id'], is_deleted=False)
                        .options(joinedload(Survey.sections).joinedload(SurveySection.children))
                        .one())
 
     def _process(self):
-        return WPSurveyResults.render_template('management/survey_results.html', self.event, survey=self.survey)
+        return WPSurveyResults.render_template('management/survey_results.html', self._conf, survey=self.survey)
 
 
 class RHExportSubmissionsBase(RHManageSurveyBase):
@@ -106,9 +106,9 @@ class RHDeleteSubmissions(RHManageSurveyBase):
             if submission.id in submission_ids:
                 self.survey.submissions.remove(submission)
                 logger.info('Submission %s deleted from survey %s', submission, self.survey)
-                self.event.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
-                               'Submission removed from survey "{}"'.format(self.survey.title),
-                               data={'Submitter': submission.user.full_name if submission.user else 'Anonymous'})
+                self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
+                                   'Submission removed from survey "{}"'.format(self.survey.title),
+                                   data={'Submitter': submission.user.full_name if submission.user else 'Anonymous'})
         return jsonify(success=True)
 
 
@@ -117,6 +117,6 @@ class RHDisplaySubmission(RHSurveySubmissionBase):
 
     def _process(self):
         answers = {answer.question_id: answer for answer in self.submission.answers}
-        return WPManageSurvey.render_template('management/survey_submission.html',
-                                              self.event, survey=self.submission.survey, submission=self.submission,
+        return WPManageSurvey.render_template('management/survey_submission.html', self._conf,
+                                              survey=self.submission.survey, submission=self.submission,
                                               answers=answers)

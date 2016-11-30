@@ -7,8 +7,8 @@
 
 {% block subtitle %}
     {{ survey.title }}
-    {% if event.getType() != 'conference' %}
-        <small>({{ event.getTitle() }})</small>
+    {% if event.type != 'conference' %}
+        <small>({{ event.title }})</small>
     {% endif %}
 {% endblock %}
 
