@@ -90,7 +90,7 @@ class AddAttachmentFilesMixin:
     def _process(self):
         form = AddAttachmentFilesForm(linked_object=self.object)
         if form.validate_on_submit():
-            files = request.files.getlist('file')
+            files = form.files.data
             folder = form.folder.data or AttachmentFolder.get_or_create_default(linked_object=self.object)
             for f in files:
                 filename = secure_filename(f.filename, 'attachment')
@@ -148,7 +148,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                 self.attachment.acl &= form.acl.data
             # files need special handling; links are already updated in `populate_obj`
             if self.attachment.type == AttachmentType.file:
-                file = request.files['file'] if request.files else None
+                file = form.file.data['added']
                 if file:
                     self.attachment.file = AttachmentFile(user=session.user, content_type=file.mimetype,
                                                           filename=secure_filename(file.filename, 'attachment'))

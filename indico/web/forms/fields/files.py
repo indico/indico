@@ -100,6 +100,9 @@ class EditableFileField(FileField):
                 uploaded.append(value)
             else:
                 deleted = json.loads(value)
+        if not self.allow_multiple_files:
+            uploaded = uploaded[0] if uploaded else None
+            deleted = deleted[0] if deleted else None
         self.data = {
             'added': uploaded,
             'deleted': deleted
