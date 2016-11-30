@@ -20,7 +20,7 @@
         <i class="icon-time header-data"></i>
         <span class="time-info">
             {% if sess.start_dt -%}
-                {{ sess.start_dt|format_datetime(timezone=sess.event_new.display_tzinfo) }}
+                {{ sess.start_dt|format_datetime(timezone=event.display_tzinfo) }}
             {%- else -%}
                 {% trans %}Not scheduled{% endtrans %}
             {%- endif %}
@@ -130,7 +130,7 @@
     <div class="js-container">
         {% if sess.contributions %}
             <div id="session-contrib-list" class="contribution-list js-view">
-                {{ render_contribution_list(event, timezone, sess.contributions, false) }}
+                {{ render_contribution_list(event, event.display_tzinfo, sess.contributions, false) }}
             </div>
         {% endif %}
 

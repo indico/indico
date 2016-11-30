@@ -81,7 +81,7 @@ class RHCreateSurvey(RHManageSurveysBase):
     def _process(self):
         form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
         if form.validate_on_submit():
-            survey = Survey(event_new=self.event.as_event)
+            survey = Survey(event_new=self.event_new)
             # add a default section so people can start adding questions right away
             survey.items.append(SurveySection(display_as_section=False))
             form.populate_obj(survey)

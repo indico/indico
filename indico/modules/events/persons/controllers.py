@@ -221,7 +221,7 @@ class RHGrantSubmissionRights(RHConferenceModifBase):
 
     def _process(self):
         count = 0
-        for cont in self._target.as_event.contributions:
+        for cont in self.event_new.contributions:
             speakers = cont.speakers[:]
             for subcontrib in cont.subcontributions:
                 speakers += subcontrib.speakers

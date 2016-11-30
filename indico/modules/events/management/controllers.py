@@ -53,11 +53,11 @@ class RHDeleteEvent(RHConferenceModifBase):
         return RH._process(self)
 
     def _process_GET(self):
-        return jsonify_template('events/management/delete_event.html', event=self._conf)
+        return jsonify_template('events/management/delete_event.html', event=self.event_new)
 
     def _process_POST(self):
         delete_event(self.event_new)
-        flash(_('Event "{}" successfully deleted.').format(self._conf.title), 'success')
+        flash(_('Event "{}" successfully deleted.').format(self.event_new.title), 'success')
         redirect_url = url_for('categories.manage_content', self.event_new.category)
         return jsonify_data(url=redirect_url, flash=False)
 
@@ -69,7 +69,7 @@ class RHLockEvent(RHConferenceModifBase):
 
     def _checkProtection(self):
         RHConferenceModifBase._checkProtection(self)
-        if not can_lock(self._conf, session.user):
+        if not can_lock(self.event_new, session.user):
             raise Forbidden
 
     def _process(self):
@@ -90,13 +90,13 @@ class RHUnlockEvent(RHConferenceModifBase):
     CSRF_ENABLED = True
 
     def _checkProtection(self):
-        self._allowClosed = can_lock(self._conf, session.user)
+        self._allowClosed = can_lock(self.event_new, session.user)
         RHConferenceModifBase._checkProtection(self)
 
     def _process(self):
         self._conf.setClosed(False)
         flash(_('The event is now unlocked.'), 'success')
-        return redirect(url_for('event_mgmt.conferenceModification', self._conf))
+        return redirect(url_for('event_mgmt.conferenceModification', self.event_new))
 
 
 class RHContributionPersonListMixin:

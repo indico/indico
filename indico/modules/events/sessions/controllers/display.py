@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 from flask import session, request
-from pytz import timezone
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
@@ -29,7 +28,6 @@ from indico.modules.events.sessions.util import (get_sessions_for_user, get_sess
 from indico.modules.events.sessions.views import WPDisplaySession, WPDisplayMySessionsConference
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
-from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -68,7 +66,6 @@ class RHDisplaySession(RHDisplaySessionBase):
         ical_params = get_base_ical_parameters(session.user, 'sessions',
                                                '/export/event/{0}/session/{1}.ics'.format(self.event_new.id,
                                                                                           self.session.id))
-        tz = timezone(DisplayTZ(session.user, self._conf).getDisplayTZ())
         contributions_strategy = subqueryload('contributions')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
         _contrib_tte_strategy.lazyload('*')
@@ -83,7 +80,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .options(contributions_strategy, blocks_strategy)
                 .one())
         return self.view_class.render_template('display/session_display.html', self._conf, sess=sess,
-                                               event=self.event_new, timezone=tz, **ical_params)
+                                               event=self.event_new, **ical_params)
 
 
 class RHExportSessionToICAL(RHDisplaySessionBase):

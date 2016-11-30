@@ -51,7 +51,7 @@ class RHStaticSiteBuild(RHStaticSiteBase):
         db.session.add(static_site)
         transaction.commit()
         build_static_site.delay(static_site)
-        return redirect(url_for('.list', self._conf))
+        return redirect(url_for('.list', self.event_new))
 
 
 class RHStaticSiteDownload(RHStaticSiteBase):
