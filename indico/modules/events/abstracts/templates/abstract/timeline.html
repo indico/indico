@@ -1,7 +1,7 @@
 {% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_score, render_visibility_hint,
                                                         render_tracks, render_track, render_instruction_box,
                                                         render_user_icon %}
-{% from 'events/abstracts/abstract/review.html' import render_comment_form, render_review_form %}
+{% from 'events/abstracts/abstract/_timeline_forms.html' import render_comment_form, render_review_form %}
 
 
 {% macro render_timeline(abstract, comment_form, review_form=none) %}
@@ -9,7 +9,7 @@
     {% set can_review = abstract.can_review(session.user, check_state=true) %}
     {% set timeline = abstract.get_timeline(session.user) %}
     {% if timeline or can_comment or can_review %}
-        <div id="abstract-timeline" class="i-timeline with-line">
+        <div class="i-timeline with-line abstract-timeline">
             <div class="i-timeline-connect-up"></div>
             {% for item in timeline %}
                 {% if item.TIMELINE_TYPE == 'comment' %}
@@ -250,7 +250,7 @@
     {% set can_comment = abstract.can_comment(session.user) %}
     {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
     {% if can_comment or reviewer_data.tracks %}
-        <div id="abstract-timeline-input" class="i-timeline-item">
+        <div id="abstract-timeline-input" class="i-timeline-item abstract-timeline-input">
             {{ render_user_icon(session.user) }}
             <div class="i-timeline-item-box footer-only header-indicator-left">
                 <div class="i-box-footer js-form-container">

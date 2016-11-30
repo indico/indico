@@ -1,8 +1,8 @@
 {% extends 'events/abstracts/management/_base.html' if management else 'events/abstracts/display/_base.html' %}
 
-{% from 'events/abstracts/abstract/public.html' import render_abstract_public, render_judgment %}
-{% from 'events/abstracts/abstract/judge.html' import render_decision_box, render_reviewed_for_tracks_box,
-                                                      render_review_summary_box %}
+{% from 'events/abstracts/abstract/judgement.html' import render_decision_box, render_reviewed_for_tracks_box,
+                                                          render_review_summary_box %}
+{% from 'events/abstracts/abstract/public.html' import render_abstract_info, render_abstract_judgment %}
 {% from 'events/abstracts/abstract/timeline.html' import render_timeline %}
 
 {% block back_button_url -%}
@@ -18,15 +18,17 @@
 {% endblock %}
 
 {% block content %}
-    {{ render_abstract_public(abstract) }}
-    <div id="abstract-private" class="i-timeline">
+    {{ render_abstract_info(abstract) }}
+
+    <div class="i-timeline">
         {{ render_timeline(abstract, comment_form, review_form) }}
+
         {% if abstract.can_judge(session.user, check_state=true) and abstract.event_new.tracks %}
             {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
         {% endif %}
 
         {% if abstract.can_see_reviews(session.user) and visible_tracks %}
-            <div id="abstract-review-summary-box" class="i-timeline-item">
+            <div class="i-timeline-item abstract-review-summary-box">
                 {{ render_review_summary_box(abstract, session.user, visible_tracks) }}
             </div>
         {% endif %}
@@ -36,11 +38,11 @@
                 {{ render_decision_box(abstract, judgment_form, session.user) }}
             </div>
         {% endif %}
-    </div>
 
-    {% if abstract.state.name not in ('submitted', 'withdrawn') %}
-        {{ render_judgment(abstract) }}
-    {% endif %}
+        {% if abstract.state.name not in ('submitted', 'withdrawn') %}
+            {{ render_abstract_judgment(abstract) }}
+        {% endif %}
+    </div>
 
     {% if abstract.email_logs and abstract.can_judge(session.user, check_state=false) %}
         <a class="open-abstract-notification-log"
