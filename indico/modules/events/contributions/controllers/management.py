@@ -549,7 +549,7 @@ class RHSortContributionFields(RHManageContributionsBase):
             field.position = index
         db.session.flush()
         self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                           'Custom fields have been reordered', session.user)
+                           'Custom fields reordered', session.user)
         return jsonify_data(flash=False)
 
 
