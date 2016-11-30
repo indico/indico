@@ -55,8 +55,8 @@ class RHListOtherAbstracts(RHAbstractsBase):
         self.excluded_ids = set(request.form.getlist('excluded_abstract_id'))
 
     def _process(self):
-        query = (Abstract
-                 .query.with_parent(self.event_new)
+        query = (Abstract.query
+                 .with_parent(self.event_new)
                  .filter(Abstract.state.notin_({AbstractState.duplicate, AbstractState.merged}))
                  .options(joinedload('submitter').lazyload('*'),
                           subqueryload('reviewed_for_tracks'),
