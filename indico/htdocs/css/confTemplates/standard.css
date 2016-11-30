@@ -59,10 +59,10 @@
     Wrapper around the bottom part of the conference header
 */
 .confSubTitleBox {
-    min-height: 45px;
     background: #f5faff;
     border-bottom: 1px solid #d5e4f1;
     border-top: 1px solid #d5e4f1;
+    padding: 0.5rem 0;
 }
 
 /*
