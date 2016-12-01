@@ -118,7 +118,7 @@ class IndicoSQLAlchemy(SQLAlchemy):
         callback without having to worry about things like the ZODB extension,
         implicit commits, etc.
         """
-        session = db.create_session({})
+        session = db.create_session({'query_cls': IndicoBaseQuery})
         try:
             yield session
         except:
@@ -211,7 +211,8 @@ naming_convention = {
     'unique_index': _unique_index
 }
 
-db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension()})
+db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension(),
+                                       'query_cls': IndicoBaseQuery})
 db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
