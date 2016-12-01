@@ -57,6 +57,14 @@ class IndicoBaseQuery(BaseQuery):
 
         return Pagination(self, page, per_page, total, items)
 
+    def scalar_exists(self):
+        """Check whether a query yields any rows.
+
+        This executes an ``EXISTS(SELECT 1 FROM ...)`` query and
+        returns either `True` or `False`.
+        """
+        return self.session.query(self.enable_eagerloads(False).exists()).scalar()
+
 
 class IndicoModel(Model):
     """Indico DB model"""
