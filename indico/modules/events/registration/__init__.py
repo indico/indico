@@ -101,7 +101,7 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_registration(event):
         if not event.has_feature('registration'):
             return False
-        if RegistrationForm.query.with_parent(event).filter(RegistrationForm.is_scheduled).scalar_exists():
+        if RegistrationForm.query.with_parent(event).filter(RegistrationForm.is_scheduled).has_rows():
             return True
         if not session.user:
             return False
@@ -110,7 +110,7 @@ def _extend_event_menu(sender, **kwargs):
                 .filter(Registration.user == session.user,
                         ~Registration.is_deleted,
                         ~RegistrationForm.is_deleted)
-                .scalar_exists())
+                .has_rows())
 
     def _visible_participant_list(event):
         return event.has_feature('registration')

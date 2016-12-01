@@ -25,7 +25,7 @@ from indico_zodbimport import Importer
 
 class EventStubImporter(Importer):
     def has_data(self):
-        return Event.has_rows()
+        return Event.query.has_rows()
 
     def migrate(self):
         self.migrate_event_stubs()

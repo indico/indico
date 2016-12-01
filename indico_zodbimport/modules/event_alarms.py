@@ -33,7 +33,7 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 class EventAlarmImporter(Importer):
     def has_data(self):
-        return EventReminder.has_rows()
+        return EventReminder.query.has_rows()
 
     def migrate(self):
         self.migrate_event_alarms()

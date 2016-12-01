@@ -36,7 +36,7 @@ class ImageCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self._find_images().scalar_exists()
+        return self._find_images().has_rows()
 
     def _find_images(self):
         return self.old_event.layout_images

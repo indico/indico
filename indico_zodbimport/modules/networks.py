@@ -29,7 +29,7 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 class NetworkImporter(Importer):
     def has_data(self):
-        return IPNetworkGroup.has_rows()
+        return IPNetworkGroup.query.has_rows()
 
     def migrate(self):
         self.migrate_networks()

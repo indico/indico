@@ -29,7 +29,7 @@ from indico_zodbimport import Importer
 
 class LegacyCategoryImporter(Importer):
     def has_data(self):
-        return LegacyCategoryMapping.has_rows()
+        return LegacyCategoryMapping.query.has_rows()
 
     def migrate(self):
         self.migrate_legacy_categories()

@@ -232,7 +232,7 @@ def get_user_tracks(event, user):
 
 
 def has_user_tracks(event, user):
-    return _query_user_tracks(event, user).scalar_exists()
+    return _query_user_tracks(event, user).has_rows()
 
 
 def get_track_reviewer_abstract_counts(event, user):

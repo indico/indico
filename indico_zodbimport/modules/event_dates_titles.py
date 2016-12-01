@@ -35,7 +35,7 @@ class EventDatesTitlesImporter(Importer):
         return (Event.query
                 .filter(Event.title.isnot(None) | Event.description.isnot(None) | Event.start_dt.isnot(None) |
                         Event.end_dt.isnot(None) | Event.timezone.isnot(None))
-                .scalar_exists())
+                .has_rows())
 
     def migrate(self):
         self.migrate_event_dates_titles()

@@ -112,7 +112,7 @@ class RoomBookingImporter(Importer):
         self.rb_root = UnbreakingDB(get_storage(self.rb_zodb_uri)).open().root()
 
     def has_data(self):
-        return Location.has_rows()
+        return Location.query.has_rows()
 
     def migrate(self):
         if not self.no_merged_avatars:

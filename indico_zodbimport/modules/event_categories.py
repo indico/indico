@@ -31,7 +31,7 @@ from indico_zodbimport import Importer
 
 class EventCategoriesImporter(Importer):
     def has_data(self):
-        return Event.query.filter(Event.category_id.isnot(None)).scalar_exists()
+        return Event.query.filter(Event.category_id.isnot(None)).has_rows()
 
     def migrate(self):
         self._load_data()

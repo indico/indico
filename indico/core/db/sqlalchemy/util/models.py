@@ -57,7 +57,7 @@ class IndicoBaseQuery(BaseQuery):
 
         return Pagination(self, page, per_page, total, items)
 
-    def scalar_exists(self):
+    def has_rows(self):
         """Check whether a query yields any rows.
 
         This executes an ``EXISTS(SELECT 1 FROM ...)`` query and
@@ -132,16 +132,6 @@ class IndicoModel(Model):
         if obj is None:
             raise NoResultFound()
         return obj
-
-    @classmethod
-    def has_rows(cls):
-        """Checks if the underlying table has any rows.
-
-        This is done in an efficient way and should preferred over
-        calling the `count` method unless you actually care about
-        the exact number of rows.
-        """
-        return cls.query.scalar_exists()
 
     @classmethod
     def preload_relationships(cls, query, *relationships, **kwargs):

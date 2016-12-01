@@ -74,7 +74,7 @@ class ReminderCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self._find_reminders().scalar_exists()
+        return self._find_reminders().has_rows()
 
     def _find_reminders(self):
         return self.old_event.reminders.filter(db.m.EventReminder.is_relative)

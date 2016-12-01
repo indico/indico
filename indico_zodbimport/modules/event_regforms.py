@@ -982,7 +982,7 @@ class EventRegformImporter(LocalFileImporterMixin, Importer):
         super(EventRegformImporter, self).__init__(**kwargs)
 
     def has_data(self):
-        return RegistrationForm.find(RegistrationForm.title != 'Participants').scalar_exists()
+        return RegistrationForm.find(RegistrationForm.title != 'Participants').has_rows()
 
     def load_data(self):
         self.print_step("Loading some data")

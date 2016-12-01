@@ -40,7 +40,7 @@ class RegistrationFormCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self._find_registration_forms().scalar_exists()
+        return self._find_registration_forms().has_rows()
 
     def _find_registration_forms(self):
         return self.old_event.registration_forms.filter(~RegistrationForm.is_deleted)

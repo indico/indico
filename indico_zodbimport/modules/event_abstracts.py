@@ -743,7 +743,7 @@ class EventAbstractsImporter(LocalFileImporterMixin, Importer):
         return super(EventAbstractsImporter, EventAbstractsImporter).decorate_command(command)
 
     def has_data(self):
-        return Abstract.has_rows() or Track.has_rows()
+        return Abstract.query.has_rows() or Track.query.has_rows()
 
     def migrate(self):
         self.load_data()

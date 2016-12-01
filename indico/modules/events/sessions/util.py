@@ -161,7 +161,7 @@ def get_sessions_for_user(event, user):
 
 
 def has_sessions_for_user(event, user):
-    return _query_sessions_for_user(event, user).scalar_exists()
+    return _query_sessions_for_user(event, user).has_rows()
 
 
 def serialize_session_for_ical(sess):

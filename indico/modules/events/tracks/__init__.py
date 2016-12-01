@@ -45,7 +45,7 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.tracks.settings import track_settings
 
     def _program_visible(event):
-        return bool(track_settings.get(event, 'program').strip() or Track.query.with_parent(event).scalar_exists())
+        return bool(track_settings.get(event, 'program').strip() or Track.query.with_parent(event).has_rows())
 
     return MenuEntryData(title=_("Scientific Programme"), name='program', endpoint='tracks.program', position=1,
                          visible=_program_visible, static_site=True)

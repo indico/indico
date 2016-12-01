@@ -187,7 +187,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         published = (RegistrationForm.query.with_parent(self.event_new)
                      .filter(RegistrationForm.publish_registrations_enabled)
-                     .scalar_exists())
+                     .has_rows())
         num_participants = sum(len(table['rows']) for table in tables)
 
         return self.view_class.render_template(

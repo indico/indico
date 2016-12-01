@@ -39,7 +39,7 @@ class EventLocationsImporter(Importer):
         return (Event.query
                 .filter(((Event.own_address != '') | (Event.own_room_name != '') | (Event.own_venue_name != '') |
                          Event.own_room_id.isnot(None)))
-                .scalar_exists())
+                .has_rows())
 
     def migrate(self):
         self.venue_mapping = {location.name: location.id for location in Location.query}

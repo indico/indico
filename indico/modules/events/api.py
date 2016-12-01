@@ -473,7 +473,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             has_future_events = False
         else:
             query = Event.find(Event.category_id.in_(ids), ~Event.is_deleted, Event.start_dt > self._toDT)
-            has_future_events = query.scalar_exists()
+            has_future_events = query.has_rows()
         return {
             'eventCategories': self._build_category_path_data(ids),
             'moreFutureEvents': has_future_events

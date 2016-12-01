@@ -30,7 +30,7 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 class NewsImporter(Importer):
     def has_data(self):
-        return NewsItem.has_rows()
+        return NewsItem.query.has_rows()
 
     def migrate(self):
         self.migrate_settings()

@@ -43,7 +43,7 @@ def _convert_data(event, value):
 
 class EventLogImporter(Importer):
     def has_data(self):
-        return EventLogEntry.has_rows()
+        return EventLogEntry.query.has_rows()
 
     def migrate(self):
         # load users so we avoid querying them in a loop

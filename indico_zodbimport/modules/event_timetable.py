@@ -990,10 +990,10 @@ class EventTimetableImporter(Importer):
         return command
 
     def has_data(self):
-        if self.parallel and self.parallel[1] == 0 and ReferenceType.has_rows():
+        if self.parallel and self.parallel[1] == 0 and ReferenceType.query.has_rows():
             return True
         models = (TimetableEntry, Break, Session, SessionBlock, Contribution, LegacyAbstract, Judgment)
-        return any(x.has_rows() for x in models)
+        return any(x.query.has_rows() for x in models)
 
     def _load_data(self):
         self.print_step("Loading some data")

@@ -59,7 +59,7 @@ class CategoryImporter(Importer):
         return command
 
     def has_data(self):
-        return Category.has_rows()
+        return Category.query.has_rows()
 
     @no_autoflush
     def migrate(self):

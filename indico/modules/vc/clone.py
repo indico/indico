@@ -34,7 +34,7 @@ class VCCloner(EventCloner):
 
     @property
     def is_available(self):
-        return VCRoomEventAssociation.find_for_event(self.old_event, include_hidden=True).scalar_exists()
+        return VCRoomEventAssociation.find_for_event(self.old_event, include_hidden=True).has_rows()
 
     def run(self, new_event, cloners, shared_data):
         self._clone_nested_vc_rooms = False

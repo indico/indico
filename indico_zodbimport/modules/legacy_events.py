@@ -41,7 +41,7 @@ class ImporterDBMgr(DBMgr):
 
 class LegacyEventImporter(Importer):
     def has_data(self):
-        return LegacyEventMapping.has_rows()
+        return LegacyEventMapping.query.has_rows()
 
     def migrate(self):
         DBMgr.setInstance(ImporterDBMgr(self.zodb_root))

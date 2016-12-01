@@ -37,7 +37,7 @@ from indico_zodbimport import Importer
 
 class EventSeriesImporter(Importer):
     def has_data(self):
-        return EventSeries.has_rows()
+        return EventSeries.query.has_rows()
 
     def migrate(self):
         self.migrate_event_series()

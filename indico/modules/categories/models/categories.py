@@ -424,7 +424,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         return chain[::-1][n_categs - 1]
 
     def is_descendant_of(self, categ):
-        return categ != self and self.parent_chain_query.filter(Category.id == categ.id).scalar_exists()
+        return categ != self and self.parent_chain_query.filter(Category.id == categ.id).has_rows()
 
     @property
     def visibility_horizon_query(self):
