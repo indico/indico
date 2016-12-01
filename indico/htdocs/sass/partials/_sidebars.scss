@@ -104,8 +104,8 @@
 
             .title-wrapper {
                 display: block;
-                min-height: 2.3rem;
-                line-height: 2.3rem;
+                min-height: 2.6em;
+                line-height: 2.6em;
                 padding-left: 9px;
 
                 .title {
@@ -116,18 +116,13 @@
 
             .title {
                 display: block;
-                min-height: 2.3rem;
-                line-height: 2.3rem;
+                min-height: 2.6em;
+                line-height: 2.6em;
                 color: $black;
                 padding-left: 26px;
 
                 &:before {
-                    margin-right: 0.5rem;
-                }
-
-                span {
-                    display: inline-block;
-                    vertical-align: middle;
+                    margin-right: 0.5em;
                 }
             }
 
@@ -141,8 +136,8 @@
                 padding: 0;
 
                 > li .title {
-                    min-height: 1.7rem;
-                    line-height: 1.7rem;
+                    min-height: 2em;
+                    line-height: 2em;
                     padding-left: 51px;
                 }
             }
