@@ -100,7 +100,7 @@ $dropzone-border-width: 2;
     }
 
     &.thin {
-        min-height: initial;
+        min-height: inherit;
 
         .dropzone-inner {
             display: block;
@@ -109,11 +109,12 @@ $dropzone-border-width: 2;
 
         .dropzone-previews {
             display: block;
+            text-align: left;
         }
 
         .dz-preview {
-            @extend .flexrow;
-            min-height: initial;
+            display: flex;
+            min-height: inherit;
             margin: 0 0 5px 0;
 
             &:hover {
@@ -126,12 +127,12 @@ $dropzone-border-width: 2;
             opacity: 1;
             font-size: 1em;
             padding: 0;
-            text-align: initial;
+            text-align: inherit;
             color: $black;
-            min-width: initial;
-            position: initial;
+            min-width: inherit;
+            position: inherit;
             flex-grow: 1;
-            cursor: initial;
+            cursor: inherit;
             width: 300px;
         }
 
