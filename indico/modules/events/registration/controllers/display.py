@@ -185,8 +185,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             # There might be forms that have not been sorted by the user yet
             tables += map(self._participant_list_table, regforms_dict.viewvalues())
 
-        published = bool(RegistrationForm.find(RegistrationForm.publish_registrations_enabled,
-                                               RegistrationForm.event_id == int(self.event.id)).count())
+        published = (RegistrationForm.query.with_parent(self.event_new)
+                     .filter(RegistrationForm.publish_registrations_enabled)
+                     .scalar_exists())
         num_participants = sum(len(table['rows']) for table in tables)
 
         return self.view_class.render_template(

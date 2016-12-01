@@ -141,11 +141,7 @@ class IndicoModel(Model):
         calling the `count` method unless you actually care about
         the exact number of rows.
         """
-        from indico.core.db import db
-        # we just need one "normal" column so sqlalchemy doesn't involve relationships
-        # it doesn't really matter which one it is - it's never even used in the query
-        pk_col = getattr(cls, inspect(cls).primary_key[0].name)
-        return db.session.query(db.session.query(pk_col).exists()).one()[0]
+        return cls.query.scalar_exists()
 
     @classmethod
     def preload_relationships(cls, query, *relationships, **kwargs):
@@ -206,7 +202,7 @@ class IndicoModel(Model):
         if getattr(self, attr_name) is not None:
             return
         with db.session.no_autoflush:
-            id_ = db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table_name, col_name))).one()[0]
+            id_ = db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table_name, col_name))).scalar()
         setattr(self, attr_name, id_)
 
     def populate_from_dict(self, data, keys=None, skip=None):

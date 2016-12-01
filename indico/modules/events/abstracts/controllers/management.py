@@ -103,11 +103,11 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
     """Configure abstract reviewing"""
 
     def _process(self):
-        has_ratings = bool(AbstractReviewRating.query
-                           .join(AbstractReviewRating.review)
-                           .join(AbstractReview.abstract)
-                           .filter(~Abstract.is_deleted, Abstract.event_new == self.event_new)
-                           .count())
+        has_ratings = (AbstractReviewRating.query
+                       .join(AbstractReviewRating.review)
+                       .join(AbstractReview.abstract)
+                       .filter(~Abstract.is_deleted, Abstract.event_new == self.event_new)
+                       .scalar_exists())
         defaults = FormDefaults(abstract_review_questions=self.event_new.abstract_review_questions,
                                 **abstracts_reviewing_settings.get_all(self.event_new))
         form = AbstractReviewingSettingsForm(event=self.event_new, obj=defaults, has_ratings=has_ratings)

@@ -37,7 +37,7 @@ STATE_MAPPING = {'Queued': StaticSiteState.failed,
 
 class StaticSitesImporter(Importer):
     def has_data(self):
-        return bool(StaticSite.find().count())
+        return StaticSite.has_rows()
 
     def migrate(self):
         print cformat('%{white!}migrating static sites')

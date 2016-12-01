@@ -27,7 +27,7 @@ from indico_zodbimport import Importer
 
 class EventTypeImporter(Importer):
     def has_data(self):
-        return bool(Event.query.filter(Event.type_ != EventType.meeting).count())
+        return Event.query.filter(Event.type_ != EventType.meeting).scalar_exists()
 
     def migrate(self):
         self.migrate_event_types()

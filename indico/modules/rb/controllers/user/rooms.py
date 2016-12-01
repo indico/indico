@@ -136,16 +136,14 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         self._room = Room.get(request.view_args['roomID'])
         self._occupancy_period = request.args.get('period', 'pastmonth')
         self._end = date.today()
-        year = None
-        month = None
         if self._occupancy_period == 'pastmonth':
             self._end = self._end - relativedelta(days=1)
             self._start = self._end - relativedelta(days=29)
         elif self._occupancy_period == 'thisyear':
             self._start = date(self._end.year, 1, 1)
         elif self._occupancy_period == 'sinceever':
-            oldest = db.session.query(func.min(Reservation.start_dt)).filter_by(room_id=self._room.id).one()[0]
-            self._start = oldest_booking_date = oldest.date() if oldest else self._end
+            oldest = db.session.query(func.min(Reservation.start_dt)).filter_by(room_id=self._room.id).scalar()
+            self._start = oldest.date() if oldest else self._end
         else:
             match = re.match(r'(\d{4})(?:-(\d{2}))?', self._occupancy_period)
             if match is None:

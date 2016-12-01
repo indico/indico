@@ -85,5 +85,5 @@ class SessionCloner(EventCloner):
             db.session
             .query(db.func.max(Session.friendly_id))
             .filter(Session.event_id == new_event.id)
-            .one()[0] or 0
+            .scalar() or 0
         )

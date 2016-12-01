@@ -46,7 +46,7 @@ def _link_repr(folder):
 
 def _get_pg_id(col):
     table = col.class_.__table__.fullname
-    return db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table, col.name))).one()[0]
+    return db.session.query(db.func.nextval(db.func.pg_get_serial_sequence(table, col.name))).scalar()
 
 
 def _sa_to_dict(obj):

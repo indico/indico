@@ -232,8 +232,7 @@ def get_user_tracks(event, user):
 
 
 def has_user_tracks(event, user):
-    query = _query_user_tracks(event, user)
-    return db.session.query(query.exists()).one()[0]
+    return _query_user_tracks(event, user).scalar_exists()
 
 
 def get_track_reviewer_abstract_counts(event, user):

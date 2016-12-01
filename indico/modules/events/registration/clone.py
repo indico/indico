@@ -40,7 +40,7 @@ class RegistrationFormCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self._find_registration_forms().count())
+        return self._find_registration_forms().scalar_exists()
 
     def _find_registration_forms(self):
         return self.old_event.registration_forms.filter(~RegistrationForm.is_deleted)
@@ -142,5 +142,5 @@ class RegistrationCloner(EventCloner):
             db.session
             .query(db.func.max(Registration.friendly_id))
             .filter(Registration.event_id == new_event.id)
-            .one()[0] or 0
+            .scalar() or 0
         )

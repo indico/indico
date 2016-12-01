@@ -49,7 +49,7 @@ class EventLayoutImporter(Importer):
         return command
 
     def has_data(self):
-        return bool(layout_settings.query.filter_by(name='is_searchable').count())
+        return layout_settings.query.filter_by(name='is_searchable').scalar_exists()
 
     def migrate(self):
         self.migrate_layout_settings()

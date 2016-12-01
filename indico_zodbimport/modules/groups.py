@@ -27,7 +27,7 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 class GroupImporter(Importer):
     def has_data(self):
-        return bool(LocalGroup.find().count())
+        return LocalGroup.has_rows()
 
     def migrate(self):
         self.migrate_groups()

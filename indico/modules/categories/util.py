@@ -107,7 +107,7 @@ def get_attachment_count(category_id=None):
                      # in case of a subcontribution we also need to check that the contrib is not deleted
                      (subcontrib_contrib.is_deleted.is_(None) | ~subcontrib_contrib.is_deleted),
                      category_filter))
-    return query.one()[0]
+    return query.scalar()
 
 
 @memoize_redis(86400)

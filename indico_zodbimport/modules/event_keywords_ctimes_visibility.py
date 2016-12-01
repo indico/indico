@@ -27,7 +27,7 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 class EventKeywordsCreationTimesVisibilityImporter(Importer):
     def has_data(self):
-        return bool(Event.query.filter(Event.created_dt != Event.start_dt).count())
+        return Event.query.filter(Event.created_dt != Event.start_dt).scalar_exists()
 
     def migrate(self):
         self.migrate_event_keywords()

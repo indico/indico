@@ -70,7 +70,7 @@ class UserImporter(Importer):
         return command
 
     def has_data(self):
-        return bool(User.find().count())
+        return User.has_rows()
 
     def migrate(self):
         self.users_by_primary_email = {}

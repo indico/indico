@@ -254,7 +254,7 @@ class ParticipationMigration(object):
 
 class EventParticipantsImporter(Importer):
     def has_data(self):
-        return bool(RegistrationForm.find(title=PARTICIPATION_FORM_TITLE).count())
+        return RegistrationForm.find(title=PARTICIPATION_FORM_TITLE).scalar_exists()
 
     def load_data(self):
         self.print_step("Loading some data")

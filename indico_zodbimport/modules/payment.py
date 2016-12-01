@@ -36,9 +36,8 @@ def ensure_tzinfo(dt):
 
 
 class PaymentImporter(Importer):
-
     def has_data(self):
-        return bool(PaymentTransaction.find().count())
+        return PaymentTransaction.has_rows()
 
     def migrate(self):
         self.messages = [cformat("\n%{blue!}Summary")]

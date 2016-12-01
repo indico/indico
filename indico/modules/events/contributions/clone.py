@@ -174,5 +174,5 @@ class ContributionCloner(EventCloner):
             db.session
             .query(db.func.max(Contribution.friendly_id))
             .filter(Contribution.event_id == new_event.id)
-            .one()[0] or 0
+            .scalar() or 0
         )

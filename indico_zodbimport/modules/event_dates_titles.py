@@ -32,10 +32,10 @@ from indico_zodbimport import Importer, convert_to_unicode
 
 class EventDatesTitlesImporter(Importer):
     def has_data(self):
-        return bool(Event.query
-                    .filter(Event.title.isnot(None) | Event.description.isnot(None) | Event.start_dt.isnot(None) |
-                            Event.end_dt.isnot(None) | Event.timezone.isnot(None))
-                    .count())
+        return (Event.query
+                .filter(Event.title.isnot(None) | Event.description.isnot(None) | Event.start_dt.isnot(None) |
+                        Event.end_dt.isnot(None) | Event.timezone.isnot(None))
+                .scalar_exists())
 
     def migrate(self):
         self.migrate_event_dates_titles()

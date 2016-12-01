@@ -167,8 +167,7 @@ def get_contributions_with_user_as_submitter(event, user):
 
 
 def has_contributions_with_user_as_submitter(event, user):
-    query = _query_contributions_with_user_as_submitter(event, user)
-    return db.session.query(query.exists()).one()[0]
+    return _query_contributions_with_user_as_submitter(event, user).scalar_exists()
 
 
 def serialize_contribution_for_ical(contrib):
