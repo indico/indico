@@ -144,6 +144,7 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
                 raise BadRequest('Menu entry "{0}" cannot be moved to another menu: Entry has nested entries.'
                                  .format(self.entry))
 
+            parent_entry = None
             if parent_id is not None:
                 parent_entry = (MenuEntry.query.with_parent(self.event_new)
                                 .filter(MenuEntry.type.in_({MenuEntryType.user_link, MenuEntryType.page}),
@@ -153,7 +154,7 @@ class RHMenuEntryPosition(RHMenuEntryEditBase):
                 if not parent_entry:
                     raise BadRequest('New parent entry not found for Menu entry "{0}".'.format(self.entry))
 
-            self.entry.insert(parent_id, position)
+            self.entry.insert(parent_entry, position)
 
         else:
             self.entry.move(position)

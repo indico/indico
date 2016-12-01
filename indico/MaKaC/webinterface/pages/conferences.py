@@ -154,7 +154,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         if not self.menu_entry_name:
             return None
         name = build_menu_entry_name(self.menu_entry_name, self.menu_entry_plugin)
-        entry = get_menu_entry_by_name(name, self._conf)
+        entry = get_menu_entry_by_name(name, self.event)
         if entry:
             return entry.id
 
@@ -260,7 +260,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["body"] = self._body
         vars["supportEmail"] = ""
         vars["supportTelephone"] = ""
-        vars['menu'] = menu_entries_for_event(self._conf)
+        vars['menu'] = menu_entries_for_event(self.event)
         vars['support_info'] = self._conf.getSupportInfo()
 
         vars["bgColorCode"] = layout_settings.get(self._conf, 'header_background_color').replace("#", "")
@@ -580,9 +580,8 @@ class WPrintPageFrame (wcomponents.WTemplated):
 
 
 class WConfDisplayBodyBase(wcomponents.WTemplated):
-
     def _getTitle(self):
-        entry = get_menu_entry_by_name(self._linkname, self._conf)
+        entry = get_menu_entry_by_name(self._linkname, self._conf.as_event)
         return entry.localized_title
 
 

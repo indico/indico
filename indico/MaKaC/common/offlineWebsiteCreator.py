@@ -369,7 +369,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
             self._getSession(session)
 
     def _get_menu_items(self):
-        entries = menu_entries_for_event(self._conf)
+        entries = menu_entries_for_event(self.event)
         visible_entries = [e for e in itertools.chain(entries, *(e.children for e in entries)) if e.is_visible]
         for entry in visible_entries:
             if entry.type == MenuEntryType.page:

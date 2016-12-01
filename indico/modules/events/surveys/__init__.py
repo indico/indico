@@ -53,7 +53,7 @@ def _extend_event_menu(sender, **kwargs):
 
     def _visible(event):
         return (event.has_feature('surveys') and
-                bool(Survey.find(Survey.is_visible, Survey.event_id == int(event.id)).count()))
+                Survey.query.with_parent(event).filter(Survey.is_visible).scalar_exists())
 
     return MenuEntryData(_('Surveys'), 'surveys', 'surveys.display_survey_list', position=12, visible=_visible)
 

@@ -29,7 +29,6 @@ from indico.core.db import db
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
-from indico.util.event import unify_event_args
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
@@ -276,7 +275,6 @@ def _build_transient_menu(event):
 
 
 @memoize_request
-@unify_event_args(legacy=True)
 def menu_entries_for_event(event):
     custom_menu_enabled = layout_settings.get(event, 'use_custom_menu')
     return _build_menu(event) if custom_menu_enabled else _build_transient_menu(event)
@@ -285,7 +283,7 @@ def menu_entries_for_event(event):
 def _build_menu_entry(event, custom_menu_enabled, data, position, children=None, parent_id=None):
     entry_cls = MenuEntry if custom_menu_enabled else TransientMenuEntry
     entry = entry_cls(
-        event_id=event.getId(),
+        event=event,
         is_enabled=data.is_enabled,
         name=data.name,
         position=position,
@@ -305,10 +303,14 @@ def _build_menu_entry(event, custom_menu_enabled, data, position, children=None,
 
 
 @memoize_request
-@unify_event_args(legacy=True)
 def get_menu_entry_by_name(name, event):
     entries = menu_entries_for_event(event)
     return next((e for e in chain(entries, *(e.children for e in entries)) if e.name == name), None)
+
+
+def is_menu_entry_enabled(entry_name, event):
+    """Check whether the MenuEntry is enabled"""
+    return get_menu_entry_by_name(entry_name, event).is_enabled
 
 
 def get_css_url(event, force_theme=None, for_preview=False):
@@ -350,8 +352,3 @@ def get_css_file_data(event):
         'size': event.stylesheet_metadata['size'],
         'content_type': 'text/css'
     }
-
-
-def is_menu_entry_enabled(entry_name, event):
-    """Check whether the MenuEntry is enabled"""
-    return get_menu_entry_by_name(entry_name, event).is_enabled

@@ -128,7 +128,7 @@ class RHDeleteTrack(RHManageTrackBase):
 
 class RHDisplayTracks(RHConferenceBaseDisplay):
     def _process(self):
-        page_title = get_menu_entry_by_name('program', self._conf).localized_title
+        page_title = get_menu_entry_by_name('program', self.event_new).localized_title
         program = track_settings.get(self.event_new, 'program')
         render_mode = track_settings.get(self.event_new, 'program_render_mode')
         program = RENDER_MODE_WRAPPER_MAP[render_mode](program)

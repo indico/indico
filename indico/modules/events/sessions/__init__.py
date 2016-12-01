@@ -100,7 +100,7 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
 
     def _visible_my_sessions(event):
-        return session.user and has_sessions_for_user(event.as_event, session.user)
+        return session.user and has_sessions_for_user(event, session.user)
 
     yield MenuEntryData(title=_("My Sessions"), name='my_sessions', endpoint='sessions.my_sessions', position=1,
                         parent='my_conference', visible=_visible_my_sessions)

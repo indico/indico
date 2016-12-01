@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import g
-from sqlalchemy.event import listens_for
+from sqlalchemy.orm import joinedload
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
@@ -26,7 +26,6 @@ from indico.util.i18n import _
 from indico.util.string import return_ascii, slugify, text_to_repr, format_repr
 from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
-from MaKaC.conference import ConferenceHolder
 
 
 def _get_next_position(context):
@@ -47,9 +46,24 @@ class MenuEntryType(TitledIntEnum):
 
 
 class MenuEntryMixin(object):
-    @cached_property
-    def event(self):
-        return ConferenceHolder().getById(str(self.event_id), True)
+    def __init__(self, **kwargs):
+        event = kwargs.pop('event', kwargs.get('event_new'))
+        super(MenuEntryMixin, self).__init__(**kwargs)
+        # XXX: not calling this `event` since we'll rename the `event_new`
+        # relationships in the future and this one should NOT use the
+        # relationship to avoid mixing data from different DB sessions
+        # when updating/populating the menu (which happens in a separate
+        # DB session)
+        self._event_ref = event
+        self.event_id = event.id if event is not None else None
+
+    @property
+    def event_ref(self):
+        try:
+            return self._event_ref
+        except AttributeError:
+            # needed for MenuEntry objects loaded from the DB
+            return self.event_new
 
     @property
     def url(self):
@@ -65,17 +79,17 @@ class MenuEntryMixin(object):
             kwargs = {}
             if self.name == 'timetable':
                 from indico.modules.events. layout import layout_settings
-                if layout_settings.get(self.event, 'timetable_by_room'):
+                if layout_settings.get(self.event_ref, 'timetable_by_room'):
                     kwargs['layout'] = 'room'
-                if layout_settings.get(self.event, 'timetable_detailed'):
-                    start_date = self.event.getAdjustedStartDate()
+                if layout_settings.get(self.event_ref, 'timetable_detailed'):
+                    start_date = self.event_ref.start_dt_local
                     kwargs['_anchor'] = start_date.strftime('%Y%m%d.detailed')
-            return url_for(data.endpoint, self.event, _external=False, **kwargs)
+            return url_for(data.endpoint, self.event_ref, _external=False, **kwargs)
         elif self.is_plugin_link:
             from indico.core.plugins import url_for_plugin
-            return url_for_plugin(self.default_data.endpoint, self.event, _external=False)
+            return url_for_plugin(self.default_data.endpoint, self.event_ref, _external=False)
         elif self.is_page:
-            return url_for('event_pages.page_display', self.event, page_id=self.page_id, slug=slugify(self.title),
+            return url_for('event_pages.page_display', self.event_ref, page_id=self.page_id, slug=slugify(self.title),
                            _external=False)
         else:
             return None
@@ -127,7 +141,7 @@ class MenuEntryMixin(object):
         data = self.default_data
         if not data.static_site and g.get('static_site'):
             return False
-        return data.visible(self.event)
+        return data.visible(self.event_ref)
 
     @property
     def localized_title(self):
@@ -145,7 +159,7 @@ class MenuEntryMixin(object):
 
     @property
     def locator(self):
-        return dict(self.event.getLocator(), menu_entry_id=self.id)
+        return dict(self.event_ref.locator, menu_entry_id=self.id)
 
     @return_ascii
     def __repr__(self):
@@ -159,8 +173,8 @@ class MenuEntryMixin(object):
 
 
 class TransientMenuEntry(MenuEntryMixin):
-    def __init__(self, event_id, is_enabled, name, position, children):
-        self.event_id = event_id
+    def __init__(self, event, is_enabled, name, position, children):
+        super(TransientMenuEntry, self).__init__(event=event)
         self.is_enabled = is_enabled
         self.title = None
         self.name = name
@@ -323,9 +337,13 @@ class MenuEntry(MenuEntryMixin, db.Model):
     def is_root(self):
         return self.parent_id is None
 
-    @classmethod
-    def get_for_event(cls, event):
-        return cls.find(event_id=int(event.id), parent_id=None, _eager=cls.children).order_by(MenuEntry.position).all()
+    @staticmethod
+    def get_for_event(event):
+        return (MenuEntry.query.with_parent(event)
+                .filter(MenuEntry.parent_id.is_(None))
+                .options(joinedload('children'))
+                .order_by(MenuEntry.position)
+                .all())
 
     def move(self, to):
         from_ = self.position
@@ -340,26 +358,29 @@ class MenuEntry(MenuEntryMixin, db.Model):
             to -= 1
             value = 1
 
-        entries = MenuEntry.find(MenuEntry.parent_id == self.parent_id,
-                                 MenuEntry.event_id == self.event_id,
-                                 MenuEntry.position.between(from_ + 1, to))
+        entries = (MenuEntry.query.with_parent(self.event_new)
+                   .filter(MenuEntry.parent == self.parent,
+                           MenuEntry.position.between(from_ + 1, to)))
         for e in entries:
             e.position += value
         self.position = new_pos
 
-    def insert(self, parent_id, position):
+    def insert(self, parent, position):
         if position is None or position < 0:
             position = -1
-        old_siblings = MenuEntry.find(MenuEntry.position > self.position,
-                                      event_id=self.event_id, parent_id=self.parent_id)
+        old_siblings = (MenuEntry.query.with_parent(self.event_new)
+                        .filter(MenuEntry.position > self.position,
+                                MenuEntry.parent == self.parent))
         for sibling in old_siblings:
             sibling.position -= 1
 
-        new_siblings = MenuEntry.find(MenuEntry.position > position, event_id=self.event_id, parent_id=parent_id)
+        new_siblings = (MenuEntry.query.with_parent(self.event_new)
+                        .filter(MenuEntry.position > position,
+                                MenuEntry.parent == parent))
         for sibling in new_siblings:
             sibling.position += 1
 
-        self.parent_id = parent_id
+        self.parent = parent
         self.position = position + 1
 
 
@@ -403,7 +424,7 @@ class EventPage(db.Model):
 
     @property
     def locator(self):
-        return dict(self.menu_entry.event.getLocator(), page_id=self.id, slug=slugify(self.menu_entry.title))
+        return dict(self.menu_entry.event_new.locator, page_id=self.id, slug=slugify(self.menu_entry.title))
 
     @property
     def is_default(self):
@@ -412,13 +433,3 @@ class EventPage(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=text_to_repr(self.html, html=True))
-
-
-@listens_for(MenuEntry.children, 'append')
-def _set_event_id(target, value, *unused):
-    if value.event_new is None and target.event_new is not None:
-        value.event_new = target.event_new
-    if value.event_id is None and target.event_id is not None:
-        value.event_id = target.event_id
-    assert value.event_id in {target.event_id, None}
-    assert value.event_new in {target.event_new, None}

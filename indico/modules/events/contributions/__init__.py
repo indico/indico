@@ -108,12 +108,12 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
     from indico.modules.events.layout.util import MenuEntryData
 
-    def _visible_my_contributions(conf):
-        return session.user and has_contributions_with_user_as_submitter(conf.as_event, session.user)
+    def _visible_my_contributions(event):
+        return session.user and has_contributions_with_user_as_submitter(event, session.user)
 
-    def _visible_list_of_contributions(conf):
+    def _visible_list_of_contributions(event):
         return bool(Contribution.query.with_entities(literal(True))
-                    .filter(Contribution.event_new == conf.as_event)
+                    .filter(Contribution.event_new == event)
                     .count())
 
     yield MenuEntryData(title=_("My Contributions"), name='my_contributions', visible=_visible_my_contributions,

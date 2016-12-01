@@ -30,12 +30,12 @@ def _visibility_my_conference(event):
 
 
 def _visibility_paper_review(event):
-    return event.getConfPaperReview().hasReviewing()
+    return event.as_legacy.getConfPaperReview().hasReviewing()
 
 
 def _visibility_paper_review_transfer(event):
     return (session.user and _visibility_paper_review(event) and
-            has_contributions_with_user_as_submitter(event.as_event, session.user))
+            has_contributions_with_user_as_submitter(event, session.user))
 
 
 def _visibility_role(event, role):
@@ -44,7 +44,7 @@ def _visibility_role(event, role):
         return False
 
     roles = user.get_linked_roles('conference')
-    return role in roles and event in user.get_linked_objects('conference', role)
+    return role in roles and event.as_legacy in user.get_linked_objects('conference', role)
 
 
 def _visibility_paper_review_managment(event):
@@ -52,21 +52,24 @@ def _visibility_paper_review_managment(event):
 
 
 def _visibility_judge(event):
-    return (_visibility_role(event, 'referee')
-            and (event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING
-                 or event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
+    conf = event.as_legacy
+    return (_visibility_role(event, 'referee') and
+            (conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING or
+             conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
 
 
 def _visibility_contributions_as_reviewer(event):
-    return (_visibility_role(event, 'reviewer')
-            and (event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING
-                 or event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
+    conf = event.as_legacy
+    return (_visibility_role(event, 'reviewer') and
+            (conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING or
+             conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
 
 
 def _visibility_contributions_as_editor(event):
-    return (_visibility_role(event, 'editor')
-            and (event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING
-                 or event.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
+    conf = event.as_legacy
+    return (_visibility_role(event, 'editor') and
+            (conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING or
+             conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
 
 
 def _visibility_paper_assign(event):

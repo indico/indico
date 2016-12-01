@@ -24,6 +24,7 @@ from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.clone import TrackCloner
+from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -43,9 +44,8 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
     from indico.modules.events.tracks.settings import track_settings
 
-    def _program_visible(conf):
-        event = conf.as_event
-        return bool(track_settings.get(event, 'program').strip() or event.tracks)
+    def _program_visible(event):
+        return bool(track_settings.get(event, 'program').strip() or Track.query.with_parent(event).scalar_exists())
 
     return MenuEntryData(title=_("Scientific Programme"), name='program', endpoint='tracks.program', position=1,
                          visible=_program_visible, static_site=True)

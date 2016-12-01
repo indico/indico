@@ -66,10 +66,10 @@ class LayoutCloner(EventCloner):
         layout_settings.set_multi(new_event, layout_settings.get_all(self.old_event, no_defaults=True))
         if layout_settings.get(self.old_event, 'use_custom_menu'):
             for menu_entry in MenuEntry.get_for_event(self.old_event):
-                self._copy_menu_entry(menu_entry, new_event, new_event.menu_entries)
+                self._copy_menu_entry(menu_entry, new_event)
         db.session.flush()
 
-    def _copy_menu_entry(self, menu_entry, new_event, container, include_children=True):
+    def _copy_menu_entry(self, menu_entry, new_event, parent=None, include_children=True):
         base_columns = get_simple_column_attrs(MenuEntry)
         new_menu_entry = MenuEntry(**{col: getattr(menu_entry, col) for col in base_columns})
         if menu_entry.is_page:
@@ -78,7 +78,9 @@ class LayoutCloner(EventCloner):
             new_menu_entry.page = page
             if menu_entry.page.is_default:
                 new_event.default_page = new_menu_entry.page
-        container.append(new_menu_entry)
+        new_event.menu_entries.append(new_menu_entry)
+        if parent is not None:
+            parent.append(new_menu_entry)
         if include_children:
             for child in menu_entry.children:
                 self._copy_menu_entry(child, new_event, new_menu_entry.children, include_children=False)
