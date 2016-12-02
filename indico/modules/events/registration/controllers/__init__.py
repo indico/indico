@@ -34,8 +34,8 @@ class RegistrationFormMixin:
     }
 
     def _checkParams(self):
-        self.regform = (RegistrationForm
-                        .find(id=request.view_args['reg_form_id'], is_deleted=False)
+        self.regform = (RegistrationForm.query
+                        .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
                         .options(defaultload('form_items').joinedload('children').joinedload('current_data'))
                         .one())
 
@@ -66,7 +66,7 @@ class RegistrationEditMixin:
             'manager': self.management
         }
 
-        return self.view_class.render_template(self.template_file, self.event, event=self.event,
+        return self.view_class.render_template(self.template_file, self._conf, event=self.event_new,
                                                sections=section_data, regform=self.regform,
                                                registration_data=registration_data,
                                                registration_metadata=registration_metadata,

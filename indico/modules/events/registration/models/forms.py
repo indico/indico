@@ -266,7 +266,7 @@ class RegistrationForm(db.Model):
 
     @has_ended.expression
     def has_ended(cls):
-        return (cls.end_dt != None) & (cls.end_dt <= now_utc())  # noqa
+        return cls.end_dt.isnot(None) & (cls.end_dt <= now_utc())
 
     @hybrid_property
     def has_started(self):
@@ -274,7 +274,7 @@ class RegistrationForm(db.Model):
 
     @has_started.expression
     def has_started(cls):
-        return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
+        return cls.start_dt.isnot(None) & (cls.start_dt <= now_utc())
 
     @hybrid_property
     def is_modification_open(self):
@@ -300,12 +300,7 @@ class RegistrationForm(db.Model):
 
     @is_scheduled.expression
     def is_scheduled(cls):
-        return ~cls.is_deleted & (cls.start_dt != None)  # noqa
-
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id), True)
+        return ~cls.is_deleted & cls.start_dt.isnot(None)
 
     @property
     def locator(self):
@@ -337,7 +332,7 @@ class RegistrationForm(db.Model):
 
     @property
     def sender_address(self):
-        return self.notification_sender_address or self.event.getSupportInfo().getEmail()
+        return self.notification_sender_address or self.event_new.as_legacy.getSupportInfo().getEmail()
 
     @return_ascii
     def __repr__(self):

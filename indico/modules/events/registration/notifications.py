@@ -36,7 +36,7 @@ def _notify_registration(registration, template, to_managers=False):
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
     from_address = registration.registration_form.sender_address if not to_managers else None
     email = make_email(to_list=to_list, template=template, html=True, from_address=from_address)
-    send_email(email, event=registration.registration_form.event, module='Registration', user=session.user)
+    send_email(email, event=registration.registration_form.event_new, module='Registration', user=session.user)
 
 
 def notify_registration_creation(registration, notify_user=True):

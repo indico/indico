@@ -13,8 +13,8 @@
             conf-form-id="{{ regform.id }}"
             conf-sections="{{ sections | tojson | forceescape }}"
             conf-currency="{{ regform.currency }}"
-            event-start-date="{{ event.as_legacy.startDate }}"
-            event-end-date="{{ event.as_legacy.endDate }}"
+            event-start-date="{{ event.start_dt }}"
+            event-end-date="{{ event.end_dt }}"
             edit-mode="true"></div>
     </div>
     <div class="toolbar right">

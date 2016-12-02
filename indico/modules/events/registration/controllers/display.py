@@ -20,7 +20,7 @@ from operator import attrgetter
 from uuid import UUID
 
 from flask import request, session, redirect, flash, jsonify
-from sqlalchemy.orm import subqueryload
+from sqlalchemy.orm import subqueryload, contains_eager
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
@@ -46,10 +46,6 @@ from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
     CSRF_ENABLED = True
-
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-        self.event = self._conf
 
     @property
     def view_class(self):
@@ -96,7 +92,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         regforms = regforms.filter(criteria).order_by(db.func.lower(RegistrationForm.title)).all()
         if len(regforms) == 1:
             return redirect(url_for('.display_regform', regforms[0]))
-        return self.view_class.render_template('display/regform_list.html', self.event, event=self.event,
+        return self.view_class.render_template('display/regform_list.html', self._conf, event=self.event_new,
                                                regforms=regforms)
 
 
@@ -115,18 +111,17 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
-        column_names = registration_settings.get(self.event, 'participant_list_columns')
+        column_names = registration_settings.get(self.event_new, 'participant_list_columns')
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
-        query = (Registration
-                 .find(Registration.event_id == self.event.id,
-                       Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
-                       RegistrationForm.publish_registrations_enabled,
-                       ~RegistrationForm.is_deleted,
-                       ~Registration.is_deleted,
-                       _join=Registration.registration_form,
-                       _eager=Registration.registration_form)
-                 .options(subqueryload('data').joinedload('field_data'))
+        query = (Registration.query.with_parent(self.event_new)
+                 .filter(Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
+                         RegistrationForm.publish_registrations_enabled,
+                         ~RegistrationForm.is_deleted,
+                         ~Registration.is_deleted)
+                 .join(Registration.registration_form)
+                 .options(subqueryload('data').joinedload('field_data'),
+                          contains_eager('registration_form'))
                  .order_by(*Registration.order_by_name))
         registrations = [_process_registration(reg, column_names) for reg in query]
         table = {'headers': headers, 'rows': registrations}
@@ -134,7 +129,6 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         return table
 
     def _participant_list_table(self, regform):
-
         def _process_registration(reg, column_ids, active_fields):
             data_by_field = reg.data_by_field
 
@@ -154,7 +148,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         active_fields = {field.id: field for field in regform.active_fields}
         column_ids = [column_id
-                      for column_id in registration_settings.get_participant_list_columns(self.event, regform)
+                      for column_id in registration_settings.get_participant_list_columns(self.event_new, regform)
                       if column_id in active_fields]
         headers = [active_fields[column_id].title.title() for column_id in column_ids]
         active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
@@ -169,12 +163,12 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                             ~RegistrationForm.is_deleted)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .all())
-        if registration_settings.get(self.event, 'merge_registration_forms'):
+        if registration_settings.get(self.event_new, 'merge_registration_forms'):
             tables = [self._merged_participant_list_table()]
         else:
             tables = []
             regforms_dict = {regform.id: regform for regform in regforms if regform.publish_registrations_enabled}
-            for form_id in registration_settings.get_participant_list_form_ids(self.event):
+            for form_id in registration_settings.get_participant_list_form_ids(self.event_new):
                 try:
                     regform = regforms_dict.pop(form_id)
                 except KeyError:
@@ -192,8 +186,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         return self.view_class.render_template(
             'display/participant_list.html',
-            self.event,
-            event=self.event,
+            self._conf,
             regforms=regforms,
             tables=tables,
             published=published,
@@ -270,12 +263,16 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
-        return self.view_class.render_template('display/regform_display.html', self.event, event=self.event,
-                                               sections=get_event_section_data(self.regform), regform=self.regform,
-                                               payment_conditions=payment_event_settings.get(self.event, 'conditions'),
-                                               payment_enabled=self.event.has_feature('payment'),
-                                               user_data=user_data, invitation=self.invitation,
-                                               registration=self.registration, management=False,
+        return self.view_class.render_template('display/regform_display.html', self._conf, event=self.event_new,
+                                               regform=self.regform,
+                                               sections=get_event_section_data(self.regform),
+                                               payment_conditions=payment_event_settings.get(self.event_new,
+                                                                                             'conditions'),
+                                               payment_enabled=self.event_new.has_feature('payment'),
+                                               user_data=user_data,
+                                               invitation=self.invitation,
+                                               registration=self.registration,
+                                               management=False,
                                                login_required=self.regform.require_login and not session.user)
 
 
@@ -313,4 +310,4 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
         if self.invitation.state == InvitationState.pending:
             self.invitation.state = InvitationState.declined
             flash(_("You declined the invitation to register."))
-        return redirect(url_for('event.conferenceDisplay', self.event))
+        return redirect(self.event_new.url)

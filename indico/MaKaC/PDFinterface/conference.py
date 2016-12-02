@@ -1954,10 +1954,9 @@ class LectureToPosterPDF:
 
 
 class TicketToPDF(PDFBase):
-
-    def __init__(self, conf, registration, doc=None, story=None):
-        self._conf = conf
-        self._event = conf.as_event
+    def __init__(self, event, registration, doc=None, story=None):
+        self._event = event
+        self._conf = event.as_legacy
         self._registration = registration
         PDFBase.__init__(self, doc, story)
 

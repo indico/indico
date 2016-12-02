@@ -36,10 +36,6 @@ class RHManageRegFormsBase(RHConferenceModifBase):
     def _process(self):
         return RH._process(self)
 
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event = self._conf
-
 
 class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
     """Base class for a specific registration form"""

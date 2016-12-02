@@ -58,7 +58,7 @@ from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
 
 def _render_registration_details(registration):
-    event = registration.registration_form.event
+    event = registration.registration_form.event_new
     tpl = get_template_module('events/registration/management/_registration_details.html')
     return tpl.render_registration_details(registration=registration, payment_enabled=event.has_feature('payment'))
 
@@ -70,8 +70,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        return WPManageRegistration.render_template('management/regform_reglist.html', self.event, regform=self.regform,
-                                                    event=self.event, **reg_list_kwargs)
+        return WPManageRegistration.render_template('management/regform_reglist.html', self._conf,
+                                                    regform=self.regform, event=self.event_new, **reg_list_kwargs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -79,8 +79,8 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_GET(self):
         reg_list_config = self.list_generator._get_config()
-        return WPManageRegistration.render_template('management/reglist_filter.html', self.event, regform=self.regform,
-                                                    event=self.event, RegistrationFormItemType=RegistrationFormItemType,
+        return WPManageRegistration.render_template('management/reglist_filter.html', self._conf, regform=self.regform,
+                                                    RegistrationFormItemType=RegistrationFormItemType,
                                                     visible_items=reg_list_config['items'],
                                                     static_items=self.list_generator.static_items,
                                                     filters=reg_list_config['filters'])
@@ -102,7 +102,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 
     def _process(self):
         registration_details_html = _render_registration_details(self.registration)
-        return WPManageRegistration.render_template('management/registration_details.html', self.event,
+        return WPManageRegistration.render_template('management/registration_details.html', self._conf,
                                                     registration=self.registration,
                                                     registration_details_html=registration_details_html)
 
@@ -121,7 +121,7 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
         self.field_data = (RegistrationData
                            .find(RegistrationData.registration_id == request.view_args['registration_id'],
                                  RegistrationData.field_data_id == request.view_args['field_data_id'],
-                                 RegistrationData.filename != None)  # noqa
+                                 RegistrationData.filename.isnot(None))
                            .options(joinedload('registration').joinedload('registration_form'))
                            .one())
 
@@ -153,9 +153,9 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
     def _checkParams(self, params):
         RHManageRegFormBase._checkParams(self, params)
         ids = set(request.form.getlist('registration_id'))
-        self.registrations = (Registration
-                              .find(Registration.id.in_(ids), ~Registration.is_deleted)
-                              .with_parent(self.regform)
+        self.registrations = (Registration.query.with_parent(self.regform)
+                              .filter(Registration.id.in_(ids),
+                                      ~Registration.is_deleted)
                               .order_by(*Registration.order_by_name)
                               .all())
 
@@ -191,10 +191,10 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                                            email_subject=form.subject.data, email_body=email_body)
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
                                from_address=form.from_address.data, template=template, html=True)
-            send_email(email, self.event, 'Registration')
+            send_email(email, self.event_new, 'Registration')
 
     def _process(self):
-        tpl = get_template_module('events/registration/emails/custom_email_default.html', event=self.event)
+        tpl = get_template_module('events/registration/emails/custom_email_default.html')
         default_body = tpl.get_html_body()
         form = EmailRegistrantsForm(body=default_body, regform=self.regform)
         if form.validate_on_submit():
@@ -253,7 +253,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
                 flash(error, 'error')
-        return WPManageRegistration.render_template('display/regform_display.html', self.event, event=self.event,
+        return WPManageRegistration.render_template('display/regform_display.html', self._conf, event=self.event_new,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     post_url=url_for('.create_registration', self.regform),
                                                     user_data=self._get_user_data(), management=True)
@@ -294,7 +294,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style"""
 
     def _process(self):
-        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
+        pdf = RegistrantsListToPDF(self._conf, reglist=self.registrations, display=self.export_config['regform_items'],
                                    static_items=self.export_config['static_item_ids'])
         try:
             data = pdf.getPDFBin()
@@ -310,7 +310,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style"""
 
     def _process(self):
-        pdf = RegistrantsListToBookPDF(self.event, reglist=self.registrations,
+        pdf = RegistrantsListToBookPDF(self._conf, reglist=self.registrations,
                                        display=self.export_config['regform_items'],
                                        static_items=self.export_config['static_item_ids'])
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
@@ -338,13 +338,13 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations"""
 
     def _process(self):
-        badge_templates = self.event.getBadgeTemplateManager().getTemplates().items()
+        badge_templates = self._conf.getBadgeTemplateManager().getTemplates().items()
         badge_templates.sort(key=lambda x: x[1].getName())
-        pdf_options = WConfModifBadgePDFOptions(self.event).getHTML()
-        badge_design_url = url_for('event_mgmt.confModifTools-badgePrinting', self.event)
-        create_pdf_url = url_for('event_mgmt.confModifTools-badgePrintingPDF', self.event)
+        pdf_options = WConfModifBadgePDFOptions(self._conf).getHTML()
+        badge_design_url = url_for('event_mgmt.confModifTools-badgePrinting', self.event_new)
+        create_pdf_url = url_for('event_mgmt.confModifTools-badgePrintingPDF', self.event_new)
 
-        return WPManageRegistration.render_template('management/print_badges.html', self.event, regform=self.regform,
+        return WPManageRegistration.render_template('management/print_badges.html', self._conf, regform=self.regform,
                                                     templates=badge_templates, pdf_options=pdf_options,
                                                     registrations=self.registrations,
                                                     registration_ids=[x.id for x in self.registrations],

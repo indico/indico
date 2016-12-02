@@ -120,7 +120,7 @@ class RegistrationFormScheduleForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
-        self.timezone = regform.event.tz
+        self.timezone = regform.event_new.timezone
         super(IndicoForm, self).__init__(*args, **kwargs)
 
 

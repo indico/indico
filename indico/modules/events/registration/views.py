@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.models.events import EventType
 from MaKaC.webinterface.meeting import WPMeetingDisplay
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
@@ -27,7 +28,7 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
 
     @property
     def sidemenu_option(self):
-        if self._conf.getType() != 'conference':
+        if self._conf.as_event.type_ != EventType.conference:
             regform = self._kwargs.get('regform')
             if not regform:
                 registration = self._kwargs.get('registration')

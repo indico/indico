@@ -67,7 +67,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
 
 
 def generate_ticket(registration):
-    pdf = TicketToPDF(registration.registration_form.event, registration)
+    pdf = TicketToPDF(registration.registration_form.event_new, registration)
     return BytesIO(pdf.getPDFBin())
 
 
