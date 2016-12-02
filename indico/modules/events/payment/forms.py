@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields.core import SelectField, IntegerField
+from wtforms.fields.core import SelectField
 from wtforms.fields.simple import TextAreaField
-from wtforms.validators import DataRequired, ValidationError, NumberRange
+from wtforms.validators import DataRequired, ValidationError
 
 from indico.modules.events.payment import settings
 from indico.util.i18n import _
@@ -29,9 +29,6 @@ from indico.web.forms.fields import MultipleItemsField
 CURRENCY_CODE_LINK = 'http://en.wikipedia.org/wiki/ISO_4217#Active_codes'
 CONDITIONS_DESC = _('The registrant must agree to these conditions before paying. When left empty, no confirmation '
                     'prompt is shown to the user.')
-CHECKOUT_SESSION_TIMEOUT_MSG = _('Time in minutes a checkout session will be alive. On checkout, a new session will '
-                                 'start. During this time, in every new checkout page a warning message will be '
-                                 'displayed in order to prevent duplicated payments.')
 
 
 class AdminSettingsForm(IndicoForm):
@@ -47,8 +44,6 @@ class AdminSettingsForm(IndicoForm):
                            description=_('The default currency for new events. If you add a new currency, you need to '
                                          'save the settings first for it to show up here.'))
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-    checkout_session_timeout = IntegerField('Checkout session timeout', validators=[DataRequired(), NumberRange(min=0)],
-                                            description=CHECKOUT_SESSION_TIMEOUT_MSG)
 
     def __init__(self, *args, **kwargs):
         super(AdminSettingsForm, self).__init__(*args, **kwargs)

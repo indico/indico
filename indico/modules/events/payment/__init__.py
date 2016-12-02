@@ -41,8 +41,7 @@ CONDITIONS = ("CANCELLATION:\n"
 settings = SettingsProxy('payment', {
     'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}],
     'currency': 'EUR',
-    'conditions': CONDITIONS,
-    'checkout_session_timeout': 10
+    'conditions': CONDITIONS
 })
 
 event_settings = EventSettingsProxy('payment', {
