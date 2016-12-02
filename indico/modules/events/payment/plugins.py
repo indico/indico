@@ -80,9 +80,9 @@ class PaymentPluginMixin(object):
         """Checks if the user is allowed to enable/disable/modify the payment method.
 
         :param user: the :class:`.User` repesenting the user
-        :param event: the :class:`Conference`
+        :param event: the :class:`Event`
         """
-        return event.as_event.can_manage(user)
+        return event.can_manage(user)
 
     def get_event_management_url(self, event, **kwargs):
         # This is needed only in case a plugin overrides `can_be_modified` and grants access to users who do not have
@@ -98,9 +98,8 @@ class PaymentPluginMixin(object):
         from indico.modules.events.registration.models.forms import RegistrationForm
         invalid_regforms = []
         if self.valid_currencies is not None:
-            regforms = event.as_event.registration_forms
-            invalid_regforms = regforms.filter(~RegistrationForm.currency.in_(self.valid_currencies),
-                                               ~RegistrationForm.is_deleted).all()
+            invalid_regforms = event.registration_forms.filter(~RegistrationForm.currency.in_(self.valid_currencies),
+                                                               ~RegistrationForm.is_deleted).all()
         return invalid_regforms
 
     def supports_currency(self, currency):

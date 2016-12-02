@@ -65,7 +65,3 @@ class AdminSettingsForm(IndicoForm):
 
 class EventSettingsForm(IndicoForm):
     conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
-
-    def __init__(self, *args, **kwargs):
-        self._event = kwargs.pop('event')
-        super(EventSettingsForm, self).__init__(*args, **kwargs)
