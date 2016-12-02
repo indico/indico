@@ -26,7 +26,7 @@
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.reviewing_state %}
     <span class="reviewing-state-icon flexrow f-a-center f-j-center {{ mapping_class[state.name] }}">
-        <span class=" flexrow {{ mapping_icon[state.name] }}"></span>
+        <span class="flexrow {{ mapping_icon[state.name] }}"></span>
     </span>
     <div class="f-self-stretch flexcol">
         <div class="summary-title semantic-text {{ mapping_class[state.name] }}">{{ state.title }}</div>

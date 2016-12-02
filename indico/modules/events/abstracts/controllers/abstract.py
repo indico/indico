@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import flash, session, request
+from sqlalchemy.orm import joinedload, defaultload
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.files import AbstractFile
@@ -32,6 +33,9 @@ from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF, AbstractToPD
 
 
 class RHDisplayAbstract(RHAbstractBase):
+    _abstract_query_options = (joinedload('reviewed_for_tracks'),
+                               defaultload('reviews').joinedload('ratings').joinedload('question'))
+
     @property
     def view_class(self):
         return WPManageAbstracts if self.management else WPDisplayAbstracts

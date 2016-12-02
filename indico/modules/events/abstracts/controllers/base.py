@@ -33,8 +33,17 @@ class SpecificAbstractMixin:
         }
     }
 
+    _abstract_query_options = ()
+
+    @property
+    def _abstract_query(self):
+        query = Abstract.query
+        if self._abstract_query_options:
+            query = query.options(*self._abstract_query_options)
+        return query
+
     def _checkParams(self):
-        self.abstract = Abstract.get_one(request.view_args['abstract_id'], is_deleted=False)
+        self.abstract = self._abstract_query.filter_by(id=request.view_args['abstract_id'], is_deleted=False).one()
 
     def _checkProtection(self):
         if not self._check_abstract_protection():
