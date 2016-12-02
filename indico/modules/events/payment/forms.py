@@ -64,4 +64,4 @@ class AdminSettingsForm(IndicoForm):
 
 
 class EventSettingsForm(IndicoForm):
-    conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC)
+    conditions = TextAreaField(_('Conditions'), description=CONDITIONS_DESC, render_kw={'rows': 10})

@@ -17,7 +17,10 @@
                 {% trans %}Configure general settings for payments.{% endtrans %}
             </div>
             <div class="toolbar">
-                <a href="{{ url_for('.event_settings_edit', event) }}" class="i-button icon-edit">
+                <a href="#" class="i-button icon-edit"
+                   data-href="{{ url_for('.event_settings_edit', event) }}"
+                   data-title="{% trans %}Edit payment settings{% endtrans %}"
+                   data-ajax-dialog>
                     {% trans %}Configure{% endtrans %}
                 </a>
             </div>
@@ -44,9 +47,11 @@
             </div>
         </a>
         {%- for short_name, method in methods %}
-            <a id="plugin-{{ method.name }}" class="js-plugin-edit i-badge {%- if method in enabled_methods %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
-               data-title="{% trans %}Payment method settings{% endtrans %}"
-               href="{{ url_for('.event_plugin_edit', event, method=short_name) }}">
+            <a href="#" id="plugin-{{ method.name }}"
+               class="js-edit-method i-badge {%- if method in enabled_methods %} i-payment-enabled {% else %} i-payment-disabled {% endif -%}"
+               data-title="{% trans method=method.title %}Payment settings: {{ method }}{% endtrans %}"
+               data-href="{{ url_for('.event_plugin_edit', event, method=short_name) }}"
+               data-ajax-dialog>
                 <div class="i-badge-legend">
                     <span class="i-badge-legend-right i-payment-status-enabled">{% trans %}enabled{% endtrans %}</span>
                     <span class="i-badge-legend-right i-payment-status-disabled">{% trans %}disabled{% endtrans %}</span>
@@ -64,15 +69,17 @@
     </div>
 
     <script>
-        $('.js-plugin-edit').ajaxDialog({
-            onClose: function closePluginDialog(data) {
+        (function() {
+            'use strict';
+
+            $('.js-edit-method').on('ajaxDialog:closed', function (evt, data) {
                 if (!data) {
                     return;
                 }
                 var plugin = $('#plugin-' + data.plugin);
                 plugin.toggleClass('i-payment-enabled', data.enabled);
                 plugin.toggleClass('i-payment-disabled', !data.enabled);
-            }
-        });
+            });
+        })();
     </script>
 {% endblock %}

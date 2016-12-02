@@ -27,8 +27,9 @@ from indico.modules.events.payment.views import WPPaymentAdmin, WPPaymentEventMa
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.i18n import _
-from indico.web.flask.util import url_for, redirect_or_jsonify
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_template, jsonify_data, jsonify_form
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
@@ -53,7 +54,9 @@ class RHPaymentAdminPluginSettings(RHPluginDetails):
 
 class RHPaymentManagementBase(RHConferenceModifBase):
     """Base RH for event management pages"""
+
     EVENT_FEATURE = 'payment'
+    CSRF_ENABLED = True
 
 
 class RHPaymentBase(RHRegistrationFormRegistrationBase):
@@ -88,9 +91,8 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
         if form.validate_on_submit():
             event_settings.set_multi(self.event_new, form.data)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('.event_settings', self.event_new))
-        return WPPaymentEventManagement.render_template('management/payments_edit.html', self._conf,
-                                                        event=self.event_new, form=form)
+            return jsonify_data()
+        return jsonify_form(form)
 
 
 class RHPaymentPluginEdit(RHPaymentManagementBase):
@@ -121,18 +123,16 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
             self.plugin.event_settings.set_multi(self.event_new, form.data)
             flash(_('Settings for {} saved').format(self.plugin.title), 'success')
             if self.protection_overridden:
-                return redirect_or_jsonify(request.url)
+                return jsonify_data()
             else:
-                return redirect_or_jsonify(url_for('.event_settings', self.event_new), plugin=self.plugin.name,
-                                           enabled=form.enabled.data)
+                return jsonify_data(plugin=self.plugin.name, enabled=form.enabled.data)
         widget_attrs = {}
         if not can_modify:
             widget_attrs = {field.short_name: {'disabled': True} for field in form}
         invalid_regforms = self.plugin.get_invalid_regforms(self.event_new)
-        return WPPaymentEventManagement.render_template('event_plugin_edit.html', self._conf,
-                                                        event=self.event_new, form=form, plugin=self.plugin,
-                                                        can_modify=can_modify, widget_attrs=widget_attrs,
-                                                        invalid_regforms=invalid_regforms)
+        return jsonify_template('events/payment/event_plugin_edit.html', event=self.event_new, form=form,
+                                plugin=self.plugin, can_modify=can_modify, widget_attrs=widget_attrs,
+                                invalid_regforms=invalid_regforms)
 
 
 class RHPaymentCheckout(RHPaymentBase):
