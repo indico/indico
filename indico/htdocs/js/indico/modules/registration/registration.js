@@ -23,7 +23,7 @@
         setupRegistrationFormSummaryPage();
     });
 
-    $(window).scroll(function(){
+    $(window).scroll(function() {
         IndicoUI.Effect.followScroll();
     });
 
@@ -43,14 +43,6 @@
     }
 
     function setupRegistrationFormSummaryPage() {
-        $('.js-conditions-dialog').on('click', function(e) {
-            e.preventDefault();
-            ajaxDialog({
-                url: $(this).data('href'),
-                title: $(this).data('title')
-            });
-        });
-
         $('.js-check-conditions').on('click', function(e) {
             var conditions = $('#conditions-accepted');
             if (conditions.length && !conditions.prop('checked')) {

@@ -69,18 +69,26 @@
             <tr>
                 <td>
                     {% if payment_conditions %}
+                        {% set link_start %}
+                            </label>
+                            <a href="#"
+                               data-href="{{ url_for('payment.event_payment_conditions', registration.registration_form.event) }}"
+                               data-title="{% trans %}Terms and conditions{% endtrans %}"
+                               data-ajax-dialog>
+                        {% endset %}
+                        {% set link_end %}
+                            </a><label for="conditions-accepted">
+                        {% endset %}
                         <div class="checkbox-with-text">
                             <input type="checkbox" id="conditions-accepted">
                             <div class="payment-conditions-agreement">
-                                {% trans -%}
-                                    I have read and accept the terms and conditions and understand that
-                                    by confirming this order I will be entering into a binding transaction
-                                {%- endtrans %}
-                                (<a href="#" class="js-conditions-dialog"
-                                    data-href="{{ url_for('payment.event_payment_conditions', registration.registration_form.event) }}"
-                                    data-title="{% trans %}Terms and conditions{% endtrans %}">
-                                    {%- trans %}Terms and conditions{% endtrans -%}
-                                </a>).
+                                <label for="conditions-accepted">
+                                    {% trans link_start=link_start|safe, link_end=link_end|safe -%}
+                                        I have read and accepted the {{ link_start }}terms and conditions{{ link_end }}
+                                        and understand that by confirming this order I will be entering into a binding
+                                        transaction.
+                                    {%- endtrans %}
+                                </label>
                             </div>
                         </div>
                     {% endif %}
