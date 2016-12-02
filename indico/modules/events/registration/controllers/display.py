@@ -111,6 +111,14 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             columns = [{'text': personal_data.get(column_name, '')} for column_name in column_names]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
+        def _deduplicate_reg_data(reg_data_iter):
+            used = set()
+            for reg_data in reg_data_iter:
+                reg_data_hash = tuple(tuple(sorted(x.items())) for x in reg_data['columns'])
+                if reg_data_hash not in used:
+                    used.add(reg_data_hash)
+                    yield reg_data
+
         column_names = registration_settings.get(self.event_new, 'participant_list_columns')
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
@@ -121,11 +129,12 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                          ~Registration.is_deleted)
                  .join(Registration.registration_form)
                  .options(subqueryload('data').joinedload('field_data'),
-                          contains_eager('registration_form'))
-                 .order_by(*Registration.order_by_name))
-        registrations = [_process_registration(reg, column_names) for reg in query]
-        table = {'headers': headers, 'rows': registrations}
-        table['show_checkin'] = any(registration['checked_in'] for registration in registrations)
+                          contains_eager('registration_form')))
+        registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
+                               key=lambda x: x['columns'])
+        table = {'headers': headers,
+                 'rows': registrations,
+                 'show_checkin': any(registration['checked_in'] for registration in registrations)}
         return table
 
     def _participant_list_table(self, regform):
