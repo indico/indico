@@ -57,8 +57,11 @@
 
     .i-timeline-item-label {
         color: rgba(#fff, 0.8);
-        font-size: 1.65em;
-        border-radius: 50%;
+
+        &:not(.square) {
+            font-size: 1.65em;
+            border-radius: 50%;
+        }
     }
 }
 
