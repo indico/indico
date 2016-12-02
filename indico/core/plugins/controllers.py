@@ -14,12 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from collections import defaultdict, OrderedDict
 from operator import attrgetter
 
 from flask import request, flash
 from werkzeug.exceptions import NotFound
-
 
 from indico.core.plugins import plugin_engine, PluginCategory
 from indico.core.plugins.views import WPPlugins
@@ -29,7 +30,11 @@ from indico.util.i18n import _
 from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
-class RHPlugins(RHAdminBase):
+class RHPluginsBase(RHAdminBase):
+    CSRF_ENABLED = True
+
+
+class RHPlugins(RHPluginsBase):
     def _process(self):
         plugins = [p for p in plugin_engine.get_active_plugins().viewvalues()]
         categories = defaultdict(list)
@@ -50,7 +55,7 @@ class RHPlugins(RHAdminBase):
         return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)
 
 
-class RHPluginDetails(RHAdminBase):
+class RHPluginDetails(RHPluginsBase):
     back_button_endpoint = 'plugins.index'
 
     def _checkParams(self):
@@ -67,7 +72,7 @@ class RHPluginDetails(RHAdminBase):
                 form = plugin.settings_form(obj=defaults)
                 if form.validate_on_submit():
                     plugin.settings.set_multi(form.data)
-                    flash(_(u'Settings saved ({0})').format(plugin.title), 'success')
+                    flash(_('Settings saved ({0})').format(plugin.title), 'success')
                     return redirect_or_jsonify(request.url)
             return WPPlugins.render_template('details.html', plugin=plugin, form=form,
                                              back_url=url_for(self.back_button_endpoint))

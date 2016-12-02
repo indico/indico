@@ -38,6 +38,8 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 class RHPaymentAdminSettings(RHAdminBase):
     """Payment settings in server admin area"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         form = AdminSettingsForm(obj=FormDefaults(**settings.get_all()))
         if form.validate_on_submit():
