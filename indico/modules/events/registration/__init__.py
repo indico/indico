@@ -153,7 +153,7 @@ def _associate_registrations(user, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if event.as_event.can_manage(session.user, role='registration'):
+    if event.can_manage(session.user, role='registration'):
         return url_for('event_registration.manage_regform_list', event)
 
 

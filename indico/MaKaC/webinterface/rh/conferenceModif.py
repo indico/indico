@@ -139,7 +139,7 @@ class RHConferenceModifManagementAccess( RHConferenceModifBase ):
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
         self._requests_manager = is_request_manager(session.user)
-        self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self._conf),
+        self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self.event_new),
                                                single_value=True)
 
     def _checkProtection(self):

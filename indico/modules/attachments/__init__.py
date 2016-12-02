@@ -52,7 +52,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if can_manage_attachments(event.as_event, session.user):
+    if can_manage_attachments(event, session.user):
         return url_for('attachments.management', event)
 
 
