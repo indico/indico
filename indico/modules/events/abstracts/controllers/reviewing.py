@@ -158,7 +158,7 @@ class RHSubmitAbstractReview(RHAbstractBase):
         if form.validate_on_submit():
             create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/review.html')
+        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
         return jsonify(html=tpl.render_review_form(form, self.abstract, self.track))
 
 
@@ -181,7 +181,7 @@ class RHEditAbstractReview(RHAbstractBase):
         if form.validate_on_submit():
             update_abstract_review(self.review, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/review.html')
+        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
         return jsonify(html=tpl.render_review_form(form, review=self.review))
 
 
@@ -194,7 +194,7 @@ class RHSubmitAbstractComment(RHAbstractBase):
         if form.validate_on_submit():
             create_abstract_comment(self.abstract, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/review.html')
+        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
         return jsonify(html=tpl.render_comment_form(form, self.abstract))
 
 
@@ -222,7 +222,7 @@ class RHEditAbstractComment(RHAbstractCommentBase):
         if form.validate_on_submit():
             update_abstract_comment(self.comment, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/review.html')
+        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
         return jsonify(html=tpl.render_comment_form(form, self.abstract, comment=self.comment))
 
 
