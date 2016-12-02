@@ -114,7 +114,9 @@
 {% block content %}
     <div class="call-for-abstracts">
         {% set cfa = event.cfa %}
-        {{ render_timeline_section(cfa) }}
+        {% if cfa.start_dt %}
+            {{ render_timeline_section(cfa) }}
+        {% endif %}
         {% if cfa.announcement %}
             <section>
                 <div class="cfa-announcement">{{ cfa.announcement }}</div>
