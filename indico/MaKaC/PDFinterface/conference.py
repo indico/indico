@@ -23,6 +23,7 @@ from operator import attrgetter
 
 from PIL import Image
 from qrcode import QRCode, constants
+from speaklater import is_lazy_string
 
 from MaKaC.PDFinterface.base import escape
 from pytz import timezone
@@ -1210,9 +1211,11 @@ class RegistrantToPDF(PDFBase):
             story.append(Spacer(inch, space*cm, full_name))
 
         def _print_row(caption, value):
-            if isinstance(value, unicode):
-                value = value.encode('utf-8')
-            text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption.encode('utf-8'), field_value=value)
+            if isinstance(caption, unicode) or is_lazy_string(caption):
+                caption = unicode(caption).encode('utf-8')
+            if isinstance(value, unicode) or is_lazy_string(value):
+                value = unicode(value).encode('utf-8')
+            text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption, field_value=value)
             _append_text_to_story(text)
 
         text = _('Registrant ID: {id}').format(id=registration.friendly_id)
