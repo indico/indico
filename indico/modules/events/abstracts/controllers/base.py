@@ -84,9 +84,6 @@ class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
 
     def _checkProtection(self):
         RHModificationBaseProtected._checkProtection(self)
-        # Only let event managers access the management versions.
-        if self.management and not self.event_new.can_manage(session.user):
-            raise Forbidden
 
 
 class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
