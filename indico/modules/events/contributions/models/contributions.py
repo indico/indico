@@ -34,6 +34,7 @@ from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin, AuthorsSpeakersMixin
+from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -278,6 +279,22 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             lazy=True
         )
     )
+    #: The accepted paper revision
+    accepted_paper_revision = db.relationship(
+        'PaperRevision',
+        lazy=True,
+        viewonly=True,
+        uselist=False,
+        primaryjoin=('(PaperRevision.contribution_id == Contribution.id) & (PaperRevision.state == {})'
+                     .format(PaperRevisionState.accepted)),
+    )
+    #: Paper files not submitted for reviewing
+    pending_paper_files = db.relationship(
+        'PaperFile',
+        lazy=True,
+        viewonly=True,
+        primaryjoin='(PaperFile.contribution_id == Contribution.id) & (PaperFile.revision_id.is_(None))',
+    )
 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.contribution)
@@ -285,6 +302,8 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # - legacy_paper_files (LegacyPaperFile.contribution)
     # - legacy_paper_reviewing_roles (LegacyPaperReviewingRole.contribution)
     # - note (EventNote.contribution)
+    # - paper_files (PaperFile.contribution)
+    # - paper_revisions (PaperRevision.contribution)
     # - timetable_entry (TimetableEntry.contribution)
     # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
 
