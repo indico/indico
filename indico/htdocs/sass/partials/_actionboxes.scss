@@ -84,12 +84,14 @@
     background: $background-color;
     color: $color;
 
-    > .section > .icon {
-        color: $emphasis-color;
-    }
+    .section:not(.highlight):not(.warning):not(.danger):not(.disabled):not(.accept):not(.plain) {
+        > .icon {
+            color: $emphasis-color;
+        }
 
-    > .section > .text > .label {
-        color: $emphasis-color;
+        .text .label {
+            color: $emphasis-color;
+        }
     }
 }
 
