@@ -27,14 +27,11 @@
     .label {
         @include ellipsis;
 
-        float: left;
-        max-width: 80%;
+        flex-grow: 1;
+        flex-basis: 0%;
         display: inline-block;
         line-height: 1.2em;
-    }
-
-    .icon-arrow-down {
-        float: right;
+        text-align: left;
     }
 }
 
@@ -52,17 +49,11 @@
     width: 100%;
 }
 
-.track-item-picker {
-    @include picker-root-element-label();
-
-    width: 100%;
-}
-
 #contribution-list {
     .subcontribution-count {
         // TODO: Make all .i-labels flexbox and remove the following line
-        display: flex;
-        max-width: 70%;
+        display: inline-flex;
+        align-items: center;
 
         .label {
             @include ellipsis;
