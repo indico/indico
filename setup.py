@@ -361,7 +361,7 @@ if __name__ == '__main__':
             event_categories = indico_zodbimport.modules.event_categories:EventCategoriesImporter
             event_dates_titles = indico_zodbimport.modules.event_dates_titles:EventDatesTitlesImporter
             event_abstracts_zodb = indico_zodbimport.modules.event_abstracts_zodb:EventAbstractZODBPatcher
-            event_paper_reviewing = indico_zodbimport.modules.event_paper_reviewing:EventPaperReviewingImporter
+            event_paper_reviewing_legacy = indico_zodbimport.modules.event_paper_reviewing_legacy:LegacyEventPaperReviewingImporter
             legal = indico_zodbimport.modules.legal:LegalImporter
             networks = indico_zodbimport.modules.networks:NetworkImporter
             categories = indico_zodbimport.modules.categories:CategoryImporter
