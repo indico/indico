@@ -38,11 +38,11 @@ from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
+from indico.web.util import _pop_injected_js, jsonify_data
 
 from MaKaC.webinterface.rh.base import RHProtected
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from indico.web.util import _pop_injected_js, jsonify_data
+from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
@@ -81,10 +81,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
 
 class RHVCManageEventBase(RHConferenceModifBase):
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event_id = int(self._conf.id)
-        self.event = self._conf
+    CSRF_ENABLED = True
 
 
 class RHEventVCRoomMixin:
@@ -106,7 +103,7 @@ class RHVCManageEvent(RHVCManageEventBase):
         room_event_assocs = VCRoomEventAssociation.find_for_event(self.event_new, include_hidden=True,
                                                                   include_deleted=True).all()
         event_vc_rooms = [event_vc_room for event_vc_room in room_event_assocs if event_vc_room.vc_room.plugin]
-        return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self._conf,
+        return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self.event_new,
                                                event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())
 
 
@@ -117,14 +114,14 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
         attach = request.args.get('attach', '')
         return WPVCManageEvent.render_template('manage_event_select.html', self._conf, vc_room_action=action,
-                                               event=self._conf, plugins=get_vc_plugins().values(), attach=attach)
+                                               event=self.event_new, plugins=get_vc_plugins().values(), attach=attach)
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
         try:
-            self.plugin = get_vc_plugins().get(request.view_args['service'])
+            self.plugin = get_vc_plugins()[request.view_args['service']]
         except KeyError:
             raise NotFound
 
@@ -178,7 +175,6 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
 
 class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
-
     def _checkParams(self, params):
         RHVCManageEventBase._checkParams(self, params)
         RHEventVCRoomMixin._checkParams(self)
