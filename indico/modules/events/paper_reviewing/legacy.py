@@ -21,8 +21,8 @@ from flask import g
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.paper_reviewing.models.papers import PaperFile
-from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRole, PaperReviewingRoleType
+from indico.modules.events.paper_reviewing.models.papers import LegacyPaperFile
+from indico.modules.events.paper_reviewing.models.roles import LegacyPaperReviewingRole, PaperReviewingRoleType
 from indico.util.caching import memoize_request
 
 
@@ -31,7 +31,7 @@ def _load_roles(contribution):
         g.contribution_roles = {}
     if contribution not in g.contribution_roles:
         g.contribution_roles[contribution] = defaultdict(list)
-        for r in contribution.paper_reviewing_roles:
+        for r in contribution.legacy_paper_reviewing_roles:
             g.contribution_roles[contribution][r.role.name].append(r)
 
 
@@ -45,8 +45,8 @@ def _add_legacy_index_entry(contribution, **kwargs):
 
 
 def add_contribution_role(user, contribution, role):
-    contribution.paper_reviewing_roles.append(PaperReviewingRole(user=user,
-                                                                 role=PaperReviewingRoleType.get(role)))
+    contribution.legacy_paper_reviewing_roles.append(LegacyPaperReviewingRole(user=user,
+                                                                              role=PaperReviewingRoleType.get(role)))
 
 
 def _get_contribution_role(user, contribution, role):
@@ -60,9 +60,9 @@ def _remove_contribution_role(user, contribution, role):
 
 
 def get_contributions_for_role(user, event, role):
-    return [r.contribution for r in PaperReviewingRole.find_all(
-        Contribution.event_id == int(event.id), PaperReviewingRole.user == user,
-        PaperReviewingRole.role == PaperReviewingRoleType.get(role), _join=Contribution)]
+    return [r.contribution for r in LegacyPaperReviewingRole.find_all(
+        Contribution.event_id == int(event.id), LegacyPaperReviewingRole.user == user,
+        LegacyPaperReviewingRole.role == PaperReviewingRoleType.get(role), _join=Contribution)]
 
 
 def get_users_for_role(contribution, role):
@@ -199,12 +199,13 @@ class ReviewManagerLegacyMixin(object):
 
 class ReviewLegacyMixin(object):
     def copyMaterials(self):
-        for paper_file in PaperFile.find(contribution=self._reviewManager.contribution,
-                                         revision_id=None):
-            new_paper_file = PaperFile(revision_id=self._version, filename=paper_file.filename,
-                                       content_type=paper_file.content_type, contribution=self._reviewManager.contribution)
+        for paper_file in LegacyPaperFile.find(contribution=self._reviewManager.contribution,
+                                               revision_id=None):
+            new_paper_file = LegacyPaperFile(revision_id=self._version, filename=paper_file.filename,
+                                             content_type=paper_file.content_type,
+                                             contribution=self._reviewManager.contribution)
             new_paper_file.save(paper_file.open())
 
     @property
     def materials(self):
-        return PaperFile.find_all(contribution=self._reviewManager.contribution, revision_id=self._version)
+        return LegacyPaperFile.find_all(contribution=self._reviewManager.contribution, revision_id=self._version)

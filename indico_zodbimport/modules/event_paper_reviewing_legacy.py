@@ -26,8 +26,8 @@ from BTrees.IOBTree import IOBTree
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.paper_reviewing.models.papers import PaperFile
-from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRole, PaperReviewingRoleType
+from indico.modules.events.paper_reviewing.models.papers import LegacyPaperFile
+from indico.modules.events.paper_reviewing.models.roles import LegacyPaperReviewingRole, PaperReviewingRoleType
 from indico.util.console import verbose_iterator
 from indico.util.date_time import now_utc
 from indico_zodbimport import Importer
@@ -64,8 +64,8 @@ class LegacyEventPaperReviewingImporter(LocalFileImporterMixin, Importer):
             if not isinstance(avatars, list):
                 avatars = [avatars]
             for avatar in avatars:
-                new_role = PaperReviewingRole(user=avatar.user, role=role)
-                new_contribution.paper_reviewing_roles.append(new_role)
+                new_role = LegacyPaperReviewingRole(user=avatar.user, role=role)
+                new_contribution.legacy_paper_reviewing_roles.append(new_role)
                 self.print_info('{}: {} -> {}'.format(event_id, new_contribution, new_role))
 
     def _migrate_resource(self, resource, new_contrib, created_dt, event_id, version=None):
@@ -73,10 +73,10 @@ class LegacyEventPaperReviewingImporter(LocalFileImporterMixin, Importer):
         storage_backend, storage_path, size = self._get_local_file_info(resource)
         content_type = mimetypes.guess_type(resource.fileName)[0] or 'application/octet-stream'
 
-        paper_file = PaperFile(filename=resource.fileName, created_dt=created_dt,
-                               content_type=content_type, size=size, storage_backend=storage_backend,
-                               storage_file_id=storage_path, contribution=new_contrib,
-                               revision_id=version)
+        paper_file = LegacyPaperFile(filename=resource.fileName, created_dt=created_dt,
+                                     content_type=content_type, size=size, storage_backend=storage_backend,
+                                     storage_file_id=storage_path, contribution=new_contrib,
+                                     revision_id=version)
 
         db.session.add(paper_file)
         self.print_info('{}: {} -> {}'.format(event_id, resource, paper_file))
