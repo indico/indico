@@ -42,10 +42,10 @@ def _invert_mapping(mapping):
     return result
 
 
-class EventPaperReviewingImporter(LocalFileImporterMixin, Importer):
+class LegacyEventPaperReviewingImporter(LocalFileImporterMixin, Importer):
     def __init__(self, **kwargs):
         kwargs = self._set_config_options(**kwargs)
-        super(EventPaperReviewingImporter, self).__init__(**kwargs)
+        super(LegacyEventPaperReviewingImporter, self).__init__(**kwargs)
 
     def migrate(self):
         self.migrate_reviewing()
