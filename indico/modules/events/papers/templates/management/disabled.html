@@ -1,0 +1,26 @@
+{% extends 'events/papers/management/_base.html' %}
+
+{% block content %}
+    <div class="action-box highlight">
+        <div class="section">
+            <div class="icon icon-file-check"></div>
+            <div class="text">
+                <div class="label">
+                    {% trans %}Call for Papers disabled{% endtrans %}
+                </div>
+                {% trans -%}
+                    "Call for Papers" provides an integrated paper management and reviewing module
+                    that will allow you to set up a full paper submission and reviewing workflow.
+                {%- endtrans %}
+            </div>
+            <div class="toolbar">
+                <a href="#" class="i-button highlight"
+                   data-href="{{ url_for('event_features.switch', event, feature='papers') }}"
+                   data-method="PUT"
+                   data-reload-after>
+                    {% trans %}Enable module{% endtrans %}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
