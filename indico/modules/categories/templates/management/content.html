@@ -43,8 +43,8 @@
 {% endmacro %}
 
 {% macro subcategories_table(subcategories) %}
-    <div class="toolbar space-after">
-        <div class="group">
+    <div class="toolbars space-after">
+        <div class="toolbar">
             <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
             <ul class="dropdown">
                 <li>
@@ -58,21 +58,15 @@
                     </a>
                 </li>
             </ul>
-        </div>
-        <div class="group">
             {{ _create_category_button(classes='highlight icon-plus') }}
-        </div>
-        <div class="group">
             <button class="i-button icon-sort-alpha-asc js-sort-categories"
                     title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
         </div>
-        <div class="right">
-            <div class="group">
-                <span class="i-button label icon-list"
-                      title="{% trans count=subcategories|count %}{{ count }} displayed{% endtrans %}">
-                    <strong>{{ subcategories|count }}</strong>
-                </span>
-            </div>
+        <div class="toolbar">
+            <span class="i-button label icon-list"
+                  title="{% trans count=subcategories|count %}{{ count }} displayed{% endtrans %}">
+                <strong>{{ subcategories|count }}</strong>
+            </span>
             <div class="group">
                 <button class="i-button icon-transmission js-bulk-move-category"
                         data-href="{{ url_for('categories.move_subcategories', category) }}"></button>
