@@ -44,11 +44,6 @@ class EventSettingsMixin(object):
             nullable=False
         )
 
-    @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(self.event_id, True)
-
     @declared_attr
     def event_new(cls):
         return db.relationship(
