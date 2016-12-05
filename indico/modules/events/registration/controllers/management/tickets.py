@@ -112,9 +112,9 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
 
         base_url = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
         qr_data = {
-            "event_id": self._conf.getId(),
-            "title": self._conf.getTitle(),
-            "date": format_date(self._conf.getAdjustedStartDate()),
+            "event_id": self.event_new.id,
+            "title": self.event_new.title,
+            "date": format_date(self.event_new.start_dt_local),  # XXX: switch to utc+isoformat?
             "server": {
                 "baseUrl": base_url,
                 "consumerKey": checkin_app.client_id,
