@@ -76,12 +76,12 @@ class RHLockEvent(RHConferenceModifBase):
         return RH._process(self)
 
     def _process_GET(self):
-        return jsonify_template('events/management/lock_event.html', event=self._conf)
+        return jsonify_template('events/management/lock_event.html')
 
     def _process_POST(self):
         self._conf.setClosed(True)
         flash(_('The event is now locked.'), 'success')
-        return jsonify_data(url=url_for('event_mgmt.conferenceModification', self._conf), flash=False)
+        return jsonify_data(url=url_for('event_mgmt.conferenceModification', self.event_new), flash=False)
 
 
 class RHUnlockEvent(RHConferenceModifBase):

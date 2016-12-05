@@ -85,7 +85,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
         with event.logging_disabled:
             event.update_principal(event.creator, full_access=True)
     if features is not None:
-        features_event_settings.set(conf.as_event, 'enabled', features)
+        features_event_settings.set(event, 'enabled', features)
     db.session.flush()
     signals.event.created.send(event)
     logger.info('Event %r created in %r by %r ', event, category, session.user)
