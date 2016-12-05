@@ -387,6 +387,7 @@ module_js = {
     'abstracts': rjs_bundle('modules_abstracts',
                             'js/indico/modules/abstracts.js',
                             'js/indico/jquery/rulelistwidget.js'),
+    'papers': rjs_bundle('modules_papers', 'js/indico/modules/papers.js'),
     'reviews': rjs_bundle('modules_reviews', 'js/indico/modules/reviews.js'),
     'timetable': rjs_bundle('modules_timetable',
                             *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
@@ -434,6 +435,7 @@ agreements_sass = sass_module_bundle('agreements')
 attachments_sass = sass_module_bundle('attachments')
 contributions_sass = sass_module_bundle('contributions')
 abstracts_sass = sass_module_bundle('abstracts')
+papers_sass = sass_module_bundle('papers')
 reviewing_sass = sass_module_bundle('reviewing')
 tracks_sass = sass_module_bundle('tracks')
 registration_sass = sass_module_bundle('registrationform')
@@ -547,6 +549,7 @@ def register_all_css(env, main_css_file):
     env.register('roombooking_sass', roombooking_sass)
     env.register('contributions_sass', contributions_sass)
     env.register('abstracts_sass', abstracts_sass)
+    env.register('papers_sass', papers_sass)
     env.register('reviewing_sass', reviewing_sass)
     env.register('tracks_sass', tracks_sass)
     env.register('dashboard_sass', dashboard_sass)
