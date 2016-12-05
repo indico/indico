@@ -372,7 +372,7 @@ class ConferenceListContributionsReview (ConferenceListModificationBase):
 
     def _handleGet(self):
         contributions = (Contribution.find(event_new=self._conf.as_event, is_deleted=False).
-                         options(joinedload('timetable_entry'), joinedload('paper_reviewing_roles')))
+                         options(joinedload('timetable_entry'), joinedload('legacy_paper_reviewing_roles')))
 
         filter = {}
 

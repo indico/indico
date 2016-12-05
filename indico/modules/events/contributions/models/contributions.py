@@ -282,9 +282,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
+    # - legacy_paper_files (LegacyPaperFile.contribution)
+    # - legacy_paper_reviewing_roles (LegacyPaperReviewingRole.contribution)
     # - note (EventNote.contribution)
-    # - paper_files (PaperFile.contribution)
-    # - paper_reviewing_roles (PaperReviewingRole.contribution)
     # - timetable_entry (TimetableEntry.contribution)
     # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
 
