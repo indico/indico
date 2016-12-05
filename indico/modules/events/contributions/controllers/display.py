@@ -119,7 +119,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
             show_paper = ((self._conf.getConfPaperReview().hasReviewing() and
                            self.contrib.can_manage(session.user, 'submit')) or reviewing_status == 'Accept')
             paper_upload_form = PaperUploadForm()
-            paper_file_data = self.contrib.paper_files.filter_by(revision_id=None) if show_paper else None
+            paper_file_data = self.contrib.legacy_paper_files.filter_by(revision_id=None) if show_paper else None
         else:
             reviewing_status = paper_upload_form = paper_file_data = None
             show_paper = False

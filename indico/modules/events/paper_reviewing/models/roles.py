@@ -31,10 +31,10 @@ class PaperReviewingRoleType(TitledIntEnum):
     editor = 2
 
 
-class PaperReviewingRole(db.Model):
+class LegacyPaperReviewingRole(db.Model):
     """Represents a role a user performs regarding a particular contribution."""
 
-    __tablename__ = 'contribution_roles'
+    __tablename__ = 'legacy_contribution_roles'
     __table_args__ = {'schema': 'event_paper_reviewing'}
 
     id = db.Column(
@@ -62,7 +62,7 @@ class PaperReviewingRole(db.Model):
         'Contribution',
         lazy=False,
         backref=db.backref(
-            'paper_reviewing_roles',
+            'legacy_paper_reviewing_roles',
             lazy=True
         )
     )
@@ -70,7 +70,7 @@ class PaperReviewingRole(db.Model):
         'User',
         lazy=False,
         backref=db.backref(
-            'paper_reviewing_roles',
+            'legacy_paper_reviewing_roles',
             lazy='dynamic'
         )
     )

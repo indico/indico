@@ -24,10 +24,10 @@ from indico.core.storage.models import StoredFileMixin
 from indico.util.string import format_repr, return_ascii, strict_unicode
 
 
-class PaperFile(StoredFileMixin, db.Model):
+class LegacyPaperFile(StoredFileMixin, db.Model):
     """Represents a file belonging to a paper that is under review (contribution)."""
 
-    __tablename__ = 'paper_files'
+    __tablename__ = 'legacy_paper_files'
     __table_args__ = {'schema': 'event_paper_reviewing'}
 
     id = db.Column(
@@ -47,7 +47,7 @@ class PaperFile(StoredFileMixin, db.Model):
         'Contribution',
         lazy=False,
         backref=db.backref(
-            'paper_files',
+            'legacy_paper_files',
             lazy='dynamic'
         )
     )
