@@ -24,7 +24,7 @@ _bp = IndicoBlueprint('paper_reviewing', __name__, template_folder='templates',
                       virtual_template_folder='events/paper_reviewing',
                       url_prefix='/event/<confId>/contributions/<contrib_id>')
 
-_bp.add_url_rule('/paper/files/', 'upload_paper_files', RHUploadPaperFiles, methods=('POST',))
-_bp.add_url_rule('/paper/submit/', 'submit_paper', RHSubmitPaper, methods=('POST',))
-_bp.add_url_rule('/paper/<paper_file_id>/<filename>', 'remove_paper_file', RHRemovePaperFile, methods=('DELETE',))
-_bp.add_url_rule('/paper/<paper_file_id>/<filename>', 'download_paper_file', RHDownloadPaperFile)
+_bp.add_url_rule('/paper-old/files/', 'upload_paper_files', RHUploadPaperFiles, methods=('POST',))
+_bp.add_url_rule('/paper-old/submit/', 'submit_paper', RHSubmitPaper, methods=('POST',))
+_bp.add_url_rule('/paper-old/<paper_file_id>/<filename>', 'remove_paper_file', RHRemovePaperFile, methods=('DELETE',))
+_bp.add_url_rule('/paper-old/<paper_file_id>/<filename>', 'download_paper_file', RHDownloadPaperFile)

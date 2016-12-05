@@ -19,9 +19,10 @@ from indico.web.flask.blueprints.event.display import event
 
 
 # paperReviewingDisplay.py
-event.add_url_rule('/paper-reviewing/', 'paperReviewingDisplay', paperReviewingDisplay.RHPaperReviewingDisplay)
-event.add_url_rule('/paper-reviewing/templates/', 'paperReviewingDisplay-downloadTemplate',
+event.add_url_rule('/paper-reviewing-old/', 'paperReviewingDisplay', paperReviewingDisplay.RHPaperReviewingDisplay)
+event.add_url_rule('/paper-reviewing-old/templates/', 'paperReviewingDisplay-downloadTemplate',
                    paperReviewingDisplay.RHDownloadPRTemplate)
-event.add_url_rule('/paper-reviewing/templates/<reviewingTemplateId>', 'paperReviewingDisplay-downloadTemplate',
+event.add_url_rule('/paper-reviewing-old/templates/<reviewingTemplateId>', 'paperReviewingDisplay-downloadTemplate',
                    paperReviewingDisplay.RHDownloadPRTemplate)
-event.add_url_rule('/paper-reviewing/upload', 'paperReviewingDisplay-uploadPaper', paperReviewingDisplay.RHUploadPaper)
+event.add_url_rule('/paper-reviewing-old/upload', 'paperReviewingDisplay-uploadPaper',
+                   paperReviewingDisplay.RHUploadPaper)
