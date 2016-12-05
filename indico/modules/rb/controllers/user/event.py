@@ -78,19 +78,14 @@ class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
         RHConferenceModifBase._checkProtection(self)
         RHRoomBookingBase._checkProtection(self)
 
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.event = self._conf
-        self.event_id = int(self.event.getId())
-
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         reservations = self.event_new.reservations.all()
         if not reservations:
-            self._redirect(url_for('event_mgmt.rooms_choose_event', self.event))
+            self._redirect(url_for('event_mgmt.rooms_choose_event', self.event_new))
             return
-        return WPRoomBookingEventBookingList(self, self.event, reservations=reservations).display()
+        return WPRoomBookingEventBookingList(self, self._conf, reservations=reservations).display()
 
 
 class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
@@ -101,7 +96,7 @@ class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
                     .order_by(TimetableEntry.start_dt)
                     .all())
         sessions = sorted([s for s in self.event_new.sessions if s.start_dt is not None], key=attrgetter('start_dt'))
-        return WPRoomBookingEventChooseEvent(self, self.event).display(contribs=contribs, sessions=sessions)
+        return WPRoomBookingEventChooseEvent(self, self._conf).display(contribs=contribs, sessions=sessions)
 
 
 class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDetails):
@@ -114,7 +109,7 @@ class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDet
         RHRoomBookingRoomDetails._checkParams(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventRoomDetails(self, self.event, **kwargs)
+        return WPRoomBookingEventRoomDetails(self, self._conf, **kwargs)
 
     def _process(self):
         return RHRoomBookingRoomDetails._process(self)
@@ -130,7 +125,7 @@ class RHRoomBookingEventBookingDetails(RHRoomBookingEventBase, RHRoomBookingBook
         RHRoomBookingBookingDetails._checkParams(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventBookingDetails(self, self.event, **kwargs)
+        return WPRoomBookingEventBookingDetails(self, self._conf, **kwargs)
 
     def _process(self):
         return RHRoomBookingBookingDetails._process(self)
@@ -146,10 +141,10 @@ class RHRoomBookingEventBookingModifyBooking(RHRoomBookingEventBase, RHRoomBooki
         RHRoomBookingModifyBooking._checkParams(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventModifyBooking(self, self.event, **kwargs)
+        return WPRoomBookingEventModifyBooking(self, self._conf, **kwargs)
 
     def _get_success_url(self):
-        return url_for('event_mgmt.rooms_booking_details', self.event, self._reservation)
+        return url_for('event_mgmt.rooms_booking_details', self.event_new, self._reservation)
 
     def _process(self):
         return RHRoomBookingModifyBooking._process(self)
@@ -165,10 +160,10 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
         RHRoomBookingCloneBooking._checkParams(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventNewBookingSimple(self, self.event, cloning=True, **kwargs)
+        return WPRoomBookingEventNewBookingSimple(self, self._conf, cloning=True, **kwargs)
 
     def _get_success_url(self, booking):
-        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
+        return url_for('event_mgmt.rooms_booking_details', self.event_new, booking)
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingCloneBooking._create_booking(self, form, room)
@@ -181,7 +176,7 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
 
 class _SuccessUrlDetailsMixin:
     def _get_success_url(self):
-        return url_for('event_mgmt.rooms_booking_details', self.event, self._reservation)
+        return url_for('event_mgmt.rooms_booking_details', self.event_new, self._reservation)
 
 
 class RHRoomBookingEventAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingEventBase, RHRoomBookingAcceptBooking):
@@ -261,7 +256,7 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
         RHRoomBookingNewBookingSimple._checkParams(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventNewBookingSimple(self, self.event, **kwargs)
+        return WPRoomBookingEventNewBookingSimple(self, self._conf, **kwargs)
 
     def _make_confirm_form(self, *args, **kwargs):
         defaults = kwargs['defaults']
@@ -270,7 +265,7 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
         return RHRoomBookingNewBookingSimple._make_confirm_form(self, *args, **kwargs)
 
     def _get_success_url(self, booking):
-        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
+        return url_for('event_mgmt.rooms_booking_details', self.event_new, booking)
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingNewBookingSimple._create_booking(self, form, room)
@@ -311,7 +306,7 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         views = {'select_room': WPRoomBookingEventNewBookingSelectRoom,
                  'select_period': WPRoomBookingEventNewBookingSelectPeriod,
                  'confirm': WPRoomBookingEventNewBookingConfirm}
-        return views[view](self, self.event, **kwargs)
+        return views[view](self, self._conf, **kwargs)
 
     def _get_select_room_form_defaults(self):
         defaults, _ = RHRoomBookingNewBooking._get_select_room_form_defaults(self)
@@ -326,7 +321,7 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         return RHRoomBookingNewBooking._make_confirm_form(self, *args, **kwargs)
 
     def _get_success_url(self, booking):
-        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
+        return url_for('event_mgmt.rooms_booking_details', self.event_new, booking)
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingNewBooking._create_booking(self, form, room)
