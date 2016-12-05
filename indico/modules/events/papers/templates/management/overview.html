@@ -1,0 +1,23 @@
+{% extends 'events/papers/management/_base.html' %}
+
+{% block content %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-settings"></div>
+            <div class="text">
+                <div class="label">{% trans %}Paper managers{% endtrans %}</div>
+                {% trans %}Add/remove users allowed to manage the call for papers{% endtrans %}
+            </div>
+            <div class="toolbar">
+                <div class="group">
+                    <a class="i-button icon-settings" href="#"
+                       data-title="{% trans %}Manage paper managers{% endtrans %}"
+                       data-href="{{ url_for('.manage_paper_managers', event) }}"
+                       data-ajax-dialog>
+                        {%- trans %}Configure{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
