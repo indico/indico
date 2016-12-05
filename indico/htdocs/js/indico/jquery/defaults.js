@@ -59,6 +59,9 @@ $.extend($.colorbox.settings, {
 });
 
 
+$.tablesorter.defaults.sortReset = true;
+
+
 $.ajaxSetup({
     traditional: true,
     beforeSend: function(xhr, settings) {
