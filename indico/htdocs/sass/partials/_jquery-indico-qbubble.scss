@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "partials/_qtips";
+@import 'partials/qtips';
 
 .qtip-default.qbubble {
     @extend %qtip-light;
@@ -45,5 +45,9 @@
     .titled-rule {
         margin-bottom: 5px;
         margin-top: 5px;
+    }
+
+    &.no-max-width {
+        max-width: none;
     }
 }
