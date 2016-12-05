@@ -91,7 +91,7 @@ class ProgrammeToPDF(PDFBase):
         self._event = event
         self._conf = event.as_legacy
         self._tz = self._event.tzinfo
-        self._title = get_menu_entry_by_name('program', event).localized_title
+        self._title = get_menu_entry_by_name('program', event).localized_title.encode('utf-8')
         PDFBase.__init__(self, title='program.pdf')
 
     def firstPage(self, c, doc):
