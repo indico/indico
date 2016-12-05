@@ -98,11 +98,6 @@ class StaticSite(db.Model):
     )
 
     @property
-    def event(self):
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(str(self.event_id))
-
-    @property
     def locator(self):
         return {'confId': self.event_id,
                 'id': self.id}

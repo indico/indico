@@ -45,7 +45,7 @@ def build_static_site(static_site):
         session.lang = static_site.creator.settings.get('lang')
         rh = RHCustomizable()
         rh._aw = AccessWrapper()
-        rh._conf = rh._target = static_site.event
+        rh._conf = rh._target = static_site.event_new.as_legacy
 
         g.rh = rh
         ContextManager.set('currentRH', rh)
@@ -78,7 +78,7 @@ def build_static_site(static_site):
 @email_sender
 def notify_static_site_success(static_site):
     template = get_template_module('events/static/emails/download_notification_email.txt',
-                                   user=static_site.creator, event=static_site.event,
+                                   user=static_site.creator, event=static_site.event_new,
                                    link=url_for('static_site.download', static_site, _external=True))
     return make_email({static_site.creator.email}, template=template, html=False)
 
