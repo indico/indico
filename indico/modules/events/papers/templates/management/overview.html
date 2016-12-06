@@ -20,14 +20,16 @@
                        {% if event.cfp.is_open %}
                            data-confirm="{% trans %}The reviewing process has started. Are you sure you want to disable the content reviewing process?{% endtrans %}"
                        {% endif %}
-                       data-reload-after>
+                       data-update="#paper-page"
+                       data-replace-update>
                         {%- trans %}Disable{% endtrans -%}
                     </a>
                 {% else %}
                     <a href="#" class="i-button icon-switchon"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
                        data-method="PUT"
-                       data-reload-after>
+                       data-update="#paper-page"
+                       data-replace-update>
                         {%- trans %}Enable{% endtrans -%}
                     </a>
                 {% endif %}
@@ -51,14 +53,16 @@
                        {% if event.cfp.is_open %}
                            data-confirm="{% trans %}The reviewing process has started. Are you sure you want to disable the layout reviewing process?{% endtrans %}"
                        {% endif %}
-                       data-reload-after>
+                       data-update="#paper-page"
+                       data-replace-update>
                         {%- trans %}Disable{% endtrans -%}
                     </a>
                 {% else %}
                     <a href="#" class="i-button icon-switchon"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='layout') }}"
                        data-method="PUT"
-                       data-reload-after>
+                       data-update="#paper-page"
+                       data-replace-update>
                         {%- trans %}Enable{% endtrans -%}
                     </a>
                 {% endif %}
