@@ -1,22 +1,77 @@
 {% extends 'events/papers/management/_base.html' %}
+{% from '_switch.html' import switch %}
 
 {% block content %}
+    <div class="action-box">
+        <div class="section highlight">
+            <div class="icon icon-file-content"></div>
+            <div class="text">
+                <div class="label">{% trans %}Content reviewing{% endtrans %}</div>
+                <!-- TODO: check if enabled -->
+                {%- if true %}
+                    {%- trans %}The content reviewing process is enabled{% endtrans -%}
+                {% else %}
+                    {%- trans %}The content reviewing process is disabled{% endtrans -%}
+                {% endif -%}
+            </div>
+            {{ switch(id='content-review-switch', checked=true, on_label=_('On'), off_label=_('Off')) }}
+        </div>
+        <div class="section">
+            <div class="icon icon-layout"></div>
+            <div class="text">
+                <div class="label">{% trans %}Layout reviewing{% endtrans %}</div>
+                <!-- TODO: check if enabled -->
+                {%- if false %}
+                    {%- trans %}The layout reviewing process is enabled{% endtrans -%}
+                {% else %}
+                    {%- trans %}The layout reviewing process is disabled{% endtrans -%}
+                {% endif -%}
+            </div>
+            {{ switch(id='layout-review-switch', checked=false, on_label=_('On'), off_label=_('Off')) }}
+        </div>
+    </div>
+
     <div class="action-box">
         <div class="section">
             <div class="icon icon-settings"></div>
             <div class="text">
-                <div class="label">{% trans %}Paper managers{% endtrans %}</div>
-                {% trans %}Add/remove users allowed to manage the call for papers{% endtrans %}
+                <div class="label">{% trans %}Reviewing settings{% endtrans %}</div>
+                {%- trans %}Configure reviewing questions, email notifications, etc.{% endtrans -%}
             </div>
             <div class="toolbar">
-                <div class="group">
-                    <a class="i-button icon-settings" href="#"
-                       data-title="{% trans %}Manage paper managers{% endtrans %}"
-                       data-href="{{ url_for('.manage_paper_managers', event) }}"
-                       data-ajax-dialog>
-                        {%- trans %}Configure{% endtrans -%}
-                    </a>
-                </div>
+                <a class="i-button icon-settings" href="#">
+                    {%- trans %}Settings{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="icon icon-users"></div>
+            <div class="text">
+                <div class="label">{% trans %}Reviewing teams{% endtrans %}</div>
+                {%- trans %}Configure teams and competences{% endtrans -%}
+            </div>
+            <div class="toolbar">
+                <a class="i-button icon-users" href="#"
+                   data-href="{{ url_for('.manage_teams', event) }}"
+                   data-title="{% trans %}Manage paper reviewing managers, reviewers and referees{% endtrans %}"
+                   data-ajax-dialog>
+                    {%- trans %}Teams{% endtrans -%}
+                </a>
+                <a class="i-button icon-settings" href="#">
+                    {%- trans %}Competences{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="section">
+            <div class="icon icon-file"></div>
+            <div class="text">
+                <div class="label">{% trans %}Paper assignment{% endtrans %}</div>
+                {%- trans %}Assign reviewers and referees to papers{% endtrans -%}
+            </div>
+            <div class="toolbar">
+                <a class="i-button icon-settings" href="#">
+                    {%- trans %}Assign papers{% endtrans -%}
+                </a>
             </div>
         </div>
     </div>
