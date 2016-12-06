@@ -207,7 +207,7 @@ class RHAbstractCommentBase(RHAbstractBase):
 
     def _checkParams(self, params):
         RHAbstractBase._checkParams(self, params)
-        self.comment = AbstractComment.get_one(request.view_args['comment_id'])
+        self.comment = AbstractComment.get_one(request.view_args['comment_id'], is_deleted=False)
 
     def _checkProtection(self):
         RHAbstractBase._checkProtection(self)

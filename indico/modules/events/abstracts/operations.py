@@ -321,7 +321,7 @@ def update_abstract_comment(comment, comment_data):
 
 
 def delete_abstract_comment(comment):
-    db.session.delete(comment)
+    comment.is_deleted = True
     db.session.flush()
     logger.info("Abstract comment %s deleted by %s", comment, session.user)
     comment.abstract.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Abstracts',
