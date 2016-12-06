@@ -792,6 +792,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         from indico.modules.events.abstracts.models.call_for_abstracts import CallForAbstracts
         return CallForAbstracts(self)
 
+    @property
+    @memoize_request
+    def cfp(self):
+        from indico.modules.events.papers.models.call_for_papers import CallForPapers
+        return CallForPapers(self)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False,
