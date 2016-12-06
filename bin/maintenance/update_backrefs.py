@@ -47,6 +47,11 @@ def _get_source_file(cls):
     return cls.__module__.replace('.', '/') + '.py'
 
 
+def _write_backrefs(rels, new_source):
+    for backref_name, target, target_rel_name in sorted(rels, key=itemgetter(0)):
+        new_source.append('    # - {} ({}.{})'.format(backref_name, target, target_rel_name))
+
+
 def main():
     import_all_models()
     for cls, rels in sorted(_find_backrefs().iteritems(), key=lambda x: x[0].__name__):
@@ -58,8 +63,7 @@ def main():
         for i, line in enumerate(source):
             if in_backrefs:
                 if not backrefs_written:
-                    for backref_name, target, target_rel_name in sorted(rels, key=itemgetter(0)):
-                        new_source.append('    # - {} ({}.{})'.format(backref_name, target, target_rel_name))
+                    _write_backrefs(rels, new_source)
                     backrefs_written = True
                 if not line.startswith('    # - '):
                     in_backrefs = False
@@ -75,6 +79,8 @@ def main():
                 if line.startswith('class {}('.format(cls.__name__)):
                     in_class = True
             new_source.append(line)
+        if in_backrefs and not backrefs_written:
+            _write_backrefs(rels, new_source)
         if not backrefs_written:
             print cformat('%{yellow}Class {} has no comment for backref information').format(cls.__name__)
         if source != new_source:
