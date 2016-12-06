@@ -49,7 +49,7 @@ def upgrade():
     )
 
     op.create_table(
-        'paper_review_questions',
+        'review_questions',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('text', sa.Text(), nullable=False),
@@ -62,7 +62,7 @@ def upgrade():
     )
 
     op.create_table(
-        'paper_reviews',
+        'reviews',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('revision_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True),
@@ -79,13 +79,13 @@ def upgrade():
     )
 
     op.create_table(
-        'paper_review_ratings',
+        'review_ratings',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('question_id', sa.Integer(), nullable=False, index=True),
         sa.Column('review_id', sa.Integer(), nullable=False, index=True),
         sa.Column('value', sa.Integer(), nullable=False),
-        sa.ForeignKeyConstraint(['question_id'], ['event_paper_reviewing.paper_review_questions.id']),
-        sa.ForeignKeyConstraint(['review_id'], ['event_paper_reviewing.paper_reviews.id']),
+        sa.ForeignKeyConstraint(['question_id'], ['event_paper_reviewing.review_questions.id']),
+        sa.ForeignKeyConstraint(['review_id'], ['event_paper_reviewing.reviews.id']),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('review_id', 'question_id'),
         schema='event_paper_reviewing'
@@ -112,7 +112,7 @@ def upgrade():
 def downgrade():
     op.drop_table('review_comments', schema='event_paper_reviewing')
     op.drop_table('files', schema='event_paper_reviewing')
-    op.drop_table('paper_review_ratings', schema='event_paper_reviewing')
-    op.drop_table('paper_review_questions', schema='event_paper_reviewing')
-    op.drop_table('paper_reviews', schema='event_paper_reviewing')
+    op.drop_table('review_ratings', schema='event_paper_reviewing')
+    op.drop_table('review_questions', schema='event_paper_reviewing')
+    op.drop_table('reviews', schema='event_paper_reviewing')
     op.drop_table('revisions', schema='event_paper_reviewing')
