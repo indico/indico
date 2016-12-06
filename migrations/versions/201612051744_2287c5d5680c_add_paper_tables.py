@@ -91,8 +91,26 @@ def upgrade():
         schema='event_paper_reviewing'
     )
 
+    op.create_table(
+        'review_comments',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('revision_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('user_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('modified_by_id', sa.Integer(), nullable=True, index=True),
+        sa.Column('text', sa.Text(), nullable=False),
+        sa.Column('modified_dt', UTCDateTime, nullable=True),
+        sa.Column('created_dt', UTCDateTime, nullable=False),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.ForeignKeyConstraint(['modified_by_id'], ['users.users.id']),
+        sa.ForeignKeyConstraint(['revision_id'], ['event_paper_reviewing.revisions.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='event_paper_reviewing'
+    )
+
 
 def downgrade():
+    op.drop_table('review_comments', schema='event_paper_reviewing')
     op.drop_table('files', schema='event_paper_reviewing')
     op.drop_table('paper_review_ratings', schema='event_paper_reviewing')
     op.drop_table('paper_review_questions', schema='event_paper_reviewing')
