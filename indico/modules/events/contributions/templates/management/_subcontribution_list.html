@@ -77,13 +77,13 @@
                                 {{ render_attachment_info(subcontribution) }}
                                 <td class="i-table">
                                     <div class="group right">
-                                        <a href="#" class="icon-edit i-button-icon"
+                                        <a href="#" class="icon-edit i-link"
                                            data-title="{% trans %}Edit the subcontribution{% endtrans %}"
                                            data-href="{{ url_for('.manage_edit_subcontrib', subcontribution) }}"
                                            data-update="#subcontribution-list"
                                            data-ajax-dialog>
                                         </a>
-                                        <a href="#" class="icon-remove i-button-icon"
+                                        <a href="#" class="icon-remove i-link"
                                            data-href="{{ url_for('.manage_subcontrib_rest', subcontribution) }}"
                                            data-method="DELETE"
                                            data-title="{% trans title=subcontribution.title%}Delete subcontribution '{{ title }}'{% endtrans %}"

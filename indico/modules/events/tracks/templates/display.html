@@ -33,7 +33,7 @@
                     {%- endif %}
                     {% if track.can_convene(session.user) or track.can_review_abstracts(session.user) %}
                         <a href="{{ url_for('abstracts.display_reviewable_track_abstracts', track) }}"
-                           class="i-button-icon track-link icon-stack-text"
+                           class="i-link icon-stack-text track-link"
                            title="{% trans %}Review abstracts in this track{% endtrans %}">
                         </a>
                     {% endif %}

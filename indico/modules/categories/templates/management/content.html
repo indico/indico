@@ -17,7 +17,7 @@
         data-category-id="{{ subcategory.id }}"
         data-category-title="{{ subcategory.title }}">
         <td class="i-table column-icon js-handle handle">
-            <a class="i-button-icon icon-handle"></a>
+            <a class="i-link icon-handle"></a>
         </td>
         <td class="i-table column-icon">
             <input type="checkbox" name="category_id" value="{{ subcategory.id }}"
@@ -36,8 +36,8 @@
             </a>
         </td>
         <td class="i-table actions">
-            {{ move_category_button(subcategory, 'i-button-icon') }}
-            {{ delete_category_button(subcategory, 'i-button-icon') }}
+            {{ move_category_button(subcategory, 'i-link') }}
+            {{ delete_category_button(subcategory, 'i-link') }}
         </td>
     </tr>
 {% endmacro %}

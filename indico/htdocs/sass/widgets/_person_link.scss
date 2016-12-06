@@ -33,13 +33,10 @@
     }
 
     .nobody-placeholder {
-        height: 2em;
-        line-height: 2em;
-    }
-
-    .nobody-placeholder {
         color: $gray;
         font-style: italic;
+        height: 2em;
+        line-height: 2em;
     }
 
     .person-row {
@@ -49,8 +46,7 @@
         @include single-transition(background-color);
 
         .name {
-            @include ellipsis;
-
+            @include ellipsis();
             flex-grow: 1;
             flex-shrink: 1;
             flex-basis: 0;
@@ -86,7 +82,7 @@
             }
         }
 
-        .i-button-icon {
+        .i-link {
             margin: 0 1px;
 
             &:first-child {
@@ -116,13 +112,13 @@
     }
 
     .person-buttons {
-        @include transition(opacity .5s);
+        @include transition(opacity 0.5s);
         display: inline-block;
         height: 2em;
         line-height: 2;
         text-align: right;
 
-        .i-button-icon {
+        .i-link {
             font-size: 1.1em;
             vertical-align: sub;
         }

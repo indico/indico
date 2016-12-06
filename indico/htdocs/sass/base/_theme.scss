@@ -82,6 +82,38 @@
     }
 }
 
+%semantic-link {
+    color: $gray;
+
+    &:not(.disabled) {
+        &:hover,
+        &:active,
+        &.active {
+            color: $black;
+
+            &.highlight {
+                color: $blue;
+            }
+
+            &.accept {
+                color: $green;
+            }
+
+            &.danger {
+                color: $red;
+            }
+
+            &.warning {
+                color: $yellow;
+            }
+        }
+    }
+
+    &.disabled {
+        color: $gray;
+    }
+}
+
 .semantic-text {
     color: $dark-gray;
 

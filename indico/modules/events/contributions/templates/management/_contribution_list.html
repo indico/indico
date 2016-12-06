@@ -181,18 +181,18 @@
                             {{ render_attachment_info(contrib) }}
                             <td class="i-table actions-column">
                                 <div class="group right entry-action-buttons vertical-aligner">
-                                    <a href="#" class="icon-edit i-button-icon highlight js-dialog-action"
+                                    <a href="#" class="icon-edit i-link highlight js-dialog-action"
                                        data-href="{{ url_for('.manage_update_contrib', contrib, flash=true) }}"
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
                                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-shield i-button-icon highlight"
+                                    <a href="#" class="icon-shield i-link highlight"
                                        title="{% trans %}Manage contribution protection{% endtrans %}"
                                        data-href="{{ url_for('.manage_contrib_protection', contrib) }}"
                                        data-title="{% trans %}Manage contribution protection{% endtrans %}"
                                        data-update="#contribution-list"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-remove i-button-icon danger js-delete"
+                                    <a href="#" class="icon-remove i-link danger js-delete"
                                        data-title="{% trans title=contrib.title %}Delete contribution '{{ title }}'?{% endtrans %}"
                                        data-confirm="{% trans title=contrib.title %}Are you sure you want to completely delete contribution '{{ title }}'?{% endtrans %}"
                                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'

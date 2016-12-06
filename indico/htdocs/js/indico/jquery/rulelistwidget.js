@@ -150,7 +150,7 @@
                 $element: $('<li>', {class: 'rule'}),
                 rule: rule
             };
-            var $removeButton = $('<a>', {class: 'i-button-icon icon-remove rule-remove-button'});
+            var $removeButton = $('<a>', {class: 'i-link icon-remove rule-remove-button'});
 
             ruleContext.$element.append(
                 _.map(this.conditionSpec, function(condition) {

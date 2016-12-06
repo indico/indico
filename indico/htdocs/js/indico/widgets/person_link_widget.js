@@ -160,11 +160,11 @@
             var $personName = $('<div>').addClass('name').text(person.name);
             var $personRoles = $('<span>').addClass('person-roles');
             var $personButtons = $('<span>').addClass('person-buttons');
-            var $buttonRemove = $('<a>').addClass('i-button-icon danger icon-close')
+            var $buttonRemove = $('<a>').addClass('i-link danger icon-close')
                                         .attr('title', $T.gettext("Remove person"));
-            var $buttonEdit = $('<a>').addClass('i-button-icon icon-edit')
+            var $buttonEdit = $('<a>').addClass('i-link icon-edit')
                                       .attr('title', $T.gettext("Edit information"));
-            var $buttonConfig = $('<a>').addClass('i-button-icon icon-settings')
+            var $buttonConfig = $('<a>').addClass('i-link icon-settings')
                                         .attr('title', $T.gettext("Configure roles"));
 
             $personRow.append($personName).append($personRoles).append($personButtons);

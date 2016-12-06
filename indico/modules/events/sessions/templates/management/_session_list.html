@@ -69,22 +69,22 @@
                                        data-colors="{{ default_colors | tojson | forceescape }}"
                                        data-color="{{ sess.colors | tojson | forceescape }}"
                                        title="{% trans %}Change colour{% endtrans %}"></a>
-                                    <a href="#" class="icon-edit highlight edit-session i-button-icon"
+                                    <a href="#" class="i-link highlight icon-edit edit-session"
                                        title="{% trans %}Edit this session{% endtrans %}"
                                        data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
                                        data-href="{{ url_for('.modify_session', sess) }}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
-                                    <a href="#" class="icon-shield i-button-icon"
+                                    <a href="#" class="i-link icon-shield"
                                        title="{% trans %}Manage protection{% endtrans %}"
                                        data-href="{{ url_for('.session_protection', sess) }}"
                                        data-title="{% trans %}Manage session protection{% endtrans %}"
                                        data-update="#sessions-wrapper"
                                        data-ajax-dialog></a>
                                     <a href="{{ url_for('timetable.manage_session', sess) }}"
-                                       class="icon-time highlight i-button-icon"
+                                       class="i-link highlight icon-time"
                                        title="{% trans %}Go to this session timetable{% endtrans %}"></a>
-                                    <a href="#" class="icon-remove highlight i-button-icon"
+                                    <a href="#" class="i-link highlight icon-remove"
                                        title="{% trans %}Remove this session{% endtrans %}"
                                        data-method="DELETE"
                                        data-href="{{ url_for('.session_rest', sess)}}"

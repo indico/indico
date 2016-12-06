@@ -34,7 +34,7 @@
             var self = this;
 
             self.buttonBox = $('<span>').addClass('button-box');
-            self.clearIcon = $('<a>').addClass('i-button-icon danger icon-close')
+            self.clearIcon = $('<a>').addClass('i-link danger icon-close')
                 .css('line-height', self.element.outerHeight() + 'px')
                 .click(function(evt) {
                     self._clear();

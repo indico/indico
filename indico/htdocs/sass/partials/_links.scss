@@ -17,15 +17,26 @@
 
 a:link,
 a:visited {
-   text-decoration: none;
+    text-decoration: none;
 }
 
-a:not(.i-button) {
+a:not(.i-link):not(.i-button) {
     color: $blue;
 
     &:hover {
         color: $orange;
         cursor: pointer;
+    }
+}
+
+.i-link {
+    @extend %semantic-link;
+    @include transition();
+    @include transition-property(color);
+    cursor: pointer;
+
+    &.disabled {
+        cursor: default !important;
     }
 }
 
@@ -44,8 +55,8 @@ a.discreet-link {
 }
 
 .anchor-link {
-    @include transition(.25s opacity ease-out);
     @extend %font-family-body;
+    @include transition(0.25s opacity ease-out);
     opacity: 0;
     margin-left: 0.5em;
     color: $gray !important;

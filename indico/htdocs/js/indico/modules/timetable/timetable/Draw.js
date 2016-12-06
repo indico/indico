@@ -100,7 +100,7 @@ type("TimetableBlockBase", [],
          createMaterialButton: function(attachments) {
              var self = this;
 
-             var button = Html.a('entry-attachments i-button-icon');
+             var button = Html.a('i-link entry-attachments');
              var $button = $(button.dom);
              $button.qtip({
                  content: {
@@ -788,8 +788,8 @@ type("TimetableBlockManagementMixin", ["DragAndDropBlockMixin"],
 
         _drawArrows: function() {
             var self = this;
-            var arrowUp = $('<a>', {class: 'i-button-icon icon-collapse'});
-            var arrowDown = $('<a>', {class: 'i-button-icon icon-expand'});
+            var arrowUp = $('<a>', {class: 'i-link icon-collapse'});
+            var arrowDown = $('<a>', {class: 'i-link icon-expand'});
 
             if (self.eventData.canSwapUp) {
                 arrowUp.attr('title', $T.gettext('Move up'));
@@ -1399,7 +1399,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
                 function createEditLink(blockData) {
                     var link = $('<a>', {
-                        class: 'icon-edit i-button-icon',
+                        class: 'i-link icon-edit',
                         title: $T.gettext("Edit"),
                         data: {
                             title: $T.gettext("Edit poster"),
@@ -1433,7 +1433,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
 
                 function createProtectionLink(blockData) {
                     var link = $('<a>', {
-                        class: 'icon-shield i-button-icon',
+                        class: 'i-link icon-shield',
                         title: $T.gettext("Manage protection"),
                         data: {
                             title: $T.gettext("Manage poster protection"),
@@ -1473,7 +1473,7 @@ type("IntervalTimetableDrawer", ["TimetableDrawer"],
                         dialogText = $T.gettext("Are you sure you want to delete the poster?");
                     }
                     var link = $('<a>', {
-                        class: 'icon-remove i-button-icon',
+                        class: 'i-link icon-remove',
                         title: tooltipText,
                         data: {
                             title: dialogTitle,

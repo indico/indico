@@ -174,11 +174,11 @@ $i-button-spacing: 0.3rem;
     }
 
     &[class*="icon-"] {
-        &:before {
+        &::before {
             font-size: 1.2em;
         }
 
-        &:not(:empty):before {
+        &:not(:empty)::before {
             margin-right: 0.5em;
         }
     }
@@ -362,43 +362,6 @@ button::-moz-focus-inner {
 .i-button > [class*="icon-"]:before {
     font-size: 1.2em;
     vertical-align: -15%;
-}
-
-a.i-button-icon {
-    @include transition();
-    @include transition-property(color);
-    color: $gray;
-    cursor: pointer;
-
-    &:not(.disabled):not(:disabled) {
-        &:hover,
-        &:active,
-        &.active {
-            color: $black;
-
-            &.accept {
-                color: $green;
-            }
-
-            &.danger {
-                color: $red;
-            }
-
-            &.highlight {
-                color: $blue;
-            }
-
-            &.warning {
-                color: $yellow;
-            }
-        }
-    }
-
-    &:disabled,
-    &.disabled {
-        @extend %button-disabled;
-        background: inherit !important;
-    }
 }
 
 a.arrow, .i-button.arrow {
