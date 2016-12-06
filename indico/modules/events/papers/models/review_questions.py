@@ -21,7 +21,7 @@ from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
 
 
 class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
-    __tablename__ = 'paper_review_questions'
+    __tablename__ = 'review_questions'
     __table_args__ = {'schema': 'event_paper_reviewing'}
 
     event_backref_name = 'paper_review_questions'

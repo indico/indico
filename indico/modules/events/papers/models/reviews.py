@@ -45,7 +45,7 @@ class PaperReview(RenderModeMixin, db.Model):
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
 
-    __tablename__ = 'paper_reviews'
+    __tablename__ = 'reviews'
     __table_args__ = (db.UniqueConstraint('revision_id', 'user_id', 'type'),
                       {'schema': 'event_paper_reviewing'})
     TIMELINE_TYPE = 'review'
