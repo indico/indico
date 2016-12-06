@@ -20,12 +20,12 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
 
 
-class AbstractReviewQuestion(ReviewQuestionMixin, db.Model):
-    __tablename__ = 'abstract_review_questions'
-    __table_args__ = {'schema': 'event_abstracts'}
+class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
+    __tablename__ = 'paper_review_questions'
+    __table_args__ = {'schema': 'event_paper_reviewing'}
 
-    rating_class_name = 'AbstractReviewRating'
-    event_backref_name = 'abstract_review_questions'
+    rating_class_name = 'PaperReviewRating'
+    event_backref_name = 'paper_review_questions'
 
     # relationship backrefs:
-    # - ratings (AbstractReviewRating.question)
+    # - ratings (PaperReviewRating.question)
