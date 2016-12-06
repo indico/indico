@@ -17,53 +17,16 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.util.string import format_repr, return_ascii
+from indico.core.db.sqlalchemy.review_ratings import ReviewRatingMixin
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 
 
-class AbstractReviewRating(db.Model):
+class AbstractReviewRating(ReviewRatingMixin, db.Model):
     __tablename__ = 'abstract_review_ratings'
     __table_args__ = (db.UniqueConstraint('review_id', 'question_id'),
                       {'schema': 'event_abstracts'})
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    question_id = db.Column(
-        db.Integer,
-        db.ForeignKey('event_abstracts.abstract_review_questions.id'),
-        index=True,
-        nullable=False
-    )
-    review_id = db.Column(
-        db.Integer,
-        db.ForeignKey('event_abstracts.abstract_reviews.id'),
-        index=True,
-        nullable=False
-    )
-    value = db.Column(
-        db.Integer,
-        nullable=False
-    )
-    question = db.relationship(
-        'AbstractReviewQuestion',
-        lazy=True,
-        backref=db.backref(
-            'ratings',
-            cascade='all, delete-orphan',
-            lazy=True
-        )
-    )
-    review = db.relationship(
-        'AbstractReview',
-        lazy=True,
-        backref=db.backref(
-            'ratings',
-            cascade='all, delete-orphan',
-            lazy=True
-        )
-    )
+    question_class = AbstractReviewQuestion
+    review_class = AbstractReview
 
-    @return_ascii
-    def __repr__(self):
-        return format_repr(self, 'id', 'review_id', 'question_id')
