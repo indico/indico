@@ -17,77 +17,12 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
-from indico.util.string import format_repr, return_ascii
+from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
 
 
-def _get_next_position(context):
-    event_id = context.current_parameters['event_id']
-    res = db.session.query(db.func.max(AbstractReviewQuestion.position)).filter_by(event_id=event_id,
-                                                                                   is_deleted=False).one()
-    return (res[0] or 0) + 1
-
-
-class AbstractReviewQuestion(db.Model):
+class AbstractReviewQuestion(ReviewQuestionMixin, db.Model):
     __tablename__ = 'abstract_review_questions'
     __table_args__ = {'schema': 'event_abstracts'}
 
-    id = db.Column(
-        db.Integer,
-        primary_key=True
-    )
-    event_id = db.Column(
-        db.Integer,
-        db.ForeignKey('events.events.id'),
-        index=True,
-        nullable=False
-    )
-    text = db.Column(
-        db.Text,
-        nullable=False
-    )
-    no_score = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    position = db.Column(
-        db.Integer,
-        nullable=False,
-        default=_get_next_position
-    )
-    is_deleted = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
-    event_new = db.relationship(
-        'Event',
-        lazy=True,
-        backref=db.backref(
-            'abstract_review_questions',
-            primaryjoin='(AbstractReviewQuestion.event_id == Event.id) & ~AbstractReviewQuestion.is_deleted',
-            order_by=position,
-            cascade='all, delete-orphan',
-            lazy=True
-        )
-    )
-
-    # relationship backrefs:
-    # - ratings (AbstractReviewRating.question)
-
-    @return_ascii
-    def __repr__(self):
-        return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.text)
-
-    def get_review_rating(self, review, allow_create=False):
-        """Get the rating given in particular review.
-
-        :param review: the review object
-        :param allow_create: if there is not rating for that review a new one is created
-        """
-        results = [rating for rating in review.ratings if rating.question == self]
-        rating = results[0] if results else None
-        if rating is None and allow_create:
-            rating = AbstractReviewRating(question=self, review=review)
-        return rating
+    rating_class_name = 'AbstractReviewRating'
+    event_backref_name = 'abstract_review_questions'
