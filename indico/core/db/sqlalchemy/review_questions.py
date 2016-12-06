@@ -31,7 +31,6 @@ def _get_next_position(cls):
 
 
 class ReviewQuestionMixin(object):
-
     #: rating class that will be used
     rating_class_name = None
     #: name of backref from event to questions

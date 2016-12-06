@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2016 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -17,15 +17,15 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
+from indico.core.db.sqlalchemy.review_ratings import ReviewRatingMixin
+from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
+from indico.modules.events.papers.models.reviews import PaperReview
 
 
-class AbstractReviewQuestion(ReviewQuestionMixin, db.Model):
-    __tablename__ = 'abstract_review_questions'
-    __table_args__ = {'schema': 'event_abstracts'}
+class PaperReviewRating(ReviewRatingMixin, db.Model):
+    __tablename__ = 'paper_review_ratings'
+    __table_args__ = (db.UniqueConstraint('review_id', 'question_id'),
+                      {'schema': 'event_paper_reviewing'})
 
-    rating_class_name = 'AbstractReviewRating'
-    event_backref_name = 'abstract_review_questions'
-
-    # relationship backrefs:
-    # - ratings (AbstractReviewRating.question)
+    question_class = PaperReviewQuestion
+    review_class = PaperReview
