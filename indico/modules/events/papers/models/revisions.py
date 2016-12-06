@@ -85,6 +85,7 @@ class PaperRevision(db.Model):
     )
 
     # relationship backrefs:
+    # - comments (PaperReviewComment.paper_revision)
     # - files (PaperFile.paper_revision)
     # - reviews (PaperReview.revision)
 
