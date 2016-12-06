@@ -22,7 +22,6 @@ from sqlalchemy.ext.declarative import declared_attr
 
 
 class ReviewRatingMixin(object):
-
     question_class = None
     review_class = None
 
