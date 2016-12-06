@@ -23,7 +23,7 @@ from indico.modules.events.papers.models.reviews import PaperReview
 
 
 class PaperReviewRating(ReviewRatingMixin, db.Model):
-    __tablename__ = 'paper_review_ratings'
+    __tablename__ = 'review_ratings'
     __table_args__ = (db.UniqueConstraint('review_id', 'question_id'),
                       {'schema': 'event_paper_reviewing'})
 
