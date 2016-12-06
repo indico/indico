@@ -1,33 +1,68 @@
 {% extends 'events/papers/management/_base.html' %}
-{% from '_switch.html' import switch %}
 
 {% block content %}
     <div class="action-box">
-        <div class="section highlight">
+        <div class="section semantic-text {{ 'highlight' if event.cfp.content_reviewing_enabled }}">
             <div class="icon icon-file-content"></div>
             <div class="text">
                 <div class="label">{% trans %}Content reviewing{% endtrans %}</div>
-                <!-- TODO: check if enabled -->
-                {%- if true %}
+                {% if event.cfp.content_reviewing_enabled %}
                     {%- trans %}The content reviewing process is enabled{% endtrans -%}
                 {% else %}
                     {%- trans %}The content reviewing process is disabled{% endtrans -%}
                 {% endif -%}
             </div>
-            {{ switch(id='content-review-switch', checked=true, on_label=_('On'), off_label=_('Off')) }}
+            <div class="toolbar">
+                {% if event.cfp.content_reviewing_enabled %}
+                    <a href="#" class="i-button icon-switchoff"
+                       data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
+                       data-method="DELETE"
+                       {% if event.cfp.is_open %}
+                           data-confirm="{% trans %}The reviewing process has started. Are you sure you want to disable the content reviewing process?{% endtrans %}"
+                       {% endif %}
+                       data-reload-after>
+                        {%- trans %}Disable{% endtrans -%}
+                    </a>
+                {% else %}
+                    <a href="#" class="i-button icon-switchon"
+                       data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
+                       data-method="PUT"
+                       data-reload-after>
+                        {%- trans %}Enable{% endtrans -%}
+                    </a>
+                {% endif %}
+            </div>
         </div>
-        <div class="section">
+        <div class="section semantic-text {{ 'highlight' if event.cfp.layout_reviewing_enabled }}">
             <div class="icon icon-layout"></div>
             <div class="text">
                 <div class="label">{% trans %}Layout reviewing{% endtrans %}</div>
-                <!-- TODO: check if enabled -->
-                {%- if false %}
+                {% if event.cfp.layout_reviewing_enabled %}
                     {%- trans %}The layout reviewing process is enabled{% endtrans -%}
                 {% else %}
                     {%- trans %}The layout reviewing process is disabled{% endtrans -%}
                 {% endif -%}
             </div>
-            {{ switch(id='layout-review-switch', checked=false, on_label=_('On'), off_label=_('Off')) }}
+            <div class="toolbar">
+                {% if event.cfp.layout_reviewing_enabled %}
+                    <a href="#" class="i-button icon-switchoff"
+                       data-href="{{ url_for('papers.switch', event, reviewing_type='layout') }}"
+                       data-method="DELETE"
+                       {% if event.cfp.is_open %}
+                           data-confirm="{% trans %}The reviewing process has started. Are you sure you want to disable the layout reviewing process?{% endtrans %}"
+                       {% endif %}
+                       data-reload-after>
+                        {%- trans %}Disable{% endtrans -%}
+                    </a>
+                {% else %}
+                    <a href="#" class="i-button icon-switchon"
+                       data-href="{{ url_for('papers.switch', event, reviewing_type='layout') }}"
+                       data-method="PUT"
+                       data-reload-after>
+                        {%- trans %}Enable{% endtrans -%}
+                    </a>
+                {% endif %}
+            </div>
         </div>
     </div>
 

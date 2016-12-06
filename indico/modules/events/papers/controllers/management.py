@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import session
+from flask import session, request
 
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import PaperManagersForm
+from indico.modules.events.papers.operations import set_reviewing_state
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.util import update_object_principals
 from indico.web.util import jsonify_data, jsonify_form
@@ -51,3 +52,15 @@ class RHManagePaperTeams(RHManagePapersBase):
             logger.info("Paper managers of %r updated by %r", self.event_new, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form)
+
+
+class RHSwitchReviewingType(RHManagePapersBase):
+    """Enable/disable the paper reviewing types"""
+
+    def _process_PUT(self):
+        set_reviewing_state(self.event_new, request.view_args['reviewing_type'], True)
+        return jsonify_data(enabled=True, flash=False)
+
+    def _process_DELETE(self):
+        set_reviewing_state(self.event_new, request.view_args['reviewing_type'], False)
+        return jsonify_data(enabled=False, flash=False)

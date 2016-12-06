@@ -64,7 +64,7 @@ class CallForPapers(object):
     def close(self):
         paper_reviewing_settings.set(self.event, 'end_dt', now_utc(False))
 
-    def toggle_reviewing(self, reviewing_type, enable):
+    def set_reviewing_state(self, reviewing_type, enable):
         if reviewing_type == 'content':
             paper_reviewing_settings.set(self.event, 'content_reviewing_enabled', enable)
         elif reviewing_type == 'layout':
