@@ -86,6 +86,7 @@ class PaperRevision(db.Model):
 
     # relationship backrefs:
     # - files (PaperFile.paper_revision)
+    # - reviews (PaperReview.revision)
 
     @return_ascii
     def __repr__(self):

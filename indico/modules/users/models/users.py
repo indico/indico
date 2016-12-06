@@ -388,6 +388,7 @@ class User(PersonMixin, db.Model):
     # - modified_abstracts (Abstract.modified_by)
     # - oauth_tokens (OAuthToken.user)
     # - owned_rooms (Room.owner)
+    # - paper_reviews (PaperReview.user)
     # - paper_revisions (PaperRevision.submitter)
     # - registrations (Registration.user)
     # - requests_created (Request.created_by_user)

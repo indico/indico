@@ -389,6 +389,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - log_entries (EventLogEntry.event_new)
     # - menu_entries (MenuEntry.event_new)
     # - note (EventNote.linked_event)
+    # - paper_review_questions (PaperReviewQuestion.event_new)
     # - persons (EventPerson.event_new)
     # - registration_forms (RegistrationForm.event_new)
     # - registrations (Registration.event_new)
