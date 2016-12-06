@@ -30,7 +30,7 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
-_bp.add_url_rule('/manage/papers/managers', 'manage_paper_managers', management.RHManagePaperManagers,
+_bp.add_url_rule('/manage/papers/teams', 'manage_teams', management.RHManagePaperTeams,
                  methods=('GET', 'POST'))
 
 # URLs available in both management and display areas

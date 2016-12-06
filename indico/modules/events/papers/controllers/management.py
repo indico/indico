@@ -39,7 +39,7 @@ class RHPapersDashboard(RHManagePapersBase):
             return WPManagePapers.render_template('management/overview.html', self._conf, event=self.event_new)
 
 
-class RHManagePaperManagers(RHManagePapersBase):
+class RHManagePaperTeams(RHManagePapersBase):
     """Modify managers of the papers module"""
 
     def _process(self):
