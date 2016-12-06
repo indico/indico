@@ -31,8 +31,6 @@ def _get_next_position(cls):
 
 
 class ReviewQuestionMixin(object):
-    #: rating class that will be used
-    rating_class_name = None
     #: name of backref from event to questions
     event_backref_name = None
 
@@ -110,5 +108,6 @@ class ReviewQuestionMixin(object):
         results = [rating for rating in review.ratings if rating.question == self]
         rating = results[0] if results else None
         if rating is None and allow_create:
-            rating = getattr(db.m, self.rating_class_name)(question=self, review=review)
+            rating_class = type(self).ratings.prop.mapper.class_
+            rating = rating_class(question=self, review=review)
         return rating
