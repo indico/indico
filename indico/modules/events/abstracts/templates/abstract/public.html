@@ -1,4 +1,5 @@
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_track, render_tracks %}
+{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_track, render_tracks,
+                                                        render_user_avatar %}
 
 
 {% macro render_abstract_info(abstract) %}
@@ -120,9 +121,7 @@
 
         <div class="i-timeline">
             <div class="i-timeline-item">
-                <div class="i-timeline-item-label action" style="{{ abstract.submitter.avatar_css }}">
-                    {{- abstract.submitter.name[0] -}}
-                </div>
+                {{ render_user_avatar(abstract.submitter) }}
                 <div class="i-timeline-item-box header-indicator-left">
                     <div class="i-box-header">
                         {% trans name=abstract.submitter.name -%}
@@ -152,9 +151,7 @@
 
 {% macro render_abstract_judgment(abstract) %}
     <div class="i-timeline-item">
-        <div class="i-timeline-item-label action" style="{{ abstract.judge.avatar_css }}">
-            {{- abstract.judge.name[0] -}}
-        </div>
+        {{ render_user_avatar(abstract.judge) }}
         <div class="i-timeline-item-box header-indicator-left">
             <div class="i-box-header flexrow">
                 <div class="f-self-stretch">

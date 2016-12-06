@@ -55,19 +55,12 @@
         z-index: 1;
     }
 
-    .i-timeline-item-label {
-        color: rgba(#fff, 0.8);
-
-        &:not(.square) {
-            font-size: 1.65em;
-            border-radius: 50%;
-        }
+    textarea {
+        width: 100% !important;
     }
 }
 
 .abstract-title {
-    margin-right: 0.5em;
-
     h3 {
         color: $blue !important;
         font-size: 1.4em;
@@ -152,12 +145,6 @@
 
     &:hover {
         color: $dark-gray;
-    }
-}
-
-.abstract-timeline {
-    textarea {
-        width: 100%;
     }
 }
 

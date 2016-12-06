@@ -101,7 +101,7 @@
 
     .i-timeline-item-metadata {
         @extend %time-information;
-        @extend .flexrow;
+        display: flex;
         align-items: center;
         color: $light-black;
         // Matches .i-timeline-item-label height
@@ -113,7 +113,7 @@
 
 .i-timeline-item-label.action {
     @extend %semantic-background;
-    @extend .flexcol;
+    display: flex;
     color: white;
     background: $dark-gray;
     // Icon centering
@@ -123,6 +123,15 @@
     &::before {
         font-size: 2em;
     }
+}
+
+.i-timeline-item-label.avatar-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(#fff, 0.9);
+    font-size: 1.65em;
+    border-radius: 50%;
 }
 
 .i-timeline-separator {

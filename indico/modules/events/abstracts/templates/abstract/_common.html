@@ -72,8 +72,8 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_user_icon(user, classes=none) %}
-    <div class="i-timeline-item-label action {{ classes }}" style="{{ user.avatar_css }}">
+{% macro render_user_avatar(user) %}
+    <div class="i-timeline-item-label avatar-placeholder" style="{{ user.avatar_css }}">
         {{- user.name[0] -}}
     </div>
 {% endmacro %}
