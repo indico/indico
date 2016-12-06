@@ -24,7 +24,6 @@ class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
     __tablename__ = 'paper_review_questions'
     __table_args__ = {'schema': 'event_paper_reviewing'}
 
-    rating_class_name = 'PaperReviewRating'
     event_backref_name = 'paper_review_questions'
 
     # relationship backrefs:
