@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request
+from flask import session, request, render_template
 
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
@@ -25,6 +25,13 @@ from indico.modules.events.papers.operations import set_reviewing_state
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.util import update_object_principals
 from indico.web.util import jsonify_data, jsonify_form
+
+
+def _render_paper_dashboard(event, view_class=None):
+    if view_class:
+        return view_class.render_template('management/overview.html', event.as_legacy, event=event)
+    else:
+        return render_template('events/papers/management/overview.html', event=event)
 
 
 class RHPapersDashboard(RHManagePapersBase):
@@ -37,7 +44,7 @@ class RHPapersDashboard(RHManagePapersBase):
         if not self.event_new.has_feature('papers'):
             return WPManagePapers.render_template('management/disabled.html', self._conf, event=self.event_new)
         else:
-            return WPManagePapers.render_template('management/overview.html', self._conf, event=self.event_new)
+            return _render_paper_dashboard(self.event_new, view_class=WPManagePapers)
 
 
 class RHManagePaperTeams(RHManagePapersBase):
@@ -59,8 +66,8 @@ class RHSwitchReviewingType(RHManagePapersBase):
 
     def _process_PUT(self):
         set_reviewing_state(self.event_new, request.view_args['reviewing_type'], True)
-        return jsonify_data(enabled=True, flash=False)
+        return jsonify_data(flash=False, html=_render_paper_dashboard(self.event_new))
 
     def _process_DELETE(self):
         set_reviewing_state(self.event_new, request.view_args['reviewing_type'], False)
-        return jsonify_data(enabled=False, flash=False)
+        return jsonify_data(flash=False, html=_render_paper_dashboard(self.event_new))
