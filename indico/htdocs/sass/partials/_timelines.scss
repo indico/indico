@@ -17,10 +17,12 @@
 
 %time-information {
     time {
-        &:before {
-            content: '\00B7\00a0';  // bullet+nbsp
-        }
         color: $gray;
+
+        &::before {
+            // bullet+nbsp
+            content: '\00B7\00a0';
+        }
     }
 }
 
@@ -34,9 +36,9 @@
         margin-left: 51px;
     }
 
-    .with-line:before {
+    .with-line::before {
         background-color: $pastel-gray;
-        content: "";
+        content: '';
         position: absolute;
         top: 0;
         bottom: 0;
@@ -48,9 +50,9 @@
 }
 
 .i-timeline-item {
+    @extend .flexrow;
     $min-height: 19px;
 
-    @extend .flexrow;
     align-items: start;
     margin-top: 1rem;
 
@@ -111,14 +113,14 @@
 
 .i-timeline-item-label.action {
     @extend %semantic-background;
+    @extend .flexcol;
     color: white;
     background: $dark-gray;
     // Icon centering
-    @extend .flexcol;
     align-items: center;
     justify-content: center;
 
-    &:before {
+    &::before {
         font-size: 2em;
     }
 }
