@@ -9,6 +9,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.modules.events.papers.models.reviews import PaperReviewType, PaperAction
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 
 
@@ -47,7 +48,53 @@ def upgrade():
         schema='event_paper_reviewing'
     )
 
+    op.create_table(
+        'paper_review_questions',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('text', sa.Text(), nullable=False),
+        sa.Column('no_score', sa.Boolean(), nullable=False),
+        sa.Column('position', sa.Integer(), nullable=False),
+        sa.Column('is_deleted', sa.Boolean(), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='event_paper_reviewing'
+    )
+
+    op.create_table(
+        'paper_reviews',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('revision_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('user_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('created_dt', UTCDateTime, nullable=False),
+        sa.Column('modified_dt', UTCDateTime, nullable=True),
+        sa.Column('comment', sa.Text(), nullable=False),
+        sa.Column('type', PyIntEnum(PaperReviewType), nullable=False),
+        sa.Column('proposed_action', PyIntEnum(PaperAction), nullable=False),
+        sa.ForeignKeyConstraint(['revision_id'], ['event_paper_reviewing.revisions.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('revision_id', 'user_id', 'type'),
+        schema='event_paper_reviewing'
+    )
+
+    op.create_table(
+        'paper_review_ratings',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('question_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('review_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('value', sa.Integer(), nullable=False),
+        sa.ForeignKeyConstraint(['question_id'], ['event_paper_reviewing.paper_review_questions.id']),
+        sa.ForeignKeyConstraint(['review_id'], ['event_paper_reviewing.paper_reviews.id']),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('review_id', 'question_id'),
+        schema='event_paper_reviewing'
+    )
+
 
 def downgrade():
     op.drop_table('files', schema='event_paper_reviewing')
+    op.drop_table('paper_review_ratings', schema='event_paper_reviewing')
+    op.drop_table('paper_review_questions', schema='event_paper_reviewing')
+    op.drop_table('paper_reviews', schema='event_paper_reviewing')
     op.drop_table('revisions', schema='event_paper_reviewing')
