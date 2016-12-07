@@ -16,9 +16,14 @@
 
 from __future__ import unicode_literals
 
+from datetime import time
+
+from wtforms.validators import Optional
+
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalListField, IndicoTagListField
+from indico.web.forms.fields import PrincipalListField, IndicoDateTimeField, IndicoTagListField
+from indico.web.forms.validators import LinkedDateTime
 
 
 def make_competences_form(event):
@@ -49,3 +54,14 @@ class PaperTeamsForm(IndicoForm):
             del self.content_reviewers
         if not self.event.cfp.layout_reviewing_enabled:
             del self.layout_reviewers
+
+
+class PapersScheduleForm(IndicoForm):
+    start_dt = IndicoDateTimeField(_("Start"), [Optional()], default_time=time(0, 0),
+                                   description=_("The moment users can start submitting papers"))
+    end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
+                                 description=_("The moment the submission process ends"))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(PapersScheduleForm, self).__init__(*args, **kwargs)

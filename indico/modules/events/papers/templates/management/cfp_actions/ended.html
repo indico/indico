@@ -1,0 +1,24 @@
+{% extends 'events/papers/management/cfp_actions/_base.html' %}
+
+{% block label %}
+    {%- trans %}The call for papers is closed{% endtrans -%}
+{% endblock %}
+
+{% block text %}
+    {% set tz = event.timezone %}
+    {% trans date=cfp.end_dt|format_date(timezone=tz), time=cfp.end_dt|format_time(timezone=tz) -%}
+        Closed on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }}).
+    {%- endtrans %}
+{% endblock %}
+
+{% block buttons %}
+    {{ super() }}
+    <a href="#" class="i-button"
+       data-href="{{ url_for('.open_cfp', event) }}"
+       data-method="POST"
+       data-update="#paper-page"
+       data-confirm="{% trans %}The call for papers is already finished. Do you want to open it again?{% endtrans %}"
+       data-replace-update>
+        {%- trans %}Reopen now{% endtrans -%}
+    </a>
+{% endblock %}

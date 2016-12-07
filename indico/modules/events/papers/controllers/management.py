@@ -19,10 +19,12 @@ from __future__ import unicode_literals
 from flask import request, render_template, flash
 
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.forms import PaperTeamsForm, make_competences_form
+from indico.modules.events.papers.forms import PaperTeamsForm, make_competences_form, PapersScheduleForm
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
                                                      update_competences)
+from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
+from indico.modules.events.papers.operations import schedule_cfp, open_cfp, close_cfp
 from indico.modules.users.models.users import User
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
@@ -111,3 +113,36 @@ class RHManageCompetences(RHManagePapersBase):
             return jsonify_data()
         return WPManagePapers.render_template('management/competences.html', self._conf, event=self.event_new,
                                               form=form)
+
+
+class RHScheduleCFP(RHManagePapersBase):
+    def _process(self):
+        form = PapersScheduleForm(obj=FormDefaults(**paper_reviewing_settings.get_all(self.event_new)),
+                                  event=self.event_new)
+        if form.validate_on_submit():
+            rescheduled = self.event_new.cfp.start_dt is not None
+            schedule_cfp(self.event_new, **form.data)
+            if rescheduled:
+                flash(_("Call for papers has been rescheduled"), 'success')
+            else:
+                flash(_("Call for papers has been scheduled"), 'success')
+            return jsonify_data(html=_render_paper_dashboard(self.event_new))
+        return jsonify_form(form)
+
+
+class RHOpenCFP(RHManagePapersBase):
+    """Open the call for papers"""
+
+    def _process(self):
+        open_cfp(self.event_new)
+        flash(_("Call for papers is now open"), 'success')
+        return jsonify_data(html=_render_paper_dashboard(self.event_new))
+
+
+class RHCloseCFP(RHManagePapersBase):
+    """Close the call for papers"""
+
+    def _process(self):
+        close_cfp(self.event_new)
+        flash(_("Call for papers is now closed"), 'success')
+        return jsonify_data(html=_render_paper_dashboard(self.event_new))
