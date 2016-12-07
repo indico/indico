@@ -69,3 +69,30 @@ class CallForPapers(object):
             paper_reviewing_settings.set(self.event, 'content_reviewing_enabled', enable)
         elif reviewing_type == 'layout':
             paper_reviewing_settings.set(self.event, 'layout_reviewing_enabled', enable)
+
+    @property
+    def managers(self):
+        return {p.principal for p in self.event.acl_entries if p.has_management_role('paper_manager')}
+
+    @property
+    def judges(self):
+        return {p.principal for p in self.event.acl_entries if p.has_management_role('paper_judge', explicit=True)}
+
+    @property
+    def content_reviewers(self):
+        return {p.principal for p in self.event.acl_entries
+                if p.has_management_role('paper_content_reviewer', explicit=True)}
+
+    @property
+    def layout_reviewers(self):
+        return {p.principal for p in self.event.acl_entries
+                if p.has_management_role('paper_layout_reviewer', explicit=True)}
+
+    @property
+    def acl_entries(self):
+        principals = self.managers | self.judges
+        if self.content_reviewing_enabled:
+            principals = principals | self.content_reviewers
+        if self.layout_reviewing_enabled:
+            principals = principals | self.layout_reviewers
+        return principals
