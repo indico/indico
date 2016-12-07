@@ -126,9 +126,6 @@ class WPContributionModifBase(WPConferenceModifBase):
     def getCSSFiles(self):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls()
 
-    def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['contributions_js'].urls()
-
 
 class WPContributionReviewing( WPContributionModifBase ):
 

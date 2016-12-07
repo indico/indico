@@ -350,7 +350,6 @@ jqplot_css = Bundle(
 )
 
 mathjax_js = rjs_bundle('mathjax', 'js/lib/mathjax/MathJax.js', 'js/custom/pagedown_mathjax.js')
-contributions_js = rjs_bundle('contributions', 'js/indico/Display/contributions.js')
 
 markdown_js = rjs_bundle(
     'markdown',
@@ -479,7 +478,6 @@ def register_all_js(env):
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('statistics_js', statistics_js)
-    env.register('contributions_js', contributions_js)
     env.register('mathjax_js', mathjax_js)
     env.register('markdown_js', markdown_js)
     env.register('jqplot_js', jqplot_js)
