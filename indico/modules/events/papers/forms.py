@@ -21,6 +21,22 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import PrincipalListField
 
 
-class PaperManagersForm(IndicoForm):
+class PaperTeamsForm(IndicoForm):
     managers = PrincipalListField(_('Paper managers'), groups=True,
                                   description=_('List of users allowed to manage the call for papers'))
+    judges = PrincipalListField(_('Judges'),
+                                description=_('List of users allowed to judge a paper reviewing process'))
+    content_reviewers = PrincipalListField(_('Content reviewers'),
+                                           description=_('List of users allowed to review the content of the assigned '
+                                                         'papers'))
+    layout_reviewers = PrincipalListField(_('Layout reviewers'),
+                                          description=_('List of users allowed to review the layout of the assigned '
+                                                        'papers'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(PaperTeamsForm, self).__init__(*args, **kwargs)
+        if not self.event.cfp.content_reviewing_enabled:
+            del self.content_reviewers
+        if not self.event.cfp.layout_reviewing_enabled:
+            del self.layout_reviewers
