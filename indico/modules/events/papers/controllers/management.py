@@ -16,14 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request, render_template
+from flask import request, render_template, flash
 
-from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.forms import PaperManagersForm
-from indico.modules.events.papers.operations import set_reviewing_state
+from indico.modules.events.papers.forms import PaperTeamsForm
+from indico.modules.events.papers.operations import set_reviewing_state, update_team_members
 from indico.modules.events.papers.views import WPManagePapers
-from indico.modules.events.util import update_object_principals
+from indico.util.i18n import _
 from indico.web.util import jsonify_data, jsonify_form
 
 
@@ -51,13 +50,27 @@ class RHManagePaperTeams(RHManagePapersBase):
     """Modify managers of the papers module"""
 
     def _process(self):
-        managers = {p.principal for p in self.event_new.acl_entries
-                    if p.has_management_role('paper_manager', explicit=True)}
-        form = PaperManagersForm(managers=managers)
+        cfp = self.event_new.cfp
+        form_data = {
+            'managers': cfp.managers,
+            'judges': cfp.judges,
+            'content_reviewers': cfp.content_reviewers,
+            'layout_reviewers': cfp.layout_reviewers
+        }
+
+        form = PaperTeamsForm(event=self.event_new, **form_data)
         if form.validate_on_submit():
-            update_object_principals(self.event_new, form.managers.data, role='paper_manager')
-            logger.info("Paper managers of %r updated by %r", self.event_new, session.user)
-            return jsonify_data(flash=False)
+            teams = {
+                'managers': form.managers.data,
+                'judges': form.judges.data
+            }
+            if cfp.content_reviewing_enabled:
+                teams['content_reviewers'] = form.content_reviewers.data
+            if cfp.layout_reviewing_enabled:
+                teams['layout_reviewers'] = form.layout_reviewers.data
+            update_team_members(self.event_new, **teams)
+            flash(_("The members of the teams were updated successfully"), 'success')
+            return jsonify_data()
         return jsonify_form(form)
 
 
