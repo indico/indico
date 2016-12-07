@@ -16,9 +16,11 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
+from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
 
 
@@ -89,10 +91,19 @@ class CallForPapers(object):
                 if p.has_management_role('paper_layout_reviewer', explicit=True)}
 
     @property
-    def acl_entries(self):
-        principals = self.managers | self.judges
+    def assignees(self):
+        users = set(self.judges)
         if self.content_reviewing_enabled:
-            principals = principals | self.content_reviewers
+            users |= self.content_reviewers
         if self.layout_reviewing_enabled:
-            principals = principals | self.layout_reviewers
-        return principals
+            users |= self.layout_reviewers
+        return users
+
+    @property
+    @memoize_request
+    def user_competences(self):
+        user_ids = {user.id for user in self.event.cfp.assignees}
+        user_competences = (PaperCompetence.query.with_parent(self.event)
+                            .filter(PaperCompetence.user_id.in_(user_ids))
+                            .all())
+        return {competences.user_id: competences for competences in user_competences}

@@ -18,7 +18,16 @@ from __future__ import unicode_literals
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalListField
+from indico.web.forms.fields import PrincipalListField, IndicoTagListField
+
+
+def make_competences_form(event):
+    form_class = type(b'PaperCompetencesForm', (IndicoForm,), {})
+    for entry in event.cfp.assignees:
+        name = 'competences_{}'.format(entry.id)
+        field = IndicoTagListField('Competences')
+        setattr(form_class, name, field)
+    return form_class
 
 
 class PaperTeamsForm(IndicoForm):

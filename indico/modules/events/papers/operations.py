@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from flask import session
 
-from indico.modules.events.papers import logger
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.util import update_object_principals
+from indico.modules.events.papers import logger
+from indico.modules.events.papers.models.competences import PaperCompetence
 
 
 def set_reviewing_state(event, reviewing_type, enable):
@@ -39,3 +40,20 @@ def update_team_members(event, managers, judges, content_reviewers, layout_revie
     if layout_reviewers:
         update_object_principals(event, layout_reviewers, role='paper_layout_reviewer')
     logger.info("Paper teams of %r updated by %r", event, session.user)
+
+
+def create_competences(event, user, competences):
+    PaperCompetence(event_new=event, user=user, competences=competences)
+    logger.info("Competences for user %r for event %r created by %r", user, event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+              "Added competences of {}".format(user.full_name), session.user,
+              data={'Competences': ', '.join(competences)})
+
+
+def update_competences(user_competences, competences):
+    event = user_competences.event_new
+    user_competences.competences = competences
+    logger.info("Competences for user %r in event %r updated by %r", user_competences.user, event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+              "Updated competences for user {}".format(user_competences.user.full_name), session.user,
+              data={'Competences': ', '.join(competences)})
