@@ -295,6 +295,42 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         viewonly=True,
         primaryjoin='(PaperFile.contribution_id == Contribution.id) & (PaperFile.revision_id.is_(None))',
     )
+    #: Paper reviewing judges
+    paper_judges = db.relationship(
+        'User',
+        secondary='event_paper_reviewing.judges',
+        collection_class=set,
+        lazy=True,
+        backref=db.backref(
+            'judge_for_contributions',
+            collection_class=set,
+            lazy=True
+        )
+    )
+    #: Paper content reviewers
+    paper_content_reviewers = db.relationship(
+        'User',
+        secondary='event_paper_reviewing.content_reviewers',
+        collection_class=set,
+        lazy=True,
+        backref=db.backref(
+            'content_reviewer_for_contributions',
+            collection_class=set,
+            lazy=True
+        )
+    )
+    #: Paper layout reviewers
+    paper_layout_reviewers = db.relationship(
+        'User',
+        secondary='event_paper_reviewing.layout_reviewers',
+        collection_class=set,
+        lazy=True,
+        backref=db.backref(
+            'layout_reviewer_for_contributions',
+            collection_class=set,
+            lazy=True
+        )
+    )
 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.contribution)
