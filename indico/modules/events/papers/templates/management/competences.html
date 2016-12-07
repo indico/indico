@@ -1,0 +1,35 @@
+{% extends 'layout/dialog_base.html' %}
+{% from 'forms/_form.html' import form_header, form_field, form_footer %}
+
+{% block dialog_id %}competences-dialog{% endblock %}
+
+{% block description %}
+    {%- trans -%}
+        Defining competences to the members of the teams may be helpful for the managers and judges during the paper
+        assignment process.
+    {%- endtrans -%}
+{%- endblock %}
+
+{% block content -%}
+    {{ form_header(form) }}
+    <table class="i-table-widget">
+        <thead>
+            <tr>
+                <th class="name-column">{% trans %}Name{% endtrans %}</th>
+                <th>{% trans %}Competences{% endtrans %}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for entry in event.cfp.assignees|sort(attribute='full_name') %}
+                <tr>
+                    <td class="icon-user competences-user">{{ entry.full_name }}</td>
+                    <td>{{ form['competences_{}'.format(entry.id)] }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% call form_footer(form, align_right=true) %}
+        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+        <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+    {% endcall %}
+{%- endblock %}

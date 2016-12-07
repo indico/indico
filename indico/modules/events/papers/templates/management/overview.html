@@ -96,7 +96,10 @@
                    data-ajax-dialog>
                     {%- trans %}Teams{% endtrans -%}
                 </a>
-                <a class="i-button icon-settings" href="#">
+                <a class="i-button icon-settings" href="#"
+                   data-href="{{ url_for('.manage_competences', event) }}"
+                   data-title="{% trans %}Competences{% endtrans %}"
+                   data-ajax-dialog>
                     {%- trans %}Competences{% endtrans -%}
                 </a>
             </div>
