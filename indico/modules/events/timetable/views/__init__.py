@@ -25,7 +25,6 @@ from pytz import timezone
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
-from indico.modules.events.contributions import Contribution
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
@@ -52,10 +51,6 @@ class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
         return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls() +
                 self._asset_env['modules_contributions_js'].urls())
 
-    def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) + self._asset_env['timetable_sass'].urls() +
-                self._asset_env['contributions_sass'].urls())
-
 
 class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/timetable/'
@@ -66,9 +61,6 @@ class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
-
-    def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['timetable_sass'].urls()
 
 
 @template_hook('meeting-body')

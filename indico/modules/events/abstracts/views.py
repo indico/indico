@@ -43,12 +43,7 @@ class WPManageAbstracts(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
                 self._asset_env['modules_abstracts_js'].urls())
 
     def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) +
-                self._asset_env['markdown_sass'].urls() +
-                self._asset_env['selectize_css'].urls() +
-                self._asset_env['reviewing_sass'].urls() +
-                self._asset_env['abstracts_sass'].urls() +
-                self._asset_env['contributions_sass'].urls())
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def _getHeadContent(self):
         return WPConferenceModifBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
@@ -65,13 +60,7 @@ class WPDisplayAbstractsBase(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDis
                 self._asset_env['modules_abstracts_js'].urls())
 
     def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) +
-                self._asset_env['markdown_sass'].urls() +
-                self._asset_env['selectize_css'].urls() +
-                self._asset_env['abstracts_sass'].urls() +
-                self._asset_env['reviewing_sass'].urls() +
-                self._asset_env['event_display_sass'].urls() +
-                self._asset_env['contributions_sass'].urls())
+        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
@@ -96,11 +85,6 @@ class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
     def getJSFiles(self):
         return (WPDisplayAbstracts.getJSFiles(self) +
                 self._asset_env['modules_event_management_js'].urls())
-
-    def getCSSFiles(self):
-        return (WPDisplayAbstracts.getCSSFiles(self) +
-                self._asset_env['event_display_sass'].urls() +
-                self._asset_env['tracks_sass'].urls())
 
 
 def render_abstract_page(abstract, view_class=None, management=False):

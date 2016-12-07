@@ -139,9 +139,7 @@ class WPBase:
     def getCSSFiles(self):
         return (self._asset_env['base_css'].urls() +
                 self._asset_env['dropzone_css'].urls() +
-                self._asset_env['screen_sass'].urls() +
-                self._asset_env['attachments_sass'].urls() +
-                self._asset_env['users_sass'].urls())
+                self._asset_env['screen_sass'].urls())
 
     def get_extra_css_files(self):
         """Return CSS urls that will be included after all other CSS"""

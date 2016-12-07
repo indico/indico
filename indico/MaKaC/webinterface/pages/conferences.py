@@ -334,11 +334,6 @@ class WConfDetails:
 class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
     menu_entry_name = 'overview'
 
-    def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self)
-                + self._asset_env['eventservices_sass'].urls()
-                + self._asset_env['event_display_sass'].urls())
-
     def _getBody(self, params):
 
         wc = WConfDetails(self._getAW(), self._conf)
@@ -527,11 +522,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
     def getCSSFiles(self):
         theme_sass = self._asset_env['themes_{}_sass'.format(self.theme_id)].urls() if self.theme['stylesheet'] else []
-
-        return (WPConferenceBase.getCSSFiles(self) +
-                self._asset_env['eventservices_sass'].urls() +
-                self._asset_env['contributions_sass'].urls() +
-                self._asset_env['event_display_sass'].urls() + theme_sass)
+        return WPConferenceBase.getCSSFiles(self) + theme_sass
 
     def getJSFiles(self):
         modules = WPConferenceBase.getJSFiles(self)
@@ -599,9 +590,6 @@ class WPConferenceModifBase(main.WPMainBase):
                 self._includeJSPackage('Management') +
                 self._includeJSPackage('MaterialEditor') +
                 self._asset_env['modules_event_management_js'].urls())
-
-    def getCSSFiles(self):
-        return main.WPMainBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
     def _getSiteArea(self):
         return "ModificationArea"

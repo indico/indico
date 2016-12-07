@@ -54,11 +54,6 @@ class WPUser(WPJinjaMixin, WPMainBase):
         return self._getPageContent(params)
 
 
-class WPUserDashboard(WPUser):
-    def getCSSFiles(self):
-        return WPUser.getCSSFiles(self) + self._asset_env['dashboard_sass'].urls()
-
-
 class WPUsersAdmin(WPJinjaMixin, WPAdminsBase):
     sidemenu_option = 'users'
     template_prefix = 'users/'
