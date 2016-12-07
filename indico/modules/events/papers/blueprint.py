@@ -30,7 +30,9 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
-_bp.add_url_rule('/manage/papers/teams', 'manage_teams', management.RHManagePaperTeams,
+_bp.add_url_rule('/manage/papers/teams/', 'manage_teams', management.RHManagePaperTeams,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/teams/competences', 'manage_competences', management.RHManageCompetences,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/enable/<any(content,layout):reviewing_type>', 'switch',
                  management.RHSwitchReviewingType, methods=('PUT', 'DELETE'))

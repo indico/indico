@@ -15,3 +15,29 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import base;
+
+#competences-dialog {
+    width: 100%;
+
+    .form-group-footer .form-field {
+        margin-top: 1rem;
+    }
+
+    .i-taglist-field {
+        width: auto;
+    }
+
+    .name-column {
+        width: 15rem;
+    }
+
+    .competences-user {
+        color: $light-black;
+
+        &::before {
+            margin-right: 5px;
+            color: $dark-gray;
+        }
+    }
+}
