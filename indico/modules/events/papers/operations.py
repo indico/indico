@@ -57,3 +57,27 @@ def update_competences(user_competences, competences):
     event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
               "Updated competences for user {}".format(user_competences.user.full_name), session.user,
               data={'Competences': ', '.join(competences)})
+
+
+def schedule_cfp(event, start_dt, end_dt):
+    event.cfp.schedule(start_dt, end_dt)
+    log_data = {}
+    if start_dt:
+        log_data['Start'] = start_dt.isoformat()
+    if end_dt:
+        log_data['End'] = end_dt.isoformat()
+    logger.info("Call for papers for %r scheduled by %r", event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.change, 'Papers', 'Call for papers scheduled', session.user,
+              data=log_data)
+
+
+def open_cfp(event):
+    event.cfp.open()
+    logger.info("Call for papers for %r opened by %r", event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.positive, 'Papers', 'Call for papers opened', session.user)
+
+
+def close_cfp(event):
+    event.cfp.close()
+    logger.info("Call for papers for %r closed by %r", event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.negative, 'Papers', 'Call for papers closed', session.user)

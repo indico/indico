@@ -1,0 +1,25 @@
+{% extends '_module_actions_base.html' %}
+
+{% block icon_classes %}icon-file{% endblock %}
+
+{% block buttons %}
+    {% set title -%}
+        {% if cfp.start_dt -%}
+            {% trans %}Reschedule call for papers{% endtrans -%}
+        {% else -%}
+            {% trans %}Schedule call for papers{% endtrans -%}
+        {% endif -%}
+    {% endset -%}
+        <a href="#" class="i-button icon-time"
+           data-href="{{ url_for('.schedule_cfp', event) }}"
+           data-title="{{ title }}"
+           data-update="#paper-page"
+           data-replace-update
+           data-ajax-dialog>
+            {% if cfp.start_dt %}
+                {% trans %}Reschedule{% endtrans %}
+            {% else %}
+                {% trans %}Schedule{% endtrans %}
+            {% endif %}
+        </a>
+{% endblock %}
