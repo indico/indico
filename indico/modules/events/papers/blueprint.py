@@ -37,6 +37,12 @@ _bp.add_url_rule('/manage/papers/teams/competences', 'manage_competences', manag
 _bp.add_url_rule('/manage/papers/enable/<any(content,layout):reviewing_type>', 'switch',
                  management.RHSwitchReviewingType, methods=('PUT', 'DELETE'))
 
+# CFP scheduling
+_bp.add_url_rule('/manage/papers/schedule', 'schedule_cfp', management.RHScheduleCFP,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/open', 'open_cfp', management.RHOpenCFP, methods=('POST',))
+_bp.add_url_rule('/manage/papers/close', 'close_cfp', management.RHCloseCFP, methods=('POST',))
+
 # URLs available in both management and display areas
 # Note: When adding a new one here make sure to specify `defaults=defaults`
 #       for each rule. Otherwise you may not get the correct one.

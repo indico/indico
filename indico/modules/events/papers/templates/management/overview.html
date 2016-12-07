@@ -1,6 +1,15 @@
 {% extends 'events/papers/management/_base.html' %}
 
 {% block content %}
+    {% set cfp = event.cfp %}
+    {% if not cfp.has_started %}
+        {% include 'events/papers/management/cfp_actions/not_started.html' %}
+    {% elif cfp.has_started and not cfp.has_ended %}
+        {% include 'events/papers/management/cfp_actions/open.html' %}
+    {% elif cfp.has_ended %}
+        {% include 'events/papers/management/cfp_actions/ended.html' %}
+    {% endif %}
+
     <div class="action-box">
         <div class="section semantic-text {{ 'highlight' if event.cfp.content_reviewing_enabled }}">
             <div class="icon icon-file-content"></div>
