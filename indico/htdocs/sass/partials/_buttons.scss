@@ -225,9 +225,10 @@ $i-button-spacing: 0.3rem;
 }
 
 // Fix for Firefox
-button.i-button {
+button.i-button,
+input.i-button[type="submit"] {
     line-height: 1em;
-    display: initial;
+    display: inline-block;
 
     &[class*="icon-"] {
         &:before {
