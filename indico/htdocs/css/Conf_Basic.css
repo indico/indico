@@ -154,15 +154,9 @@ div.datePlace > div.timezone {
 	text-align:left;
 }
 
-.menuConfTitle > a {
+.menuConfTitle a {
     color: #275C86;
     padding: 7px 12px;
-}
-
-a.confSection:visited {
-}
-
-a.confSection:link {
 }
 
 	/* sub menu item */

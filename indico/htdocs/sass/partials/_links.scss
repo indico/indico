@@ -15,17 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-a:link,
-a:visited {
-    text-decoration: none;
-}
-
-a:not(.i-link):not(.i-button) {
+a {
     color: $blue;
 
     &:hover {
         color: $orange;
         cursor: pointer;
+    }
+
+    &:link,
+    &:visited {
+        text-decoration: none;
     }
 }
 
