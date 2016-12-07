@@ -15,9 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-
-
 @mixin user-action($color, $final-color:$color) {
     @extend %user-action-button;
     color: $color;
@@ -70,7 +67,6 @@
 
 .event-user {
     @include border-radius();
-    @include border-all();
     @include icon-before('icon-user');
 
     display: inline-block;
@@ -260,7 +256,7 @@
 
         table-layout: fixed;
     }
-    .category-info,
+    .category-box-info,
     .category-action {
         position: relative;
 
@@ -271,14 +267,14 @@
 
         vertical-align: middle;
     }
-    .category-info {
-        .category-title,
+    .category-box-info {
+        .category-box-title,
         .category-path {
             @include ellipsis;
 
             display: block;
         }
-        .category-title {
+        .category-box-title {
             font-size: 1em;
             font-weight: bold;
         }

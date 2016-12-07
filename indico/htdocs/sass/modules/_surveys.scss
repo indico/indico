@@ -15,12 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
-@import 'base';
-@import 'compass';
-@import 'partials/_boxes';
-
-
 %survey-results-text-box {
     @include border-radius();
     background: $light-gray;

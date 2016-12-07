@@ -15,14 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-
 $result-group-padding: 1rem;
 $result-group-header-padding: 0.55rem;
-
-body {
-    background: $light-gray;
-}
 
 %content-fit-cell {
     width: 1%;
@@ -106,6 +100,10 @@ body {
 
         td.entry-type {
             @extend %content-fit-cell;
+
+            img {
+                max-height: 2em;
+            }
         }
 
         td.entry-location {
@@ -123,21 +121,6 @@ body {
                 color: $gray;
                 font-style: italic;
             }
-        }
-    }
-}
-
-
-// ============================================================================
-// Module-specific
-// ============================================================================
-
-// TODO to be moved under indico.modules.<module>
-
-.overview-results {
-    td.entry-type {
-        img {
-            max-height: 2em;
         }
     }
 }

@@ -15,13 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "base";
-
-@import "partials/_jquery-indico-clearableinput";
-@import "roombooking/bars";
-@import "roombooking/breadcrumbs";
-@import "roombooking/calendar";
-@import "roombooking/roomselector";
+@import 'roombooking/bars';
+@import 'roombooking/breadcrumbs';
+@import 'roombooking/calendar';
+@import 'roombooking/roomselector';
 
 #searchBookings {
     width: 615px;

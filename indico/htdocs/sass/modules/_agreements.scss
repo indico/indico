@@ -15,9 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'partials/boxes';
-
 .agreement-form-sections {
     @extend .i-box-group;
     @extend .i-box-group.vert;

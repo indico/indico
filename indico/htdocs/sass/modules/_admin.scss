@@ -15,10 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'compass';
-@import 'partials/icons';
-
 .code {
     @include border-radius();
     border: 1px solid $gray;
@@ -38,7 +34,7 @@
 }
 
 .tasks .i-label {
-     width: 100%;
+    width: 100%;
 }
 
 table.ip-network-group .actions {
