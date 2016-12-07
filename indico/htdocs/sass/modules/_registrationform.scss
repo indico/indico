@@ -15,15 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'base/animation';
 @import 'compass';
 @import 'compass/css3/user-interface';
 @import 'compass/support';
-@import 'partials/boxes';
-@import 'partials/buttons';
-@import 'partials/icons';
-@import 'partials/toolbars';
 
 // ============================================================================
 // Base classes
@@ -720,23 +714,6 @@ textarea.regFormDescriptionInputMgmt {
 
 /* CSS for the tabs */
 
-.regFormDonePlacesNeeded {
-    font-style: italic;
-    padding-left: 5px;
-}
-
-.row {
-  margin-left: -20px;
-  *zoom: 1;
-}
-.row:before,
-.row:after {
-  display: table;
-  content: "";
-}
-.row:after {
-  clear: both;
-}
 [class*="span"] {
   float: left;
 }
@@ -808,9 +785,6 @@ textarea.regFormDescriptionInputMgmt {
   text-decoration: none;
   background-color: #eeeeee;
 }
-.nav > .pull-right {
-  float: right;
-}
 .nav .nav-header {
   display: block;
   padding: 3px 15px;
@@ -826,12 +800,10 @@ textarea.regFormDescriptionInputMgmt {
   margin-top: 9px;
 }
 
-.nav-tabs > li,
-.nav-pills > li {
+.nav-tabs > li {
   float: left;
 }
-.nav-tabs > li > a,
-.nav-pills > li > a {
+.nav-tabs > li > a {
   padding-right: 12px;
   padding-left: 12px;
   margin-right: 2px;
@@ -872,12 +844,10 @@ textarea.regFormDescriptionInputMgmt {
 .tabs-left > .nav-tabs {
   border-bottom: 0;
 }
-.tab-content > .tab-pane,
-.pill-content > .pill-pane {
+.tab-content > .tab-pane {
   display: none;
 }
-.tab-content > .active,
-.pill-content > .active {
+.tab-content > .active {
   display: block;
 }
 

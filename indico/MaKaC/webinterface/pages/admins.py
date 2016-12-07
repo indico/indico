@@ -44,9 +44,6 @@ class WPAdminsBase(WPMainBase):
     def _getSiteArea(self):
         return "AdministrationArea"
 
-    def getCSSFiles(self):
-        return WPMainBase.getCSSFiles(self) + self._asset_env['admin_sass'].urls()
-
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
 

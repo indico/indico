@@ -21,9 +21,6 @@ from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase,
 
 
 class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
-    def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()
-
     def _getBody(self, params):
         return self._getPageContent(params)
 
@@ -31,6 +28,3 @@ class WPAgreementForm(WPConferenceDefaultDisplayBase, WPJinjaMixin):
 class WPAgreementManager(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/agreements/'
     sidemenu_option = 'agreements'
-
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['agreements_sass'].urls()

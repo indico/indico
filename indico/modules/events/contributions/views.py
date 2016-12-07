@@ -27,9 +27,6 @@ class WPManageContributions(WPJinjaMixin, WPConferenceModifBase):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
 
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls()
-
 
 class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/contributions/'
@@ -41,10 +38,6 @@ class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
                 self._asset_env['modules_contributions_js'].urls() +
                 self._asset_env['modules_event_display_js'].urls())
-
-    def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['contributions_sass'].urls() +
-                self._asset_env['event_display_sass'].urls())
 
 
 class WPMyContributions(WPContributionsDisplayBase):
