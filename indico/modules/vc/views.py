@@ -31,9 +31,7 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'videoconference'
 
     def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) +
-                self._asset_env['vc_sass'].urls() +
-                self._asset_env['selectize_css'].urls())
+        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def getJSFiles(self):
         return (WPConferenceModifBase.getJSFiles(self) +
@@ -52,9 +50,6 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
         self._conf = conf
         self._aw = rh.getAW()
 
-    def getCSSFiles(self):
-        return WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['eventservices_sass'].urls()
-
     def getJSFiles(self):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
                 self._asset_env['modules_event_display_js'].urls() +
@@ -65,9 +60,6 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
 
 
 class WPVCService(WPVCJinjaMixin, WPMainBase):
-    def getCSSFiles(self):
-        return WPMainBase.getCSSFiles(self) + self._asset_env['overviews_sass'].urls()
-
     def _getNavigationDrawer(self):
         return WSimpleNavigationDrawer('Videoconference', lambda: url_for('.vc_room_list'))
 

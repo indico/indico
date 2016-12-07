@@ -27,9 +27,6 @@ class WPManageSessions(WPJinjaMixin, WPConferenceModifBase):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls()
 
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls()
-
 
 class WPDisplaySession(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/sessions/'
@@ -40,10 +37,6 @@ class WPDisplaySession(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def getJSFiles(self):
         return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
-
-    def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) + self._asset_env['sessions_sass'].urls() +
-                self._asset_env['event_display_sass'].urls() + self._asset_env['timetable_sass'].urls())
 
 
 class WPDisplayMySessionsConference(WPDisplaySession):

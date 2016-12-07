@@ -15,10 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'compass';
-@import 'partials/buttons';
-
-@import "event_display/common";
-@import "event_display/conferences";
-@import "event_display/meetings";
+@import 'event_display/common';
+@import 'event_display/conferences';
+@import 'event_display/meetings';

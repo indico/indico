@@ -25,24 +25,14 @@ class WPManagePapers(WPJinjaMixin, WPConferenceModifBase):
     sidemenu_option = 'papers'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) +
-                self._asset_env['modules_papers_js'].urls())
-
-    def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) +
-                self._asset_env['papers_sass'].urls())
+        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_papers_js'].urls()
 
 
 class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/papers/'
 
     def getJSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_papers_js'].urls())
-
-    def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) +
-                self._asset_env['papers_sass'].urls())
+        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_papers_js'].urls()
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')

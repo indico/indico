@@ -422,43 +422,9 @@ base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, i
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
                      "sass/custom/*.scss",
-                     "sass/partials/*.scss"]
+                     "sass/partials/*.scss",
+                     "sass/modules/**/*.scss"]
 
-
-def sass_module_bundle(module_name, depends=[]):
-    return Bundle('sass/modules/_{0}.scss'.format(module_name),
-                  filters=("pyscss", "cssrewrite", "cssmin"),
-                  output="sass/{0}_%(version)s.min.css".format(module_name),
-                  depends=SASS_BASE_MODULES + ['sass/modules/{0}/*.scss'.format(module_name)] + depends)
-
-agreements_sass = sass_module_bundle('agreements')
-attachments_sass = sass_module_bundle('attachments')
-contributions_sass = sass_module_bundle('contributions')
-abstracts_sass = sass_module_bundle('abstracts')
-papers_sass = sass_module_bundle('papers')
-reviewing_sass = sass_module_bundle('reviewing')
-tracks_sass = sass_module_bundle('tracks')
-registration_sass = sass_module_bundle('registrationform')
-payment_sass = sass_module_bundle('payment')
-roombooking_sass = sass_module_bundle('roombooking')
-dashboard_sass = sass_module_bundle('dashboard')
-category_sass = sass_module_bundle('category')
-category_management_sass = sass_module_bundle('category_management')
-admin_sass = sass_module_bundle('admin')
-bootstrap_sass = sass_module_bundle('bootstrap')
-
-eventservices_sass = sass_module_bundle('eventservices')
-event_display_sass = sass_module_bundle('event_display')
-event_management_sass = sass_module_bundle('event_management')
-overviews_sass = sass_module_bundle('overviews')
-vc_sass = sass_module_bundle('vc')
-news_sass = sass_module_bundle('news')
-users_sass = sass_module_bundle('users')
-auth_sass = sass_module_bundle('auth')
-surveys_sass = sass_module_bundle('surveys')
-timetable_sass = sass_module_bundle('timetable')
-sessions_sass = sass_module_bundle('sessions')
-markdown_sass = sass_module_bundle('markdown')
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -543,35 +509,8 @@ def register_all_css(env, main_css_file):
     env.register('chartist_css', chartist_css)
 
     # SASS/SCSS
-    env.register('agreements_sass', agreements_sass)
-    env.register('attachments_sass', attachments_sass)
-    env.register('registration_sass', registration_sass)
-    env.register('roombooking_sass', roombooking_sass)
-    env.register('contributions_sass', contributions_sass)
-    env.register('abstracts_sass', abstracts_sass)
-    env.register('papers_sass', papers_sass)
-    env.register('reviewing_sass', reviewing_sass)
-    env.register('tracks_sass', tracks_sass)
-    env.register('dashboard_sass', dashboard_sass)
-    env.register('category_sass', category_sass)
-    env.register('category_management_sass', category_management_sass)
-    env.register('admin_sass', admin_sass)
-    env.register('bootstrap_sass', bootstrap_sass)
     env.register('screen_sass', screen_sass)
-    env.register('eventservices_sass', eventservices_sass)
-    env.register('event_display_sass', event_display_sass)
-    env.register('event_management_sass', event_management_sass)
-    env.register('overviews_sass', overviews_sass)
-    env.register('vc_sass', vc_sass)
-    env.register('news_sass', news_sass)
-    env.register('users_sass', users_sass)
-    env.register('auth_sass', auth_sass)
     env.register('fonts_sass', fonts_sass)
-    env.register('payment_sass', payment_sass)
-    env.register('surveys_sass', surveys_sass)
-    env.register('timetable_sass', timetable_sass)
-    env.register('sessions_sass', sessions_sass)
-    env.register('markdown_sass', markdown_sass)
     register_theme_sass(env)
 
 

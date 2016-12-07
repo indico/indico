@@ -30,11 +30,6 @@ class WPManageTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
 
-    def getCSSFiles(self):
-        return (WPConferenceModifBase.getCSSFiles(self) +
-                self._asset_env['markdown_sass'].urls() +
-                self._asset_env['tracks_sass'].urls())
-
     def _getHeadContent(self):
         return WPConferenceModifBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
 
@@ -50,11 +45,6 @@ class WPDisplayTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBas
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
-
-    def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) +
-                self._asset_env['markdown_sass'].urls() +
-                self._asset_env['tracks_sass'].urls())
 
     def _getHeadContent(self):
         return WPConferenceDefaultDisplayBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
