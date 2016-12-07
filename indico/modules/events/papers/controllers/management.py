@@ -19,10 +19,13 @@ from __future__ import unicode_literals
 from flask import request, render_template, flash
 
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.forms import PaperTeamsForm
-from indico.modules.events.papers.operations import set_reviewing_state, update_team_members
+from indico.modules.events.papers.forms import PaperTeamsForm, make_competences_form
+from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
+                                                     update_competences)
 from indico.modules.events.papers.views import WPManagePapers
+from indico.modules.users.models.users import User
 from indico.util.i18n import _
+from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
 
@@ -84,3 +87,27 @@ class RHSwitchReviewingType(RHManagePapersBase):
     def _process_DELETE(self):
         set_reviewing_state(self.event_new, request.view_args['reviewing_type'], False)
         return jsonify_data(flash=False, html=_render_paper_dashboard(self.event_new))
+
+
+class RHManageCompetences(RHManagePapersBase):
+    """Manage the competences of the call for papers ACLs"""
+
+    def _process(self):
+        form_class = make_competences_form(self.event_new)
+        user_competences = self.event_new.cfp.user_competences
+        defaults = {'competences_{}'.format(user_id): competences.competences
+                    for user_id, competences in user_competences.iteritems()}
+        form = form_class(obj=FormDefaults(defaults))
+        if form.validate_on_submit():
+            key_prefix = 'competences_'
+            form_data = {int(key[len(key_prefix):]): value for key, value in form.data.iteritems()}
+            users = {u.id: u for u in User.query.filter(User.id.in_(form_data), ~User.is_deleted)}
+            for user_id, competences in form_data.iteritems():
+                if user_id in user_competences:
+                    update_competences(user_competences[user_id], competences)
+                elif competences:
+                    create_competences(self.event_new, users[user_id], competences)
+            flash(_("Team competences were updated successfully"), 'success')
+            return jsonify_data()
+        return WPManagePapers.render_template('management/competences.html', self._conf, event=self.event_new,
+                                              form=form)
