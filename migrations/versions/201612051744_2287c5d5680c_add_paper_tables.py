@@ -7,6 +7,7 @@ Create Date: 2016-12-05 17:44:40.392524
 
 import sqlalchemy as sa
 from alembic import op
+from sqlalchemy import String
 
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.modules.events.papers.models.reviews import PaperReviewType, PaperAction
@@ -136,8 +137,36 @@ def upgrade():
         schema='event_paper_reviewing'
     )
 
+    op.create_table(
+        'competences',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('user_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('competences', sa.ARRAY(String()), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('id'),
+        sa.UniqueConstraint('user_id', 'event_id'),
+        schema='event_paper_reviewing'
+    )
+    op.create_table(
+        'templates',
+        sa.Column('id', sa.Integer(), nullable=False),
+        sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('storage_backend', sa.String(), nullable=False),
+        sa.Column('content_type', sa.String(), nullable=False),
+        sa.Column('size', sa.BigInteger(), nullable=False),
+        sa.Column('storage_file_id', sa.String(), nullable=False),
+        sa.Column('filename', sa.String(), nullable=False),
+        sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
+        sa.PrimaryKeyConstraint('id'),
+        schema='event_paper_reviewing'
+    )
+
 
 def downgrade():
+    op.drop_table('templates', schema='event_paper_reviewing')
+    op.drop_table('competences', schema='event_paper_reviewing')
     op.drop_table('layout_reviewers', schema='event_paper_reviewing')
     op.drop_table('content_reviewers', schema='event_paper_reviewing')
     op.drop_table('judges', schema='event_paper_reviewing')
