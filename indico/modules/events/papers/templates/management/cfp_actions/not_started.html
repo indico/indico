@@ -1,0 +1,27 @@
+{% extends 'events/papers/management/cfp_actions/_base.html' %}
+
+{% block label %}
+    {%- trans %}The call for papers is not open yet{% endtrans -%}
+{% endblock %}
+
+{% block text %}
+    {% if not cfp.start_dt %}
+        {%- trans %}Start now or schedule opening.{% endtrans -%}
+    {% else %}
+        {% set tz = event.timezone %}
+        {% trans date=cfp.start_dt|format_date(timezone=tz), time=cfp.start_dt|format_time(timezone=tz) -%}
+            Scheduled to open on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }}).
+        {%- endtrans %}
+    {% endif %}
+{% endblock %}
+
+{% block buttons %}
+    {{ super() }}
+    <a href="#" class="i-button highlight"
+       data-href="{{ url_for('.open_cfp', event) }}"
+       data-method="POST"
+       data-update="#paper-page"
+       data-replace-update>
+        {%- trans %}Start now{% endtrans -%}
+    </a>
+{% endblock %}
