@@ -51,7 +51,10 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.acl.get_management_roles.connect_via(Event)
 def _get_management_roles(sender, **kwargs):
-    return PaperManagerRole
+    yield PaperManagerRole
+    yield PaperJudgeRole
+    yield PaperContentReviewerRole
+    yield PaperLayoutReviewerRole
 
 
 class PapersFeature(EventFeature):
@@ -69,3 +72,21 @@ class PaperManagerRole(ManagementRole):
     name = 'paper_manager'
     friendly_name = _('Paper Manager')
     description = _('Grants management rights for paper reviewing on an event.')
+
+
+class PaperJudgeRole(ManagementRole):
+    name = 'paper_judge'
+    friendly_name = _('Judge')
+    description = _('Grants paper judgment rights for assigned papers.')
+
+
+class PaperContentReviewerRole(ManagementRole):
+    name = 'paper_content_reviewer'
+    friendly_name = _('Content reviewer')
+    description = _('Grants content reviewing rights for assigned papers.')
+
+
+class PaperLayoutReviewerRole(ManagementRole):
+    name = 'paper_layout_reviewer'
+    friendly_name = _('Layout reviewer')
+    description = _('Grants layout reviewing rights for assigned papers.')
