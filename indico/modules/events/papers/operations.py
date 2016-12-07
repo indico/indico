@@ -20,6 +20,7 @@ from flask import session
 
 from indico.modules.events.papers import logger
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.util import update_object_principals
 
 
 def set_reviewing_state(event, reviewing_type, enable):
@@ -28,3 +29,13 @@ def set_reviewing_state(event, reviewing_type, enable):
     logger.info("Reviewing type '%s' for event %r %s by %r", reviewing_type, event, action, session.user)
     event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
               "{} reviewing type '{}'".format("Enabled" if enable else "Disabled", reviewing_type), session.user)
+
+
+def update_team_members(event, managers, judges, content_reviewers, layout_reviewers):
+    update_object_principals(event, managers, role='paper_manager')
+    update_object_principals(event, judges, role='paper_judge')
+    if content_reviewers:
+        update_object_principals(event, content_reviewers, role='paper_content_reviewer')
+    if layout_reviewers:
+        update_object_principals(event, layout_reviewers, role='paper_layout_reviewer')
+    logger.info("Paper teams of %r updated by %r", event, session.user)
