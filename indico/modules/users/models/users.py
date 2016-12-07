@@ -392,6 +392,7 @@ class User(PersonMixin, db.Model):
     # - modified_review_comments (PaperReviewComment.modified_by)
     # - oauth_tokens (OAuthToken.user)
     # - owned_rooms (Room.owner)
+    # - paper_competences (PaperCompetence.user)
     # - paper_reviews (PaperReview.user)
     # - paper_revisions (PaperRevision.submitter)
     # - registrations (Registration.user)
