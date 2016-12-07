@@ -15,15 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'compass';
-@import 'partials/icons';
-
-body {
+.login-page {
+    font-family: Helvetica, Verdana, sans-serif;
     background-color: #f9f9f9;
     background-position: center;
     background-size: cover;
-    font-family: Helvetica, Verdana, sans-serif;
     margin: 0;
     padding: 0;
     text-align: center;
@@ -156,29 +152,15 @@ body {
         }
     }
 
-    .seperator-line-center{
-        text-align: center;
-        position: relative;
-        z-index: -1;
-        margin-top: 20px;
-    }
+    .titled-rule {
+        color: $gray;
+        font-size: 1em;
+        margin: 20px 0;
 
-    .seperator-line-center:after{
-        content: "";
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
-        border-top: solid 1px #bbb;
-        z-index: -1;
-    }
-
-    .seperator-text{
-        margin: 0;
-        padding: 0 10px;
-        background: #f9f9f9;
-        display: inline-block;
-        color: #bbb;
+        &::before,
+        &::after {
+            background: $gray;
+        }
     }
 
     .link {

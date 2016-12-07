@@ -41,7 +41,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users, get_linked_events)
-from indico.modules.users.views import WPUserDashboard, WPUser, WPUsersAdmin
+from indico.modules.users.views import WPUser, WPUsersAdmin
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
                                         AdminUserSettingsForm, AdminAccountRegistrationForm)
 from indico.util.date_time import timedelta_split, now_utc
@@ -130,13 +130,13 @@ class RHUserDashboard(RHUserBase):
                                   'reviewing': bool(roles & self.reviewer_roles),
                                   'attendance': bool(roles & self.attendance_roles)})
                          for event, roles in get_linked_events(self.user, from_dt, 10).iteritems()]
-        return WPUserDashboard.render_template('dashboard.html', 'dashboard',
-                                               timezone=unicode(tz),
-                                               offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
-                                               categories=categories,
-                                               categories_events=categories_events,
-                                               suggested_categories=get_suggested_categories(self.user),
-                                               linked_events=linked_events)
+        return WPUser.render_template('dashboard.html', 'dashboard',
+                                      timezone=unicode(tz),
+                                      offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
+                                      categories=categories,
+                                      categories_events=categories_events,
+                                      suggested_categories=get_suggested_categories(self.user),
+                                      linked_events=linked_events)
 
 
 class RHPersonalData(RHUserBase):

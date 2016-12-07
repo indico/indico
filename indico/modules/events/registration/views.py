@@ -41,9 +41,6 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
 
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['registration_sass'].urls()
-
 
 class WPManageRegistrationStats(WPManageRegistration):
     def getJSFiles(self):
@@ -65,12 +62,6 @@ class DisplayRegistrationFormMixin(WPJinjaMixin):
 
     def getJSFiles(self):
         return self.base_class.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
-
-    def getCSSFiles(self):
-        return (self.base_class.getCSSFiles(self) +
-                self._asset_env['registration_sass'].urls() +
-                self._asset_env['payment_sass'].urls() +
-                self._asset_env['event_display_sass'].urls())
 
 
 class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDefaultDisplayBase):

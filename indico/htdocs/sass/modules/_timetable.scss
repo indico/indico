@@ -32,11 +32,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import 'base';
-@import 'compass';
-@import 'partials';
-
-
 @mixin base-list-properties() {
     overflow: auto;
     list-style-type: none;

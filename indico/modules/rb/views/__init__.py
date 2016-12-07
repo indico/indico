@@ -28,9 +28,6 @@ class WPRoomBookingBase(WPMainBase):
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
-    def getCSSFiles(self):
-        return WPMainBase.getCSSFiles(self) + self._asset_env['roombooking_sass'].urls()
-
     def _getSideMenu(self):
         return render_sidemenu('rb-sidemenu', active_item=self.sidemenu_option)
 

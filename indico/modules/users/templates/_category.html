@@ -19,8 +19,8 @@
 {% macro _category_item(category, truncated_path, extra_info='') %}
     <li class="category-box">
         <div>
-            <span class="category-info">
-                <a href="{{ category.url }}" class="category-title">{{ category.title }}</a>
+            <span class="category-box-info">
+                <a href="{{ category.url }}" class="category-box-title">{{ category.title }}</a>
                 {{ _category_path(category, truncated_path) }}
                 {{ caller() }}
             {# The caller must provide the closing span tag (</span>). #}

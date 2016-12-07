@@ -24,16 +24,10 @@ class WPLayoutEdit(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
     sidemenu_option = 'layout'
 
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
-
 
 class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
     sidemenu_option = 'menu'
-
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
 
     def getJSFiles(self):
         return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
@@ -57,6 +51,3 @@ class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 class WPImages(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/layout/'
     sidemenu_option = 'images'
-
-    def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()

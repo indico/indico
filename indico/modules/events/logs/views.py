@@ -24,8 +24,5 @@ class WPEventLogs(WPConferenceModifBase, WPJinjaMixin):
     template_prefix = 'events/logs/'
     sidemenu_option = 'logs'
 
-    def getCSSFiles(self):
-            return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['event_management_sass'].urls()
-
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)

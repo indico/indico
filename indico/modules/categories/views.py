@@ -48,9 +48,6 @@ class WPCategory(WPJinjaMixin, WPMainBase):
             self._locTZ = category.display_tzinfo.zone
         self._mathjax = kwargs.pop('mathjax', False)
 
-    def getCSSFiles(self):
-        return WPMainBase.getCSSFiles(self) + self._asset_env['category_sass'].urls()
-
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._asset_env['modules_categories_js'].urls()
 
@@ -84,9 +81,6 @@ class WPCategoryManagement(WPCategory):
         WPCategory.__init__(self, rh, category, **kwargs)
         # don't show protection header in management; anything besides 'restricted' would be misleading
         self._protected_object = None
-
-    def getCSSFiles(self):
-        return WPCategory.getCSSFiles(self) + self._asset_env['category_management_sass'].urls()
 
     def getJSFiles(self):
         return WPCategory.getJSFiles(self) + self._asset_env['modules_categories_management_js'].urls()

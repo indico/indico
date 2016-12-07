@@ -22,8 +22,8 @@
             </div>
             {% set other_local_providers = providers|rejectattr('is_external')|reject('equalto', active_provider)|list %}
             {% if other_local_providers %}
-                <div class="seperator-line-center">
-                    <span class="seperator-text">{% trans %}or change authentication provider{% endtrans %}</span>
+                <div class="titled-rule">
+                    {% trans %}or change authentication provider{% endtrans %}
                 </div>
                 <div class="login-providers providers-with-form">
                     {% for provider in other_local_providers %}
@@ -42,8 +42,8 @@
         {% endif %}
         {% set external_providers = providers|selectattr('is_external')|sort(attribute='title') %}
         {% if external_providers %}
-            <div class="seperator-line-center">
-                <span class="seperator-text">{% trans %}or connect with{% endtrans %}</span>
+            <div class="titled-rule">
+                {% trans %}or connect with{% endtrans %}
             </div>
             <div class="login-providers external">
                 {% for provider in external_providers %}

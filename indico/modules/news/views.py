@@ -27,9 +27,6 @@ class WPNews(WPJinjaMixin, WPDecorated):
     def _getBody(self, params):
         return self._getPageContent(params)
 
-    def getCSSFiles(self):
-        return WPDecorated.getCSSFiles(self) + self._asset_env['news_sass'].urls()
-
     def _getTitle(self):
         return WPDecorated._getTitle(self) + ' - ' + _("News")
 
