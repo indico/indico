@@ -108,8 +108,39 @@ def upgrade():
         schema='event_paper_reviewing'
     )
 
+    op.create_table(
+        'judges',
+        sa.Column('contribution_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('contribution_id', 'user_id'),
+        schema='event_paper_reviewing'
+    )
+    op.create_table(
+        'content_reviewers',
+        sa.Column('contribution_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('contribution_id', 'user_id'),
+        schema='event_paper_reviewing'
+    )
+    op.create_table(
+        'layout_reviewers',
+        sa.Column('contribution_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.Column('user_id', sa.Integer(), autoincrement=False, nullable=False, index=True),
+        sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
+        sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
+        sa.PrimaryKeyConstraint('contribution_id', 'user_id'),
+        schema='event_paper_reviewing'
+    )
+
 
 def downgrade():
+    op.drop_table('layout_reviewers', schema='event_paper_reviewing')
+    op.drop_table('content_reviewers', schema='event_paper_reviewing')
+    op.drop_table('judges', schema='event_paper_reviewing')
     op.drop_table('review_comments', schema='event_paper_reviewing')
     op.drop_table('files', schema='event_paper_reviewing')
     op.drop_table('review_ratings', schema='event_paper_reviewing')
