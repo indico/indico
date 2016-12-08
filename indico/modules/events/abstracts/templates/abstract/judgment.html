@@ -25,7 +25,7 @@
                            'in_progress': 'icon-circle-small',
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.reviewing_state %}
-    <span class="reviewing-state-icon flexrow f-a-center f-j-center {{ mapping_class[state.name] }}">
+    <span class="global-state-icon flexrow f-a-center f-j-center {{ mapping_class[state.name] }}">
         <span class="flexrow {{ mapping_icon[state.name] }}"></span>
     </span>
     <div class="f-self-stretch flexcol">
@@ -50,7 +50,7 @@
                            'mixed': 'icon-tilde',
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
-    <div class="track-state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
+    <div class="group-state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
          title="{{ mapping_title[state.name] }}">
         <span class="{{ mapping_icon[state.name] }}"></span>
     </div>
@@ -59,7 +59,7 @@
 {% macro render_decision_box(abstract, form, user) %}
     {% set event = abstract.event_new %}
     {{ render_user_avatar(user) }}
-    <div class="i-timeline-item-box footer-only header-indicator-left">
+    <div class="i-timeline-item-box footer-only header-indicator-left review-form">
         <div class="i-box-footer">
             {% set url = url_for('.judge_abstract', abstract) %}
             {% set form_id = 'judgment-form' %}
@@ -91,7 +91,7 @@
     <div class="i-timeline-item-box content-indicator">
         <div class="i-box-content track-reviews-wrapper">
             {% if can_judge or visible_tracks.issuperset(abstract.reviewed_for_tracks) %}
-                <div class="tracks-review-summary flexrow f-a-center">
+                <div class="global-review-summary flexrow f-a-center">
                     {{ _render_abstract_reviewing_state(abstract) }}
                     <div class="abstract-comment-badges flexrow f-a-center">
                         {% if abstract.score is not none %}
@@ -100,7 +100,7 @@
                     </div>
                 </div>
             {% else %}
-                <div class="tracks-review-summary flexrow f-a-center">
+                <div class="global-review-summary flexrow f-a-center">
                     <div class="summary-title">
                         {%- trans %}Review summary{% endtrans -%}
                     </div>
@@ -109,15 +109,15 @@
             {% set ratings = abstract.get_track_question_scores() %}
             {% for track in visible_tracks %}
                 {% set has_reviews = track.id in ratings %}
-                <div class="track-review">
-                    <div class="track-review-summary flexrow f-a-center">
+                <div class="group-review-summary">
+                    <div class="group-review-summary__summary flexrow f-a-center">
                         {{ _render_abstract_track_reviewing_state_icon(abstract, track) }}
                         <div class="f-self-stretch truncate-text">
                             {{- track.title -}}
                         </div>
                         {% set score = abstract.get_track_score(track) %}
                         {% if has_reviews %}
-                            <a href="#" class="track-review-details-link"
+                            <a href="#" class="group-review-summary__link"
                                data-toggle="#review-list-{{ track.id }}"
                                data-accordion=".track-reviews-wrapper"
                                data-show-text="{% trans %}Show reviews{% endtrans %}"
@@ -125,7 +125,7 @@
                                 {%- trans %}Show reviews{% endtrans -%}
                             </a>
                             {% if score is not none %}
-                                <a href="#" class="track-review-details-link"
+                                <a href="#" class="group-review-summary__link"
                                    data-toggle="#question-list-{{ track.id }}"
                                    data-accordion=".track-reviews-wrapper"
                                    data-show-text="{% trans %}Show questions{% endtrans %}"
@@ -139,9 +139,9 @@
                         {% endif %}
                     </div>
                     {% if has_reviews %}
-                        <div class="track-review-details">
+                        <div class="group-review-summary__details">
                             <div id="question-list-{{ track.id }}" class="details-content weak-hidden">
-                                <div class="details-content-inner abstract-question-list">
+                                <div class="details-content-inner review-questions">
                                     {% for question, score in ratings[track.id].iteritems() %}
                                         <div class="details-content-row flexrow f-a-center">
                                             <div>
@@ -163,7 +163,7 @@
                                                 {%- endtrans %}
                                             </div>
                                             <a href="#abstract-review-{{ review.id }}"
-                                               class="track-review-details-link js-highlight-review">
+                                               class="group-review-summary__link js-highlight-review">
                                                 {%- trans %}See review{% endtrans -%}
                                             </a>
                                             {% if review.score is not none %}

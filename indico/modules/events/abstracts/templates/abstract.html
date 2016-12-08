@@ -28,7 +28,7 @@
         {% endif %}
 
         {% if abstract.can_see_reviews(session.user) and visible_tracks %}
-            <div class="i-timeline-item abstract-review-summary-box">
+            <div class="i-timeline-item review-summary-box">
                 {{ render_review_summary_box(abstract, session.user, visible_tracks) }}
             </div>
         {% endif %}
@@ -45,7 +45,7 @@
     </div>
 
     {% if abstract.email_logs and abstract.can_judge(session.user, check_state=false) %}
-        <a class="open-abstract-notification-log"
+        <a class="open-review-notification-log"
            data-href="{{ url_for('.notification_log', abstract) }}"
            data-title="{% trans %}Sent notifications{% endtrans %}"
            data-subtitle="{% trans %}Log of notifications sent to submitter and authors of this abstract{% endtrans %}"

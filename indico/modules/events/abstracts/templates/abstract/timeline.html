@@ -50,7 +50,7 @@
                         {% endif %}
                     </div>
                     {% if comment.can_edit(session.user) %}
-                        <div class="abstract-comment-actions">
+                        <div class="review-comment-actions">
                             <a class="i-link icon-edit js-edit-comment"
                                title="{% trans %}Edit comment{% endtrans %}"
                                data-href="{{ url_for('.edit_abstract_comment', comment) }}"
@@ -106,7 +106,7 @@
             <div class="i-timeline-item-box header-indicator-top {% if not review.comment %}header-only{% endif %}"
                  {% if not review.comment %}data-no-comment{% endif %}>
                 <div class="i-box-header flexrow">
-                    <div class="abstract-review-badges">
+                    <div class="review-badges">
                         {% set action = _render_review_state(review) %}
                         {% set endaction = '</span>'|safe %}
 
@@ -158,7 +158,7 @@
                         {% endif %}
                     </div>
                     {% if review.can_edit(session.user, check_state=true) %}
-                        <div class="abstract-comment-actions">
+                        <div class="review-comment-actions">
                             <a class="i-link icon-edit js-edit-review"
                                title="{% trans %}Edit review{% endtrans %}"
                                data-href="{{ url_for('.edit_review', review) }}"
@@ -173,7 +173,7 @@
                 <div class="i-box-content js-form-container">
                     {% if review.ratings %}
                         <div class="ratings-details weak-hidden">
-                            <ul class="abstract-question-list">
+                            <ul class="review-questions">
                                 {% for rating in review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
                                     <li class="flexrow">
                                         <div>
@@ -250,7 +250,7 @@
     {% set can_comment = abstract.can_comment(session.user) %}
     {% set reviewer_data = abstract.get_reviewer_render_data(session.user) %}
     {% if can_comment or reviewer_data.tracks %}
-        <div id="abstract-timeline-input" class="i-timeline-item abstract-timeline-input">
+        <div id="review-timeline-input" class="i-timeline-item review-timeline-input">
             {{ render_user_avatar(session.user) }}
             <div class="i-timeline-item-box footer-only header-indicator-left">
                 <div class="i-box-footer js-form-container">
@@ -341,7 +341,7 @@
             {% else %}
                 <button class="i-button big highlight text-color"
                         data-href="{{ url_for('.review_abstract', abstract, track) }}"
-                        data-form-container="#abstract-timeline-input .js-form-container"
+                        data-form-container="#review-timeline-input .js-form-container"
                         data-update="#abstract-page"
                         data-replace-update
                         data-confirm-close-unsaved
@@ -368,7 +368,7 @@
                             </a>
                         {% else %}
                             <a data-href="{{ url_for('.review_abstract', abstract, track) }}"
-                               data-form-container="#abstract-timeline-input .js-form-container"
+                               data-form-container="#review-timeline-input .js-form-container"
                                data-update="#abstract-page"
                                data-replace-update
                                data-confirm-close-unsaved
