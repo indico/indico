@@ -1,0 +1,99 @@
+{% extends 'events/papers/_base.html' %}
+
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+{% from 'events/papers/display/_common.html' import render_cfp_infoline %}
+{% from 'events/papers/display/_paper_list.html' import render_user_papers_list %}
+
+{% block title %}
+    {%- trans %}Call for Papers{% endtrans -%}
+{% endblock %}
+
+{% macro render_timestamp(label, date, tz, completed=false, alternative_text=none) %}
+    <li class="{{ 'completed' if completed }}">
+        <div class="label">{{ label }}</div>
+        <div class="timestamp flexcol f-a-center">
+            {% if date %}
+                <time datetime="{{ date.isoformat() }}">
+                    {{- date|format_datetime(timezone=tz) -}}
+                </time>
+            {% elif alternative_text %}
+                <span>{{ alternative_text }}</span>
+            {% endif %}
+        </div>
+    </li>
+{% endmacro %}
+
+{% macro render_timeline_section(cfp) %}
+    {% set tz = cfp.event.display_tzinfo %}
+    <section>
+        <ul class="deadline-timeline flexrow f-a-center f-j-center">
+            {{ render_timestamp(_("Opening day"), cfp.start_dt, tz, cfp.has_started) }}
+            {{ render_timestamp(_("Submission deadline"), cfp.end_dt, tz, cfp.has_ended, _("No deadline")) }}
+        </ul>
+    </section>
+{% endmacro %}
+
+{% block content %}
+    <div class="call-for-papers">
+        {% set cfp = event.cfp %}
+        {% if cfp.start_dt %}
+            {{ render_timeline_section(cfp) }}
+        {% endif %}
+        {% if cfp.announcement %}
+            <section>
+                <div class="cfp-announcement">{{ cfp.announcement }}</div>
+            </section>
+        {% endif %}
+        <section class="cfp-infoline-section">
+            {{ render_cfp_infoline(event, cfp, show_icon=false) }}
+        </section>
+        {% if event.paper_templates %}
+            <section>
+                <div class="header">
+                    <div class="header-row">
+                        <h3>{% trans %}Paper templates{% endtrans %}</h3>
+                    </div>
+                </div>
+                <ul class="template-list">
+                    {% for tpl in event.paper_templates|sort(attribute='id')|sort(attribute='name') %}
+                        <li>
+                            <a href="{{ url_for('.download_template', tpl) }}" class="attachment {{ icon_from_mimetype(tpl.content_type, 'icon-file') }}">
+                                <span>{{ tpl.name }}</span>
+                            </a>
+                            {% if tpl.description %}
+                                <i class="info icon-info" title="{{ tpl.description }}"></i>
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </section>
+        {% endif %}
+        {% if contributions %}
+            <section>
+                <div class="header">
+                    <div class="header-row">
+                        <h3>{% trans %}My papers{% endtrans %}</h3>
+                        <div class="toolbar thin">
+                            <div class="group">
+                                <div id="filter-statistics" class="group">
+                                    {{- render_displayed_entries_fragment(contributions|length, contributions|length) -}}
+                                </div>
+                                <div class="group">
+                                    <span class="i-button label icon-search"></span>
+                                    <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {{ render_user_papers_list(event, contributions) }}
+                <div id="filter-placeholder"></div>
+            </section>
+        {% endif %}
+    </div>
+    <script>
+        setupCallForPapersPage({
+            hasPapers: {{ contributions|bool|tojson }}
+        });
+    </script>
+{% endblock %}

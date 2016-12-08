@@ -166,3 +166,61 @@
         margin-top: 0;
     }
 }
+
+ul.deadline-timeline {
+    list-style-type: none;
+    padding: 0;
+    color: $light-black;
+
+    li {
+        flex-grow: 1;
+        flex-basis: 0;
+
+        &.completed {
+            .timestamp {
+                border-top-color: $indico-blue;
+
+                &:before {
+                    background-color: $indico-blue;
+                    border-color: $indico-blue;
+                }
+
+                time {
+                    color: $indico-blue;
+                }
+            }
+        }
+    }
+
+    .label {
+        @extend %font-family-title-light;
+        margin-bottom: 20px;
+        padding: 0 40px;
+        color: $light-black;
+        font-size: 1.1em;
+        text-align: center;
+    }
+
+    .timestamp {
+        @include border-top($width: 3px);
+
+        padding: 0 40px;
+        position: relative;
+        font-weight: bold;
+
+        &:before {
+            @include border-all($width: 2px);
+            @include border-radius(25px);
+
+            content: '';
+            width: 25px;
+            height: 25px;
+            background-color: white;
+            margin-top: -16px;
+        }
+
+        time, span {
+            margin-top: 10px;
+        }
+    }
+}

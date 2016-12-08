@@ -122,6 +122,16 @@
         color: $light-black;
         padding: 20px 0 10px;
     }
+
+    .template-list {
+        font-size: 13pt;
+        list-style-type: none;
+        padding-left: 0;
+
+        .info {
+            color: $gray;
+        }
+    }
 }
 
 .paper-contribution-list ul {
