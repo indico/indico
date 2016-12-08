@@ -37,7 +37,8 @@ class TimetableSerializer(object):
         tzinfo = event.tzinfo if self.management else event.display_tzinfo
         event.preload_all_acl_entries()
         timetable = {}
-        for day in iterdays(event.start_dt_local, event.end_dt_local, skip_weekends=hide_weekends, day_whitelist=days):
+        for day in iterdays(event.start_dt.astimezone(tzinfo), event.end_dt.astimezone(tzinfo),
+                            skip_weekends=hide_weekends, day_whitelist=days):
             date_str = day.strftime('%Y%m%d')
             timetable[date_str] = {}
         contributions_strategy = defaultload('contribution')
@@ -61,6 +62,10 @@ class TimetableSerializer(object):
                 parent_code = 's{}'.format(entry.parent_id)
                 timetable[date_str][parent_code]['entries'][key] = data
             else:
+                if (entry.type == TimetableEntryType.SESSION_BLOCK and
+                        entry.start_dt.astimezone(tzinfo).date() != entry.end_dt.astimezone(tzinfo).date()):
+                    # If a session block lasts into another day we need to add it to that day, too
+                    timetable[entry.end_dt.astimezone(tzinfo).date().strftime('%Y%m%d')][key] = data
                 timetable[date_str][key] = data
         if strip_empty_days:
             timetable = self._strip_empty_days(timetable)
