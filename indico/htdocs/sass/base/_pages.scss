@@ -151,6 +151,12 @@
     }
 }
 
+.dialog-page {
+    @extend %indico-page;
+
+    max-width: 800px;
+}
+
 .management-page {
     @extend %indico-page;
 
