@@ -46,7 +46,7 @@
         }).on('ajaxForm:hide', '.js-edit-comment, .js-edit-review', function() {
             $(this).closest('.i-box-header').show();
         }).on('focus', '.new-comment textarea', function() {
-            var $box = $('#abstract-timeline-input');
+            var $box = $('#review-timeline-input');
             var $commentForm = $box.find('form');
             $box.find('.review-trigger').hide('blind', {direction: 'left'}, 'fast');
             $commentForm.find('.form-group').show('fast');
@@ -54,7 +54,7 @@
             $commentForm.trigger('ajaxForm:externalShow');
         }).on('click', '.new-comment .js-new-cancel', function(evt) {
             evt.preventDefault();
-            var $box = $('#abstract-timeline-input');
+            var $box = $('#review-timeline-input');
             var $commentForm = $box.find('form');
             var $reviewTrigger = $box.find('.review-trigger');
             var deferred = $.Deferred();

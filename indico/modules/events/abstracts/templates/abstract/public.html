@@ -3,10 +3,10 @@
 
 
 {% macro render_abstract_info(abstract) %}
-    <div class="abstract-title flexrow">
+    <div class="submission-title flexrow">
         <h3 class="f-self-stretch">
             {{ abstract.title }}
-            <span class="abstract-id">
+            <span class="submission-id">
                 #{{ abstract.friendly_id }}
             </span>
         </h3>
@@ -342,11 +342,11 @@
 
 
 {% macro _render_abstract_summary(abstract) %}
-    <div class="abstract-summary flexrow f-a-baseline">
-        <div class="abstract-summary-badge">
+    <div class="review-summary flexrow f-a-baseline">
+        <div class="review-summary-badge">
             {{ _render_summary_state(abstract) }}
         </div>
-        <div class="abstract-summary-content f-self-stretch">
+        <div class="review-summary-content f-self-stretch">
             {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
                 <div>
                     {% if abstract.submitted_contrib_type %}

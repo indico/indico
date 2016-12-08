@@ -45,6 +45,7 @@ class WPManageAbstracts(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
         return (WPConferenceModifBase.getCSSFiles(self) +
                 self._asset_env['markdown_sass'].urls() +
                 self._asset_env['selectize_css'].urls() +
+                self._asset_env['reviewing_sass'].urls() +
                 self._asset_env['abstracts_sass'].urls() +
                 self._asset_env['contributions_sass'].urls())
 
@@ -66,6 +67,7 @@ class WPDisplayAbstractsBase(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDis
                 self._asset_env['markdown_sass'].urls() +
                 self._asset_env['selectize_css'].urls() +
                 self._asset_env['abstracts_sass'].urls() +
+                self._asset_env['reviewing_sass'].urls() +
                 self._asset_env['event_display_sass'].urls() +
                 self._asset_env['contributions_sass'].urls())
 
