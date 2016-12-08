@@ -1,0 +1,24 @@
+{% block page %}
+    <div class="{% block dialog_class %}dialog-page{% endblock %}"
+        {% if self.dialog_id()|trim -%}
+            id="{% filter trim %}{% block dialog_id %}{% endblock %}{% endfilter %}"
+        {%- endif %}>
+        {% if self.description() or self.info() %}
+            <header>
+                {% if self.description() -%}
+                    <div class="page-description">
+                        {% block description %}{% endblock %}
+                    </div>
+                {% endif %}
+                {% if self.info() %}
+                    <div class="page-info">
+                        {% block info %}{% endblock %}
+                    </div>
+                {% endif %}
+            </header>
+        {% endif %}
+        <div class="{% block dialog_content_class %}page-content{% endblock %}">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+{% endblock %}
