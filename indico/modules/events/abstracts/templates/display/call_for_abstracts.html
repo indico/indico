@@ -27,7 +27,7 @@
 {% macro render_timeline_section(cfa) %}
     {% set tz = cfa.event.display_tzinfo %}
     <section>
-        <ul class="cfa-timeline flexrow f-a-center f-j-center">
+        <ul class="deadline-timeline flexrow f-a-center f-j-center">
             {{ render_timestamp(_("Opening day"), cfa.start_dt, tz, cfa.has_started) }}
             {{ render_timestamp(_("Submission deadline"), cfa.end_dt, tz, cfa.has_ended, _("No deadline")) }}
         </ul>

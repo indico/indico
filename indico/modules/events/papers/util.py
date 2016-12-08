@@ -22,6 +22,7 @@ from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.users import User
 
 
@@ -64,3 +65,9 @@ def get_events_with_paper_roles(user, dt=None):
              .filter(~Event.is_deleted, Event.ends_after(dt))
              .filter(db.or_(*role_criteria)))
     return {principal.event_id: set(principal.roles) & paper_roles for principal in query}
+
+
+def get_contributions_with_paper_submitted_by_user(event, user):
+    return (Contribution.query.with_parent(event)
+            .filter(Contribution._paper_revisions.any(PaperRevision.submitter == user))
+            .all())

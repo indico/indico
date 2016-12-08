@@ -62,4 +62,26 @@
             applySearchFilters();
         }
     };
+
+    global.setupCallForPapersPage = function setupCallForPapersPage(options) {
+        // show the form after login when using the submit button as a guest
+        if (location.hash === '#submit-paper') {
+            $(document).ready(function() {
+                $('.js-show-paper-form').trigger('click');
+            });
+        }
+
+        if (options.hasPapers) {
+            var filterConfig = {
+                itemHandle: 'div.contribution-row',
+                listItems: 'div.paper-contribution-list div.contribution-row',
+                term: '#search-input',
+                state: '#filtering-state',
+                placeholder: '#filter-placeholder'
+            };
+
+            var applySearchFilters = setupSearchBox(filterConfig);
+            applySearchFilters();
+        }
+    };
 })(window);

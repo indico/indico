@@ -30,8 +30,10 @@ from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
                                                      update_comment, delete_comment, update_review, judge_paper,
                                                      reset_paper_state)
-from indico.modules.events.papers.util import get_user_contributions_to_review, get_user_reviewed_contributions
-from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page, WPDisplayReviewingArea
+from indico.modules.events.papers.util import (get_user_contributions_to_review, get_user_reviewed_contributions,
+                                               get_contributions_with_paper_submitted_by_user)
+from indico.modules.events.papers.views import (WPDisplayPapersBase, render_paper_page, WPDisplayReviewingArea,
+                                                WPDisplayCallForPapers)
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify
@@ -214,3 +216,12 @@ class RHResetPaperState(RHPaperBase):
             reset_paper_state(self.paper)
             flash(_("The paper judgment has been reset"), 'success')
         return jsonify_data(html=render_paper_page(self.paper))
+
+
+class RHCallForPapers(RHPapersBase):
+    """Show the main CFP page"""
+
+    def _process(self):
+        contribs = get_contributions_with_paper_submitted_by_user(self.event_new, session.user)
+        return WPDisplayCallForPapers.render_template('display/call_for_papers.html', self._conf,
+                                                      event=self.event_new, contributions=contribs)

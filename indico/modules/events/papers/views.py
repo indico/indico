@@ -78,3 +78,7 @@ def render_paper_page(paper, view_class=None):
 
 class WPDisplayReviewingArea(WPDisplayPapersBase):
     menu_entry_name = 'paper_reviewing_area'
+
+
+class WPDisplayCallForPapers(WPDisplayPapersBase):
+    menu_entry_name = 'call_for_papers'

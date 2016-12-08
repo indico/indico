@@ -1,0 +1,42 @@
+{% macro render_cfp_infoline(event, cfp, show_icon=true, redirect_first=false) %}
+    {% set can_submit_papers = cfp.is_open or session.user %}
+    <div class="infoline announcement">
+        {% if show_icon %}
+            <span class="icon icon-file-content"></span>
+        {% endif %}
+        <div class="text">
+            {%- if can_submit_papers %}
+                <div class="label">
+                    {% if cfp.is_open %}
+                        {%- trans %}The call for papers is open{% endtrans -%}
+                    {% else %}
+                        {%- trans %}You have been authorized to submit papers{% endtrans -%}
+                    {% endif %}
+                </div>
+                <div>
+                    {%- trans %}You can submit a paper for reviewing.{% endtrans -%}
+                </div>
+                <div class="toolbar right">
+                    {% if session.user and not redirect_first %}
+                        <a class="i-button highlight js-show-paper-form"
+                           data-title="{% trans %}Submit new paper{% endtrans %}"
+{#                           TODO: Link to submit paper #}
+{#                           data-href="{{ url_for('papers.submit', event) }}"#}
+                           data-confirm-close-unsaved
+                           data-ajax-dialog>
+                            {%- trans %}Submit new paper{% endtrans -%}
+                        </a>
+                    {% else %}
+                        {% set submit_url = url_for('papers.call_for_papers', event, _anchor='submit-paper') %}
+                        {% set url = submit_url if session.user else url_for_login(submit_url) %}
+                        <a class="i-button highlight" href="{{ url }}">
+                            {%- trans %}Submit new paper{% endtrans -%}
+                        </a>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
+            {% endif -%}
+        </div>
+    </div>
+{% endmacro %}
