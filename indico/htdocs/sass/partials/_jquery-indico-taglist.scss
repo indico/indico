@@ -20,16 +20,16 @@
     @include border-all();
 
     height: auto;
-    min-height: 50px;
     cursor: text;
-    padding: 5px;
+    padding: 0.3rem;
     position: relative;
     background: #fff;
-    float: left;
+    display: flex;
+    align-items: center;
 
     ul.taggle_list {
         padding: 0;
-        margin: 0;
+        margin: -0.3rem 0 0;
         float: left;
         width: 100%;
         list-style-type: none;
@@ -39,19 +39,20 @@
             display: inline-block;
             white-space: nowrap;
             font-weight: 500;
-            margin-bottom: 5px;
+            margin-top: 0.3rem;
+            height: 1.8rem;
 
             &.taggle {
-                margin-right: 8px;
+                margin-right: 0.5rem;
                 background: $pastel-blue;
-                padding: 5px 10px;
-                border-radius: 3px;
+                padding: 0.3rem 0.7rem;
+                border-radius: 2px;
                 position: relative;
                 cursor: pointer;
                 transition: all .3s;
 
                 &:hover {
-                    padding: 5px 15px 5px 5px;
+                    padding: 0.3rem 1.1rem 0.3rem 0.3rem;
                     transition: all .3s;
 
                     > .close {
@@ -60,17 +61,16 @@
                 }
 
                 .close {
-                    height: 10px;
+                    height: 0.7em;
                     font-size: 1.1rem;
                     position: absolute;
-                    top: 10px;
+                    top: 0.55em;
                     right: 0;
                     text-decoration: none;
                     padding-left: 2px;
                     line-height: 0.5;
                     color: #ccc;
                     color: rgba(0, 0, 0, 0.2);
-                    padding-bottom: 4px;
                     display: none;
                     border: 0;
                     background: none;
@@ -78,7 +78,7 @@
                 }
 
                 .taggle_text {
-                    padding: 5px;
+                    padding: 0.3rem;
                 }
             }
 
@@ -87,19 +87,17 @@
                 outline: none;
                 background: none;
                 float: left;
-                width: 10px;
+                width: 0.7em;
                 max-width: 100%;
-                margin-top: -5px;
-                padding: 8px 8px 8px 0 !important;
-                font-weight: 300;
+                padding: 0.3rem 0 !important;
+                font-weight: 500;
+                height: auto !important;
             }
         }
 
     }
 
     .taggle_placeholder {
-        top: 12px;
-        left: 8px;
         color: #ccc;
         position: absolute;
         transition: opacity, .25s;
