@@ -24,6 +24,7 @@ from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
+from indico.web.flask.util import url_for
 
 
 class AbstractAction(TitledIntEnum):
@@ -171,6 +172,16 @@ class AbstractReview(RenderModeMixin, db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', 'user_id', proposed_action=None)
+
+    # Proposal interface
+    @property
+    def group(self):
+        return self.track
+
+    # Proposal interface
+    @property
+    def proposal(self):
+        return self.abstract
 
     @property
     def score(self):

@@ -32,8 +32,8 @@ from indico.modules.events.abstracts.models.reviews import AbstractAction, Abstr
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
+from indico.modules.events.models.reviews import ProposalMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
-from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -81,7 +81,7 @@ class EditTrackMode(int, IndicoEnum):
     reviewed_for = 2
 
 
-class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Model):
+class Abstract(ProposalMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
@@ -111,6 +111,15 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
     marshmallow_aliases = {'_description': 'content'}
+
+    # Proposal mixin properties
+    proposal_type = 'abstract'
+    config_attr = 'cfa'
+    delete_comment_endpoint = 'abstracts.delete_abstract_comment'
+    create_comment_endpoint = 'abstracts.comment_abstract'
+    edit_comment_endpoint = 'abstracts.edit_abstract_comment'
+    create_review_endpoint = 'abstracts.review_abstract'
+    edit_review_endpoint = 'abstracts.edit_review'
 
     @declared_attr
     def __table_args__(cls):
@@ -557,7 +566,7 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
     def get_track_reviewing_state(self, track):
         if track not in self.reviewed_for_tracks:
             raise ValueError("Abstract not in review for given track")
-        reviews = self.get_reviews(track=track)
+        reviews = self.get_reviews(group=track)
         if not reviews:
             return AbstractReviewingState.not_started
         rejections = any(x.proposed_action == AbstractAction.reject for x in reviews)
@@ -589,35 +598,11 @@ class Abstract(DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Mod
             scores[track_id][question] = score
         return scores
 
-    def get_reviewed_for_tracks_by_user(self, user, include_reviewed=False):
+    def get_reviewed_for_groups(self, user, include_reviewed=False):
         already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
         if self.event_new in user.global_abstract_reviewer_for_events:
             return self.reviewed_for_tracks | already_reviewed
         return (self.reviewed_for_tracks & user.abstract_reviewer_for_tracks) | already_reviewed
-
-    @memoize_request
-    def get_reviewer_render_data(self, user):
-        tracks = self.get_reviewed_for_tracks_by_user(user, include_reviewed=True)
-        reviews = {x.track: x for x in self.get_reviews(user=user)}
-        reviewed_tracks = {x.track for x in reviews.itervalues()}
-        missing_tracks = tracks - reviewed_tracks
-        return {'tracks': tracks,
-                'reviewed_tracks': reviewed_tracks,
-                'missing_tracks': missing_tracks,
-                'reviews': reviews}
-
-    def get_reviews(self, track=None, user=None):
-        """Get all reviews on a particular track and/or by a particular user.
-
-        :param track: will show only reviews for the given track
-        :param user: will show only review by the given user
-        """
-        reviews = self.reviews[:]
-        if track:
-            reviews = [x for x in reviews if x.track == track]
-        if user:
-            reviews = [x for x in reviews if x.user == user]
-        return reviews
 
     def get_track_score(self, track):
         if track not in self.reviewed_for_tracks:

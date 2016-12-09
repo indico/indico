@@ -1,0 +1,129 @@
+{% from 'events/abstracts/reviewing/_common.html' import render_tracks %}
+
+
+{% macro render_review_action_text(review) %}
+    {% set action = _render_review_state(review) %}
+    {% set endaction = '</span>'|safe %}
+    {% if review.proposed_action.name == 'accept' %}
+        {% if review.proposed_contribution_type %}
+            {% set contribution_type -%}
+                <strong>{{ review.proposed_contribution_type.name|escape }}</strong>
+            {%- endset %}
+            {% trans type=contribution_type|safe -%}
+                Proposed to {{ action }}accept{{ endaction }} as {{ type }}
+            {%- endtrans %}
+        {% else %}
+            {% trans -%}
+                Proposed to {{ action }}accept{{ endaction }}
+            {%- endtrans %}
+        {% endif %}
+    {% elif review.proposed_action.name == 'reject' %}
+        {% trans -%}
+            Proposed to {{ action }}reject{{ endaction }}
+        {%- endtrans %}
+    {% elif review.proposed_action.name == 'change_tracks' %}
+        {% trans -%}
+            Proposed to {{ action }}change tracks{{ endaction }}
+        {%- endtrans %}
+    {% elif review.proposed_action.name in ('mark_as_duplicate', 'merge') %}
+        {% set other_abstract = review.proposed_related_abstract %}
+        {% set abstract_link -%}
+            <a href="{{ url_for('.display_abstract', other_abstract) }}">
+                {{ other_abstract.title|escape }}
+            </a>
+        {%- endset %}
+        {% set title = abstract_link|safe %}
+        {% if review.proposed_action.name == 'merge' %}
+            {% trans -%}
+                Proposed to {{ action }}merge{{ endaction }} into {{ title }}
+            {%- endtrans %}
+        {% elif review.proposed_action.name == 'mark_as_duplicate' %}
+            {% trans -%}
+                Proposed as {{ action }}duplicate{{ endaction }} of {{ title }}
+            {%- endtrans %}
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_ratings_details_titled_rule(review) %}
+    {% if review.proposed_action.name == 'change_tracks' %}
+        <div class="titled-rule">
+            {% trans %}Proposed tracks{% endtrans %}
+        </div>
+    {% elif review.comment %}
+        <div class="titled-rule">
+            {% trans %}Comment{% endtrans %}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_ratings_details_extra(review) %}
+    {% if review.proposed_action.name == 'change_tracks' %}
+        <div>
+            {% set tracks = render_tracks(review.proposed_tracks) %}
+            {% trans count=review.proposed_tracks|length -%}
+                Possible destination track: {{ tracks }}
+            {%- pluralize -%}
+                Possible destination tracks: {{ tracks }}
+            {%- endtrans %}
+        </div>
+        {% if review.comment %}
+            <div class="titled-rule">
+                {% trans %}Comment{% endtrans %}
+            </div>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_multiple_review_group_text(proposal) %}
+    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    {% set missing_groups = reviewer_data.missing_groups|length %}
+    {% if missing_groups %}
+        {% if not reviewer_data.reviews %}
+            {% set no_comments_title %}
+                {%- trans count=missing_groups -%}
+                    You can review this abstract in one track
+                {%- pluralize -%}
+                    You can review this abstract in {{ missing_groups }} tracks
+                {%- endtrans -%}
+            {% endset %}
+        {% else %}
+            {% set no_comments_title %}
+                {%- trans count=missing_groups -%}
+                    You can review this abstract in one more track
+                {%- pluralize -%}
+                    You can review this abstract in {{ missing_groups }} more tracks
+                {%- endtrans -%}
+            {% endset %}
+        {% endif %}
+        {% set no_comments_description %}
+            {%- trans %}You can do it until a final judgment is casted{% endtrans -%}
+        {% endset %}
+    {% else %}
+        {% set no_comments_title %}
+            {%- trans %}You have already reviewed this abstract in all your tracks{% endtrans -%}
+        {% endset %}
+        {% set no_comments_description %}
+            {%- trans %}You can still make up your mind{% endtrans -%}
+        {% endset %}
+    {% endif %}
+    <div class="empty-input-title">
+        {{- no_comments_title -}}
+    </div>
+    <div class="empty-input-description">
+        {{- no_comments_description -}}
+    </div>
+{% endmacro %}
+
+
+{% macro _render_review_state(review) %}
+    {% set mapping = {'accept': 'success',
+                      'reject': 'error',
+                      'merge': 'visited',
+                      'mark_as_duplicate': 'strong',
+                      'change_tracks': 'warning'} %}
+    <span class="bold underline semantic-text {{ mapping[review.proposed_action.name] }}">
+{% endmacro %}

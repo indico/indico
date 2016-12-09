@@ -1,5 +1,5 @@
-{% from 'events/abstracts/abstract/_common.html' import render_edited_hint, render_track, render_tracks,
-                                                        render_user_avatar %}
+{% from 'events/abstracts/reviewing/_common.html' import render_tracks, render_track %}
+{% from 'events/reviews/_common.html' import render_edited_hint, render_user_avatar %}
 
 
 {% macro render_abstract_info(abstract) %}
@@ -19,7 +19,7 @@
                            class="i-button text-color color-on-hover danger"
                            data-href="{{ url_for('.withdraw_abstract', abstract) }}"
                            data-method="POST"
-                           data-update="#abstract-page"
+                           data-update="#reviewing-page"
                            data-replace-update
                            data-title="{% trans %}Withdraw Abstract{% endtrans %}"
                            data-confirm="{% trans %}Do you really want to withdraw this abstract? This operation is irreversible.{% endtrans %}">
@@ -29,7 +29,7 @@
                         <a title="{% trans %}This abstract has been withdrawn but can be restored using this option{% endtrans %}"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
-                           data-update="#abstract-page"
+                           data-update="#reviewing-page"
                            data-replace-update
                            data-title="{% trans %}Restore Abstract{% endtrans %}"
                            data-confirm="{% trans %}Do you really want to restore this abstract? This operation is irreversible.{% endtrans %}"
@@ -166,7 +166,7 @@
                            title="{% trans %}Reset judgement{% endtrans %}"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
-                           data-update="#abstract-page"
+                           data-update="#reviewing-page"
                            data-replace-update
                            data-title="{% trans %}Reset judgment{% endtrans %}"
                            data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"></a>
