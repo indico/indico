@@ -22,6 +22,7 @@ from indico.modules.events.settings import EventSettingsProxy
 paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'start_dt': None,
     'end_dt': None,
+    'enforce_deadlines': False,
     'content_reviewing_enabled': True,
     'layout_reviewing_enabled': False,
     'judge_deadline': None,
