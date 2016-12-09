@@ -96,13 +96,13 @@
 {% endmacro %}
 
 {# `form` and `i_form` args are there in case we need them in the future #}
-{% macro form_footer(form, i_form=true, skip_label=false) -%}
+{% macro form_footer(form, i_form=true, skip_label=false, align_right=false) -%}
     {% if caller %}
         <div class="form-group form-group-footer">
             {% if not skip_label -%}
                 <div class="form-label"></div>
             {%- endif %}
-            <div class="form-field">
+            <div class="form-field {{ 'flexrow f-j-end no-padding' if align_right }}">
                 {{ caller() }}
             </div>
         </div>
