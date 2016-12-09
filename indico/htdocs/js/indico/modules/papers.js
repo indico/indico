@@ -15,7 +15,26 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+/* global setupListGenerator:false, applySearchFilters:false, setupTableSorter:false */
+
+(function(global) {
     'use strict';
 
-})();
+    global.setupPaperAssignmentList = function setupPaperAssignmentList() {
+        var filterConfig = {
+            itemHandle: 'tr',
+            listItems: '#assignment-list tbody tr',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
+        };
+
+        setupTableSorter('#assignment-list .tablesorter');
+        enableIfChecked('#assignment-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+        $('#assignment-list').on('indico:htmlUpdated', function() {
+            setupTableSorter('#assignment-list .tablesorter');
+            applySearchFilters();
+        });
+        setupListGenerator(filterConfig);
+    };
+})(window);
