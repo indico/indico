@@ -1,0 +1,108 @@
+{% from 'events/reviews/_common.html' import render_user_avatar %}
+{% from 'events/reviews/forms.html' import render_comment_form, render_review_form %}
+
+
+{% macro render_omnibox(proposal, comment_form, review_form=none) %}
+    {% set can_comment = proposal.can_comment(session.user) %}
+    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    {% if can_comment or reviewer_data.groups %}
+        <div id="review-timeline-input" class="i-timeline-item review-timeline-input">
+            {{ render_user_avatar(session.user) }}
+            <div class="i-timeline-item-box footer-only header-indicator-left">
+                <div class="i-box-footer js-form-container">
+                    {% if can_comment %}
+                        <div class="flexrow">
+                            <div class="f-self-stretch">
+                                {{ render_comment_form(comment_form, proposal) }}
+                            </div>
+                            {% if reviewer_data.groups and proposal.can_review(session.user, check_state=true) %}
+                                {{ _render_review_trigger(proposal) }}
+                            {% endif %}
+                        </div>
+                    {% elif proposal.can_review(session.user, check_state=true) %}
+                        {% set caller_ = caller %}
+                        {% call(block) _render_input_no_comment(review_form, proposal) %}
+                            {{ caller_(block) }}
+                        {% endcall %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro _render_review_trigger(proposal, exclusive=false) %}
+    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    <div class="review-trigger flexrow">
+        {% if not exclusive %}
+            <span class="comment-or-review">
+                {%- trans %}or{% endtrans -%}
+            </span>
+        {% endif %}
+        {% if reviewer_data.groups|length == 1 %}
+            {% set group = reviewer_data.groups|first %}
+            {% if group in reviewer_data.reviewed_groups %}
+                {% set review = reviewer_data.reviews[group] %}
+                <button class="i-button big highlight text-color js-new-edit-review" data-review-id="{{ review.id }}">
+                    {%- trans %}Change review{% endtrans -%}
+                </button>
+            {% else %}
+                <button class="i-button big highlight text-color"
+                        data-href="{{ proposal.get_save_review_url(group=group) }}"
+                        data-form-container="#review-timeline-input .js-form-container"
+                        data-update="#reviewing-page"
+                        data-replace-update
+                        data-confirm-close-unsaved
+                        data-ajax-form>
+                    {%- trans %}Review{% endtrans -%}
+                </button>
+            {% endif %}
+        {% else %}
+            <button class="i-button big highlight text-color arrow js-dropdown" data-toggle="dropdown">
+                {% if reviewer_data.groups.issubset(reviewer_data.reviewed_groups) %}
+                    {%- trans %}Change reviews{% endtrans -%}
+                {% else %}
+                    {%- trans %}Review{% endtrans -%}
+                {% endif %}
+            </button>
+            <ul class="dropdown">
+                {% for group in reviewer_data.groups|sort(attribute='title') %}
+                    <li>
+                        {% if group in reviewer_data.reviewed_groups %}
+                            {% set review = reviewer_data.reviews[group] %}
+                            <a class="js-new-edit-review" data-review-id="{{ review.id }}">
+                                {{ group.full_title }}
+                                <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>
+                            </a>
+                        {% else %}
+                            <a data-href="{{ proposal.get_save_review_url(group=group) }}"
+                               data-form-container="#review-timeline-input .js-form-container"
+                               data-update="#reviewing-page"
+                               data-replace-update
+                               data-confirm-close-unsaved
+                               data-ajax-form>
+                                {{ group.full_title }}
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% macro _render_input_no_comment(review_form, proposal) %}
+    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    {% if reviewer_data.groups|length == 1 and not reviewer_data.reviews %}
+        {{ render_review_form(review_form, proposal, reviewer_data.groups|first, on_pageload=true) }}
+    {% else %}
+        <div class="flexrow">
+            <div class="f-self-stretch">
+                {{ caller('multiple-review-group-text') }}
+            </div>
+            {{ _render_review_trigger(proposal, exclusive=true) }}
+        </div>
+    {% endif %}
+{% endmacro %}

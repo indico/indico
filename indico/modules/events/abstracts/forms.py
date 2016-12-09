@@ -73,7 +73,7 @@ def build_review_form(abstract=None, track=None, review=None):
         abstract = review.abstract
         track = review.track
     review_form_class = make_review_form(abstract.event_new)
-    reviews_for_track = abstract.get_reviews(user=session.user, track=track)
+    reviews_for_track = abstract.get_reviews(user=session.user, group=track)
     review_for_track = reviews_for_track[0] if reviews_for_track else None
 
     if review_for_track:

@@ -1,0 +1,193 @@
+{% from 'events/abstracts/reviewing/timeline.html' import render_review_action_text, render_ratings_details_titled_rule,
+                                                          render_ratings_details_extra %}
+{% from 'events/abstracts/reviewing/_common.html' import render_track %}
+{% from 'events/reviews/_common.html' import render_edited_hint, render_group, render_score, render_visibility_hint,
+                                             render_user_avatar %}
+{% from 'events/reviews/_omnibox.html' import render_omnibox %}
+
+
+{% macro render_timeline(proposal, comment_form, review_form=none) %}
+    {% set can_comment = proposal.can_comment(session.user) %}
+    {% set can_review = proposal.can_review(session.user, check_state=true) %}
+    {% set timeline = proposal.get_timeline(session.user) %}
+    {% if timeline or can_comment or can_review %}
+        <div class="i-timeline with-line">
+            <div class="i-timeline-connect-up"></div>
+            {% for item in timeline %}
+                {% if item.TIMELINE_TYPE == 'comment' %}
+                    {{ render_comment(item, proposal) }}
+                {% elif item.TIMELINE_TYPE == 'review' %}
+                    {{ render_review(item, form=form) }}
+                {% endif %}
+            {% endfor %}
+            {% if can_comment or can_review %}
+                {% set caller_ = caller %}
+                {% call(block) render_omnibox(proposal, comment_form, review_form) %}
+                    {{ caller_(block) }}
+                {% endcall %}
+            {% endif %}
+        </div>
+        <div class="i-timeline">
+            {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
+            <div class="i-timeline-connect-down to-separator"></div>
+        </div>
+        <div class="i-timeline-separator"></div>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro render_comment(comment, proposal) %}
+    <div id="review-comment-{{ comment.id }}" class="i-timeline-item">
+        {{ render_user_avatar(comment.user) }}
+        <div class="flexrow i-timeline-item-content">
+            <div class="i-timeline-item-box header-indicator-left">
+                <div class="i-box-header flexrow">
+                    <div class="f-self-stretch">
+                        {% trans name=comment.user.name -%}
+                            <strong>{{ name }}</strong> left a comment
+                        {%- endtrans %}
+                        {{ render_visibility_hint(comment.visibility) }}
+                        <time datetime="{{ comment.created_dt.isoformat() }}">
+                            {{- comment.created_dt|format_human_date -}}
+                        </time>
+                        {% if comment.modified_dt %}
+                            {{ render_edited_hint(comment.modified_dt, comment.modified_by) }}
+                        {% endif %}
+                    </div>
+                    {% if comment.can_edit(session.user) %}
+                        <div class="review-comment-actions">
+                            <a class="i-link icon-edit js-edit-comment"
+                               title="{% trans %}Edit comment{% endtrans %}"
+                               data-href="{{ proposal.get_save_comment_url(comment) }}"
+                               data-form-container="#review-comment-{{ comment.id }} .js-form-container"
+                               data-update="#reviewing-page"
+                               data-replace-update
+                               data-confirm-close-unsaved
+                               data-ajax-form></a>
+                            <a class="i-link icon-cross js-delete-comment"
+                               title="{% trans %}Remove comment{% endtrans %}"
+                               data-method="DELETE"
+                               data-href="{{ proposal.get_delete_comment_url(comment) }}"
+                               data-title="{% trans %}Remove comment{% endtrans %}"
+                               data-confirm="{% trans %}Are you sure you want to remove this comment?{% endtrans %}"
+                               data-ajax>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="i-box-content js-form-container">
+                    <div class="markdown-text">
+                        {{ comment.text }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_review(review, form) %}
+    {% set no_content = not review.comment and not review.ratings %}
+    {% set rating_range = review.proposal.config.rating_range %}
+    <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
+        {{ render_user_avatar(review.user) }}
+        <div class="flexrow i-timeline-item-content">
+            <div class="i-timeline-item-metadata">
+                <div class="f-self-stretch">
+                    {% trans name=review.user.name -%}
+                        <strong>{{ name }}</strong> left a review
+                    {%- endtrans %}
+                    {{ render_visibility_hint(review.visibility) }}
+                    <time datetime="{{ review.created_dt.isoformat() }}">
+                        {{- review.created_dt|format_human_date -}}
+                    </time>
+                    {% if review.modified_dt %}
+                        {{ render_edited_hint(review.modified_dt) }}
+                    {% endif %}
+                </div>
+                {% if review.proposal.proposal_type == 'abstract' %}
+                    {{ render_track(review.group) }}
+                {% else %}
+                    {{ render_group(review.group.title) }}
+                {% endif %}
+            </div>
+            <div class="i-timeline-item-box header-indicator-top {% if not review.comment %}header-only{% endif %}"
+                 {% if not review.comment %}data-no-comment{% endif %}>
+                <div class="i-box-header flexrow">
+                    <div class="review-badges">
+                        {% if review.proposal.proposal_type == 'abstract' %}
+                            {{ render_review_action_text(review) }}
+                        {% endif %}
+                        {% if review.score is not none %}
+                            · score {{ render_score(review.score, rating_range, classes='bold semantic-text') }}
+                            (<a class="js-ratings-toggle">{#--#}
+                                <span class="js-show-ratings">{% trans %}show ratings{% endtrans %}</span>{#--#}
+                                <span class="weak-hidden js-hide-ratings">{% trans %}hide ratings{% endtrans %}</span>{#--#}
+                            </a>)
+                        {% endif %}
+                    </div>
+                    {% if review.can_edit(session.user, check_state=true) %}
+                        <div class="review-comment-actions">
+                            <a class="i-link icon-edit js-edit-review"
+                               title="{% trans %}Edit review{% endtrans %}"
+                               data-href="{{ review.proposal.get_save_review_url(review=review) }}"
+                               data-form-container="#abstract-review-{{ review.id }} .js-form-container"
+                               data-update="#reviewing-page"
+                               data-replace-update
+                               data-confirm-close-unsaved
+                               data-ajax-form></a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="i-box-content js-form-container">
+                    {% if review.ratings %}
+                        <div class="ratings-details weak-hidden">
+                            <ul class="review-questions">
+                                {% for rating in review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
+                                    <li class="flexrow">
+                                        <div>
+                                            <span class="question-index">{{ loop.index }}</span>
+                                        </div>
+                                        <div class="question-text f-self-stretch">
+                                            {{ rating.question.text }}
+                                        </div>
+                                        <div>
+                                            <span class="rating-scale flexrow f-a-center">
+                                                {{ _render_rating(rating_range, rating.value) }}
+                                                <span class="score">{{ rating.value }}</span>
+                                            </span>
+                                        </div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                            {% if review.proposal.proposal_type == 'abstract' %}
+                                {{ render_ratings_details_titled_rule(review) }}
+                            {% else %}
+                                {% if review.comment %}
+                                    <div class="titled-rule">
+                                        {% trans %}Comment{% endtrans %}
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {% if review.proposal.proposal_type == 'abstract' %}
+                        {{ render_ratings_details_extra(review) }}
+                    {% endif %}
+                    {% if review.comment %}
+                        <div class="markdown-text">
+                            {{ review.comment }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_rating(rating_range, value) %}
+    {%- for bullet in range(rating_range[0], rating_range[1] + 1) -%}
+        <span class="bullet {{ 'full' if bullet <= value else '' }}"></span>
+    {%- endfor -%}
+{% endmacro %}

@@ -106,7 +106,7 @@ def render_abstract_page(abstract, view_class=None, management=False):
                                                        AbstractReviewedForTracksForm, build_review_form)
     comment_form = AbstractCommentForm(abstract=abstract, user=session.user, formdata=None)
     review_form = None
-    reviewed_for_tracks = list(abstract.get_reviewed_for_tracks_by_user(session.user))
+    reviewed_for_tracks = list(abstract.get_reviewed_for_groups(session.user))
     if len(reviewed_for_tracks) == 1:
         review_form = build_review_form(abstract, reviewed_for_tracks[0])
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)

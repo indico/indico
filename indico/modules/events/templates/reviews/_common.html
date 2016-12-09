@@ -1,0 +1,63 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_edited_hint(dt, user=None) %}
+    {% if user %}
+        <span class="review-comment-edited"
+            title="{% trans dt=dt|format_human_date, name=user.name %}On {{ dt }} by {{ name }}{% endtrans %}">
+            · {% trans %}edited{% endtrans %}
+        </span>
+    {% else %}
+        <span class="review-comment-edited" title="{{ dt|format_human_date }}">
+            · {% trans %}edited{% endtrans %}
+        </span>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_group(title, url=none) %}
+    <div class="review-group truncate-text">
+        {% if url %}
+            <a href="{{ url }}" title="{{ title }}">{{ title }}</a>
+        {% else %}
+            <span title="{{ title }}">{{ title }}</span>
+        {% endif %}
+    </div>
+{% endmacro %}
+
+{% macro render_instruction_box(container_id, instructions, title) %}
+    {% set link %}
+        <a data-title="{{ title }}"
+           data-content="#{{ container_id }} .hidden-instructions"
+           data-close-button
+           data-ajax-dialog>
+    {% endset %}
+    {% set endlink='</a>' %}
+    {% set text = caller(link|safe, endlink|safe) %}
+    {% call message_box('warning', classes='review-instructions') %}
+        {{ text }}
+        <div class="hidden-instructions weak-hidden">
+            {{ instructions | markdown }}
+        </div>
+    {% endcall %}
+{% endmacro %}
+
+{% macro render_score(score, rating_range, classes='i-tag outline') %}
+    {% set score = score|round(1) %}
+    {% set max_score = rating_range[1]|round(1) %}
+    <span class="highlight {{ classes }}"
+          title="{% trans %}Score: {{ score }} / {{ max_score }}{% endtrans %}">
+        {{ score }}
+    </span>
+{% endmacro %}
+
+{% macro render_visibility_hint(visibility) %}
+    {% if visibility.name != 'contributors' %}
+        <i class="review-comment-visibility {{ visibility.name }} icon-shield" title="{{ visibility.title }}"></i>
+    {% endif %}
+{% endmacro %}
+
+{% macro render_user_avatar(user) %}
+    <div class="i-timeline-item-label avatar-placeholder" style="{{ user.avatar_css }}">
+        {{- user.name[0] -}}
+    </div>
+{% endmacro %}
+

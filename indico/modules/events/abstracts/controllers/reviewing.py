@@ -83,7 +83,7 @@ class RHJudgeAbstract(RHAbstractBase):
             judgment_data, abstract_data = form.split_data
             judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/judge.html')
+        tpl = get_template_module('events/abstracts/reviewing/judge.html')
         return jsonify(html=tpl.render_decision_box(self.abstract, form))
 
 
@@ -145,7 +145,7 @@ class RHSubmitAbstractReview(RHAbstractBase):
     }
 
     def _check_abstract_protection(self):
-        if self.abstract.get_reviews(user=session.user, track=self.track):
+        if self.abstract.get_reviews(user=session.user, group=self.track):
             return False
         return self.abstract.can_review(session.user, check_state=True)
 
@@ -158,8 +158,8 @@ class RHSubmitAbstractReview(RHAbstractBase):
         if form.validate_on_submit():
             create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
-        return jsonify(html=tpl.render_review_form(form, self.abstract, self.track))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_review_form(form, proposal=self.abstract, group=self.track))
 
 
 class RHEditAbstractReview(RHAbstractBase):
@@ -181,7 +181,7 @@ class RHEditAbstractReview(RHAbstractBase):
         if form.validate_on_submit():
             update_abstract_review(self.review, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
+        tpl = get_template_module('events/reviews/forms.html')
         return jsonify(html=tpl.render_review_form(form, review=self.review))
 
 
@@ -194,8 +194,8 @@ class RHSubmitAbstractComment(RHAbstractBase):
         if form.validate_on_submit():
             create_abstract_comment(self.abstract, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
-        return jsonify(html=tpl.render_comment_form(form, self.abstract))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_comment_form(form, proposal=self.abstract))
 
 
 class RHAbstractCommentBase(RHAbstractBase):
@@ -222,8 +222,8 @@ class RHEditAbstractComment(RHAbstractCommentBase):
         if form.validate_on_submit():
             update_abstract_comment(self.comment, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/abstract/_timeline_forms.html')
-        return jsonify(html=tpl.render_comment_form(form, self.abstract, comment=self.comment))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_comment_form(form, proposal=self.abstract, comment=self.comment))
 
 
 class RHDeleteAbstractComment(RHAbstractCommentBase):

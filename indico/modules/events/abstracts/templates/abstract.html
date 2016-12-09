@@ -1,9 +1,10 @@
 {% extends 'events/abstracts/management/_base.html' if management else 'events/abstracts/display/_base.html' %}
 
-{% from 'events/abstracts/abstract/judgment.html' import render_decision_box, render_reviewed_for_tracks_box,
+{% from 'events/abstracts/reviewing/judgment.html' import render_decision_box, render_reviewed_for_tracks_box,
                                                          render_review_summary_box %}
-{% from 'events/abstracts/abstract/public.html' import render_abstract_info, render_abstract_judgment %}
-{% from 'events/abstracts/abstract/timeline.html' import render_timeline %}
+{% from 'events/abstracts/reviewing/public.html' import render_abstract_info, render_abstract_judgment %}
+{% from 'events/abstracts/reviewing/timeline.html' import render_multiple_review_group_text %}
+{% from 'events/reviews/timeline.html' import render_timeline %}
 
 {% block back_button_url -%}
     {% if management -%}
@@ -21,7 +22,11 @@
     {{ render_abstract_info(abstract) }}
 
     <div class="i-timeline">
-        {{ render_timeline(abstract, comment_form, review_form) }}
+        {% call(block) render_timeline(abstract, comment_form, review_form) %}
+            {% if block == 'multiple-review-group-text' %}
+                {{ render_multiple_review_group_text(abstract) }}
+            {% endif %}
+        {% endcall %}
 
         {% if abstract.can_judge(session.user, check_state=true) and abstract.event_new.tracks %}
             {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
