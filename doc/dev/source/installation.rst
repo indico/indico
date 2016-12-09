@@ -164,7 +164,7 @@ This is an example configuration that should be able to get you started:
             WSGIProcessGroup WSGIDAEMON
             WSGIApplicationGroup %{GLOBAL}
             AllowOverride None
-            Options None
+            Options FollowSymLinks
             Order deny,allow
             Allow from all
         </Directory>
