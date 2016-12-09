@@ -117,10 +117,10 @@
             <div class="icon icon-file"></div>
             <div class="text">
                 <div class="label">{% trans %}Paper assignment{% endtrans %}</div>
-                {%- trans %}Assign reviewers and referees to papers{% endtrans -%}
+                {%- trans %}Assign reviewers and judges to papers{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a class="i-button icon-settings" href="#">
+                <a class="i-button icon-settings" href="{{ url_for('.assignment', event) }}">
                     {%- trans %}Assign papers{% endtrans -%}
                 </a>
             </div>

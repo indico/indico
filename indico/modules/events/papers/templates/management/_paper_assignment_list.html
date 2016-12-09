@@ -1,0 +1,127 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_paper_assignment_list(event, total_entries, contribs) %}
+    {% set tz = event.display_tzinfo %}
+    {% if not contribs %}
+        {%- call message_box('info') %}
+            {%- if total_entries %}
+                {%- trans -%}
+                    The filtering criteria do not match with any of the existing contributions. Try to clear the filters.
+                {%- endtrans %}
+            {%- else %}
+                {%- trans %}There are no contributions yet.{% endtrans %}
+            {%- endif %}
+        {%- endcall %}
+    {%- else %}
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+            <table class="i-table tablesorter">
+                <thead>
+                    <tr class="i-table">
+                        <th class="i-table thin-column" data-sorter="false"></th>
+                        <th class="i-table id-column">
+                            {%- trans %}ID{% endtrans -%}
+                        </th>
+                        <th class="i-table title-column">
+                            {%- trans %}Title{% endtrans -%}
+                        </th>
+                        <th class="i-table state-column">
+                            {%- trans %}State{% endtrans -%}
+                        </th>
+                        <th class="i-table revision-column">
+                            {%- trans %}Revision{% endtrans -%}
+                        </th>
+                        <th class="i-table track-column">
+                            {%- trans %}Track{% endtrans -%}
+                        </th>
+                        <th class="i-table judge-column" data-sorter="false">
+                            {%- trans %}Judges{% endtrans -%}
+                        </th>
+                        <th class="i-table content-reviewers-column" data-sorter="false">
+                            {%- trans %}Content reviewers{% endtrans -%}
+                        </th>
+                        <th class="i-table layout-reviewers-column" data-sorter="false">
+                            {%- trans %}Layout reviewers{% endtrans -%}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for contrib in contribs %}
+                        {% set last_revision_state %}
+                            {% if contrib.paper_revisions %}
+                                {{- contrib.paper_last_revision.state.title -}}
+                            {% else %}
+                                {%- trans %}Paper not yet submitted{% endtrans -%}
+                            {% endif %}
+                        {% endset %}
+                        <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
+                            data-friendly-id="{{ contrib.friendly_id }}"
+                            data-title="{{ contrib.title }}">
+                            <td class="i-table id-column">
+                                <span class="vertical-aligner">
+                                    <input type="checkbox" class="select-row" name="contribution_id"
+                                           value="{{ contrib.id }}">
+                                </span>
+                            </td>
+                            <td class="i-table id-column">
+                                <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
+                            </td>
+                            <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}"
+                                data-text="{{ contrib.title | lower }}">
+                                <span class="vertical-aligner">
+                                    {# TODO: Link to the paper timeline page #}
+                                    <a href="#">
+                                        {{- contrib.title -}}
+                                    </a>
+                                </span>
+                            </td>
+                            <td class="i-table state-column" data-searchable="{{ last_revision_state | lower }}">
+                                <span class="vertical-aligner">{{ last_revision_state }}</span>
+                            </td>
+                            <td class="i-table revision-column">
+                                <span class="vertical-aligner">
+                                    {% if contrib.paper_revisions %}
+                                        {{- contrib.paper_revisions | length -}}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="i-table track-column" data-searchable="{{ contrib.track.title | lower }}">
+                                <span class="vertical-aligner">
+                                    {% if contrib.track %}
+                                        {{- contrib.track.title -}}
+                                    {% else %}
+                                        {%- trans %}No track{% endtrans -%}
+                                    {% endif %}
+                                </span>
+                            </td>
+                            <td class="i-table person-row-cell"
+                                data-searchable="{{ contrib.paper_judges|map(attribute='name')|join(', ')|lower }}">
+                                <span class="vertical-aligner">
+                                    {% for judge in contrib.paper_judges -%}
+                                        <div class="person-row icon-user">{{ judge.display_full_name }}</div>
+                                    {%- endfor %}
+                                </span>
+                            </td>
+                            <td class="i-table person-row-cell"
+                                data-searchable="{{ contrib.paper_content_reviewers|map(attribute='name')|join(', ')|lower }}">
+                                <span class="vertical-aligner">
+                                    {% for reviewer in contrib.paper_content_reviewers -%}
+                                        <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
+                                    {%- endfor %}
+                                </span>
+                            </td>
+                            <td class="i-table person-row-cell"
+                                data-searchable="{{ contrib.paper_layout_reviewers|map(attribute='name')|join(', ')|lower }}">
+                                <span class="vertical-aligner">
+                                    {% for reviewer in contrib.paper_layout_reviewers -%}
+                                        <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
+                                    {%- endfor %}
+                                </span>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </form>
+    {%- endif %}
+{% endmacro %}
