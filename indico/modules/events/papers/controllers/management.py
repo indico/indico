@@ -146,3 +146,12 @@ class RHCloseCFP(RHManagePapersBase):
         close_cfp(self.event_new)
         flash(_("Call for papers is now closed"), 'success')
         return jsonify_data(html=_render_paper_dashboard(self.event_new))
+
+
+class RHPapersAssignment(RHManagePapersBase):
+    """Assign contributions to reviewers and judges"""
+
+    def _process(self):
+        contribs = sorted(self.event_new.contributions, key=lambda x: x.friendly_id)
+        return WPManagePapers.render_template('management/assignment.html', self._conf, event=self.event_new,
+                                              contribs=contribs)
