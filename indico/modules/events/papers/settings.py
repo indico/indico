@@ -24,7 +24,13 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'end_dt': None,
     'content_reviewing_enabled': True,
     'layout_reviewing_enabled': False,
+    'judge_deadline': None,
+    'layout_reviewer_deadline': None,
+    'content_reviewer_deadline': None,
 }, converters={
     'start_dt': DatetimeConverter,
     'end_dt': DatetimeConverter,
+    'judge_deadline': DatetimeConverter,
+    'layout_reviewer_deadline': DatetimeConverter,
+    'content_reviewer_deadline': DatetimeConverter,
 })
