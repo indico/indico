@@ -184,6 +184,8 @@
                 _.defer(function() {
                     popup.canvas.data('ui-dialog')._focusTabbable();
                 });
+
+                return true;
             };
 
             var dialogClasses = _.union(['dialog-window', options.dialogClasses]);
