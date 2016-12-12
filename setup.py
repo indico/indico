@@ -373,6 +373,7 @@ if __name__ == '__main__':
             event_series = indico_zodbimport.modules.event_series:EventSeriesImporter
             event_keywords_ctimes_visibility = indico_zodbimport.modules.event_keywords_ctimes_visibility:EventKeywordsCreationTimesVisibilityImporter
             event_abstracts = indico_zodbimport.modules.event_abstracts:EventAbstractsImporter
+            event_papers = indico_zodbimport.modules.event_papers:EventPapersImporter
             """,
           zip_safe=False,
           packages=foundPackages,
