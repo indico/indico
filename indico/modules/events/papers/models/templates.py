@@ -42,6 +42,15 @@ class PaperTemplate(StoredFileMixin, db.Model):
         index=True,
         nullable=False
     )
+    name = db.Column(
+        db.String,
+        nullable=False
+    )
+    description = db.Column(
+        db.Text,
+        nullable=False,
+        default=''
+    )
 
     event_new = db.relationship(
         'Event',
