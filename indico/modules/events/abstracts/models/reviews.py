@@ -198,4 +198,4 @@ class AbstractReview(RenderModeMixin, db.Model):
         if self.abstract.can_judge(user):
             return True
         else:
-            return self.track in user.convener_for_tracks
+            return self.track.can_convene(user)
