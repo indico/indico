@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy import db, PyIntEnum
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
+from indico.modules.events.papers.models.reviews import PaperReviewType
 
 
 class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
@@ -25,6 +26,11 @@ class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
     __table_args__ = {'schema': 'event_paper_reviewing'}
 
     event_backref_name = 'paper_review_questions'
+
+    type = db.Column(
+        PyIntEnum(PaperReviewType),
+        nullable=False
+    )
 
     # relationship backrefs:
     # - ratings (PaperReviewRating.question)
