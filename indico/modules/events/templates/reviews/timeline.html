@@ -89,7 +89,7 @@
 {% macro render_review(review, form) %}
     {% set no_content = not review.comment and not review.ratings %}
     {% set rating_range = review.proposal.config.rating_range %}
-    <div id="abstract-review-{{ review.id }}" class="i-timeline-item">
+    <div id="proposal-review-{{ review.id }}" class="i-timeline-item">
         {{ render_user_avatar(review.user) }}
         <div class="flexrow i-timeline-item-content">
             <div class="i-timeline-item-metadata">
@@ -131,7 +131,7 @@
                             <a class="i-link icon-edit js-edit-review"
                                title="{% trans %}Edit review{% endtrans %}"
                                data-href="{{ review.proposal.get_save_review_url(review=review) }}"
-                               data-form-container="#abstract-review-{{ review.id }} .js-form-container"
+                               data-form-container="#proposal-review-{{ review.id }} .js-form-container"
                                data-update="#reviewing-page"
                                data-replace-update
                                data-confirm-close-unsaved
