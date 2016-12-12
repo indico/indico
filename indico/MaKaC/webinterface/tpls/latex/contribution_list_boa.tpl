@@ -42,7 +42,7 @@
             \vspace{1em}
             \normalsize {
                 \rmfamily {
-                    ${md_convert(boa_text.decode('utf-8'))}
+                    ${md_convert(boa_text)}
                 }
             }
             \fancyfoot[C]{\thepage}
