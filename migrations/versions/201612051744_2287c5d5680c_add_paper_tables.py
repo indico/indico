@@ -154,6 +154,8 @@ def upgrade():
         'templates',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('name', sa.String(), nullable=False),
+        sa.Column('description', sa.Text(), nullable=False),
         sa.Column('storage_backend', sa.String(), nullable=False),
         sa.Column('content_type', sa.String(), nullable=False),
         sa.Column('size', sa.BigInteger(), nullable=False),
