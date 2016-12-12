@@ -53,6 +53,7 @@ def upgrade():
         'review_questions',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
+        sa.Column('type', PyIntEnum(PaperReviewType), nullable=False),
         sa.Column('text', sa.Text(), nullable=False),
         sa.Column('no_score', sa.Boolean(), nullable=False),
         sa.Column('position', sa.Integer(), nullable=False),
