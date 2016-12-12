@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import os
+import shutil
 from collections import OrderedDict, defaultdict, namedtuple
 
 from sqlalchemy.orm import joinedload, load_only
@@ -277,7 +278,7 @@ def create_boa(event):
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
     path = os.path.join(Config.getInstance().getXMLCacheDir(), 'boa-{}.pdf'.format(event.id))
-    os.rename(tmp_path, path)
+    shutil.move(tmp_path, path)
     boa_settings.set(event, 'cache_path', path)
     return path
 
