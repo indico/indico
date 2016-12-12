@@ -387,6 +387,7 @@ module_js = {
     'abstracts': rjs_bundle('modules_abstracts',
                             'js/indico/modules/abstracts.js',
                             'js/indico/jquery/rulelistwidget.js'),
+    'reviews': rjs_bundle('modules_reviews', 'js/indico/modules/reviews.js'),
     'timetable': rjs_bundle('modules_timetable',
                             *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
                                        'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js', 'Actions.js')),
