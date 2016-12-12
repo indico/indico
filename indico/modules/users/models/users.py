@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import flash, session
+from flask import flash, has_request_context, session
 from flask_multipass import IdentityRetrievalFailed
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.associationproxy import association_proxy
@@ -123,7 +123,10 @@ class PersonMixin(object):
     @property
     def display_full_name(self):
         """Return the full name using the user's preferred name format."""
-        return format_display_full_name(session.user, self)
+        if has_request_context():
+            return format_display_full_name(session.user, self)
+        else:
+            return format_display_full_name(None, self)
 
     # Convenience property to have a canonical `name` property
     name = full_name
