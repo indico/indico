@@ -69,7 +69,7 @@ def strict_sanitize_email(email, fallback=None):
 
 
 # Add "temporary" column to model
-Contribution.legacy_track_id = db.Column(db.Integer, nullable=True)
+# Contribution.legacy_track_id = db.Column(db.Integer, nullable=True)
 
 
 class OldAbstract(db.Model):
