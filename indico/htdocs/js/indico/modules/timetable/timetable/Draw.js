@@ -200,7 +200,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
 
                     // If it's a contribution add the speakers information
                     if (self.eventData.presenters && self.eventData.presenters.length > 0) {
-                        var firstPresenter = _.sortBy(self.eventData.presenters, _.property('displayOrderKey'))[0];
+                        var firstPresenter = self.eventData.presenters[0];
                         this.presentersDiv = Html.div({className: 'timetableBlockPresenters'});
                         this.presentersDiv.append(firstPresenter.name);
                         if (self.eventData.presenters.length > 1) {
