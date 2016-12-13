@@ -72,14 +72,17 @@ class TimetableSerializer(object):
         return timetable
 
     def serialize_session_timetable(self, session_, without_blocks=False, strip_empty_days=False):
+        event_tz = session_.event_new.tzinfo
         timetable = {}
-        for day in iterdays(session_.event_new.start_dt_local, session_.event_new.end_dt_local):
+        start_dt = min(b.start_dt.astimezone(event_tz) for b in session_.blocks)
+        end_dt = max(b.end_dt.astimezone(event_tz) for b in session_.blocks)
+        for day in iterdays(start_dt, end_dt):
             timetable[day.strftime('%Y%m%d')] = {}
         for block in session_.blocks:
             block_entry = block.timetable_entry
             if not block_entry:
                 continue
-            date_key = block_entry.start_dt.astimezone(session_.event_new.tzinfo).strftime('%Y%m%d')
+            date_key = block_entry.start_dt.astimezone(event_tz).strftime('%Y%m%d')
             entries = block_entry.children if without_blocks else [block_entry]
             for entry in entries:
                 if not entry.can_view(session.user):
