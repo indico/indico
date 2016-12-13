@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
@@ -40,7 +41,6 @@ class CallForAbstracts(object):
     allow_contributors_in_comments = EventSettingProperty(abstracts_reviewing_settings,
                                                           'allow_contributors_in_comments')
     allow_convener_judgment = EventSettingProperty(abstracts_reviewing_settings, 'allow_convener_judgment')
-    announcement = EventSettingProperty(abstracts_settings, 'announcement')
     submission_instructions = EventSettingProperty(abstracts_settings, 'submission_instructions')
     reviewing_instructions = EventSettingProperty(abstracts_reviewing_settings, 'reviewing_instructions')
     judgment_instructions = EventSettingProperty(abstracts_reviewing_settings, 'judgment_instructions')
@@ -64,6 +64,12 @@ class CallForAbstracts(object):
     @property
     def rating_range(self):
         return tuple(abstracts_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
+
+    @property
+    def announcement(self):
+        announcement = abstracts_settings.get(self.event, 'announcement')
+        render_mode = abstracts_settings.get(self.event, 'announcement_render_mode')
+        return RENDER_MODE_WRAPPER_MAP[render_mode](announcement)
 
     def can_submit_abstracts(self, user):
         return self.is_open or abstracts_settings.acls.contains_user(self.event, 'authorized_submitters', user)

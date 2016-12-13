@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import itemgetter
+
 from flask import redirect, flash, session
 
 from indico.modules.events.abstracts import logger
@@ -31,6 +33,7 @@ from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _
+from indico.util.string import handle_legacy_description
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
@@ -90,12 +93,17 @@ class RHManageAbstractSubmission(RHManageAbstractsBase):
     """Configure abstract submission"""
 
     def _process(self):
+        settings = abstracts_settings.get_all(self.event_new)
         form = AbstractSubmissionSettingsForm(event=self.event_new,
-                                              obj=FormDefaults(**abstracts_settings.get_all(self.event_new)))
+                                              obj=FormDefaults(**settings))
         if form.validate_on_submit():
             abstracts_settings.set_multi(self.event_new, form.data)
             flash(_('Abstract submission settings have been saved'), 'success')
             return jsonify_data()
+        elif not form.is_submitted():
+            handle_legacy_description(form.announcement, settings,
+                                      get_render_mode=itemgetter('announcement_render_mode'),
+                                      get_value=itemgetter('announcement'))
         return jsonify_form(form)
 
 

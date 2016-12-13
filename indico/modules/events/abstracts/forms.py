@@ -25,6 +25,7 @@ from wtforms.validators import NumberRange, Optional, DataRequired, ValidationEr
 from wtforms.widgets import Select
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
                                                     AbstractPersonLinkListField, AbstractField, TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
@@ -37,7 +38,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
-from indico.web.forms.base import IndicoForm, FormDefaults
+from indico.web.forms.base import IndicoForm, FormDefaults, generated_data
 from indico.web.forms.fields import IndicoQuerySelectMultipleField
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, EditableFileField,
@@ -130,6 +131,10 @@ class AbstractSubmissionSettingsForm(IndicoForm):
     submission_instructions = IndicoMarkdownField(_('Instructions'), editor=True,
                                                   description=_("These instructions will be displayed right before the "
                                                                 "submission form."))
+
+    @generated_data
+    def announcement_render_mode(self):
+        return RenderMode.markdown
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
