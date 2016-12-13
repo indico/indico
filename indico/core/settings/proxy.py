@@ -167,7 +167,7 @@ class SettingProperty(object):
     """Expose a SettingsProxy value as a property.
 
     Override `attr` in a subclass for settings proxies that are tied
-    to specific objects (such as `EventSettigsProxy`)
+    to specific objects (such as `EventSettingsProxy`)
 
     :param proxy: An instance of a settings proxy
     :param name: The name of the setting
