@@ -319,8 +319,27 @@ class LaTeXExtension(markdown.Extension):
         md.postprocessors['table'] = table_pp
         md.postprocessors['link'] = link_pp
 
+        # Needed for LaTeX postprocessors not to choke on URL-encoded urls
+        md.inlinePatterns['automail'] = NonEncodedAutoMailPattern(markdown.inlinepatterns.AUTOMAIL_RE, md)
+
     def reset(self):
         pass
+
+
+class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
+    """Reimplementation of AutoMailPattern to avoid URL-encoded links"""
+
+    def handleMatch(self, m):
+        el = markdown.util.etree.Element('a')
+        email = self.unescape(m.group(2))
+        if email.startswith("mailto:"):
+            email = email[len("mailto:"):]
+        el.text = markdown.util.AtomicString(''.join(email))
+        mailto = "mailto:" + email
+        mailto = "".join([markdown.util.AMP_SUBSTITUTE + '#%d;' %
+                          ord(letter) for letter in mailto])
+        el.set('href', mailto)
+        return el
 
 
 class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
