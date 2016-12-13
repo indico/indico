@@ -269,6 +269,7 @@ class AbstractMigration(object):
             'end_dt': end_dt,
             'modification_end_dt': modification_end_dt,
             'announcement': convert_to_unicode(self.amgr._announcement),
+            'announcement_render_mode': RenderMode.html,
             'allow_multiple_tracks': bool(getattr(self.amgr, '_multipleTracks', True)),
             'tracks_required': bool(getattr(self.amgr, '_tracksMandatory', False)),
             'allow_attachments': bool(getattr(self.amgr, '_attachFiles', False)),

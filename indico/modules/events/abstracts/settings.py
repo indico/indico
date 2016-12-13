@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.core.settings.converters import DatetimeConverter, EnumConverter
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
@@ -63,6 +64,7 @@ abstracts_settings = EventSettingsProxy('abstracts', {
     'end_dt': None,
     'modification_end_dt': None,
     'announcement': '',
+    'announcement_render_mode': RenderMode.markdown,
     'allow_multiple_tracks': True,
     'tracks_required': False,
     'allow_attachments': False,
@@ -98,5 +100,6 @@ boa_settings = EventSettingsProxy('abstracts_book', {
     'cache_path': None
 }, converters={
     'sort_by': EnumConverter(BOASortField),
-    'corresponding_author': EnumConverter(BOACorrespondingAuthorType)
+    'corresponding_author': EnumConverter(BOACorrespondingAuthorType),
+    'announcement_render_mode': EnumConverter(RenderMode)
 })
