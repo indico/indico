@@ -4,8 +4,8 @@
 {% block html %}
     {% if acl %}
         <a href="#" class="enable-acl-link hidden"
-           title='{% trans %}This will change the event protection mode to "Protected"{% endtrans %}'>
-            {%- trans %}Restrict access to this event{% endtrans -%}
+           title='{% trans %}This will change the protection mode to "Protected"{% endtrans %}'>
+            {{- field.default_text -}}
         </a>
     {% endif %}
     {% set value_json = field._value() | tojson %}

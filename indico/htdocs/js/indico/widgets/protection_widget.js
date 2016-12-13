@@ -57,7 +57,7 @@
 
         $enableAclLink.on('click', function(evt) {
             evt.preventDefault();
-            $('input[name="protection_mode"][value="protected"]').trigger('click');
+            $('input[name=' + options.fieldName + '][value="protected"]').trigger('click');
         });
 
         _.defer(function() {

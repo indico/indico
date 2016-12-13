@@ -35,7 +35,8 @@ class EventProtectionForm(IndicoForm):
                                             acl_message_url=lambda form: url_for('event_management.acl_message',
                                                                                  form.protected_object))
     acl = AccessControlListField(_('Access control list'), groups=True, allow_emails=True, allow_networks=True,
-                                 allow_external=True)
+                                 allow_external=True, default_text=_('Restrict access to this event'),
+                                 description=_('List of users allowed to access the event.'))
     access_key = IndicoPasswordField(_('Access key'), toggle=True,
                                      description=_('It is more secure to use only the ACL and not set an access key. '
                                                    '<strong>It will have no effect if the event is not '

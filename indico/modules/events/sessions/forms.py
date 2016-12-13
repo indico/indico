@@ -61,7 +61,7 @@ class SessionProtectionForm(IndicoForm):
                                                                                  form.protected_object))
     acl = AccessControlListField(_('Access control list'),
                                  [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                                 groups=True, allow_emails=True,
+                                 groups=True, allow_emails=True, default_text=_('Restrict access to this session'),
                                  description=_('List of users allowed to access the session.'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
                                   description=_('List of users allowed to modify the session'))

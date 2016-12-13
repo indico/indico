@@ -100,6 +100,11 @@ class PrincipalListField(HiddenField):
 class AccessControlListField(PrincipalListField):
     widget = JinjaWidget('forms/principal_list_widget.html', single_kwargs=True, acl=True)
 
+    def __init__(self, *args, **kwargs):
+        # The text of the link that changes the protection mode of the object to protected
+        self.default_text = kwargs.pop('default_text')
+        super(AccessControlListField, self).__init__(*args, **kwargs)
+
 
 class PrincipalField(PrincipalListField):
     """A field that lets you select an Indico user/group ("principal")"""
