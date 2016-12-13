@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from itertools import chain
 
 from flask import session
 from sqlalchemy.orm import defaultload
@@ -72,10 +73,16 @@ class TimetableSerializer(object):
         return timetable
 
     def serialize_session_timetable(self, session_, without_blocks=False, strip_empty_days=False):
-        event_tz = session_.event_new.tzinfo
+        event = session_.event_new
+        event_tz = event.tzinfo
         timetable = {}
-        start_dt = min(b.start_dt.astimezone(event_tz) for b in session_.blocks)
-        end_dt = max(b.end_dt.astimezone(event_tz) for b in session_.blocks)
+        if session_.blocks:
+            start_dt = min(chain((b.start_dt for b in session_.blocks), (event.start_dt,))).astimezone(event_tz)
+            end_dt = max(chain((b.end_dt for b in session_.blocks), (event.end_dt,))).astimezone(event_tz)
+        else:
+            start_dt = event.start_dt_local
+            end_dt = event.end_dt_local
+
         for day in iterdays(start_dt, end_dt):
             timetable[day.strftime('%Y%m%d')] = {}
         for block in session_.blocks:
