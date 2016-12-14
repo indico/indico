@@ -20,6 +20,13 @@
         </thead>
         <tbody>
             {% for regform in regforms %}
+                {% set button_text -%}
+                    {% if regform.moderation_enabled %}
+                        {%- trans %}Apply{% endtrans %}
+                    {%- else %}
+                        {%- trans %}Register{% endtrans %}
+                    {%- endif %}
+                {%- endset -%}
                 <tr>
                     <td>
                         {% if event.can_manage(session.user, 'registration') %}
@@ -40,16 +47,16 @@
                         {% elif not regform.is_open %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}Registration is closed{% endtrans %}">
-                                {% trans %}Register{% endtrans %}
+                                {{ button_text }}
                             </a>
                         {% elif regform.limit_reached %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}The maximum number of registrations has been reached{% endtrans %}">
-                                {% trans %}Register{% endtrans %}
+                                {{ button_text }}
                             </a>
                         {% else %}
                             <a href="{{ url_for('.display_regform', regform) }}" class="i-button highlight">
-                                {% trans %}Register{% endtrans %}
+                                {{ button_text }}
                             </a>
                         {% endif %}
                     </td>

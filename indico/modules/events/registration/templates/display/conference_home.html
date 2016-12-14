@@ -27,10 +27,17 @@
 {% endmacro %}
 
 {% if not g.static_site %}
+    {% set is_form_moderated = regforms|length == 1 and regforms[0].moderation_enabled %}
     <div class="infoline announcement">
         <span class="icon icon-ticket"></span>
         <div class="text">
-            <div class="label">{% trans %}Registration{% endtrans %}</div>
+            <div class="label">
+                {%- if is_form_moderated %}
+                    {%- trans %}Application{% endtrans %}
+                {%- else %}
+                    {%- trans %}Registration{% endtrans %}
+                {%- endif -%}
+            </div>
             {% if user_has_registered %}
                 <div>{% trans %}You have registered for this event.{% endtrans %}</div>
                 <div class="toolbar right">
@@ -42,11 +49,21 @@
                     </a>
                 </div>
             {% else %}
-                <div>{% trans %}Registration for this event is currently open.{% endtrans %}</div>
-                <div class="toolbar right">
+                <div>
+                    {%- if is_form_moderated %}
+                        {%- trans %}Application for this event is currently open.{% endtrans %}
+                    {%- else %}
+                        {%- trans %}Registration for this event is currently open.{% endtrans %}
+                    {%- endif -%}
+                </div>
+                <div class="toolbar">
                     <a href="{{ url_for('event_registration.display_regform_list', event) }}"
                        class="i-button next highlight">
-                        {% trans %}Register now{% endtrans %}
+                        {%- if is_form_moderated %}
+                            {%- trans %}Apply now{% endtrans %}
+                        {%- else %}
+                            {%- trans %}Register now{% endtrans %}
+                        {%- endif -%}
                     </a>
                 </div>
             {% endif %}

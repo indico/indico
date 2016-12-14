@@ -138,7 +138,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
             management: '=',
             notifyDefault: '=',
             postUrl: '=',
-            checkEmailUrl: '='
+            checkEmailUrl: '=',
+            isModerated: '='
         },
 
         controller: function($scope, $resource, $location, $anchorScroll) {
