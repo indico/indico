@@ -116,7 +116,7 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         raise NotImplementedError
 
     def _process_POST(self):
-        f = request.files['file']
+        f = request.files[self.IMAGE_TYPE]
         try:
             img = Image.open(f)
         except IOError:
