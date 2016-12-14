@@ -34,7 +34,7 @@ from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin, AuthorsSpeakersMixin
-from indico.modules.events.papers.models.revisions import PaperRevisionState
+from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
@@ -331,6 +331,21 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             lazy=True
         )
     )
+
+    @declared_attr
+    def paper_last_revision(cls):
+        # Incompatible with joinedload
+        return db.relationship(
+            'PaperRevision',
+            uselist=False,
+            lazy=True,
+            viewonly=True,
+            primaryjoin=((PaperRevision.contribution_id == cls.id) &
+                         (PaperRevision.submitted_dt == (db.select([db.func.max(PaperRevision.submitted_dt)])
+                                                         .where(PaperRevision.contribution_id == cls.id)
+                                                         .correlate_except(PaperRevision)
+                                                         .as_scalar())))
+        )
 
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.contribution)
