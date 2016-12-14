@@ -61,7 +61,7 @@ class RHSubmitAbstract(RHAbstractsBase):
         RHAbstractsBase._checkProtection(self)
 
     def _process(self):
-        abstract_form_class = make_abstract_form(self.event_new)
+        abstract_form_class = make_abstract_form(self.event_new, management=self.management)
         form = abstract_form_class(event=self.event_new)
         if form.validate_on_submit():
             abstract = create_abstract(self.event_new, *get_field_values(form.data), send_notifications=True)
