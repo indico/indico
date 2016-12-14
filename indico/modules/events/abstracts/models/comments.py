@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
+from indico.modules.events.models.reviews import ProposalCommentMixin
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
@@ -41,13 +42,12 @@ class AbstractCommentVisibility(TitledIntEnum):
     users = 5
 
 
-class AbstractComment(RenderModeMixin, db.Model):
+class AbstractComment(ProposalCommentMixin, RenderModeMixin, db.Model):
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
 
     __tablename__ = 'abstract_comments'
     __table_args__ = {'schema': 'event_abstracts'}
-    TIMELINE_TYPE = 'comment'
 
     id = db.Column(
         db.Integer,

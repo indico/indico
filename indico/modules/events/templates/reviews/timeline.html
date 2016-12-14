@@ -14,9 +14,9 @@
         <div class="i-timeline with-line">
             <div class="i-timeline-connect-up"></div>
             {% for item in timeline %}
-                {% if item.TIMELINE_TYPE == 'comment' %}
+                {% if item.timeline_item_type == 'comment' %}
                     {{ render_comment(item, proposal) }}
-                {% elif item.TIMELINE_TYPE == 'review' %}
+                {% elif item.timeline_item_type == 'review' %}
                     {{ render_review(item, form=form) }}
                 {% endif %}
             {% endfor %}
@@ -88,7 +88,7 @@
 
 {% macro render_review(review, form) %}
     {% set no_content = not review.comment and not review.ratings %}
-    {% set rating_range = review.proposal.config.rating_range %}
+    {% set rating_range = review.proposal.cfp.rating_range %}
     <div id="proposal-review-{{ review.id }}" class="i-timeline-item">
         {{ render_user_avatar(review.user) }}
         <div class="flexrow i-timeline-item-content">
