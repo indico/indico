@@ -211,7 +211,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     logo_metadata = db.Column(
         JSON,
         nullable=False,
-        default=JSON.NULL
+        default=lambda: None
     )
     #: The logo's raw image data
     logo = db.deferred(db.Column(
@@ -222,7 +222,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     stylesheet_metadata = db.Column(
         JSON,
         nullable=False,
-        default=JSON.NULL
+        default=lambda: None
     )
     #: The stylesheet's raw image data
     stylesheet = db.deferred(db.Column(

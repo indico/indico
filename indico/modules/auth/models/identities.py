@@ -59,7 +59,7 @@ class Identity(db.Model):
     multipass_data = db.Column(
         JSON,
         nullable=False,
-        default=JSON.NULL
+        default=lambda: None
     )
     #: the user data from the user provider
     _data = db.Column(

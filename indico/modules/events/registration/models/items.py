@@ -261,7 +261,7 @@ class RegistrationFormItem(db.Model):
     data = db.Column(
         JSON,
         nullable=False,
-        default=JSON.NULL
+        default=lambda: None
     )
 
     #: The ID of the latest data

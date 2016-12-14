@@ -119,7 +119,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     icon_metadata = db.Column(
         JSON,
         nullable=False,
-        default=JSON.NULL
+        default=lambda: None
     )
     icon = db.deferred(db.Column(
         db.LargeBinary,
@@ -128,7 +128,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     logo_metadata = db.Column(
         JSON,
         nullable=False,
-        default=JSON.NULL
+        default=lambda: None
     )
     logo = db.deferred(db.Column(
         db.LargeBinary,
