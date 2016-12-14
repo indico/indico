@@ -114,7 +114,7 @@ class Abstract(ProposalMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeake
 
     # Proposal mixin properties
     proposal_type = 'abstract'
-    config_attr = 'cfa'
+    call_for_proposals_attr = 'cfa'
     delete_comment_endpoint = 'abstracts.delete_abstract_comment'
     create_comment_endpoint = 'abstracts.comment_abstract'
     edit_comment_endpoint = 'abstracts.edit_abstract_comment'

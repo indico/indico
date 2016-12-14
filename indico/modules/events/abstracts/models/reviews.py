@@ -18,13 +18,12 @@ from __future__ import unicode_literals, division
 
 from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
-from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
+from indico.modules.events.models.reviews import ProposalReviewMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import TitledIntEnum
-from indico.web.flask.util import url_for
 
 
 class AbstractAction(TitledIntEnum):
@@ -36,11 +35,14 @@ class AbstractAction(TitledIntEnum):
     merge = 5
 
 
-class AbstractReview(RenderModeMixin, db.Model):
+class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     """Represents an abstract review, emitted by a reviewer"""
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
+
+    proposal_relationship = 'abstract'
+    group_relationship = 'track'
 
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
@@ -50,7 +52,6 @@ class AbstractReview(RenderModeMixin, db.Model):
                                          .format(AbstractAction.mark_as_duplicate, AbstractAction.merge),
                                          name='prop_abstract_id_only_duplicate_merge'),
                       {'schema': 'event_abstracts'})
-    TIMELINE_TYPE = 'review'
 
     id = db.Column(
         db.Integer,
@@ -173,26 +174,12 @@ class AbstractReview(RenderModeMixin, db.Model):
     def __repr__(self):
         return format_repr(self, 'id', 'abstract_id', 'user_id', proposed_action=None)
 
-    # Proposal interface
-    @property
-    def group(self):
-        return self.track
-
-    # Proposal interface
-    @property
-    def proposal(self):
-        return self.abstract
-
     @property
     def score(self):
         ratings = [r for r in self.ratings if not r.question.no_score]
         if not ratings:
             return None
         return sum(x.value for x in ratings) / len(ratings)
-
-    @property
-    def visibility(self):
-        return AbstractCommentVisibility.reviewers
 
     def can_edit(self, user, check_state=False):
         if user is None:
