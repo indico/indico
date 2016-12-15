@@ -1,7 +1,7 @@
 <% import MaKaC.webinterface.urlHandlers as urlHandlers %>
 
 % for review in Versioning:
-    % if review.materials and (( (ConferenceChoice == 2 or ConferenceChoice == 4) and review.getRefereeJudgement().isSubmitted() ) or ( ConferenceChoice == 3 and review.getEditorJudgement().isSubmitted())):
+    % if (( (ConferenceChoice == 2 or ConferenceChoice == 4) and review.getRefereeJudgement().isSubmitted() ) or ( ConferenceChoice == 3 and review.getEditorJudgement().isSubmitted())):
     <div class="historyReview">
         <h1 class="historyReviewHeader">${ _("Review") } ${ review.getVersion() }</h1>
         <h2>${_("Files")}</h2>
