@@ -8,7 +8,7 @@
     </span>
 {% endmacro %}
 
-{% macro render_paper_files(paper_files) %}
+{% macro render_paper_files(paper_files, show_actions=true, only_latest=false) %}
     <table class="tree" id="paper-files">
         {% for paper_file in paper_files %}
             <tr>
@@ -19,16 +19,18 @@
                         </a>
                     </span>
                 </td>
-                <td class="actions">
-                    <a class="icon-remove js-delete"
-                       data-method="DELETE"
-                       data-href="{{ url_for('paper_reviewing.remove_paper_file', paper_file) }}"
-                       data-title="{% trans name=paper_file.file_name %}Remove {{ name }}?{% endtrans %}"
-                       data-confirm="{% trans name=paper_file.filename -%}
-                            Are you sure you want to remove &quot;{{ name }}&quot;?<br>
-                       {%- endtrans %}"
-                      data-update="#paper-files"></a>
-                </td>
+                {% if show_actions %}
+                    <td class="actions">
+                        <a class="icon-remove js-delete"
+                           data-method="DELETE"
+                           data-href="{{ url_for('paper_reviewing.remove_paper_file', paper_file) }}"
+                           data-title="{% trans name=paper_file.file_name %}Remove {{ name }}?{% endtrans %}"
+                           data-confirm="{% trans name=paper_file.filename -%}
+                                Are you sure you want to remove &quot;{{ name }}&quot;?<br>
+                           {%- endtrans %}"
+                          data-update="#paper-files"></a>
+                    </td>
+                {% endif %}
             </tr>
         {% endfor %}
     </table>
