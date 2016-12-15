@@ -5,8 +5,19 @@
 {%- endblock %}
 
 {% block body -%}
-    We're pleased to announce that your abstract "{abstract_title}" with ID #{abstract_id} has been accepted
-    in track "{abstract_track}" ({contribution_type}).
+    We're pleased to announce that your abstract "{abstract_title}" with ID #{abstract_id} has been accepted in track "{abstract_track}" ({contribution_type}).
+
+    See below a summary of your submitted abstract:
+    Conference: {event_title}
+    Submitted by: {submitter_name}
+    Title: {abstract_title}
+    Primary Authors: {primary_authors}
+    Co-authors: {co_authors}
+    Track classification: {abstract_track}
+    Presentation type: {contribution_type}
+
+    For a more detailed summary please visit the page of your abstract: 
+    {abstract_url}.
 
     Kind regards,
     The organizers of {event_title}
