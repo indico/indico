@@ -47,114 +47,98 @@
     <div class="list-section">
         <div class="toolbars space-after">
             <div class="toolbar">
-                <div class="group">
-                    <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#" data-select-all="#contribution-list input:checkbox">{% trans %}All{% endtrans %}</a>
-                        </li>
-                        <li>
-                            <a href="#" data-select-none="#contribution-list input:checkbox">{% trans %}None{% endtrans %}</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="group">
-                    <button class="i-button highlight icon-plus js-dialog-action"
-                            title="{% trans %}Add new contribution{% endtrans %}"
-                            data-title="{% trans %}Add new contribution{% endtrans %}"
-                            data-href="{{ url_for('.manage_create_contrib', event) }}"
-                            data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
-                            data-ajax-dialog>
-                        {% trans %}New contribution{% endtrans %}
-                    </button>
-                </div>
-                <div class="group">
-                    <button class="i-button js-enable-if-checked icon-remove disabled"
-                            title="{% trans %}Remove{% endtrans %}"
-                            data-method="POST"
-                            data-href="{{ url_for('.manage_delete_contribs', event) }}"
-                            data-params-selector="#contribution-list input[name=contribution_id]:checked"
-                            data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
-                            data-title="{% trans %}Confirm deletion{% endtrans %}"
-                            data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'>
-                        {%- trans %}Remove{% endtrans -%}
-                    </button>
-                </div>
-                <div class="group">
-                    <button class="i-button icon-users js-enable-if-checked disabled"
-                            data-title="{% trans %}Author list{% endtrans %}"
-                            data-href="{{ url_for('contributions.person_list', event) }}"
-                            data-params-selector="#contribution-list input[name=contribution_id]:checked"
-                            data-method="POST"
-                            data-ajax-dialog>
-                        {%- trans %}Author list{% endtrans -%}
-                    </button>
-                </div>
-                <div class="group">
-                    <a href="#" class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
-                       data-href="{{ url_for('.material_package', event) }}">
-                        {%- trans %}Material package{%- endtrans %}
-                    </a>
-                </div>
-                <div class="group">
-                    <a class="i-button js-enable-if-checked arrow disabled"
-                       title="{% trans %}Export data{% endtrans %}"
-                       data-toggle="dropdown">
-                        {% trans -%}Export{%- endtrans %}
-                    </a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                               data-href="{{ url_for('.contributions_pdf_export', event) }}">
-                                {% trans -%}PDF{%- endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                               data-href="{{ url_for('.contributions_pdf_export_book', event) }}">
-                                {% trans -%}PDF (book of abstracts){%- endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                               data-href="{{ url_for('.contributions_pdf_export_book_sorted', event) }}">
-                                {% trans -%}PDF (book of abstracts - sorted by board number){%- endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
-                               data-href="{{ url_for('.contributions_csv_export', event) }}">
-                                {% trans -%}CSV{%- endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
-                               data-href="{{ url_for('.contributions_excel_export', event) }}">
-                                {% trans -%}XLSX (Excel){%- endtrans %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
+                <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" data-select-all="#contribution-list input:checkbox">{% trans %}All{% endtrans %}</a>
+                    </li>
+                    <li>
+                        <a href="#" data-select-none="#contribution-list input:checkbox">{% trans %}None{% endtrans %}</a>
+                    </li>
+                </ul>
+                <button class="i-button highlight icon-plus js-dialog-action"
+                        title="{% trans %}Add new contribution{% endtrans %}"
+                        data-title="{% trans %}Add new contribution{% endtrans %}"
+                        data-href="{{ url_for('.manage_create_contrib', event) }}"
+                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
+                        data-ajax-dialog>
+                    {%- trans %}New contribution{% endtrans -%}
+                </button>
+                <button class="i-button js-enable-if-checked icon-remove disabled"
+                        title="{% trans %}Remove{% endtrans %}"
+                        data-method="POST"
+                        data-href="{{ url_for('.manage_delete_contribs', event) }}"
+                        data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                        data-confirm="{% trans %}Do you really want to delete the selected contributions?{% endtrans %}"
+                        data-title="{% trans %}Confirm deletion{% endtrans %}"
+                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'>
+                    {%- trans %}Remove{% endtrans -%}
+                </button>
+                <button class="i-button icon-users js-enable-if-checked disabled"
+                        data-title="{% trans %}Author list{% endtrans %}"
+                        data-href="{{ url_for('contributions.person_list', event) }}"
+                        data-params-selector="#contribution-list input[name=contribution_id]:checked"
+                        data-method="POST"
+                        data-ajax-dialog>
+                    {%- trans %}Author list{% endtrans -%}
+                </button>
+                <a href="#" class="i-button icon-attachment js-enable-if-checked js-submit-form disabled"
+                   data-href="{{ url_for('.material_package', event) }}">
+                    {%- trans %}Material package{% endtrans -%}
+                </a>
+                <a class="i-button js-enable-if-checked arrow disabled"
+                   title="{% trans %}Export data{% endtrans %}"
+                   data-toggle="dropdown">
+                    {%- trans %}Export{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_pdf_export', event) }}">
+                            {%- trans %}PDF{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_pdf_export_book', event) }}">
+                            {%- trans %}PDF (book of abstracts){% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_pdf_export_book_sorted', event) }}">
+                            {%- trans %}PDF (book of abstracts - sorted by board number){% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_csv_export', event) }}">
+                            {%- trans %}CSV{% endtrans -%}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
+                           data-href="{{ url_for('.contributions_excel_export', event) }}">
+                            {%- trans %}XLSX (Excel){% endtrans -%}
+                        </a>
+                    </li>
+                </ul>
             </div>
             <div class="toolbar">
                 <div class="group" id="filter-statistics">
                     {{ render_filter_statistics(contribs|length, total_entries, total_duration) }}
                 </div>
-                <div class="group">
-                    <button class="i-button icon-filter js-dialog-action"
-                            data-href="{{ url_for('.customize_contrib_list', event) }}"
-                            data-title="{% trans %}Contribution list configuration{% endtrans %}"
-                            data-dialog-classes="list-filter-dialog"
-                            data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
-                            data-ajax-dialog>
-                        {% trans %}Filters{% endtrans %}
-                    </button>
-                </div>
-                <div class="group">
-                    <button class="i-button icon-link js-static-url"
-                            data-href="{{ url_for('.generate_static_url', event) }}"
-                            title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
-                </div>
+                <button class="i-button icon-filter js-dialog-action"
+                        data-href="{{ url_for('.customize_contrib_list', event) }}"
+                        data-title="{% trans %}Contribution list configuration{% endtrans %}"
+                        data-dialog-classes="list-filter-dialog"
+                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
+                        data-ajax-dialog>
+                    {%- trans %}Filters{% endtrans -%}
+                </button>
+                <button class="i-button icon-link js-static-url"
+                        data-href="{{ url_for('.generate_static_url', event) }}"
+                        title="{% trans %}Generate a URL for the selected filters.{% endtrans %}"></button>
                 <div class="group">
                     <span class="i-button label icon-search"></span>
                     <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
