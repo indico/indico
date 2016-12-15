@@ -168,8 +168,8 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                  description=_("These instructions will be displayed right before the "
                                                                "reviewing form."))
     judgment_instructions = IndicoMarkdownField(_('Judgment Instructions'), editor=True,
-                                                  description=_("These instructions will be displayed right before the "
-                                                                "decision box."))
+                                                description=_("These instructions will be displayed right before the "
+                                                              "decision box."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
