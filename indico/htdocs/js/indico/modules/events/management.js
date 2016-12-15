@@ -45,7 +45,7 @@
         }, options);
 
         enableIfChecked('.js-event-person-list', '.select-row:visible', '.js-event-person-list .js-requires-selected-row');
-        $('.js-event-person-list [data-toggle=dropdown]').closest('.group').dropdown();
+        $('.js-event-person-list [data-toggle=dropdown]').closest('.toolbar').dropdown();
         $('.js-event-person-list [data-filter]').on('click', refreshPersonFilters);
 
         $('.js-event-person-list td').on('mouseenter', function() {

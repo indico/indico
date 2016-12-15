@@ -198,7 +198,7 @@
             placeholder: '#filter-placeholder'
         };
 
-        $('.list-section [data-toggle=dropdown]').closest('.group').dropdown();
+        $('.list-section [data-toggle=dropdown]').closest('.toolbar').dropdown();
         setupTableSorter('#contribution-list .tablesorter');
         setupSessionPicker(options.createSessionURL, options.timetableRESTURL);
         setupTrackPicker(options.createTrackURL);
@@ -225,7 +225,7 @@
     };
 
     global.setupSubContributionList = function setupSubContributionList() {
-        $('#subcontribution-list [data-toggle=dropdown]').closest('.group').dropdown();
+        $('#subcontribution-list [data-toggle=dropdown]').closest('.toolbar').dropdown();
         setupTableSorter('#subcontribution-list .tablesorter');
         enableIfChecked('#subcontribution-list', 'input[name=subcontribution_id]', '#subcontribution-list .js-enable-if-checked');
 
