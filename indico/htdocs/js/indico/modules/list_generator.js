@@ -67,10 +67,10 @@
         var hasColumnSelector = !!$('#visible-items').length;
 
         $('.list-filter .filter').each(function() {
-            var $filter = hasColumnSelector ? $(this).parent() : $(this);
+            var $filter = $(this).parent();
             $filter.dropdown({selector: "a[data-toggle='dropdown']", relative_to: $filter});
             if (!hasColumnSelector) {
-                $filter.next('.title-wrapper').on('click', function(evt) {
+                $filter.find('.title-wrapper').on('click', function(evt) {
                     $filter.find("a[data-toggle='dropdown']").trigger('click');
                     evt.stopPropagation();
                 });
