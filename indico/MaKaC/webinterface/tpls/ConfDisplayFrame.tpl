@@ -13,7 +13,7 @@ else:
 
 <div class="conf clearfix" itemscope itemtype="http://schema.org/Event">
     <div class="confheader clearfix" ${ bgColorStyle }>
-        <div class="confTitleBox" ${ bgColorStyle }>
+        <div class="confTitleBox clearfix" ${ bgColorStyle }>
             <div class="confTitle">
                 <h1>
                     <a href="${ displayURL }">
