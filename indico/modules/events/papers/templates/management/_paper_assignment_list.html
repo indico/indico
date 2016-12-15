@@ -1,7 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_paper_assignment_list(event, total_entries, contribs) %}
-    {% set tz = event.display_tzinfo %}
+{% macro render_paper_assignment_list(event, total_entries, contribs, static_columns) %}
     {% if not contribs %}
         {%- call message_box('info') %}
             {%- if total_entries %}
@@ -25,14 +24,11 @@
                         <th class="i-table title-column">
                             {%- trans %}Title{% endtrans -%}
                         </th>
-                        <th class="i-table state-column">
-                            {%- trans %}State{% endtrans -%}
-                        </th>
+                        {% for item in static_columns %}
+                            <th class="i-table">{{ item.caption }}</th>
+                        {% endfor %}
                         <th class="i-table revision-column">
                             {%- trans %}Revision{% endtrans -%}
-                        </th>
-                        <th class="i-table track-column">
-                            {%- trans %}Track{% endtrans -%}
                         </th>
                         <th class="i-table judge-column" data-sorter="false">
                             {%- trans %}Judges{% endtrans -%}
@@ -77,29 +73,58 @@
                                     </a>
                                 </span>
                             </td>
-                            <td class="i-table state-column"
-                                data-searchable="{{ last_revision_state | lower }}">
-                                <span class="vertical-aligner">{{ last_revision_state }}</span>
-                            </td>
+                            {% for item in static_columns %}
+                                {% if item.id == 'state' %}
+                                    <td class="i-table"
+                                        data-searchable="{{ last_revision_state | lower }}">
+                                        <span class="vertical-aligner">{{ last_revision_state }}</span>
+                                    </td>
+                                {% elif item.id == 'track' %}
+                                    <td class="i-table"
+                                        data-searchable="{{ contrib.track.title | lower }}">
+                                        <span class="vertical-aligner">
+                                            {%- if contrib.track -%}
+                                                {{ contrib.track.title }}
+                                            {%- else -%}
+                                                {% trans %}No track{% endtrans %}
+                                            {%- endif -%}
+                                        </span>
+                                    </td>
+                                {% elif item.id == 'session' %}
+                                    <td class="i-table"
+                                        data-searchable="{{ contrib.session.title | lower }}">
+                                        <span class="vertical-aligner">
+                                            {%- if contrib.session -%}
+                                                {% trans title=contrib.session.title -%}
+                                                    {{ title }}
+                                                {%- endtrans %}
+                                            {%- else -%}
+                                                {% trans %}No session{% endtrans %}
+                                            {%- endif -%}
+                                        </span>
+                                    </td>
+                                {% elif item.id == 'type' %}
+                                    <td class="i-table"
+                                        data-searchable="{{ contrib.type.name | lower }}">
+                                        <span class="vertical-aligner">
+                                            {%- if contrib.type -%}
+                                                {{ contrib.type.name }}
+                                            {%- else -%}
+                                                {% trans %}n/a{% endtrans %}
+                                            {%- endif -%}
+                                        </span>
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
                             <td class="i-table revision-column">
                                 <span class="vertical-aligner">
-                                    {% if contrib.paper_revisions %}
-                                        {{- contrib.paper_revisions | length -}}
-                                    {% endif %}
-                                </span>
-                            </td>
-                            <td class="i-table track-column"
-                                data-searchable="{{ contrib.track.title | lower }}">
-                                <span class="vertical-aligner">
-                                    {% if contrib.track %}
-                                        {{- contrib.track.title -}}
-                                    {% else %}
-                                        {%- trans %}No track{% endtrans -%}
-                                    {% endif %}
+                                    {%- if contrib.paper_revisions -%}
+                                        {{ contrib.paper_revisions | length }}
+                                    {%- endif -%}
                                 </span>
                             </td>
                             <td class="i-table person-row-cell"
-                                data-searchable="{{ contrib.paper_judges|map(attribute='name')|join(', ')|lower }}">
+                                data-searchable="{{ contrib.paper_judges|join(', ', attribute='name')|lower }}">
                                 <span class="vertical-aligner">
                                     {% for judge in contrib.paper_judges -%}
                                         <div class="person-row icon-user">{{ judge.display_full_name }}</div>
@@ -107,7 +132,7 @@
                                 </span>
                             </td>
                             <td class="i-table person-row-cell"
-                                data-searchable="{{ contrib.paper_content_reviewers|map(attribute='name')|join(', ')|lower }}">
+                                data-searchable="{{ contrib.paper_content_reviewers|join(', ', attribute='name')|lower }}">
                                 <span class="vertical-aligner">
                                     {% for reviewer in contrib.paper_content_reviewers -%}
                                         <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
@@ -115,7 +140,7 @@
                                 </span>
                             </td>
                             <td class="i-table person-row-cell"
-                                data-searchable="{{ contrib.paper_layout_reviewers|map(attribute='name')|join(', ')|lower }}">
+                                data-searchable="{{ contrib.paper_layout_reviewers|join(', ', attribute='name')|lower }}">
                                 <span class="vertical-aligner">
                                     {% for reviewer in contrib.paper_layout_reviewers -%}
                                         <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>

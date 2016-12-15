@@ -6,20 +6,22 @@
     <div class="label-group list-column">
         <div class="i-label title-wrapper" data-id="{{ item_id }}">
             <div class="title">{{ item.title }}</div>
+            <div class="actions">
+                <span class="visibility icon-eye"></span>
+            </div>
         </div>
         {% if filter_choices %}
             <div class="i-label filter">
                 <a class="icon-filter" data-toggle="dropdown"></a>
-                <ul class="dropdown" style="display: none">
+                <ul class="dropdown" style="display: none;">
                     {% for value, caption in filter_choices.iteritems() %}
                         <li>
+                            {% set value = none if value is none else value|string %}
                             <input type="checkbox" name="field_{{ item_id }}" value="{{ value }}"
                                    id="field_{{ item_id }}_option_{{ value }}"
-                                   {% if value|string in filters[item_id]|string %}
-                                       checked
-                                   {% endif %}>
+                                   {{ 'checked' if value in filters[item_id] }}>
                             <label for="field_{{ item_id }}_option_{{ value }}">
-                                {{ caption }}
+                                {{- caption -}}
                             </label>
                         </li>
                     {% endfor %}
@@ -33,7 +35,7 @@
     <div class="section">
         <div class="icon icon-wrench"></div>
         <div class="text">
-            <div class="label">Customize paper asssignment list</div>
+            <div class="label">{% trans %}Customize paper asssignment list{% endtrans %}</div>
             <div>
                 {% set filter_icon = '<i class="icon-filter"></i>' | safe %}
                 {%- trans -%}
@@ -54,12 +56,14 @@
         </div>
     </div>
 </div>
-<div class="success-message-box js-clear-filters-message" style="display: none">
+<div class="success-message-box js-clear-filters-message" style="display: none;">
     <div class="message-text">
         {%- trans -%}All filters have been cleared.{%- endtrans -%}
     </div>
 </div>
 <form class="list-filter" method="POST">
+    <input id="visible-items" type="hidden" name="visible_items"
+           value="{{ visible_items | tojson | forceescape }}">
     <h3>{% trans %}General paper assignment info{% endtrans %}</h3>
     <div class="flexrow f-wrap">
         {% for item_id, item in static_items.iteritems() %}
