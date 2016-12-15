@@ -335,16 +335,16 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @declared_attr
     def paper_last_revision(cls):
         # Incompatible with joinedload
+        subquery = (db.select([db.func.max(PaperRevision.submitted_dt)])
+                    .where(PaperRevision.contribution_id == cls.id)
+                    .correlate_except(PaperRevision)
+                    .as_scalar())
         return db.relationship(
             'PaperRevision',
             uselist=False,
             lazy=True,
             viewonly=True,
-            primaryjoin=((PaperRevision.contribution_id == cls.id) &
-                         (PaperRevision.submitted_dt == (db.select([db.func.max(PaperRevision.submitted_dt)])
-                                                         .where(PaperRevision.contribution_id == cls.id)
-                                                         .correlate_except(PaperRevision)
-                                                         .as_scalar())))
+            primaryjoin=db.and_(PaperRevision.contribution_id == cls.id, PaperRevision.submitted_dt == subquery)
         )
 
     # relationship backrefs:

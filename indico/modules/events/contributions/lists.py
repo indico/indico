@@ -40,9 +40,9 @@ class ContributionListGenerator(ListGeneratorBase):
         super(ContributionListGenerator, self).__init__(event)
         self.default_list_config = {'filters': {'items': {}}}
 
-        session_empty = {None: 'No session'}
-        track_empty = {None: 'No track'}
-        type_empty = {None: 'No type'}
+        session_empty = {None: _('No session')}
+        track_empty = {None: _('No track')}
+        type_empty = {None: _('No type')}
         session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
                                                                                key=attrgetter('title')))
         track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
@@ -122,8 +122,8 @@ class ContributionListGenerator(ListGeneratorBase):
         :param contrib: Used in RHs responsible for CRUD operations on a
                         contribution.
         :return: dict containing the list's entries, the fragment of
-                 displayed entries and whether the contrib passed is displayed
-                 in the results.
+                 displayed entries and whether the contribution passed is
+                 displayed in the results.
         """
         contrib_list_kwargs = self.get_list_kwargs()
         total_entries = contrib_list_kwargs.pop('total_entries')
@@ -151,7 +151,7 @@ class ContributionDisplayListGenerator(ContributionListGenerator):
         """Render the contribution list template components.
 
         :return: dict containing the list's entries, the fragment of
-                 displayed entries and whether the contrib passed is displayed
+                 displayed entries and whether the contribution passed is displayed
                  in the results.
         """
         contrib_list_kwargs = self.get_list_kwargs()

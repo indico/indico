@@ -170,7 +170,8 @@ class RHAssignmentListCustomize(RHManagePapersBase):
         return WPManagePapers.render_template('management/assignment_list_filter.html', self._conf,
                                               event=self.event_new,
                                               static_items=self.list_generator.static_items,
-                                              filters=list_config['filters'])
+                                              filters=list_config['filters'],
+                                              visible_items=list_config['items'])
 
     def _process_POST(self):
         self.list_generator.store_configuration()
