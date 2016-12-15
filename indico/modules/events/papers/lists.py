@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from operator import attrgetter
 
 from flask import request
 from sqlalchemy.orm import subqueryload
@@ -25,8 +26,8 @@ from indico.core.db import db
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
 from indico.modules.events.util import ListGeneratorBase
-from indico.web.flask.templating import get_template_module
 from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 
 
 class PaperAssignmentListGenerator(ListGeneratorBase):
@@ -37,15 +38,41 @@ class PaperAssignmentListGenerator(ListGeneratorBase):
 
     def __init__(self, event):
         super(PaperAssignmentListGenerator, self).__init__(event)
-        self.default_list_config = {'filters': {'items': {}}}
+        self.default_list_config = {
+            'items': ('state',),
+            'filters': {'items': {}}
+        }
 
-        state_not_submitted = {None: 'Not yet submitted'}
+        state_not_submitted = {None: _('Not yet submitted')}
+        track_empty = {None: _('No track')}
+        session_empty = {None: _('No session')}
+        type_empty = {None: _('No type')}
         state_choices = {state.value: state.title for state in PaperRevisionState}
+        track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
+                                                                             key=attrgetter('title')))
+        session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
+                                                                               key=attrgetter('title')))
+        type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
+                                                                           key=attrgetter('name')))
         self.static_items = OrderedDict([
             ('state', {'title': _('State'),
-                       'filter_choices': OrderedDict(state_not_submitted.items() + state_choices.items())})
+                       'filter_choices': OrderedDict(state_not_submitted.items() + state_choices.items())}),
+            ('track', {'title': _('Track'),
+                       'filter_choices': OrderedDict(track_empty.items() + track_choices.items())}),
+            ('session', {'title': _('Session'),
+                         'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
+            ('type', {'title': _('Type'),
+                      'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
         ])
         self.list_config = self._get_config()
+
+    def _get_static_columns(self, ids):
+        """
+        Retrieve information needed for the header of the static columns.
+
+        :return: a list of {'id': ..., 'caption': ...} dicts
+        """
+        return [{'id': id_, 'caption': self.static_items[id_]['title']} for id_ in self.static_items if id_ in ids]
 
     def _build_query(self):
         return (Contribution.query.with_parent(self.event)
@@ -67,21 +94,40 @@ class PaperAssignmentListGenerator(ListGeneratorBase):
                                           .has(PaperRevision.state == int(filter_state)))
             if state_criteria:
                 criteria.append(db.or_(*state_criteria))
+
+        filter_cols = {'track': Contribution.track_id,
+                       'session': Contribution.session_id,
+                       'type': Contribution.type_id}
+        for key, column in filter_cols.iteritems():
+            ids = set(filters['items'].get(key, ()))
+            if not ids:
+                continue
+            column_criteria = []
+            if None in ids:
+                column_criteria.append(column.is_(None))
+            if ids - {None}:
+                column_criteria.append(column.in_(ids - {None}))
+            criteria.append(db.or_(*column_criteria))
+
         return query.filter(*criteria)
 
     def get_list_kwargs(self):
+        list_config = self._get_config()
         contributions_query = self._build_query()
         total_entries = contributions_query.count()
         contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
-        return {'contribs': contributions, 'total_entries': total_entries, 'selected_entry': selected_entry}
+        static_item_ids, dynamic_item_ids = self._split_item_ids(list_config['items'], 'static')
+        static_columns = self._get_static_columns(static_item_ids)
+        return {'contribs': contributions, 'total_entries': total_entries, 'selected_entry': selected_entry,
+                'static_columns': static_columns}
 
     def render_list(self):
         """Render the contribution list template components.
 
         :return: dict containing the list's entries, the fragment of
-                 displayed entries and whether the contrib passed is displayed
+                 displayed entries and whether the contribution passed is displayed
                  in the results.
         """
         contrib_list_kwargs = self.get_list_kwargs()

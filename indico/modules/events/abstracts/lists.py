@@ -45,8 +45,8 @@ class AbstractListGeneratorBase(ListGeneratorBase):
             'items': (),
             'filters': {'fields': {}, 'items': {}, 'extra': {}}
         }
-        track_empty = {None: 'No track'}
-        type_empty = {None: 'No type'}
+        track_empty = {None: _('No track')}
+        type_empty = {None: _('No type')}
         track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
         type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
