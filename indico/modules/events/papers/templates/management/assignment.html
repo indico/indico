@@ -82,6 +82,9 @@
     </div>
     <div id="filter-placeholder"></div>
     <script>
+        {% if selected_entry %}
+            $('#search-input').val('#{{ selected_entry }}').trigger('change');
+        {% endif %}
         setupPaperAssignmentList();
     </script>
 {% endblock %}

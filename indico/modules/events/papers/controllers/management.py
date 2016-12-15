@@ -20,6 +20,7 @@ from flask import request, render_template, flash
 
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import PaperTeamsForm, make_competences_form, PapersScheduleForm
+from indico.modules.events.papers.lists import PaperAssignmentListGenerator
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
                                                      update_competences)
 from indico.modules.events.papers.settings import paper_reviewing_settings
@@ -148,10 +149,29 @@ class RHCloseCFP(RHManagePapersBase):
         return jsonify_data(html=_render_paper_dashboard(self.event_new))
 
 
-class RHPapersAssignment(RHManagePapersBase):
+class RHPapersAssignmentList(RHManagePapersBase):
     """Assign contributions to reviewers and judges"""
 
     def _process(self):
-        contribs = sorted(self.event_new.contributions, key=lambda x: x.friendly_id)
+        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
         return WPManagePapers.render_template('management/assignment.html', self._conf, event=self.event_new,
-                                              contribs=contribs)
+                                              **self.list_generator.get_list_kwargs())
+
+
+class RHAssignmentListCustomize(RHManagePapersBase):
+    """Filter options and columns to display for the paper assignment list of an event"""
+
+    def _checkParams(self, params):
+        RHManagePapersBase._checkParams(self, params)
+        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
+
+    def _process_GET(self):
+        list_config = self.list_generator.list_config
+        return WPManagePapers.render_template('management/assignment_list_filter.html', self._conf,
+                                              event=self.event_new,
+                                              static_items=self.list_generator.static_items,
+                                              filters=list_config['filters'])
+
+    def _process_POST(self):
+        self.list_generator.store_configuration()
+        return jsonify_data(flash=False, **self.list_generator.render_list())
