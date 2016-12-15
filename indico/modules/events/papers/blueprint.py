@@ -36,7 +36,9 @@ _bp.add_url_rule('/manage/papers/teams/competences', 'manage_competences', manag
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/enable/<any(content,layout):reviewing_type>', 'switch',
                  management.RHSwitchReviewingType, methods=('PUT', 'DELETE'))
-_bp.add_url_rule('/manage/papers/assign', 'assignment', management.RHPapersAssignment)
+_bp.add_url_rule('/manage/papers/assignment-list', 'assignment', management.RHPapersAssignmentList)
+_bp.add_url_rule('/manage/papers/assign/customize', 'customize_assignment_list', management.RHAssignmentListCustomize,
+                 methods=('GET', 'POST'))
 
 # CFP scheduling
 _bp.add_url_rule('/manage/papers/schedule', 'schedule_cfp', management.RHScheduleCFP,

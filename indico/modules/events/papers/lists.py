@@ -1,0 +1,96 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
+from collections import OrderedDict
+
+from flask import request
+from sqlalchemy.orm import subqueryload
+
+from indico.core.db import db
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
+from indico.modules.events.util import ListGeneratorBase
+from indico.web.flask.templating import get_template_module
+from indico.util.i18n import _
+
+
+class PaperAssignmentListGenerator(ListGeneratorBase):
+    """Listing and filtering actions in a paper assignment list."""
+
+    endpoint = '.assignment'
+    list_link_type = 'paper_asssignment_management'
+
+    def __init__(self, event):
+        super(PaperAssignmentListGenerator, self).__init__(event)
+        self.default_list_config = {'filters': {'items': {}}}
+
+        state_not_submitted = {None: 'Not yet submitted'}
+        state_choices = {state.value: state.title for state in PaperRevisionState}
+        self.static_items = OrderedDict([
+            ('state', {'title': _('State'),
+                       'filter_choices': OrderedDict(state_not_submitted.items() + state_choices.items())})
+        ])
+        self.list_config = self._get_config()
+
+    def _build_query(self):
+        return (Contribution.query.with_parent(self.event)
+                .order_by(Contribution.friendly_id)
+                .options(subqueryload('paper_last_revision')))
+
+    def _filter_list_entries(self, query, filters):
+        if not filters.get('items'):
+            return query
+        criteria = []
+        if 'state' in filters['items']:
+            filtered_states = filters['items']['state']
+            state_criteria = []
+            for filter_state in filtered_states:
+                if filter_state is None:
+                    state_criteria.append(~Contribution.paper_last_revision.has())
+                else:
+                    state_criteria.append(Contribution.paper_last_revision
+                                          .has(PaperRevision.state == int(filter_state)))
+            if state_criteria:
+                criteria.append(db.or_(*state_criteria))
+        return query.filter(*criteria)
+
+    def get_list_kwargs(self):
+        contributions_query = self._build_query()
+        total_entries = contributions_query.count()
+        contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
+        selected_entry = request.args.get('selected')
+        selected_entry = int(selected_entry) if selected_entry else None
+        return {'contribs': contributions, 'total_entries': total_entries, 'selected_entry': selected_entry}
+
+    def render_list(self):
+        """Render the contribution list template components.
+
+        :return: dict containing the list's entries, the fragment of
+                 displayed entries and whether the contrib passed is displayed
+                 in the results.
+        """
+        contrib_list_kwargs = self.get_list_kwargs()
+        total_entries = contrib_list_kwargs.pop('total_entries')
+        selected_entry = contrib_list_kwargs.pop('selected_entry')
+        tpl_contrib = get_template_module('events/papers/management/_paper_assignment_list.html')
+        tpl_lists = get_template_module('events/management/_lists.html')
+        contribs = contrib_list_kwargs['contribs']
+        filter_statistics = tpl_lists.render_displayed_entries_fragment(len(contribs), total_entries)
+        return {'html': tpl_contrib.render_paper_assignment_list(self.event, total_entries, **contrib_list_kwargs),
+                'filter_statistics': filter_statistics,
+                'selected_entry': selected_entry}
