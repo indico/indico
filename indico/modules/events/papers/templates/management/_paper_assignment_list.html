@@ -47,26 +47,28 @@
                 </thead>
                 <tbody>
                     {% for contrib in contribs %}
-                        {% set last_revision_state %}
-                            {% if contrib.paper_revisions %}
-                                {{- contrib.paper_last_revision.state.title -}}
-                            {% else %}
+                        {% if contrib.paper_revisions %}
+                            {% set last_revision_state = contrib.paper_last_revision.state.title %}
+                        {% else %}
+                            {% set last_revision_state %}
                                 {%- trans %}Paper not yet submitted{% endtrans -%}
-                            {% endif %}
-                        {% endset %}
+                            {% endset %}
+                        {% endif %}
                         <tr id="contrib-{{ contrib.id }}" class="i-table contribution-row"
                             data-friendly-id="{{ contrib.friendly_id }}"
                             data-title="{{ contrib.title }}">
                             <td class="i-table id-column">
                                 <span class="vertical-aligner">
-                                    <input type="checkbox" class="select-row" name="contribution_id"
+                                    <input type="checkbox" class="select-row"
+                                           name="contribution_id"
                                            value="{{ contrib.id }}">
                                 </span>
                             </td>
                             <td class="i-table id-column">
                                 <span class="vertical-aligner">{{ contrib.friendly_id }}</span>
                             </td>
-                            <td class="i-table title-column" data-searchable="{{ contrib.title | lower }}"
+                            <td class="i-table title-column"
+                                data-searchable="{{ contrib.title | lower }}"
                                 data-text="{{ contrib.title | lower }}">
                                 <span class="vertical-aligner">
                                     {# TODO: Link to the paper timeline page #}
@@ -75,7 +77,8 @@
                                     </a>
                                 </span>
                             </td>
-                            <td class="i-table state-column" data-searchable="{{ last_revision_state | lower }}">
+                            <td class="i-table state-column"
+                                data-searchable="{{ last_revision_state | lower }}">
                                 <span class="vertical-aligner">{{ last_revision_state }}</span>
                             </td>
                             <td class="i-table revision-column">
@@ -85,7 +88,8 @@
                                     {% endif %}
                                 </span>
                             </td>
-                            <td class="i-table track-column" data-searchable="{{ contrib.track.title | lower }}">
+                            <td class="i-table track-column"
+                                data-searchable="{{ contrib.track.title | lower }}">
                                 <span class="vertical-aligner">
                                     {% if contrib.track %}
                                         {{- contrib.track.title -}}
