@@ -16,14 +16,14 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr, MarkdownText
+from indico.util.string import return_ascii, format_repr
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -35,11 +35,14 @@ class PaperRevisionState(TitledIntEnum):
     to_be_corrected = 4
 
 
-class PaperRevision(db.Model):
+class PaperRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
     __table_args__ = (db.Index(None, 'contribution_id', unique=True,
                                postgresql_where=db.text('state = {}'.format(PaperRevisionState.accepted))),
                       {'schema': 'event_paper_reviewing'})
+
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     id = db.Column(
         db.Integer,
@@ -92,22 +95,12 @@ class PaperRevision(db.Model):
         )
     )
 
+    judgment_comment = RenderModeMixin.create_hybrid_property('_judgment_comment')
+
     # relationship backrefs:
     # - comments (PaperReviewComment.paper_revision)
     # - files (PaperFile.paper_revision)
     # - reviews (PaperReview.revision)
-
-    @hybrid_property
-    def judgment_comment(self):
-        return MarkdownText(self._judgment_comment)
-
-    @judgment_comment.setter
-    def judgment_comment(self, value):
-        self._judgment_comment = value
-
-    @judgment_comment.expression
-    def judgment_comment(cls):
-        return cls._judgment_comment
 
     @return_ascii
     def __repr__(self):
