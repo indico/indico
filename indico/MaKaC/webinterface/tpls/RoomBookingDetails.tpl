@@ -185,7 +185,7 @@
                       </td>
                       <td align="left" class="blacktext">
                         <a href="${ url_for(endpoints['room_details'], event, reservation.room) }">
-                          ${ reservation.room.name }
+                          ${ reservation.room.full_name }
                         </a>
                       </td>
                     </tr>
