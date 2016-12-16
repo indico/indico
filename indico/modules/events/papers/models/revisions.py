@@ -39,6 +39,14 @@ class PaperRevision(RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
     __table_args__ = (db.Index(None, 'contribution_id', unique=True,
                                postgresql_where=db.text('state = {}'.format(PaperRevisionState.accepted))),
+                      db.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'
+                                         .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
+                                                 PaperRevisionState.to_be_corrected),
+                                         name='judge_if_judged'),
+                      db.CheckConstraint('(state IN ({}, {}, {})) = (judgment_dt IS NOT NULL)'
+                                         .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
+                                                 PaperRevisionState.to_be_corrected),
+                                         name='judgment_dt_if_judged'),
                       {'schema': 'event_paper_reviewing'})
 
     possible_render_modes = {RenderMode.markdown}
@@ -47,6 +55,11 @@ class PaperRevision(RenderModeMixin, db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+    state = db.Column(
+        PyIntEnum(PaperRevisionState),
+        nullable=False,
+        default=PaperRevisionState.submitted
     )
     contribution_id = db.Column(
         db.Integer,
@@ -65,10 +78,15 @@ class PaperRevision(RenderModeMixin, db.Model):
         nullable=False,
         default=now_utc
     )
-    state = db.Column(
-        PyIntEnum(PaperRevisionState),
-        nullable=False,
-        default=PaperRevisionState.submitted
+    judge_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.users.id'),
+        index=True,
+        nullable=True
+    )
+    judgment_dt = db.Column(
+        UTCDateTime,
+        nullable=True
     )
     _judgment_comment = db.Column(
         'judgment_comment',
@@ -89,8 +107,18 @@ class PaperRevision(RenderModeMixin, db.Model):
     submitter = db.relationship(
         'User',
         lazy=True,
+        foreign_keys=submitter_id,
         backref=db.backref(
             'paper_revisions',
+            lazy='dynamic'
+        )
+    )
+    judge = db.relationship(
+        'User',
+        lazy=True,
+        foreign_keys=judge_id,
+        backref=db.backref(
+            'judged_papers',
             lazy='dynamic'
         )
     )
