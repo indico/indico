@@ -119,7 +119,7 @@ class PaperReview(RenderModeMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'revision', 'user_id', proposed_action=None)
+        return format_repr(self, 'id', 'type', 'revision', 'user_id', proposed_action=None)
 
     def can_edit(self, user, check_state=False):
         if user is None:
