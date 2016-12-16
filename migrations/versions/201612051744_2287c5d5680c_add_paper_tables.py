@@ -28,10 +28,21 @@ def upgrade():
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.Column('state', PyIntEnum(PaperRevisionState), nullable=False),
         sa.Column('judgment_comment', sa.Text(), nullable=False),
+        sa.Column('judge_id', sa.Integer(), nullable=True),
+        sa.Column('judgment_dt', UTCDateTime, nullable=True),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
         sa.ForeignKeyConstraint(['submitter_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
+        sa.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'
+                           .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
+                                   PaperRevisionState.to_be_corrected),
+                           name='judge_if_judged'),
+        sa.CheckConstraint('(state IN ({}, {}, {})) = (judgment_dt IS NOT NULL)'
+                           .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
+                                   PaperRevisionState.to_be_corrected),
+                           name='judgment_dt_if_judged'),
         sa.Index(None, 'contribution_id', unique=True, postgresql_where=sa.text('state = 2')),
+        sa.Index(None, 'judge_id', unique=False),
         schema='event_paper_reviewing'
     )
     op.create_table(
