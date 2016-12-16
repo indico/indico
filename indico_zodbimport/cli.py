@@ -31,6 +31,7 @@ from sqlalchemy.sql import func, select
 warnings.simplefilter('ignore', ExtDeprecationWarning)  # some of our dependencies still use flask.ext :(
 
 from indico.core.db.sqlalchemy import db
+from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.db.sqlalchemy.util.session import update_session_options
@@ -62,10 +63,11 @@ class Importer(object):
     #: Specify plugins that need to be loaded for the import (e.g. to access its .settings property)
     plugins = frozenset()
 
-    def __init__(self, sqlalchemy_uri, zodb_uri, quiet):
+    def __init__(self, sqlalchemy_uri, zodb_uri, quiet, dblog):
         self.sqlalchemy_uri = sqlalchemy_uri
         self.zodb_uri = zodb_uri
         self.quiet = quiet
+        self.dblog = dblog
         self.zodb_root = None
         self.app = None
         self.tz = None
@@ -75,6 +77,7 @@ class Importer(object):
     def command(cls):
         @click.command()
         @click.option('--quiet', '-q', is_flag=True, default=False, help="Use less verbose/spammy output")
+        @click.option('--dblog', '-L', is_flag=True, default=False, help="Enable db query logging")
         @click.pass_obj
         def _command(obj, **kwargs):
             cls(**dict(obj, **kwargs)).run()
@@ -109,6 +112,9 @@ class Importer(object):
                 ', '.join(plugin_engine.get_failed_plugins(app))))
             sys.exit(1)
         db.init_app(app)
+        if self.dblog:
+            app.debug = True
+            apply_db_loggers(app)
         import_all_models()
         alembic_migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
 
