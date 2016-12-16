@@ -1,7 +1,7 @@
 {% macro render_displayed_entries_fragment(displayed_num, total_num) -%}
     <span id="filtering-state" class="i-button label icon-list"
           title="{% trans %}{{ displayed_num }} out of {{ total_num }} displayed{% endtrans %}">
-        <strong>{{ displayed_num }}</strong> / {{ total_num }}
+        <span><strong>{{ displayed_num }}</strong> / {{ total_num }}</span>
     </span>
 {%- endmacro %}
 
