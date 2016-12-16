@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global applySearchFilters:false */
+
 (function(global) {
     'use strict';
 
@@ -25,7 +27,7 @@
     }
 
     function setState(state, visible, total) {
-        state.html(formatState(visible, total));
+        state.html($('<span>').append(formatState(visible, total)));
         state.attr('title', $T.gettext("{0} out of {1} displayed").format(visible.length, total.length));
         if (!totalDurationDisplay) {
             totalDurationDisplay = $('#total-duration').detach();
@@ -33,12 +35,11 @@
     }
 
     global.applySearchFilters = function applySearchFilters() {
-        var $items = $(searchBoxConfig.listItems),
-            term = $(searchBoxConfig.term).val().trim(),
-            $state = $(searchBoxConfig.state),
-            $visibleEntries,
-            m,
-            $filterPlaceholder = $(searchBoxConfig.placeholder);
+        var $items = $(searchBoxConfig.listItems);
+        var term = $(searchBoxConfig.term).val().trim();
+        var $state = $(searchBoxConfig.state);
+        var $visibleEntries, m;
+        var $filterPlaceholder = $(searchBoxConfig.placeholder);
 
         $filterPlaceholder.hide();
         $state.removeClass('active');
