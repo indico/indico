@@ -47,6 +47,8 @@ paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'layout_reviewer_deadline': None,
     'content_reviewer_deadline': None,
     'announcement': '',
+    'scale_lower': -3,
+    'scale_upper': 3,
 
     # Notifications
     'notify_on_added_to_event': {},
