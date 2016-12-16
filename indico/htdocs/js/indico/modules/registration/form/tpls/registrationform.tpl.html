@@ -61,7 +61,7 @@
             <input type="hidden" value="{{ csrfToken }}" name="csrf_token">
             <input type="submit" id="regformSubmit"
                    ng-switch-default class="i-button highlight"
-                   value="{{ isModerated ? 'Apply'|i18n : 'Register'|i18n }}">
+                   value="{{ isModerated ? 'Apply' : 'Register' | i18n }}">
             <input type="submit" id="regformSubmit"
                  ng-switch-when="true" class="i-button highlight" value="{{ 'Modify' | i18n }}">
         </div>
