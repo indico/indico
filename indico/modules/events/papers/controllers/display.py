@@ -22,7 +22,9 @@ from werkzeug.exceptions import Forbidden
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.papers.controllers.base import RHPapersBase
 from indico.modules.events.papers.forms import PaperSubmissionForm
+from indico.modules.events.papers.lists import PaperJudgingAreaListGeneratorDisplay
 from indico.modules.events.papers.operations import create_paper_revision
+from indico.modules.events.papers.views import WPDisplayJudgingArea
 from indico.web.util import jsonify_form, jsonify_data
 
 
@@ -53,3 +55,38 @@ class RHSubmitPaper(RHPapersBase):
 class RHPaperTimeline(RHPapersBase):
     def _process(self):
         return NotImplementedError
+
+
+class RHDisplayJudgingArea(RHPapersBase):
+    def _checkProtection(self):
+        if not session.user:
+            raise Forbidden
+            RHPapersBase._checkProtection(self)
+
+    def _checkParams(self, params):
+        RHPapersBase._checkParams(self, params)
+        self.list_generator = PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
+
+    def _process(self):
+        return WPDisplayJudgingArea.render_template('display/judging_area.html', self._conf, event=self.event_new,
+                                                    **self.list_generator.get_list_kwargs())
+
+
+class RHDisplayCustomizeJudgingAreaList(RHPapersBase):
+    """Display dialog with filters"""
+
+    def _checkParams(self, params):
+        RHPapersBase._checkParams(self, params)
+        self.list_generator = PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
+
+    def _process_GET(self):
+        list_config = self.list_generator.list_config
+        return WPDisplayJudgingArea.render_template('management/assignment_list_filter.html', self._conf,
+                                                    event=self.event_new,
+                                                    static_items=self.list_generator.static_items,
+                                                    filters=list_config['filters'],
+                                                    visible_items=list_config['items'])
+
+    def _process_POST(self):
+        self.list_generator.store_configuration()
+        return jsonify_data(flash=False, **self.list_generator.render_list())
