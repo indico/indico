@@ -1,0 +1,82 @@
+{% extends 'layout/conference_page_base.html' %}
+{% from 'events/papers/management/_paper_assignment_list.html' import render_paper_assignment_list %}
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+
+{% block title %}
+    {%- trans %}Judging Area{% endtrans -%}
+{% endblock %}
+{% block description %}
+    {%- trans %}The judging area shows the papers for which you are a judge. It allows you to assign reviewers and judge papers.{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    <div class="toolbars space-after">
+        <div class="toolbar">
+            <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                <li>
+                    <a href="#" data-select-all="#assignment-list input:checkbox">{% trans %}All{% endtrans %}</a>
+                </li>
+                <li>
+                    <a href="#" data-select-none="#assignment-list input:checkbox">{% trans %}None{% endtrans %}</a>
+                </li>
+            </ul>
+            <button class="i-button icon-settings js-dialog-action js-customize-list highlight"
+                    data-href="{{ url_for('.display_customize_judging_area_list', event) }}"
+                    data-title="{% trans %}Customize list{% endtrans %}"
+                    data-dialog-classes="list-filter-dialog"
+                    data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
+                    data-ajax-dialog>
+                {%- trans %}Customize list{% endtrans -%}
+            </button>
+            <a class="i-button arrow js-dropdown js-enable-if-checked disabled" data-toggle="dropdown">
+                {%- trans %}Assign{% endtrans -%}
+            </a>
+            <ul class="dropdown">
+                {# TODO: Dialogs to assign #}
+                <li><a href="#">{% trans %}Judge{% endtrans %}</a></li>
+                {% if event.cfp.content_reviewing_enabled %}
+                    <li><a href="#">{% trans %}Content reviewer{% endtrans %}</a></li>
+                {% endif %}
+                {% if event.cfp.layout_reviewing_enabled %}
+                    <li><a href="#">{% trans %}Layout reviewer{% endtrans %}</a></li>
+                {% endif %}
+            </ul>
+            {# TODO: Dialog to unassign #}
+            <a class="i-button js-enable-if-checked disabled">
+                {%- trans %}Unassign{% endtrans -%}
+            </a>
+            <a class="i-button arrow js-dropdown js-enable-if-checked disabled" data-toggle="dropdown">
+                {%- trans %}Change state{% endtrans -%}
+            </a>
+            <ul class="dropdown">
+                {# TODO: Bulk actions task #}
+                <li><a href="#">{% trans %}Accepted{% endtrans %}</a></li>
+                <li><a href="#">{% trans %}Rejected{% endtrans %}</a></li>
+                <li><a href="#">{% trans %}To be corrected{% endtrans %}</a></li>
+            </ul>
+            <a href="#" class="i-button icon-attachment js-enable-if-checked disabled"
+               data-href="#">
+                {# TODO: Download papers task #}
+                {%- trans %}Download papers{% endtrans -%}
+            </a>
+        </div>
+        <div class="toolbar">
+            <div id="filter-statistics">
+                {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+            </div>
+            <span class="i-button label icon-search"></span>
+            <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+        </div>
+    </div>
+    <div class="list" id="assignment-list">
+        {{ render_paper_assignment_list(event, total_entries, contribs, static_columns) }}
+    </div>
+    <div id="filter-placeholder"></div>
+    <script>
+        {% if selected_entry %}
+            $('#search-input').val('#{{ selected_entry }}').trigger('change');
+        {% endif %}
+        setupPaperAssignmentList();
+    </script>
+{% endblock %}
