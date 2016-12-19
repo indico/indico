@@ -26,18 +26,16 @@ from indico.core.db import db
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
 from indico.modules.events.util import ListGeneratorBase
+from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 
 
-class PaperAssignmentListGenerator(ListGeneratorBase):
-    """Listing and filtering actions in a paper assignment list."""
-
-    endpoint = '.assignment'
-    list_link_type = 'paper_asssignment_management'
+class PaperListGeneratorBase(ListGeneratorBase):
+    """Listing and filtering actions in a paper list."""
 
     def __init__(self, event):
-        super(PaperAssignmentListGenerator, self).__init__(event)
+        super(PaperListGeneratorBase, self).__init__(event)
         self.default_list_config = {
             'items': ('state',),
             'filters': {'items': {}}
@@ -144,3 +142,37 @@ class PaperAssignmentListGenerator(ListGeneratorBase):
         return {'html': tpl_contrib.render_paper_assignment_list(self.event, total_entries, **contrib_list_kwargs),
                 'filter_statistics': filter_statistics,
                 'selected_entry': selected_entry}
+
+
+class PaperAssignmentListGenerator(PaperListGeneratorBase):
+    """Listing and filtering actions in a paper assignment list."""
+
+    endpoint = '.assignment'
+    list_link_type = 'paper_asssignment_management'
+
+    def __init__(self, event):
+        super(PaperAssignmentListGenerator, self).__init__(event)
+        self.default_list_config = {
+            'items': ('state',),
+            'filters': {'items': {}}
+        }
+
+
+class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
+    """Listing and filtering actions in paper judging area list in the display view"""
+
+    endpoint = '.display_judging_area'
+    list_link_type = 'paper_judging_display'
+
+    def __init__(self, event, user):
+        super(PaperJudgingAreaListGeneratorDisplay, self).__init__(event)
+        self.user = user
+        self.default_list_config = {
+            'items': ('state',),
+            'filters': {'items': {}}
+        }
+
+    def _build_query(self):
+        return (super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
+                .filter(db.or_(Contribution.paper_judges.any(User.id == self.user.id))))
+
