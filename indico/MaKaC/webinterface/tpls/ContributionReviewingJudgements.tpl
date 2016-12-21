@@ -39,7 +39,7 @@
     <td colspan="5" style="padding: 1em 0;">
         <h3>Paper files</h3>
         ${ render_template('events/paper_reviewing/mako_compat/paper_file_list.html',
-                           paper_files=Contribution.paper_files, revision_id=Review._version) }
+                           paper_files=Contribution.paper_files, revision_id=None) }
     </td>
 </tr>
 
