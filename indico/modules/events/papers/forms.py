@@ -18,11 +18,15 @@ from __future__ import unicode_literals
 
 from datetime import time
 
+from flask import request
+from wtforms.fields import TextAreaField, BooleanField, HiddenField
 from wtforms.validators import Optional
 
+from indico.modules.events.papers.models.reviews import PaperAction
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import PrincipalListField, IndicoDateTimeField, IndicoTagListField
+from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, IndicoTagListField, HiddenEnumField,
+                                     HiddenFieldList)
 from indico.web.forms.validators import LinkedDateTime
 
 
@@ -65,3 +69,27 @@ class PapersScheduleForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(PapersScheduleForm, self).__init__(*args, **kwargs)
+
+
+class BulkPaperJudgmentForm(IndicoForm):
+    judgment = HiddenEnumField(enum=PaperAction)
+    contribution_id = HiddenFieldList()
+    submitted = HiddenField()
+    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
+    send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(BulkPaperJudgmentForm, self).__init__(*args, **kwargs)
+
+    def is_submitted(self):
+        return super(BulkPaperJudgmentForm, self).is_submitted() and 'submitted' in request.form
+
+    @property
+    def split_data(self):
+        contrib_data = self.data
+        judgment_data = {
+            'judgment': contrib_data.pop('judgment'),
+            'send_notifications': contrib_data.pop('send_notifications'),
+        }
+        return judgment_data, contrib_data
