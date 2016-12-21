@@ -16,7 +16,7 @@
     Track classification: {abstract_track}
     Presentation type: {contribution_type}
 
-    For a more detailed summary please visit the page of your abstract: 
+    For a more detailed summary please visit the page of your abstract:
     {abstract_url}.
 
     Kind regards,
