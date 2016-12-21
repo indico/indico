@@ -16,18 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import request, render_template, flash
+from flask import request, render_template, flash, session
 
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.forms import PaperTeamsForm, make_competences_form, PapersScheduleForm
+from indico.modules.events.papers.forms import (BulkPaperJudgmentForm, make_competences_form, PapersScheduleForm,
+                                                PaperTeamsForm)
 from indico.modules.events.papers.lists import PaperAssignmentListGenerator
+from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
-                                                     update_competences)
+                                                     update_competences, judge_paper)
 from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.papers.operations import schedule_cfp, open_cfp, close_cfp
 from indico.modules.users.models.users import User
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
@@ -176,3 +179,50 @@ class RHAssignmentListCustomize(RHManagePapersBase):
     def _process_POST(self):
         self.list_generator.store_configuration()
         return jsonify_data(flash=False, **self.list_generator.render_list())
+
+
+class RHManagePapersActionsBase(RHManagePapersBase):
+    """Base class for RHs performing actions on selected contributions"""
+
+    _contrib_query_options = ()
+
+    @property
+    def _contrib_query(self):
+        query = Contribution.query.with_parent(self.event_new)
+        if self._contrib_query_options:
+            query = query.options(*self._contrib_query_options)
+        return query
+
+    def _checkParams(self, params):
+        RHManagePapersBase._checkParams(self, params)
+        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
+        ids = map(int, request.form.getlist('contribution_id'))
+        self.contributions = self._contrib_query.filter(Contribution.id.in_(ids)).all()
+
+
+class RHBulkPaperJudgment(RHManagePapersActionsBase):
+    """Perform bulk change state operations on selected papers"""
+
+    def _process(self):
+        form = BulkPaperJudgmentForm(event=self.event_new, judgment=request.form.get('judgment'),
+                                     contribution_id=[c.id for c in self.contributions])
+        if form.validate_on_submit():
+            judgment_data, contrib_data = form.split_data
+            submitted_papers = [c for c in self.contributions if
+                                c.paper_last_revision and c.paper_last_revision.state == PaperRevisionState.submitted]
+            for submitted_paper in submitted_papers:
+                judge_paper(submitted_paper, contrib_data, judge=session.user, **judgment_data)
+            num_submitted_papers = len(submitted_papers)
+            num_not_submitted_papers = len(self.contributions) - num_submitted_papers
+            if num_submitted_papers:
+                flash(ngettext("One paper has been judged.",
+                               "{num} paper have been judged.",
+                               num_submitted_papers).format(num=num_submitted_papers), 'success')
+            if num_not_submitted_papers:
+                flash(ngettext("One contribution has been skipped since it has no paper submitted yet or is in "
+                               "a final state.",
+                               "{num} contributions have been skipped since they have no paper submitted yet or are in "
+                               "a final state.",
+                               num_not_submitted_papers).format(num=num_not_submitted_papers), 'warning')
+            return jsonify_data(**self.list_generator.render_list())
+        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
