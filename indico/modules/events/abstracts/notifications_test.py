@@ -31,9 +31,9 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.date_time import now_utc
 
 
-def text_compare(v1, v2):
+def assert_text_equal(v1, v2):
     """Compare two strings, ignoring white space and line breaks."""
-    return re.sub(r'\s', '', v1) == re.sub(r'\s', '', v2)
+    assert re.sub(r'\s', '', v1) == re.sub(r'\s', '', v2)
 
 
 @pytest.fixture
@@ -234,21 +234,33 @@ def test_notification_stop_on_match(mocker, abstract_objects, create_email_templ
 @pytest.mark.usefixtures('request_context')
 def test_email_content(monkeypatch, abstract_objects, create_email_template, dummy_user):
     def _mock_send_email(email, event, user):
+        assert event == ev
         assert email['subject'] == '[Indico] Abstract Acceptance notification (#314)'
-        assert text_compare(email['body'], """
+        assert_text_equal(email['body'], """
             Dear Guinea Pig,
 
             We're pleased to announce that your abstract "Broken Symmetry and the Mass of Gauge Vector Mesons" with ID
             #314 has been accepted in track "Dummy Track" (Poster).
 
+            See below a summary of your submitted abstract:
+            Conference: {event.title}
+            Submitted by: Guinea Pig
+            Title: Broken Symmetry and the Mass of Gauge Vector Mesons
+            Primary Authors: John Doe, John Smith, Pocahontas Silva
+            Co-authors:
+            Track classification: Dummy Track
+            Presentation type: Poster
+
+            For a more detailed summary please visit the page of your abstract:
+            http://localhost/event/-314/abstracts/1234/.
+
             Kind regards,
-            The organizers of dummy#0
+            The organizers of {event.title}
 
             --
             Indico :: Call for Abstracts
-            http://localhost/event/{}/
-        """.format(ev.id))
-        assert event == ev
+            http://localhost/event/{event.id}/
+        """.format(event=ev))
 
     ev, abstract, track, contrib_type = abstract_objects
     monkeypatch.setattr('indico.modules.events.abstracts.notifications.send_email', _mock_send_email)
