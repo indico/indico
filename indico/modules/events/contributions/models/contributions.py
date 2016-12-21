@@ -415,6 +415,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def locator(self):
         return dict(self.event_new.locator, contrib_id=self.id)
 
+    @property
+    def verbose_title(self):
+        return '#{} ({})'.format(self.friendly_id, self.title)
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)

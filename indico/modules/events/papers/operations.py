@@ -18,10 +18,16 @@ from __future__ import unicode_literals
 
 from flask import session
 
+from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.util import update_object_principals
+from indico.modules.events.papers.models.comments import PaperReviewComment
+from indico.modules.events.papers.models.reviews import PaperAction
+from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.competences import PaperCompetence
+from indico.modules.events.util import update_object_principals
+from indico.util.i18n import orig_string
 
 
 def set_reviewing_state(event, reviewing_type, enable):
@@ -81,3 +87,24 @@ def close_cfp(event):
     event.cfp.close()
     logger.info("Call for papers for %r closed by %r", event, session.user)
     event.log(EventLogRealm.management, EventLogKind.negative, 'Papers', 'Call for papers closed', session.user)
+
+
+@no_autoflush
+def judge_paper(contribution, contrib_data, judgment, judge, send_notifications=False):
+    if judgment == PaperAction.accept:
+        contribution.paper_last_revision.state = PaperRevisionState.accepted
+    elif judgment == PaperAction.reject:
+        contribution.paper_last_revision.state = PaperRevisionState.rejected
+    elif judgment == PaperAction.to_be_corrected:
+        contribution.paper_last_revision.state = PaperRevisionState.to_be_corrected
+    if contrib_data['judgment_comment']:
+        comment = PaperReviewComment(user=judge, text=contrib_data['judgment_comment'])
+        contribution.paper_last_revision.comments.append(comment)
+    db.session.flush()
+    log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
+    if send_notifications:
+        pass  # TODO: manage notifications
+    logger.info('Paper %r was judged by %r to %s', contribution, judge, orig_string(judgment.title))
+    contribution.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+                               'Paper "{}" was judged'.format(orig_string(contribution.verbose_title)), judge,
+                               data=log_data)
