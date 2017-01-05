@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
+from collections import defaultdict
 from datetime import datetime
 from flask import request
 from hashlib import md5
@@ -494,41 +495,20 @@ class outputGenerator(object):
             out.closeTag('datafield')
 
     def _generate_contrib_people(self, contrib, out, subcontrib=None):
-        aList = list(set(contrib.primary_authors) | set(contrib.secondary_authors))
         sList = list(subcontrib.person_links) if subcontrib else list(contrib.speakers)
-        list_ = {}
-        auth = list(contrib.primary_authors)
-        if auth:
-            auth = auth[0]
-            list_[auth] = ['Primary Author']
-        for user in aList:
-            if user in list_:
-                if user != auth:
-                    list_[user].append('Author')
-            else:
-                list_[user] = ['Author']
-
+        users = defaultdict(list)
+        for primary_author in contrib.primary_authors:
+            users[primary_author] = ['Primary Author']
+        for user in contrib.secondary_authors:
+            users[user].append('Author')
         for user in sList:
-            if user in list_:
-                list_[user].append('Speaker')
-            else:
-                list_[user] = ['Speaker']
-
-        if auth:
-            user = auth
-            out.openTag('datafield', [['tag', '100'], ['ind1', ' '], ['ind2', ' ']])
-            out.writeTag('subfield', u'{} {}'.format(auth.last_name, auth.first_name), [['code', 'a']])
-            for val in list_[user]:
-                out.writeTag('subfield', val, [['code', 'e']])
-            out.writeTag('subfield', auth.affiliation, [['code', 'u']])
-            out.closeTag('datafield')
-            del list_[auth]
-
-        for user in list_.keys():
-            out.openTag('datafield', [['tag', '700'], ['ind1', ' '], ['ind2', ' ']])
+            users[user].append('Speaker')
+        for user, roles in users.iteritems():
+            tag = '100' if user in contrib.primary_authors else '700'
+            out.openTag('datafield', [['tag', tag], ['ind1', ' '], ['ind2', ' ']])
             out.writeTag('subfield', u'{} {}'.format(user.last_name, user.first_name), [['code', 'a']])
-            for val in list_[user]:
-                out.writeTag('subfield', val, [['code', 'e']])
+            for role in roles:
+                out.writeTag('subfield', role, [['code', 'e']])
             out.writeTag('subfield', user.affiliation, [['code', 'u']])
             out.closeTag('datafield')
 
