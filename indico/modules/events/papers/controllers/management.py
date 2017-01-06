@@ -19,9 +19,10 @@ from __future__ import unicode_literals
 from flask import request, render_template, flash, session
 
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import (BulkPaperJudgmentForm, make_competences_form, PapersScheduleForm,
-                                                PaperTeamsForm)
+                                                PaperTeamsForm, PaperReviewingSettingsForm)
 from indico.modules.events.papers.lists import PaperAssignmentListGenerator
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
@@ -226,3 +227,25 @@ class RHBulkPaperJudgment(RHManagePapersActionsBase):
                                num_not_submitted_papers).format(num=num_not_submitted_papers), 'warning')
             return jsonify_data(**self.list_generator.render_list())
         return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
+
+
+class RHManageReviewingSettings(RHManagePapersBase):
+    def _process(self):
+        defaults = FormDefaults(content_review_questions=self.event_new.cfp.content_review_questions,
+                                layout_review_questions=self.event_new.cfp.layout_review_questions)
+        form = PaperReviewingSettingsForm(event=self.event_new, obj=defaults)
+        if form.validate_on_submit():
+            data = form.data
+            content_review_questions = data.pop('content_review_questions', None)
+            layout_review_questions = data.pop('layout_review_questions', None)
+            if content_review_questions is None:
+                content_review_questions = self.event_new.cfp.content_review_questions
+            if layout_review_questions is None:
+                layout_review_questions = self.event_new.cfp.layout_review_questions
+            self.event_new.paper_review_questions = content_review_questions + layout_review_questions
+            paper_reviewing_settings.set_multi(self.event_new, data)
+            flash(_("The reviewing settings were saved successfully"), 'success')
+            logger.info("Paper reviewing settings of %r updated by %r", self.event_new, session.user)
+            return jsonify_data()
+        self.commit = False
+        return jsonify_form(form)
