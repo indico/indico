@@ -28,7 +28,7 @@ from indico.modules.events.papers.models.review_questions import PaperReviewQues
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, IndicoTagListField, HiddenEnumField,
-                                     HiddenFieldList)
+                                     HiddenFieldList, IndicoMarkdownField)
 from indico.web.forms.validators import LinkedDateTime
 
 
@@ -106,6 +106,7 @@ class PaperReviewingSettingsForm(IndicoForm):
         _("Layout review questions"),
         question_model=lambda: PaperReviewQuestion(type=PaperReviewType.layout)
     )
+    announcement = IndicoMarkdownField(_('Announcement'), editor=True)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

@@ -16,16 +16,22 @@
 
 from __future__ import unicode_literals
 
+from indico.util.mathjax import MathjaxMixin
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
-class WPManagePapers(WPJinjaMixin, WPConferenceModifBase):
+class WPManagePapers(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/papers/'
     sidemenu_option = 'papers'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_papers_js'].urls()
+        return (WPConferenceModifBase.getJSFiles(self) +
+                self._asset_env['markdown_js'].urls() +
+                self._asset_env['modules_papers_js'].urls())
+
+    def _getHeadContent(self):
+        return WPConferenceModifBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
