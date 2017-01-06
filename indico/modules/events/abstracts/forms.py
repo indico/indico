@@ -41,10 +41,10 @@ from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm, FormDefaults, generated_data
-from indico.web.forms.fields import IndicoQuerySelectMultipleField
 from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoQuerySelectMultipleCheckboxField, EmailListField, EditableFileField,
-                                     IndicoDateTimeField, HiddenFieldList, HiddenEnumField)
+                                     IndicoDateTimeField, HiddenFieldList, HiddenEnumField,
+                                     IndicoQuerySelectMultipleField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime, WordCount, SoftLength
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
