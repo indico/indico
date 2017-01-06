@@ -256,3 +256,45 @@ class IndicoThemeSelectField(SelectField):
                                for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
                               key=itemgetter(1))
         self.default = theme_settings.defaults[event_type]
+
+
+class ReviewQuestionsField(MultipleItemsField):
+    def __init__(self, *args, **kwargs):
+        self.extra_fields = kwargs.pop('extra_fields', [])
+        self.fields = [{'id': 'text', 'caption': _("Question"), 'type': 'text', 'required': True}] + self.extra_fields
+        self.question_model = kwargs.pop('question_model')
+        super(ReviewQuestionsField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True, sortable=True,
+                                                   **kwargs)
+
+    def process_formdata(self, valuelist):
+        super(ReviewQuestionsField, self).process_formdata(valuelist)
+        if valuelist:
+            existing = {x.id: x for x in self.object_data or ()}
+            data = []
+            for pos, entry in enumerate(self.data, 1):
+                question = (existing.pop(int(entry['id'])) if entry.get('id') is not None else self.question_model())
+                question.text = entry['text']
+                question.position = pos
+                for extra_field in self.extra_fields:
+                    setattr(question, extra_field['id'], entry[extra_field['id']])
+                data.append(question)
+            for question in existing.itervalues():
+                if question.ratings:
+                    # keep it around and soft-delete if it has been used; otherwise we just skip it
+                    # which will delete it once it's gone from the relationship (when populating the
+                    # Event from the form's data)
+                    question.is_deleted = True
+                    data.append(question)
+            self.data = data
+
+    def _value(self):
+        if not self.data:
+            return []
+        else:
+            rv = []
+            for question in self.data:
+                data = {'id': question.id, 'text': question.text}
+                for extra_field in self.extra_fields:
+                    data[extra_field['id']] = getattr(question, extra_field['id'])
+                rv.append(data)
+            return rv

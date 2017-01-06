@@ -26,13 +26,15 @@ from wtforms.widgets import Select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode
-from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractReviewQuestionsField,
-                                                    AbstractPersonLinkListField, AbstractField, TrackRoleField)
+from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractPersonLinkListField, AbstractField,
+                                                    TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
 from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.fields import ReviewQuestionsField
 from indico.modules.events.models.reviews import ProposalCommentVisibility
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
@@ -163,7 +165,10 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                   widget=SwitchWidget(),
                                                   description=_("Enabling this allows submitters, authors, and "
                                                                 "speakers to also participate in the comments."))
-    abstract_review_questions = AbstractReviewQuestionsField(_("Review questions"))
+    abstract_review_questions = ReviewQuestionsField(_("Review questions"), question_model=AbstractReviewQuestion,
+                                                     extra_fields=[{'id': 'no_score',
+                                                                    'caption': _("Exclude from score"),
+                                                                    'type': 'checkbox'}])
     reviewing_instructions = IndicoMarkdownField(_('Reviewing Instructions'), editor=True,
                                                  description=_("These instructions will be displayed right before the "
                                                                "reviewing form."))
