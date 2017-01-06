@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.papers.models.competences import PaperCompetence
+from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
@@ -89,6 +90,14 @@ class CallForPapers(object):
     def layout_reviewers(self):
         return {p.principal for p in self.event.acl_entries
                 if p.has_management_role('paper_layout_reviewer', explicit=True)}
+
+    @property
+    def content_review_questions(self):
+        return [q for q in self.event.paper_review_questions if q.type == PaperReviewType.content]
+
+    @property
+    def layout_review_questions(self):
+        return [q for q in self.event.paper_review_questions if q.type == PaperReviewType.layout]
 
     @property
     def assignees(self):

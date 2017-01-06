@@ -87,7 +87,10 @@
                 {%- trans %}Configure reviewing questions, email notifications, etc.{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a class="i-button icon-settings" href="#">
+                <a class="i-button icon-settings" href="#"
+                   data-href="{{ url_for('.manage_reviewing_settings', event) }}"
+                   data-title="{% trans %}Manage reviewing settings{% endtrans %}"
+                   data-ajax-dialog>
                     {%- trans %}Settings{% endtrans -%}
                 </a>
             </div>
