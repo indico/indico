@@ -19,19 +19,12 @@ from __future__ import unicode_literals
 from flask import render_template, session
 
 from indico.modules.events.abstracts.util import get_visible_reviewed_for_tracks
-from MaKaC.common.TemplateExec import render
+from indico.util.mathjax import MathjaxMixin
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 
 
-class _MathjaxMixin:
-    def _getHeadContent(self):
-        return (render('js/mathjax.config.js.tpl') +
-                b'\n'.join(b'<script src="{0}" type="text/javascript"></script>'.format(url)
-                           for url in self._asset_env['mathjax_js'].urls()))
-
-
-class WPManageAbstracts(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
+class WPManageAbstracts(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/abstracts/'
     sidemenu_option = 'abstracts'
 
@@ -46,10 +39,10 @@ class WPManageAbstracts(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
         return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def _getHeadContent(self):
-        return WPConferenceModifBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
+        return WPConferenceModifBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayAbstractsBase(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPDisplayAbstractsBase(MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/abstracts/'
 
     def getJSFiles(self):
@@ -66,7 +59,7 @@ class WPDisplayAbstractsBase(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDis
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
 
     def _getHeadContent(self):
-        return WPConferenceDefaultDisplayBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPDisplayAbstracts(WPDisplayAbstractsBase):
