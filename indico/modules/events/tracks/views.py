@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.abstracts.views import _MathjaxMixin
+from indico.util.mathjax import MathjaxMixin
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
-class WPManageTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
+class WPManageTracks(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
 
@@ -31,10 +31,10 @@ class WPManageTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
-        return WPConferenceModifBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
+        return WPConferenceModifBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPDisplayTracks(MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/tracks/'
     menu_entry_name = 'program'
 
@@ -47,4 +47,4 @@ class WPDisplayTracks(_MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBas
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
-        return WPConferenceDefaultDisplayBase._getHeadContent(self) + _MathjaxMixin._getHeadContent(self)
+        return WPConferenceDefaultDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
