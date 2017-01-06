@@ -6,7 +6,7 @@ addons:
   postgresql: 9.4
 install:
   - pip install -U pip setuptools
-  - pip install -r requirements.txt --trusted-host indico-software.org
+  - grep -v indico-fonts requirements.txt | pip install -r /dev/stdin
   - python setup.py develop
 script:
   - pytest -v
