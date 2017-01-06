@@ -22,7 +22,9 @@ from flask import request
 from wtforms.fields import TextAreaField, BooleanField, HiddenField
 from wtforms.validators import Optional
 
-from indico.modules.events.papers.models.reviews import PaperAction
+from indico.modules.events.fields import ReviewQuestionsField
+from indico.modules.events.papers.models.reviews import PaperAction, PaperReviewType
+from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, IndicoTagListField, HiddenEnumField,
@@ -93,3 +95,22 @@ class BulkPaperJudgmentForm(IndicoForm):
             'send_notifications': contrib_data.pop('send_notifications'),
         }
         return judgment_data, contrib_data
+
+
+class PaperReviewingSettingsForm(IndicoForm):
+    content_review_questions = ReviewQuestionsField(
+        _("Content review questions"),
+        question_model=lambda: PaperReviewQuestion(type=PaperReviewType.content)
+    )
+    layout_review_questions = ReviewQuestionsField(
+        _("Layout review questions"),
+        question_model=lambda: PaperReviewQuestion(type=PaperReviewType.layout)
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(PaperReviewingSettingsForm, self).__init__(*args, **kwargs)
+        if not self.event.cfp.content_reviewing_enabled:
+            del self.content_review_questions
+        if not self.event.cfp.layout_reviewing_enabled:
+            del self.layout_review_questions
