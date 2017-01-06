@@ -22,7 +22,7 @@ from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
 from indico.util.caching import memoize_request
-from indico.util.string import return_ascii
+from indico.util.string import return_ascii, MarkdownText
 
 
 class CallForPapers(object):
@@ -116,3 +116,7 @@ class CallForPapers(object):
                             .filter(PaperCompetence.user_id.in_(user_ids))
                             .all())
         return {competences.user_id: competences for competences in user_competences}
+
+    @property
+    def announcement(self):
+        return MarkdownText(paper_reviewing_settings.get(self.event, 'announcement'))

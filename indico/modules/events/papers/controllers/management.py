@@ -232,7 +232,8 @@ class RHBulkPaperJudgment(RHManagePapersActionsBase):
 class RHManageReviewingSettings(RHManagePapersBase):
     def _process(self):
         defaults = FormDefaults(content_review_questions=self.event_new.cfp.content_review_questions,
-                                layout_review_questions=self.event_new.cfp.layout_review_questions)
+                                layout_review_questions=self.event_new.cfp.layout_review_questions,
+                                **paper_reviewing_settings.get_all(self.event_new))
         form = PaperReviewingSettingsForm(event=self.event_new, obj=defaults)
         if form.validate_on_submit():
             data = form.data
