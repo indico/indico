@@ -19,6 +19,8 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.util.caching import memoize_request
+from indico.util.i18n import _
+from indico.util.struct.enum import TitledIntEnum
 from indico.web.flask.util import url_for
 
 
@@ -89,6 +91,21 @@ class ProposalCommentMixin(object):
         raise NotImplementedError
 
 
+class ProposalCommentVisibility(TitledIntEnum):
+    """Most to least restrictive visibility for abstract comments"""
+    __titles__ = [None,
+                  _("Visible only to judges"),
+                  _("Visible to conveners and judges"),
+                  _("Visible to reviewers, conveners, and judges"),
+                  _("Visible to contributors, reviewers, conveners, and judges"),
+                  _("Visible to all users")]
+    judges = 1
+    conveners = 2
+    reviewers = 3
+    contributors = 4
+    users = 5
+
+
 class ProposalReviewMixin(object):
     timeline_item_type = 'review'
     proposal_relationship = None
@@ -104,8 +121,7 @@ class ProposalReviewMixin(object):
 
     @property
     def visibility(self):
-        from indico.modules.events.abstracts.models.comments import AbstractCommentVisibility
-        return AbstractCommentVisibility.reviewers
+        return ProposalCommentVisibility.reviewers
 
     @property
     def score(self):

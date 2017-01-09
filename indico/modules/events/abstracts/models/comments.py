@@ -19,27 +19,10 @@ from __future__ import unicode_literals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
-from indico.modules.events.models.reviews import ProposalCommentMixin
+from indico.modules.events.models.reviews import ProposalCommentMixin, ProposalCommentVisibility
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import TitledIntEnum
-from indico.util.i18n import _
-
-
-class AbstractCommentVisibility(TitledIntEnum):
-    """Most to least restrictive visibility for abstract comments"""
-    __titles__ = [None,
-                  _("Visible only to judges"),
-                  _("Visible to conveners and judges"),
-                  _("Visible to reviewers, conveners, and judges"),
-                  _("Visible to contributors, reviewers, conveners, and judges"),
-                  _("Visible to all users")]
-    judges = 1
-    conveners = 2
-    reviewers = 3
-    contributors = 4
-    users = 5
 
 
 class AbstractComment(ProposalCommentMixin, RenderModeMixin, db.Model):
@@ -87,9 +70,9 @@ class AbstractComment(ProposalCommentMixin, RenderModeMixin, db.Model):
         nullable=True
     )
     visibility = db.Column(
-        PyIntEnum(AbstractCommentVisibility),
+        PyIntEnum(ProposalCommentVisibility),
         nullable=False,
-        default=AbstractCommentVisibility.contributors
+        default=ProposalCommentVisibility.contributors
     )
     is_deleted = db.Column(
         db.Boolean,
@@ -148,13 +131,13 @@ class AbstractComment(ProposalCommentMixin, RenderModeMixin, db.Model):
             return False
         elif user == self.user:
             return True
-        elif self.visibility == AbstractCommentVisibility.users:
+        elif self.visibility == ProposalCommentVisibility.users:
             return True
-        visibility_checks = {AbstractCommentVisibility.judges: [self.abstract.can_judge],
-                             AbstractCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
-                             AbstractCommentVisibility.reviewers: [self.abstract.can_judge, self.abstract.can_convene,
+        visibility_checks = {ProposalCommentVisibility.judges: [self.abstract.can_judge],
+                             ProposalCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
+                             ProposalCommentVisibility.reviewers: [self.abstract.can_judge, self.abstract.can_convene,
                                                                    self.abstract.can_review],
-                             AbstractCommentVisibility.contributors: [self.abstract.can_judge,
+                             ProposalCommentVisibility.contributors: [self.abstract.can_judge,
                                                                       self.abstract.can_convene,
                                                                       self.abstract.can_review,
                                                                       self.abstract.user_owns]}
