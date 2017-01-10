@@ -39,3 +39,23 @@
         }
     }
 }
+
+#assign-role-table {
+    min-width: 500px;
+    margin-bottom: 15px;
+
+    .i-tag {
+        display: inline-block;
+        background-color: $pastel-blue;
+        margin-right: 5px;
+        font-weight: normal;
+        color: $light-black;
+        border-width: 0;
+    }
+}
+
+#assignment-list {
+    .revision-column {
+        width: 4rem;
+    }
+}

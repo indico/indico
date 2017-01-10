@@ -23,7 +23,6 @@ from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import EventType, Event
-# from indico.modules.events.papers.util import query_contributions_with_user_as_judge
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -96,15 +95,11 @@ class PaperLayoutReviewerRole(ManagementRole):
 @signals.event.sidemenu.connect
 def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.layout.util import MenuEntryData
-    from indico.modules.events.papers.util import query_contributions_with_user_as_judge
 
     def _judging_area_visible(event):
         if not session.user or not event.has_feature('papers'):
             return False
-        return True
-        # return query_contributions_with_user_as_judge(event, session.user).has_rows()
+        return session.user in event.cfp.judges
 
     yield MenuEntryData(title=_("Judging Area"), name='judging_area', endpoint='papers.display_judging_area',
-                        position=0,
-                        visible=_judging_area_visible)
-                        # parent = 'call_for_papers')
+                        position=-1, visible=_judging_area_visible)
