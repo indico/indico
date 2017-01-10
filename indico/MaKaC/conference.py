@@ -51,7 +51,6 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.PickleJar import Updates
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.common.url import ShortURLMapper
 from MaKaC.errors import MaKaCError, TimingError, NotFoundError, FormValuesError
 from MaKaC.fossils.conference import IConferenceMinimalFossil, IConferenceEventInfoFossil, IConferenceFossil
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -129,7 +128,6 @@ class Conference(CommonObjectBase):
         self._confPaperReview = ConferencePaperReview(self)
         self._orgText = ""
         self._comments = ""
-        self._sortUrlTag = ""
 
     @return_ascii
     def __repr__(self):
@@ -238,16 +236,6 @@ class Conference(CommonObjectBase):
     def __ne__(self, toCmp):
         return not(self is toCmp)
 
-    def setUrlTag(self, tag):
-        self._sortUrlTag = tag
-
-    def getUrlTag(self):
-        try:
-            return self._sortUrlTag
-        except:
-            self._sortUrlTag = ""
-        return self._sortUrlTag
-
     def setComments(self,comm=""):
         self._comments = comm.strip()
 
@@ -344,10 +332,7 @@ class Conference(CommonObjectBase):
         return fr
 
     def getURL(self):
-        cid = self.getUrlTag()
-        if not cid:
-            cid = self.getId()
-        return Config.getInstance().getShortEventURL() + cid
+        return self.as_event.short_external_url
 
     def notifyModification( self, date = None, raiseEvent = True):
         """Method called to notify the current conference has been modified.
@@ -419,8 +404,6 @@ class Conference(CommonObjectBase):
         # Remove all links in redis
         if redis_write_client:
             avatar_links.delete_event(self)
-        # Remote short URL mappings
-        ShortURLMapper().remove(self)
         TrashCanManager().add(self)
         self._p_changed = True
 
