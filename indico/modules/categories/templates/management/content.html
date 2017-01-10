@@ -4,12 +4,12 @@
 {% from 'events/management/_create_event_button.html' import create_event_button %}
 
 {% macro _create_category_button(classes='') %}
-    <button class="i-button js-new-category {{ classes }}"
-            data-ajax-dialog
-            data-href="{{ url_for('.create_subcategory', category) }}"
-            data-title="{% trans %}New category{% endtrans %}">
+    <a class="i-button {{ classes }}"
+       data-ajax-dialog
+       data-href="{{ url_for('.create_subcategory', category) }}"
+       data-title="{% trans %}New category{% endtrans %}">
         {% trans %}New category{% endtrans %}
-    </button>
+    </a>
 {% endmacro %}
 
 {% macro subcategory_row(subcategory) %}
