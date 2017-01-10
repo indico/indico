@@ -610,7 +610,6 @@ class WEventFooter(WFooter):
     def getVars(self):
         v = WFooter.getVars(self)
 
-        cid = self._conf.getUrlTag().strip() or self._conf.getId()
         location = self._event.venue_name
         if self._event.room_name:
             location = u'{} ({})'.format(self._event.room_name, location)
@@ -623,7 +622,7 @@ class WEventFooter(WFooter):
         if description:
             description += '\n\n'
 
-        description += Config.getInstance().getShortEventURL() + cid
+        description += self._event.short_external_url
 
         v['gc_params'] = urllib.urlencode({
             'action': 'TEMPLATE',
@@ -640,7 +639,7 @@ class WEventFooter(WFooter):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         app_data = minfo.getSocialAppConfig()
 
-        v["shortURL"] = Config.getInstance().getShortEventURL() + cid
+        v["shortURL"] = self._event.short_external_url
         v["app_data"] = app_data
         v["showSocial"] = app_data.get('active', False) and layout_settings.get(self._conf, 'show_social_badges')
         v['conf'] = self._conf
