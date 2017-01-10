@@ -113,11 +113,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                 db.Index('ix_events_not_deleted_category', cls.is_deleted, cls.category_id),
                 db.Index('ix_events_not_deleted_category_dates',
                          cls.is_deleted, cls.category_id, cls.start_dt, cls.end_dt),
+                db.Index('ix_uq_events_url_shortcut', db.func.lower(cls.url_shortcut), unique=True,
+                         postgresql_where=db.text('NOT is_deleted')),
                 db.CheckConstraint("category_id IS NOT NULL OR is_deleted", 'category_data_set'),
                 db.CheckConstraint("(logo IS NULL) = (logo_metadata::text = 'null')", 'valid_logo'),
                 db.CheckConstraint("(stylesheet IS NULL) = (stylesheet_metadata::text = 'null')",
                                    'valid_stylesheet'),
                 db.CheckConstraint("end_dt >= start_dt", 'valid_dates'),
+                db.CheckConstraint("url_shortcut != ''", 'url_shortcut_not_empty'),
                 db.CheckConstraint("cloned_from_id != id", 'not_cloned_from_self'),
                 db.CheckConstraint('visibility IS NULL OR visibility >= 0', 'valid_visibility'),
                 {'schema': 'events'})
@@ -206,6 +209,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         ARRAY(db.String),
         nullable=False,
         default=[],
+    )
+    #: The URL shortcut for the event
+    url_shortcut = db.Column(
+        db.String,
+        nullable=True
     )
     #: The metadata of the logo (hash, size, filename, content_type)
     logo_metadata = db.Column(
