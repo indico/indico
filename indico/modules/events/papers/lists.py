@@ -173,6 +173,6 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
         }
 
     def _build_query(self):
-        return (super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
-                .filter(db.or_(Contribution.paper_judges.any(User.id == self.user.id))))
+        query = super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
+        return query.filter(db.or_(Contribution.paper_judges.any(User.id == self.user.id)))
 

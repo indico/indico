@@ -31,6 +31,7 @@ from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
+from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.util import update_object_principals
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
@@ -180,3 +181,25 @@ def delete_paper_template(template):
     db.session.delete(template)
     db.session.flush()
     logger.info('Paper template %r deleted by %r', template, session.user)
+
+
+def update_reviewing_roles(event, persons, contributions, role, action):
+    for contrib in contributions:
+        if role == PaperReviewingRole.content_reviewer:
+            role_group = contrib.paper_content_reviewers
+        elif role == PaperReviewingRole.layout_reviewer:
+            role_group = contrib.paper_layout_reviewers
+        else:
+            role_group = contrib.paper_judges
+        for person in persons:
+            if action == 'assign':
+                role_group.add(person)
+            elif person in role_group:
+                role_group.remove(person)
+        event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+                  "Paper reviewing roles modified for contribution {}.".format(contrib.title), session.user,
+                  data={'Role': role.name,
+                        'Action': action,
+                        'Users': ', '.join(sorted(person.full_name for person in persons))})
+    db.session.flush()
+    logger.info("Paper reviewing roles in event %r updated by %r", event, session.user)
