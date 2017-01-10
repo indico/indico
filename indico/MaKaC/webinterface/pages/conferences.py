@@ -135,8 +135,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         p = {"modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
                 "subArea": self._getSiteArea()}
 
-        cid = self._conf.getUrlTag().strip() or self._conf.getId()
-        p["shortURL"] =  Config.getInstance().getShortEventURL() + cid
+        p["shortURL"] = self._conf.as_new.short_external_url
 
         return wc.getHTML(p)
 
@@ -483,16 +482,14 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
 
         return styleText + confMetadata + mathJax
 
-    def _getFooter( self ):
-        """
-        """
+    def _getFooter(self):
         wc = wcomponents.WEventFooter(self._conf)
-        p = {"modificationDate":format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),"subArea": self._getSiteArea(),"dark":True}
-        if Config.getInstance().getShortEventURL():
-            id=self._conf.getUrlTag().strip()
-            if not id:
-                id = self._conf.getId()
-            p["shortURL"] =  Config.getInstance().getShortEventURL() + id
+        p = {
+            "modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
+            "subArea": self._getSiteArea(),
+            "dark": True,
+            "shortURL": self._conf.as_event.short_external_url
+        }
         return wc.getHTML(p)
 
     def _getHeader( self ):
@@ -664,7 +661,7 @@ class WConfModifMainData(wcomponents.WTemplated):
             vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
         #------------------------------------------------------
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
-        vars["shortURLTag"] = self._conf.getUrlTag()
+        vars["shortURLTag"] = self._conf.as_event.url_shortcut or ''
         vars["screenDatesURL"] = urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)
         ssdate = format_datetime(self._conf.getAdjustedScreenStartDate(), format='EEEE d MMMM yyyy H:mm')
         if self._conf.getScreenStartDate() == self._conf.getStartDate():
@@ -827,7 +824,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["chairText"] = quoteattr( self._conf.getChairmanText() )
         vars["orgText"] = self._conf.getOrgText()
         vars["visibility"] = self._getVisibilityHTML()
-        vars["shortURLTag"] = quoteattr( self._conf.getUrlTag() )
+        vars["shortURLTag"] = quoteattr(self._conf.as_event.url_shortcut or '')
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["supportCaption"] = quoteattr(self._conf.getSupportInfo().getCaption())
         vars["supportEmail"] = quoteattr( self._conf.getSupportInfo().getEmail() )

@@ -22,8 +22,6 @@ from werkzeug.urls import url_encode, url_parse, url_unparse, url_join
 from werkzeug.routing import BuildError
 
 from indico.core.config import Config
-from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.errors import MaKaCError
 from indico.web.flask.util import url_rule_to_js
 
 
@@ -162,25 +160,3 @@ class EndpointURL(_BaseURL):
     def __repr__(self):
         scheme = url_parse(self.url).scheme
         return '<EndpointURL(%s, %s, %s, %s)>' % (scheme, self._endpoint, self._params, self.url)
-
-
-class ShortURLMapper(ObjectHolder):
-
-    idxName = "shorturl"
-
-    def add( self, tag, newItem ):
-        if not tag:
-            raise MaKaCError("Invalid tag for short URL : \"%s\""%tag)
-        if self.hasKey(tag):
-            raise MaKaCError("Short URL tag already used: \"%s\""%tag)
-        tree = self._getIdx()
-        tree[tag] = newItem
-        return tag
-
-    def remove( self, item ):
-        """removes the specified object from the index.
-        """
-        tree = self._getIdx()
-        if not tree.has_key( item.getUrlTag() ):
-            return
-        del tree[item.getUrlTag()]

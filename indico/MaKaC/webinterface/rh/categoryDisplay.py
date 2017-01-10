@@ -22,16 +22,17 @@ from pytz import timezone
 
 from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
+from indico.modules.events import LegacyEventMapping
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.models.events import EventType
+from indico.modules.events.models.events import EventType, Event
 from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.flask.util import endpoint_for_url
-import MaKaC.conference as conference
-from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.errors import FormValuesError
 
@@ -78,18 +79,15 @@ class UtilsConference:
         c.as_event.keywords = confData["keywords"]
         c.setChairmanText( confData.get("chairText", "") )
         if "shortURLTag" in confData.keys():
-            tag = confData["shortURLTag"].strip()
+            tag = to_unicode(confData["shortURLTag"]).strip()
             if tag:
                 try:
-                    UtilsConference.validateShortURL(tag, c)
+                    UtilsConference.validateShortURL(tag, c.as_event)
                 except ValueError, e:
                     raise FormValuesError(e.message)
-            if c.getUrlTag() != tag:
-                mapper = ShortURLMapper()
-                mapper.remove(c)
-                c.setUrlTag(tag)
-                if tag:
-                    mapper.add(tag, c)
+                c.as_event.url_shortcut = tag
+            else:
+                c.as_event.url_shortcut = None
         c.setContactInfo( confData.get("contactInfo","") )
         #################################
         # Fermi timezone awareness      #
@@ -143,12 +141,17 @@ class UtilsConference:
         if tag[0] == '/' or tag[-1] == '/':
             raise ValueError(
                 _("Short URL tag may not begin/end with a slash: '%s'. Please select another one.") % tag)
-        mapper = ShortURLMapper()
-        if mapper.hasKey(tag) and mapper.getById(tag) != target:
+        conflict = (Event.query
+                    .filter(db.func.lower(Event.url_shortcut) == tag.lower(),
+                            ~Event.is_deleted,
+                            Event.id != int(target.id))
+                    .has_rows())
+        if conflict:
             raise ValueError(_("Short URL tag already used: '%s'. Please select another one.") % tag)
-        if conference.ConferenceHolder().hasKey(tag):
+        if LegacyEventMapping.query.filter_by(legacy_event_id=tag).has_rows():
             # Reject existing event ids. It'd be EXTREMELY confusing and broken to allow such a shorturl
-            raise ValueError(_("Short URL tag is an event id: '%s'. Please select another one.") % tag)
+            # Non-legacy event IDs are already covered by the `isdigit` check above.
+            raise ValueError(_("Short URL tag is a legacy event id: '%s'. Please select another one.") % tag)
         ep = endpoint_for_url(Config.getInstance().getShortEventURL() + tag)
         if not ep or ep[0] != 'event.shorturl':
             # URL does not match the shorturl rule or collides with an existing rule that does does not
