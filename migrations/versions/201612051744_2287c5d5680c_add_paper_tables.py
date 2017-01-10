@@ -27,6 +27,7 @@ def upgrade():
         sa.Column('submitter_id', sa.Integer(), nullable=False, index=True),
         sa.Column('submitted_dt', UTCDateTime, nullable=False),
         sa.Column('state', PyIntEnum(PaperRevisionState), nullable=False),
+        sa.Column('judgment_comment', sa.Text(), nullable=False),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
         sa.ForeignKeyConstraint(['submitter_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
