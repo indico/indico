@@ -90,7 +90,7 @@
     {% set event = abstract.event_new %}
     {% set can_judge = abstract.can_judge(user, check_state=true) %}
     <div class="i-timeline-item-label action icon-file-check"></div>
-    <div class="i-timeline-item-box content-indicator">
+    <div class="i-timeline-item-box content-indicator-left">
         <div class="i-box-content track-reviews-wrapper">
             {% if can_judge or visible_tracks.issuperset(abstract.reviewed_for_tracks) %}
                 <div class="global-review-summary flexrow f-a-center">
@@ -186,7 +186,7 @@
 {% macro render_reviewed_for_tracks_box(abstract, form) %}
     <div id="abstract-reviewed-for-tracks-box" class="i-timeline-item">
         <div class="i-timeline-item-label action icon-list"></div>
-        <div class="i-timeline-item-box content-indicator">
+        <div class="i-timeline-item-box content-indicator-left">
             <div class="i-box-content">
                 <div class="flexrow">
                     <div class="f-self-stretch">

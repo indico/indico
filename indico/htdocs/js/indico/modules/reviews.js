@@ -26,6 +26,14 @@
         }).on('ajaxForm:show', '.js-edit-comment, .js-edit-review', function() {
             var $this = $(this);
             var $item = $this.closest('.i-timeline-item-box');
+            if ($item.hasClass('header-indicator-top')) {
+                $item.removeClass('header-indicator-top');
+                $item.addClass('content-indicator-top');
+            }
+            if ($item.hasClass('header-indicator-left')) {
+                $item.removeClass('header-indicator-left');
+                $item.addClass('content-indicator-left');
+            }
             if ($item.hasClass('header-only')) {
                 $item.removeClass('header-only');
             }
@@ -34,6 +42,14 @@
             var $this = $(this);
             var $item = $this.closest('.i-timeline-item-box');
             $this.closest('.i-box-header').show();
+            if ($item.hasClass('content-indicator-top')) {
+                $item.removeClass('content-indicator-top');
+                $item.addClass('header-indicator-top');
+            }
+            if ($item.hasClass('content-indicator-left')) {
+                $item.removeClass('content-indicator-left');
+                $item.addClass('header-indicator-left');
+            }
             if ($item.data('no-comment') !== undefined) {
                 $item.addClass('header-only');
             }
