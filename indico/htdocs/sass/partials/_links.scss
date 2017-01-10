@@ -15,7 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-a {
+a,
+.ui-widget-content a {
     color: $blue;
 
     &:hover {
