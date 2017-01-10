@@ -16,54 +16,51 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request, url_for
-from flask import current_app as app
+from flask import redirect, request, url_for, current_app
 from werkzeug.exceptions import NotFound
 
-from indico.core.db import DBMgr
+from indico.core.db import DBMgr, db
+from indico.modules.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _
 from indico.util.string import is_legacy_id
 from indico.web.flask.blueprints.event.display import event
 from MaKaC.webinterface.rh import conferenceDisplay
-from MaKaC.webinterface.urlHandlers import UHConferenceDisplay
 
 
 def _event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
-    from MaKaC.conference import ConferenceHolder
-    from MaKaC.common.url import ShortURLMapper
-
     func = None
     with DBMgr.getInstance().global_connection():
-        ch = ConferenceHolder()
-        su = ShortURLMapper()
-        if ch.hasKey(confId):
+        event_ = Event.get(int(confId), is_deleted=False) if confId.isdigit() else None
+        if event_:
             # For obvious reasons an event id always comes first.
             # If it's used within the short url namespace we redirect to the event namespace, otherwise
             # we call the RH to display the event
             if shorturl_namespace:
-                url = UHConferenceDisplay.getURL(ch.getById(confId))
-                func = lambda: redirect(url)
+                func = lambda: redirect(event_.url)
             else:
                 params = request.args.to_dict()
                 params['confId'] = confId
                 if ovw:
                     params['ovw'] = 'True'
                 func = lambda: conferenceDisplay.RHConferenceDisplay().process(params)
-        elif (shorturl_namespace or app.config['INDICO_COMPAT_ROUTES']) and su.hasKey(confId):
-            if shorturl_namespace:
-                # Correct namespace => redirect to the event
-                url = UHConferenceDisplay.getURL(su.getById(confId))
-                func = lambda: redirect(url)
-            else:
-                # Old event namespace => 301-redirect to the new shorturl first to get Google etc. to update it
-                url = url_for('.shorturl', confId=confId)
-                func = lambda: redirect(url, 301)
-        elif is_legacy_id(confId):
-            mapping = LegacyEventMapping.find_first(legacy_event_id=confId)
-            if mapping is not None:
-                url = url_for('event.conferenceDisplay', confId=mapping.event_id)
-                func = lambda: redirect(url, 301)
+        else:
+            shorturl_event = (Event.query
+                              .filter(db.func.lower(Event.url_shortcut) == confId.lower(),
+                                      ~Event.is_deleted)
+                              .one_or_none())
+            if (shorturl_namespace or current_app.config['INDICO_COMPAT_ROUTES']) and shorturl_event:
+                if shorturl_namespace:
+                    # Correct namespace => redirect to the event
+                    func = lambda: redirect(shorturl_event.url)
+                else:
+                    # Old event namespace => 301-redirect to the new shorturl first to get Google etc. to update it
+                    func = lambda: redirect(shorturl_event.short_url, 301)
+            elif is_legacy_id(confId):
+                mapping = LegacyEventMapping.find_first(legacy_event_id=confId)
+                if mapping is not None:
+                    url = url_for('event.conferenceDisplay', confId=mapping.event_id)
+                    func = lambda: redirect(url, 301)
 
     if func is None:
         raise NotFound(_('The specified event with id or tag "{}" does not exist or has been deleted').format(confId))
