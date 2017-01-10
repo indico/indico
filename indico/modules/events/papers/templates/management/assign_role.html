@@ -1,0 +1,67 @@
+{% extends 'layout/dialog_base.html' %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'message_box.html' import message_box %}
+
+{%  block content %}
+    <form method="POST" action="{{ url_for('.display_judging_assign_role', event) }}">
+        <div class="js-assign-dialog">
+            <div id="assign-role-table">
+                {% if person_list %}
+                    <table class="i-table-widget tablesorter">
+                        <thead>
+                            <tr class="i-table">
+                                <th class="i-table thin-column" data-sorter="false"></th>
+                                <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
+                                <th class="i-table competencies-column">{% trans %}Competences{% endtrans %}</th>
+                            </tr>
+                        </thead>
+                        <tbody class="scroll">
+                            {% for event_person in person_list -%}
+                                <tr class="i-table">
+                                    <td class="i-table thin-column id-column">
+                                        <input type="checkbox" class="select-row" value="{{ event_person.id }}" name='person_id'>
+                                    </td>
+                                    <td class="i-table name-column">{{ event_person.full_name }}</td>
+                                    <td>
+                                        {% for competence in competences['competences_{}'.format(event_person.id)] %}
+                                            <div class="label i-tag">{{ competence }}</div>
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                            {%- endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    {%- call message_box('info') -%}
+                        {% if action == 'assign' %}
+                            {% if role == 'content_reviewer' %}
+                                {%- trans %}There are no users with content reviewing rights yet.{% endtrans %}
+                            {% endif %}
+                            {% if role == 'layout_reviewer' %}
+                                {%- trans %}There are no users with layout reviewing rights yet.{% endtrans %}
+                            {% endif %}
+                        {% else %}
+                            {% if role == 'content_reviewer' %}
+                                {%- trans %}There are no content reviewers assigned to the selected contributions.{% endtrans %}
+                            {% endif %}
+                            {% if role == 'layout_reviewer' %}
+                                {%- trans %}There are no layout reviewers assigned to the selected contributions.{% endtrans %}
+                            {% endif %}
+                        {% endif %}
+                    {%- endcall %}
+                {% endif %}
+            </div>
+            {% for contrib in contribs %}
+                <input type="hidden" name="contribution_id" value="{{ contrib.id }}">
+            {% endfor %}
+            <input type="hidden" name="role" value="{{ role }}">
+            <input type="hidden" name="action" value="{{ action }}">
+            <button type="button" class="i-button big right" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+            <input class="i-button big highlight disabled js-requires-selected-row right" type="submit"
+                   value="{{ _('Assign') if action == 'assign' else _('Unassign') }}">
+        </div>
+    </form>
+    <script>
+        enableIfChecked('.js-assign-dialog', '.select-row:visible', '.js-assign-dialog .js-requires-selected-row');
+    </script>
+{% endblock %}

@@ -16,16 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
-from werkzeug.exceptions import Forbidden
+from flask import request, session, flash
+from werkzeug.exceptions import Forbidden, BadRequest
 
+from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.papers.controllers.base import RHPapersBase
+from indico.modules.events.papers.controllers.common import PaperJudgmentMixin
 from indico.modules.events.papers.forms import PaperSubmissionForm
 from indico.modules.events.papers.lists import PaperJudgingAreaListGeneratorDisplay
-from indico.modules.events.papers.operations import create_paper_revision
+from indico.modules.events.papers.operations import create_paper_revision, update_reviewing_roles
+from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea
-from indico.web.util import jsonify_form, jsonify_data
+from indico.modules.users import User
+from indico.util.i18n import _
+from indico.web.util import jsonify_form, jsonify_data, jsonify_template
 
 
 class RHSubmitPaper(RHPapersBase):
@@ -57,14 +62,16 @@ class RHPaperTimeline(RHPapersBase):
         return NotImplementedError
 
 
-class RHDisplayJudgingArea(RHPapersBase):
+class RHJudgingAreaBase(RHPapersBase):
     def _checkProtection(self):
-        if not session.user:
+        if not session.user or session.user not in self.event_new.cfp.judges:
             raise Forbidden
-            RHPapersBase._checkProtection(self)
+        RHPapersBase._checkProtection(self)
 
+
+class RHDisplayJudgingArea(RHJudgingAreaBase):
     def _checkParams(self, params):
-        RHPapersBase._checkParams(self, params)
+        RHJudgingAreaBase._checkParams(self, params)
         self.list_generator = PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
 
     def _process(self):
@@ -72,11 +79,11 @@ class RHDisplayJudgingArea(RHPapersBase):
                                                     **self.list_generator.get_list_kwargs())
 
 
-class RHDisplayCustomizeJudgingAreaList(RHPapersBase):
+class RHDisplayCustomizeJudgingAreaList(RHJudgingAreaBase):
     """Display dialog with filters"""
 
     def _checkParams(self, params):
-        RHPapersBase._checkParams(self, params)
+        RHJudgingAreaBase._checkParams(self, params)
         self.list_generator = PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
 
     def _process_GET(self):
@@ -90,3 +97,80 @@ class RHDisplayCustomizeJudgingAreaList(RHPapersBase):
     def _process_POST(self):
         self.list_generator.store_configuration()
         return jsonify_data(flash=False, **self.list_generator.render_list())
+
+
+class RHDisplayPapersActionsBase(RHJudgingAreaBase):
+    """Base class for RHs performing actions on selected contributions"""
+
+    def _checkParams(self, params):
+        RHJudgingAreaBase._checkParams(self, params)
+        ids = map(int, request.form.getlist('contribution_id'))
+        self.contributions = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(ids)).all()
+
+
+class RHDisplayBulkPaperJudgment(PaperJudgmentMixin, RHDisplayPapersActionsBase):
+    def _checkParams(self, params):
+        RHDisplayPapersActionsBase._checkParams(self, params)
+        self.list_generator = PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
+
+
+class RHRJudgingAreaAssigningBase(RHDisplayPapersActionsBase):
+    """Base class for assigning/unassigning paper reviewing roles"""
+
+    def _checkParams(self, params):
+        RHDisplayPapersActionsBase._checkParams(self, params)
+        self.role = PaperReviewingRole[request.args['role']]
+
+    def _render_template(self, person_list, action):
+        user_competences = self.event_new.cfp.user_competences
+        competences = {'competences_{}'.format(user_id): competences.competences
+                       for user_id, competences in user_competences.iteritems()}
+        return jsonify_template('events/papers/management/assign_role.html', event=self.event_new, role=self.role.name,
+                                action=action, person_list=person_list, competences=competences,
+                                contribs=self.contributions)
+
+
+class RHJudgingAreaAssign(RHRJudgingAreaAssigningBase):
+    """"Renders the person list to assign paper reviewing roles"""
+
+    def _process(self):
+        if self.role == PaperReviewingRole.content_reviewer:
+            person_list = self.event_new.cfp.content_reviewers
+        elif self.role == PaperReviewingRole.layout_reviewer:
+            person_list = self.event_new.cfp.layout_reviewers
+        else:
+            raise BadRequest
+        return self._render_template(person_list, 'assign')
+
+
+class RHJudgingAreaUnassign(RHRJudgingAreaAssigningBase):
+    """"Renders the person list to unassign paper reviewing roles"""
+
+    def _process(self):
+        person_list = set()
+        for contribution in self.contributions:
+            if self.role == PaperReviewingRole.content_reviewer:
+                person_list |= contribution.paper_content_reviewers
+            elif self.role == PaperReviewingRole.layout_reviewer:
+                person_list |= contribution.paper_layout_reviewers
+
+        return self._render_template(person_list, 'unassign')
+
+
+class RHAssignRole(RHDisplayPapersActionsBase):
+    """Assign/unassign paper reviewing roles"""
+
+    def _checkParams(self, params):
+        RHDisplayPapersActionsBase._checkParams(self, params)
+        person_ids = request.form.getlist('person_id')
+        self.persons = User.query.filter(User.id.in_(person_ids)).all()
+        self.action = request.form.get('action')
+        self.role = PaperReviewingRole[request.form.get('role')]
+
+    def _process(self):
+        update_reviewing_roles(self.event_new, self.persons, self.contributions, self.role, self.action)
+        if self.action == 'assign':
+            flash(_("Paper reviewing roles have been assigned."), 'success')
+        else:
+            flash(_("Paper reviewing roles have been unassigned."), 'success')
+        return jsonify_data(flash=False)

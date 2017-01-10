@@ -39,12 +39,8 @@ class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
     def getJSFiles(self):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_papers_js'].urls() +
-                self._asset_env['modules_event_management_js'].urls())
-
-    def getCSSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getCSSFiles(self) +
-                self._asset_env['papers_sass'].urls())
+                self._asset_env['modules_event_management_js'].urls() +
+                self._asset_env['modules_papers_js'].urls())
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
