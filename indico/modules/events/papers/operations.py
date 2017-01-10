@@ -21,7 +21,6 @@ from flask import session
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.reviews import PaperAction
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers import logger
@@ -97,9 +96,7 @@ def judge_paper(contribution, contrib_data, judgment, judge, send_notifications=
         contribution.paper_last_revision.state = PaperRevisionState.rejected
     elif judgment == PaperAction.to_be_corrected:
         contribution.paper_last_revision.state = PaperRevisionState.to_be_corrected
-    if contrib_data['judgment_comment']:
-        comment = PaperReviewComment(user=judge, text=contrib_data['judgment_comment'])
-        contribution.paper_last_revision.comments.append(comment)
+    contribution.paper_last_revision.judgment_comment = contrib_data['judgment_comment']
     db.session.flush()
     log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
     if send_notifications:
