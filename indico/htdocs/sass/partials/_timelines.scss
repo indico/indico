@@ -89,7 +89,11 @@
             @include indicator-left($background-color: $light-gray);
         }
 
-        &.content-indicator {
+        &.content-indicator-top {
+            @include indicator-top-left();
+        }
+
+        &.content-indicator-left {
             @include indicator-left();
         }
     }
