@@ -16,12 +16,14 @@
 
 from __future__ import unicode_literals
 
+from sqlalchemy.ext.hybrid import hybrid_property
+
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import return_ascii, format_repr, MarkdownText
 from indico.util.struct.enum import TitledIntEnum
 
 
@@ -65,6 +67,12 @@ class PaperRevision(db.Model):
         nullable=False,
         default=PaperRevisionState.submitted
     )
+    _judgment_comment = db.Column(
+        'judgment_comment',
+        db.Text,
+        nullable=False,
+        default=''
+    )
 
     contribution = db.relationship(
         'Contribution',
@@ -88,6 +96,18 @@ class PaperRevision(db.Model):
     # - comments (PaperReviewComment.paper_revision)
     # - files (PaperFile.paper_revision)
     # - reviews (PaperReview.revision)
+
+    @hybrid_property
+    def judgment_comment(self):
+        return MarkdownText(self._judgment_comment)
+
+    @judgment_comment.setter
+    def judgment_comment(self, value):
+        self._judgment_comment = value
+
+    @judgment_comment.expression
+    def judgment_comment(cls):
+        return cls._judgment_comment
 
     @return_ascii
     def __repr__(self):
