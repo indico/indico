@@ -24,9 +24,19 @@
         $('body').on('declarative:success', '.js-delete-comment', function() {
             $(this).closest('.i-timeline-item').remove();
         }).on('ajaxForm:show', '.js-edit-comment, .js-edit-review', function() {
-            $(this).closest('.i-box-header').hide();
+            var $this = $(this);
+            var $item = $this.closest('.i-timeline-item-box');
+            if ($item.hasClass('header-only')) {
+                $item.removeClass('header-only');
+            }
+            $this.closest('.i-box-header').hide();
         }).on('ajaxForm:hide', '.js-edit-comment, .js-edit-review', function() {
-            $(this).closest('.i-box-header').show();
+            var $this = $(this);
+            var $item = $this.closest('.i-timeline-item-box');
+            $this.closest('.i-box-header').show();
+            if ($item.data('no-comment') !== undefined) {
+                $item.addClass('header-only');
+            }
         }).on('focus', '.new-comment textarea', function() {
             var $box = $('#review-timeline-input');
             var $commentForm = $box.find('form');
