@@ -21,16 +21,16 @@ from flask import request, render_template, flash, session
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.forms import (BulkPaperJudgmentForm, make_competences_form, PapersScheduleForm,
+from indico.modules.events.papers.controllers.common import PaperJudgmentMixin
+from indico.modules.events.papers.forms import (make_competences_form, PapersScheduleForm,
                                                 PaperTeamsForm, PaperReviewingSettingsForm)
 from indico.modules.events.papers.lists import PaperAssignmentListGenerator
-from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
                                                      update_competences, judge_paper, schedule_cfp, open_cfp, close_cfp)
 from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.users.models.users import User
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
 
@@ -200,34 +200,6 @@ class RHManagePapersActionsBase(RHManagePapersBase):
         self.contributions = self._contrib_query.filter(Contribution.id.in_(ids)).all()
 
 
-class RHBulkPaperJudgment(RHManagePapersActionsBase):
-    """Perform bulk change state operations on selected papers"""
-
-    def _process(self):
-        form = BulkPaperJudgmentForm(event=self.event_new, judgment=request.form.get('judgment'),
-                                     contribution_id=[c.id for c in self.contributions])
-        if form.validate_on_submit():
-            judgment_data, paper_data = form.split_data
-            submitted_papers = [c.paper for c in self.contributions if
-                                c.paper and c.paper.state == PaperRevisionState.submitted]
-            for submitted_paper in submitted_papers:
-                judge_paper(submitted_paper, paper_data, judge=session.user, **judgment_data)
-            num_submitted_papers = len(submitted_papers)
-            num_not_submitted_papers = len(self.contributions) - num_submitted_papers
-            if num_submitted_papers:
-                flash(ngettext("One paper has been judged.",
-                               "{num} paper have been judged.",
-                               num_submitted_papers).format(num=num_submitted_papers), 'success')
-            if num_not_submitted_papers:
-                flash(ngettext("One contribution has been skipped since it has no paper submitted yet or is in "
-                               "a final state.",
-                               "{num} contributions have been skipped since they have no paper submitted yet or are in "
-                               "a final state.",
-                               num_not_submitted_papers).format(num=num_not_submitted_papers), 'warning')
-            return jsonify_data(**self.list_generator.render_list())
-        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
-
-
 class RHManageReviewingSettings(RHManagePapersBase):
     def _process(self):
         defaults = FormDefaults(content_review_questions=self.event_new.cfp.content_review_questions,
@@ -253,3 +225,9 @@ class RHManageReviewingSettings(RHManagePapersBase):
             return jsonify_data()
         self.commit = False
         return jsonify_form(form)
+
+
+class RHBulkPaperJudgment(PaperJudgmentMixin, RHManagePapersActionsBase):
+    def _checkParams(self, params):
+        RHManagePapersActionsBase._checkParams(self, params)
+        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
