@@ -29,12 +29,12 @@ from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import track_time_changes
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 
 from MaKaC import conference as conference
 from MaKaC.common import filters
 from MaKaC.common.Conversion import Conversion
 from MaKaC.common.utils import validMail, setValidEmailSeparators
-from MaKaC.common.url import ShortURLMapper
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import TimingError
@@ -171,19 +171,19 @@ class ConferenceShortURLModification(ConferenceTextModificationBase):
     Conference short URL modification
     """
     def _handleSet(self):
-        mapper = ShortURLMapper()
+        event = self._target.as_event
+        tag = to_unicode(self._value).strip()
         if self._value:
             try:
-                UtilsConference.validateShortURL(self._value, self._target)
+                UtilsConference.validateShortURL(tag, event)
             except ValueError, e:
                 raise NoReportError(e.message)
-        mapper.remove(self._target)
-        self._target.setUrlTag(self._value)
-        if self._value:
-            mapper.add(self._value, self._target)
+            event.url_shortcut = tag
+        else:
+            event.url_shortcut = None
 
     def _handleGet(self):
-        return self._target.getUrlTag()
+        return self._target.as_event.url_shortcut or ''
 
 
 class ConferenceTimezoneModification(ConferenceTextModificationBase):
