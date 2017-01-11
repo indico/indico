@@ -80,7 +80,8 @@ def natsort(environment, value, reverse=False, case_sensitive=False, attribute=N
 def groupby(environment, value, attribute, reverse=False):
     """Like Jinja's builtin `groupby` filter, but allows reversed order."""
     expr = make_attrgetter(environment, attribute)
-    return sorted(map(_GroupTuple, itertools.groupby(sorted(value, key=expr), expr)), reverse=reverse)
+    return [_GroupTuple(key, list(values))
+            for key, values in itertools.groupby(sorted(value, key=expr, reverse=reverse), expr)]
 
 
 def strip_tags(value):
