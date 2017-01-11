@@ -54,8 +54,8 @@
     </h2>
 
     {% if survey.submissions %}
-        <div>
-            <div class="toolbar left">
+        <div class="toolbars space-after">
+            <div class="toolbar">
                 <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                 <ul class="dropdown">
                     <li><a href="#" id="select-all">
@@ -66,39 +66,33 @@
                     </a></li>
                 </ul>
             </div>
-            <div class="toolbar right">
-                <div class="group">
-                    <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart">
-                        {% trans %}Results{% endtrans %}
-                    </a>
-                </div>
-                <div class="group">
-                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">
-                        {%- trans %}Export{% endtrans -%}
-                    </a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#" data-href="{{ url_for('.export_submissions_csv', survey) }}"
-                               class="icon-file-spreadsheet js-submission-action js-export-submissions">
-                                {% trans %}CSV{% endtrans %}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" data-href="{{ url_for('.export_submissions_excel', survey) }}"
-                               class="icon-file-excel js-submission-action js-export-submissions">
-                                {% trans %}XLSX (Excel){% endtrans %}
-                            </a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="group">
-                    <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
-                            data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
-                            data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
-                            data-method="DELETE" class="i-button icon-remove" disabled>
-                        {% trans %}Delete{% endtrans %}
-                    </button>
-                </div>
+            <div class="toolbar">
+                <a href="{{ url_for('.survey_results', survey) }}" class="i-button icon-chart">
+                    {% trans %}Results{% endtrans %}
+                </a>
+                <a class="i-button arrow js-dropdown" data-toggle="dropdown">
+                    {%- trans %}Export{% endtrans -%}
+                </a>
+                <ul class="dropdown">
+                    <li>
+                        <a href="#" data-href="{{ url_for('.export_submissions_csv', survey) }}"
+                           class="icon-file-spreadsheet js-submission-action js-export-submissions">
+                            {% trans %}CSV{% endtrans %}
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" data-href="{{ url_for('.export_submissions_excel', survey) }}"
+                           class="icon-file-excel js-submission-action js-export-submissions">
+                            {% trans %}XLSX (Excel){% endtrans %}
+                        </a>
+                    </li>
+                </ul>
+                <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
+                        data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
+                        data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
+                        data-method="DELETE" class="i-button icon-remove" disabled>
+                    {% trans %}Delete{% endtrans %}
+                </button>
             </div>
         </div>
 
