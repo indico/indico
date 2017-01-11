@@ -193,7 +193,7 @@ class XMLEventSerializer(object):
         if contribution.board_number:
             SubElement(xml, 'board').text = contribution.board_number
         if contribution.track:
-            SubElement(xml, 'track').text = contribution.track.getTitle()
+            SubElement(xml, 'track').text = contribution.track.title
         if contribution.type:
             type_xml = SubElement(xml, 'type')
             SubElement(type_xml, 'ID').text = str(contribution.type.id)
