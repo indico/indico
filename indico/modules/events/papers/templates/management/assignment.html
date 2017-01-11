@@ -102,11 +102,15 @@
             </a>
         </div>
         <div class="toolbar">
-            <div id="filter-statistics">
-                {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+            <div class="group">
+                <div id="filter-statistics">
+                    {{ render_displayed_entries_fragment(contribs|length, total_entries) }}
+                </div>
             </div>
-            <span class="i-button label icon-search"></span>
-            <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+            <div class="group">
+                <span class="i-button label icon-search"></span>
+                <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+            </div>
         </div>
     </div>
     <div class="list" id="assignment-list">
