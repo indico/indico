@@ -30,8 +30,8 @@
            data-close-button
            data-ajax-dialog>
     {% endset %}
-    {% set endlink='</a>' %}
-    {% set text = caller(link|safe, endlink|safe) %}
+    {% set endlink='</a>'|safe %}
+    {% set text = caller(link, endlink) %}
     {% call message_box('warning', classes='review-instructions', fixed_width=true) %}
         {{ text }}
         <div class="hidden-instructions weak-hidden">
