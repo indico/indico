@@ -29,7 +29,7 @@ reportlab==3.2
 simplejson==2.6.2
 termcolor==1.1.0
 transaction==1.3.0
-webassets==0.9
+webassets==0.12.1
 wsgiref==0.1.2
 zc.lockfile==1.0.0
 zc.queue==1.3
