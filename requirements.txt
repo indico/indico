@@ -77,7 +77,7 @@ contextlib2==0.5.4
 Flask-OAuthlib==0.9.1
 translitcodec
 certifi
-Jinja2==2.8
+Jinja2==2.9.4
 xlsxwriter==0.9.3
 jsonschema==2.5.1
 html2text==2016.5.29
