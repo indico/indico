@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import display, management, templates
+from indico.modules.events.papers.controllers import display, management, templates, paper
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -66,7 +66,8 @@ _bp.add_url_rule('/manage/papers/close', 'close_cfp', management.RHCloseCFP, met
 #       for each rule. Otherwise you may not get the correct one.
 for prefix, is_management in (('/manage/papers', True), ('/papers', False)):
     defaults = {'management': is_management}
-    # TODO...
+    _bp.add_url_rule(prefix + '/assignment-list/download', 'download_papers', paper.RHDownloadPapers,
+                     methods=('POST',), defaults=defaults)
 
 
 @_bp.url_defaults
