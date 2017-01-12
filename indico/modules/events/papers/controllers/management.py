@@ -27,7 +27,7 @@ from indico.modules.events.papers.lists import PaperAssignmentListGenerator
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
                                                      update_competences, judge_paper)
-from indico.modules.events.papers.settings import paper_reviewing_settings
+from indico.modules.events.papers.settings import paper_reviewing_settings, RoleConverter
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.events.papers.operations import schedule_cfp, open_cfp, close_cfp
 from indico.modules.users.models.users import User
@@ -244,6 +244,10 @@ class RHManageReviewingSettings(RHManagePapersBase):
             if layout_review_questions is None:
                 layout_review_questions = self.event_new.cfp.layout_review_questions
             self.event_new.paper_review_questions = content_review_questions + layout_review_questions
+
+            email_settings = data.pop('email_settings')
+            data.update(email_settings)
+
             paper_reviewing_settings.set_multi(self.event_new, data)
             flash(_("The reviewing settings were saved successfully"), 'success')
             logger.info("Paper reviewing settings of %r updated by %r", self.event_new, session.user)

@@ -23,6 +23,7 @@ from wtforms.fields import TextAreaField, BooleanField, HiddenField
 from wtforms.validators import Optional
 
 from indico.modules.events.fields import ReviewQuestionsField
+from indico.modules.events.papers.fields import PaperEmailSettingsField
 from indico.modules.events.papers.models.reviews import PaperAction, PaperReviewType
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.util.i18n import _
@@ -107,6 +108,7 @@ class PaperReviewingSettingsForm(IndicoForm):
         question_model=lambda: PaperReviewQuestion(type=PaperReviewType.layout)
     )
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
+    email_settings = PaperEmailSettingsField(_("Email notifications"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

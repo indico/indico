@@ -1,0 +1,123 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    {% set content_reviewing_enabled = field.event.cfp.content_reviewing_enabled %}
+    {% set layout_reviewing_enabled = field.event.cfp.layout_reviewing_enabled %}
+    <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value()|tojson|forceescape }}">
+    <div id="paper-email-settings-widget-{{ field.id }}">
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th>{% trans %}Notify when{% endtrans %}</th>
+                    <th>{% trans %}Judge{% endtrans %}</th>
+                    {% if content_reviewing_enabled %}
+                        <th>{% trans %}Content reviewer{% endtrans %}</th>
+                    {% endif %}
+                    {% if layout_reviewing_enabled %}
+                        <th>{% trans %}Layout reviewer{% endtrans %}</th>
+                    {% endif %}
+                    <th>{% trans %}Author{% endtrans %}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="multiple-recipients">
+                    <td>{% trans %}the person is added to/removed from the conference{% endtrans %}</td>
+                    <td>
+                        <input type="checkbox" name="notify_on_added_to_event"
+                               id="{{ field.id }}-notify_on_added_to_event-judge"
+                               value="judge">
+                    </td>
+                    {% if content_reviewing_enabled %}
+                        <td>
+                            <input type="checkbox" name="notify_on_added_to_event"
+                                   id="{{ field.id }}-notify_on_added_to_event-content_reviewer"
+                                   value="content_reviewer">
+                        </td>
+                    {% endif %}
+                    {% if layout_reviewing_enabled %}
+                        <td>
+                            <input type="checkbox" name="notify_on_added_to_event"
+                                   id="{{ field.id }}-notify_on_added_to_event-layout_reviewer"
+                                   value="layout_reviewer">
+                        </td>
+                    {% endif %}
+                    <td></td>
+                </tr>
+                <tr class="multiple-recipients">
+                    <td>{% trans %}the person is assigned to/unassigned from contributions{% endtrans %}</td>
+                    <td>
+                        <input type="checkbox" name="notify_on_assigned_contrib"
+                               id="{{ field.id }}-notify_on_assigned_contrib-judge"
+                               value="judge">
+                    </td>
+                    {% if content_reviewing_enabled %}
+                        <td>
+                            <input type="checkbox" name="notify_on_assigned_contrib"
+                                   id="{{ field.id }}-notify_on_assigned_contrib-content_reviewer"
+                                   value="content_reviewer">
+                        </td>
+                    {% endif %}
+                    {% if layout_reviewing_enabled %}
+                        <td>
+                            <input type="checkbox" name="notify_on_assigned_contrib"
+                                   id="{{ field.id }}-notify_on_assigned_contrib-layout_reviewer"
+                                   value="layout_reviewer">
+                        </td>
+                    {% endif %}
+                    <td></td>
+                </tr>
+                <tr class="multiple-recipients">
+                    <td>{% trans %}an author submits a paper{% endtrans %}</td>
+                    <td>
+                        <input type="checkbox" name="notify_on_paper_submission"
+                               id="{{ field.id }}-notify_on_paper_submission-judge"
+                               value="judge">
+                    </td>
+                    {% if content_reviewing_enabled %}
+                        <td>
+                            <input type="checkbox" name="notify_on_paper_submission"
+                                   id="{{ field.id }}-notify_on_paper_submission-content_reviewer"
+                                   value="content_reviewer">
+                        </td>
+                    {% endif %}
+                    {% if layout_reviewing_enabled %}
+                        <td>
+                            <input type="checkbox" name="notify_on_paper_submission"
+                                   id="{{ field.id }}-notify_on_paper_submission-layout_reviewer"
+                                   value="layout_reviewer">
+                        </td>
+                    {% endif %}
+                    <td></td>
+                </tr>
+                <tr class="single-recipient">
+                    <td>{% trans %}a reviewer leaves a review{% endtrans %}</td>
+                    <td>
+                        <input type="checkbox" name="notify_judge_on_review"
+                               id="{{ field.id }}-notify_judge_on_review">
+                    </td>
+                    <td></td>
+                    {% if content_reviewing_enabled %}<td></td>{% endif %}
+                    {% if layout_reviewing_enabled %}<td></td>{% endif %}
+                </tr>
+                <tr class="single-recipient">
+                    <td>{% trans %}a judge leaves a judgment{% endtrans %}</td>
+                    <td></td>
+                    {% if content_reviewing_enabled %}<td></td>{% endif %}
+                    {% if layout_reviewing_enabled %}<td></td>{% endif %}
+                    <td>
+                        <input type="checkbox" name="notify_author_on_judgment"
+                               id="{{ field.id }}-notify_author_on_judgment">
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('#{{ field.id }}').paperemailsettingswidget({
+            containerElement: $('#paper-email-settings-widget-{{ field.id }}')
+        });
+    </script>
+{% endblock %}
