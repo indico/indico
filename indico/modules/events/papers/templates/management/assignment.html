@@ -95,9 +95,8 @@
                     </a>
                 </li>
             </ul>
-            <a href="#" class="i-button icon-attachment js-enable-if-checked disabled"
-               data-href="#">
-                {# TODO: Download papers task #}
+            <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+               data-href="{{ url_for('.download_papers', event) }}">
                 {%- trans %}Download papers{% endtrans -%}
             </a>
         </div>
