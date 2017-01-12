@@ -639,7 +639,7 @@ class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
 
 class Link2Latex(object):
     def convert(self, instr):
-        dom = xml.dom.minidom.parseString(instr)
+        dom = xml.dom.minidom.parseString(instr.encode('utf-8'))
         link = dom.documentElement
         href = link.getAttribute('href')
 
@@ -647,7 +647,7 @@ class Link2Latex(object):
         out = \
             """
             \\href{%s}{%s}
-            """ % (href, desc.group(0)[1:])
+            """ % (href.decode('utf-8'), desc.group(0)[1:].decode('utf-8'))
         return out
 
 
