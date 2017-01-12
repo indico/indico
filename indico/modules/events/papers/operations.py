@@ -16,16 +16,20 @@
 
 from __future__ import unicode_literals
 
+import mimetypes
+
 from flask import session
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperAction
-from indico.modules.events.papers.models.revisions import PaperRevisionState
+from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.util import update_object_principals
+from indico.util.fs import secure_filename
 from indico.util.i18n import orig_string
 
 
@@ -86,6 +90,22 @@ def close_cfp(event):
     event.cfp.close()
     logger.info("Call for papers for %r closed by %r", event, session.user)
     event.log(EventLogRealm.management, EventLogKind.negative, 'Papers', 'Call for papers closed', session.user)
+
+
+@no_autoflush
+def create_paper_revision(contribution, submitter, files):
+    revision = PaperRevision(contribution=contribution, submitter=submitter)
+    for f in files:
+        filename = secure_filename(f.filename, 'paper')
+        content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
+        pf = PaperFile(filename=filename, content_type=content_type, paper_revision=revision, contribution=contribution)
+        pf.save(f.file)
+    db.session.flush()
+    logger.info('Paper revision %r submitted by %r', revision, session.user)
+    contribution.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+                               "Paper revision {} submitted for contribution {} ({})"
+                               .format(revision.id, contribution.title, contribution.friendly_id), session.user)
+    return revision
 
 
 @no_autoflush
