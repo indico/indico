@@ -647,7 +647,7 @@ class Link2Latex(object):
         out = \
             """
             \\href{%s}{%s}
-            """ % (href.decode('utf-8'), desc.group(0)[1:].decode('utf-8'))
+            """ % (href, desc.group(0)[1:])
         return out
 
 
