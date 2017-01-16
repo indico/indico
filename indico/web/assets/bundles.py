@@ -424,7 +424,8 @@ SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
                      "sass/custom/*.scss",
                      "sass/partials/*.scss",
-                     "sass/modules/**/*.scss"]
+                     "sass/modules/*.scss",
+                     "sass/modules/*/*.scss"]
 
 
 screen_sass = Bundle('sass/screen.scss',
