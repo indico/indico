@@ -22,6 +22,7 @@ from flask import session
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.core.notifications import make_email, send_email
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperAction
@@ -33,6 +34,7 @@ from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import orig_string
+from indico.web.flask.templating import get_template_module
 
 
 def set_reviewing_state(event, reviewing_type, enable):
@@ -123,11 +125,22 @@ def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
     db.session.flush()
     log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
     if send_notifications:
-        pass  # TODO: manage notifications
+        send_paper_notifications(paper.contribution)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
                         data=log_data)
+
+
+def send_paper_notifications(contribution):
+    """Send paper notification e-mails.
+
+    :param contribution: the contribution whose last paper revision was judged
+    """
+    template = get_template_module('events/static/emails/paper_judgment_notification_email.txt',
+                                   contribution=contribution, paper=contribution.paper_last_revision)
+    email = make_email(to_list=[contribution.paper_last_revision.submitter.email], template=template)
+    send_email(email, contribution.event_new, 'Papers', session.user)
 
 
 def _store_paper_template_file(template, file):
