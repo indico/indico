@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import management
+from indico.modules.events.papers.controllers import display, management
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -26,7 +26,9 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 
 
 # Display pages
-# TODO...
+_bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit',
+                 'submit_revision', display.RHSubmitPaper, methods=('GET', 'POST'))
+_bp.add_url_rule('/papers/<int:contrib_id>/', 'paper_timeline', display.RHPaperTimeline)
 
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)

@@ -29,7 +29,7 @@ from indico.modules.events.papers.models.review_questions import PaperReviewQues
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, IndicoTagListField, HiddenEnumField,
-                                     HiddenFieldList, IndicoMarkdownField)
+                                     HiddenFieldList, IndicoMarkdownField, FileField)
 from indico.web.forms.validators import LinkedDateTime
 
 
@@ -117,3 +117,7 @@ class PaperReviewingSettingsForm(IndicoForm):
             del self.content_review_questions
         if not self.event.cfp.layout_reviewing_enabled:
             del self.layout_review_questions
+
+
+class PaperSubmissionForm(IndicoForm):
+    files = FileField(_("Files"), multiple_files=True)
