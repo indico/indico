@@ -140,4 +140,8 @@
     &.strong {
         color: $black;
     }
+
+    &.disabled {
+        color: $gray;
+    }
 }
