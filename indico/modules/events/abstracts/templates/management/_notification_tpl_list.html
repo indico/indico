@@ -95,9 +95,19 @@
                                                     {%- endtrans -%}
                                                 {% else %}
                                                     {%- trans %}in{% endtrans -%}
-                                                    <strong>
-                                                        {{ tracks[rule.track[0]].title }}
-                                                    </strong>
+                                                    {% set track = tracks[rule.track[0]] %}
+                                                    {% if track %}
+                                                        <strong>{{ track.title }}</strong>
+                                                    {% else %}
+                                                        {% set tooltip %}
+                                                            {%- trans -%}
+                                                                This rule will never match as the track has been deleted.
+                                                            {%- endtrans -%}
+                                                        {% endset %}
+                                                        <span class="semantic-text disabled" title="{{ tooltip }}">
+                                                            {% trans %}deleted{% endtrans %}
+                                                        </span>
+                                                    {% endif %}
                                                 {% endif %}
                                             {% endif %}
                                             {% if 'contribution_type' in rule %}
@@ -111,9 +121,19 @@
                                                         {%- endtrans -%}
                                                     {% else %}
                                                         {%- trans %}as{% endtrans -%}
-                                                        <strong>
-                                                            {{ contrib_types[rule.contribution_type[0]].name }}
-                                                        </strong>
+                                                        {% set ctype = contrib_types[rule.contribution_type[0]] %}
+                                                        {% if ctype %}
+                                                            {{ ctype.name }}
+                                                        {% else %}
+                                                            {% set tooltip %}
+                                                                {%- trans -%}
+                                                                    This rule will never match as the contribution type has been deleted.
+                                                                {%- endtrans -%}
+                                                            {% endset %}
+                                                            <span class="semantic-text disabled" title="{{ tooltip }}">
+                                                                {% trans %}deleted{% endtrans %}
+                                                            </span>
+                                                        {% endif %}
                                                     {% endif %}
                                             {% endif %}
                                             {% if not loop.last %}
