@@ -1,0 +1,40 @@
+{% extends 'emails/base.txt' %}
+
+{% macro get_comments() %}
+    {% filter dedent -%}
+        Please see the comments from the reviewing team below:
+
+        {{ paper.judgment_comment }}
+    {%- endfilter %}
+{% endmacro %}
+
+{% block subject -%}
+    {% if paper.state.name in ('accepted', 'rejected') -%}
+        Your paper "{{contribution.title}}" was {{ paper.state.name }}.
+    {% elif paper.state.name == 'to_be_corrected' -%}
+        Your paper "{{contribution.title}}" requires changes.
+    {% endif %}
+{%- endblock %}
+
+{% block header_recipient -%}
+    {{ paper.submitter.first_name }}
+{%- endblock %}
+
+{% block body -%}
+    {% filter dedent -%}
+        {% if paper.state.name in ('accepted', 'rejected') %}
+            After the reviewing process your paper "{{ contribution.title }} (#{{ contribution.friendly_id }})", submitted for "{{ contribution.event_new.title }}" has been {{ paper.state.name }}.
+            {{ get_comments() }}
+            You may proceed to your paper page:
+        {% elif paper.state.name == 'to_be_corrected' %}
+            After the reviewing process your paper "{{ contribution.title }} (#{{ contribution.friendly_id }})", submitted for "{{ contribution.event_new.title }}" is required to be corrected.
+            {{ get_comments() }}
+            You may then apply the requested modifications to your paper and submit the modified version for review.
+            In order to do so, please proceed to your paper page:
+        {% endif %}
+
+        {{ url_for('papers.paper_timeline', contribution, _external=true) }}
+    {%- endfilter %}
+{%- endblock %}
+
+{% block footer_url %}{{ contribution.event_new.external_url }}{% endblock %}
