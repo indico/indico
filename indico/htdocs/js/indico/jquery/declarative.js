@@ -117,6 +117,7 @@
             var highlightUpdate = $this.data('highlight-update') !== undefined;
             var dialog = $this.data('ajax-dialog') !== undefined;
             var reload = $this.data('reload-after');
+            var redirect = $this.data('redirect-after');
             var content = $this.data('content');
 
             if (!$.isPlainObject(params)) {
@@ -159,6 +160,9 @@
                                 } else if (reload !== undefined && reload !== 'customData') {
                                     IndicoUI.Dialogs.Util.progress();
                                     location.reload();
+                                } else if (redirect !== undefined) {
+                                    IndicoUI.Dialogs.Util.progress();
+                                    location.href = redirect;
                                 }
                             } else if (reload === 'customData' && customData) {
                                 IndicoUI.Dialogs.Util.progress();
