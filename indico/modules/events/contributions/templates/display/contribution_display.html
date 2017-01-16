@@ -1,8 +1,8 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'events/display/common/_conferences.html' import render_attachments %}
-{% from 'events/contributions/display/_paper_reviewing.html' import render_paper_reviewing %}
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'events/papers/_contributions.html' import render_paper_section %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
 
@@ -204,36 +204,7 @@
         </div>
     </div>
 
-    {% if show_paper %}
-        <h3 class="icon-file">Paper</h3>
-        {{ render_paper_reviewing(contribution, reviewing_status, paper_upload_form, paper_files, can_submit_paper) }}
-    {% endif %}
-
     {{ render_attachments(contribution) }}
-
-    {% if contribution.event_new.cfp.is_open and contribution.can_manage(session.user, 'submit') %}
-        <div class="infoline announcement">
-            <span class="icon icon-file"></span>
-            <div class="text">
-                <div class="label">
-                    {%- trans %}The call for papers is open{% endtrans -%}
-                </div>
-                <div>
-                    {%- trans %}You can submit a paper for reviewing.{% endtrans -%}
-                </div>
-                <div class="toolbar right">
-                    <a href="#" class="i-button highlight js-show-abstract-form"
-                       data-title="{% trans title=contribution.title%}Submit paper for {{ title }}{% endtrans %}"
-                       data-href="{{ url_for('papers.submit_revision', contribution) }}"
-                       data-redirect-after="{{ url_for('papers.paper_timeline', contribution) }}"
-                       data-confirm-close-unsaved
-                       data-ajax-dialog>
-                        {%- trans %}Submit paper{% endtrans -%}
-                    </a>
-                </div>
-            </div>
-        </div>
-    {% endif %}
 
     {% if contribution.subcontributions -%}
         <h3>{% trans %}Subcontributions{% endtrans %}</h3>
@@ -262,6 +233,8 @@
             </div>
         </div>
     {%- endif %}
+
+    {{ render_paper_section(contribution, show_paper=show_paper) }}
 
     <script>
         setupAttachmentTreeView();
