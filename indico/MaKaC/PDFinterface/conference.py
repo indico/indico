@@ -1654,7 +1654,7 @@ class RegistrantsListToBadgesPDF:
                 #  BadgeTemplateItem instance must be passed, depending on the result of the getArgumentType() method.
                 argumentType = action.getArgumentType()
                 if argumentType == conference.Conference:
-                    text = action.getValue(registrant.registration_form.event)
+                    text = action.getValue(registrant.registration_form.event_new.as_legacy)
                 elif argumentType == BadgeTemplateItem:
                     text = action.getValue(item)
                 else:
