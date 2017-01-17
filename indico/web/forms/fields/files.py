@@ -88,6 +88,7 @@ class EditableFileField(FileField):
 
     def __init__(self, *args, **kwargs):
         self.get_metadata = kwargs.pop('get_metadata', get_file_metadata)
+        self.added_only = kwargs.pop('added_only', False)
         super(EditableFileField, self).__init__(*args, **kwargs)
         self.widget_options['editable'] = True
 
@@ -103,7 +104,7 @@ class EditableFileField(FileField):
         if not self.allow_multiple_files:
             uploaded = uploaded[0] if uploaded else None
             deleted = deleted[0] if deleted else None
-        self.data = {
+        self.data = uploaded if self.added_only else {
             'added': uploaded,
             'deleted': deleted
         }
