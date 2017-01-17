@@ -75,7 +75,7 @@ class CallForPapers(object):
 
     @property
     def managers(self):
-        return {p.principal for p in self.event.acl_entries if p.has_management_role('paper_manager')}
+        return {p.principal for p in self.event.acl_entries if p.has_management_role('paper_manager', explicit=True)}
 
     @property
     def judges(self):

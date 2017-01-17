@@ -41,12 +41,12 @@ def set_reviewing_state(event, reviewing_type, enable):
               "{} reviewing type '{}'".format("Enabled" if enable else "Disabled", reviewing_type), session.user)
 
 
-def update_team_members(event, managers, judges, content_reviewers, layout_reviewers):
+def update_team_members(event, managers, judges, content_reviewers=None, layout_reviewers=None):
     update_object_principals(event, managers, role='paper_manager')
     update_object_principals(event, judges, role='paper_judge')
-    if content_reviewers:
+    if content_reviewers is not None:
         update_object_principals(event, content_reviewers, role='paper_content_reviewer')
-    if layout_reviewers:
+    if layout_reviewers is not None:
         update_object_principals(event, layout_reviewers, role='paper_layout_reviewer')
     logger.info("Paper teams of %r updated by %r", event, session.user)
 
