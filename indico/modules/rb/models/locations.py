@@ -32,8 +32,18 @@ class Location(db.Model):
     __tablename__ = 'locations'
     __table_args__ = {'schema': 'roombooking'}
 
-    working_time_start = time(8, 30)
-    working_time_end = time(17, 30)
+    # TODO: Turn this into a proper admin setting
+    working_time_periods = ((time(8, 30), time(12, 30)), (time(13, 30), time(17, 30)))
+
+    @classproperty
+    @classmethod
+    def working_time_start(cls):
+        return cls.working_time_periods[0][0]
+
+    @classproperty
+    @classmethod
+    def working_time_end(cls):
+        return cls.working_time_periods[-1][1]
 
     id = db.Column(
         db.Integer,

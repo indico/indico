@@ -135,7 +135,7 @@
             <table cellspacing="0">
                 <tr>
                     <td class="occupancy-period">
-                        ${ _('Average room occupancy in weekdays from 8:30 to 17:30') }
+                        ${ _('Average room occupancy in weekdays during working hours') }
                         % if period == 'pastmonth':
                             ${ _('over the past 30 days') }.
                         % elif period == 'thisyear':
