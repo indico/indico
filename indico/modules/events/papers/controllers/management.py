@@ -26,10 +26,9 @@ from indico.modules.events.papers.forms import (BulkPaperJudgmentForm, make_comp
 from indico.modules.events.papers.lists import PaperAssignmentListGenerator
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
-                                                     update_competences, judge_paper)
-from indico.modules.events.papers.settings import paper_reviewing_settings, RoleConverter
+                                                     update_competences, judge_paper, schedule_cfp, open_cfp, close_cfp)
+from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
-from indico.modules.events.papers.operations import schedule_cfp, open_cfp, close_cfp
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults

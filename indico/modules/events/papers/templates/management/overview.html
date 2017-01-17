@@ -81,6 +81,22 @@
 
     <div class="action-box">
         <div class="section">
+            <div class="icon icon-file-text"></div>
+            <div class="text">
+                <div class="label">{% trans %}Paper templates{% endtrans %}</div>
+                {%- trans %}Manage paper templates that can be downloaded in the event area{% endtrans -%}
+            </div>
+            <div class="toolbar">
+                <a class="i-button icon-settings" href="#"
+                   data-href="{{ url_for('.manage_templates', event) }}"
+                   data-title="{% trans %}Manage paper templates{% endtrans %}"
+                   data-close-button
+                   data-ajax-dialog>
+                    {%- trans %}Manage{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="section">
             <div class="icon icon-settings"></div>
             <div class="text">
                 <div class="label">{% trans %}Reviewing settings{% endtrans %}</div>

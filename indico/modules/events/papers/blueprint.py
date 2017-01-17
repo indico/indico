@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import display, management
+from indico.modules.events.papers.controllers import display, management, templates
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
@@ -29,11 +29,20 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit',
                  'submit_revision', display.RHSubmitPaper, methods=('GET', 'POST'))
 _bp.add_url_rule('/papers/<int:contrib_id>/', 'paper_timeline', display.RHPaperTimeline)
+_bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
+                 templates.RHDownloadPaperTemplate)
 
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/templates/', 'manage_templates', templates.RHManagePaperTemplates)
+_bp.add_url_rule('/manage/papers/templates/add', 'upload_template',
+                 templates.RHUploadPaperTemplate, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/templates/<int:template_id>-<filename>', 'delete_template',
+                 templates.RHDeletePaperTemplate, methods=('DELETE',))
+_bp.add_url_rule('/manage/papers/templates/<int:template_id>-<filename>/edit', 'edit_template',
+                 templates.RHEditPaperTemplate, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/teams/', 'manage_teams', management.RHManagePaperTeams,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/teams/competences', 'manage_competences', management.RHManageCompetences,

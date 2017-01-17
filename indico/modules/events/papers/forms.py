@@ -19,17 +19,19 @@ from __future__ import unicode_literals
 from datetime import time
 
 from flask import request
-from wtforms.fields import TextAreaField, BooleanField, HiddenField
-from wtforms.validators import Optional
+from wtforms.fields import TextAreaField, BooleanField, HiddenField, StringField
+from wtforms.validators import Optional, DataRequired
 
 from indico.modules.events.fields import ReviewQuestionsField
 from indico.modules.events.papers.fields import PaperEmailSettingsField
-from indico.modules.events.papers.models.reviews import PaperAction, PaperReviewType
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
+from indico.modules.events.papers.models.reviews import PaperAction, PaperReviewType
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, IndicoTagListField, HiddenEnumField,
-                                     HiddenFieldList, IndicoMarkdownField, FileField)
+                                     HiddenFieldList, IndicoMarkdownField, FileField, EditableFileField)
+from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import LinkedDateTime
 
 
@@ -121,3 +123,25 @@ class PaperReviewingSettingsForm(IndicoForm):
 
 class PaperSubmissionForm(IndicoForm):
     files = FileField(_("Files"), multiple_files=True)
+
+
+def _get_template_data(tpl):
+    return {
+        'filename': tpl.filename,
+        'size': tpl.size,
+        'content_type': tpl.content_type,
+        'url': url_for('.download_template', tpl)
+    }
+
+
+class PaperTemplateForm(IndicoForm):
+    name = StringField(_("Name"), [DataRequired()])
+    description = TextAreaField(_("Description"))
+    template = EditableFileField(_("Template"), add_remove_links=False, added_only=True,
+                                 get_metadata=_get_template_data)
+
+    def __init__(self, *args, **kwargs):
+        template = kwargs.pop('template', None)
+        if template is None:
+            inject_validators(self, 'template', [DataRequired()])
+        super(PaperTemplateForm, self).__init__(*args, **kwargs)

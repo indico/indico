@@ -1,0 +1,70 @@
+{% extends 'layout/dialog_base.html' %}
+{% from 'forms/_form.html' import form_header, form_field, form_footer %}
+{% from 'message_box.html' import message_box %}
+
+{% block dialog_id %}templates-dialog{% endblock %}
+
+{% block description %}
+    {%- trans -%}
+        Uploading paper templates makes it easier for authors to write papers that
+        conform to the conference's layout standards.
+    {%- endtrans -%}
+{%- endblock %}
+
+{% block content -%}
+    <div class="toolbar space-after">
+        <button class="i-button icon-plus highlight"
+                data-href="{{ url_for('.upload_template', event) }}"
+                data-title="{% trans %}Upload new paper template{% endtrans %}"
+                data-update="#templates-dialog"
+                data-replace-update
+                data-ajax-dialog>
+            {% trans %}Upload paper template{% endtrans %}
+        </button>
+    </div>
+
+    {% if event.paper_templates %}
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th class="small-column"></th>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}Description{% endtrans %}</th>
+                    <th class="action-column"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {# sort by (name,id) to keep consistent order if names are not unique #}
+                {% for tpl in event.paper_templates|sort(attribute='id')|sort(attribute='name') %}
+                    <tr>
+                        <td class="{{ icon_from_mimetype(tpl.content_type, 'icon-file') }}"></td>
+                        <td>
+                            <a href="{{ url_for('.download_template', tpl) }}">{{ tpl.name }}</a>
+                        </td>
+                        <td>{{ tpl.description }}</td>
+                        <td class="action-column">
+                            <a class="icon-edit"
+                               data-href="{{ url_for('.edit_template', tpl) }}"
+                               data-title="{% trans %}Edit paper template{% endtrans %}"
+                               data-update="#templates-dialog"
+                               data-replace-update
+                               data-ajax-dialog></a>
+                            <a class="icon-remove"
+                               data-method="DELETE"
+                               data-href="{{ url_for('.delete_template', tpl) }}"
+                               data-confirm="{% trans %}Do you really want to delete this paper template?{% endtrans %}"
+                               data-title="{% trans %}Confirm deletion{% endtrans %}"
+                               data-update="#templates-dialog"
+                               data-replace-update
+                               data-ajax></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {%- call message_box('info') %}
+            {%- trans %}There are no paper templates yet.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
+{%- endblock %}

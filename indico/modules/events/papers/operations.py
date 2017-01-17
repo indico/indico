@@ -28,6 +28,7 @@ from indico.modules.events.papers.models.reviews import PaperAction
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.competences import PaperCompetence
+from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import orig_string
@@ -125,3 +126,39 @@ def judge_paper(contribution, contrib_data, judgment, judge, send_notifications=
     contribution.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                                'Paper "{}" was judged'.format(orig_string(contribution.verbose_title)), judge,
                                data=log_data)
+
+
+def _store_paper_template_file(template, file):
+    content_type = mimetypes.guess_type(file.filename)[0] or file.mimetype or 'application/octet-stream'
+    filename = secure_filename(file.filename, 'template')
+    # reset fields in case an existing file is replaced so we can save() again
+    template.storage_backend = None
+    template.storage_file_id = None
+    template.size = None
+    template.content_type = content_type
+    template.filename = filename
+    template.save(file.file)
+
+
+def create_paper_template(event, data):
+    file = data.pop('template')
+    template = PaperTemplate(event_new=event)
+    template.populate_from_dict(data)
+    _store_paper_template_file(template, file)
+    db.session.flush()
+    logger.info('Paper template %r uploaded by %r', template, session.user)
+    return template
+
+
+def update_paper_template(template, data):
+    file = data.pop('template', None)
+    template.populate_from_dict(data)
+    if file is not None:
+        _store_paper_template_file(template, file)
+    logger.info('Paper template %r updated by %r', template, session.user)
+
+
+def delete_paper_template(template):
+    db.session.delete(template)
+    db.session.flush()
+    logger.info('Paper template %r deleted by %r', template, session.user)
