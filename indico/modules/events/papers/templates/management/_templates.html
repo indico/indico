@@ -1,0 +1,46 @@
+{% from 'message_box.html' import message_box %}
+
+{% macro render_template_list(event) %}
+    {% if event.paper_templates %}
+        <table class="i-table-widget">
+            <thead>
+                <tr>
+                    <th class="small-column"></th>
+                    <th>{% trans %}Name{% endtrans %}</th>
+                    <th>{% trans %}Description{% endtrans %}</th>
+                    <th class="action-column"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {# sort by (name,id) to keep consistent order if names are not unique #}
+                {% for tpl in event.paper_templates|sort(attribute='id')|sort(attribute='name') %}
+                    <tr>
+                        <td class="{{ icon_from_mimetype(tpl.content_type, 'icon-file') }}"></td>
+                        <td>
+                            <a href="{{ url_for('.download_template', tpl) }}">{{ tpl.name }}</a>
+                        </td>
+                        <td>{{ tpl.description }}</td>
+                        <td class="action-column">
+                            <a class="icon-edit"
+                               data-href="{{ url_for('.edit_template', tpl) }}"
+                               data-title="{% trans %}Edit paper template{% endtrans %}"
+                               data-update="#templates-dialog .template-list"
+                               data-ajax-dialog></a>
+                            <a class="icon-remove"
+                               data-method="DELETE"
+                               data-href="{{ url_for('.delete_template', tpl) }}"
+                               data-confirm="{% trans %}Do you really want to delete this paper template?{% endtrans %}"
+                               data-title="{% trans %}Confirm deletion{% endtrans %}"
+                               data-update="#templates-dialog .template-list"
+                               data-ajax></a>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        {%- call message_box('info') %}
+            {%- trans %}There are no paper templates yet.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
+{% endmacro %}
