@@ -75,10 +75,13 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
     return jsonify(html=html, js=_pop_injected_js())
 
 
-def jsonify_template(template, _render_func=render_template, **context):
+def jsonify_template(template, _render_func=render_template, _success=None, **context):
     """Returns a json response containing a rendered template"""
     html = _render_func(template, **context)
-    return jsonify(html=html, js=_pop_injected_js())
+    jsonify_kw = {}
+    if _success is not None:
+        jsonify_kw['success'] = _success
+    return jsonify(html=html, js=_pop_injected_js(), **jsonify_kw)
 
 
 def jsonify_data(flash=True, **json_data):
