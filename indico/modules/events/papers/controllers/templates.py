@@ -16,14 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import request
+from flask import flash, request
 
 from indico.modules.events.papers.controllers.base import RHManagePapersBase, RHPapersBase
 from indico.modules.events.papers.forms import (PaperTemplateForm)
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.papers.operations import delete_paper_template, create_paper_template, update_paper_template
+from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form, jsonify_template
+from indico.web.util import jsonify_form, jsonify_template, jsonify_data
 
 
 class RHManagePaperTemplates(RHManagePapersBase):
@@ -47,14 +49,20 @@ class RHManagePaperTemplateBase(RHManagePapersBase):
         self.template = PaperTemplate.get_one(request.view_args['template_id'])
 
 
+def _render_teplate_list(event):
+    tpl = get_template_module('events/papers/management/_templates.html')
+    return jsonify_data(html=tpl.render_template_list(event))
+
+
 class RHUploadPaperTemplate(RHManagePapersBase):
     """Upload a new paper template"""
 
     def _process(self):
         form = PaperTemplateForm()
         if form.validate_on_submit():
-            create_paper_template(self.event_new, form.data)
-            return jsonify_template('events/papers/management/templates.html', event=self.event_new, _success=True)
+            template = create_paper_template(self.event_new, form.data)
+            flash(_('Paper template "{}" added.').format(template.name), 'success')
+            return _render_teplate_list(self.event_new)
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 
@@ -64,8 +72,10 @@ class RHEditPaperTemplate(RHManagePaperTemplateBase):
     def _process(self):
         form = PaperTemplateForm(template=self.template, obj=FormDefaults(self.template, template=self.template))
         if form.validate_on_submit():
+            old_name = self.template.name
             update_paper_template(self.template, form.data)
-            return jsonify_template('events/papers/management/templates.html', event=self.event_new, _success=True)
+            flash(_('Paper template "{}" updated.').format(old_name), 'success')
+            return _render_teplate_list(self.event_new)
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 
@@ -74,7 +84,8 @@ class RHDeletePaperTemplate(RHManagePaperTemplateBase):
 
     def _process(self):
         delete_paper_template(self.template)
-        return jsonify_template('events/papers/management/templates.html', event=self.event_new)
+        flash(_('Paper template "{}" deleted.').format(self.template.name), 'success')
+        return _render_teplate_list(self.event_new)
 
 
 class RHDownloadPaperTemplate(RHPapersBase):
