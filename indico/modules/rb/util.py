@@ -77,8 +77,8 @@ def get_default_booking_interval(duration=90, precision=15, force_today=False):
         raise ValueError("The duration must be strictly positive (got {} min)".format(duration))
 
     date_changed = False
-    work_start = datetime.combine(date.today(), Location.working_time_start)
-    work_end = datetime.combine(date.today(), Location.working_time_end)
+    work_start = datetime.combine(date.today(), Location.working_time_periods[0][0])
+    work_end = datetime.combine(date.today(), Location.working_time_periods[-1][1])
     start_dt = max(work_start, round_up_to_minutes(datetime.now(), precision=precision))
 
     end_dt = start_dt + timedelta(minutes=duration)

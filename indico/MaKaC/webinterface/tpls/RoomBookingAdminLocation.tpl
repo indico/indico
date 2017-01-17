@@ -386,7 +386,7 @@ indicoRequest(
               <span style="background-color: #C9FFC9; font-weight: bold;">
                 ${ '{0:.02f}'.format(kpi['occupancy'] * 100) }<small>%</small>
               </span>
-              ${inlineContextHelp('Average room occupancy in last 30 days during working hours (8H30-17H30, Monday-Friday including holidays). Only active, publically reservable rooms are taken into account.' )}
+              ${inlineContextHelp('Average room occupancy in last 30 days during working hours (8:30 - 12:30 and 13:30 - 17:30, Monday-Friday including holidays). Only active, publically reservable rooms are taken into account.' )}
             </td>
           </tr>
           <tr><td>&nbsp;</td></tr>
