@@ -146,7 +146,7 @@ class PaperMigration(object):
             content_type = mimetypes.guess_type(old_filename)[0] or 'application/octet-stream'
             tpl = PaperTemplate(filename=filename, content_type=content_type, size=size,
                                 storage_backend=storage_backend, storage_file_id=storage_path,
-                                name=convert_to_unicode(old_tpl._Template__name),
+                                name=convert_to_unicode(old_tpl._Template__name) or old_filename,
                                 description=convert_to_unicode(old_tpl._Template__description))
             self.event.paper_templates.append(tpl)
 
