@@ -146,7 +146,8 @@ class PaperMigration(object):
             content_type = mimetypes.guess_type(old_filename)[0] or 'application/octet-stream'
             tpl = PaperTemplate(filename=filename, content_type=content_type, size=size,
                                 storage_backend=storage_backend, storage_file_id=storage_path,
-                                name=old_tpl._Template__name, description=old_tpl._Template__description)
+                                name=convert_to_unicode(old_tpl._Template__name),
+                                description=convert_to_unicode(old_tpl._Template__description))
             self.event.paper_templates.append(tpl)
 
     def _migrate_competences(self):
@@ -212,7 +213,6 @@ class EventPapersImporter(LocalFileImporterMixin, Importer):
         # TODO: paper files (from legacy)
         # TODO: revisions
         # TODO: reviews/judgments
-
 
     def _iter_events(self):
         query = (Event.query
