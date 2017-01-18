@@ -23,11 +23,8 @@
 }
 
 .abstract-content {
-    @extend .i-box;
-    @extend .i-box.no-shadow;
     @extend .text-paper;
     padding: 10px 10em;
-    margin-top: 1rem;
 
     .abstract-authorship-block {
         margin-top: 0.5em;
