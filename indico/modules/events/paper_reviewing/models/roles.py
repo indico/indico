@@ -21,10 +21,10 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class PaperReviewingRoleType(TitledIntEnum):
+class PaperReviewingRoleType(RichIntEnum):
     __titles__ = (_('Reviewer'), _('Referee'), _('Editor'))
     reviewer = 0
     referee = 1

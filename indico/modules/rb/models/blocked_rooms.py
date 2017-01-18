@@ -26,10 +26,10 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.notifications.blockings import notify_request_response
 from indico.util.string import return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class BlockedRoomState(TitledIntEnum):
+class BlockedRoomState(RichIntEnum):
     __titles__ = ['Pending', 'Accepted', 'Rejected']
     pending = 0
     accepted = 1

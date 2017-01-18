@@ -39,10 +39,10 @@ from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_full_name, format_repr
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class UserTitle(TitledIntEnum):
+class UserTitle(RichIntEnum):
     __titles__ = ('', _('Mr.'), _('Ms.'), _('Mrs.'), _('Dr.'), _('Prof.'))
     none = 0
     mr = 1
@@ -56,7 +56,7 @@ class UserTitle(TitledIntEnum):
         return next((x for x in cls if unicode(x.title) == text), None)
 
 
-class NameFormat(TitledIntEnum):
+class NameFormat(RichIntEnum):
     __titles__ = (_('John Doe'), _('Doe, John'), _('Doe, J.'), _('J. Doe'),
                   _('John DOE'), _('DOE, John'), _('DOE, J.'), _('J. DOE'))
     first_last = 0
