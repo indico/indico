@@ -32,6 +32,7 @@ from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.util import update_object_principals
+from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import orig_string
 from indico.web.flask.templating import get_template_module
@@ -122,6 +123,8 @@ def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
     elif judgment == PaperAction.to_be_corrected:
         paper.state = PaperRevisionState.to_be_corrected
     paper.last_revision.judgment_comment = contrib_data['judgment_comment']
+    paper.last_revision.judge = judge
+    paper.last_revision.judgment_dt = now_utc()
     db.session.flush()
     log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
     if send_notifications:
