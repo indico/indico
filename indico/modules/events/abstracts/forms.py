@@ -64,8 +64,9 @@ def make_review_form(event):
         range_ = event.cfa.rating_range
         field = RadioField(question.text, validators=[DataRequired()],
                            choices=[(unicode(n), unicode(n)) for n in range(range_[0], range_[1] + 1)],
-                           widget=JinjaWidget('events/abstracts/forms/rating_widget.html',
-                                              question=question, cfa=event.cfa, inline_js=True, question_idx=idx))
+                           widget=JinjaWidget('events/reviews/rating_widget.html',
+                                              question=question, rating_range=event.cfa.rating_range, inline_js=True,
+                                              question_idx=idx))
         setattr(form_class, name, field)
     return form_class
 

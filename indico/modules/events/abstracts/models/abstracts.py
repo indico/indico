@@ -43,6 +43,7 @@ from indico.util.struct.enum import RichIntEnum, IndicoEnum
 
 class AbstractState(RichIntEnum):
     __titles__ = [None, _("Submitted"), _("Withdrawn"), _("Accepted"), _("Rejected"), _("Merged"), _("Duplicate")]
+    __css_classes__ = [None, '', 'outline dashed', 'success', 'error', 'visited', 'strong']
     submitted = 1
     withdrawn = 2
     accepted = 3
@@ -54,6 +55,8 @@ class AbstractState(RichIntEnum):
 class AbstractPublicState(RichIntEnum):
     __titles__ = {i: title for i, title in enumerate(AbstractState.__titles__[2:], 2)}
     __titles__.update({-1: _("Awaiting Review"), -2: _("Under Review")})
+    __css_classes__ = {i: css_class for i, css_class in enumerate(AbstractState.__css_classes__[2:], 2)}
+    __css_classes__.update({-1: '', -2: 'highlight'})
     # regular states (must match AbstractState!)
     withdrawn = 2
     accepted = 3
@@ -67,6 +70,7 @@ class AbstractPublicState(RichIntEnum):
 
 class AbstractReviewingState(RichIntEnum):
     __titles__ = [_("Not Started"), _("In progress"), _("Positive"), _("Conflicting"), _("Negative"), _("Mixed")]
+    __css_classes__ = ['', '', 'success', '', 'error', 'warning']
     not_started = 0
     in_progress = 1
     positive = 2
