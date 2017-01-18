@@ -15,7 +15,7 @@
         </div>
         <div id="{{ field.id }}" class="rating-scale flexrow f-a-center">
             <span class="score">{{ '-' if field.object_data is none else field.data }}</span>
-            {% for bullet in range(cfa.rating_range[1], cfa.rating_range[0] - 1, -1) %}
+            {% for bullet in range(rating_range[1], rating_range[0] - 1, -1) %}
                 {% set radio_id = '%s-%d'|format(field.id, bullet) %}
                 <input type="radio" id="{{ radio_id }}" name="{{ field.name }}" value="{{ bullet }}"
                        {{ 'checked' if field.data == bullet|string }}>

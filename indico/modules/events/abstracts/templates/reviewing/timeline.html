@@ -1,8 +1,9 @@
 {% from 'events/abstracts/reviewing/_common.html' import render_tracks %}
+{% from 'events/reviews/_common.html' import render_review_state %}
 
 
 {% macro render_review_action_text(review) %}
-    {% set action = _render_review_state(review) %}
+    {% set action = render_review_state(review) %}
     {% set endaction = '</span>'|safe %}
     {% if review.proposed_action.name == 'accept' %}
         {% if review.proposed_contribution_type %}
@@ -116,14 +117,4 @@
     <div class="empty-input-description">
         {{- no_comments_description -}}
     </div>
-{% endmacro %}
-
-
-{% macro _render_review_state(review) %}
-    {% set mapping = {'accept': 'success',
-                      'reject': 'error',
-                      'merge': 'visited',
-                      'mark_as_duplicate': 'strong',
-                      'change_tracks': 'warning'} %}
-    <span class="bold underline semantic-text {{ mapping[review.proposed_action.name] }}">
 {% endmacro %}

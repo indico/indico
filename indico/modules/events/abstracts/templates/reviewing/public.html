@@ -1,5 +1,5 @@
 {% from 'events/abstracts/reviewing/_common.html' import render_tracks, render_track %}
-{% from 'events/reviews/_common.html' import render_edited_hint, render_user_avatar %}
+{% from 'events/reviews/_common.html' import render_edited_hint, render_user_avatar, render_summary_state %}
 
 
 {% macro render_abstract_info(abstract) %}
@@ -344,7 +344,7 @@
 {% macro _render_abstract_summary(abstract) %}
     <div class="review-summary flexrow f-a-baseline">
         <div class="review-summary-badge">
-            {{ _render_summary_state(abstract) }}
+            {{ render_summary_state(abstract.state) }}
         </div>
         <div class="review-summary-content f-self-stretch">
             {% if abstract.state.name in ('submitted', 'withdrawn', 'rejected') %}
@@ -430,19 +430,6 @@
                 {% endif %}
             {% endif %}
         </div>
-    </div>
-{% endmacro %}
-
-
-{% macro _render_summary_state(abstract) %}
-    {% set mapping = {'under_review': 'highlight',
-                      'withdrawn': 'outline dashed',
-                      'accepted': 'success',
-                      'rejected': 'error',
-                      'merged': 'visited',
-                      'duplicate': 'strong'} %}
-    <div class="i-tag {{ mapping[abstract.public_state.name] }}">
-        {{ abstract.public_state.title }}
     </div>
 {% endmacro %}
 
