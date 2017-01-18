@@ -28,6 +28,7 @@ from indico.util.struct.enum import RichIntEnum
 
 class AbstractAction(RichIntEnum):
     __titles__ = [None, _("Accept"), _("Reject"), _("Change track"), _("Mark as duplicate"), _("Merge")]
+    __css_classes__ = [None, 'success', 'error', 'warning', 'strong', 'visited']
     accept = 1
     reject = 2
     change_tracks = 3

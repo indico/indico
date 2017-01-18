@@ -9,9 +9,6 @@
         {% set conflicting_msg = _("All reviewers proposed to accept this abstract "
                                     "but as different contribution types") %}
     {% endif %}
-    {% set mapping_class = {'positive': 'success',
-                            'negative': 'error',
-                            'mixed': 'warning'} %}
     {% set mapping_title = {'not_started': _("No reviewer has reviewed this abstract yet"),
                             'in_progress': _("Not reviewed in all tracks"),
                             'positive': _("All reviewers proposed to accept this abstract"),
@@ -25,19 +22,16 @@
                            'in_progress': 'icon-circle-small',
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.reviewing_state %}
-    <span class="global-state-icon flexrow f-a-center f-j-center {{ mapping_class[state.name] }}">
+    <span class="global-state-icon flexrow f-a-center f-j-center {{ state.css_class }}">
         <span class="flexrow {{ mapping_icon[state.name] }}"></span>
     </span>
     <div class="f-self-stretch flexcol">
-        <div class="summary-title semantic-text {{ mapping_class[state.name] }}">{{ state.title }}</div>
+        <div class="summary-title semantic-text {{ state.css_class }}">{{ state.title }}</div>
         <div class="summary-description">{{ mapping_title[state.name] }}</div>
     </div>
 {% endmacro %}
 
 {% macro _render_abstract_track_reviewing_state_icon(abstract, track) %}
-    {% set mapping_class = {'positive': 'success',
-                            'negative': 'error',
-                            'mixed': 'warning'} %}
     {% set mapping_title = {'not_started': _("No reviewer has reviewed this abstract yet"),
                             'positive': _("All reviewers proposed to accept this abstract"),
                             'conflicting': _("All reviewers proposed to accept this abstract "
@@ -50,7 +44,7 @@
                            'mixed': 'icon-tilde',
                            'not_started': 'icon-circle-small'} %}
     {% set state = abstract.get_track_reviewing_state(track) %}
-    <div class="group-state-icon {{ mapping_class[state.name] }} flexrow f-a-center f-j-center"
+    <div class="group-state-icon {{ state.css_class }} flexrow f-a-center f-j-center"
          title="{{ mapping_title[state.name] }}">
         <span class="{{ mapping_icon[state.name] }}"></span>
     </div>

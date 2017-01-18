@@ -61,3 +61,12 @@
     </div>
 {% endmacro %}
 
+{% macro render_summary_state(state) %}
+    <div class="i-tag {{ state.css_class }}">
+        {{- state.title -}}
+    </div>
+{% endmacro %}
+
+{% macro render_review_state(review) %}
+    <span class="bold underline semantic-text {{ review.proposed_action.css_class }}">
+{% endmacro %}

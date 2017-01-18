@@ -58,12 +58,6 @@
             </div>
         </div>
         <div id="display-contribution-list" class="contribution-list">
-            {% set mapping = {'under_review': 'highlight',
-                              'withdrawn': 'outline dashed',
-                              'accepted': 'success',
-                              'rejected': 'error',
-                              'merged': 'visited',
-                              'duplicate': 'strong'} %}
             {% for abstract in abstracts -%}
                 <div class="contribution-row" data-friendly-id="{{ abstract.friendly_id }}">
                     <div class="contrib-title info" data-searchable="{{ abstract.title|lower }}">
@@ -84,7 +78,7 @@
                         <time datetime="{{ dt.isoformat() }}">{{ dt | format_human_date }}</time>
                     </div>
                     <div>
-                        <div class="contrib-state small i-tag {{ mapping[abstract.public_state.name] }}">
+                        <div class="contrib-state small i-tag {{ abstract.public_state.css_class }}">
                             {{- abstract.state.title -}}
                         </div>
                         {% if abstract.accepted_track -%}
