@@ -43,7 +43,7 @@
                 </thead>
                 <tbody>
                     {% for contrib in contribs %}
-                        {% if contrib.paper_revisions %}
+                        {% if contrib.paper_last_revision %}
                             {% set last_revision_state = contrib.paper_last_revision.state.title %}
                         {% else %}
                             {% set last_revision_state %}
@@ -118,8 +118,8 @@
                             {% endfor %}
                             <td class="i-table revision-column">
                                 <span class="vertical-aligner">
-                                    {%- if contrib.paper_revisions -%}
-                                        {{ contrib.paper_revisions | length }}
+                                    {%- if contrib.paper_revision_count -%}
+                                        {{ contrib.paper_revision_count }}
                                     {%- endif -%}
                                 </span>
                             </td>
