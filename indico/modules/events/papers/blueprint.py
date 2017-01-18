@@ -29,6 +29,8 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 _bp.add_url_rule('/contributions/<int:contrib_id>/paper/submit',
                  'submit_revision', display.RHSubmitPaper, methods=('GET', 'POST'))
 _bp.add_url_rule('/papers/<int:contrib_id>/', 'paper_timeline', display.RHPaperTimeline)
+_bp.add_url_rule('/papers/<int:contrib_id>/files/<int:file_id>-<filename>', 'download_file',
+                 display.RHDownloadPaperFile)
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
 

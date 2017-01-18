@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden
 
+from indico.modules.events.contributions.models.contributions import Contribution
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -65,3 +66,15 @@ class RHJudgingAreaBase(RHPapersBase):
         RHPapersBase._checkProtection(self)
         if not session.user or (not self.management and session.user not in self.event_new.cfp.judges):
             raise Forbidden
+
+
+class RHPaperBase(RHPapersBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.contribution
+        }
+    }
+
+    def _checkParams(self, params):
+        RHPapersBase._checkParams(self, params)
+        self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)

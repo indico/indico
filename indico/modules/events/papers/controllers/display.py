@@ -17,31 +17,16 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.papers.controllers.base import RHPapersBase
+from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.forms import PaperSubmissionForm
+from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.operations import create_paper_revision
+from indico.modules.events.papers.views import WPDisplayPapersBase
 from indico.web.util import jsonify_form, jsonify_data
 
 
-class RHSubmitPaper(RHPapersBase):
-    normalize_url_spec = {
-        'locators': {
-            lambda self: self.contribution
-        }
-    }
-
-    def _checkParams(self, params):
-        RHPapersBase._checkParams(self, params)
-        self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
-
-    def _checkProtection(self):
-        RHPapersBase._checkProtection(self)
-        if not self.contribution.can_manage(session.user, role='submit'):
-            raise Forbidden
-
+class RHSubmitPaper(RHPaperBase):
     def _process(self):
         form = PaperSubmissionForm()
         if form.validate_on_submit():
@@ -50,6 +35,23 @@ class RHSubmitPaper(RHPapersBase):
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 
-class RHPaperTimeline(RHPapersBase):
+class RHPaperTimeline(RHPaperBase):
     def _process(self):
-        raise NotImplementedError
+        return WPDisplayPapersBase.render_template('paper.html', self._conf, contribution=self.contribution)
+
+
+class RHDownloadPaperFile(RHPaperBase):
+    """Download a paper file"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.file
+        }
+    }
+
+    def _checkParams(self, params):
+        RHPaperBase._checkParams(self, params)
+        self.file = PaperFile.get_one(request.view_args['file_id'])
+
+    def _process(self):
+        return self.file.send()
