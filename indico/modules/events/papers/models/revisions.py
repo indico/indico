@@ -29,6 +29,7 @@ from indico.util.struct.enum import RichIntEnum
 
 class PaperRevisionState(RichIntEnum):
     __titles__ = [None, _("Submitted"), _("Accepted"), _("Rejected"), _("To be corrected")]
+    __css_classes__ = [None, '', 'success', 'error', 'warning']
     submitted = 1
     accepted = 2
     rejected = 3

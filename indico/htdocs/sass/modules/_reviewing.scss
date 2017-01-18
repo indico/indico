@@ -493,3 +493,9 @@
         }
     }
 }
+
+.review-item-content {
+    @extend .i-box;
+    @extend .i-box.no-shadow;
+    margin-top: 1rem;
+}
