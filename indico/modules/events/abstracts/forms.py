@@ -249,7 +249,7 @@ class AbstractJudgmentFormBase(IndicoForm):
         judgment_data = {
             'judgment': abstract_data.pop('judgment'),
             'send_notifications': abstract_data.pop('send_notifications'),
-            'contrib_session': abstract_data.pop('contrib_session', None),
+            'contrib_session': abstract_data.pop('session', None),
             'merge_persons': abstract_data.pop('merge_persons', None)
         }
         return judgment_data, abstract_data
