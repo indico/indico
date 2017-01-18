@@ -37,7 +37,7 @@ class _EnumFieldMixin(object):
 
 
 class IndicoEnumSelectField(_EnumFieldMixin, SelectFieldBase):
-    """Select field backed by a :class:`TitledEnum`"""
+    """Select field backed by a :class:`RichEnum`"""
 
     widget = Select()
 

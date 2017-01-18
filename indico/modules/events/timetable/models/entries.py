@@ -30,11 +30,11 @@ from indico.core.db.sqlalchemy.util.models import populate_one_to_one_backrefs
 from indico.util.date_time import overlaps
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.util.i18n import _
 
 
-class TimetableEntryType(TitledIntEnum):
+class TimetableEntryType(RichIntEnum):
     __titles__ = [None, _("Session Block"), _("Contribution"), _("Break")]
     # entries are uppercase since `break` is a keyword...
     SESSION_BLOCK = 1

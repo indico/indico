@@ -23,17 +23,17 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class PaperAction(TitledIntEnum):
+class PaperAction(RichIntEnum):
     __titles__ = [None, _("Accept"), _("Reject"), _("To be corrected")]
     accept = 1
     reject = 2
     to_be_corrected = 3
 
 
-class PaperReviewType(TitledIntEnum):
+class PaperReviewType(RichIntEnum):
     __titles__ = [None, _("Layout"), _("Content")]
     layout = 1
     content = 2

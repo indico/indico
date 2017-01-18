@@ -38,7 +38,7 @@ from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, text_to_repr, format_repr, return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 
@@ -56,7 +56,7 @@ def _get_default_event_themes():
     }
 
 
-class EventMessageMode(TitledIntEnum):
+class EventMessageMode(RichIntEnum):
     __titles__ = [_('None'), _('Info'), _('Warning'), _('Danger')]
     disabled = 0
     info = 1
