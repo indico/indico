@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import errno
 import os
 import shutil
 from collections import OrderedDict, defaultdict, namedtuple
@@ -278,17 +279,22 @@ def create_boa(event):
         return path
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
-    path = os.path.join(Config.getInstance().getXMLCacheDir(), 'boa-{}.pdf'.format(event.id))
-    shutil.move(tmp_path, path)
-    boa_settings.set(event, 'cache_path', path)
-    return path
+    filename = 'boa-{}.pdf'.format(event.id)
+    full_path = os.path.join(Config.getInstance().getXMLCacheDir(), filename)
+    shutil.move(tmp_path, full_path)
+    boa_settings.set(event, 'cache_path', filename)
+    return full_path
 
 
 def clear_boa_cache(event):
     """Delete the cached book of abstract"""
     path = boa_settings.get(event, 'cache_path')
     if path:
-        os.remove(path)
+        try:
+            os.remove(os.path.join(Config.getInstance().getXMLCacheDir(), path))
+        except OSError as e:
+            if e.errno != errno.ENOENT:
+                raise
         boa_settings.delete(event, 'cache_path')
 
 
