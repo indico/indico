@@ -150,6 +150,10 @@
                 }
             }
         }
+
+        .i-button ~ .i-button {
+            margin-left: 0;
+        }
     }
 
     .titled-rule {
