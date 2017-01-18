@@ -31,11 +31,11 @@ from indico.modules.events.timetable.models.entries import TimetableEntry, Timet
 from indico.modules.events.timetable.operations import fit_session_block_entry
 from indico.util.date_time import format_date, format_human_timedelta
 from indico.util.i18n import _
-from indico.util.struct.enum import TitledEnum
+from indico.util.struct.enum import RichEnum
 from indico.util.struct.iterables import materialize_iterable, window
 
 
-class RescheduleMode(unicode, TitledEnum):
+class RescheduleMode(unicode, RichEnum):
     __titles__ = {'none': 'Fit blocks', 'time': 'Start times', 'duration': 'Durations'}
     none = 'none'  # no action, just fit blocks..
     time = 'time'
@@ -43,7 +43,7 @@ class RescheduleMode(unicode, TitledEnum):
 
     @property
     def title(self):
-        return TitledEnum.title.fget(self)
+        return RichEnum.title.fget(self)
 
 
 class Rescheduler(object):

@@ -22,7 +22,7 @@ from wtforms.fields import RadioField, BooleanField
 from wtforms.widgets.core import Input, Select, TextArea, HiddenInput
 from wtforms.validators import Length, NumberRange
 
-from indico.util.struct.enum import TitledEnum
+from indico.util.struct.enum import RichEnum
 from indico.web.forms.fields import (IndicoSelectMultipleCheckboxField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoEnumRadioField)
 from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, WordCount, SoftLength
@@ -77,7 +77,7 @@ def _attrs_for_validators(field, validators):
                 val = []
             elif not isinstance(val, (set, list, tuple)):
                 val = [val]
-            values = [(v.name if isinstance(v, TitledEnum) else v) for v in val]
+            values = [(v.name if isinstance(v, RichEnum) else v) for v in val]
 
             attrs['data-hidden-unless'] = json.dumps({'field': condition_field.name,
                                                       'values': values,

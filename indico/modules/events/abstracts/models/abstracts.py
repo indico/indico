@@ -38,10 +38,10 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
-from indico.util.struct.enum import TitledIntEnum, IndicoEnum
+from indico.util.struct.enum import RichIntEnum, IndicoEnum
 
 
-class AbstractState(TitledIntEnum):
+class AbstractState(RichIntEnum):
     __titles__ = [None, _("Submitted"), _("Withdrawn"), _("Accepted"), _("Rejected"), _("Merged"), _("Duplicate")]
     submitted = 1
     withdrawn = 2
@@ -51,7 +51,7 @@ class AbstractState(TitledIntEnum):
     duplicate = 6
 
 
-class AbstractPublicState(TitledIntEnum):
+class AbstractPublicState(RichIntEnum):
     __titles__ = {i: title for i, title in enumerate(AbstractState.__titles__[2:], 2)}
     __titles__.update({-1: _("Awaiting Review"), -2: _("Under Review")})
     # regular states (must match AbstractState!)
@@ -65,7 +65,7 @@ class AbstractPublicState(TitledIntEnum):
     under_review = -2
 
 
-class AbstractReviewingState(TitledIntEnum):
+class AbstractReviewingState(RichIntEnum):
     __titles__ = [_("Not Started"), _("In progress"), _("Positive"), _("Conflicting"), _("Negative"), _("Mixed")]
     not_started = 0
     in_progress = 1

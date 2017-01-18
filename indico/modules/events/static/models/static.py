@@ -24,10 +24,10 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class StaticSiteState(TitledIntEnum):
+class StaticSiteState(RichIntEnum):
     __titles__ = [_("Pending"), _("Running"), _("Success"), _("Failed"), _("Expired")]
     pending = 0
     running = 1

@@ -34,11 +34,11 @@ from indico.modules.attachments.util import can_manage_attachments
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii, strict_unicode
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 
-class AttachmentType(TitledIntEnum):
+class AttachmentType(RichIntEnum):
     __titles__ = [None, _('File'), _('Link')]
     file = 1
     link = 2
