@@ -20,7 +20,7 @@ from collections import OrderedDict
 from operator import attrgetter
 
 from flask import request
-from sqlalchemy.orm import subqueryload
+from sqlalchemy.orm import subqueryload, undefer
 
 from indico.core.db import db
 from indico.modules.events.contributions import Contribution
@@ -77,7 +77,11 @@ class PaperAssignmentListGenerator(ListGeneratorBase):
     def _build_query(self):
         return (Contribution.query.with_parent(self.event)
                 .order_by(Contribution.friendly_id)
-                .options(subqueryload('paper_last_revision')))
+                .options(subqueryload('paper_last_revision'),
+                         subqueryload('paper_judges'),
+                         subqueryload('paper_content_reviewers'),
+                         subqueryload('paper_layout_reviewers'),
+                         undefer('paper_revision_count')))
 
     def _filter_list_entries(self, query, filters):
         if not filters.get('items'):

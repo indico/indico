@@ -374,6 +374,13 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
                  .correlate_except(SubContribution))
         return db.column_property(query, deferred=True)
 
+    @declared_attr
+    def paper_revision_count(cls):
+        query = (db.select([db.func.count(PaperRevision.id)])
+                 .where(PaperRevision.contribution_id == cls.id)
+                 .correlate_except(PaperRevision))
+        return db.column_property(query, deferred=True)
+
     def __init__(self, **kwargs):
         # explicitly initialize those relationships with None to avoid
         # an extra query to check whether there is an object associated
