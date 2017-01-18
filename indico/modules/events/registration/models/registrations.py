@@ -42,10 +42,10 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr, format_full_name, strict_unicode
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class RegistrationState(TitledIntEnum):
+class RegistrationState(RichIntEnum):
     __titles__ = [None, L_('Completed'), L_('Pending'), L_('Rejected'), L_('Withdrawn'), L_('Awaiting payment')]
     complete = 1
     pending = 2

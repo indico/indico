@@ -31,12 +31,12 @@ from indico.core.roles import get_available_roles
 from indico.util.i18n import _
 from indico.util.caching import memoize_request
 from indico.util.signals import values_from_signal
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.util.user import iter_acl
 from indico.web.util import jsonify_template
 
 
-class ProtectionMode(TitledIntEnum):
+class ProtectionMode(RichIntEnum):
     __titles__ = [_('Public'), _('Inheriting'), _('Protected')]
     public = 0
     inheriting = 1

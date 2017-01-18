@@ -20,7 +20,7 @@ from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 
@@ -91,7 +91,7 @@ class ProposalCommentMixin(object):
         raise NotImplementedError
 
 
-class ProposalCommentVisibility(TitledIntEnum):
+class ProposalCommentVisibility(RichIntEnum):
     """Most to least restrictive visibility for abstract comments"""
     __titles__ = [None,
                   _("Visible only to judges"),

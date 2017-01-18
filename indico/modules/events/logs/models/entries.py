@@ -23,10 +23,10 @@ from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii
-from indico.util.struct.enum import TitledIntEnum, IndicoEnum
+from indico.util.struct.enum import RichIntEnum, IndicoEnum
 
 
-class EventLogRealm(TitledIntEnum):
+class EventLogRealm(RichIntEnum):
     __titles__ = (None, _('Event'), _('Management'), _('Participants'), _('Reviewing'), _('Emails'))
     event = 1
     management = 2

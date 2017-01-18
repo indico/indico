@@ -32,10 +32,10 @@ from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_
 from indico.util.string import return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class ModificationMode(TitledIntEnum):
+class ModificationMode(RichIntEnum):
     __titles__ = [None, L_('Always'), L_('Until payment'), L_('Never')]
     allowed_always = 1
     allowed_until_payment = 2

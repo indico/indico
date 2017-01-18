@@ -51,11 +51,11 @@ from indico.util.date_time import overlaps, now_utc
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.string import return_ascii, format_repr, text_to_repr, to_unicode
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 
-class EventType(TitledIntEnum):
+class EventType(RichIntEnum):
     __titles__ = [None, _('Lecture'), _('Meeting'), _('Conference')]
     lecture = 1
     meeting = 2

@@ -24,10 +24,10 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_repr
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class PaperRevisionState(TitledIntEnum):
+class PaperRevisionState(RichIntEnum):
     __titles__ = [None, _("Submitted"), _("Accepted"), _("Rejected"), _("To be corrected")]
     submitted = 1
     accepted = 2

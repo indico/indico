@@ -36,17 +36,19 @@ class IndicoEnum(Enum):
         return {x.name: x.value for x in cls}
 
 
-class TitledEnum(IndicoEnum):
-    """Titled Enum
-
-    All members have a `title` property that corresponds to their entry in __titles__
-    """
+class RichEnum(IndicoEnum):
+    """An Enum that stores extra information per entry."""
     __titles__ = []
+    __css_classes__ = []
 
     @property
     def title(self):
-        return self.__titles__[self]
+        return self.__titles__[self] if self.__titles__ else None
+
+    @property
+    def css_class(self):
+        return self.__css_classes__[self] if self.__css_classes__ else None
 
 
-class TitledIntEnum(int, TitledEnum):
+class RichIntEnum(int, RichEnum):
     pass

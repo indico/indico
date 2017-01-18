@@ -24,7 +24,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
 from indico.util.string import return_ascii, slugify, text_to_repr, format_repr
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 
@@ -36,7 +36,7 @@ def _get_next_position(context):
     return (res[0] or 0) + 1
 
 
-class MenuEntryType(TitledIntEnum):
+class MenuEntryType(RichIntEnum):
     __titles__ = [None, _('Separator'), _('Internal Link'), _('User Link'), _('Plugin Link'), _('Page')]
     separator = 1
     internal_link = 2

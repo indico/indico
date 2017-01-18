@@ -24,10 +24,10 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import TitledIntEnum
+from indico.util.struct.enum import RichIntEnum
 
 
-class TemplateType(TitledIntEnum):
+class TemplateType(RichIntEnum):
     __titles__ = [None, _("Badge"), _("Poster")]
     badge = 1
     poster = 2

@@ -50,7 +50,7 @@ class RegistrationFormItemType(int, IndicoEnum):
     field_pd = 5  # personal data field
 
 
-# We are not using a TitledIntEnum since one of the instances is named "title".
+# We are not using a RichIntEnum since one of the instances is named "title".
 class PersonalDataType(int, IndicoEnum):
     """Description of the personal data items that exist on every registration form"""
 
