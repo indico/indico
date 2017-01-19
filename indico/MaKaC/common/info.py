@@ -45,8 +45,6 @@ class MaKaCInfo(Persistent):
         # social sites
         self.getSocialAppConfig()
 
-        # Define if Indico use a proxy (load balancing)
-        self. _proxy = False
         # Define the volume used in archiving:
         # e.g. /afs/cern.ch/project/indico/XXXX/2008/...
         # XXXX will be replaced by self._archivingVolume
@@ -54,22 +52,10 @@ class MaKaCInfo(Persistent):
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
 
-        # http api
-        self._apiHTTPSRequired = False
-        self._apiPersistentAllowed = False
-        self._apiMode = 0
-        self._apiCacheTTL = 600
-        self._apiSignatureTTL = 600
-
     def getSocialAppConfig( self ):
         if not hasattr(self, '_socialAppConfig'):
             self._socialAppConfig = PersistentDict({'active': False, 'facebook': {}})
         return self._socialAppConfig
-
-    def isDebugActive(self):
-        msg = 'MaKaCinfo.isDebugActive() is deprecated; use app.debug or Config.getInstance().getDebug() instead'
-        warnings.warn(msg, DeprecationWarning, 2)
-        return app.debug
 
     def getTitle( self ):
         return self._title
@@ -97,11 +83,6 @@ class MaKaCInfo(Persistent):
 
     def setCountry( self, newCountry ):
         self._country = newCountry
-
-    def getTimezone(self):
-        msg = 'MaKaCinfo.getTimezone() is deprecated; use Config.getInstance().getDefaultTimezone() instead'
-        warnings.warn(msg, DeprecationWarning, 2)
-        return Config.getInstance().getDefaultTimezone()
 
     def getDefaultConference(self):
         from MaKaC.conference import DefaultConference
