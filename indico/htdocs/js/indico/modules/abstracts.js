@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false, setupSearchBox:false, applySearchFilters:false, Palette:false */
+/* global setupListGenerator:false, setupSearchBox:false */
 
 (function(global) {
     'use strict';
@@ -30,9 +30,11 @@
             state: '#filtering-state',
             placeholder: '#filter-placeholder'
         };
+        var applySearchFilters = setupSearchBox(filterConfig);
 
         abstractListContainer.on('indico:htmlUpdated', function() {
             abstractListContainer.find('.js-mathjax').mathJax();
+            _.defer(applySearchFilters);
         });
 
         setupListGenerator(filterConfig);
@@ -127,7 +129,7 @@
                 placeholder: '#filter-placeholder'
             };
 
-            setupSearchBox(filterConfig);
+            var applySearchFilters = setupSearchBox(filterConfig);
             applySearchFilters();
         }
     };
