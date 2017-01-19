@@ -365,18 +365,6 @@ class UHTemplatesSetDefaultPDFOptions(URLHandler):
     _endpoint = 'admin.adminLayout-setDefaultPDFOptions'
 
 
-class UHIPBasedACL(URLHandler):
-    _endpoint = 'admin.adminServices-ipbasedacl'
-
-
-class UHIPBasedACLFullAccessGrant(URLHandler):
-    _endpoint = 'admin.adminServices-ipbasedacl_fagrant'
-
-
-class UHIPBasedACLFullAccessRevoke(URLHandler):
-    _endpoint = 'admin.adminServices-ipbasedacl_farevoke'
-
-
 class UHBadgeTemplates(URLHandler):
     _endpoint = 'admin.badgeTemplates'
 
