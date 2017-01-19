@@ -53,6 +53,18 @@ class IPNetworkGroup(db.Model):
         nullable=False,
         default=''
     )
+    #: Whether the network group is hidden in ACL forms
+    hidden = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: Grants all IPs in the network group read access to all attachments
+    attachment_access_override = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     _networks = db.relationship(
         'IPNetwork',
@@ -72,7 +84,7 @@ class IPNetworkGroup(db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'name')
+        return format_repr(self, 'id', 'name', hidden=False, attachment_access_override=False)
 
     def __contains__(self, user):
         # This method is called via ``user in principal`` during ACL checks.
