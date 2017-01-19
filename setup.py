@@ -375,6 +375,7 @@ if __name__ == '__main__':
             event_abstracts = indico_zodbimport.modules.event_abstracts:EventAbstractsImporter
             event_papers = indico_zodbimport.modules.event_papers:EventPapersImporter
             event_shorturls = indico_zodbimport.modules.event_shorturls:EventShorturlsImporter
+            global_ip_acl = indico_zodbimport.modules.global_ip_acl:GlobalIPACLImporter
             """,
           zip_safe=False,
           packages=foundPackages,
