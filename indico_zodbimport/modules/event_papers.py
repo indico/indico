@@ -94,7 +94,7 @@ def _review_color(review, text):
 def _paper_file_from_legacy(lpf):
     return PaperFile(filename=lpf.filename, content_type=lpf.content_type, size=lpf.size,
                      storage_backend=lpf.storage_backend, storage_file_id=lpf.storage_file_id,
-                     created_dt=_to_utc(lpf.created_dt), contribution=lpf.contribution)
+                     created_dt=_to_utc(lpf.created_dt), _contribution=lpf.contribution)
 
 
 class PaperMigration(object):
@@ -304,7 +304,7 @@ class PaperMigration(object):
                 review = self._migrate_review(contribution, old_layout_review, PaperReviewType.layout)
                 revision.reviews.append(review)
                 review_colors += _review_color(review, 'L')
-            contribution.paper_revisions.append(revision)
+            contribution._paper_revisions.append(revision)
 
             self.importer.print_info(cformat('\tRevision %{{blue!}}{}%{{reset}} %{{white,{}}}  %{{reset}} {}'.format(
                 n, STATE_COLOR_MAP[state], review_colors)))

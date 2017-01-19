@@ -36,7 +36,8 @@ class PaperFile(StoredFileMixin, db.Model):
         db.Integer,
         primary_key=True
     )
-    contribution_id = db.Column(
+    _contribution_id = db.Column(
+        'contribution_id',
         db.Integer,
         db.ForeignKey('events.contributions.id'),
         index=True,
@@ -49,11 +50,11 @@ class PaperFile(StoredFileMixin, db.Model):
         nullable=True
     )
 
-    contribution = db.relationship(
+    _contribution = db.relationship(
         'Contribution',
         lazy=True,
         backref=db.backref(
-            'paper_files',
+            '_paper_files',
             lazy=True
         )
     )
@@ -67,17 +68,31 @@ class PaperFile(StoredFileMixin, db.Model):
         )
     )
 
+    def __init__(self, *args, **kwargs):
+        paper = kwargs.pop('paper', None)
+        if paper:
+            kwargs.setdefault('_contribution', paper.contribution)
+        super(PaperFile, self).__init__(*args, **kwargs)
+
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'contribution_id', content_type=None, _text=text_to_repr(self.filename))
+        return format_repr(self, 'id', '_contribution_id', content_type=None, _text=text_to_repr(self.filename))
 
     @locator_property
     def locator(self):
-        return dict(self.contribution.locator, file_id=self.id, filename=self.filename)
+        return dict(self.paper.locator, file_id=self.id, filename=self.filename)
+
+    @property
+    def paper(self):
+        return self._contribution.paper
+
+    @paper.setter
+    def paper(self, paper):
+        self._contribution = paper.contribution
 
     def _build_storage_path(self):
         self.assign_id()
-        path_segments = ['event', strict_unicode(self.contribution.event_new.id), 'papers',
-                         '{}_{}'.format(self.id, strict_unicode(self.contribution.id))]
+        path_segments = ['event', strict_unicode(self._contribution.event_new.id), 'papers',
+                         '{}_{}'.format(self.id, strict_unicode(self._contribution.id))]
         path = posixpath.join(*(path_segments + [self.filename]))
         return Config.getInstance().getAttachmentStorage(), path
