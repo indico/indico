@@ -67,10 +67,13 @@
                                 data-searchable="{{ contrib.title | lower }}"
                                 data-text="{{ contrib.title | lower }}">
                                 <span class="vertical-aligner">
-                                    {# TODO: Link to the paper timeline page #}
-                                    <a href="#">
+                                    {% if contrib.paper_last_revision %}
+                                        <a href="{{ url_for('.paper_timeline', contrib) }}">
+                                            {{- contrib.title -}}
+                                        </a>
+                                    {% else %}
                                         {{- contrib.title -}}
-                                    </a>
+                                    {% endif %}
                                 </span>
                             </td>
                             {% for item in static_columns %}
