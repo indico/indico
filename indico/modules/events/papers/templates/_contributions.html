@@ -1,8 +1,9 @@
 {% from 'events/contributions/display/_paper_reviewing.html' import render_paper_reviewing %}
 
 {% macro render_paper_section(contribution, show_paper=True) %}
-    {% set show_paper = contribution.accepted_paper_revision and show_paper %}
-    {% set show_paper_status = contribution.paper_last_revision and contribution.can_manage(session.user, 'submit') %}
+    {% set paper = contribution.paper %}
+    {% set show_paper = paper.accepted_revision and show_paper %}
+    {% set show_paper_status = paper.last_revision and contribution.can_manage(session.user, 'submit') %}
     {% set show_paper_submission = contribution.event_new.cfp.is_open and contribution.can_manage(session.user, 'submit') %}
 
     {% if show_paper or show_paper_status or show_paper_submission %}
@@ -16,7 +17,7 @@
                 {# TODO: Implement new accepted paper widget #}
                 {# {{ render_paper_reviewing(contribution, reviewing_status, paper_upload_form, paper_files, can_submit_paper) }} #}
             {% elif show_paper_status %}
-                {{ _render_paper_status_box(contribution) }}
+                {{ _render_paper_status_box(paper) }}
             {% elif show_paper_submission %}
                 {{ _render_paper_submission_box(contribution) }}
             {% endif %}
@@ -25,19 +26,19 @@
 {% endmacro %}
 
 
-{% macro _render_paper_status_box(contribution) %}
+{% macro _render_paper_status_box(paper) %}
     {% set state_mapping = {'submitted': '',
                             'accepted': 'accept',
                             'rejected': 'danger',
                             'to_be_corrected': 'warning'} %}
-    <div class="action-box {{state_mapping[contribution.paper_last_revision.state.name]}}">
+    <div class="action-box {{state_mapping[paper.last_revision.state.name]}}">
         <div class="section flexrow">
             <div class="icon icon-file"></div>
             <div class="text">
-                {{ _render_paper_status(contribution) }}
+                {{ _render_paper_status(paper) }}
             </div>
             <div>
-                <a href="{{ url_for('papers.paper_timeline', contribution) }}">
+                <a href="{{ url_for('papers.paper_timeline', paper) }}">
                     {%- trans %}Go to timeline{% endtrans -%}
                 </a>
             </div>
@@ -73,30 +74,30 @@
 {% endmacro %}
 
 
-{% macro _render_paper_status(contribution) %}
-    {% set revision = contribution.paper_last_revision %}
-    {% if revision.state.name == 'submitted' %}
+{% macro _render_paper_status(paper) %}
+    {% set revision = paper.last_revision %}
+    {% if paper.state.name == 'submitted' %}
         <div class="label">
             {%- trans %}Your paper is under review{% endtrans -%}
         </div>
         <div>
             {%- trans %}Please wait until the reviewers come back to you{% endtrans -%}
         </div>
-    {% elif revision.state.name == 'accepted' %}
+    {% elif paper.state.name == 'accepted' %}
         <div class="label">
             {%- trans %}Your paper was accepted{% endtrans -%}
         </div>
         <div>
             {%- trans %}You can check the review history in the timeline{% endtrans -%}
         </div>
-    {% elif revision.state.name == 'rejected' %}
+    {% elif paper.state.name == 'rejected' %}
     <div class="label">
             {%- trans %}Your paper was rejected{% endtrans -%}
         </div>
         <div>
             {%- trans %}You can check the review history in the timeline{% endtrans -%}
         </div>
-    {% elif revision.state.name == 'to_be_corrected' %}
+    {% elif paper.state.name == 'to_be_corrected' %}
         <div class="label">
             {%- trans %}Your paper needs to be corrected{% endtrans -%}
         </div>
