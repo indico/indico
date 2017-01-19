@@ -63,7 +63,7 @@
         setupTableSorter();
         setupPalettePickers();
         handleRowSelection();
-        setupSearchBox(filterConfig);
+        var applySearchFilters = setupSearchBox(filterConfig);
 
         $('#sessions .toolbar').on('click', '.disabled', function(evt) {
             evt.preventDefault();
