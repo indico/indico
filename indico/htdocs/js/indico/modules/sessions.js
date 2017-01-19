@@ -73,8 +73,8 @@
         $('#sessions-wrapper').on('indico:htmlUpdated', function() {
             setupTableSorter();
             setupPalettePickers();
-            applySearchFilters();
             handleRowSelection();
+            _.defer(applySearchFilters);
         }).on('click', '.show-session-blocks', function() {
             var $this = $(this);
             ajaxDialog({
