@@ -20,11 +20,12 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.review_comments import ReviewCommentMixin
+from indico.modules.events.models.reviews import ProposalCommentMixin
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 
 
-class PaperReviewComment(ReviewCommentMixin, db.Model):
+class PaperReviewComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
     __tablename__ = 'review_comments'
     __table_args__ = {'schema': 'event_paper_reviewing'}
     user_backref_name = 'review_comments'

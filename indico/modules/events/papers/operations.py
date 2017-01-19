@@ -31,6 +31,7 @@ from indico.modules.events.papers.models.reviews import PaperAction, PaperReview
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers import logger
+from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
@@ -260,3 +261,14 @@ def create_review(paper, review_type, user, review_data, questions_data):
                         'Paper for contribution {} reviewed'.format(paper.contribution.verbose_title),
                         user, data=log_data)
     return review
+
+
+@no_autoflush
+def create_comment(paper, text, user):
+    comment = PaperReviewComment(user=user, text=text)
+    comment.paper_revision = paper.last_revision
+    db.session.flush()
+    logger.info("Paper %r received a comment from %r", paper, session.user)
+    paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+                        'Paper {} received a comment'.format(paper.verbose_title),
+                        session.user)
