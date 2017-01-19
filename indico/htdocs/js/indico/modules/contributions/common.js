@@ -210,9 +210,9 @@
 
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter('#contribution-list .tablesorter');
-            applySearchFilters();
             setupStartDateQBubbles();
             setupDurationQBubbles();
+            _.defer(applySearchFilters);
         }).on('attachments:updated', function(evt) {
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
