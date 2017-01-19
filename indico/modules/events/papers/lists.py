@@ -77,11 +77,11 @@ class PaperAssignmentListGenerator(ListGeneratorBase):
     def _build_query(self):
         return (Contribution.query.with_parent(self.event)
                 .order_by(Contribution.friendly_id)
-                .options(subqueryload('paper_last_revision'),
+                .options(subqueryload('_paper_last_revision'),
                          subqueryload('paper_judges'),
                          subqueryload('paper_content_reviewers'),
                          subqueryload('paper_layout_reviewers'),
-                         undefer('paper_revision_count')))
+                         undefer('_paper_revision_count')))
 
     def _filter_list_entries(self, query, filters):
         if not filters.get('items'):
@@ -92,9 +92,9 @@ class PaperAssignmentListGenerator(ListGeneratorBase):
             state_criteria = []
             for filter_state in filtered_states:
                 if filter_state is None:
-                    state_criteria.append(~Contribution.paper_last_revision.has())
+                    state_criteria.append(~Contribution._paper_last_revision.has())
                 else:
-                    state_criteria.append(Contribution.paper_last_revision
+                    state_criteria.append(Contribution._paper_last_revision
                                           .has(PaperRevision.state == int(filter_state)))
             if state_criteria:
                 criteria.append(db.or_(*state_criteria))
