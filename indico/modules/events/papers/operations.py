@@ -28,6 +28,7 @@ from indico.modules.events.papers.models.reviews import PaperAction
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.competences import PaperCompetence
+from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
@@ -95,7 +96,8 @@ def close_cfp(event):
 
 @no_autoflush
 def create_paper_revision(contribution, submitter, files):
-    revision = PaperRevision(contribution=contribution, submitter=submitter)
+    paper = Paper(contribution=contribution)
+    revision = PaperRevision(paper=paper, submitter=submitter)
     for f in files:
         filename = secure_filename(f.filename, 'paper')
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
@@ -110,22 +112,22 @@ def create_paper_revision(contribution, submitter, files):
 
 
 @no_autoflush
-def judge_paper(contribution, contrib_data, judgment, judge, send_notifications=False):
+def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
     if judgment == PaperAction.accept:
-        contribution.paper_last_revision.state = PaperRevisionState.accepted
+        paper.state = PaperRevisionState.accepted
     elif judgment == PaperAction.reject:
-        contribution.paper_last_revision.state = PaperRevisionState.rejected
+        paper.state = PaperRevisionState.rejected
     elif judgment == PaperAction.to_be_corrected:
-        contribution.paper_last_revision.state = PaperRevisionState.to_be_corrected
-    contribution.paper_last_revision.judgment_comment = contrib_data['judgment_comment']
+        paper.state = PaperRevisionState.to_be_corrected
+    paper.last_revision.judgment_comment = contrib_data['judgment_comment']
     db.session.flush()
     log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
     if send_notifications:
         pass  # TODO: manage notifications
-    logger.info('Paper %r was judged by %r to %s', contribution, judge, orig_string(judgment.title))
-    contribution.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
-                               'Paper "{}" was judged'.format(orig_string(contribution.verbose_title)), judge,
-                               data=log_data)
+    logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
+    paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+                        'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
+                        data=log_data)
 
 
 def _store_paper_template_file(template, file):

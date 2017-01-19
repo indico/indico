@@ -61,7 +61,8 @@ class PaperRevision(RenderModeMixin, db.Model):
         nullable=False,
         default=PaperRevisionState.submitted
     )
-    contribution_id = db.Column(
+    _contribution_id = db.Column(
+        'contribution_id',
         db.Integer,
         db.ForeignKey('events.contributions.id'),
         index=True,
@@ -95,11 +96,11 @@ class PaperRevision(RenderModeMixin, db.Model):
         default=''
     )
 
-    contribution = db.relationship(
+    _contribution = db.relationship(
         'Contribution',
         lazy=True,
         backref=db.backref(
-            'paper_revisions',
+            '_paper_revisions',
             lazy=True,
             order_by=submitted_dt.desc()
         )
@@ -130,10 +131,24 @@ class PaperRevision(RenderModeMixin, db.Model):
     # - files (PaperFile.paper_revision)
     # - reviews (PaperReview.revision)
 
+    def __init__(self, *args, **kwargs):
+        paper = kwargs.pop('paper', None)
+        if paper:
+            kwargs.setdefault('_contribution', paper.contribution)
+        super(PaperRevision, self).__init__(*args, **kwargs)
+
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'contribution_id', state=None)
+        return format_repr(self, 'id', '_contribution_id', state=None)
 
     @locator_property
     def locator(self):
-        return dict(self.contribution.locator, revision_id=self.id)
+        return dict(self.paper.locator, revision_id=self.id)
+
+    @property
+    def paper(self):
+        return self._contribution.paper
+
+    @paper.setter
+    def paper(self, paper):
+        self._contribution = paper.contribution
