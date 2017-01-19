@@ -93,10 +93,13 @@ def retrieve_principal(principal, allow_groups=True, legacy=True):
 
 
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy=True, allow_missing_groups=False,
-                          allow_emails=False, allow_networks=False):
+                          allow_emails=False, allow_networks=False, existing_data=None):
     from indico.modules.networks.models.networks import IPNetworkGroup
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
+
+    if existing_data is None:
+        existing_data = set()
 
     type_ = fossil['_type']
     id_ = fossil['id']
@@ -134,7 +137,7 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, legacy
         return EmailPrincipal(id_)
     elif allow_networks and type_ == 'IPNetworkGroup':
         group = IPNetworkGroup.get(int(id_))
-        if group is None:
+        if group is None or (group.hidden and group not in existing_data):
             raise ValueError('IP network group does not exist: {}'.format(id_))
         return group
     elif allow_groups and type_ in {'LocalGroupWrapper', 'LocalGroup'}:
