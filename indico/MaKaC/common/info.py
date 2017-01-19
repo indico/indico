@@ -54,8 +54,6 @@ class MaKaCInfo(Persistent):
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
 
-        self._ip_based_acl_mgr = IPBasedACLMgr()
-
         # http api
         self._apiHTTPSRequired = False
         self._apiPersistentAllowed = False
@@ -131,9 +129,6 @@ class MaKaCInfo(Persistent):
             self._archivingVolume = ""
         return self._archivingVolume
 
-    def getIPBasedACLMgr(self):
-        return self._ip_based_acl_mgr
-
 
 class HelperMaKaCInfo:
     """Helper class used for getting and instance of MaKaCInfo.
@@ -152,24 +147,3 @@ class HelperMaKaCInfo:
             root['MaKaCInfo'] = OOBTree.OOBTree()
             root['MaKaCInfo']['main'] = minfo
         return minfo
-
-
-class IPBasedACLMgr(Persistent):
-
-    def __init__(self):
-        self._full_access_acl = set()
-
-    def get_full_access_acl(self):
-        return self._full_access_acl
-
-    def grant_full_access(self, ip):
-        self._full_access_acl.add(ip)
-        self.notify_modification()
-
-    def revoke_full_access(self, ip):
-        if ip in self._full_access_acl:
-            self._full_access_acl.remove(ip)
-        self.notify_modification()
-
-    def notify_modification(self):
-        self._p_changed = 1

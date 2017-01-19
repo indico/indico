@@ -170,19 +170,6 @@ class WPGenInfoModification(WPAdmins):
         return wc.getHTML(pars)
 
 
-class WPServicesCommon(WPAdminsBase):
-    sidemenu_option = 'ip_acl'
-
-    def _createTabCtrl(self):
-        self._tabCtrl = wcomponents.TabControl()
-
-        self._subTabIPBasedACL = self._tabCtrl.newTab("ip_based_acl", _("IP Based ACL"),
-                                                      urlHandlers.UHIPBasedACL.getURL())
-
-    def _getPageContent(self, params):
-        return wcomponents.WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
-
-
 class WPTemplatesCommon( WPAdminsBase ):
     sidemenu_option = 'layout'
 
@@ -578,26 +565,3 @@ class WPMaintenancePack(WPMaintenanceBase):
                     </tr>
                 </table>
                 """ % wc.getHTML(msg, url, {})
-
-
-class WPIPBasedACL( WPServicesCommon ):
-
-    def __init__( self, rh ):
-        WPServicesCommon.__init__( self, rh )
-
-    def _getTabContent(self, params):
-        wc = WIPBasedACL()
-        return wc.getHTML(params)
-
-    def _setActiveTab(self):
-        self._subTabIPBasedACL.setActive()
-
-
-class WIPBasedACL(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["ipList"] = minfo.getIPBasedACLMgr().get_full_access_acl()
-        vars["removeIcon"] = Config.getInstance().getSystemIconURL("remove")
-        return vars
