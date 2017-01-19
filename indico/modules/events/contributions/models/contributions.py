@@ -34,8 +34,10 @@ from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin, AuthorsSpeakersMixin
+from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
+from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -280,12 +282,12 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         )
     )
     #: The accepted paper revision
-    accepted_paper_revision = db.relationship(
+    _accepted_paper_revision = db.relationship(
         'PaperRevision',
         lazy=True,
         viewonly=True,
         uselist=False,
-        primaryjoin=('(PaperRevision.contribution_id == Contribution.id) & (PaperRevision.state == {})'
+        primaryjoin=('(PaperRevision._contribution_id == Contribution.id) & (PaperRevision.state == {})'
                      .format(PaperRevisionState.accepted)),
     )
     #: Paper files not submitted for reviewing
@@ -293,7 +295,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         'PaperFile',
         lazy=True,
         viewonly=True,
-        primaryjoin='(PaperFile.contribution_id == Contribution.id) & (PaperFile.revision_id.is_(None))',
+        primaryjoin='(PaperFile._contribution_id == Contribution.id) & (PaperFile.revision_id.is_(None))',
     )
     #: Paper reviewing judges
     paper_judges = db.relationship(
@@ -333,10 +335,10 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     )
 
     @declared_attr
-    def paper_last_revision(cls):
+    def _paper_last_revision(cls):
         # Incompatible with joinedload
         subquery = (db.select([db.func.max(PaperRevision.submitted_dt)])
-                    .where(PaperRevision.contribution_id == cls.id)
+                    .where(PaperRevision._contribution_id == cls.id)
                     .correlate_except(PaperRevision)
                     .as_scalar())
         return db.relationship(
@@ -344,17 +346,17 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             uselist=False,
             lazy=True,
             viewonly=True,
-            primaryjoin=db.and_(PaperRevision.contribution_id == cls.id, PaperRevision.submitted_dt == subquery)
+            primaryjoin=db.and_(PaperRevision._contribution_id == cls.id, PaperRevision.submitted_dt == subquery)
         )
 
     # relationship backrefs:
+    # - _paper_files (PaperFile._contribution)
+    # - _paper_revisions (PaperRevision._contribution)
     # - attachment_folders (AttachmentFolder.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
     # - legacy_paper_files (LegacyPaperFile.contribution)
     # - legacy_paper_reviewing_roles (LegacyPaperReviewingRole.contribution)
     # - note (EventNote.contribution)
-    # - paper_files (PaperFile.contribution)
-    # - paper_revisions (PaperRevision.contribution)
     # - timetable_entry (TimetableEntry.contribution)
     # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
 
@@ -375,9 +377,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return db.column_property(query, deferred=True)
 
     @declared_attr
-    def paper_revision_count(cls):
+    def _paper_revision_count(cls):
         query = (db.select([db.func.count(PaperRevision.id)])
-                 .where(PaperRevision.contribution_id == cls.id)
+                 .where(PaperRevision._contribution_id == cls.id)
                  .correlate_except(PaperRevision))
         return db.column_property(query, deferred=True)
 
@@ -425,6 +427,11 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     @property
     def verbose_title(self):
         return '#{} ({})'.format(self.friendly_id, self.title)
+
+    @property
+    @memoize_request
+    def paper(self):
+        return Paper(self) if self._paper_last_revision else None
 
     @return_ascii
     def __repr__(self):

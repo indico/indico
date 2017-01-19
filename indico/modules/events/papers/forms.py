@@ -92,12 +92,12 @@ class BulkPaperJudgmentForm(IndicoForm):
 
     @property
     def split_data(self):
-        contrib_data = self.data
+        paper_data = self.data
         judgment_data = {
-            'judgment': contrib_data.pop('judgment'),
-            'send_notifications': contrib_data.pop('send_notifications'),
+            'judgment': paper_data.pop('judgment'),
+            'send_notifications': paper_data.pop('send_notifications'),
         }
-        return judgment_data, contrib_data
+        return judgment_data, paper_data
 
 
 class PaperReviewingSettingsForm(IndicoForm):
