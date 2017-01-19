@@ -4,4 +4,30 @@
 
 {% block html %}
     {{ switch(id=field.id, name=field.name, value=field._value(), **kwargs) }}
+    {% if confirm_enable or confirm_disable %}
+        <script>
+            (function() {
+                'use strict';
+                var field = $('#{{ field.id }}');
+                var confirmEnable = {{ confirm_enable | tojson }};
+                var confirmDisable = {{ confirm_disable | tojson }};
+                field.on('change', function(evt, fromReset) {
+                    var $this = $(this);
+                    if (fromReset) {
+                        return;
+                    }
+
+                    if (this.checked && confirmEnable) {
+                        confirmPrompt(confirmEnable).fail(function() {
+                            $this.prop('checked', false).trigger('change', [true]);
+                        });
+                    } else if (!this.checked && confirmDisable) {
+                        confirmPrompt(confirmDisable).fail(function() {
+                            $this.prop('checked', true).trigger('change', [true]);
+                        });
+                    }
+                });
+            })();
+        </script>
+    {% endif %}
 {% endblock %}
