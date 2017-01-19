@@ -172,11 +172,5 @@
         }
 
         $form.data('dropzoneField', $dz[0]);
-        $form.on('ajaxForm:success', function(evt, data) {
-            if (data.redirect) {
-                IndicoUI.Dialogs.Util.progress();
-                location.href = data.redirect;
-            }
-        });
     };
 })(window);
