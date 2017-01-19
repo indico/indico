@@ -2,7 +2,7 @@
 
 {% from 'message_box.html' import message_box %}
 
-{% macro render_network_group_row(network_group) %}
+{% macro render_network_group_row(network_group, show_flag_col) %}
     <tr>
         <td>{{ network_group.name }}</td>
         <td>{{ network_group.description }}</td>
@@ -22,6 +22,23 @@
                 </div>
             {% endif %}
         </td>
+        {% if show_flag_col %}
+            <td>
+                {% if network_group.hidden %}
+                    <i class="icon-eye-blocked"
+                       title="{% trans %}Network cannot be added to ACLs{% endtrans %}"></i>
+                {% else %}
+                    <i class="icon-eye"></i>
+                {% endif %}
+
+                {% if network_group.attachment_access_override %}
+                    <i class="icon-unlocked semantic-text success"
+                       title="{% trans %}Network has unrestricted access to all attachments{% endtrans %}"></i>
+                {% else %}
+                    <i class="icon-lock semantic-text disabled"></i>
+                {% endif %}
+            </td>
+        {% endif %}
         <td class="actions">
             <a href="#"
                class="icon-edit"
@@ -42,6 +59,9 @@
 {% endmacro %}
 
 {%- block content %}
+    {% set show_flag_col = network_groups|selectattr('hidden')|any or
+                           network_groups|selectattr('attachment_access_override')|any %}
+
     {% call message_box('highlight', fixed_width=true) %}
         {% trans -%}
             IP networks can be used inside the ACLs of categories and events to
@@ -70,12 +90,15 @@
                         <th>{% trans %}Name{% endtrans %}</th>
                         <th>{% trans %}Description{% endtrans %}</th>
                         <th>{% trans %}IP subnets{% endtrans %}</th>
+                        {% if show_flag_col %}
+                            <th></th>
+                        {% endif %}
                         <th class="actions"></th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for network_group in network_groups %}
-                        {{ render_network_group_row(network_group) }}
+                        {{ render_network_group_row(network_group, show_flag_col) }}
                     {% endfor %}
                 </tbody>
             </table>
