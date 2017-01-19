@@ -152,8 +152,9 @@
     };
 
     global.setupListGenerator = function(filterConfig) {
+        var applySearchFilters;
         if (filterConfig) {
-            setupSearchBox(filterConfig);
+            applySearchFilters = setupSearchBox(filterConfig);
         }
         setupStaticURLGeneration();
         handleRowSelection();
@@ -191,6 +192,8 @@
             e.preventDefault();
             e.stopPropagation();
         });
+
+        return applySearchFilters;
     };
 
     global.getSelectedRows = function() {

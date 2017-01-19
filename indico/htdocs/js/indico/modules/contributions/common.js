@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global showUndoWarning:false, applySearchFilters:false, setupListGenerator:false, setupSearchBox:false */
+/* global showUndoWarning:false, setupListGenerator:false, setupSearchBox:false */
 /* global reloadManagementAttachmentInfoColumn:false */
 
 (function(global) {
@@ -205,6 +205,9 @@
         setupStartDateQBubbles();
         setupDurationQBubbles();
         enableIfChecked('#contribution-list', 'input[name=contribution_id]', '.js-enable-if-checked');
+
+        var applySearchFilters = setupListGenerator(filterConfig);
+
         $('#contribution-list').on('indico:htmlUpdated', function() {
             setupTableSorter('#contribution-list .tablesorter');
             applySearchFilters();
@@ -214,7 +217,6 @@
             var target = $(evt.target);
             reloadManagementAttachmentInfoColumn(target.data('locator'), target.closest('td'));
         });
-        setupListGenerator(filterConfig);
         $('.js-submit-form').on('click', function(e) {
             e.preventDefault();
             var $this = $(this);
@@ -274,7 +276,7 @@
             placeholder: '#filter-placeholder'
         };
 
-        setupListGenerator(filterConfig);
+        var applySearchFilters = setupListGenerator(filterConfig);
         applySearchFilters();
     };
 
@@ -287,7 +289,7 @@
             placeholder: '#filter-placeholder'
         };
 
-        setupSearchBox(filterConfig);
+        var applySearchFilters = setupSearchBox(filterConfig);
         applySearchFilters();
     };
 })(window);
