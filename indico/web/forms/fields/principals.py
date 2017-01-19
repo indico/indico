@@ -51,7 +51,7 @@ class PrincipalListField(HiddenField):
         self.allow_networks = kwargs.pop('allow_networks', False)
         self.ip_networks = []
         if self.allow_networks:
-            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query)
+            self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
         # Whether it is allowed to search for external users with no indico account
         self.allow_external = kwargs.pop('allow_external', False)
         # Whether the add user dialog is opened immediately when the field is displayed
@@ -60,7 +60,8 @@ class PrincipalListField(HiddenField):
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
-                                     allow_emails=self.allow_emails, allow_networks=self.allow_networks)
+                                     allow_emails=self.allow_emails, allow_networks=self.allow_networks,
+                                     existing_data=self.object_data)
 
     def process_formdata(self, valuelist):
         if valuelist:

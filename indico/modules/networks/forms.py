@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, TextAreaField
+from wtforms.fields import StringField, TextAreaField, BooleanField
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
@@ -24,6 +24,7 @@ from indico.modules.networks.fields import MultiIPNetworkField
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.widgets import SwitchWidget
 
 
 class IPNetworkGroupForm(IndicoForm):
@@ -32,6 +33,11 @@ class IPNetworkGroupForm(IndicoForm):
     name = StringField(_("Name"), [DataRequired()])
     description = TextAreaField(_("Description"))
     networks = MultiIPNetworkField(_('Subnets'), description=_("IPv4 or IPv6 subnets in CIDR notation"))
+    hidden = BooleanField(_('Hidden'), widget=SwitchWidget(),
+                          description=_("Hidden IP networks cannot be added to ACLs by users"))
+    attachment_access_override = BooleanField(_('Full attachment access'), widget=SwitchWidget(),
+                                              description=_("If enabled, these IPs have unrestricted access to all "
+                                                            "attachments without having to be logged in."))
 
     def __init__(self, *args, **kwargs):
         self._network_group_id = kwargs['obj'].id if 'obj' in kwargs else None
