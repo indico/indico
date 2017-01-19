@@ -34,7 +34,7 @@
         }
     }
 
-    global.applySearchFilters = function applySearchFilters() {
+    function _applySearchFilters(searchBoxConfig) {
         var $items = $(searchBoxConfig.listItems);
         var term = $(searchBoxConfig.term).val().trim();
         var $state = $(searchBoxConfig.state);
@@ -77,12 +77,12 @@
         // Needed because $(window).scroll() is not called when hiding elements
         // causing scrolling elements to be out of place.
         $(window).trigger('scroll');
-    };
+    }
 
     global.setupSearchBox = function setupSearchBox(config) {
-        searchBoxConfig = config;
+        var applySearchFilters = _.partial(_applySearchFilters, config);
 
-        $('#search-input').realtimefilter({
+        $(config.term).realtimefilter({
             callback: applySearchFilters
         });
 
@@ -90,5 +90,6 @@
         // browser history, this is needed since typewatch, which is used internally
         // by realtimefilter, calls applySearchFilter only when user is typing
         applySearchFilters();
+        return applySearchFilters;
     };
 })(window);
