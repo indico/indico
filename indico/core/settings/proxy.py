@@ -203,3 +203,19 @@ class SettingProperty(object):
 
     def __delete__(self, obj):
         self.proxy.delete(*self._make_args(obj, self.name))
+
+
+class AttributeProxyProperty(object):
+    def __init__(self, attr):
+        self.attr = attr
+
+    def __get__(self, obj, objtype=None):
+        if obj is None:
+            return self
+        return getattr(getattr(obj, obj.proxied_attr), self.attr)
+
+    def __set__(self, obj, value):
+        setattr(getattr(obj, obj.proxied_attr), self.attr, value)
+
+    def __delete__(self, obj):
+        delattr(getattr(obj, obj.proxied_attr), self.attr)
