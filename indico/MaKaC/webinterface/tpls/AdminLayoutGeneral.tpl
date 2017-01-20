@@ -28,38 +28,3 @@
 </tr>
 </table>
 
-<div class="groupTitle"> ${ _("Social bookmarks") }</div>
-<table>
-<tr>
-    <td>
-        <form action="${ socialFormURL }" method="POST">
-        <table>
-            <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Active")}</span></td>
-                  <td class="blacktext">
-                          <select name="socialActive">
-                              <option value="yes" ${"selected" if socialActive == True else ""}>
-                                   ${ _("Yes")}
-                              </option>
-                              <option value="no" ${"selected" if socialActive == False else ""}>
-                                   ${ _("No")}
-                              </option>
-                          </select>
-                  </td>
-            </tr>
-            <tr>
-                  <td class="titleCellTD"><span class="titleCellFormat"> ${ _("Facebook App ID")}</span></td>
-                  <td class="blacktext">
-                    <input type="text" name="facebook_appId" value="${facebookData.get('appId', '')}" />
-                  </td>
-            </tr>
-            <tr>
-                <td>
-                  <input type="submit" class="btn" value="${ _("save")}" style="margin-top: 10px;">
-                </td>
-            </tr>
-        </table>
-        </form>
-    </td>
-</tr>
-</table>

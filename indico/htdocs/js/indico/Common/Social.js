@@ -66,7 +66,7 @@ $(function() {
                     $(this).select();
                 });
 
-               inject_facebook($('#social').data('appData').facebook.appId);
+                inject_facebook($('#social').data('social-settings').facebook_app_id);
                 $.getScript('//apis.google.com/js/plusone.js');
                 $.getScript('//platform.twitter.com/widgets.js');
             },

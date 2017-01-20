@@ -27,7 +27,7 @@
   </div>
 </div>
 
-<div id="social" data-url="${url}" data-theme="${'dark' if dark else 'light'}" data-app-data="${app_data|n,j,h}">
+<div id="social" data-url="${url}" data-theme="${'dark' if dark else 'light'}" data-social-settings="${social_settings|n,j,h}">
   <img src="${systemIcon('social.png')}" alt="${_("Social Networks")}"
        title="${_("Social Networks")}" id="social_button"/>
 </div>
