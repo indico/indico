@@ -37,10 +37,6 @@
        <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Timezone")}</span></td>
        <td bgcolor="white" width="100%" valign="top" class="blacktext">${ timezone }</td>
     </tr>
-    <tr>
-      <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat">${ _("Address")}</span></td>
-      <td bgcolor="white" width="100%" valign="top" class="blacktext">${address}</td>
-    </tr>
     % if _app.debug:
         <tr>
           <td nowrap class="dataCaptionTD"><span class="dataCaptionFormat"> ${ _("Debug mode")}</span></td>

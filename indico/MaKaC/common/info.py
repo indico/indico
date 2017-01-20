@@ -14,14 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import warnings
-
-from flask import current_app as app
 from persistent import Persistent
 from persistent.dict import PersistentDict
 from BTrees import OOBTree
 
-from indico.core.config import Config
 from indico.core import db
 
 
@@ -33,8 +29,6 @@ class MaKaCInfo(Persistent):
         # server description fields
         self._title = ""
         self._organisation = ""
-        self._city = ""
-        self._country = ""
 
         # Global poster/badge templates
         self._defaultConference = None
@@ -71,18 +65,6 @@ class MaKaCInfo(Persistent):
 
     def setOrganisation( self, newOrg ):
         self._organisation = newOrg.strip()
-
-    def getCity( self ):
-        return self._city
-
-    def setCity( self, newCity ):
-        self._city = newCity.strip()
-
-    def getCountry( self ):
-        return self._country
-
-    def setCountry( self, newCountry ):
-        self._country = newCountry
 
     def getDefaultConference(self):
         from MaKaC.conference import DefaultConference
