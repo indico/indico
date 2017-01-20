@@ -23,21 +23,6 @@
       </td>
     </tr>
     <tr>
-      <td nowrap class="titleCellTD"><span class="titleCellFormat">${ _("Address")}</span></td>
-      <td bgcolor="white" width="100%">
-        <table width="100%">
-        <tr>
-          <td align="right">&nbsp;${ _("City")}</td>
-          <td width="100%"><input type="text" name="city" value="${ city }"></td>
-        </tr>
-        <tr>
-          <td align="right">&nbsp;${ _("Country")}</td>
-          <td><input type="text" name="country" value="${ country }"></td>
-        </tr>
-        </table>
-      </td>
-    </tr>
-    <tr>
       <td colspan="2" align="center">
         <table align="center">
         <tr>
