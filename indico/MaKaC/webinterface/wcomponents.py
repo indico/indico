@@ -422,7 +422,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
             dates.append("""<input type="hidden" name="showDate" value="all">""")
         # Sessions Menu
         sessions = []
-        if len(self._conf.getSessionList()) != 0:
+        if self._conf.as_event.sessions:
             selected = ""
             if vars.has_key("selectedSession"):
                 selectedSession = vars["selectedSession"]
@@ -431,7 +431,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
             else:
                 selectedSession = "all"
             sessions = [ i18nformat(""" <select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
-            for session in self._conf.getSessionList():
+            for session in self._conf.as_event.sessions:
                 selected = ""
                 sid = session.friendly_id
                 if sid == selectedSession:
@@ -442,7 +442,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
             sessions.append("""<input type="hidden" name="showSession" value="all">""")
         # Handle hide/show contributions option
         hideContributions = None;
-        if len(self._conf.getSessionList()) != 0:
+        if self._conf.as_event.sessions:
             if vars.has_key("detailLevel"):
                 if vars["detailLevel"] == "session":
                     hideContributions = "checked"
@@ -532,7 +532,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
 
         # Handle hide/show contributions option
         hideContributions = None;
-        if len(self._conf.getSessionList()) != 0:
+        if self._conf.as_event.sessions:
             if vars.has_key("detailLevel"):
                 if vars["detailLevel"] == "session":
                     hideContributions = "checked"
@@ -950,67 +950,6 @@ class WTabControl(WTemplated):
         vars['activeTab'] = self._getActiveTabId()
         vars['tabControlId'] = id(self)
 
-        return vars
-
-
-class WConfModMoveContribsToSessionConfirmation(WTemplated):
-
-    def __init__(self,conf,contribIdList=[],targetSession=None):
-        self._conf=conf
-        self._contribIdList=contribIdList
-        self._targetSession=targetSession
-
-    def _getWarningsHTML(self):
-        wl=[]
-        for id in self._contribIdList:
-            contrib=self._conf.getContributionById(id)
-            if contrib is None:
-                continue
-            spkList=[]
-            for spk in contrib.getSpeakerList():
-                spkList.append(self.htmlText(spk.getFullName()))
-            spkCaption=""
-            if len(spkList)>0:
-                spkCaption=" by %s"%"; ".join(spkList)
-            if (contrib.getSession() is not None and \
-                            contrib.getSession()!=self._targetSession):
-                scheduled=""
-                if contrib.isScheduled():
-                    scheduled= i18nformat("""  _("and scheduled") (%s)""")%self.htmlText(contrib.getStartDate().strftime("%Y-%b-%d %H:%M"))
-                wl.append( i18nformat("""
-                        <li>%s-<i>%s</i>%s: is <font color="red"> _("already in session") <b>%s</b>%s</font></li>
-                """)%(self.htmlText(contrib.getId()),
-                        self.htmlText(contrib.getTitle()),
-                        spkCaption,
-                        self.htmlText(contrib.getSession().getTitle()),
-                        scheduled))
-            if (contrib.getSession() is None and \
-                            self._targetSession is not None and \
-                            contrib.isScheduled()):
-                wl.append( i18nformat("""
-                        <li>%s-<i>%s</i>%s: is <font color="red"> _("scheduled") (%s)</font></li>
-                """)%(self.htmlText(contrib.getId()),
-                        self.htmlText(contrib.getTitle()),
-                        spkCaption,
-                        self.htmlText(contrib.getStartDate().strftime("%Y-%b-%d %H:%M"))))
-        return "<ul>%s</ul>"%"".join(wl)
-
-    def getVars(self):
-        vars=WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(vars["postURL"]))
-        vars["systemIconWarning"]=Config.getInstance().getSystemIconURL("warning")
-        vars["contribIdList"]=", ".join(self._contribIdList)
-        vars["targetSession"]="--none--"
-        if self._targetSession is not None:
-            vars["targetSession"]=self.htmlText("%s"%self._targetSession.getTitle())
-        vars["warnings"]=self._getWarningsHTML()
-        vars["targetSessionId"]=quoteattr("--none--")
-        if self._targetSession is not None:
-            vars["targetSessionId"]=quoteattr(str(self._targetSession.getId()))
-        l=[]
-        for id in self._contribIdList:
-            l.append("""<input type="hidden" name="contributions" value=%s">"""%quoteattr(str(id)))
-        vars["contributions"]="\n".join(l)
         return vars
 
 
