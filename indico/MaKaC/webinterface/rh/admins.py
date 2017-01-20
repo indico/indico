@@ -64,8 +64,6 @@ class RHGeneralInfoPerformModification(RHAdminBase):
         if 'ok' in params:
             self._minfo.setTitle(params["title"])
             self._minfo.setOrganisation(params["organisation"])
-            self._minfo.setCity(params["city"])
-            self._minfo.setCountry(params["country"])
         self._redirect(urlHandlers.UHAdminArea.getURL())
 
 
