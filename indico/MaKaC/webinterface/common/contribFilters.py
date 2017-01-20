@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.common.filters as filters
-from indico.util.string import natural_sort_key
 
 
 class TypeFilterField( filters.FilterField ):
@@ -78,28 +77,6 @@ class SessionFilterField( filters.FilterField ):
         else:
             return self._showNoValue
         return False
-
-class PosterFilterField (filters.FilterField):
-    """ Contains the filtering criteria for the contribution being a poster or not.
-        A contribution is considered a poster contribution if it belongs to a poster session.
-
-        Inherits from: AbstractFilterField
-
-        Attributes:
-            _values -- (bool) Tells if the contribution should be a poster or not.
-            _showNoValue -- (bool) Tells whether an contribution satisfies the
-                filter if it doesn't satisfy the _values criterion. So, if True, all
-                contribution will satisfy the criterion.
-    """
-
-    _id = "poster"
-    def satisfies( self, contribution ):
-        if self._showNoValue:
-            return True
-        elif len(self._values) > 0 and self._values[0]: #values[0] is True or False. Contribution has to be a poster
-            return contribution.getSession() and contribution.getSession().getScheduleType() == "poster"
-        else: #contribution must not be a poster
-            return not contribution.getSession() or contribution.getSession().getScheduleType() != "poster"
 
 
 class RefereeFilterField( filters.FilterField ):
