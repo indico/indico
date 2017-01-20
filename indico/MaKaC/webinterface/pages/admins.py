@@ -33,7 +33,7 @@ from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.users import User
-from indico.util.i18n import _, get_all_locales
+from indico.util.i18n import _
 from indico.web.menu import render_sidemenu
 
 
@@ -94,14 +94,6 @@ class WAdmins(wcomponents.WTemplated):
         wvars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
         wvars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
         wvars['lang'] = Config.getInstance().getDefaultLocale()
-        wvars['address'] = ''
-        if minfo.getCity() != '':
-            wvars['address'] = minfo.getCity()
-        if minfo.getCountry() != '':
-            if wvars['address'] != '':
-                wvars['address'] = '{0} ({1})'.format(wvars['address'], minfo.getCountry())
-            else:
-                wvars['address'] = minfo.getCountry()
         wvars['timezone'] = Config.getInstance().getDefaultTimezone()
         wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
@@ -155,10 +147,6 @@ class WGeneralInfoModification(wcomponents.WTemplated):
         genInfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         vars["title"] = genInfo.getTitle()
         vars["organisation"] = genInfo.getOrganisation()
-        vars["city"] = genInfo.getCity()
-        vars["country"] = genInfo.getCountry()
-        vars["language"] = Config.getInstance().getDefaultLocale()
-        vars["language_list"] = get_all_locales()
         return vars
 
 
