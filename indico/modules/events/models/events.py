@@ -388,6 +388,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - contribution_types (ContributionType.event_new)
     # - contributions (Contribution.event_new)
     # - custom_pages (EventPage.event_new)
+    # - designer_templates (DesignerTemplate.event_new)
     # - layout_images (ImageFile.event_new)
     # - legacy_contribution_mappings (LegacyContributionMapping.event_new)
     # - legacy_mapping (LegacyEventMapping.event_new)
