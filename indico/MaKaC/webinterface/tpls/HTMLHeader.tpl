@@ -11,8 +11,8 @@
         <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
         <meta content="${_session.csrf_token}" name="csrf-token" id="csrf-token">
 
-% if social.get('facebook', {}).get('appId', None):
-        <meta property="fb:app_id" content="${social['facebook']['appId']}"/>
+% if social['facebook_app_id']:
+        <meta property="fb:app_id" content="${social['facebook_app_id']}">
 % endif
 
 % if baseUrl == 'static':

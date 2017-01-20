@@ -36,20 +36,12 @@ class MaKaCInfo(Persistent):
         # template set
         self._defaultTemplateSet = None
 
-        # social sites
-        self.getSocialAppConfig()
-
         # Define the volume used in archiving:
         # e.g. /afs/cern.ch/project/indico/XXXX/2008/...
         # XXXX will be replaced by self._archivingVolume
         # if self._archivingVolume is empty the path would be:
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
-
-    def getSocialAppConfig( self ):
-        if not hasattr(self, '_socialAppConfig'):
-            self._socialAppConfig = PersistentDict({'active': False, 'facebook': {}})
-        return self._socialAppConfig
 
     def getTitle( self ):
         return self._title

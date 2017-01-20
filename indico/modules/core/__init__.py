@@ -19,20 +19,9 @@ from __future__ import unicode_literals
 from indico.core import signals
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuSection, SideMenuItem
-
-
-@signals.menu.sections.connect_via('admin-sidemenu')
-def _sidemenu_sections(sender, **kwargs):
-    yield SideMenuSection('security', _("Security"), 90, icon='shield')
-    yield SideMenuSection('user_management', _("User Management"), 60, icon='users')
-    yield SideMenuSection('customization', _("Customization"), 50, icon='wrench')
-    yield SideMenuSection('integration', _("Integration"), 30, icon='earth')
-    yield SideMenuSection('homepage', _("Homepage"), 40, icon='home')
+from indico.web.menu import SideMenuItem
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('general', _('General Settings (old)'), url_for('admin.adminList'), 100, icon='settings')
-    yield SideMenuItem('storage', _('Disk Storage'), url_for('admin.adminSystem'), 70, icon='stack')
-    yield SideMenuItem('layout', _('Layout'), url_for('admin.adminLayout'), section='customization')
+    yield SideMenuItem('settings', _('General Settings'), url_for('core.settings'), 100, icon='settings')

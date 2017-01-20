@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import session
-from persistent.dict import PersistentDict
 from werkzeug.exceptions import Forbidden
 
 from indico.util.i18n import _
@@ -87,23 +86,6 @@ class RHAdminLayoutSaveTemplateSet( RHAdminBase ):
 
     def _process( self ):
         self._minfo.setDefaultTemplateSet(self._defSet)
-        self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
-
-
-class RHAdminLayoutSaveSocial(RHAdminBase):
-    _uh = urlHandlers.UHAdminLayoutSaveSocial
-
-    def _checkParams( self, params ):
-        self._params = params
-        RHAdminBase._checkParams( self, params )
-
-    def _process(self):
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        cfg = minfo.getSocialAppConfig()
-        if 'socialActive' in self._params:
-            cfg['active'] = self._params.get('socialActive') == 'yes'
-        if 'facebook_appId' in self._params:
-            cfg.setdefault('facebook', PersistentDict())['appId'] = self._params.get('facebook_appId')
         self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
 
 

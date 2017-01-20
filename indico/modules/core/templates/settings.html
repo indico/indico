@@ -1,0 +1,19 @@
+{% extends 'layout/base.html' %}
+{% from 'message_box.html' import message_box %}
+{% from 'core/_settings.html' import render_system_settings, render_site_settings, render_social_settings %}
+
+{% block title %}
+    {% trans %}General Settings{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if config.DEBUG %}
+        {% call message_box('warning') -%}
+            {% trans %}Debug mode is enabled.{% endtrans %}
+        {%- endcall %}
+    {% endif %}
+
+    {{ render_system_settings() }}
+    {{ render_site_settings(core_settings) }}
+    {{ render_social_settings(social_settings) }}
+{% endblock %}
