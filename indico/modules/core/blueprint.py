@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.core.controllers import RHSettings, RHSiteSettings, RHSocialSettings
+from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('core', __name__, template_folder='templates', virtual_template_folder='core')
@@ -24,3 +25,6 @@ _bp = IndicoBlueprint('core', __name__, template_folder='templates', virtual_tem
 _bp.add_url_rule('/admin/settings/', 'settings', RHSettings)
 _bp.add_url_rule('/admin/settings/site', 'site_settings', RHSiteSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/admin/settings/social', 'social_settings', RHSocialSettings, methods=('GET', 'POST'))
+
+# TODO: replace with an actual admin dashboard at some point
+_bp.add_url_rule('/admin/', 'dashboard', view_func=redirect_view('.settings'))
