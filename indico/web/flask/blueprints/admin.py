@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModif
 
@@ -21,7 +22,7 @@ from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModi
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 
 # General settings
-admin.add_url_rule('/', 'adminList', admins.RHAdminArea)
+admin.add_url_rule('/settings-old', 'adminList', admins.RHAdminArea)
 admin.add_url_rule('/settings/general/', 'generalInfoModification', admins.RHGeneralInfoModification)
 admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admins.RHGeneralInfoPerformModification,
                    methods=('POST',))
@@ -43,7 +44,6 @@ admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTm
 
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', admins.RHAdminLayoutGeneral, methods=('GET', 'POST'))
-admin.add_url_rule('/layout/social', 'adminLayout-saveSocial', admins.RHAdminLayoutSaveSocial, methods=('POST',))
 admin.add_url_rule('/layout/template-set', 'adminLayout-saveTemplateSet', admins.RHAdminLayoutSaveTemplateSet,
                    methods=('POST',))
 admin.add_url_rule('/layout/styles/conference/', 'adminConferenceStyles', admins.RHConferenceStyles)
@@ -63,3 +63,7 @@ admin.add_url_rule('/layout/posters/save', 'posterTemplates-posterPrinting', con
                    methods=('GET', 'POST'))
 admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign', templates.RHConfPosterDesign,
                    methods=('GET', 'POST'))
+
+
+# TODO: move this to indico/modules/admin/blueprint.py once this blueprint goes avay
+admin.add_url_rule('/', view_func=redirect_view('core.settings'))

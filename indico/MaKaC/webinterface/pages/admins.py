@@ -224,15 +224,11 @@ class WPAdminLayoutGeneral( WPTemplatesCommon ):
 
     def _getTabContent(self, params):
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        socialCfg = minfo.getSocialAppConfig()
         wc = WAdminLayoutGeneral()
         pars = {
             "defaultTemplateSet": minfo.getDefaultTemplateSet(),
             "availableTemplates": self.__getAvailableTemplates(),
-            "templateSetFormURL": urlHandlers.UHAdminLayoutSaveTemplateSet.getURL(),
-            "socialFormURL": urlHandlers.UHAdminLayoutSaveSocial.getURL(),
-            "socialActive": socialCfg.get('active', True),
-            "facebookData": socialCfg.get('facebook', {})
+            "templateSetFormURL": urlHandlers.UHAdminLayoutSaveTemplateSet.getURL()
         }
         return wc.getHTML(pars)
 

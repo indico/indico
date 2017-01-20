@@ -21,6 +21,7 @@ from flask import request, session, render_template, g
 
 import MaKaC.webinterface.wcomponents as wcomponents
 from indico.core import signals
+from indico.modules.core.settings import social_settings
 from indico.web import assets
 from indico.core.config import Config
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -195,8 +196,7 @@ class WPBase:
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "language": session.lang or Config.getInstance().getDefaultLocale(),
-            # XXX: Remove SOCIAL_ENABLED once this is moved out of ZODB
-            "social": HelperMaKaCInfo().getMaKaCInfoInstance().getSocialAppConfig() if self.SOCIAL_ENABLED else {},
+            "social": social_settings.get_all() if self.SOCIAL_ENABLED else {},
             "assets": self._asset_env
         })
 
