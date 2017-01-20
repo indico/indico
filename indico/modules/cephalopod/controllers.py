@@ -28,12 +28,12 @@ from indico.modules.cephalopod import settings
 from indico.modules.cephalopod.forms import CephalopodForm
 from indico.modules.cephalopod.util import register_instance, sync_instance, unregister_instance
 from indico.modules.cephalopod.views import WPCephalopod
+from indico.modules.core.settings import core_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
 import MaKaC
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
@@ -47,14 +47,13 @@ class RHCephalopod(RHCephalopodBase):
         defaults = FormDefaults(**settings.get_all())
         form = CephalopodForm(request.form, obj=defaults)
 
-        affiliation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
         enabled = settings.get('joined')
         config = Config.getInstance()
         instance_url = config.getBaseURL()
         language = config.getDefaultLocale()
         tracker_url = urljoin(config.getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
         return WPCephalopod.render_template('cephalopod.html',
-                                            affiliation=affiliation,
+                                            affiliation=core_settings.get('site_organization'),
                                             enabled=enabled,
                                             form=form,
                                             indico_version=MaKaC.__version__,

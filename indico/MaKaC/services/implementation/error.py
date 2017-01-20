@@ -18,12 +18,13 @@ from pprint import pformat
 
 from werkzeug.urls import url_parse
 
-from MaKaC.services.implementation.base import ParameterManager, ServiceBase
-from MaKaC.webinterface.mail import GenericMailer, GenericNotification
-from MaKaC.errors import MaKaCError
-
 from indico.core.config import Config
 from indico.core.logger import Logger
+
+from MaKaC.common.mail import GenericMailer
+from MaKaC.errors import MaKaCError
+from MaKaC.services.implementation.base import ParameterManager, ServiceBase
+from MaKaC.webinterface.mail import GenericNotification
 
 
 class SendErrorReport(ServiceBase):

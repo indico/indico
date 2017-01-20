@@ -41,7 +41,7 @@ from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
-from indico.modules.core.settings import social_settings
+from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
@@ -288,17 +288,13 @@ class WHeader(WTemplated):
         vars["SelectedLanguageName"] = current_locale.language_name
         vars["Languages"] = get_all_locales()
 
-        if DBMgr.getInstance().isConnected():
-            vars["title"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getTitle()
-            vars["organization"] = info.HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
-        else:
-            vars["title"] = "Indico"
-            vars["organization"] = ""
-
+        vars["title"] = core_settings.get('site_title')
+        vars["organization"] = core_settings.get('site_organization')
         vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
         vars['protectionDisclaimerProtected'] = legal_settings.get('network_protected_disclaimer')
         vars['protectionDisclaimerRestricted'] = legal_settings.get('restricted_disclaimer')
-        #Build a list of items for the administration menu
+
+        # Build a list of items for the administration menu
         adminItemList = []
         if session.user and session.user.is_admin:
             adminItemList.append({'id': 'serverAdmin', 'url': url_for('core.dashboard'),
@@ -576,7 +572,7 @@ class WFooter(WTemplated):
         web interface.
     """
 
-    def __init__(self, tpl_name = None, isFrontPage = False):
+    def __init__(self, tpl_name=None, isFrontPage=False):
         WTemplated.__init__(self, tpl_name)
         self._isFrontPage = isFrontPage
 

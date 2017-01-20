@@ -28,6 +28,7 @@ from indico.core.db import db
 from indico.modules.auth import Identity, login_user
 from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
+from indico.modules.core.settings import core_settings
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -37,7 +38,6 @@ from indico.web.util import url_for_index
 
 import MaKaC
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.common.info import HelperMaKaCInfo
 
 # TODO: set the time zone here once communities settings are available.
 
@@ -85,8 +85,7 @@ class RHBootstrap(RH):
         transaction.commit()
 
         # Configuring server's settings
-        minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-        minfo.setOrganisation(setup_form.affiliation.data)
+        core_settings.set('site_organization', setup_form.affiliation.data)
 
         message = get_template_module('bootstrap/flash_messages.html').bootstrap_success(name=full_name)
         flash(Markup(message), 'success')

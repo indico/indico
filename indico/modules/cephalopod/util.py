@@ -23,7 +23,7 @@ from urlparse import urljoin
 
 from indico.core.config import Config
 from indico.modules.cephalopod import logger, settings
-from MaKaC.common.info import HelperMaKaCInfo
+from indico.modules.core.settings import core_settings
 
 _headers = {'Content-Type': 'application/json'}
 _url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/')
@@ -31,11 +31,10 @@ TIMEOUT = 10
 
 
 def register_instance(contact, email):
-    organisation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
     payload = {'url': Config.getInstance().getBaseURL(),
                'contact': contact,
                'email': email,
-               'organisation': organisation}
+               'organisation': core_settings.get('site_organization')}
     response = requests.post(_url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
     try:
         response.raise_for_status()
@@ -95,12 +94,11 @@ def sync_instance(contact, email):
         register_instance(contact, email)
         return
 
-    organisation = HelperMaKaCInfo.getMaKaCInfoInstance().getOrganisation()
     payload = {'enabled': True,
                'url': Config.getInstance().getBaseURL(),
                'contact': contact,
                'email': email,
-               'organisation': organisation}
+               'organisation': core_settings.get('site_organization')}
     url = urljoin(_url, settings.get('uuid'))
     response = requests.patch(url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
     try:

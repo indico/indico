@@ -29,7 +29,6 @@ from indico.util.i18n import i18nformat
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode, encode_if_unicode
 from indico.web.util import jsonify_template
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.i18n import _
 
 
@@ -99,7 +98,6 @@ class WPJinjaMixin:
 
 
 class WPBase:
-    SOCIAL_ENABLED = True
     _title = "Indico"
 
     # required user-specific "data packages"
@@ -196,7 +194,7 @@ class WPBase:
             "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
             "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
             "language": session.lang or Config.getInstance().getDefaultLocale(),
-            "social": social_settings.get_all() if self.SOCIAL_ENABLED else {},
+            "social": social_settings.get_all(),
             "assets": self._asset_env
         })
 
