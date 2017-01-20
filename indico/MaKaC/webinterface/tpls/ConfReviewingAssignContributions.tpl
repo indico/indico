@@ -76,7 +76,7 @@
                         <td><input type="checkbox" id="sessionShowNoValue" name="selSessions" value="not specified" checked/></td>
                         <td> --${ _("not specified")}--</td>
                     </tr>
-                    % for s in self_._conf.getSessionListSorted():
+                    % for s in self_._conf.as_event.sessions:
                         <tr>
                             <td><input type="checkbox" name="selSessions" value="${s.id}" checked></td>
                             <td>${ s.title }</td>
