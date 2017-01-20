@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModif
 
@@ -23,9 +22,6 @@ admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 
 # General settings
 admin.add_url_rule('/settings-old', 'adminList', admins.RHAdminArea)
-admin.add_url_rule('/settings/general/', 'generalInfoModification', admins.RHGeneralInfoModification)
-admin.add_url_rule('/settings/general/', 'generalInfoModification-update', admins.RHGeneralInfoPerformModification,
-                   methods=('POST',))
 
 # System settings
 admin.add_url_rule('/settings/system', 'adminSystem', admins.RHSystem)
@@ -63,7 +59,3 @@ admin.add_url_rule('/layout/posters/save', 'posterTemplates-posterPrinting', con
                    methods=('GET', 'POST'))
 admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign', templates.RHConfPosterDesign,
                    methods=('GET', 'POST'))
-
-
-# TODO: move this to indico/modules/admin/blueprint.py once this blueprint goes avay
-admin.add_url_rule('/', view_func=redirect_view('core.settings'))

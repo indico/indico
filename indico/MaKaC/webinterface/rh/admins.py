@@ -39,31 +39,9 @@ class RHAdminBase(RHProtected):
 
 
 class RHAdminArea(RHAdminBase):
-    _uh = urlHandlers.UHAdminArea
-
     def _process(self):
         p = admins.WPAdmins(self)
         return p.display()
-
-
-class RHGeneralInfoModification(RHAdminBase):
-    _uh = urlHandlers.UHGeneralInfoModification
-
-    def _process(self):
-        p = admins.WPGenInfoModification(self)
-        return p.display()
-
-
-class RHGeneralInfoPerformModification(RHAdminBase):
-    _uh = urlHandlers.UHGeneralInfoPerformModification
-
-    def _process(self):
-        params = self._getRequestParams()
-
-        if 'ok' in params:
-            self._minfo.setTitle(params["title"])
-            self._minfo.setOrganisation(params["organisation"])
-        self._redirect(urlHandlers.UHAdminArea.getURL())
 
 
 class RHAdminLayoutGeneral(RHAdminBase):
