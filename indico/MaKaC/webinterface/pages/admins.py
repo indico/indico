@@ -68,7 +68,7 @@ class WPAdminsBase(WPMainBase):
         })
 
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_("Server Admin"), urlHandlers.UHAdminArea.getURL, bgColor="white")
+        return wcomponents.WSimpleNavigationDrawer(_("Server Admin"), bgColor="white")
 
     def _createTabCtrl(self):
         pass
@@ -88,13 +88,6 @@ class WAdmins(wcomponents.WTemplated):
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
         minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        wvars['title'] = minfo.getTitle()
-        wvars['organisation'] = minfo.getOrganisation()
-        wvars['supportEmail'] = Config.getInstance().getSupportEmail()
-        wvars['publicSupportEmail'] = Config.getInstance().getPublicSupportEmail()
-        wvars['noReplyEmail'] = Config.getInstance().getNoReplyEmail()
-        wvars['lang'] = Config.getInstance().getDefaultLocale()
-        wvars['timezone'] = Config.getInstance().getDefaultTimezone()
         wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
@@ -126,7 +119,6 @@ class WAdminFrame(wcomponents.WTemplated):
         return 260
 
 
-
 class WPAdmins(WPAdminsBase):
     sidemenu_option = 'general'
 
@@ -135,27 +127,7 @@ class WPAdmins(WPAdminsBase):
         return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
 
     def _getPageContent(self, params):
-        wc = WAdmins()
-        pars = {'GeneralInfoModifURL': urlHandlers.UHGeneralInfoModification.getURL()}
-        return wc.getHTML(pars)
-
-
-class WGeneralInfoModification(wcomponents.WTemplated):
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        genInfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        vars["title"] = genInfo.getTitle()
-        vars["organisation"] = genInfo.getOrganisation()
-        return vars
-
-
-class WPGenInfoModification(WPAdmins):
-
-    def _getPageContent(self, params):
-        wc = WGeneralInfoModification()
-        pars = {"postURL": urlHandlers.UHGeneralInfoPerformModification.getURL()}
-        return wc.getHTML(pars)
+        return WAdmins().getHTML()
 
 
 class WPTemplatesCommon( WPAdminsBase ):

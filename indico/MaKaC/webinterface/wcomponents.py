@@ -301,7 +301,7 @@ class WHeader(WTemplated):
         #Build a list of items for the administration menu
         adminItemList = []
         if session.user and session.user.is_admin:
-            adminItemList.append({'id': 'serverAdmin', 'url': urlHandlers.UHAdminArea.getURL(),
+            adminItemList.append({'id': 'serverAdmin', 'url': url_for('core.dashboard'),
                                   'text': _("Server admin")})
 
         vars["adminItemList"] = adminItemList
