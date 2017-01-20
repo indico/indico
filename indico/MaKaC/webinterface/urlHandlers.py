@@ -297,10 +297,6 @@ class UHConfManagementAccess(UHConfUser):
     _endpoint = 'event_mgmt.conferenceModification-managementAccess'
 
 
-class UHAdminArea(URLHandler):
-    _endpoint = 'admin.adminList'
-
-
 class UHAdminsConferenceStyles(URLHandler):
     _endpoint = 'admin.adminConferenceStyles'
 
@@ -311,14 +307,6 @@ class UHAdminsSystem(URLHandler):
 
 class UHAdminsSystemModif(URLHandler):
     _endpoint = 'admin.adminSystem-modify'
-
-
-class UHGeneralInfoModification(URLHandler):
-    _endpoint = 'admin.generalInfoModification'
-
-
-class UHGeneralInfoPerformModification(URLHandler):
-    _endpoint = 'admin.generalInfoModification-update'
 
 
 class UHErrorReporting(URLHandler):
