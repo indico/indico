@@ -24,7 +24,7 @@ import sys
 import random
 import StringIO
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 from functools import wraps, partial
 from urlparse import urljoin
 from xml.sax.saxutils import escape
@@ -45,6 +45,7 @@ from MaKaC.accessControl import AccessWrapper
 
 from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
+from MaKaC.common.mail import GenericMailer
 from MaKaC.conference import Conference
 from MaKaC.errors import (
     AccessError,
@@ -55,7 +56,6 @@ from MaKaC.errors import (
     ModificationError,
     NotLoggedError,
     NotFoundError)
-from MaKaC.webinterface.mail import GenericMailer
 import MaKaC.webinterface.pages.errors as errors
 from MaKaC.webinterface.pages.error import render_error
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed

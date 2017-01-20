@@ -30,7 +30,7 @@ from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
 from indico.modules.categories.util import get_visibility_options
-from indico.modules.core.settings import social_settings
+from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
@@ -213,9 +213,7 @@ class WConfMetadata(wcomponents.WTemplated):
 
     def getVars(self):
         v = wcomponents.WTemplated.getVars( self )
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-
-        v['site_name'] = minfo.getTitle()
+        v['site_name'] = core_settings.get('site_title')
         v['social'] = social_settings.get_all()
 
         event = self._conf.as_event

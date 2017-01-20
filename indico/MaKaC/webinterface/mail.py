@@ -14,40 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.config import Config
-
-from MaKaC.common.mail import GenericMailer
-from MaKaC.common.info import HelperMaKaCInfo
-
-
-def getSubjectIndicoTitle():
-    minfo=HelperMaKaCInfo.getMaKaCInfoInstance()
-    systitle="Indico"
-    if minfo.getTitle().strip() != "":
-        systitle=minfo.getTitle().strip()
-    if minfo.getOrganisation().strip() != "":
-        systitle="%s @ %s"%(systitle, minfo.getOrganisation().strip())
-    return systitle
-
-
-class personMail:
-    @staticmethod
-    def send(addto, addcc, addfrom, subject, body):
-        addto = addto.replace("\r\n","")
-        tolist = addto.split(",")
-        cclist = addcc.split(",")
-        maildata = {
-            "fromAddr": addfrom,
-            "toList": tolist,
-            "ccList": cclist,
-            "subject": subject,
-            "body": body
-            }
-        GenericMailer.send(GenericNotification(maildata))
-
 
 class GenericNotification:
-
     def __init__(self, data=None):
         if data is None:
             self._fromAddr = ""
@@ -141,25 +109,3 @@ class GenericNotification:
             return False
         self._body = body
         return True
-
-
-class Mailer:
-    @staticmethod
-    def send(notification, fromAddress=""):
-        info = HelperMaKaCInfo.getMaKaCInfoInstance()
-        if fromAddress.strip() == "":
-            fromAddr = "%s <%s>"%(info.getTitle(), Config.getInstance().getSupportEmail())
-        else:
-            fromAddr = notification.getFromAddr()
-        toAddr = str(notification.getDestination().getEmail())
-        text = """%s
---
-Indico project <http://indico-software.org/>
-                """%(notification.getMsg())
-        maildata = {
-            "fromAddr": fromAddr,
-            "toList": [toAddr],
-            "subject": "[Indico] %s" % notification.getSubject(),
-            "body": text
-            }
-        GenericMailer.send(GenericNotification(maildata))
