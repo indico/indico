@@ -41,6 +41,7 @@ from indico.core.config import Config
 from indico.core.db import DBMgr, db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
+from indico.modules.core.settings import social_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
@@ -636,12 +637,10 @@ class WEventFooter(WFooter):
                       'name:indico']
         })
 
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        app_data = minfo.getSocialAppConfig()
-
+        social_settings_data = social_settings.get_all()
         v["shortURL"] = self._event.short_external_url
-        v["app_data"] = app_data
-        v["showSocial"] = app_data.get('active', False) and layout_settings.get(self._conf, 'show_social_badges')
+        v["showSocial"] = social_settings_data['enabled'] and layout_settings.get(self._conf, 'show_social_badges')
+        v["social_settings"] = social_settings_data
         v['conf'] = self._conf
 
         return v

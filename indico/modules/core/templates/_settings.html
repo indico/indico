@@ -1,0 +1,77 @@
+{% macro render_system_settings() %}
+    <section>
+        <header>
+            <h3>
+                {% trans %}System{% endtrans %}
+                {% set tooltip -%}
+                    {%- trans %}These settings can be changed in the indico.conf file on the server.{% endtrans -%}
+                {%- endset %}
+                <a class="i-button borderless icon-settings disabled" title="{{ tooltip }}"></a>
+            </h3>
+        </header>
+        <dl class="i-data-list">
+            <dt>{% trans %}Default Language{% endtrans %}</dt>
+            <dd>{{ indico_config.DefaultLocale }}</dd>
+            <dt>{% trans %}Default Timezone{% endtrans %}</dt>
+            <dd>{{ indico_config.DefaultTimezone }}</dd>
+            <dt>{% trans %}Admin Email{% endtrans %}</dt>
+            <dd>{{ indico_config.SupportEmail }}</dd>
+            <dt>{% trans %}Support Email{% endtrans %}</dt>
+            <dd>{{ indico_config.PublicSupportEmail }}</dd>
+            <dt>{% trans %}No-Reply Email{% endtrans %}</dt>
+            <dd>{{ indico_config.NoReplyEmail }}</dd>
+        </dl>
+    </section>
+{% endmacro %}
+
+{% macro render_site_settings(settings) %}
+    <section id="site-settings">
+        <header>
+            <h3>
+                {% trans %}Site{% endtrans %}
+                <a class="i-button borderless icon-settings"
+                   title="{% trans %}Edit Site Settings{% endtrans %}"
+                   data-title="{% trans %}Edit Site Settings{% endtrans %}"
+                   data-href="{{ url_for('.site_settings') }}"
+                   data-form-container="#site-settings .form-container"
+                   data-update="#site-settings"
+                   data-replace-update
+                   data-ajax-form></a>
+            </h3>
+        </header>
+        <div class="form-container">
+            <dl class="i-data-list">
+                <dt>{% trans %}Title{% endtrans %}</dt>
+                <dd>{{ settings.site_title }}</dd>
+                <dt>{% trans %}Organisation{% endtrans %}</dt>
+                <dd>{{ settings.site_organization }}</dd>
+            </dl>
+        </div>
+    </section>
+{% endmacro %}
+
+{% macro render_social_settings(settings) %}
+    <section id="social-settings">
+        <header>
+            <h3>
+                {% trans %}Social{% endtrans %}
+                <a href="#" class="i-button borderless icon-settings"
+                   title="{% trans %}Edit Social Settings{% endtrans %}"
+                   data-title="{% trans %}Edit Social Settings{% endtrans %}"
+                   data-href="{{ url_for('.social_settings') }}"
+                   data-form-container="#social-settings .form-container"
+                   data-update="#social-settings"
+                   data-replace-update
+                   data-ajax-form></a>
+            </h3>
+        </header>
+        <div class="form-container">
+            <dl class="i-data-list">
+                <dt>{% trans %}Enabled{% endtrans %}</dt>
+                <dd>{{ _('Yes') if settings.enabled else _('No') }}</dd>
+                <dt>{% trans %}Facebook App ID{% endtrans %}</dt>
+                <dd>{{ settings.facebook_app_id }}</dd>
+            </dl>
+        </div>
+    </section>
+{% endmacro %}

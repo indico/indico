@@ -357,10 +357,6 @@ class UHAdminLayoutSaveTemplateSet(URLHandler):
     _endpoint = 'admin.adminLayout-saveTemplateSet'
 
 
-class UHAdminLayoutSaveSocial(URLHandler):
-    _endpoint = 'admin.adminLayout-saveSocial'
-
-
 class UHTemplatesSetDefaultPDFOptions(URLHandler):
     _endpoint = 'admin.adminLayout-setDefaultPDFOptions'
 
