@@ -32,6 +32,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.cephalopod import settings as cephalopod_settings
+from indico.modules.core.settings import core_settings
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.menu import render_sidemenu
@@ -87,7 +88,6 @@ class WAdmins(wcomponents.WTemplated):
 
     def getVars(self):
         wvars = wcomponents.WTemplated.getVars(self)
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
         wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
         wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
                                                    key=methodcaller('getStraightFullName')))
@@ -97,7 +97,7 @@ class WAdmins(wcomponents.WTemplated):
                                     'contact': cephalopod_settings.get('contact_name'),
                                     'email': cephalopod_settings.get('contact_email'),
                                     'url': Config.getInstance().getBaseURL(),
-                                    'organisation': minfo.getOrganisation()}
+                                    'organisation': core_settings.get('site_organization')}
         return wvars
 
 
