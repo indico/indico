@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import render_template, session
+from sqlalchemy.exc import OperationalError
 
 from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import Config
@@ -27,12 +28,19 @@ def render_error(message, description, standalone=False):
         return render_template('standalone_error.html', error_message=message, error_description=description,
                                logo_url=logo_url)
     else:
-        return WPErrorWSGI(message, description).getHTML()
+        try:
+            return WPErrorWSGI(message, description).getHTML()
+        except OperationalError:
+            # If the error was caused while connecting the database,
+            # rendering the error page fails since e.g. the header/footer
+            # templates access the database or calls hooks doing so.
+            # In this case we simply fall-back to the standalone error
+            # page which does not show the indico UI around the error
+            # message but doesn't require any kind of DB connection.
+            return render_error(message, description, standalone=True)
 
 
 class WPErrorWSGI(WPDecorated, WPJinjaMixin):
-    SOCIAL_ENABLED = False
-
     def __init__(self, message, description):
         WPDecorated.__init__(self, None)
         self._message = message

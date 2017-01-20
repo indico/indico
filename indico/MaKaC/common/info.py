@@ -22,14 +22,9 @@ from indico.core import db
 
 
 class MaKaCInfo(Persistent):
-    """Holds and manages general information and data concerning each system
-    """
+    """Holds and manages general information and data concerning each system"""
 
     def __init__(self):
-        # server description fields
-        self._title = ""
-        self._organisation = ""
-
         # Global poster/badge templates
         self._defaultConference = None
 
@@ -42,21 +37,6 @@ class MaKaCInfo(Persistent):
         # if self._archivingVolume is empty the path would be:
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
-
-    def getTitle( self ):
-        return self._title
-
-    def setTitle( self, newTitle ):
-        self._title = newTitle.strip()
-
-    def getOrganisation( self ):
-        return self._organisation
-
-    def getAffiliation( self ):
-        return self._organisation
-
-    def setOrganisation( self, newOrg ):
-        self._organisation = newOrg.strip()
 
     def getDefaultConference(self):
         from MaKaC.conference import DefaultConference
