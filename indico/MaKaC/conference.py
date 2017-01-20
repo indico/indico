@@ -690,16 +690,6 @@ class Conference(CommonObjectBase):
             return None
         return self.as_event.get_session(friendly_id=int(sessionId))
 
-    def getSessionList( self ):
-        """Retruns a list of the conference session objects
-        """
-        return self.as_event.sessions
-
-    getSessionListSorted = getSessionList
-
-    def getNumberOfSessions(self):
-        return len(self.as_event.sessions)
-
     def getReviewManager(self, contrib):
         return self.getConfPaperReview().getReviewManager(contrib)
 

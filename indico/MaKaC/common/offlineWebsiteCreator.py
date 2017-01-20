@@ -365,7 +365,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
             for subcontrib in contrib.subcontributions:
                 self._getSubContrib(subcontrib)
 
-        for session in self._conf.getSessionList():
+        for session in self.event.sessions:
             self._getSession(session)
 
     def _get_menu_items(self):
