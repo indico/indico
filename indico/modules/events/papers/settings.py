@@ -24,10 +24,15 @@ from indico.util.struct.enum import RichIntEnum
 
 class PaperReviewingRole(RichIntEnum):
     __titles__ = [None, _('Judge'), _('Layout Reviewer'), _('Content Reviewer')]
+    __acl_roles__ = [None, 'paper_judge', 'paper_layout_reviewer', 'paper_content_reviewer']
 
     judge = 1
     layout_reviewer = 2
     content_reviewer = 3
+
+    @property
+    def acl_role(self):
+        return self.__acl_roles__[self]
 
 
 class RoleConverter(SettingConverter):

@@ -15,12 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global applySearchFilters:false */
-
 (function(global) {
     'use strict';
 
-    var searchBoxConfig, totalDurationDisplay;
+    var totalDurationDisplay;
 
     function formatState(visible, total) {
         return '{0} / {1}'.format('<strong>{0}</strong>'.format(visible.length), total.length);
@@ -40,7 +38,6 @@
         var $state = $(searchBoxConfig.state);
         var $visibleEntries, m;
         var $filterPlaceholder = $(searchBoxConfig.placeholder);
-
         $filterPlaceholder.hide();
         $state.removeClass('active');
 

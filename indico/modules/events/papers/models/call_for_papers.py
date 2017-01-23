@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.reviews import PaperReviewType
-from indico.modules.events.papers.settings import paper_reviewing_settings
+from indico.modules.events.papers.settings import paper_reviewing_settings, PaperReviewingRole
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
 from indico.util.caching import memoize_request
@@ -130,3 +130,17 @@ class CallForPapers(object):
     @property
     def rating_range(self):
         return tuple(paper_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
+
+    def is_judge(self, user):
+        return self.event.can_manage(user, role='paper_judge', explicit_role=True)
+
+    def is_reviewer(self, user, role=None):
+        if role:
+            enabled = {
+                PaperReviewingRole.content_reviewer: self.content_reviewing_enabled,
+                PaperReviewingRole.layout_reviewer: self.layout_reviewing_enabled,
+            }
+            return enabled[role] and self.event.can_manage(user, role=role.acl_role, explicit_role=True)
+        else:
+            return (self.is_reviewer(user, PaperReviewingRole.content_reviewer) or
+                    self.is_reviewer(user, PaperReviewingRole.layout_reviewer))

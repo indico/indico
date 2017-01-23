@@ -1,0 +1,68 @@
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+
+{% macro render_user_papers_list(event, contributions, to_review=false, reviewed=false) %}
+    <section>
+        {% if to_review %}
+            {% set reviewing_list_id = 'to-review-list' %}
+        {% elif reviewed %}
+            {% set reviewing_list_id = 'reviewed-list' %}
+        {% else %}
+            {% set reviewing_list_id = '' %}
+        {% endif %}
+        <div id="{{ reviewing_list_id }}" class="display-contribution-list">
+            <ul>
+                {% for contribution in contributions %}
+                    {% set latest_revision = contribution.paper.last_revision %}
+                    <div class="contribution-row">
+                        <li>
+                            <div class="row-title">
+                                <a href="{{ url_for('.paper_timeline', contribution) }}" data-searchable="{{ contribution.title|lower }}">
+                                    {{- contribution.title -}}
+                                </a>
+                            </div>
+                            <div class="row-content flexrow f-j-space-between">
+                                <div>
+                                    {% if reviewed or to_review -%}
+                                        <div class="submitter icon-user" data-searchable="{{ latest_revision.submitter.display_full_name|lower }}">
+                                            {{ latest_revision.submitter.display_full_name }}
+                                        </div>
+                                        <div>
+                                            {% if session.user in contribution.paper_layout_reviewers %}
+                                                <div class="label i-tag layout-reviewer review-role">
+                                                    {%- trans %}Layout{% endtrans -%}
+                                                    {% if latest_revision.has_user_reviewed(session.user, 'layout') %}
+                                                        <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                            {% if session.user in contribution.paper_content_reviewers %}
+                                                <div class="label i-tag content-reviewer review-role">
+                                                    {%- trans %}Content{% endtrans -%}
+                                                    {% if latest_revision.has_user_reviewed(session.user, 'content') %}
+                                                        <i class="icon-circle-small" title="{% trans %}Already reviewed{% endtrans %}"></i>
+                                                    {% endif %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="label i-tag {{ latest_revision.state.name }}">
+                                        {{ latest_revision.state.title }}
+                                    </div>
+                                </div>
+                                <div>
+{#                                    TODO: List attached files #}
+            {#                        {% for file in latest_revision.files %}#}
+            {#                            <a href="... link to the gfile...">{{ file.title }}</a><br>#}
+            {#                        {% endfor %}#}
+                                    <a>file_name.pdf</a><br>
+                                    <a>file_name.pdf</a><br>
+                                    <a>file_name.pdf</a><br>
+                                </div>
+                            </div>
+                        </li>
+                    </div>
+                {% endfor %}
+            </ul>
+        </div>
+    </section>
+{% endmacro %}
