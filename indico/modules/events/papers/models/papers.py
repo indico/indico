@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.settings.proxy import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
+from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii
 
@@ -66,3 +67,39 @@ class Paper(ProposalMixin):
     @state.setter
     def state(self, state):
         self.last_revision.state = state
+
+    def is_in_final_state(self):
+        return self.state in {PaperRevisionState.accepted or PaperRevisionState.rejected}
+
+    def can_comment(self, user):
+        if not user:
+            return False
+        return self.can_submit(user) or self.can_judge(user) or self.can_review(user)
+
+    def can_submit(self, user):
+        if not user:
+            return False
+        return any(x.person.user == user for x in self.contribution.person_links if x.person.user)
+
+    def can_manage(self, user):
+        if not user:
+            return False
+        return self.contribution.can_manage(user)
+
+    def can_judge(self, user, check_state=False):
+        if not user:
+            return False
+        elif check_state and self.is_in_final_state():
+            return False
+        elif self.can_manage(user):
+            return True
+        return user in self.contribution.paper_judges
+
+    def can_review(self, user, check_state=False):
+        if not user:
+            return False
+        elif check_state and self.is_in_final_state():
+            return False
+        elif self.can_manage(user):
+            return True
+        return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
