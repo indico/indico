@@ -30,14 +30,11 @@
             state: '#filtering-state',
             placeholder: '#filter-placeholder'
         };
-        var applySearchFilters = setupSearchBox(filterConfig);
-
+        var applySearchFilters = setupListGenerator(filterConfig);
         abstractListContainer.on('indico:htmlUpdated', function() {
             abstractListContainer.find('.js-mathjax').mathJax();
             _.defer(applySearchFilters);
         });
-
-        setupListGenerator(filterConfig);
     };
 
     global.setupAbstractEmailTemplatesPage = function setupAbstractEmailTemplatesPage() {
