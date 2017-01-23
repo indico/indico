@@ -182,3 +182,22 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
         if self.paper.cfp.layout_reviewing_enabled and user in self.paper.cfp.layout_reviewers:
             reviewed_for.add(PaperReviewType.layout)
         return set(map(PaperTypeProxy, reviewed_for))
+
+    def has_user_reviewed(self, user, review_type=None):
+        from indico.modules.events.papers.models.reviews import PaperReviewType
+        if review_type:
+            for review in self.reviews:
+                if review.user == user and review.type == PaperReviewType[review_type]:
+                    return True
+            return False
+        else:
+            layout_review = next((review for review in self.reviews
+                                  if review.user == user and review.type == PaperReviewType.layout), None)
+            content_review = next((review for review in self.reviews
+                                   if review.user == user and review.type == PaperReviewType.content), None)
+            if user in self._contribution.paper_layout_reviewers and user in self._contribution.paper_content_reviewers:
+                return layout_review and content_review
+            elif user in self._contribution.paper_layout_reviewers:
+                return layout_review
+            elif user in self._contribution.paper_content_reviewers:
+                return content_review

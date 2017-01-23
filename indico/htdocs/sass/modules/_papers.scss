@@ -63,3 +63,118 @@
         width: 4rem;
     }
 }
+
+.display-contribution-list {
+    @extend %font-family-modern-body;
+
+    .contribution-row {
+        @include border-left($width: 3px);
+        padding-left: 10px;
+        margin-bottom: 1em;
+
+        &:hover {
+            border-color: $blue;
+        }
+
+        .row-title {
+            @include border-bottom();
+            font-size: 14pt;
+        }
+
+        .submitter {
+            color : $light-black;
+            margin-top: 7px;
+        }
+
+        .label {
+            border: 0;
+            margin-top: 7px;
+            display: inline-block;
+            padding: 5px 7px;
+
+            &.review-role {
+                @include border-all($gray);
+                margin-right: 10px;
+                background-color: white;
+                color: $light-black;
+
+                i {
+                    color: $blue;
+                }
+            }
+
+            &.submitted {
+                background-color: $blue;
+            }
+
+            &.accepted {
+                background-color: $green;
+            }
+
+            &.rejected {
+                background-color: $red;
+            }
+
+            &.to_be_corrected {
+                background-color: $yellow;
+            }
+
+        }
+        .paper-list ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+    }
+
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+}
+
+.call-for-papers {
+    .cfp-infoline-section {
+        .infoline {
+            float: none;
+        }
+    }
+
+    .cfp-announcement {
+        color: $light-black;
+        padding: 20px 0 10px;
+    }
+}
+
+.display-contribution-list ul {
+    list-style-type: none;
+    padding-left: 0;
+}
+
+.deadline-info {
+    @include border-all($blue);
+    background: $light-blue;
+    padding: 10px;
+
+    .label {
+        font-size: 11pt;
+        font-weight: bold;
+        color: $blue;
+        margin-bottom: 5px;
+    }
+
+    .text {
+        color: $light-black;
+        position: relative;
+    }
+
+    .icon {
+        color: $blue;
+        float: left;
+        font-size: 2rem;
+        padding-right: 0.5em;
+    }
+
+    span {
+        margin-right: 5px;
+    }
+}

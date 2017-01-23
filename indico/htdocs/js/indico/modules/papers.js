@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false, applySearchFilters:false, setupTableSorter:false */
+/* global setupListGenerator:false, applySearchFilters:false, setupTableSorter:false. setupSearchBox:false */
 
 (function(global) {
     'use strict';
@@ -36,5 +36,34 @@
             applySearchFilters();
         });
         setupListGenerator(filterConfig);
+    };
+
+    global.setupReviewingAreaList = function setupReviewingAreaList(options) {
+        options = $.extend({
+            hasPapers: false
+        }, options);
+
+        if (options.hasPapers) {
+            var filterConfig = {
+                itemHandle: 'div.contribution-row'
+            };
+            if (options.list === 'to-review') {
+                filterConfig = $.extend({
+                    listItems: '#to-review-list div.contribution-row',
+                    term: '#search-input-to-review',
+                    state: '#filtering-state-to-review',
+                    placeholder: '#filter-placeholder-to-review'
+                }, filterConfig);
+            } else {
+                filterConfig = $.extend({
+                    listItems: '#reviewed-list div.contribution-row',
+                    term: '#search-input-reviewed',
+                    state: '#filtering-state-reviewed',
+                    placeholder: '#filter-placeholder-reviewed'
+                }, filterConfig);
+            }
+            var applySearchFilters = setupSearchBox(filterConfig);
+            applySearchFilters();
+        }
     };
 })(window);
