@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.core.db.sqlalchemy.descriptions import DescriptionMixin
+from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 
@@ -31,6 +31,9 @@ def _get_next_position(context):
 class Track(DescriptionMixin, db.Model):
     __tablename__ = 'tracks'
     __table_args__ = {'schema': 'events'}
+
+    possible_render_modes = {RenderMode.markdown}
+    default_render_mode = RenderMode.markdown
 
     id = db.Column(
         db.Integer,
