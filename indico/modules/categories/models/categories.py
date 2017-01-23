@@ -203,6 +203,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     # - favorite_of (User.favorite_categories)
     # - legacy_mapping (LegacyCategoryMapping.category)
     # - parent (Category.children)
+    # - settings (CategorySetting.category)
     # - suggestions (SuggestedCategory.category)
 
     @hybrid_property
