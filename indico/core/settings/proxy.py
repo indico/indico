@@ -219,3 +219,43 @@ class AttributeProxyProperty(object):
 
     def __delete__(self, obj):
         delattr(getattr(obj, obj.proxied_attr), self.attr)
+
+
+class FallbackSettingsProxy(object):
+    """A SettingsProxy that chains others together.
+
+    Basically this allows for stuff such as `proxy1.get('foo', proxy2.get('bar', default='baz'))` to
+    be done in a more manageable way.
+    """
+
+    default_sentinel = object()
+
+    def __init__(self, *proxies):
+        """Create a proxy that chains others together.
+
+        :param proxies: proxies can be specified as positional arguments, one by one. The first one will be
+                        the one that will be checked first, and so on. They should share the same key parameters.
+        """
+        self.proxies = proxies
+
+    def get(self, *args, **kwargs):
+        """Retrieve a property from the proxy chain.
+
+        :param args: the arguments used as key parameters for the proxy (typically a property name)
+        """
+        default = kwargs.get('default', FallbackSettingsProxy.default_sentinel)
+        for proxy in self.proxies[:-1]:
+            value = proxy.get(*args, default=FallbackSettingsProxy.default_sentinel)
+            if value is not FallbackSettingsProxy.default_sentinel:
+                return value
+
+        return self.proxies[-1].get(*args, default=(default if default is not FallbackSettingsProxy.default_sentinel
+                                                    else SettingsProxyBase.default_sentinel))
+
+    def get_all(self):
+        """Retrieve all properties in a fallback proxy chain."""
+        result = {}
+        result.update(self.proxies[-1].get_all())
+        for proxy in self.proxies[::-1][1:]:
+            result.update(proxy.get_all(no_defaults=True))
+        return result
