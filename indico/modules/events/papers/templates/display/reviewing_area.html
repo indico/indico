@@ -1,0 +1,102 @@
+{% extends 'layout/conference_page_base.html' %}
+{% from 'events/papers/display/_paper_list.html' import render_user_papers_list %}
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
+{% from 'message_box.html' import message_box %}
+
+{% block title %}
+    {%- trans %}Reviewing Area{% endtrans -%}
+{% endblock %}
+
+{% block description %}
+    {%- trans %}The reviewing area shows the papers for which you are a reviewer.{% endtrans -%}
+{% endblock %}
+
+{% block content %}
+    {% set layout_deadline = event.cfp.layout_reviewer_deadline %}
+    {% set content_deadline = event.cfp.content_reviewer_deadline %}
+    {% if layout_deadline or content_deadline %}
+        <div class="deadline-info">
+            {% set tz = event.timezone %}
+            <span class="icon icon-calendar"></span>
+            <div class="label">{% trans %}Reviewing deadlines{% endtrans %}</div>
+            <div class="text">
+                {% if layout_deadline %}
+                    <span>
+                        {% trans date=layout_deadline|format_date(timezone=tz), time=layout_deadline|format_time(timezone=tz) -%}
+                            Layout reviewing ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+                        {%- endtrans %}
+                    </span>
+                {% endif %}
+                {% if content_deadline %}
+                    <span>
+                        {% trans date=content_deadline|format_date(timezone=tz), time=content_deadline|format_time(timezone=tz) -%}
+                            Content reviewing ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+                        {%- endtrans %}
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    <section>
+        <div class="header">
+            <div class="header-row">
+                <h3>{% trans %}Papers to review{% endtrans %}</h3>
+                <div class="toolbar thin">
+                    <div class="group">
+                        <div id="filter-statistics" class="group">
+                            {{- render_displayed_entries_fragment(contribs_to_review|length, contribs_to_review|length, id='filtering-state-to-review') -}}
+                        </div>
+                        <div class="group">
+                            <span class="i-button label icon-search"></span>
+                            <input type="text" id="search-input-to-review" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if contribs_to_review %}
+            {{ render_user_papers_list(event, contribs_to_review, to_review=True) }}
+        {% else %}
+            {%- call message_box('info') %}
+                {%- trans %}There are no papers left to review.{% endtrans %}
+            {%- endcall %}
+        {% endif %}
+        <div id="filter-to-review-placeholder"></div>
+    </section>
+    <section>
+        <div class="header">
+            <div class="header-row">
+                <h3>{% trans %}Reviewed papers{% endtrans %}</h3>
+                <div class="toolbar thin">
+                    <div class="group">
+                        <div id="filter-statistics" class="group">
+                            {{- render_displayed_entries_fragment(reviewed_contribs|length, reviewed_contribs|length, id='filtering-state-reviewed') -}}
+                        </div>
+                        <div class="group">
+                            <span class="i-button label icon-search"></span>
+                            <input type="text" id="search-input-reviewed" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if reviewed_contribs %}
+            {{ render_user_papers_list(event, reviewed_contribs, reviewed=True) }}
+        {% else %}
+            {%- call message_box('info') %}
+                {%- trans %}You haven't reviewed any papers yet.{% endtrans %}
+            {%- endcall %}
+        {% endif %}
+        <div id="filter-reviewed-placeholder"></div>
+    </section>
+    <script>
+        setupReviewingAreaList({
+            hasPapers: {{ contribs_to_review|bool|tojson }},
+            list : 'to-review'
+        });
+        setupReviewingAreaList({
+            hasPapers: {{ reviewed_contribs|bool|tojson }},
+            list : 'reviewed'
+        });
+    </script>
+{% endblock %}
