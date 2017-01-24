@@ -86,6 +86,26 @@
     {% endfor %}
 {%- endmacro %}
 
+{% macro render_speakers(contribution) %}
+    <section>
+        <div class="header">
+            <div class="header-row">
+                <h3>
+                    {%- trans count=contribution.speakers|length -%}
+                        Speaker
+                    {%- pluralize -%}
+                        Speakers
+                    {%- endtrans -%}
+                </h3>
+            </div>
+        </div>
+        <div class="speaker-list">
+            {{ render_users(contribution.speakers|sort(attribute='display_order_key'),
+                            span_class='speaker-item icon-user', separator='') }}
+        </div>
+    </section>
+{% endmacro %}
+
 {% macro render_datetime(prop_name, dt, timezone, format='medium', show_weekday=false) -%}
     <time itemprop="{{ prop_name }}" datetime="{{ dt.isoformat() }}">
         {% if show_weekday %}

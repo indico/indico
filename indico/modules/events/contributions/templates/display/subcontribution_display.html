@@ -1,7 +1,7 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'events/display/common/_conferences.html' import render_attachments %}
-{% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'events/display/indico/_common.html' import render_location, render_speakers %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
 
@@ -29,7 +29,7 @@
 {% endblock %}
 
 {% block page_actions -%}
-    <div class="toolbar right">
+    <div class="toolbar">
         {% if subcontrib.can_manage(session.user) -%}
             <a href="#" class="i-button icon-edit"
                data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
@@ -41,31 +41,7 @@
 {%- endblock %}
 
 {% block content -%}
-    <div class="item-text">
-        <div class="infogrid condensed">
-            {% if subcontrib.speakers %}
-                <h3>
-                    {%- trans count=subcontrib.speakers|length -%}
-                        Speaker
-                    {%- pluralize -%}
-                        Speakers
-                    {%- endtrans -%}
-                </h3>
-                <div class="speaker-list">
-                    {{ render_users(subcontrib.speakers|sort(attribute='display_order_key'),
-                                    span_class='speaker-item icon-user', separator='') }}
-                </div>
-            {% endif %}
-        </div>
-        {% if subcontrib.description %}
-            <h3>{% trans %}Description{% endtrans %}</h3>
-            <div class="description js-mathjax">
-                {{ subcontrib.description }}
-            </div>
-        {% endif %}
-    </div>
-
-
+    {{ render_speakers(subcontrib) }}
     {{ render_attachments(subcontrib) }}
 
     <script>

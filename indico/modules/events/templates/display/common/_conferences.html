@@ -1,26 +1,31 @@
 {% from 'attachments/_attachments.html' import render_attachments as _render_attachments %}
 
 {% macro render_attachments(item) %}
-    <div class="item-attachments">
-        {% if item.can_manage_attachments(session.user) -%}
-            <a href="#" class="icon-edit i-button right"
-               data-locator="{{ item.locator|tojson|forceescape }}"
-               data-attachment-editor
-               data-reload-on-change></a>
-        {%- endif %}
+    <section class="item-attachments">
+        <div class="header">
+            <div class="header-row">
+                <h3 class="icon-attachment">
+                    {%- trans %}Presentation Materials{% endtrans -%}
+                </h3>
+                {% if item.can_manage_attachments(session.user) -%}
+                    <div class="toolbar">
+                        <a href="#" class="icon-edit i-button"
+                           data-locator="{{ item.locator|tojson|forceescape }}"
+                           data-attachment-editor
+                           data-reload-on-change></a>
+                    </div>
+                {%- endif %}
+            </div>
+        </div>
 
-        <h3 class="icon-attachment">
-            {%- trans %}Presentation Materials{% endtrans -%}
-        </h3>
-    </div>
-
-    <div class="i-box-group vert">
-        <div class="i-box no-padding">
-            <div class="i-box-content">
-                <div class="attachments-box">
-                    {{ _render_attachments(item.attached_items, management=false) }}
+        <div class="i-box-group vert">
+            <div class="i-box no-padding">
+                <div class="i-box-content">
+                    <div class="attachments-box">
+                        {{ _render_attachments(item.attached_items, management=false) }}
+                    </div>
                 </div>
             </div>
         </div>
-</div>
+    </section>
 {% endmacro %}
