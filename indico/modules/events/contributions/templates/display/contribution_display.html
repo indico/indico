@@ -159,7 +159,7 @@
         {% endif %}
     {% endfor %}
 
-    <table id="other-fields">
+    <table class="other-fields">
         {% for field_value in contribution.field_values %}
             {% set field = field_value.contribution_field %}
             {% if field.field_type == 'single_choice' or not field.field_data.multiline %}
