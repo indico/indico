@@ -1,7 +1,7 @@
 {% extends 'layout/conference_page_base.html' %}
 
 {% from 'events/display/common/_conferences.html' import render_attachments %}
-{% from 'events/display/indico/_common.html' import render_location, render_users %}
+{% from 'events/display/indico/_common.html' import render_location, render_users, render_speakers %}
 {% from 'events/papers/_contributions.html' import render_paper_section %}
 
 {% block page_class %}conference-page item-summary{% endblock %}
@@ -47,8 +47,41 @@
 {%- endblock %}
 
 {% block info -%}
-    <div>
-        <div class="right">
+    <div class="flexrow f-j-space-between">
+        <div>
+            <div class="time-data">
+                <i class="icon-calendar header-data"></i>
+                <span class="time-info">
+                    {%- if contribution.timetable_entry %}
+                        {{- contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event_new.display_tzinfo) -}}
+                    {% else %}
+                        {%- trans %}Not scheduled{% endtrans -%}
+                    {% endif -%}
+                </span>
+            </div>
+            {% if contribution.timetable_entry -%}
+                <div class="time-data">
+                    <i class="icon-time header-data"></i>
+                    <span class="time-info" title="{% trans %}Duration{% endtrans %}">
+                        {{ contribution.timetable_entry.duration|format_human_timedelta(narrow=true) }}
+                    </span>
+                </div>
+            {%- endif %}
+            {% if contribution.has_location_info %}
+                <div class="location-data">
+                    {{ render_location(contribution, class='contribution-location') }}
+                </div>
+            {% endif %}
+            {% if contribution.board_number -%}
+                <div class="board-data">
+                    <i class="icon-price-tag header-data"></i>
+                    <span class="board-info">
+                        {% trans board_number=contribution.board_number %}Board: {{ board_number }}{% endtrans %}
+                    </span>
+                </div>
+            {%- endif %}
+        </div>
+        <div>
             {% if contribution.type -%}
                 <span class="contrib-type">
                     {{ contribution.type.name }}
@@ -66,64 +99,29 @@
                 </span>
             {%- endif %}
         </div>
-        <div class="time-data">
-            <i class="icon-calendar header-data"></i>
-            <span class="time-info">
-                {% if contribution.timetable_entry -%}
-                    {{ contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event_new.display_tzinfo) }}
-                {%- else -%}
-                    {% trans %}Not scheduled{% endtrans %}
-                {%- endif %}
-            </span>
-        </div>
-        {% if contribution.timetable_entry -%}
-            <div class="time-data">
-                <i class="icon-time header-data"></i>
-                <span class="time-info" title="{% trans %}Duration{% endtrans %}">
-                    {{ contribution.timetable_entry.duration|format_human_timedelta(narrow=true) }}
-                </span>
-            </div>
-        {%- endif %}
-        {% if contribution.has_location_info %}
-            <div class="location-data">
-                {{ render_location(contribution, class='contribution-location') }}
-            </div>
-        {% endif %}
-        {% if contribution.board_number -%}
-            <div class="board-data">
-                <i class="icon-price-tag header-data"></i>
-                <span class="board-info">
-                    {% trans board_number=contribution.board_number %}Board: {{ board_number }}{% endtrans %}
-                </span>
-            </div>
-        {%- endif %}
     </div>
 {%- endblock %}
 
 {% block page_actions -%}
-    <div class="toolbar right">
+    <div class="toolbar">
         {% if contribution.can_manage(session.user) -%}
-            <div class="group">
-                <a href="#" class="i-button icon-edit"
-                   data-title="{% trans %}Edit contribution{% endtrans %}"
-                   data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
-                   data-ajax-dialog
-                   data-reload-after></a>
-            </div>
+            <a href="#" class="i-button icon-edit"
+               data-title="{% trans %}Edit contribution{% endtrans %}"
+               data-href="{{ url_for('contributions.manage_update_contrib', contribution) }}"
+               data-ajax-dialog
+               data-reload-after></a>
         {%- endif %}
-        <div class="group">
-            <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
-            {% if contribution.timetable_entry -%}
-                {% if g.static_site %}
-                    <a href="{{ url_for('contributions.export_ics', contribution) }}"
-                       class="i-button icon-calendar"></a>
-                {% else %}
-                    <a id="exportIcal{{ contribution.id }}" href="#"
-                       class="i-button icon-calendar js-export-ical"
-                       data-id="{{ contribution.id }}"></a>
-                {% endif %}
-            {%- endif %}
-        </div>
+        <a href="{{ url_for('contributions.export_pdf', contribution) }}" class="i-button icon-file-pdf"></a>
+        {% if contribution.timetable_entry -%}
+            {% if g.static_site %}
+                <a href="{{ url_for('contributions.export_ics', contribution) }}"
+                   class="i-button icon-calendar"></a>
+            {% else %}
+                <a id="exportIcal{{ contribution.id }}" href="#"
+                   class="i-button icon-calendar js-export-ical"
+                   data-id="{{ contribution.id }}"></a>
+            {% endif %}
+        {%- endif %}
 
         {% if contribution.timetable_entry -%}
             {% with item=contribution, ics_url=url_for('contributions.export_ics', contribution) -%}
@@ -134,50 +132,46 @@
 {%- endblock %}
 
 {% block content -%}
-    <div class="item-text">
-        {% if contribution.speakers %}
-            <h3>
-                {%- trans count=contribution.speakers|length -%}
-                    Speaker
-                {%- pluralize -%}
-                    Speakers
-                {%- endtrans -%}
-            </h3>
-            <div class="speaker-list">
-                {{ render_users(contribution.speakers|sort(attribute='display_order_key'),
-                                span_class='speaker-item icon-user', separator='') }}
-            </div>
-        {% endif %}
+    {% if contribution.speakers %}
+        {{- render_speakers(contribution) -}}
+    {% endif %}
 
-        {% if contribution.description %}
-            <h3>{% trans %}Description{% endtrans %}</h3>
+    {% if contribution.description %}
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}Description{% endtrans %}</h3>
+                </div>
+            </div>
             <div class="description js-mathjax">
                 {{ contribution.description }}
             </div>
-        {% endif %}
+        </section>
+    {% endif %}
 
+    {% for field_value in contribution.field_values %}
+        {% set field = field_value.contribution_field %}
+        {% if field.field_type == 'text' and field.field_data.multiline %}
+            <h3>{{ field.title }}</h3>
+            <div id="field-{{ field.id }}">
+                {{ field_value.data | markdown }}
+            </div>
+        {% endif %}
+    {% endfor %}
+
+    <table id="other-fields">
         {% for field_value in contribution.field_values %}
             {% set field = field_value.contribution_field %}
-            {% if field.field_type == 'text' and field.field_data.multiline %}
-                <h3>{{ field.title }}</h3>
-                <div id="field-{{ field.id }}">
-                    {{ field_value.data | markdown }}
-                </div>
+            {% if field.field_type == 'single_choice' or not field.field_data.multiline %}
+                {{ _render_field_value(field_value) }}
             {% endif %}
         {% endfor %}
+    </table>
 
-        <table id="other-fields">
-            {% for field_value in contribution.field_values %}
-                {% set field = field_value.contribution_field %}
-                {% if field.field_type == 'single_choice' or not field.field_data.multiline %}
-                    {{ _render_field_value(field_value) }}
-                {% endif %}
-            {% endfor %}
-        </table>
-
-        <div class="infogrid condensed">
-            {% if contribution.primary_authors %}
-                <div class="infoline">
+    {% if contribution.primary_authors %}
+        <section>
+            <div class="header">
+                <div class="header-row">
                     <h3>
                         {% trans count=contribution.primary_authors|length -%}
                             Primary author
@@ -185,12 +179,16 @@
                             Primary authors
                         {%- endtrans %}
                     </h3>
-                    {{ render_author_list(contribution.primary_authors) }}
                 </div>
-            {% endif %}
+            </div>
+            {{ render_author_list(contribution.primary_authors) }}
+        </section>
+    {% endif %}
 
-            {% if contribution.secondary_authors %}
-                <div class="infoline">
+    {% if contribution.secondary_authors %}
+        <section>
+            <div class="header">
+                <div class="header-row">
                     <h3>
                         {% trans count=contribution.secondary_authors -%}
                             Co-author
@@ -198,40 +196,47 @@
                             Co-authors
                         {%- endtrans %}
                     </h3>
-                    {{ render_author_list(contribution.secondary_authors) }}
                 </div>
-            {% endif %}
-        </div>
-    </div>
+            </div>
+            {{ render_author_list(contribution.secondary_authors) }}
+        </section>
+    {% endif %}
 
     {{ render_attachments(contribution) }}
 
     {% if contribution.subcontributions -%}
-        <h3>{% trans %}Subcontributions{% endtrans %}</h3>
-        <div class="i-box no-padding">
-            <div class="i-box-content">
-                <ul class="group-list no-content-before with-buttons">
-                    {% for subcontrib in contribution.subcontributions -%}
-                        <li>
-                            <span>
-                                <a class="js-mathjax" href="{{ url_for('contributions.display_subcontribution', subcontrib) }}">
-                                    {{ subcontrib.title }}
-                                </a>
-                            </span>
-                            {% if subcontrib.can_manage(session.user) -%}
-                                <span class="right group">
-                                    <a href="#" class="icon-edit"
-                                       data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib) }}"
-                                       data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
-                                       data-ajax-dialog
-                                       data-reload-after></a>
-                                </span>
-                            {%- endif %}
-                        </li>
-                    {%- endfor %}
-                </ul>
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}Subcontributions{% endtrans %}</h3>
+                </div>
             </div>
-        </div>
+            <div class="i-box no-padding">
+                <div class="i-box-content">
+                    <ul class="group-list no-content-before with-buttons">
+                        {% for subcontrib in contribution.subcontributions -%}
+                            <li class="flexrow f-j-space-between">
+                                <span class="text">
+                                    <a class="js-mathjax"
+                                       href="{{ url_for('contributions.display_subcontribution', subcontrib) }}">
+                                        {{- subcontrib.title -}}
+                                    </a>
+                                </span>
+                                {% if subcontrib.can_manage(session.user) -%}
+                                    <span>
+                                        <a href="#" class="icon-edit"
+                                           data-href="{{ url_for('contributions.manage_edit_subcontrib', subcontrib) }}"
+                                           data-title="{% trans title=subcontrib.title %}Edit subcontribution '{{ title }}'{% endtrans %}"
+                                           data-ajax-dialog
+                                           data-reload-after></a>
+                                    </span>
+                                {%- endif %}
+                            </li>
+                        {%- endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
     {%- endif %}
 
     {{ render_paper_section(contribution, show_paper=show_paper) }}
