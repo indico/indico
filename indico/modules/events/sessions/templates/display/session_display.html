@@ -8,11 +8,11 @@
 {% block page_class %}conference-page item-summary{% endblock %}
 
 {% block title %}
-    {% trans %}Session{% endtrans %}
+    {%- trans %}Session{% endtrans -%}
 {% endblock %}
 
 {% block subtitle %}
-    {{ sess.title }}
+    {{- sess.title -}}
 {% endblock %}
 
 {% block info %}
@@ -34,7 +34,7 @@
 {% endblock %}
 
 {% block page_actions -%}
-    <div class="toolbar right">
+    <div class="toolbar">
         {% if sess.can_manage(session.user) -%}
             <div class="group">
                 <a href="#" class="i-button icon-edit"
@@ -75,57 +75,69 @@
 
 {% block content -%}
     {% if sess.blocks and sess.conveners -%}
-        <div class="item-text">
-            <div class="infogrid condensed">
+        <section>
+            <div class="flexrow">
                 <div class="infoline">
-                    <div class="text">
-                        <h2>{% trans %}Conveners{% endtrans %}</h2>
-                        {% for block in sess.blocks -%}
-                            <h3>{{ block.full_title }}</h3>
-                            <ul>
-                                {% for convener in block.person_links -%}
-                                    <li class="icon-user">
-                                        {% if sess.can_manage(session.user) %}
-                                            <a href="mailto:{{ convener.person.email }}">
-                                                {{ convener.person.full_name }}
-                                            </a>
-                                        {% else %}
-                                            {{ convener.person.full_name }}
-                                        {% endif %}
-                                        ({{ convener.person.affiliation }})
-                                    </li>
-                                {%- else -%}
-                                    <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
-                                {%- endfor %}
-                            </ul>
-                        {%- endfor %}
+                    <div class="header">
+                        <div class="header-row">
+                            <h3>{% trans %}Conveners{% endtrans %}</h3>
+                        </div>
                     </div>
+                    {% for block in sess.blocks -%}
+                        <div class="header-row">
+                            <h4>{{ block.full_title }}</h4>
+                        </div>
+                        <ul>
+                            {% for convener in block.person_links -%}
+                                <li class="icon-user">
+                                    {% if sess.can_manage(session.user) %}
+                                        <a href="mailto:{{ convener.person.email }}">
+                                            {{ convener.person.full_name }}
+                                        </a>
+                                    {% else %}
+                                        {{ convener.person.full_name }}
+                                    {% endif %}
+                                    ({{ convener.person.affiliation }})
+                                </li>
+                            {%- else -%}
+                                <li>{% trans %}There are no conveners in this block{% endtrans %}</li>
+                            {%- endfor %}
+                        </ul>
+                    {%- endfor %}
                 </div>
             </div>
-        </div>
+        </section>
     {%- endif %}
 
     {% if sess.description %}
-        <h3>{% trans %}Description{% endtrans %}</h3>
-        <div class="description">
-            {{ sess.description }}
-        </div>
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}Description{% endtrans %}</h3>
+                </div>
+                <div class="description">
+                    {{ sess.description }}
+                </div>
+            </div>
+        </section>
     {% endif %}
 
     {{ render_attachments(sess) }}
 
-    <div class="item-subitems">
-        {% if sess.contributions %}
-            <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
-                {% trans %}Contribution list{% endtrans %}
-            </a>
-        {% endif %}
-        {% if not sess.is_poster %}
-            <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
-                {% trans %}Timetable{% endtrans %}
-            </a>
-        {% endif %}
-    </div>
+    <section>
+        <div class="item-subitems toolbar">
+            {% if sess.contributions %}
+                <a href="#" class="i-button icon-list js-switch-view" data-show="session-contrib-list">
+                    {%- trans %}Contribution list{% endtrans -%}
+                </a>
+            {% endif %}
+            {% if not sess.is_poster %}
+                <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
+                    {%- trans %}Timetable{% endtrans -%}
+                </a>
+            {% endif %}
+        </div>
+    </section>
 
     <div class="js-container">
         {% if sess.contributions %}
