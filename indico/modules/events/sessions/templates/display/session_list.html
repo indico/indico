@@ -5,50 +5,42 @@
 {% endblock %}
 
 {% block content %}
-    <table id="sessions-list" class="i-table-widget">
-        <thead>
-            <tr>
-                <th>{% trans %}Name{% endtrans %}</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for sess in sessions %}
-                <tr>
-                    <td>
-                        <a href="{{ url_for('.display_session', sess) }}">
-                            {{ sess.title }}
-                        </a>
-                    </td>
-                    <td>
-                        <div class="group right">
-                            {% if sess.can_manage(session.user) %}
-                                <a href="#" class="icon-edit" title="{% trans %}Edit session{% endtrans %}"
-                                   data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
-                                   data-href="{{ url_for('.modify_session', sess) }}"
-                                   data-ajax-dialog
-                                   data-reload-after></a>
-                                <a href="#" class="icon-shield" title="{% trans %}Manage protection{% endtrans %}"
-                                   data-title="{% trans title=sess.title %}Manage protection for session '{{ title }}'{% endtrans %}"
-                                   data-href="{{ url_for('.session_protection', sess) }}"
-                                   data-ajax-dialog
-                                   data-reload-after></a>
-                            {% endif %}
-                            <a href="{{ url_for('timetable.manage_session', sess) }}"
-                               class="icon-time"
-                               title="{% trans %}Manage timetable{% endtrans %}"></a>
-                        </div>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="2">
-                        {% trans %}You don't have any sessions at the moment.{% endtrans %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+     <section>
+        <div class="i-box no-padding">
+            <div class="i-box-content">
+                <ul class="group-list no-content-before with-buttons">
+                    {% for sess in sessions %}
+                        <li class="flexrow f-j-space-between">
+                            <span class="text">
+                                <a href="{{ url_for('.display_session', sess) }}">
+                                    {{- sess.title -}}
+                                </a>
+                            </span>
+                            <div class="group">
+                                {% if sess.can_manage(session.user) %}
+                                    <a href="#" class="icon-edit" title="{% trans %}Edit session{% endtrans %}"
+                                       data-title="{% trans title=sess.title %}Edit session '{{ title }}'{% endtrans %}"
+                                       data-href="{{ url_for('.modify_session', sess) }}"
+                                       data-ajax-dialog
+                                       data-reload-after></a>
+                                    <a href="#" class="icon-shield" title="{% trans %}Manage protection{% endtrans %}"
+                                       data-title="{% trans title=sess.title %}Manage protection for session '{{ title }}'{% endtrans %}"
+                                       data-href="{{ url_for('.session_protection', sess) }}"
+                                       data-ajax-dialog
+                                       data-reload-after></a>
+                                {% endif %}
+                                <a href="{{ url_for('timetable.manage_session', sess) }}"
+                                   class="icon-time"
+                                   title="{% trans %}Manage timetable{% endtrans %}"></a>
+                            </div>
+                        </li>
+                    {% else %}
+                        <li>{% trans %}You don't have any sessions at the moment.{% endtrans %}</li>
+                    {%- endfor %}
+                </ul>
+            </div>
+        </div>
+    </section>
     {% if event.type != 'conference' -%}
         <p>
             <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
