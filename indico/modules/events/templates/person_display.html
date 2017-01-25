@@ -2,14 +2,10 @@
 
 {% macro details_table_row(caption, value) %}
     {% if value %}
-        <tr class="i-table content">
-            <td class="i-table caption">
-                {{ caption }}
-            </td>
-            <td class="i-table value">
-                {{ value }}
-            </td>
-        </tr>
+        <div>
+            <label>{{ caption }}</label>
+            <span class="text-normal">{{ value }}</span>
+        </div>
     {% endif %}
 {% endmacro %}
 
@@ -20,26 +16,36 @@
 {%- endblock %}
 
 {% block content %}
-    <table class="i-table fixed-width no-margin author-info">
-        {{ details_table_row(_("Title"), author.title) }}
-        {{ details_table_row(_("Affiliation"), author.affiliation) }}
-    </table>
+    <section>
+        {{ details_table_row(_('Title:'), author.title) }}
+        {{ details_table_row(_('Affiliation:'), author.affiliation) }}
+    </section>
     {% if contribs -%}
-        <table class="i-table">
-            <tr>
-                <th style="text-align: left;">
-                    <h3>{% trans %}Author in the following contribution(s){% endtrans %}</h3>
-                </th>
-            </tr>
-            {% for contrib in contribs -%}
-                <tr class="i-table">
-                    <td class="i-table">
-                        <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
-                            {{ contrib.title }}
-                        </a>
-                    </td>
-                </tr>
-            {%- endfor %}
-        </table>
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>
+                        {%- trans count=contribs|length -%}
+                            Author in the following contribution
+                        {%- pluralize -%}
+                            Author in the following contributions
+                        {%- endtrans -%}
+                    </h3>
+                </div>
+            </div>
+            <div class="i-box">
+                <div class="i-box-content">
+                    <ul class="group-list no-content-before">
+                        {% for contrib in contribs -%}
+                            <li>
+                                <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                                    {{- contrib.title -}}
+                                </a>
+                            </li>
+                        {%- endfor %}
+                    </ul>
+                </div>
+            </div>
+        </section>
     {%- endif %}
 {% endblock %}
