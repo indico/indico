@@ -86,7 +86,7 @@ class RHAbstractNotificationLog(RHAbstractBase):
         return self.abstract.can_judge(session.user)
 
     def _process(self):
-        return WPManageAbstracts.render_template('abstract/notification_log.html', self._conf, abstract=self.abstract)
+        return WPManageAbstracts.render_template('reviewing/notification_log.html', self._conf, abstract=self.abstract)
 
 
 class RHAbstractExportPDF(RHAbstractBase):
