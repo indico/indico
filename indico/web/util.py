@@ -42,7 +42,7 @@ def _pop_injected_js():
 
 
 def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
-                 disabled_fields=(), form_header_kwargs=None, skip_labels=False):
+                 disabled_fields=(), form_header_kwargs=None, skip_labels=False, save_reminder=False):
     """Returns a json response containing a rendered WTForm.
 
     This ia shortcut to the ``simple_form`` jinja macro to avoid
@@ -61,6 +61,9 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
     :param form_header_kwargs: Keyword arguments passed to the
                                ``form_header`` macro
     :param skip_labels: Whether to show labels on the fields
+    :param save_reminder: Whether to show a message when the form has
+                          been modified and the save button is not
+                          visible
     """
     if submit is None:
         submit = _('Save')
