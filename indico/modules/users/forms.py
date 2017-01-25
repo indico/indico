@@ -31,7 +31,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.users import UserTitle, NameFormat
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
-from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField
+from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, PrincipalListField
 from indico.web.forms.validators import used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
 
@@ -111,3 +111,7 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
     def __init__(self, *args, **kwargs):
         super(AdminAccountRegistrationForm, self).__init__(*args, **kwargs)
         del self.comment
+
+
+class AdminsForm(IndicoForm):
+    admins = PrincipalListField(_('Admins'), [DataRequired()])

@@ -41,9 +41,9 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users, get_linked_events)
-from indico.modules.users.views import WPUser, WPUsersAdmin
+from indico.modules.users.views import WPUser, WPUsersAdmin, WPAdmins
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
-                                        AdminUserSettingsForm, AdminAccountRegistrationForm)
+                                        AdminUserSettingsForm, AdminAccountRegistrationForm, AdminsForm)
 from indico.util.date_time import timedelta_split, now_utc
 from indico.util.event import truncate_path
 from indico.util.i18n import _
@@ -325,6 +325,33 @@ class RHUserEmailsSetPrimary(RHUserBase):
             self.user.make_email_primary(email)
             flash(_('Your primary email was updated successfully.'), 'success')
         return redirect(url_for('.user_emails'))
+
+
+class RHAdmins(RHAdminBase):
+    """Show Indico administrators"""
+
+    CSRF_ENABLED = True
+
+    def _process(self):
+        admins = set(User.query
+                     .filter_by(is_admin=True, is_deleted=False)
+                     .order_by(db.func.lower(User.first_name), db.func.lower(User.last_name)))
+
+        form = AdminsForm(admins=admins)
+        if form.validate_on_submit():
+            added = form.admins.data - admins
+            removed = admins - form.admins.data
+            for user in added:
+                user.is_admin = True
+                logger.warn('Admin rights granted to %r by %r [%s]', user, session.user, request.remote_addr)
+                flash(_('Admin added: {name} ({email})').format(name=user.name, email=user.email), 'success')
+            for user in removed:
+                user.is_admin = False
+                logger.warn('Admin rights revoked from %r by %r [%s]', user, session.user, request.remote_addr)
+                flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
+            return redirect(url_for('.admins'))
+
+        return WPAdmins.render_template('admins.html', form=form)
 
 
 class RHUsersAdmin(RHAdminBase):
