@@ -60,3 +60,7 @@ class WPUsersAdmin(WPJinjaMixin, WPAdminsBase):
 
     def getJSFiles(self):
         return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_users_js'].urls()
+
+
+class WPAdmins(WPUsersAdmin):
+    sidemenu_option = 'admins'
