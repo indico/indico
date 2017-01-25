@@ -26,13 +26,16 @@ from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, R
                                               RHUserSuggestionsRemove, RHUsersAdmin, RHUsersAdminSettings,
                                               RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
                                               RHRegistrationRequestList, RHRejectRegistrationRequest,
-                                              RHAcceptRegistrationRequest)
+                                              RHAcceptRegistrationRequest, RHAdmins)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 _bp = IndicoBlueprint('users', __name__, template_folder='templates', virtual_template_folder='users',
                       url_prefix='/user')
 
-# Admin
+# Admins
+_bp.add_url_rule('!/admin/admins', 'admins', RHAdmins, methods=('GET', 'POST'))
+
+# User management
 _bp.add_url_rule('!/admin/users/', 'users_admin', RHUsersAdmin, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/settings', 'users_admin_settings', RHUsersAdminSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('!/admin/users/create/', 'users_create', RHUsersAdminCreate, methods=('GET', 'POST'))
