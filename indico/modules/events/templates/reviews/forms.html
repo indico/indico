@@ -4,7 +4,7 @@
 
 
 {% macro render_review_form(form, proposal=none, group=none, on_pageload=false, review=none) %}
-    {% set proposal = proposal or review.proposal %}
+    {% set proposal = proposal or review.revision.proposal %}
     {% set group = group or review.group %}
     {% set url = proposal.get_save_review_url(group=group, review=review) %}
     {% set form_id = 'group-review-form-%s'|format(group.id) %}

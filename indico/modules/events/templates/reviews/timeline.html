@@ -1,6 +1,7 @@
 {% from 'events/abstracts/reviewing/timeline.html' import render_abstract_review_action_text,
                                                           render_ratings_details_titled_rule, render_ratings_details_extra %}
 {% from 'events/abstracts/reviewing/_common.html' import render_track %}
+{% from 'events/papers/reviewing/timeline.html' import render_paper_review_action_text %}
 {% from 'events/reviews/_common.html' import render_edited_hint, render_group, render_score, render_visibility_hint,
                                              render_user_avatar %}
 {% from 'events/reviews/_omnibox.html' import render_omnibox %}
@@ -9,30 +10,37 @@
 {% macro render_timeline(proposal, comment_form, review_form=none) %}
     {% set can_comment = proposal.can_comment(session.user) %}
     {% set can_review = proposal.can_review(session.user, check_state=true) %}
-    {% set timeline = proposal.get_timeline(session.user) %}
-    {% if timeline or can_comment or can_review %}
-        <div class="i-timeline with-line">
-            <div class="i-timeline-connect-up"></div>
-            {% for item in timeline %}
-                {% if item.timeline_item_type == 'comment' %}
-                    {{ render_comment(item, proposal) }}
-                {% elif item.timeline_item_type == 'review' %}
-                    {{ render_review(item, form=form) }}
+    {% for revision in proposal.get_revisions() %}
+        {% set timeline = revision.get_timeline(session.user) %}
+        {{ caller('revision-info', revision) }}
+        <div class="i-timeline">
+            {% if timeline %}
+                <div class="i-timeline with-line">
+                    <div class="i-timeline-connect-up"></div>
+                    {% for item in timeline %}
+                        {% if item.timeline_item_type == 'comment' %}
+                            {{ render_comment(item, proposal) }}
+                        {% elif item.timeline_item_type == 'review' %}
+                            {{ render_review(item, form=form) }}
+                        {% endif %}
+                    {% endfor %}
+                    {% if loop.last and (can_comment or can_review) %}
+                        {% set caller_ = caller %}
+                        {% call(block) render_omnibox(proposal, comment_form, review_form) %}
+                            {{ caller_(block) }}
+                        {% endcall %}
+                    {% endif %}
+                </div>
+                {% if loop.last %}
+                    <div class="i-timeline">
+                        {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
+                        <div class="i-timeline-connect-down to-separator"></div>
+                    </div>
+                    <div class="i-timeline-separator"></div>
                 {% endif %}
-            {% endfor %}
-            {% if can_comment or can_review %}
-                {% set caller_ = caller %}
-                {% call(block) render_omnibox(proposal, comment_form, review_form) %}
-                    {{ caller_(block) }}
-                {% endcall %}
             {% endif %}
         </div>
-        <div class="i-timeline">
-            {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
-            <div class="i-timeline-connect-down to-separator"></div>
-        </div>
-        <div class="i-timeline-separator"></div>
-    {% endif %}
+    {% endfor %}
 {% endmacro %}
 
 
@@ -90,6 +98,7 @@
     {% set no_content = not review.comment and not review.ratings %}
     {% set rating_range = review.proposal.cfp.rating_range %}
     {% set ratings = review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
+    {% set proposal = review.revision.proposal %}
     <div id="proposal-review-{{ review.id }}" class="i-timeline-item">
         {{ render_user_avatar(review.user) }}
         <div class="flexrow i-timeline-item-content">
@@ -106,8 +115,8 @@
                         {{ render_edited_hint(review.modified_dt) }}
                     {% endif %}
                 </div>
-                {% if review.proposal.proposal_type == 'abstract' %}
-                    {{ render_track(review.group) }}
+                {% if proposal.proposal_type == 'abstract' %}
+                    {{ render_track(review.group.instance) }}
                 {% else %}
                     {{ render_group(review.group.title) }}
                 {% endif %}
@@ -116,11 +125,13 @@
                  {% if not review.comment %}data-no-comment{% endif %}>
                 <div class="i-box-header flexrow">
                     <div class="review-badges">
-                        {% if review.proposal.proposal_type == 'abstract' %}
-                            {{ render_review_action_text(review) }}
+                        {% if proposal.proposal_type == 'abstract' %}
+                            {{ render_abstract_review_action_text(review) }}
+                        {% elif proposal.proposal_type == 'paper' %}
+                            {{ render_paper_review_action_text(review) }}
                         {% endif %}
                         {% if review.score is not none %}
-                            · score {{ render_score(review.score, rating_range, classes='bold semantic-text') }}
+                            · score {{ render_score(review.score, proposal.cfp.rating_range, classes='bold semantic-text') }}
                             (<a class="js-ratings-toggle">{#--#}
                                 <span class="js-show-ratings">{% trans %}show ratings{% endtrans %}</span>{#--#}
                                 <span class="weak-hidden js-hide-ratings">{% trans %}hide ratings{% endtrans %}</span>{#--#}
@@ -131,7 +142,7 @@
                         <div class="review-comment-actions">
                             <a class="i-link icon-edit js-edit-review"
                                title="{% trans %}Edit review{% endtrans %}"
-                               data-href="{{ review.proposal.get_save_review_url(review=review) }}"
+                               data-href="{{ proposal.get_save_review_url(review=review) }}"
                                data-form-container="#proposal-review-{{ review.id }} .js-form-container"
                                data-update="#reviewing-page"
                                data-replace-update
@@ -154,14 +165,14 @@
                                         </div>
                                         <div>
                                             <span class="rating-scale flexrow f-a-center">
-                                                {{ _render_rating(rating_range, rating.value) }}
+                                                {{ _render_rating(proposal.cfp.rating_range, rating.value) }}
                                                 <span class="score">{{ rating.value }}</span>
                                             </span>
                                         </div>
                                     </li>
                                 {% endfor %}
                             </ul>
-                            {% if review.proposal.proposal_type == 'abstract' %}
+                            {% if proposal.proposal_type == 'abstract' %}
                                 {{ render_ratings_details_titled_rule(review) }}
                             {% else %}
                                 {% if review.comment %}
@@ -172,7 +183,7 @@
                             {% endif %}
                         </div>
                     {% endif %}
-                    {% if review.proposal.proposal_type == 'abstract' %}
+                    {% if proposal.proposal_type == 'abstract' %}
                         {{ render_ratings_details_extra(review) }}
                     {% endif %}
                     {% if review.comment %}
