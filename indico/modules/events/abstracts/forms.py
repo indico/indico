@@ -29,13 +29,12 @@ from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractPersonLinkListField, AbstractField,
                                                     TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
-from indico.modules.events.abstracts.models.reviews import AbstractAction
+from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.fields import ReviewQuestionsField
-from indico.modules.events.models.reviews import ProposalCommentVisibility
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
@@ -537,8 +536,8 @@ class AbstractsScheduleForm(IndicoForm):
 
 class AbstractCommentForm(IndicoForm):
     text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment...")})
-    visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=ProposalCommentVisibility,
-                                       skip={ProposalCommentVisibility.users})
+    visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=AbstractCommentVisibility,
+                                       skip={AbstractCommentVisibility.users})
 
     def __init__(self, *args, **kwargs):
         comment = kwargs.get('obj')
@@ -546,9 +545,9 @@ class AbstractCommentForm(IndicoForm):
         abstract = kwargs.pop('abstract')
         super(IndicoForm, self).__init__(*args, **kwargs)
         if not abstract.event_new.cfa.allow_contributors_in_comments:
-            self.visibility.skip.add(ProposalCommentVisibility.contributors)
+            self.visibility.skip.add(AbstractCommentVisibility.contributors)
         if not abstract.can_judge(user) and not abstract.can_convene(user):
-            self.visibility.skip.add(ProposalCommentVisibility.judges)
+            self.visibility.skip.add(AbstractCommentVisibility.judges)
             if not abstract.can_review(user):
                 del self.visibility
 

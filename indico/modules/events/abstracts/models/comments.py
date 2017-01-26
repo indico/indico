@@ -21,7 +21,8 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.review_comments import ReviewCommentMixin
-from indico.modules.events.models.reviews import ProposalCommentMixin, ProposalCommentVisibility
+from indico.modules.events.abstracts.models.reviews import AbstractCommentVisibility
+from indico.modules.events.models.reviews import ProposalCommentMixin
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 
@@ -44,9 +45,9 @@ class AbstractComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
     @declared_attr
     def visibility(cls):
         return db.Column(
-            PyIntEnum(ProposalCommentVisibility),
+            PyIntEnum(AbstractCommentVisibility),
             nullable=False,
-            default=ProposalCommentVisibility.contributors
+            default=AbstractCommentVisibility.contributors
         )
 
     @declared_attr
@@ -81,13 +82,13 @@ class AbstractComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
             return False
         elif user == self.user:
             return True
-        elif self.visibility == ProposalCommentVisibility.users:
+        elif self.visibility == AbstractCommentVisibility.users:
             return True
-        visibility_checks = {ProposalCommentVisibility.judges: [self.abstract.can_judge],
-                             ProposalCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
-                             ProposalCommentVisibility.reviewers: [self.abstract.can_judge, self.abstract.can_convene,
+        visibility_checks = {AbstractCommentVisibility.judges: [self.abstract.can_judge],
+                             AbstractCommentVisibility.conveners: [self.abstract.can_judge, self.abstract.can_convene],
+                             AbstractCommentVisibility.reviewers: [self.abstract.can_judge, self.abstract.can_convene,
                                                                    self.abstract.can_review],
-                             ProposalCommentVisibility.contributors: [self.abstract.can_judge,
+                             AbstractCommentVisibility.contributors: [self.abstract.can_judge,
                                                                       self.abstract.can_convene,
                                                                       self.abstract.can_review,
                                                                       self.abstract.user_owns]}
