@@ -19,11 +19,13 @@ from __future__ import unicode_literals
 from flask import request, session
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
-from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm
+from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm, build_review_form
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.operations import create_paper_revision
-from indico.modules.events.papers.views import WPDisplayPapersBase
-from indico.web.util import jsonify_form, jsonify_data
+from indico.modules.events.papers.models.reviews import PaperReviewType, PaperTypeProxy
+from indico.modules.events.papers.operations import create_paper_revision, create_review
+from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page
+from indico.web.flask.templating import get_template_module
+from indico.web.util import jsonify_form, jsonify_data, jsonify
 
 
 class RHSubmitPaper(RHPaperBase):
@@ -57,3 +59,31 @@ class RHDownloadPaperFile(RHPaperBase):
 
     def _process(self):
         return self.file.send()
+
+
+class RHSubmitPaperReview(RHPaperBase):
+    """Review an paper in a specific reviewing type"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.paper,
+            lambda self: self.type
+        }
+    }
+
+    def _check_paper_protection(self):
+        if self.paper.last_revision.get_reviews(user=session.user, group=self.type.instance):
+            return False
+        return self.paper.can_review(session.user, check_state=True)
+
+    def _checkParams(self, params):
+        RHPaperBase._checkParams(self, params)
+        self.type = PaperTypeProxy(PaperReviewType[request.view_args['review_type']])
+
+    def _process(self):
+        form = build_review_form(self.paper.last_revision, self.type.instance)
+        if form.validate_on_submit():
+            create_review(self.paper, self.type, session.user, **form.split_data)
+            return jsonify_data(flash=False, html=render_paper_page(self.paper))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_review_form(form, proposal=self.paper, group=self.type))
