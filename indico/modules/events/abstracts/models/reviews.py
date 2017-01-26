@@ -176,6 +176,10 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
         return format_repr(self, 'id', 'abstract_id', 'user_id', proposed_action=None)
 
     @property
+    def visibility(self):
+        return AbstractCommentVisibility.reviewers
+
+    @property
     def score(self):
         ratings = [r for r in self.ratings if not r.question.no_score and not r.question.is_deleted]
         if not ratings:
@@ -198,3 +202,18 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
             return True
         else:
             return self.track.can_convene(user)
+
+
+class AbstractCommentVisibility(RichIntEnum):
+    """Most to least restrictive visibility for abstract comments"""
+    __titles__ = [None,
+                  _("Visible only to judges"),
+                  _("Visible to conveners and judges"),
+                  _("Visible to reviewers, conveners, and judges"),
+                  _("Visible to contributors, reviewers, conveners, and judges"),
+                  _("Visible to all users")]
+    judges = 1
+    conveners = 2
+    reviewers = 3
+    contributors = 4
+    users = 5
