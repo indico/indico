@@ -97,17 +97,19 @@
 
 %indico-page-standalone {
     @extend %indico-page;
+
     header {
         margin-top: 1em;
     }
 }
 
 .banner {
+    @extend .flexrow;
+
     $banner-color: #000;
     $banner-title-color: $orange;
     $banner-subtitle-color: $dark-gray;
 
-    @extend .flexrow;
     color: $banner-color;
     max-width: 800px;
 
@@ -125,7 +127,7 @@
 
     .title {
         margin-bottom: 19px;
-        font-family: "Roboto Light", sans-serif;
+        font-family: 'Roboto Light', sans-serif;
         font-size: 2em;
         color: $banner-title-color;
 
@@ -198,6 +200,7 @@
         p:first-child {
             margin-top: 0;
         }
+
         p:last-child {
             margin-bottom: 0;
         }
