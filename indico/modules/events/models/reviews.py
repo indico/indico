@@ -167,21 +167,6 @@ class ProposalCommentMixin(object):
         raise NotImplementedError
 
 
-class ProposalCommentVisibility(RichIntEnum):
-    """Most to least restrictive visibility for abstract comments"""
-    __titles__ = [None,
-                  _("Visible only to judges"),
-                  _("Visible to conveners and judges"),
-                  _("Visible to reviewers, conveners, and judges"),
-                  _("Visible to contributors, reviewers, conveners, and judges"),
-                  _("Visible to all users")]
-    judges = 1
-    conveners = 2
-    reviewers = 3
-    contributors = 4
-    users = 5
-
-
 class ProposalReviewMixin(object):
     """Mixin for proposal reviews
 
@@ -206,10 +191,6 @@ class ProposalReviewMixin(object):
     @property
     def group(self):
         return self.group_proxy_cls(getattr(self, self.group_attr))
-
-    @property
-    def visibility(self):
-        return ProposalCommentVisibility.reviewers
 
     @property
     def score(self):
