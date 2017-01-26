@@ -1,77 +1,89 @@
-{% macro render_system_settings() %}
-    <section>
+{% macro _section(title, id=none) %}
+    <section {% if id %}id="{{ id }}"{% endif %}>
         <header>
-            <h3>
-                {% trans %}System{% endtrans %}
-                {% set tooltip -%}
-                    {%- trans %}These settings can be changed in the indico.conf file on the server.{% endtrans -%}
-                {%- endset %}
-                <a class="i-button borderless icon-settings disabled" title="{{ tooltip }}"></a>
-            </h3>
+            <div class="title">
+                <div class="text">
+                    <div class="title-with-actions">
+                        <h3>{{ title }}</h3>
+                        <div class="actions">
+                            {{ caller('actions') }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </header>
-        <dl class="i-data-list">
-            <dt>{% trans %}Default Language{% endtrans %}</dt>
-            <dd>{{ indico_config.DefaultLocale }}</dd>
-            <dt>{% trans %}Default Timezone{% endtrans %}</dt>
-            <dd>{{ indico_config.DefaultTimezone }}</dd>
-            <dt>{% trans %}Admin Email{% endtrans %}</dt>
-            <dd>{{ indico_config.SupportEmail }}</dd>
-            <dt>{% trans %}Support Email{% endtrans %}</dt>
-            <dd>{{ indico_config.PublicSupportEmail }}</dd>
-            <dt>{% trans %}No-Reply Email{% endtrans %}</dt>
-            <dd>{{ indico_config.NoReplyEmail }}</dd>
-        </dl>
+        {{ caller('content') }}
     </section>
+{% endmacro %}
+
+{% macro render_system_settings() %}
+    {% call(what) _section(_('System')) %}
+        {% if what == 'actions' %}
+            {% set tooltip -%}
+                {%- trans %}These settings can be changed in the indico.conf file on the server.{% endtrans -%}
+            {%- endset %}
+            <a class="i-button borderless icon-edit disabled" title="{{ tooltip }}"></a>
+        {% elif what == 'content' %}
+            <dl class="i-data-list">
+                <dt>{% trans %}Default Language{% endtrans %}</dt>
+                <dd>{{ indico_config.DefaultLocale }}</dd>
+                <dt>{% trans %}Default Timezone{% endtrans %}</dt>
+                <dd>{{ indico_config.DefaultTimezone }}</dd>
+                <dt>{% trans %}Admin Email{% endtrans %}</dt>
+                <dd>{{ indico_config.SupportEmail }}</dd>
+                <dt>{% trans %}Support Email{% endtrans %}</dt>
+                <dd>{{ indico_config.PublicSupportEmail }}</dd>
+                <dt>{% trans %}No-Reply Email{% endtrans %}</dt>
+                <dd>{{ indico_config.NoReplyEmail }}</dd>
+            </dl>
+        {% endif %}
+    {% endcall %}
 {% endmacro %}
 
 {% macro render_site_settings(settings) %}
-    <section id="site-settings">
-        <header>
-            <h3>
-                {% trans %}Site{% endtrans %}
-                <a class="i-button borderless icon-settings"
-                   title="{% trans %}Edit Site Settings{% endtrans %}"
-                   data-title="{% trans %}Edit Site Settings{% endtrans %}"
-                   data-href="{{ url_for('.site_settings') }}"
-                   data-form-container="#site-settings .form-container"
-                   data-update="#site-settings"
-                   data-replace-update
-                   data-ajax-form></a>
-            </h3>
-        </header>
-        <div class="form-container">
-            <dl class="i-data-list">
-                <dt>{% trans %}Title{% endtrans %}</dt>
-                <dd>{{ settings.site_title }}</dd>
-                <dt>{% trans %}Organisation{% endtrans %}</dt>
-                <dd>{{ settings.site_organization }}</dd>
-            </dl>
-        </div>
-    </section>
+    {% call(what) _section(_('Site'), id='site-settings') %}
+        {% if what == 'actions' %}
+            <a class="i-button borderless icon-edit"
+               title="{% trans %}Edit Site Settings{% endtrans %}"
+               data-title="{% trans %}Edit Site Settings{% endtrans %}"
+               data-href="{{ url_for('.site_settings') }}"
+               data-form-container="#site-settings .form-container"
+               data-update="#site-settings"
+               data-replace-update
+               data-ajax-form></a>
+        {% elif what == 'content' %}
+            <div class="form-container">
+                <dl class="i-data-list">
+                    <dt>{% trans %}Title{% endtrans %}</dt>
+                    <dd>{{ settings.site_title }}</dd>
+                    <dt>{% trans %}Organisation{% endtrans %}</dt>
+                    <dd>{{ settings.site_organization }}</dd>
+                </dl>
+            </div>
+        {% endif %}
+    {% endcall %}
 {% endmacro %}
 
 {% macro render_social_settings(settings) %}
-    <section id="social-settings">
-        <header>
-            <h3>
-                {% trans %}Social{% endtrans %}
-                <a href="#" class="i-button borderless icon-settings"
-                   title="{% trans %}Edit Social Settings{% endtrans %}"
-                   data-title="{% trans %}Edit Social Settings{% endtrans %}"
-                   data-href="{{ url_for('.social_settings') }}"
-                   data-form-container="#social-settings .form-container"
-                   data-update="#social-settings"
-                   data-replace-update
-                   data-ajax-form></a>
-            </h3>
-        </header>
-        <div class="form-container">
-            <dl class="i-data-list">
-                <dt>{% trans %}Enabled{% endtrans %}</dt>
-                <dd>{{ _('Yes') if settings.enabled else _('No') }}</dd>
-                <dt>{% trans %}Facebook App ID{% endtrans %}</dt>
-                <dd>{{ settings.facebook_app_id }}</dd>
-            </dl>
-        </div>
-    </section>
+    {% call(what) _section(_('Social'), id='social-settings') %}
+        {% if what == 'actions' %}
+            <a href="#" class="i-button borderless icon-edit"
+               title="{% trans %}Edit Social Settings{% endtrans %}"
+               data-title="{% trans %}Edit Social Settings{% endtrans %}"
+               data-href="{{ url_for('.social_settings') }}"
+               data-form-container="#social-settings .form-container"
+               data-update="#social-settings"
+               data-replace-update
+               data-ajax-form></a>
+        {% elif what == 'content' %}
+            <div class="form-container">
+                <dl class="i-data-list">
+                    <dt>{% trans %}Enabled{% endtrans %}</dt>
+                    <dd>{{ _('Yes') if settings.enabled else _('No') }}</dd>
+                    <dt>{% trans %}Facebook App ID{% endtrans %}</dt>
+                    <dd>{{ settings.facebook_app_id }}</dd>
+                </dl>
+            </div>
+        {% endif %}
+    {% endcall %}
 {% endmacro %}
