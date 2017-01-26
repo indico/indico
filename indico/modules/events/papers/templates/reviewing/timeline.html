@@ -1,0 +1,94 @@
+{% from 'events/reviews/_common.html' import render_summary_state, render_user_avatar, render_review_state %}
+
+{% macro _render_file_list(files) %}
+    <table class="tree">
+        <tbody>
+            {% for file in files %}
+                {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
+                <tr>
+                    <td>
+                        <a class="attachment {{ icon }}" href="{{ url_for('.download_file', file) }}"
+                           title="{{ file.filename }}">
+                            <span class="title">{{ file.filename }}</span>
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endmacro %}
+
+{% macro render_submission_info(revision) %}
+    <div class="i-timeline">
+        <div class="i-timeline-item">
+            {{ render_user_avatar(revision.submitter) }}
+            <div class="i-timeline-item-box header-indicator-left">
+                <div class="i-box-header">
+                    {% trans name=revision.submitter.name -%}
+                        <strong>{{ name }}</strong> submitted this paper
+                    {%- endtrans %}
+                    <time datetime="{{ revision.submitted_dt.isoformat() }}">
+                        {{- revision.submitted_dt|format_human_date -}}
+                    </time>
+                </div>
+                <div class="i-box-content submission-info">
+                    {{ _render_file_list(revision.files) }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_paper_info(paper) %}
+    <div class="submission-title flexrow">
+        <h3 class="f-self-stretch">
+            {% trans contribution_title=paper.contribution.title%}Paper for {{ contribution_title }}{% endtrans %}
+            <span class="submission-id">
+                #{{ paper.contribution.friendly_id }}
+            </span>
+        </h3>
+    </div>
+    <div id="paper-public">
+        {{ _render_paper_summary(paper) }}
+        <div class="review-item-content paper-content">
+            <h3>{% trans %}Latest revision files{% endtrans %}</h3>
+            {{ _render_file_list(paper.files) }}
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro _render_paper_summary(paper) %}
+    <div class="review-summary flexrow f-a-baseline">
+        <div class="review-summary-badge">
+            {{ render_summary_state(paper.state) }}
+        </div>
+        <div class="review-summary-content f-self-stretch">
+            <div>
+                {% trans name=paper.last_revision.submitter.name -%}
+                    <strong>{{ name }}</strong> submitted this paper for the contribution
+                {%- endtrans %}
+                <a href="{{ url_for('contributions.display_contribution', paper.contribution) }}">
+                    {{- paper.contribution.title -}}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+{% macro render_paper_review_action_text(review) %}
+    {% set action = render_review_state(review) %}
+    {% set endaction = '</span>'|safe %}
+    {% if review.proposed_action.name == 'accept' %}
+        {% trans -%}
+            Proposed to {{ action }}accept{{ endaction }}
+        {%- endtrans %}
+    {% elif review.proposed_action.name == 'reject' %}
+        {% trans -%}
+            Proposed to {{ action }}reject{{ endaction }}
+        {%- endtrans %}
+    {% elif review.proposed_action.name == 'to_be_corrected' %}
+        {% trans -%}
+            Proposed to {{ action }}correct{{ endaction }}
+        {%- endtrans %}
+    {% endif %}
+{% endmacro %}
