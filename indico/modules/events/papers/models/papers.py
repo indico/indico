@@ -36,6 +36,7 @@ class Paper(ProposalMixin):
     edit_comment_endpoint = 'papers.edit_comment'
     create_review_endpoint = 'papers.submit_review'
     edit_review_endpoint = 'papers.edit_review'
+    revisions_enabled = True
 
     def __init__(self, contribution):
         self.contribution = contribution
@@ -102,4 +103,10 @@ class Paper(ProposalMixin):
             return False
         elif self.can_manage(user):
             return True
-        return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
+        return self.contribution.is_paper_reviewer(user)
+
+    def get_revisions(self):
+        return self.revisions
+
+    def get_last_revision(self):
+        return self.last_revision

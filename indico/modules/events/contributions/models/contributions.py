@@ -433,6 +433,9 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def paper(self):
         return Paper(self) if self._paper_last_revision else None
 
+    def is_paper_reviewer(self, user):
+        return user in self.paper_content_reviewers or user in self.paper_layout_reviewers
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)

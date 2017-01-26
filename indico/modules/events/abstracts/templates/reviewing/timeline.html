@@ -2,7 +2,7 @@
 {% from 'events/reviews/_common.html' import render_review_state %}
 
 
-{% macro render_review_action_text(review) %}
+{% macro render_abstract_review_action_text(review) %}
     {% set action = render_review_state(review) %}
     {% set endaction = '</span>'|safe %}
     {% if review.proposed_action.name == 'accept' %}

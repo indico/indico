@@ -18,7 +18,7 @@ from __future__ import unicode_literals, division
 
 from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
-from indico.modules.events.papers.models.revisions import PaperRevisionState
+from indico.modules.events.models.reviews import ProposalReviewMixin, ProposalGroupProxy
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -28,6 +28,7 @@ from indico.util.struct.enum import RichIntEnum
 
 class PaperAction(RichIntEnum):
     __titles__ = [None, _("Accept"), _("Reject"), _("To be corrected")]
+    __css_classes__ = [None, 'success', 'error', 'warning']
     accept = 1
     reject = 2
     to_be_corrected = 3
@@ -39,11 +40,21 @@ class PaperReviewType(RichIntEnum):
     content = 2
 
 
-class PaperReview(RenderModeMixin, db.Model):
+class PaperTypeProxy(ProposalGroupProxy):
+    @locator_property
+    def locator(self):
+        return {'review_type': self.instance.name}
+
+
+class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     """Represents a paper review, emitted by a layout or content reviewer"""
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
+
+    revision_attr = 'revision'
+    group_attr = 'type'
+    group_proxy_cls = PaperTypeProxy
 
     __tablename__ = 'reviews'
     __table_args__ = (db.UniqueConstraint('revision_id', 'user_id', 'type'),
@@ -122,6 +133,7 @@ class PaperReview(RenderModeMixin, db.Model):
         return format_repr(self, 'id', 'type', 'revision_id', 'user_id', proposed_action=None)
 
     def can_edit(self, user, check_state=False):
+        from indico.modules.events.papers.models.revisions import PaperRevisionState
         if user is None:
             return False
         if check_state and self.revision.state != PaperRevisionState.submitted:

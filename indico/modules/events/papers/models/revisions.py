@@ -16,10 +16,14 @@
 
 from __future__ import unicode_literals
 
+from itertools import chain
+from operator import attrgetter
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
+from indico.modules.events.models.reviews import ProposalRevisionMixin
+from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -36,7 +40,7 @@ class PaperRevisionState(RichIntEnum):
     to_be_corrected = 4
 
 
-class PaperRevision(RenderModeMixin, db.Model):
+class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
     __table_args__ = (db.Index(None, 'contribution_id', unique=True,
                                postgresql_where=db.text('state = {}'.format(PaperRevisionState.accepted))),
@@ -52,6 +56,7 @@ class PaperRevision(RenderModeMixin, db.Model):
 
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
+    proposal_attr = 'paper'
 
     id = db.Column(
         db.Integer,
@@ -153,3 +158,27 @@ class PaperRevision(RenderModeMixin, db.Model):
     @paper.setter
     def paper(self, paper):
         self._contribution = paper.contribution
+
+    def get_timeline(self, user=None):
+        comments = [x for x in self.comments if x.can_view(user)] if user else self.comments
+        reviews = [x for x in self.reviews if x.can_view(user)] if user else self.reviews
+        return sorted(chain(comments, reviews), key=attrgetter('created_dt'))
+
+    def get_reviews(self, group=None, user=None):
+        reviews = []
+        if user and group:
+            reviews = [x for x in self.reviews if x.group.instance == group and x.user == user]
+        elif user:
+            reviews = [x for x in self.reviews if x.user == user]
+        elif group:
+            reviews = [x for x in self.reviews if x.group.instance == group]
+        return reviews
+
+    def get_reviewed_for_groups(self, user, include_reviewed=False):
+        from indico.modules.events.papers.models.reviews import PaperTypeProxy
+        reviewed_for = {x.type for x in self.reviews if x.user == user} if include_reviewed else set()
+        if self.paper.cfp.content_reviewing_enabled and user in self.paper.cfp.content_reviewers:
+            reviewed_for.add(PaperReviewType.content)
+        if self.paper.cfp.layout_reviewing_enabled and user in self.paper.cfp.layout_reviewers:
+            reviewed_for.add(PaperReviewType.layout)
+        return set(map(PaperTypeProxy, reviewed_for))

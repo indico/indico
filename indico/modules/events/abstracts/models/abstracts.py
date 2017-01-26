@@ -32,7 +32,7 @@ from indico.modules.events.abstracts.models.reviews import AbstractAction, Abstr
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.models.persons import AuthorsSpeakersMixin
-from indico.modules.events.models.reviews import ProposalMixin
+from indico.modules.events.models.reviews import ProposalMixin, ProposalRevisionMixin
 from indico.modules.events.contributions.models.contributions import _get_next_friendly_id, CustomFieldsMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -85,7 +85,8 @@ class EditTrackMode(int, IndicoEnum):
     reviewed_for = 2
 
 
-class Abstract(ProposalMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin, db.Model):
+class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeakersMixin,
+               db.Model):
     """Represents an abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
@@ -124,6 +125,7 @@ class Abstract(ProposalMixin, DescriptionMixin, CustomFieldsMixin, AuthorsSpeake
     edit_comment_endpoint = 'abstracts.edit_abstract_comment'
     create_review_endpoint = 'abstracts.review_abstract'
     edit_review_endpoint = 'abstracts.edit_review'
+    revisions_enabled = False
 
     @declared_attr
     def __table_args__(cls):

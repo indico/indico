@@ -118,30 +118,33 @@
             {% endif %}
             {{ abstract.description }}
         </div>
+    </div>
+{% endmacro %}
 
-        <div class="i-timeline">
-            <div class="i-timeline-item">
-                {{ render_user_avatar(abstract.submitter) }}
-                <div class="i-timeline-item-box header-indicator-left">
-                    <div class="i-box-header">
-                        {% trans name=abstract.submitter.name -%}
-                            <strong>{{ name }}</strong> submitted this abstract
-                        {%- endtrans %}
-                        <time datetime="{{ abstract.submitted_dt.isoformat() }}">
-                            {{- abstract.submitted_dt|format_human_date -}}
-                        </time>
-                        {% if abstract.modified_dt %}
-                            {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
-                        {% endif %}
-                    </div>
-                    <div class="i-box-content submission-info">
-                        {{ _render_submission_info(abstract) }}
-                        {% if abstract.event_new.cfa.allow_attachments %}
-                            <div class="attachment-list">
-                                {{ _render_attachments(abstract) }}
-                            </div>
-                        {% endif %}
-                    </div>
+
+{% macro render_submission_info(abstract) %}
+    <div class="i-timeline">
+        <div class="i-timeline-item">
+            {{ render_user_avatar(abstract.submitter) }}
+            <div class="i-timeline-item-box header-indicator-left">
+                <div class="i-box-header">
+                    {% trans name=abstract.submitter.name -%}
+                        <strong>{{ name }}</strong> submitted this abstract
+                    {%- endtrans %}
+                    <time datetime="{{ abstract.submitted_dt.isoformat() }}">
+                        {{- abstract.submitted_dt|format_human_date -}}
+                    </time>
+                    {% if abstract.modified_dt %}
+                        {{ render_edited_hint(abstract.modified_dt, abstract.modified_by) }}
+                    {% endif %}
+                </div>
+                <div class="i-box-content submission-info">
+                    {{ _render_submission_info(abstract) }}
+                    {% if abstract.event_new.cfa.allow_attachments %}
+                        <div class="attachment-list">
+                            {{ _render_attachments(abstract) }}
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

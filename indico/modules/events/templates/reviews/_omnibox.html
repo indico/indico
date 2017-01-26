@@ -4,7 +4,7 @@
 
 {% macro render_omnibox(proposal, comment_form, review_form=none) %}
     {% set can_comment = proposal.can_comment(session.user) %}
-    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    {% set reviewer_data = proposal.get_last_revision().get_reviewer_render_data(session.user) %}
     {% if can_comment or reviewer_data.groups %}
         <div id="review-timeline-input" class="i-timeline-item review-timeline-input">
             {{ render_user_avatar(session.user) }}
@@ -33,7 +33,7 @@
 
 
 {% macro _render_review_trigger(proposal, exclusive=false) %}
-    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    {% set reviewer_data = proposal.get_last_revision().get_reviewer_render_data(session.user) %}
     <div class="review-trigger flexrow">
         {% if not exclusive %}
             <span class="comment-or-review">
@@ -94,7 +94,7 @@
 
 
 {% macro _render_input_no_comment(review_form, proposal) %}
-    {% set reviewer_data = proposal.get_reviewer_render_data(session.user) %}
+    {% set reviewer_data = proposal.get_last_revision().get_reviewer_render_data(session.user) %}
     {% if reviewer_data.groups|length == 1 and not reviewer_data.reviews %}
         {{ render_review_form(review_form, proposal, reviewer_data.groups|first, on_pageload=true) }}
     {% else %}
