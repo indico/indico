@@ -49,15 +49,13 @@
                                         {{ latest_revision.state.title }}
                                     </div>
                                 </div>
-                                <div>
-{#                                    TODO: List attached files #}
-            {#                        {% for file in latest_revision.files %}#}
-            {#                            <a href="... link to the gfile...">{{ file.title }}</a><br>#}
-            {#                        {% endfor %}#}
-                                    <a>file_name.pdf</a><br>
-                                    <a>file_name.pdf</a><br>
-                                    <a>file_name.pdf</a><br>
-                                </div>
+                                <ul>
+                                    {% for file in latest_revision.files %}
+                                        <li>
+                                            <a class="right" href="{{ url_for('.download_file', file) }}">{{ file.filename }}</a><br>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
                             </div>
                         </li>
                     </div>
