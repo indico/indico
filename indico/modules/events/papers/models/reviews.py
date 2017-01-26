@@ -46,6 +46,19 @@ class PaperTypeProxy(ProposalGroupProxy):
         return {'review_type': self.instance.name}
 
 
+class PaperCommentVisibility(RichIntEnum):
+    """Most to least restrictive visibility for paper comments"""
+    __titles__ = [None,
+                  _("Visible only to judges"),
+                  _("Visible to reviewers and judges"),
+                  _("Visible to contributors, reviewers, and judges"),
+                  _("Visible to all users")]
+    judges = 1
+    reviewers = 2
+    contributors = 3
+    users = 4
+
+
 class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     """Represents a paper review, emitted by a layout or content reviewer"""
 
@@ -150,3 +163,7 @@ class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
         return False
         # TODO: Check this, should we add a can_judge to the contribution model?
         # return self.revision.contribution.can_judge(user)
+
+    @property
+    def visibility(self):
+        return PaperCommentVisibility.reviewers
