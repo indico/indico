@@ -24,11 +24,11 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('logger', 'settings')
+__all__ = ('logger', 'cephalopod_settings')
 
 logger = Logger.get('cephalopod')
 
-settings = SettingsProxy('cephalopod', {
+cephalopod_settings = SettingsProxy('cephalopod', {
     'joined': False,
     'contact_email': None,
     'contact_name': None,

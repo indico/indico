@@ -24,7 +24,7 @@ from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, RequestException, Timeout
 
 from indico.core.config import Config
-from indico.modules.cephalopod import settings
+from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.cephalopod.forms import CephalopodForm
 from indico.modules.cephalopod.util import register_instance, sync_instance, unregister_instance
 from indico.modules.cephalopod.views import WPCephalopod
@@ -44,14 +44,14 @@ class RHCephalopodBase(RHAdminBase):
 
 class RHCephalopod(RHCephalopodBase):
     def _process_GET(self):
-        defaults = FormDefaults(**settings.get_all())
+        defaults = FormDefaults(**cephalopod_settings.get_all())
         form = CephalopodForm(request.form, obj=defaults)
 
-        enabled = settings.get('joined')
+        enabled = cephalopod_settings.get('joined')
         config = Config.getInstance()
         instance_url = config.getBaseURL()
         language = config.getDefaultLocale()
-        tracker_url = urljoin(config.getTrackerURL(), 'api/instance/{}'.format(settings.get('uuid')))
+        tracker_url = urljoin(config.getTrackerURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         return WPCephalopod.render_template('cephalopod.html',
                                             affiliation=core_settings.get('site_organization'),
                                             enabled=enabled,
@@ -63,10 +63,10 @@ class RHCephalopod(RHCephalopodBase):
                                             tracker_url=tracker_url)
 
     def _process_POST(self):
-        name = request.form.get('contact_name', settings.get('contact_name'))
-        email = request.form.get('contact_email', settings.get('contact_email'))
+        name = request.form.get('contact_name', cephalopod_settings.get('contact_name'))
+        email = request.form.get('contact_email', cephalopod_settings.get('contact_email'))
         enabled = request.form.get('joined', False)
-        uuid = settings.get('uuid')
+        uuid = cephalopod_settings.get('uuid')
         try:
             if not enabled:
                 unregister_instance()
@@ -86,12 +86,12 @@ class RHCephalopod(RHCephalopodBase):
 
 class RHCephalopodSync(RHCephalopodBase):
     def _process(self):
-        if not settings.get('joined'):
+        if not cephalopod_settings.get('joined'):
             flash(_("Synchronization is not possible if you don't join the community first."),
                   'error')
         else:
-            contact_name = settings.get('contact_name')
-            contact_email = settings.get('contact_email')
+            contact_name = cephalopod_settings.get('contact_name')
+            contact_email = cephalopod_settings.get('contact_email')
             try:
                 sync_instance(contact_name, contact_email)
             except HTTPError as err:
