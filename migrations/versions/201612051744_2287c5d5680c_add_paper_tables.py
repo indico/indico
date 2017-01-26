@@ -10,7 +10,7 @@ from alembic import op
 from sqlalchemy import String
 
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
-from indico.modules.events.papers.models.reviews import PaperReviewType, PaperAction
+from indico.modules.events.papers.models.reviews import PaperReviewType, PaperAction, PaperCommentVisibility
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 
 
@@ -114,6 +114,7 @@ def upgrade():
         sa.Column('text', sa.Text(), nullable=False),
         sa.Column('modified_dt', UTCDateTime, nullable=True),
         sa.Column('created_dt', UTCDateTime, nullable=False),
+        sa.Column('visibility', PyIntEnum(PaperCommentVisibility), nullable=False),
         sa.Column('is_deleted', sa.Boolean(), nullable=False),
         sa.ForeignKeyConstraint(['modified_by_id'], ['users.users.id']),
         sa.ForeignKeyConstraint(['revision_id'], ['event_paper_reviewing.revisions.id']),
