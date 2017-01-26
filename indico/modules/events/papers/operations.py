@@ -264,6 +264,34 @@ def create_review(paper, review_type, user, review_data, questions_data):
     return review
 
 
+def update_review(review, review_data, questions_data):
+    paper = review.revision.paper
+    event = paper.event_new
+    changes = review.populate_from_dict(review_data)
+    review.modified_dt = now_utc()
+    log_fields = {}
+    for question in event.cfp.get_questions_from_review_type(review.type):
+        field_name = 'question_{}'.format(question.id)
+        rating = question.get_review_rating(review, allow_create=True)
+        old_value = rating.value
+        rating.value = int(questions_data[field_name])
+        if old_value != rating.value:
+            changes[field_name] = (old_value, rating.value)
+            log_fields[field_name] = {
+                'title': question.text,
+                'type': 'number'
+            }
+    db.session.flush()
+    logger.info("Paper review %r modified", review)
+    log_fields.update({
+        'proposed_action': 'Action',
+        'comment': 'Comment'
+    })
+    event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+              'Review for paper {} modified'.format(paper.verbose_title),
+              session.user, data={'Changes': make_diff_log(changes, log_fields)})
+
+
 @no_autoflush
 def create_comment(paper, text, visibility, user):
     comment = PaperReviewComment(user=user, text=text, visibility=visibility)
