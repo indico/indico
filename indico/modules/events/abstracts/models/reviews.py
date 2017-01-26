@@ -42,8 +42,8 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     possible_render_modes = {RenderMode.markdown}
     default_render_mode = RenderMode.markdown
 
-    proposal_relationship = 'abstract'
-    group_relationship = 'track'
+    revision_attr = 'abstract'
+    group_attr = 'track'
 
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
