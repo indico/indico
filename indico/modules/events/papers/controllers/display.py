@@ -87,3 +87,23 @@ class RHSubmitPaperReview(RHPaperBase):
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
         return jsonify(html=tpl.render_review_form(form, proposal=self.paper, group=self.type))
+
+
+class RHEditPaperReview(RHPaperBase):
+    # TODO
+    pass
+
+
+class RHSubmitPaperComment(RHPaperBase):
+    # TODO
+    pass
+
+
+class RHEditPaperComment(RHPaperBase):
+    # TODO
+    pass
+
+
+class RHDeletePaperComment(RHPaperBase):
+    # TODO
+    pass
