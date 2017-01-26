@@ -128,22 +128,22 @@ def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
     db.session.flush()
     log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
     if send_notifications:
-        send_paper_notifications(paper.contribution)
+        send_paper_notifications(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
                         data=log_data)
 
 
-def send_paper_notifications(contribution):
+def send_paper_notifications(paper):
     """Send paper notification e-mails.
 
     :param contribution: the contribution whose last paper revision was judged
     """
     template = get_template_module('events/static/emails/paper_judgment_notification_email.txt',
-                                   contribution=contribution, paper=contribution.paper_last_revision)
-    email = make_email(to_list=[contribution.paper_last_revision.submitter.email], template=template)
-    send_email(email, contribution.event_new, 'Papers', session.user)
+                                   contribution=paper.contribution, paper=paper.last_revision)
+    email = make_email(to_list=[paper.last_revision.submitter.email], template=template)
+    send_email(email, paper.event_new, 'Papers', session.user)
 
 
 def _store_paper_template_file(template, file):
