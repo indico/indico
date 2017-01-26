@@ -19,8 +19,10 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.review_comments import ReviewCommentMixin
 from indico.modules.events.models.reviews import ProposalCommentMixin
+from indico.modules.events.papers.models.reviews import PaperCommentVisibility
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
 
@@ -38,6 +40,14 @@ class PaperReviewComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
             db.ForeignKey('event_paper_reviewing.revisions.id'),
             index=True,
             nullable=False
+        )
+
+    @declared_attr
+    def visibility(cls):
+        return db.Column(
+            PyIntEnum(PaperCommentVisibility),
+            nullable=False,
+            default=PaperCommentVisibility.contributors
         )
 
     @declared_attr
