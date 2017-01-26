@@ -78,3 +78,4 @@ class RHPaperBase(RHPapersBase):
     def _checkParams(self, params):
         RHPapersBase._checkParams(self, params)
         self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
+        self.paper = self.contribution.paper
