@@ -33,6 +33,5 @@ def _sidemenu_sections(sender, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('general', _('General Settings (old)'), url_for('admin.adminList'), 100, icon='settings')
     yield SideMenuItem('storage', _('Disk Storage'), url_for('admin.adminSystem'), 70, icon='stack')
     yield SideMenuItem('layout', _('Layout'), url_for('admin.adminLayout'), section='customization')

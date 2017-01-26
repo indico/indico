@@ -20,7 +20,6 @@ from indico.modules.users import User
 from indico.util.i18n import _
 
 from MaKaC.common import timezoneUtils
-from MaKaC.common.fossilize import fossilize
 from MaKaC.services.implementation.base import AdminService, LoggedOnlyService
 from MaKaC.services.implementation.base import ParameterManager
 from MaKaC.services.interface.rpc.common import NoReportError
@@ -62,41 +61,7 @@ class AdminUndoLoginAs(LoggedOnlyService):
         return True
 
 
-class AddAdministrator(AdminService):
-
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userList = pm.extract("userList", pType=list, allowEmpty=False)
-
-    def _getAnswer(self):
-        for fossil in self._userList:
-            user = User.get(int(fossil['id']))
-            if user is not None:
-                user.is_admin = True
-        admins = User.find(is_admin=True, is_deleted=False).order_by(User.first_name, User.last_name).all()
-        return fossilize([u.as_avatar for u in admins])
-
-
-class RemoveAdministrator(AdminService):
-
-    def _checkParams(self):
-        AdminService._checkParams(self)
-        pm = ParameterManager(self._params)
-        self._userId = pm.extract("userId", pType=int, allowEmpty=False)
-
-    def _getAnswer(self):
-        user = User.get(self._userId)
-        if user is not None:
-            user.is_admin = False
-        admins = User.find(is_admin=True, is_deleted=False).order_by(User.first_name, User.last_name).all()
-        return fossilize([u.as_avatar for u in admins])
-
-
 methodMap = {
-    "general.addExistingAdmin": AddAdministrator,
-    "general.removeAdmin": RemoveAdministrator,
-
     "header.loginAs": AdminLoginAs,
     "header.undoLoginAs": AdminUndoLoginAs
 }

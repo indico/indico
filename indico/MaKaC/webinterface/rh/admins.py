@@ -38,12 +38,6 @@ class RHAdminBase(RHProtected):
             raise Forbidden(_("Only Indico administrators may access this page."))
 
 
-class RHAdminArea(RHAdminBase):
-    def _process(self):
-        p = admins.WPAdmins(self)
-        return p.display()
-
-
 class RHAdminLayoutGeneral(RHAdminBase):
     _uh = urlHandlers.UHAdminLayoutGeneral
 
