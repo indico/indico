@@ -36,6 +36,15 @@ _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_tem
 # Paper reviews
 _bp.add_url_rule('papers/<int:contrib_id>/review/type/<review_type>', 'submit_review',
                  display.RHSubmitPaperReview, methods=('GET', 'POST'))
+_bp.add_url_rule('papers/<int:contrib_id>/reviews/<int:review_id>/edit', 'edit_review',
+                 display.RHEditPaperReview, methods=('GET', 'POST'))
+# Paper comments
+_bp.add_url_rule('/papers/<int:contrib_id>/comment', 'submit_comment',
+                 display.RHSubmitPaperComment, methods=('POST',))
+_bp.add_url_rule('/papers/<int:contrib_id>/comments/<int:comment_id>', 'edit_comment',
+                 display.RHEditPaperComment, methods=('GET', 'POST'))
+_bp.add_url_rule('/papers/<int:contrib_id>/comments/<int:comment_id>', 'delete_comment',
+                 display.RHDeletePaperComment, methods=('DELETE',))
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,
