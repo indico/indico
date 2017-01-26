@@ -81,3 +81,19 @@ class PaperReviewComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
             return True
         else:
             return False
+
+    def can_view(self, user):
+        if user is None:
+            return False
+        elif user == self.user:
+            return True
+        elif self.visibility == PaperCommentVisibility.users:
+            return True
+        paper = self.paper_revision.paper
+        visibility_checks = {PaperCommentVisibility.judges: [paper.can_judge],
+                             PaperCommentVisibility.reviewers: [paper.can_judge,
+                                                                paper.can_review],
+                             PaperCommentVisibility.contributors: [paper.can_judge,
+                                                                   paper.can_review,
+                                                                   paper.can_submit]}
+        return any(fn(user) for fn in visibility_checks[self.visibility])

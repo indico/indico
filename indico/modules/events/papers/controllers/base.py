@@ -79,3 +79,16 @@ class RHPaperBase(RHPapersBase):
         RHPapersBase._checkParams(self, params)
         self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
         self.paper = self.contribution.paper
+
+    def _checkProtection(self):
+        RHPapersBase._checkProtection(self)
+        if not self._check_paper_protection():
+            raise Forbidden
+
+    def _check_paper_protection(self):
+        """Perform a permission check on the current paper.
+
+        Override this in case you want to check for more specific
+        privileges than the generic "can access".
+        """
+        return self.paper.contribution.can_access(session.user)
