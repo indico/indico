@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global setupListGenerator:false, applySearchFilters:false, setupTableSorter:false. setupSearchBox:false */
+/* global setupListGenerator:false, setupTableSorter:false, setupSearchBox:false */
 
 (function(global) {
     'use strict';
@@ -31,10 +31,6 @@
 
         setupTableSorter('#assignment-list .tablesorter');
         enableIfChecked('#assignment-list', 'input[name=contribution_id]', '.js-enable-if-checked');
-        $('#assignment-list').on('indico:htmlUpdated', function() {
-            setupTableSorter('#assignment-list .tablesorter');
-            applySearchFilters();
-        });
         setupListGenerator(filterConfig);
     };
 
