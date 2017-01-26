@@ -264,8 +264,8 @@ def create_review(paper, review_type, user, review_data, questions_data):
 
 
 @no_autoflush
-def create_comment(paper, text, user):
-    comment = PaperReviewComment(user=user, text=text)
+def create_comment(paper, text, visibility, user):
+    comment = PaperReviewComment(user=user, text=text, visibility=visibility)
     comment.paper_revision = paper.last_revision
     db.session.flush()
     logger.info("Paper %r received a comment from %r", paper, session.user)
