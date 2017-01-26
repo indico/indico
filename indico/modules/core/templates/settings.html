@@ -16,4 +16,15 @@
     {{ render_system_settings() }}
     {{ render_site_settings(core_settings) }}
     {{ render_social_settings(social_settings) }}
+
+    {# TODO: move this to some kind of admin dashboard once we have one #}
+    {% if cephalopod_data.enabled %}
+        <script>
+            initCephalopodOnAdminPage(
+                {{ cephalopod_url | tojson }},
+                {{ cephalopod_data | tojson }},
+                {{ url_for('cephalopod.index') | tojson }}
+            );
+        </script>
+    {% endif %}
 {% endblock %}
