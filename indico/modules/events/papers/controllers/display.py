@@ -22,7 +22,7 @@ from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm, build_review_form
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperReviewType, PaperTypeProxy
-from indico.modules.events.papers.operations import create_paper_revision, create_review
+from indico.modules.events.papers.operations import create_paper_revision, create_review, create_comment
 from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify
@@ -95,8 +95,16 @@ class RHEditPaperReview(RHPaperBase):
 
 
 class RHSubmitPaperComment(RHPaperBase):
-    # TODO
-    pass
+    def _check_paper_protection(self):
+        return self.paper.can_comment(session.user)
+
+    def _process(self):
+        form = PaperCommentForm(paper=self.paper, user=session.user)
+        if form.validate_on_submit():
+            create_comment(self.paper, form.text.data, form.visibility.data, session.user)
+            return jsonify_data(flash=False, html=render_paper_page(self.paper))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_comment_form(form, proposal=self.paper))
 
 
 class RHEditPaperComment(RHPaperBase):
