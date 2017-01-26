@@ -19,9 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.util.caching import memoize_request
-from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
 
