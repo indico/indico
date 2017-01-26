@@ -23,3 +23,6 @@ from MaKaC.webinterface.pages.base import WPJinjaMixin
 class WPSettings(WPJinjaMixin, WPAdminsBase):
     sidemenu_option = 'settings'
     template_prefix = 'core/'
+
+    def getJSFiles(self):
+        return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
