@@ -17,7 +17,10 @@
 from __future__ import unicode_literals
 
 from flask import flash
+from werkzeug.urls import url_join
 
+from indico.core.config import Config
+from indico.modules.cephalopod import settings as cephalopod_settings
 from indico.modules.core.forms import SiteSettingsForm, SocialSettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPSettings
@@ -35,10 +38,25 @@ class RHCoreAdminBase(RHAdminBase):
 class RHSettings(RHCoreAdminBase):
     """General settings"""
 
+    def _get_cephalopod_data(self):
+        if not cephalopod_settings.get('joined'):
+            return None, {'enabled': False}
+
+        url = url_join(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        data = {'enabled': cephalopod_settings.get('joined'),
+                'contact': cephalopod_settings.get('contact_name'),
+                'email': cephalopod_settings.get('contact_email'),
+                'url': Config.getInstance().getBaseURL(),
+                'organisation': core_settings.get('site_organization')}
+        return url, data
+
     def _process(self):
+        cephalopod_url, cephalopod_data = self._get_cephalopod_data()
         return WPSettings.render_template('settings.html',
                                           core_settings=core_settings.get_all(),
-                                          social_settings=social_settings.get_all())
+                                          social_settings=social_settings.get_all(),
+                                          cephalopod_url=cephalopod_url,
+                                          cephalopod_data=cephalopod_data)
 
 
 class RHSettingsBase(RHCoreAdminBase):
