@@ -16,24 +16,18 @@
 
 import os
 import re
-from operator import methodcaller
-from urlparse import urljoin
 
 # MaKaC
 import MaKaC.common.info as info
 import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.common.fossilize import fossilize
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
 # indico
 from indico.core.config import Config
 from indico.modules import ModuleHolder
-from indico.modules.cephalopod import settings as cephalopod_settings
-from indico.modules.core.settings import core_settings
-from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.menu import render_sidemenu
 
@@ -84,23 +78,6 @@ class WPAdminsBase(WPMainBase):
         return "nothing"
 
 
-class WAdmins(wcomponents.WTemplated):
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars['systemIconAdmins'] = Config.getInstance().getSystemIconURL('admin')
-        wvars['administrators'] = fossilize(sorted([u.as_avatar for u in User.find(is_admin=True, is_deleted=False)],
-                                                   key=methodcaller('getStraightFullName')))
-        wvars['tracker_url'] = urljoin(Config.getInstance().getTrackerURL(),
-                                       'api/instance/{}'.format(cephalopod_settings.get('uuid')))
-        wvars['cephalopod_data'] = {'enabled': cephalopod_settings.get('joined'),
-                                    'contact': cephalopod_settings.get('contact_name'),
-                                    'email': cephalopod_settings.get('contact_email'),
-                                    'url': Config.getInstance().getBaseURL(),
-                                    'organisation': core_settings.get('site_organization')}
-        return wvars
-
-
 class WAdminFrame(wcomponents.WTemplated):
 
     def __init__( self ):
@@ -117,17 +94,6 @@ class WAdminFrame(wcomponents.WTemplated):
 
     def getTitleTabPixels( self ):
         return 260
-
-
-class WPAdmins(WPAdminsBase):
-    sidemenu_option = 'general'
-
-    def getJSFiles(self):
-        # Cephalopod is needed to check if the data is synced.
-        return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
-
-    def _getPageContent(self, params):
-        return WAdmins().getHTML()
 
 
 class WPTemplatesCommon( WPAdminsBase ):
