@@ -20,9 +20,6 @@ from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModi
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
 
-# General settings
-admin.add_url_rule('/settings-old', 'adminList', admins.RHAdminArea)
-
 # System settings
 admin.add_url_rule('/settings/system', 'adminSystem', admins.RHSystem)
 admin.add_url_rule('/settings/system/modify', 'adminSystem-modify', admins.RHSystemModify, methods=('GET', 'POST'))

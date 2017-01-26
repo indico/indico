@@ -95,7 +95,6 @@ indico_core = rjs_bundle(
                'Widgets/Menu.js',
                'Widgets/RichText.js',
                'Widgets/Navigation.js',
-               'Widgets/UserList.js',
                'Dialogs/Popup.js',
                'Dialogs/PopupWidgets.js',
                'Dialogs/Base.js',
