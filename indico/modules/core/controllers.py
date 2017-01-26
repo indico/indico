@@ -20,7 +20,7 @@ from flask import flash
 from werkzeug.urls import url_join
 
 from indico.core.config import Config
-from indico.modules.cephalopod import settings as cephalopod_settings
+from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import SiteSettingsForm, SocialSettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPSettings

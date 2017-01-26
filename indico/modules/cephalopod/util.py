@@ -16,18 +16,23 @@
 
 from __future__ import unicode_literals
 
+import json
+
 import requests
-from json import dumps
 from requests.exceptions import HTTPError, RequestException, Timeout
-from urlparse import urljoin
+from werkzeug.urls import url_join
 
 from indico.core.config import Config
-from indico.modules.cephalopod import logger, settings
+from indico.modules.cephalopod import logger, cephalopod_settings
 from indico.modules.core.settings import core_settings
 
-_headers = {'Content-Type': 'application/json'}
-_url = urljoin(Config.getInstance().getTrackerURL(), 'api/instance/')
+
+HEADERS = {'Content-Type': 'application/json'}
 TIMEOUT = 10
+
+
+def _get_url():
+    return url_join(Config.getInstance().getTrackerURL(), 'api/instance/')
 
 
 def register_instance(contact, email):
@@ -35,16 +40,16 @@ def register_instance(contact, email):
                'contact': contact,
                'email': email,
                'organisation': core_settings.get('site_organization')}
-    response = requests.post(_url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
+    response = requests.post(_get_url(), data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT)
     try:
         response.raise_for_status()
     except HTTPError as err:
         logger.error('failed to register the server to the community hub, got: %s', err.message)
-        settings.set('joined', False)
+        cephalopod_settings.set('joined', False)
         raise
     except Timeout:
         logger.error('failed to register: timeout while contacting the community hub')
-        settings.set('joined', False)
+        cephalopod_settings.set('joined', False)
         raise
     except RequestException as err:
         logger.error('unexpected exception while registering the server with the Community Hub: %s', err.message)
@@ -53,10 +58,10 @@ def register_instance(contact, email):
     json_response = response.json()
     if 'uuid' not in json_response:
         logger.error('invalid json reply from the community hub: uuid missing')
-        settings.set('joined', False)
+        cephalopod_settings.set('joined', False)
         raise ValueError('invalid json reply from the community hub: uuid missing')
 
-    settings.set_multi({
+    cephalopod_settings.set_multi({
         'joined': True,
         'uuid': json_response['uuid'],
         'contact_name': payload['contact'],
@@ -67,8 +72,8 @@ def register_instance(contact, email):
 
 def unregister_instance():
     payload = {'enabled': False}
-    url = urljoin(_url, settings.get('uuid'))
-    response = requests.patch(url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
+    url = url_join(_get_url(), cephalopod_settings.get('uuid'))
+    response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT)
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -81,15 +86,15 @@ def unregister_instance():
     except RequestException as err:
         logger.error('unexpected exception while unregistering the server with the Community Hub: %s', err.message)
         raise
-    settings.set('joined', False)
+    cephalopod_settings.set('joined', False)
     logger.info('successfully unregistered the server from the community hub')
 
 
 def sync_instance(contact, email):
-    contact = contact or settings.get('contact_name')
-    email = email or settings.get('contact_email')
+    contact = contact or cephalopod_settings.get('contact_name')
+    email = email or cephalopod_settings.get('contact_email')
     # registration needed if the instance does not have a uuid
-    if not settings.get('uuid'):
+    if not cephalopod_settings.get('uuid'):
         logger.warn('unable to synchronise: missing uuid, registering the server instead')
         register_instance(contact, email)
         return
@@ -99,8 +104,8 @@ def sync_instance(contact, email):
                'contact': contact,
                'email': email,
                'organisation': core_settings.get('site_organization')}
-    url = urljoin(_url, settings.get('uuid'))
-    response = requests.patch(url, data=dumps(payload), headers=_headers, timeout=TIMEOUT)
+    url = url_join(_get_url(), cephalopod_settings.get('uuid'))
+    response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT)
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -117,7 +122,7 @@ def sync_instance(contact, email):
         logger.error('unexpected exception while synchronizing the server with the Community Hub: %s', err.message)
         raise
     else:
-        settings.set_multi({
+        cephalopod_settings.set_multi({
             'joined': True,
             'contact_name': payload['contact'],
             'contact_email': payload['email']})
