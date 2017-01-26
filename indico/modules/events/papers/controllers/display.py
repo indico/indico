@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import request, session
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
-from indico.modules.events.papers.forms import PaperSubmissionForm
+from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.operations import create_paper_revision
 from indico.modules.events.papers.views import WPDisplayPapersBase
@@ -37,7 +37,9 @@ class RHSubmitPaper(RHPaperBase):
 
 class RHPaperTimeline(RHPaperBase):
     def _process(self):
-        return WPDisplayPapersBase.render_template('paper.html', self._conf, contribution=self.contribution)
+        comment_form = PaperCommentForm(paper=self.paper, user=session.user, formdata=None)
+        return WPDisplayPapersBase.render_template('paper.html', self._conf, paper=self.paper,
+                                                   comment_form=comment_form, review_form=None)
 
 
 class RHDownloadPaperFile(RHPaperBase):
