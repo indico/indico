@@ -27,7 +27,8 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.reviews import PaperAction
+from indico.modules.events.papers.models.reviews import PaperAction, PaperReview
+from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.competences import PaperCompetence
@@ -238,3 +239,24 @@ def update_reviewing_roles(event, users, contributions, role, assign):
                   'Papers unassigned ({})'.format(orig_string(role.title)), session.user, data=log_data)
     db.session.flush()
     logger.info('Paper reviewing roles in event %r updated by %r', event, session.user)
+
+
+def create_review(paper, review_type, user, review_data, questions_data):
+    review = PaperReview(revision=paper.last_revision, type=review_type.instance, user=user)
+    review.populate_from_dict(review_data)
+    log_data = {}
+    for question in paper.event_new.cfp.get_questions_from_review_type(review_type.instance):
+        value = int(questions_data['question_{}'.format(question.id)])
+        review.ratings.append(PaperReviewRating(question=question, value=value))
+        log_data[question.text] = value
+    db.session.flush()
+    logger.info("Paper %r received a review of type %s by %r", paper, review_type.instance.name, user)
+    log_data.update({
+        'Type': orig_string(review_type.title),
+        'Action': orig_string(review.proposed_action.title),
+        'Comment': review.comment
+    })
+    paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+                        'Paper for contribution {} reviewed'.format(paper.contribution.verbose_title),
+                        user, data=log_data)
+    return review
