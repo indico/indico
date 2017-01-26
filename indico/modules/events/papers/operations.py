@@ -26,6 +26,7 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperAction, PaperReview
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
@@ -266,9 +267,30 @@ def create_review(paper, review_type, user, review_data, questions_data):
 @no_autoflush
 def create_comment(paper, text, visibility, user):
     comment = PaperReviewComment(user=user, text=text, visibility=visibility)
-    comment.paper_revision = paper.last_revision
+    paper.last_revision.comments.append(comment)
     db.session.flush()
     logger.info("Paper %r received a comment from %r", paper, session.user)
     paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         'Paper {} received a comment'.format(paper.verbose_title),
                         session.user)
+
+
+def update_comment(comment, text, visibility):
+    changes = comment.populate_from_dict({'text': text, 'visibility': visibility})
+    comment.modified_by = session.user
+    comment.modified_dt = now_utc()
+    db.session.flush()
+    logger.info("Paper comment %r modified by %r", comment, session.user)
+    paper = comment.paper_revision.paper
+    paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+                        'Comment on paper {} modified'.format(paper.verbose_title), session.user,
+                        data={'Changes': make_diff_log(changes, {'text': 'Text', 'visibility': 'Visibility'})})
+
+
+def delete_comment(comment):
+    comment.is_deleted = True
+    db.session.flush()
+    logger.info("Paper comment %r deleted by %r", comment, session.user)
+    paper = comment.paper_revision.paper
+    paper.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Papers',
+                        'Comment on paper {} removed'.format(paper.verbose_title), session.user)
