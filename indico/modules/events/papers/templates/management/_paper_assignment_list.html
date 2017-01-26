@@ -43,8 +43,8 @@
                 </thead>
                 <tbody>
                     {% for contrib in contribs %}
-                        {% if contrib.paper_last_revision %}
-                            {% set last_revision_state = contrib.paper_last_revision.state.title %}
+                        {% if contrib.paper %}
+                            {% set last_revision_state = contrib.paper.last_revision.state.title %}
                         {% else %}
                             {% set last_revision_state %}
                                 {%- trans %}Paper not yet submitted{% endtrans -%}
@@ -67,7 +67,7 @@
                                 data-searchable="{{ contrib.title | lower }}"
                                 data-text="{{ contrib.title | lower }}">
                                 <span class="vertical-aligner">
-                                    {% if contrib.paper_last_revision %}
+                                    {% if contrib.paper %}
                                         <a href="{{ url_for('.paper_timeline', contrib) }}">
                                             {{- contrib.title -}}
                                         </a>
@@ -121,8 +121,8 @@
                             {% endfor %}
                             <td class="i-table revision-column">
                                 <span class="vertical-aligner">
-                                    {%- if paper.revision_count -%}
-                                        {{ paper.revision_count }}
+                                    {%- if contrib.paper.revision_count -%}
+                                        {{ contrib.paper.revision_count }}
                                     {%- endif -%}
                                 </span>
                             </td>
