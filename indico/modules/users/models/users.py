@@ -383,6 +383,7 @@ class User(PersonMixin, db.Model):
     # - in_settings_acls (SettingPrincipal.user)
     # - judge_for_contributions (Contribution.paper_judges)
     # - judged_abstracts (Abstract.judge)
+    # - judged_papers (PaperRevision.judge)
     # - layout_reviewer_for_contributions (Contribution.paper_layout_reviewers)
     # - legacy_paper_reviewing_roles (LegacyPaperReviewingRole.user)
     # - local_groups (LocalGroup.members)
