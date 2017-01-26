@@ -20,9 +20,11 @@ from flask import request, session
 
 from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm, build_review_form
+from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperReviewType, PaperTypeProxy
-from indico.modules.events.papers.operations import create_paper_revision, create_review, create_comment
+from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
+                                                     update_comment, delete_comment)
 from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify
@@ -107,11 +109,35 @@ class RHSubmitPaperComment(RHPaperBase):
         return jsonify(html=tpl.render_comment_form(form, proposal=self.paper))
 
 
-class RHEditPaperComment(RHPaperBase):
-    # TODO
-    pass
+class RHPaperCommentBase(RHPaperBase):
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.comment
+        }
+    }
+
+    def _checkParams(self, params):
+        RHPaperBase._checkParams(self, params)
+        self.comment = PaperReviewComment.get_one(request.view_args['comment_id'], is_deleted=False)
+
+    def _checkProtection(self):
+        RHPaperBase._checkProtection(self)
+        if not self.comment.can_edit(session.user):
+            raise Forbidden
 
 
-class RHDeletePaperComment(RHPaperBase):
-    # TODO
-    pass
+class RHEditPaperComment(RHPaperCommentBase):
+    def _process(self):
+        form = PaperCommentForm(obj=self.comment, paper=self.paper, user=session.user,
+                                prefix='edit-comment-{}-'.format(self.comment.id))
+        if form.validate_on_submit():
+            update_comment(self.comment, form.text.data, form.visibility.data)
+            return jsonify_data(flash=False, html=render_paper_page(self.paper))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_comment_form(form, proposal=self.paper, comment=self.comment))
+
+
+class RHDeletePaperComment(RHPaperCommentBase):
+    def _process(self):
+        delete_comment(self.comment)
+        return jsonify_data(flash=False)
