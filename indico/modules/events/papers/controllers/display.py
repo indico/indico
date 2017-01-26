@@ -22,9 +22,9 @@ from indico.modules.events.papers.controllers.base import RHPaperBase
 from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm, build_review_form
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.reviews import PaperReviewType, PaperTypeProxy
+from indico.modules.events.papers.models.reviews import PaperReviewType, PaperReview, PaperTypeProxy
 from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
-                                                     update_comment, delete_comment)
+                                                     update_comment, delete_comment, update_review)
 from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify
@@ -92,8 +92,26 @@ class RHSubmitPaperReview(RHPaperBase):
 
 
 class RHEditPaperReview(RHPaperBase):
-    # TODO
-    pass
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.review
+        }
+    }
+
+    def _check_paper_protection(self):
+        return self.review.can_edit(session.user, check_state=True)
+
+    def _checkParams(self, params):
+        RHPaperBase._checkParams(self, params)
+        self.review = PaperReview.get_one(request.view_args['review_id'])
+
+    def _process(self):
+        form = build_review_form(review=self.review)
+        if form.validate_on_submit():
+            update_review(self.review, **form.split_data)
+            return jsonify_data(flash=False, html=render_paper_page(self.paper))
+        tpl = get_template_module('events/reviews/forms.html')
+        return jsonify(html=tpl.render_review_form(form, review=self.review))
 
 
 class RHSubmitPaperComment(RHPaperBase):
