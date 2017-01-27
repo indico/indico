@@ -167,3 +167,10 @@ class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     @property
     def visibility(self):
         return PaperCommentVisibility.reviewers
+
+    @property
+    def score(self):
+        ratings = [r for r in self.ratings]
+        if not ratings:
+            return None
+        return sum(x.value for x in ratings) / len(ratings)
