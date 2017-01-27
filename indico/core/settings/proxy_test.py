@@ -21,6 +21,8 @@ import pytz
 
 from indico.core.settings import SettingsProxy, FallbackSettingsProxy
 from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
+from indico.core.settings.proxy import PrefixSettingsProxy
+from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import User
 
 
@@ -212,3 +214,37 @@ def test_fallback_settings_get_all(mocker, db):
     assert fallback_proxy.get_all() == {'person': 'dave'}
     local_proxy.set('animal', 'bo')
     assert fallback_proxy.get_all() == {'person': 'dave', 'animal': 'bo'}
+
+
+def test_prefix_settings_invalid():
+    foo_proxy = SettingsProxy('foo', {'a': 1, 'b': 2})
+    bar_proxy = SettingsProxy('bar', {'x': 3, 'y': 4})
+    proxy = PrefixSettingsProxy({'foo': foo_proxy, 'bar': bar_proxy})
+    pytest.raises(ValueError, proxy.get, 'x')
+    pytest.raises(ValueError, proxy.get, 'x_y')
+    pytest.raises(ValueError, proxy.set, 'x', 'test')
+    pytest.raises(ValueError, proxy.set, 'x_y', 'test')
+
+
+@pytest.mark.parametrize('with_arg', (True, False))
+@pytest.mark.usefixtures('db')
+def test_prefix_settings(dummy_event, with_arg):
+    kw = {'arg': dummy_event} if with_arg else {'arg': None}
+    cls = EventSettingsProxy if with_arg else SettingsProxy
+    foo_proxy = cls('foo', {'a': 1, 'b': 2})
+    bar_proxy = cls('bar', {'x': None, 'y': 4})
+    proxy = PrefixSettingsProxy({'foo': foo_proxy, 'bar': bar_proxy}, has_arg=with_arg)
+    proxy.set('bar_x', 3, **kw)
+    assert proxy.get_all(**kw) == {'foo_a': 1, 'foo_b': 2, 'bar_x': 3, 'bar_y': 4}
+    assert proxy.get_all(no_defaults=True, **kw) == {'bar_x': 3}
+    assert proxy.get('foo_a', **kw) == 1
+    assert proxy.get('bar_y', 'test', **kw) == 'test'
+    proxy.set_multi({'foo_a': 11, 'bar_x': 33}, **kw)
+    assert proxy.get('foo_a', **kw) == 11
+    assert proxy.get('bar_x', **kw) == 33
+    proxy.delete('foo_a', 'bar_x', **kw)
+    assert proxy.get('foo_a', **kw) == 1
+    assert proxy.get('bar_x', **kw) is None
+    proxy.set_multi({'foo_a': 11, 'bar_x': 33}, **kw)
+    proxy.delete_all(**kw)
+    assert proxy.get_all(no_defaults=True, **kw) == {}
