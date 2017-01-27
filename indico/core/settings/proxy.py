@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
 from functools import update_wrapper, partial
 from operator import attrgetter
 
@@ -259,3 +260,76 @@ class FallbackSettingsProxy(object):
         for proxy in self.proxies[::-1][1:]:
             result.update(proxy.get_all(no_defaults=True))
         return result
+
+
+class PrefixSettingsProxy(object):
+    """A SettingsProxy that exposes settings with prefixes
+
+    This allows for simple form handling when a single form contains
+    settings from more than one proxy.
+
+    All proxies must be of the same type, e.g. `SettingsProxy` or
+    `EventSettingsProxy`.
+
+    If the proxy type requires an extra argument, it must be passed
+    in the ``arg`` kwarg to every method of this proxy. Additionally,
+    ``has_arg`` must be set to ``True``.
+
+    :param mapping: A dict mapping prefixes to SettingsProxy instances
+    :param sep: The separator between the prefix and the setting name
+    :param has_arg: Whether the underlying proxies require an extra arg
+    """
+
+    def __init__(self, mapping, sep='_', has_arg=False):
+        self.mapping = mapping
+        self.sep = sep
+        self.has_arg = has_arg
+
+    def _call(self, fn, arg, *args, **kwargs):
+        if self.has_arg:
+            args = [arg] + list(args)
+        return fn(*args, **kwargs)
+
+    def _resolve_prefix(self, name):
+        try:
+            prefix, local_name = name.split(self.sep, 1)
+            return self.mapping[prefix], local_name
+        except (ValueError, KeyError):
+            raise ValueError('no/invalid prefix specified')
+
+    def get_all(self, no_defaults=False, arg=None):
+        rv = {}
+        for prefix, proxy in self.mapping.iteritems():
+            for key, value in self._call(proxy.get_all, arg, no_defaults=no_defaults).iteritems():
+                rv[prefix + self.sep + key] = value
+        return rv
+
+    def get(self, name, default=SettingsProxyBase.default_sentinel, arg=None):
+        proxy, local_name = self._resolve_prefix(name)
+        return self._call(proxy.get, arg, local_name, default)
+
+    def set(self, name, value, arg=None):
+        proxy, local_name = self._resolve_prefix(name)
+        self._call(proxy.set, arg, local_name, value)
+
+    def set_multi(self, items, arg=None):
+        by_proxy = defaultdict(dict)
+        for name, value in items.iteritems():
+            proxy, local_name = self._resolve_prefix(name)
+            by_proxy[proxy][local_name] = value
+        for proxy, local_items in by_proxy.iteritems():
+            self._call(proxy.set_multi, arg, local_items)
+
+    def delete(self, *names, **kwargs):
+        arg = kwargs.pop('arg', None)
+        assert not kwargs
+        by_proxy = defaultdict(list)
+        for name in names:
+            proxy, local_name = self._resolve_prefix(name)
+            by_proxy[proxy].append(local_name)
+        for proxy, local_names in by_proxy.iteritems():
+            self._call(proxy.delete, arg, *local_names)
+
+    def delete_all(self, arg=None):
+        for proxy in self.mapping.itervalues():
+            self._call(proxy.delete_all, arg)
