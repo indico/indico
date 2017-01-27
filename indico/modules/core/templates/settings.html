@@ -1,6 +1,6 @@
 {% extends 'layout/base.html' %}
 {% from 'message_box.html' import message_box %}
-{% from 'core/_settings.html' import render_system_settings, render_site_settings, render_social_settings %}
+{% from 'forms/_form.html' import simple_form, form_rows, form_fieldset %}
 
 {% block title %}
     {% trans %}General Settings{% endtrans %}
@@ -13,9 +13,36 @@
         {%- endcall %}
     {% endif %}
 
-    {{ render_system_settings() }}
-    {{ render_site_settings(core_settings) }}
-    {{ render_social_settings(social_settings) }}
+    {% call simple_form(form, back_button=false) %}
+        {% set legend %}
+            {% trans %}System{% endtrans %}
+            <small>
+                <i class="icon-info"
+                   title="{%- trans -%}These settings can be changed in the indico.conf file on the server.{%- endtrans -%}"></i>
+            </small>
+        {% endset %}
+        {% call form_fieldset(legend) %}
+            <dl class="i-data-list">
+                <dt>{% trans %}Default language{% endtrans %}</dt>
+                <dd>{{ indico_config.DefaultLocale }}</dd>
+                <dt>{% trans %}Default timezone{% endtrans %}</dt>
+                <dd>{{ indico_config.DefaultTimezone }}</dd>
+                <dt>{% trans %}Admin email{% endtrans %}</dt>
+                <dd>{{ indico_config.SupportEmail }}</dd>
+                <dt>{% trans %}Support email{% endtrans %}</dt>
+                <dd>{{ indico_config.PublicSupportEmail }}</dd>
+                <dt>{% trans %}No-reply email{% endtrans %}</dt>
+                <dd>{{ indico_config.NoReplyEmail }}</dd>
+            </dl>
+        {% endcall %}
+
+        {% for legend, fields in form._fieldsets %}
+            {% call form_fieldset(legend) %}
+                {{ form_rows(form, fields=fields) }}
+            {% endcall %}
+        {% endfor %}
+    {% endcall %}
+
 
     {# TODO: move this to some kind of admin dashboard once we have one #}
     {% if cephalopod_data.enabled %}
