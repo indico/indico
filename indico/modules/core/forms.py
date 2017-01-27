@@ -25,11 +25,18 @@ from indico.web.forms.validators import IndicoRegexp
 from indico.web.forms.widgets import SwitchWidget
 
 
-class SiteSettingsForm(IndicoForm):
-    site_title = StringField(_('Title'), [DataRequired()], description=_("The global title of this Indico site."))
-    site_organization = StringField(_('Organization'), description=_("The organisation that runs this Indico site."))
+class SettingsForm(IndicoForm):
+    # Core settings
+    core_site_title = StringField(_('Title'), [DataRequired()], description=_("The global title of this Indico site."))
+    core_site_organization = StringField(_('Organization'),
+                                         description=_("The organisation that runs this Indico site."))
+    # Social settings
+    social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
+    social_facebook_app_id = StringField('Facebook App ID', [IndicoRegexp(r'^\d*$')])
 
-
-class SocialSettingsForm(IndicoForm):
-    enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
-    facebook_app_id = StringField('Facebook App ID', [IndicoRegexp(r'^\d*$')])
+    @property
+    def _fieldsets(self):
+        return [
+            (_('Site'), [x for x in self._fields if x.startswith('core_')]),
+            (_('Social'), [x for x in self._fields if x.startswith('social_')]),
+        ]
