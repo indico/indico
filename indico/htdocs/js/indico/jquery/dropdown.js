@@ -20,7 +20,7 @@
 
     $.widget('indico.dropdown', {
         options: {
-            selector: '.i-button',
+            selector: '.i-button[data-toggle]',
             effect_on: 'slideDown',
             effect_off: 'fadeOut',
             time_on: 200,
