@@ -805,10 +805,11 @@ class TimeTablePlain(PDFWithTOC):
                     conv = i18nformat(u'<font face="Times-Bold"><b>-_("Conveners"): {}</b></font>').format(conv)
 
                 res.append(Paragraph('', self._styles["session_title"]))
-                start_dt = format_time(sess_block.timetable_entry.start_dt, timezone=self._tz)
 
                 if self._ttPDFFormat.showDateCloseToSessions():
-                    start_dt = format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz)
+                    start_dt = to_unicode(format_datetime(sess_block.timetable_entry.start_dt, timezone=self._tz))
+                else:
+                    start_dt = to_unicode(format_time(sess_block.timetable_entry.start_dt, timezone=self._tz))
 
                 sess_caption = u'<font face="Times-Bold">{}</font>'.format(escape(session_caption))
                 text = u'<u>{}</u>{} ({}-{})'.format(
