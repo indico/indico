@@ -151,7 +151,11 @@
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
     {{ form_header(form, **form_header_kwargs) }}
-    {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}
+    {% if caller %}
+        {{ caller() }}
+    {% else %}
+        {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}
+    {% endif %}
     {% call form_footer(form, skip_label=skip_labels) %}
         <input class="i-button big highlight" type="submit" value="{{ submit }}"
                {%- if disabled_until_change %} data-disabled-until-change{% endif %}
