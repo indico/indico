@@ -172,7 +172,8 @@ def test_set_multi_propagate(mocker):
     SettingPrincipal.set_acl_multi.assert_called_with('foo', {'acl': {'u'}})
 
 
-def test_fallback_settings_get(mocker, db):
+@pytest.mark.usefixtures('db')
+def test_fallback_settings_get():
     local_proxy = SettingsProxy('local', {'person': None})
     parent_proxy = SettingsProxy('parent', {'person': 'dave'})
     fallback_proxy = FallbackSettingsProxy(local_proxy, parent_proxy)
@@ -186,7 +187,8 @@ def test_fallback_settings_get(mocker, db):
     assert fallback_proxy.get('person') == 'dave'
 
 
-def test_fallback_settings_get_default(mocker, db):
+@pytest.mark.usefixtures('db')
+def test_fallback_settings_get_default():
     local_proxy = SettingsProxy('local', {'person': None})
     parent_proxy = SettingsProxy('parent', {'person': 'dave'})
     fallback_proxy = FallbackSettingsProxy(local_proxy, parent_proxy)
@@ -200,7 +202,8 @@ def test_fallback_settings_get_default(mocker, db):
     assert fallback_proxy.get('person', default='foo') == 'foo'
 
 
-def test_fallback_settings_get_all(mocker, db):
+@pytest.mark.usefixtures('db')
+def test_fallback_settings_get_all():
     local_proxy = SettingsProxy('local', {'person': None, 'animal': None})
     parent_proxy = SettingsProxy('parent', {'person': 'dave'})
     fallback_proxy = FallbackSettingsProxy(local_proxy, parent_proxy)
