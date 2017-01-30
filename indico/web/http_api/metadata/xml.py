@@ -73,32 +73,35 @@ class XMLSerializer(Serializer):
             doc.getroot().append(felement)
 
         for k, v in fossil.iteritems():
-            if k not in ['_fossil', '_type', 'id']:
+            if k in ['_fossil', '_type', 'id']:
+                continue
+            if isinstance(k, (int, float)) or (isinstance(k, basestring) and k.isdigit()):
+                elem = etree.SubElement(felement, 'entry', {'key': unicode(k)})
+            else:
                 elem = etree.SubElement(felement, k)
-                if isinstance(v, dict) and v.viewkeys() == {'date', 'time', 'tz'}:
-                    v = _deserialize_date(v)
-                if isinstance(v, (list, tuple)):
-                    onlyDicts = all(type(subv) == dict for subv in v)
-                    if onlyDicts:
-                        for subv in v:
-                            elem.append(self._xmlForFossil(subv))
-                    else:
-                        for subv in v:
-                            if type(subv) == dict:
-                                elem.append(self._xmlForFossil(subv))
-                            else:
-                                subelem = etree.SubElement(elem, 'item')
-                                subelem.text = self._convert(subv)
-                elif isinstance(v, dict):
-                    elem.append(self._xmlForFossil(v))
+            if isinstance(v, dict) and v.viewkeys() == {'date', 'time', 'tz'}:
+                v = _deserialize_date(v)
+            if isinstance(v, (list, tuple)):
+                onlyDicts = all(type(subv) == dict for subv in v)
+                if onlyDicts:
+                    for subv in v:
+                        elem.append(self._xmlForFossil(subv))
                 else:
-                    txt = self._convert(v)
-                    try:
-                        elem.text = txt
-                    except Exception:
-                        Logger.get('xmlSerializer').exception('Setting XML text value failed (id: {}, value {!r})'
-                                                              .format(id, txt))
-
+                    for subv in v:
+                        if type(subv) == dict:
+                            elem.append(self._xmlForFossil(subv))
+                        else:
+                            subelem = etree.SubElement(elem, 'item')
+                            subelem.text = self._convert(subv)
+            elif isinstance(v, dict):
+                elem.append(self._xmlForFossil(v))
+            else:
+                txt = self._convert(v)
+                try:
+                    elem.text = txt
+                except Exception:
+                    Logger.get('xmlSerializer').exception('Setting XML text value failed (id: {}, value {!r})'
+                                                          .format(id, txt))
 
         return felement
 
