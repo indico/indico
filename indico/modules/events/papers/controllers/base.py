@@ -56,3 +56,12 @@ class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
     def management(self):
         """Whether the RH is currently used in the management area"""
         return request.view_args.get('management', True)
+
+
+class RHJudgingAreaBase(RHPapersBase):
+    """Base class for all paper-related RHs only available to judges/managers"""
+
+    def _checkProtection(self):
+        RHPapersBase._checkProtection(self)
+        if not session.user or (not self.management and session.user not in self.event_new.cfp.judges):
+            raise Forbidden
