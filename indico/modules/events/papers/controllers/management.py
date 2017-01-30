@@ -18,15 +18,12 @@ from __future__ import unicode_literals
 
 from flask import request, render_template, flash, session
 
-from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.controllers.common import PaperJudgmentMixin
 from indico.modules.events.papers.forms import (make_competences_form, PapersScheduleForm,
                                                 PaperTeamsForm, PaperReviewingSettingsForm)
-from indico.modules.events.papers.lists import PaperAssignmentListGenerator
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
-                                                     update_competences, judge_paper, schedule_cfp, open_cfp, close_cfp)
+                                                     update_competences, schedule_cfp, open_cfp, close_cfp)
 from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.users.models.users import User
@@ -152,54 +149,6 @@ class RHCloseCFP(RHManagePapersBase):
         return jsonify_data(html=_render_paper_dashboard(self.event_new))
 
 
-class RHPapersAssignmentList(RHManagePapersBase):
-    """Assign contributions to reviewers and judges"""
-
-    def _process(self):
-        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
-        return WPManagePapers.render_template('management/assignment.html', self._conf, event=self.event_new,
-                                              **self.list_generator.get_list_kwargs())
-
-
-class RHAssignmentListCustomize(RHManagePapersBase):
-    """Filter options and columns to display for the paper assignment list of an event"""
-
-    def _checkParams(self, params):
-        RHManagePapersBase._checkParams(self, params)
-        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
-
-    def _process_GET(self):
-        list_config = self.list_generator.list_config
-        return WPManagePapers.render_template('management/assignment_list_filter.html', self._conf,
-                                              event=self.event_new,
-                                              static_items=self.list_generator.static_items,
-                                              filters=list_config['filters'],
-                                              visible_items=list_config['items'])
-
-    def _process_POST(self):
-        self.list_generator.store_configuration()
-        return jsonify_data(flash=False, **self.list_generator.render_list())
-
-
-class RHManagePapersActionsBase(RHManagePapersBase):
-    """Base class for RHs performing actions on selected contributions"""
-
-    _contrib_query_options = ()
-
-    @property
-    def _contrib_query(self):
-        query = Contribution.query.with_parent(self.event_new)
-        if self._contrib_query_options:
-            query = query.options(*self._contrib_query_options)
-        return query
-
-    def _checkParams(self, params):
-        RHManagePapersBase._checkParams(self, params)
-        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)
-        ids = map(int, request.form.getlist('contribution_id'))
-        self.contributions = self._contrib_query.filter(Contribution.id.in_(ids)).all()
-
-
 class RHManageReviewingSettings(RHManagePapersBase):
     def _process(self):
         defaults = FormDefaults(content_review_questions=self.event_new.cfp.content_review_questions,
@@ -225,9 +174,3 @@ class RHManageReviewingSettings(RHManagePapersBase):
             return jsonify_data()
         self.commit = False
         return jsonify_form(form)
-
-
-class RHBulkPaperJudgment(PaperJudgmentMixin, RHManagePapersActionsBase):
-    def _checkParams(self, params):
-        RHManagePapersActionsBase._checkParams(self, params)
-        self.list_generator = PaperAssignmentListGenerator(event=self.event_new)

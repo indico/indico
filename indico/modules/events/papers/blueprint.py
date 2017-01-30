@@ -32,17 +32,6 @@ _bp.add_url_rule('/papers/<int:contrib_id>/', 'paper_timeline', display.RHPaperT
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
 
-# Judging area
-_bp.add_url_rule('/papers/judging/', 'display_judging_area', display.RHDisplayJudgingArea)
-_bp.add_url_rule('/papers/judging/customize', 'display_customize_judging_area_list',
-                 display.RHDisplayCustomizeJudgingAreaList, methods=('GET', 'POST'))
-_bp.add_url_rule('/papers/judging/assigning/assign', 'display_judging_assign', display.RHJudgingAreaAssign,
-                 methods=('POST',))
-_bp.add_url_rule('/papers/judging/assigning/unassign', 'display_judging_unassign', display.RHJudgingAreaUnassign,
-                 methods=('POST',))
-_bp.add_url_rule('/papers/judging/assign-role', 'display_judging_assign_role', display.RHAssignRole, methods=('POST',))
-_bp.add_url_rule('/papers/judging/judge', 'display_judge_papers', display.RHDisplayBulkPaperJudgment, methods=('POST',))
-
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,
@@ -60,11 +49,6 @@ _bp.add_url_rule('/manage/papers/teams/competences', 'manage_competences', manag
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/enable/<any(content,layout):reviewing_type>', 'switch',
                  management.RHSwitchReviewingType, methods=('PUT', 'DELETE'))
-_bp.add_url_rule('/manage/papers/assignment-list/', 'assignment', management.RHPapersAssignmentList)
-_bp.add_url_rule('/manage/papers/assignment-list/customize', 'customize_assignment_list',
-                 management.RHAssignmentListCustomize, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/papers/assignment-list/judge', 'manage_judge_papers',
-                 management.RHBulkPaperJudgment, methods=('POST',))
 
 # CFP scheduling
 _bp.add_url_rule('/manage/papers/schedule', 'schedule_cfp', management.RHScheduleCFP,
@@ -75,9 +59,19 @@ _bp.add_url_rule('/manage/papers/close', 'close_cfp', management.RHCloseCFP, met
 # URLs available in both management and display areas
 # Note: When adding a new one here make sure to specify `defaults=defaults`
 #       for each rule. Otherwise you may not get the correct one.
-for prefix, is_management in (('/manage/papers', True), ('/papers', False)):
+for prefix, is_management in (('/manage/papers/assignment-list', True), ('/papers/judging', False)):
     defaults = {'management': is_management}
-    _bp.add_url_rule(prefix + '/assignment-list/download', 'download_papers', paper.RHDownloadPapers,
+    _bp.add_url_rule(prefix + '/', 'papers_list', paper.RHPapersList, defaults=defaults)
+    _bp.add_url_rule(prefix + '/download', 'download_papers', paper.RHDownloadPapers, methods=('POST',),
+                     defaults=defaults)
+    _bp.add_url_rule(prefix + '/customize', 'customize_paper_list', paper.RHCustomizePapersList,
+                     methods=('GET', 'POST'), defaults=defaults)
+    _bp.add_url_rule(prefix + '/judge', 'judge_papers', paper.RHJudgePapers, methods=('GET', 'POST'), defaults=defaults)
+    _bp.add_url_rule(prefix + '/assigning/assign', 'assign_papers', paper.RHJudgingAreaAssign,
+                     methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/assigning/unassign', 'unassign_papers', paper.RHJudgingAreaUnassign,
+                     methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/assign-role', 'judging_assign_role', paper.RHAssignRole,
                      methods=('POST',), defaults=defaults)
 
 
