@@ -16,14 +16,15 @@
 
 from __future__ import unicode_literals, division
 
+import math
 import mimetypes
 from operator import attrgetter
 
 import click
-import math
 from pytz import utc
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.designer import event_badge_settings, category_badge_settings, DEFAULT_BADGE_SETTINGS
@@ -32,23 +33,79 @@ from indico.modules.designer.models.templates import DesignerTemplate, TemplateT
 from indico.modules.users import User
 from indico.util.console import verbose_iterator, cformat
 from indico.util.fs import secure_filename
+from indico.util.string import to_unicode
+from indico.util.struct.iterables import committing_iterator
 
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import LocalFileImporterMixin
 
 
+def _lower(text):
+    return to_unicode(text).lower()
+
+
+def _convert_font_size(size):
+    if size.endswith('pt'):
+        return size
+    else:
+        return FONT_SIZE_MAPPING[size]
+
+
 ITEM_KEY_MAPPING = {
-    'type': 'key',
-    'text': 'text',
-    'x': 'x',
-    'y': 'y',
-    'font_family': 'fontFamily',
-    'font_size': 'fontSize',
-    'color': 'color',
-    'width': 'width',
-    'bold': 'bold',
-    'italic': 'italic',
-    'text_align': 'textAlign'
+    'id': ('id', int),
+    'text': ('text', to_unicode),
+    'x': ('x', float),
+    'y': ('y', float),
+    'fontFamily': ('font_family', to_unicode),
+    'fontSize': ('font_size', _convert_font_size),
+    'color': ('color', _lower),
+    'width': ('width', int),
+    'bold': ('bold', bool),
+    'italic': ('italic', bool),
+    'textAlign': ('text_align', _lower)
+}
+
+ITEM_TYPE_MAPPING = {
+    'Title': 'title',
+    'Full Name': 'full_name',
+    'Full Name (w/o title)': 'full_name_no_title',
+    'Full Name B': 'full_name_b',
+    'Full Name B (w/o title)': 'full_name_b_no_title',
+    'Full Name C': 'full_name_c',
+    'Full Name C (w/o title)': 'full_name_c_no_title',
+    'Full Name D (abbrev)': 'full_name_d',
+    'Full Name D (abbrev, w/o title)': 'full_name_d_no_title',
+    'First Name': 'first_name',
+    'Surname': 'last_name',
+    'Institution': 'affiliation',
+    'Position': 'position',
+    'Address': 'address',
+    'Country': 'country',
+    'Phone': 'phone',
+    'Email': 'email',
+    'Amount': 'amount',
+    'Conference Name': 'event_title',
+    'Conference Dates': 'event_dates',
+    'Lecture Category': 'category_title',
+    'Lecture Name': 'event_title',
+    'Lecture Date(s)': 'event_dates',
+    'Speaker(s)': 'event_speakers',
+    'Description': 'event_description',
+    'Location (name)': 'event_venue',
+    'Location (address)': 'event_address',
+    'Location (room)': 'event_room',
+    'Organisers': 'event_organizers',
+    'Fixed Text': 'fixed'
+}
+
+FONT_SIZE_MAPPING = {
+    'xx-small': '7pt',
+    'x-small': '7.5pt',
+    'small': '10pt',
+    'medium': '12pt',
+    'large': '13.5pt',
+    'x-large': '18pt',
+    'xx-large': '24pt'
 }
 
 
@@ -92,7 +149,35 @@ class TemplateMigrationBase(object):
         self._migrate_data(manager)
 
     def _translate_tpl_item(self, item):
-        return {k: item.get(old_k) for k, old_k in ITEM_KEY_MAPPING.viewitems()}
+        result = {}
+        new_type = None
+
+        if 'key' in item:
+            new_type = ITEM_TYPE_MAPPING.get(item['key'])
+        elif 'name' in item:
+            new_type = ITEM_TYPE_MAPPING.get(item['name'])
+
+        item.pop('key', None)
+        item.pop('name', None)
+
+        if new_type is None:
+            self.importer.print_warning(cformat('%{yellow!}Template attribute type unknown'), event_id=self.event_id)
+            return
+
+        result['type'] = new_type
+
+        for old_k, old_v in item.viewitems():
+            if old_k in {'selected', 'textAlignIndex', 'fontFamilyIndex', 'fontSizeIndex', 'styleIndex', 'colorIndex'}:
+                continue
+            else:
+                new_k, datatype = ITEM_KEY_MAPPING[old_k]
+                result[new_k] = datatype(old_v)
+        diff = set(v for (k, (v, __)) in ITEM_KEY_MAPPING.viewitems()) - set(result)
+        if diff:
+            self.importer.print_warning(cformat('%{yellow!}Template item misses some attributes: {}').format(diff),
+                                        event_id=self.event_id)
+
+        return result
 
     def _translate_tpl_data(self, tpl_data):
         width = _sane_float(tpl_data[1]['width'])
@@ -107,7 +192,6 @@ class TemplateMigrationBase(object):
             'data': {
                 'width': width,
                 'height': _sane_float(tpl_data[1]['height']),
-                'pixels_cm': tpl_data[2],
                 'items': [self._translate_tpl_item(item) for item in tpl_data[4]]
             }
         }
@@ -141,6 +225,7 @@ class TemplateMigrationBase(object):
                     tpl.images.append(image)
                     self.importer.print_success(cformat('\t %{cyan!}{}').format(image), event_id=self.event_id)
 
+            old_positions_map = getattr(old_tpl, '_{}__bgPositions'.format(self.tpl_class), None)
             old_used_bg_id = int(old_tpl_data[3])
             if old_used_bg_id:
                 new_bg_image = old_background_map.get(old_used_bg_id)
@@ -149,6 +234,13 @@ class TemplateMigrationBase(object):
                 else:
                     self.importer.print_warning(cformat("%{yellow!}Background '{}' not found").format(old_used_bg_id),
                                                 event_id=self.event_id)
+                if old_positions_map:
+                    old_position = old_positions_map.get(old_used_bg_id)
+                    if old_position:
+                        tpl.data['background_position'] = unicode(old_position.lower())
+                    else:
+                        self.importer.print_warning(cformat('%{yellow!}Position setting for non-existing background'),
+                                                    event_id=self.event_id)
 
             if self.event is None:
                 tpl.category = Category.get_root()
@@ -213,6 +305,7 @@ class BadgePosterImporter(LocalFileImporterMixin, Importer):
         return (DesignerTemplate.query.has_rows() or DesignerImageFile.query.has_rows())
 
     def migrate(self):
+        update_session_options(db, {'expire_on_commit': False})
         self.janitor_user = User.get_one(self.janitor_user_id)
         self.migrate_global_templates()
         self.migrate_event_templates()
@@ -236,7 +329,7 @@ class BadgePosterImporter(LocalFileImporterMixin, Importer):
 
     def migrate_event_templates(self):
         self.print_step("Migrating event templates")
-        for conf, event in self._iter_events():
+        for conf, event in committing_iterator(self._iter_events(), n=10000):
             with db.session.no_autoflush:
                 self._migrate_badges(conf, event)
                 self._migrate_posters(conf, event)
