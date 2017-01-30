@@ -50,15 +50,47 @@
         add: function add(people) {
             var self = this;
 
-            function comparePersons(first, second) {
-                if (first.id !== undefined && second.id !== undefined) {
-                    return first.id == second.id;
-                } else {
-                    return first.email && second.email && first.email.toLowerCase() == second.email.toLowerCase();
+            function getUserId(obj) {
+                if (obj._type === 'Avatar') {
+                    return obj.id;
+                } else if (obj._type === 'EventPerson') {
+                    return obj.user_id;
                 }
             }
 
-            function cleanDuplicates(people) {
+            function comparePersons(a, b) {
+                var aUserId = getUserId(a);
+                var bUserId = getUserId(b);
+
+
+                if (a._type === b._type
+                    && a.id !== undefined && b.id !== undefined
+                    && a.id === b.id) {
+                    return true;
+                }
+
+                if (aUserId !== undefined && bUserId !== undefined
+                    && aUserId === bUserId) {
+                    return true;
+                }
+
+                return !!a.email && !!b.email && a.email.toLowerCase() === b.email.toLowerCase();
+            }
+
+            function deduplicate(people) {
+                var newPeople = [];
+                people.forEach(function(person) {
+                    var found = _.find(newPeople, function(newPerson) {
+                        return comparePersons(person, newPerson);
+                    });
+                    if (!found) {
+                        newPeople.push(person);
+                    }
+                });
+                return newPeople;
+            }
+
+            function skipExisting(people) {
                 _.each(self.people, function(person) {
                     people = _.without(people, _.find(people, function(p) {
                         return comparePersons(person, p);
@@ -67,7 +99,8 @@
                 return people;
             }
 
-            self.people = self.options.overwriteChoice ? people : self.people.concat(cleanDuplicates(people));
+            people = deduplicate(people);
+            self.people = self.options.overwriteChoice ? people : self.people.concat(skipExisting(people));
             self.people = _.sortBy(self.people, 'name');
             self.options.onAdd(self.people);
             self._update();
