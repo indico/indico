@@ -32,10 +32,22 @@ from indico.modules.events.papers.operations import judge_paper, update_reviewin
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
-from indico.modules.users import User
 from indico.util.fs import secure_filename
 from indico.util.i18n import ngettext, _
 from indico.web.util import jsonify_data, jsonify_template, jsonify_form
+
+
+CFP_ROLE_MAP = {
+    PaperReviewingRole.judge: attrgetter('judges'),
+    PaperReviewingRole.content_reviewer: attrgetter('content_reviewers'),
+    PaperReviewingRole.layout_reviewer: attrgetter('layout_reviewers'),
+}
+
+CONTRIB_ROLE_MAP = {
+    PaperReviewingRole.judge: attrgetter('paper_judges'),
+    PaperReviewingRole.content_reviewer: attrgetter('paper_content_reviewers'),
+    PaperReviewingRole.layout_reviewer: attrgetter('paper_layout_reviewers'),
+}
 
 
 class RHPapersListBase(RHJudgingAreaBase):
@@ -159,12 +171,7 @@ class RHJudgingAreaAssign(RHRJudgingAreaAssigningBase):
     """Render the user list to assign paper reviewing roles"""
 
     def _process(self):
-        role_map = {
-            PaperReviewingRole.judge: attrgetter('judges'),
-            PaperReviewingRole.content_reviewer: attrgetter('content_reviewers'),
-            PaperReviewingRole.layout_reviewer: attrgetter('layout_reviewers'),
-        }
-        users = role_map[self.role](self.event_new.cfp)
+        users = CFP_ROLE_MAP[self.role](self.event_new.cfp)
         return self._render_template(users, 'assign')
 
 
@@ -172,12 +179,7 @@ class RHJudgingAreaUnassign(RHRJudgingAreaAssigningBase):
     """Render the user list to unassign paper reviewing roles"""
 
     def _process(self):
-        role_map = {
-            PaperReviewingRole.judge: attrgetter('paper_judges'),
-            PaperReviewingRole.content_reviewer: attrgetter('paper_content_reviewers'),
-            PaperReviewingRole.layout_reviewer: attrgetter('paper_layout_reviewers'),
-        }
-        _get_users = role_map[self.role]
+        _get_users = CONTRIB_ROLE_MAP[self.role]
         users = set(chain.from_iterable(_get_users(c) for c in self.contributions))
         return self._render_template(users, 'unassign')
 
@@ -187,11 +189,10 @@ class RHAssignRole(RHPapersActionBase):
 
     def _checkParams(self, params):
         RHPapersActionBase._checkParams(self, params)
-        # TODO: sanitize
-        user_ids = request.form.getlist('user_id')
-        self.users = User.query.filter(User.id.in_(user_ids)).all()
+        self.role = PaperReviewingRole[request.form['role']]
         self.action = request.form['action']
-        self.role = PaperReviewingRole[request.form.get('role')]
+        user_ids = map(int, request.form.getlist('user_id'))
+        self.users = {u for u in CFP_ROLE_MAP[self.role](self.event_new.cfp) if u.id in user_ids}
 
     def _process(self):
         update_reviewing_roles(self.event_new, self.users, self.contributions, self.role, self.action)
