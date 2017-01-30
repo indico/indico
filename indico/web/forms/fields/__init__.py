@@ -17,8 +17,9 @@
 from __future__ import unicode_literals, absolute_import
 
 # XXX: keep `simple` on top; other modules may need fields from there (especially JSONField)
-from .simple import (IndicoSelectMultipleCheckboxField, IndicoRadioField, JSONField, HiddenFieldList, TextListField,
-                     EmailListField, IndicoPasswordField, IndicoStaticTextField, IndicoTagListField)
+from .simple import (IndicoSelectMultipleCheckboxField, IndicoSelectMultipleCheckboxBooleanField, IndicoRadioField,
+                     JSONField, HiddenFieldList, TextListField, EmailListField, IndicoPasswordField,
+                     IndicoStaticTextField, IndicoTagListField)
 
 from .colors import IndicoPalettePickerField
 from .datetime import TimeDeltaField, IndicoDateTimeField, OccurrencesField, IndicoTimezoneSelectField
@@ -38,4 +39,4 @@ __all__ = ('IndicoSelectMultipleCheckboxField', 'IndicoRadioField', 'JSONField',
            'MultiStringField', 'MultipleItemsField', 'OverrideMultipleItemsField', 'PrincipalListField',
            'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField', 'EditableFileField'
            'IndicoQuerySelectMultipleCheckboxField', 'IndicoLocationField', 'IndicoMarkdownField',
-           'IndicoProtectionField')
+           'IndicoProtectionField', 'IndicoSelectMultipleCheckboxBooleanField')

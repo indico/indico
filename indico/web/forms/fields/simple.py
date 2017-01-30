@@ -33,6 +33,18 @@ class IndicoSelectMultipleCheckboxField(SelectMultipleField):
     option_widget = CheckboxInput()
 
 
+class IndicoSelectMultipleCheckboxBooleanField(IndicoSelectMultipleCheckboxField):
+    def process_formdata(self, valuelist):
+        super(IndicoSelectMultipleCheckboxBooleanField, self).process_formdata(valuelist)
+        values = set(self.data)
+        self.data = {x[0]: x[0] in values for x in self.choices}
+
+    def iter_choices(self):
+        for value, label in self.choices:
+            selected = self.data is not None and self.data.get(self.coerce(value))
+            yield (value, label, selected)
+
+
 class IndicoRadioField(RadioField):
     widget = JinjaWidget('forms/radio_buttons_widget.html', single_kwargs=True)
 
