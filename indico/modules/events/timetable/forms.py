@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from datetime import datetime, timedelta
-from collections import defaultdict
 
 from flask import request
 from pytz import utc
@@ -33,7 +32,7 @@ from indico.modules.events.timetable.util import find_next_start_dt
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
 from indico.web.forms.fields import (TimeDeltaField, IndicoPalettePickerField, IndicoLocationField,
-                                     IndicoSelectMultipleCheckboxField)
+                                     IndicoSelectMultipleCheckboxBooleanField)
 from indico.web.forms.util import get_form_field_names
 from indico.web.forms.validators import MaxDuration, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget
@@ -175,15 +174,17 @@ class TimetablePDFExportForm(IndicoForm):
 
     advanced = BooleanField(_("Advanced timetable"), widget=SwitchWidget(),
                             description=_("Advanced customization options"))
-    document_settings = IndicoSelectMultipleCheckboxField(_('Document settings'), [HiddenUnless('advanced')],
-                                                          choices=_DOCUMENT_SETTINGS_CHOICES)
-    contribution_info = IndicoSelectMultipleCheckboxField(_('Contributions related info'), [HiddenUnless('advanced')],
-                                                          choices=_CONTRIBUTION_CHOICES)
-    session_info = IndicoSelectMultipleCheckboxField(_('Sessions related info'), [HiddenUnless('advanced')],
-                                                     choices=_SESSION_CHOICES)
-    visible_entries = IndicoSelectMultipleCheckboxField(_('Breaks and contributions'), [HiddenUnless('advanced')],
-                                                        choices=_VISIBLE_ENTRIES_CHOICES)
-    other = IndicoSelectMultipleCheckboxField(_('Miscellaneous'), choices=_OTHER_CHOICES)
+    document_settings = IndicoSelectMultipleCheckboxBooleanField(_('Document settings'), [HiddenUnless('advanced')],
+                                                                 choices=_DOCUMENT_SETTINGS_CHOICES)
+    contribution_info = IndicoSelectMultipleCheckboxBooleanField(_('Contributions related info'),
+                                                                 [HiddenUnless('advanced')],
+                                                                 choices=_CONTRIBUTION_CHOICES)
+    session_info = IndicoSelectMultipleCheckboxBooleanField(_('Sessions related info'), [HiddenUnless('advanced')],
+                                                            choices=_SESSION_CHOICES)
+    visible_entries = IndicoSelectMultipleCheckboxBooleanField(_('Breaks and contributions'),
+                                                               [HiddenUnless('advanced')],
+                                                               choices=_VISIBLE_ENTRIES_CHOICES)
+    other = IndicoSelectMultipleCheckboxBooleanField(_('Miscellaneous'), choices=_OTHER_CHOICES)
     pagesize = SelectField(_('Page size'), choices=[('A0', 'A0'), ('A1', 'A1'), ('A2', 'A2'), ('A3', 'A3'),
                                                     ('A4', 'A4'), ('A5', 'A5'), ('Letter', 'Letter')], default='A4')
     fontsize = SelectField(_('Font size'), choices=[('xxx-small', _('xxx-small')), ('xx-small', _('xx-small')),
@@ -204,4 +205,7 @@ class TimetablePDFExportForm(IndicoForm):
         else:
             fields = set(get_form_field_names(TimetablePDFExportForm)) - self._pdf_options_fields - {'csrf_token',
                                                                                                      'advanced'}
-        return defaultdict(bool, {option: True for field in fields for option in getattr(self, field).data})
+        data = {}
+        for fieldname in fields:
+            data.update(getattr(self, fieldname).data)
+        return data
