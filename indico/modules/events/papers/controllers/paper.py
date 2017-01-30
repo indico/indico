@@ -146,17 +146,17 @@ class RHRJudgingAreaAssigningBase(RHPapersActionBase):
         RHPapersActionBase._checkParams(self, params)
         self.role = PaperReviewingRole[request.args['role']]
 
-    def _render_template(self, person_list, action):
+    def _render_template(self, users, action):
         user_competences = self.event_new.cfp.user_competences
         competences = {'competences_{}'.format(user_id): competences.competences
                        for user_id, competences in user_competences.iteritems()}
         return jsonify_template('events/papers/assign_role.html', event=self.event_new, role=self.role.name,
-                                action=action, person_list=person_list, competences=competences,
+                                action=action, users=users, competences=competences,
                                 contribs=self.contributions)
 
 
 class RHJudgingAreaAssign(RHRJudgingAreaAssigningBase):
-    """Render the person list to assign paper reviewing roles"""
+    """Render the user list to assign paper reviewing roles"""
 
     def _process(self):
         role_map = {
@@ -164,12 +164,12 @@ class RHJudgingAreaAssign(RHRJudgingAreaAssigningBase):
             PaperReviewingRole.content_reviewer: attrgetter('content_reviewers'),
             PaperReviewingRole.layout_reviewer: attrgetter('layout_reviewers'),
         }
-        person_list = role_map[self.role](self.event_new.cfp)
-        return self._render_template(person_list, 'assign')
+        users = role_map[self.role](self.event_new.cfp)
+        return self._render_template(users, 'assign')
 
 
 class RHJudgingAreaUnassign(RHRJudgingAreaAssigningBase):
-    """Render the person list to unassign paper reviewing roles"""
+    """Render the user list to unassign paper reviewing roles"""
 
     def _process(self):
         role_map = {
@@ -178,8 +178,8 @@ class RHJudgingAreaUnassign(RHRJudgingAreaAssigningBase):
             PaperReviewingRole.layout_reviewer: attrgetter('paper_layout_reviewers'),
         }
         _get_users = role_map[self.role]
-        person_list = set(chain.from_iterable(_get_users(c) for c in self.contributions))
-        return self._render_template(person_list, 'unassign')
+        users = set(chain.from_iterable(_get_users(c) for c in self.contributions))
+        return self._render_template(users, 'unassign')
 
 
 class RHAssignRole(RHPapersActionBase):
@@ -188,13 +188,13 @@ class RHAssignRole(RHPapersActionBase):
     def _checkParams(self, params):
         RHPapersActionBase._checkParams(self, params)
         # TODO: sanitize
-        person_ids = request.form.getlist('person_id')
-        self.persons = User.query.filter(User.id.in_(person_ids)).all()
+        user_ids = request.form.getlist('user_id')
+        self.users = User.query.filter(User.id.in_(user_ids)).all()
         self.action = request.form['action']
         self.role = PaperReviewingRole[request.form.get('role')]
 
     def _process(self):
-        update_reviewing_roles(self.event_new, self.persons, self.contributions, self.role, self.action)
+        update_reviewing_roles(self.event_new, self.users, self.contributions, self.role, self.action)
         if self.action == 'assign':
             flash(_("Paper reviewing roles have been assigned."), 'success')
         else:

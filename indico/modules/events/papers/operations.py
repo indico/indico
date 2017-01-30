@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import mimetypes
+from operator import attrgetter
 
 from flask import session
 
@@ -183,23 +184,24 @@ def delete_paper_template(template):
     logger.info('Paper template %r deleted by %r', template, session.user)
 
 
-def update_reviewing_roles(event, persons, contributions, role, action):
+def update_reviewing_roles(event, users, contributions, role, action):
+    role_map = {
+        PaperReviewingRole.judge: attrgetter('paper_judges'),
+        PaperReviewingRole.content_reviewer: attrgetter('paper_content_reviewers'),
+        PaperReviewingRole.layout_reviewer: attrgetter('paper_layout_reviewers'),
+    }
+
     for contrib in contributions:
-        if role == PaperReviewingRole.content_reviewer:
-            role_group = contrib.paper_content_reviewers
-        elif role == PaperReviewingRole.layout_reviewer:
-            role_group = contrib.paper_layout_reviewers
-        else:
-            role_group = contrib.paper_judges
-        for person in persons:
+        role_group = role_map[role](contrib)
+        for user in users:
             if action == 'assign':
-                role_group.add(person)
-            elif person in role_group:
-                role_group.remove(person)
+                role_group.add(user)
+            else:
+                role_group.discard(user)
         event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                   "Paper reviewing roles modified for contribution {}.".format(contrib.title), session.user,
                   data={'Role': role.name,
                         'Action': action,
-                        'Users': ', '.join(sorted(person.full_name for person in persons))})
+                        'Users': ', '.join(sorted(person.full_name for person in users))})
     db.session.flush()
     logger.info("Paper reviewing roles in event %r updated by %r", event, session.user)
