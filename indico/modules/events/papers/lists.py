@@ -135,7 +135,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
         contrib_list_kwargs = self.get_list_kwargs()
         total_entries = contrib_list_kwargs.pop('total_entries')
         selected_entry = contrib_list_kwargs.pop('selected_entry')
-        tpl_contrib = get_template_module('events/papers/management/_paper_assignment_list.html')
+        tpl_contrib = get_template_module('events/papers/_paper_list.html')
         tpl_lists = get_template_module('events/management/_lists.html')
         contribs = contrib_list_kwargs['contribs']
         filter_statistics = tpl_lists.render_displayed_entries_fragment(len(contribs), total_entries)
@@ -147,7 +147,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
 class PaperAssignmentListGenerator(PaperListGeneratorBase):
     """Listing and filtering actions in a paper assignment list."""
 
-    endpoint = '.assignment'
+    endpoint = '.papers_list'
     list_link_type = 'paper_asssignment_management'
 
     def __init__(self, event):
@@ -161,7 +161,7 @@ class PaperAssignmentListGenerator(PaperListGeneratorBase):
 class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
     """Listing and filtering actions in paper judging area list in the display view"""
 
-    endpoint = '.display_judging_area'
+    endpoint = '.papers_list'
     list_link_type = 'paper_judging_display'
 
     def __init__(self, event, user):
@@ -174,5 +174,5 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
 
     def _build_query(self):
         query = super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
-        return query.filter(db.or_(Contribution.paper_judges.any(User.id == self.user.id)))
+        return query.filter(Contribution.paper_judges.any(User.id == self.user.id))
 

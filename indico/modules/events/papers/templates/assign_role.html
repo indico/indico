@@ -2,8 +2,8 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 {% from 'message_box.html' import message_box %}
 
-{%  block content %}
-    <form method="POST" action="{{ url_for('.display_judging_assign_role', event) }}">
+{% block content %}
+    <form method="POST" action="{{ url_for('.judging_assign_role', event) }}">
         <div class="js-assign-dialog">
             <div id="assign-role-table">
                 {% if person_list %}
@@ -16,7 +16,7 @@
                             </tr>
                         </thead>
                         <tbody class="scroll">
-                            {% for event_person in person_list -%}
+                            {% for event_person in person_list|sort(attribute='full_name') -%}
                                 <tr class="i-table">
                                     <td class="i-table thin-column id-column">
                                         <input type="checkbox" class="select-row" value="{{ event_person.id }}" name='person_id'>
@@ -34,17 +34,19 @@
                 {% else %}
                     {%- call message_box('info') -%}
                         {% if action == 'assign' %}
-                            {% if role == 'content_reviewer' %}
-                                {%- trans %}There are no users with content reviewing rights yet.{% endtrans %}
-                            {% endif %}
-                            {% if role == 'layout_reviewer' %}
-                                {%- trans %}There are no users with layout reviewing rights yet.{% endtrans %}
+                            {% if role == 'judge' %}
+                                {%- trans %}There are no judges yet.{% endtrans %}
+                            {% elif role == 'content_reviewer' %}
+                                {%- trans %}There are no content reviewers yet.{% endtrans %}
+                            {% elif role == 'layout_reviewer' %}
+                                {%- trans %}There are no layout reviewers yet.{% endtrans %}
                             {% endif %}
                         {% else %}
-                            {% if role == 'content_reviewer' %}
+                            {% if role == 'judge' %}
+                                {%- trans %}There are no judges assigned to the selected contributions.{% endtrans %}
+                            {% elif role == 'content_reviewer' %}
                                 {%- trans %}There are no content reviewers assigned to the selected contributions.{% endtrans %}
-                            {% endif %}
-                            {% if role == 'layout_reviewer' %}
+                            {% elif role == 'layout_reviewer' %}
                                 {%- trans %}There are no layout reviewers assigned to the selected contributions.{% endtrans %}
                             {% endif %}
                         {% endif %}

@@ -16,11 +16,187 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.papers.controllers.common import DownloadPapersMixin
-from indico.modules.events.papers.controllers.management import RHManagePapersActionsBase
+import os
+from itertools import chain
+from operator import attrgetter
+
+from flask import flash, request, session
+from werkzeug.utils import cached_property
+
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.papers.controllers.base import RHJudgingAreaBase
+from indico.modules.events.papers.forms import BulkPaperJudgmentForm
+from indico.modules.events.papers.lists import PaperJudgingAreaListGeneratorDisplay, PaperAssignmentListGenerator
+from indico.modules.events.papers.models.revisions import PaperRevisionState
+from indico.modules.events.papers.operations import judge_paper, update_reviewing_roles
+from indico.modules.events.papers.settings import PaperReviewingRole
+from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
+from indico.modules.events.util import ZipGeneratorMixin
+from indico.modules.users import User
+from indico.util.fs import secure_filename
+from indico.util.i18n import ngettext, _
+from indico.web.util import jsonify_data, jsonify_template, jsonify_form
 
 
-class RHDownloadPapers(DownloadPapersMixin, RHManagePapersActionsBase):
+class RHPapersListBase(RHJudgingAreaBase):
+    """Base class for assignment/judging paper lists"""
+
+    @cached_property
+    def list_generator(self):
+        if self.management:
+            return PaperAssignmentListGenerator(event=self.event_new)
+        else:
+            return PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
+
+
+class RHPapersList(RHPapersListBase):
+    """Display the paper list for assignment/judging"""
+
+    @cached_property
+    def view_class(self):
+        return WPManagePapers if self.management else WPDisplayJudgingArea
+
     def _process(self):
-        return self._generate_zip_file(self.contributions, name_prefix='paper-files',
-                                       name_suffix=self.event_new.id)
+        return self.view_class.render_template(self.template, self._conf, event=self.event_new,
+                                               **self.list_generator.get_list_kwargs())
+
+    @cached_property
+    def template(self):
+        return 'management/assignment.html' if self.management else 'display/judging_area.html'
+
+
+class RHCustomizePapersList(RHPapersListBase):
+    """Filter options and columns to display for the paper list"""
+
+    def _process_GET(self):
+        list_config = self.list_generator.list_config
+        return jsonify_template('events/papers/paper_list_filter.html',
+                                event=self.event_new,
+                                static_items=self.list_generator.static_items,
+                                filters=list_config['filters'],
+                                visible_items=list_config['items'])
+
+    def _process_POST(self):
+        self.list_generator.store_configuration()
+        return jsonify_data(flash=False, **self.list_generator.render_list())
+
+
+class RHPapersActionBase(RHPapersListBase):
+    """Base class for actions on selected papers"""
+
+    def _checkParams(self, params):
+        RHPapersListBase._checkParams(self, params)
+        ids = map(int, request.form.getlist('contribution_id'))
+        self.contributions = (self.list_generator._build_query()
+                              .filter(Contribution.id.in_(ids))
+                              .all())
+
+
+class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
+    """Generate a ZIP file with paper files for a given list of contributions"""
+
+    def _prepare_folder_structure(self, item):
+        paper_title = secure_filename('{}_{}'.format(item.paper.contribution.title, item.paper.contribution.id),
+                                      'paper')
+        file_name = secure_filename('{}_{}'.format(item.id, item.filename), 'paper')
+        return os.path.join(*self._adjust_path_length([paper_title, file_name]))
+
+    def _iter_items(self, contributions):
+        contributions_with_paper = [c for c in self.contributions if c.paper]
+        for contrib in contributions_with_paper:
+            for f in contrib.paper.last_revision.files:
+                yield f
+
+    def _process(self):
+        return self._generate_zip_file(self.contributions, name_prefix='paper-files', name_suffix=self.event_new.id)
+
+
+class RHJudgePapers(RHPapersActionBase):
+    """Bulk judgment of papers"""
+
+    def _process(self):
+        form = BulkPaperJudgmentForm(event=self.event_new, judgment=request.form.get('judgment'),
+                                     contribution_id=[c.id for c in self.contributions])
+        if form.validate_on_submit():
+            judgment_data, contrib_data = form.split_data
+            submitted_papers = [c for c in self.contributions if
+                                c._paper_last_revision and c._paper_last_revision.state == PaperRevisionState.submitted]
+            for submitted_paper in submitted_papers:
+                judge_paper(submitted_paper, contrib_data, judge=session.user, **judgment_data)
+            num_submitted_papers = len(submitted_papers)
+            num_not_submitted_papers = len(self.contributions) - num_submitted_papers
+            if num_submitted_papers:
+                flash(ngettext("One paper has been judged.",
+                               "{num} papers have been judged.",
+                               num_submitted_papers).format(num=num_submitted_papers), 'success')
+            if num_not_submitted_papers:
+                flash(ngettext("One contribution has been skipped since it has no paper submitted yet or it is in "
+                               "a final state.",
+                               "{num} contributions have been skipped since they have no paper submitted yet or they "
+                               "are in a final state.",
+                               num_not_submitted_papers).format(num=num_not_submitted_papers), 'warning')
+            return jsonify_data(**self.list_generator.render_list())
+        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
+
+
+class RHRJudgingAreaAssigningBase(RHPapersActionBase):
+    """Base class for assigning/unassigning paper reviewing roles"""
+
+    def _checkParams(self, params):
+        RHPapersActionBase._checkParams(self, params)
+        self.role = PaperReviewingRole[request.args['role']]
+
+    def _render_template(self, person_list, action):
+        user_competences = self.event_new.cfp.user_competences
+        competences = {'competences_{}'.format(user_id): competences.competences
+                       for user_id, competences in user_competences.iteritems()}
+        return jsonify_template('events/papers/assign_role.html', event=self.event_new, role=self.role.name,
+                                action=action, person_list=person_list, competences=competences,
+                                contribs=self.contributions)
+
+
+class RHJudgingAreaAssign(RHRJudgingAreaAssigningBase):
+    """Render the person list to assign paper reviewing roles"""
+
+    def _process(self):
+        role_map = {
+            PaperReviewingRole.judge: attrgetter('judges'),
+            PaperReviewingRole.content_reviewer: attrgetter('content_reviewers'),
+            PaperReviewingRole.layout_reviewer: attrgetter('layout_reviewers'),
+        }
+        person_list = role_map[self.role](self.event_new.cfp)
+        return self._render_template(person_list, 'assign')
+
+
+class RHJudgingAreaUnassign(RHRJudgingAreaAssigningBase):
+    """Render the person list to unassign paper reviewing roles"""
+
+    def _process(self):
+        role_map = {
+            PaperReviewingRole.judge: attrgetter('paper_judges'),
+            PaperReviewingRole.content_reviewer: attrgetter('paper_content_reviewers'),
+            PaperReviewingRole.layout_reviewer: attrgetter('paper_layout_reviewers'),
+        }
+        _get_users = role_map[self.role]
+        person_list = set(chain.from_iterable(_get_users(c) for c in self.contributions))
+        return self._render_template(person_list, 'unassign')
+
+
+class RHAssignRole(RHPapersActionBase):
+    """Assign/unassign paper reviewing roles"""
+
+    def _checkParams(self, params):
+        RHPapersActionBase._checkParams(self, params)
+        # TODO: sanitize
+        person_ids = request.form.getlist('person_id')
+        self.persons = User.query.filter(User.id.in_(person_ids)).all()
+        self.action = request.form['action']
+        self.role = PaperReviewingRole[request.form.get('role')]
+
+    def _process(self):
+        update_reviewing_roles(self.event_new, self.persons, self.contributions, self.role, self.action)
+        if self.action == 'assign':
+            flash(_("Paper reviewing roles have been assigned."), 'success')
+        else:
+            flash(_("Paper reviewing roles have been unassigned."), 'success')
+        return jsonify_data(flash=False)
