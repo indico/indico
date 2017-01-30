@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.papers.controllers.base import RHJudgingAreaBase
 from indico.modules.events.papers.controllers.common import DownloadPapersMixin
-from indico.modules.events.papers.controllers.management import RHManagePapersActionsBase
 
 
-class RHDownloadPapers(DownloadPapersMixin, RHManagePapersActionsBase):
+class RHDownloadPapers(DownloadPapersMixin, RHJudgingAreaBase):
     def _process(self):
         return self._generate_zip_file(self.contributions, name_prefix='paper-files',
                                        name_suffix=self.event_new.id)

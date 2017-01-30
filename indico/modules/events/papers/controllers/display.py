@@ -21,7 +21,7 @@ from werkzeug.exceptions import Forbidden, BadRequest
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.papers.controllers.base import RHPapersBase
+from indico.modules.events.papers.controllers.base import RHPapersBase, RHJudgingAreaBase
 from indico.modules.events.papers.controllers.common import PaperJudgmentMixin
 from indico.modules.events.papers.forms import PaperSubmissionForm
 from indico.modules.events.papers.lists import PaperJudgingAreaListGeneratorDisplay
@@ -60,13 +60,6 @@ class RHSubmitPaper(RHPapersBase):
 class RHPaperTimeline(RHPapersBase):
     def _process(self):
         return NotImplementedError
-
-
-class RHJudgingAreaBase(RHPapersBase):
-    def _checkProtection(self):
-        if not session.user or session.user not in self.event_new.cfp.judges:
-            raise Forbidden
-        RHPapersBase._checkProtection(self)
 
 
 class RHDisplayJudgingArea(RHJudgingAreaBase):
