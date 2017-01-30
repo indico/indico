@@ -101,5 +101,5 @@ def _extend_event_menu(sender, **kwargs):
             return False
         return session.user in event.cfp.judges
 
-    yield MenuEntryData(title=_("Judging Area"), name='judging_area', endpoint='papers.display_judging_area',
+    yield MenuEntryData(title=_("Judging Area"), name='judging_area', endpoint='papers.papers_list',
                         position=-1, visible=_judging_area_visible)
