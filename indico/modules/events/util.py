@@ -208,10 +208,13 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
         revoke = {'del_roles': {role}}
 
     new_principals = set(new_principals)
-    for principal in new_principals - existing:
+    added = new_principals - existing
+    removed = existing - new_principals
+    for principal in added:
         obj.update_principal(principal, **grant)
-    for principal in existing - new_principals:
+    for principal in removed:
         obj.update_principal(principal, **revoke)
+    return {'added': added, 'removed': removed}
 
 
 class ListGeneratorBase(object):

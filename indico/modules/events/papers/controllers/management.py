@@ -27,9 +27,9 @@ from indico.modules.events.papers.operations import (set_reviewing_state, update
 from indico.modules.events.papers.settings import paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.users.models.users import User
-from indico.util.i18n import _
+from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 def _render_paper_dashboard(event, view_class=None):
@@ -74,10 +74,15 @@ class RHManagePaperTeams(RHManagePapersBase):
                 teams['content_reviewers'] = form.content_reviewers.data
             if cfp.layout_reviewing_enabled:
                 teams['layout_reviewers'] = form.layout_reviewers.data
-            update_team_members(self.event_new, **teams)
+            unassigned_contribs = update_team_members(self.event_new, **teams)
             flash(_("The members of the teams were updated successfully"), 'success')
+            if unassigned_contribs:
+                flash(ngettext("Users have been removed from 1 contribution",
+                               "Users have been removed from {} contributions",
+                               len(unassigned_contribs)).format(len(unassigned_contribs)),
+                      'warning')
             return jsonify_data()
-        return jsonify_form(form)
+        return jsonify_template('events/papers/management/teams.html', form=form)
 
 
 class RHSwitchReviewingType(RHManagePapersBase):
