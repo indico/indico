@@ -80,7 +80,9 @@ def _add_management_flag(endpoint, values):
     if ('management' not in values and
             endpoint.split('.')[0] == _bp.name and
             current_app.url_map.is_endpoint_expecting(endpoint, 'management')):
-        values['management'] = g.rh.management
+        # XXX: using getattr because the conference menu builds the url from an
+        # RH without the management attribute
+        values['management'] = getattr(g.rh, 'management', False)
 
 
 # Legacy URLs
