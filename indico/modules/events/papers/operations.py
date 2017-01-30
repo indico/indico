@@ -24,6 +24,7 @@ from flask import session
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.notifications import make_email, send_email
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperAction
@@ -34,6 +35,7 @@ from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.util import update_object_principals
+from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import orig_string
@@ -48,14 +50,40 @@ def set_reviewing_state(event, reviewing_type, enable):
               "{} reviewing type '{}'".format("Enabled" if enable else "Disabled", reviewing_type), session.user)
 
 
+def _unassign_removed(event, changes):
+    role_map = {
+        PaperReviewingRole.judge: Contribution.paper_judges,
+        PaperReviewingRole.content_reviewer: Contribution.paper_content_reviewers,
+        PaperReviewingRole.layout_reviewer: Contribution.paper_layout_reviewers,
+    }
+    changed_contribs = set()
+    for role, role_changes in changes.iteritems():
+        removed = role_changes['removed']
+        if not removed:
+            continue
+        attr = role_map[role]
+        contribs = (Contribution.query.with_parent(event)
+                    .filter(attr.any(User.id.in_(x.id for x in removed)))
+                    .all())
+        changed_contribs.update(contribs)
+        for contrib in contribs:
+            getattr(contrib, attr.key).difference_update(removed)
+    return changed_contribs
+
+
 def update_team_members(event, managers, judges, content_reviewers=None, layout_reviewers=None):
+    updated = {}
     update_object_principals(event, managers, role='paper_manager')
-    update_object_principals(event, judges, role='paper_judge')
+    updated[PaperReviewingRole.judge] = update_object_principals(event, judges, role='paper_judge')
     if content_reviewers is not None:
-        update_object_principals(event, content_reviewers, role='paper_content_reviewer')
+        updated[PaperReviewingRole.content_reviewer] = update_object_principals(event, content_reviewers,
+                                                                                role='paper_content_reviewer')
     if layout_reviewers is not None:
-        update_object_principals(event, layout_reviewers, role='paper_layout_reviewer')
+        updated[PaperReviewingRole.layout_reviewer] = update_object_principals(event, layout_reviewers,
+                                                                               role='paper_layout_reviewer')
+    unassigned_contribs = _unassign_removed(event, updated)
     logger.info("Paper teams of %r updated by %r", event, session.user)
+    return unassigned_contribs
 
 
 def create_competences(event, user, competences):

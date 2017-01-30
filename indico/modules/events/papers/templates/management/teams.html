@@ -1,0 +1,11 @@
+{% from 'forms/_form.html' import simple_form %}
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('warning') %}
+    {%- trans -%}
+        Removing judges/reviewers who are already assigned to contributions will
+        automatically unassign them from these contributions.
+    {%- endtrans -%}
+{% endcall %}
+
+{{ simple_form(form, back=_('Cancel')) }}
