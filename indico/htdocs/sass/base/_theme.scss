@@ -145,3 +145,7 @@
         color: $gray;
     }
 }
+
+.semantic-background {
+    @extend %semantic-background;
+}

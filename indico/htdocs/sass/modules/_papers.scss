@@ -102,22 +102,6 @@
                     color: $blue;
                 }
             }
-
-            &.submitted {
-                background-color: $blue;
-            }
-
-            &.accepted {
-                background-color: $green;
-            }
-
-            &.rejected {
-                background-color: $red;
-            }
-
-            &.to-be-corrected {
-                background-color: $yellow;
-            }
         }
     }
 
