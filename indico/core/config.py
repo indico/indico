@@ -508,26 +508,8 @@ class Config:
         from pytz import all_timezones as Timezones
         return Timezones
 
-
     def getCssStylesheetName(self):
-        """gives back the css stylesheet name used by Indico"""
-        template = 'Default'
-
-        # NOTE: don't move the import outside because we need config.py
-        # to be loaded from setup.py and at that point we don't have db access
-        # and therefore the import will fail.
-        import MaKaC.common.info as info
-
-        if current_app.config['TESTING']:
-            return 'Default.css'
-
-        with DBMgr.getInstance().global_connection():
-            defTemplate = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()
-
-        if (defTemplate is not None and os.path.exists("%s/css/Default.%s.css" % (self.getHtdocsDir(), defTemplate))):
-            template = "Default.%s" % defTemplate
-
-        return '%s.css' % template
+        return 'Default.css'
 
     def getCssConfTemplateBaseURL(self):
         rh = ContextManager.get('currentRH', None)

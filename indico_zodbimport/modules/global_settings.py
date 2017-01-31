@@ -31,7 +31,8 @@ class GlobalSettingsImporter(Importer):
         minfo = self.zodb_root['MaKaCInfo']['main']
         core_settings.set_multi({
             'site_title': convert_to_unicode(minfo._title),
-            'site_organization': convert_to_unicode(minfo._organisation)
+            'site_organization': convert_to_unicode(minfo._organisation),
+            'custom_template_set': convert_to_unicode(minfo._defaultTemplateSet) or None
         })
         social_settings.set_multi({
             'enabled': bool(minfo._socialAppConfig['active']),

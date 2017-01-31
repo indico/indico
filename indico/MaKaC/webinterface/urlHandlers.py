@@ -337,14 +337,6 @@ class UHMaintenancePerformPack(URLHandler):
     _endpoint = 'admin.adminMaintenance-performPack'
 
 
-class UHAdminLayoutGeneral(URLHandler):
-    _endpoint = 'admin.adminLayout'
-
-
-class UHAdminLayoutSaveTemplateSet(URLHandler):
-    _endpoint = 'admin.adminLayout-saveTemplateSet'
-
-
 class UHTemplatesSetDefaultPDFOptions(URLHandler):
     _endpoint = 'admin.adminLayout-setDefaultPDFOptions'
 
