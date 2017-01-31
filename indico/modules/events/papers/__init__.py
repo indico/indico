@@ -90,3 +90,16 @@ class PaperLayoutReviewerRole(ManagementRole):
     name = 'paper_layout_reviewer'
     friendly_name = _('Layout reviewer')
     description = _('Grants layout reviewing rights for assigned papers.')
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.layout.util import MenuEntryData
+
+    def _judging_area_visible(event):
+        if not session.user or not event.has_feature('papers'):
+            return False
+        return session.user in event.cfp.judges
+
+    yield MenuEntryData(title=_("Judging Area"), name='judging_area', endpoint='papers.display_judging_area',
+                        position=-1, visible=_judging_area_visible)

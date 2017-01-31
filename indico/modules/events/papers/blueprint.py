@@ -32,6 +32,17 @@ _bp.add_url_rule('/papers/<int:contrib_id>/', 'paper_timeline', display.RHPaperT
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
 
+# Judging area
+_bp.add_url_rule('/papers/judging/', 'display_judging_area', display.RHDisplayJudgingArea)
+_bp.add_url_rule('/papers/judging/customize', 'display_customize_judging_area_list',
+                 display.RHDisplayCustomizeJudgingAreaList, methods=('GET', 'POST'))
+_bp.add_url_rule('/papers/judging/assigning/assign', 'display_judging_assign', display.RHJudgingAreaAssign,
+                 methods=('POST',))
+_bp.add_url_rule('/papers/judging/assigning/unassign', 'display_judging_unassign', display.RHJudgingAreaUnassign,
+                 methods=('POST',))
+_bp.add_url_rule('/papers/judging/assign-role', 'display_judging_assign_role', display.RHAssignRole, methods=('POST',))
+_bp.add_url_rule('/papers/judging/judge', 'display_judge_papers', display.RHDisplayBulkPaperJudgment, methods=('POST',))
+
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)
 _bp.add_url_rule('/manage/papers/settings', 'manage_reviewing_settings', management.RHManageReviewingSettings,

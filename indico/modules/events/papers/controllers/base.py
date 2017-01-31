@@ -21,6 +21,8 @@ from werkzeug.exceptions import Forbidden
 
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.contributions import Contribution
+from indico.modules.users import User
 
 
 class RHPapersBase(RHConferenceBaseDisplay):
@@ -56,3 +58,22 @@ class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
     def management(self):
         """Whether the RH is currently used in the management area"""
         return request.view_args.get('management', True)
+
+
+class RHJudgingAreaBase(RHPapersBase):
+    """Base class for all paper-related RHs that require judging or event management permissions"""
+
+    def _checkParams(self, params):
+        RHPapersBase._checkParams(self, params)
+        if session.user:
+            query = Contribution.query.with_parent(self.event_new)
+            if not self.management:
+                query = query.filter(Contribution.paper_judges.any(User.id == session.user.id))
+            self.contributions = query.all()
+
+    def _checkProtection(self):
+        RHPapersBase._checkProtection(self)
+        if not session.user:
+            raise Forbidden
+        if not self.management and session.user not in self.event_new.cfp.judges:
+            raise Forbidden

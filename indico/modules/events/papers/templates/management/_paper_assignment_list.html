@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_paper_assignment_list(event, total_entries, contribs, static_columns) %}
+{% macro render_paper_assignment_list(event, total_entries, contribs, static_columns, management=false) %}
     {% if not contribs %}
         {%- call message_box('info') %}
             {%- if total_entries %}
@@ -30,9 +30,11 @@
                         <th class="i-table revision-column">
                             {%- trans %}Revision{% endtrans -%}
                         </th>
-                        <th class="i-table judge-column" data-sorter="false">
-                            {%- trans %}Judges{% endtrans -%}
-                        </th>
+                        {% if management %}
+                            <th class="i-table judge-column" data-sorter="false">
+                                {%- trans %}Judges{% endtrans -%}
+                            </th>
+                        {% endif %}
                         <th class="i-table content-reviewers-column" data-sorter="false">
                             {%- trans %}Content reviewers{% endtrans -%}
                         </th>
@@ -126,14 +128,16 @@
                                     {%- endif -%}
                                 </span>
                             </td>
-                            <td class="i-table person-row-cell"
-                                data-searchable="{{ contrib.paper_judges|join(', ', attribute='name')|lower }}">
-                                <span class="vertical-aligner">
-                                    {% for judge in contrib.paper_judges -%}
-                                        <div class="person-row icon-user">{{ judge.display_full_name }}</div>
-                                    {%- endfor %}
-                                </span>
-                            </td>
+                            {% if management %}
+                                <td class="i-table person-row-cell"
+                                    data-searchable="{{ contrib.paper_judges|join(', ', attribute='name')|lower }}">
+                                    <span class="vertical-aligner">
+                                        {% for judge in contrib.paper_judges -%}
+                                            <div class="person-row icon-user">{{ judge.display_full_name }}</div>
+                                        {%- endfor %}
+                                    </span>
+                                </td>
+                            {% endif %}
                             <td class="i-table person-row-cell"
                                 data-searchable="{{ contrib.paper_content_reviewers|join(', ', attribute='name')|lower }}">
                                 <span class="vertical-aligner">

@@ -38,7 +38,13 @@ class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
     template_prefix = 'events/papers/'
 
     def getJSFiles(self):
-        return WPConferenceDefaultDisplayBase.getJSFiles(self) + self._asset_env['modules_papers_js'].urls()
+        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
+                self._asset_env['modules_event_management_js'].urls() +
+                self._asset_env['modules_papers_js'].urls())
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
+
+
+class WPDisplayJudgingArea(WPDisplayPapersBase):
+    menu_entry_name = 'judging_area'
