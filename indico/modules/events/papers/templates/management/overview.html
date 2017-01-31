@@ -2,6 +2,7 @@
 
 {% block content %}
     {% set cfp = event.cfp %}
+    {% set tz = event.tzinfo %}
     {% if not cfp.has_started %}
         {% include 'events/papers/management/cfp_actions/not_started.html' %}
     {% elif cfp.has_started and not cfp.has_ended %}
@@ -11,22 +12,35 @@
     {% endif %}
 
     <div class="action-box">
-        <div class="section semantic-text {{ 'highlight' if event.cfp.content_reviewing_enabled }}">
+        <div class="section semantic-text {{ 'highlight' if cfp.content_reviewing_enabled }}">
             <div class="icon icon-file-content"></div>
             <div class="text">
                 <div class="label">{% trans %}Content reviewing{% endtrans %}</div>
-                {% if event.cfp.content_reviewing_enabled %}
-                    {%- trans %}The content reviewing process is enabled{% endtrans -%}
-                {% else %}
+                {% set deadline = cfp.content_reviewer_deadline %}
+                {% if not cfp.content_reviewing_enabled %}
                     {%- trans %}The content reviewing process is disabled{% endtrans -%}
+                {% elif deadline -%}
+                    {% trans date=deadline|format_date(timezone=tz), time=deadline|format_time(timezone=tz) -%}
+                        The content reviewing process ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+                    {%- endtrans %}
+                {% else %}
+                    {%- trans %}The content reviewing process is enabled{% endtrans -%}
                 {% endif -%}
             </div>
             <div class="toolbar">
-                {% if event.cfp.content_reviewing_enabled %}
+                {% if cfp.content_reviewing_enabled %}
+                    <a href="#" class="i-button icon-time"
+                       data-href="{{ url_for('.manage_deadline', event, role='content_reviewer') }}"
+                       data-title="{% trans %}Set content reviewing deadline{% endtrans %}"
+                       data-update="#paper-page"
+                       data-replace-update
+                       data-ajax-dialog>
+                        {% trans %}Deadline{% endtrans %}
+                    </a>
                     <a href="#" class="i-button icon-switchoff"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
                        data-method="DELETE"
-                       {% if event.cfp.is_open %}
+                       {% if cfp.is_open %}
                            data-confirm="{% trans %}The reviewing process has started. Are you sure you want to disable the content reviewing process?{% endtrans %}"
                        {% endif %}
                        data-update="#paper-page"
@@ -44,22 +58,35 @@
                 {% endif %}
             </div>
         </div>
-        <div class="section semantic-text {{ 'highlight' if event.cfp.layout_reviewing_enabled }}">
+        <div class="section semantic-text {{ 'highlight' if cfp.layout_reviewing_enabled }}">
             <div class="icon icon-layout"></div>
             <div class="text">
                 <div class="label">{% trans %}Layout reviewing{% endtrans %}</div>
-                {% if event.cfp.layout_reviewing_enabled %}
-                    {%- trans %}The layout reviewing process is enabled{% endtrans -%}
-                {% else %}
+                {% set deadline = cfp.layout_reviewer_deadline %}
+                {% if not cfp.layout_reviewing_enabled %}
                     {%- trans %}The layout reviewing process is disabled{% endtrans -%}
+                {% elif deadline %}
+                    {% trans date=deadline|format_date(timezone=tz), time=deadline|format_time(timezone=tz) -%}
+                        The layout reviewing process ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+                    {%- endtrans %}
+                {% else %}
+                    {%- trans %}The layout reviewing process is enabled{% endtrans -%}
                 {% endif -%}
             </div>
             <div class="toolbar">
-                {% if event.cfp.layout_reviewing_enabled %}
+                {% if cfp.layout_reviewing_enabled %}
+                    <a href="#" class="i-button icon-time"
+                       data-href="{{ url_for('.manage_deadline', event, role='layout_reviewer') }}"
+                       data-title="{% trans %}Set layout reviewing deadline{% endtrans %}"
+                       data-update="#paper-page"
+                       data-replace-update
+                       data-ajax-dialog>
+                        {% trans %}Deadline{% endtrans %}
+                    </a>
                     <a href="#" class="i-button icon-switchoff"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='layout') }}"
                        data-method="DELETE"
-                       {% if event.cfp.is_open %}
+                       {% if cfp.is_open %}
                            data-confirm="{% trans %}The reviewing process has started. Are you sure you want to disable the layout reviewing process?{% endtrans %}"
                        {% endif %}
                        data-update="#paper-page"
@@ -75,6 +102,30 @@
                         {%- trans %}Enable{% endtrans -%}
                     </a>
                 {% endif %}
+            </div>
+        </div>
+        <div class="section">
+            <div class="icon icon-hammer"></div>
+            <div class="text">
+                <div class="label">{% trans %}Paper judging{% endtrans %}</div>
+                {% set deadline = cfp.judge_deadline %}
+                {% if deadline %}
+                    {% trans date=deadline|format_date(timezone=tz), time=deadline|format_time(timezone=tz) -%}
+                        Paper judging ends on <strong>{{ date }}</strong> at <strong>{{ time }}</strong>.
+                    {%- endtrans %}
+                {% else %}
+                    {%- trans %}There is no deadline for paper judging.{% endtrans -%}
+                {% endif %}
+            </div>
+            <div class="toolbar">
+                <a href="#" class="i-button icon-time"
+                   data-href="{{ url_for('.manage_deadline', event, role='judge') }}"
+                   data-title="{% trans %}Set paper judging deadline{% endtrans %}"
+                   data-update="#paper-page"
+                   data-replace-update
+                   data-ajax-dialog>
+                    {% trans %}Deadline{% endtrans %}
+                </a>
             </div>
         </div>
     </div>

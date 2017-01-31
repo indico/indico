@@ -36,7 +36,7 @@ from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
-from indico.modules.events.papers.settings import PaperReviewingRole
+from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.util import update_object_principals
 from indico.modules.users import User
 from indico.util.date_time import now_utc
@@ -322,3 +322,14 @@ def delete_comment(comment):
     paper = comment.paper_revision.paper
     paper.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Papers',
                         'Comment on paper {} removed'.format(paper.verbose_title), session.user)
+
+
+def set_deadline(event, role, deadline, enforce=True):
+    paper_reviewing_settings.set_multi(event, {
+        '{}_deadline'.format(role.name): deadline,
+        'enforce_{}_deadline'.format(role.name): enforce
+    })
+    log_data = {'Enforced': enforce, 'Deadline': deadline.isoformat() if deadline else 'None'}
+    logger.info('Paper reviewing deadline (%s) set in %r by %r', role.name, event, session.user)
+    event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+              "Paper reviewing deadline ({}) set".format(role.name), session.user, data=log_data)
