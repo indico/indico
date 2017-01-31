@@ -43,19 +43,21 @@ class RoleConverter(SettingConverter):
 paper_reviewing_settings = EventSettingsProxy('paper_reviewing', {
     'start_dt': None,
     'end_dt': None,
-    'enforce_deadlines': False,
     'content_reviewing_enabled': True,
     'layout_reviewing_enabled': False,
     'judge_deadline': None,
     'layout_reviewer_deadline': None,
     'content_reviewer_deadline': None,
+    'enforce_judge_deadline': False,
+    'enforce_layout_reviewer_deadline': False,
+    'enforce_content_reviewer_deadline': False,
     'announcement': '',
     'scale_lower': -3,
     'scale_upper': 3,
 
     # Notifications
-    'notify_on_added_to_event': {},
-    'notify_on_assigned_contrib': {},
+    'notify_on_added_to_event': set(),
+    'notify_on_assigned_contrib': set(),
     'notify_on_paper_submission': {PaperReviewingRole.layout_reviewer, PaperReviewingRole.content_reviewer},
     'notify_judge_on_review': True,
     'notify_author_on_judgment': True
