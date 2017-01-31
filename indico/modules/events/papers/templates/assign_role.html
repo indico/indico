@@ -19,9 +19,14 @@
                             {% for user in users|sort(attribute='full_name') -%}
                                 <tr class="i-table">
                                     <td class="i-table thin-column id-column">
-                                        <input type="checkbox" class="select-row" value="{{ user.id }}" name='user_id'>
+                                        <input type="checkbox" class="select-row" id="assign-user-{{ user.id }}"
+                                               name='user_id' value="{{ user.id }}">
                                     </td>
-                                    <td class="i-table name-column">{{ user.full_name }}</td>
+                                    <td class="i-table name-column">
+                                        <label for="assign-user-{{ user.id }}">
+                                            {{ user.full_name }}
+                                        </label>
+                                    </td>
                                     <td>
                                         {% for competence in competences['competences_{}'.format(user.id)] %}
                                             <div class="label i-tag">{{ competence }}</div>
