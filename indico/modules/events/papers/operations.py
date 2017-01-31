@@ -212,7 +212,7 @@ def delete_paper_template(template):
     logger.info('Paper template %r deleted by %r', template, session.user)
 
 
-def update_reviewing_roles(event, users, contributions, role, action):
+def update_reviewing_roles(event, users, contributions, role, assign):
     role_map = {
         PaperReviewingRole.judge: attrgetter('paper_judges'),
         PaperReviewingRole.content_reviewer: attrgetter('paper_content_reviewers'),
@@ -222,14 +222,14 @@ def update_reviewing_roles(event, users, contributions, role, action):
     for contrib in contributions:
         role_group = role_map[role](contrib)
         for user in users:
-            if action == 'assign':
+            if assign:
                 role_group.add(user)
             else:
                 role_group.discard(user)
         event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                   "Paper reviewing roles modified for contribution {}.".format(contrib.title), session.user,
                   data={'Role': role.name,
-                        'Action': action,
+                        'Action': 'Assign' if assign else 'Unassign',
                         'Users': ', '.join(sorted(person.full_name for person in users))})
     db.session.flush()
     logger.info("Paper reviewing roles in event %r updated by %r", event, session.user)

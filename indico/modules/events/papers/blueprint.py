@@ -67,12 +67,10 @@ for prefix, is_management in (('/manage/papers/assignment-list', True), ('/paper
     _bp.add_url_rule(prefix + '/customize', 'customize_paper_list', paper.RHCustomizePapersList,
                      methods=('GET', 'POST'), defaults=defaults)
     _bp.add_url_rule(prefix + '/judge', 'judge_papers', paper.RHJudgePapers, methods=('GET', 'POST'), defaults=defaults)
-    _bp.add_url_rule(prefix + '/assigning/assign', 'assign_papers', paper.RHJudgingAreaAssign,
-                     methods=('POST',), defaults=defaults)
-    _bp.add_url_rule(prefix + '/assigning/unassign', 'unassign_papers', paper.RHJudgingAreaUnassign,
-                     methods=('POST',), defaults=defaults)
-    _bp.add_url_rule(prefix + '/assign-role', 'judging_assign_role', paper.RHAssignRole,
-                     methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/assign/<any(judge,content_reviewer,layout_reviewer):role>', 'assign_papers',
+                     paper.RHAssignPapers, methods=('POST',), defaults=defaults)
+    _bp.add_url_rule(prefix + '/unassign/<any(judge,content_reviewer,layout_reviewer):role>', 'unassign_papers',
+                     paper.RHUnassignPapers, methods=('POST',), defaults=defaults)
 
 
 @_bp.url_defaults
