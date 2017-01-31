@@ -20,7 +20,8 @@ from indico.core.settings import SettingsProxy
 
 core_settings = SettingsProxy('core', {
     'site_title': 'Indico',
-    'site_organization': ''
+    'site_organization': '',
+    'custom_template_set': None
 })
 
 

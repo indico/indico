@@ -38,29 +38,6 @@ class RHAdminBase(RHProtected):
             raise Forbidden(_("Only Indico administrators may access this page."))
 
 
-class RHAdminLayoutGeneral(RHAdminBase):
-    _uh = urlHandlers.UHAdminLayoutGeneral
-
-    def _process(self):
-        p = admins.WPAdminLayoutGeneral(self)
-        return p.display()
-
-
-class RHAdminLayoutSaveTemplateSet( RHAdminBase ):
-    _uh = urlHandlers.UHAdminLayoutSaveTemplateSet
-
-    def _checkParams( self, params ):
-        self._params = params
-        self._defSet = params.get("templateSet",None)
-        if self._defSet == "None":
-            self._defSet = None
-        RHAdminBase._checkParams( self, params )
-
-    def _process( self ):
-        self._minfo.setDefaultTemplateSet(self._defSet)
-        self._redirect( urlHandlers.UHAdminLayoutGeneral.getURL() )
-
-
 class RHSystem(RHAdminBase):
     _uh = urlHandlers.UHAdminsSystem
 
@@ -68,6 +45,7 @@ class RHSystem(RHAdminBase):
 
         p = admins.WPAdminsSystem( self )
         return p.display()
+
 
 class RHSystemModify(RHAdminBase):
 
@@ -85,6 +63,7 @@ class RHSystemModify(RHAdminBase):
         else:
             p = admins.WPAdminsSystemModif( self )
             return p.display()
+
 
 class RHConferenceStyles(RHAdminBase):
     _uh = urlHandlers.UHAdminsConferenceStyles

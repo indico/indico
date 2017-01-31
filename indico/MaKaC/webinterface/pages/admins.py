@@ -14,9 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-import re
-
 # MaKaC
 import MaKaC.common.info as info
 import MaKaC.webinterface.pages.conferences as conferences
@@ -102,8 +99,6 @@ class WPTemplatesCommon( WPAdminsBase ):
     def _createTabCtrl( self ):
         self._tabCtrl = wcomponents.TabControl()
 
-        self._subTabGeneral = self._tabCtrl.newTab( "general", _("General Definitions"), \
-                urlHandlers.UHAdminLayoutGeneral.getURL() )
         self._subTabCSSTpls = self._tabCtrl.newTab( "styles", _("Conference Styles"), \
                 urlHandlers.UHAdminsConferenceStyles.getURL() )
         self._subTabBadges = self._tabCtrl.newTab( "badges", _("Badges"), \
@@ -122,57 +117,6 @@ class WPBadgeTemplatesBase(WPTemplatesCommon):
 
     def getJSFiles(self):
         return WPTemplatesCommon.getJSFiles(self) + self._includeJSPackage('badges_js')
-
-
-class WPAdminLayoutGeneral( WPTemplatesCommon ):
-
-    def _setActiveTab( self ):
-        self._subTabGeneral.setActive()
-
-    def __getAvailableTemplates(self):
-        tplDir = Config.getInstance().getTPLDir()
-
-        tplRE = re.compile('^([^\.]+)\.([^\.]+)\.tpl$')
-
-        templates = {}
-
-        fnames = os.listdir(tplDir);
-        for fname in fnames:
-            m = tplRE.match(fname)
-            if m:
-                templates[m.group(2)] = None
-
-        tplRE = re.compile('^([^\.]+)\.([^\.]+)\.wohl$')
-
-        fnames = os.listdir(os.path.join(tplDir, 'chelp'))
-        for fname in fnames:
-            m = tplRE.match(fname)
-            if m:
-                templates[m.group(2)] = None
-
-        cssRE = re.compile('Default.([^\.]+)\.css$')
-
-        fnames = os.listdir(Config.getInstance().getCssDir())
-        for fname in fnames:
-            m = cssRE.match(fname)
-            if m:
-                templates[m.group(1)] = None
-
-        return templates.keys()
-
-    def _getTabContent(self, params):
-        minfo = info.HelperMaKaCInfo.getMaKaCInfoInstance()
-        wc = WAdminLayoutGeneral()
-        pars = {
-            "defaultTemplateSet": minfo.getDefaultTemplateSet(),
-            "availableTemplates": self.__getAvailableTemplates(),
-            "templateSetFormURL": urlHandlers.UHAdminLayoutSaveTemplateSet.getURL()
-        }
-        return wc.getHTML(pars)
-
-
-class WAdminLayoutGeneral(wcomponents.WTemplated):
-    pass
 
 
 class WPAdminsConferenceStyles( WPTemplatesCommon ):
