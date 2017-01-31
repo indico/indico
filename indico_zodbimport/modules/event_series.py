@@ -124,7 +124,7 @@ class EventSeriesImporter(Importer):
                     series[0] |= series_ids
                     for id_ in series_ids:
                         series_map[id_] = series_ids
-                        return series_list
+        return series_list
 
     @property
     def _events_query(self):
