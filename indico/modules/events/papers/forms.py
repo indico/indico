@@ -33,8 +33,8 @@ from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, In
                                      HiddenFieldList, IndicoMarkdownField, FileField, EditableFileField,
                                      IndicoEnumSelectField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import LinkedDateTime
-from indico.web.forms.widgets import JinjaWidget
+from indico.web.forms.validators import LinkedDateTime, HiddenUnless
+from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 
 def make_review_form(event, review_type):
@@ -227,3 +227,12 @@ class PaperReviewForm(IndicoForm):
         data = self.data
         return {'questions_data': {k: v for k, v in data.iteritems() if k.startswith('question_')},
                 'review_data': {k: v for k, v in data.iteritems() if not k.startswith('question_')}}
+
+
+class DeadlineForm(IndicoForm):
+    deadline = IndicoDateTimeField(_("Deadline"), [Optional()], default_time=time(23, 59))
+    enforce = BooleanField(_("Enforce deadline"), [HiddenUnless('deadline')], widget=SwitchWidget())
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(DeadlineForm, self).__init__(*args, **kwargs)

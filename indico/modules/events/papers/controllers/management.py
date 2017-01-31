@@ -21,10 +21,11 @@ from flask import request, render_template, flash, session
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import (make_competences_form, PapersScheduleForm,
-                                                PaperTeamsForm, PaperReviewingSettingsForm)
+                                                PaperTeamsForm, PaperReviewingSettingsForm, DeadlineForm)
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
-                                                     update_competences, schedule_cfp, open_cfp, close_cfp)
-from indico.modules.events.papers.settings import paper_reviewing_settings
+                                                     update_competences, schedule_cfp, open_cfp, close_cfp,
+                                                     set_deadline)
+from indico.modules.events.papers.settings import paper_reviewing_settings, PaperReviewingRole
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
@@ -178,4 +179,22 @@ class RHManageReviewingSettings(RHManagePapersBase):
             logger.info("Paper reviewing settings of %r updated by %r", self.event_new, session.user)
             return jsonify_data()
         self.commit = False
+        return jsonify_form(form)
+
+
+class RHSetDeadline(RHManagePapersBase):
+    def _process(self):
+        role = PaperReviewingRole[request.view_args['role']]
+        deadline = paper_reviewing_settings.get(self.event_new, '{}_deadline'.format(role.name))
+        enforce = paper_reviewing_settings.get(self.event_new, 'enforce_{}_deadline'.format(role.name))
+        form = DeadlineForm(obj=FormDefaults(deadline=deadline, enforce=enforce), event=self.event_new)
+        if form.validate_on_submit():
+            set_deadline(self.event_new, role, form.deadline.data, form.enforce.data)
+            messages = {
+                PaperReviewingRole.content_reviewer: _('Content reviewing deadline has been set.'),
+                PaperReviewingRole.layout_reviewer: _('Layout reviewing deadline has been set.'),
+                PaperReviewingRole.judge: _('Judging deadline has been set.')
+            }
+            flash(messages[role], 'success')
+            return jsonify_data(html=_render_paper_dashboard(self.event_new))
         return jsonify_form(form)
