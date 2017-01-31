@@ -194,8 +194,8 @@
                            data-title="{% trans %}Assign judges to selected contributions{% endtrans %}"
                            data-href="{{ url_for('.assign_papers', event, role='judge') }}"
                            data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
                            data-method="POST"
-                           data-reload-after
                            data-ajax-dialog>
                             {%- trans %}Judges{% endtrans %}
                         </a>
@@ -207,8 +207,8 @@
                            data-title="{% trans %}Assign content reviewers to selected contributions{% endtrans %}"
                            data-href="{{ url_for('.assign_papers', event, role='content_reviewer') }}"
                            data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
                            data-method="POST"
-                           data-reload-after
                            data-ajax-dialog>
                             {%- trans %}Content reviewers{% endtrans %}
                         </a>
@@ -220,8 +220,8 @@
                            data-title="{% trans %}Assign layout reviewers to selected contributions{% endtrans %}"
                            data-href="{{ url_for('.assign_papers', event, role='layout_reviewer') }}"
                            data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
                            data-method="POST"
-                           data-reload-after
                            data-ajax-dialog>
                             {%- trans %}Layout reviewers{% endtrans %}
                         </a>
@@ -238,8 +238,8 @@
                            data-title="{% trans %}Unassign judges from selected contributions{% endtrans %}"
                            data-href="{{ url_for('.unassign_papers', event, role='judge') }}"
                            data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
                            data-method="POST"
-                           data-reload-after
                            data-ajax-dialog>
                             {%- trans %}Judges{% endtrans %}
                         </a>
@@ -251,8 +251,8 @@
                            data-title="{% trans %}Unassign content reviewers from selected contributions{% endtrans %}"
                            data-href="{{ url_for('.unassign_papers', event, role='content_reviewer') }}"
                            data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
                            data-method="POST"
-                           data-reload-after
                            data-ajax-dialog>
                             {%- trans %}Content reviewers{% endtrans %}
                         </a>
@@ -264,8 +264,8 @@
                            data-title="{% trans %}Unassign layout reviewers from selected contributions{% endtrans %}"
                            data-href="{{ url_for('.unassign_papers', event, role='layout_reviewer') }}"
                            data-params-selector="#assignment-list input[name=contribution_id]:checked"
+                           data-update='{"html": "#assignment-list", "filter_statistics": "#filter-statistics"}'
                            data-method="POST"
-                           data-reload-after
                            data-ajax-dialog>
                             {%- trans %}Layout reviewers{% endtrans %}
                         </a>

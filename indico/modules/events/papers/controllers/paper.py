@@ -172,7 +172,7 @@ class RHAssignPapersBase(RHPapersActionBase):
             flash(_("Paper reviewing roles have been assigned."), 'success')
         else:
             flash(_("Paper reviewing roles have been unassigned."), 'success')
-        return jsonify_data(flash=False)
+        return jsonify_data(**self.list_generator.render_list())
 
     def _render_form(self, users, action):
         user_competences = self.event_new.cfp.user_competences
