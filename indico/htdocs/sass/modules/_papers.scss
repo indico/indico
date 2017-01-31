@@ -52,6 +52,10 @@
         color: $light-black;
         border-width: 0;
     }
+
+    label {
+        font-weight: normal;
+    }
 }
 
 #assignment-list {
