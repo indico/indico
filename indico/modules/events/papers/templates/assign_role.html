@@ -3,7 +3,7 @@
 {% from 'message_box.html' import message_box %}
 
 {% block content %}
-    <form method="POST" action="{{ url_for('.judging_assign_role', event) }}">
+    <form method="POST">
         <div class="js-assign-dialog">
             <div id="assign-role-table">
                 {% if users %}
@@ -61,8 +61,6 @@
             {% for contrib in contribs %}
                 <input type="hidden" name="contribution_id" value="{{ contrib.id }}">
             {% endfor %}
-            <input type="hidden" name="role" value="{{ role }}">
-            <input type="hidden" name="action" value="{{ action }}">
             <button type="button" class="i-button big right" data-button-back>{% trans %}Cancel{% endtrans %}</button>
             <input class="i-button big highlight disabled js-requires-selected-row right" type="submit"
                    value="{{ _('Assign') if action == 'assign' else _('Unassign') }}">
