@@ -18,10 +18,13 @@ from __future__ import unicode_literals
 
 from indico.core.settings.converters import DatetimeConverter, SettingConverter
 from indico.modules.events.settings import EventSettingsProxy
-from indico.util.struct.enum import IndicoEnum
+from indico.util.i18n import _
+from indico.util.struct.enum import RichIntEnum
 
 
-class PaperReviewingRole(int, IndicoEnum):
+class PaperReviewingRole(RichIntEnum):
+    __titles__ = [None, _('Judge'), _('Layout Reviewer'), _('Content Reviewer')]
+
     judge = 1
     layout_reviewer = 2
     content_reviewer = 3
