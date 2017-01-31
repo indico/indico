@@ -157,6 +157,11 @@ class PaperAssignmentListGenerator(PaperListGeneratorBase):
             'filters': {'items': {}}
         }
 
+    def get_list_kwargs(self):
+        kwargs = super(PaperAssignmentListGenerator, self).get_list_kwargs()
+        kwargs['management'] = True
+        return kwargs
+
 
 class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
     """Listing and filtering actions in paper judging area list in the display view"""
@@ -176,3 +181,7 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
         query = super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
         return query.filter(Contribution.paper_judges.any(User.id == self.user.id))
 
+    def get_list_kwargs(self):
+        kwargs = super(PaperJudgingAreaListGeneratorDisplay, self).get_list_kwargs()
+        kwargs['management'] = False
+        return kwargs
