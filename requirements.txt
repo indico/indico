@@ -37,6 +37,7 @@ oauth2==1.5.211
 requests==1.2.0
 pyScss==1.1.5
 Werkzeug==0.9
+Jinja2==2.8.1
 Flask==0.10
 bcrypt==1.0.2
 beautifulsoup4==4.2.1
