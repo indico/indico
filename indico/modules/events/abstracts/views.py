@@ -68,16 +68,14 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
 
 class WPDisplayCallForAbstracts(WPDisplayAbstracts):
     def getJSFiles(self):
-        return (WPDisplayAbstractsBase.getJSFiles(self) +
-                self._asset_env['modules_event_display_js'].urls())
+        return WPDisplayAbstractsBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
 
 
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
     menu_entry_name = 'user_tracks'
 
     def getJSFiles(self):
-        return (WPDisplayAbstracts.getJSFiles(self) +
-                self._asset_env['modules_event_management_js'].urls())
+        return WPDisplayAbstracts.getJSFiles(self) + self._asset_env['modules_event_management_js'].urls()
 
 
 def render_abstract_page(abstract, view_class=None, management=False):
