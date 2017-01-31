@@ -226,10 +226,15 @@ def update_reviewing_roles(event, users, contributions, role, assign):
                 role_group.add(user)
             else:
                 role_group.discard(user)
+
+    contrib_ids = ['#{}'.format(c.friendly_id) for c in sorted(contributions, key=attrgetter('friendly_id'))]
+    log_data = {'Users': ', '.join(sorted(person.full_name for person in users)),
+                'Contributions': ', '.join(contrib_ids)}
+    if assign:
         event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
-                  "Paper reviewing roles modified for contribution {}.".format(contrib.title), session.user,
-                  data={'Role': role.name,
-                        'Action': 'Assign' if assign else 'Unassign',
-                        'Users': ', '.join(sorted(person.full_name for person in users))})
+                  'Papers assigned ({})'.format(orig_string(role.title)), session.user, data=log_data)
+    else:
+        event.log(EventLogRealm.management, EventLogKind.negative, 'Papers',
+                  'Papers unassigned ({})'.format(orig_string(role.title)), session.user, data=log_data)
     db.session.flush()
-    logger.info("Paper reviewing roles in event %r updated by %r", event, session.user)
+    logger.info('Paper reviewing roles in event %r updated by %r', event, session.user)
