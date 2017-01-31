@@ -21,6 +21,7 @@ from itertools import chain
 from operator import attrgetter
 
 from flask import flash, request, session
+from werkzeug.exceptions import Forbidden
 from werkzeug.utils import cached_property
 
 from indico.modules.events.contributions import Contribution
@@ -156,7 +157,12 @@ class RHRJudgingAreaAssigningBase(RHPapersActionBase):
 
     def _checkParams(self, params):
         RHPapersActionBase._checkParams(self, params)
-        self.role = PaperReviewingRole[request.args['role']]
+        self.role = PaperReviewingRole[request.values['role']]
+
+    def _checkProtection(self):
+        RHPapersActionBase._checkProtection(self)
+        if not self.management and self.role == PaperReviewingRole.judge:
+            raise Forbidden
 
     def _render_template(self, users, action):
         user_competences = self.event_new.cfp.user_competences
@@ -184,12 +190,11 @@ class RHJudgingAreaUnassign(RHRJudgingAreaAssigningBase):
         return self._render_template(users, 'unassign')
 
 
-class RHAssignRole(RHPapersActionBase):
+class RHAssignRole(RHRJudgingAreaAssigningBase):
     """Assign/unassign paper reviewing roles"""
 
     def _checkParams(self, params):
-        RHPapersActionBase._checkParams(self, params)
-        self.role = PaperReviewingRole[request.form['role']]
+        RHRJudgingAreaAssigningBase._checkParams(self, params)
         self.action = request.form['action']
         user_ids = map(int, request.form.getlist('user_id'))
         self.users = {u for u in CFP_ROLE_MAP[self.role](self.event_new.cfp) if u.id in user_ids}
