@@ -26,7 +26,6 @@ from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from MaKaC.i18n import _
-from MaKaC.common import info
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import Conference
 from MaKaC.common.timezoneUtils import DisplayTZ
@@ -38,7 +37,7 @@ import MaKaC.common.TemplateExec as templateEngine
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db import DBMgr, db
+from indico.core.db import db
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.core.settings import social_settings, core_settings
@@ -83,19 +82,12 @@ class WTemplated:
             and if there is a specific file for this page, for this template set.
             Returns the file that should be used.
         """
-
-
-        if DBMgr.getInstance().isConnected():
-            template = info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultTemplateSet()
-
-            if template != None :
-                specTpl = "%s.%s.%s" % (tplId, template, extension)
-
-                if os.path.exists(os.path.join(dir,specTpl)):
-                    return specTpl
-
-
-        return "%s.%s" % (tplId, extension)
+        custom = core_settings.get('custom_template_set')
+        if custom is not None:
+            custom_tpl = '{}.{}.{}'.format(tplId, custom, extension)
+            if os.path.exists(os.path.join(dir, custom_tpl)):
+                return custom_tpl
+        return '{}.{}'.format(tplId, extension)
 
     def _setTPLFile(self):
         """Sets the TPL (template) file for the object. It will try to get
@@ -104,8 +96,6 @@ class WTemplated:
             in the configured TPL directory.
         """
         cfg = Config.getInstance()
-
-        #file = cfg.getTPLFile(self.tplId)
 
         # because MANY classes skip the constructor...
         tplDir = cfg.getTPLDir()
