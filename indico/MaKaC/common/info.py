@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from persistent import Persistent
-from persistent.dict import PersistentDict
 from BTrees import OOBTree
 
 from indico.core import db
@@ -27,9 +26,6 @@ class MaKaCInfo(Persistent):
     def __init__(self):
         # Global poster/badge templates
         self._defaultConference = None
-
-        # template set
-        self._defaultTemplateSet = None
 
         # Define the volume used in archiving:
         # e.g. /afs/cern.ch/project/indico/XXXX/2008/...
@@ -43,17 +39,6 @@ class MaKaCInfo(Persistent):
         if self._defaultConference is None:
             self._defaultConference = DefaultConference()
         return self._defaultConference
-
-    def getDefaultTemplateSet( self ):
-        try:
-            return self._defaultTemplateSet
-        except:
-            self._defaultTemplateSet = None
-            return None
-
-    def setDefaultTemplateSet( self, defTemp ):
-        self._defaultTemplateSet = defTemp
-        return self._defaultTemplateSet
 
     def setArchivingVolume(self, volume):
         if isinstance(volume, str):

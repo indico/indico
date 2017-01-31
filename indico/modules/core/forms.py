@@ -16,9 +16,13 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, BooleanField
-from wtforms.validators import DataRequired
+import os
+from glob import glob
 
+from wtforms.fields import StringField, BooleanField, SelectField
+from wtforms.validators import DataRequired, Optional
+
+from indico.core.config import Config
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import IndicoRegexp
@@ -30,9 +34,23 @@ class SettingsForm(IndicoForm):
     core_site_title = StringField(_('Title'), [DataRequired()], description=_("The global title of this Indico site."))
     core_site_organization = StringField(_('Organization'),
                                          description=_("The organisation that runs this Indico site."))
+    core_custom_template_set = SelectField(_('Template Set'), [Optional()], coerce=lambda x: (x or None),
+                                           description=_('Custom Mako template set to use.'))
+
     # Social settings
     social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
     social_facebook_app_id = StringField('Facebook App ID', [IndicoRegexp(r'^\d*$')])
+
+    def __init__(self, *args, **kwargs):
+        super(SettingsForm, self).__init__(*args, **kwargs)
+        template_sets = sorted(self._get_template_sets())
+        self.core_custom_template_set.choices = [('', 'Default')] + zip(template_sets, template_sets)
+
+    def _get_template_sets(self):
+        sets = set()
+        for fn in map(os.path.basename, glob(os.path.join(Config.getInstance().getTPLDir(), '*.*.tpl'))):
+            sets.add(fn.split('.')[1])
+        return sets
 
     @property
     def _fieldsets(self):
