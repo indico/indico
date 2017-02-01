@@ -50,36 +50,6 @@
     </div>
 {% endmacro %}
 
-{% macro render_decision_box(abstract, form, user) %}
-    {% set event = abstract.event_new %}
-    {{ render_user_avatar(user) }}
-    <div class="i-timeline-item-box footer-only header-indicator-left review-form">
-        <div class="i-box-footer">
-            {% set url = url_for('.judge_abstract', abstract) %}
-            {% set form_id = 'judgment-form' %}
-
-            {% call form_header(form, action=url, orientation='vertical', id=form_id) %}
-                data-form-container="#abstract-decision-box"
-                data-update="#reviewing-page"
-                data-ajax-form
-            {% endcall %}
-            {% if event.cfa.judgment_instructions %}
-                {% call(link, endlink) render_instruction_box(form_id, event.cfa.judgment_instructions, _("Judgment instructions")) %}
-                    {% trans -%}
-                        Please don't forget to read the {{ link }}judgment instructions{{ endlink }} before taking your decision.
-                    {%- endtrans %}
-                {% endcall %}
-            {% endif %}
-            {{ form_rows(form, fields=form._order, skip_labels=true) }}
-            {% call form_footer(form) %}
-                <button class="i-button big highlight">
-                    {% trans %}Judge{% endtrans %}
-                </button>
-            {% endcall %}
-        </div>
-    </div>
-{% endmacro %}
-
 {% macro render_review_summary_box(abstract, user, visible_tracks) %}
     {% set event = abstract.event_new %}
     {% set can_judge = abstract.can_judge(user, check_state=true) %}
