@@ -280,6 +280,8 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
             kwargs.setdefault('accepted_track', candidate_tracks[0])
         if len(candidate_contrib_types) == 1:
             kwargs.setdefault('accepted_contrib_type', candidate_contrib_types[0])
+        elif not abstract.reviews:
+            kwargs.setdefault('accepted_contrib_type', abstract.submitted_contrib_type)
         super(AbstractJudgmentForm, self).__init__(*args, **kwargs)
         self.duplicate_of.excluded_abstract_ids = {abstract.id}
         self.merged_into.excluded_abstract_ids = {abstract.id}
