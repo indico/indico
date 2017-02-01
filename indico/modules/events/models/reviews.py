@@ -121,6 +121,7 @@ class ProposalMixin(object):
     edit_comment_endpoint = None
     create_review_endpoint = None
     edit_review_endpoint = None
+    create_judgment_endpoint = None
 
     @property
     def cfp(self):
@@ -156,6 +157,9 @@ class ProposalMixin(object):
         return (url_for(self.edit_review_endpoint, review)
                 if review
                 else url_for(self.create_review_endpoint, self, group))
+
+    def get_save_judgment_url(self):
+        return url_for(self.create_judgment_endpoint, self)
 
 
 class ProposalCommentMixin(object):

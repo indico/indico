@@ -1,3 +1,4 @@
+{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 {% from 'message_box.html' import message_box %}
 
 {% macro render_edited_hint(dt, user=None) %}
@@ -69,4 +70,36 @@
 
 {% macro render_review_state(review) %}
     <span class="bold underline semantic-text {{ review.proposed_action.css_class }}">
+{% endmacro %}
+
+{% macro render_decision_box(proposal, form, user) %}
+    {% set event = proposal.event_new %}
+    {{ render_user_avatar(user) }}
+    <div class="i-timeline-item-box footer-only header-indicator-left review-form">
+        <div class="i-box-footer">
+            {% set form_id = 'judgment-form' %}
+            {% call form_header(form, action=proposal.get_save_judgment_url(), orientation='vertical', id=form_id) %}
+                data-form-container="#proposal-decision-box"
+                data-update="#reviewing-page"
+                data-ajax-form
+            {% endcall %}
+            {% if proposal.cfp.judgment_instructions %}
+                {% call(link, endlink) render_instruction_box(form_id, proposal.cfp.judgment_instructions, _("Judgment instructions")) %}
+                    {% trans -%}
+                        Please don't forget to read the {{ link }}judgment instructions{{ endlink }} before taking your decision.
+                    {%- endtrans %}
+                {% endcall %}
+            {% endif %}
+            {% if form._order %}
+                {{ form_rows(form, fields=form._order, skip_labels=true) }}
+            {% else %}
+                {{ form_rows(form, skip_labels=true) }}
+            {% endif %}
+            {% call form_footer(form) %}
+                <button class="i-button big highlight">
+                    {%- trans %}Judge{% endtrans -%}
+                </button>
+            {% endcall %}
+        </div>
+    </div>
 {% endmacro %}
