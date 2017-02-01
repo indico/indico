@@ -6,6 +6,7 @@
                                                         render_submission_info %}
 {% from 'events/abstracts/reviewing/timeline.html' import render_multiple_review_group_text %}
 {% from 'events/reviews/timeline.html' import render_timeline %}
+{% from 'events/reviews/_common.html' import render_decision_box %}
 
 {% block back_button_url -%}
     {% if management -%}

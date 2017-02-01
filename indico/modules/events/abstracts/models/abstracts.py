@@ -125,6 +125,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     edit_comment_endpoint = 'abstracts.edit_abstract_comment'
     create_review_endpoint = 'abstracts.review_abstract'
     edit_review_endpoint = 'abstracts.edit_review'
+    create_judgment_endpoint = 'abstracts.judge_abstract'
     revisions_enabled = False
 
     @declared_attr
