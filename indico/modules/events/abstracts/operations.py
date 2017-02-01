@@ -210,7 +210,10 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
     if judgment == AbstractAction.accept:
         abstract.state = AbstractState.accepted
         abstract.accepted_track = abstract_data.get('accepted_track')
-        abstract.accepted_contrib_type = abstract_data.get('accepted_contrib_type')
+        if abstract_data.get('override_contrib_type'):
+            abstract.accepted_contrib_type = abstract_data.get('accepted_contrib_type')
+        else:
+            abstract.accepted_contrib_type = abstract.submitted_contrib_type
         if not abstract.contribution:
             abstract.contribution = create_contribution_from_abstract(abstract, contrib_session)
         if abstract.accepted_track:

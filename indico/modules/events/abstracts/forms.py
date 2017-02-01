@@ -212,7 +212,11 @@ class AbstractJudgmentFormBase(IndicoForm):
     accepted_track = QuerySelectField(_("Track"), [HiddenUnless('judgment', AbstractAction.accept)],
                                       get_label='title', allow_blank=True, blank_text=_("Choose a track..."),
                                       description=_("The abstract will be accepted in this track"))
-    accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept)],
+    override_contrib_type = BooleanField(_("Override contribution type"),
+                                         [HiddenUnless('judgment', AbstractAction.accept)], widget=SwitchWidget(),
+                                         description=_("Override the contribution type for all selected abstracts"))
+    accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept),
+                                                                      HiddenUnless('override_contrib_type')],
                                              get_label=lambda x: x.name.title(), allow_blank=True,
                                              blank_text=_("You may choose a contribution type..."),
                                              description=_("The abstract will be converted "
@@ -247,6 +251,7 @@ class AbstractJudgmentFormBase(IndicoForm):
                                             .order_by(ContributionType.name))
         if not self.accepted_contrib_type.query.count():
             del self.accepted_contrib_type
+            del self.override_contrib_type
 
     @property
     def split_data(self):
