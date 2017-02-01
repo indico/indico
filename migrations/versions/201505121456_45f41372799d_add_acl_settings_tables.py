@@ -48,7 +48,7 @@ def upgrade():
         sa.CheckConstraint(
             'type != 3 OR (local_group_id IS NULL AND user_id IS NULL AND mp_group_provider IS NOT NULL AND '
             'mp_group_name IS NOT NULL)',
-            name='valid_mp_group'),
+            name='valid_multipass_group'),
         sa.ForeignKeyConstraint(['local_group_id'], ['users.groups.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
@@ -88,7 +88,7 @@ def upgrade():
         sa.CheckConstraint(
             'type != 3 OR (local_group_id IS NULL AND user_id IS NULL AND mp_group_provider IS NOT NULL AND '
             'mp_group_name IS NOT NULL)',
-            name='valid_mp_group'
+            name='valid_multipass_group'
         ),
         sa.ForeignKeyConstraint(['local_group_id'], ['users.groups.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
