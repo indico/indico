@@ -119,12 +119,23 @@ class PapersScheduleForm(IndicoForm):
         super(PapersScheduleForm, self).__init__(*args, **kwargs)
 
 
-class BulkPaperJudgmentForm(IndicoForm):
+class PaperJudgmentFormBase(IndicoForm):
+    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
+    send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
+
+
+class PaperJudgmentForm(PaperJudgmentFormBase):
+    """Form for judging a single paper"""
+
+    _order = ('judgment', 'judgment_comment', 'send_notifications')
+
+    judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=PaperAction)
+
+
+class BulkPaperJudgmentForm(PaperJudgmentFormBase):
     judgment = HiddenEnumField(enum=PaperAction)
     contribution_id = HiddenFieldList()
     submitted = HiddenField()
-    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
-    send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
@@ -132,15 +143,6 @@ class BulkPaperJudgmentForm(IndicoForm):
 
     def is_submitted(self):
         return super(BulkPaperJudgmentForm, self).is_submitted() and 'submitted' in request.form
-
-    @property
-    def split_data(self):
-        paper_data = self.data
-        judgment_data = {
-            'judgment': paper_data.pop('judgment'),
-            'send_notifications': paper_data.pop('send_notifications'),
-        }
-        return judgment_data, paper_data
 
 
 class PaperReviewingSettingsForm(IndicoForm):

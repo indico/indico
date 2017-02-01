@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session, render_template
 
-from indico.modules.events.papers.forms import PaperCommentForm, build_review_form
+from indico.modules.events.papers.forms import PaperCommentForm, build_review_form, PaperJudgmentForm
 from indico.util.mathjax import MathjaxMixin
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
@@ -60,7 +60,8 @@ def render_paper_page(paper, view_class=None):
     reviewed_for_groups = list(paper.last_revision.get_reviewed_for_groups(session.user))
     if len(reviewed_for_groups) == 1:
         review_form = build_review_form(paper, reviewed_for_groups[0])
-    params = {'paper': paper, 'comment_form': comment_form, 'review_form': review_form}
+    judgment_form = PaperJudgmentForm()
+    params = {'paper': paper, 'comment_form': comment_form, 'review_form': review_form, 'judgment_form': judgment_form}
     if view_class:
         return view_class.render_template('paper.html', paper.event_new.as_legacy, **params)
     else:

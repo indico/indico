@@ -25,6 +25,9 @@
                         {% endif %}
                     {% endfor %}
                     {% if loop.last and (can_comment or can_review) %}
+                        {% if not proposal.is_in_final_state %}
+                            {{ caller('revision-judgment', revision) }}
+                        {% endif %}
                         {% set caller_ = caller %}
                         {% call(block) render_omnibox(proposal, comment_form, review_form) %}
                             {{ caller_(block) }}
@@ -37,6 +40,9 @@
                         <div class="i-timeline-connect-down to-separator"></div>
                     </div>
                     <div class="i-timeline-separator"></div>
+                    {% if proposal.is_in_final_state %}
+                        {{ caller('revision-judgment', revision) }}
+                    {% endif %}
                 {% endif %}
             {% endif %}
         </div>

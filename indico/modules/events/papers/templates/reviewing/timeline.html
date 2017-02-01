@@ -79,16 +79,67 @@
     {% set action = render_review_state(review) %}
     {% set endaction = '</span>'|safe %}
     {% if review.proposed_action.name == 'accept' %}
-        {% trans -%}
-            Proposed to {{ action }}accept{{ endaction }}
-        {%- endtrans %}
+        {%- trans %}Proposed to {{ action }}accept{{ endaction }}{% endtrans -%}
     {% elif review.proposed_action.name == 'reject' %}
-        {% trans -%}
-            Proposed to {{ action }}reject{{ endaction }}
-        {%- endtrans %}
+        {%- trans %}Proposed to {{ action }}reject{{ endaction }}{% endtrans -%}
     {% elif review.proposed_action.name == 'to_be_corrected' %}
-        {% trans -%}
-            Proposed to {{ action }}correct{{ endaction }}
-        {%- endtrans %}
+        {%- trans %}Proposed to {{ action }}correct{{ endaction }}{% endtrans -%}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_paper_judgment(revision) %}
+    {% if revision.state.name != 'submitted' %}
+        <div class="i-timeline-item">
+            {{ render_user_avatar(revision.judge) }}
+            <div class="i-timeline-item-box header-indicator-left">
+                <div class="i-box-header flexrow">
+                    <div class="f-self-stretch">
+                        {{ _render_paper_judgment_action(revision) }}
+                        <time datetime="{{ revision.judgment_dt.isoformat() }}">
+                            {{- revision.judgment_dt|format_human_date -}}
+                        </time>
+                    </div>
+                    {% if revision.paper.can_judge(session.user) and revision.is_last_revision %}
+                        <div>
+                            <a class="i-link icon-remove"
+                               title="{% trans %}Reset judgement{% endtrans %}"
+                               data-href="{{ url_for('.reset_paper_state', revision.paper) }}"
+                               data-method="DELETE"
+                               data-update="#reviewing-page"
+                               data-title="{% trans %}Reset judgment{% endtrans %}"
+                               data-confirm="{% trans %}Do you really want to reset the judgment? This operation is irreversible.{% endtrans %}"
+                               data-replace-update></a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="i-box-content">
+                    {% if revision.state.name == 'accepted' %}
+                        {%- trans %}The paper was accepted.{% endtrans -%}
+                    {% elif revision.state.name == 'rejected' %}
+                        {%- trans %}The paper was rejected.{% endtrans -%}
+                    {% elif revision.state.name == 'to_be_corrected' %}
+                        {%- trans %}The paper requires changes{% endtrans -%}
+                    {% endif %}
+                    {% if revision.judgment_comment %}
+                        <div class="titled-rule">
+                            {%- trans %}Comment{% endtrans -%}
+                        </div>
+                        {{ revision.judgment_comment }}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro _render_paper_judgment_action(revision) %}
+    {% set action = revision.state.name %}
+    {% set judge_name = revision.judge.name %}
+    {% if action == 'accepted' %}
+        {%- trans %}<strong>{{ judge_name }}</strong> accepted this paper{% endtrans -%}
+    {% elif action == 'rejected' %}
+        {%- trans %}<strong>{{ judge_name }}</strong> rejected this paper{% endtrans -%}
+    {% elif action == 'to_be_corrected' %}
+        {%- trans %}<strong>{{ judge_name }}</strong> asked for changes{% endtrans -%}
     {% endif %}
 {% endmacro %}

@@ -36,6 +36,7 @@ class Paper(ProposalMixin):
     edit_comment_endpoint = 'papers.edit_comment'
     create_review_endpoint = 'papers.submit_review'
     edit_review_endpoint = 'papers.edit_review'
+    create_judgment_endpoint = 'papers.judge_paper'
     revisions_enabled = True
 
     def __init__(self, contribution):
@@ -71,7 +72,7 @@ class Paper(ProposalMixin):
 
     @property
     def is_in_final_state(self):
-        return self.state in {PaperRevisionState.accepted or PaperRevisionState.rejected}
+        return self.state in {PaperRevisionState.accepted, PaperRevisionState.rejected}
 
     def can_comment(self, user):
         if not user:
@@ -111,3 +112,9 @@ class Paper(ProposalMixin):
 
     def get_last_revision(self):
         return self.last_revision
+
+    def reset_state(self):
+        self.last_revision.state = PaperRevisionState.submitted
+        self.last_revision.judgment_comment = ''
+        self.last_revision.judge = None
+        self.last_revision.judgment_dt = None
