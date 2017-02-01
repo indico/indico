@@ -155,6 +155,10 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def paper(self):
         return self._contribution.paper
 
+    @property
+    def is_last_revision(self):
+        return self == self.paper.last_revision
+
     @paper.setter
     def paper(self, paper):
         self._contribution = paper.contribution

@@ -1,8 +1,10 @@
 {% extends 'events/papers/_base.html' %}
 
 {% from 'events/abstracts/reviewing/timeline.html' import render_multiple_review_group_text %}
+{% from 'events/papers/reviewing/timeline.html' import render_paper_info, render_submission_info,
+                                                       render_paper_judgment %}
 {% from 'events/reviews/timeline.html' import render_timeline %}
-{% from 'events/papers/reviewing/timeline.html' import render_paper_info, render_submission_info %}
+{% from 'events/reviews/_common.html' import render_decision_box %}
 
 {% block back_button_url -%}
     {% if management -%}
@@ -26,11 +28,17 @@
         {% if block == 'revision-info' %}
             {{ render_submission_info(revision) }}
         {% endif %}
+        {% if block == 'revision-judgment' %}
+            {{ render_paper_judgment(revision) }}
+        {% endif %}
     {% endcall %}
 
     {# TODO: render review-summary-box #}
-    {# TODO: render decision-box #}
-    {# TODO: render judgment #}
+    {% if paper.can_judge(session.user, check_state=true) %}
+        <div id="proposal-decision-box" class="i-timeline-item">
+            {{ render_decision_box(paper, judgment_form, session.user) }}
+        </div>
+    {% endif %}
 
     {% if not no_javascript %}
         <script>

@@ -148,14 +148,14 @@ def create_paper_revision(contribution, submitter, files):
 
 
 @no_autoflush
-def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
+def judge_paper(paper, judgment, comment, judge, send_notifications=False):
     if judgment == PaperAction.accept:
         paper.state = PaperRevisionState.accepted
     elif judgment == PaperAction.reject:
         paper.state = PaperRevisionState.rejected
     elif judgment == PaperAction.to_be_corrected:
         paper.state = PaperRevisionState.to_be_corrected
-    paper.last_revision.judgment_comment = contrib_data['judgment_comment']
+    paper.last_revision.judgment_comment = comment
     paper.last_revision.judge = judge
     paper.last_revision.judgment_dt = now_utc()
     db.session.flush()
@@ -166,6 +166,14 @@ def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
     paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
                         data=log_data)
+
+
+def reset_paper_state(paper):
+    paper.reset_state()
+    db.session.flush()
+    logger.info('Paper %r state reset by %r', paper, session.user)
+    paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+                        'Judgment {} reset'.format(paper.verbose_title), session.user)
 
 
 def send_paper_notifications(paper):
