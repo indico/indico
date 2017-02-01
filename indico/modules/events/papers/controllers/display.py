@@ -16,18 +16,22 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session
+from flask import request, session, flash
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
-from indico.modules.events.papers.forms import PaperSubmissionForm, PaperCommentForm, build_review_form
+from indico.modules.events.papers.forms import (PaperSubmissionForm, PaperCommentForm, build_review_form,
+                                                PaperJudgmentForm)
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperReviewType, PaperReview, PaperTypeProxy
+from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
-                                                     update_comment, delete_comment, update_review)
+                                                     update_comment, delete_comment, update_review, judge_paper,
+                                                     reset_paper_state)
 from indico.modules.events.papers.util import get_user_contributions_to_review, get_user_reviewed_contributions
 from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page, WPDisplayReviewingArea
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify
 
@@ -43,9 +47,7 @@ class RHSubmitPaper(RHPaperBase):
 
 class RHPaperTimeline(RHPaperBase):
     def _process(self):
-        comment_form = PaperCommentForm(paper=self.paper, user=session.user, formdata=None)
-        return WPDisplayPapersBase.render_template('paper.html', self._conf, paper=self.paper,
-                                                   comment_form=comment_form, review_form=None)
+        return render_paper_page(self.paper, view_class=WPDisplayPapersBase)
 
 
 class RHDownloadPaperFile(RHPaperBase):
@@ -177,3 +179,30 @@ class RHReviewingArea(RHPapersBase):
         return WPDisplayReviewingArea.render_template('display/reviewing_area.html', self._conf, event=self.event_new,
                                                       contribs_to_review=contribs_to_review,
                                                       reviewed_contribs=reviewed_contribs)
+
+
+class RHJudgePaper(RHPaperBase):
+    def _check_paper_protection(self):
+        return self.paper.can_judge(session.user, check_state=True)
+
+    def _process(self):
+        form = PaperJudgmentForm()
+        if form.validate_on_submit():
+            judge_paper(self.paper, form.judgment.data, form.judgment_comment.data, judge=session.user,
+                        send_notifications=form.send_notifications.data)
+            return jsonify_data(flash=False, html=render_paper_page(self.paper))
+
+
+class RHResetPaperState(RHPaperBase):
+    def _check_paper_protection(self):
+        if self.paper.state == PaperRevisionState.submitted:
+            return False
+        # managers and judges can always reset
+        if self.paper.event_new.can_manage(session.user) or self.paper.can_judge(session.user):
+            return True
+
+    def _process(self):
+        if self.paper.state != PaperRevisionState.submitted:
+            reset_paper_state(self.paper)
+            flash(_("The paper judgment has been reset"), 'success')
+        return jsonify_data(html=render_paper_page(self.paper))
