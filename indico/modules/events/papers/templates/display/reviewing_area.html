@@ -55,7 +55,7 @@
             </div>
         </div>
         {% if contribs_to_review %}
-            {{ render_user_papers_list(event, contribs_to_review, to_review=True) }}
+            {{ render_user_papers_list(event, contribs_to_review, to_review=true) }}
         {% else %}
             {%- call message_box('info') %}
                 {%- trans %}There are no papers left to review.{% endtrans %}
@@ -81,7 +81,7 @@
             </div>
         </div>
         {% if reviewed_contribs %}
-            {{ render_user_papers_list(event, reviewed_contribs, reviewed=True) }}
+            {{ render_user_papers_list(event, reviewed_contribs, reviewed=true) }}
         {% else %}
             {%- call message_box('info') %}
                 {%- trans %}You haven't reviewed any papers yet.{% endtrans %}
@@ -92,11 +92,11 @@
     <script>
         setupReviewingAreaList({
             hasPapers: {{ contribs_to_review|bool|tojson }},
-            list : 'to-review'
+            list: 'to-review'
         });
         setupReviewingAreaList({
             hasPapers: {{ reviewed_contribs|bool|tojson }},
-            list : 'reviewed'
+            list: 'reviewed'
         });
     </script>
 {% endblock %}

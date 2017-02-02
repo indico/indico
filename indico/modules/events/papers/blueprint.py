@@ -46,7 +46,7 @@ _bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/comment/<i
 _bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/comment/<int:comment_id>', 'delete_comment',
                  display.RHDeletePaperComment, methods=('DELETE',))
 # Reviewing area
-_bp.add_url_rule('/papers/reviewing/', 'display_reviewing_area', display.RHDisplayReviewingArea)
+_bp.add_url_rule('/papers/reviewing/', 'reviewing_area', display.RHReviewingArea)
 
 # Management
 _bp.add_url_rule('/manage/papers/', 'management', management.RHPapersDashboard)

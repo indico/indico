@@ -64,7 +64,7 @@
     }
 }
 
-.display-contribution-list {
+.paper-contribution-list {
     @extend %font-family-modern-body;
 
     .contribution-row {
@@ -87,7 +87,7 @@
         }
 
         .label {
-            border: 0;
+            border: None;
             margin-top: 7px;
             display: inline-block;
             padding: 5px 7px;
@@ -124,7 +124,7 @@
     }
 }
 
-.display-contribution-list ul {
+.paper-contribution-list ul {
     list-style-type: none;
     padding-left: 0;
 }
