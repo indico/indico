@@ -109,5 +109,5 @@ def _extend_event_menu(sender, **kwargs):
     yield MenuEntryData(title=_("Judging Area"), name='judging_area', endpoint='papers.papers_list',
                         position=-1, visible=_judging_area_visible)
 
-    yield MenuEntryData(title=_("Reviewing Area"), name='reviewing_area', endpoint='papers.display_reviewing_area',
+    yield MenuEntryData(title=_("Reviewing Area"), name='reviewing_area', endpoint='papers.reviewing_area',
                         position=-1, visible=_reviewing_area_visible)
