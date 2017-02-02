@@ -332,4 +332,4 @@ def set_deadline(event, role, deadline, enforce=True):
     log_data = {'Enforced': enforce, 'Deadline': deadline.isoformat() if deadline else 'None'}
     logger.info('Paper reviewing deadline (%s) set in %r by %r', role.name, event, session.user)
     event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
-              "Paper reviewing deadline ({}) set".format(role.name), session.user, data=log_data)
+              "Paper reviewing deadline ({}) set".format(role.title), session.user, data=log_data)
