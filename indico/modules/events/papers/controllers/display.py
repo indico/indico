@@ -26,8 +26,7 @@ from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperReviewType, PaperReview, PaperTypeProxy
 from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
                                                      update_comment, delete_comment, update_review)
-from indico.modules.events.papers.util import get_user_contributions_to_review
-from indico.modules.events.papers.util import get_user_reviewed_contributions
+from indico.modules.events.papers.util import get_user_contributions_to_review, get_user_reviewed_contributions
 from indico.modules.events.papers.views import WPDisplayPapersBase, render_paper_page, WPDisplayReviewingArea
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify
@@ -164,10 +163,11 @@ class RHDeletePaperComment(RHPaperCommentBase):
         return jsonify_data(flash=False)
 
 
-class RHDisplayReviewingArea(RHPapersBase):
+class RHReviewingArea(RHPapersBase):
     def _checkProtection(self):
-        if (not session.user or (session.user not in self.event_new.cfp.layout_reviewers and
-                                 session.user not in self.event_new.cfp.content_reviewers)):
+        if not session.user:
+            raise Forbidden
+        if not self.event_new.cfp.is_reviewer(session.user):
             raise Forbidden
         RHPapersBase._checkProtection(self)
 
