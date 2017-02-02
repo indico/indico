@@ -3,13 +3,11 @@
 {% macro render_user_papers_list(event, contributions, to_review=false, reviewed=false) %}
     <section>
         {% if to_review %}
-            {% set reviewing_list_id = 'to-review-list' %}
+            {% set id = 'to-review-list' %}
         {% elif reviewed %}
-            {% set reviewing_list_id = 'reviewed-list' %}
-        {% else %}
-            {% set reviewing_list_id = '' %}
+            {% set id = 'reviewed-list' %}
         {% endif %}
-        <div id="{{ reviewing_list_id }}" class="display-contribution-list">
+        <div {% if id %}id="{{ id }}"{% endif %} class="paper-contribution-list">
             <ul>
                 {% for contribution in contributions %}
                     {% set latest_revision = contribution.paper.last_revision %}
