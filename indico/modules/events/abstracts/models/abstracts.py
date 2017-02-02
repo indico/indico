@@ -472,6 +472,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def verbose_title(self):
         return '#{} ({})'.format(self.friendly_id, self.title)
 
+    @property
+    def is_in_final_state(self):
+        return self.state != AbstractState.submitted
+
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', is_deleted=False, _text=text_to_repr(self.title))
