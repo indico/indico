@@ -169,10 +169,6 @@ def judge_paper(paper, contrib_data, judgment, judge, send_notifications=False):
 
 
 def send_paper_notifications(paper):
-    """Send paper notification e-mails.
-
-    :param contribution: the contribution whose last paper revision was judged
-    """
     template = get_template_module('events/static/emails/paper_judgment_notification_email.txt',
                                    contribution=paper.contribution, paper=paper.last_revision)
     email = make_email(to_list=[paper.last_revision.submitter.email], template=template)
