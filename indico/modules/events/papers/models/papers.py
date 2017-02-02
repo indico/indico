@@ -69,6 +69,7 @@ class Paper(ProposalMixin):
     def state(self, state):
         self.last_revision.state = state
 
+    @property
     def is_in_final_state(self):
         return self.state in {PaperRevisionState.accepted or PaperRevisionState.rejected}
 
@@ -90,7 +91,7 @@ class Paper(ProposalMixin):
     def can_judge(self, user, check_state=False):
         if not user:
             return False
-        elif check_state and self.is_in_final_state():
+        elif check_state and self.is_in_final_state:
             return False
         elif self.can_manage(user):
             return True
@@ -99,7 +100,7 @@ class Paper(ProposalMixin):
     def can_review(self, user, check_state=False):
         if not user:
             return False
-        elif check_state and self.is_in_final_state():
+        elif check_state and self.is_in_final_state:
             return False
         elif self.can_manage(user):
             return True
