@@ -349,6 +349,12 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(BulkAbstractJudgmentForm, self).__init__(*args, **kwargs)
+        self.accepted_track.description = _("The abstracts will be accepted in this track")
+        self.accepted_contrib_type.description = _("The abstracts will be converted into a contribution of this type")
+        self.session.description = _("The generated contributions will be allocated in this session")
+        self.duplicate_of.description = _("The selected abstracts will be marked as duplicate of this one")
+        self.merged_into.description = _("The selected abstracts will be merged onto this one")
+        self.merge_persons.description = ("Authors and speakers of the selected abstracts will be added to this one")
         self.duplicate_of.excluded_abstract_ids = set(kwargs['abstract_id'])
         self.merged_into.excluded_abstract_ids = set(kwargs['abstract_id'])
         if kwargs['judgment']:
