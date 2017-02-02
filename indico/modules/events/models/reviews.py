@@ -127,6 +127,10 @@ class ProposalMixin(object):
     def cfp(self):
         return getattr(self.event_new, self.call_for_proposals_attr)
 
+    @property
+    def is_in_final_state(self):
+        raise NotImplementedError
+
     def get_revisions(self):
         if self.revisions_enabled:
             raise NotImplementedError
