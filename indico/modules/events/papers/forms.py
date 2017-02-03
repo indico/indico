@@ -167,7 +167,7 @@ class PaperReviewingSettingsForm(IndicoForm):
 
 
 class PaperSubmissionForm(IndicoForm):
-    files = FileField(_("Files"), multiple_files=True)
+    files = FileField(_("Files"), [DataRequired()], multiple_files=True)
 
 
 def _get_template_data(tpl):
