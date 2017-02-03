@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from flask import current_app, session
+from flask import current_app, session, json
+from qrcode import QRCode, constants
 from sqlalchemy.orm import load_only, joinedload
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
@@ -432,3 +433,27 @@ def build_registration_api_data(registration):
     registration_info['checkin_date'] = registration.checked_in_dt.isoformat() if registration.checked_in_dt else ''
     registration_info['event_id'] = registration.event_id
     return registration_info
+
+
+def generate_ticket_qr_code(registration):
+    """Generate a Pillow `Image` with a QR Code encoding a check-in ticket.
+
+    :param registration: corresponding `Registration` object
+    """
+    qr = QRCode(
+        version=6,
+        error_correction=constants.ERROR_CORRECT_M,
+        box_size=4,
+        border=1
+    )
+    config = Config.getInstance()
+    baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
+    qr_data = {"registrant_id": registration.id,
+               "checkin_secret": registration.ticket_uuid,
+               "event_id": unicode(registration.event_new.id),
+               "server_url": baseURL
+               }
+    json_qr_data = json.dumps(qr_data)
+    qr.add_data(json_qr_data)
+    qr.make(fit=True)
+    return qr.make_image()._img
