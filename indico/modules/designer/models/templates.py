@@ -20,16 +20,15 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.util.i18n import _
+from indico.modules.designer import TemplateType, DEFAULT_CONFIG
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
-from indico.util.struct.enum import RichIntEnum
 
 
-class TemplateType(RichIntEnum):
-    __titles__ = [None, _("Badge"), _("Poster")]
-    badge = 1
-    poster = 2
+TEMPLATE_DEFAULTS = {
+    'items': [],
+    'background_position': 'stretch'
+}
 
 
 class DesignerTemplate(db.Model):
@@ -96,6 +95,18 @@ class DesignerTemplate(db.Model):
         foreign_keys=background_image_id,
         post_update=True
     )
+
+    def __init__(self, **kwargs):
+        data = kwargs.pop('data', None)
+        tpl_type = kwargs.get('type')
+        if data is None:
+            data = {
+                'items': [],
+                'background_position': 'stretch'
+            }
+            size = DEFAULT_CONFIG[tpl_type]['tpl_size']
+            data.update({'width': size[0], 'height': size[1]})
+        super(DesignerTemplate, self).__init__(data=data, **kwargs)
 
     @property
     def owner(self):

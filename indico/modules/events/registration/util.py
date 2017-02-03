@@ -446,12 +446,13 @@ def generate_ticket_qr_code(registration):
         border=1
     )
     config = Config.getInstance()
-    baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
-    qr_data = {"registrant_id": registration.id,
-               "checkin_secret": registration.ticket_uuid,
-               "event_id": unicode(registration.event_new.id),
-               "server_url": baseURL
-               }
+    base_url = config.getBaseSecureURL() or config.getBaseURL()
+    qr_data = {
+        "registrant_id": registration.id,
+        "checkin_secret": registration.ticket_uuid,
+        "event_id": unicode(registration.event_new.id),
+        "server_url": base_url
+    }
     json_qr_data = json.dumps(qr_data)
     qr.add_data(json_qr_data)
     qr.make(fit=True)

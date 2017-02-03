@@ -1,0 +1,202 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+#designer-control-tabs {
+    .designer-tab {
+        overflow: auto;
+        min-height: 170px;
+    }
+
+    .designer-tab > .left:not(:first-of-type) {
+        margin-left: 10px;
+    }
+
+    .designer-tab > .panel {
+        min-height: 11em;
+        padding-right: 2em;
+
+        div {
+            margin-bottom: 1em;
+        }
+    }
+
+    .designer-tab > .panel:not(:last-of-type) {
+        border-right: 1px solid #ddd;
+    }
+
+    .panel > i[class*='icon-'] {
+        margin-left: 0 !important;
+    }
+
+    .panel > i[class*='icon-']::before {
+        color: #ddd;
+        font-size: 2.5em;
+        margin-right: 0.2em;
+    }
+
+    .panel .content {
+        margin-left: 4em;
+    }
+
+    .panel .content h4:first-child {
+        margin-top: 0;
+    }
+
+    label[for="snap_checkbox"] {
+        font-weight: normal;
+        margin-left: 0.5em;
+    }
+
+    #font-selector, #color-selector, #style-selector, #size-selector, #alignment-selector {
+        display: block;
+        width: 10em;
+    }
+
+    #bgForm input[type="file"] {
+        max-width: 250px;
+    }
+
+    .move-button[data-direction='center'] {
+        margin: 0.3rem 0 0.3rem 0.3rem;
+    }
+}
+
+.designer-table {
+    #controls {
+        vertical-align: top;
+        width: 230px;
+        padding-right: 2em;
+
+        #selection-text {
+            margin: 0.2em 0.5em 0.2em 0.2em;
+            font-size: 1.2em;
+            color: #888;
+        }
+    }
+
+    .ruler {
+        position: relative;
+    }
+
+    .ruler#horizontal-ruler {
+        height: 10px;
+        top: -6px;
+    }
+
+    .ruler#vertical-ruler {
+        width: 10px;
+        left: -6px;
+    }
+
+    .ruler .marking {
+        box-sizing: border-box;
+        position: absolute;
+        border: 1px solid #aaa;
+        color: #aaa;
+        background: #eee;
+        vertical-align: middle;
+        font-size: 0.7em;
+    }
+
+    .ruler#vertical-ruler .marking {
+        border-width: 1px 0 0 0;
+        text-align: center;
+        width: 15px;
+    }
+
+    .ruler#horizontal-ruler .marking {
+        border-width: 0 0 0 1px;
+        padding-left: 5px;
+        line-height: 15px;
+        height: 15px;
+    }
+
+    .designer-item {
+        border: 1px dashed $dark-blue;
+
+        &.selected {
+            background-color: $pastel-blue;
+
+            &[data-type='fixed'] {
+                background-color: lighten($pastel-red, 20%);
+            }
+        }
+
+        &[data-type='fixed'] {
+            border-color: $orange;
+        }
+    }
+
+    #template-div {
+        border: 1px solid $gray;
+        user-select: none;
+        width: 425px;
+        height: 270px;
+        position: relative;
+        left: 0;
+        top: 0;
+    }
+}
+
+#badge-settings-form .form-group-footer {
+    margin-top: 10px;
+}
+
+.margin-editor .form-group {
+    max-width: 120px;
+
+    .form-label {
+        width: inherit;
+    }
+
+    .form-field input {
+        max-width: 90px;
+    }
+}
+
+.margin-editor .margins-between .form-group {
+    .form-label {
+        width: 200px;
+    }
+
+    &#form-group-margin_columns .form-label {
+        color: $red;
+    }
+
+    &#form-group-margin_rows .form-label {
+        color: $dark-blue;
+    }
+}
+
+.designer-template-type-icon {
+    font-size: 1.2em;
+    color: $dark-gray;
+
+    &.template-icon-poster {
+        @include icon-before('icon-file-image');
+        color: $orange;
+    }
+
+    &.template-icon-badge {
+        @include icon-before('icon-id-badge');
+        color: $blue;
+    }
+}
+
+.custom-template-list {
+    margin-top: 20px;
+}

@@ -17,10 +17,13 @@
 from __future__ import unicode_literals
 
 import os
+import uuid
 from io import BytesIO
+from operator import attrgetter
 
 from flask import session, request, redirect, jsonify, flash, render_template
 from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import Config
 from indico.core.db import db
@@ -28,15 +31,20 @@ from indico.core.db import db
 from indico.core import signals
 from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
+from indico.modules.designer.models.templates import DesignerTemplate
+from indico.modules.designer.util import get_all_templates
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.registration import logger
+from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
                                                                        RHManageRegFormsBase)
-from indico.modules.events.registration.forms import EmailRegistrantsForm, CreateMultipleRegistrationsForm
+from indico.modules.events.registration.forms import (EmailRegistrantsForm, CreateMultipleRegistrationsForm,
+                                                      BadgeSettingsForm)
 from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.notifications import notify_registration_state_update
+from indico.modules.events.registration.settings import merged_badge_settings, event_badge_settings
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_spreadsheet_from_registrations,
@@ -55,6 +63,9 @@ from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
+
+
+badge_cache = GenericCache('badge-printing')
 
 
 def _render_registration_details(registration):
@@ -335,20 +346,72 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
 
 
 class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
-    """Print badges for the selected registrations"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.regform
+        },
+        'preserved_args': {'uuid', 'template_id'}
+    }
+
+    def _checkParams(self, params):
+        RHRegistrationsActionBase._checkParams(self, params)
+        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+
+    def _checkProtection(self):
+        RHRegistrationsActionBase._checkProtection(self)
+
+        # Check that template belongs to this event or a category that
+        # is a parent
+        if self.template.owner != self.event_new and self.template.owner.id not in self.event_new.category_chain:
+            raise Forbidden
 
     def _process(self):
-        badge_templates = self._conf.getBadgeTemplateManager().getTemplates().items()
-        badge_templates.sort(key=lambda x: x[1].getName())
-        pdf_options = WConfModifBadgePDFOptions(self._conf).getHTML()
-        badge_design_url = url_for('event_mgmt.confModifTools-badgePrinting', self.event_new)
-        create_pdf_url = url_for('event_mgmt.confModifTools-badgePrintingPDF', self.event_new)
+        config_params = badge_cache.get(request.view_args['uuid'])
+        if not config_params:
+            raise NotFound
 
-        return WPManageRegistration.render_template('management/print_badges.html', self._conf, regform=self.regform,
-                                                    templates=badge_templates, pdf_options=pdf_options,
-                                                    registrations=self.registrations,
-                                                    registration_ids=[x.id for x in self.registrations],
-                                                    badge_design_url=badge_design_url, create_pdf_url=create_pdf_url)
+        registration_ids = config_params.pop('registration_ids')
+        pdf = RegistrantsListToBadgesPDF(self.template, config_params, self.event_new, registration_ids)
+        return send_file('Badges-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'PDF')
+
+
+class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
+    """Print badges for the selected registrations"""
+
+    def _checkParams(self, params):
+        RHManageRegFormBase._checkParams(self, params)
+        ids = set(request.form.getlist('registration_id'))
+        self.registrations = (Registration.query.with_parent(self.regform)
+                              .filter(Registration.id.in_(ids),
+                                      ~Registration.is_deleted)
+                              .order_by(*Registration.order_by_name)
+                              .all())
+        self.template_id = request.args.get('template_id')
+
+    def _process(self):
+        badge_templates = sorted((tpl for tpl in get_all_templates(self.event_new) if tpl.type.name == 'badge'),
+                                 key=attrgetter('title'))
+        pdf_options = WConfModifBadgePDFOptions(self._conf).getHTML()
+        settings = merged_badge_settings.get_all(self.event_new.id, self.event_new.category.id)
+        form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
+        registrations = self.registrations or self.regform.registrations
+
+        if form.validate_on_submit():
+            data = form.data
+            data.pop('submitted', None)
+            template_id = data.pop('template')
+            if data.pop('save_values'):
+                event_badge_settings.set_multi(self.event_new, data)
+            data['registration_ids'] = [x.id for x in registrations]
+
+            key = unicode(uuid.uuid4())
+            badge_cache.set(key, data, time=1800)
+            download_url = url_for('.registrations_print_badges', self.regform, template_id=template_id, uuid=key)
+            return jsonify_data(flash=False, redirect=download_url)
+        return jsonify_template('events/registration/management/print_badges.html', event=self.event_new,
+                                regform=self.regform, settings_form=form, templates=badge_templates,
+                                pdf_options=pdf_options, registrations=registrations)
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):
