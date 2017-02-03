@@ -18,14 +18,17 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
-from wtforms import BooleanField, StringField
+from wtforms import BooleanField, StringField, FloatField, SelectField
+from wtforms.validators import InputRequired
 
+from indico.modules.designer import PageSize
+from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
-                                     IndicoPasswordField)
+                                     IndicoPasswordField, IndicoEnumSelectField)
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -59,6 +62,19 @@ class EventProtectionForm(IndicoForm):
         for name, title in sorted(COORDINATOR_PRIV_TITLES.iteritems(), key=itemgetter(1)):
             setattr(cls, name, BooleanField(title, widget=SwitchWidget(), description=COORDINATOR_PRIV_DESCS[name]))
             cls.priv_fields.add(name)
+
+
+class PosterPrintingForm(IndicoForm):
+    template = SelectField(_('Template'))
+    margin_horizontal = FloatField(_('Horizontal margins'), [InputRequired()], default=0)
+    margin_vertical = FloatField(_('Vertical margins'), [InputRequired()], default=0)
+    page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize, default=PageSize.A4)
+
+    def __init__(self, event, **kwargs):
+        all_templates = set(event.designer_templates) | get_inherited_templates(event)
+        poster_templates = [tpl for tpl in all_templates if tpl.type.name == 'poster']
+        super(PosterPrintingForm, self).__init__(**kwargs)
+        self.template.choices = sorted(((unicode(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))
 
 
 EventProtectionForm._create_coordinator_priv_fields()

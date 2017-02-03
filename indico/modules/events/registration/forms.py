@@ -18,15 +18,18 @@ from __future__ import unicode_literals
 
 import json
 from datetime import time
+from operator import itemgetter
 
 import jsonschema
-from flask import session
-from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField
+from flask import session, request
+from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField, FloatField, HiddenField
 from wtforms.fields.html5 import EmailField, DecimalField
-from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
+from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError, InputRequired
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import Config
+from indico.modules.designer import PageOrientation, PageSize
+from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
@@ -327,3 +330,31 @@ class CreateMultipleRegistrationsForm(IndicoForm):
         for user in field.data:
             if user.registrations.filter_by(registration_form=self._regform, is_deleted=False).one_or_none():
                 raise ValidationError(_("A registration for {} already exists.").format(user.full_name))
+
+
+class BadgeSettingsForm(IndicoForm):
+    template = SelectField(_('Template'))
+    save_values = BooleanField(_("Save values for next time"), widget=SwitchWidget(),
+                               description=_("Save these values in the event settings"))
+    dashed_border = BooleanField(_("Dashed border around each badge"), widget=SwitchWidget(),
+                                 description=_("Display a dashed border around each badge"))
+    page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize)
+    page_orientation = IndicoEnumSelectField(_('Page orientation'), enum=PageOrientation)
+
+    top_margin = FloatField(_('Top margin'), [InputRequired()])
+    left_margin = FloatField(_('Left margin'), [InputRequired()])
+    right_margin = FloatField(_('Right margin'), [InputRequired()])
+    bottom_margin = FloatField(_('Bottom margin'), [InputRequired()])
+    margin_columns = FloatField(_('Margin between columns'), [InputRequired()])
+    margin_rows = FloatField(_('Margin between rows'), [InputRequired()])
+
+    submitted = HiddenField()
+
+    def __init__(self, event, **kwargs):
+        all_templates = set(event.designer_templates) | get_inherited_templates(event)
+        badge_templates = [tpl for tpl in all_templates if tpl.type.name == 'badge']
+        super(BadgeSettingsForm, self).__init__(**kwargs)
+        self.template.choices = sorted(((unicode(tpl.id), tpl.title) for tpl in badge_templates), key=itemgetter(1))
+
+    def is_submitted(self):
+        return super(BadgeSettingsForm, self).is_submitted() and 'submitted' in request.form

@@ -395,6 +395,7 @@ module_js = {
                                        'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js', 'Actions.js')),
     'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js'),
     'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
+    'designer': rjs_bundle('modules_designer', 'js/indico/modules/designer.js')
 }
 
 widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',

@@ -1,0 +1,12 @@
+{% extends 'categories/management/base.html' if category else 'layout/base.html' %}
+{% from 'designer/_list.html' import render_template_list %}
+
+{% block title %}
+    {% trans %}Poster and Badge Designer{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div id="template-list">
+        {{ render_template_list(target.designer_templates, target, inherited_templates=inherited_templates, event=event) }}
+    </div>
+{% endblock %}

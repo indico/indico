@@ -74,6 +74,7 @@ from indico.modules.events.registration.controllers.management.reglists import (
                                                                                 RHRegistrationsExportExcel,
                                                                                 RHRegistrationTogglePayment,
                                                                                 RHRegistrationsPrintBadges,
+                                                                                RHRegistrationsConfigBadges,
                                                                                 RHRegistrationApprove,
                                                                                 RHRegistrationReject,
                                                                                 RHRegistrationsModifyStatus,
@@ -150,14 +151,16 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrat
                  'registrations_csv_export', RHRegistrationsExportCSV, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
                  'registrations_excel_export', RHRegistrationsExportExcel, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/badges',
-                 'registrations_print_badges', RHRegistrationsPrintBadges, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status',
                  'registrations_modify_status', RHRegistrationsModifyStatus, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in',
                  'registrations_check_in', RHRegistrationBulkCheckIn, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments',
                  'registrations_attachments_export', RHRegistrationsExportAttachments, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/config',
+                 'registrations_config_badges', RHRegistrationsConfigBadges, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/print/<int:template_id>/<uuid>',
+                 'registrations_print_badges', RHRegistrationsPrintBadges)
 
 # Invitation management
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)
