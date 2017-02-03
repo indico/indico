@@ -58,7 +58,9 @@ class RHDeleteEvent(RHConferenceModifBase):
     def _process_POST(self):
         delete_event(self.event_new)
         flash(_('Event "{}" successfully deleted.').format(self.event_new.title), 'success')
-        redirect_url = url_for('categories.manage_content', self.event_new.category)
+        category = self.event_new.category
+        endpoint = 'categories.manage_content' if category.can_manage(session.user) else 'categories.display'
+        redirect_url = url_for(endpoint, category)
         return jsonify_data(url=redirect_url, flash=False)
 
 
