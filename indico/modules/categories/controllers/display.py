@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta, date
+from datetime import datetime, timedelta, date, time
 from functools import partial
 from io import BytesIO
 from itertools import chain, groupby, imap
@@ -537,9 +537,13 @@ class RHCategoryOverview(RHDisplayCategoryBase):
     def _get_days(start_dt, end_dt):
         # Return all days in the open-ended interval
         current_dt = start_dt
+        tz = current_dt.tzinfo
+        next_day = current_dt.date() + timedelta(1)
+        beginning_of_next_day = tz.localize(datetime.combine(next_day, time()))
         while current_dt < end_dt:
             yield current_dt
-            current_dt = current_dt + relativedelta(days=1)
+            current_dt = beginning_of_next_day
+            beginning_of_next_day = current_dt + relativedelta(days=1)
 
     @staticmethod
     def _pop_head_while(predicate, list_):
