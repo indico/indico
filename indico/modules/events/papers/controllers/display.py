@@ -87,7 +87,7 @@ class RHSubmitPaperReview(RHPaperBase):
         self.type = PaperTypeProxy(PaperReviewType[request.view_args['review_type']])
 
     def _process(self):
-        form = build_review_form(self.paper.last_revision, self.type.instance)
+        form = build_review_form(self.paper.last_revision, self.type)
         if form.validate_on_submit():
             create_review(self.paper, self.type, session.user, **form.split_data)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
