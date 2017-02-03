@@ -103,7 +103,7 @@ class DesignerTemplate(db.Model):
 
     @locator_property
     def locator(self):
-        return {'template_id': self.id}
+        return dict(self.owner.locator, template_id=self.id)
 
     @return_ascii
     def __repr__(self):
