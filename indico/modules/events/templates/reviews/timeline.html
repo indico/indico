@@ -7,14 +7,21 @@
 {% from 'events/reviews/_omnibox.html' import render_omnibox %}
 
 
-{% macro render_timeline(proposal, comment_form, review_form=none) %}
+{% macro render_timeline(proposal, comment_form, review_form=none, revision_form=none) %}
     {% set can_comment = proposal.can_comment(session.user) %}
     {% set can_review = proposal.can_review(session.user, check_state=true) %}
-    {% for revision in proposal.get_revisions() %}
+    {% for revision in proposal.get_revisions()|sort(attribute='submitted_dt') %}
         {% set timeline = revision.get_timeline(session.user) %}
+        {% if not loop.first %}
+            <div class="i-timeline">
+                <div class="i-timeline">
+                    <div class="i-timeline-connect-down to-separator"></div>
+                </div>
+            </div>
+        {% endif %}
         {{ caller('revision-info', revision) }}
         <div class="i-timeline">
-            {% if timeline %}
+            {% if timeline or (can_comment or can_review) %}
                 <div class="i-timeline with-line">
                     <div class="i-timeline-connect-up"></div>
                     {% for item in timeline %}
@@ -24,6 +31,9 @@
                             {{ render_review(item, form=form) }}
                         {% endif %}
                     {% endfor %}
+                    {% if not loop.last %}
+                        {{ caller('revision-judgment', revision) }}
+                    {% endif %}
                     {% if loop.last and (can_comment or can_review) %}
                         {% if not proposal.is_in_final_state %}
                             {{ caller('revision-judgment', revision) }}
@@ -40,6 +50,7 @@
                         <div class="i-timeline-connect-down to-separator"></div>
                     </div>
                     <div class="i-timeline-separator"></div>
+                    {{ caller('submit-revision') }}
                     {% if proposal.is_in_final_state %}
                         {{ caller('revision-judgment', revision) }}
                     {% endif %}
