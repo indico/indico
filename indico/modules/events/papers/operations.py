@@ -27,14 +27,13 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.logs.util import make_diff_log
+from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.reviews import PaperAction, PaperReview
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
-from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
-from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.util import update_object_principals
@@ -130,20 +129,20 @@ def close_cfp(event):
     event.log(EventLogRealm.management, EventLogKind.negative, 'Papers', 'Call for papers closed', session.user)
 
 
-@no_autoflush
-def create_paper_revision(contribution, submitter, files):
-    paper = Paper(contribution=contribution)
+def create_paper_revision(paper, submitter, files):
     revision = PaperRevision(paper=paper, submitter=submitter)
     for f in files:
         filename = secure_filename(f.filename, 'paper')
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
-        pf = PaperFile(filename=filename, content_type=content_type, paper_revision=revision, contribution=contribution)
+        pf = PaperFile(filename=filename, content_type=content_type, paper_revision=revision,
+                       _contribution=paper.contribution)
         pf.save(f.file)
     db.session.flush()
     logger.info('Paper revision %r submitted by %r', revision, session.user)
-    contribution.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
-                               "Paper revision {} submitted for contribution {} ({})"
-                               .format(revision.id, contribution.title, contribution.friendly_id), session.user)
+    paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+                        "Paper revision {} submitted for contribution {} ({})"
+                        .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
+    db.session.expire(revision._contribution, ['_paper_last_revision'])
     return revision
 
 

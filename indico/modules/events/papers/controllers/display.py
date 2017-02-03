@@ -24,6 +24,7 @@ from indico.modules.events.papers.forms import (PaperSubmissionForm, PaperCommen
                                                 PaperJudgmentForm)
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
+from indico.modules.events.papers.models.papers import Paper
 from indico.modules.events.papers.models.reviews import PaperReviewType, PaperReview, PaperTypeProxy
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
@@ -40,8 +41,13 @@ class RHSubmitPaper(RHPaperBase):
     def _process(self):
         form = PaperSubmissionForm()
         if form.validate_on_submit():
-            create_paper_revision(self.contribution, session.user, form.files.data)
-            return jsonify_data(flash=False)
+            if self.paper is None:
+                self.paper = Paper(self.contribution)
+                create_paper_revision(self.paper, session.user, form.files.data)
+                return jsonify_data(flash=False)
+            else:
+                create_paper_revision(self.paper, session.user, form.files.data)
+                return jsonify_data(flash=False, html=render_paper_page(self.paper))
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 

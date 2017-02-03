@@ -1,4 +1,5 @@
 {% from 'events/reviews/_common.html' import render_summary_state, render_user_avatar, render_review_state %}
+{% from 'forms/_form.html' import form_header, form_row, form_footer %}
 
 {% macro _render_file_list(files) %}
     <table class="tree">
@@ -52,7 +53,7 @@
         {{ _render_paper_summary(paper) }}
         <div class="review-item-content paper-content">
             <h3>{% trans %}Latest revision files{% endtrans %}</h3>
-            {{ _render_file_list(paper.files) }}
+            {{ _render_file_list(paper.last_revision.files) }}
         </div>
     </div>
 {% endmacro %}
@@ -141,5 +142,31 @@
         {%- trans %}<strong>{{ judge_name }}</strong> rejected this paper{% endtrans -%}
     {% elif action == 'to_be_corrected' %}
         {%- trans %}<strong>{{ judge_name }}</strong> asked for changes{% endtrans -%}
+    {% endif %}
+{% endmacro %}
+
+{% macro render_paper_revision_submission_form(paper, form) %}
+    {%if paper.state.name == 'to_be_corrected' %}
+        <div class="i-timeline-item" id="proposal-revision-submission-box">
+            {{ render_user_avatar(session.user) }}
+            <div class="i-timeline-item-box header-indicator-left">
+                <div class="i-box-header flexrow">{% trans %}Upload corrected revision{% endtrans %}</div>
+                <div class="i-box-content">
+                    {% call form_header(form, action=url_for('.submit_revision', paper)) %}
+                        data-form-container="#proposal-revision-submission-box"
+                        data-update="#reviewing-page"
+                        data-replace-update
+                        data-save-reminder
+                        data-ajax-form
+                    {% endcall %}
+                    {{ form_row(form.files, classes='fit-to-parent', skip_label=true) }}
+                    {% call form_footer(form, skip_label=true) %}
+                        <input class="i-button big highlight" type="submit"
+                               value="{% trans %}Submit new revision{% endtrans %}"
+                               data-disabled-until-change>
+                    {% endcall %}
+                </div>
+            </div>
+        </div>
     {% endif %}
 {% endmacro %}
