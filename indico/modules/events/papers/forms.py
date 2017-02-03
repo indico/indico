@@ -25,7 +25,8 @@ from wtforms.validators import Optional, DataRequired
 from indico.modules.events.fields import ReviewQuestionsField
 from indico.modules.events.papers.fields import PaperEmailSettingsField
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
-from indico.modules.events.papers.models.reviews import PaperAction, PaperReviewType, PaperCommentVisibility
+from indico.modules.events.papers.models.reviews import (PaperAction, PaperReviewType, PaperCommentVisibility,
+                                                         PaperTypeProxy)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, FormDefaults
@@ -62,11 +63,10 @@ def make_review_form(event, review_type):
 def build_review_form(paper_revision=None, review_type=None, review=None):
     if review:
         paper_revision = review.revision
-        review_type = review.type
-    review_form_class = make_review_form(paper_revision.paper.event_new, review_type=review_type)
-    reviews = paper_revision.get_reviews(user=session.user, group=review_type)
+        review_type = PaperTypeProxy(review.type)
+    review_form_class = make_review_form(paper_revision.paper.event_new, review_type=review_type.instance)
+    reviews = paper_revision.get_reviews(user=session.user, group=review_type.instance)
     latest_user_review = reviews[0] if reviews else None
-
     if latest_user_review:
         answers = {'question_{}'.format(rating.question.id): rating.value
                    for rating in latest_user_review.ratings}
@@ -74,8 +74,8 @@ def build_review_form(paper_revision=None, review_type=None, review=None):
     else:
         defaults = FormDefaults()
 
-    return review_form_class(prefix='type-{}'.format(review_type.value), obj=defaults, paper=paper_revision.paper,
-                             edit=review is not None)
+    return review_form_class(prefix='type-{}'.format(review_type.instance.value), obj=defaults,
+                             paper=paper_revision.paper, edit=review is not None)
 
 
 def make_competences_form(event):
