@@ -138,6 +138,10 @@ $i-form-button-line-height: 1.8;
                 color: $light-black;
             }
         }
+
+        &.fit-to-parent {
+            width: 100%;
+        }
     }
 
     &.has-error {
