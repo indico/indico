@@ -91,4 +91,4 @@ class RHPaperBase(RHPapersBase):
         Override this in case you want to check for more specific
         privileges than the generic "can access".
         """
-        return self.paper.contribution.can_access(session.user)
+        return self.contribution.can_access(session.user)
