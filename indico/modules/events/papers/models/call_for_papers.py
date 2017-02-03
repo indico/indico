@@ -124,8 +124,10 @@ class CallForPapers(object):
     def announcement(self):
         return MarkdownText(paper_reviewing_settings.get(self.event, 'announcement'))
 
-    def get_questions_from_review_type(self, type_):
-        return self.content_review_questions if type_ == PaperReviewType.content else self.layout_review_questions
+    def get_questions_from_review_type(self, review_type):
+        return (self.content_review_questions
+                if review_type == PaperReviewType.content
+                else self.layout_review_questions)
 
     @property
     def rating_range(self):
