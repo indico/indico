@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import uuid
 from collections import defaultdict
 
 from flask import flash, redirect, session, request
@@ -24,24 +25,30 @@ from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.categories.models.categories import Category
+from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
-from indico.modules.events.management.forms import EventProtectionForm
+from indico.modules.events.management.forms import EventProtectionForm, PosterPrintingForm
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.operations import delete_event, create_event_references, update_event
+from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
+from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
+from MaKaC.common.cache import GenericCache
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+poster_cache = GenericCache('poster-printing')
 
 
 class RHDeleteEvent(RHConferenceModifBase):
@@ -282,3 +289,47 @@ class RHManageEventPersonLinks(RHConferenceModifBase):
             return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
         self.commit = False
         return jsonify_form(form)
+
+
+class RHPosterPrintSettings(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.template_id = request.args.get('template_id')
+
+    def _process(self):
+        self.commit = False
+        form = PosterPrintingForm(self.event_new, template=self.template_id)
+        if form.validate_on_submit():
+            data = dict(form.data)
+            template_id = data.pop('template')
+            key = unicode(uuid.uuid4())
+            poster_cache.set(key, data, time=1800)
+            download_url = url_for('.print_poster', self.event_new, template_id=template_id, uuid=key)
+            return jsonify_data(flash=False, redirect=download_url)
+        return jsonify_form(form, disabled_until_change=False, submit=_('Download PDF'), )
+
+
+class RHPrintEventPoster(RHConferenceModifBase):
+
+    def _checkParams(self, params):
+        RHConferenceModifBase._checkParams(self, params)
+        self.template = DesignerTemplate.find_one(id=request.view_args['template_id'])
+
+    def _checkProtection(self):
+        RHConferenceModifBase._checkProtection(self)
+
+        # Check that template belongs to this event or a category that
+        # is a parent
+        if self.template.owner != self.event_new and self.template.owner.id not in self.event_new.category_chain:
+            raise Forbidden
+
+    def _process(self):
+        self.commit = False
+        config_params = poster_cache.get(request.view_args['uuid'])
+        if not config_params:
+            raise NotFound
+
+        pdf = PosterPDF(self.template, config_params, self.event_new)
+        return send_file('Poster-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'application/pdf')

@@ -50,7 +50,7 @@ class RegistrationFormCloner(EventCloner):
         attrs = get_simple_column_attrs(RegistrationForm) - {'start_dt', 'end_dt', 'modification_end_dt'}
         self._field_data_map = {}
         self._form_map = {}
-        for old_form in self.event.registration_forms:
+        for old_form in self.old_event.registration_forms:
             new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
             self._clone_form_items(old_form, new_form, clone_all_revisions)
             new_event.registration_forms.append(new_form)

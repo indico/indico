@@ -1,52 +1,45 @@
-{% extends 'layout/full_content_base.html' %}
-{% from 'events/registration/management/_reglist.html' import render_registration_list %}
-{% from 'events/registration/management/_badges.html' import render_template_list, render_badges_registration_list %}
-
-{% block title %}
-    {%- trans %}Registration{% endtrans -%}
-{% endblock %}
-
-{% block subtitle %}
-    {%- trans title=regform.title -%}
-        Badges for "{{ title }}"
-    {%- endtrans -%}
-{% endblock %}
+{% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
 
 {% block content %}
-    <form action="{{ create_pdf_url }}" method="post" target="_blank" class="i-form horizontal">
-        <div class="action-box">
-            <div class="section">
-                <div class="icon icon-tag"></div>
-                <div class="text">
-                    <div class="label">
-                        {%- trans title=regform.title -%}
-                            Print badges for registrations of "{{ title }}"
-                        {%- endtrans -%}
-                    </div>
-                    <div>{% trans %}Below you can configure the layout of the badges.{% endtrans %}</div>
+    {% call simple_form(settings_form, form_header_kwargs={'id': 'badge-settings-form'}, submit=_("Download PDF"),
+                        disabled_until_change=false) %}
+        {{ form_row(settings_form.template) }}
+
+        {% call form_fieldset(_('Page configuration')) %}
+            {{ form_rows(settings_form, fields=('save_values', 'dashed_border', 'page_size', 'page_orientation')) }}
+        {% endcall %}
+
+        <div class="flexrow margin-editor f-j-center">
+            <div class="flexcol f-a-center">
+                {{ form_row(settings_form.top_margin, orientation='vertical') }}
+                <div class="flexrow f-a-center">
+                    {{ form_row(settings_form.left_margin, orientation='vertical') }}
+                    <img src="/images/badge_margins.png">
+                    {{ form_row(settings_form.right_margin, orientation='vertical') }}
                 </div>
-                <div class="toolbar">
-                    <div class="group">
-                        <input class="i-button highlight" value="{% trans %}Print Badges{% endtrans %}"
-                               type="submit">
-                    </div>
-                </div>
+                {{ form_row(settings_form.bottom_margin, orientation='vertical') }}
+            </div>
+            <div class="flexcol margins-between">
+                {{ form_rows(settings_form, ('margin_columns', 'margin_rows'), orientation='vertical') }}
             </div>
         </div>
-
-        <fieldset>
-            <legend>{% trans %}List of available templates{% endtrans %}</legend>
-            {{ render_template_list(templates) }}
-            <a class="i-button right" href="{{ badge_design_url }}">
-                {%- trans %}Badge template design{% endtrans -%}
-            </a>
-        </fieldset>
-
-        <fieldset>
-            <legend>{% trans %}PDF Options{% endtrans %}</legend>
-            {{ pdf_options | safe }}
-        </fieldset>
-
-        {{ render_badges_registration_list(registrations, registration_ids) }}
-    </form>
+        <div class="message info">
+            <div>
+                {% trans -%}
+                    <strong>Tip</strong>: if your printer does not align the badges correctly, you can tweak the margins.
+                {%- endtrans %}
+            </div>
+            <div>
+                {% trans -%}
+                    <strong>Example</strong>: If your left and right margins are 1.5 cm each, but your printer prints
+                    everything 1 mm to the left, you could use a left margin of 1.6 cm and a right margin of 1.4 cm to
+                    compensate. If you increase a margin, do not forget to decrease the opposing one to avoid Indico
+                    thinking there is less space for printing badges, and the number of rows / columns will change.
+                {%- endtrans %}
+            </div>
+        </div>
+        {% for registration in registrations %}
+            <input type="hidden" name="registration_id" value="{{ registration.id }}">
+        {% endfor %}
+    {% endcall %}
 {% endblock %}

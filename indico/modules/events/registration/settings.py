@@ -16,8 +16,30 @@
 
 from __future__ import unicode_literals
 
+from indico.core.settings import FallbackSettingsProxy
+from indico.core.settings.converters import EnumConverter
+from indico.modules.categories.settings import CategorySettingsProxy
+from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.settings import EventSettingsProxy
+
+
+DEFAULT_BADGE_SETTINGS = {
+    'top_margin': 1.6,
+    'bottom_margin': 1.1,
+    'left_margin': 1.6,
+    'right_margin': 1.4,
+    'margin_columns': 1.0,
+    'margin_rows': 0.0,
+    'page_size': PageSize.A4,
+    'page_orientation': PageOrientation.portrait,
+    'dashed_border': True
+}
+
+BADGE_SETTING_CONVERTERS = {
+    'page_orientation': EnumConverter(PageOrientation),
+    'page_size': EnumConverter(PageSize)
+}
 
 
 class RegistrationSettingsProxy(EventSettingsProxy):
@@ -60,3 +82,8 @@ class RegistrationSettingsProxy(EventSettingsProxy):
 
     def set_participant_list_form_ids(self, event, form_ids):
         self.set(event, 'participant_list_forms', form_ids)
+
+
+event_badge_settings = EventSettingsProxy('badge', DEFAULT_BADGE_SETTINGS, converters=BADGE_SETTING_CONVERTERS)
+category_badge_settings = CategorySettingsProxy('badge', DEFAULT_BADGE_SETTINGS, converters=BADGE_SETTING_CONVERTERS)
+merged_badge_settings = FallbackSettingsProxy(event_badge_settings, category_badge_settings)

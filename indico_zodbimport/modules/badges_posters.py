@@ -141,7 +141,7 @@ BADGE_CONFIG_MAPPING = {
     'margin_columns': ('__BadgePDFOptions_marginColumns', float),
     'margin_rows': ('__BadgePDFOptions_marginRows', float),
     'page_size': ('_pageSize', lambda s: getattr(PageSize, s.title())),
-    'page_orientation': ('_landscape', lambda l: PageOrientation.landscape if l else PageOrientation.portrait),
+    'page_orientation': ('_landscape', lambda x: PageOrientation.landscape if x else PageOrientation.portrait),
     'dashed_border': ('_drawDashedRectangles', bool)
 }
 
@@ -189,10 +189,9 @@ class TemplateMigrationBase(object):
         for old_k, old_v in item.viewitems():
             if old_k in {'selected', 'textAlignIndex', 'fontFamilyIndex', 'fontSizeIndex', 'styleIndex', 'colorIndex'}:
                 continue
-            else:
-                new_k, datatype = ITEM_KEY_MAPPING[old_k]
-                result[new_k] = datatype(old_v)
-        diff = set(v for (k, (v, __)) in ITEM_KEY_MAPPING.viewitems()) - set(result)
+            new_k, datatype = ITEM_KEY_MAPPING[old_k]
+            result[new_k] = datatype(old_v)
+        diff = {v[0] for v in ITEM_KEY_MAPPING.viewvalues()} - set(result)
         if diff:
             self.importer.print_warning(cformat('%{yellow!}Template item misses some attributes: {}').format(diff),
                                         event_id=self.event_id)

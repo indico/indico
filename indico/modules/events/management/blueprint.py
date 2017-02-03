@@ -21,7 +21,8 @@ from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockE
                                                           RHShowNonInheriting, RHEventProtection,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
                                                           RHManageReferences, RHManageEventLocation,
-                                                          RHManageEventPersonLinks, RHManageEventKeywords)
+                                                          RHManageEventPersonLinks, RHManageEventKeywords,
+                                                          RHPrintEventPoster, RHPosterPrintSettings)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -40,6 +41,8 @@ _bp.add_url_rule('/external-ids', 'manage_event_references', RHManageReferences,
 _bp.add_url_rule('/event-location', 'manage_event_location', RHManageEventLocation, methods=('GET', 'POST'))
 _bp.add_url_rule('/event-keywords', 'manage_event_keywords', RHManageEventKeywords, methods=('GET', 'POST'))
 _bp.add_url_rule('/event-persons', 'manage_event_person_links', RHManageEventPersonLinks, methods=('GET', 'POST'))
+_bp.add_url_rule('/print-poster/settings', 'poster_settings', RHPosterPrintSettings, methods=('GET', 'POST'))
+_bp.add_url_rule('/print-poster/<int:template_id>/<uuid>', 'print_poster', RHPrintEventPoster)
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():
     if object_type == 'subcontribution':

@@ -1,0 +1,158 @@
+{% macro _render_badge_form_button(regform, tpl, format='text', text='') %}
+    {% set no_registrations = not regform.registrations %}
+    {% set no_registrations_msg %}
+        {% trans %}Registration Form has no registrations{% endtrans %}
+    {% endset %}
+    {% if format == 'icon' %}
+        <a {% if no_registrations %}
+               title="{{ no_registrations_msg }}"
+           {% else %}
+               title="{% trans %}Print badges{% endtrans %}"
+           {% endif %}
+           class="i-button icon-printer icon-only text-color borderless highlight
+                  {% if no_registrations -%}
+                      disabled
+                  {%- endif %}"
+           data-href="{{ url_for('event_registration.registrations_config_badges', regform, template_id=tpl.id) }}"
+           data-title="{% trans %}Badge Printing Settings{% endtrans %}"
+           data-method="POST"
+           data-ajax-dialog>
+        </a>
+    {% else %}
+        {% if no_registrations %}
+            <span class="text-not-important" title="{{ no_registrations_msg }}">
+                {{ text }}
+            </span>
+        {% else %}
+            <a data-href="{{ url_for('event_registration.registrations_config_badges', regform, template_id=tpl.id) }}"
+               data-title="{% trans %}Badge Printing Settings{% endtrans %}"
+               data-method="POST"
+               data-ajax-dialog
+               {% if no_registrations %}
+                   title="{{ no_registrations_msg }}"
+               {% endif %}>
+                {{ text }}
+            </a>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% macro _render_template(tpl, target, inherited=false, event=none) -%}
+    <tr>
+        <td class="i-table id-column">
+            <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
+               title="{{ tpl.type.title }}"></i>
+        </td>
+        <td>
+            {{ tpl.title }}
+        </td>
+        <td class="text-superfluous">
+            {% if inherited %}
+                {% if tpl.category.is_root %}
+                    {% trans %}Default template{% endtrans %}
+                {% else %}
+                    {% trans title=tpl.category.title -%}
+                        from category "{{ title }}"
+                    {% endtrans %}
+                {% endif %}
+            {% endif %}
+        </td>
+        <td>
+            <div class="thin toolbar right">
+                <div class="group">
+                    {% if not inherited %}
+                        <a class="i-button icon-edit icon-only text-color borderless"
+                           href="{{ url_for('.edit_template', tpl) }}"></a>
+                    {% endif %}
+                    <button class="i-button icon-copy icon-only text-color borderless"
+                            title="{% trans %}Clone this template{% endtrans %}"
+                            data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
+                            data-method="POST"
+                            data-update="#template-list"
+                            data-confirm="{% trans title=tpl.title -%}
+                                               Are you sure you want to clone template '{{ title }}''?
+                                          {%- endtrans %}">
+                    </button>
+                    {% if not inherited %}
+                        <button class="i-button icon-remove icon-only text-color borderless danger"
+                                 data-href="{{ url_for('.delete_template', tpl) }}"
+                                 data-method="DELETE"
+                                 data-update="#template-list"
+                                 data-confirm="{% trans title=tpl.title -%}
+                                                    Are you sure you want to delete template '{{ title }}'?
+                                               {%- endtrans %}">
+                        </button>
+                    {%- endif %}
+                </div>
+                <div class="group">
+                    {% if tpl.type.name == 'poster' and event %}
+                        <a href="#" class="i-button icon-print icon-only highlight text-color borderless"
+                           title="{% trans %}Print poster for the event{% endtrans %}"
+                           data-href="{{ url_for('event_management.poster_settings', event, template_id=tpl.id) }}"
+                           data-title="{% trans %}Poster Printing Settings{% endtrans %}"
+                           data-ajax-dialog>
+                        </a>
+                    {% elif event %}
+                        {% set single_form = event.registration_forms|length == 1 %}
+                        {% if single_form %}
+                            {{ _render_badge_form_button(event.registration_forms[0], tpl, format='icon') }}
+                        {% else %}
+                            <a href="#" class="i-button icon-print icon-only highlight text-color js-dropdown borderless
+                                              {{ 'disabled' if not event.registration_forms }}"
+                               title="{{ _('Print badges') if event.registration_forms
+                                        else _('There are no registration forms in this event') }}"
+                               data-toggle="dropdown">
+                            </a>
+                            <ul class="dropdown">
+                                {% for regform in event.registration_forms %}
+                                    <li>
+                                        {{ _render_badge_form_button(regform, tpl, format='text', text=regform.title) }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+    </tr>
+{% endmacro -%}
+
+{% macro render_template_list(templates, target, inherited_templates=[], event=none) -%}
+    <section>
+        <h3>{% trans %}Inherited templates{% endtrans %}</h3>
+        <table class="i-table-widget" id="template-list">
+            <tbody>
+                {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
+                    {{ _render_template(tpl, target, inherited=true, event=event) }}
+                {% endfor %}
+            </tbody>
+        </table>
+    </section>
+
+    <section class="custom-template-list">
+        <div class="flexrow f-a-center f-j-space-between">
+            <h3>Custom templates</h3>
+            <button class="i-button highlight icon-plus"
+                    data-href="{{ url_for('.add_template', target) }}"
+                    data-title="{% trans %}Add a new blank designer template{% endtrans %}"
+                    data-update="#template-list"
+                    data-ajax-dialog>
+                {% trans %}Add new{% endtrans %}
+            </button>
+        </div>
+        {% if templates %}
+            <table class="i-table-widget" id="template-list">
+                <tbody>
+                    {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
+                        {{ _render_template(tpl, target, event=event) }}
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="italic text-not-important">
+                {% trans %}No templates{% endtrans %}
+            </div>
+        {% endif %}
+    </section>
+{% endmacro -%}
