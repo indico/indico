@@ -69,118 +69,125 @@ $dropzone-border-width: 2;
     }
 }
 
-.form-group .dropzone {
-    padding: 0;
-    margin-bottom: 1em;
-    width: 400px;
-    display: table;
+.form-group {
 
-    .dropzone-inner {
-        display: table-row;
-
-        .dropzone-previews {
-            display: table-cell;
-            text-align: center;
-
-            .dz-message {
-                display: none;
-            }
-        }
-
-        .select-files-btn {
-            display: table-cell;
-            vertical-align: middle;
-            text-align: center;
-
-            button {
-                margin: $image-preview-margin + 'px';
-                height: inherit;
-            }
-        }
+    .form-field.fit-to-parent .dropzone {
+        width: 100%;
     }
 
-    &.thin {
-        min-height: inherit;
+    .dropzone {
+        padding: 0;
+        margin-bottom: 1em;
+        width: 400px;
+        display: table;
 
         .dropzone-inner {
-            display: block;
-            padding: 10px;
-        }
+            display: table-row;
 
-        .dropzone-previews {
-            display: block;
-            text-align: left;
-        }
+            .dropzone-previews {
+                display: table-cell;
+                text-align: center;
 
-        .dz-preview {
-            display: flex;
-            min-height: inherit;
-            margin: 0 0 5px 0;
-
-            &:hover {
-                @include transition(background-color .2s);
-                background-color: $light-gray;
-            }
-        }
-
-        .dz-details {
-            opacity: 1;
-            font-size: 1em;
-            padding: 0;
-            text-align: inherit;
-            color: $black;
-            min-width: inherit;
-            position: inherit;
-            flex-grow: 1;
-            cursor: inherit;
-            width: 300px;
-        }
-
-        .select-files-btn {
-            display: block;
-
-            button {
-                margin: 5px 0 0 0;
-            }
-        }
-
-        .dz-message {
-            font-size: 1em;
-            margin: 0;
-        }
-
-        .message-seperator {
-            font-size: 1em;
-            margin-top: 0;
-        }
-
-        .dz-filename{
-            span:hover {
-                @include transition(background-color .2s);
-                background-color: $light-gray;
-                border-color: transparent;
+                .dz-message {
+                    display: none;
+                }
             }
 
-            &:hover {
-                span {
-                    @include transition(background-color .2s);
-                    background-color: $light-gray;
-                    border-color: transparent;
+            .select-files-btn {
+                display: table-cell;
+                vertical-align: middle;
+                text-align: center;
+
+                button {
+                    margin: $image-preview-margin + 'px';
+                    height: inherit;
                 }
             }
         }
 
-        .dz-remove {
-            margin-left: 5px;
-            color: $link;
+        &.thin {
+            min-height: inherit;
 
-            i:before {
-                cursor: pointer;
+            .dropzone-inner {
+                display: block;
+                padding: 10px;
             }
 
-            &:hover {
-                color: $bright-orange;
-                text-decoration: initial;
+            .dropzone-previews {
+                display: block;
+                text-align: left;
+            }
+
+            .dz-preview {
+                display: flex;
+                min-height: inherit;
+                margin: 0 0 5px 0;
+
+                &:hover {
+                    @include transition(background-color .2s);
+                    background-color: $light-gray;
+                }
+            }
+
+            .dz-details {
+                opacity: 1;
+                font-size: 1em;
+                padding: 0;
+                text-align: inherit;
+                color: $black;
+                min-width: inherit;
+                position: inherit;
+                flex-grow: 1;
+                cursor: inherit;
+                width: 300px;
+            }
+
+            .select-files-btn {
+                display: block;
+
+                button {
+                    margin: 5px 0 0 0;
+                }
+            }
+
+            .dz-message {
+                font-size: 1em;
+                margin: 0;
+            }
+
+            .message-seperator {
+                font-size: 1em;
+                margin-top: 0;
+            }
+
+            .dz-filename{
+                span:hover {
+                    @include transition(background-color .2s);
+                    background-color: $light-gray;
+                    border-color: transparent;
+                }
+
+                &:hover {
+                    span {
+                        @include transition(background-color .2s);
+                        background-color: $light-gray;
+                        border-color: transparent;
+                    }
+                }
+            }
+
+            .dz-remove {
+                margin-left: 5px;
+                color: $link;
+
+                i:before {
+                    cursor: pointer;
+                }
+
+                &:hover {
+                    color: $bright-orange;
+                    text-decoration: initial;
+                }
             }
         }
     }
