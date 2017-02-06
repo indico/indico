@@ -272,19 +272,6 @@ MaxUploadFileSize = 0
 
 
 #------------------------------------------------------------------------------
-# OFFLINE WEBSITE PACKAGES CREATION
-#------------------------------------------------------------------------------
-# Indico allows users to download their event so they can run it offline.
-#
-# The OfflineStore variable points to a directory that Indico will use to store
-# the offline website packages.
-#
-# If the OfflineStore variable is not set, the functionality will be disabled.
-#
-# OfflineStore         = "/opt/indico/archive"
-
-
-#------------------------------------------------------------------------------
 # LATEX/PDF GENERATION
 #------------------------------------------------------------------------------
 # Set the path to xelatex if it's not within PATH:

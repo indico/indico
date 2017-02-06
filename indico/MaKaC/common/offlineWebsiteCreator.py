@@ -104,13 +104,13 @@ class OfflineEvent:
         self._conf = conf
         self._eventType = eventType
 
-    def create(self, static_site_id):
+    def create(self):
         websiteCreator = None
         if self._eventType in ("simple_event", "meeting"):
             websiteCreator = OfflineEventCreator(self._rh, self._conf, self._eventType)
         elif self._eventType == "conference":
             websiteCreator = ConferenceOfflineCreator(self._rh, self._conf)
-        return websiteCreator.create(static_site_id)
+        return websiteCreator.create()
 
 
 class OfflineEventCreator(object):
@@ -129,7 +129,7 @@ class OfflineEventCreator(object):
         self._css_files = set()
         self._downloaded_files = {}
 
-    def create(self, static_site_id):
+    def create(self):
         config = Config.getInstance()
         self._fileHandler = ZIPFileHandler()
 
@@ -178,7 +178,7 @@ class OfflineEventCreator(object):
                                      '<meta http-equiv="Refresh" content="0; url=%s">' % conferenceDisplayPath)
 
         self._fileHandler.close()
-        return self._save_file(self._fileHandler.getPath(), static_site_id)
+        return self._fileHandler.getPath()
 
     def _get_static_files(self, html):
         config = Config.getInstance()
@@ -311,18 +311,6 @@ class OfflineEventCreator(object):
                 self._fileHandler.addDir(dst_dirpath)
                 if not self._fileHandler.hasFile(dst_filepath):
                     self._fileHandler.add(dst_filepath, src_filepath)
-
-    def _save_file(self, srcPath, static_site_id):
-        volume = HelperMaKaCInfo.getMaKaCInfoInstance().getArchivingVolume()
-        path = os.path.join(Config.getInstance().getOfflineStore(), volume, 'offline', self._conf.getId())
-        file_path = os.path.join(path, '{}.zip'.format(static_site_id))
-        try:
-            os.makedirs(path)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
-        shutil.copyfile(srcPath, file_path)
-        return file_path
 
 
 class ConferenceOfflineCreator(OfflineEventCreator):

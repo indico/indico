@@ -27,11 +27,10 @@ import sys
 import urlparse
 
 import pytz
-from flask import current_app, g, has_app_context, request
+from flask import g, has_app_context, request
 from werkzeug.urls import url_parse
 
 import MaKaC
-from indico.core.db import DBMgr
 from indico.util.contextManager import ContextManager
 
 
@@ -226,7 +225,6 @@ class Config:
         'UploadedFilesTempDir'      : "/opt/indico/tmp",
         'UploadedFilesSharedTempDir': "",
         'XMLCacheDir'               : "/opt/indico/cache",
-        'OfflineStore'              : "",
         'CacheBackend'              : 'files',
         'MemcachedServers'          : [],
         'RedisCacheURL'             : None,
