@@ -212,11 +212,7 @@ class AbstractJudgmentFormBase(IndicoForm):
     accepted_track = QuerySelectField(_("Track"), [HiddenUnless('judgment', AbstractAction.accept)],
                                       get_label='title', allow_blank=True, blank_text=_("Choose a track..."),
                                       description=_("The abstract will be accepted in this track"))
-    override_contrib_type = BooleanField(_("Override contribution type"),
-                                         [HiddenUnless('judgment', AbstractAction.accept)], widget=SwitchWidget(),
-                                         description=_("Override the contribution type for all selected abstracts"))
-    accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept),
-                                                                      HiddenUnless('override_contrib_type')],
+    accepted_contrib_type = QuerySelectField(_("Contribution type"), [HiddenUnless('judgment', AbstractAction.accept)],
                                              get_label=lambda x: x.name.title(), allow_blank=True,
                                              blank_text=_("You may choose a contribution type..."),
                                              description=_("The abstract will be converted "
@@ -251,7 +247,6 @@ class AbstractJudgmentFormBase(IndicoForm):
                                             .order_by(ContributionType.name))
         if not self.accepted_contrib_type.query.count():
             del self.accepted_contrib_type
-            del self.override_contrib_type
 
     @property
     def split_data(self):
@@ -342,19 +337,31 @@ class AbstractReviewForm(IndicoForm):
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
+    _order = ('judgment', 'accepted_track', 'override_contrib_type', 'accepted_contrib_type', 'session', 'duplicate_of',
+              'merged_into', 'merge_persons', 'judgment_comment', 'send_notifications')
+
     judgment = HiddenEnumField(enum=AbstractAction, skip={AbstractAction.change_tracks})
     abstract_id = HiddenFieldList()
     submitted = HiddenField()
+    override_contrib_type = BooleanField(_("Override contribution type"),
+                                         [HiddenUnless('judgment', AbstractAction.accept)], widget=SwitchWidget(),
+                                         description=_("Override the contribution type for all selected abstracts"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(BulkAbstractJudgmentForm, self).__init__(*args, **kwargs)
-        self.accepted_track.description = _("The abstracts will be accepted in this track")
-        self.accepted_contrib_type.description = _("The abstracts will be converted into a contribution of this type")
-        self.session.description = _("The generated contributions will be allocated in this session")
+        if self.accepted_track:
+            self.accepted_track.description = _("The abstracts will be accepted in this track")
+        if self.accepted_contrib_type:
+            self.accepted_contrib_type.description = _("The abstracts will be converted into a contribution of this "
+                                                       "type")
+        else:
+            del self.override_contrib_type
+        if self.session:
+            self.session.description = _("The generated contributions will be allocated in this session")
         self.duplicate_of.description = _("The selected abstracts will be marked as duplicate of this one")
         self.merged_into.description = _("The selected abstracts will be merged onto this one")
-        self.merge_persons.description = ("Authors and speakers of the selected abstracts will be added to this one")
+        self.merge_persons.description = _("Authors and speakers of the selected abstracts will be added to this one")
         self.duplicate_of.excluded_abstract_ids = set(kwargs['abstract_id'])
         self.merged_into.excluded_abstract_ids = set(kwargs['abstract_id'])
         if kwargs['judgment']:
@@ -371,6 +378,18 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
 
     def is_submitted(self):
         return super(BulkAbstractJudgmentForm, self).is_submitted() and 'submitted' in request.form
+
+    @classmethod
+    def _add_contrib_type_hidden_unless(cls):
+        # In the bulk form we need to hide/disable the contrib type selector unless we want to
+        # override the type specified in the abstract.  However, multiple HiddenUnless validators
+        # are not supported in the client-side JS so we only add it to this form - it removes
+        # inactive fields on the server side so it still works (the JavaScript picks up the last
+        # HiddenUnless validator)
+        inject_validators(BulkAbstractJudgmentForm, 'accepted_contrib_type', [HiddenUnless('override_contrib_type')])
+
+
+BulkAbstractJudgmentForm._add_contrib_type_hidden_unless()
 
 
 class AbstractReviewingRolesForm(IndicoForm):

@@ -88,7 +88,7 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
                                "{num} abstracts have been skipped since they are already judged.",
                                num_prejudged_abstracts).format(num=num_prejudged_abstracts), 'warning')
             return jsonify_data(**self.list_generator.render_list())
-        return jsonify_form(form=form, submit=_('Judge'), disabled_until_change=False)
+        return jsonify_form(form=form, fields=form._order, submit=_('Judge'), disabled_until_change=False)
 
 
 class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
