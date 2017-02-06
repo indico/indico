@@ -206,3 +206,14 @@ class StoredFileMixin(object):
         if self.storage_file_id is None:
             raise Exception('There is no file to send')
         return self.storage.send_file(self.storage_file_id, self.content_type, self.filename, inline=inline)
+
+    def delete(self):
+        """Delete the file from storage"""
+        if self.storage_file_id is None:
+            raise Exception('There is no file to delete')
+        self.storage.delete(self.storage_file_id)
+        self.storage_backend = None
+        self.storage_file_id = None
+        self.size = None
+        self.content_type = None
+        self.filename = None
