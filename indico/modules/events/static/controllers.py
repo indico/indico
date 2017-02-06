@@ -20,32 +20,27 @@ import transaction
 from flask import redirect, request, session
 from werkzeug.exceptions import NotFound
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.modules.events.static.tasks import build_static_site
 from indico.modules.events.static.views import WPStaticSites
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import url_for
 
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHStaticSiteBase(RHConferenceModifBase):
-    pass
+    CSRF_ENABLED = True
 
 
 class RHStaticSiteList(RHStaticSiteBase):
     def _process(self):
-        if not Config.getInstance().getOfflineStore():
-            raise NotFound()
         static_sites = self.event_new.static_sites.order_by(StaticSite.requested_dt.desc()).all()
         return WPStaticSites.render_template('static_sites.html', self._conf,
                                              event=self.event_new, static_sites=static_sites)
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         static_site = StaticSite(creator=session.user, event_new=self.event_new)
         db.session.add(static_site)
@@ -67,6 +62,5 @@ class RHStaticSiteDownload(RHStaticSiteBase):
 
     def _process(self):
         if self.static_site.state != StaticSiteState.success:
-            raise NotFound()
-        return send_file('static_site_{0.event_id}.zip'.format(self.static_site), self.static_site.path,
-                         'application/zip')
+            raise NotFound
+        return self.static_site.send()
