@@ -225,7 +225,7 @@ class AbstractJudgmentFormBase(IndicoForm):
                                  description=_("The current abstract will be marked as duplicate of the selected one"),
                                  ajax_endpoint='abstracts.other_abstracts')
     merged_into = AbstractField(_("Merge into"), [HiddenUnless('judgment', AbstractAction.merge), DataRequired()],
-                                description=_("The current abstract will be merged onto the selected one"),
+                                description=_("The current abstract will be merged into the selected one"),
                                 ajax_endpoint='abstracts.other_abstracts')
     merge_persons = BooleanField(_("Merge persons"), [HiddenUnless('judgment', AbstractAction.merge)],
                                  description=_("Authors and speakers of the current abstract will be added to the "
@@ -359,9 +359,11 @@ class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):
             del self.override_contrib_type
         if self.session:
             self.session.description = _("The generated contributions will be allocated in this session")
-        self.duplicate_of.description = _("The selected abstracts will be marked as duplicate of this one")
-        self.merged_into.description = _("The selected abstracts will be merged onto this one")
-        self.merge_persons.description = _("Authors and speakers of the selected abstracts will be added to this one")
+        self.duplicate_of.description = _("The selected abstracts will be marked as duplicate of the specified "
+                                          "abstract")
+        self.merged_into.description = _("The selected abstracts will be merged into the specified abstract")
+        self.merge_persons.description = _("Authors and speakers of the selected abstracts will be added to the "
+                                           "specified abstract")
         self.duplicate_of.excluded_abstract_ids = set(kwargs['abstract_id'])
         self.merged_into.excluded_abstract_ids = set(kwargs['abstract_id'])
         if kwargs['judgment']:
