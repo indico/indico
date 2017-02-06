@@ -24,6 +24,7 @@ from flask import session, g
 from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.notifications import make_email, email_sender
+from indico.core.storage import StorageReadOnlyError
 from indico.modules.events.static import logger
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.contextManager import ContextManager
@@ -55,10 +56,12 @@ def build_static_site(static_site):
         wf = rh.getWebFactory()
         event_type = wf.getId() if wf else 'conference'
 
-        zip_file_path = OfflineEvent(rh, rh._conf, event_type).create(static_site.id)
-
-        static_site.path = zip_file_path
+        zip_file_path = OfflineEvent(rh, rh._conf, event_type).create()
         static_site.state = StaticSiteState.success
+        static_site.content_type = 'application/zip'
+        static_site.filename = 'offline_site_{}.zip'.format(static_site.event_new.id)
+        with open(zip_file_path, 'rb') as f:
+            static_site.save(f)
         db.session.commit()
 
         logger.info('Building static site successful: %s', static_site)
@@ -94,9 +97,13 @@ def static_sites_cleanup(days=30):
     logger.info('Removing %d expired static sites from the past %d days', len(expired_sites), days)
     try:
         for site in expired_sites:
-            site.delete_file()
-            site.path = None
-            site.state = StaticSiteState.expired
-            logger.info('Removed static site %s', site)
+            try:
+                site.delete()
+            except StorageReadOnlyError:
+                # If a site is on read-only storage we simply keep it alive.
+                logger.debug('Could not delete static site %r (read-only storage)', site)
+            else:
+                site.state = StaticSiteState.expired
+                logger.info('Removed static site %r', site)
     finally:
         db.session.commit()
