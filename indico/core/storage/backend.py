@@ -63,6 +63,10 @@ class StorageError(Exception):
     """Exception used when a storage operation fails for any reason"""
 
 
+class StorageReadOnlyError(StorageError):
+    """Exception used when trying to write to a read-only storage"""
+
+
 class Storage(object):
     """Base class for storage backends
 
@@ -200,10 +204,10 @@ class ReadOnlyStorageMixin(object):
     """Mixin that makes write operations fail with an error"""
 
     def save(self, name, content_type, filename, fileobj):
-        raise StorageError('Cannot write to read-only storage')
+        raise StorageReadOnlyError('Cannot write to read-only storage')
 
     def delete(self, file_id):
-        raise StorageError('Cannot delete from read-only storage')
+        raise StorageReadOnlyError('Cannot delete from read-only storage')
 
 
 class FileSystemStorage(Storage):

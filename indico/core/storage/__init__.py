@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from .backend import Storage, FileSystemStorage, StorageError, ReadOnlyFileSystemStorage
+from .backend import Storage, FileSystemStorage, StorageError, StorageReadOnlyError, ReadOnlyFileSystemStorage
 from .models import VersionedResourceMixin, StoredFileMixin
 
-__all__ = ('Storage', 'FileSystemStorage', 'StorageError', 'ReadOnlyFileSystemStorage', 'VersionedResourceMixin',
-           'StoredFileMixin')
+__all__ = ('Storage', 'FileSystemStorage', 'StorageError', 'StorageReadOnlyError', 'ReadOnlyFileSystemStorage',
+           'VersionedResourceMixin', 'StoredFileMixin')
