@@ -28,7 +28,7 @@ from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.PDFinterface.conference import ConfManagerAbstractToPDF, AbstractToPDF
 
 
@@ -86,7 +86,7 @@ class RHAbstractNotificationLog(RHAbstractBase):
         return self.abstract.can_judge(session.user)
 
     def _process(self):
-        return WPManageAbstracts.render_template('reviewing/notification_log.html', self._conf, abstract=self.abstract)
+        return jsonify_template('events/abstracts/reviewing/notification_log.html', abstract=self.abstract)
 
 
 class RHAbstractExportPDF(RHAbstractBase):
