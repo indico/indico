@@ -234,7 +234,7 @@ class AbstractJudgmentFormBase(IndicoForm):
         self.session.query = Session.query.with_parent(self.event).order_by(Session.title)
         if not self.session.query.count():
             del self.session
-        self.accepted_track.query = Track.query.with_parent(self.event).order_by(Track.title)
+        self.accepted_track.query = Track.query.with_parent(self.event).order_by(Track.position)
         if not self.accepted_track.query.count():
             del self.accepted_track
         self.accepted_contrib_type.query = (ContributionType.query
@@ -317,7 +317,7 @@ class AbstractReviewForm(IndicoForm):
                                       .with_parent(self.event)
                                       .filter(db.or_(Track.id.notin_(reviewed_for_track_ids),
                                                      existing_prop_track_cond))
-                                      .order_by(Track.title))
+                                      .order_by(Track.position))
         if not self.proposed_tracks.query.count():
             del self.proposed_tracks
             self.proposed_action.skip.add(AbstractAction.change_tracks)
@@ -494,7 +494,7 @@ class SingleTrackMixin(object):
         super(SingleTrackMixin, self).__init__(*args, **kwargs)
         if not abstracts_settings.get(event, 'tracks_required'):
             self.submitted_for_tracks.blank_text = _('No track selected')
-        self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
+        self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)
 
 
 class MultiTrackMixin(object):
@@ -507,7 +507,7 @@ class MultiTrackMixin(object):
         if abstracts_settings.get(event, 'tracks_required') and not self.track_field_disabled:
             inject_validators(self, 'submitted_for_tracks', [DataRequired()])
         super(MultiTrackMixin, self).__init__(*args, **kwargs)
-        self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
+        self.submitted_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)
 
 
 class SendNotificationsMixin(object):
@@ -553,4 +553,4 @@ class AbstractReviewedForTracksForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
         super(AbstractReviewedForTracksForm, self).__init__(*args, **kwargs)
-        self.reviewed_for_tracks.query = Track.query.with_parent(event).order_by(Track.title)
+        self.reviewed_for_tracks.query = Track.query.with_parent(event).order_by(Track.position)
