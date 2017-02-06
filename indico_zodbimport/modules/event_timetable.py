@@ -213,6 +213,9 @@ class TimetableMigration(object):
             if isinstance(values, basestring):
                 values = [values]
             for value in map(convert_to_unicode, values):
+                if value == 'None':
+                    self.importer.print_warning(cformat("%{yellow!}Skipping 'None' value"), event_id=self.event.id)
+                    continue
                 if not self.importer.quiet:
                     self.importer.print_info(cformat(' - %{magenta}{}: %{green!}{}').format(name, value))
                 yield reference_cls(reference_type=reference_type, value=value)
