@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
-from io import BytesIO
 import os
+from io import BytesIO
 
 import pytest
 
-from indico.core.storage import Storage, FileSystemStorage, StorageError, ReadOnlyFileSystemStorage
+from indico.core.storage import (Storage, FileSystemStorage, StorageError, StorageReadOnlyError,
+                                 ReadOnlyFileSystemStorage)
 
 
 @pytest.fixture
@@ -137,9 +138,9 @@ def test_fs_readonly(fs_storage):
     assert readonly.open(f).read() == b'hello world'
     assert readonly.send_file(f, 'test/plain', 'test.txt')
     assert readonly.getsize(f) == 11
-    with pytest.raises(StorageError):
+    with pytest.raises(StorageReadOnlyError):
         readonly.delete(f)
-    with pytest.raises(StorageError):
+    with pytest.raises(StorageReadOnlyError):
         readonly.save('test2.txt', 'unused/unused', 'unused', b'hello fail')
     # just to make sure the file is still there
     assert readonly.open(f).read() == b'hello world'
