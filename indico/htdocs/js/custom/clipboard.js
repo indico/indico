@@ -70,7 +70,7 @@ $(document).ready(function() {
     });
 
     /* Allow to use clipboard.js on <a> with href attributes. */
-    $('.js-copy-to-clipboard').on('click', function(evt) {
+    $(document).on('click', '.js-copy-to-clipboard', function(evt) {
         evt.preventDefault();
     });
 });
