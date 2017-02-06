@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 from functools import update_wrapper, partial
+from itertools import izip
 from operator import attrgetter
 
 from flask import has_request_context, g
@@ -244,21 +245,24 @@ class FallbackSettingsProxy(object):
 
         :param args: the arguments used as key parameters for the proxy (typically a property name)
         """
+        proxy_args = args[:len(self.proxies)]
+        key_args = args[len(self.proxies):]
         default = kwargs.get('default', FallbackSettingsProxy.default_sentinel)
-        for proxy in self.proxies[:-1]:
-            value = proxy.get(*args, default=FallbackSettingsProxy.default_sentinel)
+        for proxy, proxy_arg in izip(self.proxies[:-1], proxy_args[:-1]):
+            value = proxy.get(proxy_arg, *key_args, default=FallbackSettingsProxy.default_sentinel)
             if value is not FallbackSettingsProxy.default_sentinel:
                 return value
 
-        return self.proxies[-1].get(*args, default=(default if default is not FallbackSettingsProxy.default_sentinel
-                                                    else SettingsProxyBase.default_sentinel))
+        sentinel = (default if default is not FallbackSettingsProxy.default_sentinel
+                    else SettingsProxyBase.default_sentinel)
+        return self.proxies[-1].get(proxy_args[-1], *key_args, default=sentinel)
 
-    def get_all(self):
+    def get_all(self, *args):
         """Retrieve all properties in a fallback proxy chain."""
         result = {}
-        result.update(self.proxies[-1].get_all())
-        for proxy in self.proxies[::-1][1:]:
-            result.update(proxy.get_all(no_defaults=True))
+        result.update(self.proxies[-1].get_all(args[-1]))
+        for proxy, arg in izip(self.proxies[::-1][1:], args[::-1][1:]):
+            result.update(proxy.get_all(arg, no_defaults=True))
         return result
 
 
