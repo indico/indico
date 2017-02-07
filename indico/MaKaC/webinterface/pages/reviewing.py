@@ -29,7 +29,7 @@ class WPConfModifReviewingBase(WPConferenceModifBase):
     """
 
     _userData = ['favorite-user-list']
-    sidemenu_option = 'paper_reviewing'
+    sidemenu_option = 'paper_reviewing_old'
 
     def __init__(self, rh, target):
         WPConferenceModifBase.__init__(self, rh, target)
