@@ -17,10 +17,14 @@
             <div id="action-menu-actions">
                 {% if event.as_legacy.isClosed() %}
                     <button class="i-button icon-lock-center disabled"
-                            title="{% trans %}This event is already locked.{% endtrans %}"></button>
+                            title="{% trans %}This event is already locked.{% endtrans %}">
+                        {% trans %}Lock{% endtrans %}
+                    </button>
                 {% elif not can_lock %}
                     <button class="i-button icon-lock-center disabled"
-                            title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}"></button>
+                            title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
+                        {% trans %}Lock{% endtrans %}
+                    </button>
                 {% else %}
                     <button class="i-button icon-lock-center js-ajax-dialog-lock"
                             data-href="{{ url_for('event_management.lock', event) }}"
