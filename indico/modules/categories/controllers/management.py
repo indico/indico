@@ -41,7 +41,7 @@ from indico.util.i18n import _, ngettext
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template, url_for_index
 
 
 CATEGORY_ICON_DIMENSIONS = (16, 16)
@@ -233,9 +233,15 @@ class RHDeleteCategory(RHManageCategoryBase):
         if not self.category.is_empty:
             raise BadRequest('Cannot delete a non-empty category')
         delete_category(self.category)
-        url = url_for('.manage_content', self.category.parent)
+        parent = self.category.parent
+        if parent.can_manage(session.user):
+            url = url_for('.manage_content', parent)
+        elif parent.can_access(session.user):
+            url = url_for('.display', parent)
+        else:
+            url = url_for_index()
         if request.is_xhr:
-            return jsonify_data(flash=False, redirect=url, is_parent_empty=self.category.parent.is_empty)
+            return jsonify_data(flash=False, redirect=url, is_parent_empty=parent.is_empty)
         else:
             flash(_('Category "{}" has been deleted.').format(self.category.title), 'success')
             return redirect(url)
