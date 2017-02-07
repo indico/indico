@@ -93,8 +93,8 @@ def get_default_menu_entries():
             visible=_visibility_my_conference
         ),
         MenuEntryData(
-            title=_("Paper Reviewing"),
-            name='paper_reviewing',
+            title=_("Paper Reviewing (old)"),
+            name='paper_reviewing_old',
             endpoint='event.paperReviewingDisplay',
             position=8,
             visible=_visibility_paper_review
@@ -105,7 +105,7 @@ def get_default_menu_entries():
             endpoint='event_mgmt.confModifReviewing-paperSetup',
             visible=_visibility_paper_review_managment,
             position=0,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         ),
         MenuEntryData(
             title=_("Assign Papers"),
@@ -113,7 +113,7 @@ def get_default_menu_entries():
             endpoint='event_mgmt.assignContributions',
             visible=_visibility_paper_assign,
             position=1,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         ),
         MenuEntryData(
             title=_("Referee Area"),
@@ -121,7 +121,7 @@ def get_default_menu_entries():
             endpoint='event_mgmt.confListContribToJudge',
             visible=_visibility_judge,
             position=2,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         ),
         MenuEntryData(
             title=_("Content Reviewer Area"),
@@ -129,7 +129,7 @@ def get_default_menu_entries():
             endpoint='event_mgmt.confListContribToJudge-asReviewer',
             visible=_visibility_contributions_as_reviewer,
             position=3,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         ),
         MenuEntryData(
             title=_("Layout Reviewer Area"),
@@ -137,7 +137,7 @@ def get_default_menu_entries():
             endpoint='event_mgmt.confListContribToJudge-asEditor',
             visible=_visibility_contributions_as_editor,
             position=4,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         ),
         MenuEntryData(
             title=_("Upload Paper"),
@@ -145,7 +145,7 @@ def get_default_menu_entries():
             endpoint='event.paperReviewingDisplay-uploadPaper',
             visible=_visibility_paper_review_transfer,
             position=5,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         ),
         MenuEntryData(
             title=_("Download Template"),
@@ -153,6 +153,6 @@ def get_default_menu_entries():
             endpoint='event.paperReviewingDisplay-downloadTemplate',
             visible=_visibility_paper_review_transfer,
             position=6,
-            parent='paper_reviewing'
+            parent='paper_reviewing_old'
         )
     ]
