@@ -165,6 +165,8 @@ class RHEventACLMessage(RHConferenceModifBase):
 class RHEventProtection(RHConferenceModifBase):
     """Show event protection"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
         if form.validate_on_submit():
@@ -209,6 +211,8 @@ class RHEventProtection(RHConferenceModifBase):
 
 class RHMoveEvent(RHConferenceModifBase):
     """Move event to a different category"""
+
+    CSRF_ENABLED = True
 
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
