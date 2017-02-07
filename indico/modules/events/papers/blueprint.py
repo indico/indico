@@ -34,9 +34,9 @@ _bp.add_url_rule('/papers/<int:contrib_id>/files/<int:file_id>-<filename>', 'dow
 _bp.add_url_rule('/papers/templates/<int:template_id>-<filename>', 'download_template',
                  templates.RHDownloadPaperTemplate)
 # Paper reviews
-_bp.add_url_rule('papers/<int:contrib_id>/review/type/<review_type>', 'submit_review',
+_bp.add_url_rule('/papers/<int:contrib_id>/review/type/<review_type>', 'submit_review',
                  display.RHSubmitPaperReview, methods=('GET', 'POST'))
-_bp.add_url_rule('papers/<int:contrib_id>/revision/<int:revision_id>/review/<int:review_id>/edit', 'edit_review',
+_bp.add_url_rule('/papers/<int:contrib_id>/revision/<int:revision_id>/review/<int:review_id>/edit', 'edit_review',
                  display.RHEditPaperReview, methods=('GET', 'POST'))
 # Paper comments
 _bp.add_url_rule('/papers/<int:contrib_id>/comment', 'submit_comment',
