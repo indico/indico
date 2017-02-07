@@ -39,7 +39,7 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template, jsonify_data, jsonify_form
+from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
 from MaKaC.webinterface.rh.base import RH
 from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -59,8 +59,12 @@ class RHDeleteEvent(RHConferenceModifBase):
         delete_event(self.event_new)
         flash(_('Event "{}" successfully deleted.').format(self.event_new.title), 'success')
         category = self.event_new.category
-        endpoint = 'categories.manage_content' if category.can_manage(session.user) else 'categories.display'
-        redirect_url = url_for(endpoint, category)
+        if category.can_manage(session.user):
+            redirect_url = url_for('categories.manage_content', category)
+        elif category.can_access(session.user):
+            redirect_url = url_for('categories.display', category)
+        else:
+            redirect_url = url_for_index()
         return jsonify_data(url=redirect_url, flash=False)
 
 
