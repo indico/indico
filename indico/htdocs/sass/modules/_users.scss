@@ -15,9 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "compass";
-@import "base/palette";
-@import "base/utilities";
+@import 'base';
 
 
 @mixin user-action($color, $final-color:$color) {
