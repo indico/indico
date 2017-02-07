@@ -331,7 +331,6 @@
     .folder .attachment {
         @include ellipsis;
 
-        display: inline-block;
         max-width: 150px;
         padding-left: 0.2em !important;
 
@@ -344,7 +343,6 @@
     }
     .folder .i-button.attachment,
     .folder .attachments {
-        display: inline-block;
         font-family: Roboto;
         font-weight: normal;
 

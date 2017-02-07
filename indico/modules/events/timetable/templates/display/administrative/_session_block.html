@@ -57,14 +57,15 @@
 
     {% if entries -%}
         <ul class="meeting-sub-timetable">
-            {% set index = 1 %}
+            {% set index = [] %}
             {# It's impossible to sort by `lambda:` with Jinja, hence the double-sort #}
             {% for entry in entries|sort(attribute='object.title')|sort(attribute='start_dt') %}
                 {% if entry.type.name == 'CONTRIBUTION' and entry.object.can_access(session.user) %}
+                    {# Dirty solution to increment the index count due to Jinja's scoping issues #}
+                    {% set __ = index.append(1) %}
                     {{ render_contribution(entry.contribution, event, timezone=timezone, hide_time=hide_time,
                                            show_notes=show_notes, link_documents=link_documents,
-                                           numeral=index, show_numerals=show_numerals, print_mode=print_mode) }}
-                   {% set index = index + 1 %}
+                                           numeral=index|length, show_numerals=show_numerals, print_mode=print_mode) }}
                 {% elif entry.type.name == 'BREAK' %}
                     {{ render_break(entry.break_) }}
                 {% endif %}

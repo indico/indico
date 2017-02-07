@@ -145,7 +145,10 @@ definitions:
   sa2:
     <<: *standard
     stylesheet: staff_assoc_modern.scss
-    title: Staff Association (with time)
+    settings:
+      show_numerals: true
+      hide_time: true
+    title: Staff Association
 
   # Meetings - CERN Administrative
   administrative: &administrative
@@ -196,7 +199,7 @@ definitions:
       show_notes: true
       title_en: 'Staff Association'
       title_fr: 'Association du Personnel'
-    title: Staff Association
+    title: Staff Association (administrative)
 
   # XML
   jacow:
