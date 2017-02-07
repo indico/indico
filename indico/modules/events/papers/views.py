@@ -51,7 +51,7 @@ class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 
 
 class WPDisplayJudgingArea(WPDisplayPapersBase):
-    menu_entry_name = 'judging_area'
+    menu_entry_name = 'paper_judging_area'
 
 
 def render_paper_page(paper, view_class=None):
@@ -68,4 +68,4 @@ def render_paper_page(paper, view_class=None):
 
 
 class WPDisplayReviewingArea(WPDisplayPapersBase):
-    menu_entry_name = 'reviewing_area'
+    menu_entry_name = 'paper_reviewing_area'

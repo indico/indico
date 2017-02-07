@@ -52,7 +52,7 @@ class WPUploadPaper(WPConferenceDefaultDisplayBase):
 
 class WPaperReviewingDisplay(WConfDisplayBodyBase):
 
-    _linkname = 'paper_reviewing'
+    _linkname = 'paper_reviewing_old'
 
     def __init__(self, conference):
         self._conf = conference
