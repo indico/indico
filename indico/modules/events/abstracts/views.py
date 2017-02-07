@@ -72,7 +72,7 @@ class WPDisplayCallForAbstracts(WPDisplayAbstracts):
 
 
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
-    menu_entry_name = 'user_tracks'
+    menu_entry_name = 'abstract_reviewing_area'
 
     def getJSFiles(self):
         return WPDisplayAbstracts.getJSFiles(self) + self._asset_env['modules_event_management_js'].urls()
