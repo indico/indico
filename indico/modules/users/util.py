@@ -116,19 +116,14 @@ def get_linked_events(user, dt, limit=None):
     from indico.modules.events.abstracts.util import (get_events_with_abstract_reviewer_convener,
                                                       get_events_with_abstract_persons)
     from indico.modules.events.contributions.util import get_events_with_linked_contributions
+    from indico.modules.events.papers.util import get_events_with_paper_roles
     from indico.modules.events.registration.util import get_events_registered
     from indico.modules.events.sessions.util import get_events_with_linked_sessions
     from indico.modules.events.surveys.util import get_events_with_submitted_surveys
     from indico.modules.events.util import (get_events_managed_by, get_events_created_by,
                                             get_events_with_linked_event_persons)
 
-    links = avatar_links.get_links(user, dt) if redis_client else OrderedDict()
-    allowed_redis_links = {'conference_editor', 'conference_paperReviewManager', 'conference_referee',
-                           'conference_reviewer'}
-    for event_id, event_links in links.items():
-        event_links &= allowed_redis_links
-        if not event_links:
-            del links[event_id]
+    links = OrderedDict()
     for event_id in get_events_registered(user, dt):
         links.setdefault(str(event_id), set()).add('registration_registrant')
     for event_id in get_events_with_submitted_surveys(user, dt):
@@ -146,6 +141,8 @@ def get_linked_events(user, dt, limit=None):
     for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).iteritems():
         links.setdefault(str(event_id), set()).update(roles)
     for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
+        links.setdefault(str(event_id), set()).update(roles)
+    for event_id, roles in get_events_with_paper_roles(user, dt).iteritems():
         links.setdefault(str(event_id), set()).update(roles)
 
     if not links:
