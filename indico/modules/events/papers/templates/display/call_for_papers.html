@@ -3,35 +3,11 @@
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 {% from 'events/papers/display/_common.html' import render_cfp_infoline %}
 {% from 'events/papers/display/_paper_list.html' import render_user_papers_list %}
+{% from 'events/reviews/_common.html' import render_timeline_section %}
 
 {% block title %}
     {%- trans %}Call for Papers{% endtrans -%}
 {% endblock %}
-
-{% macro render_timestamp(label, date, tz, completed=false, alternative_text=none) %}
-    <li class="{{ 'completed' if completed }}">
-        <div class="label">{{ label }}</div>
-        <div class="timestamp flexcol f-a-center">
-            {% if date %}
-                <time datetime="{{ date.isoformat() }}">
-                    {{- date|format_datetime(timezone=tz) -}}
-                </time>
-            {% elif alternative_text %}
-                <span>{{ alternative_text }}</span>
-            {% endif %}
-        </div>
-    </li>
-{% endmacro %}
-
-{% macro render_timeline_section(cfp) %}
-    {% set tz = cfp.event.display_tzinfo %}
-    <section>
-        <ul class="deadline-timeline flexrow f-a-center f-j-center">
-            {{ render_timestamp(_("Opening day"), cfp.start_dt, tz, cfp.has_started) }}
-            {{ render_timestamp(_("Submission deadline"), cfp.end_dt, tz, cfp.has_ended, _("No deadline")) }}
-        </ul>
-    </section>
-{% endmacro %}
 
 {% block content %}
     <div class="call-for-papers">
