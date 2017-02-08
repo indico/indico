@@ -63,17 +63,6 @@ class GroupWrapper(Persistent, Fossilizable):
     def getEmail(self):
         return ''
 
-    def isObsolete(self):
-        return False
-
-    def containsUser(self, avatar):
-        if self.group is None or avatar is None:
-            return False
-        return avatar.user in self.group
-
-    def getMemberList(self):
-        return sorted([x.as_avatar for x in self.group.get_members()], key=attrgetter('user.last_name'))
-
     def canModify(self, aw_or_user):
         if hasattr(aw_or_user, 'getUser'):
             aw_or_user = aw_or_user.getUser()

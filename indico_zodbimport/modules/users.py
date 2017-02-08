@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from contextlib import contextmanager
 from datetime import timedelta
 from uuid import uuid4
 
@@ -29,7 +28,6 @@ from indico.core.db import db
 from indico.modules.api import APIKey
 from indico.modules.auth import Identity
 from indico.modules.users import User, user_settings
-from indico.modules.users.models.links import UserLink
 from indico.modules.users.models.users import UserTitle
 from indico.util.caching import memoize
 from indico.util.console import cformat
@@ -79,8 +77,6 @@ class UserImporter(Importer):
         self.fix_sequences('users', {'users'})
         self.migrate_favorite_users()
         self.migrate_admins()
-        with db.session.no_autoflush:
-            self.migrate_links()
 
     def migrate_users(self):
         print cformat('%{white!}migrating users')
@@ -244,47 +240,6 @@ class UserImporter(Importer):
                 continue
             user.is_admin = True
             print cformat('%{green}+++%{reset} %{cyan}{}').format(user)
-
-    def migrate_links(self):
-        print cformat('%{white!}migrating links')
-        for avatars in grouper(self._iter_avatars(), 2500, skip_missing=True):
-            avatars = {int(a.id): a for a in avatars}
-            users = ((u, avatars[u.id]) for u in User.find(User.id.in_(avatars)))
-
-            for user, avatar in committing_iterator(self.flushing_iterator(users, 250), 2500):
-                registrants = set()
-                user_shown = False
-                for type_, entries in avatar.linkedTo.iteritems():
-                    # store registrant roles, in order to avoid duplication below
-                    for role, objects in entries.iteritems():
-                        if (type_ == 'category' and role == 'favorite') or type_ == 'group':
-                            continue
-                        if not objects:
-                            continue
-                        if type_ == 'registration' and role == 'registrant':
-                            registrants |= set(objects)
-                        if not user_shown:
-                            print cformat('%{green}+++%{reset} '
-                                          '%{white!}{:6d}%{reset} %{cyan}{}%{reset}').format(user.id, user.full_name)
-                            user_shown = True
-                        print cformat('%{blue!}<->%{reset}        '
-                                      '%{yellow!}{:4d}%{reset}x  %{green!}{:12}  %{cyan!}{}%{reset}').format(
-                            len(objects), type_, role)
-                        for obj in objects:
-                            try:
-                                UserLink.create_link(user, obj, role, type_)
-                            except Exception as e:
-                                print cformat('%{red!}!!!%{reset}        '
-                                              '%{red!}linking failed%{reset} (%{yellow!}{}%{reset}): '
-                                              '{}').format(unicode(e), obj)
-
-                # add old "registrant" entries to registration/registrant
-                for reg in getattr(avatar, 'registrants', {}).itervalues():
-                    if reg.getConference().getOwner() and reg not in registrants:
-                        UserLink.create_link(user, reg, 'registrant', 'registration')
-                        print cformat('%{cyan!}<->%{reset}        '
-                                      '%{yellow!}   1%{reset}x  %{green!}{:12}  %{cyan!}{}%{reset}').format(
-                            'registration', 'registrant')
 
     def _user_from_avatar(self, avatar, **kwargs):
         email = sanitize_email(convert_to_unicode(avatar.email).lower().strip())
