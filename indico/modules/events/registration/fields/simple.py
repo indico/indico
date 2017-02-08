@@ -248,6 +248,8 @@ class FileField(RegistrationFormFieldBase):
 
     def process_form_data(self, registration, value, old_data=None, billable_items_locked=False):
         data = {'field_data': self.form_item.current_data}
+        if not value:
+            return data
         file_ = value['uploaded_file']
         if file_:
             # we have a file -> always save it
