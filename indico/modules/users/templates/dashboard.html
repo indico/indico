@@ -65,27 +65,6 @@
                 <div class="dashboard-box">
                     <h3>
                         {% trans %}Your events at hand{% endtrans %}
-                        {% if session.user.is_admin %}
-                            <a href="#" id="refresh-redis-links"
-                               style="float: right;" class="icon-loop"
-                               title="{% trans %}Admin tool: Refresh Redis links{% endtrans %}"></a>
-                            <script>
-                                $('#refresh-redis-links').on('click', function(e) {
-                                    e.preventDefault();
-                                    var killProgress = IndicoUI.Dialogs.Util.progress();
-                                    indicoRequest('user.refreshRedisLinks', {
-                                        userId: {{ user.id | tojson }}
-                                    }, function(result, error) {
-                                        if(error) {
-                                            killProgress();
-                                            IndicoUtil.errorReport(error);
-                                            return;
-                                        }
-                                        location.reload();
-                                    });
-                                });
-                            </script>
-                        {% endif %}
                     </h3>
                     <ol>
                         {% for event, roles in linked_events %}
