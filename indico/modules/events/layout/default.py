@@ -21,7 +21,6 @@ from flask import session
 from indico.modules.events.layout.util import MenuEntryData, get_menu_entry_by_name
 from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
 from indico.util.i18n import _
-from MaKaC.paperReviewing import ConferencePaperReview
 
 
 def _visibility_my_conference(event):
@@ -36,44 +35,6 @@ def _visibility_paper_review(event):
 def _visibility_paper_review_transfer(event):
     return (session.user and _visibility_paper_review(event) and
             has_contributions_with_user_as_submitter(event, session.user))
-
-
-def _visibility_role(event, role):
-    user = session.user
-    if user is None:
-        return False
-
-    roles = user.get_linked_roles('conference')
-    return role in roles and event.as_legacy in user.get_linked_objects('conference', role)
-
-
-def _visibility_paper_review_managment(event):
-    return _visibility_role(event, 'paperReviewManager')
-
-
-def _visibility_judge(event):
-    conf = event.as_legacy
-    return (_visibility_role(event, 'referee') and
-            (conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING or
-             conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
-
-
-def _visibility_contributions_as_reviewer(event):
-    conf = event.as_legacy
-    return (_visibility_role(event, 'reviewer') and
-            (conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING or
-             conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
-
-
-def _visibility_contributions_as_editor(event):
-    conf = event.as_legacy
-    return (_visibility_role(event, 'editor') and
-            (conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_REVIEWING or
-             conf.getConfPaperReview().getChoice() == ConferencePaperReview.CONTENT_AND_LAYOUT_REVIEWING))
-
-
-def _visibility_paper_assign(event):
-    return _visibility_paper_review_managment(event) and _visibility_judge(event)
 
 
 def get_default_menu_entries():
@@ -103,7 +64,7 @@ def get_default_menu_entries():
             title=_("Manage Paper Reviewing"),
             name='paper_setup',
             endpoint='event_mgmt.confModifReviewing-paperSetup',
-            visible=_visibility_paper_review_managment,
+            visible=_visibility_paper_review,
             position=0,
             parent='paper_reviewing_old'
         ),
@@ -111,7 +72,7 @@ def get_default_menu_entries():
             title=_("Assign Papers"),
             name='paper_assign',
             endpoint='event_mgmt.assignContributions',
-            visible=_visibility_paper_assign,
+            visible=_visibility_paper_review,
             position=1,
             parent='paper_reviewing_old'
         ),
@@ -119,7 +80,7 @@ def get_default_menu_entries():
             title=_("Referee Area"),
             name='contributions_to_judge',
             endpoint='event_mgmt.confListContribToJudge',
-            visible=_visibility_judge,
+            visible=_visibility_paper_review,
             position=2,
             parent='paper_reviewing_old'
         ),
@@ -127,7 +88,7 @@ def get_default_menu_entries():
             title=_("Content Reviewer Area"),
             name='contributions_as_reviewer',
             endpoint='event_mgmt.confListContribToJudge-asReviewer',
-            visible=_visibility_contributions_as_reviewer,
+            visible=_visibility_paper_review,
             position=3,
             parent='paper_reviewing_old'
         ),
@@ -135,7 +96,7 @@ def get_default_menu_entries():
             title=_("Layout Reviewer Area"),
             name='contributions_as_editor',
             endpoint='event_mgmt.confListContribToJudge-asEditor',
-            visible=_visibility_contributions_as_editor,
+            visible=_visibility_paper_review,
             position=4,
             parent='paper_reviewing_old'
         ),

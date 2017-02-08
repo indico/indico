@@ -81,12 +81,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
     def api_key(self):
         return self.user.api_key if self.user else None
 
-    def linkTo(self, obj, role):
-        pass
-
-    def unlinkTo(self, obj, role):
-        pass
-
     def getStatus(self):
         return 'deleted' if not self.user or self.user.is_deleted else 'activated'
 
@@ -218,25 +212,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         self.user.phone = to_unicode(phone)
 
     setPhone = setTelephone
-
-    def isRegisteredInConf(self, conf):
-        if not self.user:
-            return False
-        return any(obj for obj in self.user.get_linked_objects('registration', 'registrant')
-                   if obj.getConference() == conf)
-
-    def getRegistrantById(self, conf_id):
-        if not self.user:
-            return None
-        return next((obj for obj in self.user.get_linked_objects('registration', 'registrant')
-                    if obj.getConference().id == conf_id), None)
-
-    def containsUser(self, avatar):
-        if self.user is None:
-            return False
-        return int(avatar.id) == self.user.id if avatar else False
-
-    containsMember = containsUser
 
     def canModify(self, aw_or_user):
         if hasattr(aw_or_user, 'getUser'):

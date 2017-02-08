@@ -35,7 +35,6 @@ from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.favorites import favorite_user_table, favorite_category_table
-from indico.modules.users.models.links import UserLink
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import return_ascii, format_full_name, format_repr
@@ -317,13 +316,6 @@ class User(PersonMixin, db.Model):
         cascade='all, delete-orphan',
         backref=db.backref('user', lazy=True)
     )
-    #: the legacy objects the user is connected to
-    linked_objects = db.relationship(
-        'UserLink',
-        lazy='dynamic',
-        cascade='all, delete-orphan',
-        backref=db.backref('user', lazy=True)
-    )
     #: the active API key of the user
     api_key = db.relationship(
         'APIKey',
@@ -545,30 +537,6 @@ class User(PersonMixin, db.Model):
         db.session.flush()
         secondary.is_primary = True
         db.session.flush()
-
-    def get_linked_roles(self, type_):
-        """Retrieves the roles the user is linked to for a given type"""
-        return UserLink.get_linked_roles(self, type_)
-
-    def get_linked_objects(self, type_, role):
-        """Retrieves linked objects for the user"""
-        return UserLink.get_links(self, type_, role)
-
-    def link_to(self, obj, role):
-        """Adds a link between the user and an object
-
-        :param obj: a legacy object
-        :param role: the role to use in the link
-        """
-        return UserLink.create_link(self, obj, role)
-
-    def unlink_to(self, obj, role):
-        """Removes a link between the user and an object
-
-        :param obj: a legacy object
-        :param role: the role to use in the link
-        """
-        return UserLink.remove_link(self, obj, role)
 
     def synchronize_data(self, refresh=False):
         """Synchronize the fields of the user from the sync identity.
