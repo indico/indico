@@ -288,21 +288,6 @@ def merge_users(source, target, force=False):
     if target.is_deleted:
         raise ValueError('Target user {} has been deleted. Merge aborted.'.format(target))
 
-    # Merge links
-    for link in source.linked_objects:
-        if link.object is None:
-            # remove link if object does no longer exist
-            db.session.delete(link)
-        else:
-            link.user = target
-
-    # De-duplicate links
-    unique_links = {(link.object, link.role): link for link in target.linked_objects}
-    to_delete = set(target.linked_objects) - set(unique_links.viewvalues())
-
-    for link in to_delete:
-        db.session.delete(link)
-
     # Move emails to the target user
     primary_source_email = source.email
     logger.info("Target %s initial emails: %s", target, ', '.join(target.all_emails))

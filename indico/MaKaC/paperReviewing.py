@@ -574,7 +574,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
             raise MaKaCError("This referee has already been added to this conference")
         else:
             self._refereesList.append(newReferee)
-            newReferee.linkTo(self._conference, "referee")
             if not self._userCompetences.has_key(newReferee):
                 self._userCompetences[newReferee] = []
             self.notifyModification()
@@ -597,7 +596,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
                     self.clearUserCompetences(referee)
                     del(self._userCompetences[referee])
             self._refereesList.remove(referee)
-            referee.unlinkTo(self._conference, "referee")
             self.notifyModification()
             if self._enableRefereeEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(referee, 'Referee', self._conference)
@@ -627,7 +625,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
             raise MaKaCError("This editor has already been added to this conference")
         else:
             self._editorsList.append(newEditor)
-            newEditor.linkTo(self._conference, "editor")
             if not self._userCompetences.has_key(newEditor):
                 self._userCompetences[newEditor] = []
             self.notifyModification()
@@ -649,7 +646,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
                     self.clearUserCompetences(editor)
                     del(self._userCompetences[editor])
             self._editorsList.remove(editor)
-            editor.unlinkTo(self._conference, "editor")
             self.notifyModification()
             if self._enableEditorEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(editor, 'Layout Reviewer', self._conference)
@@ -679,7 +675,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
             raise MaKaCError("This reviewer has already been added to this conference")
         else:
             self._reviewersList.append(newReviewer)
-            newReviewer.linkTo(self._conference, "reviewer")
             if not self._userCompetences.has_key(newReviewer):
                 self._userCompetences[newReviewer] = []
             self.notifyModification()
@@ -701,7 +696,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
                     self.clearUserCompetences(reviewer)
                     del(self._userCompetences[reviewer])
             self._reviewersList.remove(reviewer)
-            reviewer.unlinkTo(self._conference, "reviewer")
             self.notifyModification()
             if self._enableReviewerEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(reviewer, 'Content Reviewer', self._conference)
@@ -731,7 +725,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
             raise MaKaCError("This paper review manager has already been added to this conference")
         else:
             self._paperReviewManagersList.append(newPaperReviewManager)
-            newPaperReviewManager.linkTo(self._conference, "paperReviewManager")
             if not self._userCompetences.has_key(newPaperReviewManager):
                 self._userCompetences[newPaperReviewManager] = []
             self.notifyModification()
@@ -753,7 +746,6 @@ class ConferencePaperReview(ConferencePaperReviewLegacyMixin, Persistent):
                     self.clearUserCompetences(paperReviewManager)
                     del(self._userCompetences[paperReviewManager])
             self._paperReviewManagersList.remove(paperReviewManager)
-            paperReviewManager.unlinkTo(self._conference, "paperReviewManager")
             self.notifyModification()
             if self._enablePRMEmailNotif == True:
                 notification = ConferenceReviewingRemoveNotification(paperReviewManager, 'Paper Review Manager', self._conference)
