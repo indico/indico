@@ -22,8 +22,6 @@ from indico.modules.auth import Identity
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.string import to_unicode, return_ascii, encode_utf8
-from indico.util.redis import write_client as redis_write_client
-from indico.util.redis import avatar_links
 from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 
@@ -84,23 +82,10 @@ class AvatarUserWrapper(Persistent, Fossilizable):
         return self.user.api_key if self.user else None
 
     def linkTo(self, obj, role):
-        if not self.user or self.user.is_deleted:
-            return
-        link = self.user.link_to(obj, role)
-        if link and redis_write_client:
-            event = avatar_links.event_from_obj(obj)
-            if event:
-                avatar_links.add_link(self.user, event, '{}_{}'.format(link.type, link.role))
+        pass
 
     def unlinkTo(self, obj, role):
-        if not self.user or self.user.is_deleted:
-            return
-        links = self.user.unlink_to(obj, role)
-        if redis_write_client:
-            for link in links:
-                event = avatar_links.event_from_obj(obj)
-                if event:
-                    avatar_links.del_link(self.user, event, '{}_{}'.format(link.type, link.role))
+        pass
 
     def getStatus(self):
         return 'deleted' if not self.user or self.user.is_deleted else 'activated'

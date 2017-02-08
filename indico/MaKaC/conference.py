@@ -36,8 +36,6 @@ from indico.modules.events.operations import create_event, update_event
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
-from indico.util.redis import avatar_links
-from indico.util.redis import write_client as redis_write_client
 from indico.util.string import return_ascii, is_legacy_id, to_unicode
 from indico.util.user import unify_user_args
 
@@ -401,9 +399,6 @@ class Conference(CommonObjectBase):
     def delete(self, user=None):
         signals.event.deleted.send(self, user=user)
         ConferenceHolder().remove(self)
-        # Remove all links in redis
-        if redis_write_client:
-            avatar_links.delete_event(self)
         TrashCanManager().add(self)
         self._p_changed = True
 
@@ -472,10 +467,6 @@ class Conference(CommonObjectBase):
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()
-
-        # Update redis link timestamp
-        if redis_write_client:
-            avatar_links.update_event_time(self)
 
         #if everything went well, we notify the observers that the start date has changed
         if notifyObservers:
