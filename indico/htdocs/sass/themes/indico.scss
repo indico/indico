@@ -402,12 +402,18 @@ div.event-header {
 
     &.break {
         color: $tt-secondary-color !important;
+        border-color: $tt-secondary-color;
 
         .end-time {
             color: $tt-secondary-color !important;
         }
-        .start-time {
+
+        &.top-level .start-time {
             @include ribbon($tt-secondary-color);
+        }
+
+        &.nested .start-time {
+            background-color: $tt-secondary-color;
         }
     }
 
