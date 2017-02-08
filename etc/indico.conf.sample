@@ -465,3 +465,6 @@ MaxUploadFileSize = 0
 # Existing files are taken from whatever backend was used when they have been
 # uploaded.
 #AttachmentStorage = 'default'
+# Static sites can be stored in a different backend.  If not set, the attachment
+# storage backend will be used.
+#StaticSiteStorage = None

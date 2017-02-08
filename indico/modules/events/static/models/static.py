@@ -107,7 +107,7 @@ class StaticSite(StoredFileMixin, db.Model):
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))
-        return Config.getInstance().getAttachmentStorage(), path
+        return Config.getInstance().getStaticSiteStorage(), path
 
     @return_ascii
     def __repr__(self):
