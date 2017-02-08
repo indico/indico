@@ -145,9 +145,6 @@ definitions:
   sa2:
     <<: *standard
     stylesheet: staff_assoc_modern.scss
-    settings:
-      show_numerals: true
-      hide_time: true
     title: Staff Association
 
   # Meetings - CERN Administrative
