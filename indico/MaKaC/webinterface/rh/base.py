@@ -70,7 +70,6 @@ from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.locators import get_locator
-from indico.util.redis import RedisError
 from indico.util.string import truncate
 from indico.web.flask.util import ResponseUtil, url_for
 
@@ -221,7 +220,6 @@ class RH(RequestHandlerBase):
         self._startTime = None
         self._endTime = None
         self._tempFilesToDelete = []
-        self._redisPipeline = None
         self._doProcess = True  # Flag which indicates whether the RH process
                                 # must be carried out; this is useful for
                                 # the checkProtection methods when they
@@ -570,9 +568,6 @@ class RH(RequestHandlerBase):
         flush_after_commit_queue(False)
         # delete all queued emails
         GenericMailer.flushQueue(False)
-        # clear the existing redis pipeline
-        if self._redisPipeline:
-            self._redisPipeline.reset()
 
     def _process_retry_auth_check(self, params):
         self._setSessionUser()
@@ -647,12 +642,6 @@ class RH(RequestHandlerBase):
             self._deleteTempFiles()
         except:
             Logger.get('mail').exception('Mail sending operation failed')
-        # execute redis pipeline if we have one
-        if self._redisPipeline:
-            try:
-                self._redisPipeline.execute()
-            except RedisError:
-                Logger.get('redis').exception('Could not execute pipeline')
 
     def process(self, params):
         if request.method not in HTTP_VERBS:

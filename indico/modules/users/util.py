@@ -34,9 +34,6 @@ from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.util.event import truncate_path
-from indico.util.redis import write_client as redis_write_client
-from indico.util.redis import client as redis_client
-from indico.util.redis import avatar_links
 from indico.util.string import crc32
 
 # colors for user-specific avatar bubbles
@@ -79,8 +76,6 @@ def get_related_categories(user, detailed=True):
 
 def get_suggested_categories(user):
     """Gets the suggested categories of a user for the dashboard"""
-    if not redis_write_client:
-        return []
     related = set(get_related_categories(user, detailed=False))
     res = []
     category_strategy = contains_eager('category')
@@ -331,10 +326,6 @@ def merge_users(source, target, force=False):
     # Merge identities
     for identity in set(source.identities):
         identity.user = target
-
-    # Merge avatars in redis
-    if redis_write_client:
-        avatar_links.merge_avatars(target, source)
 
     # Notify signal listeners about the merge
     signals.users.merged.send(target, source=source)

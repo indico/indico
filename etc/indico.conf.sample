@@ -44,16 +44,6 @@ SQLAlchemyDatabaseURI  = 'postgresql://localhost/indico'
 # SQLAlchemyMaxOverflow = 3
 
 #------------------------------------------------------------------------------
-# REDIS
-#------------------------------------------------------------------------------
-
-# To enable redis, specify a valid redis connection string here.
-# Example: redis://unused:password@localhost:6379/0
-# You also need to install the python redis client (pip install redis hiredis)
-# Note that the Redis server needs to run at least Redis 2.6 with LUA support.
-#RedisConnectionURL = None
-
-#------------------------------------------------------------------------------
 # SECURITY
 #------------------------------------------------------------------------------
 # Possible values of SanitizationLevel:

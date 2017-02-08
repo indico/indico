@@ -21,10 +21,11 @@ import os
 import time
 from itertools import izip
 
+import redis
+
 from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.util.fs import silentremove
-from indico.util.redis import redis
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.utils import OSSpecific
 
