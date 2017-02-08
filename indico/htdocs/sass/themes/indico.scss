@@ -282,7 +282,7 @@ div.event-header {
     }
 
     .timetable-item {
-        @extend .flexrow;
+        display: flex;
 
         &:not(:first-child) {
             margin-top: 1em;
@@ -395,6 +395,7 @@ div.event-header {
 
         margin-right: 0.5em;
         border-right: 3px solid $tt-nested-time-color;
+
         .start-time {
             background-color: $tt-nested-time-color;
         }
@@ -494,12 +495,16 @@ a.lecture-series-link {
 }
 
 .timetable-item:target {
-    .timetable-time.nested {
+    .timetable-time {
         border-color: $selected-color;
 
         .start-time {
             background-color: $selected-color;
         }
+    }
+
+    .timetable-title {
+        color: $selected-color !important;
     }
 
     &.timetable-block > .timetable-time .start-time {
