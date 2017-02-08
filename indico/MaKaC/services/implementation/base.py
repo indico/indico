@@ -173,7 +173,6 @@ class ServiceBase(RequestHandlerBase):
                                 #   must be carried out; this is useful for
                                 #   the checkProtection methods
         self._tempFilesToDelete = []
-        self._redisPipeline = None
 
     # Methods =============================================================
 

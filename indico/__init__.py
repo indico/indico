@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.patches import apply_patches
 from indico.util.mimetypes import register_custom_mimetypes
 
 register_custom_mimetypes()
-
-# monkey-patches for older Python versions
-apply_patches()

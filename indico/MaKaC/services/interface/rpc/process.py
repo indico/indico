@@ -37,10 +37,8 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error, ConstraintViolated
-from indico.core.logger import Logger
 from indico.core.errors import NoReportError as NoReportIndicoError
 from indico.core.db.util import flush_after_commit_queue
-from indico.util.redis import RedisError
 from indico.util import fossilize
 
 
@@ -99,15 +97,8 @@ class ServiceRunner(object):
         DBMgr.getInstance().sync()
 
     def _invokeMethodSuccess(self):
-        rh = ContextManager.get('currentRH')
-
         flush_after_commit_queue(True)  # run after-commit functions
         GenericMailer.flushQueue(True)  # send emails
-        if rh._redisPipeline:
-            try:
-                rh._redisPipeline.execute()
-            except RedisError:
-                Logger.get('redis').exception('Could not execute pipeline')
 
     def invokeMethod(self, method, params):
         cfg = Config.getInstance()

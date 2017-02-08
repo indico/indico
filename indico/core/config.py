@@ -211,7 +211,6 @@ class Config:
         'SQLAlchemyMaxOverflow'     : 3,
         'EnableRoomBooking'         : True,
         'MaxRetries'                : 10,
-        'RedisConnectionURL'        : None,
         'SanitizationLevel'         : 1,
         'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost/',
@@ -390,19 +389,6 @@ class Config:
 
         if self.getCSRFLevel() not in range(4):
             raise MaKaCError("Invalid CSRFLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['CSRFLevel']))
-
-        if self.getRedisConnectionURL():
-            # Rest if redis is available and if we can connect
-            try:
-                import redis
-                redis.StrictRedis.from_url(self.getRedisConnectionURL())
-                # a redis ping here would be nice but we do not have a working logger yet
-            except ImportError, e:
-                raise MaKaCError('Could not import redis: %s' % e.message)
-
-        else:
-            if self.getCacheBackend() == 'redis':
-                raise MaKaCError('Cannot use redis CacheBackend with no RedisConnectionURL')
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
