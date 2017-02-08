@@ -99,7 +99,7 @@ class RHUserBase(RHProtected):
 class RHUserDashboard(RHUserBase):
     management_roles = {'conference_creator', 'conference_chair', 'conference_manager', 'session_manager',
                         'session_coordinator', 'contribution_manager'}
-    reviewer_roles = {'conference_paperReviewManager', 'conference_referee', 'conference_editor', 'conference_reviewer',
+    reviewer_roles = {'paper_manager', 'paper_judge', 'paper_content_reviewer', 'paper_layour_reviewer',
                       'contribution_referee', 'contribution_editor', 'contribution_reviewer', 'abstract_reviewer',
                       'track_convener'}
     attendance_roles = {'contributor', 'contribution_submission', 'abstract_submitter', 'abstract_person',
