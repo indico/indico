@@ -18,23 +18,27 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import flash, redirect, session, request
+from flask import flash, redirect, session, request, signals
 from markupsafe import Markup
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.core.db import db
+from indico.core.db.event import SupportInfo
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.categories.models.categories import Category
-from indico.modules.events import EventLogRealm, EventLogKind
+from indico.modules.categories.util import get_visibility_options
+from indico.modules.events import EventLogRealm, EventLogKind, logger
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
-from indico.modules.events.management.forms import EventProtectionForm
+from indico.modules.events.management.forms import EventProtectionForm, GeneralSettingsForm, BasicSettingsForm, \
+    SupportInfoForm
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.operations import delete_event, create_event_references, update_event
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
-from indico.modules.events.util import get_object_from_args, update_object_principals
+from indico.modules.events.util import get_object_from_args, update_object_principals, track_time_changes
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -274,3 +278,53 @@ class RHManageEventPersonLinks(RHConferenceModifBase):
             return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
         self.commit = False
         return jsonify_form(form)
+
+
+class RHGeneralSettings(RHConferenceModifBase):
+    """General settings"""
+    CSRF_ENABLED = True
+
+    def _process(self):
+        form = GeneralSettingsForm(obj=self.event_new, event=self.event_new)
+        # form = GeneralSettingsForm(obj=FormDefaults(self.event_new))
+
+        # form.event_type.data = self.event_new._type
+        if form.validate_on_submit():
+            print 'form submitted'
+            with track_time_changes():
+                update_event(self.event_new, form.data)
+            return redirect(url_for('.settings', self.event_new))
+        return WPEventManagement.render_template('general_settings.html', self._conf, event=self.event_new, form=form)
+
+
+class RHSettingsBase(RHConferenceModifBase):
+    CSRF_ENABLED = True
+
+
+class RHSettingsBasic(RHSettingsBase):
+    def _process(self):
+        form = BasicSettingsForm(obj=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, form.data)
+            return jsonify_data()
+        return jsonify_form(form)
+
+
+class RHSettingsSupport(RHConferenceModifBase):
+    def _update_support_info(self, data):
+        support_info = self.event_new.as_legacy.getSupportInfo()
+        support_info.setCaption(data['support_caption'])
+        support_info.setEmail(data['support_email'])
+        support_info.setTelephone(data['support_phone'])
+        self.event_new.as_legacy.setSupportInfo(support_info)
+
+
+    def _process(self):
+        form = SupportInfoForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
+        if form.validate_on_submit():
+            self._update_support_info(form.data)
+            self.event_new.as_legacy.setContactInfo(form.data['contact_info'])
+            db.session.flush()
+            return jsonify_data()
+        return jsonify_form(form)
+

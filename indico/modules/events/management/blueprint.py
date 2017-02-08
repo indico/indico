@@ -21,7 +21,8 @@ from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockE
                                                           RHShowNonInheriting, RHEventProtection,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
                                                           RHManageReferences, RHManageEventLocation,
-                                                          RHManageEventPersonLinks, RHManageEventKeywords)
+                                                          RHManageEventPersonLinks, RHManageEventKeywords,
+                                                          RHGeneralSettings, RHSettingsBasic, RHSettingsSupport)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -29,6 +30,9 @@ _bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
                       virtual_template_folder='events/management',
                       url_prefix='/event/<confId>/manage')
 
+_bp.add_url_rule('/settings', 'settings', RHGeneralSettings, methods=('GET', 'POST'))
+_bp.add_url_rule('/settings/basic', 'settings_basic', RHSettingsBasic, methods=('GET', 'POST'))
+_bp.add_url_rule('/settings/support', 'settings_support', RHSettingsSupport, methods=('GET', 'POST'))
 _bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', RHUnlockEvent, methods=('POST',))

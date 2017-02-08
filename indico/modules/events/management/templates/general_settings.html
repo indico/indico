@@ -1,0 +1,56 @@
+{% extends 'layout/base.html' %}
+{% from 'forms/_form.html' import simple_form, form_fieldset, form_rows %}
+
+{% block title %}
+    {% trans %}General Settings{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-file-content"></div>
+            <div class="text">
+                <div class="label">{% trans %}Basic settings{% endtrans %}</div>
+                {%- trans %}Title and description{% endtrans -%}
+            </div>
+            <div class="toolbar">
+                <a href="#" class="i-button icon-settings"
+                   data-href="{{ url_for('event_management.settings_basic', event)}}"
+                   data-method="POST"
+                   data-reload-after
+                   data-ajax-dialog>
+                    {%- trans %}Configure{% endtrans -%}
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="action-box">
+        <div class="section">
+            <div class="icon icon-file-content"></div>
+            <div class="text">
+                <div class="label">{% trans %}Support{% endtrans %}</div>
+                {%- trans %}Support info, additional info and organizers{% endtrans -%}
+            </div>
+            <div class="toolbar">
+                <a href="#" class="i-button icon-settings"
+                   data-href="{{ url_for('event_management.settings_support', event)}}"
+                   data-method="POST"
+                   data-reload-after
+                   data-ajax-dialog>
+                    {%- trans %}Configure{% endtrans -%}
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+{#    {{ simple_form(form, back_button=false) }}#}
+{#    {% call simple_form(form, back_button=false) %}#}
+{#        {% for legend, fields in form._fieldsets %}#}
+{#            {% call form_fieldset(legend, collapsible=true) %}#}
+{#                {{ form_rows(form, fields=fields) }}#}
+{#            {% endcall %}#}
+{#        {% endfor %}#}
+{#    {% endcall %}#}
+{% endblock %}
