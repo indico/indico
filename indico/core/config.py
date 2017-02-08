@@ -281,6 +281,7 @@ class Config:
         'FlowerURL'                 : None,
         'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
         'AttachmentStorage'         : 'default',
+        'StaticSiteStorage'         : None,
         'TrackerURL'                : 'http://localhost:5000/api'
     }
 
@@ -352,6 +353,7 @@ class Config:
             'ImagesBaseURL'             : self.getImagesBaseURL(),
             'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
             'Version'                   : MaKaC.__version__,
+            'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
         })
 
     def __readConfigFile(self):
