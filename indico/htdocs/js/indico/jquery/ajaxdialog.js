@@ -265,7 +265,7 @@
             var forms = popup.contentContainer.find('form');
             showFormErrors(popup.resultContainer);
             initForms(forms);
-            forms.each(function() {
+            forms.filter(':not([data-no-ajax])').each(function() {
                 var $this = $(this);
                 $this.on('ajaxForm:beforeSubmit', function() {
                     killProgress = IndicoUI.Dialogs.Util.progress();

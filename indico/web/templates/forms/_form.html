@@ -8,12 +8,14 @@
     </ul>
 {%- endmacro %}
 
-{% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=false, i_form=true) -%}
+{% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=false,
+                     i_form=true, no_ajax=false) -%}
     <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %}
           class="{% if i_form %}i-form {% endif %}{{ orientation }} {{ classes }}"
           {% if id %}id="{{ id }}"{% endif %}
           {% if multipart %}enctype="multipart/form-data"{% endif %}
-          {% if caller %}{{ caller() }}{% endif %}>
+          {% if caller %}{{ caller() }}{% endif %}
+          {% if no_ajax %}data-no-ajax{% endif %}>
         {% if form.csrf_enabled -%}
             {{ form.csrf_token() }}
         {% endif %}
