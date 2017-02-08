@@ -14,8 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from sqlalchemy.orm import noload, load_only
+
 from indico.core.db import db
+from indico.modules.events import Event
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.users import User
 
 
@@ -39,3 +45,22 @@ def get_user_contributions_to_review(event, user):
     contribs = _query_contributions_with_user_as_reviewer(event, user).all()
     contribs = [contrib for contrib in contribs if not contrib.paper.last_revision.has_user_reviewed(user)]
     return contribs
+
+
+def get_events_with_paper_roles(user, dt=None):
+    """
+    Get the IDs and PR roles of events where the user has any kind
+    of paper reviewing privileges.
+
+    :param user: A `User`
+    :param dt: Only include events taking place on/after that date
+    :return: A dict mapping event IDs to a set of roles
+    """
+    paper_roles = {'paper_manager', 'paper_judge', 'paper_content_reviewer', 'paper_layout_reviewer'}
+    role_criteria = [EventPrincipal.has_management_role(role, explicit=True) for role in paper_roles]
+    query = (user.in_event_acls
+             .join(Event)
+             .options(noload('user'), noload('local_group'), load_only('event_id', 'roles'))
+             .filter(~Event.is_deleted, Event.ends_after(dt))
+             .filter(db.or_(*role_criteria)))
+    return {principal.event_id: set(principal.roles) & paper_roles for principal in query}
