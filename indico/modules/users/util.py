@@ -120,39 +120,39 @@ def get_linked_events(user, dt, limit=None):
 
     links = OrderedDict()
     for event_id in get_events_registered(user, dt):
-        links.setdefault(str(event_id), set()).add('registration_registrant')
+        links.setdefault(event_id, set()).add('registration_registrant')
     for event_id in get_events_with_submitted_surveys(user, dt):
-        links.setdefault(str(event_id), set()).add('survey_submitter')
+        links.setdefault(event_id, set()).add('survey_submitter')
     for event_id in get_events_managed_by(user, dt):
-        links.setdefault(str(event_id), set()).add('conference_manager')
+        links.setdefault(event_id, set()).add('conference_manager')
     for event_id in get_events_created_by(user, dt):
-        links.setdefault(str(event_id), set()).add('conference_creator')
+        links.setdefault(event_id, set()).add('conference_creator')
     for event_id, principal_roles in get_events_with_linked_sessions(user, dt).iteritems():
-        links.setdefault(str(event_id), set()).update(principal_roles)
+        links.setdefault(event_id, set()).update(principal_roles)
     for event_id, principal_roles in get_events_with_linked_contributions(user, dt).iteritems():
-        links.setdefault(str(event_id), set()).update(principal_roles)
+        links.setdefault(event_id, set()).update(principal_roles)
     for event_id in get_events_with_linked_event_persons(user, dt):
-        links.setdefault(str(event_id), set()).add('conference_chair')
+        links.setdefault(event_id, set()).add('conference_chair')
     for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).iteritems():
-        links.setdefault(str(event_id), set()).update(roles)
+        links.setdefault(event_id, set()).update(roles)
     for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
-        links.setdefault(str(event_id), set()).update(roles)
+        links.setdefault(event_id, set()).update(roles)
     for event_id, roles in get_events_with_paper_roles(user, dt).iteritems():
-        links.setdefault(str(event_id), set()).update(roles)
+        links.setdefault(event_id, set()).update(roles)
 
     if not links:
         return OrderedDict()
 
     query = (Event.query
              .filter(~Event.is_deleted,
-                     Event.id.in_(map(int, links)))
+                     Event.id.in_(links))
              .options(joinedload('series'),
                       load_only('id', 'category_id', 'title', 'start_dt', 'end_dt',
                                 'series_id', 'series_pos', 'series_count'))
              .order_by(Event.start_dt, Event.id))
     if limit is not None:
         query = query.limit(limit)
-    return OrderedDict((event, links[str(event.id)]) for event in query)
+    return OrderedDict((event, links[event.id]) for event in query)
 
 
 def serialize_user(user):
