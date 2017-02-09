@@ -25,10 +25,8 @@ from persistent.list import PersistentList
 from pytz import timezone
 from werkzeug.exceptions import Forbidden
 
-from indico.core import signals
 from indico.core.config import Config
 from indico.util import json
-from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.conference import RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.common.info import HelperMaKaCInfo
@@ -126,39 +124,6 @@ class RHConfScreenDatesEdit(RHConferenceModifBase):
             return
         p = conferences.WPScreenDatesEdit(self, self._target)
         return p.display()
-
-
-class RHConferenceModifManagementAccess( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfManagementAccess
-    _tohttps = True
-
-    def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
-        self._isPRM = RCPaperReviewManager.hasRights(self)
-        self._isReferee = RCReferee.hasRights(self)
-        self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self.event_new),
-                                               single_value=True)
-
-    def _checkProtection(self):
-        if not (self._isPRM or self._isReferee or self._requests_manager or self._plugin_urls):
-            RHConferenceModifBase._checkProtection(self)
-
-    def _process(self):
-        url = None
-        if self._conf.canModify(self.getAW()):
-            url = urlHandlers.UHConferenceModification.getURL( self._conf )
-
-        elif self._isPRM:
-            url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
-        elif self._isReferee:
-            url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
-        elif self._plugin_urls:
-            url = next(iter(self._plugin_urls), None)
-        if not url:
-            url = urlHandlers.UHConfManagementAccess.getURL( self._conf )
-
-        self._redirect(url)
 
 
 class RHConfDataModif(RHConferenceModifBase):
