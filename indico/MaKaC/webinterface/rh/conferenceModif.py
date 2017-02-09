@@ -27,10 +27,9 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.modules.events.requests.util import is_request_manager
 from indico.util import json
 from indico.util.signals import values_from_signal
-from indico.web.flask.util import send_file, url_for
+from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.conference import RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import MaKaCError, FormValuesError
@@ -138,7 +137,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifBase ):
         from MaKaC.webinterface.rh.reviewingModif import RCPaperReviewManager, RCReferee
         self._isPRM = RCPaperReviewManager.hasRights(self)
         self._isReferee = RCReferee.hasRights(self)
-        self._requests_manager = is_request_manager(session.user)
         self._plugin_urls = values_from_signal(signals.event_management.management_url.send(self.event_new),
                                                single_value=True)
 
@@ -155,8 +153,6 @@ class RHConferenceModifManagementAccess( RHConferenceModifBase ):
             url = urlHandlers.UHConfModifReviewingPaperSetup.getURL( self._conf )
         elif self._isReferee:
             url = urlHandlers.UHConfModifReviewingAssignContributionsList.getURL( self._conf )
-        elif self._requests_manager:
-            url = url_for('requests.event_requests', self._conf)
         elif self._plugin_urls:
             url = next(iter(self._plugin_urls), None)
         if not url:
