@@ -32,7 +32,7 @@
     {% endset %}
     {% set endlink='</a>' %}
     {% set text = caller(link|safe, endlink|safe) %}
-    {% call message_box('warning', classes='review-instructions') %}
+    {% call message_box('warning', classes='review-instructions', fixed_width=true) %}
         {{ text }}
         <div class="hidden-instructions weak-hidden">
             {{ instructions | markdown }}
