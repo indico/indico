@@ -176,7 +176,7 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
     @property
     def score(self):
-        ratings = [r for r in self.ratings if not r.question.no_score]
+        ratings = [r for r in self.ratings if not r.question.no_score and not r.question.is_deleted]
         if not ratings:
             return None
         return sum(x.value for x in ratings) / len(ratings)
