@@ -17,7 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.events import event_management_object_url_prefixes
-from indico.modules.events.management.controllers import (RHDeleteEvent, RHLockEvent, RHUnlockEvent,
+from indico.modules.events.management.controllers import (RHEventManagementDashboard,
+                                                          RHDeleteEvent, RHLockEvent, RHUnlockEvent,
                                                           RHShowNonInheriting, RHEventProtection,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
                                                           RHManageReferences, RHManageEventLocation,
@@ -30,6 +31,7 @@ _bp = IndicoBlueprint('event_management', __name__, template_folder='templates',
                       virtual_template_folder='events/management',
                       url_prefix='/event/<confId>/manage')
 
+_bp.add_url_rule('/', 'dashboard', RHEventManagementDashboard)
 _bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', RHUnlockEvent, methods=('POST',))
