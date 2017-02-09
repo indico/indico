@@ -385,8 +385,9 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
     // "wrapper" is the actual Indico API object that represents an editor
 
     try {
-        config = {
+        var config = {
             language: userLanguage,
+            entities: false,
             width   : width,
             height  : height - 75,
             //CKEDITOR Custom Config
@@ -422,7 +423,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
                 {
                     each(callbacks, function(func) {
                         func();
-                    })
+                    });
                 });
 
         // process onLoad events for each individual instance (wrapper)
