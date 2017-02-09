@@ -53,10 +53,17 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 poster_cache = GenericCache('poster-printing')
 
 
-class RHEventManagementDashboard(RHConferenceModifBase):
-    """Main event management dashboard"""
+class RHManageEventBase(RHConferenceModifBase):
+    """Base class for event management RHs"""
 
     CSRF_ENABLED = True
+
+    def _process(self):
+        return RH._process(self)
+
+
+class RHEventManagementDashboard(RHManageEventBase):
+    """Main event management dashboard"""
 
     def _checkProtection(self):
         if not session.user:
@@ -75,13 +82,8 @@ class RHEventManagementDashboard(RHConferenceModifBase):
         return WPEventDashboard.render_template('dashboard.html', self._conf)
 
 
-class RHDeleteEvent(RHConferenceModifBase):
+class RHDeleteEvent(RHManageEventBase):
     """Delete an event."""
-
-    CSRF_ENABLED = True
-
-    def _process(self):
-        return RH._process(self)
 
     def _process_GET(self):
         return jsonify_template('events/management/delete_event.html', event=self.event_new)
@@ -99,18 +101,13 @@ class RHDeleteEvent(RHConferenceModifBase):
         return jsonify_data(url=redirect_url, flash=False)
 
 
-class RHLockEvent(RHConferenceModifBase):
+class RHLockEvent(RHManageEventBase):
     """Lock an event."""
 
-    CSRF_ENABLED = True
-
     def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
+        RHManageEventBase._checkProtection(self)
         if not can_lock(self.event_new, session.user):
             raise Forbidden
-
-    def _process(self):
-        return RH._process(self)
 
     def _process_GET(self):
         return jsonify_template('events/management/lock_event.html')
@@ -121,14 +118,12 @@ class RHLockEvent(RHConferenceModifBase):
         return jsonify_data(url=url_for('event_mgmt.conferenceModification', self.event_new), flash=False)
 
 
-class RHUnlockEvent(RHConferenceModifBase):
+class RHUnlockEvent(RHManageEventBase):
     """Unlock an event."""
-
-    CSRF_ENABLED = True
 
     def _checkProtection(self):
         self._allowClosed = can_lock(self.event_new, session.user)
-        RHConferenceModifBase._checkProtection(self)
+        RHManageEventBase._checkProtection(self)
 
     def _process(self):
         self._conf.setClosed(False)
@@ -163,11 +158,11 @@ class RHContributionPersonListMixin:
                                 event_persons=contribution_persons_dict, event=self.event_new)
 
 
-class RHShowNonInheriting(RHConferenceModifBase):
+class RHShowNonInheriting(RHManageEventBase):
     """Show a list of non-inheriting child objects"""
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self.obj = get_object_from_args()[2]
         if self.obj is None:
             raise NotFound
@@ -177,14 +172,14 @@ class RHShowNonInheriting(RHConferenceModifBase):
         return jsonify_template('events/management/non_inheriting_objects.html', objects=objects)
 
 
-class RHEventACL(RHConferenceModifBase):
+class RHEventACL(RHManageEventBase):
     """Display the inherited ACL of the event"""
 
     def _process(self):
         return render_acl(self.event_new)
 
 
-class RHEventACLMessage(RHConferenceModifBase):
+class RHEventACLMessage(RHManageEventBase):
     """Render the inheriting ACL message"""
 
     def _process(self):
@@ -193,10 +188,8 @@ class RHEventACLMessage(RHConferenceModifBase):
                                 endpoint='event_management.acl')
 
 
-class RHEventProtection(RHConferenceModifBase):
+class RHEventProtection(RHManageEventBase):
     """Show event protection"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
@@ -240,13 +233,11 @@ class RHEventProtection(RHConferenceModifBase):
             self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg, session.user)
 
 
-class RHMoveEvent(RHConferenceModifBase):
+class RHMoveEvent(RHManageEventBase):
     """Move event to a different category"""
 
-    CSRF_ENABLED = True
-
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self.target_category = Category.get_one(int(request.form['target_category_id']), is_deleted=False)
         if not self.target_category.can_create_events(session.user):
             raise Forbidden(_("You may only move events to categories where you are allowed to create events."))
@@ -263,9 +254,7 @@ class RHMoveEvent(RHConferenceModifBase):
         return jsonify_data(flash=False)
 
 
-class RHManageReferences(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
+class RHManageReferences(RHManageEventBase):
     def _process(self):
         form = EventReferencesForm(obj=FormDefaults(references=self.event_new.references))
         if form.validate_on_submit():
@@ -276,9 +265,7 @@ class RHManageReferences(RHConferenceModifBase):
         return jsonify_form(form)
 
 
-class RHManageEventLocation(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
+class RHManageEventLocation(RHManageEventBase):
     def _process(self):
         form = EventLocationForm(obj=self.event_new)
         if form.validate_on_submit():
@@ -289,9 +276,7 @@ class RHManageEventLocation(RHConferenceModifBase):
         return jsonify_form(form)
 
 
-class RHManageEventKeywords(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
+class RHManageEventKeywords(RHManageEventBase):
     def _process(self):
         form = EventKeywordsForm(obj=self.event_new)
         if form.validate_on_submit():
@@ -301,9 +286,7 @@ class RHManageEventKeywords(RHConferenceModifBase):
         return jsonify_form(form)
 
 
-class RHManageEventPersonLinks(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
+class RHManageEventPersonLinks(RHManageEventBase):
     def _process(self):
         form = EventPersonLinkForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
         if form.validate_on_submit():
