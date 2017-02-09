@@ -45,6 +45,12 @@ def _extend_event_management_menu(sender, event, **kwargs):
     return SideMenuItem('requests', _('Logistics'), url_for('requests.event_requests', event), section='services')
 
 
+@signals.event_management.management_url.connect
+def _get_event_management_url(event, **kwargs):
+    if is_request_manager(session.user):
+        return url_for('requests.event_requests', event)
+
+
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     Request.find(created_by_id=source.id).update({Request.created_by_id: target.id})
