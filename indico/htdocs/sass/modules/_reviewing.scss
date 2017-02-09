@@ -129,7 +129,8 @@
 
             li {
                 background-color: $light-gray;
-                display: block;
+                display: inline-flex;
+                align-items: center;
             }
         }
     }
