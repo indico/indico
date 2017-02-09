@@ -49,7 +49,7 @@
 	url = https://github.com/running-coder/jquery-typeahead.git
 [submodule "ext_modules/selectize.js"]
 	path = ext_modules/selectize.js
-	url = https://github.com/brianreavis/selectize.js.git
+	url = https://github.com/selectize/selectize.js.git
 [submodule "ext_modules/chartist.js"]
 	path = ext_modules/chartist.js
 	url = git://github.com/gionkunz/chartist-js.git
