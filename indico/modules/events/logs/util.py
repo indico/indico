@@ -34,16 +34,13 @@ def get_log_renderers():
 def make_diff_log(changes, fields):
     """Create a value for log data containing change information.
 
-    :param: a dict mapping attributes to ``(old, new)`` tuples
-    :param: a dict mapping attributes to field metadata.  for simple
-            cases this may be a string with the human-friendly title,
-            for more advanced fields it should be a dict containing
-            ``title``, a ``type`` string and a ``convert`` callback
-            which will be invoked with a tuple containing the old and
-            new value
-    :param: a dict overriding type information for attributes. can be
-            a string or a function that takes a tuple with the old/new
-            value and returns a ``(type, changes)`` tuple
+    :param changes: a dict mapping attributes to ``(old, new)`` tuples
+    :param fields: a dict mapping attributes to field metadata.  for
+            simple cases this may be a string with the human-friendly
+            title, for more advanced fields it should be a dict
+            containing ``title``, a ``type`` string and a ``convert``
+            callback which will be invoked with a tuple containing the
+            old and new value
     """
     data = {'_diff': True}
     for key, field_data in fields.iteritems():
