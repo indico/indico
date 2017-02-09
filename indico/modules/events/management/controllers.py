@@ -34,7 +34,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
 from indico.modules.events.management.forms import EventProtectionForm, PosterPrintingForm
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
-from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
 from indico.modules.events.operations import delete_event, create_event_references, update_event
 from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
@@ -72,8 +72,7 @@ class RHEventManagementDashboard(RHConferenceModifBase):
             raise Forbidden(response=response)
 
     def _process(self):
-        # TODO: show dashboard instead
-        return redirect(url_for('event_mgmt.conferenceModification', self.event_new))
+        return WPEventDashboard.render_template('dashboard.html', self._conf)
 
 
 class RHDeleteEvent(RHConferenceModifBase):
@@ -211,7 +210,7 @@ class RHEventProtection(RHConferenceModifBase):
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event_new))
-        return WPEventManagement.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
+        return WPEventProtection.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
 
     def _get_defaults(self):
         acl = {p.principal for p in self.event_new.acl_entries if p.read_access}
