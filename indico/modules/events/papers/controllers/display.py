@@ -131,7 +131,8 @@ class RHSubmitPaperComment(RHPaperBase):
     def _process(self):
         form = PaperCommentForm(paper=self.paper, user=session.user)
         if form.validate_on_submit():
-            create_comment(self.paper, form.text.data, form.visibility.data, session.user)
+            visibility = form.visibility.data if form.visibility else None
+            create_comment(self.paper, form.text.data, visibility, session.user)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
         return jsonify(html=tpl.render_comment_form(form, proposal=self.paper))
@@ -159,7 +160,8 @@ class RHEditPaperComment(RHPaperCommentBase):
         form = PaperCommentForm(obj=self.comment, paper=self.paper, user=session.user,
                                 prefix='edit-comment-{}-'.format(self.comment.id))
         if form.validate_on_submit():
-            update_comment(self.comment, form.text.data, form.visibility.data)
+            visibility = form.visibility.data if form.visibility else None
+            update_comment(self.comment, form.text.data, visibility)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
         return jsonify(html=tpl.render_comment_form(form, proposal=self.paper, comment=self.comment))
