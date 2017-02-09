@@ -69,7 +69,7 @@
                 row.addClass('active show-details');
                 row.next()
                     .children('td').wrapInner('<div style="display: none;" />')
-                    .parent().find('td > div').slideDown(400, function() {
+                    .parent().children('td').children('div').slideDown(400, function() {
                         var $set = $(this);
                         $set.replaceWith($set.contents());
                     });
@@ -79,7 +79,7 @@
                 row.removeClass('active');
                 row.next()
                     .children('td').wrapInner('<div style="display: block;" />')
-                    .parent().find('td > div').slideUp(400, function() {
+                    .parent().children('td').children('div').slideUp(400, function() {
                         var $set = $(this);
                         $set.replaceWith($set.contents());
                         row.removeClass('show-details');
@@ -122,7 +122,7 @@
 
                 return function() {
                     return $(this).data('realm') in filters;
-                }
+                };
             };
 
             var hideEmptyTables = function() {
