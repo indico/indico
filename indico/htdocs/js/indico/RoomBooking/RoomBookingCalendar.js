@@ -956,9 +956,7 @@ type ("RoomBookingNavBar", [],
                     'href': '#',
                     'title': 'Filters',
                     'class': 'i-button icon-only arrow icon-filter',
-                    'data': {
-                        'toggle': 'dropdown'
-                    }
+                    'data-toggle': 'dropdown'
                 });
                 var filterDropdown = $('<ul class="dropdown">');
                 $('<li>', {
