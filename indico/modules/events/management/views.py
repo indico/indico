@@ -22,7 +22,14 @@ from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
 class WPEventManagement(WPJinjaMixin, WPConferenceModifBase):
     template_prefix = 'events/management/'
-    sidemenu_option = 'protection'
 
     def _getPageContent(self, params):
         return WPJinjaMixin._getPageContent(self, params)
+
+
+class WPEventDashboard(WPEventManagement):
+    sidemenu_option = 'dashboard'
+
+
+class WPEventProtection(WPEventManagement):
+    sidemenu_option = 'protection'
