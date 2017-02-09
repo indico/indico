@@ -158,11 +158,9 @@ class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
             return False
         elif user == self.user:
             return True
-        elif user == self.revision.submitter:
+        elif self.revision.paper.can_judge(user):
             return True
         return False
-        # TODO: Check this, should we add a can_judge to the contribution model?
-        # return self.revision.contribution.can_judge(user)
 
     @property
     def visibility(self):
