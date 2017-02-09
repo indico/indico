@@ -19,10 +19,11 @@ from __future__ import unicode_literals
 import uuid
 from collections import defaultdict
 
-from flask import flash, redirect, session, request
+from flask import flash, redirect, session, request, signals
 from markupsafe import Markup
 from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
+from indico.core import signals
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -39,6 +40,7 @@ from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
+from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
@@ -49,6 +51,29 @@ from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 poster_cache = GenericCache('poster-printing')
+
+
+class RHEventManagementDashboard(RHConferenceModifBase):
+    """Main event management dashboard"""
+
+    CSRF_ENABLED = True
+
+    def _checkProtection(self):
+        if not session.user:
+            raise Forbidden
+        # If the user cannot manage the whole event see if anything gives them
+        # limited management access.
+        # XXX: We could consider always allowing access to the dashboard instead
+        # and then just restricting the widgets there.
+        if not self.event_new.can_manage(session.user):
+            urls = sorted(values_from_signal(signals.event_management.management_url.send(self.event_new),
+                                             single_value=True))
+            response = redirect(urls[0]) if urls else None
+            raise Forbidden(response=response)
+
+    def _process(self):
+        # TODO: show dashboard instead
+        return redirect(url_for('event_mgmt.conferenceModification', self.event_new))
 
 
 class RHDeleteEvent(RHConferenceModifBase):

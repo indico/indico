@@ -293,10 +293,6 @@ class UHConfEnterAccessKey(UHConfUser):
     _endpoint = 'event.conferenceDisplay-accessKey'
 
 
-class UHConfManagementAccess(UHConfUser):
-    _endpoint = 'event_mgmt.conferenceModification-managementAccess'
-
-
 class UHAdminsConferenceStyles(URLHandler):
     _endpoint = 'admin.adminConferenceStyles'
 
