@@ -138,7 +138,7 @@ class XMLEventSerializer(object):
         SubElement(xml, 'category').text = event.category.title
         SubElement(xml, 'parentProtection').text = self._format_bool(event.is_protected)
         if event.can_manage(self._user):
-            SubElement(xml, 'modifyLink').text = self._url_for('event_mgmt.conferenceModification', event)
+            SubElement(xml, 'modifyLink').text = self._url_for('event_management.dashboard', event)
             SubElement(xml, 'cloneLink').text = self._url_for('event_mgmt.confModifTools-clone', event)
         SubElement(xml, 'iCalLink').text = self._url_for('events.export_event_ical', event)
         SubElement(xml, 'announcer').append(self._serialize_user(event.creator,

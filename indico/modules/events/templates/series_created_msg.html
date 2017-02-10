@@ -7,7 +7,7 @@
     {% for event in events[1:] %}
         <li>
             {{ event.start_dt | format_date }}:
-            <a href="{{ url_for('event_mgmt.conferenceModification', event) }}">{{ event.title }}</a>
+            <a href="{{ url_for('event_management.dashboard', event) }}">{{ event.title }}</a>
         </li>
     {% endfor %}
 </ul>
