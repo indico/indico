@@ -27,7 +27,9 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from indico.modules.designer import event_badge_settings, category_badge_settings, DEFAULT_BADGE_SETTINGS
+from indico.modules.events.registration.settings import (event_badge_settings, category_badge_settings,
+                                                         DEFAULT_BADGE_SETTINGS)
+from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate, TemplateType
 from indico.modules.users import User
@@ -51,12 +53,20 @@ def _convert_font_size(size):
         return FONT_SIZE_MAPPING[size]
 
 
+def _convert_font_family(name):
+    if name in FONT_FAMILY_MAPPING:
+        return FONT_FAMILY_MAPPING[name]
+    else:
+        print(cformat("%{yellow!}--%{reset} Unknown font: '{}'. Using 'sans-serif' instead.").format(name))
+        return 'sans-serif'
+
+
 ITEM_KEY_MAPPING = {
     'id': ('id', int),
     'text': ('text', to_unicode),
     'x': ('x', float),
     'y': ('y', float),
-    'fontFamily': ('font_family', to_unicode),
+    'fontFamily': ('font_family', _convert_font_family),
     'fontSize': ('font_size', _convert_font_size),
     'color': ('color', _lower),
     'width': ('width', int),
@@ -108,6 +118,16 @@ FONT_SIZE_MAPPING = {
     'xx-large': '24pt'
 }
 
+FONT_FAMILY_MAPPING = {
+    'Sans': 'sans-serif',
+    'Times New Roman': 'serif',
+    'Courier': 'courier',
+    'LinuxLibertine': 'LinuxLibertine',
+    'Kochi-Mincho': 'Kochi-Mincho',
+    'Kochi-Gothic': 'Kochi-Gothic',
+    'Uming-CN': 'Uming-CN'
+}
+
 
 def _sane_float(num):
     return float(num) if not math.isnan(num) else None
@@ -120,9 +140,9 @@ BADGE_CONFIG_MAPPING = {
     'right_margin': ('__BadgePDFOptions_rightMargin', float),
     'margin_columns': ('__BadgePDFOptions_marginColumns', float),
     'margin_rows': ('__BadgePDFOptions_marginRows', float),
-    'page_size': ('_pageSize', unicode),
-    'landscape': ('_landscape', bool),
-    'draw_dashed_rectangles': ('_drawDashedRectangles', bool)
+    'page_size': ('_pageSize', lambda s: getattr(PageSize, s.title())),
+    'page_orientation': ('_landscape', lambda l: PageOrientation.landscape if l else PageOrientation.portrait),
+    'dashed_border': ('_drawDashedRectangles', bool)
 }
 
 
@@ -177,6 +197,11 @@ class TemplateMigrationBase(object):
             self.importer.print_warning(cformat('%{yellow!}Template item misses some attributes: {}').format(diff),
                                         event_id=self.event_id)
 
+        # we should store every position/size at 50px/cm
+        # previously, posters were at 25px/cm, hence the multiplier
+        result['x'] *= self.zoom_multiplier
+        result['y'] *= self.zoom_multiplier
+        result['width'] *= self.zoom_multiplier
         return result
 
     def _translate_tpl_data(self, tpl_data):
@@ -190,8 +215,8 @@ class TemplateMigrationBase(object):
         return {
             'title': convert_to_unicode(tpl_data[0]),
             'data': {
-                'width': width,
-                'height': _sane_float(tpl_data[1]['height']),
+                'width': width * self.zoom_multiplier,
+                'height': _sane_float(tpl_data[1]['height']) * self.zoom_multiplier,
                 'items': [self._translate_tpl_item(item) for item in tpl_data[4]]
             }
         }
@@ -241,6 +266,8 @@ class TemplateMigrationBase(object):
                     else:
                         self.importer.print_warning(cformat('%{yellow!}Position setting for non-existing background'),
                                                     event_id=self.event_id)
+            if 'background_position' not in tpl.data:
+                tpl.data['background_position'] = 'stretch'
 
             if self.event is None:
                 tpl.category = Category.get_root()
@@ -253,6 +280,7 @@ class TemplateMigrationBase(object):
 
 
 class PosterMigration(TemplateMigrationBase):
+    zoom_multiplier = 2
     obj_type = 'poster'
     manager_class = 'PosterTemplateManager'
     tpl_class = 'PosterTemplate'
@@ -260,6 +288,7 @@ class PosterMigration(TemplateMigrationBase):
 
 
 class BadgeMigration(TemplateMigrationBase):
+    zoom_multiplier = 1
     obj_type = 'badge'
     manager_class = 'BadgeTemplateManager'
     tpl_class = 'BadgeTemplate'
