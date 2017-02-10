@@ -32,7 +32,8 @@ from indico.modules.events.contributions.models.persons import (ContributionPers
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
-from indico.modules.events.management.forms import EventProtectionForm, PosterPrintingForm
+from indico.modules.events.management.forms import PosterPrintingForm
+from indico.modules.events.management.forms import EventProtectionForm, EventDataForm, EventDatesForm
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
 from indico.modules.events.posters import PosterPDF
@@ -40,7 +41,7 @@ from indico.modules.events.operations import (delete_event, create_event_referen
                                               update_event)
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
-from indico.modules.events.util import get_object_from_args, update_object_principals
+from indico.modules.events.util import get_object_from_args, update_object_principals, track_time_changes
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
@@ -81,7 +82,31 @@ class RHEventManagementDashboard(RHManageEventBase):
             raise Forbidden(response=response)
 
     def _process(self):
-        return WPEventDashboard.render_template('dashboard.html', self._conf)
+        return WPEventDashboard.render_template('dashboard.html', self._conf, event=self.event_new)
+
+
+class RHEditEventData(RHManageEventBase):
+    def _process(self):
+        form = EventDataForm(obj=self.event_new, event=self.event_new)
+        if form.validate_on_submit():
+            update_event(self.event_new, **form.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+
+class RHEditEventDates(RHManageEventBase):
+    def _process(self):
+        defaults = FormDefaults(self.event_new,
+                                displayed_start_dt=self._conf._screenStartDate,
+                                displayed_end_dt=self._conf._screenEndDate,
+                                update_timetable=True)
+        form = EventDatesForm(obj=defaults, event=self.event_new)
+        if form.validate_on_submit():
+            with track_time_changes():
+                update_event(self.event_new, **form.data)
+            return jsonify_data(flash=False)
+        show_screen_dates = form.has_displayed_dates and (form.displayed_start_dt.data or form.displayed_end_dt.data)
+        return jsonify_template('events/management/event_dates.html', form=form, show_screen_dates=show_screen_dates)
 
 
 class RHDeleteEvent(RHManageEventBase):

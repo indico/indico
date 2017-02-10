@@ -16,20 +16,126 @@
 
 from __future__ import unicode_literals
 
-from operator import itemgetter
+import re
+from datetime import timedelta
+from operator import itemgetter, attrgetter
 
-from wtforms import BooleanField, StringField, FloatField, SelectField
-from wtforms.validators import InputRequired
+from pytz import timezone
+from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField
+from wtforms.validators import InputRequired, DataRequired, ValidationError, Optional
 
+from indico.core.config import Config
+from indico.core.db import db
 from indico.modules.designer import PageSize
 from indico.modules.designer.util import get_inherited_templates
+from indico.modules.events import Event, LegacyEventMapping
+from indico.modules.events.models.events import EventType
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
+from indico.modules.events.timetable.util import get_top_level_entries
+from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
-                                     IndicoPasswordField, IndicoEnumSelectField)
-from indico.web.forms.widgets import SwitchWidget
+                                     IndicoEnumSelectField,
+                                     IndicoPasswordField, IndicoDateTimeField, IndicoTimezoneSelectField)
+from indico.web.forms.validators import LinkedDateTime
+from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
+
+
+class EventDataForm(IndicoForm):
+    title = StringField(_('Event title'), [DataRequired()])
+    description = TextAreaField(_('Description'), widget=CKEditorWidget())
+    url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(EventDataForm, self).__init__(*args, **kwargs)
+        # TODO: Add a custom widget showing the prefix right before the field
+        prefix = Config.getInstance().getShortEventURL()
+        self.url_shortcut.description = _('<strong>{}SHORTCUT</strong> - the URL shortcut must be unique within '
+                                          'this Indico instance and is not case sensitive.').format(prefix)
+
+    def validate_url_shortcut(self, field):
+        shortcut = field.data
+        if not shortcut:
+            return
+        if shortcut.isdigit():
+            raise ValidationError(_("The URL shortcut must contain at least one character that is not a digit."))
+        if not re.match(r'^[a-zA-Z0-9/._-]+$', shortcut):
+            raise ValidationError(_("The URL shortcut contains an invalid character."))
+        if '//' in shortcut:
+            raise ValidationError(_("The URL shortcut may not contain two consecutive slashes."))
+        if shortcut[0] == '/' or shortcut[-1] == '/':
+            raise ValidationError(_("The URL shortcut may not begin/end with a slash."))
+        conflict = (Event.query
+                    .filter(db.func.lower(Event.url_shortcut) == shortcut.lower(),
+                            ~Event.is_deleted,
+                            Event.id != self.event.id)
+                    .has_rows())
+        if conflict:
+            raise ValidationError(_("The URL shortcut is already used in another event."))
+        if LegacyEventMapping.query.filter_by(legacy_event_id=shortcut).has_rows():
+            # Reject existing event ids. It'd be EXTREMELY confusing and broken to allow such a shorturl
+            # Non-legacy event IDs are already covered by the `isdigit` check above.
+            raise ValidationError(_("This URL shortcut is not available.") % shortcut)
+
+
+class EventDatesForm(IndicoForm):
+    _field_order = ('start_dt', 'end_dt', 'timezone', 'update_timetable', 'override_displayed_dates')
+    _displayed_date_fields = ('displayed_start_dt', 'displayed_end_dt')
+
+    timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
+    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], allow_clear=False)
+    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt', not_equal=True)],
+                                 allow_clear=False)
+    update_timetable = BooleanField(_('Update timetable'), widget=SwitchWidget(),
+                                    description=_("Move sessions/contributions/breaks in the timetable according "
+                                                  "to the new event start time."))
+    displayed_start_dt = IndicoDateTimeField(_("Start"), [Optional()], allow_clear=True,
+                                             description=_("Specifying this date overrides the start date displayed "
+                                                           "on the main conference page."))
+    displayed_end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('displayed_start_dt', not_equal=True)],
+                                           allow_clear=True,
+                                           description=_("Specifying this date overrides the end date displayed "
+                                                         "on the main conference page."))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(EventDatesForm, self).__init__(*args, **kwargs)
+        # timetable synchronization
+        self.check_timetable_boundaries = (self.event.type_ != EventType.lecture)
+        if self.check_timetable_boundaries:
+            self.toplevel_timetable_entries = get_top_level_entries(self.event)
+            if not self.toplevel_timetable_entries:
+                self.check_timetable_boundaries = False
+        if not self.check_timetable_boundaries:
+            del self.update_timetable
+        # displayed dates
+        self.has_displayed_dates = (self.event.type_ == EventType.conference)
+        if self.has_displayed_dates:
+            self.displayed_start_dt.default_time = self.start_dt.data.astimezone(timezone(self.timezone.data)).time()
+            self.displayed_end_dt.default_time = self.end_dt.data.astimezone(timezone(self.timezone.data)).time()
+        else:
+            del self.displayed_start_dt
+            del self.displayed_end_dt
+
+    def validate_start_dt(self, field):
+        if not self.check_timetable_boundaries or self.update_timetable.data or field.object_data == field.data:
+            return
+        if field.data > min(self.toplevel_timetable_entries, key=attrgetter('start_dt')).start_dt:
+            raise ValidationError(_("To use this start date the timetable must be updated."))
+
+    def validate_end_dt(self, field):
+        if not self.check_timetable_boundaries:
+            return
+        start_dt_offset = self.start_dt.data - self.start_dt.object_data
+        end_buffer = field.data - max(self.toplevel_timetable_entries, key=attrgetter('end_dt')).end_dt
+        delta = max(timedelta(), start_dt_offset - end_buffer)
+        if delta:
+            delta_str = format_human_timedelta(delta, 'minutes', True)
+            raise ValidationError(_("The event is too short to fit all timetable entries. "
+                                    "It must be at least {} longer.").format(delta_str))
 
 
 class EventProtectionForm(IndicoForm):
