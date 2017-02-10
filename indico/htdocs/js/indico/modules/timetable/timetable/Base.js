@@ -953,24 +953,27 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.infoBox = Html.div({className: 'timetableInfoBox'});
 
         this.addMenuLink = this.contextInfo.isPoster ?
-            $('<a href="#"/>').text($T('Add poster')).bind('menu_select', function() {
+            $('<a href="#" data-toggle="menu_select"/>').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
             }) : $('<a href="#" id="add_new" class="arrow" data-toggle="dropdown"/>').text($T('Add new'));
 
 
-        this.rescheduleLink = $('<a href="#"/>').text($T('Reschedule')).bind('menu_select', function() {
+        this.rescheduleLink = $('<a href="#" data-toggle="menu_select"/>').text($T('Reschedule'));
+        this.rescheduleLink.bind('menu_select', function() {
             var popup = new RescheduleDialog(self);
             popup.open();
             return false;
         });
 
-        this.fitInnerTimetableLink = $('<a href="#"/>').text($T('Fit to content')).bind('menu_select', function() {
+        this.fitInnerTimetableLink = $('<a href="#" data-toggle="menu_select"/>').text($T('Fit to content'));
+        this.fitInnerTimetableLink.bind('menu_select', function() {
             var popup = new FitInnerTimetableDialog(self);
             popup.open();
             return false;
         });
 
-        this.addIntervalLink = $('<a href="#"/>').text($T('Add new block')).bind('menu_select', function() {
+        this.addIntervalLink = $('<a href="#" data-toggle="menu_select"/>').text($T('Add new block'))
+        this.addIntervalLink.bind('menu_select', function() {
             self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
             return false;
         });
