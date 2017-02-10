@@ -121,6 +121,6 @@ class RHCreateEvent(RHProtected):
             else:
                 event = self._create_event(form.data)
                 notify_event_creation(event)
-            return jsonify_data(flash=False, redirect=url_for('event_mgmt.conferenceModification', event))
+            return jsonify_data(flash=False, redirect=url_for('event_management.dashboard', event))
         return jsonify_template('events/forms/event_creation_form.html', form=form, fields=form._field_order,
                                 event_type=self.event_type.name)
