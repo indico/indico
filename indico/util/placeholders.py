@@ -152,7 +152,7 @@ class ParametrizedPlaceholder(Placeholder):
         raise NotImplementedError
 
 
-def _get_placeholders(context, **kwargs):
+def get_placeholders(context, **kwargs):
     return named_objects_from_signal(signals.get_placeholders.send(context, **kwargs))
 
 
@@ -164,7 +164,7 @@ def replace_placeholders(context, text, escape_html=True, **kwargs):
     :param escape_html: whether HTML escaping should be done
     :param kwargs: arguments specific to the context
     """
-    for name, placeholder in _get_placeholders(context, **kwargs).iteritems():
+    for name, placeholder in get_placeholders(context, **kwargs).iteritems():
         text = placeholder.replace(text, escape_html=escape_html, **kwargs)
     return text
 
@@ -176,7 +176,7 @@ def get_missing_placeholders(context, text, **kwargs):
     :param text: the text to check
     :param kwargs: arguments specific to the context
     """
-    placeholders = {p for p in _get_placeholders(context, **kwargs).itervalues() if p.required}
+    placeholders = {p for p in get_placeholders(context, **kwargs).itervalues() if p.required}
     return {p.friendly_name for p in placeholders if not p.is_in(text, **kwargs)}
 
 
@@ -186,6 +186,6 @@ def render_placeholder_info(context, **kwargs):
     :param context: the context where the placeholders are used
     :param kwargs: arguments specific to the context
     """
-    placeholders = sorted(_get_placeholders(context, **kwargs).values(), key=attrgetter('name'))
+    placeholders = sorted(get_placeholders(context, **kwargs).values(), key=attrgetter('name'))
     return Markup(render_template('placeholder_info.html', placeholder_kwargs=kwargs, placeholders=placeholders,
                                   ParametrizedPlaceholder=ParametrizedPlaceholder))
