@@ -384,6 +384,12 @@ i[class^="icon-"]:before {
 .icon-price-tag:before {
     content: "\e9f4";
 }
+.icon-printer:before {
+    content: "\e906";
+}
+.icon-print:before {
+    content: "\e906";
+}
 .icon-projector:before {
     content: "\e604";
 }
@@ -516,6 +522,10 @@ i[class^="icon-"]:before {
 .icon-wrench:before {
     content: "\77";
 }
+.icon-id-badge:before {
+    content: "\e907";
+}
+
 /* End of icomoon's icon definitions */
 
 /* animated spinner icon */
