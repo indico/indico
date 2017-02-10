@@ -105,7 +105,7 @@ class UtilsConference:
 
         old_location_data = c.as_event.location_data
         location_data = cls.get_location_data(confData)
-        update_event(c.as_event, {'location_data': location_data})
+        update_event(c.as_event, location_data=location_data)
 
         if old_location_data != location_data:
             signals.event.data_changed.send(c, attr='location', old=old_location_data, new=location_data)

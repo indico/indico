@@ -21,9 +21,11 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.sessions import logger
+from indico.modules.events.logs.util import make_diff_log
+from indico.modules.events.sessions import logger, session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.util.i18n import orig_string
 
 
 def create_session(event, data):
@@ -111,3 +113,18 @@ def delete_session_block(session_block):
         delete_session(session_)
     db.session.flush()
     logger.info('Session block %s deleted by %s', session_block, session.user)
+
+
+def update_session_coordinator_privs(event, data):
+    changes = {}
+    for priv, enabled in data.iteritems():
+        setting = COORDINATOR_PRIV_SETTINGS[priv]
+        if session_settings.get(event, setting) == enabled:
+            continue
+        session_settings.set(event, setting, enabled)
+        changes[priv] = (not enabled, enabled)
+    db.session.flush()
+    logger.info('Session coordinator privs of event %r updated with %r by %r', event, data, session.user)
+    log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.iteritems()}
+    event.log(EventLogRealm.management, EventLogKind.change, 'Sessions', 'Coordinator privileges updated', session.user,
+              data={'Changes': make_diff_log(changes, log_fields)})
