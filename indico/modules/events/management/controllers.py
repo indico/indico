@@ -21,7 +21,7 @@ from collections import defaultdict
 
 from flask import flash, redirect, session, request, signals
 from markupsafe import Markup
-from werkzeug.exceptions import Forbidden, NotFound, BadRequest
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
@@ -35,9 +35,11 @@ from indico.modules.events.forms import EventReferencesForm, EventLocationForm, 
 from indico.modules.events.management.forms import EventProtectionForm, PosterPrintingForm
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
-from indico.modules.events.operations import delete_event, create_event_references, update_event
 from indico.modules.events.posters import PosterPDF
-from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
+from indico.modules.events.operations import (delete_event, create_event_references, update_event_protection,
+                                              update_event)
+from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
+from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -194,9 +196,9 @@ class RHEventProtection(RHManageEventBase):
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event_new)
         if form.validate_on_submit():
-            update_event(self.event_new, {'protection_mode': form.protection_mode.data,
-                                          'own_no_access_contact': form.own_no_access_contact.data,
-                                          'access_key': form.access_key.data})
+            update_event_protection(self.event_new, {'protection_mode': form.protection_mode.data,
+                                                     'own_no_access_contact': form.own_no_access_contact.data,
+                                                     'access_key': form.access_key.data})
             update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
             update_object_principals(self.event_new, form.submitters.data, role='submit')
@@ -220,17 +222,8 @@ class RHEventProtection(RHManageEventBase):
                      'own_no_access_contact': self.event_new.own_no_access_contact}, **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):
-        for priv_field in form.priv_fields:
-            try:
-                setting = COORDINATOR_PRIV_SETTINGS[priv_field]
-            except KeyError:
-                raise BadRequest('No such privilege')
-            if session_settings.get(self.event_new, setting) == form.data[priv_field]:
-                continue
-            session_settings.set(self.event_new, setting, form.data[priv_field])
-            log_msg = 'Session coordinator privilege changed to {}: {}'.format(form.data[priv_field],
-                                                                               COORDINATOR_PRIV_TITLES[priv_field])
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection', log_msg, session.user)
+        data = {field: getattr(form, field).data for field in form.priv_fields}
+        update_session_coordinator_privs(self.event_new, data)
 
 
 class RHMoveEvent(RHManageEventBase):
@@ -269,7 +262,7 @@ class RHManageEventLocation(RHManageEventBase):
     def _process(self):
         form = EventLocationForm(obj=self.event_new)
         if form.validate_on_submit():
-            update_event(self.event_new, form.data)
+            update_event(self.event_new, **form.data)
             flash(_('The location for the event has been updated'))
             tpl = get_template_module('events/management/_event_location.html')
             return jsonify_data(html=tpl.render_event_location_info(self.event_new.location_data))
@@ -280,7 +273,7 @@ class RHManageEventKeywords(RHManageEventBase):
     def _process(self):
         form = EventKeywordsForm(obj=self.event_new)
         if form.validate_on_submit():
-            update_event(self.event_new, form.data)
+            update_event(self.event_new, **form.data)
             flash(_('The keywords for the event have been updated'))
             return jsonify_data(html=Markup('<br>').join(self.event_new.keywords))
         return jsonify_form(form)
@@ -291,7 +284,7 @@ class RHManageEventPersonLinks(RHManageEventBase):
         form = EventPersonLinkForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
         if form.validate_on_submit():
             with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
-                update_event(self.event_new, form.data)
+                update_event(self.event_new, **form.data)
             tpl = get_template_module('events/management/_event_person_links.html')
             return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
         self.commit = False

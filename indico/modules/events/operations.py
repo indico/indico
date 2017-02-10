@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session
 
 from indico.core import signals
@@ -24,6 +26,8 @@ from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
+from indico.modules.events.logs.util import make_diff_log
+from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType
 
 
@@ -94,14 +98,87 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     return event
 
 
-def update_event(event, data):
-    event.populate_from_dict(data)
+def _get_venue_room_name(data):
+    venue_name = data['venue'].name if data.get('venue') else data.get('venue_name')
+    room_name = data['room'].full_name if data.get('room') else data.get('room_name')
+    return venue_name, room_name
+
+
+def _format_location(data):
+    venue_name = data[0]
+    room_name = data[1]
+    if venue_name and room_name:
+        return '{}: {}'.format(venue_name, room_name)
+    elif venue_name or room_name:
+        return venue_name or room_name
+    else:
+        return None
+
+
+def _split_location_changes(changes):
+    location_changes = changes.pop('location_data', None)
+    if location_changes is None:
+        return
+    if location_changes[0]['address'] != location_changes[1]['address']:
+        changes['address'] = (location_changes[0]['address'], location_changes[1]['address'])
+    venue_room_changes = (_get_venue_room_name(location_changes[0]), _get_venue_room_name(location_changes[1]))
+    if venue_room_changes[0] != venue_room_changes[1]:
+        changes['venue_room'] = map(_format_location, venue_room_changes)
+
+
+def _format_person(data):
+    return '{} <{}>'.format(data.full_name, data.email) if data.email else data.full_name
+
+
+def update_event(event, **data):
+    assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'timezone',
+                               'person_link_data'}
+    old_person_links = event.person_links[:]
+    changes = event.populate_from_dict(data)
+    if event.person_links != old_person_links:
+        changes['person_links'] = (old_person_links, event.person_links)
     db.session.flush()
     signals.event.updated.send(event)
-    logger.info('Event %r updated with %r', event, data)
+    # Now log everything nicely...
+    logger.info('Event %r updated with %r by %r', event, data, session.user)
+    log_fields = {'title': {'title': 'Title', 'type': 'string'},
+                  'description': 'Description',
+                  'url_shortcut': {'title': 'URL Shortcut', 'type': 'string'},
+                  'address': 'Address',
+                  'venue_room': {'title': 'Location', 'type': 'string'},
+                  'keywords': 'Keywords',
+                  'timezone': {'title': 'Timezone', 'type': 'string'},
+                  'person_links': {'title': 'Speakers' if event.type_ == EventType.lecture else 'Chairpersons',
+                                   'convert': lambda changes: [map(_format_person, persons) for persons in changes]}}
+    _split_location_changes(changes)
+    changes.pop('person_link_data', None)
+    if changes:
+        # XXX: we don't end up logging reordering of person links - there is no way to keep the old
+        # order in here as it is updated on the objects already in the DB by the wtforms field
+        what = log_fields[changes.keys()[0]] if len(changes) == 1 else 'Data'
+        if isinstance(what, dict):
+            what = what['title']
+        event.log(EventLogRealm.management, EventLogKind.change, 'Event', '{} updated'.format(what), session.user,
+                  data={'Changes': make_diff_log(changes, log_fields)})
+
+
+def update_event_protection(event, data):
+    assert data.viewkeys() <= {'protection_mode', 'own_no_access_contact', 'access_key'}
+    changes = event.populate_from_dict(data)
+    db.session.flush()
+    signals.event.updated.send(event)
+    # Log everything...
+    logger.info('Protection of event %r updated with %r by %r', event, data, session.user)
+    if changes:
+        log_fields = {'protection_mode': 'Protection mode',
+                      'own_no_access_contact': 'No access contact',
+                      'access_key': {'title': 'Access key', 'type': 'string'}}
+        event.log(EventLogRealm.management, EventLogKind.change, 'Event', 'Protection updated', session.user,
+                  data={'Changes': make_diff_log(changes, log_fields)})
 
 
 def delete_event(event):
     event.as_legacy.delete(session.user)
     db.session.flush()
     logger.info('Event %r deleted by %r', event, session.user)
+    event.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', session.user)
