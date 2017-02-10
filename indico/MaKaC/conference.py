@@ -153,7 +153,7 @@ class Conference(CommonObjectBase):
 
     @timezone.setter
     def timezone(self, timezone):
-        update_event(self.as_event, {'timezone': to_unicode(timezone).strip()})
+        update_event(self.as_event, timezone=to_unicode(timezone).strip())
 
     @property
     def title(self):
