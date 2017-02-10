@@ -1,0 +1,10 @@
+{% from 'forms/_form.html' import simple_form, form_fieldset, form_rows %}
+
+{% call simple_form(form, back=_('Cancel')) %}
+    {{ form_rows(form, fields=form._field_order) }}
+    {% if form.has_displayed_dates %}
+        {% call form_fieldset(_('Screen dates'), collapsible=true, initially_collapsed=(not show_screen_dates)) %}
+            {{ form_rows(form, fields=form._displayed_date_fields) }}
+        {% endcall %}
+    {% endif %}
+{% endcall %}

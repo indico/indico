@@ -3,5 +3,19 @@
 {% block title %}{% trans %}Dashboard{% endtrans %}{% endblock %}
 
 {% block content %}
-    TODO...
+    {# TODO: pretty dashboard. the current HTML is just to access the dialogs! #}
+    <a class="i-button"
+       data-href="{{ url_for('.edit_data', event) }}"
+       data-title="{% trans %}Edit basic event data{% endtrans %}"
+       data-reload-after
+       data-ajax-dialog>
+        Basic information
+    </a>
+    <a class="i-button"
+       data-href="{{ url_for('.edit_dates', event) }}"
+       data-title="{% trans %}Edit event date/time{% endtrans %}"
+       data-reload-after
+       data-ajax-dialog>
+        Date/time
+    </a>
 {% endblock %}
