@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import re
+from datetime import datetime
 from difflib import SequenceMatcher
 
 from enum import Enum
@@ -71,6 +72,9 @@ def make_diff_log(changes, fields):
             change = map(sorted, change)
         elif all(isinstance(x, bool) for x in change):
             type_ = 'bool'
+        elif all(isinstance(x, datetime) for x in change):
+            type_ = 'datetime'
+            change = [x.isoformat() for x in change]
         else:
             type_ = 'text'
             change = map(unicode, map(orig_string, change))
@@ -85,7 +89,7 @@ def render_changes(a, b, type_):
     :param b: new value
     :param type_: the type determining how the values should be compared
     """
-    if type_ in ('number', 'enum', 'bool'):
+    if type_ in ('number', 'enum', 'bool', 'datetime'):
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a, b)
     elif type_ == 'string':
         return '{} \N{RIGHTWARDS ARROW} {}'.format(a or '\N{EMPTY SET}', b or '\N{EMPTY SET}')
