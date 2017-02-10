@@ -142,7 +142,7 @@ class RHLockEvent(RHManageEventBase):
     def _process_POST(self):
         self._conf.setClosed(True)
         flash(_('The event is now locked.'), 'success')
-        return jsonify_data(url=url_for('event_mgmt.conferenceModification', self.event_new), flash=False)
+        return jsonify_data(url=url_for('event_management.dashboard', self.event_new), flash=False)
 
 
 class RHUnlockEvent(RHManageEventBase):
@@ -155,7 +155,7 @@ class RHUnlockEvent(RHManageEventBase):
     def _process(self):
         self._conf.setClosed(False)
         flash(_('The event is now unlocked.'), 'success')
-        return redirect(url_for('event_mgmt.conferenceModification', self.event_new))
+        return redirect(url_for('event_management.dashboard', self.event_new))
 
 
 class RHContributionPersonListMixin:

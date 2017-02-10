@@ -21,7 +21,7 @@
         {% if item_type == 'EVENT' %}
             {% if item.can_manage(session.user) %}
                 <li>
-                    <a href="{{ url_for('event_mgmt.conferenceModification', item) }}">
+                    <a href="{{ url_for('event_management.dashboard', item) }}">
                         {% trans %}Edit Event{% endtrans %}
                     </a>
                 </li>
