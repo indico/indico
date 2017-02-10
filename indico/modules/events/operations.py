@@ -98,6 +98,68 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
     return event
 
 
+def update_event(event, update_timetable=False, **data):
+    # TODO: Move this legacy stuff to proper places and then handle it together with the other new data
+    _unset = object()
+    displayed_start_dt = data.pop('displayed_start_dt', _unset)
+    displayed_end_dt = data.pop('displayed_end_dt', _unset)
+    if displayed_start_dt is not _unset:
+        event.as_legacy.setScreenStartDate(displayed_start_dt)
+    if displayed_end_dt is not _unset:
+        event.as_legacy.setScreenEndDate(displayed_end_dt)
+
+    assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
+                               'start_dt', 'end_dt', 'timezone'}
+    old_person_links = event.person_links[:]
+    if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
+        # Lectures have no exposed timetable so if we have any timetable entries
+        # (e.g. because the event had a different type before) we always update them
+        # silently.
+        event.move_start_dt(data.pop('start_dt'))
+    changes = event.populate_from_dict(data)
+    changes.pop('person_link_data', None)
+    if event.person_links != old_person_links:
+        changes['person_links'] = (old_person_links, event.person_links)
+    db.session.flush()
+    signals.event.updated.send(event)
+    logger.info('Event %r updated with %r by %r', event, data, session.user)
+    _log_event_update(event, changes)
+
+
+def _log_event_update(event, changes):
+    log_fields = {
+        'title': {'title': 'Title', 'type': 'string'},
+        'description': 'Description',
+        'url_shortcut': {'title': 'URL Shortcut', 'type': 'string'},
+        'address': 'Address',
+        'venue_room': {'title': 'Location', 'type': 'string'},
+        'keywords': 'Keywords',
+        'person_links': {
+            'title': 'Speakers' if event.type_ == EventType.lecture else 'Chairpersons',
+            'convert': lambda changes: [map(_format_person, persons) for persons in changes]
+        },
+        'start_dt': 'Start date',
+        'end_dt': 'End date',
+        'timezone': {'title': 'Timezone', 'type': 'string'}
+    }
+    _split_location_changes(changes)
+    if changes:
+        # XXX: we don't end up logging reordering of person links - there is
+        # no way to retrieve the old order in here as it is updated on the
+        # objects by the wtforms field (since we are modifying objects already
+        # in the database)
+        if changes.viewkeys() <= {'timezone', 'start_dt', 'end_dt', 'displayed_start_dt', 'displayed_end_dt'}:
+            what = 'Dates'
+        elif len(changes) == 1:
+            what = log_fields[changes.keys()[0]]
+            if isinstance(what, dict):
+                what = what['title']
+        else:
+            what = 'Data'
+        event.log(EventLogRealm.management, EventLogKind.change, 'Event', '{} updated'.format(what), session.user,
+                  data={'Changes': make_diff_log(changes, log_fields)})
+
+
 def _get_venue_room_name(data):
     venue_name = data['venue'].name if data.get('venue') else data.get('venue_name')
     room_name = data['room'].full_name if data.get('room') else data.get('room_name')
@@ -130,69 +192,11 @@ def _format_person(data):
     return '{} <{}>'.format(data.full_name, data.email) if data.email else data.full_name
 
 
-def update_event(event, update_timetable=False, **data):
-    # TODO: Move this legacy stuff to proper places and then handle it together with the other new data
-    _unset = object()
-    displayed_start_dt = data.pop('displayed_start_dt', _unset)
-    displayed_end_dt = data.pop('displayed_end_dt', _unset)
-    if displayed_start_dt is not _unset:
-        event.as_legacy.setScreenStartDate(displayed_start_dt)
-    if displayed_end_dt is not _unset:
-        event.as_legacy.setScreenEndDate(displayed_end_dt)
-
-    assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
-                               'start_dt', 'end_dt', 'timezone'}
-    old_person_links = event.person_links[:]
-    if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
-        # Lectures have no exposed timetable so if we have any timetable entries
-        # (e.g. because the event had a different type before) we always update them
-        # silently.
-        event.move_start_dt(data.pop('start_dt'))
-    changes = event.populate_from_dict(data)
-    if event.person_links != old_person_links:
-        changes['person_links'] = (old_person_links, event.person_links)
-    db.session.flush()
-    signals.event.updated.send(event)
-    # Now log everything nicely...
-    logger.info('Event %r updated with %r by %r', event, data, session.user)
-    log_fields = {
-        'title': {'title': 'Title', 'type': 'string'},
-        'description': 'Description',
-        'url_shortcut': {'title': 'URL Shortcut', 'type': 'string'},
-        'address': 'Address',
-        'venue_room': {'title': 'Location', 'type': 'string'},
-        'keywords': 'Keywords',
-        'person_links': {
-            'title': 'Speakers' if event.type_ == EventType.lecture else 'Chairpersons',
-            'convert': lambda changes: [map(_format_person, persons) for persons in changes]
-        },
-        'start_dt': 'Start date',
-        'end_dt': 'End date',
-        'timezone': {'title': 'Timezone', 'type': 'string'}
-    }
-    _split_location_changes(changes)
-    changes.pop('person_link_data', None)
-    if changes:
-        # XXX: we don't end up logging reordering of person links - there is no way to keep the old
-        # order in here as it is updated on the objects already in the DB by the wtforms field
-        if changes.viewkeys() <= {'timezone', 'start_dt', 'end_dt'}:
-            what = 'Dates'
-        elif len(changes) == 1:
-            what = log_fields[changes.keys()[0]]
-            if isinstance(what, dict):
-                what = what['title']
-        else:
-            what = 'Data'
-        event.log(EventLogRealm.management, EventLogKind.change, 'Event', '{} updated'.format(what), session.user,
-                  data={'Changes': make_diff_log(changes, log_fields)})
-
-
 def update_event_protection(event, data):
     assert data.viewkeys() <= {'protection_mode', 'own_no_access_contact', 'access_key'}
     changes = event.populate_from_dict(data)
     db.session.flush()
     signals.event.updated.send(event)
-    # Log everything...
     logger.info('Protection of event %r updated with %r by %r', event, data, session.user)
     if changes:
         log_fields = {'protection_mode': 'Protection mode',
