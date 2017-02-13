@@ -44,7 +44,7 @@ from indico.modules.events.registration.forms import (EmailRegistrantsForm, Crea
 from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.notifications import notify_registration_state_update
-from indico.modules.events.registration.settings import merged_badge_settings, event_badge_settings
+from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, generate_spreadsheet_from_registrations,
@@ -393,7 +393,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         badge_templates = sorted((tpl for tpl in get_all_templates(self.event_new) if tpl.type.name == 'badge'),
                                  key=attrgetter('title'))
         pdf_options = WConfModifBadgePDFOptions(self._conf).getHTML()
-        settings = merged_badge_settings.get_all(self.event_new.id, self.event_new.category.id)
+        settings = event_badge_settings.get_all(self.event_new.id)
         form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
 

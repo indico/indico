@@ -16,9 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.settings import FallbackSettingsProxy
 from indico.core.settings.converters import EnumConverter
-from indico.modules.categories.settings import CategorySettingsProxy
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.settings import EventSettingsProxy
@@ -85,5 +83,3 @@ class RegistrationSettingsProxy(EventSettingsProxy):
 
 
 event_badge_settings = EventSettingsProxy('badge', DEFAULT_BADGE_SETTINGS, converters=BADGE_SETTING_CONVERTERS)
-category_badge_settings = CategorySettingsProxy('badge', DEFAULT_BADGE_SETTINGS, converters=BADGE_SETTING_CONVERTERS)
-merged_badge_settings = FallbackSettingsProxy(event_badge_settings, category_badge_settings)
