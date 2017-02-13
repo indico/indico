@@ -105,12 +105,12 @@
     </div>
 {% endmacro %}
 
-{% macro render_timeline_section(cf) %}
-    {% set tz = cf.event.display_tzinfo %}
+{% macro render_timeline_section(cfp) %}
+    {% set tz = cfp.event.display_tzinfo %}
     <section>
-        <ul class="deadline-timeline flexrow f-a-center f-j-center">
-            {{ render_timestamp(_("Opening day"), cf.start_dt, tz, cf.has_started) }}
-            {{ render_timestamp(_("Submission deadline"), cf.end_dt, tz, cf.has_ended, _("No deadline")) }}
+        <ul class="steps flexrow f-a-center f-j-center">
+            {{ render_timestamp(_("Opening day"), cfp.start_dt, tz, cfp.has_started) }}
+            {{ render_timestamp(_("Submission deadline"), cfp.end_dt, tz, cfp.has_ended, _("No deadline")) }}
         </ul>
     </section>
 {% endmacro %}
