@@ -1,5 +1,5 @@
 {% macro render_cfp_infoline(event, cfp, show_icon=true, redirect_first=false) %}
-    {% set can_submit_papers = cfp.is_open or session.user %}
+    {% set can_submit_papers = cfp.is_open %}
     <div class="infoline announcement">
         {% if show_icon %}
             <span class="icon icon-file-content"></span>
@@ -7,11 +7,7 @@
         <div class="text">
             {%- if can_submit_papers %}
                 <div class="label">
-                    {% if cfp.is_open %}
-                        {%- trans %}The call for papers is open{% endtrans -%}
-                    {% else %}
-                        {%- trans %}You have been authorized to submit papers{% endtrans -%}
-                    {% endif %}
+                    {%- trans %}The call for papers is open{% endtrans -%}
                 </div>
                 <div>
                     {%- trans %}You can submit a paper for reviewing.{% endtrans -%}

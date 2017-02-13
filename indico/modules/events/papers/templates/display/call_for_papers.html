@@ -4,6 +4,7 @@
 {% from 'events/papers/display/_common.html' import render_cfp_infoline %}
 {% from 'events/papers/display/_paper_list.html' import render_user_papers_list %}
 {% from 'events/reviews/_common.html' import render_timeline_section %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}
     {%- trans %}Call for Papers{% endtrans -%}
@@ -33,7 +34,8 @@
                 <ul class="template-list">
                     {% for tpl in event.paper_templates|sort(attribute='id')|sort(attribute='name') %}
                         <li>
-                            <a href="{{ url_for('.download_template', tpl) }}" class="attachment {{ icon_from_mimetype(tpl.content_type, 'icon-file') }}">
+                            <a href="{{ url_for('.download_template', tpl) }}"
+                               class="attachment {{ icon_from_mimetype(tpl.content_type, 'icon-file') }}">
                                 <span>{{ tpl.name }}</span>
                             </a>
                             {% if tpl.description %}
@@ -44,28 +46,32 @@
                 </ul>
             </section>
         {% endif %}
-        {% if contributions %}
-            <section>
-                <div class="header">
-                    <div class="header-row">
-                        <h3>{% trans %}My papers{% endtrans %}</h3>
-                        <div class="toolbar thin">
+        <section>
+            <div class="header">
+                <div class="header-row">
+                    <h3>{% trans %}My papers{% endtrans %}</h3>
+                    <div class="toolbar thin">
+                        <div class="group">
+                            <div id="filter-statistics" class="group">
+                                {{- render_displayed_entries_fragment(contributions|length, contributions|length) -}}
+                            </div>
                             <div class="group">
-                                <div id="filter-statistics" class="group">
-                                    {{- render_displayed_entries_fragment(contributions|length, contributions|length) -}}
-                                </div>
-                                <div class="group">
-                                    <span class="i-button label icon-search"></span>
-                                    <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
-                                </div>
+                                <span class="i-button label icon-search"></span>
+                                <input type="text" id="search-input" placeholder="{% trans %}Enter #id or search string{% endtrans %}">
                             </div>
                         </div>
                     </div>
                 </div>
+            </div>
+            {% if contributions %}
                 {{ render_user_papers_list(event, contributions) }}
-                <div id="filter-placeholder"></div>
-            </section>
-        {% endif %}
+            {% else %}
+                {% call message_box('info', fixed_width=true) %}
+                    {% trans %}You haven't submitted any paper.{% endtrans %}
+                {% endcall %}
+            {% endif %}
+            <div id="filter-placeholder"></div>
+        </section>
     </div>
     <script>
         setupCallForPapersPage({
