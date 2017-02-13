@@ -33,6 +33,8 @@ class MultiStringField(HiddenField):
                   placeholder.
     :param uuid_field: If set, each item will have a UUID assigned and
                        stored in the field specified here.
+    :param flat: If True, the field returns a list of string values instead
+                 of dicts.  Cannot be combined with `uuid_field`.
     :param unique: Whether the values should be unique.
     :param sortable: Whether items should be sortable.
     """
@@ -43,7 +45,10 @@ class MultiStringField(HiddenField):
         self.field_name, self.field_caption = kwargs.pop('field')
         self.sortable = kwargs.pop('sortable', False)
         self.unique = kwargs.pop('unique', False)
+        self.flat = kwargs.pop('flat', False)
         self.uuid_field = kwargs.pop('uuid_field', None)
+        if self.flat and self.uuid_field:
+            raise ValueError('`uuid_field` and `flat` are mutually exclusive')
         super(MultiStringField, self).__init__(*args, **kwargs)
 
     def process_formdata(self, valuelist):
@@ -69,9 +74,16 @@ class MultiStringField(HiddenField):
                 raise ValueError('UUIDs must be unique')
         if not all(item[self.field_name].strip() for item in self.data):
             raise ValueError('Empty items are not allowed')
+        if self.flat:
+            self.data = [x[self.field_name] for x in self.data]
 
     def _value(self):
-        return self.data or []
+        if not self.data:
+            return []
+        elif self.flat:
+            return [{self.field_name: x} for x in self.data]
+        else:
+            return self.data
 
 
 class MultipleItemsField(HiddenField):
