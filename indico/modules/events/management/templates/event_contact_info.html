@@ -1,0 +1,9 @@
+{% from 'forms/_form.html' import simple_form, form_fieldset, form_rows %}
+
+{% set has_other_fields = (form.organizer_info or form.additional_info) | bool %}
+{% call simple_form(form, back=_('Cancel')) %}
+    {{ form_rows(form, fields=('organizer_info', 'additional_info')) }}
+    {% call form_fieldset(_('Contact/Support'), render_as_fieldset=has_other_fields) %}
+        {{ form_rows(form, fields=form._contact_fields) }}
+    {% endcall %}
+{% endcall %}

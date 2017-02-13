@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from flask import session
 
 from indico.core import signals
@@ -101,15 +99,32 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 def update_event(event, update_timetable=False, **data):
     # TODO: Move this legacy stuff to proper places and then handle it together with the other new data
     _unset = object()
+    # screen dates
     displayed_start_dt = data.pop('displayed_start_dt', _unset)
     displayed_end_dt = data.pop('displayed_end_dt', _unset)
     if displayed_start_dt is not _unset:
         event.as_legacy.setScreenStartDate(displayed_start_dt)
     if displayed_end_dt is not _unset:
         event.as_legacy.setScreenEndDate(displayed_end_dt)
+    # contact info
+    contact_title = data.pop('contact_title', _unset)
+    contact_emails = data.pop('contact_emails', _unset)
+    contact_phones = data.pop('contact_phones', _unset)
+    organizer_info = data.pop('organizer_info', _unset)
+    additional_info = data.pop('additional_info', _unset)
+    if contact_title is not _unset:
+        event.as_legacy.getSupportInfo().setCaption(contact_title.encode('utf-8'))
+    if contact_emails is not _unset:
+        event.as_legacy.getSupportInfo().setEmail(', '.join(contact_emails).encode('utf-8'))
+    if contact_phones is not _unset:
+        event.as_legacy.getSupportInfo().setTelephone(', '.join(contact_phones).encode('utf-8'))
+    if organizer_info is not _unset:
+        event.as_legacy.setOrgText(organizer_info.encode('utf-8'))
+    if additional_info is not _unset:
+        event.as_legacy.setContactInfo(additional_info.encode('utf-8'))
 
     assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
-                               'start_dt', 'end_dt', 'timezone'}
+                               'start_dt', 'end_dt', 'timezone', 'keywords', 'references'}
     old_person_links = event.person_links[:]
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
         # Lectures have no exposed timetable so if we have any timetable entries
@@ -134,6 +149,10 @@ def _log_event_update(event, changes):
         'address': 'Address',
         'venue_room': {'title': 'Location', 'type': 'string'},
         'keywords': 'Keywords',
+        'references': {
+            'title': 'External IDs',
+            'convert': lambda changes: [map(_format_ref, refs) for refs in changes]
+        },
         'person_links': {
             'title': 'Speakers' if event.type_ == EventType.lecture else 'Chairpersons',
             'convert': lambda changes: [map(_format_person, persons) for persons in changes]
@@ -158,6 +177,10 @@ def _log_event_update(event, changes):
             what = 'Data'
         event.log(EventLogRealm.management, EventLogKind.change, 'Event', '{} updated'.format(what), session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
+
+
+def _format_ref(ref):
+    return '{}:{}'.format(ref.reference_type.name, ref.value)
 
 
 def _get_venue_room_name(data):

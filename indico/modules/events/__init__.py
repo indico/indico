@@ -237,7 +237,7 @@ def _inject_event_references(event, **kwargs):
 
 @template_hook('event-location-field')
 def _render_location_field(event, **kwargs):
-    from indico.modules.events.forms import EventLocationForm
+    from indico.modules.events.management.forms import EventLocationForm
     location_data = event.location_data if event else {'inheriting': False}
     form = EventLocationForm(obj=FormDefaults(location_data=location_data))
     tpl = get_template_module('forms/_form.html')

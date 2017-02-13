@@ -20,6 +20,7 @@ import re
 from datetime import timedelta
 from operator import itemgetter, attrgetter
 
+from markupsafe import escape
 from pytz import timezone
 from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField
 from wtforms.validators import InputRequired, DataRequired, ValidationError, Optional
@@ -29,16 +30,20 @@ from indico.core.db import db
 from indico.modules.designer import PageSize
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import Event, LegacyEventMapping
+from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
 from indico.modules.events.models.events import EventType
+from indico.modules.events.models.references import EventReference
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
+from indico.util.string import is_valid_mail, to_unicode
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
-                                     IndicoEnumSelectField,
-                                     IndicoPasswordField, IndicoDateTimeField, IndicoTimezoneSelectField)
+                                     IndicoEnumSelectField, IndicoPasswordField, IndicoDateTimeField,
+                                     IndicoTimezoneSelectField, IndicoLocationField, MultiStringField,
+                                     IndicoTagListField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
@@ -136,6 +141,65 @@ class EventDatesForm(IndicoForm):
             delta_str = format_human_timedelta(delta, 'minutes', True)
             raise ValidationError(_("The event is too short to fit all timetable entries. "
                                     "It must be at least {} longer.").format(delta_str))
+
+
+class EventLocationForm(IndicoForm):
+    location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
+
+
+class EventPersonsForm(IndicoForm):
+    person_link_data = EventPersonLinkListField(_('Chairpersons'))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(EventPersonsForm, self).__init__(*args, **kwargs)
+        if self.event.type_ == EventType.lecture:
+            self.person_link_data.label.text = _('Speakers')
+
+
+class EventContactInfoForm(IndicoForm):
+    _contact_fields = ('contact_title', 'contact_emails', 'contact_phones')
+
+    contact_title = StringField(_('Title'), [DataRequired()])
+    contact_emails = MultiStringField(_('Emails'), field=('email', _('email')), unique=True, flat=True, sortable=True)
+    contact_phones = MultiStringField(_('Phone numbers'), field=('phone', _('number')), unique=True, flat=True,
+                                      sortable=True)
+    organizer_info = TextAreaField(_('Organisers'))
+    additional_info = TextAreaField(_('Additional information'), widget=CKEditorWidget(),
+                                    description=_("This text is displayed on the main conference page."))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        # TODO: move to Event properties (or pass defaults from a SettingsProxy) and remove this
+        si = self.event.as_legacy.getSupportInfo()
+        kwargs['organizer_info'] = to_unicode(self.event.as_legacy.getOrgText())
+        kwargs['additional_info'] = to_unicode(self.event.as_legacy.getContactInfo())
+        kwargs['contact_title'] = to_unicode(si.getCaption())
+        kwargs['contact_emails'] = (map(unicode.strip, re.split(r'[\s;,]+', to_unicode(si.getEmail())))
+                                    if si.hasEmail() else [])
+        kwargs['contact_phones'] = (map(unicode.strip, re.split(r'[/;,]+', to_unicode(si.getTelephone())))
+                                    if si.hasTelephone() else [])
+        super(EventContactInfoForm, self).__init__(*args, **kwargs)
+        if self.event.type_ != EventType.lecture:
+            del self.organizer_info
+        if self.event.type_ != EventType.conference:
+            del self.additional_info
+
+    def validate_contact_emails(self, field):
+        for email in field.data:
+            if not is_valid_mail(email, False):
+                raise ValidationError(_('Invalid email address: {}').format(escape(email)))
+
+
+class EventClassificationForm(IndicoForm):
+    keywords = IndicoTagListField(_('Keywords'))
+    references = ReferencesField(_('External IDs'), reference_class=EventReference)
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event')
+        super(EventClassificationForm, self).__init__(*args, **kwargs)
+        if event.type_ != EventType.meeting:
+            del self.references
 
 
 class EventProtectionForm(IndicoForm):
