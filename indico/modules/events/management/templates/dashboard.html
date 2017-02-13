@@ -18,4 +18,36 @@
        data-ajax-dialog>
         Date/time
     </a>
+    <a class="i-button"
+       data-href="{{ url_for('.edit_location', event) }}"
+       data-title="{% trans %}Edit event location{% endtrans %}"
+       data-reload-after
+       data-ajax-dialog>
+        Location
+    </a>
+    <a class="i-button"
+       data-href="{{ url_for('.edit_persons', event) }}"
+       data-title="{{ _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') }}"
+       data-reload-after
+       data-ajax-dialog>
+        {%- if event.type == 'lecture' -%}
+            Speakers
+        {%- else -%}
+            Chairpersons
+        {%- endif -%}
+    </a>
+    <a class="i-button"
+       data-href="{{ url_for('.edit_contact_info', event) }}"
+       data-title="{% trans %}Edit contact info{% endtrans %}"
+       data-reload-after
+       data-ajax-dialog>
+        Contact info
+    </a>
+    <a class="i-button"
+       data-href="{{ url_for('.edit_classification', event) }}"
+       data-title="{% trans %}Edit classification{% endtrans %}"
+       data-reload-after
+       data-ajax-dialog>
+        Classification
+    </a>
 {% endblock %}
