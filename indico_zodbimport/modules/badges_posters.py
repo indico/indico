@@ -27,8 +27,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.categories import Category
 from indico.modules.events import Event
-from indico.modules.events.registration.settings import (event_badge_settings, category_badge_settings,
-                                                         DEFAULT_BADGE_SETTINGS)
+from indico.modules.events.registration.settings import (event_badge_settings, DEFAULT_BADGE_SETTINGS)
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate, TemplateType
@@ -301,6 +300,10 @@ class BadgeMigration(TemplateMigrationBase):
                 self.importer.print_warning(cformat('%{yellow!}Event has no badge PDF options'), event_id=self.event.id)
             return
 
+        if not self.event:
+            # don't migrate server-wide defaults
+            return
+
         new_settings = {}
         for new_prop, (old_prop, datatype) in BADGE_CONFIG_MAPPING.viewitems():
             value = getattr(options, old_prop, None)
@@ -311,10 +314,7 @@ class BadgeMigration(TemplateMigrationBase):
                     new_settings[new_prop] = value
 
         if new_settings:
-            if self.event:
-                event_badge_settings.set_multi(self.event, new_settings)
-            else:
-                category_badge_settings.set_multi(0, new_settings)
+            event_badge_settings.set_multi(self.event, new_settings)
 
 
 class BadgePosterImporter(LocalFileImporterMixin, Importer):
