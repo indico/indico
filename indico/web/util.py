@@ -74,7 +74,7 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
     tpl = get_template_module('forms/_form.html')
     html = tpl.simple_form(form, fields=fields, submit=submit, back=back, back_url=back_url, back_button=back_button,
                            disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
-                           form_header_kwargs=form_header_kwargs, skip_labels=skip_labels)
+                           form_header_kwargs=form_header_kwargs, skip_labels=skip_labels, save_reminder=save_reminder)
     return jsonify(html=html, js=_pop_injected_js())
 
 
