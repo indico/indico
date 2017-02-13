@@ -31,9 +31,10 @@ from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.forms import EventReferencesForm, EventLocationForm, EventPersonLinkForm, EventKeywordsForm
-from indico.modules.events.management.forms import PosterPrintingForm
-from indico.modules.events.management.forms import EventProtectionForm, EventDataForm, EventDatesForm
+from indico.modules.events.forms import EventReferencesForm, EventPersonLinkForm, EventKeywordsForm
+from indico.modules.events.management.forms import (EventProtectionForm, EventDataForm, EventDatesForm,
+                                                    EventLocationForm, EventPersonsForm, EventContactInfoForm,
+                                                    EventClassificationForm, PosterPrintingForm)
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
 from indico.modules.events.posters import PosterPDF
@@ -85,13 +86,41 @@ class RHEventManagementDashboard(RHManageEventBase):
         return WPEventDashboard.render_template('dashboard.html', self._conf, event=self.event_new)
 
 
-class RHEditEventData(RHManageEventBase):
+class RHEditEventDataBase(RHManageEventBase):
+    form_class = None
+
+    def render_form(self, form):
+        return jsonify_form(form)
+
     def _process(self):
-        form = EventDataForm(obj=self.event_new, event=self.event_new)
+        form = self.form_class(obj=self.event_new, event=self.event_new)
         if form.validate_on_submit():
             update_event(self.event_new, **form.data)
             return jsonify_data(flash=False)
-        return jsonify_form(form)
+        return self.render_form(form)
+
+
+class RHEditEventData(RHEditEventDataBase):
+    form_class = EventDataForm
+
+
+class RHEditEventLocation(RHEditEventDataBase):
+    form_class = EventLocationForm
+
+
+class RHEditEventPersons(RHEditEventDataBase):
+    form_class = EventPersonsForm
+
+
+class RHEditEventContactInfo(RHEditEventDataBase):
+    form_class = EventContactInfoForm
+
+    def render_form(self, form):
+        return jsonify_template('events/management/event_contact_info.html', form=form)
+
+
+class RHEditEventClassification(RHEditEventDataBase):
+    form_class = EventClassificationForm
 
 
 class RHEditEventDates(RHManageEventBase):

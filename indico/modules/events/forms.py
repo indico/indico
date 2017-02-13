@@ -65,10 +65,6 @@ class EventReferencesForm(IndicoForm):
                                  description=_("Manage external resources for this event"))
 
 
-class EventLocationForm(IndicoForm):
-    location_data = IndicoLocationField(_('Location'), allow_location_inheritance=False)
-
-
 class EventKeywordsForm(IndicoForm):
     keywords = IndicoTagListField(_('Keywords'))
 
