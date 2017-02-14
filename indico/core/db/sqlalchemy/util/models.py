@@ -16,6 +16,7 @@
 
 import os
 import pkg_resources
+from copy import copy
 from importlib import import_module
 
 from flask import g
@@ -213,7 +214,8 @@ class IndicoModel(Model):
                 raise ValueError("{} has no attribute '{}'".format(cls.__name__, key))
             old_value = getattr(self, key, None)
             if old_value != value:
-                changed[key] = (old_value, value)
+                # XXX: we copy because of https://bitbucket.org/zzzeek/sqlalchemy/issues/3913/
+                changed[key] = (copy(old_value), value)
                 setattr(self, key, value)
         return changed
 
