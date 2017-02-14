@@ -1,53 +1,162 @@
 {% extends 'layout/base.html' %}
 
+{% from 'events/management/_event_person_links.html' import render_event_person_links %}
+
 {% block title %}{% trans %}Dashboard{% endtrans %}{% endblock %}
 
+{% macro with_default(content='', empty_msg=none) %}
+    {% set content = (caller() if caller is defined else content) | trim %}
+    {%- if content -%}
+        {{ content }}
+    {%- else -%}
+        <em class="semantic-text disabled">{{ empty_msg or _('None') }}</em>
+    {%- endif -%}
+{% endmacro %}
+
+
+{% macro render_section(icon, edit_endpoint, edit_title) %}
+    <div class="section">
+        <div class="icon {{ icon }}"></div>
+        <div class="text">
+            {{ caller() }}
+        </div>
+        <div class="toolbar">
+            <button class="i-button borderless text-color icon-only icon-edit"
+                    title="{{ edit_title }}"
+                    data-href="{{ url_for(edit_endpoint, event) }}"
+                    data-title="{{ edit_title }}"
+                    data-reload-after {# TODO: use data-update instead #}
+                    data-ajax-dialog></button>
+        </div>
+    </div>
+{% endmacro %}
+
+
 {% block content %}
-    {# TODO: pretty dashboard. the current HTML is just to access the dialogs! #}
-    <a class="i-button"
-       data-href="{{ url_for('.edit_data', event) }}"
-       data-title="{% trans %}Edit basic event data{% endtrans %}"
-       data-reload-after
-       data-ajax-dialog>
-        Basic information
-    </a>
-    <a class="i-button"
-       data-href="{{ url_for('.edit_dates', event) }}"
-       data-title="{% trans %}Edit event date/time{% endtrans %}"
-       data-reload-after
-       data-ajax-dialog>
-        Date/time
-    </a>
-    <a class="i-button"
-       data-href="{{ url_for('.edit_location', event) }}"
-       data-title="{% trans %}Edit event location{% endtrans %}"
-       data-reload-after
-       data-ajax-dialog>
-        Location
-    </a>
-    <a class="i-button"
-       data-href="{{ url_for('.edit_persons', event) }}"
-       data-title="{{ _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') }}"
-       data-reload-after
-       data-ajax-dialog>
-        {%- if event.type == 'lecture' -%}
-            Speakers
-        {%- else -%}
-            Chairpersons
-        {%- endif -%}
-    </a>
-    <a class="i-button"
-       data-href="{{ url_for('.edit_contact_info', event) }}"
-       data-title="{% trans %}Edit contact info{% endtrans %}"
-       data-reload-after
-       data-ajax-dialog>
-        Contact info
-    </a>
-    <a class="i-button"
-       data-href="{{ url_for('.edit_classification', event) }}"
-       data-title="{% trans %}Edit classification{% endtrans %}"
-       data-reload-after
-       data-ajax-dialog>
-        Classification
-    </a>
+    <div class="action-box event-settings">
+        {% call render_section('icon-home', '.edit_data', _('Edit basic event data')) %}
+            {# TODO: cleanup html, use better semantics (dl?) #}
+            <label>{% trans %}Title:{% endtrans %}</label>
+            {{ event.title }}
+            <br>
+
+            <label>{% trans %}Description:{% endtrans %}</label>
+            {{ with_default(event.description.split('</p>')[0]|striptags|truncate(75)) }}
+            <br>
+
+            <label>{% trans %}Short URL:{% endtrans %}</label>
+            {% call with_default() %}
+                {% if event.url_shortcut %}
+                    <a href="{{ event.short_external_url }}"
+                       class="js-copy-to-clipboard"
+                       title="{% trans %}Copy link to clipboard{% endtrans %}"
+                       data-clipboard-text="{{ event.short_external_url }}"
+                       data-clipboard-action="copy">
+                        {{ event.short_external_url }}
+                    </a>
+                {% endif %}
+            {% endcall %}
+        {% endcall %}
+
+        {% call render_section('icon-calendar', '.edit_dates', _('Edit event dates')) %}
+            {% set tz = event.tzinfo %}
+
+            <label>{% trans %}Date:{% endtrans %}</label>
+            {% if event.start_dt.astimezone(tz).date() == event.end_dt.astimezone(tz).date() %}
+                {{ event.start_dt|format_date('long', timezone=tz) }}
+            {% else %}
+                {{ event.start_dt|format_date(timezone=tz) }} - {{ event.end_dt|format_date(timezone=tz) }}
+            {% endif %}
+            <br>
+
+            <label>{% trans %}Time:{% endtrans %}</label>
+            {{ event.start_dt|format_time(timezone=tz) }} - {{ event.end_dt|format_time(timezone=tz) }}
+            <br>
+
+            <label>{% trans %}Timezone:{% endtrans %}</label> {{ event.timezone }}
+
+            {% if event.type == 'conference' %}
+                <br>
+                <label>{% trans %}Screen dates:{% endtrans %}</label>
+                {% if event.as_legacy._screenStartDate or event.as_legacy._screenEndDate %}
+                    {{ (event.as_legacy._screenStartDate if event.as_legacy._screenStartDate else event.start_dt) | format_datetime(timezone=tz) }} -
+                    {{ (event.as_legacy._screenEndDate if event.as_legacy._screenEndDate else event.end_dt) | format_datetime(timezone=tz) }}
+                {% else %}
+                    {{ with_default() }}
+                {% endif %}
+            {% endif %}
+        {% endcall %}
+
+        {% call render_section('icon-location', '.edit_location', _('Edit event location')) %}
+            <label>{% trans %}Room:{% endtrans %}</label>
+            {{ with_default(event.room_name) }}<br>
+
+            <label>{% trans %}Venue:{% endtrans %}</label>
+            {{ with_default(event.venue_name) }}<br>
+
+            <label>{% trans %}Address:{% endtrans %}</label>
+            {{ with_default(event.address|replace('\n', ', ')) }}
+        {% endcall %}
+
+        {% set edit_persons_title = _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') %}
+        {% call render_section('icon-user-chairperson', '.edit_persons', edit_persons_title) %}
+            {% set empty_msg = _('No speakers') if event.type == 'lecture' else _('No chairpersons') %}
+            {% call with_default(empty_msg=empty_msg) %}
+                {% if event.person_links %}
+                    <label>
+                        {%- if event.type == 'lecture' -%}
+                            {% trans %}Speakers{% endtrans %}
+                        {%- else -%}
+                            {% trans %}Chairpersons{% endtrans %}
+                        {%- endif -%}
+                    </label>
+                    {{ render_event_person_links(event.type, event.person_links) }}
+                {% endif %}
+            {% endcall %}
+        {% endcall %}
+
+        {% call render_section('icon-info', '.edit_contact_info', _('Edit contact info')) %}
+            {% if event.type == 'lecture' %}
+                <label>{% trans %}Organiser:{% endtrans %}</label>
+                {{ with_default(event.as_legacy.getOrgText().decode('utf-8')|truncate(75)) }}
+                <br>
+            {% endif %}
+
+            {% if event.type == 'conference' %}
+                <label>{% trans %}Additional info:{% endtrans %}</label>
+                {{ with_default(event.as_legacy.getContactInfo().decode('utf-8').split('</p>')[0]|striptags|truncate(75)) }}
+                <br>
+            {% endif %}
+
+            <label>{% trans %}Contact/Support title:{% endtrans %}</label>
+            {{ with_default(event.as_legacy.getSupportInfo().getCaption().decode('utf-8')) }}
+            <br>
+
+            <label>{% trans %}Email:{% endtrans %}</label>
+            {{ with_default(event.as_legacy.getSupportInfo().getEmail().decode('utf-8')) }}
+            <br>
+
+            <label>{% trans %}Phone:{% endtrans %}</label>
+            {{ with_default(event.as_legacy.getSupportInfo().getTelephone().decode('utf-8')) }}
+        {% endcall %}
+
+        {% set edit_cls_title = _('Edit keywords / references') if event.type == 'meeting' else _('Edit keywords') %}
+        {% call render_section('icon-tag', '.edit_classification', edit_cls_title) %}
+            <label>{% trans %}Keywords:{% endtrans %}</label>
+            {{ with_default(event.keywords|join(', ')) }}
+            {% if event.type == 'meeting' %}
+                <br>
+                <label>{% trans %}External IDs:{% endtrans %}</label>
+                {% call with_default() %}
+                    {% set references = event.references|sort(attribute='value')|sort(attribute='reference_type.name') %}
+                    {% if references %}
+                        {% for reference in references -%}
+                            {{ reference.reference_type.name }}:{{ reference.value }}
+                            {{- ', ' if not loop.last -}}
+                        {% endfor %}
+                    {% endif %}
+                {% endcall %}
+            {% endif %}
+        {% endcall %}
+    </div>
 {% endblock %}

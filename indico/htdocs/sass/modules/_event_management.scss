@@ -602,3 +602,16 @@ th.i-table {
         max-height: 30px;
     }
 }
+
+.event-settings {
+    & > .section {
+        .text, .toolbar {
+            align-self: flex-start;
+        }
+
+        &:not(:first-child) {
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+    }
+}
