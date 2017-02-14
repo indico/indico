@@ -98,8 +98,9 @@ class PaymentPluginMixin(object):
         from indico.modules.events.registration.models.forms import RegistrationForm
         invalid_regforms = []
         if self.valid_currencies is not None:
-            invalid_regforms = event.registration_forms.filter(~RegistrationForm.currency.in_(self.valid_currencies),
-                                                               ~RegistrationForm.is_deleted).all()
+            invalid_regforms = (RegistrationForm.query.with_parent(event)
+                                .filter(~RegistrationForm.currency.in_(self.valid_currencies))
+                                .all())
         return invalid_regforms
 
     def supports_currency(self, currency):

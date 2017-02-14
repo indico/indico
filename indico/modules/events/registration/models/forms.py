@@ -224,7 +224,9 @@ class RegistrationForm(db.Model):
         lazy=True,
         backref=db.backref(
             'registration_forms',
-            lazy='dynamic'
+            primaryjoin='(RegistrationForm.event_id == Event.id) & ~RegistrationForm.is_deleted',
+            cascade='all, delete-orphan',
+            lazy=True
         )
     )
     # The items (sections, text, fields) in the form
