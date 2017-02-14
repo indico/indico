@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session, render_template, flash
 
 from indico.core import signals
@@ -80,13 +82,8 @@ def _inject_regform_announcement(event, **kwargs):
 
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    from indico.modules.events.registration.models.forms import RegistrationForm
-
     event = event.as_event
-    regforms = (event.registration_forms
-                .filter_by(is_deleted=False, is_open=True)
-                .order_by(db.func.lower(RegistrationForm.title))
-                .all())
+    regforms = sorted((rf for rf in event.registration_forms if rf.is_open), key=lambda f: f.title.lower())
 
     # A participant could appear more than once in the list in case he register to multiple registration form.
     # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
@@ -101,14 +98,13 @@ def _extend_event_menu(sender, **kwargs):
     def _visible_registration(event):
         if not event.has_feature('registration'):
             return False
-        if RegistrationForm.query.with_parent(event).filter(RegistrationForm.is_scheduled).has_rows():
+        if any(form.is_scheduled for form in event.registration_forms):
             return True
         if not session.user:
             return False
         return (Registration.query.with_parent(event)
                 .join(Registration.registration_form)
                 .filter(Registration.user == session.user,
-                        ~Registration.is_deleted,
                         ~RegistrationForm.is_deleted)
                 .has_rows())
 

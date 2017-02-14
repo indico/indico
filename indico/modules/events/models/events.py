@@ -479,7 +479,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def participation_regform(self):
-        return self.registration_forms.filter_by(is_participation=True, is_deleted=False).first()
+        return next((form for form in self.registration_forms if form.is_participation), None)
 
     @property
     @memoize_request

@@ -81,7 +81,7 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
     def _process(self):
-        regforms = self.event_new.registration_forms.filter(~RegistrationForm.is_deleted)
+        regforms = RegistrationForm.query.with_parent(self.event_new)
         if session.user:
             criteria = db.or_(
                 RegistrationForm.is_scheduled,
