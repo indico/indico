@@ -50,10 +50,13 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].enable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
-                    $scope.field.isEnabled = updatedField.view_data.isEnabled;
-                    $scope.section.items.sort(function(a, b) {
-                        return a.position - b.position;
+                    var lastEnabledIndex = _.findLastIndex($scope.section.items, function(item) {
+                        return item.isEnabled;
                     });
+                    var updatedFieldIndex = $scope.section.items.indexOf($scope.field);
+                    $scope.section.items.splice(updatedFieldIndex, 1);
+                    $scope.field.isEnabled = updatedField.view_data.isEnabled;
+                    $scope.section.items.splice(lastEnabledIndex + 1, 0, $scope.field);
                 }
             });
         }, handleAjaxError);
