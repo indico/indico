@@ -51,10 +51,7 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
     """List all registrations forms for an event"""
 
     def _process(self):
-        regforms = (self.event_new.registration_forms
-                    .filter_by(is_deleted=False)
-                    .order_by(db.func.lower(RegistrationForm.title))
-                    .all())
+        regforms = sorted((rf for rf in self.event_new.registration_forms), key=lambda f: f.title.lower())
         registration_counts = dict(self.event_new.registrations
                                    .with_entities(Registration.registration_form_id, db.func.count())
                                    .filter(Registration.is_active)
@@ -68,11 +65,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
     """Customize the display of registrations on the public page"""
 
     def _process(self):
-        regforms = (self.event_new.registration_forms
-                    .filter_by(is_deleted=False)
-                    .order_by(db.func.lower(RegistrationForm.title))
-                    .all())
-
+        regforms = sorted((rf for rf in self.event_new.registration_forms), key=lambda f: f.title.lower())
         form = ParticipantsDisplayForm()
         if form.validate_on_submit():
             data = form.json.data

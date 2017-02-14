@@ -40,10 +40,7 @@ class RegistrationFormCloner(EventCloner):
 
     @property
     def is_available(self):
-        return self._find_registration_forms().has_rows()
-
-    def _find_registration_forms(self):
-        return self.old_event.registration_forms.filter(~RegistrationForm.is_deleted)
+        return bool(self.old_event.registration_forms)
 
     @no_autoflush
     def run(self, new_event, cloners, shared_data):
@@ -53,7 +50,7 @@ class RegistrationFormCloner(EventCloner):
         attrs = get_simple_column_attrs(RegistrationForm) - {'start_dt', 'end_dt', 'modification_end_dt'}
         self._field_data_map = {}
         self._form_map = {}
-        for old_form in self._find_registration_forms():
+        for old_form in self.event.registration_forms:
             new_form = RegistrationForm(**{attr: getattr(old_form, attr) for attr in attrs})
             self._clone_form_items(old_form, new_form, clone_all_revisions)
             new_event.registration_forms.append(new_form)
@@ -102,9 +99,9 @@ class RegistrationCloner(EventCloner):
 
     @property
     def is_available(self):
-        return bool(self.old_event.registration_forms
-                    .filter(~RegistrationForm.is_deleted, RegistrationForm.registrations.any(Registration.is_active))
-                    .count())
+        return (RegistrationForm.query.with_parent(self.old_event)
+                .filter(RegistrationForm.registrations.any(Registration.is_active))
+                .has_rows())
 
     @property
     def is_default(self):

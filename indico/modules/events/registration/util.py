@@ -394,8 +394,7 @@ def get_events_registered(user, dt=None):
 
 def build_registrations_api_data(event):
     api_data = []
-    query = (event.registration_forms
-             .filter_by(is_deleted=False)
+    query = (RegistrationForm.query.with_parent(event)
              .options(joinedload('registrations').joinedload('data').joinedload('field_data')))
     for regform in query:
         for registration in regform.active_registrations:
