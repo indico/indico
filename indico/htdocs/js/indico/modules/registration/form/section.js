@@ -116,11 +116,10 @@ ndRegForm.controller('SectionCtrl', function($scope, $rootScope, regFormFactory)
 
     $scope.actions.openAddField = function(section, fieldType) {
         $scope.dialogs.newfield = true;
-        section.items.push({
-            id: -1,
-            isEnabled: true,
-            inputType: fieldType
+        var lastEnabledIndex = _.findLastIndex(section.items, function(item) {
+            return item.isEnabled;
         });
+        section.items.splice(lastEnabledIndex + 1, 0, {id: -1, isEnabled: true, inputType: fieldType});
     };
 });
 

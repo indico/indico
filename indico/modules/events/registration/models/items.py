@@ -37,7 +37,7 @@ def _get_next_position(context):
     regform_id = context.current_parameters['registration_form_id']
     parent_id = context.current_parameters['parent_id']
     res = (db.session.query(db.func.max(RegistrationFormItem.position))
-           .filter_by(parent_id=parent_id, registration_form_id=regform_id, is_deleted=False)
+           .filter_by(parent_id=parent_id, registration_form_id=regform_id, is_deleted=False, is_enabled=True)
            .one())
     return (res[0] or 0) + 1
 
@@ -102,25 +102,30 @@ class PersonalDataType(int, IndicoEnum):
                 'title': cls.affiliation.get_title(),
                 'input_type': 'text'
             }),
+            # Fields disabled by default start in position 1000 to avoid problems reordering
             (cls.address, {
                 'title': cls.address.get_title(),
                 'input_type': 'textarea',
-                'is_enabled': False
+                'is_enabled': False,
+                'position': 1000
             }),
             (cls.country, {
                 'title': cls.country.get_title(),
                 'input_type': 'country',
-                'is_enabled': False
+                'is_enabled': False,
+                'position': 1001
             }),
             (cls.phone, {
                 'title': cls.phone.get_title(),
                 'input_type': 'phone',
-                'is_enabled': False
+                'is_enabled': False,
+                'position': 1002
             }),
             (cls.position, {
                 'title': cls.position.get_title(),
                 'input_type': 'text',
-                'is_enabled': False
+                'is_enabled': False,
+                'position': 1003
             }),
         ]
 

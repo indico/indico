@@ -26,6 +26,8 @@ from indico.modules.events.registration.models.items import RegistrationFormText
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.util.string import snakify_keys
 
+FIRST_DISABLED_POSITION = 1000
+
 
 def _fill_form_field_with_data(field, field_data, set_data=True):
     field.title = field_data.pop('title')
@@ -64,6 +66,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
+        positions = [x.position for x in self.regform.form_items if x.is_enabled == enabled]
+        self.field.position = max(positions) + 1 if positions else FIRST_DISABLED_POSITION
         self.field.is_enabled = enabled
         db.session.flush()
         logger.info('Field %s modified by %s', self.field, session.user)
@@ -102,12 +106,13 @@ class RHRegistrationFormMoveField(RHManageRegFormFieldBase):
             return jsonify()
         elif new_position < old_position:
             def fn(field):
-                return field.position >= new_position and field.id != self.field.id and not field.is_deleted
+                return (field.position >= new_position and field.id != self.field.id and not field.is_deleted and
+                        field.is_enabled)
             start_enum = new_position + 1
         else:
             def fn(field):
                 return (old_position < field.position <= new_position and field.id != self.field.id and
-                        not field.is_deleted)
+                        not field.is_deleted and field.is_enabled)
             start_enum = self.field.position
         to_update = filter(fn, self.section.children)
         self.field.position = new_position
