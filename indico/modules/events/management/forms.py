@@ -27,6 +27,7 @@ from wtforms.validators import InputRequired, DataRequired, ValidationError, Opt
 
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.categories import Category
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.designer import PageSize
 from indico.modules.designer.util import get_inherited_templates
@@ -231,7 +232,24 @@ class EventProtectionForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.protected_object = event = kwargs.pop('event')
         super(EventProtectionForm, self).__init__(*args, **kwargs)
+        self._init_visibility(event)
+
+    def _get_event_own_visibility_horizon(self, event):
+        if self.visibility.data is None:  # unlimited
+            return Category.get_root()
+        elif self.visibility.data == 0:  # invisible
+            return None
+        else:
+            return event.category.nth_parent(self.visibility.data - 1)
+
+    def _init_visibility(self, event):
         self.visibility.choices = get_visibility_options(event, allow_invisible=True)
+        # Check if event visibility would be affected by any of the categories
+        real_horizon = event.category.real_visibility_horizon
+        own_horizon = self._get_event_own_visibility_horizon(event)
+        if own_horizon and real_horizon and real_horizon.is_descendant_of(own_horizon):
+            self.visibility.warning = _("This event's visibility is currently limited by that of '{}'.").format(
+                real_horizon.title)
 
     @classmethod
     def _create_coordinator_priv_fields(cls):
