@@ -242,3 +242,17 @@ def delete_event(event):
     db.session.flush()
     logger.info('Event %r deleted by %r', event, session.user)
     event.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', session.user)
+
+
+def lock_event(event):
+    event.is_locked = True
+    db.session.flush()
+    logger.info('Event %r locked by %r', event, session.user)
+    event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Event locked', session.user)
+
+
+def unlock_event(event):
+    event.is_locked = False
+    db.session.flush()
+    logger.info('Event %r unlocked by %r', event, session.user)
+    event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Event unlocked', session.user)

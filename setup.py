@@ -378,6 +378,7 @@ if __name__ == '__main__':
             global_ip_acl = indico_zodbimport.modules.global_ip_acl:GlobalIPACLImporter
             global_settings = indico_zodbimport.modules.global_settings:GlobalSettingsImporter
             badges_posters = indico_zodbimport.modules.badges_posters:BadgePosterImporter
+            event_data = indico_zodbimport.modules.event_data:EventDataImporter
             """,
           zip_safe=False,
           packages=foundPackages,

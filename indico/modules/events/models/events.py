@@ -45,6 +45,7 @@ from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
+from indico.modules.events.settings import EventSettingProperty, event_core_settings, event_contact_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
 from indico.util.date_time import overlaps, now_utc
@@ -81,6 +82,11 @@ class EventType(RichIntEnum):
 EventType.legacy_map = {'simple_event': EventType.lecture,
                         'meeting': EventType.meeting,
                         'conference': EventType.conference}
+
+
+class _EventSettingProperty(EventSettingProperty):
+    # the Event is already an Event (duh!), no need to get any other attribute
+    attr = staticmethod(lambda x: x)
 
 
 class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionManagersMixin, AttachedItemsMixin,
@@ -136,6 +142,12 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     )
     #: If the event has been deleted
     is_deleted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
+    #: If the event is locked (read-only mode)
+    is_locked = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -416,6 +428,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - timetable_entries (TimetableEntry.event_new)
     # - tracks (Track.event_new)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
+
+    displayed_start_dt = _EventSettingProperty(event_core_settings, 'displayed_start_dt')
+    displayed_end_dt = _EventSettingProperty(event_core_settings, 'displayed_end_dt')
+    organizer_info = _EventSettingProperty(event_core_settings, 'organizer_info')
+    additional_info = _EventSettingProperty(event_core_settings, 'additional_info')
+    contact_title = _EventSettingProperty(event_contact_settings, 'title')
+    contact_emails = _EventSettingProperty(event_contact_settings, 'emails')
+    contact_phones = _EventSettingProperty(event_contact_settings, 'phones')
 
     @classmethod
     def category_chain_overlaps(cls, category_ids):
@@ -822,7 +842,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False,
+        return format_repr(self, 'id', 'start_dt', 'end_dt', is_deleted=False, is_locked=False,
                            _text=text_to_repr(self.title, max_length=75))
 
 

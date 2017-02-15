@@ -21,9 +21,9 @@ from functools import wraps
 import yaml
 
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
+from indico.core.settings.converters import DatetimeConverter
 from indico.core.settings.proxy import SettingProperty
 from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
-from indico.modules.events import Event
 from indico.modules.events.models.settings import EventSettingPrincipal, EventSetting
 from indico.util.caching import memoize
 from indico.util.user import iter_acl
@@ -32,6 +32,7 @@ from indico.util.user import iter_acl
 def event_or_id(f):
     @wraps(f)
     def wrapper(self, event, *args, **kwargs):
+        from indico.modules.events import Event
         from MaKaC.conference import Conference
         if isinstance(event, (Conference, Event)):
             event = event.id
@@ -193,7 +194,6 @@ class EventSettingProperty(SettingProperty):
 
 
 class ThemeSettingsProxy(object):
-
     def __init__(self, settings_file):
         settings = self._load_settings(settings_file)
         self.themes = settings['definitions']
@@ -215,3 +215,20 @@ class ThemeSettingsProxy(object):
     def xml_themes(self):
         return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
                 if theme_data.get('is_xml')}
+
+
+event_core_settings = EventSettingsProxy('core', {
+    'displayed_start_dt': None,
+    'displayed_end_dt': None,
+    'organizer_info': '',
+    'additional_info': ''
+}, converters={
+    'displayed_start_dt': DatetimeConverter,
+    'displayed_end_dt': DatetimeConverter
+})
+
+event_contact_settings = EventSettingsProxy('contact', {
+    'title': 'Contact',
+    'emails': [],
+    'phones': []
+})
