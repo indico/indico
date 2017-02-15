@@ -101,7 +101,7 @@ def update_event(event, update_timetable=False, **data):
     assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
                                'start_dt', 'end_dt', 'timezone', 'keywords', 'references', 'organizer_info',
                                'additional_info', 'contact_title', 'contact_emails', 'contact_phones',
-                               'displayed_start_dt', 'displayed_end_dt'}
+                               'start_dt_override', 'end_dt_override'}
     old_person_links = event.person_links[:]
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
         # Lectures have no exposed timetable so if we have any timetable entries
@@ -136,8 +136,8 @@ def _log_event_update(event, changes):
         },
         'start_dt': 'Start date',
         'end_dt': 'End date',
-        'displayed_start_dt': 'Displayed start date',
-        'displayed_end_dt': 'Displayed end date',
+        'start_dt_override': 'Displayed start date',
+        'end_dt_override': 'Displayed end date',
         'timezone': {'title': 'Timezone', 'type': 'string'},
         'organizer_info': 'Organizers',
         'additional_info': 'Additional Info',
@@ -151,7 +151,7 @@ def _log_event_update(event, changes):
         # no way to retrieve the old order in here as it is updated on the
         # objects by the wtforms field (since we are modifying objects already
         # in the database)
-        if changes.viewkeys() <= {'timezone', 'start_dt', 'end_dt', 'displayed_start_dt', 'displayed_end_dt'}:
+        if changes.viewkeys() <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
             what = 'Dates'
         elif len(changes) == 1:
             what = log_fields[changes.keys()[0]]

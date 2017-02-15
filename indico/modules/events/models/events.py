@@ -429,8 +429,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - tracks (Track.event_new)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
 
-    displayed_start_dt = _EventSettingProperty(event_core_settings, 'displayed_start_dt')
-    displayed_end_dt = _EventSettingProperty(event_core_settings, 'displayed_end_dt')
+    start_dt_override = _EventSettingProperty(event_core_settings, 'start_dt_override')
+    end_dt_override = _EventSettingProperty(event_core_settings, 'end_dt_override')
     organizer_info = _EventSettingProperty(event_core_settings, 'organizer_info')
     additional_info = _EventSettingProperty(event_core_settings, 'additional_info')
     contact_title = _EventSettingProperty(event_contact_settings, 'title')
@@ -518,6 +518,28 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def end_dt_local(self):
         return self.end_dt.astimezone(self.tzinfo)
+
+    @property
+    def start_dt_display(self):
+        """
+        The 'displayed start dt', which is usually the actual start dt,
+        but may be overridden for a conference.
+        """
+        if self.type_ == EventType.conference and self.start_dt_override:
+            return self.start_dt_override
+        else:
+            return self.start_dt
+
+    @property
+    def end_dt_display(self):
+        """
+        The 'displayed end dt', which is usually the actual end dt,
+        but may be overridden for a conference.
+        """
+        if self.type_ == EventType.conference and self.end_dt_override:
+            return self.end_dt_override
+        else:
+            return self.end_dt
 
     @property
     def type(self):
