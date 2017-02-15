@@ -149,10 +149,10 @@ class ConferenceAdditionalInfoModification(ConferenceHTMLModificationBase):
     Conference additional info (a.k.a contact info) modification
     """
     def _handleSet(self):
-        self._target.setContactInfo(self._value)
+        self._target.as_event.additional_info = to_unicode(self._value)
 
     def _handleGet(self):
-        return self._target.getContactInfo()
+        return self._target.as_event.additional_info
 
 
 class ConferenceTypeModification(ConferenceTextModificationBase):
@@ -211,10 +211,10 @@ class ConferenceOrganiserTextModification(ConferenceTextModificationBase):
     """ Conference organiser text modification (for lectures)
     """
     def _handleSet(self):
-        self._target.setOrgText(self._value)
+        self._target.as_event.organizer_info = to_unicode(self._value)
 
     def _handleGet(self):
-        return self._target.getOrgText()
+        return self._target.as_event.organizer_info
 
 
 class ConferenceSupportModification(ConferenceTextModificationBase):

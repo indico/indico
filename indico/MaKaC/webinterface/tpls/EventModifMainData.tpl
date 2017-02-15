@@ -14,8 +14,6 @@ visibilityList = dict(get_visibility_options(confObj.as_event))
 visibilityList[999] = visibilityList.pop('')
 
 numRows = 11
-
-additionalInfo = confObj.getContactInfo()
 %>
 
 <tr>
@@ -84,7 +82,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Organisers")}</span>
     </td>
     <td class="blacktext">
-        <span id="inPlaceEditOrganiserText">${confObj.getOrgText() }</span>
+        <span id="inPlaceEditOrganiserText">${confObj.as_event.organizer_info }</span>
     </td>
 </tr>
 % endif
@@ -173,7 +171,7 @@ $E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', $
 
 % if evtType == 'lecture':
     $E('inPlaceEditOrganiserText').set(new TextAreaEditWidget('event.main.changeOrganiserText',
-            {'conference':'${ conferenceId }'}, ${ jsonEncode(confObj.getOrgText()) }, true, null, null,
+            {'conference':'${ conferenceId }'}, ${ jsonEncode(confObj.as_event.organizer_info) }, true, null, null,
             null).draw());
 % endif
 
@@ -193,7 +191,7 @@ $E('inPlaceEditDescription').set(new ParsedRichTextInlineEditWidget('event.main.
 var userCaption = "speaker";
 
 % if evtType == 'conference':
-    $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(additionalInfo) }, 600, 45, "${_('No additional info')}").draw());
+    $E('inPlaceEditAdditionalInfo').set(new RichTextInlineEditWidget('event.main.changeAdditionalInfo', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, ${ jsonEncode(confObj.as_event.additional_info) }, 600, 45, "${_('No additional info')}").draw());
     userCaption = "chairperson";
 % endif
 

@@ -48,10 +48,10 @@
             </tr>
         {% endif %}
 
-        {% if conf.getOrgText() %}
+        {% if event.organizer_info %}
             <tr>
                 <td class="leftCol">{% trans %}Organised by{% endtrans %}</td>
-                <td>{{ conf.getOrgText() | markdown }}</td>
+                <td>{{ event.organizer_info | markdown }}</td>
             </tr>
         {% endif %}
 
