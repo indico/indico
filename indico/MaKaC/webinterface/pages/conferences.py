@@ -304,7 +304,7 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["conf"] = self._conf
         vars["event"] = self._conf.as_event
 
-        info = self._conf.getContactInfo()
+        info = self._conf.as_event.additional_info
         vars["moreInfo_html"] = isStringHTML(info)
         vars["moreInfo"] = info
         vars["actions"] = ''
@@ -650,10 +650,12 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["startDate"]=formatDateTime(self._conf.getAdjustedStartDate())
         vars["endDate"]=formatDateTime(self._conf.getAdjustedEndDate())
         vars["chairText"] = self.htmlText(self._conf.getChairmanText())
-        if isStringHTML(self._conf.getContactInfo()):
-            vars["contactInfo"]=self._conf.getContactInfo()
+        additional_info = self._conf.as_event.additional_info
+        if isStringHTML(additional_info):
+            vars["contactInfo"] = additional_info
         else:
-            vars["contactInfo"] = """<table class="tablepre"><tr><td><pre>%s</pre></td></tr></table>""" % self._conf.getContactInfo()
+            vars["contactInfo"] = ("""<table class="tablepre"><tr><td><pre>{}</pre></td></tr></table>"""
+                                   .format(additional_info.encode('utf-8')))
         vars["supportEmailCaption"] = self._conf.getSupportInfo().getCaption()
         vars["supportEmail"] = i18nformat("""--_("not set")--""")
         if self._conf.getSupportInfo().hasEmail():
@@ -769,7 +771,7 @@ class WConferenceDataModificationAdditionalInfo(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars( self )
-        vars["contactInfo"] = self._conf.getContactInfo()
+        vars["contactInfo"] = self._conf.as_event.additional_info
         return vars
 
 
@@ -821,7 +823,7 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["eHour"] = str( self._conf.getAdjustedEndDate(tz).hour )
         vars["eMinute"] = str( self._conf.getAdjustedEndDate(tz).minute )
         vars["chairText"] = quoteattr( self._conf.getChairmanText() )
-        vars["orgText"] = self._conf.getOrgText()
+        vars["orgText"] = self._conf.as_event.organizer_info
         vars["visibility"] = self._getVisibilityHTML()
         vars["shortURLTag"] = quoteattr(self._conf.as_event.url_shortcut or '')
         vars["locator"] = self._conf.getLocator().getWebForm()

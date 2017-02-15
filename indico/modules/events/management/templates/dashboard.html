@@ -118,13 +118,13 @@
         {% call render_section('icon-info', '.edit_contact_info', _('Edit contact info')) %}
             {% if event.type == 'lecture' %}
                 <label>{% trans %}Organiser:{% endtrans %}</label>
-                {{ with_default(event.as_legacy.getOrgText().decode('utf-8')|truncate(75)) }}
+                {{ with_default(event.organizer_info|truncate(75)) }}
                 <br>
             {% endif %}
 
             {% if event.type == 'conference' %}
                 <label>{% trans %}Additional info:{% endtrans %}</label>
-                {{ with_default(event.as_legacy.getContactInfo().decode('utf-8').split('</p>')[0]|striptags|truncate(75)) }}
+                {{ with_default(event.additional_info.split('</p>')[0]|striptags|truncate(75)) }}
                 <br>
             {% endif %}
 

@@ -111,21 +111,16 @@ def update_event(event, update_timetable=False, **data):
     contact_title = data.pop('contact_title', _unset)
     contact_emails = data.pop('contact_emails', _unset)
     contact_phones = data.pop('contact_phones', _unset)
-    organizer_info = data.pop('organizer_info', _unset)
-    additional_info = data.pop('additional_info', _unset)
     if contact_title is not _unset:
         event.as_legacy.getSupportInfo().setCaption(contact_title.encode('utf-8'))
     if contact_emails is not _unset:
         event.as_legacy.getSupportInfo().setEmail(', '.join(contact_emails).encode('utf-8'))
     if contact_phones is not _unset:
         event.as_legacy.getSupportInfo().setTelephone(', '.join(contact_phones).encode('utf-8'))
-    if organizer_info is not _unset:
-        event.as_legacy.setOrgText(organizer_info.encode('utf-8'))
-    if additional_info is not _unset:
-        event.as_legacy.setContactInfo(additional_info.encode('utf-8'))
 
     assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
-                               'start_dt', 'end_dt', 'timezone', 'keywords', 'references'}
+                               'start_dt', 'end_dt', 'timezone', 'keywords', 'references', 'organizer_info',
+                               'additional_info'}
     old_person_links = event.person_links[:]
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
         # Lectures have no exposed timetable so if we have any timetable entries
@@ -160,7 +155,9 @@ def _log_event_update(event, changes):
         },
         'start_dt': 'Start date',
         'end_dt': 'End date',
-        'timezone': {'title': 'Timezone', 'type': 'string'}
+        'timezone': {'title': 'Timezone', 'type': 'string'},
+        'organizer_info': 'Organizers',
+        'additional_info': 'Additional Info',
     }
     _split_location_changes(changes)
     if changes:

@@ -74,7 +74,8 @@ class UtilsConference:
     def setValues(cls, c, confData, notify=False):
         c.setTitle( confData["title"] )
         c.setDescription( confData["description"] )
-        c.setOrgText(confData.get("orgText",""))
+        c.as_event.organizer_info = to_unicode(confData.get("orgText", ""))
+        c.as_event.additional_info = to_unicode(confData.get("contactInfo", ""))
         c.setComments(confData.get("comments",""))
         c.as_event.keywords = confData["keywords"]
         c.setChairmanText( confData.get("chairText", "") )
@@ -88,7 +89,6 @@ class UtilsConference:
                 c.as_event.url_shortcut = tag
             else:
                 c.as_event.url_shortcut = None
-        c.setContactInfo( confData.get("contactInfo","") )
         #################################
         # Fermi timezone awareness      #
         #################################
