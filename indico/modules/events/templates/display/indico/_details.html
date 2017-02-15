@@ -57,26 +57,22 @@
 
         {{ hook_event_header }}
 
-        {% if conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone() %}
+        {% if event.contact_emails or event.contact_phones %}
             <tr>
-                <td class="leftCol">{{ conf.getSupportInfo().getCaption() }}</td>
+                <td class="leftCol">{{ event.contact_title }}</td>
                 <td class="support-info">
-                {% if conf.getSupportInfo().getEmail() %}
+                {% for email in event.contact_emails %}
                     <div>
                         <i class="icon-mail"></i>
-                        <a href="mailto:{{ conf.getSupportInfo().getEmail() }}">
-                            {{ conf.getSupportInfo().getEmail() }}
-                        </a>
+                        <a href="mailto:{{ email }}">{{ email }}</a>
                     </div>
-                {% endif %}
-                {% if conf.getSupportInfo().getTelephone() %}
+                {% endfor %}
+                {% for phone in event.contact_phones %}
                     <div>
                         <i class="icon-phone"></i>
-                        <a href="tel:{{ conf.getSupportInfo().getTelephone() }}">
-                            {{ conf.getSupportInfo().getTelephone() }}
-                        </a>
+                        <a href="tel:{{ phone }}">{{ phone }}</a>
                     </div>
-                {% endif %}
+                {% endfor %}
                 </td>
             </tr>
         {% endif %}

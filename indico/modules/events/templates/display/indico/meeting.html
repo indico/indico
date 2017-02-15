@@ -7,7 +7,7 @@
 
 {% set hook_event_header = template_hook('event-header', event=conf) | trim %}
 {% set has_subheader = event.description or files or folders or lectures or event.organizer_info
-                       or conf.getSupportInfo().getEmail() or conf.getSupportInfo().getTelephone()
+                       or event.contact_emails or event.contact_phones
                        or (event.references and event.type == 'meeting') or hook_event_header %}
 
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">

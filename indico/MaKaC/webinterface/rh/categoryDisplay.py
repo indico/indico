@@ -33,7 +33,6 @@ from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.util import endpoint_for_url
-from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.errors import FormValuesError
 
 
@@ -110,13 +109,6 @@ class UtilsConference:
         if old_location_data != location_data:
             signals.event.data_changed.send(c, attr='location', old=old_location_data, new=location_data)
 
-        emailstr = setValidEmailSeparators(confData.get("supportEmail", ""))
-
-        if (emailstr != "") and not validMail(emailstr):
-            raise FormValuesError("One of the emails specified or one of the separators is invalid")
-
-        c.getSupportInfo().setEmail(emailstr)
-        c.getSupportInfo().setCaption(confData.get("supportCaption","Support"))
         # TODO: remove TODO once visibility has been updated
         if c.getVisibility() != confData.get("visibility", 999) and confData.get('visibility') != 'TODO':
             c.setVisibility(confData.get("visibility", 999))

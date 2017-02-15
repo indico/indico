@@ -172,13 +172,6 @@ class EventContactInfoForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        # TODO: move to Event properties (or pass defaults from a SettingsProxy) and remove this
-        si = self.event.as_legacy.getSupportInfo()
-        kwargs['contact_title'] = to_unicode(si.getCaption())
-        kwargs['contact_emails'] = (map(unicode.strip, re.split(r'[\s;,]+', to_unicode(si.getEmail())))
-                                    if si.hasEmail() else [])
-        kwargs['contact_phones'] = (map(unicode.strip, re.split(r'[/;,]+', to_unicode(si.getTelephone())))
-                                    if si.hasTelephone() else [])
         super(EventContactInfoForm, self).__init__(*args, **kwargs)
         if self.event.type_ != EventType.lecture:
             del self.organizer_info
