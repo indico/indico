@@ -61,14 +61,6 @@
         </tr>
         <!-- Fermi timezone awareness(end) -->
 ${ additionalInfo }
-        <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Support caption")}</span></td>
-            <td bgcolor="white" width="100%"><input type="text" name="supportCaption" value=${ supportCaption } size="50"></td>
-        </tr>
-        <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Support email")}</span></td>
-            <td bgcolor="white" width="100%"><input type="text" name="supportEmail" value=${ supportEmail } size="50"></td>
-        </tr>
         <!-- TO REMOVE CHAIRPERSON TEXT -->
         % if conference.getType() != "simple_event" and chairText != '""':
         <tr>

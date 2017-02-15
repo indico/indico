@@ -17,8 +17,6 @@
 from MaKaC.common.fossilize import IFossil
 from MaKaC.common.Conversion import Conversion
 
-from indico.core.fossils.event import ISupportInfoFossil
-
 
 class IConferenceMinimalFossil(IFossil):
 
@@ -55,10 +53,6 @@ class IConferenceFossil(IConferenceMinimalFossil):
 
     def getTimezone(self):
         """ Time zone """
-
-    def getSupportInfo(self):
-        """ Support Info"""
-    getSupportInfo.result = ISupportInfoFossil
 
 
 class IConferenceEventInfoFossil(IConferenceMinimalFossil):

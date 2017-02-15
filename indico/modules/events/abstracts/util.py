@@ -48,7 +48,7 @@ def build_default_email_template(event, tpl_type):
     email = get_template_module('events/abstracts/emails/default_{}_notification.txt'.format(tpl_type))
     tpl = AbstractEmailTemplate(body=email.get_body(),
                                 extra_cc_emails=[],
-                                reply_to_address=to_unicode(event.as_legacy.getSupportInfo().getEmail()) or '',
+                                reply_to_address=event.contact_emails[0] if event.contact_emails else '',
                                 subject=email.get_subject(),
                                 include_authors=True,
                                 include_submitter=True,

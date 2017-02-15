@@ -27,7 +27,6 @@ from sqlalchemy.orm import joinedload
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
-from indico.core.db.event import SupportInfo
 from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
@@ -41,7 +40,6 @@ from indico.util.user import unify_user_args
 
 from MaKaC import fileRepository
 from MaKaC.badge import BadgeTemplateManager
-from MaKaC.common.Counter import Counter
 from MaKaC.common.fossilize import fossilizes, Fossilizable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
@@ -116,10 +114,6 @@ class Conference(CommonObjectBase):
         self._modificationDS = nowutc()
 
         self._logo = None
-        self._supportInfo = SupportInfo(self, "Support")
-        self._contribTypes = {}
-        self.___contribTypeGenerator = Counter()
-        self._closed = False
         self.__badgeTemplateManager = BadgeTemplateManager(self)
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._confPaperReview = ConferencePaperReview(self)
@@ -593,14 +587,6 @@ class Conference(CommonObjectBase):
             signals.event.data_changed.send(self, attr='description', old=oldDescription, new=desc)
         self.notifyModification()
 
-    def getSupportInfo(self):
-        if not hasattr(self, "_supportInfo"):
-            self._supportInfo = SupportInfo(self, "Support")
-        return self._supportInfo
-
-    def setSupportInfo(self, supportInfo):
-        self._supportInfo = supportInfo
-
     def getChairmanText(self):
         # this is only used in legacy data and not settable for new events
         # TODO: check whether we can get rid of it at some point
@@ -664,7 +650,6 @@ class Conference(CommonObjectBase):
                              add_creator_as_manager=False)
         conf = event.as_legacy
         conf.setChairmanText(self.getChairmanText())
-        conf.setSupportInfo(self.getSupportInfo().clone(self))
         conf.notifyModification()
 
         # Run the new modular cloning system

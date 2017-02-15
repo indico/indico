@@ -256,10 +256,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
             vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
         vars["confLocation"] = self.event.venue_name
         vars["body"] = self._body
-        vars["supportEmail"] = ""
-        vars["supportTelephone"] = ""
         vars['menu'] = menu_entries_for_event(self.event)
-        vars['support_info'] = self._conf.getSupportInfo()
 
         vars["bgColorCode"] = layout_settings.get(self._conf, 'header_background_color').replace("#", "")
         vars["textColorCode"] = layout_settings.get(self._conf, 'header_text_color').replace("#", "")
@@ -267,13 +264,6 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["confId"] = self._conf.getId()
         vars["conf"] = self._conf
         return vars
-
-
-class WConfDisplayMenu(wcomponents.WTemplated):
-
-    def __init__(self, menu):
-        wcomponents.WTemplated.__init__(self)
-        self._menu = menu
 
 
 class WConfDetailsBase( wcomponents.WTemplated ):
@@ -656,10 +646,6 @@ class WConfModifMainData(wcomponents.WTemplated):
         else:
             vars["contactInfo"] = ("""<table class="tablepre"><tr><td><pre>{}</pre></td></tr></table>"""
                                    .format(additional_info.encode('utf-8')))
-        vars["supportEmailCaption"] = self._conf.getSupportInfo().getCaption()
-        vars["supportEmail"] = i18nformat("""--_("not set")--""")
-        if self._conf.getSupportInfo().hasEmail():
-            vars["supportEmail"] = self.htmlText(self._conf.getSupportInfo().getEmail())
         #------------------------------------------------------
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
         vars["shortURLTag"] = self._conf.as_event.url_shortcut or ''
@@ -827,8 +813,6 @@ class WConferenceDataModification(wcomponents.WTemplated):
         vars["visibility"] = self._getVisibilityHTML()
         vars["shortURLTag"] = quoteattr(self._conf.as_event.url_shortcut or '')
         vars["locator"] = self._conf.getLocator().getWebForm()
-        vars["supportCaption"] = quoteattr(self._conf.getSupportInfo().getCaption())
-        vars["supportEmail"] = quoteattr( self._conf.getSupportInfo().getEmail() )
         vars["locator"] = self._conf.getLocator().getWebForm()
         vars["event_type"] = ""
         vars["navigator"] = navigator

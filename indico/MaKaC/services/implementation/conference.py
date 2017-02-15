@@ -34,7 +34,6 @@ from indico.util.string import to_unicode
 from MaKaC import conference as conference
 from MaKaC.common import filters
 from MaKaC.common.Conversion import Conversion
-from MaKaC.common.utils import validMail, setValidEmailSeparators
 from MaKaC.common.fossilize import fossilize
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import TimingError
@@ -215,34 +214,6 @@ class ConferenceOrganiserTextModification(ConferenceTextModificationBase):
 
     def _handleGet(self):
         return self._target.as_event.organizer_info
-
-
-class ConferenceSupportModification(ConferenceTextModificationBase):
-    """
-    Conference support caption and e-mail modification
-    """
-    def _handleSet(self):
-        self._supportInfo = self._target.getSupportInfo()
-        caption = self._value.get("caption", "")
-        email = self._value.get("email", "")
-        phone = self._value.get("telephone", "")
-
-        if caption == "":
-            raise ServiceError("ERR-E2", "The caption cannot be empty")
-        self._supportInfo.setCaption(caption)
-
-        # handling the case of a list of emails with separators different than ","
-        email = setValidEmailSeparators(email)
-
-        if validMail(email) or email == "":
-            self._supportInfo.setEmail(email)
-        else:
-            raise ServiceError('ERR-E0', 'E-mail address %s is not valid!' %
-                               self._value)
-        self._supportInfo.setTelephone(phone)
-
-    def _handleGet(self):
-        return fossilize(self._supportInfo)
 
 
 class ConferenceDefaultStyleModification(ConferenceTextModificationBase):
@@ -435,7 +406,6 @@ class ContributionsReviewingFilterCrit(filters.FilterCriteria):
 
 methodMap = {
     "main.changeTitle": ConferenceTitleModification,
-    "main.changeSupport": ConferenceSupportModification,
     "main.changeSpeakerText": ConferenceSpeakerTextModification,
     "main.changeOrganiserText": ConferenceOrganiserTextModification,
     "main.changeDefaultStyle": ConferenceDefaultStyleModification,

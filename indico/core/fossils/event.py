@@ -18,22 +18,6 @@
 from MaKaC.common.fossilize import IFossil
 
 
-class ISupportInfoFossil(IFossil):
-
-    """
-    Support information fossil
-    """
-
-    def getCaption(self):
-        """ Support Caption """
-
-    def getEmail(self):
-        """ Support Email """
-
-    def getTelephone(self):
-        """ Support Telephone """
-
-
 class IErrorReportFossil(IFossil):
     def getMessage(self):
         pass

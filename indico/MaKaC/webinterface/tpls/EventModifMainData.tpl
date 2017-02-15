@@ -68,14 +68,6 @@ from markupsafe import escape
     </td>
 </tr>
 % endif
-<tr>
-    <td class="dataCaptionTD">
-        <span class="dataCaptionFormat">${ _("Support") }</span>
-    </td>
-    <td class="blacktext">
-        <span id="inPlaceEditSupport">${ supportEmail }</span>
-    </td>
-</tr>
 % if evtType == 'lecture':
 <tr>
     <td class="dataCaptionTD">
@@ -166,8 +158,6 @@ var confFossile = ${ jsonEncode(confObj.fossilize(IConferenceFossil, tz=confObj.
 $E('inPlaceEditTitle').set(new InputEditWidget('event.main.changeTitle',
         {'conference':'${ conferenceId }'}, ${ jsonEncode(title) }, false, null, null,
         null).draw());
-
-$E('inPlaceEditSupport').set(new SupportEditWidget('event.main.changeSupport', ${ jsonEncode(dict(conference="%s"%conferenceId)) }, {'caption': confFossile.supportInfo.caption, 'email': confFossile.supportInfo.email, 'telephone': confFossile.supportInfo.telephone}).draw());
 
 % if evtType == 'lecture':
     $E('inPlaceEditOrganiserText').set(new TextAreaEditWidget('event.main.changeOrganiserText',
