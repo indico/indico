@@ -51,7 +51,7 @@
             {% if not print_mode %}
                 {{ render_manage_button(contrib, 'CONTRIBUTION', toggle_notes=false, show_notes=show_notes,
                                         show_note_operations=true,
-                                        show_button=(not event.as_legacy.isClosed() and
+                                        show_button=(not event.is_locked and
                                                      contrib.can_manage_attachments(session.user))) }}
             {% endif %}
         </td>

@@ -13,7 +13,7 @@
 <div class="eventWrapper" itemscope itemtype="http://schema.org/Event">
     {% block header %}
         <div class="event-header {%- if not has_subheader %} round-bottom-corners{% endif %}">
-            {% set show_button = not conf.isClosed() and event.can_manage_attachments(session.user) %}
+            {% set show_button = not event.is_locked and event.can_manage_attachments(session.user) %}
             <div class="event-manage-button">
                 {{ render_manage_button(event, 'EVENT', show_button=show_button, toggle_notes=false) }}
             </div>

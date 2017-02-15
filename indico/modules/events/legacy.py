@@ -146,7 +146,7 @@ class XMLEventSerializer(object):
         xml.append(self._serialize_support_info(event.as_legacy.getSupportInfo()))
         SubElement(xml, 'title').text = event.title
         SubElement(xml, 'description').text = event.description
-        SubElement(xml, 'closed').text = str(event.as_legacy.isClosed())
+        SubElement(xml, 'closed').text = str(event.is_locked)
         xml.append(self._serialize_location(event))
         SubElement(xml, 'startDate').text = self._format_date(event.start_dt)
         SubElement(xml, 'endDate').text = self._format_date(event.end_dt)

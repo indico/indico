@@ -138,8 +138,8 @@ class RHConfModifReviewingPaperSetup( RHConfModifReviewingPRMBase ):
     """
     _uh = urlHandlers.UHConfModifReviewingPaperSetup
 
-    def _process( self ):
-        if self._conf.isClosed():
+    def _process(self):
+        if self.event_new.is_locked:
             p = WPConferenceModificationClosed( self, self._target )
         else:
             p = WPConfModifReviewingPaperSetup( self, self._target)
