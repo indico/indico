@@ -224,7 +224,7 @@ class CountryField(RegistrationFormFieldBase):
         return OrderedDict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data, for_humans=False):
-        return CountryHolder.getCountryById(registration_data.data) if registration_data.data else ''
+        return CountryHolder.getCountryById(registration_data.data).decode('utf-8') if registration_data.data else ''
 
 
 class _DeletableFileField(wtforms.FileField):
