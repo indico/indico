@@ -112,7 +112,6 @@ class Conference(CommonObjectBase):
         self.rooms = []
         self._screenStartDate = None
         self._screenEndDate = None
-        self.contactInfo = ""
         self.chairmanText = ""
         self._modificationDS = nowutc()
 
@@ -124,7 +123,6 @@ class Conference(CommonObjectBase):
         self.__badgeTemplateManager = BadgeTemplateManager(self)
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._confPaperReview = ConferencePaperReview(self)
-        self._orgText = ""
         self._comments = ""
 
     @return_ascii
@@ -250,44 +248,8 @@ class Conference(CommonObjectBase):
             self._confPaperReview = ConferencePaperReview(self)
         return self._confPaperReview
 
-    def getOrgText( self ):
-        try:
-            return self._orgText
-        except:
-            self.setOrgText()
-            return ""
-
-    def setOrgText( self, org="" ):
-        self._orgText = org
-
     def getType(self):
         return self.as_event.type_.legacy_name
-
-    def setValues(self, confData):
-        """
-            Sets SOME values of the current conference object from a dictionary
-            containing the following key-value pairs:
-                visibility-(str)
-                title-(str)
-                description-(str)
-                supportEmail-(str)
-                contactInfo-(str)
-                locationName-(str) => name of the location, if not specified
-                        it will be set to the conference location name.
-                locationAddress-(str)
-                roomName-(str) => name of the room, if not specified it will
-                    be set to the conference room name.
-            Please, note that this method sets SOME values which means that if
-            needed it can be completed to set more values. Also note that if
-            the given dictionary doesn't contain all the values, the missing
-            ones will be set to the default values.
-        """
-        self.setVisibility(confData.get("visibility", "999"))
-        self.setTitle(confData.get("title", _("NO TITLE ASSIGNED")))
-        self.setDescription(confData.get("description", ""))
-        self.getSupportInfo().setEmail(confData.get("supportEmail", ""))
-        self.setContactInfo(confData.get("contactInfo", ""))
-        self.notifyModification()
 
     def getVisibility(self):
         return self.as_event.visibility if self.as_event.visibility is not None else 999
@@ -652,13 +614,6 @@ class Conference(CommonObjectBase):
     def setChairmanText( self, newText ):
         self.chairmanText = newText.strip()
 
-    def getContactInfo(self):
-        return self.contactInfo
-
-    def setContactInfo(self, contactInfo):
-        self.contactInfo = contactInfo
-        self.notifyModification()
-
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
             unique session id specified
@@ -708,7 +663,6 @@ class Conference(CommonObjectBase):
                              features=features_event_settings.get(self, 'enabled'),
                              add_creator_as_manager=False)
         conf = event.as_legacy
-        conf.setContactInfo(self.getContactInfo())
         conf.setChairmanText(self.getChairmanText())
         conf.setSupportInfo(self.getSupportInfo().clone(self))
         conf.notifyModification()

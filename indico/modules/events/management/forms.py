@@ -174,8 +174,6 @@ class EventContactInfoForm(IndicoForm):
         self.event = kwargs.pop('event')
         # TODO: move to Event properties (or pass defaults from a SettingsProxy) and remove this
         si = self.event.as_legacy.getSupportInfo()
-        kwargs['organizer_info'] = to_unicode(self.event.as_legacy.getOrgText())
-        kwargs['additional_info'] = to_unicode(self.event.as_legacy.getContactInfo())
         kwargs['contact_title'] = to_unicode(si.getCaption())
         kwargs['contact_emails'] = (map(unicode.strip, re.split(r'[\s;,]+', to_unicode(si.getEmail())))
                                     if si.hasEmail() else [])
