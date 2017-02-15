@@ -39,7 +39,7 @@ from indico.modules.events.management.util import flash_if_unregistered, can_loc
 from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
 from indico.modules.events.posters import PosterPDF
 from indico.modules.events.operations import (delete_event, create_event_references, update_event_protection,
-                                              update_event)
+                                              update_event, lock_event, unlock_event)
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args, update_object_principals, track_time_changes
@@ -169,7 +169,7 @@ class RHLockEvent(RHManageEventBase):
         return jsonify_template('events/management/lock_event.html')
 
     def _process_POST(self):
-        self._conf.setClosed(True)
+        lock_event(self.event_new)
         flash(_('The event is now locked.'), 'success')
         return jsonify_data(url=url_for('event_management.dashboard', self.event_new), flash=False)
 
@@ -182,7 +182,7 @@ class RHUnlockEvent(RHManageEventBase):
         RHManageEventBase._checkProtection(self)
 
     def _process(self):
-        self._conf.setClosed(False)
+        unlock_event(self.event_new)
         flash(_('The event is now unlocked.'), 'success')
         return redirect(url_for('event_management.dashboard', self.event_new))
 

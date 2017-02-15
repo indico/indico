@@ -300,15 +300,8 @@ class Conference(CommonObjectBase):
         visibility = int(visibility)
         self.as_event.visibility = visibility if visibility != 999 else None
 
-    def isClosed( self ):
-        try:
-            return self._closed
-        except:
-            self._closed = False
-            return False
-
-    def setClosed( self, closed=True ):
-        self._closed = closed
+    def isClosed(self):
+        return self.as_event.is_locked
 
     @memoize_request
     def getContribTypeList(self):
