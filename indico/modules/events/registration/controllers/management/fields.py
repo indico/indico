@@ -43,6 +43,13 @@ def _fill_form_field_with_data(field, field_data, set_data=True):
                                                                                    field.versioned_data)
 
 
+def _remove_regform_item_gaps(form_items, from_position):
+    """Update positions when deleting/disabling an item in order to prevent gaps"""
+    for item in form_items:
+        if item.position > from_position and item.is_enabled:
+            item.position -= 1
+
+
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
     """Base class for a specific field within a registration form"""
 
@@ -66,6 +73,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
+        if not enabled:
+            _remove_regform_item_gaps(self.regform.form_items, self.field.position)
         positions = [x.position for x in self.regform.form_items if x.is_enabled == enabled]
         self.field.position = max(positions) + 1 if positions else FIRST_DISABLED_POSITION
         self.field.is_enabled = enabled
@@ -81,6 +90,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
         self.field.is_deleted = True
+        _remove_regform_item_gaps(self.regform.form_items, self.field.position)
         db.session.flush()
         logger.info('Field %s deleted by %s', self.field, session.user)
         return jsonify()
