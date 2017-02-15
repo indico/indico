@@ -168,8 +168,8 @@ def _format_ref(ref):
 
 
 def _get_venue_room_name(data):
-    venue_name = data['venue'].name if data.get('venue') else data.get('venue_name')
-    room_name = data['room'].full_name if data.get('room') else data.get('room_name')
+    venue_name = data['venue'].name if data.get('venue') else data.get('venue_name', '')
+    room_name = data['room'].full_name if data.get('room') else data.get('room_name', '')
     return venue_name, room_name
 
 
