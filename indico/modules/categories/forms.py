@@ -49,10 +49,6 @@ class CategorySettingsForm(IndicoForm):
                                            description=_("Default timetable theme used for lecture events"))
     meeting_theme = IndicoThemeSelectField(_("Theme for Meetings"), [DataRequired()], event_type=EventType.meeting,
                                            description=_("Default timetable theme used for meeting events"))
-    visibility = SelectField(_("Event visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
-                             description=_("""From which point in the category tree contents will be visible from """
-                                           """(number of categories upwards). Applies to "Today's events" and """
-                                           """Calendar. If the category is moved, this number will be preserved."""))
     suggestions_disabled = BooleanField(_('Disable Suggestions'), widget=SwitchWidget(),
                                         description=_("Enable this if you don't want Indico to suggest this category as"
                                                       " a possible addition to a user's favourites."))
@@ -69,18 +65,6 @@ class CategorySettingsForm(IndicoForm):
                                                                       "every time a new event is created inside the "
                                                                       "category or one of its subcategories. "
                                                                       "One email address per line."))
-
-    def __init__(self, *args, **kwargs):
-        super(CategorySettingsForm, self).__init__(*args, **kwargs)
-        category = kwargs.pop('category')
-        self.visibility.choices = get_visibility_options(category, allow_invisible=False)
-
-        # Check if category visibility would be affected by any of the parents
-        real_horizon = category.real_visibility_horizon
-        own_horizon = category.own_visibility_horizon
-        if real_horizon and real_horizon.is_descendant_of(own_horizon):
-            self.visibility.warning = _("This category's visibility is currently limited by that of '{}'.").format(
-                real_horizon.title)
 
 
 class CategoryIconForm(IndicoForm):
@@ -110,6 +94,10 @@ class CategoryProtectionForm(IndicoForm):
     own_no_access_contact = StringField(_('No access contact'),
                                         description=_('Contact information shown when someone lacks access to the '
                                                       'category'))
+    visibility = SelectField(_("Event visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
+                             description=_("""From which point in the category tree contents will be visible from """
+                                           """(number of categories upwards). Applies to "Today's events" and """
+                                           """Calendar. If the category is moved, this number will be preserved."""))
     event_creation_restricted = BooleanField(_('Restricted event creation'), widget=SwitchWidget(),
                                              description=_('Whether the event creation should be restricted '
                                                            'to a list of specific persons'))
@@ -117,8 +105,18 @@ class CategoryProtectionForm(IndicoForm):
                                         description=_('Users allowed to create events in this category'))
 
     def __init__(self, *args, **kwargs):
-        self.protected_object = kwargs.pop('category')
+        self.protected_object = category = kwargs.pop('category')
         super(CategoryProtectionForm, self).__init__(*args, **kwargs)
+        self._init_visibility(category)
+
+    def _init_visibility(self, category):
+        self.visibility.choices = get_visibility_options(category, allow_invisible=False)
+        # Check if category visibility would be affected by any of the parents
+        real_horizon = category.real_visibility_horizon
+        own_horizon = category.own_visibility_horizon
+        if real_horizon and real_horizon.is_descendant_of(own_horizon):
+            self.visibility.warning = _("This category's visibility is currently limited by that of '{}'.").format(
+                real_horizon.title)
 
 
 class CreateCategoryForm(IndicoForm):
