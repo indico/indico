@@ -294,10 +294,10 @@ class SerializerBase(object):
             'bookedRooms': Conversion.reservationsList(event.reservations.all()),
             'supportInfo': {
                 '_fossil': 'supportInfo',
-                'caption': to_unicode(event.as_legacy.getSupportInfo().getCaption()),
+                'caption': event.contact_title,
                 '_type': 'SupportInfo',
-                'email': event.as_legacy.getSupportInfo().getEmail(),
-                'telephone': event.as_legacy.getSupportInfo().getTelephone()
+                'email': ', '.join(event.contact_emails),
+                'telephone': ', '.join(event.contact_phones)
             },
         })
         return data

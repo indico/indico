@@ -334,7 +334,8 @@ class RegistrationForm(db.Model):
 
     @property
     def sender_address(self):
-        return self.notification_sender_address or self.event_new.as_legacy.getSupportInfo().getEmail()
+        contact_email = self.event_new.contact_emails[0] if self.event_new.contact_emails else None
+        return self.notification_sender_address or contact_email
 
     @return_ascii
     def __repr__(self):

@@ -720,7 +720,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return query.first()
 
     def get_allowed_sender_emails(self, include_current_user=True, include_creator=True, include_managers=True,
-                                  include_support=True, include_chairs=True, extra=None):
+                                  include_contact=True, include_chairs=True, extra=None):
         """
         Return the emails of people who can be used as senders (or
         rather Reply-to contacts) in emails sent from within an event.
@@ -731,8 +731,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                 event creator
         :param include_managers: Whether to include the email of all
                                  event managers
-        :param include_support: Whether to include the "event support"
-                                email
+        :param include_contact: Whether to include the "event contact"
+                                emails
         :param include_chairs: Whether to include the emails of event
                                chairpersons (or lecture speakers)
         :param extra: An email address that is always included, even
@@ -740,10 +740,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         :return: An OrderedDict mapping emails to pretty names
         """
         emails = {}
-        # Support
-        if include_support:
-            support = self.as_legacy.getSupportInfo()
-            emails[support.getEmail()] = support.getCaption() or support.getEmail()
+        # Contact/Support
+        if include_contact:
+            for email in self.contact_emails:
+                emails[email] = self.contact_title
         # Current user
         if include_current_user and has_request_context() and session.user:
             emails[session.user.email] = session.user.full_name

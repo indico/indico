@@ -7,25 +7,23 @@
         {% endfor -%}
     </ul>
 
-    {% if not support_info.isEmpty() -%}
+    {% if event.contact_emails or event.contact_phones -%}
         <div class="support_box">
-            <h3>{{ support_info.getCaption() }}</h3>
+            <h3>{{ event.contact_title }}</h3>
             <ul>
-                {% if support_info.hasEmail() %}
-                    {% for email in support_info.getEmail().split(',') %}
-                        <li>
-                            <span class="icon icon-mail" aria-hidden="true"></span>
-                            <a href="mailto:{{ email }}?subject={{ event_title }}"> {{ email }}</a>
-                        </li>
-                        {% endfor %}
-                {% endif %}
-
-                {% if support_info.hasTelephone() %}
+                {% for email in event.contact_emails %}
                     <li>
-                      <span class="icon icon-phone" aria-hidden="true"></span>
-                      <a href="tel:{{ support_info.getTelephone().replace(' ', '') }}"> {{ support_info.getTelephone() }}</a>
+                        <span class="icon icon-mail" aria-hidden="true"></span>
+                        <a href="mailto:{{ email }}?subject={{ event_title }}"> {{ email }}</a>
                     </li>
-                {% endif %}
+                {% endfor %}
+
+                {% for phone in event.contact_phones %}
+                    <li>
+                        <span class="icon icon-phone" aria-hidden="true"></span>
+                        <a href="tel:{{ phone|replace(' ', '') }}"> {{ phone }}</a>
+                    </li>
+                {% endfor %}
             </ul>
         </div>
     {%- endif %}

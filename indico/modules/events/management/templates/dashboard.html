@@ -129,15 +129,15 @@
             {% endif %}
 
             <label>{% trans %}Contact/Support title:{% endtrans %}</label>
-            {{ with_default(event.as_legacy.getSupportInfo().getCaption().decode('utf-8')) }}
+            {{ with_default(event.contact_title) }}
             <br>
 
             <label>{% trans %}Email:{% endtrans %}</label>
-            {{ with_default(event.as_legacy.getSupportInfo().getEmail().decode('utf-8')) }}
+            {{ with_default(event.contact_emails|join(', ')) }}
             <br>
 
             <label>{% trans %}Phone:{% endtrans %}</label>
-            {{ with_default(event.as_legacy.getSupportInfo().getTelephone().decode('utf-8')) }}
+            {{ with_default(event.contact_phones|join(', ')) }}
         {% endcall %}
 
         {% set edit_cls_title = _('Edit keywords / references') if event.type == 'meeting' else _('Edit keywords') %}

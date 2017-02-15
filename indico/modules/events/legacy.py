@@ -84,11 +84,9 @@ class XMLEventSerializer(object):
         return xml
 
     @staticmethod
-    def _serialize_support_info(support_info):
-        xml = Element('supportEmail', {
-            'caption': to_unicode(support_info.getCaption())
-        })
-        xml.text = to_unicode(support_info.getEmail())
+    def _serialize_support_info(event):
+        xml = Element('supportEmail', {'caption': event.contact_title})
+        xml.text = ', '.join(event.contact_emails)
         return xml
 
     @staticmethod
@@ -143,7 +141,7 @@ class XMLEventSerializer(object):
         SubElement(xml, 'iCalLink').text = self._url_for('events.export_event_ical', event)
         SubElement(xml, 'announcer').append(self._serialize_user(event.creator,
                                                                  include_email=self._include_announcer_email))
-        xml.append(self._serialize_support_info(event.as_legacy.getSupportInfo()))
+        xml.append(self._serialize_support_info(event))
         SubElement(xml, 'title').text = event.title
         SubElement(xml, 'description').text = event.description
         SubElement(xml, 'closed').text = str(event.is_locked)
