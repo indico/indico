@@ -131,7 +131,7 @@ class RHEditEventDates(RHManageEventBase):
             with track_time_changes():
                 update_event(self.event_new, **form.data)
             return jsonify_data(flash=False)
-        show_screen_dates = form.has_displayed_dates and (form.displayed_start_dt.data or form.displayed_end_dt.data)
+        show_screen_dates = form.has_displayed_dates and (form.start_dt_override.data or form.end_dt_override.data)
         return jsonify_template('events/management/event_dates.html', form=form, show_screen_dates=show_screen_dates)
 
 

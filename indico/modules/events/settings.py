@@ -218,13 +218,13 @@ class ThemeSettingsProxy(object):
 
 
 event_core_settings = EventSettingsProxy('core', {
-    'displayed_start_dt': None,
-    'displayed_end_dt': None,
+    'start_dt_override': None,
+    'end_dt_override': None,
     'organizer_info': '',
     'additional_info': ''
 }, converters={
-    'displayed_start_dt': DatetimeConverter,
-    'displayed_end_dt': DatetimeConverter
+    'start_dt_override': DatetimeConverter,
+    'end_dt_override': DatetimeConverter
 })
 
 event_contact_settings = EventSettingsProxy('contact', {
