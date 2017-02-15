@@ -125,6 +125,7 @@ def update_session_coordinator_privs(event, data):
         changes[priv] = (not enabled, enabled)
     db.session.flush()
     logger.info('Session coordinator privs of event %r updated with %r by %r', event, data, session.user)
-    log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.iteritems()}
-    event.log(EventLogRealm.management, EventLogKind.change, 'Sessions', 'Coordinator privileges updated', session.user,
-              data={'Changes': make_diff_log(changes, log_fields)})
+    if changes:
+        log_fields = {priv: orig_string(title) for priv, title in COORDINATOR_PRIV_TITLES.iteritems()}
+        event.log(EventLogRealm.management, EventLogKind.change, 'Sessions', 'Coordinator privileges updated',
+                  session.user, data={'Changes': make_diff_log(changes, log_fields)})
