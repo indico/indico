@@ -187,7 +187,7 @@ class SettingProperty(object):
         self.name = name
         self.default = default
         attr = attr or self.attr
-        self.attrgetter = attrgetter(attr) if attr else None
+        self.attrgetter = attr if callable(attr) else attrgetter(attr) if attr else None
 
     def _make_args(self, obj, *args):
         if self.attrgetter is not None:
