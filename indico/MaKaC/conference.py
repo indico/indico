@@ -115,7 +115,6 @@ class Conference(CommonObjectBase):
         self.__badgeTemplateManager = BadgeTemplateManager(self)
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._confPaperReview = ConferencePaperReview(self)
-        self._comments = ""
 
     @return_ascii
     def __repr__(self):
@@ -223,17 +222,6 @@ class Conference(CommonObjectBase):
 
     def __ne__(self, toCmp):
         return not(self is toCmp)
-
-    def setComments(self,comm=""):
-        self._comments = comm.strip()
-
-    def getComments(self):
-        try:
-            if self._comments:
-                pass
-        except AttributeError,e:
-            self.setComments()
-        return self._comments
 
     def getConfPaperReview(self):
         if not hasattr(self, "_confPaperReview"):
