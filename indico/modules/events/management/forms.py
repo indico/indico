@@ -90,7 +90,7 @@ class EventDataForm(IndicoForm):
 
 class EventDatesForm(IndicoForm):
     _field_order = ('start_dt', 'end_dt', 'timezone', 'update_timetable', 'override_displayed_dates')
-    _displayed_date_fields = ('displayed_start_dt', 'displayed_end_dt')
+    _displayed_date_fields = ('start_dt_override', 'end_dt_override')
 
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], allow_clear=False)
@@ -99,10 +99,10 @@ class EventDatesForm(IndicoForm):
     update_timetable = BooleanField(_('Update timetable'), widget=SwitchWidget(),
                                     description=_("Move sessions/contributions/breaks in the timetable according "
                                                   "to the new event start time."))
-    displayed_start_dt = IndicoDateTimeField(_("Start"), [Optional()], allow_clear=True,
+    start_dt_override = IndicoDateTimeField(_("Start"), [Optional()], allow_clear=True,
                                              description=_("Specifying this date overrides the start date displayed "
                                                            "on the main conference page."))
-    displayed_end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('displayed_start_dt', not_equal=True)],
+    end_dt_override = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt_override', not_equal=True)],
                                            allow_clear=True,
                                            description=_("Specifying this date overrides the end date displayed "
                                                          "on the main conference page."))
@@ -121,11 +121,11 @@ class EventDatesForm(IndicoForm):
         # displayed dates
         self.has_displayed_dates = (self.event.type_ == EventType.conference)
         if self.has_displayed_dates:
-            self.displayed_start_dt.default_time = self.start_dt.data.astimezone(timezone(self.timezone.data)).time()
-            self.displayed_end_dt.default_time = self.end_dt.data.astimezone(timezone(self.timezone.data)).time()
+            self.start_dt_override.default_time = self.start_dt.data.astimezone(timezone(self.timezone.data)).time()
+            self.end_dt_override.default_time = self.end_dt.data.astimezone(timezone(self.timezone.data)).time()
         else:
-            del self.displayed_start_dt
-            del self.displayed_end_dt
+            del self.start_dt_override
+            del self.end_dt_override
 
     def validate_start_dt(self, field):
         if not self.check_timetable_boundaries or self.update_timetable.data or field.object_data == field.data:

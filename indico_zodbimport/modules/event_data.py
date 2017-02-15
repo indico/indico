@@ -46,9 +46,9 @@ class EventDataImporter(Importer):
         for conf in committing_iterator(self._iter_events()):
             event_id = int(conf.id)
             if conf._screenStartDate:
-                event_core_settings.set(event_id, 'displayed_start_dt', conf._screenStartDate)
+                event_core_settings.set(event_id, 'start_dt_override', conf._screenStartDate)
             if conf._screenEndDate:
-                event_core_settings.set(event_id, 'displayed_end_dt', conf._screenEndDate)
+                event_core_settings.set(event_id, 'end_dt_override', conf._screenEndDate)
             organizer_info = convert_to_unicode(conf._orgText)
             if organizer_info:
                 event_core_settings.set(event_id, 'organizer_info', organizer_info)

@@ -78,9 +78,9 @@
             {% if event.type == 'conference' %}
                 <br>
                 <label>{% trans %}Screen dates:{% endtrans %}</label>
-                {% if event.displayed_start_dt or event.displayed_end_dt %}
-                    {{ (event.displayed_start_dt or event.start_dt) | format_datetime(timezone=tz) }} -
-                    {{ (event.displayed_end_dt or event.end_dt) | format_datetime(timezone=tz) }}
+                {% if event.start_dt_override or event.end_dt_override %}
+                    {{ event.start_dt_display | format_datetime(timezone=tz) }} -
+                    {{ event.end_dt_display | format_datetime(timezone=tz) }}
                 {% else %}
                     {{ with_default() }}
                 {% endif %}

@@ -16,7 +16,6 @@
 
 import os
 import posixpath
-import re
 from collections import OrderedDict
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
@@ -65,8 +64,8 @@ class WPConferenceBase(base.WPDecorated):
         self._navigationTarget = self._conf = conference
         event = self._conf.as_event
         self._tz = event.display_tzinfo.zone
-        start_dt_local = (event.displayed_start_dt or event.start_dt).astimezone(event.display_tzinfo)
-        end_dt_local = (event.displayed_end_dt or event.end_dt).astimezone(event.display_tzinfo)
+        start_dt_local = event.start_dt_display.astimezone(event.display_tzinfo)
+        end_dt_local = event.end_dt_display.astimezone(event.display_tzinfo)
         dates = " (%s)" % format_date(start_dt_local, format='long')
         if start_dt_local.strftime("%d%B%Y") != end_dt_local.strftime("%d%B%Y"):
             if start_dt_local.strftime("%B%Y") == end_dt_local.strftime("%B%Y"):
@@ -215,8 +214,8 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
-        start_dt_local = (self.event.displayed_start_dt or self.event.start_dt).astimezone(self.event.display_tzinfo)
-        end_dt_local = (self.event.displayed_end_dt or self.event.end_dt).astimezone(self.event.display_tzinfo)
+        start_dt_local = self.event.start_dt_display.astimezone(self.event.display_tzinfo)
+        end_dt_local = self.event.end_dt_display.astimezone(self.event.display_tzinfo)
         vars["timezone"] = self.event.display_tzinfo.zone
         vars["confDateInterval"] = _("from {start} to {end}").format(start=format_date(start_dt_local, format='long'),
                                                                      end=format_date(end_dt_local, format='long'))
@@ -253,8 +252,8 @@ class WConfDetailsFull(wcomponents.WTemplated):
         vars["description"] = description
 
         event = self._conf.as_event
-        start_dt_local = (event.displayed_start_dt or event.start_dt).astimezone(event.display_tzinfo)
-        end_dt_local = (event.displayed_end_dt or event.end_dt).astimezone(event.display_tzinfo)
+        start_dt_local = event.start_dt_display.astimezone(event.display_tzinfo)
+        end_dt_local = event.end_dt_display.astimezone(event.display_tzinfo)
 
         fsdate, fedate = format_date(start_dt_local, format='medium'), format_date(end_dt_local, format='medium')
         fstime, fetime = start_dt_local.strftime("%H:%M"), end_dt_local.strftime("%H:%M")
