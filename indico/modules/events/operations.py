@@ -98,18 +98,10 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 
 def update_event(event, update_timetable=False, **data):
-    # TODO: Move this legacy stuff to proper places and then handle it together with the other new data
-    _unset = object()
-    # screen dates
-    displayed_start_dt = data.pop('displayed_start_dt', _unset)
-    displayed_end_dt = data.pop('displayed_end_dt', _unset)
-    if displayed_start_dt is not _unset:
-        event.as_legacy.setScreenStartDate(displayed_start_dt)
-    if displayed_end_dt is not _unset:
-        event.as_legacy.setScreenEndDate(displayed_end_dt)
     assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
                                'start_dt', 'end_dt', 'timezone', 'keywords', 'references', 'organizer_info',
-                               'additional_info', 'contact_title', 'contact_emails', 'contact_phones'}
+                               'additional_info', 'contact_title', 'contact_emails', 'contact_phones',
+                               'displayed_start_dt', 'displayed_end_dt'}
     old_person_links = event.person_links[:]
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
         # Lectures have no exposed timetable so if we have any timetable entries
@@ -144,6 +136,8 @@ def _log_event_update(event, changes):
         },
         'start_dt': 'Start date',
         'end_dt': 'End date',
+        'displayed_start_dt': 'Displayed start date',
+        'displayed_end_dt': 'Displayed end date',
         'timezone': {'title': 'Timezone', 'type': 'string'},
         'organizer_info': 'Organizers',
         'additional_info': 'Additional Info',

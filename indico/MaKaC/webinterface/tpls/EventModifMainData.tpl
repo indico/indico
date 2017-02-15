@@ -147,12 +147,6 @@ from markupsafe import escape
 </tr>
 
 <script type="text/javascript">
-function removeItem(number, form)
-{
-    form.selChair.value = number;
-    form.submit();
-}
-
 var confFossile = ${ jsonEncode(confObj.fossilize(IConferenceFossil, tz=confObj.getTimezone())) };
 
 $E('inPlaceEditTitle').set(new InputEditWidget('event.main.changeTitle',

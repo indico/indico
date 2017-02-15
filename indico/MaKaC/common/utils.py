@@ -29,37 +29,6 @@ from MaKaC import errors
 if os.name == 'posix':
     import fcntl
 
-_KEY_DEFAULT_LENGTH = 20
-_FAKENAME_SIZEMIN = 5
-_FAKENAME_SIZEMAX = 10
-
-
-def stringToDate( str ):
-    months = { "January":1, "February":2, "March":3, "April":4, "May":5, "June":6, "July":7, "August":8, "September":9, "October":10, "November":11, "December":12 }
-    [ day, month, year ] = str.split("-")
-
-    if months.has_key(month):
-        month = months[month]
-    else:
-        month = int(month)
-    return datetime(int(year),month,int(day))
-
-def getTextColorFromBackgroundColor(bgcolor):
-    #Returns black if the average of the RGV values
-    #is less than 128, and white if bigger.
-    if len(bgcolor.strip())==7:# remove "#" before the color code
-        bgcolor=bgcolor[1:]
-    if len(bgcolor)==6:
-        try:
-            avg=int((int(bgcolor[0:2], 16)+int(bgcolor[2:4], 16)+int(bgcolor[4:6], 16))/3)
-            if avg>128:
-                return "#000000"
-            else:
-                return "#FFFFFF"
-        except ValueError:
-            pass
-    return "#202020"
-
 
 def utf8rep(text):
     # \x -> _x keeps windows systems satisfied

@@ -56,34 +56,6 @@ from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.pages import main, base
 from MaKaC.webinterface.pages.base import WPDecorated
 
-LECTURE_SERIES_RE = re.compile(r'^part\d+$')
-
-
-def stringToDate(str):
-
-    # Don't delete this dictionary inside comment. Its purpose is to
-    # add the dictionary in the language dictionary during the extraction!
-    # months = { _("January"): 1, _("February"): 2, _("March"): 3, _("April"): 4,
-    #            _("May"): 5, _("June"): 6, _("July"): 7, _("August"): 8,
-    #            _("September"): 9, _("October"): 10, _("November"): 11, _("December"): 12 }
-
-    months = {
-        "January": 1,
-        "February": 2,
-        "March": 3,
-        "April": 4,
-        "May": 5,
-        "June": 6,
-        "July": 7,
-        "August": 8,
-        "September": 9,
-        "October": 10,
-        "November": 11,
-        "December": 12
-    }
-    [day, month, year] = str.split("-")
-    return datetime(int(year), months[month], int(day))
-
 
 class WPConferenceBase(base.WPDecorated):
 
@@ -91,15 +63,17 @@ class WPConferenceBase(base.WPDecorated):
         WPDecorated.__init__(self, rh, _protected_object=conference, _current_category=conference.as_event.category,
                              **kwargs)
         self._navigationTarget = self._conf = conference
-        tz = self._tz = DisplayTZ(rh._aw, self._conf).getDisplayTZ()
-        sDate = self.sDate = self._conf.getAdjustedScreenStartDate(tz)
-        eDate = self.eDate = self._conf.getAdjustedScreenEndDate(tz)
-        dates = " (%s)" % format_date(sDate, format='long')
-        if sDate.strftime("%d%B%Y") != eDate.strftime("%d%B%Y"):
-            if sDate.strftime("%B%Y") == eDate.strftime("%B%Y"):
-                dates = " (%s-%s)" % (sDate.strftime("%d"), format_date(eDate, format='long'))
+        event = self._conf.as_event
+        self._tz = event.display_tzinfo.zone
+        start_dt_local = (event.displayed_start_dt or event.start_dt).astimezone(event.display_tzinfo)
+        end_dt_local = (event.displayed_end_dt or event.end_dt).astimezone(event.display_tzinfo)
+        dates = " (%s)" % format_date(start_dt_local, format='long')
+        if start_dt_local.strftime("%d%B%Y") != end_dt_local.strftime("%d%B%Y"):
+            if start_dt_local.strftime("%B%Y") == end_dt_local.strftime("%B%Y"):
+                dates = " (%s-%s)" % (start_dt_local.strftime("%d"), format_date(end_dt_local, format='long'))
             else:
-                dates = " (%s - %s)" % (format_date(sDate, format='long'), format_date(eDate, format='long'))
+                dates = " (%s - %s)" % (format_date(start_dt_local, format='long'),
+                                        format_date(end_dt_local, format='long'))
         self._setTitle("%s %s" % (strip_ml_tags(self._conf.getTitle()), dates))
 
     def _getFooter(self):
@@ -108,8 +82,7 @@ class WPConferenceBase(base.WPDecorated):
         wc = wcomponents.WFooter()
 
         p = {"modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
-             "subArea": self._getSiteArea()
-             }
+             "subArea": self._getSiteArea()}
         return wc.getHTML(p)
 
     def getLogoutURL(self):
@@ -242,18 +215,16 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["confTitle"] = self._conf.getTitle()
         vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
         vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
-        tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        adjusted_sDate = self._conf.getAdjustedScreenStartDate(tz)
-        adjusted_eDate = self._conf.getAdjustedScreenEndDate(tz)
-
-        vars["timezone"] = tz
-        vars["confDateInterval"] = i18nformat("""_("from") %s _("to") %s""") % (
-            format_date(adjusted_sDate, format='long'), format_date(adjusted_eDate, format='long'))
-        if adjusted_sDate.strftime("%d%B%Y") == \
-                adjusted_eDate.strftime("%d%B%Y"):
-            vars["confDateInterval"] = format_date(adjusted_sDate, format='long')
-        elif adjusted_sDate.strftime("%B%Y") == adjusted_eDate.strftime("%B%Y"):
-            vars["confDateInterval"] = "%s-%s %s"%(adjusted_sDate.day, adjusted_eDate.day, format_date(adjusted_sDate, format='MMMM yyyy'))
+        start_dt_local = (self.event.displayed_start_dt or self.event.start_dt).astimezone(self.event.display_tzinfo)
+        end_dt_local = (self.event.displayed_end_dt or self.event.end_dt).astimezone(self.event.display_tzinfo)
+        vars["timezone"] = self.event.display_tzinfo.zone
+        vars["confDateInterval"] = _("from {start} to {end}").format(start=format_date(start_dt_local, format='long'),
+                                                                     end=format_date(end_dt_local, format='long'))
+        if start_dt_local.strftime("%d%B%Y") == end_dt_local.strftime("%d%B%Y"):
+            vars["confDateInterval"] = format_date(start_dt_local, format='long')
+        elif start_dt_local.strftime("%B%Y") == end_dt_local.strftime("%B%Y"):
+            vars["confDateInterval"] = "%s-%s %s" % (start_dt_local.day, end_dt_local.day,
+                                                     format_date(start_dt_local, format='MMMM yyyy'))
         vars["confLocation"] = self.event.venue_name
         vars["body"] = self._body
         vars['menu'] = menu_entries_for_event(self.event)
@@ -266,7 +237,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         return vars
 
 
-class WConfDetailsBase( wcomponents.WTemplated ):
+class WConfDetailsFull(wcomponents.WTemplated):
 
     def __init__(self, aw, conf):
         self._conf = conf
@@ -281,9 +252,12 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["description_html"] = isStringHTML(description)
         vars["description"] = description
 
-        sdate, edate = self._conf.getAdjustedScreenStartDate(tz), self._conf.getAdjustedScreenEndDate(tz)
-        fsdate, fedate = format_date(sdate, format='medium'), format_date(edate, format='medium')
-        fstime, fetime = sdate.strftime("%H:%M"), edate.strftime("%H:%M")
+        event = self._conf.as_event
+        start_dt_local = (event.displayed_start_dt or event.start_dt).astimezone(event.display_tzinfo)
+        end_dt_local = (event.displayed_end_dt or event.end_dt).astimezone(event.display_tzinfo)
+
+        fsdate, fedate = format_date(start_dt_local, format='medium'), format_date(end_dt_local, format='medium')
+        fstime, fetime = start_dt_local.strftime("%H:%M"), end_dt_local.strftime("%H:%M")
 
         vars["dateInterval"] = (fsdate, fstime, fedate, fetime)
 
@@ -300,10 +274,6 @@ class WConfDetailsBase( wcomponents.WTemplated ):
         vars["actions"] = ''
         vars["isSubmitter"] = self._conf.as_event.can_manage(session.user, 'submit')
         return vars
-
-
-class WConfDetailsFull(WConfDetailsBase):
-    pass
 
 
 #---------------------------------------------------------------------------
@@ -624,7 +594,8 @@ class WConfModifMainData(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["defaultStyle"] = self._conf.as_event.theme
+        event = self._conf.as_event
+        vars["defaultStyle"] = event.theme
         vars["visibility"] = self._conf.getVisibility()
         vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
         vars["title"]=self._conf.getTitle()
@@ -640,7 +611,7 @@ class WConfModifMainData(wcomponents.WTemplated):
         vars["startDate"]=formatDateTime(self._conf.getAdjustedStartDate())
         vars["endDate"]=formatDateTime(self._conf.getAdjustedEndDate())
         vars["chairText"] = self.htmlText(self._conf.getChairmanText())
-        additional_info = self._conf.as_event.additional_info
+        additional_info = event.additional_info
         if isStringHTML(additional_info):
             vars["contactInfo"] = additional_info
         else:
@@ -648,20 +619,8 @@ class WConfModifMainData(wcomponents.WTemplated):
                                    .format(additional_info.encode('utf-8')))
         #------------------------------------------------------
         vars["shortURLBase"] = Config.getInstance().getShortEventURL()
-        vars["shortURLTag"] = self._conf.as_event.url_shortcut or ''
-        vars["screenDatesURL"] = urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)
-        ssdate = format_datetime(self._conf.getAdjustedScreenStartDate(), format='EEEE d MMMM yyyy H:mm')
-        if self._conf.getScreenStartDate() == self._conf.getStartDate():
-            ssdate += i18nformat(""" <i> _("(normal)")</i>""")
-        else:
-            ssdate += i18nformat(""" <font color='red'>_("(modified)")</font>""")
-        sedate = format_datetime(self._conf.getAdjustedScreenEndDate(), format='EEEE d MMMM yyyy H:mm')
-        if self._conf.getScreenEndDate() == self._conf.getEndDate():
-            sedate += i18nformat(""" <i> _("(normal)")</i>""")
-        else:
-            sedate += i18nformat(""" <font color='red'> _("(modified)")</font>""")
+        vars["shortURLTag"] = event.url_shortcut or ''
         vars['rbActive'] = Config.getInstance().getIsRoomBookingActive()
-        vars["screenDates"] = "%s -> %s" % (ssdate, sedate)
         vars["timezoneList"] = TimezoneRegistry.getList()
 
         vars['styleOptions'] = {tid: data['title'] for tid, data in
@@ -698,57 +657,6 @@ class WPConferenceModification( WPConferenceModifBase ):
         pars = { "type": params.get("type","") , "conferenceId": self._conf.getId()}
         return wc.getHTML( pars )
 
-class WConfModScreenDatesEdit(wcomponents.WTemplated):
-
-    def __init__(self,conf):
-        self._conf=conf
-
-    def getVars(self):
-        vars=wcomponents.WTemplated.getVars(self)
-        vars["postURL"]=quoteattr(str(urlHandlers.UHConfScreenDatesEdit.getURL(self._conf)))
-        ###################################
-        # Fermi timezone awareness        #
-        ###################################
-        csd = self._conf.getAdjustedStartDate()
-        ced = self._conf.getAdjustedEndDate()
-        ###################################
-        # Fermi timezone awareness(end)   #
-        ###################################
-        vars["conf_start_date"]=self.htmlText(format_datetime(csd, format='EEEE d MMMM yyyy H:mm'))
-        vars["conf_end_date"]=self.htmlText(format_datetime(ced, format='EEEE d MMMM yyyy H:mm'))
-        vars["start_date_own_sel"]=""
-        vars["start_date_conf_sel"]=" checked"
-        vars["sDay"],vars["sMonth"],vars["sYear"]=csd.day,csd.month,csd.year
-        vars["sHour"],vars["sMin"]=csd.hour,csd.minute
-        if self._conf.getScreenStartDate() != self._conf.getStartDate():
-            vars["start_date_own_sel"]=" checked"
-            vars["start_date_conf_sel"]=""
-            sd=self._conf.getAdjustedScreenStartDate()
-            vars["sDay"]=quoteattr(str(sd.day))
-            vars["sMonth"]=quoteattr(str(sd.month))
-            vars["sYear"]=quoteattr(str(sd.year))
-            vars["sHour"]=quoteattr(str(sd.hour))
-            vars["sMin"]=quoteattr(str(sd.minute))
-        vars["end_date_own_sel"]=""
-        vars["end_date_conf_sel"]=" checked"
-        vars["eDay"],vars["eMonth"],vars["eYear"]=ced.day,ced.month,ced.year
-        vars["eHour"],vars["eMin"]=ced.hour,ced.minute
-        if self._conf.getScreenEndDate() != self._conf.getEndDate():
-            vars["end_date_own_sel"]=" checked"
-            vars["end_date_conf_sel"]=""
-            ed=self._conf.getAdjustedScreenEndDate()
-            vars["eDay"]=quoteattr(str(ed.day))
-            vars["eMonth"]=quoteattr(str(ed.month))
-            vars["eYear"]=quoteattr(str(ed.year))
-            vars["eHour"]=quoteattr(str(ed.hour))
-            vars["eMin"]=quoteattr(str(ed.minute))
-        return vars
-
-class WPScreenDatesEdit(WPConferenceModification):
-
-    def _getPageContent( self, params ):
-        wc = WConfModScreenDatesEdit(self._conf)
-        return wc.getHTML()
 
 class WConferenceDataModificationAdditionalInfo(wcomponents.WTemplated):
 
