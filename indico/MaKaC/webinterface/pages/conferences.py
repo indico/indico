@@ -36,7 +36,7 @@ from indico.modules.events.layout.util import (build_menu_entry_name, get_css_ur
                                                menu_entries_for_event)
 from indico.modules.events.models.events import EventType, Event
 from indico.util.date_time import format_date, format_datetime
-from indico.util.i18n import i18nformat, _
+from indico.util.i18n import _
 from indico.util.string import encode_if_unicode, to_unicode
 from indico.web.flask.util import url_for
 from indico.web.menu import render_sidemenu

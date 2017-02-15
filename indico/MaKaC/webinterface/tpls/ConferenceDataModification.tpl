@@ -79,12 +79,6 @@ ${ additionalInfo }
                 <textarea name="orgText" cols="50" rows="5">${ orgText }</textarea>
             </td>
         </tr>
-        <tr>
-            <td nowrap class="titleCellTD"><span class="titleCellFormat">Internal Comments</span></td>
-            <td bgcolor="white" width="100%">
-                <textarea name="comments" cols=50 rows=5>${ conference.getComments() }</textarea>
-            </td>
-        </tr>
         % endif
         <tr>
             <td nowrap class="titleCellTD"><span class="titleCellFormat"> ${ _("Timetable default style")}</span></td>
