@@ -25,7 +25,7 @@ class RHConfModifUserCompetences( RHConfModifReviewingPRMAMBase ):
     _uh = urlHandlers.UHConfModifUserCompetences
 
     def _process( self ):
-        if self._conf.isClosed():
+        if self.event_new.is_locked:
             p = WPConferenceModificationClosed( self, self._target )
         else:
             p = reviewing.WPConfModifUserCompetences( self, self._target)

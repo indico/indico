@@ -855,5 +855,5 @@ class RHModificationBaseProtected(RHProtected):
             else:
                 raise ModificationError()
         if hasattr(self._target, "getConference") and not self._allowClosed:
-            if self._target.getConference().isClosed():
+            if self._target.getConference().as_event.is_locked:
                 raise ConferenceClosedError(self._target.getConference())

@@ -30,7 +30,7 @@
                 {%- endif %}
                 <div class="timetable-item-actions">
                     {{ render_manage_button(block, 'SESSION_BLOCK', show_notes=show_notes,
-                                            show_button=(not event.as_legacy.isClosed() and
+                                            show_button=(not event.is_locked and
                                                          block.can_manage_attachments(session.user))) }}
                     {{ template_hook('vc-actions', event=event, item=block) }}
                 </div>

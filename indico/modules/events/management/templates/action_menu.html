@@ -15,7 +15,7 @@
                title="{% trans %}Event actions{% endtrans %}"></a>
 
             <div id="action-menu-actions">
-                {% if event.as_legacy.isClosed() %}
+                {% if event.is_locked %}
                     <button class="i-button icon-lock-center disabled"
                             title="{% trans %}This event is already locked.{% endtrans %}">
                         {% trans %}Lock{% endtrans %}
@@ -29,7 +29,7 @@
                     <button class="i-button icon-lock-center js-ajax-dialog-lock"
                             data-href="{{ url_for('event_management.lock', event) }}"
                             title="{% trans %}Lock event{% endtrans %}"
-                            {{ 'disabled' if event.as_legacy.isClosed() }}>
+                            {{ 'disabled' if event.is_locked }}>
                         {% trans %}Lock{% endtrans %}</button>
                 {% endif %}
 
