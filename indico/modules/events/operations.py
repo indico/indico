@@ -21,6 +21,7 @@ from flask import session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
@@ -216,7 +217,7 @@ def _format_person(data):
 
 
 def update_event_protection(event, data):
-    assert data.viewkeys() <= {'protection_mode', 'own_no_access_contact', 'access_key'}
+    assert data.viewkeys() <= {'protection_mode', 'own_no_access_contact', 'access_key', 'visibility'}
     changes = event.populate_from_dict(data)
     db.session.flush()
     signals.event.updated.send(event)
@@ -224,9 +225,16 @@ def update_event_protection(event, data):
     if changes:
         log_fields = {'protection_mode': 'Protection mode',
                       'own_no_access_contact': 'No access contact',
-                      'access_key': {'title': 'Access key', 'type': 'string'}}
+                      'access_key': {'title': 'Access key', 'type': 'string'},
+                      'visibility': {'title': 'Visibility', 'type': 'string',
+                                     'convert': lambda changes: [_format_visibility(event, x) for x in changes]}}
         event.log(EventLogRealm.management, EventLogKind.change, 'Event', 'Protection updated', session.user,
                   data={'Changes': make_diff_log(changes, log_fields)})
+
+
+def _format_visibility(event, visibility):
+    options = dict(get_visibility_options(event, allow_invisible=True))
+    return options[visibility if visibility is not None else '']
 
 
 def delete_event(event):

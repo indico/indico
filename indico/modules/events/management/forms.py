@@ -27,6 +27,7 @@ from wtforms.validators import InputRequired, DataRequired, ValidationError, Opt
 
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.categories.util import get_visibility_options
 from indico.modules.designer import PageSize
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import Event, LegacyEventMapping
@@ -221,11 +222,16 @@ class EventProtectionForm(IndicoForm):
                                   description=_('List of users allowed to modify the event'))
     submitters = PrincipalListField(_('Submitters'), allow_emails=True, allow_external=True,
                                     description=_('List of users with submission rights'))
+    visibility = SelectField(_("Visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
+                             description=_("""From which point in the category tree this event will be visible from """
+                                           """(number of categories upwards). Applies to "Today's events" and """
+                                           """Calendar only. If the event is moved, this number will be preserved."""))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):
-        self.protected_object = kwargs.pop('event')
+        self.protected_object = event = kwargs.pop('event')
         super(EventProtectionForm, self).__init__(*args, **kwargs)
+        self.visibility.choices = get_visibility_options(event, allow_invisible=True)
 
     @classmethod
     def _create_coordinator_priv_fields(cls):
