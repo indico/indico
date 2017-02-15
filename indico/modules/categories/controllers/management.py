@@ -199,7 +199,8 @@ class RHManageCategoryProtection(RHManageCategoryBase):
             update_category(self.category,
                             {'protection_mode': form.protection_mode.data,
                              'own_no_access_contact': form.own_no_access_contact.data,
-                             'event_creation_restricted': form.event_creation_restricted.data})
+                             'event_creation_restricted': form.event_creation_restricted.data,
+                             'visibility': form.visibility.data})
             update_object_principals(self.category, form.acl.data, read_access=True)
             update_object_principals(self.category, form.managers.data, full_access=True)
             update_object_principals(self.category, form.event_creators.data, role='create')
