@@ -252,7 +252,8 @@ class RHEventProtection(RHManageEventBase):
         if form.validate_on_submit():
             update_event_protection(self.event_new, {'protection_mode': form.protection_mode.data,
                                                      'own_no_access_contact': form.own_no_access_contact.data,
-                                                     'access_key': form.access_key.data})
+                                                     'access_key': form.access_key.data,
+                                                     'visibility': form.visibility.data})
             update_object_principals(self.event_new, form.acl.data, read_access=True)
             update_object_principals(self.event_new, form.managers.data, full_access=True)
             update_object_principals(self.event_new, form.submitters.data, role='submit')
@@ -272,7 +273,7 @@ class RHEventProtection(RHManageEventBase):
                              if event_session_settings.get(val)}
         return dict({'protection_mode': self.event_new.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
-                     'access_key': self.event_new.access_key,
+                     'access_key': self.event_new.access_key, 'visibility': self.event_new.visibility,
                      'own_no_access_contact': self.event_new.own_no_access_contact}, **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):
