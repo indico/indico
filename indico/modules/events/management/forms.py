@@ -39,7 +39,7 @@ from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.util.date_time import format_human_timedelta
 from indico.util.i18n import _
-from indico.util.string import is_valid_mail, to_unicode
+from indico.util.string import is_valid_mail
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
