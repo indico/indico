@@ -40,7 +40,7 @@
             <td class="itemTopAlign actions">
                 {{ render_manage_button(block, 'SESSION_BLOCK', toggle_notes=false, show_notes=show_notes,
                                         show_note_operations=true,
-                                        show_button=(not event.as_legacy.isClosed() and
+                                        show_button=(not event.is_locked and
                                                      block.can_manage_attachments(session.user))) }}
             </td>
         {% endif %}

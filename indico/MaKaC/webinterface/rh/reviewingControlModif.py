@@ -32,7 +32,7 @@ class RHConfModifReviewingControl( RHConfModifReviewingPRMAMBase ):
         RHConfModifReviewingPRMAMBase._checkParams( self, params )
 
     def _process( self ):
-        if self._conf.isClosed():
+        if self.event_new.is_locked:
             p = WPConferenceModificationClosed( self, self._target )
         else:
             p = reviewing.WPConfModifReviewingControl( self, self._target)

@@ -70,7 +70,7 @@ class RHConferenceModification(RHConferenceModifBase):
         wf=self.getWebFactory()
         if wf is not None:
             pars["type"]=wf.getId()
-        if self._conf.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p.display(**pars)
         else:
@@ -466,7 +466,7 @@ class RHConfBadgePrinting(RHConfBadgeBase):
         self.__cancel = params.get("cancel","False") == "True"
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             return conferences.WPConferenceModificationClosed(self, self._target).display()
         else:
             if self.__templateId and self.__templateData and not self.__deleteTemplateId:
@@ -528,7 +528,7 @@ class RHConfBadgeDesign(RHConfBadgeBase):
 
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
         else:
             p = conferences.WPConfModifBadgeDesign(self, self._target, self.__templateId, self.__new, self.__baseTemplate)
@@ -611,7 +611,7 @@ class RHConfBadgePrintingPDF(RHConfBadgeBase):
 
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
@@ -684,7 +684,7 @@ class RHConfBadgeSaveTempBackground(RHConfBadgeBase):
             self._tempFilePath = None
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             return json.dumps({'status': 'error'}, textarea=True)
         else:
             if self._tempFilePath is not None:
@@ -738,7 +738,7 @@ class RHConfBadgeGetBackground(RHConfBadgeBase):
         return send_file('tempBackground', filePath, 'application/octet-stream')
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
@@ -794,7 +794,7 @@ class RHConfPosterPrinting(RHConferenceModifBase):
 
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             return conferences.WPConferenceModificationClosed(self, self._target).display()
         else:
             if self.__templateId and self.__templateData and not self.__deleteTemplateId:
@@ -851,7 +851,7 @@ class RHConfPosterDesign(RHConferenceModifBase):
         self.__baseTemplate = params.get("baseTemplate",'blank')
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
         else:
             if (self._target.getId() == "default"):
@@ -896,7 +896,7 @@ class RHConfPosterPrintingPDF(RHConferenceModifBase):
 
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:
@@ -948,7 +948,7 @@ class RHConfPosterSaveTempBackground(RHConferenceModifBase):
             self._tempFilePath = None
 
     def _process(self):
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             return json.dumps({'status': 'error'}, textarea=True)
         else:
             if self._tempFilePath is not None:
@@ -1009,7 +1009,7 @@ class RHConfPosterGetBackground(RHConferenceModifBase):
 
     def _process(self):
 
-        if self._target.isClosed():
+        if self.event_new.is_locked:
             p = conferences.WPConferenceModificationClosed( self, self._target )
             return p
         else:

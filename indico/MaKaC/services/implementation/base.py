@@ -287,8 +287,8 @@ class ProtectedModificationService(ProtectedService):
                 self._checkSessionUser()
             else:
                 raise ServiceAccessError("You don't have the rights to modify this object")
-        if hasattr(self._target, "getConference") and hasattr(self._target, "isClosed"):
-            if target.getConference().isClosed():
+        if hasattr(self._target, "getConference") and hasattr(self._target, "as_event"):
+            if target.getConference().as_event.is_locked:
                 raise ServiceAccessError("Conference %s is closed"%target.getConference().getId())
 
 class AdminService(LoggedOnlyService):
