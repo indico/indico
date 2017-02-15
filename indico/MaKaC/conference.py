@@ -108,8 +108,6 @@ class Conference(CommonObjectBase):
         self.id = id
         self.places = []
         self.rooms = []
-        self._screenStartDate = None
-        self._screenEndDate = None
         self.chairmanText = ""
         self._modificationDS = nowutc()
 
@@ -443,27 +441,6 @@ class Conference(CommonObjectBase):
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
-    def setScreenStartDate(self, date):
-        if date == self.getStartDate():
-            date = None
-        self._screenStartDate = date
-        self.notifyModification()
-
-    def getScreenStartDate(self):
-        try:
-            date = self._screenStartDate
-        except:
-            date = self._screenStartDate = None
-        if date != None:
-            return date
-        else:
-            return self.getStartDate()
-
-    def getAdjustedScreenStartDate(self, tz=None):
-        if not tz:
-            tz = self.getTimezone()
-        return self.getScreenStartDate().astimezone(timezone(tz))
-
     def verifyEndDate(self, edate):
         if edate<self.getStartDate():
             raise TimingError( _("End date cannot be before the start date"), _("Event"))
@@ -507,27 +484,6 @@ class Conference(CommonObjectBase):
         if tz not in all_timezones:
             tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
-
-    def setScreenEndDate(self, date):
-        if date == self.getEndDate():
-            date = None
-        self._screenEndDate = date
-        self.notifyModification()
-
-    def getScreenEndDate(self):
-        try:
-            date = self._screenEndDate
-        except:
-            date = self._screenEndDate = None
-        if date != None:
-            return date
-        else:
-            return self.getEndDate()
-
-    def getAdjustedScreenEndDate(self, tz=None):
-        if not tz:
-            tz = self.getTimezone()
-        return self.getScreenEndDate().astimezone(timezone(tz))
 
     def setTimezone(self, tz):
         self.timezone = tz

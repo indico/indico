@@ -22,7 +22,6 @@ from datetime import datetime,timedelta
 from dateutil.relativedelta import relativedelta
 from flask import session, request
 from persistent.list import PersistentList
-from pytz import timezone
 from werkzeug.exceptions import Forbidden
 
 from indico.core.config import Config
@@ -30,7 +29,7 @@ from indico.util import json
 from indico.web.flask.util import send_file
 from MaKaC.PDFinterface.conference import RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.common.info import HelperMaKaCInfo
-from MaKaC.errors import MaKaCError, FormValuesError
+from MaKaC.errors import FormValuesError
 from MaKaC.i18n import _
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages import admins, conferences
@@ -79,51 +78,6 @@ class RHConferenceModification(RHConferenceModifBase):
             if wf is not None:
                 p = wf.getConfModif(self, self._conf)
             return p.display(**pars)
-
-
-class RHConfScreenDatesEdit(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfScreenDatesEdit
-
-    def _checkParams(self,params):
-        RHConferenceModifBase._checkParams(self,params)
-        self._action=""
-        if params.has_key("CANCEL"):
-            self._action="CANCEL"
-        elif params.has_key("OK"):
-            self._action="EDIT"
-            self._sDate,self._eDate=None,None
-            tz = self._target.getTimezone()
-            if params.get("start_date","conference")=="own":
-                try:
-                    self._sDate=timezone(tz).localize(datetime(int(params["sYear"]),
-                                    int(params["sMonth"]),
-                                    int(params["sDay"]),
-                                    int(params["sHour"]),
-                                    int(params["sMin"]))).astimezone(timezone('UTC'))
-                except ValueError:
-                    raise MaKaCError( _("Please enter integers in all the start date fields"), _("Schedule"))
-            if params.get("end_date","conference")=="own":
-                try:
-                    self._eDate=timezone(tz).localize(datetime(int(params["eYear"]),
-                                    int(params["eMonth"]),
-                                    int(params["eDay"]),
-                                    int(params["eHour"]),
-                                    int(params["eMin"]))).astimezone(timezone('UTC'))
-                except ValueError:
-                    raise MaKaCError( _("Please enter integers in all the end date fields"), _("Schedule"))
-
-    def _process( self ):
-        url=urlHandlers.UHConferenceModification.getURL(self._target)
-        if self._action=="CANCEL":
-            self._redirect(url)
-            return
-        elif self._action=="EDIT":
-            self._target.setScreenStartDate(self._sDate)
-            self._target.setScreenEndDate(self._eDate)
-            self._redirect(url)
-            return
-        p = conferences.WPScreenDatesEdit(self, self._target)
-        return p.display()
 
 
 class RHConfDataModif(RHConferenceModifBase):

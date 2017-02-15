@@ -125,10 +125,7 @@ class RHEditEventClassification(RHEditEventDataBase):
 
 class RHEditEventDates(RHManageEventBase):
     def _process(self):
-        defaults = FormDefaults(self.event_new,
-                                displayed_start_dt=self._conf._screenStartDate,
-                                displayed_end_dt=self._conf._screenEndDate,
-                                update_timetable=True)
+        defaults = FormDefaults(self.event_new, update_timetable=True)
         form = EventDatesForm(obj=defaults, event=self.event_new)
         if form.validate_on_submit():
             with track_time_changes():

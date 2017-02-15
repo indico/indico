@@ -257,10 +257,6 @@ class UHConfDataModif(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-data'
 
 
-class UHConfScreenDatesEdit(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-screenDates'
-
-
 class UHConfPerformDataModif(URLHandler):
     _endpoint = 'event_mgmt.conferenceModification-dataPerform'
 
