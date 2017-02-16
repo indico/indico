@@ -1,11 +1,13 @@
 {% set clones = event.clones|rejectattr('is_deleted')|list %}
 
+
 {% macro change_type_confirmation(type) %}
     {% trans -%}
         Changing the event type to <strong>{{ type }}</strong> will change the look of the event page
         and may disable some features not available for the new event type.
     {%- endtrans %}
 {% endmacro %}
+
 
 {% macro render_change_event_type() %}
     <button class="i-button borderless icon-wrench arrow js-dropdown" data-toggle="dropdown">
@@ -24,7 +26,6 @@
                        data-params="{{ {'type': type} | tojson | forceescape }}"
                        data-title="{% trans %}Confirm type change{% endtrans %}"
                        data-confirm="{{ change_type_confirmation(title) }}"
-                       data-redirect-after="{{ url_for('event_management.dashboard', event) }}"
                        data-ajax>
                         {{ title }}
                     </a>
@@ -47,13 +48,34 @@
             {% trans %}Lock{% endtrans %}
         </button>
     {% else %}
-        <button class="i-button borderless icon-lock-center js-ajax-dialog-lock"
-                data-href="{{ url_for('event_management.lock', event) }}"
+        <button class="i-button borderless icon-lock-center"
                 title="{% trans %}Lock event{% endtrans %}"
-                {{ 'disabled' if event.is_locked }}>
+                data-href="{{ url_for('event_management.lock', event) }}"
+                data-ajax-dialog>
             {% trans %}Lock{% endtrans %}
         </button>
     {% endif %}
+{% endmacro %}
+
+
+{% macro render_move_event() %}
+    <button class="i-button borderless icon-transmission js-ajax-dialog-move"
+            title="{% trans %}Move event to another category{% endtrans %}"
+            data-href="{{ url_for('event_management.move', event) }}"
+            data-category-id="{{ event.category.id }}">
+        {% trans %}Move{% endtrans %}
+    </button>
+{% endmacro %}
+
+
+{% macro render_delete_event() %}
+    <button class="i-button borderless icon-remove danger"
+            title="{% trans %}Delete event{% endtrans %}"
+            data-qtip-style="danger"
+            data-href="{{ url_for('event_management.delete', event) }}"
+            data-ajax-dialog>
+        {% trans %}Delete{% endtrans %}
+    </button>
 {% endmacro %}
 
 
@@ -73,22 +95,9 @@
 
             <div id="action-menu-actions">
                 <div class="action-menu-buttons">
-                    <button class="i-button borderless icon-transmission js-ajax-dialog-move"
-                            title="{% trans %}Move event to another category{% endtrans %}"
-                            data-href="{{ url_for('event_management.move', event) }}"
-                            data-category-id="{{ event.category.id }}">
-                        {% trans %}Move{% endtrans %}
-                    </button>
-
+                    {{ render_move_event() }}
                     {{ render_lock_event() }}
-
-                    <button class="i-button borderless icon-remove js-ajax-dialog-delete danger"
-                            data-href="{{ url_for('event_management.delete', event) }}"
-                            title="{% trans %}Delete event{% endtrans %}"
-                            data-qtip-style="danger">
-                        {% trans %}Delete{% endtrans %}
-                    </button>
-
+                    {{ render_delete_event() }}
                     {{ render_change_event_type() }}
                 </div>
             </div>
@@ -113,15 +122,6 @@
 <script>
     (function() {
         'use strict';
-
-        $('.js-ajax-dialog-delete, .js-ajax-dialog-lock').ajaxDialog({
-            onClose: function(data) {
-                if (data && data.url) {
-                    location.href = data.url;
-                }
-                return true;
-            }
-        });
 
         $('.js-ajax-dialog-move').on('click', function(evt) {
             evt.preventDefault();
