@@ -174,7 +174,7 @@
                 }
 
                 // Handle html update or reload
-                if (ajax || update || reload !== undefined) {
+                if (ajax || update || reload !== undefined || redirect !== undefined) {
                     $.ajax({
                         method: method,
                         url: url,
@@ -193,6 +193,9 @@
                             } else if (reload !== undefined) {
                                 IndicoUI.Dialogs.Util.progress();
                                 location.reload();
+                            } else if (redirect !== undefined) {
+                                IndicoUI.Dialogs.Util.progress();
+                                location.href = redirect;
                             }
                         }
                     });
