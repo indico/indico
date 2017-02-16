@@ -100,11 +100,14 @@
                 if (!$this.attr('href') || $this.attr('href') === "#" || $this.data('ignore-href') !== undefined ||
                         self.options.always_listen) {
                     $this.click(function(e) {
+                        e.preventDefault();
+                        if ($this.hasClass('disabled')) {
+                            return;
+                        }
                         var result = $this.triggerHandler('menu_select', self.element);
                         if (!result) {
                             self._close_all();
                         }
-                        e.preventDefault();
                     });
                 }
             });
