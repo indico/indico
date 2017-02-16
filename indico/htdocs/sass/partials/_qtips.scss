@@ -84,6 +84,14 @@
         min-width: 320px;
     }
 
+    &.qtip-allow-overflow {
+        overflow: visible;
+
+        .qtip-content {
+            overflow: visible;
+        }
+    }
+
     &.add-field-qtip {
         @extend %qtip-light;
         @extend %font-family-title;

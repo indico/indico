@@ -220,6 +220,14 @@ def _format_visibility(event, visibility):
     return options[visibility if visibility is not None else '']
 
 
+def update_event_type(event, type_):
+    if event.type_ == type_:
+        return
+    event.type_ = type_
+    logger.info('Event %r type changed to %s by %r', event, type_.name, session.user)
+    event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Type changed to {}'.format(type_.title), session.user)
+
+
 def delete_event(event):
     event.as_legacy.delete(session.user)
     db.session.flush()
