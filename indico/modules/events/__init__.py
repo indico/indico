@@ -67,7 +67,9 @@ def _event_deleted(event, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
+    from indico.modules.events.models.persons import EventPerson
     from indico.modules.events.models.principals import EventPrincipal
+    EventPerson.merge_users(target, source)
     EventPrincipal.merge_users(target, source, 'event_new')
 
 

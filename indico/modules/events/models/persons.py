@@ -207,6 +207,24 @@ class EventPerson(PersonMixin, db.Model):
         return person or cls.create_from_user(user, event, is_untrusted=is_untrusted)
 
     @classmethod
+    def merge_users(cls, target, source):
+        """Merge the EventPersons of two users.
+
+        :param target: The target user of the merge
+        :param source: The user that is being merged into `target`
+        """
+        existing_persons = {ep.event_id: ep for ep in target.event_persons}
+        for event_person in source.event_persons:
+            existing = existing_persons.get(event_person.event_id)
+            if existing is None:
+                assert event_person.email in target.all_emails
+                event_person.user = target
+            else:
+                existing.merge_person_info(event_person)
+                db.session.delete(event_person)
+        db.session.flush()
+
+    @classmethod
     def link_user_by_email(cls, user):
         """
         Links all email-based persons matching the user's
@@ -244,7 +262,7 @@ class EventPerson(PersonMixin, db.Model):
             if existing_event_link is None:
                 event_link.person = self
             else:
-                db.session.delete(event_link)
+                other.event_links.remove(event_link)
 
         for abstract_link in other.abstract_links:
             existing_abstract_link = next((link for link in self.abstract_links
@@ -256,7 +274,7 @@ class EventPerson(PersonMixin, db.Model):
                 existing_abstract_link.is_speaker |= abstract_link.is_speaker
                 existing_abstract_link.author_type = AuthorType.get_highest(existing_abstract_link.author_type,
                                                                             abstract_link.author_type)
-                db.session.delete(abstract_link)
+                other.abstract_links.remove(abstract_link)
 
         for contribution_link in other.contribution_links:
             existing_contribution_link = next((link for link in self.contribution_links
@@ -268,7 +286,7 @@ class EventPerson(PersonMixin, db.Model):
                 existing_contribution_link.is_speaker |= contribution_link.is_speaker
                 existing_contribution_link.author_type = AuthorType.get_highest(existing_contribution_link.author_type,
                                                                                 contribution_link.author_type)
-                db.session.delete(contribution_link)
+                other.contribution_links.remove(contribution_link)
 
         for subcontribution_link in other.subcontribution_links:
             existing_subcontribution_link = next(
@@ -277,7 +295,7 @@ class EventPerson(PersonMixin, db.Model):
             if existing_subcontribution_link is None:
                 subcontribution_link.person = self
             else:
-                db.session.delete(subcontribution_link)
+                other.subcontribution_links.remove(subcontribution_link)
 
         for session_block_link in other.session_block_links:
             existing_session_block_link = next((link for link in self.session_block_links
@@ -286,7 +304,7 @@ class EventPerson(PersonMixin, db.Model):
             if existing_session_block_link is None:
                 session_block_link.person = self
             else:
-                db.session.delete(session_block_link)
+                other.session_block_links.remove(session_block_link)
 
         db.session.flush()
 
