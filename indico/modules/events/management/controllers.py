@@ -152,7 +152,7 @@ class RHDeleteEvent(RHManageEventBase):
             redirect_url = url_for('categories.display', category)
         else:
             redirect_url = url_for_index()
-        return jsonify_data(url=redirect_url, flash=False)
+        return jsonify_data(flash=False, redirect=redirect_url)
 
 
 class RHChangeEventType(RHManageEventBase):
@@ -179,7 +179,7 @@ class RHLockEvent(RHManageEventBase):
     def _process_POST(self):
         lock_event(self.event_new)
         flash(_('The event is now locked.'), 'success')
-        return jsonify_data(url=url_for('event_management.dashboard', self.event_new), flash=False)
+        return jsonify_data(flash=False, redirect=url_for('event_management.dashboard', self.event_new))
 
 
 class RHUnlockEvent(RHManageEventBase):
