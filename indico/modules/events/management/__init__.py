@@ -31,8 +31,11 @@ from indico.web.menu import SideMenuItem, SideMenuSection
 @template_hook('event-manage-header')
 @unify_event_args
 def _add_action_menu(event, **kwargs):
-    return render_template('events/management/action_menu.html', event=event, can_lock=can_lock(event, session.user),
-                           can_manage=event.can_manage(session.user))
+    from indico.modules.events.models.events import EventType
+    return render_template('events/management/action_menu.html', event=event,
+                           can_lock=can_lock(event, session.user),
+                           can_manage=event.can_manage(session.user),
+                           event_types=[(et.name, et.title) for et in EventType])
 
 
 @signals.menu.sections.connect_via('event-management-sidemenu')

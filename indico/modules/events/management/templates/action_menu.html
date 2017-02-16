@@ -1,9 +1,66 @@
 {% set clones = event.clones|rejectattr('is_deleted')|list %}
 
+{% macro change_type_confirmation(type) %}
+    {% trans -%}
+        Changing the event type to <strong>{{ type }}</strong> will change the look of the event page
+        and may disable some features not available for the new event type.
+    {%- endtrans %}
+{% endmacro %}
+
+{% macro render_change_event_type() %}
+    <button class="i-button borderless icon-wrench arrow js-dropdown" data-toggle="dropdown">
+        {% trans %}Change type{% endtrans %}
+    </button>
+    <ul class="dropdown">
+        {% for type, title in event_types %}
+            <li>
+                {% if type == event.type_.name %}
+                    <a class="disabled" title="{% trans %}This is the event's current type.{% endtrans %}">
+                        {{ title }}
+                    </a>
+                {% else %}
+                    <a data-href="{{ url_for('event_management.change_type', event) }}"
+                       data-method="POST"
+                       data-params="{{ {'type': type} | tojson | forceescape }}"
+                       data-title="{% trans %}Confirm type change{% endtrans %}"
+                       data-confirm="{{ change_type_confirmation(title) }}"
+                       data-redirect-after="{{ url_for('event_management.dashboard', event) }}"
+                       data-ajax>
+                        {{ title }}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+
+{% macro render_lock_event() %}
+    {% if event.is_locked %}
+        <button class="i-button borderless icon-lock-center disabled"
+                title="{% trans %}This event is already locked.{% endtrans %}">
+            {% trans %}Lock{% endtrans %}
+        </button>
+    {% elif not can_lock %}
+        <button class="i-button borderless icon-lock-center disabled"
+                title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
+            {% trans %}Lock{% endtrans %}
+        </button>
+    {% else %}
+        <button class="i-button borderless icon-lock-center js-ajax-dialog-lock"
+                data-href="{{ url_for('event_management.lock', event) }}"
+                title="{% trans %}Lock event{% endtrans %}"
+                {{ 'disabled' if event.is_locked }}>
+            {% trans %}Lock{% endtrans %}
+        </button>
+    {% endif %}
+{% endmacro %}
+
+
 <div class="action-menu">
     <div class="toolbar">
         {% if can_manage %}
-            <div class="group left">
+            <div class="group">
                 <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
                    title="{% trans %}Clone event{% endtrans %}">Clone</a>
                 {% if clones %}
@@ -15,35 +72,25 @@
                title="{% trans %}Event actions{% endtrans %}"></a>
 
             <div id="action-menu-actions">
-                {% if event.is_locked %}
-                    <button class="i-button icon-lock-center disabled"
-                            title="{% trans %}This event is already locked.{% endtrans %}">
-                        {% trans %}Lock{% endtrans %}
+                <div class="action-menu-buttons">
+                    <button class="i-button borderless icon-transmission js-ajax-dialog-move"
+                            title="{% trans %}Move event to another category{% endtrans %}"
+                            data-href="{{ url_for('event_management.move', event) }}"
+                            data-category-id="{{ event.category.id }}">
+                        {% trans %}Move{% endtrans %}
                     </button>
-                {% elif not can_lock %}
-                    <button class="i-button icon-lock-center disabled"
-                            title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
-                        {% trans %}Lock{% endtrans %}
-                    </button>
-                {% else %}
-                    <button class="i-button icon-lock-center js-ajax-dialog-lock"
-                            data-href="{{ url_for('event_management.lock', event) }}"
-                            title="{% trans %}Lock event{% endtrans %}"
-                            {{ 'disabled' if event.is_locked }}>
-                        {% trans %}Lock{% endtrans %}</button>
-                {% endif %}
 
-                <button class="i-button icon-transmission js-ajax-dialog-move"
-                        title="{% trans %}Move event to another category{% endtrans %}"
-                        data-href="{{ url_for('event_management.move', event) }}"
-                        data-category-id="{{ event.category.id }}">
-                    {% trans %}Move{% endtrans %}
-                </button>
-                <button class="i-button icon-remove js-ajax-dialog-delete danger"
-                        data-href="{{ url_for('event_management.delete', event) }}"
-                        title="{% trans %}Delete event{% endtrans %}"
-                        data-qtip-style="danger">
-                    {% trans %}Delete{% endtrans %}</button>
+                    {{ render_lock_event() }}
+
+                    <button class="i-button borderless icon-remove js-ajax-dialog-delete danger"
+                            data-href="{{ url_for('event_management.delete', event) }}"
+                            title="{% trans %}Delete event{% endtrans %}"
+                            data-qtip-style="danger">
+                        {% trans %}Delete{% endtrans %}
+                    </button>
+
+                    {{ render_change_event_type() }}
+                </div>
             </div>
 
             <div id="action-menu-clones">
@@ -122,10 +169,13 @@
         $('#action-menu-actions-target').qbubble({
             content: {
                 text: $('#action-menu-actions')
+            },
+            style: {
+                classes: 'qtip-allow-overflow'
             }
         });
 
-        $('#action-menu-actions button').on('click', function() {
+        $('#action-menu-actions button:not(.js-dropdown), #action-menu-actions a:not(.disabled)').on('click', function() {
             $('#action-menu-actions-target').qbubble('hide');
         });
     })();
