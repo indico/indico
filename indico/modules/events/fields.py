@@ -30,6 +30,7 @@ from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.util import serialize_person_link
 from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle
+from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
 from indico.web.forms.fields import MultipleItemsField, PrincipalListField
 from indico.web.forms.widgets import JinjaWidget
@@ -197,6 +198,7 @@ class PersonLinkListFieldBase(EventPersonListField):
         if email != person_link.email:
             if not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
+                person_link.person.user = get_user_by_email(email)
             else:
                 raise UserValueError(_('There is already a person with the email {}').format(email))
         return person_link
