@@ -223,6 +223,10 @@
                 url: $form.attr('action') || formUrl,
                 dataType: 'json',
                 beforeSubmit: function() {
+                    if ($form.data('dropzoneField')) {
+                        // Dropzone takes care of the form submission
+                        return false;
+                    }
                     var evt = $.Event('ajaxForm:validateBeforeSubmit');
                     $form.trigger(evt);
                     if (evt.isDefaultPrevented()) {
