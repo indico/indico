@@ -37,9 +37,10 @@ from indico.modules.events.management.forms import (EventProtectionForm, EventDa
                                                     EventClassificationForm, PosterPrintingForm)
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
 from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
-from indico.modules.events.posters import PosterPDF
+from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import (delete_event, create_event_references, update_event_protection,
-                                              update_event, lock_event, unlock_event)
+                                              update_event, lock_event, unlock_event, update_event_type)
+from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args, update_object_principals, track_time_changes
@@ -152,6 +153,16 @@ class RHDeleteEvent(RHManageEventBase):
         else:
             redirect_url = url_for_index()
         return jsonify_data(url=redirect_url, flash=False)
+
+
+class RHChangeEventType(RHManageEventBase):
+    """Change the type of an event"""
+
+    def _process(self):
+        type_ = EventType[request.form['type']]
+        update_event_type(self.event_new, type_)
+        flash(_('The event type has been changed to {}.').format(type_.title), 'success')
+        return jsonify_data(flash=False)
 
 
 class RHLockEvent(RHManageEventBase):

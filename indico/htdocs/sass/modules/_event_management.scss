@@ -19,11 +19,11 @@
     flex-shrink: 0;
 
     .toolbar {
-        margin-bottom: 0px;
-        padding-bottom: 0px;
+        margin-bottom: 0;
+        padding-bottom: 0;
 
         .group {
-            margin-bottom: 0px;
+            margin-bottom: 0;
         }
     }
 
@@ -37,6 +37,15 @@
     #action-menu-clones,
     #action-menu-actions {
         display: none;
+    }
+}
+
+.action-menu-buttons {
+    @extend .flexcol;
+
+    .i-button {
+        text-align: left;
+        margin: 0;
     }
 }
 

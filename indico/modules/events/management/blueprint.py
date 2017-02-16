@@ -20,7 +20,7 @@ from indico.modules.events import event_management_object_url_prefixes
 from indico.modules.events.management.controllers import (RHEventManagementDashboard, RHEditEventData, RHEditEventDates,
                                                           RHEditEventLocation, RHEditEventPersons,
                                                           RHEditEventContactInfo, RHEditEventClassification,
-                                                          RHDeleteEvent, RHLockEvent, RHUnlockEvent,
+                                                          RHDeleteEvent, RHChangeEventType, RHLockEvent, RHUnlockEvent,
                                                           RHShowNonInheriting, RHEventProtection,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
                                                           RHManageReferences, RHManageEventLocation,
@@ -41,6 +41,7 @@ _bp.add_url_rule('/settings/persons', 'edit_persons', RHEditEventPersons, method
 _bp.add_url_rule('/settings/contact-info', 'edit_contact_info', RHEditEventContactInfo, methods=('GET', 'POST'))
 _bp.add_url_rule('/settings/classification', 'edit_classification', RHEditEventClassification, methods=('GET', 'POST'))
 _bp.add_url_rule('/delete', 'delete', RHDeleteEvent, methods=('GET', 'POST'))
+_bp.add_url_rule('/change-type', 'change_type', RHChangeEventType, methods=('POST',))
 _bp.add_url_rule('/lock', 'lock', RHLockEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/unlock', 'unlock', RHUnlockEvent, methods=('POST',))
 _bp.add_url_rule('/protection', 'protection', RHEventProtection, methods=('GET', 'POST'))
