@@ -21,7 +21,7 @@
     @include single-box-shadow();
     background: $light-gray;
     margin-top: 1px;
-    padding: 0px;
+    padding: 0;
     position: absolute;
     z-index: 1;
     display: none;
@@ -40,15 +40,20 @@
             padding-top: 0.1em;
             width: 100%;
 
-            &[class*="icon-"]:before {
+            &[class*='icon-']::before {
                 font-size: 1.2rem;
                 margin-right: 0.3em;
                 vertical-align: -10%;
             }
+
+            &.disabled {
+                color: $gray;
+                cursor: default;
+            }
         }
 
-        &:hover a,
-        &:hover a[class*="icon-"]:before {
+        &:hover a:not(.disabled),
+        &:hover a:not(.disabled)[class*='icon-']::before {
             color: $light-black;
         }
     }
