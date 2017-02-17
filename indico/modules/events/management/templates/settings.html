@@ -4,12 +4,12 @@
 
 {% block title %}{% trans %}Settings{% endtrans %}{% endblock %}
 
-{% macro with_default(content='', empty_msg=none) %}
+{% macro with_default(content='') %}
     {% set content = (caller() if caller is defined else content) | trim %}
     {%- if content -%}
         {{ content }}
     {%- else -%}
-        <em class="semantic-text disabled">{{ empty_msg or _('None') }}</em>
+        <span class="no-value">{% trans %}None{% endtrans %}</span>
     {%- endif -%}
 {% endmacro %}
 
@@ -35,128 +35,142 @@
 {% block content %}
     <div class="action-box event-settings">
         {% call render_section('icon-home', '.edit_data', _('Edit basic event data')) %}
-            {# TODO: cleanup html, use better semantics (dl?) #}
-            <label>{% trans %}Title:{% endtrans %}</label>
-            {{ event.title }}
-            <br>
+            <dl class="i-data-list">
+                <dt>{% trans %}Title{% endtrans %}</dt>
+                <dd>{{ event.title }}</dd>
 
-            <label>{% trans %}Description:{% endtrans %}</label>
-            {{ with_default(event.description.split('</p>')[0]|striptags|truncate(75)) }}
-            <br>
+                <dt>{% trans %}Description{% endtrans %}</dt>
+                <dd>{{ with_default(event.description|striptags)|truncate(200) }}</dd>
 
-            <label>{% trans %}Short URL:{% endtrans %}</label>
-            {% call with_default() %}
-                {% if event.url_shortcut %}
-                    <a href="{{ event.short_external_url }}"
-                       class="js-copy-to-clipboard"
-                       title="{% trans %}Copy link to clipboard{% endtrans %}"
-                       data-clipboard-text="{{ event.short_external_url }}"
-                       data-clipboard-action="copy">
-                        {{ event.short_external_url }}
-                    </a>
-                {% endif %}
-            {% endcall %}
+                <dt>{% trans %}Short URL{% endtrans %}</dt>
+                <dd>
+                    {% call with_default() %}
+                        {% if event.url_shortcut %}
+                            <a href="{{ event.short_external_url }}"
+                               class="js-copy-to-clipboard"
+                               title="{% trans %}Copy link to clipboard{% endtrans %}"
+                               data-clipboard-text="{{ event.short_external_url }}"
+                               data-clipboard-action="copy">
+                                {{ event.short_external_url }}
+                            </a>
+                        {% endif %}
+                    {% endcall %}
+                </dd>
+            </dl>
         {% endcall %}
 
         {% call render_section('icon-calendar', '.edit_dates', _('Edit event dates')) %}
             {% set tz = event.tzinfo %}
 
-            <label>{% trans %}Date:{% endtrans %}</label>
-            {% if event.start_dt.astimezone(tz).date() == event.end_dt.astimezone(tz).date() %}
-                {{ event.start_dt|format_date('long', timezone=tz) }}
-            {% else %}
-                {{ event.start_dt|format_date(timezone=tz) }} - {{ event.end_dt|format_date(timezone=tz) }}
-            {% endif %}
-            <br>
+            <dl class="i-data-list">
+                <dt>{% trans %}Date{% endtrans %}</dt>
+                <dd>
+                    {% if event.start_dt.astimezone(tz).date() == event.end_dt.astimezone(tz).date() %}
+                        {{ event.start_dt|format_date('long', timezone=tz) }}
+                    {% else %}
+                        {{ event.start_dt|format_date(timezone=tz) }} - {{ event.end_dt|format_date(timezone=tz) }}
+                    {% endif %}
+                </dd>
 
-            <label>{% trans %}Time:{% endtrans %}</label>
-            {{ event.start_dt|format_time(timezone=tz) }} - {{ event.end_dt|format_time(timezone=tz) }}
-            <br>
+                <dt>{% trans %}Time{% endtrans %}</dt>
+                <dd>{{ event.start_dt|format_time(timezone=tz) }} - {{ event.end_dt|format_time(timezone=tz) }}</dd>
 
-            <label>{% trans %}Timezone:{% endtrans %}</label> {{ event.timezone }}
+                <dt>{% trans %}Timezone{% endtrans %}</dt>
+                <dd>{{ event.timezone }}</dd>
 
-            {% if event.type == 'conference' %}
-                <br>
-                <label>{% trans %}Screen dates:{% endtrans %}</label>
-                {% if event.start_dt_override or event.end_dt_override %}
-                    {{ event.start_dt_display | format_datetime(timezone=tz) }} -
-                    {{ event.end_dt_display | format_datetime(timezone=tz) }}
-                {% else %}
-                    {{ with_default() }}
+                {% if event.type == 'conference' %}
+                    <dt>{% trans %}Screen dates{% endtrans %}</dt>
+                    <dd>
+                        {% if event.start_dt_override or event.end_dt_override %}
+                            {{ event.start_dt_display | format_datetime(timezone=tz) }} -
+                            {{ event.end_dt_display | format_datetime(timezone=tz) }}
+                        {% else %}
+                            {{ with_default() }}
+                        {% endif %}
+                    </dd>
                 {% endif %}
-            {% endif %}
         {% endcall %}
 
         {% call render_section('icon-location', '.edit_location', _('Edit event location')) %}
-            <label>{% trans %}Room:{% endtrans %}</label>
-            {{ with_default(event.room_name) }}<br>
+            <dl class="i-data-list">
+                <dt>{% trans %}Room{% endtrans %}</dt>
+                <dd>{{ with_default(event.room_name) }}</dd>
 
-            <label>{% trans %}Venue:{% endtrans %}</label>
-            {{ with_default(event.venue_name) }}<br>
+                <dt>{% trans %}Venue{% endtrans %}</dt>
+                <dd>{{ with_default(event.venue_name) }}</dd>
 
-            <label>{% trans %}Address:{% endtrans %}</label>
-            {{ with_default(event.address|replace('\n', ', ')) }}
+                <dt>{% trans %}Address{% endtrans %}</dt>
+                <dd>{{ with_default(event.address|replace('\n', '<br>'|safe)) }}</dd>
+            </dl>
         {% endcall %}
 
         {% set edit_persons_title = _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') %}
         {% call render_section('icon-user-chairperson', '.edit_persons', edit_persons_title) %}
-            {% set empty_msg = _('No speakers') if event.type == 'lecture' else _('No chairpersons') %}
-            {% call with_default(empty_msg=empty_msg) %}
-                {% if event.person_links %}
-                    <label>
-                        {%- if event.type == 'lecture' -%}
-                            {% trans %}Speakers{% endtrans %}
-                        {%- else -%}
-                            {% trans %}Chairpersons{% endtrans %}
-                        {%- endif -%}
-                    </label>
-                    {{ render_event_person_links(event.type, event.person_links) }}
-                {% endif %}
-            {% endcall %}
+            <dl class="i-data-list">
+                <dt>
+                    {%- if event.type == 'lecture' -%}
+                        {% trans %}Speakers{% endtrans %}
+                    {%- else -%}
+                        {% trans %}Chairpersons{% endtrans %}
+                    {%- endif -%}
+                </dt>
+                <dd>
+                    {% call with_default() %}
+                        {{ render_event_person_links(event.type, event.person_links) if event.person_links }}
+                    {% endcall %}
+                </dd>
+            </dl>
         {% endcall %}
 
         {% call render_section('icon-info', '.edit_contact_info', _('Edit contact info')) %}
-            {% if event.type == 'lecture' %}
-                <label>{% trans %}Organiser:{% endtrans %}</label>
-                {{ with_default(event.organizer_info|truncate(75)) }}
-                <br>
-            {% endif %}
+            <dl class="i-data-list">
+                {% if event.type == 'lecture' %}
+                    <dt>{% trans %}Organiser{% endtrans %}</dt>
+                    <dd>{{ with_default(event.organizer_info|truncate(200)) }}</dd>
+                {% endif %}
 
-            {% if event.type == 'conference' %}
-                <label>{% trans %}Additional info:{% endtrans %}</label>
-                {{ with_default(event.additional_info.split('</p>')[0]|striptags|truncate(75)) }}
-                <br>
-            {% endif %}
+                {% if event.type == 'conference' %}
+                    <dt>{% trans %}Additional info{% endtrans %}</dt>
+                    <dd>{{ with_default(event.additional_info|striptags|truncate(200)) }}</dd>
+                {% endif %}
 
-            <label>{% trans %}Contact/Support title:{% endtrans %}</label>
-            {{ with_default(event.contact_title) }}
-            <br>
+                <dt>{% trans %}Contact title{% endtrans %}</dt>
+                <dd>{{ with_default(event.contact_title) }}</dd>
 
-            <label>{% trans %}Email:{% endtrans %}</label>
-            {{ with_default(event.contact_emails|join(', ')) }}
-            <br>
+                <dt>{% trans %}Email{% endtrans %}</dt>
+                <dd>{{ with_default(event.contact_emails|join(', ')) }}</dd>
 
-            <label>{% trans %}Phone:{% endtrans %}</label>
-            {{ with_default(event.contact_phones|join(', ')) }}
+                <dt>{% trans %}Phone{% endtrans %}</dt>
+                <dd>{{ with_default(event.contact_phones|join(', ')) }}</dl>
+            </dl>
         {% endcall %}
 
         {% set edit_cls_title = _('Edit keywords / references') if event.type == 'meeting' else _('Edit keywords') %}
         {% call render_section('icon-tag', '.edit_classification', edit_cls_title) %}
-            <label>{% trans %}Keywords:{% endtrans %}</label>
-            {{ with_default(event.keywords|join(', ')) }}
-            {% if event.type == 'meeting' %}
-                <br>
-                <label>{% trans %}External IDs:{% endtrans %}</label>
-                {% call with_default() %}
-                    {% set references = event.references|sort(attribute='value')|sort(attribute='reference_type.name') %}
-                    {% if references %}
-                        {% for reference in references -%}
-                            {{ reference.reference_type.name }}:{{ reference.value }}
-                            {{- ', ' if not loop.last -}}
+            <dl class="i-data-list">
+                <dt>{% trans %}Keywords{% endtrans %}</dt>
+                <dd>
+                    {% call with_default() %}
+                        {% for keyword in event.keywords %}
+                            <span class="badge">{{ keyword }}</span>
                         {% endfor %}
-                    {% endif %}
-                {% endcall %}
-            {% endif %}
+                    {% endcall %}
+                </dd>
+                {% if event.type == 'meeting' %}
+                    <dt>{% trans %}External IDs{% endtrans %}</dt>
+                    <dd>
+                        {% call with_default() %}
+                            {% set references = event.references|sort(attribute='value')|sort(attribute='reference_type.name') %}
+                            {% if references %}
+                                {% for reference in references -%}
+                                    {{ reference.value }} ({{ reference.reference_type.name }})
+                                    {% if not loop.last %}<br>{% endif %}
+                                {% endfor %}
+                            {% endif %}
+                        {% endcall %}
+                    </dd>
+                {% endif %}
+            </dl>
         {% endcall %}
     </div>
 {% endblock %}
