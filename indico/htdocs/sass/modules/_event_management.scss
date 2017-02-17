@@ -613,7 +613,20 @@ th.i-table {
 }
 
 .event-settings {
+    @include border-all($gray);
+
+    background: rgba($light-blue, 0.2);
+
     & > .section {
+        margin-left: -10px;
+        margin-right: -10px;
+        padding-left: 10px;
+        padding-right: 10px;
+
+        & > .icon {
+            color: $dark-gray !important;
+        }
+
         .text, .toolbar {
             align-self: flex-start;
         }
@@ -626,12 +639,14 @@ th.i-table {
 
     dl.i-data-list {
         color: $light-black;
-        margin-top: 0;
-        margin-bottom: 0.2em;
+        margin: 0;
 
         dt, dd {
             padding: 0;
-            margin-bottom: 0.3em;
+
+            &:not(:last-of-type) {
+                margin-bottom: 0.3em;
+            }
         }
 
         dd {
@@ -639,6 +654,7 @@ th.i-table {
 
             .no-value {
                 color: $gray;
+                font-style: italic;
             }
         }
     }
