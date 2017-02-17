@@ -35,13 +35,6 @@ function iterate(list, iterator, offset) {
         return iterator.result;
 }
 
-function iterateReplace(list, iterator, offset) {
-        for (var i = any(offset, 0), length = list.length; i < length; i++) {
-                list[i] = iterator(list[i], i);
-        }
-        return iterator.result;
-}
-
 /**
  * For each property of the object invokes the iterator with two arguments:
  * a value of the property and a key of the property.
@@ -53,13 +46,6 @@ function iterateReplace(list, iterator, offset) {
 function enumerate(object, iterator) {
         for (var key in object) {
                 iterator(object[key], key);
-        }
-        return iterator.result;
-}
-
-function enumerateReplace(list, iterator, offset) {
-        for (var i = any(offset, 0), length = list.length; i < length; i++) {
-                list[i] = iterator(list[i], i);
         }
         return iterator.result;
 }
@@ -311,22 +297,3 @@ function match(value, key) {
                 };
         }
 }
-
-/**
- * Returns template that return true if a value from a getter of an input object (or its property with the given key) is equal to the value.
- * @param {Object} value
- * @param {String} [key]
- * @param {Function}
- */
-function matchGet(value, key) {
-        if (exists(key)) {
-                return function(object) {
-                        return object[key].get() === value;
-                };
-        } else {
-                return function(object) {
-                        return object.get() === value;
-                };
-        }
-}
-

@@ -60,25 +60,6 @@ class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
         return self._displayDefaultPage()
 
 
-class RHConferenceModification(RHConferenceModifBase):
-    _uh = urlHandlers.UHConferenceModification
-
-    def _process( self ):
-        pars={}
-        wf=self.getWebFactory()
-        if wf is not None:
-            pars["type"]=wf.getId()
-        if self.event_new.is_locked:
-            p = conferences.WPConferenceModificationClosed( self, self._target )
-            return p.display(**pars)
-        else:
-            p = conferences.WPConferenceModification( self, self._target )
-
-            if wf is not None:
-                p = wf.getConfModif(self, self._conf)
-            return p.display(**pars)
-
-
 #######################################################################################
 
 class RHConfClone( RHConferenceModifBase ):

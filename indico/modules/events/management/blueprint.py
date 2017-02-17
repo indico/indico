@@ -23,9 +23,8 @@ from indico.modules.events.management.controllers import (RHEventSettings, RHEdi
                                                           RHDeleteEvent, RHChangeEventType, RHLockEvent, RHUnlockEvent,
                                                           RHShowNonInheriting, RHEventProtection,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
-                                                          RHManageReferences, RHManageEventLocation,
-                                                          RHManageEventPersonLinks, RHManageEventKeywords,
                                                           RHPrintEventPoster, RHPosterPrintSettings)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -48,12 +47,10 @@ _bp.add_url_rule('/protection', 'protection', RHEventProtection, methods=('GET',
 _bp.add_url_rule('/protection/acl', 'acl', RHEventACL)
 _bp.add_url_rule('/protection/acl-message', 'acl_message', RHEventACLMessage)
 _bp.add_url_rule('/move', 'move', RHMoveEvent, methods=('POST',))
-_bp.add_url_rule('/external-ids', 'manage_event_references', RHManageReferences, methods=('GET', 'POST'))
-_bp.add_url_rule('/event-location', 'manage_event_location', RHManageEventLocation, methods=('GET', 'POST'))
-_bp.add_url_rule('/event-keywords', 'manage_event_keywords', RHManageEventKeywords, methods=('GET', 'POST'))
-_bp.add_url_rule('/event-persons', 'manage_event_person_links', RHManageEventPersonLinks, methods=('GET', 'POST'))
+
 _bp.add_url_rule('/print-poster/settings', 'poster_settings', RHPosterPrintSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/print-poster/<int:template_id>/<uuid>', 'print_poster', RHPrintEventPoster)
+
 
 for object_type, prefixes in event_management_object_url_prefixes.iteritems():
     if object_type == 'subcontribution':
@@ -62,3 +59,7 @@ for object_type, prefixes in event_management_object_url_prefixes.iteritems():
         prefix = '!/event/<confId>' + prefix
         _bp.add_url_rule(prefix + '/show-non-inheriting', 'show_non_inheriting', RHShowNonInheriting,
                          defaults={'object_type': object_type})
+
+
+_compat_bp = IndicoBlueprint('compat_event_management', __name__, url_prefix='/event/<confId>/manage')
+_compat_bp.add_url_rule('/general/', 'settings', make_compat_redirect_func(_bp, 'settings'))

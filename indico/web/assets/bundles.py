@@ -139,8 +139,7 @@ indico_common = rjs_bundle(
     *namespace('js/indico/Common',
                'Export.js',
                'TimezoneSelector.js',
-               'Social.js',
-               'htmlparser.js'))
+               'Social.js'))
 
 indico_materialeditor = rjs_bundle('indico_materialeditor', 'js/indico/MaterialEditor/Editor.js')
 
@@ -296,15 +295,8 @@ presentation = rjs_bundle(
                'Ui/Text.js',
                'Ui/Styles/SimpleStyles.js',
                'Ui/Widgets/WidgetBase.js',
-               'Ui/Widgets/WidgetPage.js',
                'Ui/Widgets/WidgetComponents.js',
-               'Ui/Widgets/WidgetControl.js',
-               'Ui/Widgets/WidgetEditor.js',
-               'Ui/Widgets/WidgetTable.js',
-               'Ui/Widgets/WidgetField.js',
-               'Ui/Widgets/WidgetEditable.js',
-               'Ui/Widgets/WidgetMenu.js',
-               'Ui/Widgets/WidgetGrid.js'))
+               'Ui/Widgets/WidgetControl.js'))
 
 statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
 

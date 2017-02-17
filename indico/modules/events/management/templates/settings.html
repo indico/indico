@@ -1,7 +1,5 @@
 {% extends 'layout/base.html' %}
 
-{% from 'events/management/_event_person_links.html' import render_event_person_links %}
-
 {% block title %}{% trans %}Settings{% endtrans %}{% endblock %}
 
 {% macro with_default(content='') %}
@@ -116,7 +114,14 @@
                 </dt>
                 <dd>
                     {% call with_default() %}
-                        {{ render_event_person_links(event.type, event.person_links) if event.person_links }}
+                        {% for event_person_link in event.person_links | sort(attribute='display_order_key') %}
+                            <div>
+                                <span>{{ event_person_link.display_full_name }}</span>
+                                {% if event_person_link.is_submitter %}
+                                    <span class="badge">{% trans %}Submitter{% endtrans %}</span>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
                     {% endcall %}
                 </dd>
             </dl>
