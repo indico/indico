@@ -24,14 +24,11 @@
     {% call(block, revision) render_timeline(paper, comment_form, review_form, revision_form) %}
         {% if block == 'multiple-review-group-text' %}
             {{ render_multiple_review_group_text(paper) }}
-        {% endif %}
-        {% if block == 'revision-info' %}
+        {% elif block == 'revision-info' %}
             {{ render_submission_info(revision) }}
-        {% endif %}
-        {% if block == 'revision-judgment' %}
+        {% elif block == 'revision-judgment' %}
             {{ render_paper_judgment(revision) }}
-        {% endif %}
-        {% if block == 'submit-revision' %}
+        {% elif block == 'submit-revision' %}
             {{ render_paper_revision_submission_form(paper, revision_form) }}
         {% endif %}
     {% endcall %}
