@@ -99,3 +99,22 @@ dl.i-data-list {
         color: $light-black;
     }
 }
+
+.file-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 1.1em;
+
+    li {
+        line-height: 2em;
+
+        a {
+            color: $light-black;
+
+            &:hover {
+                color: $black;
+            }
+        }
+    }
+}
