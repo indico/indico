@@ -122,34 +122,6 @@ IndicoUI.Widgets = {
     },
 
     /**
-         @namespace Widgets that handle personal options
-       */
-    Options:
-    {
-        /**
-        * Sets the 'advanced tabs' feature on/off
-        * @param {Boolean} state The value that the property
-        * should be set to
-        * @param {Function} handler The callback that will be
-        * invoked in case of success
-        */
-        setAdvancedOptions: function(state, handler){
-            jsonRpc(Indico.Urls.JsonRpcService, 'user.personalinfo.set', {
-                'value': {
-                    'tabAdvancedMode': state
-                }
-            }, function(response, error){
-                if (exists(error)) {
-                    IndicoUtil.errorReport(error);
-                }
-                else {
-                    handler();
-                }
-            });
-        }
-    },
-
-    /**
         @namespace Generic, resusable, components
         */
     Generic: {
@@ -200,10 +172,6 @@ IndicoUI.Widgets = {
 
         selectionField: function(elem, method, attributes, options, cachedValue, observer){
             elem.set(new SelectEditWidget(method, attributes, options, cachedValue, observer).draw());
-        },
-
-        textField: function(elem, method, attributes, cachedValue, observer){
-            elem.set(new InputEditWidget(method, attributes, cachedValue, true, observer).draw());
         },
 
         /**
@@ -553,60 +521,8 @@ IndicoUI.Widgets = {
 
         dateField_edate: function(showTime, attributes, hiddenFields){
             return IndicoUI.Widgets.Generic.dateField(showTime, attributes, hiddenFields, {'id':'edate', 'name':'edate'});
-        },
-
-        timeField: function(attributes, hiddenFields){
-            attributes = attributes || {};
-            return Html.input("text", attributes);
-        },
-
-        dateEditor: function(elem, method, attributes, cachedValue){
-
-            IndicoUI.Effect.mouseOver(elem.dom);
-
-            var context = new WidgetEditableContext();
-
-            var editable = new WidgetEditable(WidgetEditable.getClickableView(WidgetEditable.getTemplatedTextView(getBlankTemplate(Html.span({
-                style: {
-                    fontStyle: 'italic'
-                }
-            }, "None")))), WidgetEditable.getFieldEditor(curry(IndicoUI.Widgets.Generic.dateField, true)));
-
-            $B(elem, [editable(IndicoUtil.cachedRpcValue(Indico.Urls.JsonRpcService, method, attributes, cachedValue), context), Widget.text(" "), IndicoUI.Aux.defaultEditMenu(context)]);
-        },
-
-        dateStartEndTimeField: function(defaultStartTime, defaultEndTime, attributesStartTime, attributesEndTime, additional) {
-
-            var obj = new WatchObject();
-            obj.set('startTime', defaultStartTime);
-            obj.set('endTime', defaultEndTime);
-
-            var dash = Html.span({style: {padding: '0 10px'}});
-            dash.dom.innerHTML = '&ndash;';
-
-            var startTimeField = IndicoUI.Widgets.Generic.timeField(attributesStartTime);
-            var endTimeField = IndicoUI.Widgets.Generic.timeField(attributesEndTime);
-
-            var element = Widget.block([
-                $B(startTimeField, obj.accessor('startTime')), dash,
-                $B(endTimeField, obj.accessor('endTime')),
-                additional || ''
-            ]);
-
-            return {'element': element,
-                    'accessor': obj,
-                    'startTimeField': startTimeField,
-                    'endTimeField': endTimeField};
-        },
-
-        durationField: function(defaultVal, attributes) {
-            // TODO: Add value type checking
-            attributes = attributes || {};
-            attributes.style = {width: '40px'};
-            return Html.edit(attributes, defaultVal);
-        },
-    }// end of Generic namespace
-
+        }
+    }
 };
 
 

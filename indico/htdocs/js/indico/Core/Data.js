@@ -191,11 +191,6 @@ var Util = {
         return date;
     },
 
-    dateTimeJSToIndico: function(obj){
-        return {date:  obj.getFullYear()+ '-'+ zeropad(obj.getMonth()+1) + '-' + zeropad(obj.getDate()),
-                time: zeropad(obj.getHours())+':'+zeropad(obj.getMinutes())+':'+zeropad(obj.getSeconds())};
-    },
-
     HTMLEscape: function(text) {
         // escape special HTML chars - kind of hacky but works
         return $('<p/>').text(text || '').html();
@@ -229,60 +224,6 @@ Util.Validation = {
 
 };
 
-Util.DateTime = {
-    friendlyDateTime: function(dateTime, format) {
-        if (!dateTime) {
-            return Html.em({},'none');
-        } else {
-            var now = Util.dateTimeJSToIndico(new Date());
-            var dateStr = Util.formatDateTime(dateTime,
-                                         format).split(' ');
-
-            var day = dateTime.date == now.date ?
-                Html.span({}, "today"):Html.span({}, dateStr[0]);
-
-            return Html.span({}, day, ' ', dateStr[1]);
-        }
-    }
-};
-
-Util.Text = {
-    wordsCounter: function(value) {
-        var fullStr = value + " ";
-        var initialWhitespaceRExp = /^[^A-Za-z0-9]+/gi;
-        var leftTrimmedStr = fullStr.replace(initialWhitespaceRExp, "");
-        var nonAlphanumericsRExp = /[^A-Za-z0-9]+/gi;
-        var cleanedStr = leftTrimmedStr.replace(nonAlphanumericsRExp, " ");
-        var splitString = cleanedStr.split(" ");
-        var wordCount = splitString.length - 1;
-        if (fullStr.length < 2) {
-            wordCount = 0;
-        }
-        return wordCount;
-    }
-};
-
-Protection = {
-
-    ParentRestrictionMessages: {
-        '1': $T("(currently <strong>restricted</strong> to some users, but can change)"),
-        '-1': $T("(currently <strong>open</strong> to everyone, but can change)") },
-
-    resolveProtection: function(resourceProtection, parentProtection) {
-        if (resourceProtection === 0) {
-            return parentProtection;
-        } else {
-            return resourceProtection;
-        }
-    }
-};
-
-var IndicoSortCriteria = {
-    StartTime: function(c1, c2) {
-        return SortCriteria.Integer(c1.startDate.time.replace(/:/g, ''),
-                                    c2.startDate.time.replace(/:/g, ''));
-    }
-};
 
 var IndicoDateTimeFormats = {
     International: '%d/%m/%Y %H:%M',

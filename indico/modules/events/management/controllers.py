@@ -20,7 +20,6 @@ import uuid
 from collections import defaultdict
 
 from flask import flash, redirect, session, request, signals
-from markupsafe import Markup
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
@@ -31,22 +30,20 @@ from indico.modules.events import EventLogRealm, EventLogKind
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
-from indico.modules.events.forms import EventReferencesForm, EventPersonLinkForm, EventKeywordsForm
 from indico.modules.events.management.forms import (EventProtectionForm, EventDataForm, EventDatesForm,
                                                     EventLocationForm, EventPersonsForm, EventContactInfoForm,
                                                     EventClassificationForm, PosterPrintingForm)
-from indico.modules.events.management.util import flash_if_unregistered, can_lock
+from indico.modules.events.management.util import can_lock
 from indico.modules.events.management.views import WPEventSettings, WPEventProtection
 from indico.modules.events.models.events import EventType
-from indico.modules.events.operations import (delete_event, create_event_references, update_event_protection,
-                                              update_event, lock_event, unlock_event, update_event_type)
+from indico.modules.events.operations import (delete_event, update_event_protection, update_event, update_event_type,
+                                              lock_event, unlock_event)
 from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args, update_object_principals, track_time_changes
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
@@ -306,50 +303,6 @@ class RHMoveEvent(RHManageEventBase):
         flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, self.target_category.title),
               'success')
         return jsonify_data(flash=False)
-
-
-class RHManageReferences(RHManageEventBase):
-    def _process(self):
-        form = EventReferencesForm(obj=FormDefaults(references=self.event_new.references))
-        if form.validate_on_submit():
-            create_event_references(event=self.event_new, data=form.data)
-            flash(_('External IDs saved'), 'success')
-            tpl = get_template_module('events/management/_reference_list.html')
-            return jsonify_data(html=tpl.render_event_references_list(self.event_new.references))
-        return jsonify_form(form)
-
-
-class RHManageEventLocation(RHManageEventBase):
-    def _process(self):
-        form = EventLocationForm(obj=self.event_new)
-        if form.validate_on_submit():
-            update_event(self.event_new, **form.data)
-            flash(_('The location for the event has been updated'))
-            tpl = get_template_module('events/management/_event_location.html')
-            return jsonify_data(html=tpl.render_event_location_info(self.event_new.location_data))
-        return jsonify_form(form)
-
-
-class RHManageEventKeywords(RHManageEventBase):
-    def _process(self):
-        form = EventKeywordsForm(obj=self.event_new)
-        if form.validate_on_submit():
-            update_event(self.event_new, **form.data)
-            flash(_('The keywords for the event have been updated'))
-            return jsonify_data(html=Markup('<br>').join(self.event_new.keywords))
-        return jsonify_form(form)
-
-
-class RHManageEventPersonLinks(RHManageEventBase):
-    def _process(self):
-        form = EventPersonLinkForm(obj=self.event_new, event=self.event_new, event_type=self.event_new.type)
-        if form.validate_on_submit():
-            with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
-                update_event(self.event_new, **form.data)
-            tpl = get_template_module('events/management/_event_person_links.html')
-            return jsonify_data(html=tpl.render_event_person_links(self.event_new.type, self.event_new.person_links))
-        self.commit = False
-        return jsonify_form(form)
 
 
 class RHPosterPrintSettings(RHConferenceModifBase):

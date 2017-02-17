@@ -23,174 +23,6 @@
 var IndicoUtil = {
 
     /**
-     * Utility function that, given a container element, will look at all of the nodes inside it, and
-     * return the list of nodes that are of type "input", "select", and "textArea".
-     * @param {multiple XElement} A variable number of XElement's that we want to scan for form-like nodes.
-     * @return {Array of DOM nodes} Returns an array of DOM nodes that are of type "input", "select", and "textArea".
-     */
-    findFormFields : function() {
-        var formNodes = [];
-
-        for (var i=0; i < arguments.length; i++) {
-            var xelement = arguments[i];
-
-            var inputNodes = xelement.dom.getElementsByTagName("input");
-            var selectNodes = xelement.dom.getElementsByTagName("select");
-            var textAreaNodes = xelement.dom.getElementsByTagName("textArea");
-
-            for (var j=0; j < inputNodes.length; j++) {formNodes.push(inputNodes[j]);}
-            for (var j=0; j < selectNodes.length; j++) {formNodes.push(selectNodes[j]);}
-            for (var j=0; j < textAreaNodes.length; j++) {formNodes.push(textAreaNodes[j]);}
-        }
-
-        return formNodes;
-    },
-
-    /**
-    * Utility function that, given a container element, will find the "form" nodes inside it
-    * and extract the values from those elements.
-    * @param {Array} components An array of input nodes / custom components.
-    *                           Nodes can be obtained easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
-    *                           Custom components have to have a .get() and a .getName() method.
-    * @param {Object} values An object where there values will be stored; this object will be "cleaned" and then returned.
-    *                        If left to null, a new object will be returned.
-    * @return {Array} an object whose keys are the "name" attribute of the form nodes, and the values
-    *                 are the values of those nodes.
-    */
-    getFormValues : function(components, values) {
-        if (!exists(values)) {
-            values = {};
-        } else {
-            each(values, function(value, key){
-                delete values[key];
-            });
-        }
-        for (var i=0; i < components.length; i++) {
-            var component = components[i];
-            if (isDom(component)) {
-                var node = component;
-                if (exists(node.name) && node.name) {
-                    if (node.type == "checkbox") {
-                        if (!exists(values[node.name])) {
-                            values[node.name] = [];
-                        }
-                        if (node.checked) {
-                            values[node.name].push(node.value);
-                        }
-                    } else if (node.type == "radio") {
-                        if (node.checked) {
-                            values[node.name] = node.value;
-                        }
-                    } else {
-                        values[node.name] = node.value;
-                    }
-                }
-            } else {
-                if(exists(component.get) && exists(component.getName)) {
-                    values[component.getName()] = component.get();
-                }
-            }
-        }
-        return values;
-    },
-
-    /**
-    * Utility function that, given a container element, and an object with key/value pairs, will find the "form" nodes inside it
-    * and put those values in each node. To find the correct node for each value, the "name" attribute of the nodes are compared
-    * to the 'keys' of the object.
-    * @param {Array} components An array of input nodes / custom components.
-    *                           Nodes can be obtained easily like this: var formNodes = IndicoUtil.findFormFields(containerElement)
-    *                           Custom components have to have a .get() and a .getName() method.
-    * @param {Array} an object whose keys are the "name" attribute of the form nodes, and the values
-    *                are the values of those nodes.
-    */
-    setFormValues : function(components, values) {
-
-        for (var i=0; i < components.length; i++) {
-            var component = components[i];
-            if (isDom(component)) {
-                var node = component;
-                if (node.type == "checkbox") {
-                    node.checked = node.name in values && exists($L(values[node.name]).indexOf(node.value));
-                } else if (node.type == "radio") {
-                    node.checked = node.name in values && values[node.name] == node.value;
-                } else {
-                    node.value = values[node.name];
-                }
-            } else {
-                if(exists(component.set) && exists(component.getName)) {
-                    component.set(values[component.getName()]);
-                }
-            }
-        }
-    },
-
-    /**
-     * Utility function that sets "form" nodes inside an element to disabled.
-     * @param {XElement} containerElement An element to scan for form nodes to disable.
-     * @param {Boolean} enableDisable true = enable, false = disable
-     */
-     enableDisableForm : function (containerElement, enableDisable) {
-        var nodesToDisable = {button :'', input :'', optgroup :'', option :'', select :'', textarea :''};
-
-        var node, nodes;
-        nodes = containerElement.dom.getElementsByTagName('*');
-        if (!nodes) return;
-
-        var i = nodes.length;
-        while (i--){
-            node = nodes[i];
-            if ( node.nodeName && node.nodeName.toLowerCase() in nodesToDisable ) {
-                node.disabled = !enableDisable;
-            }
-        }
-    },
-
-    /**
-    * Given a function 'f', returns another function 'g' that will accept calls of
-    * the form 'g(list,arg1,..,argn)', and append f(arg1,...,argn) to list.
-    * @param {Function} func The function that will be applied
-    * @return The created function
-    * @type Function
-    */
-    appender: function(func){
-        function f(list){
-            list.append(func.apply(this, Array.prototype.slice.call(arguments, 1)));
-        }
-
-        return f;
-    },
-
-    /**
-    * Changes the style of a CSS class dynamically.
-    * WARNING: the cls argument will be converted to lowercase.
-    * Due to Firefox storing css names like this: ul.tabList ,
-    * and IE7 storing them like this: UL.tabList,
-    * the cls argument has to be converted to lowercase.
-    * This means that two class names who only differ by lowercase / uppercase
-    * will be considered the same.
-    * @param {String} cls The name of the class whose style will be changed
-    * @param {String} style The new style (CSS)
-    */
-    changeClassCss: function(cls, style){
-        if (!document.styleSheets) {
-            return;
-        }
-        var css;
-        if (document.styleSheets[0].cssRules) {
-            css = document.styleSheets[0].cssRules;
-        }
-        else {
-            css = document.styleSheets[0].rules;
-        }
-        for (var i = 0; i < css.length; i++) {
-            if (css[i].selectorText.toLowerCase() == cls.toLowerCase()) {
-                css[i].style.cssText = style;
-            }
-        }
-    },
-
-    /**
     * Creates a new DOM-based HTML form from a map specification.
     * @param {List} map A map, conforming to the described format
     * @return An element (DIV) containing the form
@@ -272,15 +104,6 @@ var IndicoUtil = {
     },
 
     /**
-     * Formats a JS Date, returning just the time as a string (HH:MM)
-     * @param {Date} date A JS Date
-     * @return A string representation of the Date object
-     */
-    formatJustTime: function(date) {
-        return zeropad(date.getHours())+ ':' +zeropad(date.getMinutes());
-    },
-
-    /**
     * Parses a string (DD/MM/YY HH:MM) into a JS Date, returning a string
     * @param {String} strDateTime A string representation of the date/time
     * @return A JS Date with the parsed date/time
@@ -291,7 +114,6 @@ var IndicoUtil = {
             return null;
         }
 
-        var sdatetime = new Date();
         var sdate = parseDate(strDateTime[0]);
         var stime = parseTime(strDateTime[1]);
 
@@ -307,7 +129,6 @@ var IndicoUtil = {
 
     parseDate: function(strDate) {
 
-        var sdatetime = new Date();
         var sdate = parseDate(strDate);
 
         if ( !sdate ) {
@@ -319,14 +140,6 @@ var IndicoUtil = {
 
 
         return sdatetime;
-    },
-
-    /**
-     * Formats a datetime object with 2 attributes, .date and .time
-     * (obtained by pickling with Conversion.datetime)
-     */
-    formatJsonDate: function(jsonDate) {
-        return jsonDate.date + ' at ' + jsonDate.time.substring(0,5);
     },
 
     /**
@@ -416,24 +229,6 @@ var IndicoUtil = {
     },
 
     /**
-     * Determines if a string contains invalid characters for short URLs
-     * @param {String} s The input string
-     * @return {Boolean} true if the string is a valid string, false otherwise
-     */
-    parseShortURL: function(s) {
-        if (/^[0-9]+$/.test(s)) {
-            // Just a number
-            return false;
-        }
-        if (s.substr(0, 1) == '/' || s.substr(s.length - 1, 1) == '/' || ~s.indexOf('//')) {
-            // Leading/trailing/duplicate slash
-            return false;
-        }
-        // Restrict characters
-        return /^[a-zA-Z0-9/._-]*$/.test(s);
-    },
-
-    /**
      * Marks an input field (text, checkbox or select) as invalid.
      * It will change its CSS class so that it appears red, and place an error tooltip over it on mouseover.
      * If the value of the field changes / the user types in the field, the red color and the tooltip will disappear
@@ -486,19 +281,6 @@ var IndicoUtil = {
         }
 
         return oList;
-    },
-
-    /**
-     *  Used as extraCheckFunction within the parameter manager.
-     *  Extra checking for numbers (minimum, maximum).
-     *
-     */
-    validate_number: function(opts) {
-        return function(value) {
-            var val = parseInt(value, 10);
-            if(opts.minimum && val < opts.minimum) return Html.span({}, $T("The value must be at least ") + opts.minimum);
-            if(opts.maximum && val > opts.maximum) return Html.span({}, $T("The value must be at maximum ") + opts.maximum);
-        }
     },
 
     /**
@@ -615,9 +397,6 @@ var IndicoUtil = {
                 }
                 else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
                     error = Html.span({}, $T("Time format is not valid. It should be hh:mm"));
-                }
-                else if (dataType == 'shortURL' && !IndicoUtil.parseShortURL(component.get())) {
-                    error = Html.span({}, $T("The short URL contains invalid characters. The allowed characters are alphanumeric, /, _, - and ."));
                 }
                 else if (!allowEmpty && component.get() != null && (!isString(component.get()) || trim(component.get()) === '')) {
                     error = Html.span({}, $T("Field is mandatory"));
@@ -770,61 +549,6 @@ var IndicoUtil = {
             }
         };
 
-    },
-
-    waitLoad : function(preLoad, process) {
-
-        var counter = preLoad.length;
-
-        var retVal = new WatchValue();
-
-        var run = (counter===0)?
-            curry(process, retVal):
-            function() {
-                $L(preLoad).each(function(value) {
-
-                    var hook = new WatchValue();
-                    hook.set(false);
-
-                    hook.observe(function(value){
-                        if (value) {
-                            bind.detach(hook);
-                            counter--;
-
-                            if (counter === 0) {
-                                process(retVal);
-                            }
-                        }
-                    });
-
-                    value(hook);
-                });
-            };
-
-        return {'returnValue': retVal,
-                'run': run };
-    },
-
-    detectTextFormat : function(text) {
-        if (/<.*>.*<\/.*>/.exec(text)) {
-            return "html";
-        } else {
-            return "plain";
-        }
-    },
-
-    /**
-     * Sorts a watchList by using the watchList clear() and appendMany() methods.
-     * Thus, changes in the watchList are notified, but it is an inefficient way
-     * of ordering a watchList.
-     * If one day the watchList class gets a good sort() method then
-     * this should be deprecated.
-     * @param {WatchList} watchList
-     */
-    sortWatchList : function(watchList) {
-        var old = watchList.clear();
-        var sortedItems = old.sort();
-        watchList.appendMany(sortedItems);
     },
 
     /**

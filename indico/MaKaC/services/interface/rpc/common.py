@@ -101,8 +101,6 @@ class HTMLSecurityError(CausedError):
 class ServiceAccessError(NoReportError):
     pass
 
-class TimingNoReportError(NoReportError):
-    pass
 
 
 class Warning(Fossilizable):

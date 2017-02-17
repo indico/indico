@@ -26,13 +26,13 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.categories.fields import CategoryField
-from indico.modules.events.fields import ReferencesField, EventPersonLinkListField, IndicoThemeSelectField
+from indico.modules.events.fields import EventPersonLinkListField, IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
-from indico.modules.events.models.references import ReferenceType, EventReference
+from indico.modules.events.models.references import ReferenceType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoLocationField, IndicoDateTimeField, IndicoTimezoneSelectField,
-                                     IndicoEnumRadioField, OccurrencesField, IndicoTagListField)
+                                     IndicoEnumRadioField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
 
@@ -58,26 +58,6 @@ class ReferenceTypeForm(IndicoForm):
     def validate_url_template(self, field):
         if field.data and '{value}' not in field.data:
             raise ValidationError(_("The URL template must contain the placeholder '{value}'."))
-
-
-class EventReferencesForm(IndicoForm):
-    references = ReferencesField(_('External IDs'), reference_class=EventReference,
-                                 description=_("Manage external resources for this event"))
-
-
-class EventKeywordsForm(IndicoForm):
-    keywords = IndicoTagListField(_('Keywords'))
-
-
-class EventPersonLinkForm(IndicoForm):
-    person_link_data = EventPersonLinkListField(_('Chairpersons'))
-
-    def __init__(self, *args, **kwargs):
-        self.event = kwargs.pop('event')
-        self.event_type = kwargs.pop('event_type')
-        super(EventPersonLinkForm, self).__init__(*args, **kwargs)
-        if self.event_type == 'lecture':
-            self.person_link_data.label.text = _('Speakers')
 
 
 class EventCreationFormBase(IndicoForm):

@@ -19,7 +19,6 @@ import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from MaKaC.webinterface.general import WebFactory
-from MaKaC.webinterface import meeting
 from indico.modules.events.cloning import EventCloner
 
 
@@ -38,10 +37,6 @@ class WebFactory(WebFactory):
         tabCtrl.getTabById("posters").enable()
         tabCtrl.getTabById("badges").disable()
 
-    def getConfModif(rh, conf):
-        return WPSEConfModif(rh, conf)
-    getConfModif = staticmethod(getConfModif)
-
     def getConfClone(rh, conf):
         return WPSEConfClone(rh, conf)
     getConfClone = staticmethod(getConfClone)
@@ -52,16 +47,6 @@ SimpleEventWebFactory = WebFactory
 
 #################Conference Modification#############################
 
-##Main##
-class WPSEConfModif(conferences.WPConferenceModification):
-    def _getPageContent( self, params ):
-        wc = WSEConfModifMainData(self._conf, self._ct, self._rh)
-        pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
-        return wc.getHTML( pars )
-
-
-class WSEConfModifMainData(meeting.WMConfModifMainData):
-    pass
 
 
 #####Tools # Stays the same as conference for now

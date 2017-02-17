@@ -1114,11 +1114,6 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
              return result;
          },
 
-         flatten2: function(data) {
-
-             return data;
-         },
-
          drawDay: function(day) {
              this.day = day;
 

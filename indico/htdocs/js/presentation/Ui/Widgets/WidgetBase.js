@@ -26,11 +26,6 @@ var Widget = {
 	navigator: function(target) {
 		return curry(this.navigate, target);
 	},
-	getTarget: function(target) {
-		throw new Exception("Cannot lookup target.", {
-			target: target
-		});
-	},
 	template: function(target, properties) {
 		var $ = this;
 		return function(item) {
@@ -54,12 +49,6 @@ var Widget = {
 			view = $.view(target, data);
 			return view;
 		};
-	},
-	presenter: function(source, target, properties) {
-		return this.template(target, properties)(source);
-	},
-	repeater: function(source, target, properties) {
-		return $L(source, this.template(target, properties));
 	}
 };
 
@@ -85,37 +74,3 @@ function WidgetBuilder(method, attributes) {
 	return builder;
 }
 
-function WidgetDocument(view, context, loaded) {
-	var hiddenElementCounter = 0;
-	var hiddenElements = new WatchObject();
-	var overlayElements = new WatchList();
-
-	WidgetDocument.attachHidden = function(element) {
-		var key = ++hiddenElementCounter;
-		hiddenElements.set(key, element);
-		return function() {
-			hiddenElements.set(key, null);
-		};
-	};
-
-	WidgetDocument.setOverlay = function(elements) {
-		$B(overlayElements, elements);
-	};
-	
-	window.onload = function() {
-		invoke(loaded);
-		var overlayContainer = Widget.block(overlayElements).fixedBox(0, 0, 0, 0);
-		$B(overlayContainer.styleAccessor("display"), overlayElements.length,
-			function(value) {
-				return value == 0 ? "none" : "block";
-			}
-		);
-		$B($E(window.document.body), [
-			Widget.block($L(hiddenElements, function(value) {
-				return value.get();
-			})),
-			Widget.block(Widget.view(view, context)),
-			overlayContainer
-		])
-	};
-}

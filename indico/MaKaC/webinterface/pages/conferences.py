@@ -16,25 +16,22 @@
 
 import os
 import posixpath
-from collections import OrderedDict
 from datetime import datetime
 from xml.sax.saxutils import quoteattr
 
 from flask import session, render_template, request
-from markupsafe import escape
 from pytz import timezone
 from sqlalchemy.orm import load_only
 
 from indico.core.config import Config
 from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
-from indico.modules.categories.util import get_visibility_options
 from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
-from indico.modules.events.models.events import EventType, Event
+from indico.modules.events.models.events import Event
 from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
 from indico.util.string import encode_if_unicode, to_unicode
@@ -47,10 +44,9 @@ from MaKaC.badgeDesignConf import BadgeDesignConfiguration
 from MaKaC.common.TemplateExec import render
 from MaKaC.common.output import outputGenerator
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.common.utils import isStringHTML, formatDateTime
+from MaKaC.common.utils import isStringHTML
 from MaKaC.posterDesignConf import PosterDesignConfiguration
 from MaKaC.webinterface import wcomponents, urlHandlers
-from MaKaC.webinterface.common.timezones import TimezoneRegistry
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.pages import main, base
 from MaKaC.webinterface.pages.base import WPDecorated
@@ -584,47 +580,6 @@ class WPConferenceModifBase(main.WPMainBase):
         return "nothing"
 
 
-class WConfModifMainData(wcomponents.WTemplated):
-
-    def __init__(self, conference, ct, rh):
-        self._conf = conference
-        self._ct = ct
-        self._rh = rh
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        event = self._conf.as_event
-        vars["defaultStyle"] = event.theme
-        vars["visibility"] = self._conf.getVisibility()
-        vars["title"]=self._conf.getTitle()
-        if isStringHTML(self._conf.getDescription()):
-            vars["description"] = self._conf.getDescription()
-        elif self._conf.getDescription():
-            vars["description"] = self._conf.getDescription()
-        else:
-            vars["description"] = ""
-
-        tz = self._conf.getTimezone()
-        vars["timezone"] = tz
-        vars["startDate"]=formatDateTime(self._conf.getAdjustedStartDate())
-        vars["endDate"]=formatDateTime(self._conf.getAdjustedEndDate())
-        vars["chairText"] = self.htmlText(self._conf.getChairmanText())
-        additional_info = event.additional_info
-        if isStringHTML(additional_info):
-            vars["contactInfo"] = additional_info
-        else:
-            vars["contactInfo"] = ("""<table class="tablepre"><tr><td><pre>{}</pre></td></tr></table>"""
-                                   .format(additional_info.encode('utf-8')))
-        #------------------------------------------------------
-        vars["shortURLBase"] = Config.getInstance().getShortEventURL()
-        vars["shortURLTag"] = event.url_shortcut or ''
-        vars['rbActive'] = Config.getInstance().getIsRoomBookingActive()
-        vars["timezoneList"] = TimezoneRegistry.getList()
-
-        vars['styleOptions'] = {tid: data['title'] for tid, data in
-                                theme_settings.get_themes_for(self._conf.getType()).viewitems()}
-        return vars
-
 class WPConferenceModificationClosed( WPConferenceModifBase ):
 
     def __init__(self, rh, target):
@@ -640,20 +595,6 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
                                               "postURL": url_for('event_management.unlock', self._conf),
                                               "showUnlockButton": can_unlock,
                                               "unlockButtonCaption": _("Unlock event")})
-
-
-class WPConferenceModification( WPConferenceModifBase ):
-
-    sidemenu_option = 'general'
-
-    def __init__(self, rh, target, ct=None):
-        WPConferenceModifBase.__init__(self, rh, target)
-        self._ct = ct
-
-    def _getPageContent( self, params ):
-        wc = WConfModifMainData(self._conf, self._ct, self._rh)
-        pars = { "type": params.get("type","") , "conferenceId": self._conf.getId()}
-        return wc.getHTML( pars )
 
 
 class WPConfModifToolsBase(WPConferenceModifBase):
