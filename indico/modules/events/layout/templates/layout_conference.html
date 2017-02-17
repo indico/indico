@@ -38,7 +38,7 @@
         {% call form_row(css_form.css_file, skip_label=true) %}
             <a href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}" target="_blank"
                class="i-button i-form-field-fixed-width icon-eye js-preview-button
-                      {%- if not css_form.css_file.data %} weak-hidden{% endif %}">
+                      {%- if not css_form.css_file.data %} hidden{% endif %}">
                 {%- trans %}Preview{% endtrans -%}
             </a>
         {% endcall %}
@@ -46,7 +46,7 @@
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
             {% trans %}Upload CSS file{% endtrans %}
         </button>
-        <button class="i-button js-remove-button danger icon-remove{% if not css_form.css_file._value() %} weak-hidden{% endif %}"
+        <button class="i-button js-remove-button danger icon-remove{% if not css_form.css_file._value() %} hidden{% endif %}"
                 data-href="{{ url_for('event_layout.delete_css', event) }}" data-method="DELETE">
             {% trans %}Delete{% endtrans %}
         </button>
@@ -60,7 +60,7 @@
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
             {% trans %}Upload logo{% endtrans %}
         </button>
-        <button class="i-button js-remove-button danger icon-remove{% if not logo_form.logo._value() %} weak-hidden{% endif %}"
+        <button class="i-button js-remove-button danger icon-remove{% if not logo_form.logo._value() %} hidden{% endif %}"
                 data-href="{{ url_for('event_layout.delete_logo', event) }}" data-method="DELETE">
             {% trans %}Delete{% endtrans %}
         </button>
@@ -99,7 +99,7 @@
             $('.css-form, .logo-form').on('indico:fieldsSaved', function(e, response) {
                 var hidden = !response.content;
                 var $this = $(this);
-                $this.find('.js-remove-button, .js-preview-button').toggleClass('weak-hidden', hidden).prop('disabled', hidden);
+                $this.find('.js-remove-button, .js-preview-button').toggleClass('hidden', hidden).prop('disabled', hidden);
                 if ($this.is('.css-form')) {
                     updateCustomCSS(!hidden);
                 }
