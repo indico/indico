@@ -28,9 +28,8 @@ from flask import url_for as _url_for
 from flask import send_file as _send_file
 from werkzeug.wrappers import Response as WerkzeugResponse
 from werkzeug.datastructures import Headers, FileStorage
-from werkzeug.exceptions import NotFound, HTTPException
-from werkzeug.routing import BaseConverter, UnicodeConverter, RequestRedirect, BuildError
-from werkzeug.urls import url_parse
+from werkzeug.exceptions import NotFound
+from werkzeug.routing import BaseConverter, UnicodeConverter, BuildError
 
 from indico.util.caching import memoize
 from indico.util.fs import secure_filename
@@ -204,17 +203,6 @@ def make_compat_blueprint(blueprint):
                             make_compat_redirect_func(blueprint, rule['endpoint'], rule['view_func']),
                             methods=rule['options'].get('methods'))
     return compat
-
-
-def endpoint_for_url(url):
-    urldata = url_parse(url)
-    adapter = app.url_map.bind(urldata.netloc)
-    try:
-        return adapter.match(urldata.path)
-    except RequestRedirect, e:
-        return endpoint_for_url(e.new_url)
-    except HTTPException:
-        return None
 
 
 def url_for(endpoint, *targets, **values):
