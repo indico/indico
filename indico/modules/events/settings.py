@@ -207,6 +207,9 @@ class ThemeSettingsProxy(object):
 
     @memoize
     def get_themes_for(self, event_type):
+        # TODO: use lecture instead of simple_event
+        if event_type == 'lecture':
+            event_type = 'simple_event'
         return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
                 if event_type in theme_data['event_types']}
 

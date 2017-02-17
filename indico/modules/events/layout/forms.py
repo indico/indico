@@ -22,6 +22,7 @@ from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.config import Config
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import get_logo_data, get_css_file_data
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
@@ -35,7 +36,14 @@ THEMES = [('', _('No theme selected')),
           ('right_menu.css', _('Right menu'))]
 
 
-class LayoutForm(IndicoForm):
+def _get_timetable_theme_choices(event):
+    it = ((tid, data['title'])
+          for tid, data in theme_settings.get_themes_for(event.type).viewitems()
+          if not data.get('is_xml'))
+    return sorted(it, key=lambda x: x[1].lower())
+
+
+class ConferenceLayoutForm(IndicoForm):
     is_searchable = BooleanField(_("Enable search"), widget=SwitchWidget(),
                                  description=_("Enable search within the event"))
     show_nav_bar = BooleanField(_("Show navigation bar"), widget=SwitchWidget(),
@@ -60,7 +68,7 @@ class LayoutForm(IndicoForm):
                                      description=_("Group the entries of the timetable by room by default"))
     timetable_detailed = BooleanField(_("Show detailed view"), widget=SwitchWidget(),
                                       description=_("Show the detailed view of the timetable by default."))
-
+    timetable_theme = SelectField(_('Theme'), [DataRequired()])
     # Themes
     use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
                                   description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
@@ -72,11 +80,21 @@ class LayoutForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
-        super(LayoutForm, self).__init__(*args, **kwargs)
+        super(ConferenceLayoutForm, self).__init__(*args, **kwargs)
+        self.timetable_theme.choices = _get_timetable_theme_choices(self.event)
 
     def validate_use_custom_css(self, field):
         if field.data and not self.event.has_stylesheet:
             raise ValidationError(_('Cannot enable custom stylesheet unless there is one.'))
+
+
+class LectureMeetingLayoutForm(IndicoForm):
+    timetable_theme = SelectField(_('Timetable theme'), [DataRequired()])
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event')
+        super(LectureMeetingLayoutForm, self).__init__(*args, **kwargs)
+        self.timetable_theme.choices = _get_timetable_theme_choices(event)
 
 
 class LogoForm(IndicoForm):

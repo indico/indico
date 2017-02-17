@@ -17,7 +17,7 @@
             {{ form_rows(form, fields=('announcement', 'show_announcement')) }}
         {% endcall %}
         {% call form_fieldset(_('Timetable')) %}
-            {{ form_rows(form, fields=('timetable_by_room', 'timetable_detailed')) }}
+            {{ form_rows(form, fields=('timetable_theme', 'timetable_by_room', 'timetable_detailed')) }}
         {% endcall %}
         {% call form_fieldset(_('Theme')) %}
             {{ form_row(form.use_custom_css) }}
