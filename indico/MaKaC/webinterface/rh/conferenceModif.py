@@ -34,7 +34,6 @@ from MaKaC.i18n import _
 from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages import admins, conferences
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.webinterface.rh.categoryDisplay import UtilsConference
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
 
 
@@ -78,37 +77,6 @@ class RHConferenceModification(RHConferenceModifBase):
             if wf is not None:
                 p = wf.getConfModif(self, self._conf)
             return p.display(**pars)
-
-
-class RHConfDataModif(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfDataModif
-
-    def _displayCustomPage(self, wf):
-        return None
-
-    def _displayDefaultPage(self):
-        p = conferences.WPConfDataModif(self, self._target)
-        pars = {}
-        wf = self.getWebFactory()
-        if wf is not None:
-            pars["type"] = wf.getId()
-        return p.display(**pars)
-
-
-class RHConfPerformDataModif(RHConferenceModifBase):
-    _uh = urlHandlers.UHConfPerformDataModif
-
-    def _checkParams( self, params ):
-        RHConferenceModifBase._checkParams( self, params )
-        if params.get("title", "").strip() =="" and not ("cancel" in params):
-            raise FormValuesError("Please, provide a name for the event")
-        self._cancel = params.has_key("cancel")
-
-    def _process( self ):
-        if not self._cancel:
-            params = dict(self._getRequestParams(), keywords=request.form.getlist('keywords'))
-            UtilsConference.setValues(self._conf, params)
-        self._redirect( urlHandlers.UHConferenceModification.getURL( self._conf) )
 
 
 #######################################################################################

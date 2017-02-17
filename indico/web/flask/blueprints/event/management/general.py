@@ -20,7 +20,3 @@ from indico.web.flask.blueprints.event.management import event_mgmt
 
 # General settings
 event_mgmt.add_url_rule('/general/', 'conferenceModification', conferenceModif.RHConferenceModification)
-event_mgmt.add_url_rule('/general/data', 'conferenceModification-data', conferenceModif.RHConfDataModif,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/general/data/save', 'conferenceModification-dataPerform',
-                        conferenceModif.RHConfPerformDataModif, methods=('POST',))

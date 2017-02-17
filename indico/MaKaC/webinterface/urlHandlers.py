@@ -253,14 +253,6 @@ class UHRoomBookingSaveCustomAttributes(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-saveCustomAttributes'
 
 
-class UHConfDataModif(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-data'
-
-
-class UHConfPerformDataModif(URLHandler):
-    _endpoint = 'event_mgmt.conferenceModification-dataPerform'
-
-
 class UHConfModifTools(URLHandler):
     _endpoint = 'event_mgmt.confModifTools'
 

@@ -596,7 +596,6 @@ class WConfModifMainData(wcomponents.WTemplated):
         event = self._conf.as_event
         vars["defaultStyle"] = event.theme
         vars["visibility"] = self._conf.getVisibility()
-        vars["dataModificationURL"]=quoteattr(str(urlHandlers.UHConfDataModif.getURL(self._conf)))
         vars["title"]=self._conf.getTitle()
         if isStringHTML(self._conf.getDescription()):
             vars["description"] = self._conf.getDescription()
@@ -655,91 +654,6 @@ class WPConferenceModification( WPConferenceModifBase ):
         wc = WConfModifMainData(self._conf, self._ct, self._rh)
         pars = { "type": params.get("type","") , "conferenceId": self._conf.getId()}
         return wc.getHTML( pars )
-
-
-class WConferenceDataModificationAdditionalInfo(wcomponents.WTemplated):
-
-    def __init__( self, conference ):
-        self._conf = conference
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["contactInfo"] = self._conf.as_event.additional_info
-        return vars
-
-
-class WConferenceDataModification(wcomponents.WTemplated):
-
-    def __init__( self, conference, rh ):
-        self._conf = conference
-        self._rh = rh
-
-    def _getVisibilityHTML(self):
-        options = [(val or 999,
-                    label,
-                    'selected' if self._conf.getVisibility() == (val or 999) else '')
-                   for val, label in get_visibility_options(self._conf.as_event)]
-        return u'\n'.join(u'<option value="{}" {}>{}</option>'.format(val, selected, escape(label))
-                          for val, label, selected in options)
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-
-        navigator = ""
-        evt_type = self._conf.getType()
-        vars["timezoneOptions"] = TimezoneRegistry.getShortSelectItemsHTML(self._conf.getTimezone())
-        styleoptions = ""
-        defStyle = self._conf.as_event.theme
-        if defStyle not in theme_settings.themes:
-            defStyle = ""
-        for theme_id, theme_data in theme_settings.get_themes_for(evt_type).viewitems():
-            if theme_id == defStyle or (defStyle == "" and theme_id == "static"):
-                selected = "selected"
-            else:
-                selected = ""
-            styleoptions += "<option value=\"%s\" %s>%s</option>" % (theme_id, selected, theme_data['title'])
-        vars["conference"] = self._conf
-        vars["useRoomBookingModule"] = Config.getInstance().getIsRoomBookingActive()
-        vars["styleOptions"] = styleoptions
-        vars['types'] = OrderedDict((t.legacy_name, t.title) for t in EventType)
-        vars["title"] = quoteattr( self._conf.getTitle() )
-        vars["description"] = self._conf.getDescription()
-        tz = self._conf.getTimezone()
-        vars["sDay"] = str( self._conf.getAdjustedStartDate(tz).day )
-        vars["sMonth"] = str( self._conf.getAdjustedStartDate(tz).month )
-        vars["sYear"] = str( self._conf.getAdjustedStartDate(tz).year )
-        vars["sHour"] = str( self._conf.getAdjustedStartDate(tz).hour )
-        vars["sMinute"] = str( self._conf.getAdjustedStartDate(tz).minute )
-        vars["eDay"] = str( self._conf.getAdjustedEndDate(tz).day )
-        vars["eMonth"] = str( self._conf.getAdjustedEndDate(tz).month )
-        vars["eYear"] = str( self._conf.getAdjustedEndDate(tz).year )
-        vars["eHour"] = str( self._conf.getAdjustedEndDate(tz).hour )
-        vars["eMinute"] = str( self._conf.getAdjustedEndDate(tz).minute )
-        vars["chairText"] = quoteattr( self._conf.getChairmanText() )
-        vars["orgText"] = self._conf.as_event.organizer_info
-        vars["visibility"] = self._getVisibilityHTML()
-        vars["shortURLTag"] = quoteattr(self._conf.as_event.url_shortcut or '')
-        vars["locator"] = self._conf.getLocator().getWebForm()
-        vars["locator"] = self._conf.getLocator().getWebForm()
-        vars["event_type"] = ""
-        vars["navigator"] = navigator
-        eventType = self._conf.getType()
-        if eventType == "conference":
-            vars["additionalInfo"] = WConferenceDataModificationAdditionalInfo(self._conf).getHTML(vars)
-        else:
-            vars["additionalInfo"] = ""
-        return vars
-
-
-class WPConfDataModif( WPConferenceModification ):
-
-    def _getPageContent( self, params ):
-        p = WConferenceDataModification( self._conf, self._rh )
-        pars = {
-            "postURL": urlHandlers.UHConfPerformDataModif.getURL(self._conf),
-            "type": params.get("type")
-        }
-        return p.getHTML( pars )
 
 
 class WPConfModifToolsBase(WPConferenceModifBase):
