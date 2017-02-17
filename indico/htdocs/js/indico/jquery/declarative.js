@@ -314,6 +314,7 @@
             evt.preventDefault();
             var $elem = $(this);
             var accordion = $elem.data('accordion');
+            var toggleClass = $elem.data('toggle-class');
             var isVisible = $elem.hasClass('js-details-visible');
 
             function toggleDetails($trigger) {
@@ -321,6 +322,9 @@
                 var wasVisible = $trigger.hasClass('js-details-visible');
                 $target.slideToggle('fast');
                 $trigger.toggleClass('js-details-visible');
+                if (toggleClass) {
+                    $(toggleClass.target).toggleClass(toggleClass.class);
+                }
                 $trigger.text(wasVisible ? $trigger.data('show-text') : $trigger.data('hide-text'));
             }
 
