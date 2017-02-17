@@ -264,10 +264,6 @@ class Conference(CommonObjectBase):
         """Method called to notify the current conference has been modified.
         """
         self.setModificationDate()
-
-        if raiseEvent and self.id:
-            signals.event.data_changed.send(self, attr=None, old=None, new=None)
-
         self._p_changed=1
 
     def getModificationDate( self ):
@@ -369,12 +365,6 @@ class Conference(CommonObjectBase):
                                         "enough to accomodate the contained timetable entries and spacings."),
                                       explanation=_("You should try using a larger timespan."))
 
-        # notify observers
-        old_data = (oldStartDate, oldEndDate)
-        new_data = (self.getStartDate(), self.getEndDate())
-        if old_data != new_data:
-            signals.event.data_changed.send(self, attr='dates', old=old_data, new=new_data)
-
     def setStartDate(self, sDate, check = 1, moveEntries = 0, index = True, notifyObservers = True):
         """ Changes the current conference starting date/time to the one specified by the parameters.
         """
@@ -395,11 +385,6 @@ class Conference(CommonObjectBase):
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()
-
-        #if everything went well, we notify the observers that the start date has changed
-        if notifyObservers:
-            if oldSdate != sDate:
-                signals.event.data_changed.send(self, attr='start_date', old=oldSdate, new=sDate)
 
     def verifyStartDate(self, sdate, check=1):
         if sdate>self.getEndDate():
@@ -448,11 +433,6 @@ class Conference(CommonObjectBase):
         #datetime object is non-mutable so we must "force" the modification
         #   otherwise ZODB won't be able to notice the change
         self.notifyModification()
-
-        #if everything went well, we notify the observers that the start date has changed
-        if notifyObservers:
-            if oldEdate != eDate:
-                signals.event.data_changed.send(self, attr='end_date', old=oldEdate, new=eDate)
 
     def setEndTime(self, hours = 0, minutes = 0, notifyObservers = True):
         """ Changes the current conference end time (not date) to the one specified by the parameters.
@@ -511,13 +491,8 @@ class Conference(CommonObjectBase):
 
     def setTitle(self, title):
         """changes the current title of the conference to the one specified"""
-        oldTitle = self.title
-
         self.title = title
         self.notifyModification()
-
-        if oldTitle != title:
-            signals.event.data_changed.send(self, attr='title', old=oldTitle, new=title)
 
     def getDescription(self):
         """returns (String) the description of the conference"""
@@ -525,10 +500,7 @@ class Conference(CommonObjectBase):
 
     def setDescription(self, desc):
         """changes the current description of the conference"""
-        oldDescription = self.description
         self.description = desc
-        if oldDescription != desc:
-            signals.event.data_changed.send(self, attr='description', old=oldDescription, new=desc)
         self.notifyModification()
 
     def getChairmanText(self):
