@@ -37,7 +37,11 @@
     <dd style="width: 70%; float: left; margin: 0; min-height: 20px; white-space: pre-wrap; word-break: break-all; padding-left: 20px; box-sizing: border-box;">
         {%- set friendly_data = regdata.friendly_data -%}
         {%- if regdata.field_data.field.input_type == 'accommodation' and friendly_data -%}
+            {% if friendly_data['is_no_accommodation'] %}
+                {{- friendly_data.choice -}}
+            {% else %}
                 {{- friendly_data.choice }} ({{ friendly_data.arrival_date | format_date(locale='en_GB') }} - {{ friendly_data.departure_date | format_date(locale='en_GB') -}})
+            {% endif %}
         {%- elif regdata.field_data.field.input_type == 'multi_choice' -%}
             {{- friendly_data | join(', ') }}
         {%- else -%}
