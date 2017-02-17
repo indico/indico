@@ -108,7 +108,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
         backref=db.backref(
             '_paper_revisions',
             lazy=True,
-            order_by=submitted_dt.desc()
+            order_by=submitted_dt.asc()
         )
     )
     submitter = db.relationship(
@@ -158,6 +158,10 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     @property
     def is_last_revision(self):
         return self == self.paper.last_revision
+
+    @property
+    def number(self):
+        return self.paper.revisions.index(self) + 1
 
     @paper.setter
     def paper(self, paper):
