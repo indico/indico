@@ -29,6 +29,11 @@ The `user` kwarg contains the user performing the deletion if available.
 
 updated = _signals.signal('updated', """
 Called when basic data of an event is updated. The *sender* is the event.
+A dict of changes is passed in the `changes` kwarg, with ``(old, new)``
+tuples for each change. Note than the `person_links` change may happen
+with `old` and `new` being the same lists for technical reasons. If the
+key is present, it should be assumed that something changed (usually
+the order or some data on the person link).
 """)
 
 cloned = _signals.signal('cloned', """
