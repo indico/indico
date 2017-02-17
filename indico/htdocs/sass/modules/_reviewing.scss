@@ -266,15 +266,6 @@
 .review-badges {
     flex-grow: 1;
     color: $gray;
-
-    .js-ratings-toggle {
-        color: $gray;
-        user-select: none;
-
-        &:hover {
-            color: $dark-gray;
-        }
-    }
 }
 
 
@@ -498,4 +489,8 @@
     @extend .i-box;
     @extend .i-box.no-shadow;
     margin-top: 1rem;
+}
+
+.toggle-link {
+    user-select: none;
 }
