@@ -46,26 +46,6 @@ Called when the type of an event is changed. The `sender` is the event,
 the old type is passed in the `old_type` kwarg.
 """)
 
-data_changed = _signals.signal('data-changed', """
-Called when the basic data of an event is changed. The `sender` is the event,
-and the following kwargs are available:
-
-* `attr` - the changed attribute (`title`, `description`, `dates`, `start_date`, `end_date` or `location`)
-* `old` - the old value
-* `new` - the new value
-
-If the `dates` changed, both `old` and `new` are ``(start_date, end_date)`` tuples.
-If the `location` changed, both `old` and `new` are dicts containing `location`, `address` and `room`.
-
-`attr` may be ``None`` in cases where it's not known which data has been changed.
-In that case, both `old` and `new` are ``None``, too.
-
-If your plugin reacts to date changes, always make sure to handle all three types.
-Depending on the code performing the change, sometimes separate `start_date` and
-`end_date` changes are triggered while in other cases a single `dates` change is
-triggered.
-""")
-
 moved = _signals.signal('moved', """
 Called when an event is moved to a different category. The `sender` is the event,
 the old category is in the `old_parent` kwarg.
