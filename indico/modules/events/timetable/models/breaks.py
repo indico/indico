@@ -63,11 +63,15 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
         if parent:
             return parent.object.can_access(user)
         else:
-            return self.timetable_entry.event_new.can_access(user)
+            return self.event_new.can_access(user)
+
+    @property
+    def event_new(self):
+        return self.timetable_entry.event_new if self.timetable_entry else None
 
     @property
     def location_parent(self):
-        return (self.timetable_entry.event_new
+        return (self.event_new
                 if self.timetable_entry.parent_id is None
                 else self.timetable_entry.parent.session_block)
 
@@ -85,7 +89,7 @@ class Break(DescriptionMixin, ColorMixin, LocationMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.timetable_entry.event_new.locator, break_id=self.id)
+        return dict(self.event_new.locator, break_id=self.id)
 
 
 Break.register_location_events()
