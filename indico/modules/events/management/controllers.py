@@ -33,7 +33,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.management.forms import (EventProtectionForm, EventDataForm, EventDatesForm,
                                                     EventLocationForm, EventPersonsForm, EventContactInfoForm,
                                                     EventClassificationForm, PosterPrintingForm)
-from indico.modules.events.management.util import can_lock
+from indico.modules.events.management.util import can_lock, flash_if_unregistered
 from indico.modules.events.management.views import WPEventSettings, WPEventProtection
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import (delete_event, update_event_protection, update_event, update_event_type,
@@ -91,8 +91,10 @@ class RHEditEventDataBase(RHManageEventBase):
     def _process(self):
         form = self.form_class(obj=self.event_new, event=self.event_new)
         if form.validate_on_submit():
-            update_event(self.event_new, **form.data)
+            with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
+                update_event(self.event_new, **form.data)
             return jsonify_data(flash=False)
+        self.commit = False
         return self.render_form(form)
 
 
