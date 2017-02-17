@@ -64,10 +64,6 @@ def _sidemenu_items(sender, event, **kwargs):
 
     if can_modify:
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
-        yield SideMenuItem('general', _('General settings (old)'),
-                           url_for('event_mgmt.conferenceModification', event),
-                           90,
-                           icon='settings')
         if rb_active:
             yield SideMenuItem('room_booking', _('Room Booking'),
                                url_for('event_mgmt.rooms_booking_list', event),

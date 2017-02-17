@@ -48,7 +48,7 @@ from MaKaC.common.PickleJar import Updates
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError, TimingError, NotFoundError, FormValuesError
-from MaKaC.fossils.conference import IConferenceMinimalFossil, IConferenceEventInfoFossil, IConferenceFossil
+from MaKaC.fossils.conference import IConferenceMinimalFossil, IConferenceEventInfoFossil
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.trashCan import TrashCanManager
@@ -102,7 +102,7 @@ class Conference(CommonObjectBase):
         (ex: contributions, sessions, ...).
     """
 
-    fossilizes(IConferenceFossil, IConferenceMinimalFossil, IConferenceEventInfoFossil)
+    fossilizes(IConferenceMinimalFossil, IConferenceEventInfoFossil)
 
     def __init__(self, id=''):
         self.id = id

@@ -45,10 +45,6 @@ class WebFactory(WebFactory):
         tabCtrl.getTabById("posters").enable()
 
     @staticmethod
-    def getConfModif(rh, conf):
-        return WPMConfModif(rh, conf)
-
-    @staticmethod
     def getConfClone(rh, conf):
         return WPMConfClone(rh, conf)
 
@@ -56,17 +52,6 @@ class WebFactory(WebFactory):
 MeetingWebFactory = WebFactory
 
 #################Conference Modification#############################
-
-##Main##
-class WPMConfModif(conferences.WPConferenceModification):
-    def _getPageContent( self, params ):
-        wc = WMConfModifMainData(self._conf, self._ct, self._rh)
-        pars = { "type": params.get("type",""), "conferenceId": self._conf.getId() }
-        return wc.getHTML( pars )
-
-
-class WMConfModifMainData(conferences.WConfModifMainData):
-    pass
 
 
 class WPMConfClone(conferences.WPConfClone):

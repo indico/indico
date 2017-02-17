@@ -27,34 +27,6 @@ class IConferenceMinimalFossil(IFossil):
         """Conference title"""
 
 
-class IConferenceFossil(IConferenceMinimalFossil):
-
-    def getType(self):
-        """ Event type: 'conference', 'meeting', 'simple_event' """
-
-    def getDescription(self):
-        """Conference description"""
-
-    def getStartDate(self):
-        """ Start Date """
-    getStartDate.convert = Conversion.datetime
-
-    def getEndDate(self):
-        """ End Date """
-    getEndDate.convert = Conversion.datetime
-
-    def getAdjustedStartDate(self):
-        """ Adjusted Start Date """
-    getAdjustedStartDate.convert = Conversion.datetime
-
-    def getAdjustedEndDate(self):
-        """ Adjusted End Date """
-    getAdjustedEndDate.convert = Conversion.datetime
-
-    def getTimezone(self):
-        """ Time zone """
-
-
 class IConferenceEventInfoFossil(IConferenceMinimalFossil):
     """
     Fossil used to format the 'eventInfo' javascript object used
