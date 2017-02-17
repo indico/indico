@@ -123,15 +123,6 @@ from markupsafe import escape
 </tr>
 
 <tr>
-    <td></td>
-    <td style="vertical-align: bottom;text-align:right">
-        <form action=${ dataModificationURL } method="post">
-            <input type="submit" class="btn" value="${_('Edit all')}"/>
-        </form>
-    </td>
-</tr>
-
-<tr>
     <td colspan="3" class="horizontalLine"></td>
 </tr>
 <tr>
