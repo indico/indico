@@ -63,7 +63,7 @@ def _sidemenu_items(sender, event, **kwargs):
     is_review_staff = paper_review.isInReviewingTeam(session.avatar)
 
     if can_modify:
-        yield SideMenuItem('dashboard', _('Dashboard'), url_for('event_management.dashboard', event), 100, icon='home')
+        yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
         yield SideMenuItem('general', _('General settings (old)'),
                            url_for('event_mgmt.conferenceModification', event),
                            90,

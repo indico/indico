@@ -14,7 +14,7 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
     <div class="content-column">
         <div class="banner full-width">
             <div class="title">
-                <a href="${ url_for('event_management.dashboard', event) }">
+                <a href="${ url_for('event_management.settings', event) }">
                     ${ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | remove_tags }
                     <span class="date">
                         % if startDate == endDate:
@@ -29,7 +29,7 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
                         ${ _(u'Created by {name} ({email}) from event on <a href="{link}" title="{title}">{date}</a>').format(
                             date=format_date(cloned_from.start_dt, format="medium").decode('utf-8'),
                             title=event.title,
-                            link=url_for('event_management.dashboard', cloned_from),
+                            link=url_for('event_management.settings', cloned_from),
                             name=event.creator.full_name,
                             email=event.creator.email)}
                     % else:

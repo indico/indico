@@ -36,7 +36,7 @@ from indico.modules.events.management.forms import (EventProtectionForm, EventDa
                                                     EventLocationForm, EventPersonsForm, EventContactInfoForm,
                                                     EventClassificationForm, PosterPrintingForm)
 from indico.modules.events.management.util import flash_if_unregistered, can_lock
-from indico.modules.events.management.views import WPEventDashboard, WPEventProtection
+from indico.modules.events.management.views import WPEventSettings, WPEventProtection
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import (delete_event, create_event_references, update_event_protection,
                                               update_event, lock_event, unlock_event, update_event_type)
@@ -67,16 +67,14 @@ class RHManageEventBase(RHConferenceModifBase):
         return RH._process(self)
 
 
-class RHEventManagementDashboard(RHManageEventBase):
-    """Main event management dashboard"""
+class RHEventSettings(RHManageEventBase):
+    """Event settings dashboard"""
 
     def _checkProtection(self):
         if not session.user:
             raise Forbidden
         # If the user cannot manage the whole event see if anything gives them
         # limited management access.
-        # XXX: We could consider always allowing access to the dashboard instead
-        # and then just restricting the widgets there.
         if not self.event_new.can_manage(session.user):
             urls = sorted(values_from_signal(signals.event_management.management_url.send(self.event_new),
                                              single_value=True))
@@ -84,7 +82,7 @@ class RHEventManagementDashboard(RHManageEventBase):
             raise Forbidden(response=response)
 
     def _process(self):
-        return WPEventDashboard.render_template('dashboard.html', self._conf, event=self.event_new)
+        return WPEventSettings.render_template('settings.html', self._conf, event=self.event_new)
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -162,7 +160,7 @@ class RHChangeEventType(RHManageEventBase):
         type_ = EventType[request.form['type']]
         update_event_type(self.event_new, type_)
         flash(_('The event type has been changed to {}.').format(type_.title), 'success')
-        return jsonify_data(flash=False, redirect=url_for('.dashboard', self.event_new))
+        return jsonify_data(flash=False, redirect=url_for('.settings', self.event_new))
 
 
 class RHLockEvent(RHManageEventBase):
@@ -179,7 +177,7 @@ class RHLockEvent(RHManageEventBase):
     def _process_POST(self):
         lock_event(self.event_new)
         flash(_('The event is now locked.'), 'success')
-        return jsonify_data(flash=False, redirect=url_for('.dashboard', self.event_new))
+        return jsonify_data(flash=False, redirect=url_for('.settings', self.event_new))
 
 
 class RHUnlockEvent(RHManageEventBase):
@@ -192,7 +190,7 @@ class RHUnlockEvent(RHManageEventBase):
     def _process(self):
         unlock_event(self.event_new)
         flash(_('The event is now unlocked.'), 'success')
-        return redirect(url_for('event_management.dashboard', self.event_new))
+        return redirect(url_for('event_management.settings', self.event_new))
 
 
 class RHContributionPersonListMixin:
