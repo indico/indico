@@ -162,7 +162,7 @@ class RHChangeEventType(RHManageEventBase):
         type_ = EventType[request.form['type']]
         update_event_type(self.event_new, type_)
         flash(_('The event type has been changed to {}.').format(type_.title), 'success')
-        return jsonify_data(flash=False)
+        return jsonify_data(flash=False, redirect=url_for('.dashboard', self.event_new))
 
 
 class RHLockEvent(RHManageEventBase):
@@ -179,7 +179,7 @@ class RHLockEvent(RHManageEventBase):
     def _process_POST(self):
         lock_event(self.event_new)
         flash(_('The event is now locked.'), 'success')
-        return jsonify_data(flash=False, redirect=url_for('event_management.dashboard', self.event_new))
+        return jsonify_data(flash=False, redirect=url_for('.dashboard', self.event_new))
 
 
 class RHUnlockEvent(RHManageEventBase):

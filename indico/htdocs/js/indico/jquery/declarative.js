@@ -196,6 +196,9 @@
                             } else if (redirect !== undefined) {
                                 IndicoUI.Dialogs.Util.progress();
                                 location.href = redirect;
+                            } else if (data.redirect) {
+                                IndicoUI.Dialogs.Util.progress();
+                                location.href = data.redirect;
                             }
                         }
                     });
