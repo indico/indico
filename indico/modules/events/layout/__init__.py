@@ -45,7 +45,7 @@ layout_settings = EventSettingsProxy('layout', {
     'show_announcement': False,
     'use_custom_css': False,
     'theme': None,
-    'timetable_theme': None,  # meetings/lectures
+    'timetable_theme': None,
     'use_custom_menu': False,
     'timetable_by_room': False,
     'timetable_detailed': False
@@ -63,8 +63,8 @@ def _event_type_changed(event, **kwargs):
 def _extend_event_management_menu_layout(sender, event, **kwargs):
     if not event.can_manage(session.user):
         return
-    if event.as_legacy.getType() == 'conference':
-        yield SideMenuItem('layout', _('Layout'), url_for('event_layout.index', event), section='customization')
+    yield SideMenuItem('layout', _('Layout'), url_for('event_layout.index', event), section='customization')
+    if event.type_ == EventType.conference:
         yield SideMenuItem('menu', _('Menu'), url_for('event_layout.menu', event), section='customization')
     if event.has_feature('images'):
         yield SideMenuItem('images', _('Images'), url_for('event_layout.images', event), section='customization')
