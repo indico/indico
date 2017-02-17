@@ -821,8 +821,9 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             };
 
             $scope.areAccommodationOptionsDefined = function(data) {
+                // `No accommodation` option does not count as an actual option
                 var choices = data.choices.filter(function(item) {
-                    return item.remove !== true;
+                    return item.remove !== true && !item.isNoAccommodation;
                 });
                 return choices.length !== 0;
             };
@@ -891,6 +892,18 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 _.each(field.choices, function(item, ind) {
                     formData.choices[ind] = angular.copy(item);
                 });
+
+                // Adds `No accommodation` default choice the first time the Accommodation field is added
+                if (!field.choices) {
+                    formData.choices.push({
+                        caption: "No accommodation",
+                        isBillable: false,
+                        isEnabled: true,
+                        isNoAccommodation: true,
+                        placesLimit: 0,
+                        price: 0
+                    });
+                }
             };
         },
         link: function(scope) {

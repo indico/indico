@@ -76,7 +76,7 @@ ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displ
     return {
         processResponse: function(data, callback) {
             callback = callback || {};
-            if(data.error) {
+            if (data.error) {
                 IndicoUtil.errorReport(data.error);
                 if (callback.error) {
                     callback.error(data);
