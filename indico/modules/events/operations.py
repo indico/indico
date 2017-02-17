@@ -109,16 +109,19 @@ def update_event(event, update_timetable=False, **data):
         # silently.
         event.move_start_dt(data.pop('start_dt'))
     changes = event.populate_from_dict(data)
+    # Person links are partially updated when the WTForms field is processed,
+    # we we don't have proper change tracking there in some cases
     changes.pop('person_link_data', None)
-    if event.person_links != old_person_links:
+    visible_person_link_changes = event.person_links != old_person_links
+    if visible_person_link_changes or 'person_link_data' in data:
         changes['person_links'] = (old_person_links, event.person_links)
     db.session.flush()
-    signals.event.updated.send(event)
+    signals.event.updated.send(event, changes=changes)
     logger.info('Event %r updated with %r by %r', event, data, session.user)
-    _log_event_update(event, changes)
+    _log_event_update(event, changes, visible_person_link_changes=visible_person_link_changes)
 
 
-def _log_event_update(event, changes):
+def _log_event_update(event, changes, visible_person_link_changes=False):
     log_fields = {
         'title': {'title': 'Title', 'type': 'string'},
         'description': 'Description',
@@ -146,11 +149,14 @@ def _log_event_update(event, changes):
         'contact_phones': 'Contact phone numbers',
     }
     _split_location_changes(changes)
+    if not visible_person_link_changes:
+        # Don't log a person link change with no visible changes (changes
+        # on an existing link or reordering). It would look quite weird in
+        # the event log.
+        # TODO: maybe use a separate signal for such changes to log them
+        # anyway and allow other code to act on them?
+        changes.pop('person_links', None)
     if changes:
-        # XXX: we don't end up logging reordering of person links - there is
-        # no way to retrieve the old order in here as it is updated on the
-        # objects by the wtforms field (since we are modifying objects already
-        # in the database)
         if changes.viewkeys() <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
             what = 'Dates'
         elif len(changes) == 1:
@@ -203,7 +209,7 @@ def update_event_protection(event, data):
     assert data.viewkeys() <= {'protection_mode', 'own_no_access_contact', 'access_key', 'visibility'}
     changes = event.populate_from_dict(data)
     db.session.flush()
-    signals.event.updated.send(event)
+    signals.event.updated.send(event, changes=changes)
     logger.info('Protection of event %r updated with %r by %r', event, data, session.user)
     if changes:
         log_fields = {'protection_mode': 'Protection mode',
