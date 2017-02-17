@@ -1,12 +1,12 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset, simple_form %}
 
 {% block title %}
     {%- trans %}Layout{% endtrans -%}
 {% endblock %}
 
 {%- block content %}
-    {{ form_header(form, action=url_for('event_layout.index', event)) }}
+    {% call simple_form(form, save_reminder=true) %}
         {% call form_fieldset(_('General')) %}
             {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
         {% endcall %}
@@ -28,20 +28,18 @@
                 </a>
             {% endcall %}
         {% endcall %}
-    {% call form_footer(form) %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}" data-disabled-until-change data-save-reminder>
     {% endcall %}
 
     <h2>{% trans %}Stylesheet{% endtrans %}</h2>
     {{ form_header(css_form, classes='css-form', action=url_for('event_layout.upload_css', event)) }}
-        <div class="flashed-messages"></div>
-        {% call form_row(css_form.css_file, skip_label=true) %}
-            <a href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}" target="_blank"
-               class="i-button i-form-field-fixed-width icon-eye js-preview-button
-                      {%- if not css_form.css_file.data %} hidden{% endif %}">
-                {%- trans %}Preview{% endtrans -%}
-            </a>
-        {% endcall %}
+    <div class="flashed-messages"></div>
+    {% call form_row(css_form.css_file, skip_label=true) %}
+        <a href="{{ url_for('event_layout.css_preview', event, theme='_custom') }}" target="_blank"
+           class="i-button i-form-field-fixed-width icon-eye js-preview-button
+                  {%- if not css_form.css_file.data %} hidden{% endif %}">
+            {%- trans %}Preview{% endtrans -%}
+        </a>
+    {% endcall %}
     {% call form_footer(css_form, skip_label=true) %}
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
             {% trans %}Upload CSS file{% endtrans %}
@@ -54,8 +52,8 @@
 
     <h2>{% trans %}Event Logo{% endtrans %}</h2>
     {{ form_header(logo_form, classes='logo-form', action=url_for('event_layout.upload_logo', event)) }}
-        <div class="flashed-messages"></div>
-        {{ form_rows(logo_form, skip_labels=true) }}
+    <div class="flashed-messages"></div>
+    {{ form_rows(logo_form, skip_labels=true) }}
     {% call form_footer(css_form, skip_label=true) %}
         <button class="i-button js-dropzone-upload highlight icon-upload" data-disabled-until-change>
             {% trans %}Upload logo{% endtrans %}
