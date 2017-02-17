@@ -314,12 +314,6 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
     $scope.isVisible = function(field) {
         return field.isEnabled && !field.remove;
     };
-
-    $scope.isNoAccommodationChoice = function(choice, field) {
-        return !!_.find(field.choices, function(c) {
-            return c.id === choice && c.isNoAccommodation;
-        });
-    };
 });
 
 ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
@@ -955,8 +949,16 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                     $('#registrationForm input[name=field_{0}]'.format(scope.field.id)).val('{}');
                 } else {
                     updateAccommodationPostData('choice', newValue);
+                    updateAccommodationPostData('isNoAccommodation',
+                                                scope.isNoAccommodationChoice(newValue, scope.field));
                 }
             });
+
+            scope.isNoAccommodationChoice = function(choice, field) {
+                return !!_.find(field.choices, function(c) {
+                    return c.id === choice && c.isNoAccommodation;
+                });
+            };
 
             scope.billableOptionPayed = function(userdata, registrationMetaData) {
                 if (userdata[scope.field.htmlName] !== undefined) {

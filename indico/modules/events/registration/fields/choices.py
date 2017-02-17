@@ -359,13 +359,14 @@ class AccommodationField(RegistrationFormBillableItemsField):
             if not field.data:
                 return
             data = snakify_keys(field.data)
-            try:
-                arrival_date = data['arrival_date']
-                departure_date = data['departure_date']
-            except KeyError:
-                raise ValidationError(_("Arrival/departure date is missing"))
-            if _to_date(arrival_date) > _to_date(departure_date):
-                raise ValidationError(_("Arrival date can't be set after the departure date."))
+            if not data['is_no_accommodation']:
+                try:
+                    arrival_date = data['arrival_date']
+                    departure_date = data['departure_date']
+                except KeyError:
+                    raise ValidationError(_("Arrival/departure date is missing"))
+                if _to_date(arrival_date) > _to_date(departure_date):
+                    raise ValidationError(_("Arrival date can't be set after the departure date."))
 
         def _check_number_of_places(form, field):
             if not field.data:
@@ -393,9 +394,10 @@ class AccommodationField(RegistrationFormBillableItemsField):
             return '' if for_humans else {}
         unversioned_data = registration_data.field_data.field.data
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
-        friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
-        friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
-        friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
+        if not friendly_data['is_no_accommodation']:
+            friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
+            friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
+            friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
         return friendly_data['choice'] if for_humans else friendly_data
 
     def calculate_price(self, reg_data, versioned_data):
@@ -414,11 +416,11 @@ class AccommodationField(RegistrationFormBillableItemsField):
             return {}
         data = {}
         if value:
-            data = {
-                'choice': value['choice'],
-                'arrival_date': value['arrivalDate'],
-                'departure_date': value['departureDate']
-            }
+            data = {'choice': value['choice'],
+                    'is_no_accommodation': value['isNoAccommodation']}
+            if not value['isNoAccommodation']:
+                data.update({'arrival_date': value['arrivalDate'],
+                             'departure_date': value['departureDate']})
         return super(AccommodationField, self).process_form_data(registration, data, old_data, billable_items_locked,
                                                                  new_data_version)
 
