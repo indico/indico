@@ -250,7 +250,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
     review = PaperReview(revision=paper.last_revision, type=review_type.instance, user=user)
     review.populate_from_dict(review_data)
     log_data = {}
-    for question in paper.event_new.cfp.get_questions_from_review_type(review_type.instance):
+    for question in paper.event_new.cfp.get_questions_for_review_type(review_type.instance):
         value = int(questions_data['question_{}'.format(question.id)])
         review.ratings.append(PaperReviewRating(question=question, value=value))
         log_data[question.text] = value
@@ -273,7 +273,7 @@ def update_review(review, review_data, questions_data):
     changes = review.populate_from_dict(review_data)
     review.modified_dt = now_utc()
     log_fields = {}
-    for question in event.cfp.get_questions_from_review_type(review.type):
+    for question in event.cfp.get_questions_for_review_type(review.type):
         field_name = 'question_{}'.format(question.id)
         rating = question.get_review_rating(review, allow_create=True)
         old_value = rating.value
