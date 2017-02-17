@@ -68,7 +68,7 @@ class RHLayoutEdit(RHLayoutBase):
                 logo_form.logo.data = self.event_new
             if self.event_new.has_stylesheet:
                 css_form.css_file.data = self.event_new
-        return WPLayoutEdit.render_template('layout.html', self._conf, form=form, event=self.event_new,
+        return WPLayoutEdit.render_template('layout_conference.html', self._conf, form=form, event=self.event_new,
                                             logo_form=logo_form, css_form=css_form)
 
 
