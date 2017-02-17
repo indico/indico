@@ -14,110 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import json
 import re
-from datetime import timedelta, datetime
 
-from pytz import timezone
-
-from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events import LegacyEventMapping
-from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.models.events import EventType, Event
-from indico.modules.events.operations import update_event
-from indico.modules.events.util import track_time_changes
-from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.rooms import Room
+from indico.modules.events.models.events import Event
 from indico.util.i18n import _
-from indico.util.string import to_unicode
 from indico.web.flask.util import endpoint_for_url
-from MaKaC.errors import FormValuesError
 
 
 class UtilsConference:
-    @staticmethod
-    def get_start_dt(params):
-        tz = params['Timezone']
-        try:
-            return timezone(tz).localize(datetime(int(params['sYear']), int(params['sMonth']), int(params['sDay']),
-                                                  int(params['sHour']), int(params['sMinute'])))
-        except ValueError as e:
-            raise FormValuesError('The start date you have entered is not correct: {}'.format(e), 'Event')
-
-    @staticmethod
-    def get_end_dt(params, start_dt):
-        tz = params['Timezone']
-        if params.get('duration'):
-            end_dt = start_dt + timedelta(minutes=params['duration'])
-        else:
-            try:
-                end_dt = timezone(tz).localize(datetime(int(params['eYear']), int(params['eMonth']),
-                                                        int(params['eDay']), int(params['eHour']),
-                                                        int(params['eMinute'])))
-            except ValueError as e:
-                raise FormValuesError('The end date you have entered is not correct: {}'.format(e), 'Event')
-        return end_dt
-
-    @staticmethod
-    def get_location_data(params):
-        location_data = json.loads(params['location_data'])
-        if location_data.get('room_id'):
-            location_data['room'] = Room.get_one(location_data['room_id'])
-        if location_data.get('venue_id'):
-            location_data['venue'] = Location.get_one(location_data['venue_id'])
-        return location_data
-
-    @classmethod
-    def setValues(cls, c, confData, notify=False):
-        c.setTitle( confData["title"] )
-        c.setDescription( confData["description"] )
-        c.as_event.organizer_info = to_unicode(confData.get("orgText", ""))
-        c.as_event.additional_info = to_unicode(confData.get("contactInfo", ""))
-        c.as_event.keywords = confData["keywords"]
-        c.setChairmanText( confData.get("chairText", "") )
-        if "shortURLTag" in confData.keys():
-            tag = to_unicode(confData["shortURLTag"]).strip()
-            if tag:
-                try:
-                    UtilsConference.validateShortURL(tag, c.as_event)
-                except ValueError, e:
-                    raise FormValuesError(e.message)
-                c.as_event.url_shortcut = tag
-            else:
-                c.as_event.url_shortcut = None
-        #################################
-        # Fermi timezone awareness      #
-        #################################
-        c.setTimezone(confData["Timezone"])
-        sDate = cls.get_start_dt(confData)
-        eDate = cls.get_end_dt(confData, sDate)
-        moveEntries = int(confData.get("move",0))
-        with track_time_changes():
-            c.setDates(sDate.astimezone(timezone('UTC')), eDate.astimezone(timezone('UTC')), moveEntries=moveEntries)
-
-        #################################
-        # Fermi timezone awareness(end) #
-        #################################
-
-        location_data = cls.get_location_data(confData)
-        update_event(c.as_event, location_data=location_data)
-
-        # TODO: remove TODO once visibility has been updated
-        if c.getVisibility() != confData.get("visibility", 999) and confData.get('visibility') != 'TODO':
-            c.setVisibility(confData.get("visibility", 999))
-        theme = confData.get('defaultStyle', '')
-        new_type = EventType.legacy_map[confData['eventType']] if 'eventType' in confData else c.as_event.type_
-        if new_type != c.as_event.type_:
-            c.as_event.type_ = new_type
-        elif not theme or theme == theme_settings.defaults.get(new_type.legacy_name):
-            # if it's the default theme or nothing was set (does this ever happen?!), we don't store it
-            layout_settings.delete(c, 'timetable_theme')
-        else:
-            # set the new theme
-            layout_settings.set(c, 'timetable_theme', theme)
-
     @staticmethod
     def validateShortURL(tag, target):
         if tag.isdigit():
