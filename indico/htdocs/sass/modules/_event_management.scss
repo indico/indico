@@ -623,4 +623,23 @@ th.i-table {
             padding-top: 10px;
         }
     }
+
+    dl.i-data-list {
+        color: $light-black;
+        margin-top: 0;
+        margin-bottom: 0.2em;
+
+        dt, dd {
+            padding: 0;
+            margin-bottom: 0.3em;
+        }
+
+        dd {
+            padding-left: 0.5em;
+
+            .no-value {
+                color: $gray;
+            }
+        }
+    }
 }
