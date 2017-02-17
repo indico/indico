@@ -23,16 +23,29 @@
     <div class="i-timeline">
         <div class="i-timeline-item">
             {{ render_user_avatar(revision.submitter) }}
-            <div class="i-timeline-item-box header-indicator-left">
-                <div class="i-box-header">
-                    {% trans name=revision.submitter.name -%}
-                        <strong>{{ name }}</strong> submitted this paper
-                    {%- endtrans %}
-                    <time datetime="{{ revision.submitted_dt.isoformat() }}">
-                        {{- revision.submitted_dt|format_human_date -}}
-                    </time>
+            {% set header_class = 'header-only' if not revision.is_last_revision %}
+            <div class="i-timeline-item-box header-indicator-left {{ header_class }}" id="revision-info-{{ revision.id }}">
+                <div class="i-box-header flexrow">
+                    <div class="f-self-stretch">
+                        {% trans name=revision.submitter.name, number=revision.number -%}
+                            <strong>{{ name }}</strong> submitted paper revision #{{ number }}
+                        {%- endtrans %}
+                        <time datetime="{{ revision.submitted_dt.isoformat() }}">
+                            {{- revision.submitted_dt|format_human_date -}}
+                        </time>
+                    </div>
+                    {% if not revision.is_last_revision %}
+                        <a href="#" class="revision-info-link i-link"
+                           data-toggle="#revision-timeline-{{ revision.id }}, #revision-info-{{ revision.id }} .submission-info"
+                           data-toggle-class='{"target": "#revision-info-{{ revision.id }}", "class": "header-only"}'
+                           data-show-text="{% trans %}Show old revision{% endtrans %}"
+                           data-hide-text="{% trans %}Hide old revision{% endtrans %}">
+                            {%- trans %}Show old revision{% endtrans -%}
+                        </a>
+                    {% endif %}
                 </div>
-                <div class="i-box-content submission-info">
+                {% set submission_info_class = 'weak-hidden' if not revision.is_last_revision %}
+                <div class="i-box-content submission-info {{ submission_info_class }}">
                     {{ _render_file_list(revision.files) }}
                 </div>
             </div>

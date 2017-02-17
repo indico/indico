@@ -10,7 +10,7 @@
 {% macro render_timeline(proposal, comment_form, review_form=none, revision_form=none) %}
     {% set can_comment = proposal.can_comment(session.user) %}
     {% set can_review = proposal.can_review(session.user, check_state=true) %}
-    {% for revision in proposal.get_revisions()|sort(attribute='submitted_dt') %}
+    {% for revision in proposal.get_revisions() %}
         {% set timeline = revision.get_timeline(session.user) %}
         {% if not loop.first %}
             <div class="i-timeline">
@@ -20,7 +20,8 @@
             </div>
         {% endif %}
         {{ caller('revision-info', revision) }}
-        <div class="i-timeline">
+        {% set timeline_class = 'weak-hidden' if revision != proposal.get_last_revision() %}
+        <div class="i-timeline {{ timeline_class }}" id="revision-timeline-{{ revision.id }}">
             {% if timeline or (can_comment or can_review) %}
                 <div class="i-timeline with-line">
                     <div class="i-timeline-connect-up"></div>
@@ -149,7 +150,7 @@
                         {% endif %}
                         {% if review.score is not none %}
                             · score {{ render_score(review.score, proposal.cfp.rating_range, classes='bold semantic-text') }}
-                            (<a class="js-ratings-toggle">{#--#}
+                            (<a class="js-ratings-toggle toggle-link i-link">{#--#}
                                 <span class="js-show-ratings">{% trans %}show ratings{% endtrans %}</span>{#--#}
                                 <span class="weak-hidden js-hide-ratings">{% trans %}hide ratings{% endtrans %}</span>{#--#}
                             </a>)
