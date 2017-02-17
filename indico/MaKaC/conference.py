@@ -16,7 +16,6 @@
 
 import os
 import stat
-from datetime import datetime
 
 from BTrees.OOBTree import OOBTree
 from flask import request, has_request_context, session
@@ -27,15 +26,14 @@ from sqlalchemy.orm import joinedload
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import DBMgr, db
-from indico.core.db.sqlalchemy.core import ConstraintViolated
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
-from indico.modules.events.operations import create_event, update_event
+from indico.modules.events.operations import create_event
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
-from indico.util.string import return_ascii, is_legacy_id, to_unicode
+from indico.util.string import return_ascii, is_legacy_id
 from indico.util.user import unify_user_args
 
 from MaKaC import fileRepository
@@ -47,7 +45,7 @@ from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.PickleJar import Updates
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.common.timezoneUtils import nowutc
-from MaKaC.errors import MaKaCError, TimingError, NotFoundError, FormValuesError
+from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.fossils.conference import IConferenceMinimalFossil, IConferenceEventInfoFossil
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.poster import PosterTemplateManager
@@ -106,12 +104,8 @@ class Conference(CommonObjectBase):
 
     def __init__(self, id=''):
         self.id = id
-        self.places = []
-        self.rooms = []
-        self.chairmanText = ""
         self._modificationDS = nowutc()
 
-        self._logo = None
         self.__badgeTemplateManager = BadgeTemplateManager(self)
         self.__posterTemplateManager = PosterTemplateManager(self)
         self._confPaperReview = ConferencePaperReview(self)
@@ -124,45 +118,21 @@ class Conference(CommonObjectBase):
     def startDate(self):
         return self.as_event.start_dt
 
-    @startDate.setter
-    def startDate(self, dt):
-        self.as_event.start_dt = dt
-
     @property
     def endDate(self):
         return self.as_event.end_dt
-
-    @endDate.setter
-    def endDate(self, dt):
-        self.as_event.end_dt = dt
 
     @property
     def timezone(self):
         return self.as_event.timezone.encode('utf-8')
 
-    @timezone.setter
-    def timezone(self, timezone):
-        update_event(self.as_event, timezone=to_unicode(timezone).strip())
-
     @property
     def title(self):
         return self.as_event.title.encode('utf-8')
 
-    @title.setter
-    def title(self, title):
-        self.as_event.title = to_unicode(title).strip()
-
     @property
     def description(self):
         return self.as_event.description.encode('utf-8')
-
-    @description.setter
-    def description(self, description):
-        self.as_event.description = to_unicode(description).strip()
-
-    @property
-    def all_manager_emails(self):
-        return self.as_event.all_manager_emails
 
     @property
     @memoize_request
@@ -231,21 +201,9 @@ class Conference(CommonObjectBase):
     def getType(self):
         return self.as_event.type_.legacy_name
 
-    def getVisibility(self):
-        return self.as_event.visibility if self.as_event.visibility is not None else 999
-
-    def setVisibility(self, visibility=999):
-        visibility = int(visibility)
-        self.as_event.visibility = visibility if visibility != 999 else None
-
     @memoize_request
     def getContribTypeList(self):
         return self.as_event.contribution_types.all()
-
-    def getContribTypeById(self, tid):
-        if not tid.isdigit():
-            return None
-        return self.as_event.contribution_types.filter_by(id=int(tid)).first()
 
     def _getRepository( self ):
         dbRoot = DBMgr.getInstance().getDBConnection().root()
@@ -270,17 +228,9 @@ class Conference(CommonObjectBase):
         """Returns the date in which the conference was last modified"""
         return self._modificationDS
 
-    def getAdjustedModificationDate( self, tz ):
-        """Returns the date in which the conference was last modified"""
-        return self._modificationDS.astimezone(timezone(tz))
-
     def getCreationDate(self):
         """Returns the date in which the conference was created"""
         return self.as_event.created_dt
-
-    def getAdjustedCreationDate(self, tz):
-        """Returns the date in which the conference was created"""
-        return self.as_event.created_dt.astimezone(timezone(tz))
 
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
@@ -288,7 +238,6 @@ class Conference(CommonObjectBase):
 
     def getUniqueId( self ):
         """returns (string) the unique identiffier of the item"""
-        """used mainly in the web session access key table"""
         return "a%s" % self.id
 
     def setId(self, newId):
@@ -303,23 +252,6 @@ class Conference(CommonObjectBase):
         d["confId"] = self.getId()
         return d
 
-    def getOwner( self ):
-        raise NotImplementedError('getOwner')
-
-    def getOwnerList(self):
-        # TODO: check places where this is called whether to remove/adapt them
-        raise NotImplementedError('getOwnerList')
-
-    def getOwnerPath(self):
-        # TODO: check places where this is called whether to remove/adapt them
-        raise NotImplementedError('getOwnerPath')
-        l=[]
-        owner = self.getOwnerList()[0]
-        while owner != None and owner.getId() != "0":
-            l.append(owner)
-            owner = owner.getOwner()
-        return l
-
     def delete(self, user=None):
         signals.event.deleted.send(self, user=user)
         ConferenceHolder().remove(self)
@@ -328,77 +260,6 @@ class Conference(CommonObjectBase):
 
     def getConference( self ):
         return self
-
-    def setDates( self, sDate, eDate=None, check=1, moveEntries=0, enforce_constraints=True):
-        """
-        Set the start/end date for a conference
-        """
-
-        oldStartDate = self.getStartDate()
-        oldEndDate = self.getEndDate()
-
-        # do some checks first
-        if sDate > eDate:
-            # obvious case
-            raise FormValuesError(_("Start date cannot be after the end date"), _("Event"))
-
-        elif sDate == oldStartDate and eDate == oldEndDate:
-            # if there's nothing to do (yet another obvious case)
-            return
-
-        # if we reached this point, it means either the start or
-        # the end date (or both) changed
-        # If only the end date was changed, moveEntries = 0
-        if sDate == oldStartDate:
-            moveEntries = 0
-
-        # set the dates
-        with db.session.no_autoflush:
-            self.setStartDate(sDate, check=0, moveEntries = moveEntries, index=False, notifyObservers = False)
-            self.setEndDate(eDate, check=0, index=False, notifyObservers = False)
-
-            if enforce_constraints:
-                try:
-                    db.enforce_constraints()
-                except ConstraintViolated:
-                    raise TimingError(_("The start/end dates were not changed since the selected timespan is not large "
-                                        "enough to accomodate the contained timetable entries and spacings."),
-                                      explanation=_("You should try using a larger timespan."))
-
-    def setStartDate(self, sDate, check = 1, moveEntries = 0, index = True, notifyObservers = True):
-        """ Changes the current conference starting date/time to the one specified by the parameters.
-        """
-        if not sDate.tzname():
-            raise MaKaCError("date should be timezone aware")
-        if sDate == self.getStartDate():
-            return
-        if check != 0:
-            self.verifyStartDate(sDate)
-        oldSdate = self.getStartDate()
-        diff = sDate - oldSdate
-
-        if moveEntries:
-            # If the start date changed, we move entries inside the timetable
-            self.as_event.move_start_dt(sDate)
-        else:
-            self.startDate = sDate
-        #datetime object is non-mutable so we must "force" the modification
-        #   otherwise ZODB won't be able to notice the change
-        self.notifyModification()
-
-    def verifyStartDate(self, sdate, check=1):
-        if sdate>self.getEndDate():
-            raise MaKaCError( _("End date cannot be before the Start date"), _("Event"))
-
-    def setStartTime(self, hours=0, minutes=0, notifyObservers = True):
-        """ Changes the current conference starting time (not date) to the one specified by the parameters.
-        """
-
-        sdate = self.getStartDate()
-        self.startDate = datetime( sdate.year, sdate.month, sdate.day,
-                                                    int(hours), int(minutes) )
-        self.verifyStartDate(self.startDate)
-        self.notifyModification()
 
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
@@ -414,34 +275,6 @@ class Conference(CommonObjectBase):
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
-    def verifyEndDate(self, edate):
-        if edate<self.getStartDate():
-            raise TimingError( _("End date cannot be before the start date"), _("Event"))
-
-    def setEndDate(self, eDate, check = 1, index = True, notifyObservers = True):
-        """ Changes the current conference end date/time to the one specified by the parameters.
-        """
-        if not eDate.tzname():
-            raise MaKaCError("date should be timezone aware")
-        if eDate == self.getEndDate():
-            return
-        if check != 0:
-            self.verifyEndDate(eDate)
-
-        oldEdate = self.endDate
-        self.endDate  = eDate
-        #datetime object is non-mutable so we must "force" the modification
-        #   otherwise ZODB won't be able to notice the change
-        self.notifyModification()
-
-    def setEndTime(self, hours = 0, minutes = 0, notifyObservers = True):
-        """ Changes the current conference end time (not date) to the one specified by the parameters.
-        """
-        edate = self.getEndDate()
-        self.endDate = datetime( edate.year, edate.month, edate.day, int(hours), int(minutes) )
-        self.verifyEndDate(self.endDate)
-        self.notifyModification()
-
     def getEndDate(self):
         """returns (datetime) the ending date of the conference"""
         return self.endDate
@@ -453,68 +286,19 @@ class Conference(CommonObjectBase):
             tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
 
-    def setTimezone(self, tz):
-        self.timezone = tz
-
     def getTimezone(self):
         try:
             return self.timezone
         except AttributeError:
             return 'UTC'
 
-    def moveToTimezone(self, tz):
-        if self.getTimezone() == tz:
-            return
-        sd=self.getAdjustedStartDate()
-        ed=self.getAdjustedEndDate()
-        self.setTimezone(tz)
-        try:
-            sDate = timezone(tz).localize(datetime(sd.year, \
-                                 sd.month, \
-                                 sd.day, \
-                                 sd.hour, \
-                                 sd.minute))
-            eDate = timezone(tz).localize(datetime(ed.year, \
-                                 ed.month, \
-                                 ed.day, \
-                                 ed.hour, \
-                                 ed.minute))
-        except ValueError,e:
-            raise MaKaCError("Error moving the timezone: %s"%e)
-        self.setDates( sDate.astimezone(timezone('UTC')), \
-                       eDate.astimezone(timezone('UTC')),
-                       moveEntries=1)
-
     def getTitle(self):
         """returns (String) the title of the conference"""
         return self.title
 
-    def setTitle(self, title):
-        """changes the current title of the conference to the one specified"""
-        self.title = title
-        self.notifyModification()
-
     def getDescription(self):
         """returns (String) the description of the conference"""
         return self.description
-
-    def setDescription(self, desc):
-        """changes the current description of the conference"""
-        self.description = desc
-        self.notifyModification()
-
-    def getChairmanText(self):
-        # this is only used in legacy data and not settable for new events
-        # TODO: check whether we can get rid of it at some point
-        try:
-            if self.chairmanText:
-                pass
-        except AttributeError, e:
-            self.chairmanText = ""
-        return self.chairmanText
-
-    def setChairmanText( self, newText ):
-        self.chairmanText = newText.strip()
 
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the
@@ -545,9 +329,6 @@ class Conference(CommonObjectBase):
             aw_or_user = aw_or_user.user
         return self.as_event.can_manage(aw_or_user)
 
-    def getDefaultStyle(self):
-        return self.as_event.theme
-
     def clone(self, startDate):
         # startDate is in the timezone of the event
         old_event = self.as_event
@@ -565,7 +346,6 @@ class Conference(CommonObjectBase):
                              features=features_event_settings.get(self, 'enabled'),
                              add_creator_as_manager=False)
         conf = event.as_legacy
-        conf.setChairmanText(self.getChairmanText())
         conf.notifyModification()
 
         # Run the new modular cloning system
