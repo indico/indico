@@ -48,7 +48,7 @@ def make_review_form(event, review_type):
     :return: A `PaperReviewForm` subclass.
     """
     form_class = type(b'_PaperReviewForm', (PaperReviewForm,), {})
-    for idx, question in enumerate(event.cfp.get_questions_from_review_type(review_type), start=1):
+    for idx, question in enumerate(event.cfp.get_questions_for_review_type(review_type), start=1):
         name = 'question_{}'.format(question.id)
         range_ = event.cfp.rating_range
         field = RadioField(question.text, validators=[DataRequired()],
