@@ -48,7 +48,8 @@
                        name="{{ elem.name }}"
                        ng-required="elem.index == 'price' && !!item['isBillable']"
                        ng-pattern="{{ elem.pattern }}"
-                       class="editable"/>
+                       class="editable"
+                       placeholder="{{ item.placeholder }}"/>
                 <ng-form name="nestedForm"
                          ng-if="elem.editable == true && elem.edittype == 'int' && !item.isNoAccommodation">
                     <input type="text" name="{{ elem.name }}"
