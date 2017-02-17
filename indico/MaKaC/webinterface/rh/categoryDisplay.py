@@ -101,12 +101,8 @@ class UtilsConference:
         # Fermi timezone awareness(end) #
         #################################
 
-        old_location_data = c.as_event.location_data
         location_data = cls.get_location_data(confData)
         update_event(c.as_event, location_data=location_data)
-
-        if old_location_data != location_data:
-            signals.event.data_changed.send(c, attr='location', old=old_location_data, new=location_data)
 
         # TODO: remove TODO once visibility has been updated
         if c.getVisibility() != confData.get("visibility", 999) and confData.get('visibility') != 'TODO':
