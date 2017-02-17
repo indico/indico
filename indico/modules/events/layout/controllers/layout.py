@@ -25,7 +25,8 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import LayoutForm, LogoForm, CSSForm, CSSSelectionForm
+from indico.modules.events.layout.forms import (ConferenceLayoutForm, LectureMeetingLayoutForm, LogoForm, CSSForm,
+                                                CSSSelectionForm)
 from indico.modules.events.layout.util import get_css_url, get_logo_data, get_css_file_data
 from indico.modules.events.layout.views import WPLayoutEdit
 from indico.modules.events.models.events import EventType
@@ -45,24 +46,37 @@ class RHLayoutBase(RHConferenceModifBase):
 
 
 class RHLayoutEdit(RHLayoutBase):
-    def _checkProtection(self):
-        RHLayoutBase._checkProtection(self)
-        if self.event_new.type_ != EventType.conference:
-            raise NotFound('Only conferences have layout settings')
-
     def _process(self):
-        defaults = FormDefaults(**layout_settings.get_all(self._conf))
-        form = LayoutForm(obj=defaults, event=self.event_new)
+        if self.event_new.type_ == EventType.conference:
+            return self._process_conference()
+        else:
+            return self._process_lecture_meeting()
+
+    def _get_form_defaults(self):
+        defaults = FormDefaults(**layout_settings.get_all(self.event_new))
+        defaults.timetable_theme = self.event_new.theme
+        return defaults
+
+    def _process_lecture_meeting(self):
+        form = LectureMeetingLayoutForm(obj=self._get_form_defaults(), event=self.event_new)
+        if form.validate_on_submit():
+            layout_settings.set_multi(self.event_new, form.data)
+            flash(_('Settings saved'), 'success')
+            return redirect(url_for('.index', self.event_new))
+        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self._conf, form=form, event=self.event_new)
+
+    def _process_conference(self):
+        form = ConferenceLayoutForm(obj=self._get_form_defaults(), event=self.event_new)
         css_form = CSSForm()
         logo_form = LogoForm()
 
         if form.validate_on_submit():
             data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
-            layout_settings.set_multi(self._conf, data)
+            layout_settings.set_multi(self.event_new, data)
             if form.theme.data == '_custom':
-                layout_settings.set(self._conf, 'use_custom_css', True)
+                layout_settings.set(self.event_new, 'use_custom_css', True)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('event_layout.index', self._conf))
+            return redirect(url_for('.index', self.event_new))
         else:
             if self.event_new.logo_metadata:
                 logo_form.logo.data = self.event_new
@@ -156,7 +170,7 @@ class RHLayoutCSSSaveTheme(RHLayoutBase):
             if form.theme.data != '_custom':
                 layout_settings.set(self._conf, 'theme', form.theme.data)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('event_layout.index', self.event_new))
+            return redirect(url_for('.index', self.event_new))
 
 
 class RHLogoDisplay(RHConferenceBaseDisplay):
