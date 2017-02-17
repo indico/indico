@@ -2,7 +2,7 @@
 
 {% from 'events/management/_event_person_links.html' import render_event_person_links %}
 
-{% block title %}{% trans %}Dashboard{% endtrans %}{% endblock %}
+{% block title %}{% trans %}Settings{% endtrans %}{% endblock %}
 
 {% macro with_default(content='', empty_msg=none) %}
     {% set content = (caller() if caller is defined else content) | trim %}

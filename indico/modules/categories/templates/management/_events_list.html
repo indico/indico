@@ -14,7 +14,7 @@
             {% endif %}
         </td>
         <td class="i-table">
-            <a href="{{ url_for('event_management.dashboard', event) }}">
+            <a href="{{ url_for('event_management.settings', event) }}">
                 {{ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | strip_tags }}
             </a>
         </td>
