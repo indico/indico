@@ -20,7 +20,7 @@
             {% for event in events %}
                 <li>
                     <input type="hidden" name="event_id" value="{{ event.id }}">
-                    <a href="{{ url_for('event_management.dashboard', event) }}" target="_blank">
+                    <a href="{{ url_for('event_management.settings', event) }}" target="_blank">
                         {{ event.title }}
                     </a>
                     ({{ event.start_dt|format_date(timezone=event.timezone) }})

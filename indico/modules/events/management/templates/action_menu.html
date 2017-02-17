@@ -107,7 +107,7 @@
                 <ul>
                     {% for clone in clones %}
                         <li>
-                            <a href="{{ url_for('event_management.dashboard', clone) }}"
+                            <a href="{{ url_for('event_management.settings', clone) }}"
                                title="{{ clone.title }}" data-qtip-position="left">
                                 {{ clone.start_dt | format_date(timezone=clone.tzinfo) }}
                             </a>

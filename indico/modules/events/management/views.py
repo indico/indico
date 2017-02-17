@@ -27,8 +27,8 @@ class WPEventManagement(WPJinjaMixin, WPConferenceModifBase):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPEventDashboard(WPEventManagement):
-    sidemenu_option = 'dashboard'
+class WPEventSettings(WPEventManagement):
+    sidemenu_option = 'settings'
 
 
 class WPEventProtection(WPEventManagement):

@@ -181,7 +181,7 @@ class UHConferenceOtherViews(URLHandler):
 
 
 class UHConferenceModification(URLHandler):
-    _endpoint = 'event_management.dashboard'
+    _endpoint = 'event_management.settings'
 
 
 

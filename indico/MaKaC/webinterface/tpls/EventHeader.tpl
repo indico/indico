@@ -86,7 +86,7 @@ ${ template_hook('global-announcement') }
 
         <div class="separator"></div>
 
-        <a id="manageEventButton" href="${ url_for('event_management.dashboard', conf) }"
+        <a id="manageEventButton" href="${ url_for('event_management.settings', conf) }"
            style="background-image: url(${ systemIcon('manage') })"></a>
     </div>
 
