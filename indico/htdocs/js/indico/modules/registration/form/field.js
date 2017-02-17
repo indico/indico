@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global angular, ndRegForm */
+
 ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.fieldApi = {};
     $scope.getDefaultFieldSetting = regFormFactory.getDefaultFieldSetting;
@@ -29,13 +31,13 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.disableField = function(field) {
-        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].disable(getRequestParams(field), function(updatedField) {
+        regFormFactory[field.inputType === 'label' ? 'Labels' : 'Fields'].disable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
                     var index = -1;
                     _.find($scope.section.items, function(item) {
                         index++;
-                        return item.id == $scope.field.id;
+                        return item.id === $scope.field.id;
                     });
 
                     $scope.field.isEnabled = updatedField.view_data.isEnabled;
@@ -47,7 +49,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.fieldApi.enableField = function(field) {
-        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'].enable(getRequestParams(field), function(updatedField) {
+        regFormFactory[field.inputType === 'label' ? 'Labels' : 'Fields'].enable(getRequestParams(field), function(updatedField) {
             regFormFactory.processResponse(updatedField, {
                 success: function(updatedField) {
                     var lastEnabledIndex = _.findLastIndex($scope.section.items, function(item) {
@@ -73,7 +75,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
             delete postData['fieldId'];
         }
 
-        regFormFactory[field.inputType == 'label' ? 'Labels' : 'Fields'][$scope.isNew() ? 'save' : 'modify'](postData, function(response) {
+        regFormFactory[field.inputType === 'label' ? 'Labels' : 'Fields'][$scope.isNew() ? 'save' : 'modify'](postData, function(response) {
             regFormFactory.processResponse(response, {
                 success: function(response) {
                     $scope.field = angular.extend($scope.field, response.view_data);
@@ -95,7 +97,7 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     };
 
     $scope.isNew = function() {
-        return $scope.field.id == -1;
+        return $scope.field.id === -1;
     };
 
     $scope.getNumberOfSlots = function(item) {
@@ -139,10 +141,10 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
     $scope.dialog = {
         open: false,
         title: function() {
-            return $scope.isNew()? $T('New Field') : $T('Edit Field');
+            return $scope.isNew() ? $T('New Field') : $T('Edit Field');
         },
         okButton: function() {
-            return $scope.isNew()? $T('Add') : $T('Update');
+            return $scope.isNew() ? $T('Add') : $T('Update');
         },
         onOk: function(dialogScope) {
             if (dialogScope.optionsForm.$invalid === true) {
@@ -405,7 +407,7 @@ ndRegForm.directive('ndDateField', function(url) {
             var fmt = scope.field.dateFormat || scope.getDefaultFieldSetting('defaultDateFormat');
 
             fmt = fmt.replace(/%([HMdmY])/g, function(match, c) {
-                return {'H': 'HH', 'M': 'mm', 'd': 'DD', 'm': 'MM', 'Y': 'YYYY'}[c];
+                return {H: 'HH', M: 'mm', d: 'DD', m: 'MM', Y: 'YYYY'}[c];
             });
 
             scope.dateTime = splitDateTime(scope.userdata[scope.field.htmlName], fmt);
@@ -593,7 +595,7 @@ ndRegForm.directive('ndRadioField', function(url) {
 
             // keep track of the selected radio item
             scope.radioValue = {};
-            scope.$watch('userdata[fieldName]', function(){
+            scope.$watch('userdata[fieldName]', function() {
                 scope.radioValue.id = scope.getUserdataValue();
             });
 
@@ -644,7 +646,7 @@ ndRegForm.directive('ndRadioField', function(url) {
             scope.settings.editionTable = {
                 sortable: false,
                 actions: ['remove', 'sortable'],
-                colNames:[
+                colNames: [
                     $T("Caption"),
                     $T("Billable"),
                     $T("Price"),
@@ -653,76 +655,80 @@ ndRegForm.directive('ndRadioField', function(url) {
                     $T("Extra slots pay"),
                     $T("Enabled")],
 
-                colModel: [
-                    {name: 'caption',
-                     index:'caption',
-                     align: 'center',
-                     width: 160,
-                     editable: true,
-                     edittype: "text",
-                     editoptions: {
-                         size: "30",
-                         maxlength: "50"}},
-
-                    {name: 'isBillable',
-                     index: 'isBillable',
-                     width: 50,
-                     editable: true,
-                     align: 'center',
-                     defaultVal: false,
-                     edittype: 'bool_select'},
-
-                    {name: 'price',
-                     index: 'price',
-                     align: 'center',
-                     width: 50,
-                     editable: true,
-                     edittype: 'text',
-                     pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
-                     editoptions: {
-                         size: "7",
-                         maxlength: "20"}},
-
-                    {name: 'placesLimit',
-                     index: 'placesLimit',
-                     align: 'center',
-                     width: 50,
-                     editable: true,
-                     edittype: "text",
-                     pattern: '/^\\d*$/',
-                     editoptions: {
-                         size: "7",
-                         maxlength: "20"}},
-
-                    {name: 'maxExtraSlots',
-                     index: 'maxExtraSlots',
-                     align: 'center',
-                     width: 50,
-                     editable: true,
-                     edittype: "text",
-                     pattern: '/^\\d*$/',
-                     className: 'extra-slots',
-                     editoptions: {
-                         size: "7",
-                         maxlength: "2"}},
-
-                    {name: 'extraSlotsPay',
-                     index: 'extraSlotsPay',
-                     align: 'center',
-                     width: 50,
-                     editable: true,
-                     edittype: "bool_select",
-                     className: 'extra-slots',
-                     defaultVal: false},
-
-                    {name: 'isEnabled',
-                     index: 'isEnabled',
-                     width: 50,
-                     editable: true,
-                     align: 'center',
-                     edittype: 'bool_select',
-                     defaultVal: true}
-                ]
+                colModel: [{
+                    name: 'caption',
+                    index: 'caption',
+                    align: 'center',
+                    width: 160,
+                    editable: true,
+                    edittype: "text",
+                    editoptions: {
+                        size: "30",
+                        maxlength: "50"
+                    }
+                }, {
+                    name: 'isBillable',
+                    index: 'isBillable',
+                    width: 50,
+                    editable: true,
+                    align: 'center',
+                    defaultVal: false,
+                    edittype: 'bool_select'
+                }, {
+                    name: 'price',
+                    index: 'price',
+                    align: 'center',
+                    width: 50,
+                    editable: true,
+                    edittype: 'text',
+                    pattern: '/^(\\d+(\\.\\d{1,2})?)?$/',
+                    editoptions: {
+                        size: "7",
+                        maxlength: "20"
+                    }
+                }, {
+                    name: 'placesLimit',
+                    index: 'placesLimit',
+                    align: 'center',
+                    width: 50,
+                    editable: true,
+                    edittype: "text",
+                    pattern: '/^\\d*$/',
+                    editoptions: {
+                        size: "7",
+                        maxlength: "20"
+                    }
+                }, {
+                    name: 'maxExtraSlots',
+                    index: 'maxExtraSlots',
+                    align: 'center',
+                    width: 50,
+                    editable: true,
+                    edittype: "text",
+                    pattern: '/^\\d*$/',
+                    className: 'extra-slots',
+                    editoptions: {
+                        size: "7",
+                        maxlength: "2"
+                    }
+                }, {
+                    name: 'extraSlotsPay',
+                    index: 'extraSlotsPay',
+                    align: 'center',
+                    width: 50,
+                    editable: true,
+                    edittype: "bool_select",
+                    className: 'extra-slots',
+                    defaultVal: false
+                }, {
+                    name: 'isEnabled',
+                    index: 'isEnabled',
+                    width: 50,
+                    editable: true,
+                    align: 'center',
+                    edittype: 'bool_select',
+                    defaultVal: true
+                }]
             };
         }
     };
@@ -1237,7 +1243,7 @@ ndRegForm.directive('ndFieldDialog', function(url) {
                 return url.tpl(file);
             };
 
-            scope.hasRadioItems = function () {
+            scope.hasRadioItems = function() {
                 return _.any(scope.formData.choices, function(item) {
                     return item.remove !== true;
                 });
