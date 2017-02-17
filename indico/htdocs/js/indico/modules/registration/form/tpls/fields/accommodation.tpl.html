@@ -12,15 +12,6 @@
                     {{ 'There are no available accommodation options' | i18n }}.
                 </td>
             </tr>
-            <tr ng-if="!field.isRequired">
-                <td class="accommodation-option-item">
-                    <input type="radio" name="accommodationType-{{ field.id }}"
-                           ng-model="accommodation.choice"
-                           ng-checked="!userdata[fieldName].choice"
-                           nd-radio-extend/>
-                    {{ 'No accommodation' | i18n }}
-                </td>
-            </tr>
             <tr ng-repeat="item in field.choices">
                 <td align="left" class="accommodation-option-item">
                     <input type="radio" nd-radio-extend
@@ -99,7 +90,7 @@
                         ng-model="accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
                         ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) || !accommodation.choice"
-                        ng-required="field.isRequired || accommodation.choice">
+                        ng-required="!isNoAccommodationChoice(accommodation.choice, field)">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.arrivalDates" value="{{ date[0] }}"
                                 ng-selected="userdata[fieldName].arrivalDate == date[0]">
@@ -121,7 +112,7 @@
                         ng-model="accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
                         ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) || !accommodation.choice"
-                        ng-required="field.isRequired || accommodation.choice">
+                        ng-required="!isNoAccommodationChoice(accommodation.choice, field)">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.departureDates" value="{{ date[0] }}"
                                 ng-selected="userdata[fieldName].departureDate == date[0]">

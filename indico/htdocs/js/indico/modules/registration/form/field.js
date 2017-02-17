@@ -314,6 +314,12 @@ ndRegForm.controller('BillableCtrl', function($scope, $filter) {
     $scope.isVisible = function(field) {
         return field.isEnabled && !field.remove;
     };
+
+    $scope.isNoAccommodationChoice = function(choice, field) {
+        return !!_.find(field.choices, function(c) {
+            return c.id === choice && c.isNoAccommodation;
+        });
+    };
 });
 
 ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
