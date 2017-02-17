@@ -896,12 +896,13 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                 // Adds `No accommodation` default choice the first time the Accommodation field is added
                 if (!field.choices) {
                     formData.choices.push({
-                        caption: "No accommodation",
+                        caption: '',
                         isBillable: false,
                         isEnabled: true,
                         isNoAccommodation: true,
                         placesLimit: 0,
-                        price: 0
+                        price: 0,
+                        placeholder: $T('No accommodation...')
                     });
                 }
             };
