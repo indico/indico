@@ -89,7 +89,8 @@
                         id="arrivalDate"
                         ng-model="accommodation.arrivalDate"
                         ng-class="{hasError: validationStarted && nestedFormArrival.$invalid}"
-                        ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) || !accommodation.choice"
+                        ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) ||
+                                      isNoAccommodationChoice(accommodation.choice, field)"
                         ng-required="!isNoAccommodationChoice(accommodation.choice, field)">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.arrivalDates" value="{{ date[0] }}"
@@ -111,7 +112,8 @@
                         id="departureDate"
                         ng-model="accommodation.departureDate"
                         ng-class="{hasError: validationStarted && nestedFormDeparture.$invalid}"
-                        ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) || !accommodation.choice"
+                        ng-disabled="(!regMetadata.manager && billableOptionPayed(userdata, regMetadata)) ||
+                                      isNoAccommodationChoice(accommodation.choice, field)"
                         ng-required="!isNoAccommodationChoice(accommodation.choice, field)">
                         <option value="" selected>{{ 'Select a date' | i18n }}</option>
                         <option ng-repeat="date in field.departureDates" value="{{ date[0] }}"
