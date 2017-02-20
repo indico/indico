@@ -225,8 +225,9 @@ class MultiChoiceField(ChoiceBaseField):
             value = {}
 
         return_value = {}
+        has_old_data = old_data is not None and old_data.data is not None
 
-        if old_data is not None and old_data.data is not None:
+        if has_old_data:
             # in case nothing changed we can skip all checks
             if old_data.data == value:
                 return {}
@@ -283,14 +284,14 @@ class MultiChoiceField(ChoiceBaseField):
         # This is pretty ugly but especially in case of non-billable extra slots it makes
         # sense to keep it like this.  If someone tampers with the list of billable fields
         # we detect it any reject the change to the field's data anyway.
-        if old_data is not None:
+        if has_old_data:
             old_choices_mapping = {x['id']: x for x in old_data.field_data.versioned_data['choices']}
             new_choices_mapping = {x['id']: x for x in new_choices}
             old_billable = {uuid: num for uuid, num in old_data.data.iteritems()
                             if old_choices_mapping[uuid]['is_billable'] and old_choices_mapping[uuid]['price']}
             new_billable = {uuid: num for uuid, num in value.iteritems()
                             if new_choices_mapping[uuid]['is_billable'] and new_choices_mapping[uuid]['price']}
-        if old_data and old_billable != new_billable:
+        if has_old_data and old_billable != new_billable:
             # preserve existing data
             return return_value
         else:
