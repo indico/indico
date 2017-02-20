@@ -166,23 +166,8 @@ class UHConferenceDisplay(URLHandler):
     _endpoint = 'event.conferenceDisplay'
 
 
-class UHConferenceOverview(URLHandler):
-    _endpoint = 'event.conferenceDisplay-overview'
-
-    @classmethod
-    def getURL(cls, target):
-        if g.get('static_site'):
-            return URL(UHConferenceDisplay.getStaticURL(target))
-        return super(UHConferenceOverview, cls).getURL(target)
-
-
 class UHConferenceOtherViews(URLHandler):
     _endpoint = 'event.conferenceOtherViews'
-
-
-class UHConferenceModification(URLHandler):
-    _endpoint = 'event_management.settings'
-
 
 
 # ============================================================================
@@ -664,25 +649,3 @@ class UHPaperReviewingDisplay(URLHandler):
 
 class UHContact(URLHandler):
     _endpoint = 'misc.contact'
-
-
-class UHHelper(object):
-    """ Returns the display or modif UH for an object of a given class
-    """
-
-    modifUHs = {
-        "Conference": UHConferenceModification,
-        "DefaultConference": UHConferenceModification
-    }
-
-    displayUHs = {
-        "Conference": UHConferenceDisplay
-    }
-
-    @classmethod
-    def getModifUH(cls, klazz):
-        return cls.modifUHs.get(klazz.__name__, None)
-
-    @classmethod
-    def getDisplayUH(cls, klazz, type=""):
-        return cls.displayUHs.get("%s%s" % (klazz.__name__, type), None)
