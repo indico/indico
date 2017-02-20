@@ -29,7 +29,7 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.reviews import PaperAction, PaperReview
+from indico.modules.events.papers.models.reviews import PaperAction, PaperReview, PaperReviewType
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.models.comments import PaperReviewComment
@@ -48,8 +48,10 @@ def set_reviewing_state(event, reviewing_type, enable):
     event.cfp.set_reviewing_state(reviewing_type, enable)
     action = 'enabled' if enable else 'disabled'
     logger.info("Reviewing type '%s' for event %r %s by %r", reviewing_type, event, action, session.user)
-    event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
-              "{} reviewing type '{}'".format("Enabled" if enable else "Disabled", reviewing_type), session.user)
+    event.log(EventLogRealm.management, EventLogKind.positive if enable else EventLogKind.negative, 'Papers',
+              "{} {} reviewing".format("Enabled" if enable else "Disabled",
+                                       orig_string(PaperReviewType[reviewing_type].title.lower())),
+              session.user)
 
 
 def _unassign_removed(event, changes):
