@@ -112,4 +112,4 @@ class LectureCreationForm(EventCreationFormBase):
                                    default_duration=timedelta(minutes=90))
     person_link_data = EventPersonLinkListField(_('Speakers'))
     description = TextAreaField(_('Description'), widget=CKEditorWidget())
-    theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture)
+    theme = IndicoThemeSelectField(_('Theme'), event_type=EventType.lecture, allow_default=True)
