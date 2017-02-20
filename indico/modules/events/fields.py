@@ -21,6 +21,7 @@ import json
 from sqlalchemy import inspect
 from wtforms import SelectField
 
+from indico.core import signals
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
@@ -198,6 +199,7 @@ class PersonLinkListFieldBase(EventPersonListField):
             if not self.event.persons.filter_by(email=email).first():
                 person_link.person.email = email
                 person_link.person.user = get_user_by_email(email)
+                signals.event.person_updated.send(person_link.person)
             else:
                 raise UserValueError(_('There is already a person with the email {}').format(email))
         return person_link
