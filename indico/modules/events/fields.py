@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 import json
-from operator import itemgetter
 
 from sqlalchemy import inspect
 from wtforms import SelectField
@@ -253,6 +252,7 @@ class IndicoThemeSelectField(SelectField):
         event_type = kwargs.pop('event_type').legacy_name
         super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
         self.choices = sorted([(tid, theme['title'])
-                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()],
-                              key=itemgetter(1))
+                               for tid, theme in theme_settings.get_themes_for(event_type).viewitems()
+                               if not theme.get('is_xml')],
+                              key=lambda x: x[1].lower())
         self.default = theme_settings.defaults[event_type]
