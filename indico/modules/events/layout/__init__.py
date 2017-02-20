@@ -54,6 +54,13 @@ layout_settings = EventSettingsProxy('layout', {
 theme_settings = ThemeSettingsProxy(os.path.join(os.path.dirname(indico.__file__), 'modules', 'events', 'themes.yaml'))
 
 
+@signals.event.created.connect
+def _event_created(event, **kwargs):
+    defaults = event.category.default_event_themes
+    if not layout_settings.get(event, 'timetable_theme') and event.type_.name in defaults:
+        layout_settings.set(event, 'timetable_theme', defaults[event.type_.name])
+
+
 @signals.event.type_changed.connect
 def _event_type_changed(event, **kwargs):
     layout_settings.delete(event, 'timetable_theme')
