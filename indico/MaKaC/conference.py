@@ -112,7 +112,7 @@ class Conference(CommonObjectBase):
 
     @return_ascii
     def __repr__(self):
-        return '<Conference({0}, {1}, {2})>'.format(self.getId(), self.getTitle(), self.getStartDate())
+        return '<Conference({0}, {1}, {2})>'.format(self.id, self.title, self.startDate)
 
     @property
     def startDate(self):
@@ -295,10 +295,6 @@ class Conference(CommonObjectBase):
     def getTitle(self):
         """returns (String) the title of the conference"""
         return self.title
-
-    def getDescription(self):
-        """returns (String) the description of the conference"""
-        return self.description
 
     def getSessionById(self, sessionId):
         """Returns the session from the conference list corresponding to the

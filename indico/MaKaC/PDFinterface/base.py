@@ -492,7 +492,8 @@ class PDFBase:
                 startHeight = self._PAGE_HEIGHT
 
                 if drawTitle:
-                    startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+                    startHeight = self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                                                          height=self._PAGE_HEIGHT - inch)
 
                 # lower edge of the image
                 startHeight = startHeight - inch / 2 - height
@@ -502,7 +503,8 @@ class PDFBase:
                 return startHeight
             except IOError:
                 if drawTitle:
-                    self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - inch)
+                    self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                                            height=self._PAGE_HEIGHT - inch)
         return 0
 
 

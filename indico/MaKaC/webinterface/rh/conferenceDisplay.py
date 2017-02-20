@@ -163,7 +163,7 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams(self, params)
 
     def _process(self):
-        filename = "%s - Event.xml" % self._target.getTitle()
+        filename = u'event-{}.xml'.format(self.event_new.id)
         serializer = XMLEventSerializer(self.event_new, user=session.user, include_announcer_email=True)
         return send_file(filename, StringIO(serializer.serialize_event()), 'XML')
 
@@ -171,7 +171,6 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
 
     def _process( self ):
-        filename = "%s - Event.xml"%cleanHTMLHeaderFilename(self._target.getTitle())
         from MaKaC.common.xmlGen import XMLGen
         from MaKaC.common.output import outputGenerator
         xmlgen = XMLGen()
@@ -180,4 +179,4 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
         outgen.confToXMLMarc21(self._target.getConference())
         xmlgen.closeTag("marc:record")
-        return send_file(filename, StringIO(xmlgen.getXml()), 'XML')
+        return send_file(u'event-{}.marc.xml'.format(self.event_new.id), StringIO(xmlgen.getXml()), 'XML')
