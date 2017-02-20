@@ -1,6 +1,4 @@
 <%
-from MaKaC.webinterface.urlHandlers import UHHelper
-from MaKaC.conference import Conference
 from indico.modules.categories.models.categories import Category
 
 l = []
@@ -15,29 +13,19 @@ while target_ != None:
                 url = category.url
             l.append((category.title, url))
         break
-    else:
-        name = target_.getTitle()
-
-    if isModif:
-        url = UHHelper.getModifUH(type(target_)).getURL(target_)
-    else:
-        if actionType:
-            catType = actionType
+    else:  # Conference
+        event = target_.as_event
+        name = event.title
+        if isModif:
+            url = url_for('event_management.settings', target_)
         else:
-            catType = ''
-        url = UHHelper.getDisplayUH(type(target_), catType).getURL(target_)
+            url = event.url
+        target_ = event.category
 
-    l.append( (name, url) )
-
-    if isinstance(target_, Conference):
-        target_ = target_.as_event.category
-    else:
-        target_ = target_.getOwner()
+    l.append((name, url))
 
 l.reverse()
-
 arrowImage = systemIcon( "breadcrumb_arrow.png" )
-
 %>
 
 <div class="main-breadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>

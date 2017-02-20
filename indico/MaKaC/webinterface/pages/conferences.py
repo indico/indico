@@ -131,7 +131,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         frame = WConfDisplayFrame( self._getAW(), self._conf )
 
         frameParams = {
-            "confModifURL": urlHandlers.UHConferenceModification.getURL(self._conf),
+            "confModifURL": url_for('event_management.settings', self._conf),
             "logoURL": self.logo_url,
             "currentURL": request.url,
             "simpleTextAnnouncement": drawer.getSimpleText(),
@@ -290,7 +290,7 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
     def _getBody(self, params):
 
         wc = WConfDetails(self._getAW(), self._conf)
-        pars = {"modifyURL": urlHandlers.UHConferenceModification.getURL(self._conf)}
+        pars = {"modifyURL": url_for('event_management.settings', self._conf)}
         return wc.getHTML(pars)
 
     def _getFooter(self):
@@ -331,7 +331,7 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         return ""
 
     def _getBodyVariables(self):
-        pars = {"modifyURL": urlHandlers.UHConferenceModification.getURL(self._conf),
+        pars = {"modifyURL": url_for('event_management.settings', self._conf),
                 "cloneURL": urlHandlers.UHConfClone.getURL(self._conf)}
 
         pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })

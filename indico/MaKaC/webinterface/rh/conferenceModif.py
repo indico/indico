@@ -26,7 +26,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.config import Config
 from indico.util import json
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 from MaKaC.PDFinterface.conference import RegistrantsListToBadgesPDF, LectureToPosterPDF
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.errors import FormValuesError
@@ -121,7 +121,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         elif self._confirm:
             if self._cloneType == "once" :
                 newConf = self._conf.clone(self._date)
-                self._redirect( urlHandlers.UHConferenceModification.getURL( newConf ) )
+                self._redirect(url_for('event_management.settings', newConf))
             elif self._cloneType == "intervals" :
                 self._withIntervals()
             elif self._cloneType == "days" :
