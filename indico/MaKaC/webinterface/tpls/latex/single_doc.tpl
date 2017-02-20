@@ -18,7 +18,7 @@
     \begin{center}
         \large {
             \sffamily {
-                \color{gray} \textbf{${conf.getTitle() | latex_escape}}
+                \color{gray} \textbf{${conf.as_event.title.encode('utf-8') | latex_escape}}
             }
         }
     \end{center}

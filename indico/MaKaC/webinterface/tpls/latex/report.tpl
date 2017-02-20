@@ -29,7 +29,7 @@
 
     % for item in items:
         \newpage
-        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.getTitle() | latex_escape}}{80pt} / ${title | latex_escape}}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.as_event.title.encode('utf-8') | latex_escape}}{80pt} / ${title | latex_escape}}
         \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${item.title | latex_escape}}{150pt}}
         \phantomsection
         \addcontentsline{toc}{section}{${item.title | latex_escape}}

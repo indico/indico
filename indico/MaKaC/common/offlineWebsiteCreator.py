@@ -137,7 +137,7 @@ class OfflineEventCreator(object):
         self._create_home()
 
         # Create main and static folders
-        self._mainPath = self._normalize_path(u'OfflineWebsite-{}'.format(self._conf.getTitle().decode('utf-8')))
+        self._mainPath = self._normalize_path(u'OfflineWebsite-{}'.format(self.event.title))
         self._fileHandler.addDir(self._mainPath)
         self._staticPath = os.path.join(self._mainPath, "static")
         self._fileHandler.addDir(self._staticPath)
