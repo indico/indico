@@ -6,7 +6,7 @@ ZConfig==2.9.2
 ZODB3==3.10.5
 indico-fonts==1.1
 cssmin==0.2.0
-icalendar==3.11.2
+icalendar==3.11.3
 jsmin==2.2.1
 lxml==3.4.1
 pojson==0.4
@@ -16,7 +16,7 @@ pyatom==1.4
 pycountry==1.2
 mock==2.0.0
 freezegun==0.3.8
-pytest==3.0.5
+pytest==3.0.6
 pytest-catchlog==1.2.2
 pytest-cov==2.4.0
 pytest-localserver==0.3.6
@@ -37,7 +37,7 @@ zope.index==3.6.4
 zope.interface==3.8.0
 ujson==1.19
 oauth2==1.5.211
-requests==2.12.5
+requests==2.13.0
 pyScss==1.3.5
 Werkzeug==0.11.15
 Flask==0.12
@@ -77,9 +77,9 @@ translitcodec
 certifi
 Jinja2==2.9.4
 xlsxwriter==0.9.6
-jsonschema==2.5.1
+jsonschema==2.6.0
 html2text==2016.5.29
-marshmallow==2.11.1
+marshmallow==2.13.0
 marshmallow-sqlalchemy==0.12.1
 marshmallow-enum==1.0
 flask-marshmallow==0.7.0
