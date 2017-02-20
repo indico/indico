@@ -5,7 +5,7 @@
 \thispagestyle{fancy}
 
 \begin{center}
-    \fontsize{30}{36}\selectfont \textbf{${conf.getTitle() | latex_escape}}
+    \fontsize{30}{36}\selectfont \textbf{${conf.as_event.title.encode('utf-8') | latex_escape}}
 \end{center}
 
 \vspace{2em}

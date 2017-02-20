@@ -46,6 +46,7 @@ from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
 from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
+from indico.util.string import truncate
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
@@ -601,11 +602,7 @@ class WEventFooter(WFooter):
         if self._event.room_name:
             location = u'{} ({})'.format(self._event.room_name, location)
 
-        description = self._conf.getDescription()
-
-        if len(description) > 1000:
-            description = description[:997] + "..."
-
+        description = truncate(self._event.description, 1000).encode('utf-8')
         if description:
             description += '\n\n'
 
@@ -613,7 +610,7 @@ class WEventFooter(WFooter):
 
         v['gc_params'] = urllib.urlencode({
             'action': 'TEMPLATE',
-            'text': self._conf.getTitle(),
+            'text': self._event.title.encode('utf-8'),
             'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
                                 self._gCalDateFormat(self._conf.getEndDate())),
             'details': description,

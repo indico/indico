@@ -69,7 +69,7 @@ class WPConferenceBase(base.WPDecorated):
             else:
                 dates = " (%s - %s)" % (format_date(start_dt_local, format='long'),
                                         format_date(end_dt_local, format='long'))
-        self._setTitle("%s %s" % (strip_ml_tags(self._conf.getTitle()), dates))
+        self._setTitle("%s %s" % (strip_ml_tags(self._conf.as_event.title.encode('utf-8')), dates))
 
     def _getFooter(self):
         """
@@ -186,7 +186,7 @@ class WConfMetadata(wcomponents.WTemplated):
 
         event = self._conf.as_event
         v['image'] = event.logo_url if event.has_logo else Config.getInstance().getSystemIconURL("logo_indico")
-        v['description'] = strip_ml_tags(to_unicode(self._conf.getDescription())[:500].encode('utf-8'))
+        v['description'] = strip_ml_tags(self._conf.as_event.description[:500].encode('utf-8'))
         return v
 
 
@@ -206,10 +206,10 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["logo"] = ""
         if self.event.has_logo:
             vars["logoURL"] = self.event.logo_url
-            vars["logo"] = "<img src=\"%s\" alt=\"%s\" border=\"0\" class=\"confLogo\" >"%(vars["logoURL"], escape_html(self._conf.getTitle(), escape_quotes = True))
-        vars["confTitle"] = self._conf.getTitle()
-        vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        vars["imgConferenceRoom"] = Config.getInstance().getSystemIconURL( "conferenceRoom" )
+            vars["logo"] = '<img src="{}" alt="{}" border="0" class="confLogo">'.format(
+                vars["logoURL"], escape_html(self.event.title.encode('utf-8'), escape_quotes=True))
+        vars["confTitle"] = self.event.title.encode('utf-8')
+        vars["displayURL"] = self.event.url
         start_dt_local = self.event.start_dt_display.astimezone(self.event.display_tzinfo)
         end_dt_local = self.event.end_dt_display.astimezone(self.event.display_tzinfo)
         vars["timezone"] = self.event.display_tzinfo.zone
@@ -243,7 +243,7 @@ class WConfDetailsFull(wcomponents.WTemplated):
         tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
         vars["timezone"] = tz
 
-        description = self._conf.getDescription()
+        description = self._conf.as_event.description.encode('utf-8')
         vars["description_html"] = isStringHTML(description)
         vars["description"] = description
 
@@ -687,7 +687,7 @@ class WConferenceClone(wcomponents.WTemplated):
 
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self.__conf.getTitle()
+        vars["confTitle"] = self.__conf.as_event.title.encode('utf-8')
         vars["confId"] = self.__conf.getId()
         vars["selectDay"] = self._getSelectDay()
         vars["selectMonth"] = self._getSelectMonth()

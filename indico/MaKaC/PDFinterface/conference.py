@@ -63,7 +63,7 @@ from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
 from indico.util.i18n import i18nformat, ngettext
-from indico.util.string import html_color_to_rgb, to_unicode
+from indico.util.string import html_color_to_rgb, to_unicode, truncate
 
 styles = getSampleStyleSheet()
 
@@ -101,7 +101,8 @@ class ProgrammeToPDF(PDFBase):
         height = self._drawLogo(c)
 
         if not height:
-            height = self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+            height = self._drawWrappedString(c, escape(self._event.title.encode('utf-8')),
+                                             height=self._PAGE_HEIGHT - 2*inch)
 
         c.setFont('Times-Bold', 15)
 
@@ -114,13 +115,17 @@ class ProgrammeToPDF(PDFBase):
         c.setFont('Times-Bold', 30)
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
-        self._drawWrappedString(c, "%s / %s"%(strip_ml_tags(self._conf.getTitle()),self._title), width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
+        self._drawWrappedString(c, "%s / %s" % (strip_ml_tags(self._event.title.encode('utf-8')), self._title),
+                                width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def laterPages(self, c, doc):
         c.saveState()
-        self._drawWrappedString(c, "%s / %s"%(escape(strip_ml_tags(self._conf.getTitle())),self._title), width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
+        self._drawWrappedString(c, "%s / %s" % (escape(strip_ml_tags(self._event.title.encode('utf-8'))), self._title),
+                                width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9,
+                                color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5*inch,
+                                measurement=inch, lineSpacing=0.15)
         c.drawCentredString(self._PAGE_WIDTH/2.0, 0.75 * inch, "Page %d "%doc.page)
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
         c.restoreState()
@@ -986,7 +991,7 @@ class TimeTablePlain(PDFWithTOC):
             s.fontSize = 18
             s.leading = 22
             s.alignment = TA_CENTER
-            p = Paragraph(escape(self._conf.getTitle()), s)
+            p = Paragraph(escape(self._event.title.encode('utf-8')), s)
             story.append(p)
             story.append(Spacer(1, 0.4 * inch))
 
@@ -1018,7 +1023,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                  fontsize='normal', tz=None):
         self._conf = event.as_legacy
         self._event = event
-        self._tz = tz or self._conf.getTimezone()
+        self._tz = tz or self._event.timezone
         self._aw = aw
         self._showSessions = showSessions
         self._showDays = showDays
@@ -1202,7 +1207,8 @@ class RegistrantToPDF(PDFBase):
         c.saveState()
         c.setFont('Times-Bold', 30)
         if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+            self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                                    height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 25)
         #c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT - inch - 5*cm, self._abstract.getTitle())
         c.setLineWidth(3)
@@ -1291,10 +1297,10 @@ class RegistrantsListToBookPDF(PDFWithTOC):
 
     def firstPage(self, c, doc):
         c.saveState()
-        showLogo = False
         c.setFont('Times-Bold', 30)
         if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT - 2*inch)
+            self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                                    height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 35)
         c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
         c.setLineWidth(3)
@@ -1306,13 +1312,10 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.restoreState()
 
     def laterPages(self, c, doc):
-
         c.saveState()
         c.setFont('Times-Roman', 9)
         c.setFillColorRGB(0.5, 0.5, 0.5)
-        confTitle = escape(self._conf.getTitle())
-        if len(self._conf.getTitle())>30:
-            confTitle = escape(self._conf.getTitle()[:30] + "...")
+        confTitle = escape(truncate(self._conf.as_event.title, 30).encode('utf-8'))
         c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
         title = doc.getCurrentPart()
         if len(doc.getCurrentPart())>50:
@@ -1346,7 +1349,7 @@ class RegistrantsListToPDF(PDFBase):
         showLogo = False
         c.setFont('Times-Bold', 30)
         if not showLogo:
-            self._drawWrappedString(c, escape(self._conf.getTitle()), height=self._PAGE_HEIGHT-0.75*inch)
+            self._drawWrappedString(c, escape(self._conf.title.encode('utf-8')), height=self._PAGE_HEIGHT-0.75*inch)
         c.setFont('Times-Bold', 25)
         c.setLineWidth(3)
         c.setStrokeGray(0.7)
@@ -1362,7 +1365,7 @@ class RegistrantsListToPDF(PDFBase):
         style.fontSize = 12
         style.alignment = TA_CENTER
         text = i18nformat("""<b>_("List of registrants")</b>""")
-        p = Paragraph(text, style, part=escape(self._conf.getTitle()))
+        p = Paragraph(text, style, part=escape(self._conf.title.encode('utf-8')))
         p.spaceAfter = 30
         story.append(p)
 
@@ -1988,7 +1991,7 @@ class TicketToPDF(PDFBase):
 
         # Conference title
         height -= 1*cm
-        startHeight = self._drawWrappedString(c, escape(self._conf.getTitle()),
+        startHeight = self._drawWrappedString(c, escape(self._event.title.encode('utf-8')),
                                               height=height, width=width, size=20,
                                               align="left", font='Times-Bold')
 
