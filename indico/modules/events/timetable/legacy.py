@@ -23,11 +23,10 @@ from flask import session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.models.events import EventType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.util.date_time import iterdays
 from indico.web.flask.util import url_for
-from MaKaC.common.fossilize import fossilize
-from MaKaC.fossils.conference import IConferenceEventInfoFossil
 
 
 class TimetableSerializer(object):
@@ -312,10 +311,13 @@ def serialize_entry_update(entry, with_timetable=False, session_=None):
 
 
 def serialize_event_info(event):
-    conf = event.as_legacy
-    event_info = fossilize(conf, IConferenceEventInfoFossil, tz=conf.tz)
-    event_info['sessions'] = {sess.id: serialize_session(sess) for sess in event.sessions}
-    return event_info
+    return {'_type': 'Conference',
+            'id': unicode(event.id),
+            'title': event.title,
+            'startDate': event.start_dt_local,
+            'endDate': event.end_dt_local,
+            'isConference': event.type_ == EventType.conference,
+            'session': {sess.id: serialize_session(sess) for sess in event.sessions}}
 
 
 def serialize_session(sess):

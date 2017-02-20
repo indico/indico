@@ -38,7 +38,7 @@ from indico.util.user import unify_user_args
 
 from MaKaC import fileRepository
 from MaKaC.badge import BadgeTemplateManager
-from MaKaC.common.fossilize import fossilizes, Fossilizable
+from MaKaC.common.fossilize import Fossilizable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
@@ -46,7 +46,6 @@ from MaKaC.common.PickleJar import Updates
 from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError, NotFoundError
-from MaKaC.fossils.conference import IConferenceMinimalFossil, IConferenceEventInfoFossil
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.poster import PosterTemplateManager
 from MaKaC.trashCan import TrashCanManager
@@ -99,8 +98,6 @@ class Conference(CommonObjectBase):
         access to other objects representing certain parts of the conferences
         (ex: contributions, sessions, ...).
     """
-
-    fossilizes(IConferenceMinimalFossil, IConferenceEventInfoFossil)
 
     def __init__(self, id=''):
         self.id = id
