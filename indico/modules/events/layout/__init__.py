@@ -63,7 +63,11 @@ def _event_created(event, **kwargs):
 
 @signals.event.type_changed.connect
 def _event_type_changed(event, **kwargs):
-    layout_settings.delete(event, 'timetable_theme')
+    theme = event.category.default_event_themes.get(event.type_.name)
+    if theme is None:
+        layout_settings.delete(event, 'timetable_theme')
+    else:
+        layout_settings.set(event, 'timetable_theme', theme)
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')
