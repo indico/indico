@@ -10,7 +10,7 @@
 </%block>
 
 <%block name="first_page">
-    <%include file="inc/first_page.tpl" args="conf=conf,title=_('Book of Abstracts'),show_dates=True"/>
+    <%include file="inc/first_page.tpl" args="event=conf.as_event,title=_('Book of Abstracts'),show_dates=True"/>
 </%block>
 
 <%block name="table_of_contents">
@@ -21,7 +21,7 @@
 <%block name="book_body">
     % for contrib in contribs:
         % if contrib.can_access(_session.user):
-            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Book of Abstracts") | latex_escape}}
+            \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.as_event.title | latex_escape}}{300pt} / ${_("Book of Abstracts") | latex_escape}}
             \fancyhead[R]{}
 
             \phantomsection

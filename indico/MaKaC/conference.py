@@ -160,19 +160,9 @@ class Conference(CommonObjectBase):
     as_new = as_event
 
     @property
-    @memoize_request
-    def note(self):
-        from indico.modules.events.notes.models.notes import EventNote
-        return EventNote.get_for_linked_object(self.as_event)
-
-    @property
     def tz(self):
         from MaKaC.common.timezoneUtils import DisplayTZ
         return DisplayTZ(conf=self).getDisplayTZ()
-
-    @unify_user_args
-    def log(self, *args, **kwargs):
-        self.as_event.log(*args, **kwargs)
 
     @memoize_request
     def has_feature(self, feature):
@@ -243,7 +233,7 @@ class Conference(CommonObjectBase):
         """Gives back (Locator) a globaly unique identification encapsulated in
             a Locator object for the conference instance """
         d = Locator()
-        d["confId"] = self.getId()
+        d["confId"] = self.id
         return d
 
     def delete(self, user=None):

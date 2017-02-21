@@ -267,22 +267,11 @@ class outputGenerator(object):
 
         self._generate_category_path(event, out)
 
-        ####################################
-        # Fermi timezone awareness         #
-        ####################################
-        #if conf.getStartDate() is not None:
-        #    out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
-        #    out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(conf.getStartDate().year, string.zfill(conf.getStartDate().month,2), string.zfill(conf.getStartDate().day,2), string.zfill(conf.getStartDate().hour,2), string.zfill(conf.getStartDate().minute,2)),[["code","d"]])
-        #    out.closeTag("datafield")
-        #sd = conf.getAdjustedStartDate(tz)
         sd = event.start_dt
         if sd is not None:
             out.openTag("datafield",[["tag","518"],["ind1"," "],["ind2"," "]])
             out.writeTag("subfield","%d-%s-%sT%s:%s:00Z" %(sd.year, string.zfill(sd.month,2), string.zfill(sd.day,2), string.zfill(sd.hour,2), string.zfill(sd.minute,2)),[["code","d"]])
             out.closeTag("datafield")
-        ####################################
-        # Fermi timezone awareness(end)    #
-        ####################################
 
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
         out.writeTag("subfield", event.description, [["code", "a"]])

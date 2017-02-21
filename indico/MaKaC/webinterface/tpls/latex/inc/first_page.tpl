@@ -1,11 +1,11 @@
-<%page args="conf,title,show_dates=False"/>
+<%page args="event,title,show_dates=False"/>
 
 \begin{titlepage}
 
 \thispagestyle{fancy}
 
 \begin{center}
-    \fontsize{30}{36}\selectfont \textbf{${conf.as_event.title.encode('utf-8') | latex_escape}}
+    \fontsize{30}{36}\selectfont \textbf{${event.title.encode('utf-8') | latex_escape}}
 \end{center}
 
 \vspace{2em}
@@ -13,14 +13,14 @@
 %if show_dates:
     \begin{center}
         \Large
-        ${conf.getAdjustedStartDate(tz).strftime("%A %d %B %Y") | latex_escape} -
-        ${conf.getAdjustedEndDate(tz).strftime("%A %d %B %Y") | latex_escape}
+        ${event.start_dt.astimezone(tz).strftime("%A %d %B %Y") | latex_escape} -
+        ${event.end_dt.astimezone(tz).strftime("%A %d %B %Y") | latex_escape}
     \end{center}
 
-    % if conf.as_event.venue_name:
+    % if event.venue_name:
         \begin{center}
             \Large
-            ${conf.as_event.venue_name | latex_escape}
+            ${event.venue_name | latex_escape}
         \end{center}
     % endif
 

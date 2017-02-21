@@ -72,7 +72,7 @@ class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
         wc = wcomponents.WMenuSimpleEventHeader( self._getAW(),self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(),\
+                             "confId": self._conf.id,
                              "currentView": "static",\
                              "type": WebFactory.getId(),\
                              "dark": True } )
