@@ -70,6 +70,37 @@ def register_user(email, extra_emails, user_data, identity_data, settings, from_
     return user, identity
 
 
+def impersonate_user(user):
+    """Impersonate another user as an admin"""
+    from indico.modules.auth import login_user, logger
+
+    current_user = session.user
+    # We don't overwrite a previous entry - the original (admin) user should be kept there
+    session.setdefault('login_as_orig_user', {
+        'session_data': {k: session.pop(k) for k in session.keys() if k[0] != '_' or k in ('_timezone', '_lang')},
+        'user_id': session.user.id,
+        'user_name': session.user.get_full_name(last_name_first=False, last_name_upper=False)
+    })
+    login_user(user, admin_impersonation=True)
+    logger.info('Admin %r is impersonating user %r', current_user, user)
+
+
+def undo_impersonate_user():
+    """Undo an admin impersonation login and revert to the old user"""
+    from indico.modules.auth import logger
+    from indico.modules.users import User
+
+    try:
+        entry = session.pop('login_as_orig_user')
+    except KeyError:
+        # The user probably already switched back from antoher tab
+        return
+    user = User.get_one(entry['user_id'])
+    logger.info('Admin %r stopped impersonating user %r', user, session.user)
+    session.user = user
+    session.update(entry['session_data'])
+
+
 def redirect_to_login(next_url=None, reason=None):
     """Redirects to the login page.
 

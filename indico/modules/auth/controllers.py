@@ -31,7 +31,7 @@ from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationFor
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
                                        AddLocalIdentityForm, EditLocalIdentityForm)
 from indico.modules.auth.models.registration_requests import RegistrationRequest
-from indico.modules.auth.util import load_identity_info, register_user
+from indico.modules.auth.util import load_identity_info, register_user, impersonate_user, undo_impersonate_user
 from indico.modules.auth.views import WPAuth, WPAuthUser
 from indico.modules.users import User
 from indico.modules.users.controllers import RHUserBase
@@ -42,8 +42,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.util import url_for_index
 
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.common.mail import GenericMailer
+from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -593,3 +593,25 @@ class RHResetPassword(RH):
         form.username.data = identity.identifier
         return WPAuth.render_template('reset_password.html', form=form, identity=identity,
                                       widget_attrs={'username': {'disabled': True}})
+
+
+class RHAdminImpersonate(RHAdminBase):
+    CSRF_ENABLED = True
+
+    def _checkParams(self, params):
+        RHAdminBase._checkParams(self, params)
+        if request.form.get('undo') == '1':
+            self.user = None
+        else:
+            self.user = User.get_one(int(request.form['user_id']), is_deleted=False)
+
+    def _checkProtection(self):
+        if self.user:
+            RHAdminBase._checkProtection(self)
+
+    def _process(self):
+        if self.user:
+            impersonate_user(self.user)
+        else:
+            undo_impersonate_user()
+        return jsonify()
