@@ -15,7 +15,7 @@
             </tr>
         {% endif %}
 
-        {% if event.references and conf.getType() == "meeting" %}
+        {% if event.references and event.type_.name == "meeting" %}
             <tr id="eventReportNumbers">
                 <td class="leftCol">
                     {% trans %}External references{% endtrans %}

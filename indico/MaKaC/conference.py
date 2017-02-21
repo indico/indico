@@ -195,9 +195,6 @@ class Conference(CommonObjectBase):
             self._confPaperReview = ConferencePaperReview(self)
         return self._confPaperReview
 
-    def getType(self):
-        return self.as_event.type_.legacy_name
-
     @memoize_request
     def getContribTypeList(self):
         return self.as_event.contribution_types.all()
@@ -395,9 +392,6 @@ class DefaultConference(Conference):
 
     def __repr__(self):
         return '<DefaultConference()>'
-
-    def getType(self):
-        return 'conference'
 
     def notifyModification(self, *args, **kwargs):
         pass

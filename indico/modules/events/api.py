@@ -281,7 +281,7 @@ class SerializerBase(object):
             'room': event.get_room_name(full=False),
             'location': event.venue_name,
             'address': event.address,
-            'type': event.as_legacy.getType(),
+            'type': event.type_.legacy_name,
             'references': map(self.serialize_reference, event.references)
         }
 
