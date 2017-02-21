@@ -15,38 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.blueprints.event.management import event_mgmt
-from indico.web.flask.util import redirect_view
 from MaKaC.webinterface.rh import conferenceModif
 
-
-# Tools
-event_mgmt.add_url_rule('/tools/', 'confModifTools', redirect_view('event_mgmt.confModifTools-badgePrinting'))
 
 # Tools: Clone
 event_mgmt.add_url_rule('/clone', 'confModifTools-clone', conferenceModif.RHConfClone)
 event_mgmt.add_url_rule('/clone', 'confModifTools-performCloning', conferenceModif.RHConfPerformCloning,
                         methods=('POST',))
-
-# Tools: Posters
-event_mgmt.add_url_rule('/tools/posters/', 'confModifTools-posterPrinting', conferenceModif.RHConfPosterPrinting,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/posters/poster.pdf', 'confModifTools-posterPrintingPDF',
-                        conferenceModif.RHConfPosterPrintingPDF, methods=('POST',))
-event_mgmt.add_url_rule('/tools/posters/design', 'confModifTools-posterDesign', conferenceModif.RHConfPosterDesign,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/posters/background', 'confModifTools-posterGetBackground',
-                        conferenceModif.RHConfPosterGetBackground, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/posters/save-background', 'confModifTools-posterSaveBackground',
-                        conferenceModif.RHConfPosterSaveTempBackground, methods=('POST',))
-
-# Tools: Badges
-event_mgmt.add_url_rule('/tools/badges/', 'confModifTools-badgePrinting', conferenceModif.RHConfBadgePrinting,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/badges/badges.pdf', 'confModifTools-badgePrintingPDF',
-                        conferenceModif.RHConfBadgePrintingPDF, methods=('POST',))
-event_mgmt.add_url_rule('/tools/badges/design', 'confModifTools-badgeDesign', conferenceModif.RHConfBadgeDesign,
-                        methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/badges/background', 'confModifTools-badgeGetBackground',
-                        conferenceModif.RHConfBadgeGetBackground, methods=('GET', 'POST'))
-event_mgmt.add_url_rule('/tools/badges/save-background', 'confModifTools-badgeSaveBackground',
-                        conferenceModif.RHConfBadgeSaveTempBackground, methods=('POST',))

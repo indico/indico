@@ -59,7 +59,6 @@ class WPMConfClone(conferences.WPConfClone):
     def _getPageContent(self, params):
         p = conferences.WConferenceClone(self._conf)
         pars = {
-            "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
             "startTime": self._conf.as_event.start_dt_local.isoformat(),
             "cloneOptions": ''

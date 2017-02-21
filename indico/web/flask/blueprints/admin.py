@@ -16,7 +16,7 @@
 
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import admins, maintenance, templates, conferenceModif
+from MaKaC.webinterface.rh import admins, maintenance
 
 
 admin = IndicoBlueprint('admin', __name__, url_prefix='/admin')
@@ -39,19 +39,3 @@ admin.add_url_rule('/maintenance/clean-tmp/execute', 'adminMaintenance-performTm
 # Layout
 admin.add_url_rule('/layout/', 'adminLayout', redirect_view('.adminConferenceStyles'))
 admin.add_url_rule('/layout/styles/conference/', 'adminConferenceStyles', admins.RHConferenceStyles)
-
-# Badge templates
-admin.add_url_rule('/layout/badges/', 'badgeTemplates', templates.RHBadgeTemplates, methods=('GET', 'POST'))
-admin.add_url_rule('/layout/badges/save', 'badgeTemplates-badgePrinting', conferenceModif.RHConfBadgePrinting,
-                   methods=('GET', 'POST'))
-admin.add_url_rule('/layout/badges/pdf-options', 'adminLayout-setDefaultPDFOptions', templates.RHSetDefaultPDFOptions,
-                   methods=('POST',))
-admin.add_url_rule('/layout/badges/design', 'badgeTemplates-badgeDesign', templates.RHConfBadgeDesign,
-                   methods=('GET', 'POST'))
-
-# Poster templates
-admin.add_url_rule('/layout/posters/', 'posterTemplates', templates.RHPosterTemplates, methods=('GET', 'POST'))
-admin.add_url_rule('/layout/posters/save', 'posterTemplates-posterPrinting', conferenceModif.RHConfPosterPrinting,
-                   methods=('GET', 'POST'))
-admin.add_url_rule('/layout/posters/design', 'posterTemplates-posterDesign', templates.RHConfPosterDesign,
-                   methods=('GET', 'POST'))

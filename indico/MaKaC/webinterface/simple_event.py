@@ -54,7 +54,6 @@ class WPSEConfClone(conferences.WPConfClone):
     def _getPageContent(self, params):
         p = conferences.WConferenceClone(self._conf)
         pars = {
-            "cancelURL": urlHandlers.UHConfModifTools.getURL(self._conf),
             "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
             "startTime": self._conf.as_event.start_dt_local.isoformat(),
             "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
