@@ -30,8 +30,6 @@ from indico.modules.events.contributions.util import (get_contribution_ical_file
 from indico.modules.events.contributions.views import WPMyContributions, WPContributions, WPAuthorList, WPSpeakerList
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.paper_reviewing.forms import PaperUploadForm
-from indico.modules.events.paper_reviewing.legacy import get_reviewing_status
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.events.views import WPEventDisplay
 from indico.web.flask.util import send_file, jsonify_data
@@ -114,16 +112,6 @@ class RHContributionDisplay(RHContributionDisplayBase):
     view_class = WPContributions
 
     def _process(self):
-        if self.event_new.type == 'conference':
-            reviewing_status = get_reviewing_status(self.contrib, self._conf)
-            show_paper = ((self._conf.getConfPaperReview().hasReviewing() and
-                           self.contrib.can_manage(session.user, 'submit')) or reviewing_status == 'Accept')
-            paper_upload_form = PaperUploadForm()
-            paper_file_data = self.contrib.legacy_paper_files.filter_by(revision_id=None) if show_paper else None
-        else:
-            reviewing_status = paper_upload_form = paper_file_data = None
-            show_paper = False
-
         ical_params = get_base_ical_parameters(session.user, 'contributions',
                                                '/export/event/{0}.ics'.format(self.event_new.id))
         contrib = (Contribution.query
@@ -134,14 +122,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                             joinedload('timetable_entry').lazyload('*'))
                    .one())
         return self.view_class.render_template('display/contribution_display.html', self._conf,
-                                               contribution=contrib,
-                                               event=self.event_new,
-                                               reviewing_status=reviewing_status,
-                                               show_paper=show_paper,
-                                               can_submit_paper=self.contrib.can_manage(session.user, 'submit'),
-                                               paper_files=paper_file_data,
-                                               paper_upload_form=paper_upload_form,
-                                               **ical_params)
+                                               contribution=contrib, **ical_params)
 
 
 class RHAuthorList(RHDisplayProtectionBase):

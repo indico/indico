@@ -70,33 +70,7 @@ def get_users_for_role(contribution, role):
     return g.contribution_roles[contribution][role]
 
 
-def get_reviewing_status(contrib, conf):
-    from MaKaC.paperReviewing import ConferencePaperReview
-    review_manager = conf.getReviewManager(contrib)
-    versioning = review_manager.getVersioning()
-    last_review = review_manager.getLastReview()
-
-    if conf.getConfPaperReview().getChoice() == ConferencePaperReview.LAYOUT_REVIEWING:
-        if last_review.getEditorJudgement().isSubmitted():  # editor has accepted or rejected
-            return last_review.getEditorJudgement().getJudgement()
-        elif last_review.isAuthorSubmitted():
-            return 'Submitted'
-        elif len(versioning) > 1:  # there was a judgement 'To be corrected' or custom status
-            return versioning[-2].getEditorJudgement().getJudgement()
-    else:
-        if last_review.getRefereeJudgement().isSubmitted():  # referee has accepted or rejected
-            return last_review.getRefereeJudgement().getJudgement()
-        elif last_review.isAuthorSubmitted():
-            return 'Submitted'
-        elif len(versioning) > 1:  # there was a judgement 'To be corrected' or custom status
-            return versioning[-2].getRefereeJudgement().getJudgement()
-    if last_review.isAuthorSubmitted():
-        return 'Submitted'
-    return None
-
-
 class ConferencePaperReviewLegacyMixin(object):
-
     def addRefereeContribution(self, user, contribution):
         add_contribution_role(user.user, contribution, 'referee')
         self.notifyModification()
@@ -141,7 +115,6 @@ class ConferencePaperReviewLegacyMixin(object):
 
 
 class ReviewManagerLegacyMixin(object):
-
     @property
     @memoize_request
     def contribution(self):

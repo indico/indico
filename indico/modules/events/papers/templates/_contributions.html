@@ -1,5 +1,3 @@
-{% from 'events/contributions/display/_paper_reviewing.html' import render_paper_reviewing %}
-
 {% macro render_paper_section(contribution, show_paper=True) %}
     {% set paper = contribution.paper %}
     {% set show_paper = paper.accepted_revision and show_paper %}
@@ -15,7 +13,6 @@
             </div>
             {% if show_paper %}
                 {# TODO: Implement new accepted paper widget #}
-                {# {{ render_paper_reviewing(contribution, reviewing_status, paper_upload_form, paper_files, can_submit_paper) }} #}
             {% elif show_paper_status %}
                 {{ _render_paper_status_box(paper) }}
             {% elif show_paper_submission %}
