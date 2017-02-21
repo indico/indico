@@ -83,8 +83,8 @@ def process_identity(identity_info):
     login_user(user, identity)
 
 
-def login_user(user, identity=None):
-    """Sets the session user and performs on-login logic
+def login_user(user, identity=None, admin_impersonation=False):
+    """Set the session user and performs on-login logic
 
     When specifying `identity`, the provider/identitifer information
     is saved in the session so the identity management page can prevent
@@ -92,17 +92,21 @@ def login_user(user, identity=None):
 
     :param user: The :class:`~indico.modules.users.User` to log in to.
     :param identity: The :class:`Identity` instance used to log in.
+    :param admin_impersonation: Whether the login is an admin
+                                impersonating the user and thus should not
+                                be considered a login by the user.
     """
     avatar = user.as_avatar
     session.timezone = SessionTZ(avatar).getSessionTZ()
     session.user = user
     session.lang = user.settings.get('lang')
-    if identity:
-        identity.register_login(request.remote_addr)
-        session['login_identity'] = identity.id
-    else:
-        session.pop('login_identity', None)
-    user.synchronize_data()
+    if not admin_impersonation:
+        if identity:
+            identity.register_login(request.remote_addr)
+            session['login_identity'] = identity.id
+        else:
+            session.pop('login_identity', None)
+        user.synchronize_data()
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')

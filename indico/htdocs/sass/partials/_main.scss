@@ -202,14 +202,12 @@ div.impersonation-header {
     }
 
     .undo-login-as {
+        color: inherit;
         float: right;
         margin-right: 2px;
         vertical-align: middle;
-        cursor: pointer;
         font-size: 1.5em;
         line-height: 1em;
-        font-family: 'icomoon-ultimate';
-        content: "\3b";
     }
 }
 
