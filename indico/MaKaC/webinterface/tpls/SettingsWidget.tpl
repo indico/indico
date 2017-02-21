@@ -20,11 +20,15 @@
         <div class="settingsWidgetSection"><a href="${ url_for('users.user_dashboard', user_id=_session.user.id) }">${ _("My profile") }</a></div>
         <div class="settingsWidgetSection"><a href="${ url_for('users.user_preferences', user_id=_session.user.id) }">${ _("My preferences") }</a></div>
         % if _session.user.is_admin:
-            <div class="settingsWidgetSection"><a href="#" class="login-as">${ _("Login as...") }</a></div>
+            <div class="settingsWidgetSection">
+                <a href="#" class="login-as" data-href="${ url_for('auth.admin_impersonate') }">
+                    ${ _("Login as...") }
+                </a>
+            </div>
         % endif
         % if 'login_as_orig_user' in _session:
             <div class="settingsWidgetSection">
-                <a href="#" class="undo-login-as">
+                <a href="#" class="undo-login-as" data-href="${ url_for('auth.admin_impersonate') }">
                     ${ _("Switch back to") } ${ _session['login_as_orig_user']['user_name'] }
                 </a>
             </div>

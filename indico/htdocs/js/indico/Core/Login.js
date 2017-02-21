@@ -15,49 +15,51 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-function loginAs() {
-    var popup = new ChooseUsersPopup(
-        $T("Select user to log in as"), true, null, false,
-        true, true, true, true, false,
-        function(user) {
-            indicoRequest(
-                'admin.header.loginAs',
-                {
-                    userId: user[0]['id']
-                },
-                function(result, error) {
-                    if (!error) {
-                        // redirect to the same page
-                        window.location.reload();
-                    } else {
-                        IndicoUtil.errorReport(error);
-                    }
-                }
-            );
-        }, null, false);
-    popup.execute();
-}
+/* global ChooseUsersPopup:false */
 
-function undoLoginAs() {
-    indicoRequest('admin.header.undoLoginAs', {}, function(result, error) {
-        if (!error) {
-            window.location.reload();
+(function() {
+    'use strict';
+
+    function sendRequest(url, payload) {
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data: payload,
+            complete: IndicoUI.Dialogs.Util.progress(),
+            error: handleAjaxError,
+            success: function() {
+                IndicoUI.Dialogs.Util.progress();
+                location.reload();
+            }
+        });
+    }
+
+    function impersonateUser(url) {
+        function _userSelected(users) {
+            sendRequest(url, {user_id: users[0].id});
         }
-        else {
-            IndicoUtil.errorReport(error);
-        }
-    });
-}
 
-$(document).ready(function() {
-    $('.login-as').on('click', function(e) {
-        e.preventDefault();
-        loginAs();
-    });
+        var dialog = new ChooseUsersPopup(
+            $T("Select user to impersonate"),
+            true, null, false, true, null, true, true, false, _userSelected, null, false
+        );
 
+        dialog.execute();
+    }
 
-    $('.undo-login-as').on('click', function(e) {
-        e.preventDefault();
-        undoLoginAs();
+    function undoImpersonateUser(url) {
+        sendRequest(url, {undo: '1'});
+    }
+
+    $(document).ready(function() {
+        $('.login-as').on('click', function(evt) {
+            evt.preventDefault();
+            impersonateUser($(this).data('href'));
+        });
+
+        $('.undo-login-as').on('click', function(evt) {
+            evt.preventDefault();
+            undoImpersonateUser($(this).data('href'));
+        });
     });
-});
+})();

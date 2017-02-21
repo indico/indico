@@ -291,14 +291,6 @@ class ProtectedModificationService(ProtectedService):
             if target.getConference().as_event.is_locked:
                 raise ServiceAccessError("Conference %s is closed"%target.getConference().getId())
 
-class AdminService(LoggedOnlyService):
-    """
-    A AdminService can only be accessed by administrators
-    """
-    def _checkProtection(self):
-        LoggedOnlyService._checkProtection(self)
-        if not session.user.is_admin:
-            raise ServiceAccessError(_("Only administrators can perform this operation"))
 
 class TextModificationBase:
     """
