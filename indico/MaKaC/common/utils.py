@@ -16,8 +16,6 @@
 
 import os
 import re
-import time
-from datetime import datetime
 
 from indico.core.db import db
 from indico.util.date_time import format_datetime, format_date, format_time
@@ -65,6 +63,7 @@ def validMail(emailstr, allowMultiple=True):
                 return False
     return True
 
+
 def setValidEmailSeparators(emailstr):
     """
     Replace occurrences of separators in a string of email addresses by
@@ -98,65 +97,6 @@ def getEmailList(stri):
             emailList.append(email)
     return emailList
 
-
-def dictionaryToString(dico):
-    """ Convert the given dictionary to a string, which is returned.
-        Useful for HTML attributes (e.g. name="a" value="x" ...).
-    """
-    #check params
-    if not isinstance(dico, dict): return ""
-    #converting
-    attrString = " "
-    for item in dico.items():
-        if len(item)==2: #it should always be 2 (Better to prevent than to heal!)
-            attrName= str(item[0])
-            attrVal = str(item[1])
-            attrVal = attrVal.replace('"', "'") #remove double quotes : " -> '
-            attrString += """%s="%s" """%(attrName,attrVal)
-    return attrString
-
-def removeQuotes(myString):
-    """encode/replace problematics quotes."""
-    # XXX: why are we handling this one in a special way? there are more non-ascii quotes!
-    # http://en.wikipedia.org/wiki/Quotation_mark#Unicode_code_point_table
-    unicode_quote = u'\N{RIGHT SINGLE QUOTATION MARK}'.encode('utf-8')
-    return str(myString).strip().replace('"', '&quot;').replace("'", '&rsquo;').replace(unicode_quote, '&rsquo;')
-
-
-def putbackQuotes(myString):
-    """cancel (almost all) effects of function removeQuotes()."""
-    return str(myString).strip().replace("&quot;", '"').replace("&rsquo;", "'")
-
-
-def nodeValue(node):
-    """given a leaf node, returns its value."""
-    from xml.dom.minidom import Element,Text
-    if isinstance(node,Text):
-        return node.data
-    elif isinstance(node,Element) and node.firstChild!=None and isinstance(node.firstChild,Text):
-        return node.firstChild.data.encode('utf-8')
-    return ""
-
-def _bool(val):
-    """same as bool(), but returns False when you give "False"."""
-    if str(val).strip() == "False" :
-        return False
-    else: return bool(val)
-
-def _int(val):
-    """same as int(), but returns 0 when you give "" or None."""
-    if str(val).strip()=="" or val==None :
-        val=0
-    else:
-        return int(val)
-
-def _positiveInt(val):
-    """same as _int(), but returns 0 when you give a negative int."""
-    val = _int(val)
-    if val<0:
-        return 0
-    else:
-        return val
 
 def encodeUnicode(text, sourceEncoding = "utf-8"):
     try:
@@ -200,19 +140,6 @@ def formatTime(tm, format=None, locale=None, server_tz=False, tz=None):
         return format_time(tm, format, locale=locale, timezone=tz, server_tz=server_tz)
 
 
-def parseDate(dateStr, format='%d/%m/%Y'):
-    t=time.strptime(dateStr, format)
-    return datetime(t.tm_year,t.tm_mon, t.tm_mday).date()
-
-def prettyDuration(duration):
-    """Return duration 01:05 in a pretty format 1h05'"""
-    hours = duration.seconds/60/60
-    minutes = duration.seconds/60%60
-    if hours:
-        return "%sh%s'" % (hours, minutes)
-    else:
-        return "%s'" % minutes
-
 def formatDuration(duration, units = 'minutes', truncate = True):
     """ Formats a duration (a timedelta object)
     """
@@ -252,15 +179,6 @@ def formatDuration(duration, units = 'minutes', truncate = True):
         return result
 
 
-def parseDateTime(dateTimeStr):
-    t=time.strptime(dateTimeStr, '%d/%m/%Y %H:%M')
-    return datetime(t.tm_year,t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min)
-
-def normalizeToList(l):
-    if type(l) != list:
-        l=[l]
-    return l
-
 def getHierarchicalId(obj):
 
     """
@@ -277,6 +195,7 @@ def getHierarchicalId(obj):
     elif isinstance(obj, db.m.SessionBlock):
         return '{}.s{}.{}'.format(obj.event_new.id, obj.session.id, obj.id)
     return obj.id
+
 
 def resolveHierarchicalId(objId):
     """
