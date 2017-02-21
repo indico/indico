@@ -19,14 +19,12 @@
         {% endif %}
     {% endcall %}
 
-    {% set instructions = proposal.cfp.instructions %}
-    {% if instructions %}
-        {% call(link, endlink) render_instruction_box(form_id, instructions, _("Reviewing instructions")) %}
-           {% trans -%}
-               Please don't forget to read the {{ link }}reviewing instructions{{ endlink }} before submitting a review.
-           {%- endtrans %}
-        {% endcall %}
-    {% endif %}
+    {% set instructions = proposal.cfp.reviewing_instructions %}
+    {% call(link, endlink) render_instruction_box(form_id, instructions, _("Reviewing instructions")) %}
+       {% trans -%}
+           Please don't forget to read the {{ link }}reviewing instructions{{ endlink }} before submitting a review.
+       {%- endtrans %}
+    {% endcall %}
 
     {% if not review %}
         {% if proposal.proposal_type == 'abstract' %}
