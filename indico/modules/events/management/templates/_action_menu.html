@@ -1,0 +1,184 @@
+{% macro _change_type_confirmation(type) %}
+    {% trans -%}
+        Changing the event type to <strong>{{ type }}</strong> will change the look of the event page
+        and may disable some features not available for the new event type.
+    {%- endtrans %}
+{% endmacro %}
+
+
+{% macro _render_change_event_type(event, event_types) %}
+    <button class="i-button borderless icon-wrench arrow js-dropdown" data-toggle="dropdown">
+        {% trans %}Change type{% endtrans %}
+    </button>
+    <ul class="dropdown">
+        {% for type, title in event_types %}
+            <li>
+                {% if type == event.type_.name %}
+                    <a class="disabled" title="{% trans %}This is the event's current type.{% endtrans %}">
+                        {{ title }}
+                    </a>
+                {% else %}
+                    <a data-href="{{ url_for('event_management.change_type', event) }}"
+                       data-method="POST"
+                       data-params="{{ {'type': type} | tojson | forceescape }}"
+                       data-title="{% trans %}Confirm type change{% endtrans %}"
+                       data-confirm="{{ _change_type_confirmation(title) }}"
+                       data-ajax>
+                        {{ title }}
+                    </a>
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+
+{% macro _render_lock_event(event) %}
+    {% if event.is_locked %}
+        <button class="i-button borderless icon-lock-center disabled"
+                title="{% trans %}This event is already locked.{% endtrans %}">
+            {% trans %}Lock{% endtrans %}
+        </button>
+    {% elif not event.can_lock(session.user) %}
+        <button class="i-button borderless icon-lock-center disabled"
+                title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
+            {% trans %}Lock{% endtrans %}
+        </button>
+    {% else %}
+        <button class="i-button borderless icon-lock-center"
+                title="{% trans %}Lock event{% endtrans %}"
+                data-href="{{ url_for('event_management.lock', event) }}"
+                data-ajax-dialog>
+            {% trans %}Lock{% endtrans %}
+        </button>
+    {% endif %}
+{% endmacro %}
+
+
+{% macro _render_move_event(event) %}
+    <button class="i-button borderless icon-transmission js-ajax-dialog-move"
+            title="{% trans %}Move event to another category{% endtrans %}"
+            data-href="{{ url_for('event_management.move', event) }}"
+            data-category-id="{{ event.category.id }}">
+        {% trans %}Move{% endtrans %}
+    </button>
+{% endmacro %}
+
+
+{% macro _render_delete_event(event) %}
+    <button class="i-button borderless icon-remove danger"
+            title="{% trans %}Delete event{% endtrans %}"
+            data-qtip-style="danger"
+            data-href="{{ url_for('event_management.delete', event) }}"
+            data-ajax-dialog>
+        {% trans %}Delete{% endtrans %}
+    </button>
+{% endmacro %}
+
+
+{% macro render_action_menu(event, event_types) %}
+    {% set clones = event.clones|rejectattr('is_deleted')|list %}
+
+    <div class="action-menu">
+        <div class="toolbar">
+            {% if event.can_manage(session.user) %}
+                <div class="group">
+                    <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
+                       title="{% trans %}Clone event{% endtrans %}">Clone</a>
+                    {% if clones %}
+                        <a id="action-menu-clones-target" class="i-button label clickable arrow">{{ clones|length }}</a>
+                    {% endif %}
+                </div>
+
+                <a id="action-menu-actions-target" class="i-button icon-settings i-button arrow"
+                   title="{% trans %}Event actions{% endtrans %}"></a>
+
+                <div id="action-menu-actions">
+                    <div class="action-menu-buttons">
+                        {{ _render_move_event(event) }}
+                        {{ _render_lock_event(event) }}
+                        {{ _render_delete_event(event) }}
+                        {{ _render_change_event_type(event, event_types) }}
+                    </div>
+                </div>
+
+                <div id="action-menu-clones">
+                    {% trans %}Events cloned from the current event:{% endtrans %}
+                    <ul>
+                        {% for clone in clones %}
+                            <li>
+                                <a href="{{ url_for('event_management.settings', clone) }}"
+                                   title="{{ clone.title }}" data-qtip-position="left">
+                                    {{ clone.start_dt | format_date(timezone=clone.tzinfo) }}
+                                </a>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            'use strict';
+
+            // TODO: move to JS file
+            $('.js-ajax-dialog-move').on('click', function(evt) {
+                evt.preventDefault();
+
+                var $this = $(this);
+                $('<div>').categorynavigator({
+                    openInDialog: true,
+                    actionOn: {
+                        categoriesWithSubcategories: {
+                            disabled: true
+                        },
+                        categoriesWithoutEventCreationRights: {
+                            disabled: true
+                        },
+                        categories: {
+                            disabled: true,
+                            ids: [$this.data('category-id')]
+                        }
+                    },
+                    onAction: function(category) {
+                        var msg = $T.gettext('You are about to move the event to the category "{0}". Are you sure you want to proceed?').format(category.title);
+                        confirmPrompt(msg, $T.gettext('Move event')).then(function() {
+                            $.ajax({
+                                url: $this.data('href'),
+                                type: 'POST',
+                                data: {'target_category_id': category.id},
+                                error: handleAjaxError,
+                                success: function(data) {
+                                    if (data.success) {
+                                        location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    }
+                });
+            });
+
+            $('#action-menu-clones-target').qbubble({
+                content: {
+                    text: $('#action-menu-clones')
+                }
+            });
+
+            $('#action-menu-actions-target').qbubble({
+                content: {
+                    text: $('#action-menu-actions')
+                },
+                style: {
+                    classes: 'qtip-allow-overflow'
+                }
+            });
+
+            $('#action-menu-actions button:not(.js-dropdown), #action-menu-actions a:not(.disabled)').on('click', function() {
+                $('#action-menu-actions-target').qbubble('hide');
+            });
+        })();
+    </script>
+{% endmacro %}

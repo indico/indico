@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.models.events import EventType
+from indico.web.flask.templating import get_template_module
 from MaKaC.webinterface.pages.base import WPJinjaMixin
 from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
 
@@ -33,3 +35,17 @@ class WPEventSettings(WPEventManagement):
 
 class WPEventProtection(WPEventManagement):
     sidemenu_option = 'protection'
+
+
+# TODO: once all legacy event management code is gone, use jinja inheritance like we do in category management
+def render_event_management_frame(event, body, active_menu_item):
+    tpl = get_template_module('events/management/_management_frame.html')
+    return tpl.render_management_frame(event=event,
+                                       body=body,
+                                       active_menu_item=active_menu_item,
+                                       event_types=[(et.name, et.title) for et in EventType])
+
+
+def render_event_management_header_right(event):
+    tpl = get_template_module('events/management/_management_frame.html')
+    return tpl.render_event_management_header_right(event=event, event_types=[(et.name, et.title) for et in EventType])

@@ -32,8 +32,9 @@ from indico.web.flask.util import url_for
 
 @unify_event_args
 def can_lock(event, user):
-    """Checks whether a user can lock/unlock an event."""
-    return user and (user.is_admin or user == event.creator or event.category.can_manage(user))
+    """Check whether a user can lock/unlock an event."""
+    # TODO: remove this and call the method directly
+    return event.can_lock(user)
 
 
 class _ProtectedObjectWrapper(object):
