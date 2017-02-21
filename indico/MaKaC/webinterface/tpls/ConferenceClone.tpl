@@ -23,7 +23,7 @@
         return next.toDate();
     };
 
-    var startTime = new Date(${ startTime } * 1000);
+    var startTime = moment(${startTime|n,j}).toDate();
 
     // Clone on given date
     var formattedDate = Util.formatDateTime(nextWeekly(startTime), IndicoDateTimeFormats.DefaultHourless);
