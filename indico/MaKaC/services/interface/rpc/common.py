@@ -17,10 +17,10 @@
 import sys
 import traceback
 from MaKaC.common.fossilize import Fossilizable, fossilizes
-from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil, IWarningFossil, IResultWithWarningFossil
+from MaKaC.fossils.error import ICausedErrorFossil, INoReportErrorFossil
+
 
 class CausedError(Exception, Fossilizable):
-
     """
     A normal error, triggered on the server side
     """
@@ -55,6 +55,7 @@ class CausedError(Exception, Fossilizable):
                 inner = self.inner
             return "%s : %s\r\n\r\nInner Exception:\r\n%s" % (self.code, self.message, inner)
 
+
 class NoReportError(CausedError):
     """
     An error that doesn't get reported (no log entry, no warning e-mail,
@@ -77,18 +78,22 @@ class NoReportError(CausedError):
     def getExplanation(self):
         return self._explanation
 
+
 class CSRFError(NoReportError):
     def __init__(self):
         NoReportError.__init__(self, _('Oops, looks like there was a problem with your current session. Please refresh the page and try again.'))
         self.code = 'ERR-CSRF'
 
+
 class RequestError(CausedError):
     pass
+
 
 class ProcessError(CausedError):
 
     def __init__(self, code, message):
         CausedError.__init__(self, code, message, inner = traceback.format_exception(*sys.exc_info()))
+
 
 class ServiceError(CausedError):
     def __init__(self, code='', message='', inner = None):
@@ -98,38 +103,7 @@ class ServiceError(CausedError):
 class HTMLSecurityError(CausedError):
     pass
 
+
 class ServiceAccessError(NoReportError):
     pass
 
-
-
-class Warning(Fossilizable):
-
-    fossilizes(IWarningFossil)
-
-    def __init__(self, title, content):
-        self._title = title
-        self._content = content
-
-    def getTitle(self):
-        return self._title
-
-    def getProblems(self):
-        return self._content
-
-class ResultWithWarning(Fossilizable):
-
-    fossilizes(IResultWithWarningFossil)
-
-    def __init__(self, result, warning):
-        self._result = result
-        self._warning = warning
-
-    def getResult(self):
-        return self._result
-
-    def getWarning(self):
-        return self._warning
-
-    def hasWarning(self):
-        return True

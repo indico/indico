@@ -91,7 +91,6 @@ indico_core = rjs_bundle(
                'Interaction/Base.js',
                'Widgets/Base.js',
                'Widgets/Inline.js',
-               'Widgets/DateTime.js',
                'Widgets/Menu.js',
                'Widgets/RichText.js',
                'Widgets/Navigation.js',
@@ -112,7 +111,6 @@ indico_management = rjs_bundle(
     *namespace('js/indico/Management',
 
                'RoomBooking.js',
-               'PaperReviewing.js',
                'RoomBookingMapOfRooms.js'))
 
 indico_room_booking = rjs_bundle(

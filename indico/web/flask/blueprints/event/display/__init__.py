@@ -19,5 +19,4 @@ from indico.web.flask.wrappers import IndicoBlueprint
 event = IndicoBlueprint('event', __name__, url_prefix='/event/<confId>')
 
 import indico.web.flask.blueprints.event.display.main
-import indico.web.flask.blueprints.event.display.paperreviewing
 import indico.web.flask.blueprints.event.display.misc

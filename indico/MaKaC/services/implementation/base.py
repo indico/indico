@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
 import distutils
 import os
 import sys
@@ -24,24 +23,14 @@ from datetime import datetime, date
 from flask import request, session
 from pytz import timezone
 
-
-from MaKaC.common.timezoneUtils import setAdjustedDate
-from MaKaC.common import security
-from MaKaC.common.utils import parseDateTime
-
-from MaKaC.errors import MaKaCError, HtmlForbiddenTag, TimingError
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError, Warning,\
-    ResultWithWarning
-
-from MaKaC.webinterface.rh.base import RequestHandlerBase
-
-from MaKaC.accessControl import AccessWrapper
-
-from MaKaC.i18n import _
-from MaKaC.common.contextManager import ContextManager
-
 from indico.core.config import Config
 from indico.util.string import unicode_struct_to_utf8
+from MaKaC.accessControl import AccessWrapper
+from MaKaC.common import security
+from MaKaC.common.contextManager import ContextManager
+from MaKaC.errors import MaKaCError, HtmlForbiddenTag
+from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError
+from MaKaC.webinterface.rh.base import RequestHandlerBase
 
 
 class ExpectedParameterException(ServiceError):
@@ -268,123 +257,3 @@ class LoggedOnlyService(ProtectedService):
 
     def _checkProtection( self ):
         self._checkSessionUser()
-
-
-class ProtectedModificationService(ProtectedService):
-    """
-    A ProtectedModificationService can only be accessed by users that
-    are authorized to modify the target resource
-    """
-    def _checkProtection( self ):
-        """
-        Overloads ProtectedService._checkProtection, so that it is
-        verified if the user has modification access to the resource
-        """
-
-        target = self._target
-        if not target.canModify( self.getAW() ):
-            if self._getUser() is None:
-                self._checkSessionUser()
-            else:
-                raise ServiceAccessError("You don't have the rights to modify this object")
-        if hasattr(self._target, "getConference") and hasattr(self._target, "as_event"):
-            if target.getConference().as_event.is_locked:
-                raise ServiceAccessError("Conference %s is closed"%target.getConference().getId())
-
-
-class TextModificationBase:
-    """
-    Base class for text field modification
-    """
-
-    def _getAnswer( self ):
-        """ Calls _handleGet() or _handleSet() on the derived classes, in order to make it happen. Provides
-            them with self._value.
-
-            When calling _handleGet(), it will return the value to return.
-            When calling _handleSet(), it will return:
-            -either self._value if there were no problems
-            -either a FieldModificationWarning object (pickled) if there are warnings to give to the user
-        """
-
-        # fetch the 'value' parameter (default for text)
-        if self._params.has_key('value'):
-            self._value = self._params['value']
-        else:
-            # None if not passed
-            self._value = None
-
-        if self._value == None:
-            return self._handleGet()
-        else:
-            setResult = self._handleSet()
-            if isinstance(setResult, Warning):
-                return ResultWithWarning(self._value, setResult).fossilize()
-            else:
-                return self._value
-
-class HTMLModificationBase:
-    """
-    Base class for HTML field modification
-    """
-    def _getAnswer( self ):
-        """
-        Calls _handle() on the derived classes, in order to make it happen. Provides
-        them with self._value.
-        """
-
-        if self._params.has_key('value'):
-            self._value = self._params['value']
-        else:
-            self._value = None
-
-        if self._value == None:
-            return self._handleGet()
-        else:
-            self._handleSet()
-
-        return self._value
-
-
-class DateTimeModificationBase( TextModificationBase ):
-    """ Date and time modification base class
-        Its _handleSet method is called by TextModificationBase's _getAnswer method.
-        DateTimeModificationBase's _handletSet method will call the _setParam method
-        from the classes that inherits from DateTimeModificationBase.
-        _handleSet will return whatever _setParam returns (usually None if there were no problems,
-        or a FieldModificationWarning object with information about a problem / warning to give to the user)
-    """
-    def _handleSet(self):
-        try:
-            naiveDate = parseDateTime(self._value)
-        except ValueError:
-            raise ServiceError("ERR-E2",
-                               "Date/time is not in the correct format")
-
-        try:
-            self._pTime = setAdjustedDate(naiveDate, self._conf)
-            return self._setParam()
-        except TimingError,e:
-            raise ServiceError("ERR-E2", e.getMessage())
-
-
-class ListModificationBase:
-    """ Base class for a list modification.
-        The class that inherits from this must have:
-        -a _handleGet() method that returns a list.
-        -a _handleSet() method which can use self._value to process the input. self._value will be a list.
-    """
-
-    def _getAnswer(self):
-        if self._params.has_key('value'):
-            pm = ParameterManager(self._params)
-            self._value = pm.extract("value", pType=list, allowEmpty=True)
-        else:
-            self._value = None
-
-        if self._value == None:
-            return self._handleGet()
-        else:
-            self._handleSet()
-
-        return self._value
