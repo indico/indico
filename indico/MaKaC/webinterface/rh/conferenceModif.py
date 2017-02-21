@@ -92,23 +92,23 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         if self._cloneType is None:
             raise FormValuesError( _("""Please choose a cloning interval for this event"""))
         elif self._cloneType == "once" :
-            self._date = datetime( int(params["stdyo"]), \
-                                int(params["stdmo"]), \
-                                int(params["stddo"]), \
-                                int(self._conf.getAdjustedStartDate().hour), \
-                                int(self._conf.getAdjustedStartDate().minute) )
+            self._date = datetime( int(params["stdyo"]),
+                                int(params["stdmo"]),
+                                int(params["stddo"]),
+                                int(self.event_new.start_dt_local.hour),
+                                int(self.event_new.start_dt_local.minute))
         elif self._cloneType == "intervals" :
-            self._date = datetime( int(params["indyi"]), \
-                                int(params["indmi"]), \
-                                int(params["inddi"]), \
-                                int(self._conf.getAdjustedStartDate().hour), \
-                                int(self._conf.getAdjustedStartDate().minute) )
+            self._date = datetime( int(params["indyi"]),
+                                int(params["indmi"]),
+                                int(params["inddi"]),
+                                int(self.event_new.start_dt_local.hour),
+                                int(self.event_new.start_dt_local.minute))
         elif self._cloneType == "days" :
-            self._date = datetime( int(params["indyd"]), \
-                                int(params["indmd"]), \
-                                int(params["inddd"]), \
-                                int(self._conf.getAdjustedStartDate().hour), \
-                                int(self._conf.getAdjustedStartDate().minute) )
+            self._date = datetime( int(params["indyd"]),
+                                int(params["indmd"]),
+                                int(params["inddd"]),
+                                int(self.event_new.start_dt_local.hour),
+                                int(self.event_new.start_dt_local.minute))
         self._confirm = params.has_key( "confirm" )
         self._cancel = params.has_key( "cancel" )
 
@@ -117,7 +117,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         paramNames = params.keys()
         #we notify the event in case any plugin wants to add their options
         if self._cancel:
-            self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
+            self._redirect(urlHandlers.UHConfClone.getURL(self._conf))
         elif self._confirm:
             if self._cloneType == "once" :
                 newConf = self._conf.clone(self._date)

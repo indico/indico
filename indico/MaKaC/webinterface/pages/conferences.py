@@ -114,7 +114,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         wc = wcomponents.WConferenceHeader(self._getAW(), self._conf)
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(), \
+                             "confId": self._conf.id,
                              "dark": True} )
 
     @property
@@ -227,7 +227,7 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["bgColorCode"] = layout_settings.get(self._conf, 'header_background_color').replace("#", "")
         vars["textColorCode"] = layout_settings.get(self._conf, 'header_text_color').replace("#", "")
 
-        vars["confId"] = self._conf.getId()
+        vars["confId"] = self._conf.id
         vars["conf"] = self._conf
         return vars
 
@@ -457,7 +457,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(),\
+                             "confId": str(self._conf.id),
                              "currentView": self._view,\
                              "type": self._type,\
                              "selectedDate": self._params.get("showDate",""),\
@@ -688,7 +688,7 @@ class WConferenceClone(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
         vars["confTitle"] = self.__conf.as_event.title.encode('utf-8')
-        vars["confId"] = self.__conf.getId()
+        vars["confId"] = self.__conf.id
         vars["selectDay"] = self._getSelectDay()
         vars["selectMonth"] = self._getSelectMonth()
         vars["selectYear"] = self._getSelectYear()
@@ -1209,7 +1209,7 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         return "%s%s%s"%( self._getHeader(), body, self._getFooter() )
 
     def _getBody( self, params ):
-        params['confId'] = self._conf.getId()
+        params['confId'] = self._conf.id
         params['conf'] = self._conf
 
         ###############################

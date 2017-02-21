@@ -12,7 +12,7 @@ else:
     </div>
      <script type="text/javascript">
          % if conf:
-             $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "/event/"+${conf.getId()});
+             $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "/event/"+${conf.as_event.id});
              % if conf.as_event.is_protected:
                   $("#mobileURL").prop("href", $("#mobileURL").prop("href") + "?pr=yes");
              % endif

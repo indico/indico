@@ -62,8 +62,8 @@
         {% endif %}
 
         {% if event.has_note or event.can_manage(session.user) %}
-            {{ render_note(conf.note, hidden=not theme_settings.show_notes, can_edit=event.can_manage(session.user),
-                           for_event=conf) }}
+            {{ render_note(event.note, hidden=not theme_settings.show_notes, can_edit=event.can_manage(session.user),
+                           for_event=event) }}
         {% endif %}
 
         <div class="event-body">

@@ -289,8 +289,8 @@ class SerializerBase(object):
         data = self._build_event_api_data_base(event)
         data.update({
             '_fossil': 'conference',
-            'adjustedStartDate': self._serialize_date(event.as_legacy.getAdjustedStartDate()),
-            'adjustedEndDate': self._serialize_date(event.as_legacy.getAdjustedEndDate()),
+            'adjustedStartDate': self._serialize_date(event.start_dt_local),
+            'adjustedEndDate': self._serialize_date(event.end_dt_local),
             'bookedRooms': Conversion.reservationsList(event.reservations.all()),
             'supportInfo': {
                 '_fossil': 'supportInfo',

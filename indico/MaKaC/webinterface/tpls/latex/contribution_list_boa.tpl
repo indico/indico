@@ -32,7 +32,7 @@
     %% first page
     \frontmatter
     <%block name="first_page">
-        <%include file="inc/first_page.tpl" args="conf=conf,title=_('Report of Abstracts'),show_dates=True"/>
+        <%include file="inc/first_page.tpl" args="event=conf.as_event,title=_('Report of Abstracts'),show_dates=True"/>
     </%block>
 
     % if boa_text:
@@ -57,7 +57,7 @@
     <%block name="book_body">
         % for contrib in contribs:
             % if contrib.can_access(aw):
-                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.title | latex_escape}}{300pt} / ${_("Report of Abstracts") | latex_escape}}
+                \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.as_event.title | latex_escape}}{300pt} / ${_("Report of Abstracts") | latex_escape}}
                 \phantomsection
                 \addcontentsline{toc}{chapter}{${contrib.title | latex_escape}}
 
