@@ -37,7 +37,6 @@ from indico.util.string import return_ascii, is_legacy_id
 from indico.util.user import unify_user_args
 
 from MaKaC import fileRepository
-from MaKaC.badge import BadgeTemplateManager
 from MaKaC.common.fossilize import Fossilizable
 from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
@@ -46,7 +45,6 @@ from MaKaC.common.PickleJar import Updates
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
-from MaKaC.poster import PosterTemplateManager
 from MaKaC.trashCan import TrashCanManager
 
 
@@ -114,9 +112,6 @@ class Conference(CommonObjectBase):
     def __init__(self, id=''):
         self.id = id
         self._modificationDS = nowutc()
-
-        self.__badgeTemplateManager = BadgeTemplateManager(self)
-        self.__posterTemplateManager = PosterTemplateManager(self)
         self._confPaperReview = ConferencePaperReview(self)
 
     @return_ascii
@@ -370,44 +365,6 @@ class Conference(CommonObjectBase):
         # further improvements
         return True
 
-    def getBadgeTemplateManager(self):
-        try:
-            if self.__badgeTemplateManager:
-                pass
-        except AttributeError:
-            self.__badgeTemplateManager = BadgeTemplateManager(self)
-        return self.__badgeTemplateManager
-
-    def setBadgeTemplateManager(self, badgeTemplateManager):
-        self.__badgeTemplateManager = badgeTemplateManager
-
-    def getPosterTemplateManager(self):
-        try:
-            if self.__posterTemplateManager:
-                pass
-        except AttributeError:
-            self.__posterTemplateManager = PosterTemplateManager(self)
-
-        return self.__posterTemplateManager
-
-    def setPosterTemplateManager(self, posterTemplateManager):
-        self.__posterTemplateManager = posterTemplateManager
-
-
-class DefaultConference(Conference):
-    """ 'default' conference, which stores the
-     default templates for posters and badges
-    """
-
-    def __init__(self):
-        Conference.__init__(self, id='default')
-
-    def __repr__(self):
-        return '<DefaultConference()>'
-
-    def notifyModification(self, *args, **kwargs):
-        pass
-
 
 class ConferenceHolder( ObjectHolder ):
     """Specialised ObjectHolder dealing with conference objects. It gives a
@@ -428,9 +385,6 @@ class ConferenceHolder( ObjectHolder ):
         ObjectHolder.add(self, conf)
 
     def getById(self, id, quiet=False):
-        if id == 'default':
-            return HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference()
-
         id = str(id)
         if is_legacy_id(id):
             mapping = LegacyEventMapping.find_first(legacy_event_id=id)
