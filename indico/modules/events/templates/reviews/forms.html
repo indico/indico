@@ -9,7 +9,7 @@
     {% set url = proposal.get_save_review_url(group=group, review=review) %}
     {% set form_id = 'group-review-form-%s'|format(group.id) %}
     {% call form_header(form, action=url, orientation='vertical', id=form_id, classes='review-form') %}
-        {% if on_pageload and on_pageload_url %}
+        {% if on_pageload %}
             data-href="{{ url }}"
             data-form-container="#review-timeline-input .js-form-container"
             data-update="#reviewing-page"
