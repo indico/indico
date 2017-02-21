@@ -19,22 +19,12 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.modules.events.layout.util import MenuEntryData, get_menu_entry_by_name
-from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
 from indico.util.i18n import _
 
 
 def _visibility_my_conference(event):
     return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
                              get_menu_entry_by_name('my_sessions', event).is_visible)
-
-
-def _visibility_paper_review(event):
-    return event.as_legacy.getConfPaperReview().hasReviewing()
-
-
-def _visibility_paper_review_transfer(event):
-    return (session.user and _visibility_paper_review(event) and
-            has_contributions_with_user_as_submitter(event, session.user))
 
 
 def get_default_menu_entries():
@@ -52,68 +42,5 @@ def get_default_menu_entries():
             endpoint='event.myconference',
             position=7,
             visible=_visibility_my_conference
-        ),
-        MenuEntryData(
-            title=_("Paper Reviewing (old)"),
-            name='paper_reviewing_old',
-            endpoint='event.paperReviewingDisplay',
-            position=8,
-            visible=_visibility_paper_review
-        ),
-        MenuEntryData(
-            title=_("Manage Paper Reviewing"),
-            name='paper_setup',
-            endpoint='event_mgmt.confModifReviewing-paperSetup',
-            visible=_visibility_paper_review,
-            position=0,
-            parent='paper_reviewing_old'
-        ),
-        MenuEntryData(
-            title=_("Assign Papers"),
-            name='paper_assign',
-            endpoint='event_mgmt.assignContributions',
-            visible=_visibility_paper_review,
-            position=1,
-            parent='paper_reviewing_old'
-        ),
-        MenuEntryData(
-            title=_("Referee Area"),
-            name='contributions_to_judge',
-            endpoint='event_mgmt.confListContribToJudge',
-            visible=_visibility_paper_review,
-            position=2,
-            parent='paper_reviewing_old'
-        ),
-        MenuEntryData(
-            title=_("Content Reviewer Area"),
-            name='contributions_as_reviewer',
-            endpoint='event_mgmt.confListContribToJudge-asReviewer',
-            visible=_visibility_paper_review,
-            position=3,
-            parent='paper_reviewing_old'
-        ),
-        MenuEntryData(
-            title=_("Layout Reviewer Area"),
-            name='contributions_as_editor',
-            endpoint='event_mgmt.confListContribToJudge-asEditor',
-            visible=_visibility_paper_review,
-            position=4,
-            parent='paper_reviewing_old'
-        ),
-        MenuEntryData(
-            title=_("Upload Paper"),
-            name='paper_upload',
-            endpoint='event.paperReviewingDisplay-uploadPaper',
-            visible=_visibility_paper_review_transfer,
-            position=5,
-            parent='paper_reviewing_old'
-        ),
-        MenuEntryData(
-            title=_("Download Template"),
-            name='download_template',
-            endpoint='event.paperReviewingDisplay-downloadTemplate',
-            visible=_visibility_paper_review_transfer,
-            position=6,
-            parent='paper_reviewing_old'
         )
     ]

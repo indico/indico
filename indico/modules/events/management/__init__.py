@@ -36,32 +36,12 @@ def _sidemenu_sections(sender, **kwargs):
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
-    # Some legacy handling of menu items
-    # Once those parts are modularized, we will be able to include them
-    # conditionally from their respective modules.
-
-    from indico.modules.events.models.events import EventType
-
-    can_modify = event.can_manage(session.user)
-    rb_active = Config.getInstance().getIsRoomBookingActive()
-
-    is_conference = event.type_ == EventType.conference
-    paper_review = event.as_legacy.getConfPaperReview()
-    is_review_staff = paper_review.isInReviewingTeam(session.avatar)
-
-    if can_modify:
+    if event.can_manage(session.user):
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
-        if rb_active:
+        if Config.getInstance().getIsRoomBookingActive():
             yield SideMenuItem('room_booking', _('Room Booking'),
                                url_for('event_mgmt.rooms_booking_list', event),
                                50,
                                icon='location')
-    if is_conference:
-        if can_modify or is_review_staff:
-            yield SideMenuItem('paper_reviewing', _('Paper Reviewing'),
-                               url_for('event_mgmt.confModifReviewing-access', event),
-                               section='organization')
-
-    if can_modify:
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
                            60, icon='shield')
