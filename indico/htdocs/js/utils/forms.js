@@ -38,10 +38,15 @@
             var active = !!((!requiredValues.length && value) ||
                             (requiredValues.length && _.contains(requiredValues, value)));
             field.closest('.form-group').toggle(active);
-            if (!field.is(':input')) {
-                field.find(':input').prop('disabled', !active);
-            } else if (!field.data('initiallyDisabled')) {
-                field.prop('disabled', !active);
+            var realField = field.is(':input') ? field : field.find(':input');
+            if (realField.length) {
+                // Selectize clones the field and copies the `required` flag so we need
+                // to make sure to also disable the clone to avoid validation errors!
+                var selectizeField = realField[0].selectize ? $('#{0}-selectized'.format(realField[0].id)) : $();
+                if (!field.data('initiallyDisabled')) {
+                    realField.prop('disabled', !active);
+                    selectizeField.prop('disabled', !active);
+                }
             }
         });
     }
