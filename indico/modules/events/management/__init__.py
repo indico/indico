@@ -63,8 +63,5 @@ def _sidemenu_items(sender, event, **kwargs):
                                section='organization')
 
     if can_modify:
-        yield SideMenuItem('utilities', _('Utilities'),
-                           url_for('event_mgmt.confModifTools', event),
-                           section='advanced')
         yield SideMenuItem('protection', _('Protection'), url_for('event_management.protection', event),
                            60, icon='shield')

@@ -16,10 +16,8 @@
 
 # MaKaC
 import MaKaC.common.info as info
-import MaKaC.webinterface.pages.conferences as conferences
 import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 from MaKaC.webinterface.pages.main import WPMainBase
 
 # indico
@@ -101,22 +99,9 @@ class WPTemplatesCommon( WPAdminsBase ):
 
         self._subTabCSSTpls = self._tabCtrl.newTab( "styles", _("Conference Styles"), \
                 urlHandlers.UHAdminsConferenceStyles.getURL() )
-        self._subTabBadges = self._tabCtrl.newTab( "badges", _("Badges"), \
-                urlHandlers.UHBadgeTemplates.getURL() )
-        self._subTabPosters = self._tabCtrl.newTab( "posters", _("Posters"), \
-                urlHandlers.UHPosterTemplates.getURL() )
 
     def _getPageContent(self, params):
         return wcomponents.WTabControl( self._tabCtrl, self._getAW() ).getHTML( self._getTabContent( params ) )
-
-
-class WPBadgeTemplatesBase(WPTemplatesCommon):
-
-    def getCSSFiles(self):
-        return WPTemplatesCommon.getCSSFiles(self) + self._asset_env['indico_badges_css'].urls()
-
-    def getJSFiles(self):
-        return WPTemplatesCommon.getJSFiles(self) + self._includeJSPackage('badges_js')
 
 
 class WPAdminsConferenceStyles( WPTemplatesCommon ):
@@ -137,161 +122,6 @@ class WAdminsConferenceStyles(wcomponents.WTemplated):
         cssTplsModule=ModuleHolder().getById("cssTpls")
         vars["cssTplsModule"] = cssTplsModule
         return vars
-
-
-class WPBadgeTemplates(WPBadgeTemplatesBase):
-    pageURL = "badgeTemplates.py"
-
-    def __init__(self, rh):
-        WPBadgeTemplatesBase.__init__(self, rh)
-
-    def _getTabContent( self, params ):
-        wp = WBadgeTemplates(info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference())
-        return wp.getHTML(params)
-
-    def _setActiveTab( self ):
-        self._subTabBadges.setActive()
-
-
-class WPPosterTemplates(WPBadgeTemplatesBase):
-    pageURL = "posterTemplates.py"
-
-    def __init__(self, rh):
-        WPBadgeTemplatesBase.__init__(self, rh)
-
-    def _getTabContent( self, params ):
-        wp = WPosterTemplates(info.HelperMaKaCInfo.getMaKaCInfoInstance().getDefaultConference())
-        return wp.getHTML(params)
-
-    def _setActiveTab(self):
-        self._subTabPosters.setActive()
-
-
-class WPBadgeTemplateDesign(WPBadgeTemplatesBase):
-
-    def __init__(self, rh, conf, templateId=None, new=False):
-        WPBadgeTemplatesBase.__init__(self, rh)
-        self._conf = conf
-        self.__templateId = templateId
-        self.__new = new
-
-    def _setActiveTab(self):
-        self._subTabBadges.setActive()
-
-    def _getTabContent(self, params):
-        wc = conferences.WConfModifBadgeDesign(self._conf, self.__templateId, self.__new)
-        return wc.getHTML()
-
-
-class WPPosterTemplateDesign(WPBadgeTemplatesBase):
-
-    def __init__(self, rh, conf, templateId=None, new=False):
-        WPBadgeTemplatesBase.__init__(self, rh)
-        self._conf = conf
-        self.__templateId = templateId
-        self.__new = new
-
-    def _setActiveTab(self):
-        self._subTabPosters.setActive()
-
-    def _getTabContent(self, params):
-        wc = conferences.WConfModifPosterDesign(self._conf, self.__templateId, self.__new)
-        return wc.getHTML()
-
-
-class WBadgePosterTemplatingBase(wcomponents.WTemplated):
-
-    DEF_TEMPLATE_BADGE = None
-
-    def __init__(self, conference, user=None):
-        wcomponents.WTemplated.__init__(self)
-        self._conf = conference
-        self._user = user
-
-    def getVars(self):
-        uh = urlHandlers
-        vars = wcomponents.WTemplated.getVars(self)
-        vars['NewDefaultTemplateURL'] = str(self.DEF_TEMPLATE_BADGE.getURL(self._conf,
-                                                                             self._conf.getBadgeTemplateManager().getNewTemplateId(), new=True))
-
-        vars['templateList'] = self._getTemplates()
-        self._addExtras(vars)
-
-        return vars
-
-    def _getConfTemplates(self):
-        """
-        To be overridden in inheriting class.
-        """
-        pass
-
-    def _getTemplates(self):
-        templates = []
-        rawTemplates = self._getConfTemplates()
-        rawTemplates.sort(lambda x, y: cmp(x[1].getName(), y[1].getName()))
-
-        for templateId, template in rawTemplates:
-            templates.append(self._processTemplate(templateId, template))
-
-        return templates
-
-    def _addExtras(self, vars):
-        """
-        To be overridden in inheriting class, adds specific entries
-        into the dictionary vars which the child implementation may require.
-        """
-        pass
-
-    def _processTemplate(self, templateId, template):
-        """
-        To be overridden in inheriting class, takes the template and its
-        ID, the child then processes the data into the format it expects later.
-        """
-        pass
-
-
-class WBadgeTemplates(WBadgePosterTemplatingBase):
-
-    DEF_TEMPLATE_BADGE = urlHandlers.UHModifDefTemplateBadge
-
-    def _addExtras(self, vars):
-        vars['PDFOptions'] = WConfModifBadgePDFOptions(self._conf,
-                                                       showKeepValues=False,
-                                                       showTip=False).getHTML()
-
-    def _getConfTemplates(self):
-        return self._conf.getBadgeTemplateManager().getTemplates().items()
-
-    def _processTemplate(self, templateId, template):
-        uh = urlHandlers
-
-        data = {
-            'name': template.getName(),
-            'urlEdit': str(uh.UHConfModifBadgeDesign.getURL(self._conf, templateId)),
-            'urlDelete': str(uh.UHConfModifBadgePrinting.getURL(self._conf, deleteTemplateId=templateId))
-        }
-
-        return data
-
-
-class WPosterTemplates(WBadgePosterTemplatingBase):
-
-    DEF_TEMPLATE_BADGE = urlHandlers.UHModifDefTemplatePoster
-
-    def _getConfTemplates(self):
-        return self._conf.getPosterTemplateManager().getTemplates().items()
-
-    def _processTemplate(self, templateId, template):
-        uh = urlHandlers
-
-        data = {
-            'name': template.getName(),
-            'urlEdit': str(uh.UHConfModifPosterDesign.getURL(self._conf, templateId)),
-            'urlDelete': str(uh.UHConfModifPosterPrinting.getURL(self._conf, deleteTemplateId=templateId)),
-            'urlCopy': str(uh.UHConfModifPosterPrinting.getURL(self._conf, copyTemplateId=templateId))
-        }
-
-        return data
 
 
 class WPAdminsSystemBase(WPAdminsBase):

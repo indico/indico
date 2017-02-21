@@ -62,7 +62,6 @@ from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data, jsonify_template
 from MaKaC.common.cache import GenericCache
 from MaKaC.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
-from MaKaC.webinterface.pages.conferences import WConfModifBadgePDFOptions
 
 
 badge_cache = GenericCache('badge-printing')
@@ -392,7 +391,6 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     def _process(self):
         badge_templates = sorted((tpl for tpl in get_all_templates(self.event_new) if tpl.type.name == 'badge'),
                                  key=attrgetter('title'))
-        pdf_options = WConfModifBadgePDFOptions(self._conf).getHTML()
         settings = event_badge_settings.get_all(self.event_new.id)
         form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
@@ -411,7 +409,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             return jsonify_data(flash=False, redirect=download_url)
         return jsonify_template('events/registration/management/print_badges.html', event=self.event_new,
                                 regform=self.regform, settings_form=form, templates=badge_templates,
-                                pdf_options=pdf_options, registrations=registrations)
+                                registrations=registrations)
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):

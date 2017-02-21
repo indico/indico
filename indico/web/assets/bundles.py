@@ -176,11 +176,6 @@ indico_jquery = rjs_bundle(
 
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
-indico_badges_js = rjs_bundle('indico_badges', 'js/indico/Management/ConfModifBadgePosterPrinting.js')
-
-indico_badges_css = Bundle('css/badges.css',
-                           filters='cssmin', output='css/indico_badges_%(version)s.min.css')
-
 fonts_sass = Bundle('sass/partials/_fonts.scss',
                     filters=('pyscss', 'cssmin'), output='css/indico_fonts_%(version)s.min.css')
 
@@ -439,7 +434,6 @@ def register_all_js(env):
     env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
-    env.register('indico_badges_js', indico_badges_js)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('statistics_js', statistics_js)
@@ -498,7 +492,6 @@ def register_all_css(env, main_css_file):
         output='css/base_%(version)s.min.css')
 
     env.register('base_css', base_css)
-    env.register('indico_badges_css', indico_badges_css)
     env.register('jqplot_css', jqplot_css)
     env.register('dropzone_css', dropzone_css)
     env.register('selectize_css', selectize_css)

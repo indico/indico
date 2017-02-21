@@ -24,21 +24,12 @@ class MaKaCInfo(Persistent):
     """Holds and manages general information and data concerning each system"""
 
     def __init__(self):
-        # Global poster/badge templates
-        self._defaultConference = None
-
         # Define the volume used in archiving:
         # e.g. /afs/cern.ch/project/indico/XXXX/2008/...
         # XXXX will be replaced by self._archivingVolume
         # if self._archivingVolume is empty the path would be:
         # /afs/cern.ch/project/indico/2008/...
         self._archivingVolume = ""
-
-    def getDefaultConference(self):
-        from MaKaC.conference import DefaultConference
-        if self._defaultConference is None:
-            self._defaultConference = DefaultConference()
-        return self._defaultConference
 
     def setArchivingVolume(self, volume):
         if isinstance(volume, str):
