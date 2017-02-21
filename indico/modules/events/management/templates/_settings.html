@@ -8,7 +8,7 @@
 {% endmacro %}
 
 
-{% macro render_section(event, icon, edit_endpoint, edit_title, ajax_update=true) %}
+{% macro render_section(event, icon, edit_endpoint, edit_title) %}
     <div class="section">
         <div class="icon {{ icon }}"></div>
         <div class="text">
@@ -19,11 +19,8 @@
                     title="{{ edit_title }}"
                     data-href="{{ url_for(edit_endpoint, event) }}"
                     data-title="{{ edit_title }}"
-                    {% if ajax_update %}
-                        data-update="#event-settings-container"
-                    {% else %}
-                        data-reload-after
-                    {% endif %}
+                    data-update='{"settings_box": "#event-settings-container",
+                                  "right_header": "#event-management-header-right"}'
                     data-ajax-dialog></button>
         </div>
     </div>
@@ -31,7 +28,7 @@
 
 
 {% macro render_event_settings(event) %}
-    {% call render_section(event, 'icon-home', '.edit_data', _('Edit basic event data'), ajax_update=false) %}
+    {% call render_section(event, 'icon-home', '.edit_data', _('Edit basic event data')) %}
         <dl class="i-data-list">
             <dt>{% trans %}Title{% endtrans %}</dt>
             <dd>{{ event.title }}</dd>
@@ -56,7 +53,7 @@
         </dl>
     {% endcall %}
 
-    {% call render_section(event, 'icon-calendar', '.edit_dates', _('Edit event dates'), ajax_update=false) %}
+    {% call render_section(event, 'icon-calendar', '.edit_dates', _('Edit event dates')) %}
         {% set tz = event.tzinfo %}
 
         <dl class="i-data-list">
