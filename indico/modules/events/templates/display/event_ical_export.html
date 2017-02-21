@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block extra_download %}
-    {% if item.type != 'lecture' %}
+    {% if item.type_.name != 'lecture' %}
         <div class="iCalExportSection">
             <a class="icon-calendar" href="{{ url_for('events.export_event_ical', item, detail='contributions') }}">
                 {% trans %}Detailed timetable calendar file{% endtrans %}
@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block extra_info %}
-    {% if item.getType() != 'lecture' %}
+    {% if item.type_.name != 'lecture' %}
         <input type="checkbox" id="detailExport{{ item.id }}"> {% trans %}Detailed timetable{% endtrans %}
     {% endif %}
 {% endblock %}

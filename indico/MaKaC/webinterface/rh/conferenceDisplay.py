@@ -23,6 +23,7 @@ from indico.core import signals
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.legacy import XMLEventSerializer
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
@@ -69,21 +70,21 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
 
 class MeetingRendererMixin:
     def render_meeting_page(self, conf, view, hide_frame=False):
-        evt_type = conf.getType()
+        evt_type = conf.as_event.type_
         view = view or conf.as_event.theme
 
         # if the current view is invalid, use the default
         if view not in theme_settings.themes:
-            view = theme_settings.defaults[evt_type]
+            view = theme_settings.defaults[evt_type.name]
 
         if view in theme_settings.xml_themes:
             if hide_frame:
                 self._responseUtil.content_type = 'text/xml'
-            return conferences.WPXSLConferenceDisplay(self, conf, view, evt_type, self._reqParams)
+            return conferences.WPXSLConferenceDisplay(self, conf, view, evt_type.legacy_name, self._reqParams)
         elif view == "static":
             return conferences.WPConferenceDisplay(self, conf)
         else:
-            return conferences.WPTPLConferenceDisplay(self, conf, view, evt_type, self._reqParams)
+            return conferences.WPTPLConferenceDisplay(self, conf, view, evt_type.legacy_name, self._reqParams)
 
 
 class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
@@ -107,7 +108,7 @@ class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
         warningText = ""
 
         # create the html factory
-        if self._target.getType() == "conference":
+        if self.event_new.type_ == EventType.conference:
             if params.get("ovw", False):
                 p = conferences.WPConferenceDisplay( self, self._target )
             else:

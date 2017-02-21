@@ -27,6 +27,7 @@ from indico.modules.attachments.controllers.util import SpecificFolderMixin
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
 from indico.modules.attachments.views import (WPEventFolderDisplay, WPPackageEventAttachmentsDisplayConference,
                                               WPPackageEventAttachmentsDisplay)
+from indico.modules.events.models.events import EventType
 
 
 class RHDownloadEventAttachment(DownloadAttachmentMixin, RHConferenceBase):
@@ -58,7 +59,7 @@ class RHPackageEventAttachmentsDisplay(AttachmentPackageMixin, RHConferenceBaseD
 
     @property
     def wp(self):
-        if self._conf.getType() == 'conference':
+        if self.event_new.type_ == EventType.conference:
             return WPPackageEventAttachmentsDisplayConference
         else:
             return WPPackageEventAttachmentsDisplay

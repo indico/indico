@@ -26,7 +26,7 @@ ${ template_hook('global-announcement') }
 
     % if 'needsBackButton' in locals() and needsBackButton:
         <a href="${ urlHandlers.UHConferenceDisplay.getURL(self_._conf) }" style=class="eventHeaderButtonBar">${ _('Go back to Conference') }<div class="leftCorner"></div></a>
-    % elif conf.getType() != "conference" or displayNavigationBar:
+    % elif conf.as_event.type != "conference" or displayNavigationBar:
         <a id="homeButton" href="${ url_for_index() }"
            style="background-image: url(${ systemIcon('home') }); margin-left: 10px"></a>
 
@@ -73,7 +73,7 @@ ${ template_hook('global-announcement') }
                 ${ _("iCal export") }
                 <div class="leftCorner"></div>
             </a>
-            ${ template_hook('event-ical-export', event=self_._conf) }
+            ${ template_hook('event-ical-export', event=self_._conf.as_event) }
         % endif
 
         % if showMoreButton:
@@ -106,7 +106,7 @@ ${ template_hook('global-announcement') }
 
 </div>
 
-% if conf.getType() != 'conference':
+% if conf.as_event.type != 'conference':
     ${ render_template('flashed_messages.html') }
 % endif
 
