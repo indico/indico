@@ -19,7 +19,7 @@ from datetime import datetime, timedelta
 import pytest
 import pytz
 
-from indico.core.settings import SettingsProxy, FallbackSettingsProxy
+from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
 from indico.core.settings.proxy import PrefixSettingsProxy
 from indico.modules.events.settings import EventSettingsProxy
@@ -170,53 +170,6 @@ def test_set_multi_propagate(mocker):
     })
     Setting.set_multi.assert_called_once_with('foo', {'reg': 'bar'})
     SettingPrincipal.set_acl_multi.assert_called_with('foo', {'acl': {'u'}})
-
-
-@pytest.mark.usefixtures('db')
-def test_fallback_settings_get():
-    local_proxy = SettingsProxy('local', {'person': None})
-    parent_proxy = SettingsProxy('parent', {'person': 'dave'})
-    fallback_proxy = FallbackSettingsProxy(local_proxy, parent_proxy)
-    local_proxy.set('person', 'local')
-    parent_proxy.set('person', 'not_a_local')
-
-    assert fallback_proxy.get('person') == 'local'
-    local_proxy.delete('person')
-    assert fallback_proxy.get('person') == 'not_a_local'
-    parent_proxy.delete('person')
-    assert fallback_proxy.get('person') == 'dave'
-
-
-@pytest.mark.usefixtures('db')
-def test_fallback_settings_get_default():
-    local_proxy = SettingsProxy('local', {'person': None})
-    parent_proxy = SettingsProxy('parent', {'person': 'dave'})
-    fallback_proxy = FallbackSettingsProxy(local_proxy, parent_proxy)
-    local_proxy.set('person', 'local')
-    parent_proxy.set('person', 'not_a_local')
-
-    assert fallback_proxy.get('person', default='foo') == 'local'
-    local_proxy.delete('person')
-    assert fallback_proxy.get('person', default='foo') == 'not_a_local'
-    parent_proxy.delete('person')
-    assert fallback_proxy.get('person', default='foo') == 'foo'
-
-
-@pytest.mark.usefixtures('db')
-def test_fallback_settings_get_all():
-    local_proxy = SettingsProxy('local', {'person': None, 'animal': None})
-    parent_proxy = SettingsProxy('parent', {'person': 'dave'})
-    fallback_proxy = FallbackSettingsProxy(local_proxy, parent_proxy)
-    local_proxy.set('person', 'local')
-    parent_proxy.set('person', 'not_a_local')
-
-    assert fallback_proxy.get_all() == {'person': 'local'}
-    local_proxy.delete('person')
-    assert fallback_proxy.get_all() == {'person': 'not_a_local'}
-    parent_proxy.delete('person')
-    assert fallback_proxy.get_all() == {'person': 'dave'}
-    local_proxy.set('animal', 'bo')
-    assert fallback_proxy.get_all() == {'person': 'dave', 'animal': 'bo'}
 
 
 def test_prefix_settings_invalid():
