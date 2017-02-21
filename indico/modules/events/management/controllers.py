@@ -33,7 +33,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.management.forms import (EventProtectionForm, EventDataForm, EventDatesForm,
                                                     EventLocationForm, EventPersonsForm, EventContactInfoForm,
                                                     EventClassificationForm, PosterPrintingForm)
-from indico.modules.events.management.util import can_lock, flash_if_unregistered
+from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import (WPEventSettings, WPEventProtection,
                                                     render_event_management_header_right)
 from indico.modules.events.models.events import EventType
@@ -174,7 +174,7 @@ class RHLockEvent(RHManageEventBase):
 
     def _checkProtection(self):
         RHManageEventBase._checkProtection(self)
-        if not can_lock(self.event_new, session.user):
+        if not self.event_new.can_lock(session.user):
             raise Forbidden
 
     def _process_GET(self):
@@ -190,7 +190,7 @@ class RHUnlockEvent(RHManageEventBase):
     """Unlock an event."""
 
     def _checkProtection(self):
-        self._allowClosed = can_lock(self.event_new, session.user)
+        self._allowClosed = self.event_new.can_lock(session.user)
         RHManageEventBase._checkProtection(self)
 
     def _process(self):

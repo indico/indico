@@ -20,7 +20,6 @@ from flask import session
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.modules.events.management.util import can_lock
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, SideMenuSection

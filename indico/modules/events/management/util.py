@@ -24,17 +24,9 @@ from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
-from indico.util.event import unify_event_args
 from indico.util.i18n import _, ngettext
 from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
-
-
-@unify_event_args
-def can_lock(event, user):
-    """Check whether a user can lock/unlock an event."""
-    # TODO: remove this and call the method directly
-    return event.can_lock(user)
 
 
 class _ProtectedObjectWrapper(object):
