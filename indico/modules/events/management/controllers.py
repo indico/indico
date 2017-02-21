@@ -34,7 +34,8 @@ from indico.modules.events.management.forms import (EventProtectionForm, EventDa
                                                     EventLocationForm, EventPersonsForm, EventContactInfoForm,
                                                     EventClassificationForm, PosterPrintingForm)
 from indico.modules.events.management.util import can_lock, flash_if_unregistered
-from indico.modules.events.management.views import WPEventSettings, WPEventProtection
+from indico.modules.events.management.views import (WPEventSettings, WPEventProtection,
+                                                    render_event_management_header_right)
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import (delete_event, update_event_protection, update_event, update_event_type,
                                               lock_event, unlock_event)
@@ -98,7 +99,8 @@ class RHEditEventDataBase(RHManageEventBase):
         if form.validate_on_submit():
             with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
                 update_event(self.event_new, **form.data)
-            return jsonify_data(flash=False, html=self.render_settings_box())
+            return jsonify_data(flash=False, settings_box=self.render_settings_box(),
+                                right_header=render_event_management_header_right(self.event_new))
         self.commit = False
         return self.render_form(form)
 
