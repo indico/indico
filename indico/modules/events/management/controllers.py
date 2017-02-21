@@ -44,6 +44,7 @@ from indico.modules.events.sessions.operations import update_session_coordinator
 from indico.modules.events.util import get_object_from_args, update_object_principals, track_time_changes
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
@@ -88,12 +89,16 @@ class RHEditEventDataBase(RHManageEventBase):
     def render_form(self, form):
         return jsonify_form(form)
 
+    def render_settings_box(self):
+        tpl = get_template_module('events/management/_settings.html')
+        return tpl.render_event_settings(self.event_new)
+
     def _process(self):
         form = self.form_class(obj=self.event_new, event=self.event_new)
         if form.validate_on_submit():
             with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
                 update_event(self.event_new, **form.data)
-            return jsonify_data(flash=False)
+            return jsonify_data(flash=False, html=self.render_settings_box())
         self.commit = False
         return self.render_form(form)
 
