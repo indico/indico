@@ -31,8 +31,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import jsonify_data
 
-from MaKaC.webinterface.rh.contribMod import RCContributionPaperReviewingStaff
-
 
 def _render_paper_file_list(contrib):
     tpl = get_template_module('events/contributions/display/_paper_reviewing.html')
@@ -115,8 +113,7 @@ class RHDownloadPaperFile(RHContributionDisplayBase):
     }
 
     def _checkProtection(self):
-        has_pr_rights = RCContributionPaperReviewingStaff.hasRights(self)
-        if not self.contrib.can_manage(session.user, 'submit') and not has_pr_rights:
+        if not self.contrib.can_manage(session.user, 'submit'):
             raise Forbidden
 
     def _checkParams(self, params):

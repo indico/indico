@@ -995,7 +995,7 @@ You have been chosen as a %s for the conference entitled "%s" in order to help w
 
 Kind regards,
 Indico on behalf of "%s"
-""" % ( user.getStraightFullName(), role, conference.getTitle(), urlHandlers.UHPaperReviewingDisplay.getURL(conference), conference.getTitle()))
+""" % ( user.getStraightFullName(), role, conference.getTitle(), '', conference.getTitle()))
 
 class ConferenceReviewingRemoveNotification(GenericNotification):
     """ Template to build an email notification to a removed PRM / Referee / Editor / Reviewer / Abstract Manager / Abstract Reviewer
