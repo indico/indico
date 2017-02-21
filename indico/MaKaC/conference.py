@@ -92,6 +92,19 @@ class CommonObjectBase(CoreObject, Fossilizable):
             raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
 
 
+def warn_on_access(fn):
+    import warnings
+    from functools import wraps
+
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if Config.getInstance().getDebug():
+            warnings.warn('Called {}'.format(fn.__name__), stacklevel=2)
+        return fn(*args, **kwargs)
+
+    return wrapper
+
+
 class Conference(CommonObjectBase):
     """This class represents the real world conferences themselves. Objects of
         this class will contain basic data about the confence and will provide
@@ -112,22 +125,27 @@ class Conference(CommonObjectBase):
         return '<Conference({0}, {1}, {2})>'.format(self.id, self.title, self.startDate)
 
     @property
+    @warn_on_access
     def startDate(self):
         return self.as_event.start_dt
 
     @property
+    @warn_on_access
     def endDate(self):
         return self.as_event.end_dt
 
     @property
+    @warn_on_access
     def timezone(self):
         return self.as_event.timezone.encode('utf-8')
 
     @property
+    @warn_on_access
     def title(self):
         return self.as_event.title.encode('utf-8')
 
     @property
+    @warn_on_access
     def description(self):
         return self.as_event.description.encode('utf-8')
 
@@ -160,6 +178,7 @@ class Conference(CommonObjectBase):
     as_new = as_event
 
     @property
+    @warn_on_access
     def tz(self):
         from MaKaC.common.timezoneUtils import DisplayTZ
         return DisplayTZ(conf=self).getDisplayTZ()
@@ -216,6 +235,7 @@ class Conference(CommonObjectBase):
         """Returns the date in which the conference was created"""
         return self.as_event.created_dt
 
+    @warn_on_access
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
         return self.id
@@ -245,13 +265,16 @@ class Conference(CommonObjectBase):
     def getConference( self ):
         return self
 
+    @warn_on_access
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
         return self.startDate
 
+    @warn_on_access
     def getUnixStartDate(self):
         return datetimeToUnixTimeInt(self.startDate)
 
+    @warn_on_access
     def getAdjustedStartDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
@@ -259,10 +282,12 @@ class Conference(CommonObjectBase):
             tz = 'UTC'
         return self.getStartDate().astimezone(timezone(tz))
 
+    @warn_on_access
     def getEndDate(self):
         """returns (datetime) the ending date of the conference"""
         return self.endDate
 
+    @warn_on_access
     def getAdjustedEndDate(self,tz=None):
         if not tz:
             tz = self.getTimezone()
@@ -270,12 +295,14 @@ class Conference(CommonObjectBase):
             tz = 'UTC'
         return self.getEndDate().astimezone(timezone(tz))
 
+    @warn_on_access
     def getTimezone(self):
         try:
             return self.timezone
         except AttributeError:
             return 'UTC'
 
+    @warn_on_access
     def getTitle(self):
         """returns (String) the title of the conference"""
         return self.title
