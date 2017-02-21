@@ -15,11 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import exceptions
 import urllib
 import pkg_resources
 from flask import session
-from lxml import etree
 from speaklater import _LazyString
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
@@ -28,9 +26,6 @@ from MaKaC.i18n import _
 from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import Conference
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.common import utils
-from MaKaC.errors import MaKaCError
-from MaKaC.common.ContextHelp import ContextHelp
 from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.TemplateExec as templateEngine
 
@@ -105,12 +100,6 @@ class WTemplated:
         else:
             self.tplFile = self._getSpecificTPL(tplDir, self.tplId)
 
-        hfile = self._getSpecificTPL(os.path.join(tplDir,'chelp'),
-                                              self.tplId,
-                                              extension='wohl')
-
-        self.helpFile = os.path.join('chelp', hfile)
-
     def getVars( self ):
         """Returns a dictionary containing the TPL variables that will
             be passed at the TPL formating time. For this class, it will
@@ -144,33 +133,10 @@ class WTemplated:
         if params != None:
             self.__params = params
 
-        # include context help info, if it exists
-        helpText = None
-        if os.path.exists(self.helpFile):
-            try:
-                fh = open( self.helpFile, "r")
-                helpText = fh.read()
-                fh.close()
-            except exceptions.IOError:
-                pass
-
         vars = self.getVars()
-
         vars['__rh__'] = self._rh
         vars['self_'] = self
-
-        tempHTML = templateEngine.render(self.tplFile, vars, self)
-
-        if helpText == None:
-            return tempHTML
-        else:
-            try:
-                return ContextHelp().merge(self.tplId, tempHTML, helpText)
-            except etree.LxmlError, e:
-                if tempHTML.strip() == '':
-                    raise MaKaCError(_("Template " + str(self.tplId) + " produced empty output, and it has a .wohl file. Error: " + str(e)))
-                else:
-                    raise
+        return templateEngine.render(self.tplFile, vars, self)
 
     @staticmethod
     def htmlText(param):
@@ -686,24 +652,6 @@ class WBannerModif(WTemplated):
         """
 
         return WTemplated.getHTML(self, {"type" : self._type, "path": self._path, "title": self._title})
-
-
-class WListOfPapersToReview(WBannerModif):
-
-    def __init__(self, target, user ):
-        ## PATH
-        # Iterate till conference is reached
-        conf = target.event_new.as_legacy
-        if user == "referee":
-            path = [{"url": urlHandlers.UHConfModifListContribToJudge.getURL(conf), "title":_("Contributions list")}]
-        if user == "reviewer":
-            path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsReviewer.getURL(conf), "title":_("Contributions list")}]
-        if user == "editor":
-            path = [{"url": urlHandlers.UHConfModifListContribToJudgeAsEditor.getURL(conf), "title":_("Contributions list")}]
-        # TITLE AND TYPE
-        itemType = type(target).__name__
-        title = target.title
-        WBannerModif.__init__(self, path, itemType, title)
 
 
 class WConfirmation(WTemplated):

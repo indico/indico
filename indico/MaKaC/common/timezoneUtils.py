@@ -35,19 +35,6 @@ def utc2server(date, naive=True):
     return servertime
 
 
-def setAdjustedDate(date, object=None, tz=None):
-    # Localizes a date to the timezone tz
-    # tz can be a string (preferred) or a pytz.timezone object
-    # If tz is None, the timezone of the object is used
-    if not tz:
-        tz = object.getTimezone()
-    if isinstance(tz, basestring):
-        tz = timezone(tz)
-    if tz.zone not in all_timezones:
-        tz = timezone('UTC')
-    return tz.localize(date).astimezone(timezone('UTC'))
-
-
 def getAdjustedDate(date, object=None, tz=None):
     # Returns a date adjusted to the timezone tz
     # tz can be string (preferred) or a pytz.timezone object

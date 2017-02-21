@@ -14,18 +14,16 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import zipfile
-import tempfile
-import string
 import os
+import string
+import tempfile
+import zipfile
 
-from MaKaC.common.utils import utf8rep
 from indico.core.config import Config
-from indico.util.fs import secure_filename
+from MaKaC.common.utils import utf8rep
 
 
 class ZIPFileHandler:
-
     def __init__(self):
         (fh, name) = tempfile.mkstemp(prefix="Indico", dir=Config.getInstance().getTempDir())
         os.fdopen(fh).close()
@@ -65,40 +63,3 @@ class ZIPFileHandler:
             if zfile.filename == fileName:
                 return True
         return False
-
-
-class ReviewingPacker:
-
-    """
-        Package the reviewing materials for the accepted papers
-    """
-
-    def __init__(self, conf):
-        self._conf = conf
-        self._confDirName = "%s" % self._normalisePathItem(self._conf.getTitle().strip())
-        self._items = 0
-
-    def getItems(self):
-        return self._items
-
-    def _normalisePathItem(self, name):
-        return str(name).translate(string.maketrans("",""),"\\/")
-
-    def pack(self, fileHandler=None):
-        for contribution in self._conf.as_event.contributions:
-            reviewingStatus = self._conf.getReviewManager(contribution).getLastReview().getRefereeJudgement().getJudgement()
-            if reviewingStatus == "Accept":
-                dirName = secure_filename(contribution.title, fallback='')
-                self._packContribution(contribution, dirName, fileHandler)
-
-        fileHandler.close()
-        return fileHandler.getPath()
-
-    def _packContribution(self, contribution, dirName="", fileHandler=None):
-        for mat in self._conf.getReviewManager(contribution).getLastReview().materials:
-            self._items += 1
-            with mat.get_local_path() as file_path:
-                fileHandler.add("%s" % (os.path.join(self._confDirName,
-                                                     self._normalisePathItem(contribution.id) + "-" + dirName,
-                                                     self._normalisePathItem(mat.filename))),
-                                file_path)

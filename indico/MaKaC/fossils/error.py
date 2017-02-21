@@ -13,8 +13,10 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from MaKaC.common.fossilize import IFossil
 from MaKaC.webinterface.common.tools import escape_html
+
 
 class ICausedErrorFossil(IFossil):
 
@@ -31,6 +33,7 @@ class ICausedErrorFossil(IFossil):
     def getType(self):
         pass
 
+
 class INoReportErrorFossil(ICausedErrorFossil):
 
     def getTitle(self):
@@ -42,24 +45,3 @@ class INoReportErrorFossil(ICausedErrorFossil):
         """
         Additional error information (can be shown on the client side)
         """
-
-class IWarningFossil(IFossil):
-
-    def getTitle(self):
-        """ Title of the Warning """
-
-    def getProblems(self):
-        """ Content of the Warning """
-    getProblems.name = "content"
-
-class IResultWithWarningFossil(IFossil):
-
-    def getResult(self):
-        """ Result """
-
-    def getWarning(self):
-        """ Warning """
-    getWarning.result = IWarningFossil
-
-    def hasWarning(self):
-        """ Whether the result has a Warning or not """
