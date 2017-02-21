@@ -60,8 +60,8 @@
                 </div>
             </div>
             <div class="toolbar">
-                <a href="#" class="i-button highlight js-show-abstract-form"
-                   data-title="{% trans title=contribution.title%}Submit paper for {{ title }}{% endtrans %}"
+                <a href="#" class="i-button highlight"
+                   data-title="{% trans title=contribution.title %}Submit paper for &quot;{{ title }}&quot;{% endtrans %}"
                    data-href="{{ url_for('papers.submit_revision', contribution) }}"
                    data-redirect-after="{{ url_for('papers.paper_timeline', contribution) }}"
                    data-confirm-close-unsaved

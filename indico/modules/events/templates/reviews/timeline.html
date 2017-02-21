@@ -114,7 +114,6 @@
 
 {% macro render_review(review, form) %}
     {% set no_content = not review.comment and not review.ratings %}
-    {% set rating_range = review.proposal.cfp.rating_range %}
     {% set ratings = review.ratings|rejectattr('question.is_deleted')|sort(attribute='question.position') %}
     {% set proposal = review.revision.proposal %}
     <div id="proposal-review-{{ review.id }}" class="i-timeline-item">
@@ -140,7 +139,7 @@
                 {% endif %}
             </div>
             <div class="i-timeline-item-box header-indicator-top {% if not review.comment %}header-only{% endif %}"
-                 {% if not review.comment %}data-no-comment{% endif %}>
+                {% if not review.comment %}data-no-comment{% endif %}>
                 <div class="i-box-header flexrow">
                     <div class="review-badges">
                         {% if proposal.proposal_type == 'abstract' %}
