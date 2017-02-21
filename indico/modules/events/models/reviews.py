@@ -37,9 +37,12 @@ class ProposalGroupProxy(object):
         self.instance = group
 
     def __eq__(self, other):
-        if not isinstance(other, ProposalGroupProxy):
+        if isinstance(other, ProposalGroupProxy):
+            return self.instance == other.instance
+        elif isinstance(other, type(self.instance)):
+            return self.instance == other
+        else:
             return False
-        return self.instance == other.instance
 
     def __hash__(self):
         return hash(self.instance)
@@ -60,6 +63,9 @@ class ProposalGroupProxy(object):
     @locator_property
     def locator(self):
         return self.instance.locator
+
+    def __repr__(self):
+        return '<ProposalGroupProxy: {}>'.format(self.instance)
 
 
 class ProposalRevisionMixin(object):
