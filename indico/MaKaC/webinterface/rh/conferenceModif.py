@@ -147,7 +147,8 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
 
         if params["intEndDateChoice"] == "until":
             date=self._date
-            endDate = datetime(int(params["stdyi"]),int(params["stdmi"]),int(params["stddi"]), self._conf.getEndDate().hour,self._conf.getEndDate().minute)
+            endDate = datetime(int(params["stdyi"]), int(params["stdmi"]), int(params["stddi"]),
+                               self.event_new.end_dt.hour, self.event_new.end_dt.minute)
             while date <= endDate:
                 if confirmed:
                     self._conf.clone(date)
@@ -246,7 +247,8 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         if params["daysEndDateChoice"] == "until":
             date = self._date
 
-            endDate = datetime(int(params["stdyd"]),int(params["stdmd"]),int(params["stddd"]),self._conf.getEndDate().hour,self._conf.getEndDate().minute)
+            endDate = datetime(int(params["stdyd"]), int(params["stdmd"]), int(params["stddd"]),
+                               self.event_new.end_dt.hour, self.event_new.end_dt.minute)
 
             if params["day"] == "OpenDay":
                 rd = self._getOpenDay(date, params["order"])

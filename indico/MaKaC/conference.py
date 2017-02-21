@@ -43,7 +43,6 @@ from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.timezoneUtils import datetimeToUnixTimeInt
 from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
@@ -269,10 +268,6 @@ class Conference(CommonObjectBase):
     def getStartDate(self):
         """returns (datetime) the starting date of the conference"""
         return self.startDate
-
-    @warn_on_access
-    def getUnixStartDate(self):
-        return datetimeToUnixTimeInt(self.startDate)
 
     @warn_on_access
     def getAdjustedStartDate(self,tz=None):
