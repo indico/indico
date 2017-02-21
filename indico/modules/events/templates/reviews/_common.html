@@ -25,20 +25,22 @@
 {% endmacro %}
 
 {% macro render_instruction_box(container_id, instructions, title) %}
-    {% set link %}
-        <a data-title="{{ title }}"
-           data-content="#{{ container_id }} .hidden-instructions"
-           data-close-button
-           data-ajax-dialog>
-    {% endset %}
-    {% set endlink='</a>'|safe %}
-    {% set text = caller(link, endlink) %}
-    {% call message_box('warning', classes='review-instructions', fixed_width=true) %}
-        {{ text }}
-        <div class="hidden-instructions weak-hidden">
-            {{ instructions | markdown }}
-        </div>
-    {% endcall %}
+    {% if instructions|trim %}
+        {% set link %}
+            <a data-title="{{ title }}"
+               data-content="#{{ container_id }} .hidden-instructions"
+               data-close-button
+               data-ajax-dialog>
+        {% endset %}
+        {% set endlink='</a>'|safe %}
+        {% set text = caller(link, endlink) %}
+        {% call message_box('warning', classes='review-instructions', fixed_width=true) %}
+            {{ text }}
+            <div class="hidden-instructions weak-hidden">
+                {{ instructions | markdown }}
+            </div>
+        {% endcall %}
+    {% endif %}
 {% endmacro %}
 
 {% macro render_score(score, rating_range, classes='i-tag outline') %}
@@ -83,13 +85,12 @@
                 data-update="#reviewing-page"
                 data-ajax-form
             {% endcall %}
-            {% if proposal.cfp.judgment_instructions %}
-                {% call(link, endlink) render_instruction_box(form_id, proposal.cfp.judgment_instructions, _("Judgment instructions")) %}
-                    {% trans -%}
-                        Please don't forget to read the {{ link }}judgment instructions{{ endlink }} before taking your decision.
-                    {%- endtrans %}
-                {% endcall %}
-            {% endif %}
+            {% set instructions = proposal.cfp.judgment_instructions %}
+            {% call(link, endlink) render_instruction_box(form_id, instructions, _("Judgment instructions")) %}
+                {% trans -%}
+                    Please don't forget to read the {{ link }}judgment instructions{{ endlink }} before taking your decision.
+                {%- endtrans %}
+            {% endcall %}
             {% if form._order %}
                 {{ form_rows(form, fields=form._order, skip_labels=true) }}
             {% else %}
