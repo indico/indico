@@ -485,9 +485,9 @@ class WMenuMeetingHeader( WConferenceHeader ):
         vars["showLayout"] = True
 
         # Dates Menu
-        tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
-        sdate = self._conf.getStartDate().astimezone(timezone(tz))
-        edate = self._conf.getEndDate().astimezone(timezone(tz))
+        event = self._conf.as_event
+        sdate = event.start_dt.astimezone(event.display_tzinfo)
+        edate = event.end_dt.astimezone(event.display_tzinfo)
         selected = ""
         if vars.has_key("selectedDate"):
             selectedDate = vars["selectedDate"]
@@ -573,7 +573,8 @@ class WFooter(WTemplated):
         vars = WTemplated.getVars(self)
         vars["isFrontPage"] = self._isFrontPage
         event = getattr(self._rh, '_conf', None)
-        vars['is_meeting'] = event and event.getType() == 'meeting' and not isinstance(self._rh, RHConferenceModifBase)
+        vars['is_meeting'] = (event and event.as_event.type == 'meeting' and
+                              not isinstance(self._rh, RHConferenceModifBase))
 
         if not vars.has_key("modificationDate"):
             vars["modificationDate"] = ""
