@@ -706,26 +706,6 @@ class WListOfPapersToReview(WBannerModif):
         WBannerModif.__init__(self, path, itemType, title)
 
 
-class WConferenceModifFrame(WTemplated):
-
-    def __init__( self, conference, aw,):
-        self.__conf = conference
-        self._aw = aw
-
-    def getHTML( self, body, **params ):
-        params["body"] = body
-        return WTemplated.getHTML( self, params )
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-
-        vars["conf"] = self.__conf
-        vars["startDate"] = utils.formatDateTime(self.__conf.as_event.start_dt_local, format="d MMM")
-        vars["endDate"] = utils.formatDateTime(self.__conf.as_event.end_dt_local, format="d MMM")
-
-        return vars
-
-
 class WConfirmation(WTemplated):
 
     def getHTML(self, message, postURL, passingArgs, loading=False, severity="warning", **opts):
