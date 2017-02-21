@@ -86,7 +86,7 @@ class WPMeetingDisplay( WPConferenceDisplayBase ):
         wc = wcomponents.WMenuMeetingHeader( self._getAW(),self._conf )
         return wc.getHTML( { "loginURL": self.getLoginURL(),\
                              "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.getId(),\
+                             "confId": self._conf.id,
                              "currentView": currentView,\
                              "type": WebFactory.getId(),\
                              "filterActive": False,\

@@ -107,7 +107,8 @@ class ProgrammeToPDF(PDFBase):
 
         height -= 2 * cm
 
-        c.drawCentredString(self._PAGE_WIDTH/2.0, height, "%s - %s"%(self._conf.getAdjustedStartDate(self._tz).strftime("%A %d %B %Y"), self._conf.getAdjustedEndDate(self._tz).strftime("%A %d %B %Y")))
+        c.drawCentredString(self._PAGE_WIDTH/2.0, height, "{} - {}".format(
+            self._event.start_dt_local.strftime("%A %d %B %Y"), self._event.end_dt_local.strftime("%A %d %B %Y")))
         if self._event.venue_name:
             height-=1*cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self._event.venue_name.encode('utf-8')))
@@ -164,7 +165,7 @@ class AbstractToPDF(PDFLaTeXBase):
             'doc_type': 'abstract',
             'abstract': abstract,
             'conf': event.as_legacy,
-            'tz': tz,
+            'tz': timezone(tz),
             'track_class': self._get_track_classification(abstract),
             'contrib_type': self._get_contrib_type(abstract),
             'fields': [f for f in event.contribution_fields if f.is_active]
@@ -283,7 +284,7 @@ class ContribToPDF(PDFLaTeXBase):
             'coauthors_affil': coauthor_mapping,
             'contrib': contrib,
             'conf': event.as_legacy,
-            'tz': tz or event.timezone,
+            'tz': timezone(tz or event.timezone),
             'fields': [f for f in event.contribution_fields if f.is_active]
         })
 
@@ -308,7 +309,7 @@ class ContribsToPDF(PDFLaTeXBase):
             'items': contribs,
             'fields': [f for f in event.contribution_fields if f.is_active],
             'url': conf.getURL(),
-            'tz': tz or event.timezone
+            'tz': timezone(tz or event.timezone)
         })
 
         if event.logo:
@@ -364,7 +365,7 @@ class ContributionBook(PDFLaTeXBase):
             'corresp_authors': corresp_authors,
             'contribs': contribs,
             'conf': event.as_legacy,
-            'tz': tz or event.timezone,
+            'tz': timezone(tz or event.timezone),
             'url': event.url,
             'fields': [f for f in event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
@@ -1146,18 +1147,11 @@ class SimplifiedTimeTablePlain(PDFBase):
             if not day_entries:
                 current_day += timedelta(days=1)
                 continue
-            if self._event.end_dt.astimezone(timezone(self._tz)).month != self._conf.getAdjustedEndDate(self._tz).month:
-                text = u'{} - {}-{}'.format(
-                    escape(self._event.title),
-                    escape(to_unicode(format_date(self._event.start_dt, timezone=self._tz))),
-                    escape(to_unicode(format_date(self._event.end_dt, timezone=self._tz)))
-                )
-            else:
-                text = u'{} - {}-{}'.format(
-                    escape(self._event.title),
-                    escape(to_unicode(format_date(self._event.start_dt, format='dd', timezone=self._tz))),
-                    escape(to_unicode(format_date(self._event.end_dt, format='dd MM yy', timezone=self._tz)))
-                )
+            text = u'{} - {}-{}'.format(
+                escape(self._event.title),
+                escape(to_unicode(format_date(self._event.start_dt, timezone=self._tz))),
+                escape(to_unicode(format_date(self._event.end_dt, timezone=self._tz)))
+            )
             if self._event.venue_name:
                 text = u'%s, %s.' % (text, self._event.venue_name)
             p = Paragraph(text.encode('utf-8'), self._styles["title"])
@@ -1980,8 +1974,8 @@ class TicketToPDF(PDFBase):
         # Conference start and end date
         height = startHeight - 1*cm
         self._drawWrappedString(c, "%s - %s" % (
-            format_date(self._conf.getStartDate(), format='full'),
-            format_date(self._conf.getEndDate(), format='full')),
+            format_date(self._event.start_dt_local, format='full'),
+            format_date(self._event.end_dt_local, format='full')),
             height=height, width=width, align="left", font="Times-Italic",
             size=15)
 
@@ -2011,9 +2005,8 @@ class TicketToPDF(PDFBase):
         baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
         qr_data = {"registrant_id": self._registration.id,
                    "checkin_secret": self._registration.ticket_uuid,
-                   "event_id": self._conf.getId(),
-                   "server_url": baseURL
-                   }
+                   "event_id": self._event.id,
+                   "server_url": baseURL}
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)
         qr.make(fit=True)

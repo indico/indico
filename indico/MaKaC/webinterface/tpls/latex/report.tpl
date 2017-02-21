@@ -22,7 +22,7 @@
 <%block name="content">
     %% first page
     \frontmatter
-    <%include file="inc/first_page.tpl" args="conf=conf,title=title"/>
+    <%include file="inc/first_page.tpl" args="event=conf.as_event,title=title"/>
 
     %% body
     \mainmatter

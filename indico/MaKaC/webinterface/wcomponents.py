@@ -20,7 +20,6 @@ import urllib
 import pkg_resources
 from flask import session
 from lxml import etree
-from pytz import timezone
 from speaklater import _LazyString
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
@@ -353,8 +352,8 @@ class WConferenceHeader(WHeader):
         user = self._aw.getUser()
         apiKey = user.api_key if user else None
 
-        topURLs = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.getId())
-        urls = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.getId(),
+        topURLs = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.id)
+        urls = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.id,
                                             {'detail': 'contributions'})
 
         vars["requestURLs"] = {
@@ -388,9 +387,9 @@ class WMenuConferenceHeader( WConferenceHeader ):
         vars["categurl"] = self._conf.as_event.category.url
 
         # Dates Menu
-        tz = DisplayTZ(self._aw,self._conf,useServerTZ=1).getDisplayTZ()
-        sdate = self._conf.getStartDate().astimezone(timezone(tz))
-        edate = self._conf.getEndDate().astimezone(timezone(tz))
+        event = self._conf.as_event
+        sdate = event.start_dt.astimezone(event.display_tzinfo)
+        edate = event.end_dt.astimezone(event.display_tzinfo)
         dates = []
         if sdate.strftime("%Y-%m-%d") != edate.strftime("%Y-%m-%d"):
             selected = ""
@@ -612,8 +611,8 @@ class WEventFooter(WFooter):
         v['gc_params'] = urllib.urlencode({
             'action': 'TEMPLATE',
             'text': self._event.title.encode('utf-8'),
-            'dates': "%s/%s" % (self._gCalDateFormat(self._conf.getStartDate()),
-                                self._gCalDateFormat(self._conf.getEndDate())),
+            'dates': "%s/%s" % (self._gCalDateFormat(self._event.start_dt),
+                                self._gCalDateFormat(self._event.end_dt)),
             'details': description,
             'location': location.encode('utf-8'),
             'trp': False,
@@ -721,8 +720,8 @@ class WConferenceModifFrame(WTemplated):
         vars = WTemplated.getVars( self )
 
         vars["conf"] = self.__conf
-        vars["startDate"] = utils.formatDateTime(self.__conf.getAdjustedStartDate(), format="d MMM")
-        vars["endDate"] = utils.formatDateTime(self.__conf.getAdjustedEndDate(), format="d MMM")
+        vars["startDate"] = utils.formatDateTime(self.__conf.as_event.start_dt_local, format="d MMM")
+        vars["endDate"] = utils.formatDateTime(self.__conf.as_event.end_dt_local, format="d MMM")
 
         return vars
 

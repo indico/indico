@@ -21,6 +21,7 @@ from email.mime.text import MIMEText
 from email import charset
 
 from indico.core.config import Config
+from indico.util.event import unify_event_args
 from indico.util.string import to_unicode
 from MaKaC.errors import MaKaCError
 from MaKaC.i18n import _
@@ -144,7 +145,8 @@ class GenericMailer:
         Logger.get('mail').info('Mail sent to {}'.format(', '.join(to_addrs)))
 
     @classmethod
-    def sendAndLog(cls, notification, conference, module=None, user=None, skipQueue=False):
+    @unify_event_args
+    def sendAndLog(cls, notification, event, module=None, user=None, skipQueue=False):
         from indico.modules.events.logs import EventLogRealm, EventLogKind
         if isinstance(notification, dict):
             # Wrap a raw dictionary in a notification class
@@ -161,5 +163,5 @@ class GenericMailer:
             u'body': to_unicode(notification.getBody()).strip()
         }
         summary = u'Sent email: {}'.format(log_data[u'subject'])
-        conference.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or u'Unknown'), summary, user,
-                       type_=u'email', data=log_data)
+        event.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or u'Unknown'), summary, user,
+                  type_=u'email', data=log_data)
