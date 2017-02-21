@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.settings.proxy import SettingsProxyBase, ACLProxyBase, FallbackSettingsProxy
+from indico.core.settings.proxy import SettingsProxyBase, ACLProxyBase
 from indico.core.settings.core import SettingsProxy
 
-__all__ = ('SettingsProxyBase', 'ACLProxyBase', 'FallbackSettingsProxy', 'SettingsProxy')
+__all__ = ('SettingsProxyBase', 'ACLProxyBase', 'SettingsProxy')
