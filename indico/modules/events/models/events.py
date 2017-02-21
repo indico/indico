@@ -671,6 +671,10 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def duration(self):
         return self.end_dt - self.start_dt
 
+    def can_lock(self, user):
+        """Check whether the user can lock/unlock the event"""
+        return user and (user.is_admin or user == self.creator or self.category.can_manage(user))
+
     def get_relative_event_ids(self):
         """Get the first, last, previous and next event IDs.
 

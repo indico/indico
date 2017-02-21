@@ -1,0 +1,74 @@
+{% from 'events/management/_action_menu.html' import render_action_menu %}
+
+
+{%- macro _render_clone_info(event) -%}
+    {% set cloned_from = event.cloned_from %}
+    {% if cloned_from and not cloned_from.is_deleted %}
+        {% set link_start %}
+            <a href="{{ url_for('event_management.settings', cloned_from) }}" title="{{ cloned_from.title }}">
+        {% endset %}
+        {% set link_end = '</a>'|safe %}
+        {% set date = cloned_from.start_dt_local | format_date('medium', timezone=cloned_from.tzinfo) %}
+
+        {% trans name=event.creator.full_name, email=event.creator.email -%}
+            Created by {{ name }} ({{ email }}) from event on {{ link_start }}{{ date }}{{ link_end }}
+        {%- endtrans %}
+    {% else %}
+        {% trans name=event.creator.full_name, email=event.creator.email -%}
+            Created by {{ name }} ({{ email }})
+        {%- endtrans %}
+    {% endif %}
+{%- endmacro -%}
+
+
+{% macro render_event_management_header_right(event, event_types) %}
+    {% set start_date = event.start_dt | format_date('d MMM', timezone=event.tzinfo) %}
+    {% set end_date = event.end_dt | format_date('d MMM', timezone=event.tzinfo) %}
+
+    <div class="banner full-width">
+        <div class="title">
+            <a href="{{ url_for('event_management.settings', event) }}">
+                {{ event.get_verbose_title(show_series_pos=(event.type_.name == 'lecture')) }}
+                <span class="date">
+                    {% if start_date == end_date %}
+                        {{ start_date }}
+                    {% else %}
+                        {{ start_date }} - {{ end_date }}
+                    {% endif %}
+                </span>
+            </a>
+            <div class="subtitle">
+                {{ _render_clone_info(event) }}
+            </div>
+        </div>
+        {{ render_action_menu(event, event_types) }}
+    </div>
+{% endmacro %}
+
+
+{% macro render_management_frame(event, body, active_menu_item, event_types) %}
+    <div class="layout-side-menu">
+        <div class="menu-column">
+            <div class="group">
+                <a href="{{ event.url }}" class="icon-switchon highlight i-button"
+                   title="{% trans %}See the display page of the event{% endtrans %}">
+                    {%- trans %}Switch to display view{% endtrans -%}
+                </a>
+            </div>
+        </div>
+        <div class="content-column" id="event-management-header-right">
+            {{ render_event_management_header_right(event, event_types) }}
+        </div>
+    </div>
+    <div class="layout-side-menu">
+        <div class="menu-column">
+            <div id="event-side-menu" class="menu-column">
+                {{ render_sidemenu('event-management-sidemenu', active_item=active_menu_item, event=event) }}
+            </div>
+        </div>
+        <div class="content-column">
+            {% include 'flashed_messages.html' %}
+            {{ body | safe }}
+        </div>
+    </div>
+{% endmacro %}

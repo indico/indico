@@ -556,19 +556,8 @@ class WPConferenceModifBase(main.WPMainBase):
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
 
     def _applyFrame(self, body):
-        frame = wcomponents.WConferenceModifFrame(self._conf, self._getAW())
-
-        params = {
-            "confDisplayURLGen": urlHandlers.UHConferenceDisplay.getURL,
-            "event": "Conference",
-            "sideMenu": render_sidemenu('event-management-sidemenu', active_item=self.sidemenu_option,
-                                        event=self._conf.as_event)
-        }
-
-        wf = self._rh.getWebFactory()
-        if wf:
-            params["event"] = wf.getName()
-        return frame.getHTML(body, **params)
+        from indico.modules.events.management.views import render_event_management_frame
+        return render_event_management_frame(self._conf.as_event, body, self.sidemenu_option)
 
     def _getBody( self, params ):
         return self._applyFrame( self._getPageContent( params ) )
