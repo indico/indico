@@ -80,6 +80,8 @@ class RHEventSettings(RHManageEventBase):
             response = redirect(urls[0]) if urls else None
             raise Forbidden(response=response)
 
+        RHManageEventBase._checkProtection(self)  # mainly to trigger the legacy "event locked" check
+
     def _process(self):
         return WPEventSettings.render_template('settings.html', self._conf, event=self.event_new)
 
