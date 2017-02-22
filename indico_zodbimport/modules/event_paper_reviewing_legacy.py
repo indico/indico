@@ -26,8 +26,8 @@ from BTrees.IOBTree import IOBTree
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.paper_reviewing.models.papers import LegacyPaperFile
-from indico.modules.events.paper_reviewing.models.roles import LegacyPaperReviewingRole, PaperReviewingRoleType
+# from indico.modules.events.paper_reviewing.models.papers import LegacyPaperFile
+# from indico.modules.events.paper_reviewing.models.roles import LegacyPaperReviewingRole, PaperReviewingRoleType
 from indico.util.console import verbose_iterator
 from indico.util.date_time import now_utc
 from indico_zodbimport import Importer

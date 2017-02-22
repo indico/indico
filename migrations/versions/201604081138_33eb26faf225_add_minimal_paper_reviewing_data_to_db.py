@@ -10,11 +10,17 @@ from alembic import op
 from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
-from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRoleType
+from indico.util.struct.enum import RichIntEnum
 
 # revision identifiers, used by Alembic.
 revision = '33eb26faf225'
 down_revision = '3b0b69b541a2'
+
+
+class PaperReviewingRoleType(RichIntEnum):
+    reviewer = 0
+    referee = 1
+    editor = 2
 
 
 def upgrade():
