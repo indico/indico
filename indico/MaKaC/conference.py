@@ -16,7 +16,7 @@
 
 from flask import request, has_request_context, session
 from persistent import Persistent
-from pytz import all_timezones, timezone, utc
+from pytz import utc
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
@@ -30,7 +30,6 @@ from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.string import return_ascii, is_legacy_id
-from indico.util.user import unify_user_args
 
 from MaKaC.common.fossilize import Fossilizable
 from MaKaC.common.Locators import Locator
@@ -180,10 +179,6 @@ class Conference(CommonObjectBase):
         """returns (string) the unique identifier of the conference"""
         return self.id
 
-    def getUniqueId( self ):
-        """returns (string) the unique identiffier of the item"""
-        return "a%s" % self.id
-
     def setId(self, newId):
         """changes the current unique identifier of the conference to the
             one which is specified"""
@@ -201,34 +196,6 @@ class Conference(CommonObjectBase):
         ConferenceHolder().remove(self)
         TrashCanManager().add(self)
         self._p_changed = True
-
-    def getConference( self ):
-        return self
-
-    @warn_on_access
-    def getTimezone(self):
-        try:
-            return self.timezone
-        except AttributeError:
-            return 'UTC'
-
-    def canAccess(self, aw):
-        return self.as_event.can_access(aw.user)
-
-    @unify_user_args
-    def canUserModify(self, user):
-        return self.as_event.can_manage(user)
-
-    def canModify(self, aw_or_user):
-        """Tells whether an access wrapper is allowed to modify the current
-            conference: only if the user is granted to modify the conference and
-            he is accessing from an IP address which is not restricted.
-        """
-        if hasattr(aw_or_user, 'getUser'):
-            aw_or_user = aw_or_user.getUser()
-        if isinstance(aw_or_user, AvatarUserWrapper):
-            aw_or_user = aw_or_user.user
-        return self.as_event.can_manage(aw_or_user)
 
     def clone(self, startDate):
         # startDate is in the timezone of the event
@@ -258,15 +225,6 @@ class Conference(CommonObjectBase):
             event.update_principal(session.user, full_access=True)
 
         return conf
-
-    def hasEnabledSection(self, section):
-        # This hack is there since there is no more enable/disable boxes
-        # in the conference managment area corresponding to those features.
-        # Until the managment area is improved to get a more user-friendly
-        # way of enabling/disabling those features, we always make them
-        # available for the time being, but we keep the previous code for
-        # further improvements
-        return True
 
 
 class ConferenceHolder( ObjectHolder ):

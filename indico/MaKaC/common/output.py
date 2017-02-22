@@ -18,7 +18,6 @@ import os
 from collections import defaultdict
 from datetime import datetime
 from flask import request
-from hashlib import md5
 from indico.modules.groups import GroupProxy
 from sqlalchemy.orm import joinedload, load_only
 
@@ -117,29 +116,6 @@ class outputGenerator(object):
     def _getBasicXML(self, conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession="all", showDate="all", showContribution="all", showSubContribution="all", out=None):
         serializer = XMLEventSerializer(conf.as_event, include_timetable=includeContribution, event_tag_name='iconf')
         return serializer.serialize_event()
-
-    def _userToXML(self, obj, user, out):
-        out.openTag("user")
-        out.writeTag("title", user.getTitle())
-        out.writeTag("name", "", [["first", user.getFirstName()], ["middle", ""], ["last", user.getFamilyName()]])
-        out.writeTag("organization", user.getAffiliation())
-
-        if obj.canModify(self.__aw):
-            out.writeTag("email", user.getEmail())
-
-        out.writeTag("emailHash", md5(user.getEmail()).hexdigest())
-
-        try:
-            out.writeTag("userid",user.id)
-        except:
-            pass
-        out.closeTag("user")
-
-    def _generateLinkField(self, url, obj, text, out):
-        out.openTag("datafield", [["tag", "856"], ["ind1", "4"], ["ind2", " "]])
-        out.writeTag("subfield", str(url.getURL(obj)), [["code", "u"]])
-        out.writeTag("subfield", text, [["code", "y"]])
-        out.closeTag("datafield")
 
     def _generateACLDatafield(self, eType, memberList, objId, out):
         """

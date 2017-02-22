@@ -63,11 +63,6 @@ class GroupWrapper(Persistent, Fossilizable):
     def getEmail(self):
         return ''
 
-    def canModify(self, aw_or_user):
-        if hasattr(aw_or_user, 'getUser'):
-            aw_or_user = aw_or_user.getUser()
-        return self.canUserModify(aw_or_user)
-
     def canUserModify(self, avatar):
         return avatar.user.is_admin
 

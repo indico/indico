@@ -184,8 +184,8 @@ def test_prefix_settings_invalid():
 
 @pytest.mark.parametrize('with_arg', (True, False))
 @pytest.mark.usefixtures('db')
-def test_prefix_settings(dummy_event, with_arg):
-    kw = {'arg': dummy_event} if with_arg else {'arg': None}
+def test_prefix_settings(dummy_event_new, with_arg):
+    kw = {'arg': dummy_event_new} if with_arg else {'arg': None}
     cls = EventSettingsProxy if with_arg else SettingsProxy
     foo_proxy = cls('foo', {'a': 1, 'b': 2})
     bar_proxy = cls('bar', {'x': None, 'y': 4})
