@@ -16,7 +16,6 @@
 
 from flask import request, flash, redirect
 
-from MaKaC.webinterface import urlHandlers
 from indico.core.errors import IndicoError, FormValuesError, NoReportError
 from indico.core.db import db
 from indico.util.i18n import _

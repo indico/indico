@@ -26,7 +26,6 @@ from indico.modules.rb.models.locations import Location
 from indico.web.assets import core_env
 from indico.web.flask.util import url_rule_to_js, url_for
 from MaKaC.webinterface.common import tools as security_tools
-from MaKaC.webinterface import urlHandlers
 
 
 def generate_global_file(config):
@@ -169,4 +168,4 @@ def generate_global_file(config):
         }
     }
 
-    return render_template('assets/vars_globals.js', indico_vars=indico_vars, config=config, url_handlers=urlHandlers)
+    return render_template('assets/vars_globals.js', indico_vars=indico_vars, config=config)
