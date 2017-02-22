@@ -302,18 +302,6 @@ class UHMaintenancePerformPack(URLHandler):
     _endpoint = 'admin.adminMaintenance-performPack'
 
 
-class UHTemplatesSetDefaultPDFOptions(URLHandler):
-    _endpoint = 'admin.adminLayout-setDefaultPDFOptions'
-
-
-class UHBadgeTemplates(URLHandler):
-    _endpoint = 'admin.badgeTemplates'
-
-
-class UHPosterTemplates(URLHandler):
-    _endpoint = 'admin.posterTemplates'
-
-
 class UHResetSession(URLHandler):
     _endpoint = 'misc.resetSessionTZ'
 
