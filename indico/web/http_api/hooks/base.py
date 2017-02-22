@@ -19,7 +19,6 @@ Base export interface
 """
 
 # python stdlib imports
-import itertools
 import pytz
 import re
 import urllib
@@ -37,7 +36,6 @@ from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.date_time import now_utc
-from indico.util.fossilize import fossilize
 from indico.web.http_api.metadata import Serializer
 from indico.web.http_api.metadata.html import HTML4Serializer
 from indico.web.http_api.metadata.jsonp import JSONPSerializer
@@ -231,14 +229,8 @@ class HTTPAPIHook(object):
 
 
 class DataFetcher(object):
-
     _deltas = {'yesterday': timedelta(-1),
                'tomorrow': timedelta(1)}
-
-    _sortingKeys = {'id': lambda x: x.getId(),
-                    'start': lambda x: x.getStartDate(),
-                    'end': lambda x: x.getEndDate(),
-                    'title': lambda x: x.getTitle()}
 
     def __init__(self, aw, hook):
         self._aw = aw
@@ -311,9 +303,6 @@ class DataFetcher(object):
 
 
 class IteratedDataFetcher(DataFetcher):
-    DETAIL_INTERFACES = {}
-    FULL_SORTING_TIMEFRAME = timedelta(weeks=4)
-
     def __init__(self, aw, hook):
         super(IteratedDataFetcher, self).__init__(aw, hook)
         self._tz = hook._tz
@@ -325,83 +314,6 @@ class IteratedDataFetcher(DataFetcher):
         self._descending = hook._descending
         self._fromDT = hook._fromDT
         self._toDT = hook._toDT
-
-    def _userAccessFilter(self, obj):
-        return obj.canAccess(self._aw)
-
-    def _limitIterator(self, iterator, limit):
-        counter = 0
-        # this set acts as a checklist to know if a record has already been sent
-        exclude = set()
-        self._intermediateResults = []
-
-        for obj in iterator:
-            if counter >= limit:
-                raise LimitExceededException()
-            if obj not in exclude and (not hasattr(obj, 'canAccess') or obj.canAccess(self._aw)):
-                self._intermediateResults.append(obj)
-                yield obj
-                exclude.add(obj)
-                counter += 1
-
-    def _sortedIterator(self, iterator, limit, orderBy, descending):
-
-        exceeded = False
-        if orderBy or descending:
-            sortingKey = self._sortingKeys.get(orderBy)
-            if self._toDT and self._fromDT and self._toDT - self._fromDT <= self.FULL_SORTING_TIMEFRAME:
-                # If the timeframe is not too big we sort the whole dataset and limit it afterwards. Ths results in
-                # better results but worse performance.
-                limitedIterable = self._limitIterator(sorted(iterator, key=sortingKey, reverse=descending), limit)
-            else:
-                try:
-                    limitedIterable = sorted(self._limitIterator(iterator, limit),
-                                             key=sortingKey, reverse=descending)
-                except LimitExceededException:
-                    exceeded = True
-                    limitedIterable = sorted(self._intermediateResults,
-                                             key=sortingKey, reverse=descending)
-        else:
-            limitedIterable = self._limitIterator(iterator, limit)
-
-        # iterate over result
-        for obj in limitedIterable:
-            yield obj
-
-        # in case the limit was exceeded while sorting the results,
-        # raise the exception as if we were truly consuming an iterator
-        if orderBy and exceeded:
-            raise LimitExceededException()
-
-    def _iterateOver(self, iterator, offset, limit, orderBy, descending, filter=None):
-        """
-        Iterates over a maximum of `limit` elements, starting at the
-        element number `offset`. The elements will be ordered according
-        to `orderby` and `descending` (slooooow) and filtered by the
-        callable `filter`:
-        """
-
-        if filter:
-            iterator = itertools.ifilter(filter, iterator)
-        # offset + limit because offset records are skipped and do not count
-        sortedIterator = self._sortedIterator(iterator, offset + limit, orderBy, descending)
-        # Skip offset elements - http://docs.python.org/library/itertools.html#recipes
-        next(itertools.islice(sortedIterator, offset, offset), None)
-        return sortedIterator
-
-    def _postprocess(self, obj, fossil, iface):
-        return fossil
-
-    def _makeFossil(self, obj, iface):
-        return fossilize(obj, iface, tz=self._tz, naiveTZ=self._serverTZ, filters={'access': self._userAccessFilter})
-
-    def _process(self, iterator, filter=None, iface=None):
-        if iface is None:
-            iface = self.DETAIL_INTERFACES.get(self._detail)
-            if iface is None:
-                raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
-        for obj in self._iterateOver(iterator, self._offset, self._limit, self._orderBy, self._descending, filter):
-            yield self._postprocess(obj, self._makeFossil(obj, iface), iface)
 
 
 Serializer.register('html', HTML4Serializer)
