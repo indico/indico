@@ -22,7 +22,6 @@ from speaklater import _LazyString
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
-from MaKaC.conference import Conference
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.contextManager import ContextManager
 import MaKaC.common.TemplateExec as templateEngine
@@ -34,6 +33,7 @@ from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.legacy import LegacyConference
 from indico.modules.legal import legal_settings
 from indico.util.i18n import i18nformat, get_current_locale, get_all_locales, _
 from indico.util.date_time import format_date
@@ -207,7 +207,7 @@ class WHeader(WTemplated):
         Return a list with the status (Public, Protected, Restricted)
         and extra info (domain list).
         """
-        if isinstance(target, Conference):
+        if isinstance(target, LegacyConference):
             return self._get_protection_new(target.as_event)
         elif isinstance(target, db.m.Category):
             return self._get_protection_new(target)
