@@ -1,4 +1,5 @@
 {% from 'events/management/_action_menu.html' import render_action_menu %}
+{% from 'message_box.html' import message_box %}
 
 
 {%- macro _render_clone_info(event) -%}
@@ -67,6 +68,11 @@
             </div>
         </div>
         <div class="content-column">
+            {% if event.is_locked %}
+                {% call message_box('warning', fixed_width=true) %}
+                    {% trans %}This event has been locked and cannot be modified.{% endtrans %}
+                {% endcall %}
+            {% endif %}
             {% include 'flashed_messages.html' %}
             {{ body | safe }}
         </div>
