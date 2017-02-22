@@ -295,7 +295,7 @@ class WConferenceHeader(WHeader):
                                for theme_id, data in sorted(styles.viewitems(), key=lambda x: x[1]['title'])]
         vars["SelectedStyle"] = ""
         vars["pdfURL"] = ""
-        vars["displayURL"] = str(urlHandlers.UHConferenceOtherViews.getURL(self._conf))
+        vars["displayURL"] = url_for('event.conferenceOtherViews', self._conf.as_event)
 
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = False
@@ -405,15 +405,14 @@ class WMenuConferenceHeader( WConferenceHeader ):
         # Save to session
         vars["hideContributions"] = hideContributions
 
-        urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
-        urlCustPrint.addParam("showDate", vars.get("selectedDate") or "all")
-        urlCustPrint.addParam("showSession", vars.get("selectedSession") or "all")
-        urlCustPrint.addParam("fr", "no")
-        urlCustPrint.addParam("view", vars["currentView"])
-        vars["printURL"]=str(urlCustPrint)
+        vars['printURL'] = url_for('event.conferenceOtherViews', event,
+                                   showDate=vars.get('selectedDate') or 'all',
+                                   showSession=vars.get('selectedSession') or 'all',
+                                   fr='no',
+                                   view=vars['currentView'])
 
         vars["printIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("printer")))
-        vars["pdfURL"] = quoteattr(url_for('timetable.export_pdf', self._conf))
+        vars["pdfURL"] = quoteattr(url_for('timetable.export_pdf', self._conf.as_event))
         vars["pdfIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
         vars["zipIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("smallzip")))
 
@@ -439,7 +438,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
 
         vars["viewoptions"] = view_options
         vars["SelectedStyle"] = theme_settings.themes[vars['currentView']]['title']
-        vars["displayURL"] = urlHandlers.UHConferenceDisplay.getURL(self._rh._conf)
+        vars["displayURL"] = self._rh._conf.as_event.url
 
         # Setting the buttons that will be displayed in the header menu
         vars["showFilterButton"] = True
@@ -494,14 +493,13 @@ class WMenuMeetingHeader( WConferenceHeader ):
                     hideContributions = ""
         vars["hideContributions"] = hideContributions
 
-        urlCustPrint = urlHandlers.UHConferenceOtherViews.getURL(self._conf)
-        urlCustPrint.addParam("showDate", vars.get("selectedDate") or "all")
-        urlCustPrint.addParam("showSession", vars.get("selectedSession") or "all")
-        urlCustPrint.addParam("detailLevel", vars.get("detailLevel") or "all")
-        urlCustPrint.addParam("fr", "no")
-        urlCustPrint.addParam("view", vars["currentView"])
-        vars["printURL"]=str(urlCustPrint)
-        vars["pdfURL"] = url_for('timetable.export_pdf', self._conf)
+        vars['printURL'] = url_for('event.conferenceOtherViews', event,
+                                   showDate=vars.get('selectedDate') or 'all',
+                                   showSession=vars.get('selectedSession') or 'all',
+                                   detailLevel=vars.get('detailLevel') or 'all',
+                                   fr='no',
+                                   view=vars['currentView'])
+        vars["pdfURL"] = url_for('timetable.export_pdf', self._conf.as_event)
         return vars
 
 
@@ -577,8 +575,7 @@ class WEventFooter(WFooter):
             'details': description,
             'location': location.encode('utf-8'),
             'trp': False,
-            'sprop': [str(urlHandlers.UHConferenceDisplay.getURL(self._conf)),
-                      'name:indico']
+            'sprop': [self._event.external_url, 'name:indico']
         })
 
         social_settings_data = social_settings.get_all()

@@ -34,9 +34,9 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
         self._tabExistBookings = self._tabCtrl.newTab('existing', 'Existing Bookings',
-                                                      url_for('event_mgmt.rooms_booking_list', self._conf))
+                                                      url_for('event_mgmt.rooms_booking_list', self._conf.as_event))
         self._tabNewBooking = self._tabCtrl.newTab('new', 'New Booking',
-                                                   url_for('event_mgmt.rooms_choose_event', self._conf))
+                                                   url_for('event_mgmt.rooms_choose_event', self._conf.as_event))
         if not Reservation.query.with_parent(self._conf.as_event).has_rows():
             self._tabExistBookings.setEnabled(False)
         self._setActiveTab()

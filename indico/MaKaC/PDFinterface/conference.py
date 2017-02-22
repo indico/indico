@@ -1290,7 +1290,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
         #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
         c.setFont('Times-Roman', 10)
-        c.drawString(0.5*inch, 0.5*inch, str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
+        c.drawString(0.5*inch, 0.5*inch, self._conf.as_event.short_external_url)
         c.restoreState()
 
     def laterPages(self, c, doc):

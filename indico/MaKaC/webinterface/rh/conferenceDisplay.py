@@ -49,8 +49,7 @@ class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
         # for that if there's an access key for the event in the session.
         # this is pretty awful but eventually we'll do this properly :)
         self.event_new.set_session_access_key(self._accesskey)
-        url = urlHandlers.UHConferenceDisplay.getURL(self._conf)
-        self._redirect(url)
+        self._redirect(self.event_new.url)
 
 
 class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
@@ -88,8 +87,6 @@ class MeetingRendererMixin:
 
 
 class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
-    _uh = urlHandlers.UHConferenceDisplay
-
     def _checkProtection(self):
         # check users allowed by plugins
         if any(values_from_signal(signals.event.has_read_access.send(self._conf, user=session.user))):
@@ -128,7 +125,6 @@ class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
     this class is for the conference type objects only
     it is an alternative to the standard TimeTable view
     """
-    _uh = urlHandlers.UHConferenceOtherViews
 
     def _process( self ):
         if not self._reqParams.has_key("showDate"):
@@ -149,8 +145,6 @@ class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
 
 
 class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
-    _uh=urlHandlers.UHConfMyStuff
-
     def _checkProtection(self):
         base.RHProtected._checkProtection(self)
 
