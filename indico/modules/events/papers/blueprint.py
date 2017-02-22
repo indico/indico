@@ -27,6 +27,7 @@ _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template
 
 # Display pages
 _bp.add_url_rule('/papers/', 'call_for_papers', display.RHCallForPapers)
+_bp.add_url_rule('/papers/select-contribution', 'select_contribution', display.RHSelectContribution)
 _bp.add_url_rule('/papers/<int:contrib_id>/', 'paper_timeline', display.RHPaperTimeline)
 _bp.add_url_rule('/papers/<int:contrib_id>/files/<int:file_id>-<filename>', 'download_file',
                  display.RHDownloadPaperFile)

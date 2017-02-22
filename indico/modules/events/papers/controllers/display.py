@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import request, session, flash
 from werkzeug.exceptions import Forbidden
 
+from indico.modules.events.contributions.util import get_contributions_with_user_as_submitter
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
 from indico.modules.events.papers.forms import (PaperSubmissionForm, PaperCommentForm, build_review_form,
                                                 PaperJudgmentForm)
@@ -36,7 +37,7 @@ from indico.modules.events.papers.views import (WPDisplayPapersBase, render_pape
                                                 WPDisplayCallForPapers)
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_form, jsonify_data, jsonify
+from indico.web.util import jsonify_form, jsonify_data, jsonify, jsonify_template
 
 
 class RHSubmitPaper(RHPaperBase):
@@ -221,7 +222,25 @@ class RHResetPaperState(RHPaperBase):
 class RHCallForPapers(RHPapersBase):
     """Show the main CFP page"""
 
+    def _checkProtection(self):
+        if not session.user:
+            raise Forbidden
+        RHPapersBase._checkProtection(self)
+
+    def _checkParams(self, params):
+        RHPapersBase._checkParams(self, params)
+        self.contribs = get_contributions_with_user_as_submitter(self.event_new, session.user)
+        self.papers = get_contributions_with_paper_submitted_by_user(self.event_new, session.user)
+        self.contribs = list(set(self.contribs) - set(self.papers))
+
     def _process(self):
-        contribs = get_contributions_with_paper_submitted_by_user(self.event_new, session.user)
         return WPDisplayCallForPapers.render_template('display/call_for_papers.html', self._conf,
-                                                      event=self.event_new, contributions=contribs)
+                                                      event=self.event_new, contributions=self.contribs,
+                                                      papers=self.papers)
+
+
+class RHSelectContribution(RHCallForPapers):
+    """Select a contribution for which the user wants to submit a paper"""
+
+    def _process(self):
+        return jsonify_template('events/papers/display/select_contribution.html', contributions=self.contribs)

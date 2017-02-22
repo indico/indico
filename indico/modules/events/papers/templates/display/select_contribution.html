@@ -1,0 +1,28 @@
+{% extends 'layout/dialog_base.html' %}
+
+{% block dialog_id %}select-contribution-dialog{% endblock %}
+
+{% block description %}
+    {%- trans -%}
+        Select a contribution for which you wish to submit a paper.
+    {%- endtrans -%}
+{%- endblock %}
+
+{% block content -%}
+    <div class="contrib-list">
+        <ul>
+            {% for contrib in contributions|sort(attribute='friendly_id') -%}
+                <li>
+                    <a data-title="{% trans %}Submit new paper{% endtrans %}"
+                       data-href="{{ url_for('.submit_revision', contrib) }}"
+                       data-redirect-after="{{ url_for('.paper_timeline', contrib) }}"
+                       data-confirm-close-unsaved
+                       data-ajax-dialog>
+                        {{ '#%d: %s' | format(contrib.friendly_id, contrib.title) | truncate(65) }}
+                    </a>
+                </li>
+            {%- endfor %}
+        </ul>
+    </div>
+    <button type="button" class="i-button big right" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+{%- endblock %}
