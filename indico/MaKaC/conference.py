@@ -33,7 +33,6 @@ from indico.util.string import return_ascii, is_legacy_id
 from MaKaC.common.fossilize import Fossilizable
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import NotFoundError
-from MaKaC.trashCan import TrashCanManager
 
 
 class CoreObject(Persistent):
@@ -123,7 +122,6 @@ class Conference(CommonObjectBase):
     def delete(self, user=None):
         signals.event.deleted.send(self, user=user)
         ConferenceHolder().remove(self)
-        TrashCanManager().add(self)
         self._p_changed = True
 
     def clone(self, startDate):
