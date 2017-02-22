@@ -34,7 +34,6 @@ globalname_dict = {
     "PersistentList": ("persistent.list", None),
     'SlotSchedule': ('MaKaC.schedule', 'SlotSchedule'),
     'PosterSlotSchedule': ('MaKaC.schedule', 'PosterSlotSchedule'),
-    'UHConferenceInstantMessaging': ('MaKaC.webinterface.urlHandlers', 'URLHandler'),
     'Avatar': ('indico.modules.users.legacy', 'AvatarUserWrapper'),
     'Group': ('indico.modules.groups.legacy', 'LocalGroupWrapper'),
     'LDAPGroup': ('indico.modules.groups.legacy', 'LDAPGroupWrapper'),
