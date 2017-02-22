@@ -57,8 +57,6 @@ def generate_global_file(config):
             'FavoriteUserAdd': url_for('users.user_favorites_users_add'),
             'FavoriteUserRemove': url_rule_to_js('users.user_favorites_user_remove'),
 
-            'ConferenceDisplay': urlHandlers.UHConferenceDisplay.getURL(_ignore_static=True).js_router,
-
             'AttachmentManager': url_rule_to_js('attachments.management'),
             'ManagementAttachmentInfoColumn': url_rule_to_js('attachments.management_info_column'),
 

@@ -24,9 +24,7 @@ ${ template_hook('global-announcement') }
 
     <div class="eventHeaderButtonBar" >
 
-    % if 'needsBackButton' in locals() and needsBackButton:
-        <a href="${ urlHandlers.UHConferenceDisplay.getURL(self_._conf) }" style=class="eventHeaderButtonBar">${ _('Go back to Conference') }<div class="leftCorner"></div></a>
-    % elif conf.as_event.type != "conference" or displayNavigationBar:
+    % if conf.as_event.type != "conference" or displayNavigationBar:
         <a id="homeButton" href="${ url_for_index() }"
            style="background-image: url(${ systemIcon('home') }); margin-left: 10px"></a>
 
@@ -86,7 +84,7 @@ ${ template_hook('global-announcement') }
 
         <div class="separator"></div>
 
-        <a id="manageEventButton" href="${ url_for('event_management.settings', conf) }"
+        <a id="manageEventButton" href="${ url_for('event_management.settings', conf.as_event) }"
            style="background-image: url(${ systemIcon('manage') })"></a>
     </div>
 

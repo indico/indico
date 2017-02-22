@@ -158,18 +158,6 @@ def setSSLPort(url):
     return re.sub(regexp, sslPort, url)
 
 
-class UHConferenceHelp(URLHandler):
-    _endpoint = 'misc.help'
-
-
-class UHConferenceDisplay(URLHandler):
-    _endpoint = 'event.conferenceDisplay'
-
-
-class UHConferenceOtherViews(URLHandler):
-    _endpoint = 'event.conferenceOtherViews'
-
-
 # ============================================================================
 # ROOM BOOKING ===============================================================
 # ============================================================================
@@ -238,36 +226,8 @@ class UHRoomBookingSaveCustomAttributes(URLHandler):
     _endpoint = 'rooms_admin.roomBooking-saveCustomAttributes'
 
 
-class UHConfClone(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-clone'
-
-
-class UHConfPerformCloning(URLHandler):
-    _endpoint = 'event_mgmt.confModifTools-performCloning'
-
-
-class UHConfUser(URLHandler):
-    @classmethod
-    def getURL(cls, conference, av=None):
-        url = cls._getURL()
-        if conference is not None:
-            loc = conference.getLocator().copy()
-            if av:
-                loc.update(av.getLocator())
-            url.setParams(loc)
-        return url
-
-
-class UHConfEnterAccessKey(UHConfUser):
-    _endpoint = 'event.conferenceDisplay-accessKey'
-
-
 class UHErrorReporting(URLHandler):
     _endpoint = 'misc.errors'
-
-
-class UHConfMyStuff(URLHandler):
-    _endpoint = 'event.myconference'
 
 
 class UHResetSession(URLHandler):

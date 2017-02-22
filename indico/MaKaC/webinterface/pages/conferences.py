@@ -17,7 +17,6 @@
 import os
 import posixpath
 from datetime import datetime
-from xml.sax.saxutils import quoteattr
 
 from flask import session, render_template, request
 from pytz import timezone
@@ -31,17 +30,16 @@ from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
 from indico.modules.events.models.events import Event
-from indico.util.date_time import format_date, format_datetime
+from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.string import encode_if_unicode, to_unicode
 from indico.web.flask.util import url_for
-from indico.web.menu import render_sidemenu
 
 from MaKaC.common.TemplateExec import render
 from MaKaC.common.output import outputGenerator
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.utils import isStringHTML
-from MaKaC.webinterface import wcomponents, urlHandlers
+from MaKaC.webinterface import wcomponents
 from MaKaC.webinterface.common.tools import strip_ml_tags, escape_html
 from MaKaC.webinterface.pages import main, base
 from MaKaC.webinterface.pages.base import WPDecorated
@@ -72,7 +70,7 @@ class WPConferenceBase(base.WPDecorated):
         return wc.getHTML(p)
 
     def getLogoutURL(self):
-        return url_for_logout(str(urlHandlers.UHConferenceDisplay.getURL(self._conf)))
+        return url_for_logout(self._conf.as_event.external_url)
 
 
 class WPConferenceDisplayBase(WPConferenceBase):
@@ -119,7 +117,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         frame = WConfDisplayFrame( self._getAW(), self._conf )
 
         frameParams = {
-            "confModifURL": url_for('event_management.settings', self._conf),
+            "confModifURL": url_for('event_management.settings', self._conf.as_event),
             "logoURL": self.logo_url,
             "currentURL": request.url,
             "simpleTextAnnouncement": drawer.getSimpleText(),
@@ -276,9 +274,8 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
     menu_entry_name = 'overview'
 
     def _getBody(self, params):
-
         wc = WConfDetails(self._getAW(), self._conf)
-        pars = {"modifyURL": url_for('event_management.settings', self._conf)}
+        pars = {"modifyURL": url_for('event_management.settings', self._conf.as_event)}
         return wc.getHTML(pars)
 
     def _getFooter(self):
@@ -319,8 +316,8 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         return ""
 
     def _getBodyVariables(self):
-        pars = {"modifyURL": url_for('event_management.settings', self._conf),
-                "cloneURL": urlHandlers.UHConfClone.getURL(self._conf)}
+        pars = {"modifyURL": url_for('event_management.settings', self._conf.as_event),
+                "cloneURL": url_for('event_mgmt.confModifTools-clone', self._conf.as_event)}
 
         pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })
         return pars
@@ -539,7 +536,7 @@ class WPConferenceModifBase(main.WPMainBase):
                              "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
 
     def _getNavigationDrawer(self):
-        pars = {"target": self._conf, "isModif": True }
+        pars = {"target": self._conf.as_event, "isModif": True}
         return wcomponents.WNavigationDrawer( pars, bgColor="white" )
 
     def _applyFrame(self, body):
@@ -578,13 +575,10 @@ class WPConfCloneConfirm(WPConferenceModifBase):
         msg = _("This action will create {0} new events. Are you sure you want to proceed").format(self._nbClones)
 
         wc = wcomponents.WConfirmation()
-        url = urlHandlers.UHConfPerformCloning.getURL(self._conf)
-        params = self._rh._getRequestParams()
-        for key in params.keys():
-            url.addParam(key, params[key])
-        return wc.getHTML( msg, \
-                        url, {}, True, \
-                        confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
+        params = dict(self._rh._getRequestParams())
+        del params['confId']
+        url = url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event, **params)
+        return wc.getHTML(msg, url, {}, True, confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
 
 
 class WConferenceClone(wcomponents.WTemplated):
@@ -637,7 +631,7 @@ class WConferenceClone(wcomponents.WTemplated):
 class WPConfClone(WPConferenceModifBase):
     def _getPageContent(self, params):
         p = WConferenceClone(self._conf)
-        pars = {"cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+        pars = {"cloning": url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event),
                 "startTime": self._conf.as_event.start_dt_local.isoformat(),
                 "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')}
         return p.getHTML(pars)

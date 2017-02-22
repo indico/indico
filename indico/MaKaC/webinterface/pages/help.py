@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.urlHandlers as urlHandlers
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from MaKaC.webinterface.pages.main import WPMainBase
-import MaKaC.webinterface.wcomponents as wcomponents
-from MaKaC.i18n import _
+from MaKaC.webinterface import wcomponents
 
 
 class WPHelp(WPMainBase):
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_("Help"), urlHandlers.UHConferenceHelp.getURL)
+        return wcomponents.WSimpleNavigationDrawer(_("Help"), lambda: url_for('misc.help'))
 
     def _getBody(self, params):
         wc = wcomponents.WTemplated('Help')
