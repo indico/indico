@@ -58,7 +58,7 @@ class EventLinkPlaceholder(Placeholder):
     @classmethod
     def render(cls, regform, registration):
         regform = registration.registration_form
-        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=regform.event_new.as_legacy.getURL(),
+        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=regform.event_new.short_external_url,
                                                                          title=escape(regform.event_new.title)))
 
 
