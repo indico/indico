@@ -72,10 +72,7 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
                      and the default feature set for the event type
                      will be ignored.
     """
-    from MaKaC.conference import Conference, ConferenceHolder
-    conf = Conference()
     event = Event(category=category, type_=event_type)
-    ConferenceHolder().add(conf, event)
     data.setdefault('creator', session.user)
     theme = data.pop('theme', None)
     person_link_data = data.pop('person_link_data', {})
@@ -232,13 +229,6 @@ def update_event_type(event, type_):
     event.type_ = type_
     logger.info('Event %r type changed to %s by %r', event, type_.name, session.user)
     event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Type changed to {}'.format(type_.title), session.user)
-
-
-def delete_event(event):
-    event.as_legacy.delete(session.user)
-    db.session.flush()
-    logger.info('Event %r deleted by %r', event, session.user)
-    event.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', session.user)
 
 
 def lock_event(event):

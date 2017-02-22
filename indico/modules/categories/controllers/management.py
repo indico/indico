@@ -34,7 +34,6 @@ from indico.modules.categories.operations import create_category, delete_categor
 from indico.modules.categories.util import get_image_data
 from indico.modules.categories.views import WPCategoryManagement
 from indico.modules.events import Event
-from indico.modules.events.operations import delete_event
 from indico.modules.events.util import update_object_principals
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
@@ -354,7 +353,7 @@ class RHDeleteEvents(RHManageCategorySelectedEventsBase):
         if not is_submitted:
             return jsonify_template('events/management/delete_events.html', events=self.events)
         for ev in self.events[:]:
-            delete_event(ev)
+            ev.delete('Bulk-deleted by category manager', session.user)
         flash(ngettext('You have deleted one event', 'You have deleted {} events', len(self.events))
               .format(len(self.events)), 'success')
         return jsonify_data(flash=False, redirect=url_for('.manage_content', self.category))

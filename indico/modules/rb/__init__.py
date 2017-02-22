@@ -66,9 +66,10 @@ def _merge_users(target, source, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, user, **kwargs):
-    reservations = Reservation.find(Reservation.event_id == int(event.id),
-                                    ~Reservation.is_cancelled,
-                                    ~Reservation.is_rejected)
+    reservations = (Reservation.query.with_parent(event)
+                    .filter(~Reservation.is_cancelled,
+                            ~Reservation.is_rejected)
+                    .all())
     for resv in reservations:
         resv.cancel(user or session.user, 'Associated event was deleted')
 

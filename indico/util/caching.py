@@ -30,8 +30,7 @@ def make_hashable(obj):
         return frozenset((k, make_hashable(v)) for k, v in obj.iteritems())
     elif hasattr(obj, 'getId') and obj.getId.__self__ is not None:
         # getId of AvatarUserWrapper would access a cached property, we can't have that here
-        # don't call Conference.getId() so we get the getId() access warning for other places
-        id_ = obj.getId() if obj.__class__.__name__ not in ('AvatarUserWrapper', 'Conference') else obj.id
+        id_ = obj.getId() if obj.__class__.__name__ != 'AvatarUserWrapper' else obj.id
         return obj.__class__.__name__, id_
     return obj
 

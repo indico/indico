@@ -59,8 +59,7 @@ def _merge_users(target, source, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    event_id = int(event.id)
-    query = Request.find(Request.event_id == event_id,
-                         Request.state.in_((RequestState.accepted, RequestState.pending)))
+    query = (Request.query.with_parent(event)
+             .filter(Request.state.in_((RequestState.accepted, RequestState.pending))))
     for req in query:
         req.definition.withdraw(req, notify_event_managers=False)
