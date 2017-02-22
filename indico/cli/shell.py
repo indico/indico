@@ -38,7 +38,6 @@ from indico.util.console import strip_ansi, cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
-from MaKaC.conference import Conference, ConferenceHolder
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):
@@ -158,9 +157,6 @@ class IndicoShell(Shell):
                                  [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
                                  [itertools, re, sys, os],
                                  color='yellow')
-            # Legacy Indico
-            self._info.append(cformat('*** %{magenta!}Legacy%{reset} ***'))
-            add_to_context_multi([Conference, ConferenceHolder], color='green')
             # Models
             self._info.append(cformat('*** %{magenta!}Models%{reset} ***'))
             models = [cls for name, cls in sorted(db.Model._decl_class_registry.items(), key=itemgetter(0))
@@ -186,7 +182,6 @@ class IndicoShell(Shell):
             add_to_context(current_app, 'app', doc='flask app')
             add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
                            doc='like datetime() but converted from localtime to utc')
-            add_to_context(lambda x: ConferenceHolder().getById(x, True), 'E', doc='get event by id (Conference)')
             add_to_context(Event.get, 'EE', doc='get event by id (Event)')
             # Stuff from plugins
             signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)

@@ -14,9 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.util.caching import memoize_request
-from indico.util.contextManager import ContextManager
-from MaKaC.conference import ConferenceHolder
+from werkzeug.exceptions import NotFound
+
+from indico.modules.events import Event
+from indico.util.i18n import _
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -34,14 +35,12 @@ class RHCustomizable(RH):
 
 class RHConferenceSite(RHCustomizable):
     def _checkParams(self, params):
-        # getById raises a NotFoundError if the event doesn't exist
-        self._conf = self._target = ConferenceHolder().getById(params['confId'])
-        ContextManager.set("currentConference", self._conf)
-
-    @property
-    @memoize_request
-    def event_new(self):
-        return self._conf.as_event
+        self.event_new = Event.get(int(params['confId']))
+        if self.event_new is None:
+            raise NotFound(_(u'An event with this ID does not exist.'))
+        elif self.event_new.is_deleted:
+            raise NotFound(_(u'This event has been deleted.'))
+        self._conf = self._target = self.event_new.as_legacy
 
 
 class RHConferenceBase(RHConferenceSite):

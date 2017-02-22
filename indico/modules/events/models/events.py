@@ -466,9 +466,9 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     @memoize_request
     def as_legacy(self):
-        """Returns a legacy `Conference` object (ZODB)"""
-        from MaKaC.conference import ConferenceHolder
-        return ConferenceHolder().getById(self.id, True)
+        """Return a legacy `Conference` object"""
+        from MaKaC.conference import Conference
+        return Conference(self)
 
     @property
     def event_new(self):
@@ -853,6 +853,14 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         self.category = category
         db.session.flush()
         signals.event.moved.send(self, old_parent=old_category)
+
+    def delete(self, reason, user=None):
+        from indico.modules.events import logger, EventLogRealm, EventLogKind
+        self.is_deleted = True
+        signals.event.deleted.send(self, user=user)
+        db.session.flush()
+        logger.info('Event %r deleted [%s]', self, reason)
+        self.log(EventLogRealm.event, EventLogKind.negative, 'Event', 'Event deleted', user, data={'Reason': reason})
 
     @property
     @memoize_request
