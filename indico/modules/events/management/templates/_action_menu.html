@@ -56,7 +56,8 @@
 
 
 {% macro _render_move_event(event) %}
-    <button class="i-button borderless icon-transmission js-ajax-dialog-move"
+    <button class="i-button borderless icon-transmission"
+            id="event-action-move-to-category"
             title="{% trans %}Move event to another category{% endtrans %}"
             data-href="{{ url_for('event_management.move', event) }}"
             data-category-id="{{ event.category.id }}">
@@ -86,14 +87,16 @@
                     <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
                        title="{% trans %}Clone event{% endtrans %}">Clone</a>
                     {% if clones %}
-                        <a id="action-menu-clones-target" class="i-button label clickable arrow">{{ clones|length }}</a>
+                        <a id="event-action-menu-clones-target" class="i-button label clickable arrow">
+                            {{- clones|length -}}
+                        </a>
                     {% endif %}
                 </div>
 
-                <a id="action-menu-actions-target" class="i-button icon-settings i-button arrow"
+                <a id="event-action-menu-actions-target" class="i-button icon-settings i-button arrow"
                    title="{% trans %}Event actions{% endtrans %}"></a>
 
-                <div id="action-menu-actions">
+                <div id="event-action-menu-actions">
                     <div class="action-menu-buttons">
                         {{ _render_move_event(event) }}
                         {{ _render_lock_event(event) }}
@@ -102,7 +105,7 @@
                     </div>
                 </div>
 
-                <div id="action-menu-clones">
+                <div id="event-action-menu-clones">
                     {% trans %}Events cloned from the current event:{% endtrans %}
                     <ul>
                         {% for clone in clones %}
@@ -120,65 +123,6 @@
     </div>
 
     <script>
-        (function() {
-            'use strict';
-
-            // TODO: move to JS file
-            $('.js-ajax-dialog-move').on('click', function(evt) {
-                evt.preventDefault();
-
-                var $this = $(this);
-                $('<div>').categorynavigator({
-                    openInDialog: true,
-                    actionOn: {
-                        categoriesWithSubcategories: {
-                            disabled: true
-                        },
-                        categoriesWithoutEventCreationRights: {
-                            disabled: true
-                        },
-                        categories: {
-                            disabled: true,
-                            ids: [$this.data('category-id')]
-                        }
-                    },
-                    onAction: function(category) {
-                        var msg = $T.gettext('You are about to move the event to the category "{0}". Are you sure you want to proceed?').format(category.title);
-                        confirmPrompt(msg, $T.gettext('Move event')).then(function() {
-                            $.ajax({
-                                url: $this.data('href'),
-                                type: 'POST',
-                                data: {'target_category_id': category.id},
-                                error: handleAjaxError,
-                                success: function(data) {
-                                    if (data.success) {
-                                        location.reload();
-                                    }
-                                }
-                            });
-                        });
-                    }
-                });
-            });
-
-            $('#action-menu-clones-target').qbubble({
-                content: {
-                    text: $('#action-menu-clones')
-                }
-            });
-
-            $('#action-menu-actions-target').qbubble({
-                content: {
-                    text: $('#action-menu-actions')
-                },
-                style: {
-                    classes: 'qtip-allow-overflow'
-                }
-            });
-
-            $('#action-menu-actions button:not(.js-dropdown), #action-menu-actions a:not(.disabled)').on('click', function() {
-                $('#action-menu-actions-target').qbubble('hide');
-            });
-        })();
+        setupEventManagementActionMenu();
     </script>
 {% endmacro %}
