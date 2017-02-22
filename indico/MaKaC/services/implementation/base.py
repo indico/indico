@@ -14,14 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import distutils
 import os
 import sys
 import traceback
-from datetime import datetime, date
 
 from flask import request, session
-from pytz import timezone
 
 from indico.core.config import Config
 from indico.util.string import unicode_struct_to_utf8
@@ -29,113 +26,8 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import security
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.errors import MaKaCError, HtmlForbiddenTag
-from MaKaC.services.interface.rpc.common import ServiceError, ServiceAccessError, HTMLSecurityError
+from MaKaC.services.interface.rpc.common import ServiceAccessError, HTMLSecurityError
 from MaKaC.webinterface.rh.base import RequestHandlerBase
-
-
-class ExpectedParameterException(ServiceError):
-    """
-    Represents an exception that occurs when a type of parameter was expected
-    but another one was obtained
-    """
-
-    def __init__(self, paramName, expected, got):
-        ServiceError.__init__(self, "ERR-P2","'%s': Expected '%s', got instead '%s'" % (paramName, expected, got))
-
-
-class EmptyParameterException(ServiceError):
-    """
-    Thrown when a parameter that should have a value is empty
-    """
-    def __init__(self, paramName=""):
-        ServiceError.__init__(self, "ERR-P3","Expected parameter '%s' is empty"%paramName)
-
-
-class DateTimeParameterException(ServiceError):
-    """
-    Thrown when a parameter that should have a value is empty
-    """
-    def __init__(self, paramName, value):
-        ServiceError.__init__(self, "ERR-P4","Date/Time %s = '%s' is not valid " % (paramName, value))
-
-
-class ParameterManager(object):
-
-    """
-    The ParameterManager makes parameter processing a bit easier, by providing
-    some default transformations
-    """
-
-    def __init__(self, paramList, allowEmpty=False, timezone=None):
-        self._paramList = paramList
-        self._allowEmpty = allowEmpty
-        self._timezone = timezone
-
-    def extract(self, paramName, pType=None, allowEmpty=None, defaultValue=None):
-        """
-        Extracts a parameter, given a parameter name, and optional type
-        """
-
-        # "global" policy applies if allowEmpty not set
-        if allowEmpty is None:
-            allowEmpty = self._allowEmpty
-
-        value = self._paramList.get(paramName)
-        if value is None:
-            if allowEmpty:
-                value = defaultValue
-            else:
-                raise EmptyParameterException(paramName)
-
-        if value is not None:
-            if pType == str:
-                value = str(value)
-            elif pType == int:
-                value = int(value)
-            elif pType == float:
-                value = float(value)
-            elif pType == bool:
-                if not type(value) == bool:
-                    try:
-                        value = distutils.util.strtobool(str(value))
-                    except ValueError:
-                        raise ExpectedParameterException(paramName, bool, type(value))
-            elif pType == dict:
-                if not type(value) == dict:
-                    raise ExpectedParameterException(paramName, dict, type(value))
-            elif pType == list:
-                if not type(value) == list:
-                    raise ExpectedParameterException(paramName, list, type(value))
-            elif pType == date:
-                # format will possibly be accomodated to different standards,
-                # in the future
-                value = datetime.strptime(value, '%Y/%m/%d').date()
-            elif pType == datetime:
-                # format will possibly be accomodated to different standards,
-                # in the future
-                try:
-                    # both strings and objects are accepted
-                    if isinstance(value, basestring):
-                        naiveDate = datetime.strptime(value, '%Y/%m/%d %H:%M')
-                    elif value:
-                        naiveDate = datetime.strptime(value['date']+' '+value['time'][:5], '%Y/%m/%d %H:%M')
-                    else:
-                        naiveDate = None
-                except ValueError:
-                    raise DateTimeParameterException(paramName, value)
-
-                if self._timezone and naiveDate:
-                    value = timezone(self._timezone).localize(naiveDate).astimezone(timezone('utc'))
-                else:
-                    value = naiveDate
-
-        if (value is None or value == "") and not allowEmpty:
-            EmptyParameterException(paramName)
-
-        return value
-
-    def setTimezone(self, tz):
-        self._timezone = tz
 
 
 class ServiceBase(RequestHandlerBase):
