@@ -571,14 +571,9 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
         WPConferenceModifBase.__init__(self, rh, target)
 
     def _getPageContent( self, params ):
-        can_unlock = self._conf.as_event.can_lock(session.user)
-        message = _("The event is currently locked so it cannot be modified.")
-        if can_unlock:
-            message += ' ' + _("If you unlock the event, you will be able to modify it again.")
-        return wcomponents.WClosed().getHTML({"message": message,
-                                              "postURL": url_for('event_management.unlock', self._conf),
-                                              "showUnlockButton": can_unlock,
-                                              "unlockButtonCaption": _("Unlock event")})
+        # XXX: We show a message in the management frame but this class is used
+        # in too many places so we keep it around for now.
+        return ''
 
 
 class WPConfCloneConfirm(WPConferenceModifBase):
