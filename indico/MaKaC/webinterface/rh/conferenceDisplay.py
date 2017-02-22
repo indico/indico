@@ -170,7 +170,6 @@ class RHConferenceToXML(RHConferenceBaseDisplay):
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
-
     def _process( self ):
         from MaKaC.common.xmlGen import XMLGen
         from MaKaC.common.output import outputGenerator
@@ -178,6 +177,6 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         xmlgen.initXml()
         outgen = outputGenerator(self.getAW(), xmlgen)
         xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
-        outgen.confToXMLMarc21(self._target.getConference())
+        outgen.confToXMLMarc21(self._conf)
         xmlgen.closeTag("marc:record")
         return send_file(u'event-{}.marc.xml'.format(self.event_new.id), StringIO(xmlgen.getXml()), 'XML')

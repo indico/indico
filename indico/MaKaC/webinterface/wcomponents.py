@@ -307,8 +307,6 @@ class WConferenceHeader(WHeader):
 
         vars["displayNavigationBar"] = layout_settings.get(self._conf, 'show_nav_bar')
 
-        # This is basically the same WICalExportBase, but we need some extra
-        # logic in order to have the detailed URLs
         apiMode = api_settings.get('security_mode')
 
         vars["icsIconURL"] = str(Config.getInstance().getSystemIconURL("ical_grey"))

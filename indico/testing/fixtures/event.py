@@ -20,22 +20,14 @@ import pytest
 
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
-from indico.testing.mocks import MockConference, MockConferenceHolder
 from indico.util.date_time import now_utc
-from MaKaC.conference import ConferenceHolder
 
 
-@pytest.yield_fixture
-def create_event(monkeypatch, monkeypatch_methods, dummy_user, dummy_category, db):
+@pytest.fixture
+def create_event(dummy_user, dummy_category, db):
     """Returns a callable which lets you create dummy events"""
-    monkeypatch_methods('MaKaC.conference.ConferenceHolder', MockConferenceHolder)
-    monkeypatch.setattr('MaKaC.conference.Conference', MockConference)  # for some isinstance checks
 
-    _events = []
-    ch = ConferenceHolder()
-
-    def _create_event(id_=None, legacy=False, **kwargs):
-        conf = MockConference()
+    def _create_event(id_=None, **kwargs):
         # we specify `acl_entries` so SA doesn't load it when accessing it for
         # the first time, which would require no_autoflush blocks in some cases
         now = now_utc(exact=False)
@@ -45,26 +37,14 @@ def create_event(monkeypatch, monkeypatch_methods, dummy_user, dummy_category, d
         kwargs.setdefault('end_dt', now + timedelta(hours=1))
         kwargs.setdefault('timezone', 'UTC')
         kwargs.setdefault('category', dummy_category)
-        conf.as_event = Event(id=id_, creator=dummy_user, acl_entries=set(), **kwargs)
+        event = Event(id=id_, creator=dummy_user, acl_entries=set(), **kwargs)
         db.session.flush()
-        conf.id = str(conf.as_event.id)
-        ch.add(conf)
-        _events.append(conf)
-        return conf if legacy else conf.as_event
+        return event
 
-    yield _create_event
-
-    for event in _events:
-        ch.remove(event)
-
-
-@pytest.fixture
-def dummy_event(create_event):
-    """Creates a mocked dummy event"""
-    return create_event('0', legacy=True)
+    return _create_event
 
 
 @pytest.fixture
 def dummy_event_new(create_event):
     """Creates a mocked dummy event"""
-    return create_event('0', legacy=False)
+    return create_event(0)
