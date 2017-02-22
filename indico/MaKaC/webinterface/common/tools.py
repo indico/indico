@@ -113,9 +113,6 @@ locatestartendtag = re.compile(r"""
   <([a-zA-Z][^\s<>]*)>
 """, re.VERBOSE)
 
-# Generate the regular expression objects to found the not allowed tags
-tagSearch = re.compile("< *[^<^>^ ]+",re.IGNORECASE|re.DOTALL)
-
 
 class HarmfulHTMLException(Exception):
 
@@ -124,6 +121,7 @@ class HarmfulHTMLException(Exception):
 
     def __str__(self):
         return self.msg
+
 
 class RestrictedHTMLParser( HTMLParser ):
 
@@ -212,9 +210,6 @@ class RestrictedHTMLParser( HTMLParser ):
             raise
 
 
-
-
-
 def restrictedHTML(txt, sanitizationLevel):
     try:
         parser = RestrictedHTMLParser(sanitizationLevel)
@@ -224,10 +219,6 @@ def restrictedHTML(txt, sanitizationLevel):
         return e.msg
     return None
 
-def hasTags(s):
-    """ Returns if a given string has any tags
-    """
-    return tagSearch.search(s) is not None
 
 def escape_html(text, escape_quotes=False):
     """ Escape all HTML tags, avoiding XSS attacks.
@@ -249,31 +240,11 @@ def escape_html(text, escape_quotes=False):
         text = text.replace("'", '&#34;')
     return text
 
-def escape_tags_short_url(text):
-    """
-    Escapes the tag short url permitting only some characters
-    """
-    text = re.sub('[^a-zA-Z0-9_\-\.]', '', text)
-    return text
-
-def unescape_html(text):
-    """ Replaces instances of escaped entities by their characters
-        &nbsp; => (space)
-        &lt; => <
-        &gt; => >
-        &amp; => &
-        &quot; => "
-        &#34; => '
-
-        Also replaces '\xc2\xa0' (a kind of space char) by ' '
-    """
-    return text.replace('&nbsp;', ' ').replace('\xc2\xa0', ' ').replace('&lt;', '<').replace('&gt;','>').replace('&quot','"').replace('&#34;',"'").replace('&amp;','&')
 
 # Routine by Micah D. Cochran
 # Submitted on 26 Aug 2005
 # This routine is allowed to be put under any license Open Source (GPL, BSD, LGPL, etc.) License
 # or any Propriety License. Effectively this routine is in public domain. Please attribute where appropriate.
-
 def strip_ml_tags(in_text):
     """ Description: Removes all HTML/XML-like tags from the input text.
         Inputs: s --> string of text
@@ -309,11 +280,3 @@ def strip_ml_tags(in_text):
     # convert the list back into text
     join_char=''
     return join_char.join(s_list)
-
-# Method that remove all the problematic characters from a filename used
-# in HTML Headers.
-def cleanHTMLHeaderFilename(fn):
-    fn=fn.replace("/", "")
-    fn=fn.replace("\r","")
-    fn=fn.replace("\n","")
-    return fn

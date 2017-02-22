@@ -22,8 +22,6 @@ from speaklater import _LazyString
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
-from MaKaC.i18n import _
-from MaKaC.webinterface import urlHandlers
 from MaKaC.conference import Conference
 from MaKaC.common.timezoneUtils import DisplayTZ
 from MaKaC.common.contextManager import ContextManager
@@ -37,7 +35,7 @@ from indico.modules.api import settings as api_settings
 from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.legal import legal_settings
-from indico.util.i18n import i18nformat, get_current_locale, get_all_locales
+from indico.util.i18n import i18nformat, get_current_locale, get_all_locales, _
 from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
 from indico.util.string import truncate

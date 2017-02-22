@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 # MaKaC
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.wcomponents as wcomponents
 from MaKaC.webinterface.pages.main import WPMainBase
 

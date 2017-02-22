@@ -32,7 +32,6 @@ from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT
 from reportlab.rl_config import defaultPageSize
 from reportlab.platypus import Table, TableStyle
 from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.PDFinterface.base import PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, modifiedFontSize
 from reportlab.lib.pagesizes import landscape, A4
 from MaKaC.webinterface.common.tools import strip_ml_tags
