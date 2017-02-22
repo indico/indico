@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-import stat
-
-from BTrees.OOBTree import OOBTree
 from flask import request, has_request_context, session
 from persistent import Persistent
 from pytz import all_timezones, timezone, utc
@@ -25,7 +21,7 @@ from sqlalchemy.orm import joinedload
 
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db import DBMgr, db
+from indico.core.db import db
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
@@ -36,12 +32,10 @@ from indico.util.i18n import _
 from indico.util.string import return_ascii, is_legacy_id
 from indico.util.user import unify_user_args
 
-from MaKaC import fileRepository
 from MaKaC.common.fossilize import Fossilizable
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
-from MaKaC.common.PickleJar import Updates
-from MaKaC.errors import MaKaCError, NotFoundError
+from MaKaC.errors import NotFoundError
 from MaKaC.trashCan import TrashCanManager
 
 
