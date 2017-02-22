@@ -710,10 +710,15 @@ class EventSearchFetcher(IteratedDataFetcher):
                      .filter(Event.title_matches(to_unicode(query_string)),
                              ~Event.is_deleted)
                      .options(undefer('effective_protection_mode')))
+            sort_dir = db.desc if self._descending else db.asc
             if self._orderBy == 'start':
-                query = query.order_by(Event.start_dt)
+                query = query.order_by(sort_dir(Event.start_dt))
+            elif self._orderBy == 'end':
+                query = query.order_by(sort_dir(Event.end_dt))
             elif self._orderBy == 'id':
-                query = query.order_by(Event.id)
+                query = query.order_by(sort_dir(Event.id))
+            elif self._orderBy == 'title':
+                query = query.order_by(sort_dir(db.func.lower(Event.title)))
 
             counter = 0
             # Query the DB in chunks of 1000 records per query until the limit is satisfied
@@ -727,11 +732,7 @@ class EventSearchFetcher(IteratedDataFetcher):
                         if (self._limit is not None) and (counter == self._offset + self._limit):
                             break
 
-        if self._orderBy in ['start', 'id', None]:
-            obj_list = _iterate_objs(query)
-        else:
-            obj_list = sorted(_iterate_objs(query), key=self._sortingKeys.get(self._orderBy), reverse=self._descending)
-        for event in obj_list:
+        for event in _iterate_objs(query):
             yield {
                 'id': event.id,
                 'title': event.title,
