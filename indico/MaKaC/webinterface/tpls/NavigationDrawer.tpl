@@ -13,11 +13,11 @@ while target_ != None:
                 url = category.url
             l.append((category.title, url))
         break
-    else:  # Conference
-        event = target_.as_event
+    else:  # Event
+        event = target_
         name = event.title
         if isModif:
-            url = url_for('event_management.settings', target_)
+            url = url_for('event_management.settings', event)
         else:
             url = event.url
         target_ = event.category

@@ -53,7 +53,6 @@ class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
 #######################################################################################
 
 class RHConfClone( RHConferenceModifBase ):
-    _uh = urlHandlers.UHConfClone
     _allowClosed = True
 
     def _process( self ):
@@ -71,7 +70,6 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
     adds mechanism of selective cloning of materials and access
     privileges attached to an event
     """
-    _uh = urlHandlers.UHConfPerformCloning
     _cloneType = "none"
     _allowClosed = True
 
@@ -107,17 +105,17 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         paramNames = params.keys()
         #we notify the event in case any plugin wants to add their options
         if self._cancel:
-            self._redirect(urlHandlers.UHConfClone.getURL(self._conf))
+            self._redirect(url_for('event_mgmt.confModifTools-clone', self.event_new))
         elif self._confirm:
             if self._cloneType == "once" :
                 newConf = self._conf.clone(self._date)
-                self._redirect(url_for('event_management.settings', newConf))
+                self._redirect(url_for('event_management.settings', newConf.as_event))
             elif self._cloneType == "intervals" :
                 self._withIntervals()
             elif self._cloneType == "days" :
                 self._days()
             else :
-                self._redirect( urlHandlers.UHConfClone.getURL( self._conf ) )
+                self._redirect(url_for('event_mgmt.confModifTools-clone', self.event_new))
         else:
             if self._cloneType == "once" :
                 nbClones = 1
@@ -231,8 +229,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         #search the first day of the month
 
         if params["day"] == "NOVAL":
-            #self._endRequest()
-            self.redirect( urlHandlers.UHConfClone.getURL( self._target ) )
+            self.redirect(url_for('event_mgmt.confModifTools-clone', self.event_new))
 
         if params["daysEndDateChoice"] == "until":
             date = self._date

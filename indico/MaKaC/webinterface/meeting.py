@@ -15,12 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import MaKaC.webinterface.wcomponents as wcomponents
-import MaKaC.webinterface.urlHandlers as urlHandlers
 import MaKaC.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from MaKaC.webinterface.general import WebFactory
 from MaKaC.webinterface.pages.conferences import WPConferenceDisplayBase
 from indico.modules.events.cloning import EventCloner
+from indico.web.flask.util import url_for
 
 
 class WebFactory(WebFactory):
@@ -59,7 +59,7 @@ class WPMConfClone(conferences.WPConfClone):
     def _getPageContent(self, params):
         p = conferences.WConferenceClone(self._conf)
         pars = {
-            "cloning": urlHandlers.UHConfPerformCloning.getURL(self._conf),
+            "cloning": url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event),
             "startTime": self._conf.as_event.start_dt_local.isoformat(),
             "cloneOptions": ''
         }
@@ -70,7 +70,7 @@ class WPMConfClone(conferences.WPConfClone):
 class WPMeetingDisplay( WPConferenceDisplayBase ):
 
     def _getNavigationDrawer(self):
-        pars = {"target": self._conf, "isModif": False}
+        pars = {"target": self._conf.as_event, "isModif": False}
         return wcomponents.WNavigationDrawer( pars )
 
     def _getHeader( self ):

@@ -31,7 +31,6 @@ from indico.util.i18n import _
 from indico.util.string import return_ascii, is_legacy_id
 
 from MaKaC.common.fossilize import Fossilizable
-from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.errors import NotFoundError
 from MaKaC.trashCan import TrashCanManager
@@ -114,12 +113,12 @@ class Conference(CommonObjectBase):
             one which is specified"""
         self.id = str(newId)
 
-    def getLocator( self ):
-        """Gives back (Locator) a globaly unique identification encapsulated in
-            a Locator object for the conference instance """
-        d = Locator()
-        d["confId"] = self.id
-        return d
+    @property
+    @warn_on_access
+    def locator(self):
+        import warnings
+        warnings.warn('Accessed Conference.locator', stacklevel=4)
+        return self.as_event.locator
 
     def delete(self, user=None):
         signals.event.deleted.send(self, user=user)
