@@ -24,7 +24,6 @@ from pytz import timezone
 from sqlalchemy.orm import load_only
 
 from indico.core.config import Config
-from indico.modules import ModuleHolder
 from indico.modules.auth.util import url_for_logout
 from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.cloning import EventCloner
@@ -672,7 +671,6 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
 
         self._conf = conf
-        self._cssTplsModule = ModuleHolder().getById("cssTpls")
 
     def _applyDecoration( self, body ):
         """

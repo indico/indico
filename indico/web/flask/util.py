@@ -367,7 +367,6 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional)
     except IOError:
-        from MaKaC.common.info import HelperMaKaCInfo
         if not app.debug:
             raise
         raise NotFound('File not found: %s' % path_or_fd)

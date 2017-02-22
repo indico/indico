@@ -29,7 +29,7 @@ from flask import current_app, request
 from werkzeug.utils import secure_filename
 
 from MaKaC.common.contribPacker import ZIPFileHandler
-from MaKaC.common import timezoneUtils, HelperMaKaCInfo
+from MaKaC.common import timezoneUtils
 from MaKaC.PDFinterface.conference import ProgrammeToPDF, AbstractBook, ContribToPDF, ContribsToPDF
 from MaKaC.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay, WPStaticConferenceProgram,
                                              WPStaticContributionDisplay, WPStaticContributionList, WPStaticCustomPage,
