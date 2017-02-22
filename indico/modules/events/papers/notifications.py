@@ -89,3 +89,12 @@ def notify_paper_assignment(user, role, contributions, event, assign):
                                    receiver=user, assign=assign, role=role)
     email = make_email(to_list=user.email, template=template, html=True)
     send_email(email, event=event, module='Papers', user=session.user)
+
+
+def notify_comment(person, paper, comment, submitter):
+    event = paper.event_new
+    receiver_name = person.first_name or 'user'
+    template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
+                                   contribution=paper.contribution, comment=comment, submitter=submitter)
+    email = make_email(to_list=user.email, template=template, html=True)
+    send_email(email, event=event, module='Papers', user=session.user)

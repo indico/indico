@@ -1,0 +1,24 @@
+{% extends 'events/papers/emails/base.html' %}
+
+{% block subject_message %}New paper comment{% endblock %}
+
+{% block header_subtitle %}New paper comment{% endblock %}
+
+{% block header_subtitle_ref %}ref #{{ contribution.friendly_id }}{% endblock %}
+
+{% block content_header %}
+    <p>Dear {{ receiver }},</p>
+    <p>{{ submitter.full_name }} commented on the paper <strong>{{ contribution.title }}</strong>:</p>
+    <blockquote style="border-left: 5px solid #dfdfdf; padding-left: 10px; font-style: italic; color: #999;">
+        {{ comment }}
+    </blockquote>
+{% endblock %}
+
+{% block content_body %}
+    <p>You can reply to this comment from within the paper page:</p>
+    <p>
+        <a href="{{ url_for('papers.paper_timeline', contribution, _external=true) }}">
+            {{- url_for('papers.paper_timeline', contribution, _external=true) -}}
+        </a>
+    </p>
+{% endblock %}

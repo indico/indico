@@ -28,7 +28,8 @@ from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKin
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.reviews import PaperAction, PaperReview, PaperReviewType
+from indico.modules.events.papers.models.reviews import (PaperAction, PaperReview, PaperReviewType,
+                                                         PaperCommentVisibility)
 from indico.modules.events.papers.models.review_ratings import PaperReviewRating
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.models.comments import PaperReviewComment
@@ -36,7 +37,7 @@ from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.papers.notifications import (notify_paper_revision_submission,
                                                         notify_paper_review_submission, notify_paper_judgment,
-                                                        notify_added_to_reviewing_team,
+                                                        notify_added_to_reviewing_team, notify_comment,
                                                         notify_removed_from_reviewing_team, notify_paper_assignment)
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.util import update_object_principals
@@ -319,6 +320,16 @@ def create_comment(paper, text, visibility, user):
     comment = PaperReviewComment(user=user, text=text, visibility=visibility)
     paper.last_revision.comments.append(comment)
     db.session.flush()
+    receivers = {x for x in paper.contribution.paper_judges}
+    if visibility == PaperCommentVisibility.contributors or visibility == PaperCommentVisibility.reviewers:
+        receivers |= paper.contribution.paper_layout_reviewers if paper.cfp.layout_reviewing_enabled else {}
+        receivers |= paper.contribution.paper_content_reviewers if paper.cfp.content_reviewing_enabled else {}
+    if visibility == PaperCommentVisibility.contributors:
+        receivers |= {x.person for x in paper.contribution.person_links
+                      if x.person.email and x.person.email != user.email}
+    receivers.discard(user)
+    for receiver in receivers:
+        notify_comment(receiver, paper, text, user)
     logger.info("Paper %r received a comment from %r", paper, session.user)
     paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         'Paper {} received a comment'.format(paper.verbose_title),
