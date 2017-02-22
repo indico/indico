@@ -22,7 +22,6 @@ from sqlalchemy import and_, func, or_, cast, Date
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import contains_eager
 
-from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.common.Locators import Locator
 from MaKaC.common.cache import GenericCache
 from indico.core.db.sqlalchemy import db
@@ -278,7 +277,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     def details_url(self):
         if self.id is None:
             return None
-        return str(UH.UHRoomBookingRoomDetails.getURL(target=self))
+        return url_for('rooms.roomBooking-roomDetails', self)
 
     @property
     def large_photo_url(self):

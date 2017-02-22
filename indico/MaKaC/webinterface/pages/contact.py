@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.webinterface.pages.main import WPMainBase
-import MaKaC.webinterface.wcomponents as wcomponents
 from indico.core.config import Config
+from indico.web.flask.util import url_for
+from MaKaC.webinterface import wcomponents
+from MaKaC.webinterface.pages.main import WPMainBase
 
 
 class WPContact(WPMainBase):
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer("Contact", urlHandlers.UHContact.getURL)
+        return wcomponents.WSimpleNavigationDrawer("Contact", lambda: url_for('misc.contact'))
 
     def _getBody(self, params):
         wc = WContact()

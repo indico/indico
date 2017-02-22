@@ -2,7 +2,7 @@
 
 <tr>
   <td class="formTitle">
-    <a href="${ urlHandlers.UHRoomBookingAdmin.getURL() }">
+    <a href="${ url_for('rooms_admin.roomBooking-admin') }">
         &lt;&lt;Back
     </a>
   </td>
@@ -89,7 +89,7 @@
           <p style="color: Green;">
             ${ _('This location supports dynamic equipment management.') }
           </p>
-          <form action="${ urlHandlers.UHRoomBookingSaveEquipment.getURL(location) }" method="POST">
+          <form action="${ url_for('rooms_admin.roomBooking-saveEquipment', location) }" method="POST">
             <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
             <p>
               <input type="text" id="newEquipmentName" name="newEquipmentName" value="" size="28">
@@ -97,7 +97,7 @@
             </p>
           </form>
           % if equipment_types:
-            <form action="${ urlHandlers.UHRoomBookingDeleteEquipment.getURL(location) }" method="POST">
+            <form action="${ url_for('rooms_admin.roomBooking-deleteEquipment', location) }" method="POST">
               <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
               <p>
                 <select name="removeEquipmentName" id="removeEquipmentName">
@@ -134,7 +134,7 @@
             <p style="color: Green;">
                 ${ _('This location supports dynamic attributes management.') }
             </p>
-            <form action="${ urlHandlers.UHRoomBookingSaveCustomAttributes.getURL(location) }" method="POST">
+            <form action="${ url_for('rooms_admin.roomBooking-saveCustomAttributes', location) }" method="POST">
               <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
               <table>
                 <tr>
@@ -227,7 +227,7 @@
 <script type="text/javascript">
 
     var urlTemplates = {
-        'details': ${ urlHandlers.UHRoomBookingRoomDetails.getURL().js_router | j,n },
+        'details': ${ url_rule_to_js('rooms.roomBooking-roomDetails') | j,n },
         'modify': ${ url_rule_to_js('rooms_admin.modify_room') | j,n },
         'create': ${ url_rule_to_js('rooms_admin.create_room') | j,n },
         'delete': ${ url_rule_to_js('rooms_admin.delete_room') | j,n }
@@ -367,7 +367,7 @@ indicoRequest(
     % if not kpi:
     <tr>
       <td colspan="2" style="padding-left: 30px; padding-top: 30px;">
-        <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location, withKPI=True) }">
+        <a href="${ url_for('rooms_admin.roomBooking-adminLocation', location, withKPI=True) }">
           ${ _('Show Key Performance Indicators') }
         </a>
       </td>

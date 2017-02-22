@@ -89,7 +89,7 @@
     <table width="95%" cellpadding="0" cellspacing="0" border="0" align="center">
         <tr>
             <td class="formTitle">
-                <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">
+                <a href="${ url_for('rooms_admin.roomBooking-adminLocation', location) }">
                     &lt;&lt;${ _('Back') }
                 </a>
             </td>
@@ -371,7 +371,7 @@
                                 </table>
                             % else:
                                 ${ _('There are no custom attributes to pick.') }
-                                <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may first add some to location, {0}.').format(location.name) }</a>
+                                <a href="${ url_for('rooms_admin.roomBooking-adminLocation', location) }">${ _('You may first add some to location, {0}.').format(location.name) }</a>
                             % endif
                         </td>
                     </tr>
@@ -401,7 +401,7 @@
                                 </table>
                             % else:
                                 ${ _('There is no equipment to pick.') }
-                                <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(location) }">${ _('You may add some to location, {0}.').format(location.name) }</a>
+                                <a href="${ url_for('rooms_admin.roomBooking-adminLocation', location) }">${ _('You may add some to location, {0}.').format(location.name) }</a>
                             % endif
                         </td>
                     </tr>

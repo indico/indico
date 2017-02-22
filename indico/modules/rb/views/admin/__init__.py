@@ -29,7 +29,6 @@ class WPRoomsBase(WPAdminsBase):
 
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
-
         if session.user.is_admin:
             self._subTabRoomBooking = self._tabCtrl.newTab(
                 'booking',
@@ -46,26 +45,14 @@ class WPRoomsBase(WPAdminsBase):
             self._subTabRoomBooking = self._tabCtrl.newTab(
                 'booking',
                 _('Room Booking'),
-                urlHandlers.UHRoomBookingAdmin.getURL()
+                url_for('rooms_admin.roomBooking-admin')
             )
 
         self._subTabConfig = self._subTabRoomBooking.newSubTab(
             'management',
             _('Management'),
-            urlHandlers.UHRoomBookingAdmin.getURL()
+            url_for('rooms_admin.roomBooking-admin')
         )
-
-    def _getNavigationDrawer(self):
-        if self._rh._getUser().isAdmin():
-            return WSimpleNavigationDrawer(
-                _('Room Booking Admin'),
-                lambda: url_for('rooms_admin.settings'),
-                bgColor='white'
-            )
-
-        return WSimpleNavigationDrawer(_('Room Booking Admin'),
-                                       urlHandlers.UHRoomBookingAdmin.getURL,
-                                       bgColor="white")
 
     def _getPageContent(self, params):
         return WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))

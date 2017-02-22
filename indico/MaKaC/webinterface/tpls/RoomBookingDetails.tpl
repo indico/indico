@@ -86,7 +86,7 @@
         var contentDiv = createContentDiv($T("This action is irreversible. Are you sure you want to <strong>delete</strong> the booking?"));
         new ConfirmPopup($T("Delete booking"), contentDiv, function(confirmed) {
             if(confirmed) {
-                $("#submits").attr("action", '${ urlHandlers.UHRoomBookingDeleteBooking.getURL( reservation ) }');
+                $("#submits").attr("action", "${ url_for('rooms.roomBooking-deleteBooking', reservation ) }");
                 $("#submits").submit();
             }
         }, $T("Yes"), $T("No")).open();
