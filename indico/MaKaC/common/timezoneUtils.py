@@ -17,7 +17,7 @@
 from datetime import datetime
 
 from flask import session, has_request_context
-from pytz import timezone, all_timezones
+from pytz import timezone
 
 from indico.core.config import Config
 
@@ -33,19 +33,6 @@ def utc2server(date, naive=True):
     if naive:
         return servertime.replace(tzinfo=None)
     return servertime
-
-
-def getAdjustedDate(date, object=None, tz=None):
-    # Returns a date adjusted to the timezone tz
-    # tz can be string (preferred) or a pytz.timezone object
-    # If tz is None, the timezone of the object is used
-    if not tz:
-        tz = object.getTimezone()
-    if isinstance(tz, basestring):
-        tz = timezone(tz)
-    if tz.zone not in all_timezones:
-        tz = timezone('UTC')
-    return date.astimezone(tz)
 
 
 class DisplayTZ:
