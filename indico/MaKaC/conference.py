@@ -38,11 +38,9 @@ from indico.util.user import unify_user_args
 
 from MaKaC import fileRepository
 from MaKaC.common.fossilize import Fossilizable
-from MaKaC.common.info import HelperMaKaCInfo
 from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.PickleJar import Updates
-from MaKaC.common.timezoneUtils import nowutc
 from MaKaC.errors import MaKaCError, NotFoundError
 from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.trashCan import TrashCanManager
@@ -204,15 +202,6 @@ class Conference(CommonObjectBase):
     def getURL(self):
         return self.as_event.short_external_url
 
-    def notifyModification( self, date = None, raiseEvent = True):
-        """Method called to notify the current conference has been modified.
-        """
-        self._p_changed=1
-
-    def getCreationDate(self):
-        """Returns the date in which the conference was created"""
-        return self.as_event.created_dt
-
     @warn_on_access
     def getId( self ):
         """returns (string) the unique identifier of the conference"""
@@ -327,7 +316,6 @@ class Conference(CommonObjectBase):
                              features=features_event_settings.get(self, 'enabled'),
                              add_creator_as_manager=False)
         conf = event.as_legacy
-        conf.notifyModification()
 
         # Run the new modular cloning system
         EventCloner.run_cloners(old_event, event)
