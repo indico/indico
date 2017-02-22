@@ -33,19 +33,20 @@
 
 \vspace{1em}
 
-% for field in fields:
+\begin{addmargin}[1em]{1em}
+    %% Markdown content
+    \rmfamily {
+        \allsectionsfont{\rmfamily}
+        \sectionfont{\normalsize\rmfamily}
+        \subsectionfont{\small\rmfamily}
+        \small
+        ${md_convert(contrib.description)}
+    }
+    \vspace{1.5em}
+\end{addmargin}
 
-    \begin{addmargin}[1em]{1em}
-        %% Markdown content
-        \rmfamily {
-            \allsectionsfont{\rmfamily}
-            \sectionfont{\normalsize\rmfamily}
-            \subsectionfont{\small\rmfamily}
-            \small
-            ${md_convert(contrib.description)}
-        }
-        \vspace{1.5em}
-    \end{addmargin}
+
+% for field in fields:
 
     {\bf
         \noindent
