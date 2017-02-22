@@ -19,6 +19,4 @@
         % endfor
         \end{itemize*}
     }
-
-    \vspace{0.5em}
 %endif

@@ -52,7 +52,6 @@
         \large
         ${field.title | latex_escape}
     }
-    \vspace{0.5em}
 
     \begin{addmargin}[1em]{1em}
         %% Markdown content

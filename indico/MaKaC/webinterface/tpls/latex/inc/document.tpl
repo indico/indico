@@ -31,6 +31,7 @@
 \usepackage{tcolorbox}
 \usepackage[inline]{enumitem}
 \usepackage[breakall]{truncate}
+\usepackage[parfill]{parskip}
 
 <%block name="header_extra">
 </%block>

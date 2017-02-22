@@ -94,6 +94,4 @@
         \small
         ${ md_convert(field_value.friendly_data) }
     }
-
-    \vspace{0.5em}
 % endfor

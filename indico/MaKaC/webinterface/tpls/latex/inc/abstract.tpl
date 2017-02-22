@@ -31,7 +31,6 @@
     \large
     ${_("Content")}
 }
-\vspace{0.5em}
 
 \begin{addmargin}[1em]{1em}
     %% Markdown content
@@ -52,7 +51,6 @@
         \large
         ${field.title | latex_escape}
     }
-    \vspace{0.5em}
 
     \begin{addmargin}[1em]{1em}
         %% Markdown content
@@ -74,7 +72,6 @@
 <%include file="person_list.tpl" args="caption=_('Co-author(s)'), list=abstract.secondary_authors" />
 <%include file="person_list.tpl" args="caption=_('Presenter(s)'), list=abstract.speakers" />
 
-\vspace{0.5em}
 
 % if track_class:
 {
@@ -97,7 +94,6 @@
 % endif
 
 % if abstract.submission_comment:
-    \vspace{0.5em}
     \textbf{${_("Comments:") | latex_escape}}
     \begin{addmargin}[1em]{1em}
         ${abstract.submission_comment | latex_escape}
@@ -107,7 +103,6 @@
 <%block name="management_data">
 </%block>
 
-\vspace{0.5em}
 
 ${latex_escape(_("Submitted by {0} on {1}"), ignore_braces=True).format(
     r"\textbf{{{0}}}".format(latex_escape(abstract.submitter.get_full_name(abbrev_first_name=False, show_title=True).encode('utf-8'))),
