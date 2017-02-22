@@ -824,13 +824,12 @@ class RHProtected(RH):
 
 class RHDisplayBaseProtected(RHProtected):
     def _checkProtection(self):
-        if isinstance(self._target, Conference):
-            event = self._target.as_event
-            can_access = event.can_access(session.user)
-            if not can_access and event.access_key:
-                raise KeyAccessError()
-        else:
-            can_access = self._target.canAccess(self.getAW())
+        if not isinstance(self._target, Conference):
+            raise Exception('Unexpected object')
+        event = self._target.as_event
+        can_access = event.can_access(session.user)
+        if not can_access and event.access_key:
+            raise KeyAccessError()
         if can_access:
             return
         elif self._getUser() is None:
@@ -845,15 +844,13 @@ class RHModificationBaseProtected(RHProtected):
     ROLE = None
 
     def _checkProtection(self):
-        if isinstance(self._target, Conference):
-            can_manage = self._target.as_event.can_manage(session.user, role=self.ROLE)
-        else:
-            can_manage = self._target.canModify(session.avatar)
-        if not can_manage:
+        if not isinstance(self._target, Conference):
+            raise Exception('Unexpected object')
+        event = self._target.as_event
+        if not event.can_manage(session.user, role=self.ROLE):
             if self._getUser() is None:
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-        if hasattr(self._target, "getConference") and not self._allowClosed:
-            if self._target.getConference().as_event.is_locked:
-                raise ConferenceClosedError(self._target.getConference())
+        if not self._allowClosed and event.is_locked:
+            raise ConferenceClosedError(self._target)

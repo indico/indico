@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-"""Some pages for dealing with generic application errors
-"""
 import json
 import sys
 import traceback
@@ -30,6 +28,7 @@ from MaKaC.webinterface.pages.main import WPMainBase
 from MaKaC.i18n import _
 from indico.core.config import Config
 from indico.util.i18n import i18nformat
+from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
 
 
@@ -179,14 +178,8 @@ class WAccessKeyError( WTemplated ):
         self._msg = msg
 
     def getVars( self ):
-        from MaKaC.conference import Conference
-        vars = WTemplated.getVars( self )
-        if isinstance(self._rh._target,Conference):
-            vars["type"] = "event"
-            vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target) ) )
-        else:
-            vars["type"] = "presentation"
-            vars["url"] = quoteattr( str( urlHandlers.UHConfEnterAccessKey.getURL(self._rh._target.getConference()) ) )
+        vars = WTemplated.getVars(self)
+        vars["url"] = url_for('event.conferenceDisplay-accessKey', self._rh._target)
         vars["msg"] = self._msg
         return vars
 
@@ -227,10 +220,10 @@ class WPLaTeXError(WPDecorated):
         conf = self._error.params['conf']
         return wc.getHTML({
             'report_id': self._error.report_id,
-            'is_manager': conf.canModify(self._getAW()),
+            'is_manager': conf.as_event.can_manage(session.user),
             'log': open(self._error.log_file, 'r').read(),
             'source_code': open(self._error.source_file, 'r').read()
-            })
+        })
 
 
 class WTimingError( WTemplated ):

@@ -213,11 +213,6 @@ class AvatarUserWrapper(Persistent, Fossilizable):
 
     setPhone = setTelephone
 
-    def canModify(self, aw_or_user):
-        if hasattr(aw_or_user, 'getUser'):
-            aw_or_user = aw_or_user.getUser()
-        return self.canUserModify(aw_or_user)
-
     def canUserModify(self, avatar):
         if not self.user:
             return False

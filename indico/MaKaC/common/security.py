@@ -93,9 +93,6 @@ class Sanitization(object):
         # if no user logged in, then no html allowed
         if accessWrapper.getUser():
             level = Config.getInstance().getSanitizationLevel()
-        elif target and hasattr(target, "canModify") and target.canModify(accessWrapper):
-            # not logged user, but use a modification key
-            level = Config.getInstance().getSanitizationLevel()
         else:
             level = 0
 
