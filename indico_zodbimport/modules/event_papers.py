@@ -26,7 +26,8 @@ from pytz import utc
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
-from indico.core.storage import StorageError
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.core.storage import StorageError, StoredFileMixin
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.features.util import set_feature_enabled
@@ -39,12 +40,11 @@ from indico.modules.events.papers.models.reviews import PaperReview, PaperReview
 from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.models.templates import PaperTemplate
 from indico.modules.events.papers.settings import paper_reviewing_settings, PaperReviewingRole
-from indico.modules.events.paper_reviewing.models.papers import LegacyPaperFile
-from indico.modules.events.paper_reviewing.models.roles import PaperReviewingRoleType
 from indico.modules.users import User
 from indico.util.console import verbose_iterator, cformat
 from indico.util.fs import secure_filename
-from indico.util.string import crc32
+from indico.util.string import crc32, format_repr
+from indico.util.struct.enum import IndicoEnum
 from indico.util.struct.iterables import committing_iterator
 
 from indico_zodbimport import Importer, convert_to_unicode
@@ -73,6 +73,41 @@ STATE_COLOR_MAP = {
     PaperRevisionState.to_be_corrected: 'yellow',
     PaperRevisionState.rejected: 'red'
 }
+
+
+class LegacyPaperReviewingRoleType(int, IndicoEnum):
+    reviewer = 0
+    referee = 1
+    editor = 2
+
+
+class LegacyPaperReviewingRole(db.Model):
+    __tablename__ = 'legacy_contribution_roles'
+    __table_args__ = {'schema': 'event_paper_reviewing'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.users.id'), nullable=False)
+    contribution_id = db.Column(db.Integer, db.ForeignKey('events.contributions.id'))
+    role = db.Column(PyIntEnum(LegacyPaperReviewingRoleType))
+
+    contribution = db.relationship('Contribution', lazy=False, backref='legacy_paper_reviewing_roles')
+    user = db.relationship('User', lazy=False)
+
+    def __repr__(self):
+        return format_repr(self, 'id')
+
+
+class LegacyPaperFile(StoredFileMixin, db.Model):
+    __tablename__ = 'legacy_paper_files'
+    __table_args__ = {'schema': 'event_paper_reviewing'}
+
+    id = db.Column(db.Integer, primary_key=True)
+    contribution_id = db.Column(db.Integer, db.ForeignKey('events.contributions.id'))
+    revision_id = db.Column(db.Integer)
+    contribution = db.relationship('Contribution', lazy=False, backref='legacy_paper_files')
+
+    def __repr__(self):
+        return format_repr(self, 'id')
 
 
 def _to_utc(dt):
@@ -220,11 +255,11 @@ class PaperMigration(object):
 
     def _migrate_paper_roles(self, contribution):
         for role in contribution.legacy_paper_reviewing_roles:
-            if role.role == PaperReviewingRoleType.referee:
+            if role.role == LegacyPaperReviewingRoleType.referee:
                 contribution.paper_judges.add(role.user)
-            elif role.role == PaperReviewingRoleType.reviewer:
+            elif role.role == LegacyPaperReviewingRoleType.reviewer:
                 contribution.paper_content_reviewers.add(role.user)
-            elif role.role == PaperReviewingRoleType.editor:
+            elif role.role == LegacyPaperReviewingRoleType.editor:
                 contribution.paper_layout_reviewers.add(role.user)
 
     def _migrate_review(self, contribution, old_judgment, review_type):
