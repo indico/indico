@@ -140,8 +140,7 @@ class EventOrgTextPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, event):
-        # TODO: Replace with proper Event field when available
-        return event.as_legacy.getOrgText()
+        return event.organizer_info
 
 
 class CategoryTitlePlaceholder(Placeholder):
