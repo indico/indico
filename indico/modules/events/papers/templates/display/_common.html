@@ -1,32 +1,37 @@
-{% macro render_cfp_infoline(event, cfp, show_icon=true, redirect_first=false) %}
-    {% set can_submit_papers = cfp.is_open %}
+{% macro render_cfp_infoline(event, cfp, contributions, show_icon=true, redirect_first=false) %}
     <div class="infoline announcement">
         {% if show_icon %}
             <span class="icon icon-file-content"></span>
         {% endif %}
         <div class="text">
-            {%- if can_submit_papers %}
+            {%- if cfp.is_open %}
                 <div class="label">
                     {%- trans %}The call for papers is open{% endtrans -%}
                 </div>
                 <div>
-                    {%- trans %}You can submit a paper for reviewing.{% endtrans -%}
+                    {% if contributions|length == 1 %}
+                        {%- trans %}You can submit your paper for {% endtrans -%}
+                        "<span>{{ _('#%d: %s' | format(contributions[0].friendly_id, contributions[0].title) | truncate(65)) }}</span>"
+                    {% else %}
+                        {%- trans %}You can submit a paper for reviewing.{% endtrans -%}
+                    {% endif %}
                 </div>
-                <div class="toolbar right">
-                    {% if session.user and not redirect_first %}
-                        <a class="i-button highlight js-show-paper-form"
+                <div class="toolbar">
+                    {% if contributions|length == 1 %}
+                        <a class="i-button highlight"
                            data-title="{% trans %}Submit new paper{% endtrans %}"
-{#                           TODO: Link to submit paper #}
-{#                           data-href="{{ url_for('papers.submit', event) }}"#}
+                           data-href="{{ url_for('papers.submit_revision', contributions[0]) }}"
+                           data-redirect-after="{{ url_for('papers.paper_timeline', contributions[0]) }}"
                            data-confirm-close-unsaved
                            data-ajax-dialog>
-                            {%- trans %}Submit new paper{% endtrans -%}
+                            {%- trans %}Submit paper{% endtrans -%}
                         </a>
                     {% else %}
-                        {% set submit_url = url_for('papers.call_for_papers', event, _anchor='submit-paper') %}
-                        {% set url = submit_url if session.user else url_for_login(submit_url) %}
-                        <a class="i-button highlight" href="{{ url }}">
-                            {%- trans %}Submit new paper{% endtrans -%}
+                        <a class="i-button highlight"
+                           data-title="{% trans %}Select contribution{% endtrans %}"
+                           data-href="{{ url_for('papers.select_contribution', event) }}"
+                           data-ajax-dialog>
+                            {%- trans %}Submit paper{% endtrans -%}
                         </a>
                     {% endif %}
                 </div>

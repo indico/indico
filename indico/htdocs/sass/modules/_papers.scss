@@ -115,6 +115,10 @@
     .cfp-infoline-section {
         .infoline {
             float: none;
+
+            .text span {
+                font-weight: bold;
+            }
         }
     }
 
@@ -132,6 +136,30 @@
             color: $gray;
         }
     }
+}
+
+#select-contribution-dialog {
+    min-width: 500px;
+    padding: 0 20px;
+
+    ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+    ul li {
+        @include border-bottom($light-gray);
+        padding-bottom: 3px;
+        margin-bottom: 10px;
+        font-size: 1.1em;
+    }
+
+    .contrib-list {
+        max-height: 600px;
+        overflow-y: auto;
+        margin-bottom: 15px;
+    }
+
 }
 
 .paper-contribution-list ul {
