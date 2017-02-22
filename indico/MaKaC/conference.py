@@ -49,17 +49,7 @@ from MaKaC.trashCan import TrashCanManager
 
 
 class CoreObject(Persistent):
-    """
-    CoreObjects are Persistent objects that are employed by Indico's core
-    """
-
-    def setModificationDate(self, date=None):
-        """
-        Method called to notify the current object has been modified.
-        """
-        if not date:
-            date = nowutc()
-        self._modificationDS = date
+    pass
 
 
 class CommonObjectBase(CoreObject, Fossilizable):
@@ -111,7 +101,6 @@ class Conference(CommonObjectBase):
 
     def __init__(self, id=''):
         self.id = id
-        self._modificationDS = nowutc()
         self._confPaperReview = ConferencePaperReview(self)
 
     @return_ascii
@@ -218,12 +207,7 @@ class Conference(CommonObjectBase):
     def notifyModification( self, date = None, raiseEvent = True):
         """Method called to notify the current conference has been modified.
         """
-        self.setModificationDate()
         self._p_changed=1
-
-    def getModificationDate( self ):
-        """Returns the date in which the conference was last modified"""
-        return self._modificationDS
 
     def getCreationDate(self):
         """Returns the date in which the conference was created"""

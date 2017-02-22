@@ -148,8 +148,7 @@ class XMLEventSerializer(object):
         xml.append(self._serialize_location(event))
         SubElement(xml, 'startDate').text = self._format_date(event.start_dt)
         SubElement(xml, 'endDate').text = self._format_date(event.end_dt)
-        SubElement(xml, 'creationDate').text = self._format_date(event.as_legacy.getCreationDate())
-        SubElement(xml, 'modificationDate').text = self._format_date(event.as_legacy.getModificationDate())
+        SubElement(xml, 'creationDate').text = self._format_date(event.created_dt)
         xml.append(self._serialize_timezone(self._tz))
         if self._include_timetable:
             for entry in event.timetable_entries.filter(TimetableEntry.parent_id.is_(None)):
