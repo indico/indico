@@ -247,7 +247,7 @@ class WConfDetailsFull(wcomponents.WTemplated):
         vars["address"] = None
         vars["room"] = None
 
-        vars["attachments"] = self._conf.attached_items
+        vars["attachments"] = self._conf.as_event.attached_items
         vars["conf"] = self._conf
         vars["event"] = self._conf.as_event
 
@@ -367,7 +367,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         tz = timezoneUtil.getDisplayTZ()
         wvars['timezone'] = timezone(tz)
 
-        attached_items = conf.attached_items
+        attached_items = event.attached_items
         folders = [folder for folder in attached_items.get('folders', []) if folder.title != "Internal Page Files"]
 
         lectures = []
