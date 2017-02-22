@@ -23,7 +23,7 @@ from indico.core.logger import Logger
 
 from MaKaC.common.mail import GenericMailer
 from MaKaC.errors import MaKaCError
-from MaKaC.services.implementation.base import ParameterManager, ServiceBase
+from MaKaC.services.implementation.base import ServiceBase
 from MaKaC.webinterface.mail import GenericNotification
 
 
@@ -67,13 +67,12 @@ class SendErrorReport(ServiceBase):
 
     def _checkParams(self):
         params = self._params or {}  # if params is not specified it's an empty list
-        pManager = ParameterManager(params)
-        self._userMail = pManager.extract("userMail", pType=str, allowEmpty=True)
-        self._code = pManager.extract("code", pType=str, allowEmpty=True)
-        self._message = pManager.extract("message", pType=str, allowEmpty=True)
+        self._userMail = params.get('userMail', '')
+        self._code = params.get('code', '')
+        self._message = params.get('message', '')
         inner = params.get('inner', '')
         self._inner = '\n'.join(inner) if isinstance(inner, list) else inner
-        self._requestInfo = pManager.extract("requestInfo", pType=dict, allowEmpty=True)
+        self._requestInfo = params.get('requestInfo')
 
     def _getAnswer(self):
 
