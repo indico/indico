@@ -331,7 +331,6 @@ def _extractDirsFromConf(conf):
             'tmp': values['UploadedFilesTempDir'],
             'log': values['LogDir'],
             'cache': values['XMLCacheDir'],
-            'archive': values['ArchiveDir'],
             'db': LOCALDATABASEDIR}
 
 def _replacePrefixInConf(filePath, prefix):

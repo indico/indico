@@ -79,6 +79,8 @@ class StaticSitesImporter(Importer):
         # call any legacy methods in ZODB migrations to avoid breakage in the future.
         if f is None:
             return None, None
+
+        # TODO: add a CLI parameter instead of getting legacy option from config
         archive_path = Config.getInstance().getArchiveDir()
         archive_id = f._LocalFile__archivedId
         repo = f._LocalFile__repository
