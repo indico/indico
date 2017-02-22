@@ -206,24 +206,6 @@ class Conference(CommonObjectBase):
         return self
 
     @warn_on_access
-    def getStartDate(self):
-        """returns (datetime) the starting date of the conference"""
-        return self.startDate
-
-    @warn_on_access
-    def getEndDate(self):
-        """returns (datetime) the ending date of the conference"""
-        return self.endDate
-
-    @warn_on_access
-    def getAdjustedEndDate(self,tz=None):
-        if not tz:
-            tz = self.getTimezone()
-        if tz not in all_timezones:
-            tz = 'UTC'
-        return self.getEndDate().astimezone(timezone(tz))
-
-    @warn_on_access
     def getTimezone(self):
         try:
             return self.timezone
