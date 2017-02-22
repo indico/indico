@@ -37,7 +37,7 @@ def utc2server(date, naive=True):
 
 class DisplayTZ:
     def __init__(self, aw=None, conf=None, useServerTZ=0):
-        from MaKaC.conference import Conference
+        from indico.modules.events.legacy import LegacyConference
         if not has_request_context():
             sessTimezone = 'LOCAL'
         else:
@@ -45,7 +45,7 @@ class DisplayTZ:
         if sessTimezone == 'LOCAL':
             if useServerTZ == 0 and conf is not None:
                 # conf can be Event, Conference or Category
-                if isinstance(conf, Conference):
+                if isinstance(conf, LegacyConference):
                     conf = conf.as_event
                 sessTimezone = getattr(conf, 'timezone', 'UTC')
             else:

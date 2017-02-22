@@ -132,8 +132,8 @@ def unify_event_args(fn, legacy=False):
             return arg.as_legacy if isinstance(arg, db.m.Event) else arg
     else:
         def _convert(arg):
-            from MaKaC.conference import Conference
-            return arg.as_event if isinstance(arg, Conference) else arg
+            from indico.modules.events.legacy import LegacyConference
+            return arg.as_event if isinstance(arg, LegacyConference) else arg
 
     @wraps(fn)
     def wrapper(*args, **kwargs):

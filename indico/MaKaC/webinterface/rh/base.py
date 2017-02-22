@@ -46,7 +46,7 @@ from MaKaC.accessControl import AccessWrapper
 from MaKaC.common import fossilize, security
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
-from MaKaC.conference import Conference
+
 from MaKaC.errors import (
     AccessError,
     BadRefererError,
@@ -66,6 +66,7 @@ from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import get_error_description
 from indico.core.logger import Logger
 from indico.modules.auth.util import url_for_login, redirect_to_login
+from indico.modules.events.legacy import LegacyConference
 from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
@@ -824,7 +825,7 @@ class RHProtected(RH):
 
 class RHDisplayBaseProtected(RHProtected):
     def _checkProtection(self):
-        if not isinstance(self._target, Conference):
+        if not isinstance(self._target, LegacyConference):
             raise Exception('Unexpected object')
         event = self._target.as_event
         can_access = event.can_access(session.user)
@@ -844,7 +845,7 @@ class RHModificationBaseProtected(RHProtected):
     ROLE = None
 
     def _checkProtection(self):
-        if not isinstance(self._target, Conference):
+        if not isinstance(self._target, LegacyConference):
             raise Exception('Unexpected object')
         event = self._target.as_event
         if not event.can_manage(session.user, role=self.ROLE):

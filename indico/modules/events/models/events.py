@@ -467,8 +467,8 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @memoize_request
     def as_legacy(self):
         """Return a legacy `Conference` object"""
-        from MaKaC.conference import Conference
-        return Conference(self)
+        from indico.modules.events.legacy import LegacyConference
+        return LegacyConference(self)
 
     @property
     def event_new(self):
