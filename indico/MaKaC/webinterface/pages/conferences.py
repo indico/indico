@@ -68,12 +68,8 @@ class WPConferenceBase(base.WPDecorated):
         self._setTitle("%s %s" % (strip_ml_tags(self._conf.as_event.title.encode('utf-8')), dates))
 
     def _getFooter(self):
-        """
-        """
         wc = wcomponents.WFooter()
-
-        p = {"modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
-             "subArea": self._getSiteArea()}
+        p = {"subArea": self._getSiteArea()}
         return wc.getHTML(p)
 
     def getLogoutURL(self):
@@ -97,11 +93,8 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
 
     def _getFooter( self ):
         wc = wcomponents.WFooter()
-        p = {"modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
-                "subArea": self._getSiteArea()}
-
-        p["shortURL"] = self._conf.as_new.short_external_url
-
+        p = {"subArea": self._getSiteArea(),
+             "shortURL": self._conf.as_new.short_external_url}
         return wc.getHTML(p)
 
     def _getHeader( self ):
@@ -435,7 +428,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
     def _getFooter(self):
         wc = wcomponents.WEventFooter(self._conf)
         p = {
-            "modificationDate": format_datetime(self._conf.getModificationDate(), format='d MMMM yyyy H:mm'),
             "subArea": self._getSiteArea(),
             "dark": True,
             "shortURL": self._conf.as_event.short_external_url
