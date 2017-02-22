@@ -147,18 +147,6 @@ class Conference(CommonObjectBase):
             # use get() so sqlalchemy can make use of the identity cache
             return Event.get_one(event_id)
 
-    as_new = as_event
-
-    @property
-    @warn_on_access
-    def tz(self):
-        from MaKaC.common.timezoneUtils import DisplayTZ
-        return DisplayTZ(conf=self).getDisplayTZ()
-
-    @memoize_request
-    def has_feature(self, feature):
-        return self.as_event.has_feature(feature)
-
     def __cmp__(self, toCmp):
         if isinstance(toCmp, Conference):
             return cmp(self.getId(), toCmp.getId())

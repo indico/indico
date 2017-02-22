@@ -168,7 +168,7 @@ class WAccessError( WTemplated ):
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
         vars["contactInfo"] = ""
         if isinstance(self._rh._target, Conference):
-            vars["contactInfo"] = self._rh._target.as_new.no_access_contact
+            vars["contactInfo"] = self._rh._target.as_event.no_access_contact
         return vars
 
 class WAccessKeyError( WTemplated ):

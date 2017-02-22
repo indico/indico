@@ -69,7 +69,7 @@
   </div>
   % endif
 
-  ${ template_hook('conference-home-info', event=conf) }
+  ${ template_hook('conference-home-info', event=conf.as_event) }
   </div>
 </div>
 
