@@ -1,0 +1,59 @@
+{% extends 'events/papers/emails/base.html' %}
+
+{% block subject_message %}
+    {% if assign -%}
+        New paper review assignment
+    {%- else -%}
+        Removed from paper review assignment
+    {%- endif %}
+{% endblock %}
+
+{% block header_subtitle %}
+    {% if assign -%}
+        New paper review assignment
+    {%- else -%}
+        Removed from paper review assignment
+    {%- endif %}
+{% endblock %}
+
+{% block content_header %}
+    <p>Dear {{ receiver.first_name }},</p>
+    {% if contribs | length == 1 %}
+        {% set contrib = contribs | first %}
+        {% if assign %}
+            <p>You have been assigned as a <strong>{{ role.title }}</strong> to the paper <strong>{{ contrib.title }}</strong>.</p>
+        {% else %}
+            <p>You are no longer a <strong>{{ role.title }}</strong> for the paper <strong>{{ contrib.title }}</strong>.</p>
+        {% endif %}
+    {% else %}
+        {% if assign %}
+            <p>You have been assigned as a <strong>{{ role.title }}</strong> to the following papers:</p>
+        {% else %}
+            <p>You are no longer a <strong>{{ role.title }}</strong> for the following papers:</p>
+        {% endif %}
+        <p>
+            <ul>
+                {% for contrib in contribs %}
+                    <li>{{ contrib.title }}</li>
+                {% endfor %}
+            </ul>
+        </p>
+    {% endif %}
+{% endblock %}
+
+{% block content_body %}
+    <p>You can have an overview of the papers assigned to you in the following page:</p>
+    {% if role.name == 'judge' %}
+        <p>
+            <a href="{{ url_for('papers.papers_list', event, management=false, _external=true) }}">
+                {{- url_for('papers.papers_list', event, management=false, _external=true) -}}
+            </a>
+        </p>
+    {% else %}
+        <p>
+            <a href="{{ url_for('papers.reviewing_area', event, _external=true) }}">
+                {{- url_for('papers.reviewing_area', event, _external=true) -}}
+            </a>
+        </p>
+    {% endif %}
+{% endblock %}

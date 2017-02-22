@@ -23,7 +23,6 @@ from flask import session
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.core.notifications import make_email, send_email
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.logs.util import make_diff_log
@@ -35,13 +34,16 @@ from indico.modules.events.papers.models.revisions import PaperRevision, PaperRe
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.templates import PaperTemplate
+from indico.modules.events.papers.notifications import (notify_paper_revision_submission,
+                                                        notify_paper_review_submission, notify_paper_judgment,
+                                                        notify_added_to_reviewing_team,
+                                                        notify_removed_from_reviewing_team, notify_paper_assignment)
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.util import update_object_principals
 from indico.modules.users import User
 from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import orig_string
-from indico.web.flask.templating import get_template_module
 
 
 def set_reviewing_state(event, reviewing_type, enable):
@@ -85,6 +87,22 @@ def update_team_members(event, managers, judges, content_reviewers=None, layout_
         updated[PaperReviewingRole.layout_reviewer] = update_object_principals(event, layout_reviewers,
                                                                                role='paper_layout_reviewer')
     unassigned_contribs = _unassign_removed(event, updated)
+    roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_added_to_event')
+    if PaperReviewingRole.judge in roles_to_notify:
+        for judge in updated[PaperReviewingRole.judge]['added']:
+            notify_added_to_reviewing_team(judge, PaperReviewingRole.judge, event)
+        for judge in updated[PaperReviewingRole.judge]['removed']:
+            notify_removed_from_reviewing_team(judge, PaperReviewingRole.judge, event)
+    if PaperReviewingRole.content_reviewer in roles_to_notify:
+        for reviewer in updated[PaperReviewingRole.content_reviewer]['added']:
+            notify_added_to_reviewing_team(reviewer, PaperReviewingRole.content_reviewer, event)
+        for reviewer in updated[PaperReviewingRole.content_reviewer]['removed']:
+            notify_removed_from_reviewing_team(reviewer, PaperReviewingRole.content_reviewer, event)
+    if PaperReviewingRole.layout_reviewer in roles_to_notify:
+        for reviewer in updated[PaperReviewingRole.layout_reviewer]['added']:
+            notify_added_to_reviewing_team(reviewer, PaperReviewingRole.layout_reviewer, event)
+        for reviewer in updated[PaperReviewingRole.layout_reviewer]['removed']:
+            notify_removed_from_reviewing_team(reviewer, PaperReviewingRole.layout_reviewer, event)
     logger.info("Paper teams of %r updated by %r", event, session.user)
     return unassigned_contribs
 
@@ -139,6 +157,7 @@ def create_paper_revision(paper, submitter, files):
                        _contribution=paper.contribution)
         pf.save(f.file)
     db.session.flush()
+    notify_paper_revision_submission(revision)
     logger.info('Paper revision %r submitted by %r', revision, session.user)
     paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         "Paper revision {} submitted for contribution {} ({})"
@@ -148,7 +167,7 @@ def create_paper_revision(paper, submitter, files):
 
 
 @no_autoflush
-def judge_paper(paper, judgment, comment, judge, send_notifications=False):
+def judge_paper(paper, judgment, comment, judge):
     if judgment == PaperAction.accept:
         paper.state = PaperRevisionState.accepted
     elif judgment == PaperAction.reject:
@@ -159,9 +178,8 @@ def judge_paper(paper, judgment, comment, judge, send_notifications=False):
     paper.last_revision.judge = judge
     paper.last_revision.judgment_dt = now_utc()
     db.session.flush()
-    log_data = {'New state': orig_string(judgment.title), 'Sent notifications': send_notifications}
-    if send_notifications:
-        send_paper_notifications(paper)
+    log_data = {'New state': orig_string(judgment.title)}
+    notify_paper_judgment(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
@@ -171,16 +189,10 @@ def judge_paper(paper, judgment, comment, judge, send_notifications=False):
 def reset_paper_state(paper):
     paper.reset_state()
     db.session.flush()
+    notify_paper_judgment(paper, reset=True)
     logger.info('Paper %r state reset by %r', paper, session.user)
     paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Judgment {} reset'.format(paper.verbose_title), session.user)
-
-
-def send_paper_notifications(paper):
-    template = get_template_module('events/static/emails/paper_judgment_notification_email.txt',
-                                   contribution=paper.contribution, paper=paper.last_revision)
-    email = make_email(to_list=[paper.last_revision.submitter.email], template=template)
-    send_email(email, paper.event_new, 'Papers', session.user)
 
 
 def _store_paper_template_file(template, file):
@@ -237,6 +249,10 @@ def update_reviewing_roles(event, users, contributions, role, assign):
     contrib_ids = ['#{}'.format(c.friendly_id) for c in sorted(contributions, key=attrgetter('friendly_id'))]
     log_data = {'Users': ', '.join(sorted(person.full_name for person in users)),
                 'Contributions': ', '.join(contrib_ids)}
+    roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_assigned_contrib')
+    if role in roles_to_notify:
+        for user in users:
+            notify_paper_assignment(user, role, contributions, event, assign)
     if assign:
         event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                   'Papers assigned ({})'.format(orig_string(role.title)), session.user, data=log_data)
@@ -256,6 +272,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
         review.ratings.append(PaperReviewRating(question=question, value=value))
         log_data[question.text] = value
     db.session.flush()
+    notify_paper_review_submission(review)
     logger.info("Paper %r received a review of type %s by %r", paper, review_type.instance.name, user)
     log_data.update({
         'Type': orig_string(review_type.title),
@@ -286,6 +303,7 @@ def update_review(review, review_data, questions_data):
                 'type': 'number'
             }
     db.session.flush()
+    notify_paper_review_submission(review)
     logger.info("Paper review %r modified", review)
     log_fields.update({
         'proposed_action': 'Action',

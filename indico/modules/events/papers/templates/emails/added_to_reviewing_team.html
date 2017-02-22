@@ -1,0 +1,25 @@
+{% extends 'events/papers/emails/base.html' %}
+
+{% block subject_message %}Added in paper reviewing team{% endblock %}
+
+{% block header_subtitle %}Added in paper reviewing team{% endblock %}
+
+{% block content %}
+    <p>Dear {{ receiver.first_name }},</p>
+    <p>You have been chosen as a <strong>{{ role.title }}</strong> for the conference <strong>{{ event.title }}</strong> in order to help with the paper reviewing process.</p>
+    {% if role.name == 'judge' %}
+        <p>Once there are some papers for you to judge, you will be able to do so in the judging area page:</p>
+        <p>
+            <a href="{{ url_for('papers.papers_list', event, management=false, _external=true) }}">
+                {{- url_for('papers.papers_list', event,management=false, _external=true) -}}
+            </a>
+        </p>
+    {% else %}
+        <p>Once there are some papers for you to review, you will be able to do so in the reviewing area page:</p>
+        <p>
+            <a href="{{ url_for('papers.reviewing_area', event, _external=true) }}">
+                {{- url_for('papers.reviewing_area', event, _external=true) -}}
+            </a>
+        </p>
+    {% endif %}
+{% endblock %}

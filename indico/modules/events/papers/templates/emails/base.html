@@ -1,0 +1,40 @@
+{% extends 'emails/base.html' %}
+
+{% block header %}{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block subject -%}
+    {% block subject_message %}Call for papers{% endblock %}
+    {%- block subject_name %}{% endblock %}
+{%- endblock %}
+
+{% block body %}
+    <div class="mail" style="width: 600px; font-family: Arial, sans-serif; border: 1px solid #dfdfdf; background-color: #fcfcfc; margin: auto auto 40px auto;">
+        <div class="header" style="background-color: #5d95ea; color: #eee; padding: 10px 20px;">
+            <h1 style="margin: 0;">
+                {% block header_title %}{{ event.title }}{% endblock %}
+            </h1>
+            <h3 style="margin: 0; margin-top: 10px; padding-top: 10px; border-top: 1px solid #eee;">
+                {% block header_subtitle %}{% endblock %}
+                <span style="float: right; font-style: italic;">
+                    {% block header_subtitle_ref %}{% endblock %}
+                </span>
+            </h3>
+        </div>
+        <div class="content" style="padding: 10px 20px; color: #555;">
+            {% block content %}
+                <div style="border-bottom: 1px solid #ebebeb;">
+                    {% block content_header %}{% endblock %}
+                </div>
+                {% block content_body %}{% endblock %}
+                <div>
+                    {% block content_footer %}{% endblock %}
+                </div>
+            {% endblock %}
+        </div>
+        <div style="text-align: center; padding: 10px; background: #ebebeb; font-size: small; color: #999;">
+            Indico :: Call for papers
+        </div>
+    </div>
+{% endblock %}
