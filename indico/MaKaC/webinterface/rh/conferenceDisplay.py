@@ -27,8 +27,6 @@ from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
-from MaKaC.webinterface import urlHandlers
-from MaKaC.webinterface.common.tools import cleanHTMLHeaderFilename
 from MaKaC.webinterface.pages import conferences
 from MaKaC.webinterface.rh import base, conferenceBase
 from MaKaC.webinterface.rh.base import RHDisplayBaseProtected

@@ -16,9 +16,8 @@
 
 from flask import session
 
-from MaKaC.webinterface import urlHandlers
 from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.wcomponents import TabControl, WSimpleNavigationDrawer, WTabControl
+from MaKaC.webinterface.wcomponents import TabControl, WTabControl
 
 from indico.util.i18n import _
 from indico.web.flask.util import url_for

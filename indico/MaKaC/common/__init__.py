@@ -22,7 +22,6 @@ skip_imports = getIndicoInstallMode()
 
 if not skip_imports:
 
-    __all__ = ['URL', 'Config']
+    __all__ = ['Config']
 
     from indico.core.config import Config
-    from MaKaC.common.url import URL
