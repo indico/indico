@@ -56,9 +56,9 @@
       </ul>
   </div>
   % endif
-  % if conf.attached_items or isSubmitter:
+  % if isSubmitter or conf.as_event.attached_items:
   <div class="infoline material material-list">
-      ${ render_template('attachments/mako_compat/attachments_tree.html', linked_object=conf, can_edit=isSubmitter) }
+      ${ render_template('attachments/mako_compat/attachments_tree.html', event=conf.as_event, can_edit=isSubmitter) }
   </div>
   % endif
 
