@@ -4,14 +4,14 @@
     <div class="attachments-box-header">
         <h2 class="icon-attachment">{% trans %}Materials{% endtrans %}</h2>
         {% if can_edit %}
-            <a href="#" id="manageAttachments-{{ linked_object.id }}" class="right i-button icon-edit"></a>
+            <a href="#" id="manageAttachments-{{ event.id }}" class="right i-button icon-edit"></a>
         {% endif %}
     </div>
-    {{ render_attachments(linked_object.attached_items, management=false) }}
+    {{ render_attachments(event.attached_items, management=false) }}
 </div>
 <script>
-    $('#manageAttachments-{{ linked_object.id }}').on('click', function(evt) {
+    $('#manageAttachments-{{ event.id }}').on('click', function(evt) {
         evt.preventDefault();
-        openAttachmentManager({{ linked_object.getLocator()|tojson }});
+        openAttachmentManager({{ event.locator|tojson }});
     });
 </script>

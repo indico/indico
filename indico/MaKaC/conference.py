@@ -26,7 +26,6 @@ from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.operations import create_event
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.string import return_ascii, is_legacy_id
@@ -43,30 +42,7 @@ class CoreObject(Persistent):
 
 
 class CommonObjectBase(CoreObject, Fossilizable):
-    """
-    This class is for holding commonly used methods that are used by several classes.
-    It is inherited by the following classes:
-      * Category
-      * Conference
-      * Session
-      * Contribution
-      * SubContribution
-      * Material
-      * Resource
-    """
-
-    @property
-    @memoize_request
-    def attached_items(self):
-        """
-        CAUTION: this won't return empty directories (used by interface), nor things the
-        current user can't see
-        """
-        from indico.modules.attachments.util import get_attached_items
-        if isinstance(self, Conference):
-            return get_attached_items(self.as_event, include_empty=False, include_hidden=False, preload_event=True)
-        else:
-            raise ValueError("Object of type '{}' cannot have attachments".format(type(self)))
+    pass
 
 
 def warn_on_access(fn):
