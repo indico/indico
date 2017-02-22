@@ -62,12 +62,13 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 
 def _get_open_regforms(event):
+    from indico.modules.events.registration.models.forms import RegistrationForm
     if not event.has_feature('registration'):
         return []
-    from indico.modules.events.registration.models.forms import RegistrationForm
-    return (RegistrationForm.find(RegistrationForm.is_open, event_id=int(event.id))
-                            .order_by(db.func.lower(RegistrationForm.title))
-                            .all())
+    return (RegistrationForm.query.with_parent(event)
+            .filter(RegistrationForm.is_open)
+            .order_by(db.func.lower(RegistrationForm.title))
+            .all())
 
 
 @template_hook('conference-home-info')
@@ -82,9 +83,7 @@ def _inject_regform_announcement(event, **kwargs):
 
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    event = event.as_event
     regforms = sorted((rf for rf in event.registration_forms if rf.is_open), key=lambda f: f.title.lower())
-
     # A participant could appear more than once in the list in case he register to multiple registration form.
     # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
     return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)

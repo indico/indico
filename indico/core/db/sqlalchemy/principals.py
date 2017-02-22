@@ -91,10 +91,6 @@ class EmailPrincipal(Fossilizable):
         return self
 
     @property
-    def as_new(self):
-        return self
-
-    @property
     def user(self):
         from indico.modules.users import User
         return User.find_first(~User.is_deleted, User.all_emails.contains(self.email))
