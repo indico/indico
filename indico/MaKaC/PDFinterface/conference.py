@@ -314,7 +314,7 @@ class ContribsToPDF(PDFLaTeXBase):
             'conf': conf,
             'items': contribs,
             'fields': [f for f in event.contribution_fields if f.is_active],
-            'url': conf.getURL(),
+            'url': event.short_external_url,
             'tz': timezone(tz or event.timezone)
         })
 
@@ -1331,7 +1331,8 @@ class RegistrantsListToPDF(PDFBase):
         showLogo = False
         c.setFont('Times-Bold', 30)
         if not showLogo:
-            self._drawWrappedString(c, escape(self._conf.title.encode('utf-8')), height=self._PAGE_HEIGHT-0.75*inch)
+            self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                                    height=self._PAGE_HEIGHT - 0.75*inch)
         c.setFont('Times-Bold', 25)
         c.setLineWidth(3)
         c.setStrokeGray(0.7)
@@ -1347,7 +1348,7 @@ class RegistrantsListToPDF(PDFBase):
         style.fontSize = 12
         style.alignment = TA_CENTER
         text = i18nformat("""<b>_("List of registrants")</b>""")
-        p = Paragraph(text, style, part=escape(self._conf.title.encode('utf-8')))
+        p = Paragraph(text, style, part=escape(self._conf.as_event.title.encode('utf-8')))
         p.spaceAfter = 30
         story.append(p)
 

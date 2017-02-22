@@ -59,43 +59,12 @@ def warn_on_access(fn):
 
 
 class Conference(CommonObjectBase):
-    """This class represents the real world conferences themselves. Objects of
-        this class will contain basic data about the confence and will provide
-        access to other objects representing certain parts of the conferences
-        (ex: contributions, sessions, ...).
-    """
-
     def __init__(self, id=''):
         self.id = id
 
     @return_ascii
     def __repr__(self):
-        return '<Conference({0}, {1}, {2})>'.format(self.id, self.title, self.startDate)
-
-    @property
-    @warn_on_access
-    def startDate(self):
-        return self.as_event.start_dt
-
-    @property
-    @warn_on_access
-    def endDate(self):
-        return self.as_event.end_dt
-
-    @property
-    @warn_on_access
-    def timezone(self):
-        return self.as_event.timezone.encode('utf-8')
-
-    @property
-    @warn_on_access
-    def title(self):
-        return self.as_event.title.encode('utf-8')
-
-    @property
-    @warn_on_access
-    def description(self):
-        return self.as_event.description.encode('utf-8')
+        return '<Conference({})>'.format(self.id)
 
     @property
     @memoize_request
@@ -134,9 +103,6 @@ class Conference(CommonObjectBase):
 
     def __ne__(self, toCmp):
         return not(self is toCmp)
-
-    def getURL(self):
-        return self.as_event.short_external_url
 
     @warn_on_access
     def getId( self ):

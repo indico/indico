@@ -30,5 +30,5 @@ def make_reminder_email(event, with_agenda, note):
     if event.type_ == EventType.lecture:
         with_agenda = False
     return get_template_module('events/reminders/emails/event_reminder.txt', event=event,
-                               url=event.as_legacy.getURL(), note=note, with_agenda=with_agenda,
+                               url=event.short_external_url, note=note, with_agenda=with_agenda,
                                agenda=event.timetable_entries.filter_by(parent_id=None))
