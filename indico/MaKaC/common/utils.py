@@ -17,10 +17,7 @@
 import os
 import re
 
-from indico.core.db import db
 from indico.util.date_time import format_datetime, format_date, format_time
-
-from MaKaC import errors
 
 
 # fcntl is only available for POSIX systems
@@ -177,74 +174,6 @@ def formatDuration(duration, units = 'minutes', truncate = True):
         return int(result)
     else:
         return result
-
-
-def getHierarchicalId(obj):
-
-    """
-    Gets the ID of a Conference, Contribution or Subcontribution,
-    in an hierarchical manner
-    """
-
-    if isinstance(obj, db.m.Contribution):
-        return '{}.{}'.format(obj.event_new.id, obj.id)
-    elif isinstance(obj, db.m.SubContribution):
-        return '{}.{}.{}'.format(obj.event_new.id, obj.contribution.id, obj.id)
-    elif isinstance(obj, db.m.Session):
-        return '{}.s{}'.format(obj.event_new.id, obj.id)
-    elif isinstance(obj, db.m.SessionBlock):
-        return '{}.s{}.{}'.format(obj.event_new.id, obj.session.id, obj.id)
-    return obj.id
-
-
-def resolveHierarchicalId(objId):
-    """
-    Gets an object from its Id (unless it doesn't exist,
-    in which case it returns None
-    """
-
-    from MaKaC.conference import ConferenceHolder
-
-    m = re.match(r'(\w+)(?:\.(s?)(\w+))?(?:\.(\w+))?', objId)
-
-    # If the expression doesn't match at all, return
-    if not m or not m.groups()[0]:
-        return None
-
-    try:
-        m = m.groups()
-        conference = ConferenceHolder().getById(m[0])
-
-        if m[1]:
-            # session id specified - session or slot
-            session = conference.getSessionById(m[2])
-
-            if m[3]:
-                # session slot: 1234.s12.1
-                return session.getSlotById(m[3])
-            else:
-                # session: 1234.s12
-                return session
-        else:
-            if m[2]:
-                # second token is not a session id
-                # (either contribution or subcontribution)
-
-                contribution = conference.getContributionById(m[2])
-
-                if m[3]:
-                    # subcontribution: 1234.12.1
-                    return contribution.getSubContributionById(m[3])
-                else:
-                    # contribution: 1234.12
-                    return contribution
-            else:
-                # there's not second token
-                # it's definitely a conference
-                return conference
-
-    except errors.MaKaCError:
-        return None
 
 
 class OSSpecific(object):
