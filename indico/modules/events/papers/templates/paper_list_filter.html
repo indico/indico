@@ -6,12 +6,14 @@
     <div class="label-group list-column">
         <div class="i-label title-wrapper" data-id="{{ item_id }}">
             <div class="title">{{ item.title }}</div>
-            <div class="actions">
-                <span class="visibility icon-eye"></span>
-            </div>
+            {% if item_id != 'unassigned' %}
+                <div class="actions">
+                    <span class="visibility icon-eye"></span>
+                </div>
+            {% endif %}
         </div>
         {% if filter_choices %}
-            <div class="i-label filter">
+            <div class="i-label filter" {{ 'data-only-filter' if item_id == 'unassigned' }}>
                 <a class="icon-filter" data-toggle="dropdown"></a>
                 <ul class="dropdown" style="display: none;">
                     {% for value, caption in filter_choices.iteritems() %}

@@ -25,6 +25,7 @@ from sqlalchemy.orm import subqueryload, undefer
 from indico.core.db import db
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
+from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.util import ListGeneratorBase
 from indico.modules.users import User
 from indico.util.i18n import _
@@ -46,6 +47,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
         session_empty = {None: _('No session')}
         type_empty = {None: _('No type')}
         state_choices = {state.value: state.title for state in PaperRevisionState}
+        unassigned_choices = {role.value: role.title for role in PaperReviewingRole}
         track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
         session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
@@ -61,6 +63,8 @@ class PaperListGeneratorBase(ListGeneratorBase):
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
             ('type', {'title': _('Type'),
                       'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
+            ('unassigned', {'title': _('Unassigned'),
+                            'filter_choices': OrderedDict(unassigned_choices.items())}),
         ])
         self.list_config = self._get_config()
 
@@ -96,6 +100,17 @@ class PaperListGeneratorBase(ListGeneratorBase):
                                           .has(PaperRevision.state == int(filter_state)))
             if state_criteria:
                 criteria.append(db.or_(*state_criteria))
+
+        if 'unassigned' in filters['items']:
+            role_map = {
+                PaperReviewingRole.judge.value: Contribution.paper_judges,
+                PaperReviewingRole.content_reviewer.value: Contribution.paper_content_reviewers,
+                PaperReviewingRole.layout_reviewer.value: Contribution.paper_layout_reviewers,
+            }
+            filtered_roles = filters['items']['unassigned']
+            unassigned_criteria = [~role_map[int(filter_role)].any() for filter_role in filtered_roles]
+            if unassigned_criteria:
+                criteria.append(db.or_(*unassigned_criteria))
 
         filter_cols = {'track': Contribution.track_id,
                        'session': Contribution.session_id,

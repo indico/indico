@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global setupSearchBox:false, handleRowSelection:false, setupTableSorter:false */
+
 (function(global) {
     'use strict';
 
@@ -68,8 +70,9 @@
 
         $('.list-filter .filter').each(function() {
             var $filter = $(this).parent();
+            var isOnlyFilter = !!$filter.find('[data-only-filter]').length;
             $filter.dropdown({selector: "a[data-toggle='dropdown']", relative_to: $filter});
-            if (!hasColumnSelector) {
+            if (!hasColumnSelector || isOnlyFilter) {
                 $filter.find('.title-wrapper').on('click', function(evt) {
                     $filter.find("a[data-toggle='dropdown']").trigger('click');
                     evt.stopPropagation();
@@ -89,19 +92,20 @@
             var fieldId = field.data('id');
             var visibilityIcon = field.find('.visibility');
             var enabled = visibilityIcon.hasClass('enabled');
+            var isOnlyFilter = !!$this.parent().find('[data-only-filter]').length;
 
-            if (hasColumnSelector) {
+            if (hasColumnSelector && !isOnlyFilter) {
                 var itemsData = JSON.parse(visibleItems.val());
                 if (enabled) {
                     itemsData.splice(itemsData.indexOf(fieldId), 1);
                 } else {
                     itemsData.push(fieldId);
                 }
-            }
 
-            visibilityIcon.toggleClass('enabled', !enabled);
-            field.toggleClass('striped', enabled);
-            visibleItems.val(JSON.stringify(itemsData)).trigger('change');
+                visibilityIcon.toggleClass('enabled', !enabled);
+                field.toggleClass('striped', enabled);
+                visibleItems.val(JSON.stringify(itemsData)).trigger('change');
+            }
         });
 
         if (hasColumnSelector) {
@@ -109,11 +113,14 @@
                 var field = $(this);
                 var fieldId = field.data('id');
                 var itemsData = JSON.parse(visibleItems.val());
+                var isOnlyFilter = !!field.parent().find('[data-only-filter]').length;
 
-                if (itemsData.indexOf(fieldId) != -1) {
-                    field.find('.visibility').addClass('enabled');
-                } else {
-                    field.addClass('striped');
+                if (!isOnlyFilter) {
+                    if (itemsData.indexOf(fieldId) !== -1) {
+                        field.find('.visibility').addClass('enabled');
+                    } else {
+                        field.addClass('striped');
+                    }
                 }
             });
         }
