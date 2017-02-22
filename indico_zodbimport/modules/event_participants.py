@@ -40,7 +40,6 @@ from indico.util.date_time import now_utc
 from indico.util.string import normalize_phone_number
 from indico.util.struct.iterables import committing_iterator
 from indico.web.flask.templating import strip_tags
-from MaKaC.conference import Conference
 
 from indico_zodbimport import Importer, convert_to_unicode
 

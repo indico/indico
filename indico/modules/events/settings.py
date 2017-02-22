@@ -33,8 +33,8 @@ def event_or_id(f):
     @wraps(f)
     def wrapper(self, event, *args, **kwargs):
         from indico.modules.events import Event
-        from MaKaC.conference import Conference
-        if isinstance(event, (Conference, Event)):
+        from indico.modules.events.legacy import LegacyConference
+        if isinstance(event, (LegacyConference, Event)):
             event = event.id
         return f(self, int(event), *args, **kwargs)
 

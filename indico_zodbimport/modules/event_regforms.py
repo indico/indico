@@ -55,7 +55,6 @@ from indico.util.fs import secure_filename
 from indico.util.string import normalize_phone_number, format_repr
 from indico.util.struct.iterables import committing_iterator
 from indico.web.flask.templating import strip_tags
-from MaKaC.conference import Conference
 
 from indico_zodbimport import Importer, convert_to_unicode
 from indico_zodbimport.util import LocalFileImporterMixin
