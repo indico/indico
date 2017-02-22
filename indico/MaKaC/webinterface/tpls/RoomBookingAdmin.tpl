@@ -30,12 +30,12 @@
       </td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
         % if locations:
-        <form action="${ urlHandlers.UHRoomBookingDeleteLocation.getURL() }" method="POST">
+        <form action="${ url_for('rooms_admin.roomBooking-deleteLocation') }" method="POST">
           <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
           <p>
             % for loc in locations:
               <input type="radio" name="location_id" value="${ loc.id }">
-              <a href="${ urlHandlers.UHRoomBookingAdminLocation.getURL(loc) }">
+              <a href="${ url_for('rooms_admin.roomBooking-adminLocation', loc) }">
                 ${ loc.name }
               </a><br>
             % endfor
@@ -43,7 +43,7 @@
           </p>
         </form>
         % endif
-        <form action="${urlHandlers.UHRoomBookingSaveLocation.getURL() }" method="POST">
+        <form action="${ url_for('rooms_admin.roomBooking-saveLocation') }" method="POST">
           <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
           <p>
             <input type="text" id="newLocationName" name="newLocationName" value="" size="28" />
@@ -58,7 +58,7 @@
         <span class="titleCellFormat">${ _("Default location") }</span>
       </td>
       <td bgcolor="white" valign="top" class="blacktext" style="padding-left: 12px;">
-        <form action="${urlHandlers.UHRoomBookingSetDefaultLocation.getURL() }" method="POST">
+        <form action="${ url_for('rooms_admin.roomBooking-setDefaultLocation') }" method="POST">
           <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
           <select name="location_id" id="defaultLocation">
             % for loc in locations:

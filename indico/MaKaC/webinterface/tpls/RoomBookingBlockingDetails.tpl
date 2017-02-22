@@ -91,7 +91,7 @@
                                         <tbody>
                                         % for rb in blocking.blocked_rooms:
                                             <tr class="blockingHover blockingPadding">
-                                                <td><a href="${ urlHandlers.UHRoomBookingRoomDetails.getURL(rb.room) }">${ rb.room.full_name }</a></td>
+                                                <td><a href="${ url_for('rooms.roomBooking-roomDetails', rb.room) }">${ rb.room.full_name }</a></td>
                                                 <td>
                                                     ${ rb.state_name }
                                                     % if rb.state == rb.State.pending:

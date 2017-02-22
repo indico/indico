@@ -62,7 +62,7 @@ def generate_global_file(config):
 
             'RoomBookingBookRoom': url_rule_to_js('rooms.room_book'),
             'RoomBookingBook': url_rule_to_js('rooms.book'),
-            'RoomBookingDetails': urlHandlers.UHRoomBookingRoomDetails.getURL(_ignore_static=True).js_router,
+            'RoomBookingDetails': url_rule_to_js('rooms.roomBooking-roomDetails'),
             'RoomBookingCloneBooking': url_rule_to_js('rooms.roomBooking-cloneBooking'),
 
             'APIKeyCreate': url_for('api.key_create'),

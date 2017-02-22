@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface import urlHandlers as UH
+from flask import redirect
 
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.models.locations import Location
@@ -25,6 +25,6 @@ class RHRoomBookingWelcome(RHRoomBookingBase):
     def _process(self):
         default_location = Location.default_location
         if default_location and default_location.is_map_available:
-            self._redirect(UH.UHRoomBookingMapOfRooms.getURL())
+            return redirect(url_for('rooms.roomBooking-mapOfRooms'))
         else:
-            self._redirect(url_for('rooms.book'))
+            return redirect(url_for('rooms.book'))
