@@ -22,7 +22,7 @@ from celery.schedules import crontab
 
 from indico.core.celery import celery
 from indico.core.config import Config
-from indico.core.db import DBMgr, db
+from indico.core.db import db
 from indico.modules.categories import logger, Category
 from indico.modules.users import User, UserSetting
 from indico.modules.users.models.suggestions import SuggestedCategory
@@ -81,9 +81,7 @@ def category_cleanup():
                     len(to_delete), days)
         for i, event in enumerate(to_delete, 1):
             logger.info("Deleting %s", event)
-            event.as_legacy.delete(user=janitor_user)
+            event.delete('Cleaning up category', janitor_user)
             if i % 100 == 0:
                 db.session.commit()
-                DBMgr.getInstance().commit()
         db.session.commit()
-        DBMgr.getInstance().commit()

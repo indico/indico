@@ -58,12 +58,6 @@ event_management_object_url_prefixes = {
 }
 
 
-@signals.event.deleted.connect
-def _event_deleted(event, **kwargs):
-    event.as_event.is_deleted = True
-    logger.info('Event %s deleted. ZODB OID: %r', event.id, event._p_oid)
-
-
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
     from indico.modules.events.models.persons import EventPerson

@@ -24,7 +24,7 @@ from BTrees import OOBTree
 
 from indico.core.db import DBMgr
 from Counter import Counter
-from MaKaC.errors import MaKaCError
+
 
 class ObjectHolder:
     """This class provides a common entry point for accessing conferences and

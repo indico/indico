@@ -37,7 +37,7 @@ from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import (WPEventSettings, WPEventProtection,
                                                     render_event_management_header_right)
 from indico.modules.events.models.events import EventType
-from indico.modules.events.operations import (delete_event, update_event_protection, update_event, update_event_type,
+from indico.modules.events.operations import (update_event_protection, update_event, update_event_type,
                                               lock_event, unlock_event)
 from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
@@ -149,7 +149,7 @@ class RHDeleteEvent(RHManageEventBase):
         return jsonify_template('events/management/delete_event.html', event=self.event_new)
 
     def _process_POST(self):
-        delete_event(self.event_new)
+        self.event_new.delete('Deleted by user', session.user)
         flash(_('Event "{}" successfully deleted.').format(self.event_new.title), 'success')
         category = self.event_new.category
         if category.can_manage(session.user):
