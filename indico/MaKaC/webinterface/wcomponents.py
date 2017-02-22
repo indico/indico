@@ -541,9 +541,6 @@ class WFooter(WTemplated):
         vars['is_meeting'] = (event and event.as_event.type == 'meeting' and
                               not isinstance(self._rh, RHConferenceModifBase))
 
-        if not vars.has_key("modificationDate"):
-            vars["modificationDate"] = ""
-
         if not vars.has_key("shortURL"):
             vars["shortURL"] = ""
         return vars

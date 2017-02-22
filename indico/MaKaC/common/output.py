@@ -321,18 +321,12 @@ class outputGenerator(object):
             out.writeTag("subfield", chair.person.email, [["code", "f"]])
             out.closeTag("datafield")
 
-        edate = event.as_legacy.getCreationDate()
-        creaDate = datetime( edate.year, edate.month, edate.day )
-
-        out.openTag("datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","%d-%s-%sT"%(creaDate.year, string.zfill(creaDate.month,2), string.zfill(creaDate.day,2)),[["code","x"]])
+        out.openTag("datafield", [["tag", "961"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", event.created_dt.strftime('%Y-%m-%dT'), [["code", "x"]])
         out.closeTag("datafield")
 
-        edate = event.as_legacy.getModificationDate()
-        modifDate = datetime( edate.year, edate.month, edate.day )
-
-        out.openTag("datafield",[["tag","961"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield","%d-%s-%sT"%(modifDate.year, string.zfill(modifDate.month,2), string.zfill(modifDate.day,2)),[["code","c"]])
+        out.openTag("datafield", [["tag", "961"], ["ind1", " "], ["ind2", " "]])
+        out.writeTag("subfield", datetime.now().strftime('%Y-%m-%dT'), [["code", "c"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","980"],["ind1"," "],["ind2"," "]])
