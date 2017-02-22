@@ -1,3 +1,4 @@
+{% set tz = event.display_tzinfo %}
 <div id="now-happening" {{ text_color }} style="margin: 10px 0;">
     <span id="now-happening-label" style="font-weight: bold;">
         {% trans %}Now happening:{% endtrans %}
@@ -18,7 +19,7 @@
                 <a href="{{ url }}">{{ obj.title }}</a>
                 {% if obj.room_name %} ({{ obj.room_name }}){% endif %}
                 <em>
-                    {{ entry.start_dt|format_time(timezone=event.as_legacy.tz) }} - {{ entry.end_dt|format_time(timezone=event.as_legacy.tz) }}
+                    {{ entry.start_dt|format_time(timezone=tz) }} - {{ entry.end_dt|format_time(timezone=tz) }}
                 </em>
             </span>
         {% endfor %}

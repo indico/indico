@@ -2,7 +2,7 @@
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
 {% from 'events/notes/_note.html' import render_note %}
 
-{% set hook_event_header = template_hook('event-header', event=conf) | trim %}
+{% set hook_event_header = template_hook('event-header', event=event) | trim %}
 {% set has_subheader = event.description or files or folders or lectures or event.organizer_info
                        or event.contact_emails or event.contact_phones
                        or (event.references and event.type == 'meeting') or hook_event_header %}

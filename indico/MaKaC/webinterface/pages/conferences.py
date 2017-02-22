@@ -93,7 +93,7 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
     def _getFooter( self ):
         wc = wcomponents.WFooter()
         p = {"subArea": self._getSiteArea(),
-             "shortURL": self._conf.as_new.short_external_url}
+             "shortURL": self._conf.as_event.short_external_url}
         return wc.getHTML(p)
 
     def _getHeader( self ):

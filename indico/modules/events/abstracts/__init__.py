@@ -146,7 +146,6 @@ def _extend_event_menu(sender, **kwargs):
 
 @template_hook('conference-home-info')
 def _inject_cfa_announcement(event, **kwargs):
-    event = event.as_event
     if (event.has_feature('abstracts') and
             (event.cfa.is_open or (session.user and event.cfa.can_submit_abstracts(session.user)))):
         return render_template('events/abstracts/display/conference_home.html', event=event)
