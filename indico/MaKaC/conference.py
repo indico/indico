@@ -42,7 +42,6 @@ from MaKaC.common.Locators import Locator
 from MaKaC.common.ObjectHolders import ObjectHolder
 from MaKaC.common.PickleJar import Updates
 from MaKaC.errors import MaKaCError, NotFoundError
-from MaKaC.paperReviewing import ConferencePaperReview as ConferencePaperReview
 from MaKaC.trashCan import TrashCanManager
 
 
@@ -99,7 +98,6 @@ class Conference(CommonObjectBase):
 
     def __init__(self, id=''):
         self.id = id
-        self._confPaperReview = ConferencePaperReview(self)
 
     @return_ascii
     def __repr__(self):
@@ -180,15 +178,6 @@ class Conference(CommonObjectBase):
     def __ne__(self, toCmp):
         return not(self is toCmp)
 
-    def getConfPaperReview(self):
-        if not hasattr(self, "_confPaperReview"):
-            self._confPaperReview = ConferencePaperReview(self)
-        return self._confPaperReview
-
-    @memoize_request
-    def getContribTypeList(self):
-        return self.as_event.contribution_types.all()
-
     def _getRepository( self ):
         dbRoot = DBMgr.getInstance().getDBConnection().root()
         try:
@@ -238,14 +227,6 @@ class Conference(CommonObjectBase):
         return self.startDate
 
     @warn_on_access
-    def getAdjustedStartDate(self,tz=None):
-        if not tz:
-            tz = self.getTimezone()
-        if tz not in all_timezones:
-            tz = 'UTC'
-        return self.getStartDate().astimezone(timezone(tz))
-
-    @warn_on_access
     def getEndDate(self):
         """returns (datetime) the ending date of the conference"""
         return self.endDate
@@ -277,9 +258,6 @@ class Conference(CommonObjectBase):
         if not sessionId.isdigit():
             return None
         return self.as_event.get_session(friendly_id=int(sessionId))
-
-    def getReviewManager(self, contrib):
-        return self.getConfPaperReview().getReviewManager(contrib)
 
     def canAccess(self, aw):
         return self.as_event.can_access(aw.user)
