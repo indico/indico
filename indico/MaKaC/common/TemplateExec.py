@@ -326,8 +326,6 @@ def registerHelpers(objDict):
         objDict['linkify'] = linkify
     if not 'truncateTitle' in objDict:
         objDict['truncateTitle'] = truncateTitle
-    if not 'urlHandlers' in objDict:
-        objDict['urlHandlers'] = MaKaC.webinterface.urlHandlers
     if not 'Config' in objDict:
         objDict['Config'] = Config
     if not 'jsBoolean' in objDict:
