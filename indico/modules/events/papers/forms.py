@@ -121,13 +121,12 @@ class PapersScheduleForm(IndicoForm):
 
 class PaperJudgmentFormBase(IndicoForm):
     judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
-    send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
 
 
 class PaperJudgmentForm(PaperJudgmentFormBase):
     """Form for judging a single paper"""
 
-    _order = ('judgment', 'judgment_comment', 'send_notifications')
+    _order = ('judgment', 'judgment_comment')
 
     judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=PaperAction)
 

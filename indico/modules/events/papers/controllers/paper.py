@@ -134,8 +134,7 @@ class RHJudgePapers(RHPapersActionBase):
             submitted_papers = [c.paper for c in self.contributions if
                                 c.paper and c.paper.last_revision.state == PaperRevisionState.submitted]
             for submitted_paper in submitted_papers:
-                judge_paper(submitted_paper, form.judgment.data, form.judgment_comment.data, judge=session.user,
-                            send_notifications=form.send_notifications.data)
+                judge_paper(submitted_paper, form.judgment.data, form.judgment_comment.data, judge=session.user)
             num_submitted_papers = len(submitted_papers)
             num_not_submitted_papers = len(self.contributions) - num_submitted_papers
             if num_submitted_papers:

@@ -71,6 +71,10 @@ class Paper(ProposalMixin):
         self.last_revision.state = state
 
     @property
+    def judgment_comment(self):
+        return self.last_revision._judgment_comment
+
+    @property
     def is_in_final_state(self):
         return self.state in {PaperRevisionState.accepted, PaperRevisionState.rejected}
 

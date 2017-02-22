@@ -1,0 +1,18 @@
+{% extends 'events/papers/emails/base.html' %}
+
+{% block subject_message %}Paper assessment withdrawn{% endblock %}
+
+{% block header_subtitle %}Paper assessment withdrawn{% endblock %}
+
+{% block header_subtitle_ref %}ref #{{ contribution.friendly_id }}{% endblock %}
+
+{% block content %}
+    <p>Dear {{ receiver.first_name }},</p>
+    <p>Your paper <strong>{{ contribution.title }}</strong> has been put back to review, after the assessment has been withdrawn.</p>
+    <p>To see your paper please use the following link:</p>
+    <p>
+        <a href="{{ url_for('papers.paper_timeline', contribution, _external=true) }}">
+            {{- url_for('papers.paper_timeline', contribution, _external=true) -}}
+        </a>
+    </p>
+{% endblock %}

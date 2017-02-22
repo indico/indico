@@ -200,8 +200,7 @@ class RHJudgePaper(RHPaperBase):
     def _process(self):
         form = PaperJudgmentForm()
         if form.validate_on_submit():
-            judge_paper(self.paper, form.judgment.data, form.judgment_comment.data, judge=session.user,
-                        send_notifications=form.send_notifications.data)
+            judge_paper(self.paper, form.judgment.data, form.judgment_comment.data, judge=session.user)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
 
 

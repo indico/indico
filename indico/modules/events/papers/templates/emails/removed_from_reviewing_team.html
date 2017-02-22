@@ -1,0 +1,10 @@
+{% extends 'events/papers/emails/base.html' %}
+
+{% block subject_message %}Removed from paper reviewing team{% endblock %}
+
+{% block header_subtitle %}Removed from paper reviewing team{% endblock %}
+
+{% block content %}
+    <p>Dear {{ receiver.first_name }},</p>
+    <p>Please, be aware that you are no longer a <strong>{{ role.title }}</strong> for the conference <strong>{{ event.title }}</strong></p>
+{% endblock %}
