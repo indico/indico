@@ -191,6 +191,9 @@ class PaperJudgingAreaListGeneratorDisplay(PaperListGeneratorBase):
             'items': ('state',),
             'filters': {'items': {}}
         }
+        judging_unassigned_choices = {role.value: role.title for role in PaperReviewingRole
+                                      if role is not PaperReviewingRole.judge}
+        self.static_items['unassigned']['filter_choices'] = OrderedDict(sorted(judging_unassigned_choices.items()))
 
     def _build_query(self):
         query = super(PaperJudgingAreaListGeneratorDisplay, self)._build_query()
