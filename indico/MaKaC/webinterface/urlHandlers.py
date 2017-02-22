@@ -262,44 +262,12 @@ class UHConfEnterAccessKey(UHConfUser):
     _endpoint = 'event.conferenceDisplay-accessKey'
 
 
-class UHAdminsConferenceStyles(URLHandler):
-    _endpoint = 'admin.adminConferenceStyles'
-
-
-class UHAdminsSystem(URLHandler):
-    _endpoint = 'admin.adminSystem'
-
-
-class UHAdminsSystemModif(URLHandler):
-    _endpoint = 'admin.adminSystem-modify'
-
-
 class UHErrorReporting(URLHandler):
     _endpoint = 'misc.errors'
 
 
 class UHConfMyStuff(URLHandler):
     _endpoint = 'event.myconference'
-
-
-class UHMaintenance(URLHandler):
-    _endpoint = 'admin.adminMaintenance'
-
-
-class UHMaintenanceTmpCleanup(URLHandler):
-    _endpoint = 'admin.adminMaintenance-tmpCleanup'
-
-
-class UHMaintenancePerformTmpCleanup(URLHandler):
-    _endpoint = 'admin.adminMaintenance-performTmpCleanup'
-
-
-class UHMaintenancePack(URLHandler):
-    _endpoint = 'admin.adminMaintenance-pack'
-
-
-class UHMaintenancePerformPack(URLHandler):
-    _endpoint = 'admin.adminMaintenance-performPack'
 
 
 class UHResetSession(URLHandler):

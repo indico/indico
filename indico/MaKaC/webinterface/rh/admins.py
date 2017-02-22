@@ -19,58 +19,13 @@ from werkzeug.exceptions import Forbidden
 
 from indico.util.i18n import _
 
-import MaKaC.webinterface.pages.admins as admins
-import MaKaC.webinterface.urlHandlers as urlHandlers
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.webinterface.rh.base import RHProtected
 
 
 class RHAdminBase(RHProtected):
-    def _checkParams(self, params):
-        RHProtected._checkParams(self, params)
-        self._minfo = HelperMaKaCInfo.getMaKaCInfoInstance()
-
     def _checkProtection(self):
         RHProtected._checkProtection(self)
         if not session.user and not self._doProcess:
             return
         if not session.user.is_admin:
             raise Forbidden(_("Only Indico administrators may access this page."))
-
-
-class RHSystem(RHAdminBase):
-    _uh = urlHandlers.UHAdminsSystem
-
-    def _process( self ):
-
-        p = admins.WPAdminsSystem( self )
-        return p.display()
-
-
-class RHSystemModify(RHAdminBase):
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-        self._action = params.get("action", None)
-        self._volume = params.get("volume", None)
-
-    def _process( self ):
-        if self._action == "ok":
-            self._minfo.setArchivingVolume(self._volume)
-            self._redirect(urlHandlers.UHAdminsSystem.getURL())
-        elif self._action == "cancel":
-            self._redirect(urlHandlers.UHAdminsSystem.getURL())
-        else:
-            p = admins.WPAdminsSystemModif( self )
-            return p.display()
-
-
-class RHConferenceStyles(RHAdminBase):
-    _uh = urlHandlers.UHAdminsConferenceStyles
-
-    def _checkParams( self, params ):
-        RHAdminBase._checkParams( self, params )
-
-    def _process( self ):
-        p = admins.WPAdminsConferenceStyles( self )
-        return p.display()

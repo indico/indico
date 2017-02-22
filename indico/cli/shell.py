@@ -26,7 +26,6 @@ import transaction
 import sqlalchemy.orm
 from flask import current_app
 from flask_script import Shell, Option
-from werkzeug.local import LocalProxy
 
 import MaKaC
 from indico.core import signals
@@ -39,7 +38,6 @@ from indico.util.console import strip_ansi, cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
-from MaKaC.common import HelperMaKaCInfo
 from MaKaC.conference import Conference, ConferenceHolder
 
 
@@ -163,7 +161,6 @@ class IndicoShell(Shell):
             # Legacy Indico
             self._info.append(cformat('*** %{magenta!}Legacy%{reset} ***'))
             add_to_context_multi([Conference, ConferenceHolder], color='green')
-            add_to_context(LocalProxy(HelperMaKaCInfo.getMaKaCInfoInstance), 'minfo', color='green')
             # Models
             self._info.append(cformat('*** %{magenta!}Models%{reset} ***'))
             models = [cls for name, cls in sorted(db.Model._decl_class_registry.items(), key=itemgetter(0))

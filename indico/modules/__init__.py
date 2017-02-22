@@ -14,7 +14,5 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.base import ModuleHolder, Module
-
 # TODO: remove imports below once they're imported from somewhere else:
 import indico.modules.admin

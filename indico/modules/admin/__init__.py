@@ -18,8 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core import signals
 from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuSection, SideMenuItem
+from indico.web.menu import SideMenuSection
 
 
 @signals.menu.sections.connect_via('admin-sidemenu')
@@ -29,9 +28,3 @@ def _sidemenu_sections(sender, **kwargs):
     yield SideMenuSection('customization', _("Customization"), 50, icon='wrench')
     yield SideMenuSection('integration', _("Integration"), 30, icon='earth')
     yield SideMenuSection('homepage', _("Homepage"), 40, icon='home')
-
-
-@signals.menu.items.connect_via('admin-sidemenu')
-def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('storage', _('Disk Storage'), url_for('admin.adminSystem'), 70, icon='stack')
-    yield SideMenuItem('layout', _('Layout'), url_for('admin.adminLayout'), section='customization')
