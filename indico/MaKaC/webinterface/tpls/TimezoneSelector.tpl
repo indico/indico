@@ -9,7 +9,7 @@ var tzSelector = new TimezoneSelector(
         '${ ActiveTimezoneDisplay }',
         ${"'"+ currentUser.getTimezone() +"'" if currentUser else "null"},
         ${"'"+ currentUser.getDisplayTZMode() +"'" if currentUser else "null"},
-        '${ urlHandlers.UHResetSession.getURL() }'
+        "${ url_for('misc.resetSessionTZ') }"
 );
 
 $('#timezoneSelectorLink').on('click', function(e) {

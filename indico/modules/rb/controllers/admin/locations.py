@@ -14,8 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, flash
-from sqlalchemy import func
+from flask import request, flash, redirect
 
 from MaKaC.webinterface import urlHandlers
 from indico.core.errors import IndicoError, FormValuesError, NoReportError
@@ -30,6 +29,7 @@ from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.admin.locations import WPRoomBookingAdmin, WPRoomBookingAdminLocation
 from indico.util.string import natural_sort_key
+from indico.web.flask.util import url_for
 
 
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
@@ -51,7 +51,7 @@ class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdmin
     def _process(self):
         db.session.delete(self._location)
         flash(_(u'Location deleted'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdmin.getURL())
+        return redirect(url_for('rooms_admin.roomBooking-admin'))
 
 
 class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
@@ -70,7 +70,7 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
         is_default = Location.find().count() == 0
         db.session.add(Location(name=self._locationName, is_default=is_default))
         flash(_(u'Location added'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdmin.getURL())
+        return redirect(url_for('rooms_admin.roomBooking-admin'))
 
 
 class RHRoomBookingSetDefaultLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
@@ -79,7 +79,7 @@ class RHRoomBookingSetDefaultLocation(RHRoomBookingLocationMixin, RHRoomBookingA
     def _process(self):
         self._location.set_default()
         flash(_(u'Default location changed'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdmin.getURL())
+        return redirect(url_for('rooms_admin.roomBooking-admin'))
 
 
 class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
@@ -127,7 +127,7 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
         attr = self._location.attributes.filter_by(name=self._attr).one()
         db.session.delete(attr)
         flash(_(u'Custom attribute deleted'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
+        return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))
 
 
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
@@ -159,7 +159,7 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
             flash(_(u'Custom attribute added'), 'success')
 
         flash(_(u'Custom attributes updated'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
+        return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))
 
 
 class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
@@ -181,7 +181,7 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
         eq = self._location.equipment_types.filter_by(name=self._eq).one()
         db.session.delete(eq)
         flash(_(u'Equipment deleted'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
+        return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))
 
 
 class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
@@ -194,4 +194,4 @@ class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
         if self._eq:
             self._location.equipment_types.append(EquipmentType(name=self._eq))
             flash(_(u'Equipment added'), 'success')
-        self._redirect(urlHandlers.UHRoomBookingAdminLocation.getURL(self._location))
+        return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._location))

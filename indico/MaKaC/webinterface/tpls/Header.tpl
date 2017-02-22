@@ -37,7 +37,7 @@ ${ template_hook('global-announcement') }
         </ul>
 
         % if roomBooking:
-            <a href="${ urlHandlers.UHRoomBookingWelcome.getURL() }">${ _("Room booking") }</a>
+            <a href="${ url_for('rooms.roomBooking') }">${ _("Room booking") }</a>
         % endif
 
         % if len(adminItemList) == 1:
@@ -80,7 +80,7 @@ ${ template_hook('global-announcement') }
                 </a>
             </li>
             % if show_contact:
-                <li><a href="${ urlHandlers.UHContact.getURL() }">${ _("Contact") }</a></li>
+                <li><a href="${ url_for('misc.contact') }">${ _("Contact") }</a></li>
             % endif
             <li><a href="http://indico-software.org">${ _("More about Indico") }</a></li>
         </ul>

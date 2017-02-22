@@ -31,7 +31,7 @@
                 <td colspan="2"></td>
                 <td colspan="2">
                     <div>
-                        ${ '<br />'.join('<a href="{}">{}</a>'.format(urlHandlers.UHRoomBookingRoomDetails.getURL(br.room), br.room.full_name) for br in block.blocked_rooms) }
+                        ${ '<br />'.join('<a href="{}">{}</a>'.format(url_for('rooms.roomBooking-roomDetails', br.room), br.room.full_name) for br in block.blocked_rooms) }
                     </div>
                 </td>
                 <td></td>

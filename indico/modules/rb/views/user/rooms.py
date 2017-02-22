@@ -20,7 +20,6 @@ from dateutil.relativedelta import relativedelta
 from flask import request, session
 
 from MaKaC.common.cache import GenericCache
-from MaKaC.webinterface import urlHandlers as UH
 from MaKaC.webinterface.pages.base import WPNotDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.locations import Location
@@ -55,7 +54,7 @@ class WRoomBookingMapOfRooms(WTemplated):
 
     def getVars(self):
         wvars = WTemplated.getVars(self)
-        wvars['mapOfRoomsWidgetURL'] = UH.UHRoomBookingMapOfRoomsWidget.getURL(None, **self._params)
+        wvars['mapOfRoomsWidgetURL'] = url_for('rooms.roomBooking-mapOfRoomsWidget', **self._params)
         return wvars
 
 
@@ -154,7 +153,7 @@ class WRoomBookingRoomDetails(WTemplated):
         wvars['nonbookable_periods'] = room.nonbookable_periods.all()
 
         # URLs
-        wvars['stats_url'] = UH.UHRoomBookingRoomStats.getURL(room)
+        wvars['stats_url'] = url_for('rooms.roomBooking-roomStats', room)
         wvars['delete_room_url'] = url_for('rooms_admin.delete_room', room)
         wvars['modify_room_url'] = url_for('rooms_admin.modify_room', room)
         if not self._standalone:

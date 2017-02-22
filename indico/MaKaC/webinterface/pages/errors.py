@@ -21,7 +21,6 @@ from xml.sax.saxutils import quoteattr
 
 from flask import session, request
 
-import MaKaC.webinterface.urlHandlers as urlHandlers
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
@@ -61,7 +60,7 @@ class WGenericError( WTemplated ):
         if av:
             userHTML = self.htmlText( "%s <%s>"%( av.getFullName(), av.getEmail() ) )
             vars["userEmail"] = quoteattr( av.getEmail() )
-        vars["reportURL"] = quoteattr( str( urlHandlers.UHErrorReporting.getURL() ) )
+        vars["reportURL"] = quoteattr(url_for('misc.errors'))
         details = ""
         show_details = Config.getInstance().getDebug()
         if not show_details:
@@ -278,7 +277,7 @@ class WReportError( WTemplated ):
 
     def getVars( self ):
         vars = WTemplated.getVars( self )
-        vars["postURL"] = quoteattr( str( urlHandlers.UHErrorReporting.getURL() ) )
+        vars["postURL"] = quoteattr(url_for('misc.errors'))
         vars["dstEmail"] = quoteattr( self._dstMail )
         vars["reportMsg"] = quoteattr( self._msg )
         return vars

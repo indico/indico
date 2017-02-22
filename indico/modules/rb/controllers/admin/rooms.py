@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, flash
+from flask import request, flash, redirect
 from wtforms import StringField
 from wtforms.validators import DataRequired
 
@@ -34,7 +34,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.validators import IndicoEmail
 from MaKaC.common.cache import GenericCache
-from MaKaC.webinterface import urlHandlers as UH
 
 
 _cache = GenericCache('Rooms')
@@ -50,11 +49,11 @@ class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
     def _process(self):
         if self._room.has_live_reservations():
             flash(_(u'Cannot delete room with live bookings'), 'error')
-            self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))
+            return redirect(url_for('rooms.roomBooking-roomDetails', self._room))
         else:
             db.session.delete(self._room)
             flash(_(u'Room deleted'), 'success')
-            self._redirect(url_for('rooms_admin.roomBooking-adminLocation', self._room.location))
+            return redirect(url_for('rooms_admin.roomBooking-adminLocation', self._room.location))
 
 
 class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
@@ -135,7 +134,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
     def _process(self):
         if self._form.validate_on_submit():
             self._save()
-            self._redirect(UH.UHRoomBookingRoomDetails.getURL(self._room))
+            return redirect(url_for('rooms.roomBooking-roomDetails', self._room))
         else:
             return room_views.WPRoomBookingRoomForm(self, form=self._form, room=self._room, location=self._location,
                                                     errors=self._form.error_list).display()
