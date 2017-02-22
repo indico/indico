@@ -20,6 +20,68 @@
 (function(global) {
     'use strict';
 
+    global.setupEventManagementActionMenu = function setupEventManagementActionMenu() {
+        $('#event-action-move-to-category').on('click', function(evt) {
+            evt.preventDefault();
+
+            var $this = $(this);
+            $('<div>').categorynavigator({
+                openInDialog: true,
+                actionOn: {
+                    categoriesWithSubcategories: {
+                        disabled: true
+                    },
+                    categoriesWithoutEventCreationRights: {
+                        disabled: true
+                    },
+                    categories: {
+                        disabled: true,
+                        ids: [$this.data('category-id')]
+                    }
+                },
+                onAction: function(category) {
+                    var msg = $T.gettext('You are about to move the event to the category "{0}". Are you sure you want to proceed?').format(category.title);
+                    confirmPrompt(msg, $T.gettext('Move event')).then(function() {
+                        $.ajax({
+                            url: $this.data('href'),
+                            type: 'POST',
+                            data: {target_category_id: category.id},
+                            error: handleAjaxError,
+                            success: function(data) {
+                                if (data.success) {
+                                    location.reload();
+                                }
+                            }
+                        });
+                    });
+                }
+            });
+        });
+
+        $('#event-action-menu-clones-target').qbubble({
+            content: {
+                text: $('#event-action-menu-clones')
+            }
+        });
+
+        $('#event-action-menu-actions-target').qbubble({
+            content: {
+                text: $('#event-action-menu-actions')
+            },
+            style: {
+                classes: 'qtip-allow-overflow'
+            }
+        });
+
+        var selectors = [
+            '#event-action-menu-actions button:not(.js-dropdown)',
+            '#event-action-menu-actions a:not(.disabled)'
+        ];
+        $(selectors.join(', ')).on('click', function() {
+            $('#event-action-menu-actions-target').qbubble('hide');
+        });
+    };
+
     function refreshPersonFilters() {
         var personRows = $('.js-event-person-list tr[data-person-roles]');
         var filters = $('.js-event-person-list [data-filter]:checked').map(function() {

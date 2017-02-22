@@ -34,8 +34,8 @@
         }
     }
 
-    #action-menu-clones,
-    #action-menu-actions {
+    #event-action-menu-clones,
+    #event-action-menu-actions {
         display: none;
     }
 }
@@ -49,7 +49,7 @@
     }
 }
 
-#action-menu-clones ul {
+#event-action-menu-clones ul {
     list-style-type: disc;
     padding-left: 1.5em;
 }
