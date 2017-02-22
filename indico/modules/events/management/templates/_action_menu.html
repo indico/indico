@@ -34,23 +34,39 @@
 
 
 {% macro _render_lock_event(event) %}
-    {% if event.is_locked %}
-        <button class="i-button borderless icon-lock-center disabled"
-                title="{% trans %}This event is already locked.{% endtrans %}">
-            {% trans %}Lock{% endtrans %}
-        </button>
-    {% elif not event.can_lock(session.user) %}
-        <button class="i-button borderless icon-lock-center disabled"
-                title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
-            {% trans %}Lock{% endtrans %}
-        </button>
+    {% if not event.can_lock(session.user) %}
+        {% if event.is_locked %}
+            <button class="i-button borderless icon-lock-center disabled"
+                    title="{% trans %}Only the event creator and category managers may unlock an event.{% endtrans %}">
+                {% trans %}Unlock{% endtrans %}
+            </button>
+        {% else %}
+            <button class="i-button borderless icon-lock-center disabled"
+                    title="{% trans %}Only the event creator and category managers may lock an event.{% endtrans %}">
+                {% trans %}Lock{% endtrans %}
+            </button>
+        {% endif %}
     {% else %}
-        <button class="i-button borderless icon-lock-center"
-                title="{% trans %}Lock event{% endtrans %}"
-                data-href="{{ url_for('event_management.lock', event) }}"
-                data-ajax-dialog>
-            {% trans %}Lock{% endtrans %}
-        </button>
+        {% if event.is_locked %}
+            <button class="i-button borderless icon-lock-center warning"
+                    title="{% trans %}Unlock event{% endtrans %}"
+                    data-qtip-style="warning"
+                    data-href="{{ url_for('event_management.unlock', event) }}"
+                    data-method="POST"
+                    data-reload-after
+                    data-ajax>
+                {% trans %}Unlock{% endtrans %}
+            </button>
+        {% else %}
+            <button class="i-button borderless icon-lock-center warning"
+                    title="{% trans %}Lock event{% endtrans %}"
+                    data-qtip-style="warning"
+                    data-href="{{ url_for('event_management.lock', event) }}"
+                    data-reload-after
+                    data-ajax-dialog>
+                {% trans %}Lock{% endtrans %}
+            </button>
+        {% endif %}
     {% endif %}
 {% endmacro %}
 

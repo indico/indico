@@ -722,10 +722,6 @@ class WConfirmation(WTemplated):
         return WTemplated.getHTML(self, params)
 
 
-class WClosed(WTemplated):
-    pass
-
-
 class TabControl:
 
     def __init__( self, parent=None, child=None ):
