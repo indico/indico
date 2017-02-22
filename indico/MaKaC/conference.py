@@ -212,19 +212,6 @@ class Conference(CommonObjectBase):
         except AttributeError:
             return 'UTC'
 
-    @warn_on_access
-    def getTitle(self):
-        """returns (String) the title of the conference"""
-        return self.title
-
-    def getSessionById(self, sessionId):
-        """Returns the session from the conference list corresponding to the
-            unique session id specified
-        """
-        if not sessionId.isdigit():
-            return None
-        return self.as_event.get_session(friendly_id=int(sessionId))
-
     def canAccess(self, aw):
         return self.as_event.can_access(aw.user)
 

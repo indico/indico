@@ -20,7 +20,6 @@ from datetime import datetime
 from flask import request
 from hashlib import md5
 from indico.modules.groups import GroupProxy
-from pytz import timezone
 from sqlalchemy.orm import joinedload, load_only
 
 import string
@@ -31,8 +30,6 @@ from lxml import etree
 import MaKaC.webinterface.urlHandlers as urlHandlers
 from xmlGen import XMLGen
 from MaKaC.i18n import _
-from MaKaC.common.utils import getHierarchicalId, resolveHierarchicalId
-from MaKaC.common.cache import MultiLevelCache, MultiLevelCacheEntry
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from indico.core.config import Config
@@ -83,7 +80,6 @@ class outputGenerator(object):
         self.text = ""
         self.time_XML = 0
         self.time_HTML = 0
-        self.cache = XMLCache()
 
     def _getRecordCollection(self, obj):
         if obj.is_protected:
@@ -210,24 +206,12 @@ class outputGenerator(object):
             self._generateACLDatafield(None, None, objId, out)
 
     @unify_event_args
-    def confToXMLMarc21(self,event,includeSession=1,includeContribution=1,includeMaterial=1,out=None, overrideCache=False):
-
+    def confToXMLMarc21(self,event,includeSession=1,includeContribution=1,includeMaterial=1,out=None):
         if not out:
             out = self._XMLGen
-        #try to get a cache
-        version = "MARC21_ses-%s_cont-%s_mat-%s"%(includeSession,includeContribution,includeMaterial)
-        obj = None
-        if not overrideCache:
-            obj = self.cache.loadObject(version, event.as_legacy)
-        if obj:
-            xml = obj.getContent()
-        else:
-            # No cache, build the XML
-            temp = XMLGen(init=False)
-            self._event_to_xml_marc_21(event, includeSession, includeContribution, includeMaterial, out=temp)
-            xml = temp.getXml()
-            # save XML in cache
-            self.cache.cacheObject(version, xml, event.as_legacy)
+        temp = XMLGen(init=False)
+        self._event_to_xml_marc_21(event, includeSession, includeContribution, includeMaterial, out=temp)
+        xml = temp.getXml()
         out.writeXML(xml)
 
     def _generate_category_path(self, event, out):
@@ -342,23 +326,12 @@ class outputGenerator(object):
 
         self._generateAccessList(event, out, objId=uniqueId(event))
 
-    def contribToXMLMarc21(self, contrib, includeMaterial=1, out=None, overrideCache=False):
+    def contribToXMLMarc21(self, contrib, includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
-        #try to get a cache
-        version = "MARC21_mat-%s"%(includeMaterial)
-        obj = None
-        if not overrideCache:
-            obj = self.cache.loadObject(version, contrib)
-        if obj:
-            xml = obj.getContent()
-        else:
-            # No cache, build the XML
-            temp = XMLGen(init=False)
-            self._contrib_to_marc_xml_21(contrib, includeMaterial, out=temp)
-            xml = temp.getXml()
-            # save XML in cache
-            self.cache.cacheObject(version, xml, contrib)
+        temp = XMLGen(init=False)
+        self._contrib_to_marc_xml_21(contrib, includeMaterial, out=temp)
+        xml = temp.getXml()
         out.writeXML(xml)
 
     def _contrib_to_marc_xml_21(self, contrib, include_material=1, out=None):
@@ -488,23 +461,12 @@ class outputGenerator(object):
             out.writeTag('subfield', user.affiliation, [['code', 'u']])
             out.closeTag('datafield')
 
-    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None, overrideCache=False):
+    def subContribToXMLMarc21(self,subCont,includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
-        #try to get a cache
-        version = "MARC21_mat-%s"%(includeMaterial)
-        obj = None
-        if not overrideCache:
-            obj = self.cache.loadObject(version, subCont)
-        if obj:
-            xml = obj.getContent()
-        else:
-            # No cache, build the XML
-            temp = XMLGen(init=False)
-            self._subcontrib_to_marc_xml_21(subCont,includeMaterial, out=temp)
-            xml = temp.getXml()
-            # save XML in cache
-            self.cache.cacheObject(version, xml, subCont)
+        temp = XMLGen(init=False)
+        self._subcontrib_to_marc_xml_21(subCont,includeMaterial, out=temp)
+        xml = temp.getXml()
         out.writeXML(xml)
 
     def _subcontrib_to_marc_xml_21(self, subcontrib, includeMaterial=1, out=None):
@@ -657,43 +619,5 @@ class outputGenerator(object):
         out.closeTag('datafield')
 
 
-class XMLCacheEntry(MultiLevelCacheEntry):
-    def __init__(self, objId):
-        MultiLevelCacheEntry.__init__(self)
-        self.id = objId
-
-    def getId(self):
-        return self.id
-
-    @classmethod
-    def create(cls, content, obj):
-        entry = cls(getHierarchicalId(obj))
-        entry.setContent(content)
-        return entry
 
 
-class XMLCache(MultiLevelCache):
-
-    _entryFactory = XMLCacheEntry
-
-    def __init__(self):
-        MultiLevelCache.__init__(self, 'xml')
-
-
-    def isDirty(self, mtime, object):
-        modDate = resolveHierarchicalId(object.getId())._modificationDS
-        fileModDate = timezone("UTC").localize(
-            datetime.utcfromtimestamp(mtime))
-
-        # check file system date vs. event date
-        return (modDate > fileModDate)
-
-    def _generatePath(self, entry):
-        """
-        Generate the actual hierarchical location
-        """
-
-        # a205.0 -> /cachedir/a/a2/a205/0
-
-        tree = entry.getId().split('.')
-        return [tree[0][0], tree[0][0:2]] + tree
