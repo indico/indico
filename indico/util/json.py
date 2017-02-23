@@ -21,7 +21,6 @@ from datetime import datetime, date
 from UserDict import UserDict
 
 from flask import current_app, session
-from persistent.dict import PersistentDict
 from speaklater import _LazyString
 from werkzeug.exceptions import Forbidden
 
@@ -37,7 +36,6 @@ class IndicoJSONEncoder(_json.JSONEncoder):
     """
     Custom JSON encoder that supports more types
      * datetime objects
-     * PersistentDict
     """
     def __init__(self, *args, **kwargs):
         if kwargs.get('separators') is None:
@@ -47,7 +45,7 @@ class IndicoJSONEncoder(_json.JSONEncoder):
     def default(self, o):
         if isinstance(o, _LazyString):
             return o.value
-        elif isinstance(o, (PersistentDict, UserDict)):
+        elif isinstance(o, UserDict):
             return dict(o)
         elif isinstance(o, datetime):
             return {'date': str(o.date()), 'time': str(o.time()), 'tz': str(o.tzinfo)}
