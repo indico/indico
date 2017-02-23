@@ -27,8 +27,6 @@ from types import GeneratorType
 
 import transaction
 from flask import request, current_app
-from ZEO.Exceptions import ClientDisconnected
-from ZODB.POSException import ConflictError
 
 # indico imports
 from MaKaC.common.mail import GenericMailer
@@ -200,16 +198,10 @@ class HTTPAPIHook(object):
                 for i, retry in enumerate(transaction.attempts(10)):
                     with retry:
                         GenericMailer.flushQueue(False)
-                        try:
-                            is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
-                            transaction.commit()
-                            GenericMailer.flushQueue(True)
-                            break
-                        except ConflictError:
-                            transaction.abort()
-                        except ClientDisconnected:
-                            transaction.abort()
-                            time.sleep(i * 5)
+                        is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
+                        transaction.commit()
+                        GenericMailer.flushQueue(True)
+                        break
                 else:
                     raise HTTPAPIError('An unresolvable database conflict has occured', 500)
             except Exception:
