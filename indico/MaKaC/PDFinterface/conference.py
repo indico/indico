@@ -19,27 +19,20 @@ from datetime import timedelta
 from itertools import takewhile
 from operator import attrgetter
 
-from qrcode import QRCode, constants
-from speaklater import is_lazy_string
-
-from MaKaC.PDFinterface.base import escape
 from pytz import timezone
+from qrcode import QRCode, constants
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT
+from reportlab.lib.pagesizes import landscape, A4
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.units import inch, cm
 from reportlab.lib.utils import ImageReader
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT
-from reportlab.rl_config import defaultPageSize
 from reportlab.platypus import Table, TableStyle
-from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
-from MaKaC.PDFinterface.base import PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak, modifiedFontSize
-from reportlab.lib.pagesizes import landscape, A4
-from MaKaC.webinterface.common.tools import strip_ml_tags
-from MaKaC.i18n import _
-from MaKaC.common import utils
+from reportlab.rl_config import defaultPageSize
+from speaklater import is_lazy_string
 
-from indico.core.db import db
 from indico.core.config import Config
+from indico.core.db import db
 from indico.modules.events.abstracts.models.abstracts import AbstractState, AbstractReviewingState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import boa_settings, BOASortField, BOACorrespondingAuthorType
@@ -49,8 +42,13 @@ from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
-from indico.util.i18n import i18nformat, ngettext
+from indico.util.i18n import i18nformat, ngettext, _
 from indico.util.string import html_color_to_rgb, to_unicode, truncate
+from MaKaC.PDFinterface.base import (escape, PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak,
+                                     modifiedFontSize)
+from MaKaC.common import utils
+from MaKaC.common.timezoneUtils import DisplayTZ, nowutc
+from MaKaC.webinterface.common.tools import strip_ml_tags
 
 styles = getSampleStyleSheet()
 

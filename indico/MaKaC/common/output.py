@@ -29,7 +29,6 @@ import StringIO
 from lxml import etree
 
 from xmlGen import XMLGen
-from MaKaC.i18n import _
 from MaKaC.common.TemplateExec import escapeHTMLForJS
 
 from indico.core.config import Config
@@ -40,6 +39,7 @@ from indico.modules.users.legacy import AvatarUserWrapper
 from indico.modules.users import User
 from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.util.event import uniqueId, unify_event_args
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 

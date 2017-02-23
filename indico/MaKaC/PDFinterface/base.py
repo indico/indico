@@ -14,50 +14,43 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-import math
 import cgi
+import math
+import os
 import shutil
-import xml.sax.saxutils as saxutils
+import subprocess
+import tempfile
 import uuid
-import re
+import xml.sax.saxutils as saxutils
 
-from HTMLParser import HTMLParser
-from reportlab.platypus import SimpleDocTemplate, PageTemplate, Table
-from reportlab.platypus.tableofcontents import TableOfContents
-from reportlab.lib.styles import ParagraphStyle
-from reportlab.rl_config import defaultPageSize
-from reportlab.lib.units import inch, cm
-from reportlab.lib.enums import TA_CENTER, TA_RIGHT, TA_LEFT
+import markdown
+import pkg_resources
+from PIL import Image as PILImage
 from reportlab import platypus
-from reportlab.pdfgen.canvas import Canvas
-from reportlab.platypus.frames import Frame
+from reportlab.lib.enums import TA_CENTER
+from reportlab.lib.fonts import addMapping
 from reportlab.lib.pagesizes import landscape, A4, LETTER, A0, A1, A2, A3, A5
+from reportlab.lib.styles import ParagraphStyle
+from reportlab.lib.units import inch, cm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.fonts import addMapping
-from MaKaC.i18n import _
-from MaKaC.common.utils import isStringHTML
-from MaKaC.common.TemplateExec import render as tpl_render
-import subprocess
-import pkg_resources
-import tempfile
-from MaKaC.common.logger import Logger
-
-from mako.template import Template
+from reportlab.pdfgen.canvas import Canvas
+from reportlab.platypus import SimpleDocTemplate, PageTemplate
+from reportlab.platypus.frames import Frame
 
 from indico.core.config import Config
+from indico.core.logger import Logger
 from indico.util import mdx_latex
-from indico.util.string import render_markdown
-import markdown
-from PIL import Image as PILImage
-from indico.util.string import sanitize_for_platypus, to_unicode
+from indico.util.i18n import _
+from indico.util.string import render_markdown, sanitize_for_platypus, to_unicode
+from MaKaC.common.TemplateExec import render as tpl_render
+from MaKaC.common.utils import isStringHTML
 
 
 ratio = math.sqrt(math.sqrt(2.0))
 
-class PDFSizes:
 
+class PDFSizes:
     def __init__(self):
         self.PDFpagesizes = {'Letter' : LETTER,
                     'A0' : A3,

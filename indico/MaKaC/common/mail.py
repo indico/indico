@@ -21,12 +21,12 @@ from email.mime.text import MIMEText
 from email import charset
 
 from indico.core.config import Config
+from indico.core.logger import Logger
 from indico.util.event import unify_event_args
+from indico.util.i18n import _
 from indico.util.string import to_unicode
 from MaKaC.errors import MaKaCError
-from MaKaC.i18n import _
 
-from indico.core.logger import Logger
 from MaKaC.common.contextManager import ContextManager
 
 # Prevent base64 encoding of utf-8 e-mails
