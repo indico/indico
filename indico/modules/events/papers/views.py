@@ -62,7 +62,7 @@ def render_paper_page(paper, view_class=None):
     reviewed_for_groups = list(paper.last_revision.get_reviewed_for_groups(session.user))
     if len(reviewed_for_groups) == 1:
         review_form = build_review_form(paper.last_revision, reviewed_for_groups[0])
-    judgment_form = PaperJudgmentForm(formdata=None)
+    judgment_form = PaperJudgmentForm(formdata=None, paper=paper)
     revision_form = PaperSubmissionForm(formdata=None)
     params = {
         'paper': paper,
