@@ -19,7 +19,6 @@ import ez_setup
 ez_setup.use_setuptools()
 
 import os
-import getpass
 import re
 import shutil
 import sys
@@ -42,7 +41,6 @@ class vars(object):
     versionVal = 'None'
     accessuser = None
     accessgroup = None
-    dbInstalledBySetupPy = False
     binDir = None
     documentationDir = None
     configurationDir = None
@@ -157,7 +155,6 @@ class develop_config(develop_indico):
                      ('www-gid=', None, "Set group for cache/log/db (typically apache group)"),
                      ('http-port=', None, "Set port used by HTTP server"),
                      ('https-port=', None, "Set port used by HTTP server in HTTPS mode"),
-                     ('zodb-port=', None, "Set port used by ZODB"),
                      ('smtp-port=', None, "Set port used for SMTP (e-mail sending)"),
                      ('use-apache', None, "Use apache (will chmod directories accordingly)")])
 
@@ -165,8 +162,6 @@ class develop_config(develop_indico):
     www_gid = None
     http_port = 8000
     https_port = 8443
-    zodb_port = 9675
-    use_apache = False
     smtp_port = 8025
 
     def run(self):
@@ -186,8 +181,8 @@ class develop_config(develop_indico):
                 'SmtpServer': ("localhost", int(self.smtp_port))
                 })
 
-        for f in [x for x in ('etc/zdctl.conf', 'etc/zodb.conf', 'etc/logging.conf') if not os.path.exists(x)]:
-            shutil.copy('%s.sample' % f, f)
+        if not os.path.exists('etc/logging.conf'):
+            shutil.copy('etc/logging.conf.sample', 'etc/logging.conf')
 
         print """\nIndico needs to store some information in the filesystem (database, cache, temporary files, logs...)
 Please specify the directory where you'd like it to be placed.
@@ -215,31 +210,12 @@ Please specify the directory where you'd like it to be placed.
         # avoid modifying the htdocs folder permissions (it brings problems with git)
         directories.pop('htdocs')
 
-        from MaKaC.consoleScripts.installBase import _databaseText, _findApacheUserGroup, _checkDirPermissions, \
-            _updateDbConfigFiles, _updateMaKaCEggCache
-
-        user = getpass.getuser()
-        sourcePath = os.getcwd()
-
-        if self.use_apache:
-            # find the apache user/group
-            user, group = _findApacheUserGroup(self.www_uid, self.www_gid)
-            _checkDirPermissions(directories, dbInstalledBySetupPy=directories['db'], accessuser=user, accessgroup=group)
-
-        _updateDbConfigFiles(os.path.join(sourcePath, 'etc'),
-                             db=directories['db'],
-                             log=directories['log'],
-                             tmp=directories['tmp'],
-                             port=self.zodb_port,
-                             uid=user)
+        from MaKaC.consoleScripts.installBase import _updateMaKaCEggCache
 
         _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'),
                              directories['tmp'])
 
         compile_languages(self)
-        print '''
-%s
-        ''' % _databaseText('etc')
 
     def _update_conf_dir_paths(self, filePath, dirs):
         fdata = open(filePath).read()
@@ -327,7 +303,6 @@ if __name__ == '__main__':
           entry_points="""
             [console_scripts]
             indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
-            indico_ctl = MaKaC.consoleScripts.indicoCtl:main
             indico = indico.cli.manage:main
             indico-zodbimport = indico_zodbimport.cli:main
 
