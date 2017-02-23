@@ -21,9 +21,9 @@ from indico.modules.groups import GroupProxy
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_event_person
+from indico.modules.users.legacy import search_avatars
 from indico.util.string import to_unicode, sanitize_email
 from MaKaC.common.fossilize import fossilize
-from MaKaC.common.search import searchUsers
 from MaKaC.fossils.user import IGroupFossil
 from MaKaC.services.implementation.base import LoggedOnlyService
 
@@ -48,8 +48,13 @@ class SearchUsers(SearchBase):
 
     def _getAnswer(self):
         event_persons = []
-        users = searchUsers(self._surName, self._name, self._organisation, self._email,
-                            self._exactMatch, self._searchExt)
+        criteria = {
+            'surName': self._surName,
+            'name': self._name,
+            'organisation': self._organisation,
+            'email': self._email
+        }
+        users = search_avatars(criteria, self._exactMatch, self._searchExt)
         if self._event:
             fields = {EventPerson.first_name: self._name,
                       EventPerson.last_name: self._surName,
