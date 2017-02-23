@@ -206,7 +206,6 @@ class Config:
         'SQLAlchemyPoolRecycle'     : 120,
         'SQLAlchemyMaxOverflow'     : 3,
         'EnableRoomBooking'         : True,
-        'MaxRetries'                : 10,
         'SanitizationLevel'         : 1,
         'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost/',

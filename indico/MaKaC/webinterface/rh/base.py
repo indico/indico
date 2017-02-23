@@ -557,13 +557,7 @@ class RH(RequestHandlerBase):
     def _processHtmlForbiddenTag(self, e):
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 
-    def _process_retry_setup(self):
-        # clear the fossile cache at the start of each request
-        fossilize.clearCache()
-        # delete all queued emails
-        GenericMailer.flushQueue(False)
-
-    def _process_retry_auth_check(self, params):
+    def _check_auth(self, params):
         self._setSessionUser()
         if session.user:
             Logger.get('requestHandler').info('Request authenticated: %r', session.user)
@@ -575,8 +569,8 @@ class RH(RequestHandlerBase):
         self._checkCSRF()
         self._reqParams = copy.copy(params)
 
-    def _process_retry_do(self, profile):
-        profile_name, res = '', ''
+    def _do_process(self, profile):
+        profile_name = res = ''
         try:
             # old code gets parameters from call
             # new code utilizes of flask.request
@@ -621,11 +615,6 @@ class RH(RequestHandlerBase):
                 res = self._process()
         return profile_name, res
 
-    def _process_retry(self, params, retry, profile):
-        self._process_retry_setup()
-        self._process_retry_auth_check(params)
-        return self._process_retry_do(profile)
-
     def _process_success(self):
         Logger.get('requestHandler').info('Request successful')
         # request is succesfull, now, doing tasks that must be done only once
@@ -641,7 +630,7 @@ class RH(RequestHandlerBase):
             raise BadRequest
 
         cfg = Config.getInstance()
-        max_retries, profile = cfg.getMaxRetries(), cfg.getProfile()
+        profile = cfg.getProfile()
         profile_name, res, textLog = '', '', []
 
         self._startTime = datetime.now()
@@ -664,22 +653,18 @@ class RH(RequestHandlerBase):
 
         is_error_response = False
         try:
-            for i, retry in enumerate(transaction.attempts(max_retries)):
-                with retry:
-                    if i > 0:
-                        signals.before_retry.send()
-
-                    try:
-                        profile_name, res = self._process_retry(params, i, profile)
-                        signals.after_process.send()
-                        if self.commit:
-                            transaction.commit()
-                        else:
-                            transaction.abort()
-                        break
-                    except DatabaseError:
-                        handle_sqlalchemy_database_error()
-                        break
+            try:
+                fossilize.clearCache()
+                GenericMailer.flushQueue(False)
+                self._check_auth(params)
+                profile_name, res = self._do_process(profile)
+                signals.after_process.send()
+                if self.commit:
+                    transaction.commit()
+                else:
+                    transaction.abort()
+            except DatabaseError:
+                handle_sqlalchemy_database_error()  # this will re-raise an exception
             self._process_success()
         except Exception as e:
             transaction.abort()

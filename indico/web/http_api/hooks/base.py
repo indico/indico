@@ -195,15 +195,10 @@ class HTTPAPIHook(object):
             is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
         else:
             try:
-                for i, retry in enumerate(transaction.attempts(10)):
-                    with retry:
-                        GenericMailer.flushQueue(False)
-                        is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
-                        transaction.commit()
-                        GenericMailer.flushQueue(True)
-                        break
-                else:
-                    raise HTTPAPIError('An unresolvable database conflict has occured', 500)
+                GenericMailer.flushQueue(False)
+                is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
+                transaction.commit()
+                GenericMailer.flushQueue(True)
             except Exception:
                 transaction.abort()
                 raise
