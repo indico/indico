@@ -21,7 +21,7 @@ import transaction
 from flask import request, session
 from sqlalchemy.exc import DatabaseError
 
-from MaKaC.errors import NoReportError, FormValuesError
+from MaKaC.errors import NoReportError
 from MaKaC.common.contextManager import ContextManager
 from MaKaC.common.mail import GenericMailer
 from MaKaC.services.interface.rpc import handlers
@@ -88,7 +88,7 @@ class ServiceRunner(object):
                     signals.after_process.send()
                 except NoReportError as e:
                     raise ServiceNoReportError(e.getMessage())
-                except (NoReportIndicoError, FormValuesError) as e:
+                except NoReportIndicoError as e:
                     raise ServiceNoReportError(e.getMessage(), title=_("Error"))
                 transaction.commit()
             except DatabaseError:
