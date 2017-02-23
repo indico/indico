@@ -106,21 +106,7 @@ class ModificationError(AccessControlError):
         return _("you are not authorised to modify this %s") % self.objType
 
 
-class TimingError(MaKaCError):
-    """
-    Timetable problems
-    """
-
-    fossilizes(IErrorNoReportFossil)
-
-
 class NotLoggedError(MaKaCError):
-    """
-    """
-    fossilizes(IErrorNoReportFossil)
-
-
-class FormValuesError(MaKaCError):
     """
     """
     fossilizes(IErrorNoReportFossil)
