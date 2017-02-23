@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
-from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.string import to_unicode, return_ascii, encode_utf8
 from MaKaC.fossils.user import IGroupFossil
@@ -49,17 +48,8 @@ class GroupWrapper(Fossilizable):
     def getFullName(self):
         return self.getName()
 
-    def getDescription(self):
-        return ''
-
-    def setDescription(self, value):
-        pass
-
     def getEmail(self):
         return ''
-
-    def canUserModify(self, avatar):
-        return avatar.user.is_admin
 
     def exists(self):
         return self.group.group is not None
@@ -91,18 +81,6 @@ class LocalGroupWrapper(GroupWrapper):
     @encode_utf8
     def getName(self):
         return self.group.group.name if self.exists() else self.id
-
-    def addMember(self, member):
-        if not isinstance(member, AvatarUserWrapper):
-            raise TypeError('Groups can only contain users')
-        group = self.group.group  # needed to avoid GC
-        group.members.add(member.user)
-
-    def removeMember(self, member):
-        if not isinstance(member, AvatarUserWrapper):
-            raise TypeError('Groups can only contain users')
-        group = self.group.group  # needed to avoid GC
-        group.members.discard(member.user)
 
 
 class LDAPGroupWrapper(GroupWrapper):
