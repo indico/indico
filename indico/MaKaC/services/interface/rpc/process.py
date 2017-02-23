@@ -75,50 +75,25 @@ def processRequest(method, params, internal=False):
 
 
 class ServiceRunner(object):
-
-    def _invokeMethodBefore(self):
-        # clear the context
-        ContextManager.destroy()
-        # notify components that the request has started
-
-    def _invokeMethodRetryBefore(self):
-        # clear/init fossil cache
-        fossilize.clearCache()
-        # delete all queued emails
-        GenericMailer.flushQueue(False)
-
-    def _invokeMethodSuccess(self):
-        GenericMailer.flushQueue(True)  # send emails
-
     def invokeMethod(self, method, params):
-        cfg = Config.getInstance()
-        max_retries = cfg.getMaxRetries()
         result = None
 
-        self._invokeMethodBefore()
-
         try:
-            for i, retry in enumerate(transaction.attempts(max_retries)):
-                with retry:
-                    if i > 0:
-                        # notify components that the request is being retried
-                        signals.before_retry.send()
-
-                    self._invokeMethodRetryBefore()
-                    try:
-                        try:
-                            result = processRequest(method, copy.deepcopy(params))
-                            signals.after_process.send()
-                        except NoReportError as e:
-                            raise ServiceNoReportError(e.getMessage())
-                        except (NoReportIndicoError, FormValuesError) as e:
-                            raise ServiceNoReportError(e.getMessage(), title=_("Error"))
-                        transaction.commit()
-                        break
-                    except DatabaseError:
-                        handle_sqlalchemy_database_error()
-                        break
-            self._invokeMethodSuccess()
+            ContextManager.destroy()
+            fossilize.clearCache()
+            GenericMailer.flushQueue(False)
+            try:
+                try:
+                    result = processRequest(method, copy.deepcopy(params))
+                    signals.after_process.send()
+                except NoReportError as e:
+                    raise ServiceNoReportError(e.getMessage())
+                except (NoReportIndicoError, FormValuesError) as e:
+                    raise ServiceNoReportError(e.getMessage(), title=_("Error"))
+                transaction.commit()
+            except DatabaseError:
+                handle_sqlalchemy_database_error()
+            GenericMailer.flushQueue(True)
         except Exception as e:
             transaction.abort()
             if isinstance(e, CausedError):
