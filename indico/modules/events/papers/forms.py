@@ -27,6 +27,7 @@ from indico.modules.events.papers.fields import PaperEmailSettingsField
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.modules.events.papers.models.reviews import (PaperAction, PaperReviewType, PaperCommentVisibility,
                                                          PaperTypeProxy)
+from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, FormDefaults
@@ -129,6 +130,12 @@ class PaperJudgmentForm(PaperJudgmentFormBase):
     _order = ('judgment', 'judgment_comment')
 
     judgment = IndicoEnumSelectField(_("Judgment"), [DataRequired()], enum=PaperAction)
+
+    def __init__(self, *args, **kwargs):
+        self.paper = kwargs.pop('paper')
+        super(PaperJudgmentForm, self).__init__(*args, **kwargs)
+        if self.paper.state == PaperRevisionState.to_be_corrected:
+            self.judgment.skip.add(PaperAction.to_be_corrected)
 
 
 class BulkPaperJudgmentForm(PaperJudgmentFormBase):
