@@ -28,11 +28,9 @@ from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import get_object_from_args
-from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
 from MaKaC.webinterface.rh.base import RHProtected
-from MaKaC.accessControl import AccessWrapper
 
 
 class RHNoteBase(RHProtected):
@@ -122,7 +120,7 @@ class RHDeleteNote(RHManageNoteBase):
             logger.info('Note %s deleted by %s', note, session.user)
             self.event_new.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
                                session.user, data=note.link_event_log_data)
-        return redirect(url_for('event.conferenceDisplay', self.event_new))
+        return redirect(self.event_new.url)
 
 
 class RHViewNote(RHNoteBase):

@@ -105,7 +105,7 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
         if not _can_redirect_to_single_survey(surveys):
             back_button_endpoint = '.display_survey_list'
         elif self.event_new.type_ != EventType.conference:
-            back_button_endpoint = 'event.conferenceDisplay'
+            back_button_endpoint = 'events.display'
         else:
             back_button_endpoint = None
         return self.view_class.render_template('display/survey_questionnaire.html', self._conf, form=form,

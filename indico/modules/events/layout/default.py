@@ -32,7 +32,7 @@ def get_default_menu_entries():
         MenuEntryData(
             title=_("Overview"),
             name='overview',
-            endpoint='event.conferenceDisplay-overview',
+            endpoint='events.display_overview',
             position=0,
             static_site=True
         ),

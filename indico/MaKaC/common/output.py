@@ -316,8 +316,7 @@ class outputGenerator(object):
         out.writeTag("subfield", "INDICO." + str(uniqueId(event)), [["code", "a"]])
         out.closeTag("datafield")
 
-        self._generate_link_field(url_for('event.conferenceDisplay', confId=event.id, _external=True), 'Event details',
-                                  out)
+        self._generate_link_field(event.external_url, 'Event details', out)
 
         self._generateAccessList(event, out, objId=uniqueId(event))
 
@@ -408,8 +407,7 @@ class outputGenerator(object):
         self._generate_link_field(url_for('contributions.display_contribution', contrib, _external=True),
                                   'Contribution details', out)
 
-        self._generate_link_field(url_for('event.conferenceDisplay', contrib.event_new, _external=True),
-                                  'Event details', out)
+        self._generate_link_field(contrib.event_new.external_url, 'Event details', out)
 
         self._generateAccessList(contrib, out, objId=uniqueId(contrib))
     ####
@@ -531,10 +529,7 @@ class outputGenerator(object):
 
         self._generate_link_field(url_for('contributions.display_contribution', subcontrib.contribution,
                                           _external=True), 'Contribution details', out)
-
-        self._generate_link_field(url_for('event.conferenceDisplay', subcontrib.event_new, _external=True),
-                                  'Event details', out)
-
+        self._generate_link_field(subcontrib.event_new.external_url, 'Event details', out)
         self._generateAccessList(subcontrib.contribution, out, objId=uniqueId(subcontrib))
 
     def materialToXMLMarc21(self, obj, out=None):

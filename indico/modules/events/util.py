@@ -503,7 +503,7 @@ def serialize_event_for_ical(event, detail_level):
     from indico.modules.events.contributions.util import serialize_contribution_for_ical
     fossil = 'conferenceMetadataWithContribs' if detail_level == 'contributions' else 'conferenceMetadata'
     data = {'id': event.id, 'title': event.title, 'description': event.description, 'startDate': event.start_dt,
-            'endDate': event.end_dt, 'url': url_for('event.conferenceDisplay', event, _external=True),
+            'endDate': event.end_dt, 'url': event.external_url,
             'location': event.venue_name, 'roomFullname': event.room_name, 'speakers': [], '_fossil': fossil,
             'contributions': []}
     if detail_level == 'contributions':

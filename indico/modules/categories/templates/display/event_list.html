@@ -92,7 +92,7 @@
                             {{ format_event_date(event) }}
                             <time itemprop="startDate" datetime="{{ event.start_dt.isoformat() }}">
                         </span>
-                        <a href="{{ url_for('event.conferenceDisplay', event) }}" itemprop="url">
+                        <a href="{{ event.url }}" itemprop="url">
                             <span itemprop="summary">
                                 {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | strip_tags }}
                             </span>
