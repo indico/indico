@@ -986,6 +986,8 @@ ndRegForm.directive('ndAccommodationField', function(url) {
             scope.settings.formData.push('departureDateFrom');
             scope.settings.formData.push('departureDateTo');
             scope.settings.formData.push('choices');
+            scope.settings.isRequired = false;
+
 
             scope.settings.editionTable = {
                 sortable: false,

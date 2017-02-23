@@ -3,7 +3,7 @@
         <span ng-class="{'error-message-underline': validationStarted && nestedFormAccommodation.$invalid}">
             {{ 'Select your accommodation' | i18n }}:
         </span>
-        <span ng-if="field.isRequired" class="regFormMandatoryField">*</span>
+        <span class="regFormMandatoryField">*</span>
     </div>
     <ng-form name="nestedFormAccommodation">
         <table cellspacing="0">
@@ -21,7 +21,7 @@
                         ng-checked="userdata[fieldName].choice == item.id"
                         ng-model="accommodation.choice"
                         ng-disabled="isDisabled(item, userdata[fieldName].choice) || !regMetadata.manager && (paymentBlocked(item, userdata, regMetadata) || billableOptionPayed(userdata, regMetadata))"
-                        ng-required="field.isRequired"/>
+                        required="required"/>
                     {{ item.caption }}
 
                     <span class="unavailable-text" ng-if="item.cancelled && !hasPlacesLeft(item, userdata[fieldName].choice)">
@@ -81,7 +81,8 @@
         <tr>
             <td align="left">
                 <span>{{ 'Arrival date' | i18n }}</span>
-                <span ng-if="field.isRequired" class="regFormMandatoryField">*</span>
+                <span ng-if="!isNoAccommodationChoice(accommodation.choice, field)"
+                      class="regFormMandatoryField">*</span>
             </td>
             <td align="left">
                 <ng-form name="nestedFormArrival">
@@ -104,7 +105,8 @@
         <tr>
             <td align="left">
                 <span>{{ 'Departure date' | i18n }}</span>
-                <span ng-if="field.isRequired" class="regFormMandatoryField">*</span>
+                <span ng-if="!isNoAccommodationChoice(accommodation.choice, field)"
+                      class="regFormMandatoryField">*</span>
             </td>
             <td align="left">
                 <ng-form name="nestedFormDeparture">
