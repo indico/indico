@@ -149,7 +149,7 @@ def _handle_legacy_ids(app, **kwargs):
     # Those endpoints handle legacy event ids on their own so we ignore them here.
     # confModifTools-*Background is called via /event/default/... when editing a global
     # badge/poster template...
-    _non_standard_id_endpoints = {'event.shorturl', 'event.conferenceDisplay', 'conferenceDisplay-overview'}
+    _non_standard_id_endpoints = {'events.shorturl', 'events.display', 'events.display_overview'}
 
     @app.before_request
     def _redirect_legacy_id():

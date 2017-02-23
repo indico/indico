@@ -17,7 +17,7 @@
     Dates:    {{ event.start_dt | format_date(timezone=event.tzinfo) }}, {{ event.start_dt | format_time(timezone=event.tzinfo) }} - {{ event.end_dt | format_date(timezone=event.tzinfo) }}, {{ event.end_dt | format_time(timezone=event.tzinfo) }}
     {%- endif %}
     Location: {% if event.venue_name %}{{ event.venue_name }}: {% endif %}{{ event.room_name }}
-    Details:  {{ url_for('event.conferenceDisplay', event, _external=True) }}
+    Details:  {{ event.external_url }}
 {%- endmacro %}
 
 

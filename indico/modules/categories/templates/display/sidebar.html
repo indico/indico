@@ -68,8 +68,7 @@
         <ul class="main-page-list">
             {% for event in upcoming_events %}
                 <li>
-                    <a href="{{ url_for('event.conferenceDisplay', confId=event.id)}}"
-                       class="title" title="{{ event.title|strip_tags }}" >
+                    <a href="{{ event.url }}" class="title" title="{{ event.title|strip_tags }}" >
                         {{ event.title|strip_tags }}
                     </a>
                     <span class="timing">

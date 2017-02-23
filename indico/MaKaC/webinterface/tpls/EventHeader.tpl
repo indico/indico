@@ -31,11 +31,11 @@ ${ template_hook('global-announcement') }
         <div class="separator"></div>
 
         %if rel['first'] is not None:
-            <a id="firstEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['first']) }"
+            <a id="firstEventButton" href="${ url_for('events.display', confId=rel['first']) }"
                style="background-image: url(${ systemIcon('first_arrow') })"></a>
         % endif
         % if rel['prev'] is not None:
-        <a id="previousEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['prev']) }"
+        <a id="previousEventButton" href="${ url_for('events.display', confId=rel['prev']) }"
                style="background-image: url(${ systemIcon('left_arrow') })"></a>
         % endif
 
@@ -43,11 +43,11 @@ ${ template_hook('global-announcement') }
            style="background-image: url(${ systemIcon('upCategory') })"></a>
 
         %if rel['next'] is not None:
-            <a id="nextEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['next']) }"
+            <a id="nextEventButton" href="${ url_for('events.display', confId=rel['next']) }"
                style="background-image: url(${ systemIcon('right_arrow') })"></a>
         % endif
         % if rel['last'] is not None:
-            <a id="lastEventButton" href="${ url_for('event.conferenceDisplay', confId=rel['last']) }"
+            <a id="lastEventButton" href="${ url_for('events.display', confId=rel['last']) }"
                    style="background-image: url(${ systemIcon('last_arrow') })"></a>
         % endif
 

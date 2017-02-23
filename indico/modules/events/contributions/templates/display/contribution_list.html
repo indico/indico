@@ -44,7 +44,7 @@
     </div>
     {% if event.type != 'conference' -%}
         <p>
-            <a href="{{ url_for('event.conferenceDisplay', event) }}" class="i-button">
+            <a href="{{ event.url }}" class="i-button">
                 {%- trans %}Back to the event{% endtrans -%}
             </a>
         </p>

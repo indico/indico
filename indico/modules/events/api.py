@@ -561,7 +561,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
             'category': event.category.title,
             'note': build_note_api_data(event.note),
             'roomFullname': event.room_name,
-            'url': url_for('event.conferenceDisplay', confId=event.id, _external=True),
+            'url': event.external_url,
             'creationDate': self._serialize_date(event.created_dt),
             'creator': self._serialize_person(event.creator, person_type='Avatar', can_manage=can_manage),
             'hasAnyProtection': event.effective_protection_mode != ProtectionMode.public,

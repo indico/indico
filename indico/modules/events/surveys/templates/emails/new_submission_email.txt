@@ -22,5 +22,5 @@
 {%- endblock %}
 
 {% block footer_url -%}
-    {{ url_for('event.conferenceDisplay', survey.event_new, _external=true) }}
+    {{ survey.event_new.external_url }}
 {%- endblock %}
