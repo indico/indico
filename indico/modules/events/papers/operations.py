@@ -158,12 +158,12 @@ def create_paper_revision(paper, submitter, files):
                        _contribution=paper.contribution)
         pf.save(f.file)
     db.session.flush()
+    db.session.expire(revision._contribution, ['_paper_last_revision'])
     notify_paper_revision_submission(revision)
     logger.info('Paper revision %r submitted by %r', revision, session.user)
     paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         "Paper revision {} submitted for contribution {} ({})"
                         .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
-    db.session.expire(revision._contribution, ['_paper_last_revision'])
     return revision
 
 

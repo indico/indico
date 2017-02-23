@@ -429,7 +429,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return '#{} ({})'.format(self.friendly_id, self.title)
 
     @property
-    @memoize_request
     def paper(self):
         return Paper(self) if self._paper_last_revision else None
 
