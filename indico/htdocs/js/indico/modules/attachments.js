@@ -119,7 +119,8 @@
                     }
                 },
                 onOpen: function(popup) {
-                    popup.canvas.closest('.ui-dialog').prev('.ui-widget-overlay').addClass('attachment-preview-overlay');
+                    var dialog = popup.canvas.closest('.ui-dialog');
+                    dialog.prev('.ui-widget-overlay').addClass('attachment-preview-overlay');
                     popup.canvas.find('.attachment-preview-content-wrapper, .js-close-preview').on('click', function() {
                         popup.canvas.trigger('ajaxDialog:close');
                     });
@@ -134,12 +135,17 @@
                     popup.canvas.find('.attachment-preview-content, .attachment-preview-top-bar').on('click', function(e) {
                         e.stopPropagation();
                     });
-                    $('body').add(popup.canvas.closest('.ui-dialog')).on('keydown.attachmentPreview', function(e) {
+                    $('body').add(dialog).on('keydown.attachmentPreview', function(e) {
                         if (e.which === $.ui.keyCode.ESCAPE) {
                             popup.canvas.trigger('ajaxDialog:close');
                         }
                     });
                     $('html, body').addClass('prevent-scrolling');
+                    // for some reason the dialog is hidden when its position
+                    // gets updated so we explicitly show it.
+                    _.defer(function() {
+                        dialog.show();
+                    });
                 },
                 onLoadError: function(xhr) {
                     var hash = location.hash;
