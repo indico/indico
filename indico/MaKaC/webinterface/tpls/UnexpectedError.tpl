@@ -1,5 +1,5 @@
 <%
-from MaKaC.i18n import _
+from indico.util.i18n import _
 %>
 
 <div class="container">
