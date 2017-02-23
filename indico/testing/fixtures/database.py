@@ -28,7 +28,6 @@ from sqlalchemy import event
 
 from indico.core.db import db as db_
 from indico.core.db.sqlalchemy.util.management import delete_all_tables
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.util.process import silent_check_call
 from indico.web.flask.app import configure_db
 
@@ -96,7 +95,6 @@ def database(app, postgresql):
     """
     app.config['SQLALCHEMY_DATABASE_URI'] = postgresql
     configure_db(app)
-    update_session_options(db_)
     if 'INDICO_TEST_DATABASE_URI' in os.environ and os.environ.get('INDICO_TEST_DATABASE_HAS_TABLES') == '1':
         yield db_
         return

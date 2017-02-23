@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-import transaction
 from flask import redirect, request, session
 from werkzeug.exceptions import NotFound
 
@@ -44,7 +43,7 @@ class RHStaticSiteBuild(RHStaticSiteBase):
     def _process(self):
         static_site = StaticSite(creator=session.user, event_new=self.event_new)
         db.session.add(static_site)
-        transaction.commit()
+        db.session.commit()
         build_static_site.delay(static_site)
         return redirect(url_for('.list', self.event_new))
 

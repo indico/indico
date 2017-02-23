@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from collections import defaultdict, OrderedDict
 from operator import itemgetter
 
-import transaction
 from flask import request, session, redirect, flash, jsonify
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
@@ -67,12 +66,12 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
             existing = {x.vc_room for x in q}
 
     if event_vc_room.link_type != VCRoomLinkType.event and existing:
-        transaction.abort()
+        db.session.rollback()
         flash(_("There is already a VC room attached to '{link_object_title}'.").format(
             link_object_title=resolve_title(event_vc_room.link_object)), 'error')
         return None
     elif event_vc_room.link_type == VCRoomLinkType.event and vc_room in existing:
-        transaction.abort()
+        db.session.rollback()
         flash(_("This {plugin_name} room is already attached to the event.").format(plugin_name=plugin.friendly_name),
               'error')
         return None
@@ -159,7 +158,7 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
                     raise
                 field = getattr(form, err.field)
                 field.errors.append(err.message)
-                transaction.abort()  # otherwise the incomplete vc room would be added to the db!
+                db.session.rollback()  # otherwise the incomplete vc room would be added to the db!
             else:
                 db.session.add(vc_room)
                 # TODO: notify_created(vc_room, self.event_new, session.user)
@@ -219,7 +218,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
                     raise
                 field = getattr(form, err.field)
                 field.errors.append(err.message)
-                transaction.abort()
+                db.session.rollback()
             else:
                 # TODO
                 # notify_modified(self.vc_room, self.event_new, session.user)

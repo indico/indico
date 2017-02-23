@@ -24,15 +24,10 @@ from indico.core.db import db
 
 
 def update_session_options(db, session_options=None):
-    """Replaces the Flask-SQLAlchemy session a new one using the given options.
-
-    This can be used when you want a session that does not use the ZopeTransaction extension.
-    """
+    """Replace the Flask-SQLAlchemy session with a new one using the given options."""
     if session_options is None:
         session_options = {}
-    session_options.setdefault(
-        'scopefunc', connection_stack.__ident_func__
-    )
+    session_options.setdefault('scopefunc', connection_stack.__ident_func__)
     db.session = db.create_scoped_session(session_options)
 
 

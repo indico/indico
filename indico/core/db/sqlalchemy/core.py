@@ -32,7 +32,6 @@ from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import mapper, Session, CompositeProperty
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
-from zope.sqlalchemy import ZopeTransactionExtension
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
@@ -211,8 +210,7 @@ naming_convention = {
     'unique_index': _unique_index
 }
 
-db = IndicoSQLAlchemy(session_options={'extension': ZopeTransactionExtension(),
-                                       'query_cls': IndicoBaseQuery})
+db = IndicoSQLAlchemy(session_options={'query_cls': IndicoBaseQuery})
 db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
