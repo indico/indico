@@ -14,8 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from persistent import Persistent
-
 from flask_multipass import IdentityInfo
 
 from indico.core.config import Config
@@ -37,7 +35,7 @@ AVATAR_FIELD_MAP = {
 }
 
 
-class AvatarUserWrapper(Persistent, Fossilizable):
+class AvatarUserWrapper(Fossilizable):
     """Avatar-like wrapper class that holds a DB-stored user."""
 
     fossilizes(IAvatarFossil, IAvatarMinimalFossil)

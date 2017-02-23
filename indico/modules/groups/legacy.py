@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from persistent.cPersistence import Persistent
-
 from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
 from indico.modules.users.legacy import AvatarUserWrapper
@@ -26,7 +24,7 @@ from indico.util.string import to_unicode, return_ascii, encode_utf8
 from MaKaC.fossils.user import IGroupFossil
 
 
-class GroupWrapper(Persistent, Fossilizable):
+class GroupWrapper(Fossilizable):
     """Group-like wrapper class that holds a DB-stored (or remote) group."""
 
     fossilizes(IGroupFossil)
