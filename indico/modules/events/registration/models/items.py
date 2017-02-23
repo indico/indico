@@ -25,11 +25,11 @@ from sqlalchemy.orm import aliased
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
+from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
+from indico.util.i18n import orig_string
 from indico.util.string import return_ascii, camelize_keys, format_repr
 from indico.util.struct.enum import IndicoEnum
-
-from MaKaC.webinterface.common.person_titles import TitlesRegistry
 
 
 def _get_next_position(context):
@@ -83,7 +83,8 @@ class PersonalDataType(int, IndicoEnum):
                 'data': {
                     'item_type': 'dropdown',
                     'with_extra_slots': False,
-                    'choices': [dict(title_item, id=unicode(uuid4()), caption=t) for t in TitlesRegistry.getList() if t]
+                    'choices': [dict(title_item, id=unicode(uuid4()), caption=orig_string(t.title))
+                                for t in UserTitle if t]
                 }
             }),
             (cls.first_name, {
