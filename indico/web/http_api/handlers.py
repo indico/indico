@@ -26,12 +26,12 @@ import time
 import urllib
 from uuid import UUID
 
-import transaction
 from flask import request, session, g, current_app
 from urlparse import parse_qs
 from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.config import Config
+from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
@@ -269,11 +269,11 @@ def handler(prefix, path):
             norm_path, norm_query = normalizeQuery(path, query, remove=('signature', 'timestamp'), separate=True)
             uri = to_unicode('?'.join(filter(None, (norm_path, norm_query))))
             ak.register_used(request.remote_addr, uri, not onlyPublic)
-            transaction.commit()
+            db.session.commit()
         else:
             # No need to commit stuff if we didn't use an API key (nothing was written)
             # XXX do we even need this?
-            transaction.abort()
+            db.session.rollback()
 
         # Log successful POST api requests
         if error is None and request.method == 'POST':

@@ -34,7 +34,6 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.migration import migrate as alembic_migrate
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.plugins import plugin_engine
 from indico.modules.users.models.users import User
 from indico.util.console import cformat, clear_line
@@ -99,8 +98,6 @@ class Importer(object):
         print('migration took {:.06f} seconds\a'.format((time.time() - start)))
 
     def setup(self):
-        update_session_options(db)  # get rid of the zope transaction extension
-
         self.app = app = IndicoFlask('indico_zodbimport')
         app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
         app.config['PLUGINENGINE_PLUGINS'] = self.plugins

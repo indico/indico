@@ -18,7 +18,6 @@ from datetime import datetime, time, timedelta, date
 from collections import defaultdict
 
 import dateutil
-import transaction
 from flask import request, session, jsonify, flash
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import Forbidden
@@ -29,7 +28,7 @@ from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency
+from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import get_default_booking_interval, rb_is_admin
@@ -355,7 +354,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         try:
             booking = self._create_booking(form, room)
         except NoReportError as e:
-            transaction.abort()
+            db.session.rollback()
             return jsonify(success=False, msg=unicode(e))
         flash(_(u'Pre-Booking created') if booking.is_pending else _(u'Booking created'), 'success')
         return jsonify(success=True, url=self._get_success_url(booking))
@@ -650,7 +649,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
                 self._reservation.modify(form.data, session.user)
                 flash(_(u'Booking updated'), 'success')
             except NoReportError as e:
-                transaction.abort()
+                db.session.rollback()
                 return jsonify(success=False, msg=unicode(e))
             return jsonify(success=True, url=self._get_success_url())
 

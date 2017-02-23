@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from platform import python_version
 
-import transaction
 from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
 from requests.exceptions import HTTPError, RequestException, Timeout
@@ -82,7 +81,7 @@ class RHBootstrap(RH):
         login_user(user, identity)
         full_name = user.full_name  # needed after the session closes
 
-        transaction.commit()
+        db.session.commit()
 
         # Configuring server's settings
         core_settings.set('site_organization', setup_form.affiliation.data)

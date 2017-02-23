@@ -17,7 +17,6 @@
 import copy
 import sys
 
-import transaction
 from flask import request, session
 from sqlalchemy.exc import DatabaseError
 
@@ -32,6 +31,7 @@ from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error, ConstraintViolated
 from indico.core.errors import NoReportError as NoReportIndicoError
 from indico.util import fossilize
@@ -90,12 +90,12 @@ class ServiceRunner(object):
                     raise ServiceNoReportError(e.getMessage())
                 except NoReportIndicoError as e:
                     raise ServiceNoReportError(e.getMessage(), title=_("Error"))
-                transaction.commit()
+                db.session.commit()
             except DatabaseError:
                 handle_sqlalchemy_database_error()
             GenericMailer.flushQueue(True)
         except Exception as e:
-            transaction.abort()
+            db.session.rollback()
             if isinstance(e, CausedError):
                 raise
             elif isinstance(e, ConstraintViolated):

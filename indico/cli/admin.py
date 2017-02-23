@@ -1,10 +1,8 @@
 from __future__ import print_function
 
-import transaction
 from flask_script import Manager, prompt, prompt_bool
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.modules.users.operations import create_user
@@ -28,7 +26,6 @@ def print_user_info(user):
                            help="Grants administration rights")
 def user_create(grant_admin):
     """Creates new user"""
-    update_session_options(db)
     user_type = 'user' if not grant_admin else 'admin'
     while True:
         email = prompt_email()
@@ -76,7 +73,7 @@ def user_grant(user_id):
         return
     if prompt_bool(cformat("%{yellow}Grant administration rights to this user?")):
         user.is_admin = True
-        transaction.commit()
+        db.session.commit()
         success("Administration rights granted successfully")
 
 
@@ -93,5 +90,5 @@ def user_revoke(user_id):
         return
     if prompt_bool(cformat("%{yellow}Revoke administration rights from this user?")):
         user.is_admin = False
-        transaction.commit()
+        db.session.commit()
         success("Administration rights revoked successfully")
