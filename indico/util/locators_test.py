@@ -27,10 +27,6 @@ def test_get_locator_none():
 
 
 def test_get_locator():
-    class _Legacy(object):
-        def getLocator(self):
-            return {'foo': 'bar'}
-
     class _Prop(object):
         @property
         def locator(self):
@@ -41,7 +37,6 @@ def test_get_locator():
         def locator(self):
             return {'foo': 'bar'}
 
-    assert get_locator(_Legacy()) == {'foo': 'bar'}
     assert get_locator(_Prop()) == {'foo': 'bar'}
     assert get_locator(_Locator()) == {'foo': 'bar'}
     assert get_locator({'foo': 'bar'}) == {'foo': 'bar'}
