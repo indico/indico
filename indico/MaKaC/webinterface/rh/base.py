@@ -61,7 +61,6 @@ from MaKaC.webinterface.pages.error import render_error
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db import DBMgr
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import get_error_description
 from indico.core.logger import Logger
@@ -628,7 +627,6 @@ class RH(RequestHandlerBase):
     def _process_retry(self, params, retry, profile, forced_conflicts):
         self._process_retry_setup()
         self._process_retry_auth_check(params)
-        DBMgr.getInstance().sync()
         return self._process_retry_do(profile)
 
     def _process_success(self):
@@ -656,14 +654,13 @@ class RH(RequestHandlerBase):
         ContextManager.set('currentRH', self)
         g.rh = self
 
-        #redirect to https if necessary
+        # redirect to https if necessary
         if self._checkHttpsRedirect():
             return self._responseUtil.make_redirect()
 
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()
 
-        DBMgr.getInstance().startRequest()
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
         Logger.get('requestHandler').info(u'Request started: %s %s [IP=%s] [PID=%s]',
                                           request.method, request.relative_url, request.remote_addr, os.getpid())
@@ -684,7 +681,6 @@ class RH(RequestHandlerBase):
                             transaction.commit()
                         else:
                             transaction.abort()
-                        DBMgr.getInstance().endRequest(commit=False)
                         break
                     except (ConflictError, POSKeyError):
                         transaction.abort()

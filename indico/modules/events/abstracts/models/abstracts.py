@@ -136,7 +136,6 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         db.Integer,
         primary_key=True
     )
-    #: The friendly ID for the abstract (same as the legacy id in ZODB)
     friendly_id = db.Column(
         db.Integer,
         nullable=False,
