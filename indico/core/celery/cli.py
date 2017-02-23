@@ -23,8 +23,6 @@ from celery.bin.celery import CeleryCommand, command_classes
 from flask_script import Command
 
 from indico.core.config import Config
-from indico.core.db import db
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.celery import celery
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.util.console import cformat
@@ -43,8 +41,6 @@ class IndicoCeleryCommand(Command):
             return self.run(*args, **kwargs)
 
     def run(self, args):
-        # disable the zodb commit hook
-        update_session_options(db)
         # remove the celery shell command
         next(funcs for group, funcs, _ in command_classes if group == 'Main').remove('shell')
         del CeleryCommand.commands['shell']

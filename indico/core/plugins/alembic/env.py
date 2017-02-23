@@ -5,8 +5,6 @@ from flask import current_app
 from flask_pluginengine import current_plugin
 from sqlalchemy import engine_from_config, pool
 
-from indico.core.db import db
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.core.db.sqlalchemy.util.models import import_all_models
 
 
@@ -25,9 +23,6 @@ logging.config.fileConfig(config.config_file_name)
 
 config.set_main_option('sqlalchemy.url', current_app.config.get('SQLALCHEMY_DATABASE_URI'))
 target_metadata = current_app.extensions['migrate'].db.metadata
-
-# Get rid of the ZODB transaction manager
-update_session_options(db)
 
 plugin_schema = 'plugin_{}'.format(current_plugin.name)
 version_table = 'alembic_version_plugin_{}'.format(current_plugin.name)

@@ -22,7 +22,6 @@ import sys
 from functools import partial
 from operator import itemgetter, attrgetter
 
-import transaction
 import sqlalchemy.orm
 from flask import current_app
 from flask_script import Shell, Option
@@ -173,7 +172,6 @@ class IndicoShell(Shell):
             self._info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
             add_to_context(celery, 'celery', doc='celery app', color='blue!')
             add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
-            add_to_context(transaction, doc='transaction module', color='cyan!')
             add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
             add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
             add_to_context(current_app, 'app', doc='flask app')

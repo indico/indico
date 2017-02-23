@@ -29,7 +29,6 @@ from urlparse import urljoin
 from xml.sax.saxutils import escape
 
 import jsonschema
-import transaction
 from flask import request, session, g, current_app, redirect
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
@@ -58,6 +57,7 @@ from MaKaC.webinterface.pages.error import render_error
 from MaKaC.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
+from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import get_error_description
 from indico.core.logger import Logger
@@ -660,14 +660,14 @@ class RH(RequestHandlerBase):
                 profile_name, res = self._do_process(profile)
                 signals.after_process.send()
                 if self.commit:
-                    transaction.commit()
+                    db.session.commit()
                 else:
-                    transaction.abort()
+                    db.session.rollback()
             except DatabaseError:
                 handle_sqlalchemy_database_error()  # this will re-raise an exception
             self._process_success()
         except Exception as e:
-            transaction.abort()
+            db.session.rollback()
             res = self._getMethodByExceptionName(e)(e)
             if isinstance(e, HTTPException) and e.response is not None:
                 res = e.response

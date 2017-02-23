@@ -18,19 +18,17 @@
 Base export interface
 """
 
-# python stdlib imports
-import pytz
 import re
 import urllib
 from datetime import datetime, timedelta, time
 from types import GeneratorType
 
-import transaction
+import pytz
 from flask import request, current_app
 
-# indico imports
-from MaKaC.common.mail import GenericMailer
 from indico.core.config import Config
+from indico.core.db import db
+from indico.core.logger import Logger
 from indico.util.date_time import now_utc
 from indico.web.http_api.metadata import Serializer
 from indico.web.http_api.metadata.html import HTML4Serializer
@@ -40,9 +38,7 @@ from indico.web.http_api.metadata.atom import AtomSerializer
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
-
-# indico legacy imports
-from MaKaC.common.logger import Logger
+from MaKaC.common.mail import GenericMailer
 
 
 class HTTPAPIHook(object):
@@ -193,14 +189,15 @@ class HTTPAPIHook(object):
 
         if not self.COMMIT:
             is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
+            db.session.rollback()
         else:
             try:
                 GenericMailer.flushQueue(False)
                 is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
-                transaction.commit()
+                db.session.commit()
                 GenericMailer.flushQueue(True)
             except Exception:
-                transaction.abort()
+                db.session.rollback()
                 raise
         if is_response:
             return resultList

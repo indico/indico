@@ -30,7 +30,6 @@ from pygments.formatters import Terminal256Formatter
 from pygments.lexers import HtmlLexer
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.util.string import render_markdown
 from indico.web.flask.app import make_app
 
@@ -367,6 +366,5 @@ cli.add_command(contribution_descriptions)
 
 
 if __name__ == '__main__':
-    update_session_options(db)
     with make_app().app_context():
         cli(obj={})
