@@ -36,8 +36,6 @@ import MaKaC
 
 globals()['INDICO_INSTALL'] = False
 
-LOCALDATABASEDIR = '/opt/indico/db'
-
 # Egg directory + etc/indico.conf
 PWD_INDICO_CONF = os.path.abspath(os.path.join(
     os.path.split(os.path.dirname(MaKaC.__file__))[0],'etc', 'indico.conf'
@@ -267,12 +265,9 @@ def _findApacheUserGroup(uid, gid):
         return "apache", "apache"
 
 
-def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=None, accessgroup=None):
+def _checkDirPermissions(directories, accessuser=None, accessgroup=None):
     '''Makes sure that directories which need write access from Apache have
     the correct permissions
-
-    - dbInstalledBySetupPy if True, means that the dbdir has been created by the setup
-        process and needs to be checked.
 
     - uid and gid: if they are valid user_ids and group_ids they will be used to chown
         the directories instead of the indico.conf ones.
@@ -282,9 +277,6 @@ def _checkDirPermissions(directories, dbInstalledBySetupPy=False, accessuser=Non
 
     if sys.platform == "linux2":
         dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache', 'archive'] if directories.has_key(x))
-        if dbInstalledBySetupPy:
-            dirs2check.append(dbInstalledBySetupPy)
-
         for dir in dirs2check:
             stat_info = os.stat(dir)
             if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser or os.path.basename(dir) == 'htdocs':
@@ -330,8 +322,7 @@ def _extractDirsFromConf(conf):
             'htdocs': values['HtdocsDir'],
             'tmp': values['UploadedFilesTempDir'],
             'log': values['LogDir'],
-            'cache': values['XMLCacheDir'],
-            'db': LOCALDATABASEDIR}
+            'cache': values['XMLCacheDir']}
 
 def _replacePrefixInConf(filePath, prefix):
     fdata = open(filePath).read()
@@ -339,23 +330,6 @@ def _replacePrefixInConf(filePath, prefix):
     fdata = re.sub(r"^#\s*SecretKey = ''", "SecretKey = {!r}".format(os.urandom(32)), fdata)
     open(filePath, 'w').write(fdata)
 
-def _updateDbConfigFiles(cfg_dir, uid=None, port=None, **kwargs):
-    """
-    Update parameters inside DB config files
-    """
-    kwargs['etc'] = cfg_dir
-
-    for fname in ['zodb.conf', 'zdctl.conf']:
-        with open(os.path.join(cfg_dir, fname), 'r+') as f:
-            fdata = f.read()
-            for dirname in ['db', 'log', 'tmp', 'etc']:
-                fdata = re.sub(r'\/opt\/indico\/{0}'.format(dirname), kwargs.get(dirname, dirname), fdata)
-            if uid:
-                fdata = re.compile(r'^(\s*user\s+)apache[^\S\n]*', re.MULTILINE).sub(r'\g<1>{0}'.format(uid), fdata)
-            if port is not None:
-                fdata = re.compile(r'^(\s*address\s+localhost:)\d+[^\S\n]*', re.MULTILINE).sub(r'\g<1>{0}'.format(port), fdata)
-            f.seek(0)
-            f.write(fdata)
 
 def indico_pre_install(defaultPrefix, force_upgrade=False, existingConfig=None):
     """
@@ -458,17 +432,12 @@ What do you want to do [c/a]? ''')
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
 
     return dict((dirName, os.path.join(prefixDir, dirName))
-                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache','db','archive'])
+                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache','archive'])
 
 
-def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, force_no_db=False, uid=None,
-                        gid=None, dbDir=LOCALDATABASEDIR, upgrade_config=True):
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, uid=None,
+                        gid=None, upgrade_config=True):
     from indico.core.config import Config
-
-    if 'db' in targetDirs:
-        # we don't want that the db directory be created
-        dbDir = targetDirs['db']
-        del targetDirs['db']
 
     print "Creating directories for resources... ",
     # Create the directories where the resources will be installed
@@ -492,48 +461,12 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
             print "done!"
 
     # change MaKaCConfig.py to include the config
-    updateIndicoConfPathInsideMaKaCConfig(newConf,
-                                          os.path.join(makacconfig_base_dir, 'MaKaCConfig.py'))
+    updateIndicoConfPathInsideMaKaCConfig(newConf, os.path.join(makacconfig_base_dir, 'MaKaCConfig.py'))
 
-    # copy the db config files
-    for f in [xx for xx in ('%s/zdctl.conf' % targetDirs['etc'],
-                            '%s/zodb.conf' % targetDirs['etc'],
-                            '%s/logging.conf' %targetDirs['etc']) if not os.path.exists(xx)]:
-        shutil.copy('%s.sample' % f, f)
-
-    # Shall we create a DB?
-    dbInstalledBySetupPy = False
-    dbpath = None
-
-    if force_no_db:
-        print 'Skipping database detection'
-    else:
-        if os.path.exists(dbDir):
-            dbpath = dbDir
-            print 'Successfully found a database directory at %s' % dbDir
-        else:
-            opt = None
-            while opt not in ('Y', 'y', 'n', ''):
-                opt = raw_input('''\nWe cannot find a configured database at %s.
-
-    Do you want to create a new database now [Y/n]? ''' % dbDir)
-                if opt in ('Y', 'y', ''):
-                    dbInstalledBySetupPy = True
-                    dbpath_ok = False
-                    while not dbpath_ok:
-                        dbpath = raw_input('''\nWhere do you want to install the database [%s]? ''' % dbDir)
-                        if dbpath.strip() == '':
-                            dbpath = dbDir
-
-                        try:
-                            os.makedirs(dbpath)
-                            dbpath_ok = True
-                        except Exception, e:
-                            print e
-                            print 'Unable to create database at %s, please make sure that you have permissions to create that directory' % dbpath
-
-                elif opt == 'n':
-                    pass
+    # copy the logging config
+    fpath = os.path.join(targetDirs['etc'], 'logging.conf')
+    if not os.path.exists(fpath):
+        shutil.copy(fpath + '.sample', fpath)
 
     #we delete an existing vars.js.tpl.tmp
     tmp_dir = targetDirs['tmp']
@@ -543,27 +476,14 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
         print 'Old vars.js.tpl.tmp found at: %s. Removing' % varsJsTplTmpPath
         os.remove(varsJsTplTmpPath)
 
-    if dbInstalledBySetupPy:
-        dbParam = dbpath
-    else:
-        dbParam = None
-
     # find the apache user/group
     user, group = _findApacheUserGroup(uid, gid)
 
     # set the directory for the egg cache
     _updateMaKaCEggCache(os.path.join(package_dir, 'MaKaC', '__init__.py'), targetDirs['tmp'])
 
-    if not force_no_db and dbpath:
-        # change the db config files (paths + apache user/group)
-        _updateDbConfigFiles(targetDirs['etc'],
-                             log=targetDirs['log'],
-                             db=dbpath,
-                             tmp=targetDirs['tmp'],
-                             uid=user)
-
     # check permissions
-    _checkDirPermissions(targetDirs, dbInstalledBySetupPy=dbParam, accessuser=user, accessgroup=group)
+    _checkDirPermissions(targetDirs, accessuser=user, accessgroup=group)
     # check that mod_python is installed
     _checkModPythonIsInstalled()
 
@@ -587,13 +507,4 @@ http://indico.readthedocs.org/en/latest/installation/#configuring-the-web-server
 Please do not forget to start the Celery worker in order to use background tasks
 such as event reminders and periodic cleanups. You can run it using this command:
 $ indico celery worker -B
-
-%s
-""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'], _databaseText(targetDirs['etc']))
-
-
-def _databaseText(cfgPrefix):
-    return """If you are running ZODB on this host:
- - Review %s/zodb.conf and %s/zdctl.conf to make sure everything is ok.
- - To start the database run: zdaemon -C %s/zdctl.conf start
-""" % (cfgPrefix, cfgPrefix, cfgPrefix)
+""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'])

@@ -43,15 +43,3 @@ def disallow_emails(monkeypatch):
     monkeypatch.setattr(SMTP, 'connect', _connect)
     monkeypatch.setattr('logging.handlers.SMTPHandler.emit', _emit)
     return allowed
-
-
-@pytest.fixture(autouse=True)
-def disallow_zodb(monkeypatch):
-    """Prevents any code from connecting to ZODB"""
-
-    @staticmethod
-    def _fail(*args, **kwargs):
-        __tracebackhide__ = True
-        pytest.fail('Code tried to connect to ZODB')
-
-    monkeypatch.setattr('indico.core.db.manager.DBMgr.getInstance', _fail)
