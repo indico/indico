@@ -561,21 +561,21 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
 
     @property
     def url(self):
-        return url_for('event.conferenceDisplay', self)
+        return url_for('events.display', self)
 
     @property
     def external_url(self):
-        return url_for('event.conferenceDisplay', self, _external=True)
+        return url_for('events.display', self, _external=True)
 
     @property
     def short_url(self):
         id_ = self.url_shortcut or self.id
-        return url_for('event.shorturl', confId=id_)
+        return url_for('events.shorturl', confId=id_)
 
     @property
     def short_external_url(self):
         id_ = self.url_shortcut or self.id
-        return url_for('event.shorturl', confId=id_, _external=True)
+        return url_for('events.shorturl', confId=id_, _external=True)
 
     @property
     def web_factory(self):

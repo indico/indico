@@ -55,7 +55,7 @@
             {#- #} ({{ event.timezone }})
 
             {% filter underline %}URL{% endfilter %}
-            {{ url_for('event.conferenceDisplay', event, _external=true) }}
+            {{ event.external_url }}
         {%- else -%}
             {% filter underline %}Timezone{% endfilter %}
             {{ event.timezone }}
@@ -65,7 +65,7 @@
                 {{ evt.start_dt|format_date(timezone=evt.timezone) }}, {# -#}
                 {{ evt.start_dt|format_time(timezone=evt.timezone) }} - {# -#}
                 {{ evt.end_dt|format_time(timezone=evt.timezone) }}: {# -#}
-                {{ url_for('event.conferenceDisplay', evt, _external=true) -}}
+                {{ evt.external_url -}}
             {%- endfor -%}
         {%- endif -%}
     {%- endfilter -%}

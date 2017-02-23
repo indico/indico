@@ -636,7 +636,7 @@ class RHCategoryCalendarView(RHDisplayCategoryBase):
             event_data = {'title': event.title,
                           'start': event.start_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
                           'end': event.end_dt.astimezone(tz).replace(tzinfo=None).isoformat(),
-                          'url': url_for('event.conferenceDisplay', event)}
+                          'url': event.url}
             colors = CALENDAR_COLOR_PALETTE[category_id % len(CALENDAR_COLOR_PALETTE)]
             event_data.update({'textColor': '#' + colors.text, 'color': '#' + colors.background})
             data.append(event_data)

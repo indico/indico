@@ -21,10 +21,9 @@ from markupsafe import Markup, escape
 from indico.modules.auth.util import url_for_register
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
-from indico.web.flask.util import url_for
 
 
-# XXX: `person` may be either an `EventPerson` or a `USer`
+# XXX: `person` may be either an `EventPerson` or a `User`
 
 
 class FirstNamePlaceholder(Placeholder):
@@ -69,8 +68,8 @@ class EventLinkPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, person, event, **kwargs):
-        url = url_for('event.conferenceDisplay', event, _external=True)
-        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=url, title=escape(event.title)))
+        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=event.short_external_url,
+                                                                         title=escape(event.title)))
 
 
 class RegisterLinkPlaceholder(Placeholder):
