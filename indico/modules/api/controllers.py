@@ -25,6 +25,7 @@ from indico.modules.api import settings as api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
+from indico.modules.admin import RHAdminBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -36,7 +37,6 @@ from indico.web.forms.base import FormDefaults
 from indico.web.http_api.util import generate_public_auth_request
 from indico.web.util import jsonify_data
 from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHAPIAdminSettings(RHAdminBase):

@@ -31,6 +31,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.notifications import make_email, send_email
+from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
 from indico.modules.auth.util import register_user
@@ -57,7 +58,6 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from MaKaC.common.cache import GenericCache
 from MaKaC.common.mail import GenericMailer
 from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RHProtected
 
 
@@ -330,8 +330,6 @@ class RHUserEmailsSetPrimary(RHUserBase):
 class RHAdmins(RHAdminBase):
     """Show Indico administrators"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         admins = set(User.query
                      .filter_by(is_admin=True, is_deleted=False)
@@ -406,8 +404,6 @@ class RHUsersAdminSettings(RHAdminBase):
 
 class RHUsersAdminCreate(RHAdminBase):
     """Create user (admin)"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         form = AdminAccountRegistrationForm()
@@ -491,8 +487,6 @@ class RHRegistrationRequestList(RHAdminBase):
 
 class RHRegistrationRequestBase(RHAdminBase):
     """Base class to process a registration request"""
-
-    CSRF_ENABLED = True
 
     def _checkParams(self, params):
         RHAdminBase._checkParams(self, params)

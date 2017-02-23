@@ -18,18 +18,16 @@ from __future__ import unicode_literals
 
 from flask import flash, redirect
 
+from indico.modules.admin import RHAdminBase
 from indico.modules.announcement import announcement_settings
 from indico.modules.announcement.forms import AnnouncementForm
 from indico.modules.announcement.views import WPAnnouncement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHAnnouncement(RHAdminBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         form = AnnouncementForm(obj=FormDefaults(**announcement_settings.get_all()))
         if form.validate_on_submit():

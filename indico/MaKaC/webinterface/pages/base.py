@@ -171,7 +171,7 @@ class WPBase:
 
     def _getHTMLHeader( self ):
         from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-        from MaKaC.webinterface.rh.admins import RHAdminBase
+        from indico.modules.admin import RHAdminBase
 
         area=""
         if self.MANAGEMENT or isinstance(self._rh, RHModificationBaseProtected):

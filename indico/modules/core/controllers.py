@@ -21,6 +21,7 @@ from werkzeug.urls import url_join
 
 from indico.core.config import Config
 from indico.core.settings.proxy import PrefixSettingsProxy
+from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
@@ -28,13 +29,10 @@ from indico.modules.core.views import WPSettings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHSettings(RHAdminBase):
     """General settings"""
-
-    CSRF_ENABLED = True
 
     def _get_cephalopod_data(self):
         if not cephalopod_settings.get('joined'):

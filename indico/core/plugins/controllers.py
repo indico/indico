@@ -24,14 +24,14 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.plugins import plugin_engine, PluginCategory
 from indico.core.plugins.views import WPPlugins
+from indico.modules.admin import RHAdminBase
 from indico.web.forms.base import FormDefaults
 from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.util.i18n import _
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHPluginsBase(RHAdminBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHPlugins(RHPluginsBase):

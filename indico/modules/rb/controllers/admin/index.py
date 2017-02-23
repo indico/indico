@@ -19,13 +19,13 @@ from __future__ import unicode_literals
 from flask import flash, redirect
 
 from indico.core.config import Config
+from indico.modules.admin import RHAdminBase
 from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.forms.settings import SettingsForm
 from indico.modules.rb.views.admin.index import WPRoomBookingSettings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHRoomBookingSettings(RHAdminBase):

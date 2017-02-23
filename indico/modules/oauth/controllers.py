@@ -23,6 +23,7 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.modules.admin import RHAdminBase
 from indico.modules.users.controllers import RHUserBase
 from indico.modules.oauth import logger
 from indico.modules.oauth.provider import oauth
@@ -33,7 +34,6 @@ from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH, RHProtected
 
 
@@ -107,8 +107,6 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
     """Handles OAuth application deletion"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         db.session.delete(self.application)
         logger.info("Application %s deleted by %s", self.application, session.user)
@@ -135,8 +133,6 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
 class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
     """Resets the client secret of the OAuth application"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         self.application.reset_client_secret()
         logger.info("Client secret of %s reset by %s", self.application, session.user)
@@ -146,8 +142,6 @@ class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):
 
 class RHOAuthAdminApplicationRevoke(RHOAuthAdminApplicationBase):
     """Revokes all user tokens associated to the OAuth application"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         self.application.tokens.delete()
