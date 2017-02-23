@@ -34,7 +34,6 @@ from ZODB.POSException import ConflictError
 from MaKaC.common.mail import GenericMailer
 from indico.core.config import Config
 from indico.core.db import DBMgr
-from indico.core.db.util import flush_after_commit_queue
 from indico.util.date_time import now_utc
 from indico.web.http_api.metadata import Serializer
 from indico.web.http_api.metadata.html import HTML4Serializer
@@ -204,13 +203,11 @@ class HTTPAPIHook(object):
                     with retry:
                         if i > 0:
                             dbi.abort()
-                        flush_after_commit_queue(False)
                         GenericMailer.flushQueue(False)
                         dbi.sync()
                         try:
                             is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
                             transaction.commit()
-                            flush_after_commit_queue(True)
                             GenericMailer.flushQueue(True)
                             break
                         except ConflictError:

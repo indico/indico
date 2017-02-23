@@ -67,7 +67,6 @@ from indico.core.errors import get_error_description
 from indico.core.logger import Logger
 from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.modules.events.legacy import LegacyConference
-from indico.core.db.util import flush_after_commit_queue
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.locators import get_locator
@@ -565,8 +564,6 @@ class RH(RequestHandlerBase):
     def _process_retry_setup(self):
         # clear the fossile cache at the start of each request
         fossilize.clearCache()
-        # clear after-commit queue
-        flush_after_commit_queue(False)
         # delete all queued emails
         GenericMailer.flushQueue(False)
 
@@ -638,7 +635,6 @@ class RH(RequestHandlerBase):
         Logger.get('requestHandler').info('Request successful')
         # request is succesfull, now, doing tasks that must be done only once
         try:
-            flush_after_commit_queue(True)
             GenericMailer.flushQueue(True)  # send emails
             self._deleteTempFiles()
         except:
