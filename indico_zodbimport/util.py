@@ -49,16 +49,16 @@ class UnbreakingDB(DB):
             modulename = 'persistent.mapping'
         elif globalname == 'PersistentList':
             modulename = 'persistent.list'
-        elif globalname == 'Avatar':
+        elif globalname in ('Avatar', 'AvatarUserWrapper'):
             modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'AvatarUserWrapper'
-        elif globalname == 'Group':
+        elif globalname in ('Group', 'LocalGroupWrapper'):
             modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'LocalGroupWrapper'
-        elif globalname == 'LDAPGroup':
+        elif globalname in ('LDAPGroup', 'LDAPGroupWrapper'):
             modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'LDAPGroupWrapper'
-        elif globalname == 'CERNGroup':
+        elif globalname in ('CERNGroup', 'LDAPGroupWrapper'):
             modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'LDAPGroupWrapper'
         return find_global(modulename, globalname, Broken=NotBroken)
