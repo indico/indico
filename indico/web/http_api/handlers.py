@@ -31,7 +31,6 @@ from flask import request, session, g, current_app
 from urlparse import parse_qs
 from werkzeug.exceptions import NotFound, BadRequest
 
-from indico.core.db import DBMgr
 from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.modules.api import APIMode
@@ -147,9 +146,6 @@ def handler(prefix, path):
         # Parse the actual query string
         queryParams = dict((key, value.encode('utf-8')) for key, value in request.args.iteritems())
         query = request.query_string
-
-    dbi = DBMgr.getInstance()
-    dbi.startRequest()
 
     apiKey = get_query_parameter(queryParams, ['ak', 'apikey'], None)
     cookieAuth = get_query_parameter(queryParams, ['ca', 'cookieauth'], 'no') == 'yes'

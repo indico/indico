@@ -35,7 +35,6 @@ from MaKaC.services.interface.rpc.common import RequestError
 from MaKaC.services.interface.rpc.common import ProcessError
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db import DBMgr
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error, ConstraintViolated
 from indico.core.errors import NoReportError as NoReportIndicoError
 from indico.util import fossilize
@@ -84,14 +83,12 @@ class ServiceRunner(object):
         # clear the context
         ContextManager.destroy()
         # notify components that the request has started
-        DBMgr.getInstance().startRequest()
 
     def _invokeMethodRetryBefore(self):
         # clear/init fossil cache
         fossilize.clearCache()
         # delete all queued emails
         GenericMailer.flushQueue(False)
-        DBMgr.getInstance().sync()
 
     def _invokeMethodSuccess(self):
         GenericMailer.flushQueue(True)  # send emails
@@ -143,8 +140,5 @@ class ServiceRunner(object):
                 raise ProcessError, ('ERR-P0', e.message), sys.exc_info()[2]
             else:
                 raise ProcessError('ERR-P0', 'Error processing method.')
-        finally:
-            # notify components that the request has ended
-            DBMgr.getInstance().endRequest()
 
         return result

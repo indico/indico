@@ -183,7 +183,6 @@ class develop_config(develop_indico):
         upgrade_indico_conf(local, 'etc/indico.conf.sample', {
                 'BaseURL': 'http://localhost:{0}'.format(self.http_port),
                 'BaseSecureURL': 'https://localhost:{0}'.format(self.https_port),
-                'DBConnectionParams': ("localhost", int(self.zodb_port)),
                 'SmtpServer': ("localhost", int(self.smtp_port))
                 })
 

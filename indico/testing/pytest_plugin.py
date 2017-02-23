@@ -40,7 +40,6 @@ def pytest_configure(config):
     plugins = filter(None, [x.strip() for x in re.split(r'[\s,;]+', config.getini('indico_plugins'))])
     # Throw away all indico.conf options early
     Config.getInstance().reset({
-        'DBConnectionParams': ('localhost', 0),  # invalid port - just so we never connect to a real ZODB!
         'SmtpServer': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
         'CacheBackend': 'null',
         'Loggers': [],

@@ -31,7 +31,7 @@ import MaKaC
 from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import Config
-from indico.core.db import DBMgr, db
+from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import strip_ansi, cformat
@@ -92,7 +92,6 @@ class IndicoShell(Shell):
 
     def run(self, no_ipython, use_bpython, quiet):
         current_app.config['REPL'] = True  # disables e.g. memoize_request
-        context = self.get_context()
         if not quiet:
             self.banner = '\n'.join(self._info + ['', self.banner])
         if use_bpython:
@@ -100,8 +99,7 @@ class IndicoShell(Shell):
             # https://github.com/bpython/bpython/issues/396
             self.banner = strip_ansi(self.banner)
         clearCache()
-        with context['dbi'].global_connection():
-            self.run_shell(no_ipython or use_bpython, not use_bpython, quiet)
+        self.run_shell(no_ipython or use_bpython, not use_bpython, quiet)
 
     def run_shell(self, no_ipython, no_bpython, quiet):
         # based on the flask-script Shell.run() method
@@ -174,7 +172,6 @@ class IndicoShell(Shell):
             # Utils
             self._info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
             add_to_context(celery, 'celery', doc='celery app', color='blue!')
-            add_to_context(DBMgr.getInstance(), 'dbi', doc='zodb db interface', color='cyan!')
             add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
             add_to_context(transaction, doc='transaction module', color='cyan!')
             add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
