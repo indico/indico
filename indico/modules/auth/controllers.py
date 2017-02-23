@@ -26,6 +26,7 @@ from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.notifications import make_email
+from indico.modules.admin import RHAdminBase
 from indico.modules.auth import logger, Identity, login_user
 from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
                                        RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
@@ -43,7 +44,6 @@ from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.util import url_for_index
 
 from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -596,8 +596,6 @@ class RHResetPassword(RH):
 
 
 class RHAdminImpersonate(RHAdminBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self, params):
         RHAdminBase._checkParams(self, params)
         if request.form.get('undo') == '1':

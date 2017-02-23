@@ -20,6 +20,7 @@ from flask import request, session
 from sqlalchemy.orm import contains_eager
 
 from indico.core.db import db
+from indico.modules.admin import RHAdminBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.models.events import Event
 from indico.modules.networks import logger
@@ -27,11 +28,10 @@ from indico.modules.networks.forms import IPNetworkGroupForm
 from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.views import WPNetworksAdmin
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHNetworkBase(RHAdminBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHManageNetworks(RHNetworkBase):

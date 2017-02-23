@@ -21,6 +21,7 @@ from datetime import timedelta
 from flask import flash, request, redirect, session
 
 from indico.core.db import db
+from indico.modules.admin import RHAdminBase
 from indico.modules.news import news_settings, logger
 from indico.modules.news.forms import NewsSettingsForm, NewsForm
 from indico.modules.news.models.news import NewsItem
@@ -31,7 +32,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -51,7 +51,7 @@ class RHNews(RH):
 
 
 class RHManageNewsBase(RHAdminBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHManageNews(RHManageNewsBase):

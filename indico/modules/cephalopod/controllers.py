@@ -24,6 +24,7 @@ from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, RequestException, Timeout
 
 from indico.core.config import Config
+from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.cephalopod.forms import CephalopodForm
 from indico.modules.cephalopod.util import register_instance, sync_instance, unregister_instance
@@ -34,12 +35,11 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
 import MaKaC
-from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
 class RHCephalopodBase(RHAdminBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHCephalopod(RHCephalopodBase):

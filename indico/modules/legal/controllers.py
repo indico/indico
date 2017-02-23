@@ -18,17 +18,15 @@ from __future__ import unicode_literals
 
 from flask import redirect
 
+from indico.modules.admin import RHAdminBase
 from indico.modules.legal import legal_settings
 from indico.modules.legal.forms import LegalMessagesForm
 from indico.modules.legal.views import WPDisplayLegalMessages, WPManageLegalMessages
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.admins import RHAdminBase
 from MaKaC.webinterface.rh.base import RH
 
 
 class RHManageLegalMessages(RHAdminBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         form = LegalMessagesForm(**legal_settings.get_all())
         if form.validate_on_submit():
@@ -38,7 +36,5 @@ class RHManageLegalMessages(RHAdminBase):
 
 
 class RHDisplayLegalMessages(RH):
-    CSRF_ENABLED = True
-
     def _process(self):
         return WPDisplayLegalMessages.render_template('tos.html', tos=legal_settings.get('tos'))
