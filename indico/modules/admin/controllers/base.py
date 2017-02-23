@@ -14,18 +14,21 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from flask import session
 from werkzeug.exceptions import Forbidden
 
 from indico.util.i18n import _
-
 from MaKaC.webinterface.rh.base import RHProtected
 
 
 class RHAdminBase(RHProtected):
+    """Base class for all admin-only RHs"""
+
+    CSRF_ENABLED = True
+
     def _checkProtection(self):
         RHProtected._checkProtection(self)
-        if not session.user and not self._doProcess:
-            return
         if not session.user.is_admin:
             raise Forbidden(_("Only Indico administrators may access this page."))

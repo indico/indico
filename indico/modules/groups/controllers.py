@@ -24,6 +24,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.auth import multipass
 from indico.core.db import db
+from indico.modules.admin import RHAdminBase
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.forms import SearchForm, EditGroupForm
 from indico.modules.groups.models.groups import LocalGroup
@@ -33,7 +34,6 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 class RHGroups(RHAdminBase):
@@ -128,8 +128,6 @@ class RHLocalGroupBase(RHAdminBase):
 class RHGroupDelete(RHLocalGroupBase):
     """Admin group deletion"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         db.session.delete(self.group)
         flash(_("The group '{name}' has been deleted.").format(name=self.group.name), 'success')
@@ -138,8 +136,6 @@ class RHGroupDelete(RHLocalGroupBase):
 
 class RHGroupDeleteMember(RHLocalGroupBase):
     """Admin group member deletion (ajax)"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         self.group.members.discard(User.get(request.view_args['user_id']))

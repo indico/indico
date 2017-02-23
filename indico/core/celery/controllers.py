@@ -20,7 +20,7 @@ from datetime import timedelta
 from operator import itemgetter
 
 from indico.core.celery.views import WPCelery
-from MaKaC.webinterface.rh.admins import RHAdminBase
+from indico.modules.admin import RHAdminBase
 
 from indico.core.celery import celery
 from indico.core.config import Config

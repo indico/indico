@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import flash, request
 
 from indico.core.db import db
+from indico.modules.admin import RHAdminBase
 from indico.modules.events.views import WPReferenceTypes
 from indico.modules.events.forms import ReferenceTypeForm
 from indico.modules.events.models.references import ReferenceType
@@ -27,7 +28,6 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from MaKaC.webinterface.rh.admins import RHAdminBase
 
 
 def _get_all_reference_types():
