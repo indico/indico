@@ -18,9 +18,9 @@ from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from MaKaC.errors import FormValuesError
-from MaKaC.i18n import _
 from MaKaC.webinterface.pages import conferences
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase

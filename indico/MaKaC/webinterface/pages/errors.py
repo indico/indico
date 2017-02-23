@@ -24,9 +24,8 @@ from flask import session, request
 from MaKaC.webinterface.pages.base import WPDecorated
 from MaKaC.webinterface.wcomponents import WTemplated
 from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.i18n import _
 from indico.core.config import Config
-from indico.util.i18n import i18nformat
+from indico.util.i18n import i18nformat, _
 from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
 
