@@ -50,16 +50,16 @@ class UnbreakingDB(DB):
         elif globalname == 'PersistentList':
             modulename = 'persistent.list'
         elif globalname == 'Avatar':
-            modulename = 'indico.modules.users.legacy'
+            modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'AvatarUserWrapper'
         elif globalname == 'Group':
-            modulename = 'indico.modules.groups.legacy'
+            modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'LocalGroupWrapper'
         elif globalname == 'LDAPGroup':
-            modulename = 'indico.modules.groups.legacy'
+            modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'LDAPGroupWrapper'
         elif globalname == 'CERNGroup':
-            modulename = 'indico.modules.groups.legacy'
+            modulename = 'indico_zodbimport.zodb_objects'
             globalname = 'LDAPGroupWrapper'
         return find_global(modulename, globalname, Broken=NotBroken)
 
