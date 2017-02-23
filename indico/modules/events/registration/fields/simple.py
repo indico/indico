@@ -26,13 +26,13 @@ from werkzeug.datastructures import FileStorage
 from wtforms.validators import NumberRange, ValidationError, InputRequired
 
 from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField)
+from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, L_
 from indico.util.string import normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import IndicoEmail
-from MaKaC.webinterface.common.countries import CountryHolder
 
 
 class TextField(RegistrationFormFieldBase):
@@ -211,11 +211,11 @@ class CountryField(RegistrationFormFieldBase):
 
     @property
     def wtf_field_kwargs(self):
-        return {'choices': sorted(CountryHolder.getCountries().items(), key=itemgetter(1))}
+        return {'choices': sorted(get_countries().iteritems(), key=itemgetter(1))}
 
     @classmethod
     def unprocess_field_data(cls, versioned_data, unversioned_data):
-        choices = sorted([{'caption': v, 'countryKey': k} for k, v in CountryHolder.getCountries().iteritems()],
+        choices = sorted(({'caption': v, 'countryKey': k} for k, v in get_countries().iteritems()),
                          key=itemgetter('caption'))
         return {'choices': choices}
 
@@ -224,7 +224,7 @@ class CountryField(RegistrationFormFieldBase):
         return OrderedDict(self.wtf_field_kwargs['choices'])
 
     def get_friendly_data(self, registration_data, for_humans=False):
-        return CountryHolder.getCountryById(registration_data.data).decode('utf-8') if registration_data.data else ''
+        return get_country(registration_data.data) if registration_data.data else ''
 
 
 class _DeletableFileField(wtforms.FileField):
