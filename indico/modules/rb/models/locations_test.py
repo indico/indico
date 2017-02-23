@@ -21,8 +21,8 @@ from indico.modules.rb.models.locations import Location
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 
-def test_getLocator(dummy_location):
-    assert dummy_location.getLocator() == {'locationId': dummy_location.name}
+def test_locator(dummy_location):
+    assert dummy_location.locator == {'locationId': dummy_location.name}
 
 
 def test_is_map_available(dummy_location, db):

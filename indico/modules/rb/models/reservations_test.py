@@ -397,8 +397,8 @@ def test_find_overlapping(create_reservation):
     assert resv1.find_overlapping().one() == resv2
 
 
-def test_getLocator(dummy_reservation, dummy_location):
-    assert dummy_reservation.getLocator() == {'roomLocation': dummy_location.name, 'resvID': dummy_reservation.id}
+def test_locator(dummy_reservation, dummy_location):
+    assert dummy_reservation.locator == {'roomLocation': dummy_location.name, 'resvID': dummy_reservation.id}
 
 
 @pytest.mark.xfail

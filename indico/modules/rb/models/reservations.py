@@ -42,12 +42,12 @@ from indico.modules.rb.notifications.reservations import (notify_confirmation, n
 from indico.modules.rb.util import rb_is_admin
 from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
 from indico.util.i18n import _, N_
+from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, to_unicode
 from indico.util.struct.enum import IndicoEnum
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
-from MaKaC.common.Locators import Locator
 
 
 class ConflictingOccurrences(Exception):
@@ -597,11 +597,9 @@ class Reservation(Serializer, db.Model):
         occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()
         return Reservation.find_overlapping_with(self.room, occurrences, self.id)
 
-    def getLocator(self):
-        locator = Locator()
-        locator['roomLocation'] = self.location_name
-        locator['resvID'] = self.id
-        return locator
+    @locator_property
+    def locator(self):
+        return {'roomLocation': self.location_name, 'resvID': self.id}
 
     def get_conflicting_occurrences(self):
         valid_occurrences = self.occurrences.filter(ReservationOccurrence.is_valid).all()

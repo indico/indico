@@ -292,8 +292,8 @@ def test_set_attribute_value(create_room_attribute, dummy_room):
     assert dummy_room.get_attribute_value(u'foo', _notset) is _notset
 
 
-def test_getLocator(dummy_location, dummy_room):
-    assert dummy_room.getLocator() == {'roomLocation': dummy_location.name, 'roomID': dummy_room.id}
+def test_locator(dummy_location, dummy_room):
+    assert dummy_room.locator == {'roomLocation': dummy_location.name, 'roomID': dummy_room.id}
 
 
 @pytest.mark.parametrize(('building', 'floor', 'number', 'name', 'expected_name'), (

@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from persistent.cPersistence import Persistent
 
 from indico.core.auth import multipass
@@ -25,7 +23,6 @@ from indico.modules.groups import GroupProxy
 from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.string import to_unicode, return_ascii, encode_utf8
-from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IGroupFossil
 
 
@@ -65,9 +62,6 @@ class GroupWrapper(Persistent, Fossilizable):
 
     def canUserModify(self, avatar):
         return avatar.user.is_admin
-
-    def getLocator(self):
-        return Locator(groupId=self.id)
 
     def exists(self):
         return self.group.group is not None

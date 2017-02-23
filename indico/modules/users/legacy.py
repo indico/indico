@@ -21,8 +21,8 @@ from indico.modules.users import User, logger
 from indico.modules.auth import Identity
 from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
+from indico.util.locators import locator_property
 from indico.util.string import to_unicode, return_ascii, encode_utf8
-from MaKaC.common.Locators import Locator
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 
 
@@ -218,10 +218,11 @@ class AvatarUserWrapper(Persistent, Fossilizable):
             return False
         return avatar.id == str(self.user.id) or avatar.user.is_admin
 
-    def getLocator(self):
-        d = Locator()
+    @locator_property
+    def locator(self):
+        d = {}
         if self.user:
-            d["userId"] = self.user.id
+            d['userId'] = self.user.id
         return d
 
     def isAdmin(self):
