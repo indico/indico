@@ -17,9 +17,9 @@
 from flask import jsonify, session
 
 from indico.modules.oauth import oauth
+from indico.modules.users import User
 from indico.web.http_api.hooks.base import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIError
-from MaKaC.user import AvatarHolder
 
 
 def fetch_authenticated_user():
@@ -42,12 +42,11 @@ class UserInfoHook(HTTPAPIHook):
         self._user_id = self._pathParams['user_id']
 
     def export_user(self, aw):
-        requested_user = AvatarHolder().getById(self._user_id)
-        user = aw.getUser()
-        if not requested_user:
+        if not aw.user:
+            raise HTTPAPIError('You need to be logged in', 403)
+        user = User.get(self._user_id, is_deleted=False)
+        if not user:
             raise HTTPAPIError('Requested user not found', 404)
-        if user:
-            if requested_user.canUserModify(user):
-                return [requested_user.fossilize()]
+        if not user.can_be_modified(aw.user):
             raise HTTPAPIError('You do not have access to that info', 403)
-        raise HTTPAPIError('You need to be logged in', 403)
+        return [user.as_avatar.fossilize()]

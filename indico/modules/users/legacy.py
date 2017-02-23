@@ -16,6 +16,8 @@
 
 from persistent import Persistent
 
+from flask_multipass import IdentityInfo
+
 from indico.core.config import Config
 from indico.modules.users import User, logger
 from indico.modules.auth import Identity
@@ -23,7 +25,16 @@ from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.locators import locator_property
 from indico.util.string import to_unicode, return_ascii, encode_utf8
+from MaKaC.common.cache import GenericCache
 from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
+
+
+AVATAR_FIELD_MAP = {
+    'email': 'email',
+    'name': 'first_name',
+    'surName': 'last_name',
+    'organisation': 'affiliation'
+}
 
 
 class AvatarUserWrapper(Persistent, Fossilizable):
@@ -326,3 +337,22 @@ class AvatarProvisionalWrapper(Fossilizable):
             self.identity_info.provider.name,
             self.identity_info.identifier,
             **self.data.to_dict())
+
+
+def search_avatars(criteria, exact=False, search_externals=False):
+    from indico.modules.users.util import search_users
+
+    if not any(criteria.viewvalues()):
+        return []
+
+    def _process_identities(obj):
+        if isinstance(obj, IdentityInfo):
+            GenericCache('pending_identities').set('{}:{}'.format(obj.provider.name, obj.identifier), obj.data)
+            return AvatarProvisionalWrapper(obj)
+        else:
+            return obj.as_avatar
+
+    results = search_users(exact=exact, external=search_externals,
+                           **{AVATAR_FIELD_MAP[k]: v for (k, v) in criteria.iteritems() if v})
+
+    return [_process_identities(obj) for obj in results]
