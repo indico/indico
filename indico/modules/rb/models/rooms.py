@@ -22,8 +22,6 @@ from sqlalchemy import and_, func, or_, cast, Date
 from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
 from sqlalchemy.orm import contains_eager
 
-from MaKaC.common.Locators import Locator
-from MaKaC.common.cache import GenericCache
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
@@ -42,10 +40,12 @@ from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.util.date_time import round_up_month
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, natural_sort_key
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
+from MaKaC.common.cache import GenericCache
 
 
 _cache = GenericCache('Rooms')
@@ -424,11 +424,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
             self.attributes.append(attr_assoc)
         db.session.flush()
 
-    def getLocator(self):
-        locator = Locator()
-        locator['roomLocation'] = self.location_name
-        locator['roomID'] = self.id
-        return locator
+    @locator_property
+    def locator(self):
+        return {'roomLocation': self.location_name, 'roomID': self.id}
 
     def generate_name(self):
         return u'{}-{}-{}'.format(

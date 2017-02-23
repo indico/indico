@@ -24,8 +24,8 @@ from indico.modules.rb.models.aspects import Aspect
 from indico.util.caching import memoize_request
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii
-from MaKaC.common.Locators import Locator
 
 
 class Location(db.Model):
@@ -133,10 +133,9 @@ class Location(db.Model):
             self.name
         )
 
-    def getLocator(self):
-        d = Locator()
-        d['locationId'] = self.name
-        return d
+    @locator_property
+    def locator(self):
+        return {'locationId': self.name}
 
     @property
     @memoize_request
