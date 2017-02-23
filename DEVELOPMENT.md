@@ -6,8 +6,6 @@ It's dangerous to go alone. Take these tips in case you need to fit Indico to yo
 Use `indico db prepare` to create your tables based on the SQLAlchemy models and set the migration status to the most
 recent alembic revision.
 
-If you want to import data from ZODB, run `bin/migration/migrate_to_sqlalchemy.py` with the appropriate arguments.
-
 
 ## SQL Database migrations
 Whenever you modify the database structure or want to perform data migrations, create an alembic revision.

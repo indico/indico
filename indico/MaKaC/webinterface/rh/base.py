@@ -754,10 +754,6 @@ class RH(RequestHandlerBase):
 class RHSimple(RH):
     """A simple RH that calls a function to build the response
 
-    The main purpose of this RH is to allow external library to
-    display something within the Indico layout (which requires a
-    RH / a ZODB connection in most cases).
-
     The preferred way to use this class is by using the
     `RHSimple.wrap_function` decorator.
 

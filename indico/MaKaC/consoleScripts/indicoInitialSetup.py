@@ -22,14 +22,14 @@ functions refer to installBase.py
 On RPM or windist based installations it can be made run automatically'''
 
 import os, sys
-import shutil, getopt
+import getopt
 
-from distutils.sysconfig import get_python_lib
 
-from installBase import getIndicoInstallMode, setIndicoInstallMode, PWD_INDICO_CONF, indico_pre_install, indico_post_install, copyTreeSilently
+from installBase import setIndicoInstallMode, indico_pre_install, indico_post_install, copyTreeSilently
 
 # The directory where the egg is located
 eggDir = os.path.join(os.path.dirname(__file__), '..', '..')
+
 
 def copy_egg_datafiles_to_base(dstDir):
     """Copies bin, doc, etc & htdocs from egg's installation folder to dstDir
@@ -109,7 +109,6 @@ def main():
                                      '..',
                                      'common'),
                         eggDir,
-                        force_no_db=(existingPath != None),
                         uid=wwwUid,
                         gid=wwwGid,
                         upgrade_config=upgrade_config)

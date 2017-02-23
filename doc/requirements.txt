@@ -3,4 +3,3 @@ babel
 repoze.sphinx.autointerface
 flask
 Flask-BabelEx
-ZODB3==3.10.5
