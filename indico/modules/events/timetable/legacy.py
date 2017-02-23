@@ -317,7 +317,7 @@ def serialize_event_info(event):
             'startDate': event.start_dt_local,
             'endDate': event.end_dt_local,
             'isConference': event.type_ == EventType.conference,
-            'session': {sess.id: serialize_session(sess) for sess in event.sessions}}
+            'sessions': {sess.id: serialize_session(sess) for sess in event.sessions}}
 
 
 def serialize_session(sess):
