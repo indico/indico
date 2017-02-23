@@ -16,7 +16,6 @@
 import copy
 import inspect
 import itertools
-import time
 import os
 import cProfile as profiler
 import pstats
@@ -38,8 +37,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden, HTTPException
 from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
-from ZEO.Exceptions import ClientDisconnected
-from ZODB.POSException import ConflictError, POSKeyError
 
 from MaKaC.accessControl import AccessWrapper
 
@@ -624,7 +621,7 @@ class RH(RequestHandlerBase):
                 res = self._process()
         return profile_name, res
 
-    def _process_retry(self, params, retry, profile, forced_conflicts):
+    def _process_retry(self, params, retry, profile):
         self._process_retry_setup()
         self._process_retry_auth_check(params)
         return self._process_retry_do(profile)
@@ -644,7 +641,7 @@ class RH(RequestHandlerBase):
             raise BadRequest
 
         cfg = Config.getInstance()
-        forced_conflicts, max_retries, profile = cfg.getForceConflicts(), cfg.getMaxRetries(), cfg.getProfile()
+        max_retries, profile = cfg.getMaxRetries(), cfg.getProfile()
         profile_name, res, textLog = '', '', []
 
         self._startTime = datetime.now()
@@ -673,25 +670,13 @@ class RH(RequestHandlerBase):
                         signals.before_retry.send()
 
                     try:
-                        profile_name, res = self._process_retry(params, i, profile, forced_conflicts)
+                        profile_name, res = self._process_retry(params, i, profile)
                         signals.after_process.send()
-                        if i < forced_conflicts:  # raise conflict error if enabled to easily handle conflict error case
-                            raise ConflictError
                         if self.commit:
                             transaction.commit()
                         else:
                             transaction.abort()
                         break
-                    except (ConflictError, POSKeyError):
-                        transaction.abort()
-                        import traceback
-                        # only log conflict if it wasn't forced
-                        if i >= forced_conflicts:
-                            Logger.get('requestHandler').warning('Database conflict')
-                    except ClientDisconnected:
-                        transaction.abort()
-                        Logger.get('requestHandler').warning('Client disconnected')
-                        time.sleep(i)
                     except DatabaseError:
                         handle_sqlalchemy_database_error()
                         break

@@ -234,7 +234,6 @@ class Config:
         'AuthenticatedEnforceSecure': 'no',
         'MaxUploadFilesTotalSize'   : 0,
         'MaxUploadFileSize'         : 0,
-        'ForceConflicts'            : 0,
         'PropagateAllExceptions'    : False,
         'Debug'                     : False,
         'DebugUnicode'              : 0,
