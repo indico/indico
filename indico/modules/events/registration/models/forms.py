@@ -22,6 +22,7 @@ from babel.numbers import format_currency
 from flask import session
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.hybrid import hybrid_property
+from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -329,8 +330,12 @@ class RegistrationForm(db.Model):
         return self.is_open and not self.limit_reached
 
     @property
+    @memoize_request
     def active_registrations(self):
-        return [r for r in self.registrations if r.is_active]
+        return (Registration.query.with_parent(self)
+                .filter(Registration.is_active)
+                .options(subqueryload('data'))
+                .all())
 
     @property
     def sender_address(self):
