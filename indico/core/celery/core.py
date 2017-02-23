@@ -31,7 +31,7 @@ from terminaltables import AsciiTable
 
 from indico.core.celery.util import locked_task
 from indico.core.config import Config
-from indico.core.db import DBMgr, db
+from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.util.fossilize import clearCache
@@ -126,7 +126,6 @@ class IndicoCelery(Celery):
             def __call__(s, *args, **kwargs):
                 stack = ExitStack()
                 stack.enter_context(self.flask_app.app_context())
-                stack.enter_context(DBMgr.getInstance().global_connection())
                 if getattr(s, 'request_context', False):
                     stack.enter_context(self.flask_app.test_request_context(base_url=Config.getInstance().getBaseURL()))
                 args = _CelerySAWrapper.unwrap_args(args)

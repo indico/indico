@@ -197,10 +197,6 @@ class Config:
                      }
 
     default_values = {
-        'DBConnectionParams'        : ("localhost", 9675),
-        'DBUserName'                : '',
-        'DBPassword'                : '',
-        'DBRealm'                   : '',
         'IsRoomBookingActive'       : True,
         'SQLAlchemyDatabaseURI'     : None,
         'SQLAlchemyEcho'            : False,

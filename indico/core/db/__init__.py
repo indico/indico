@@ -16,8 +16,7 @@
 
 from __future__ import absolute_import
 
-__all__ = ['DBMgr', 'MigratedDB']
-
-from .manager import DBMgr
-from .migration import MigratedDB
 from .sqlalchemy import db
+
+
+__all__ = ['db']

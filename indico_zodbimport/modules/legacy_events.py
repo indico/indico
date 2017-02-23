@@ -20,7 +20,7 @@ from operator import attrgetter
 
 import transaction
 
-from indico.core.db import db, DBMgr
+from indico.core.db import db
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.util.console import cformat, verbose_iterator
@@ -28,15 +28,19 @@ from indico.util.string import is_legacy_id
 from indico_zodbimport import Importer
 
 
-class Dummy(object):
-    pass
-
-
-class ImporterDBMgr(DBMgr):
-    def __init__(self, zodb_root):
-        self._db = zodb_root
-        self._conn = Dummy()
-        self._conn.conn = zodb_root._p_jar
+# XXX: No idea for what we needed this - it won't be used in the
+# 2.0 migration script anymore since we won't have to patch ZODB.
+# Just keeping this around in case it turns out to be relevant
+# when adapting the migration scripts!
+# class Dummy(object):
+#     pass
+#
+#
+# class ImporterDBMgr(DBMgr):
+#     def __init__(self, zodb_root):
+#         self._db = zodb_root
+#         self._conn = Dummy()
+#         self._conn.conn = zodb_root._p_jar
 
 
 class LegacyEventImporter(Importer):
@@ -44,7 +48,7 @@ class LegacyEventImporter(Importer):
         return LegacyEventMapping.query.has_rows()
 
     def migrate(self):
-        DBMgr.setInstance(ImporterDBMgr(self.zodb_root))
+        # DBMgr.setInstance(ImporterDBMgr(self.zodb_root))
         self.migrate_legacy_events()
 
     def migrate_legacy_events(self):

@@ -20,7 +20,7 @@ from flask.json import htmlsafe_dumps
 from jinja2 import Environment, FileSystemLoader
 from sqlalchemy.orm import load_only
 
-from indico.core.db import DBMgr, db
+from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import update_session_options
 from indico.modules.categories.models.categories import Category
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -64,5 +64,4 @@ def main():
 if __name__ == '__main__':
     update_session_options(db)
     with make_app().app_context():
-        with DBMgr.getInstance().global_connection():
-            main()
+        main()
