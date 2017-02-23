@@ -73,9 +73,8 @@ class locator_property(object):
 def get_locator(obj):
     """Retrieves the locator data from an object.
 
-    The object may be a dictionary (in case a locator is passed), an
-    object with a ``locator`` property or a legacy object with a
-    ``getLocator`` method.
+    The object may be a dictionary (in case a locator is passed) or
+    an object with a ``locator`` property.
     """
     # note: we use explicit hasattr checks since we don't want to end
     # up with an AttributeError raised from inside the locator method.
@@ -86,8 +85,6 @@ def get_locator(obj):
         return obj
     elif hasattr(obj, 'locator'):
         return obj.locator
-    elif hasattr(obj, 'getLocator'):
-        return obj.getLocator()
     else:
         raise TypeError('{} does not contain a locator'.format(obj))
 

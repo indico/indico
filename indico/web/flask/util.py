@@ -208,24 +208,16 @@ def make_compat_blueprint(blueprint):
 def url_for(endpoint, *targets, **values):
     """Wrapper for Flask's url_for() function.
 
-    Instead of an endpoint you can also pass an URLHandler - in this case **only** its _endpoint will be used.
-    However, there is usually no need to do so. This is just so you can use it in places where sometimes a UH
-    might be passed instead.
-
-    The `target` argument allows you to pass some object having a `locator` property or `getLocator` method
-    returning a dict. This should be used e.g. when generating an URL for an event since ``getLocator()``
-    provides the ``{'confId': 123}`` dict instead of you having to pass ``confId=event.getId()`` as a kwarg.
+    The `target` argument allows you to pass some object having a `locator` property returning a dict.
 
     For details on Flask's url_for, please see its documentation.
-    Anyway, the important arguments you can put in `values` besides actual arguments are:
+    The important special arguments you can put in `values` are:
+
     _external: if set to `True`, an absolute URL is generated
     _secure: if True/False, set _scheme to https/http if possible (only with _external)
     _scheme: a string specifying the desired URL scheme (only with _external) - use _secure if possible!
     _anchor: if provided this is added as #anchor to the URL.
     """
-
-    if hasattr(endpoint, '_endpoint'):
-        endpoint = endpoint._endpoint
 
     secure = values.pop('_secure', None)
     if secure is not None:
@@ -276,9 +268,6 @@ def url_rule_to_js(endpoint):
     ``params`` is is an object containing the arguments and ``fragment``
     a string containing the ``#anchor`` if needed.
     """
-
-    if hasattr(endpoint, '_endpoint'):
-        endpoint = endpoint._endpoint
 
     if endpoint[0] == '.':
         endpoint = request.blueprint + endpoint
