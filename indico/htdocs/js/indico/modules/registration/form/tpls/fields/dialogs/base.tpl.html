@@ -38,7 +38,7 @@
                         ng-class="{hasError: validationStarted && optionsForm.title.$invalid}"
                         nd-init-focus
                         class="caption-input"/>
-                    <span ng-if="field.inputType != 'accommodation'">
+                    <span ng-if="settings.isRequired">
                         <span class="mandatory-check">
                             <input type="checkbox" name="isRequired"
                                 ng-model="formData.isRequired"
