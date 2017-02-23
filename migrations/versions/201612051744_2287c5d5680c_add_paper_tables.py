@@ -32,6 +32,7 @@ def upgrade():
         sa.Column('judgment_dt', UTCDateTime, nullable=True),
         sa.ForeignKeyConstraint(['contribution_id'], ['events.contributions.id']),
         sa.ForeignKeyConstraint(['submitter_id'], ['users.users.id']),
+        sa.ForeignKeyConstraint(['judge_id'], ['users.users.id']),
         sa.PrimaryKeyConstraint('id'),
         sa.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'
                            .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
