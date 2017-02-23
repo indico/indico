@@ -38,7 +38,6 @@ from indico.core.config import Config
 from indico.core.db import DBMgr
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error, ConstraintViolated
 from indico.core.errors import NoReportError as NoReportIndicoError
-from indico.core.db.util import flush_after_commit_queue
 from indico.util import fossilize
 
 
@@ -90,14 +89,11 @@ class ServiceRunner(object):
     def _invokeMethodRetryBefore(self):
         # clear/init fossil cache
         fossilize.clearCache()
-        # clear after-commit queue
-        flush_after_commit_queue(False)
         # delete all queued emails
         GenericMailer.flushQueue(False)
         DBMgr.getInstance().sync()
 
     def _invokeMethodSuccess(self):
-        flush_after_commit_queue(True)  # run after-commit functions
         GenericMailer.flushQueue(True)  # send emails
 
     def invokeMethod(self, method, params):
