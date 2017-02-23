@@ -101,7 +101,7 @@ class EventShorturlsImporter(Importer):
         it = verbose_iterator(it, total, lambda x: x[1].id, lambda x: '')
         for shorturl, conf in it:
             try:
-                event = conf.as_event
+                event = Event.get_one(conf.id)
             except NoResultFound:
                 self.print_warning(cformat('%{yellow!}Ignoring shorturl %{reset}%{yellow}{}%{yellow!} (event deleted)')
                                    .format(shorturl), always=False, event_id=conf.id)
