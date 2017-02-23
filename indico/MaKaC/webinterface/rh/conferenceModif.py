@@ -18,9 +18,9 @@ from datetime import datetime, timedelta
 
 from dateutil.relativedelta import relativedelta
 
+from indico.core.errors import UserValueError
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.errors import FormValuesError
 from MaKaC.webinterface.pages import conferences
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
 from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
@@ -77,7 +77,7 @@ class RHConfPerformCloning(RHConferenceModifBase, object):
         self._date = datetime.today()
         self._cloneType = params.get("cloneType", None)
         if self._cloneType is None:
-            raise FormValuesError( _("""Please choose a cloning interval for this event"""))
+            raise UserValueError(_("""Please choose a cloning interval for this event"""))
         elif self._cloneType == "once" :
             self._date = datetime( int(params["stdyo"]),
                                 int(params["stdmo"]),
