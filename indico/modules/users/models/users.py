@@ -50,10 +50,6 @@ class UserTitle(RichIntEnum):
     dr = 4
     prof = 5
 
-    @classmethod
-    def from_legacy(cls, text):
-        return next((x for x in cls if unicode(x.title) == text), None)
-
 
 class NameFormat(RichIntEnum):
     __titles__ = (_('John Doe'), _('Doe, John'), _('Doe, J.'), _('J. Doe'),
