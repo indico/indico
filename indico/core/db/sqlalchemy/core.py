@@ -22,14 +22,11 @@ import logging
 import sys
 from functools import partial
 
-from flask import has_app_context, g, has_request_context
-from flask import session as flask_session
-
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.event import listen
 from sqlalchemy.exc import DatabaseError
-from sqlalchemy.orm import mapper, Session, CompositeProperty
+from sqlalchemy.orm import mapper, CompositeProperty
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 
@@ -165,33 +162,6 @@ def _mapper_configured(mapper, class_):
                 listen(getattr(class_, prop.key), 'set', partial(_coerce_custom, fn=func), retval=True)
 
 
-def _transaction_ended(session, transaction):
-    # The zope transaction system closes the session (and thus the
-    # transaction) e.g. when calling `transaction.abort()`.
-    # in this case we need to clear the memoization cache to avoid
-    # accessing memoized objects (which are now session-less)
-
-    if transaction._parent is not None:
-        # we don't care about sub-transactions
-        return
-
-    if has_app_context():
-        if 'memoize_cache' in g:
-            del g.memoize_cache
-        if 'settings_cache' in g:
-            del g.settings_cache
-        if 'global_settings_cache' in g:
-            del g.global_settings_cache
-        if 'event_notes' in g:
-            del g.event_notes
-        if 'event_attachments' in g:
-            del g.event_attachments
-        if 'relationship_cache' in g:
-            del g.relationship_cache
-    if has_request_context() and hasattr(flask_session, '_user'):
-        delattr(flask_session, '_user')
-
-
 def _column_names(constraint, table):
     return '_'.join((c if isinstance(c, basestring) else c.name) for c in constraint.columns)
 
@@ -214,4 +184,3 @@ db = IndicoSQLAlchemy(session_options={'query_cls': IndicoBaseQuery})
 db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
-listen(Session, 'after_transaction_end', _transaction_ended)
