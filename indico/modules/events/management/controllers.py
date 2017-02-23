@@ -101,7 +101,7 @@ class RHEditEventDataBase(RHManageEventBase):
         if form.validate_on_submit():
             with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
                 update_event(self.event_new, **form.data)
-            return jsonify_data(flash=False, settings_box=self.render_settings_box(),
+            return jsonify_data(settings_box=self.render_settings_box(),
                                 right_header=render_event_management_header_right(self.event_new))
         self.commit = False
         return self.render_form(form)
