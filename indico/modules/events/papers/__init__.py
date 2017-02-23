@@ -108,7 +108,7 @@ def _extend_event_menu(sender, **kwargs):
 
     yield MenuEntryData(title=_("Call for Papers"), name='call_for_papers',
                         endpoint='papers.call_for_papers', position=8,
-                        visible=lambda event: event.has_feature('abstracts'))
+                        visible=lambda event: event.has_feature('papers'))
 
     yield MenuEntryData(title=_("Reviewing Area"), name='paper_reviewing_area', parent='call_for_papers',
                         endpoint='papers.reviewing_area', position=0, visible=_reviewing_area_visible)
