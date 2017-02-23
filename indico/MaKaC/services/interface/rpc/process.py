@@ -16,12 +16,9 @@
 
 import copy
 import sys
-import time
 
 import transaction
 from flask import request, session
-from ZODB.POSException import ConflictError
-from ZEO.Exceptions import ClientDisconnected
 from sqlalchemy.exc import DatabaseError
 
 from MaKaC.errors import NoReportError, FormValuesError
@@ -95,7 +92,6 @@ class ServiceRunner(object):
 
     def invokeMethod(self, method, params):
         cfg = Config.getInstance()
-        forced_conflicts = cfg.getForceConflicts()
         max_retries = cfg.getMaxRetries()
         result = None
 
@@ -117,17 +113,8 @@ class ServiceRunner(object):
                             raise ServiceNoReportError(e.getMessage())
                         except (NoReportIndicoError, FormValuesError) as e:
                             raise ServiceNoReportError(e.getMessage(), title=_("Error"))
-                        # Raise a conflict error if enabled.
-                        # This allows detecting conflict-related issues easily.
-                        if i < forced_conflicts:
-                            raise ConflictError
                         transaction.commit()
                         break
-                    except ConflictError:
-                        transaction.abort()
-                    except ClientDisconnected:
-                        transaction.abort()
-                        time.sleep(i)
                     except DatabaseError:
                         handle_sqlalchemy_database_error()
                         break
