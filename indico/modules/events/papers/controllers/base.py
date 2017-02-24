@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.contributions.models.contributions import Contribution
 from MaKaC.webinterface.rh.base import RHModificationBaseProtected
@@ -69,6 +69,8 @@ class RHJudgingAreaBase(RHPapersBase):
 
 
 class RHPaperBase(RHPapersBase):
+    PAPER_REQUIRED = True
+
     normalize_url_spec = {
         'locators': {
             lambda self: self.contribution
@@ -79,6 +81,8 @@ class RHPaperBase(RHPapersBase):
         RHPapersBase._checkParams(self, params)
         self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
         self.paper = self.contribution.paper
+        if self.paper is None and self.PAPER_REQUIRED:
+            raise NotFound
 
     def _checkProtection(self):
         RHPapersBase._checkProtection(self)

@@ -9,7 +9,7 @@
         {% endif %}
         <div {% if id %}id="{{ id }}"{% endif %} class="paper-contribution-list">
             <ul>
-                {% for contribution in contributions %}
+                {% for contribution in contributions|sort(attribute='friendly_id') %}
                     {% set latest_revision = contribution.paper.last_revision %}
                     <div class="contribution-row" data-friendly-id="{{ contribution.friendly_id }}">
                         <li>

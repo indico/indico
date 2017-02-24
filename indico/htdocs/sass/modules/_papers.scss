@@ -82,7 +82,7 @@
         }
 
         .submitter {
-            color : $light-black;
+            color: $light-black;
             margin-top: 7px;
         }
 
@@ -115,10 +115,6 @@
     .cfp-infoline-section {
         .infoline {
             float: none;
-
-            .text span {
-                font-weight: bold;
-            }
         }
     }
 
@@ -160,11 +156,6 @@
         margin-bottom: 15px;
     }
 
-}
-
-.paper-contribution-list ul {
-    list-style-type: none;
-    padding-left: 0;
 }
 
 .deadline-info {

@@ -20,7 +20,9 @@ from sqlalchemy.orm import noload, load_only
 
 from indico.core.db import db
 from indico.modules.events import Event
+from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.users import User
@@ -71,3 +73,17 @@ def get_contributions_with_paper_submitted_by_user(event, user):
     return (Contribution.query.with_parent(event)
             .filter(Contribution._paper_revisions.any(PaperRevision.submitter == user))
             .all())
+
+
+def _query_contributions_with_user_paper_submission_rights(event, user):
+    criteria = [Contribution.person_links.any(ContributionPersonLink.person.has(user=user)),
+                Contribution.abstract.has(Abstract.submitter_id == user.id)]
+    return Contribution.query.with_parent(event).filter(db.or_(*criteria))
+
+
+def has_contributions_with_user_paper_submission_rights(event, user):
+    return _query_contributions_with_user_paper_submission_rights(event, user).has_rows()
+
+
+def get_contributions_with_user_paper_submission_rights(event, user):
+    return _query_contributions_with_user_paper_submission_rights(event, user).all()
