@@ -107,10 +107,11 @@ def _extend_event_menu(sender, **kwargs):
         return event.cfp.can_access_reviewing_area(session.user)
 
     def _call_for_papers_visible(event):
-        from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
+        from indico.modules.events.papers.util import has_contributions_with_user_paper_submission_rights
         if not session.user or not event.has_feature('papers'):
             return False
-        return has_contributions_with_user_as_submitter(event, session.user) or event.cfp.is_staff(session.user)
+        return (has_contributions_with_user_paper_submission_rights(event, session.user) or
+                event.cfp.is_staff(session.user))
 
     yield MenuEntryData(title=_("Call for Papers"), name='call_for_papers',
                         endpoint='papers.call_for_papers', position=8,
