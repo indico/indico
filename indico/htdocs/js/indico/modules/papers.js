@@ -64,13 +64,6 @@
     };
 
     global.setupCallForPapersPage = function setupCallForPapersPage(options) {
-        // show the form after login when using the submit button as a guest
-        if (location.hash === '#submit-paper') {
-            $(document).ready(function() {
-                $('.js-show-paper-form').trigger('click');
-            });
-        }
-
         if (options.hasPapers) {
             var filterConfig = {
                 itemHandle: 'div.contribution-row',
