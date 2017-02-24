@@ -28,6 +28,7 @@
         {% endcall %}
     {% endif %}
 
+    {% set review_question_rows = form_rows(form, skip=form._order, skip_labels=true) | trim %}
     {% if not review %}
         {% if proposal.proposal_type == 'abstract' %}
             {% set group_title = render_track(group) %}
@@ -39,14 +40,19 @@
                 Reviewing in {{ group_title }}
             {%- endtrans %}
         </div>
-        <div class="titled-rule">
-            {%- trans %}Ratings{% endtrans -%}
+        {% if review_question_rows %}
+            <div class="titled-rule">
+                {%- trans %}Ratings{% endtrans -%}
+            </div>
+        {% endif %}
+    {% endif %}
+
+    {% if review_question_rows %}
+        <div class="review-questions">
+            {{ review_question_rows }}
         </div>
     {% endif %}
 
-    <div class="review-questions">
-        {{ form_rows(form, skip=form._order, skip_labels=true) }}
-    </div>
     <div class="titled-rule">
         {%- trans %}Proposal{% endtrans -%}
     </div>
