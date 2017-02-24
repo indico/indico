@@ -11,11 +11,11 @@
             <ul>
                 {% for contribution in contributions %}
                     {% set latest_revision = contribution.paper.last_revision %}
-                    <div class="contribution-row">
+                    <div class="contribution-row" data-friendly-id="{{ contribution.friendly_id }}">
                         <li>
                             <div class="row-title">
                                 <a href="{{ url_for('.paper_timeline', contribution) }}" data-searchable="{{ contribution.title|lower }}">
-                                    {{- contribution.title -}}
+                                    #{{ contribution.friendly_id }}: {{ contribution.title }}
                                 </a>
                             </div>
                             <div class="row-content flexrow f-j-space-between">
