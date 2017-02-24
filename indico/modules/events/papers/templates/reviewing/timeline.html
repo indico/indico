@@ -112,7 +112,7 @@
                     {% if revision.paper.can_judge(session.user) and revision.is_last_revision %}
                         <div>
                             <a class="i-link icon-remove"
-                               title="{% trans %}Reset judgement{% endtrans %}"
+                               title="{% trans %}Reset judgment{% endtrans %}"
                                data-href="{{ url_for('.reset_paper_state', revision.paper) }}"
                                data-method="DELETE"
                                data-update="#reviewing-page"
