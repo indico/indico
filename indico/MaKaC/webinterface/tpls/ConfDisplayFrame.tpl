@@ -44,8 +44,8 @@ else:
                 ${ template_hook('conference-header-right-column', event=conf) }
             </div>
         </div>
-        % if simpleTextAnnouncement:
-            <div class="simpleTextAnnouncement">${ simpleTextAnnouncement }</div>
+        % if announcement:
+            <div class="simpleTextAnnouncement">${ announcement }</div>
         % endif
     </div>
     <div id="confSectionsBox" class="clearfix">

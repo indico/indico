@@ -862,52 +862,6 @@ div.timetableFullScreenHeader {
     background: white;
 }
 
-ul.keywordList
-{
-    margin: 5px;
-    padding: 0px;
-    display: block;
-    list-style-type: none;
-}
-
-
-ul.keywordList li.oneLineListItem {
-    display: inline;
-    position: relative;
-    padding: 0 0 0 0;
-    color: #5FA5D4;
-}
-
-ul.keywordList li.oneLineListItem:after {
-    color: black;
-    content: ", ";
-}
-
-ul.keywordList li.oneLineListItem_last {
-    display: inline;
-    position: relative;
-    padding: 0 0 0 0;
-    color: #5FA5D4;
-}
-
-ul.keywordList li.oneLineListItem_last:after {
-    content: "";
-}
-
-ul.keywordList li.multipleLinesListItem {
-    position: relative;
-    padding: 0 0 0 0;
-    padding-bottom: 5px;
-    color: #606060;
-}
-
-ul.keywordList li.multipleLinesListItem_last {
-    position: relative;
-    padding: 0 0 0 0;
-    color: #5FA5D4;
-}
-
-
 .popUpLabel {
    text-align: right;
    font-size: 13px;

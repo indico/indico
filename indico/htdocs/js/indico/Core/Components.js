@@ -126,20 +126,12 @@ var IndicoUI = {
         this.__globalLayerLevels[parseInt(level) - 3000] = false;
     },
     __loadCount : 0,
-    __unloadCount : 0,
     loadTimeFuncs : {},
-    unloadTimeFuncs : {},
 
     executeOnLoad : function(func) {
         IndicoUI.loadTimeFuncs[IndicoUI.__loadCount] = (func);
         IndicoUI.__loadCount++;
-    },
-
-    executeOnUnload : function(func) {
-        IndicoUI.unloadTimeFuncs[IndicoUI.__unloadCount] = (func);
-        IndicoUI.__unloadCount++;
     }
-
 };
 
 $(function() {
@@ -172,9 +164,3 @@ $(function() {
         });
     });
 });
-
-window.onunload = function() {
-    for (var f in IndicoUI.unloadTimeFuncs) {
-        IndicoUI.unloadTimeFuncs[f]();
-    }
-};

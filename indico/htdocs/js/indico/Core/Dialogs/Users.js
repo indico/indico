@@ -478,10 +478,7 @@ type ("UserAndGroupsSearchPanel", ["IWidget"], {
      * Returns the panel's DOM
      */
     draw: function() {
-        var self = this;
-
         this.tabWidget = new JTabWidget([[$T("Users"), this.userPanel.draw()], [$T("Groups"), this.groupPanel.draw()]]);
-
         return this.IWidget.prototype.draw.call(this, this.tabWidget.draw());
     }
 },
@@ -908,51 +905,6 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
      }
     );
 
-/**
- * Creates a data creation / edit pop-up dialog.
- * @param {String} title The title of the popup.
- * @param {Object} userData A WatchObject that has to have the following keys/attributes:
- *                          id, title, familyName, firstName, affiliation, email, telephone.
- *                          Its information will be displayed as initial values in the dialog.
- * @param {Function} action A callback function that will be called if the user presses ok. The function will be passed
- *                          a WatchObject with the new values.
- */
-type("AuthorDataPopup", ["ExclusivePopupWithButtons"],
-    {
-        draw: function() {
-            var userData = this.userData;
-            var self = this;
-            self.parameterManager = new IndicoUtil.parameterManager();
-
-            var form = IndicoUtil.createFormFromMap([
-               [$T('Title'), $B(Html.select({}, Html.option({}, ""), Html.option({value:'Mr.'}, $T("Mr.")), Html.option({value:'Mrs.'}, $T("Mrs.")), Html.option({value:'Ms.'}, $T("Ms.")), Html.option({value:'Dr.'}, $T("Dr.")), Html.option({value:'Prof.'}, $T("Prof."))), userData.accessor('title'))],
-               [$T('Family Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('familyName'))],
-               [$T('First Name'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('firstName'))],
-               [$T('Affiliation'), $B(self.parameterManager.add(Html.edit({style: {width: '300px'}}), 'text', false), userData.accessor('affiliation'))],
-               [$T('Email'),  $B(self.parameterManager.add(Html.edit({style: {width: '200px'}}), 'email', false), userData.accessor('email'))],
-               [$T('Telephone'), $B(Html.edit({style: {width: '150px'}}), userData.accessor('phone'))]
-               ]);
-
-
-            return this.ExclusivePopupWithButtons.prototype.draw.call(this, form);
-         },
-
-        _getButtons: function() {
-            var userData = this.userData;
-            var self = this;
-            return [
-                    [$T('Save'), command(curry(this.action, userData, function() {self.close();}))],
-                    [$T('Cancel'), function() { self.close();}]
-                   ];
-         }
-
-     },
-     function(title, userData, action) {
-         this.userData = userData;
-         this.action = action;
-         this.ExclusivePopup(title,  function(){return true;});
-     }
-    );
 
 $(function() {
     // This widget creates a clickable icon-shield that opens a qtip with the different rights that
@@ -1192,20 +1144,12 @@ type("UserListWidget", ["ListWidget"],
  *
  */
 type("UserListField", ["IWidget"], {
-    getUsers: function() {
-        return $L(this.userList);
-    },
-
     clear: function() {
         this.userList.clearList();
     },
 
     privilegesOn: function() {
         return $('#grant-manager').prop("checked") || $('#presenter-grant-submission').prop("checked");
-    },
-
-    bothPrivilegesOn: function() {
-        return $('#grant-manager').prop("checked") && $('#presenter-grant-submission').prop("checked");
     },
 
     setUpParameters: function() {
@@ -1278,10 +1222,6 @@ type("UserListField", ["IWidget"], {
                 this.clearMessages();
             }
         }
-    },
-
-    getPrivileges: function() {
-        return this.selectedPrivileges;
     },
 
     draw: function() {

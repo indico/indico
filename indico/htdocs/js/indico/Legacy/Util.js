@@ -158,37 +158,6 @@ var IndicoUtil = {
        return new Date(year, month-1, day, hour, min);
    },
 
-    cachedRpcValue: function(endPoint, method, attributes, cachedValue) {
-
-        if (exists(cachedValue)) {
-            var self;
-            self = new WatchValue();
-            self.set(cachedValue);
-
-            self.observe(function(value) {
-                jsonRpcCommit(endPoint, method, attributes, value,
-                              function(result, error) {
-                                  if(exists(error)) {
-                                      IndicoUtil.errorReport(error);
-                                      self.set(cachedValue);
-                                  } else {
-                                      cachedValue = value;
-                                      if (exists(result.hasWarning) && result.hasWarning === true) {
-                                          var popup = new WarningPopup(result.warning.title, result.warning.content);
-                                          popup.open();
-                                      }
-                                      // would loop infinitely
-                                      // self.set(result);
-                                  }
-                              });
-            });
-            return self;
-        } else {
-            return jsonRpcValue(endPoint, method, attributes);
-        }
-
-    },
-
     /**
      *
      */
@@ -368,12 +337,6 @@ var IndicoUtil = {
                 else if (dataType == 'int' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
                     error = Html.span({}, $T("Field must be a number"));
                 }
-                // TODO: to be replaced by just 'int'
-                else if (dataType == 'int_pos_or_neg' && !(allowEmpty && trim(component.get()) === '') && !IndicoUtil.isInteger(component.get())) {
-                    if (!(component.get()[0] == '-' && IndicoUtil.isInteger(component.get().slice(1)))) {
-                        error = Html.span({}, $T("Field must be a number"));
-                    }
-                }
                 else if (dataType == 'unsigned_int' && !(allowEmpty && trim(component.get()) === '') && (!IndicoUtil.isInteger(component.get()) || component.get()<=0)) {
                     error = Html.span({}, "Field must be a positive number");
                 }
@@ -386,14 +349,8 @@ var IndicoUtil = {
                 else if (dataType == 'email' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailAddress(component.get())) {
                     error = Html.span({}, $T("Invalid e-mail address"));
                 }
-                else if (dataType == 'emaillist' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isEmailList(component.get())){
-                    error = Html.span({}, $T("List contains invalid e-mail address or invalid separator"));
-                }
                 else if (dataType == 'url' && !(allowEmpty && trim(component.get()) === '') && !Util.Validation.isURL(component.get())) {
                     error = Html.span({}, $T("Invalid URL"));
-                }
-                else if (dataType == 'ip' && !(allowEmpty && trim(component.get()) === '') &&  !Util.Validation.isIPAddress(component.get())) {
-                    error = Html.span({}, $T("That doesn't seem like a valid IP Address. Example of valid IP Address: 132.156.31.38"));
                 }
                 else if (dataType == 'time' && !IndicoUtil.isTime(trim(component.get()))) {
                     error = Html.span({}, $T("Time format is not valid. It should be hh:mm"));

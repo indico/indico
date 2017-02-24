@@ -51,13 +51,6 @@ type("PopupDialog", ["PopupWidget"], {
             IndicoUtil.onclickHandlerRemove(this.clickHandler);
             this.PopupWidget.prototype.close.call(this);
         }
-    },
-    /**
-     * Adds an element to the list of elements that when clicked
-     * on do not trigger close of the popup dialog.
-     */
-    addNonCloseTriggeringElement: function(element) {
-        this.nonCloseTriggeringElements.push(element);
     }
     },
      function(content, triggerElement, closeHandler, nonCloseTriggeringElements) {

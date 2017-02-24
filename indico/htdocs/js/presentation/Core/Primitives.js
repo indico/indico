@@ -145,9 +145,6 @@ function get(value, builder) {
     return exists(value) ? value : builder();
 }
 
-function getByKey(object, property, value) {
-    return property in object ? object[property] : value;
-}
 
 /**
  * Returns true if the value is an object.
@@ -225,23 +222,6 @@ function init(object, property, value) {
 function obtain(object, property, initializer) {
     var result = object[property];
     return exists(result) ? result : object[property] = initializer();
-}
-
-function obtainGet(object, property, initializer) {
-    var result = object.get(property);
-    if (!exists(result)) {
-        result = initializer();
-        object.set(property, result);
-    }
-    return result;
-}
-
-function obtainSet(object, property, key, value) {
-    obtain(object, property, newObject)[key] = value;
-}
-
-function obtainAdd(object, property, value) {
-    obtain(object, property, newArray).push(value);
 }
 
 
@@ -328,21 +308,13 @@ function objectize(key, value) {
     return obj;
 }
 
-function setExisting(object, key, value) {
-    if (exists(value)) {
-        object[key] = value;
-    }
-}
-
 /**
  * Browser detection from Prototype JavaScript Framework.
  */
 var Browser = {
     IE: (window.attachEvent && !window.opera) ? extract(navigator.appVersion, "MSIE ", ";") : false,
-    Opera: window.opera ? extract(navigator.appVersion, "", " ") : false,
     WebKit: navigator.appVersion.indexOf('AppleWebKit/') > -1 ? extract(navigator.appVersion, "AppleWebKit/", " ") : false,
     Gecko: navigator.userAgent.indexOf('Gecko') > -1 && navigator.userAgent.indexOf('KHTML') == -1 ? extract(navigator.userAgent, "rv:", ")") : false,
-    KHTML: navigator.appVersion.indexOf('KHTML') > -1 && navigator.appVersion.indexOf('AppleWebKit') == -1 ? extract(navigator.appVersion, "KHTML/", " ") : false,
-    MobileSafari: !!navigator.userAgent.match(/Apple.*Mobile.*Safari/)
+    KHTML: navigator.appVersion.indexOf('KHTML') > -1 && navigator.appVersion.indexOf('AppleWebKit') == -1 ? extract(navigator.appVersion, "KHTML/", " ") : false
 };
 
