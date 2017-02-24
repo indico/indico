@@ -110,7 +110,7 @@ class RHWithdrawAbstract(RHAbstractBase):
 
     def _process(self):
         if self.abstract.state != AbstractState.withdrawn:
-            withdraw_abstract(self.abstract)
+            withdraw_abstract(self.abstract, delete_contrib=(self.abstract.state == AbstractState.accepted))
             flash(_("Abstract has been withdrawn"), 'success')
         return jsonify_data(html=render_abstract_page(self.abstract, management=self.management))
 

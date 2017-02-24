@@ -15,6 +15,18 @@
             {% if abstract.submitter == session.user or can_manage %}
                 <div class="group">
                     {% if abstract.can_withdraw(session.user, check_state=true) %}
+                        {% set message %}
+                            {% trans %}Do you really want to withdraw this abstract?{% endtrans %}
+                            {% if abstract.state.name == 'accepted' and abstract.contribution %}
+                                <br>
+                                {%- trans -%}
+                                    Withdrawing this abstract will permanently delete its corresponding contribution.
+                                {%- endtrans -%}
+                            {% elif not can_manage %}
+                                <br>
+                                {% trans %}This operation is irreversible.{% endtrans %}
+                            {% endif %}
+                        {% endset %}
                         <a title="{% trans %}Withdraw abstract{% endtrans %}"
                            class="i-button text-color color-on-hover danger"
                            data-href="{{ url_for('.withdraw_abstract', abstract) }}"
@@ -22,18 +34,29 @@
                            data-update="#reviewing-page"
                            data-replace-update
                            data-title="{% trans %}Withdraw Abstract{% endtrans %}"
-                           data-confirm="{% trans %}Do you really want to withdraw this abstract? This operation is irreversible.{% endtrans %}">
+                           data-confirm="{{ message }}">
+                            {% trans %}Withdraw{% endtrans %}
+                        </a>
+                    {% elif abstract.state.name == 'accepted' %}
+                        {% set message %}
+                            {% trans %}
+                                You can't withdraw this abstract because it has already been accepted.
+                                Contact the managers if you want this abstract to be withdrawn.
+                            {% endtrans %}
+                        {% endset %}
+                        <a title="{{ message }}"
+                           class="i-button disabled">
                             {% trans %}Withdraw{% endtrans %}
                         </a>
                     {% elif abstract.state.name == 'withdrawn' and can_manage %}
                         <a title="{% trans %}This abstract has been withdrawn but can be restored using this option{% endtrans %}"
+                           class="i-button accept icon-lamp"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
                            data-update="#reviewing-page"
                            data-replace-update
                            data-title="{% trans %}Restore Abstract{% endtrans %}"
-                           data-confirm="{% trans %}Do you really want to restore this abstract? This operation is irreversible.{% endtrans %}"
-                           class="i-button accept icon-lamp">
+                           data-confirm="{% trans %}Do you really want to restore this abstract?{% endtrans %}">
                             {% trans %}Restore{% endtrans %}
                         </a>
                     {% endif %}
