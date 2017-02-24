@@ -32,8 +32,8 @@ class RHPapersBase(RHConferenceBaseDisplay):
 
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
-        # Only let event managers access the management versions.
-        if self.management and not self.event_new.can_manage(session.user, role='paper_manager'):
+        # Only let managers access the management versions.
+        if self.management and not self.event_new.cfp.is_manager(session.user):
             raise Forbidden
 
     @property
