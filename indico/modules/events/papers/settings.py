@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.settings.converters import DatetimeConverter, SettingConverter
+from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.settings import EventSettingsProxy
 from indico.util.i18n import _
 from indico.util.struct.enum import RichIntEnum
@@ -25,6 +26,7 @@ from indico.util.struct.enum import RichIntEnum
 class PaperReviewingRole(RichIntEnum):
     __titles__ = [None, _('Judge'), _('Layout Reviewer'), _('Content Reviewer')]
     __acl_roles__ = [None, 'paper_judge', 'paper_layout_reviewer', 'paper_content_reviewer']
+    __review_types__ = [None, None, PaperReviewType.layout, PaperReviewType.content]
 
     judge = 1
     layout_reviewer = 2
@@ -33,6 +35,10 @@ class PaperReviewingRole(RichIntEnum):
     @property
     def acl_role(self):
         return self.__acl_roles__[self]
+
+    @property
+    def review_type(self):
+        return self.__review_types__[self]
 
 
 class RoleConverter(SettingConverter):
