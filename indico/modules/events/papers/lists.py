@@ -54,6 +54,12 @@ class PaperListGeneratorBase(ListGeneratorBase):
                                                                                key=attrgetter('title')))
         type_choices = OrderedDict((unicode(t.id), t.name) for t in sorted(self.event.contribution_types,
                                                                            key=attrgetter('name')))
+
+        if not event.cfp.content_reviewing_enabled:
+            del unassigned_choices[PaperReviewingRole.content_reviewer.value]
+        if not event.cfp.layout_reviewing_enabled:
+            del unassigned_choices[PaperReviewingRole.layout_reviewer.value]
+
         self.static_items = OrderedDict([
             ('state', {'title': _('State'),
                        'filter_choices': OrderedDict(state_not_submitted.items() + state_choices.items())}),
@@ -106,8 +112,10 @@ class PaperListGeneratorBase(ListGeneratorBase):
                 PaperReviewingRole.content_reviewer.value: Contribution.paper_content_reviewers,
                 PaperReviewingRole.layout_reviewer.value: Contribution.paper_layout_reviewers,
             }
-            filtered_roles = filters['items']['unassigned']
-            unassigned_criteria = [~role_map[int(filter_role)].any() for filter_role in filtered_roles]
+            filtered_roles = map(PaperReviewingRole, map(int, filters['items']['unassigned']))
+            unassigned_criteria = [~role_map[role.value].any() for role in filtered_roles
+                                   if (role == PaperReviewingRole.judge or
+                                       self.event.cfp.get_reviewing_state(role.review_type))]
             if unassigned_criteria:
                 criteria.append(db.or_(*unassigned_criteria))
 

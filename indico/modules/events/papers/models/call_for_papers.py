@@ -72,9 +72,19 @@ class CallForPapers(object):
 
     def set_reviewing_state(self, reviewing_type, enable):
         if reviewing_type == 'content':
-            paper_reviewing_settings.set(self.event, 'content_reviewing_enabled', enable)
+            self.content_reviewing_enabled = enable
         elif reviewing_type == 'layout':
-            paper_reviewing_settings.set(self.event, 'layout_reviewing_enabled', enable)
+            self.layout_reviewing_enabled = enable
+        else:
+            raise ValueError('Invalid reviewing type: {}'.format(reviewing_type))
+
+    def get_reviewing_state(self, reviewing_type):
+        if reviewing_type == PaperReviewType.content:
+            return self.content_reviewing_enabled
+        elif reviewing_type == PaperReviewType.layour:
+            return self.layout_reviewing_enabled
+        else:
+            raise ValueError('Invalid reviewing type: {}'.format(reviewing_type))
 
     @property
     def managers(self):
