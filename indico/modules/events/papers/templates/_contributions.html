@@ -1,22 +1,25 @@
 {% macro render_paper_section(contribution) %}
     {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
     {% set paper = contribution.paper %}
-    {% set show_paper = paper.accepted_revision %}
-    {% set show_paper_status = paper.last_revision and can_submit %}
+    {% set show_paper = paper and paper.accepted_revision %}
+    {% set show_paper_status = paper and can_submit %}
     {% set show_paper_submission = contribution.event_new.cfp.is_open and can_submit %}
 
     {% if show_paper or show_paper_status or show_paper_submission %}
         <section>
             <div class="header">
                 <div class="header-row">
-                    <h3 class="icon-file">Paper</h3>
+                    <h3 class="icon-file">{% trans %}Paper{% endtrans %}</h3>
                 </div>
             </div>
+
             {% if show_paper %}
                 {# TODO: Implement new accepted paper widget #}
-            {% elif show_paper_status %}
+            {% endif %}
+
+            {% if show_paper_status %}
                 {{ _render_paper_status_box(paper) }}
-            {% elif show_paper_submission %}
+            {% elif not show_paper and show_paper_submission %}
                 {{ _render_paper_submission_box(contribution) }}
             {% endif %}
         </section>
