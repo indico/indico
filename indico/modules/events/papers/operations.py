@@ -47,10 +47,9 @@ from indico.web.flask.templating import get_template_module
 def set_reviewing_state(event, reviewing_type, enable):
     event.cfp.set_reviewing_state(reviewing_type, enable)
     action = 'enabled' if enable else 'disabled'
-    logger.info("Reviewing type '%s' for event %r %s by %r", reviewing_type, event, action, session.user)
+    logger.info("Reviewing type '%s' for event %r %s by %r", reviewing_type.name, event, action, session.user)
     event.log(EventLogRealm.management, EventLogKind.positive if enable else EventLogKind.negative, 'Papers',
-              "{} {} reviewing".format("Enabled" if enable else "Disabled",
-                                       orig_string(PaperReviewType[reviewing_type].title.lower())),
+              "{} {} reviewing".format("Enabled" if enable else "Disabled", orig_string(reviewing_type.title.lower())),
               session.user)
 
 

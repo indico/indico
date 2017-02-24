@@ -71,9 +71,9 @@ class CallForPapers(object):
         paper_reviewing_settings.set(self.event, 'end_dt', now_utc(False))
 
     def set_reviewing_state(self, reviewing_type, enable):
-        if reviewing_type == 'content':
+        if reviewing_type == PaperReviewType.content:
             self.content_reviewing_enabled = enable
-        elif reviewing_type == 'layout':
+        elif reviewing_type == PaperReviewType.layout:
             self.layout_reviewing_enabled = enable
         else:
             raise ValueError('Invalid reviewing type: {}'.format(reviewing_type))
