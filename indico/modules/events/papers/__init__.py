@@ -32,7 +32,7 @@ logger = Logger.get('events.papers')
 
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _extend_event_management_menu(sender, event, **kwargs):
-    if not event.can_manage(session.user, role='paper_manager') or not PapersFeature.is_allowed_for_event(event):
+    if not event.cfp.is_manager(session.user) or not PapersFeature.is_allowed_for_event(event):
         return
     return SideMenuItem('papers', _('Call for Papers'), url_for('papers.management', event),
                         section='organization')
@@ -40,7 +40,7 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if event.can_manage(session.user, role='paper_manager'):
+    if event.cfp.is_manager(session.user):
         return url_for('papers.management', event)
 
 
