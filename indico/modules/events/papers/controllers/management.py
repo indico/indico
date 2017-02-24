@@ -22,6 +22,7 @@ from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import (make_competences_form, PapersScheduleForm,
                                                 PaperTeamsForm, PaperReviewingSettingsForm, DeadlineForm)
+from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
                                                      update_competences, schedule_cfp, open_cfp, close_cfp,
                                                      set_deadline)
@@ -90,11 +91,11 @@ class RHSwitchReviewingType(RHManagePapersBase):
     """Enable/disable the paper reviewing types"""
 
     def _process_PUT(self):
-        set_reviewing_state(self.event_new, request.view_args['reviewing_type'], True)
+        set_reviewing_state(self.event_new, PaperReviewType[request.view_args['reviewing_type']], True)
         return jsonify_data(flash=False, html=_render_paper_dashboard(self.event_new))
 
     def _process_DELETE(self):
-        set_reviewing_state(self.event_new, request.view_args['reviewing_type'], False)
+        set_reviewing_state(self.event_new, PaperReviewType[request.view_args['reviewing_type']], False)
         return jsonify_data(flash=False, html=_render_paper_dashboard(self.event_new))
 
 
