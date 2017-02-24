@@ -110,8 +110,7 @@ def _extend_event_menu(sender, **kwargs):
         from indico.modules.events.contributions.util import has_contributions_with_user_as_submitter
         if not session.user or not event.has_feature('papers'):
             return False
-        return (has_contributions_with_user_as_submitter(event, session.user) or event.cfp.is_reviewer(session.user) or
-                event.cfp.is_judge(session.user))
+        return has_contributions_with_user_as_submitter(event, session.user) or event.cfp.is_staff(session.user)
 
     yield MenuEntryData(title=_("Call for Papers"), name='call_for_papers',
                         endpoint='papers.call_for_papers', position=8,
