@@ -125,6 +125,20 @@
         });
     };
 
+    $.fn.focusFirstField = function focusTabbable() {
+        return this.each(function() {
+            var $this = $(this);
+            var elem = $this.find('[autofocus]');
+            if (!elem.length) {
+                elem = $this.find(':input:tabbable');
+            }
+            if (!elem.length) {
+                elem = $this;
+            }
+            elem.eq(0).focus();
+        });
+    };
+
     var __gotoToday = $.datepicker._gotoToday;
 
     $.extend($.datepicker, {

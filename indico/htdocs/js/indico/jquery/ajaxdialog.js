@@ -182,7 +182,7 @@
                 injectJS(dialogData.js);
                 _onOpen();
                 _.defer(function() {
-                    popup.canvas.data('ui-dialog')._focusTabbable();
+                    popup.canvas.focusFirstField();
                 });
 
                 return true;
