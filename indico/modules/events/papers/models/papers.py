@@ -80,9 +80,7 @@ class Paper(ProposalMixin):
         return self.can_submit(user) or self.can_judge(user) or self.can_review(user)
 
     def can_submit(self, user):
-        if not user:
-            return False
-        return any(x.person.user == user for x in self.contribution.person_links if x.person.user)
+        return self.contribution.is_user_associated(user, check_abstract=True)
 
     def can_manage(self, user):
         if not user:

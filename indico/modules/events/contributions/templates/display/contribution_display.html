@@ -238,9 +238,9 @@
             </div>
         </section>
     {%- endif %}
-
-    {{ render_paper_section(contribution, show_paper=show_paper) }}
-
+    {% if contribution.event_new.has_feature('papers') %}
+        {{ render_paper_section(contribution) }}
+    {% endif %}
     <script>
         setupAttachmentTreeView();
     </script>
