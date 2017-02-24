@@ -12,13 +12,36 @@
 
     % if track_judgements and any(x[1] for x in track_judgements):
         \textbf{${_("Track Reviews:") | latex_escape}}
-        \begin{description}
-            % for track_name, judgement in track_judgements:
+        \begin{addmargin}[1em]{1em}
+            % for track_name, judgement, comments in track_judgements:
                 % if judgement:
-                    \small \item[${track_name | latex_escape}:] ${judgement | latex_escape}
+                    \small \textbf{${track_name | latex_escape}:}
+                    \begin{addmargin}[1em]{1em}
+                        \vspace{0.5em}
+
+                        \textbf{${_("Judgments:")}} ${judgement | latex_escape}
+
+                        % if comments:
+                            \vspace{0.5em}
+                            \textbf{${_("Comments:")}}
+                            % for comment, proposed_action in comments:
+                                \vspace{0.5em}
+                                \begin{addmargin}[1em]{1em}
+                                    \rmfamily {
+                                        \allsectionsfont{\rmfamily}
+                                        \sectionfont{\normalsize\rmfamily}
+                                        \subsectionfont{\small\rmfamily}
+                                        \small
+                                        ${md_convert(comment)}
+                                        \textbf{ (Judgment: ${proposed_action | latex_escape})}
+                                    }
+                                \end{addmargin}
+                            % endfor
+                        % endif
+                    \end{addmargin}
                 % endif
             % endfor
-        \end{description}
+        \end{addmargin}
     % endif
 
 </%block>

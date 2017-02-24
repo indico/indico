@@ -53,6 +53,7 @@ from MaKaC.common import utils
 from indico.core.db import db
 from indico.core.config import Config
 from indico.modules.events.abstracts.models.abstracts import AbstractState, AbstractReviewingState
+from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import boa_settings, BOASortField, BOACorrespondingAuthorType
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.registration.models.registrations import Registration
@@ -230,22 +231,30 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
         for track in abstract.reviewed_for_tracks:
             track_review_state = abstract.get_track_reviewing_state(track)
             review_state = track_review_state.title
+            track_reviews = abstract.get_reviews(group=track)
+            review_comments = [(review.comment, unicode(review.proposed_action.title))
+                               for review in track_reviews if review.comment]
             if track_review_state == AbstractReviewingState.positive:
-                track_reviews = abstract.get_reviews(group=track)
                 proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews
                                           if r.proposed_contribution_type}
                 if proposed_contrib_types:
                     contrib_types = u', '.join(proposed_contrib_types)
                     review_state = u'{}: {}'.format(review_state, contrib_types)
             elif track_review_state == AbstractReviewingState.mixed:
-                track_reviews = abstract.get_reviews(group=track)
                 other_tracks = {x.title for r in track_reviews for x in r.proposed_tracks}
+                proposed_actions = {x.proposed_action for x in track_reviews}
+                no_track_actions = proposed_actions - {AbstractAction.change_tracks}
+                other_info = []
+                if no_track_actions:
+                    other_info.append(u', '.join(unicode(a.title) for a in no_track_actions))
                 if other_tracks:
-                    review_state = _(u"{}: Proposed for other tracks: {}").format(review_state,
-                                                                                  u', '.join(other_tracks))
+                    other_info.append(_(u"Proposed for other tracks: {}").format(u', '.join(other_tracks)))
+                if other_info:
+                    review_state = u'{}: {}'.format(review_state, u'; '.join(other_info))
+
             elif track_review_state not in {AbstractReviewingState.negative, AbstractReviewingState.conflicting}:
                 continue
-            reviews.append((track.title, review_state))
+            reviews.append((track.title, review_state, review_comments))
         return reviews
 
 
