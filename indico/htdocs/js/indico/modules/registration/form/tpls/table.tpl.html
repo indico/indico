@@ -29,7 +29,8 @@
                 </span>
             </td>
         </tr>
-        <tr ng-repeat="item in formData | filter: matchFilter">
+        <tr ng-repeat="item in formData | filter: matchFilter"
+            ng-class="item.isNoAccommodation ? 'no-accommodation-row' : ''">
             <td ng-if="isSortable()"
                 class="table-sortable-handle"></td>
             <td ng-repeat="elem in config.colModel"
