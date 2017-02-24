@@ -100,7 +100,7 @@ class RHResetAbstractState(RHAbstractBase):
     def _process(self):
         if self.abstract.state != AbstractState.submitted:
             reset_abstract_state(self.abstract)
-            flash(_("Abstract state has been reset"), 'success')
+            flash(_("Abstract judgment has been reset"), 'success')
         return jsonify_data(html=render_abstract_page(self.abstract, management=self.management))
 
 
