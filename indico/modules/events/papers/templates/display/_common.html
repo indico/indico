@@ -10,18 +10,22 @@
                 </div>
                 <div>
                     {% if contributions|length == 1 %}
-                        {%- trans %}You can submit your paper for {% endtrans -%}
-                        "<span>{{ _('#%d: %s' | format(contributions[0].friendly_id, contributions[0].title) | truncate(65)) }}</span>"
+                        {% set contrib = contributions|first %}
+                        {% set contrib_title -%}
+                            <strong>{{ '#%d: %s' | format(contrib.friendly_id, contrib.title) | truncate(65) }}</strong>
+                        {%- endset %}
+                        {%- trans %}You can submit your paper for {{ contrib_title }}{% endtrans -%}
                     {% else %}
-                        {%- trans %}You can submit a paper for reviewing.{% endtrans -%}
+                        {%- trans %}You can submit a paper for reviewing{% endtrans -%}
                     {% endif %}
                 </div>
                 <div class="toolbar">
                     {% if contributions|length == 1 %}
+                        {% set contrib = contributions|first %}
                         <a class="i-button highlight"
                            data-title="{% trans %}Submit new paper{% endtrans %}"
-                           data-href="{{ url_for('papers.submit_revision', contributions[0]) }}"
-                           data-redirect-after="{{ url_for('papers.paper_timeline', contributions[0]) }}"
+                           data-href="{{ url_for('papers.submit_revision', contrib) }}"
+                           data-redirect-after="{{ url_for('papers.paper_timeline', contrib) }}"
                            data-confirm-close-unsaved
                            data-ajax-dialog>
                             {%- trans %}Submit paper{% endtrans -%}

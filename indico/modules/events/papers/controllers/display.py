@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import request, session, flash
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.contributions.util import get_contributions_with_user_as_submitter
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
 from indico.modules.events.papers.forms import (PaperSubmissionForm, PaperCommentForm, build_review_form,
                                                 PaperJudgmentForm)
@@ -32,7 +31,8 @@ from indico.modules.events.papers.operations import (create_paper_revision, crea
                                                      update_comment, delete_comment, update_review, judge_paper,
                                                      reset_paper_state)
 from indico.modules.events.papers.util import (get_user_contributions_to_review, get_user_reviewed_contributions,
-                                               get_contributions_with_paper_submitted_by_user)
+                                               get_contributions_with_paper_submitted_by_user,
+                                               get_contributions_with_user_paper_submission_rights)
 from indico.modules.events.papers.views import (WPDisplayPapersBase, render_paper_page, WPDisplayReviewingArea,
                                                 WPDisplayCallForPapers)
 from indico.util.i18n import _
@@ -41,12 +41,14 @@ from indico.web.util import jsonify_form, jsonify_data, jsonify, jsonify_templat
 
 
 class RHSubmitPaper(RHPaperBase):
+    PAPER_REQUIRED = False
+
     def _process(self):
         form = PaperSubmissionForm()
         if form.validate_on_submit():
             if self.paper is None:
-                self.paper = Paper(self.contribution)
-                create_paper_revision(self.paper, session.user, form.files.data)
+                paper = Paper(self.contribution)
+                create_paper_revision(paper, session.user, form.files.data)
                 return jsonify_data(flash=False)
             else:
                 create_paper_revision(self.paper, session.user, form.files.data)
@@ -229,9 +231,9 @@ class RHCallForPapers(RHPapersBase):
 
     def _checkParams(self, params):
         RHPapersBase._checkParams(self, params)
-        self.contribs = get_contributions_with_user_as_submitter(self.event_new, session.user)
-        self.papers = get_contributions_with_paper_submitted_by_user(self.event_new, session.user)
-        self.contribs = list(set(self.contribs) - set(self.papers))
+        self.papers = set(get_contributions_with_paper_submitted_by_user(self.event_new, session.user))
+        contribs = set(get_contributions_with_user_paper_submission_rights(self.event_new, session.user))
+        self.contribs = contribs - self.papers
 
     def _process(self):
         return WPDisplayCallForPapers.render_template('display/call_for_papers.html', self._conf,
