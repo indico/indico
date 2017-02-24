@@ -454,10 +454,12 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         """Get a set of child objects that do not inherit protection."""
         return get_non_inheriting_objects(self)
 
-    def is_user_associated(self, user):
+    def is_user_associated(self, user, check_abstract=False):
         if user is None:
             return False
-        return any(pl.person.user == user for pl in self.person_links)
+        if check_abstract and self.abstract and self.abstract.submitter == user:
+            return True
+        return any(pl.person.user == user for pl in self.person_links if pl.person.user)
 
 Contribution.register_protection_events()
 
