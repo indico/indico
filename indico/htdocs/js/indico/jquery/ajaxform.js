@@ -151,6 +151,9 @@
                     });
                 }
             }
+            _.defer(function() {
+                formContainer.focusFirstField();
+            });
         }
 
         function hideForm() {
