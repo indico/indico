@@ -77,7 +77,7 @@ class PaperReviewComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
             return False
         elif self.user == user:
             return True
-        elif self.paper_revision.paper.event_new.can_manage(user, role='paper_manager'):
+        elif self.paper_revision.paper.event_new.cfp.is_manager(user):
             return True
         else:
             return False
