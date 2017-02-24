@@ -132,10 +132,9 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                           contains_eager('registration_form')))
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
                                key=lambda x: x['columns'])
-        table = {'headers': headers,
-                 'rows': registrations,
-                 'show_checkin': any(registration['checked_in'] for registration in registrations)}
-        return table
+        return {'headers': headers,
+                'rows': registrations,
+                'show_checkin': any(registration['checked_in'] for registration in registrations)}
 
     def _participant_list_table(self, regform):
         def _process_registration(reg, column_ids, active_fields):
@@ -162,12 +161,13 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
         headers = [active_fields[column_id].title.title() for column_id in column_ids]
         active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
         registrations = [_process_registration(reg, column_ids, active_fields) for reg in active_registrations]
-        table = {'headers': headers, 'rows': registrations, 'title': regform.title}
-        table['show_checkin'] = any(registration['checked_in'] for registration in registrations)
-        return table
+        return {'headers': headers,
+                'rows': registrations,
+                'title': regform.title,
+                'show_checkin': any(registration['checked_in'] for registration in registrations)}
 
     def _process(self):
-        regforms = (self.event_new.registration_forms
+        regforms = (RegistrationForm.query.with_parent(self.event_new)
                     .filter(RegistrationForm.publish_registrations_enabled,
                             ~RegistrationForm.is_deleted)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
