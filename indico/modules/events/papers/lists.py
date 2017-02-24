@@ -46,8 +46,8 @@ class PaperListGeneratorBase(ListGeneratorBase):
         track_empty = {None: _('No track')}
         session_empty = {None: _('No session')}
         type_empty = {None: _('No type')}
-        state_choices = {state.value: state.title for state in PaperRevisionState}
-        unassigned_choices = {role.value: role.title for role in PaperReviewingRole}
+        state_choices = OrderedDict((state.value, state.title) for state in PaperRevisionState)
+        unassigned_choices = OrderedDict((role.value, role.title) for role in PaperReviewingRole)
         track_choices = OrderedDict((unicode(t.id), t.title) for t in sorted(self.event.tracks,
                                                                              key=attrgetter('title')))
         session_choices = OrderedDict((unicode(s.id), s.title) for s in sorted(self.event.sessions,
@@ -63,8 +63,7 @@ class PaperListGeneratorBase(ListGeneratorBase):
                          'filter_choices': OrderedDict(session_empty.items() + session_choices.items())}),
             ('type', {'title': _('Type'),
                       'filter_choices': OrderedDict(type_empty.items() + type_choices.items())}),
-            ('unassigned', {'title': _('Unassigned'),
-                            'filter_choices': OrderedDict(unassigned_choices.items())}),
+            ('unassigned', {'title': _('Unassigned'), 'filter_choices': unassigned_choices}),
         ])
         self.list_config = self._get_config()
 
