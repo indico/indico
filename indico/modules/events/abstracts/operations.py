@@ -176,6 +176,7 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
 
 
 def withdraw_abstract(abstract, delete_contrib=False):
+    abstract.reset_state()
     abstract.state = AbstractState.withdrawn
     contrib = abstract.contribution
     abstract.contribution = None
