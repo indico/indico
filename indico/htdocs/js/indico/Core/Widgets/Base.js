@@ -1518,39 +1518,6 @@ var progressIndicator = function(small, center) {
                    Html.img({src: imageSrc(small ? "loading" : "load_big", 'gif'), alt: "Loading..."}));
 };
 
-type("ServiceWidget", ["IWidget"],
-     {
-         _error: function(error) {
-             IndicoUI.Dialogs.Util.error(error);
-         },
-
-         request: function(extraArgs) {
-             var self = this;
-             var args = extend(clone(this.args), extraArgs);
-
-             var killProgress = IndicoUI.Dialogs.Util.progress();
-
-             jsonRpc(Indico.Urls.JsonRpcService, this.method, args,
-                     function(response,error) {
-                         if(exists(error)) {
-                             killProgress();
-                             self._error(error);
-                         } else {
-                             self._success(response);
-                             killProgress();
-                         }
-                     }
-                    );
-         }
-     },
-
-     function(endPoint, method, args) {
-         this.endPoint = endPoint;
-         this.method = method;
-         this.args = args;
-         this.IWidget();
-     }
-    );
 
 type("PopupWidget", [], {
     draw: function(content, x, y, styles, setWidth) {
@@ -1615,15 +1582,6 @@ type("PopupWidget", [], {
     },
 
     postDraw: function() {
-    },
-
-    getCanvas: function() {
-        return this.canvas;
-    },
-
-    setFixedPosition: function(fixed) {
-        fixed = any(fixed, true);
-        this.canvas.dom.style.position = fixed ? 'fixed' : 'absolute';
     },
 
     close: function(e) {
@@ -1691,50 +1649,12 @@ type("ErrorAware", [],
                               elem();
                           });
 
-                     this._inError = false;
                      this._stopErrorList = [];
                  }
              } else {
                  this._setErrorState(text);
-                 this._inError = true;
-                 this._currentErrorState = text;
              }
              return this._stopErrorList;
-         },
-
-         inError: function() {
-             return this._inError;
-         },
-
-         askForErrorCheck: function() {
-             var errorState = this._checkErrorState();
-
-             if (errorState) {
-                 // if we're already in error state,
-                 // no need to do anything
-
-                 if (!this._inError || this._currentErrorState != errorState) {
-                     // otherwise, we have to set it
-                     this.setError(null);
-                     this.setError(errorState);
-                 }
-                 return errorState;
-             } else {
-                 this.setError(null);
-                 return null;
-             }
-         },
-
-         plugParameterManager: function(parameterManager) {
-             this.parameterManager = parameterManager;
-             var self = this;
-
-             parameterManager.add(self, null, null,
-                                  function(){
-                                      return self.askForErrorCheck();
-                                  });
-
-         }
-     },
+         }},
      function() {
      });

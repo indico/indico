@@ -85,9 +85,6 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
         theme_url = get_css_url(self._conf.as_event)
         return [theme_url] if theme_url else []
 
-    def getJSFiles(self):
-        return (WPConferenceBase.getJSFiles(self) + self._includeJSPackage('MaterialEditor'))
-
     def _getFooter( self ):
         wc = wcomponents.WFooter()
         p = {"subArea": self._getSiteArea(),
@@ -113,14 +110,17 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             return entry.id
 
     def _applyConfDisplayDecoration( self, body ):
-        drawer = wcomponents.WConfTickerTapeDrawer(self._conf, self._tz)
         frame = WConfDisplayFrame( self._getAW(), self._conf )
+
+        announcement = ''
+        if layout_settings.get(self._conf, 'show_announcement'):
+            announcement = layout_settings.get(self._conf, 'announcement')
 
         frameParams = {
             "confModifURL": url_for('event_management.settings', self._conf.as_event),
             "logoURL": self.logo_url,
             "currentURL": request.url,
-            "simpleTextAnnouncement": drawer.getSimpleText(),
+            "announcement": announcement,
             'active_menu_entry_id': self.sidemenu_option
         }
         if self.event.has_logo:
@@ -465,7 +465,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         # TODO: find way to check if the user is able to manage
         # anything inside the conference (sessions, ...)
         modules += (self._includeJSPackage('Management') +
-                    self._includeJSPackage('MaterialEditor') +
                     self._asset_env['modules_vc_js'].urls() +
                     self._asset_env['modules_event_display_js'].urls() +
                     self._asset_env['clipboard_js'].urls())
@@ -523,7 +522,6 @@ class WPConferenceModifBase(main.WPMainBase):
     def getJSFiles(self):
         return (main.WPMainBase.getJSFiles(self) +
                 self._includeJSPackage('Management') +
-                self._includeJSPackage('MaterialEditor') +
                 self._asset_env['modules_event_management_js'].urls())
 
     def _getSiteArea(self):

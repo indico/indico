@@ -35,22 +35,6 @@ function apply(method, instance) {
 	};
 }
 
-
-/**
- * Returns function that wraps method of given object
- * @param {Object} object
- * @param {String} key
- * @return {Function} invoker
- */
-function methodize(object, key) {
-	return function() {
-		var method = object[key];
-		if (exists(method)) {
-			return method.apply(object, $A(arguments));
-		}
-	};
-}
-
 /**
  * Returns a template that invokes an input value on the object with the arguments.
  * @param {Object} self
@@ -61,22 +45,6 @@ function invoker(object, args) {
 	args = any(args, []);
 	return function Invoke(func) {
 		return (arguments.callee.result = func.apply(object, args));
-	};
-}
-
-/**
- * Returns a template that invokes a method of the object determined by an input value with the arguments.
- * @param {Object} object
- * @param {Array} [args]
- * @return {Function} template
- */
-function objectInvoker(object, args) {
-	args = any(args, []);
-	return function(key) {
-		var method = object[key];
-		if (exists(method)) {
-			return method.apply(object, args);
-		}
 	};
 }
 

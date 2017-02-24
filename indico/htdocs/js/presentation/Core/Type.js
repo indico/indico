@@ -80,10 +80,3 @@ function Enum() {
 		self[item] = index;
 	});
 }
-
-function NamedEnum() {
-	var self = this;
-	iterate(arguments, function(item) {
-		self[item] = item;
-	});
-}

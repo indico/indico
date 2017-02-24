@@ -290,7 +290,7 @@ function availabilityFilterFunction(filtersCallback) {
         }, function (ids, error) {
             if (!error) {
                 function roomIdFilter(room) {
-                    return contains(ids, room.id);
+                    return ids.indexOf(room.id) != -1;
                 }
                 filtersCallback([], [roomIdFilter]);
             } else {

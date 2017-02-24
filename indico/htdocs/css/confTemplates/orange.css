@@ -76,11 +76,6 @@ li ul.inner li a {
     color: #5b5d53;
 }
 
-.nowHappening {
-    color: #5b5d53;
-}
-
-
 .simpleTextAnnouncement {
     background: #F5FAFF url(../../images/conf/sprites_orange.png) repeat-x scroll 0 -400px;
     border-top: none;

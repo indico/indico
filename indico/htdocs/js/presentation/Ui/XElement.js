@@ -20,10 +20,6 @@ type("XElement", ["List"], {
 		return this.observeEvent("click", observer);
 	},
 
-	observeDblClick: function(observer) {
-		return this.observeEvent("dblclick", observer);
-	},
-	
 	/**
 	 * Attaches the observer to a change event. Returns a function to detach the observer.
 	 * @param {Function} observer
@@ -31,10 +27,6 @@ type("XElement", ["List"], {
 	 */
 	observeChange: function(observer) {
 		return this.observeEvent("change", observer);
-	},
-	
-	observeMouseWheel: function(observer) {
-		//if (window)
 	},
 	
 	observeKeyPress: function(observer) {
@@ -64,16 +56,6 @@ type("XElement", ["List"], {
 		}).attach(observer);
 	},
 	
-	/**
-	 * Attaches the observer to a complex event with the given name. Returns a function to detach the observer.
-	 * @param {String} eventName
-	 * @param {Function} observer
-	 * @return {Function} function to remove observer
-	 */
-	observeEventEx: function(eventName, observer) {
-		return Dom.Event.observe(this.dom, eventName, observer);
-	},
-
 	/**
 	 * Triggers an event with the given name. Returns an event object of the event.
 	 * @param {String} eventName
@@ -193,20 +175,6 @@ type("XElement", ["List"], {
 	},
 
 	/**
-	 * Returns an accessor for a style with the key.
-	 * @param {String} key
-	 * @return {Accessor} accessor
-	 */
-	styleAccessor: function(key) {
-		var self = this;
-		return new Accessor(function() {
-			return self.getStyle(key);
-		}, function(value) {
-			return self.setStyle(key, value);
-		});
-	},
-
-	/**
 	 * Returns content.
 	 * @return {Array}
 	 */
@@ -223,27 +191,13 @@ type("XElement", ["List"], {
 		schedule(this.itemsUpdated);
 		return Dom.Content.add(this.dom, value);
 	},
-	
-	/**
-	 * Sets the value as new content. Returns previous content.
-	 * @param {Object} value
-	 * @return {Array}
-	 */
-	setContent: function(value) {
-		schedule(this.itemsUpdated);
-		return Dom.Content.set(this.dom, value);
-	},
-	
+
 	/**
 	 * Returns a name of a tag of the element.
 	 * @return {String} tag
 	 */
 	getTag: function() {
 		return this.dom.tagName.toLowerCase();
-	},
-	
-	inTree: function() {
-		return exists(this.dom.offsetParent());
 	},
 	
 	getParent: function() {

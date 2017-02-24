@@ -854,17 +854,6 @@ class WTabControl(WTemplated):
         return vars
 
 
-class WConfTickerTapeDrawer(WTemplated):
-
-    def __init__(self,conf, tz=None):
-        self._conf = conf
-        self._tz = tz
-
-    def getSimpleText( self ):
-        if layout_settings.get(self._conf, 'show_announcement'):
-            return layout_settings.get(self._conf, 'announcement')
-
-
 class WFilterCriteria(WTemplated):
     """
     Draws the options for a filter criteria object

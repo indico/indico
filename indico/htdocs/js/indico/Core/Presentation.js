@@ -106,17 +106,6 @@ var numberSorter = function(a, b) {
     return a - b;
 };
 
-// Utility function to get the selected items in a select box with multiple selection
-var getSelectedItems = function(select) {
-    var selectedItems = [];
-    for (var i=0; i<select.dom.length; i++) {
-        if (select.dom.options[i].selected) {
-            selectedItems.push(select.dom[i].value);
-        }
-    }
-    return(selectedItems);
-};
-
 function createObject(clazz, args) {
     function Dummy(){}
 
@@ -255,10 +244,6 @@ type("WatchOrderedDict", ["WatchObject"],
          };
 
      });
-
-function $D(source, template) {
-        return bind.toDictionary(new WatchOrderedDict(), source, template);
-}
 
 Html.unescaped = map({'div': null, 'span': null}, function(value, elemType) {
     return function() {

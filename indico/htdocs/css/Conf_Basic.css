@@ -291,15 +291,6 @@ pre {
     font-size: 11pt;
 }
 
-.nowHappening {
-    margin-bottom: 10px;
-}
-
-.nowHappening .nowHappeningText {
-    margin-right: 5px;
-    float: left;
-}
-
 .simpleTextAnnouncement {
     background: #F5FAFF url(../images/conf/sprites_blue.png) repeat-x scroll 0 -400px;
     border-top: 1px solid #c2d6e7;

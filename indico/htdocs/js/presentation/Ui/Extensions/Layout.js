@@ -65,26 +65,6 @@ internal(function() {
 			}
 			return this.style(style);
 		},
-		locateX: function(left, right) {
-			var style = {
-				left: left,
-				right: right,
-				width: null,
-				position: "absolute"
-			};
-			computeX(style);
-			return this.style(style);
-		},
-		locateY: function(top, bottom) {
-			var style = {
-				top: top,
-				bottom: bottom,
-				height: null,
-				position: "absolute"
-			};
-			computeY(style);
-			return this.style(style);
-		},
 		locate: function(top, left, bottom, right) {
 			var style = {
 				left: left,
@@ -98,33 +78,6 @@ internal(function() {
 			computeX(style);
 			computeY(style);
 			return this.style(style);
-		},
-		messageBox: function(width, height) {
-			return this.style({
-				left: "50%",
-				top: "40%",
-				marginLeft: -width / 2,
-				marginTop: -height / 2,
-				width: width,
-				height: height,
-				display: "block",
-				position: "fixed"
-			});
-		},
-		fixedBox: function(top, left, bottom, right) {
-			var style = {
-				left: left,
-				right: right,
-				width: null,
-				top: top,
-				bottom: bottom,
-				height: null,
-				display: "block",
-				position: "fixed"
-			};
-			computeX(style);
-			computeY(style);
-			return this.style(style);
 		}
 	})
 });
@@ -134,24 +87,6 @@ extend(Html.prototype, {
 		return document.body === this.dom;
 	},
 
-	layout: function(layout) {
-		var self = this;
-		invoke(self.removeLayout);
-		if (isString(layout)) {
-			layout = Layout[layout];
-		}
-		if (exists(layout)) {
-			var layoutElement = function() {
-				schedule(function() {
-					layout(self);
-				});
-			};
-			self.removeLayout = self.itemsUpdated.attach(layoutElement);
-			layoutElement();
-		}
-		return self;
-	},
-	
 	getOffsetParent: function() {
 		return $E(this.getAttribute("offsetParent"));
 	}
@@ -222,58 +157,4 @@ var Layout = {
 			});
 		};
 	}
-//	vertical: function(element) {
-//		var style = {
-//			display: "block"
-//		};
-//		if (element.fixedHeight) {
-//			var top = 0;
-//			var height = element.getAttribute("clientHeight");
-//			var count = element.length.get();
-//			var top = 0;
-//			element.each(function(item, index) {
-//				var next = height * (index + 1) / count;
-//				item.attribute({
-//					$fixedHeight: false,
-//					style: {
-//						position: "absolute",
-//						display: "block",
-//						left: 0,
-//						right: 0,
-//						margin: "0",
-//						padding: "0",
-//						border: "0",
-//						width: null,
-//						top: top,
-//						height: next - top
-//					}
-//				});
-//				top = next;
-//			});
-//		} else {
-//			var height = 0;
-//			element.each(function(item) {
-//				item.attribute({
-//					$fixedHeight: false,
-//					style: {
-//						position: "absolute",
-//						display: "block",
-//						left: 0,
-//						right: 0,
-//						margin: "0",
-//						padding: "0",
-//						border: "0",
-//						width: null,
-//						top: height
-//					}
-//				});
-//				height += item.getAttribute("offsetHeight");
-//			});
-//			style.height = height;
-//		}
-//		if (element.item(0).getStyle("offsetParent") !== element) {
-//			style.position = "relative";
-//		}
-//		element.style(style);
-//	}
 };

@@ -199,20 +199,11 @@ var Util = {
 };
 
 Util.Validation = {
-    isIPAddress: function(address) {
-        // thanks to Jan Goyvaerts
-        return exists(address.match(/^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/));
-    },
-
     isEmailAddress: function(address) {
         // Adapted RFC2822 (thanks to Jan Goyvaerts)
         return exists(address.toLowerCase().match(/^[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?$/));
     },
 
-    isEmailList: function(emails) {
-        // check if the emails given are valid and if valid separators are used
-        return exists(emails.toLowerCase().match(/^(?:[ ,;]*)(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?)(?:[ ,;]+(?:[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+(?:\.[a-z0-9!#$%&\'*+\/=?\^_`{|}~\-]+)*@(?:[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9\-]*[a-z0-9])?))*(?:[ ,;]*)$/));
-    },
     isURL: function(address) {
         // per RFC2396, but forcing xxx: prefix and at least some text after
         return exists(address.match(/^(([^:\/?#]+):)((\/\/)?([^\/?#]+))([^?#]*)(\?([^#]*))?(#(.*))?$/));
@@ -221,7 +212,6 @@ Util.Validation = {
     isHtml: function(text) {
         return /<.*>[\s\S]*<\/.*>|<br\s*\/>/.exec(text);
     }
-
 };
 
 

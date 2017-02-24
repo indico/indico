@@ -37,14 +37,6 @@ function dict(source, template) {
 	}));
 }
 
-function extractStrings(source, template) {
-	return translate(dict(source, function(value, key) {
-		return [template(value, key), null];
-	}), function(value, key) {
-		return key;
-	});
-}
-
 /**
  * Creates a new array that contains items from the list but not existing ones.
  * @param {Array, Object} items
@@ -54,17 +46,6 @@ function extractStrings(source, template) {
  */
 function compact(list, offset, template) {
 	return iterate(list, existing(stacker(template)), offset);
-}
-
-/**
- * Creates a new array that contains items from the list and flattens sub-lists.
- * @param {Array, Object} items
- * @param {Number} [offset]
- * @param {Function} [template]
- * @return {Array}
- */
-function linearize(list, offset, template) {
-	return iterate(list, linearizing(existing(stacker(template))), offset);
 }
 
 function filter(list, match, offset, template) {
@@ -110,14 +91,6 @@ function merge() {
 			extend(result, arg);
 		}
 	});
-	return result;
-}
-
-function withoutProperties(object) {
-	var result = merge(object);
-	iterate(arguments, function(property) {
-		delete result[property];
-	}, 1);
 	return result;
 }
 
@@ -211,23 +184,6 @@ function replaceProperties(object, values, observer) {
 }
 
 /**
- * Creates an accessor for a property of the object with the given key.
- * @param {Object} object
- * @param {String} key
- * @return {Accessor} accessor
- */
-function objectAccessor(object, key) {
-	return new Accessor(function() {
-		return object[key];
-	}, function(value) {
-		var oldValue = object[key];
-		object[key] = value;
-		return oldValue;
-	});
-}
-
-
-/**
  * Creates watch getter from the watch accessor.
  * @param {WatchAccessor} accessor
  * @return {WatchGetter} getter
@@ -255,77 +211,4 @@ function setter(accessor, value) {
 	return function() {
 		accessor.set(value);
 	};
-}
-
-/**
- * Returns the deepest accessor.
- * @param {Accessor} accessor
- * @return {Accessor} accessor
- */
-function getAccessorDeep(accessor) {
-	while (true) {
-		var value = accessor.get();
-		if (!exists(value) || !value.Accessor) {
-			return accessor;
-		}
-		accessor = value;
-	}
-}
-
-/**
- * Creates a date from a natural representation.
- * @param {Number} year
- * @param {Number} month
- * @param {Number} day
- * @param {Number} hour
- * @param {Number} min
- * @param {Number} sec
- */
-function date(year, month, day, hour, min, sec) {
-	return new Date(year, month - 1, day, hour, min, sec);
-}
-
-/**
- * Creates a copy of the given date.
- * @param {Date} date
- * @return {Date} result
- */
-function copyDate(date) {
-	return new Date(date.getTime());
-}
-
-
-function getArgumentsCount(func) {
-	// from Prototype
-	var items = func.toString().match(/^[\s\(]*function[^(]*\((.*?)\)/)[1].split(",");
-	return items.length == 1 && !items[0] ? 0 : items.length;
-}
-
-
-function multiDictSet(dict, key, value) {
-	return obtain(dict, key, newWatchList).append(value);
-}
-
-function tryGet(source, key) {
-	return exists(source) ? source.get(key) : null;
-}
-
-function path(source, path) {
-	indexOf(path, function(step) {
-		if (!exists(source)) {
-			return true;
-		}
-		source = source[step];
-	});
-	return source;
-}
-
-function pathGet(source, path) {
-	indexOf(path, function(step) {
-		if (!exists(source)) {
-			return true;
-		}
-		source = source.get(step);
-	});
-	return source;
 }

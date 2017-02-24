@@ -162,21 +162,13 @@ type("MapAspectListWidget", ["ListWidget"], {
  * Creates a form field with a list of aspects.
  */
 type("MapAspectListField", ["IWidget"], {
-
-    getAspects: function() {
-        return $L(this.aspectList);
-    },
-
     clear: function() {
         this.aspectList.clearList();
     },
 
     draw: function() {
         var self = this;
-
-        var select;
         var buttonDiv = Html.div({style:{marginTop: pixels(10)}});
-
         var addNewAspectButton = Html.input("button", {style: {marginRight: pixels(5)}, className: 'i-button'}, $T('Add Map Aspect') );
 
         addNewAspectButton.observeClick(function() {

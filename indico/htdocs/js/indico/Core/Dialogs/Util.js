@@ -16,7 +16,6 @@
  */
 
 IndicoUI.Dialogs.Util = {
-
     error: function(err) {
         var dialog = null;
         if (err.type === 'noReport') {
@@ -33,24 +32,6 @@ IndicoUI.Dialogs.Util = {
 
         return function() {
             dialog.close();
-        };
-    },
-
-    ttStatusInfo: function(text) {
-        var stext = $('<div class="text"></div>').text(text ? $T(text) : null);
-        var image = $('<img/>', {
-            src: Indico.Urls.Base + "/images/loading.gif",
-            alt: $T('Loading...')
-        });
-
-        var progress = $('<div id="tt_status_info"></div>').
-            append(image, stext);
-
-        $('#tt_status_info').replaceWith(progress).show();
-        progress.fadeIn();
-
-        return function() {
-            progress.hide();
         };
     }
 };

@@ -3,16 +3,6 @@
  */
 
 /**
- * Returns true if the text contains the string.
- * @param {String} text
- * @param {String} string
- * @return {Boolean} result
- */
-function contains(text, string) {
-	return text.indexOf(string) != -1;
-}
-
-/**
  * Returns true if the text starts with the string.
  * @param {String} text
  * @param {String} string
@@ -20,16 +10,6 @@ function contains(text, string) {
  */
 function startsWith(text, string) {
 	return string == text.slice(0, string.length);
-}
-
-/**
- * Returns true if the text ends with the string.
- * @param {String} text
- * @param {String} str
- * @return {Boolean} result
- */
-function endsWith(text, str) {
-	return str == text.slice(-str.length);
 }
 
 var specialCharMap = {
@@ -58,17 +38,6 @@ function escapeString(text) {
 }
 
 /**
- * Returns text formatting template.
- * @param {String} text
- * @return {Function} templating function
- */
-function textTemplate(template) {
-	return function(args) {
-		return format(template, args);
-	};
-}
-
-/**
  * Formats the text using the args.
  * @param {String} text
  * @param {Array, Object} args
@@ -89,12 +58,6 @@ function format(text, args) {
   });
 }
 
-
-/**
- * Remove whitespace from begining and end of the text
- * @param {String} text
- * @return {String}
- */
 function trim(text) {
 	return trimEnd(trimStart(text));
 }
@@ -117,34 +80,3 @@ function padLeft(text, size, character) {
 function zeroPad(text, size) {
 	return padLeft(text, size, "0");
 }
-
-function camelToDash(text) {
-	return text.replace(/[A-Z]/g, function(item) {
-		return "-" + item.toLowerCase();
-	});
-}
-
-function decodeHtml(html) {
-	var dom = obtain(decodeHtml, "dom", function() {
-		return document.createElement("div");
-	});
-	dom.innerHTML = html;
-	var result = [];
-	var text = "";
-	(function fetch(dom) {
-		iterate(dom.childNodes, function(child) {
-			if (child.nodeType == 1) {
-				result.push(text);
-				text = "";
-				fetch(child);
-				result.push(text);
-				text = "";
-			} else {
-				text += child.nodeValue;
-			}
-		});
-	})(dom);
-	result.push(text);
-	return result;
-}
-

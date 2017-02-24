@@ -168,14 +168,6 @@ type("PopupMenu", ["ChainedPopupWidget"],
                 this.ChainedPopupWidget.prototype.close.call(this);
             }
         },
-        drawInfoBubbles: function(infoItems){
-            for(var item in infoItems){
-                var span = Html.span('infoBubble');
-                $E(item).append(span);
-                span.dom.innerHTML = infoItems[item];
-                span.dom.style.visibility = "visible";
-            }
-        },
         draw: function(x, y) {
             var self = this;
 
@@ -230,55 +222,6 @@ type("SectionPopupMenu", ["PopupMenu"], {
             this.closeHandler = any(closeHandler, function() {return true;});
         }
 );
-
-type("RadioPopupWidget", ["ChainedPopupWidget"],
-     {
-         draw: function(x, y) {
-
-             var self = this;
-             var optionsId = Html.generateId();
-
-             // need to store radiobuttons, for IE compatibility
-             // purposes
-             this.radioButtons = {};
-
-             var content = $B(Html.ul({className: "popupList", style: {padding: pixels(2)}}),
-                 this.states,
-                 function(pair) {
-                     var optionRadio = Html.radio({name:optionsId});
-
-                     self.radioButtons[pair.key] = optionRadio;
-
-                     optionRadio.observe(function(value) {
-                         if (value) {
-                             self.accessor.set(pair.key);
-                         }
-                     });
-
-                     return Html.li({},
-                                    Html.span({style: {padding: '0px 4px 2px 0px'}}, optionRadio, pair.get()));
-                 });
-
-             return this.PopupWidget.prototype.draw.call(this, content, x, y);
-         },
-
-         postDraw: function() {
-             // called after all the rendering is done
-             var self = this;
-
-             each(this.radioButtons, function(radio, key) {
-                 if (self.accessor.get() == key) {
-                     radio.set(true);
-                 }
-             });
-         }
-     },
-
-     function(states, accessor, chainElements) {
-         this.ChainedPopupWidget(chainElements);
-         this.states = states;
-         this.accessor = accessor;
-     });
 
 type("CheckPopupWidget", ["ChainedPopupWidget"],
      {

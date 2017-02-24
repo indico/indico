@@ -90,13 +90,6 @@
     font-size: 12pt;
 }
 
-/*
-    Styles for the nowHappening information
-*/
-.nowHappening .nowHappeningText {
-    margin-right: 5px;
-    float: left;
-}
 
 /*
     Announcement styles

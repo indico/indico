@@ -93,7 +93,6 @@ indico_core = rjs_bundle(
                'Widgets/Inline.js',
                'Widgets/Menu.js',
                'Widgets/RichText.js',
-               'Widgets/Navigation.js',
                'Dialogs/Popup.js',
                'Dialogs/PopupWidgets.js',
                'Dialogs/Base.js',
@@ -138,8 +137,6 @@ indico_common = rjs_bundle(
                'Export.js',
                'TimezoneSelector.js',
                'Social.js'))
-
-indico_materialeditor = rjs_bundle('indico_materialeditor', 'js/indico/MaterialEditor/Editor.js')
 
 indico_jquery = rjs_bundle(
     'indico_jquery',
@@ -278,12 +275,9 @@ presentation = rjs_bundle(
                'Data/Json.js',
                'Data/Remote.js',
                'Data/DateTime.js',
-               'Ui/MimeTypes.js',
                'Ui/XElement.js',
                'Ui/Html.js',
                'Ui/Dom.js',
-               'Ui/Style.js',
-               'Ui/Extensions/Lookup.js',
                'Ui/Extensions/Layout.js',
                'Ui/Text.js',
                'Ui/Styles/SimpleStyles.js',
@@ -429,7 +423,6 @@ def register_all_js(env):
     env.register('indico_roombooking', indico_room_booking)
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
-    env.register('indico_materialeditor', indico_materialeditor)
     env.register('indico_jquery', indico_jquery)
     env.register('indico_authors', indico_jquery_authors)
     env.register('indico_regform', indico_regform)
