@@ -8,8 +8,13 @@
 {% endmacro %}
 
 
-{% macro render_section(event, icon, edit_endpoint, edit_title) %}
-    <div class="section">
+{% macro section_id(name) -%}
+    event-settings-{{ name|replace('_', '-') }}
+{%- endmacro %}
+
+
+{% macro render_section(event, name, icon, edit_endpoint, edit_title, with_container=true) %}
+    {% if with_container %}<div class="section" id="{{ section_id(name) }}">{% endif %}
         <div class="icon {{ icon }}"></div>
         <div class="text">
             {{ caller() }}
@@ -19,16 +24,17 @@
                     title="{{ edit_title }}"
                     data-href="{{ url_for(edit_endpoint, event) }}"
                     data-title="{{ edit_title }}"
-                    data-update='{"settings_box": "#event-settings-container",
+                    data-form-container="#{{ section_id(name) }}"
+                    data-update='{"settings_box": "#{{ id }}",
                                   "right_header": "#event-management-header-right"}'
                     data-ajax-dialog></button>
         </div>
-    </div>
+    {% if with_container %}</div>{% endif %}
 {% endmacro %}
 
 
-{% macro render_event_settings(event) %}
-    {% call render_section(event, 'icon-home', '.edit_data', _('Edit basic event data')) %}
+{% macro render_section_data(event, with_container=true) %}
+    {% call render_section(event, 'data', 'icon-home', '.edit_data', _('Edit basic event data')) %}
         <dl class="i-data-list">
             <dt>{% trans %}Title{% endtrans %}</dt>
             <dd>{{ event.title }}</dd>
@@ -52,8 +58,11 @@
             </dd>
         </dl>
     {% endcall %}
+{% endmacro %}
 
-    {% call render_section(event, 'icon-calendar', '.edit_dates', _('Edit event dates')) %}
+
+{% macro render_section_dates(event, with_container=true) %}
+    {% call render_section(event, 'dates', 'icon-calendar', '.edit_dates', _('Edit event dates')) %}
         {% set tz = event.tzinfo %}
 
         <dl class="i-data-list">
@@ -84,8 +93,11 @@
                 </dd>
             {% endif %}
     {% endcall %}
+{% endmacro %}
 
-    {% call render_section(event, 'icon-location', '.edit_location', _('Edit event location')) %}
+
+{% macro render_section_location(event, with_container=true) %}
+    {% call render_section(event, 'location', 'icon-location', '.edit_location', _('Edit event location')) %}
         <dl class="i-data-list">
             <dt>{% trans %}Room{% endtrans %}</dt>
             <dd>{{ with_default(event.room_name) }}</dd>
@@ -98,8 +110,12 @@
         </dl>
     {% endcall %}
 
+{% endmacro %}
+
+
+{% macro render_section_persons(event, with_container=true) %}
     {% set edit_persons_title = _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') %}
-    {% call render_section(event, 'icon-user-chairperson', '.edit_persons', edit_persons_title) %}
+    {% call render_section(event, 'persons', 'icon-user-chairperson', '.edit_persons', edit_persons_title) %}
         <dl class="i-data-list">
             <dt>
                 {%- if event.type == 'lecture' -%}
@@ -122,8 +138,11 @@
             </dd>
         </dl>
     {% endcall %}
+{% endmacro %}
 
-    {% call render_section(event, 'icon-info', '.edit_contact_info', _('Edit contact info')) %}
+
+{% macro render_section_contact_info(event, with_container=true) %}
+    {% call render_section(event, 'contact_info', 'icon-info', '.edit_contact_info', _('Edit contact info')) %}
         <dl class="i-data-list">
             {% if event.type == 'lecture' %}
                 <dt>{% trans %}Organiser{% endtrans %}</dt>
@@ -145,9 +164,12 @@
             <dd>{{ with_default(event.contact_phones|join(', ')) }}</dl>
         </dl>
     {% endcall %}
+{% endmacro %}
 
+
+{% macro render_section_classification(event, with_container=true) %}
     {% set edit_cls_title = _('Edit keywords / references') if event.type == 'meeting' else _('Edit keywords') %}
-    {% call render_section(event, 'icon-tag', '.edit_classification', edit_cls_title) %}
+    {% call render_section(event, 'classification', 'icon-tag', '.edit_classification', edit_cls_title) %}
         <dl class="i-data-list">
             <dt>{% trans %}Keywords{% endtrans %}</dt>
             <dd>
@@ -173,4 +195,26 @@
             {% endif %}
         </dl>
     {% endcall %}
+{% endmacro %}
+
+
+{% macro render_event_settings(event, section=none, with_container=true) %}
+    {% if section is none or section == 'data' %}
+        {{ render_section_data(event, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'dates' %}
+        {{ render_section_dates(event, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'location' %}
+        {{ render_section_location(event, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'persons' %}
+        {{ render_section_persons(event, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'contact_info' %}
+        {{ render_section_contact_info(event, with_container=with_container) }}
+    {% endif %}
+    {% if section is none or section == 'classification' %}
+        {{ render_section_classification(event, with_container=with_container) }}
+    {% endif %}
 {% endmacro %}

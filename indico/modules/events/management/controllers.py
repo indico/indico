@@ -88,39 +88,48 @@ class RHEventSettings(RHManageEventBase):
 
 class RHEditEventDataBase(RHManageEventBase):
     form_class = None
+    section_name = None
 
     def render_form(self, form):
         return jsonify_form(form)
 
     def render_settings_box(self):
         tpl = get_template_module('events/management/_settings.html')
-        return tpl.render_event_settings(self.event_new)
+        assert self.section_name
+        return tpl.render_event_settings(self.event_new, section=self.section_name, with_container=False)
+
+    def jsonify_success(self):
+        return jsonify_data(settings_box=self.render_settings_box(),
+                            right_header=render_event_management_header_right(self.event_new))
 
     def _process(self):
         form = self.form_class(obj=self.event_new, event=self.event_new)
         if form.validate_on_submit():
             with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
                 update_event(self.event_new, **form.data)
-            return jsonify_data(settings_box=self.render_settings_box(),
-                                right_header=render_event_management_header_right(self.event_new))
+            return self.jsonify_success()
         self.commit = False
         return self.render_form(form)
 
 
 class RHEditEventData(RHEditEventDataBase):
     form_class = EventDataForm
+    section_name = 'data'
 
 
 class RHEditEventLocation(RHEditEventDataBase):
     form_class = EventLocationForm
+    section_name = 'location'
 
 
 class RHEditEventPersons(RHEditEventDataBase):
     form_class = EventPersonsForm
+    section_name = 'persons'
 
 
 class RHEditEventContactInfo(RHEditEventDataBase):
     form_class = EventContactInfoForm
+    section_name = 'contact_info'
 
     def render_form(self, form):
         return jsonify_template('events/management/event_contact_info.html', form=form)
@@ -128,16 +137,19 @@ class RHEditEventContactInfo(RHEditEventDataBase):
 
 class RHEditEventClassification(RHEditEventDataBase):
     form_class = EventClassificationForm
+    section_name = 'classification'
 
 
-class RHEditEventDates(RHManageEventBase):
+class RHEditEventDates(RHEditEventDataBase):
+    section_name = 'dates'
+
     def _process(self):
         defaults = FormDefaults(self.event_new, update_timetable=True)
         form = EventDatesForm(obj=defaults, event=self.event_new)
         if form.validate_on_submit():
             with track_time_changes():
                 update_event(self.event_new, **form.data)
-            return jsonify_data(flash=False)
+            return self.jsonify_success()
         show_screen_dates = form.has_displayed_dates and (form.start_dt_override.data or form.end_dt_override.data)
         return jsonify_template('events/management/event_dates.html', form=form, show_screen_dates=show_screen_dates)
 
