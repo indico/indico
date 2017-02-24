@@ -188,7 +188,7 @@
                 {% if abstract.event_new.can_manage(session.user) %}
                     <div>
                         <a class="i-link icon-remove"
-                           title="{% trans %}Reset judgement{% endtrans %}"
+                           title="{% trans %}Reset judgment{% endtrans %}"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
                            data-update="#reviewing-page"
