@@ -81,7 +81,7 @@ class CallForPapers(object):
     def get_reviewing_state(self, reviewing_type):
         if reviewing_type == PaperReviewType.content:
             return self.content_reviewing_enabled
-        elif reviewing_type == PaperReviewType.layour:
+        elif reviewing_type == PaperReviewType.layout:
             return self.layout_reviewing_enabled
         else:
             raise ValueError('Invalid reviewing type: {}'.format(reviewing_type))
