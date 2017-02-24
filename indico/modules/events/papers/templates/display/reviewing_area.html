@@ -12,6 +12,15 @@
 {% endblock %}
 
 {% block content %}
+    {% if not event.cfp.is_reviewer(session.user) %}
+        {% call message_box('info') %}
+            {% trans -%}
+                Paper reviewers use this area to review papers assigned to them.<br>
+                As a judge/manager there is nothing for you to do here.
+            {%- endtrans %}
+        {% endcall %}
+    {% endif %}
+
     {% set layout_deadline = event.cfp.layout_reviewer_deadline %}
     {% set content_deadline = event.cfp.content_reviewer_deadline %}
     {% if layout_deadline or content_deadline %}

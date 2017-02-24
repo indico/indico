@@ -99,13 +99,12 @@ def _extend_event_menu(sender, **kwargs):
     def _judging_area_visible(event):
         if not session.user or not event.has_feature('papers'):
             return False
-        return event.cfp.is_judge(session.user) or event.can_manage(session.user, role='paper_manager')
+        return event.cfp.can_access_judging_area(session.user)
 
     def _reviewing_area_visible(event):
         if not session.user or not event.has_feature('papers'):
             return False
-        return (event.cfp.is_reviewer(session.user) or event.cfp.is_judge(session.user) or
-                event.can_manage(session.user, role='paper_manager'))
+        return event.cfp.can_access_reviewing_area(session.user)
 
     yield MenuEntryData(title=_("Call for Papers"), name='call_for_papers',
                         endpoint='papers.call_for_papers', position=8,
