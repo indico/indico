@@ -27,36 +27,35 @@
                                 {% trans %}This operation is irreversible.{% endtrans %}
                             {% endif %}
                         {% endset %}
-                        <a title="{% trans %}Withdraw abstract{% endtrans %}"
-                           class="i-button text-color color-on-hover danger"
+                        <a class="i-button text-color color-on-hover danger"
+                           title="{% trans %}Withdraw abstract{% endtrans %}"
+                           data-title="{% trans %}Withdraw Abstract{% endtrans %}"
+                           data-confirm="{{ message }}"
                            data-href="{{ url_for('.withdraw_abstract', abstract) }}"
                            data-method="POST"
                            data-update="#reviewing-page"
-                           data-replace-update
-                           data-title="{% trans %}Withdraw Abstract{% endtrans %}"
-                           data-confirm="{{ message }}">
+                           data-replace-update>
                             {% trans %}Withdraw{% endtrans %}
                         </a>
                     {% elif abstract.state.name == 'accepted' %}
                         {% set message %}
-                            {% trans %}
-                                You can't withdraw this abstract because it has already been accepted.
-                                Contact the managers if you want this abstract to be withdrawn.
-                            {% endtrans %}
+                            {% trans -%}
+                                You cannot withdraw this abstract as it has already been accepted.
+                                Plaese contact the event organizers if you want to withdraw the abstract anyway.
+                            {%- endtrans %}
                         {% endset %}
-                        <a title="{{ message }}"
-                           class="i-button disabled">
+                        <a class="i-button disabled" title="{{ message }}">
                             {% trans %}Withdraw{% endtrans %}
                         </a>
                     {% elif abstract.state.name == 'withdrawn' and can_manage %}
-                        <a title="{% trans %}This abstract has been withdrawn but can be restored using this option{% endtrans %}"
-                           class="i-button accept icon-lamp"
+                        <a class="i-button accept icon-lamp"
+                           title="{% trans %}This abstract has been withdrawn but can be restored.{% endtrans %}"
+                           data-title="{% trans %}Restore Abstract{% endtrans %}"
+                           data-confirm="{% trans %}Do you really want to restore this abstract?{% endtrans %}"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"
                            data-method="POST"
                            data-update="#reviewing-page"
-                           data-replace-update
-                           data-title="{% trans %}Restore Abstract{% endtrans %}"
-                           data-confirm="{% trans %}Do you really want to restore this abstract?{% endtrans %}">
+                           data-replace-update>
                             {% trans %}Restore{% endtrans %}
                         </a>
                     {% endif %}
