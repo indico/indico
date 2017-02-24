@@ -33,8 +33,7 @@ from indico.modules.events.papers.operations import (create_paper_revision, crea
 from indico.modules.events.papers.util import (get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_contributions_with_paper_submitted_by_user,
                                                get_contributions_with_user_paper_submission_rights)
-from indico.modules.events.papers.views import (WPDisplayPapersBase, render_paper_page, WPDisplayReviewingArea,
-                                                WPDisplayCallForPapers)
+from indico.modules.events.papers.views import render_paper_page, WPDisplayReviewingArea, WPDisplayCallForPapers
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_form, jsonify_data, jsonify, jsonify_template
@@ -58,7 +57,7 @@ class RHSubmitPaper(RHPaperBase):
 
 class RHPaperTimeline(RHPaperBase):
     def _process(self):
-        return render_paper_page(self.paper, view_class=WPDisplayPapersBase)
+        return render_paper_page(self.paper, view_class=WPDisplayCallForPapers)
 
 
 class RHDownloadPaperFile(RHPaperBase):
