@@ -133,6 +133,9 @@ class CallForPapers(object):
     def rating_range(self):
         return tuple(paper_reviewing_settings.get(self.event, key) for key in ('scale_lower', 'scale_upper'))
 
+    def is_manager(self, user):
+        return self.event.can_manage(user, role='paper_manager')
+
     def is_judge(self, user):
         return self.event.can_manage(user, role='paper_judge', explicit_role=True)
 
@@ -146,3 +149,9 @@ class CallForPapers(object):
         else:
             return (self.is_reviewer(user, PaperReviewingRole.content_reviewer) or
                     self.is_reviewer(user, PaperReviewingRole.layout_reviewer))
+
+    def can_access_reviewing_area(self, user):
+        return self.is_manager(user) or self.is_judge(user) or self.is_reviewer(user)
+
+    def can_access_judging_area(self, user):
+        return self.is_manager(user) or self.is_judge(user)

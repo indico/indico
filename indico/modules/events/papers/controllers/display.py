@@ -177,7 +177,7 @@ class RHReviewingArea(RHPapersBase):
     def _checkProtection(self):
         if not session.user:
             raise Forbidden
-        if not self.event_new.cfp.is_reviewer(session.user):
+        if not self.event_new.cfp.can_access_reviewing_area(session.user):
             raise Forbidden
         RHPapersBase._checkProtection(self)
 

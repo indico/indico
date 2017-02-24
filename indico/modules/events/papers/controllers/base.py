@@ -64,7 +64,7 @@ class RHJudgingAreaBase(RHPapersBase):
 
     def _checkProtection(self):
         RHPapersBase._checkProtection(self)
-        if not session.user or (not self.management and session.user not in self.event_new.cfp.judges):
+        if not session.user or not self.event_new.cfp.can_access_judging_area(session.user):
             raise Forbidden
 
 
