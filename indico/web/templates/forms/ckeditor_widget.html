@@ -11,7 +11,8 @@
     <script>
         setupCKEditorWidget({
             fieldId: {{ field.id | tojson }},
-            simple: {{ simple | tojson }}
+            simple: {{ simple | tojson }},
+            height: {{ height | tojson }}
         });
     </script>
 {% endblock %}
