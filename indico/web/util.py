@@ -42,7 +42,8 @@ def _pop_injected_js():
 
 
 def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
-                 disabled_fields=(), form_header_kwargs=None, skip_labels=False, save_reminder=False):
+                 disabled_fields=(), form_header_kwargs=None, skip_labels=False, save_reminder=False,
+                 footer_align_right=False):
     """Returns a json response containing a rendered WTForm.
 
     This ia shortcut to the ``simple_form`` jinja macro to avoid
@@ -64,6 +65,8 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
     :param save_reminder: Whether to show a message when the form has
                           been modified and the save button is not
                           visible
+    :param footer_align_right: Whether the buttons in the event footer
+                               should be aligned to the right.
     """
     if submit is None:
         submit = _('Save')
@@ -74,7 +77,8 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
     tpl = get_template_module('forms/_form.html')
     html = tpl.simple_form(form, fields=fields, submit=submit, back=back, back_url=back_url, back_button=back_button,
                            disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
-                           form_header_kwargs=form_header_kwargs, skip_labels=skip_labels, save_reminder=save_reminder)
+                           form_header_kwargs=form_header_kwargs, skip_labels=skip_labels, save_reminder=save_reminder,
+                           footer_align_right=footer_align_right)
     return jsonify(html=html, js=_pop_injected_js())
 
 
