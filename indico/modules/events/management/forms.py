@@ -43,7 +43,7 @@ from indico.modules.events.models.references import EventReference
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.modules.events.timetable.util import get_top_level_entries
 from indico.util.date_time import format_human_timedelta, now_utc, relativedelta
-from indico.util.i18n import _, get_current_locale
+from indico.util.i18n import _
 from indico.util.string import is_valid_mail
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -65,7 +65,7 @@ CLONE_REPEAT_CHOICES = (
 
 class EventDataForm(IndicoForm):
     title = StringField(_('Event title'), [DataRequired()])
-    description = TextAreaField(_('Description'), widget=CKEditorWidget())
+    description = TextAreaField(_('Description'), widget=CKEditorWidget(simple=True, height=250))
     url_shortcut = StringField(_('URL shortcut'), filters=[lambda x: (x or None)])
 
     def __init__(self, *args, **kwargs):
@@ -180,7 +180,7 @@ class EventContactInfoForm(IndicoForm):
     contact_phones = MultiStringField(_('Phone numbers'), field=('phone', _('number')), unique=True, flat=True,
                                       sortable=True)
     organizer_info = TextAreaField(_('Organizers'))
-    additional_info = TextAreaField(_('Additional information'), widget=CKEditorWidget(),
+    additional_info = TextAreaField(_('Additional information'), widget=CKEditorWidget(simple=True, height=250),
                                     description=_("This text is displayed on the main conference page."))
 
     def __init__(self, *args, **kwargs):
