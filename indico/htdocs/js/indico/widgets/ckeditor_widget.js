@@ -23,11 +23,12 @@
     global.setupCKEditorWidget = function setupCKEditorWidget(options) {
         options = $.extend(true, {
             fieldId: null,
-            simple: false
+            simple: false,
+            height: 475
         }, options);
 
         var field = $('#' + options.fieldId);
-        var editor = new RichTextEditor(600, 475, options.simple);
+        var editor = new RichTextEditor(600, options.height, options.simple);
         editor.set(field.val());
         editor.onLoad(function() {
             editor.onChange(function() {
