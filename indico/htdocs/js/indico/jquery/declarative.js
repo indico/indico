@@ -270,6 +270,10 @@
                 } else {
                     $this.prop('disabled', disabled);
                 }
+
+                if (disabled) {
+                    $this.trigger('indico:closeAutoTooltip');
+                }
             }
 
             $this.on('ajaxForm:show', function() {
