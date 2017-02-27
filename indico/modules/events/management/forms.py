@@ -89,8 +89,8 @@ class EventDataForm(IndicoForm):
 
 
 class EventDatesForm(IndicoForm):
-    _field_order = ('start_dt', 'end_dt', 'timezone', 'update_timetable', 'override_displayed_dates')
-    _displayed_date_fields = ('start_dt_override', 'end_dt_override')
+    _main_fields = ('start_dt', 'end_dt', 'timezone', 'update_timetable')
+    _override_date_fields = ('start_dt_override', 'end_dt_override')
 
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
     start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], allow_clear=False)
