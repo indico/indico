@@ -204,7 +204,7 @@ type("TimetableBlockNormal", ["TimetableBlockBase"],
                         this.presentersDiv = Html.div({className: 'timetableBlockPresenters'});
                         this.presentersDiv.append(firstPresenter.name);
                         if (self.eventData.presenters.length > 1) {
-                            this.presentersDiv.append($T(' et al.'));
+                            this.presentersDiv.append(' ' + $T('et al.'));
                         }
                         this.titleWrapper.insert(this.presentersDiv);
                     }
