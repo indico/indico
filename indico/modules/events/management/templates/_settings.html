@@ -14,7 +14,8 @@
 
 
 {% macro render_section(event, name, icon, edit_endpoint, edit_title, with_container=true) %}
-    {% if with_container %}<div class="section" id="{{ section_id(name) }}">{% endif %}
+    {% set id = section_id(name) %}
+    {% if with_container %}<div class="section" id="{{ id }}">{% endif %}
         <div class="icon {{ icon }}"></div>
         <div class="text">
             {{ caller() }}
@@ -34,7 +35,8 @@
 
 
 {% macro render_section_data(event, with_container=true) %}
-    {% call render_section(event, 'data', 'icon-home', '.edit_data', _('Edit basic event data')) %}
+    {% call render_section(event, 'data', 'icon-home', '.edit_data', _('Edit basic event data'),
+                           with_container=with_container) %}
         <dl class="i-data-list">
             <dt>{% trans %}Title{% endtrans %}</dt>
             <dd>{{ event.title }}</dd>
@@ -62,7 +64,8 @@
 
 
 {% macro render_section_dates(event, with_container=true) %}
-    {% call render_section(event, 'dates', 'icon-calendar', '.edit_dates', _('Edit event dates')) %}
+    {% call render_section(event, 'dates', 'icon-calendar', '.edit_dates', _('Edit event dates'),
+                           with_container=with_container) %}
         {% set tz = event.tzinfo %}
 
         <dl class="i-data-list">
@@ -97,7 +100,8 @@
 
 
 {% macro render_section_location(event, with_container=true) %}
-    {% call render_section(event, 'location', 'icon-location', '.edit_location', _('Edit event location')) %}
+    {% call render_section(event, 'location', 'icon-location', '.edit_location', _('Edit event location'),
+                           with_container=with_container) %}
         <dl class="i-data-list">
             <dt>{% trans %}Room{% endtrans %}</dt>
             <dd>{{ with_default(event.room_name) }}</dd>
@@ -115,7 +119,8 @@
 
 {% macro render_section_persons(event, with_container=true) %}
     {% set edit_persons_title = _('Edit speakers') if event.type == 'lecture' else _('Edit chairpersons') %}
-    {% call render_section(event, 'persons', 'icon-user-chairperson', '.edit_persons', edit_persons_title) %}
+    {% call render_section(event, 'persons', 'icon-user-chairperson', '.edit_persons', edit_persons_title,
+                           with_container=with_container) %}
         <dl class="i-data-list">
             <dt>
                 {%- if event.type == 'lecture' -%}
@@ -142,7 +147,8 @@
 
 
 {% macro render_section_contact_info(event, with_container=true) %}
-    {% call render_section(event, 'contact_info', 'icon-info', '.edit_contact_info', _('Edit contact info')) %}
+    {% call render_section(event, 'contact_info', 'icon-info', '.edit_contact_info', _('Edit contact info'),
+                           with_container=with_container) %}
         <dl class="i-data-list">
             {% if event.type == 'lecture' %}
                 <dt>{% trans %}Organiser{% endtrans %}</dt>
@@ -169,7 +175,8 @@
 
 {% macro render_section_classification(event, with_container=true) %}
     {% set edit_cls_title = _('Edit keywords / references') if event.type == 'meeting' else _('Edit keywords') %}
-    {% call render_section(event, 'classification', 'icon-tag', '.edit_classification', edit_cls_title) %}
+    {% call render_section(event, 'classification', 'icon-tag', '.edit_classification', edit_cls_title,
+                           with_container=with_container) %}
         <dl class="i-data-list">
             <dt>{% trans %}Keywords{% endtrans %}</dt>
             <dd>
