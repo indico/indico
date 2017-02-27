@@ -41,9 +41,43 @@ from speaklater import _LazyString, is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect
 
 
-BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + ['sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr',
-                                             'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'pre']
+# basic list of tags, used for markdown content
+BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
+    'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
+    'h5', 'h6', 'pre'
+]
 BLEACH_ALLOWED_ATTRIBUTES = dict(bleach.ALLOWED_ATTRIBUTES, img=['src', 'alt'])
+# extended list of tags, used for HTML content
+BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS + [
+    'address', 'area', 'bdo', 'big', 'caption', 'center', 'cite', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div',
+    'dl', 'dt', 'fieldset', 'font', 'ins', 'kbd', 'legend', 'map', 'menu', 'q', 's', 'samp', 'span', 'strike', 'tfoot',
+    'tt', 'u', 'var'
+]
+# yuck, this is ugly, but all these attributes were allowed in legacy...
+BLEACH_ALLOWED_ATTRIBUTES_HTML = dict(BLEACH_ALLOWED_ATTRIBUTES, **{'*': [
+    'align', 'abbr', 'alt', 'border', 'bgcolor', 'class', 'cellpadding', 'cellspacing', 'color', 'char', 'charoff',
+    'cite', 'clear', 'colspan', 'compact', 'dir', 'disabled', 'face', 'href', 'height', 'headers', 'hreflang', 'hspace',
+    'id', 'ismap', 'lang', 'name', 'noshade', 'nowrap', 'rel', 'rev', 'rowspan', 'rules', 'size', 'scope', 'shape',
+    'span', 'src', 'start', 'summary', 'tabindex', 'target', 'title', 'type', 'valign', 'value', 'vspace', 'width',
+    'wrap'
+]})
+BLEACH_ALLOWED_STYLES_HTML = [
+    'background-color', 'border-top-color', 'border-top-style', 'border-top-width', 'border-top', 'border-right-color',
+    'border-right-style', 'border-right-width', 'border-right', 'border-bottom-color', 'border-bottom-style',
+    'border-bottom-width', 'border-bottom', 'border-left-color', 'border-left-style', 'border-left-width',
+    'border-left', 'border-color', 'border-style', 'border-width', 'border', 'bottom', 'border-collapse',
+    'border-spacing', 'color', 'clear', 'clip', 'caption-side', 'display', 'direction', 'empty-cells', 'float',
+    'font-size', 'font-family', 'font-style', 'font', 'font-variant', 'font-weight', 'font-size-adjust', 'font-stretch',
+    'height', 'left', 'list-style-type', 'list-style-position', 'line-height', 'letter-spacing', 'marker-offset',
+    'margin', 'margin-left', 'margin-right', 'margin-top', 'margin-bottom', 'max-height', 'min-height', 'max-width',
+    'min-width', 'marks', 'overflow', 'outline-color', 'outline-style', 'outline-width', 'outline', 'orphans',
+    'position', 'padding-top', 'padding-right', 'padding-bottom', 'padding-left', 'padding', 'page', 'page-break-after',
+    'page-break-before', 'page-break-inside', 'quotes', 'right', 'size', 'text-align', 'top', 'table-layout',
+    'text-decoration', 'text-indent', 'text-shadow', 'text-transform', 'unicode-bidi', 'visibility', 'vertical-align',
+    'width', 'widows', 'white-space', 'word-spacing', 'word-wrap', 'z-index'
+]
+
+
 LATEX_MATH_PLACEHOLDER = u"\uE000"
 
 
@@ -555,6 +589,11 @@ def sanitize_email(email, require_valid=False):
         return None
 
 
+def sanitize_html(string):
+    return bleach.clean(string, tags=BLEACH_ALLOWED_TAGS_HTML, attributes=BLEACH_ALLOWED_ATTRIBUTES_HTML,
+                        styles=BLEACH_ALLOWED_STYLES_HTML)
+
+
 def inject_unicode_debug(s, level=1):
     """
     Wrap a string in invisible unicode characters to trigger a unicode
@@ -593,10 +632,13 @@ class RichMarkup(Markup):
         return obj
 
     def __html__(self):
-        if self._preformatted:
-            return u'<div class="preformatted">{}</div>'.format(self)
+        # XXX: ensure we have no harmful HTML - there are certain malicious values that
+        # are not caught by the legacy sanitizer that runs at submission time
+        string = RichMarkup(sanitize_html(unicode(self)), preformatted=self._preformatted)
+        if string._preformatted:
+            return u'<div class="preformatted">{}</div>'.format(string)
         else:
-            return self
+            return string
 
     def __getstate__(self):
         return {slot: getattr(self, slot) for slot in self.__slots__ if hasattr(self, slot)}
