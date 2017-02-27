@@ -71,7 +71,7 @@ $(document).ready(function() {
         var qtipHTMLContainer = $(this).data('qtip-html');
         var qtipHTML = (qtipHTMLContainer && qtipHTMLContainer.length) ? $(this).next(qtipHTMLContainer) : null;
 
-        if (!qtipHTML && !title) {
+        if ((!qtipHTML && !title) || this.disabled) {
             return;
         }
 
