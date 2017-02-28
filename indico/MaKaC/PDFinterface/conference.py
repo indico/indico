@@ -227,14 +227,23 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
     @staticmethod
     def _get_track_reviewing_states(abstract):
+        def _format_review_action(review):
+            action = unicode(review.proposed_action.title)
+            if review.proposed_action == AbstractAction.accept and review.proposed_contribution_type:
+                return u'{}: {}'.format(action, review.proposed_contribution_type.name)
+            else:
+                return action
+
         reviews = []
         for track in abstract.reviewed_for_tracks:
             track_review_state = abstract.get_track_reviewing_state(track)
             review_state = track_review_state.title
             track_reviews = abstract.get_reviews(group=track)
-            review_comments = [(review.comment, unicode(review.proposed_action.title))
-                               for review in track_reviews if review.comment]
-            if track_review_state == AbstractReviewingState.positive:
+            review_details = [(_format_review_action(review),
+                               review.user.get_full_name(abbrev_first_name=False),
+                               review.comment)
+                              for review in track_reviews]
+            if track_review_state in {AbstractReviewingState.positive, AbstractReviewingState.conflicting}:
                 proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews
                                           if r.proposed_contribution_type}
                 if proposed_contrib_types:
@@ -254,7 +263,7 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
 
             elif track_review_state not in {AbstractReviewingState.negative, AbstractReviewingState.conflicting}:
                 continue
-            reviews.append((track.title, review_state, review_comments))
+            reviews.append((track.title, review_state, review_details))
         return reviews
 
 
