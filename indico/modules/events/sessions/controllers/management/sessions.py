@@ -156,6 +156,8 @@ class RHSessionREST(RHManageSessionBase):
 class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActionsBase):
     """List of persons in the session's contributions"""
 
+    template = 'events/sessions/management/session_person_list.html'
+
     @property
     def _membership_filter(self):
         session_ids = {s.id for s in self.sessions}

@@ -1,0 +1,51 @@
+<div class="i-form no-max-width event-person-list js-event-person-list">
+    <div class="flashed-messages"></div>
+    <div>
+        <div class="toolbar space-after">
+            <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
+            <ul class="dropdown">
+                <li>
+                    <a href="#" data-select-all="#person-list-table input.select-row:visible">
+                        {%- trans %}All{% endtrans -%}
+                    </a>
+                </li>
+                <li>
+                    <a href="#" data-select-none="#person-list-table input.select-row:visible">
+                        {%- trans %}None{% endtrans -%}
+                    </a>
+                </li>
+            </ul>
+            <div class="group i-selection">
+                <span class="i-button label">{% trans %}Show{% endtrans %}</span>
+                {% block selection_toolbar %}{% endblock %}
+            </div>
+        </div>
+    </div>
+    <div id="person-list-table">
+        <table class="i-table-widget tablesorter">
+            <thead>
+                <tr class="i-table">
+                    {% block table_head %}{% endblock %}
+                </tr>
+            </thead>
+            <tbody class="scroll">
+                {% block table_body %}{% endblock %}
+            </tbody>
+        </table>
+    </div>
+    <div class="form-group-mail">
+        <a href="#" class="i-button icon-mail right highlight disabled js-requires-selected-row send-mails-btn"
+           {% block send_email_href %}
+               data-href="{{ url_for('persons.email_event_persons', event) }}"
+           {% endblock %}
+           data-title="{% trans %}Send email{% endtrans %}"
+           data-method="POST"
+           data-params-selector="#person-list-table input[name=person_id]:checkbox:checked:visible, #person-list-table input[name=user_id]:checkbox:checked:visible"
+           data-ajax-dialog>
+            {%- trans %}Send emails{% endtrans -%}
+        </a>
+    </div>
+</div>
+<script>
+    setupEventPersonsList();
+</script>

@@ -284,6 +284,8 @@ class RHContributionREST(RHManageContributionBase):
 class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributionsActionsBase):
     """List of persons in the contribution"""
 
+    template = 'events/contributions/management/contribution_person_list.html'
+
     @property
     def _membership_filter(self):
         contribution_ids = {contrib.id for contrib in self.contribs}
