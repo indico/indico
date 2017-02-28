@@ -163,8 +163,8 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
             person_roles['secondary_author'] |= abstract_person.author_type == AuthorType.secondary
         for submitter in submitters:
             abstract_persons_dict[submitter]['submitter'] |= True
-        return jsonify_template('events/management/contribution_person_list.html',
-                                event_persons=abstract_persons_dict, event=self.event_new, include_submitters=True)
+        return jsonify_template('events/abstracts/management/abstract_person_list.html',
+                                event_persons=abstract_persons_dict, event=self.event_new)
 
 
 class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsActionsBase):
