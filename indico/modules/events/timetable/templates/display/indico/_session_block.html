@@ -20,11 +20,9 @@
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title {{ 'top-level' if not nested }}" data-anchor="{{ anchor }}">
                     {%- if block.title and block.title != session_.title -%}
-                        {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
-                        {{- session_.title | safe -}}: {{ block.title | safe -}}
+                        {{- session_.title -}}: {{ block.title -}}
                     {%- else -%}
-                        {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
-                        {{- session_.title | safe -}}
+                        {{- session_.title -}}
                     {%- endif -%}
                 </span>
                 {% if block.has_location_info and show_location -%}

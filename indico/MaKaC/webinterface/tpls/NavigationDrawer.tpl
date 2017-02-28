@@ -48,7 +48,7 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
             % endif
             <% name, url = l[i] %>
             <a href="${ url }" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url">
-                <span itemprop="title">${ truncateTitle(name, 40) | remove_tags }</span>
+                <span itemprop="title">${ escape(truncateTitle(name, 40)) }</span>
             </a>
         % endfor
     </span>

@@ -5,7 +5,6 @@
 
 from MaKaC.fossils.conference import IConferenceFossil
 import MaKaC.webinterface.urlHandlers as urlHandlers
-from xml.sax.saxutils import escape
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events.models.events import EventType
 
@@ -16,6 +15,7 @@ visibilityList[999] = visibilityList.pop('')
 numRows = 11
 
 additionalInfo = confObj.getContactInfo()
+from markupsafe import escape
 %>
 
 <tr>
@@ -23,7 +23,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Title")}</span>
     </td>
     <td class="blacktext" style="width:100%">
-        <span id="inPlaceEditTitle">${title }</span>
+        <span id="inPlaceEditTitle">${ escape(confObj.as_event.title) }</span>
     </td>
 </tr>
 <tr>
@@ -31,7 +31,7 @@ additionalInfo = confObj.getContactInfo()
         <span class="dataCaptionFormat">${ _("Description")}</span>
     </td>
     <td>
-        <div class="blacktext" id="inPlaceEditDescription">${description }</div>
+        <div class="blacktext" id="inPlaceEditDescription">${ escape(confObj.as_event.description) }</div>
     </td>
 </tr>
 <tr>

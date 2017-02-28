@@ -10,8 +10,7 @@
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title" data-anchor="{{ anchor }}">
-                    {#- TODO: remove '| safe' once we start enforcing no-HTML policy -#}
-                    {{- subcontrib.title | safe -}}
+                    {{- subcontrib.title -}}
                 </span>
                 {% if subcontrib.duration %}
                     <span class="icon-time timetable-duration">

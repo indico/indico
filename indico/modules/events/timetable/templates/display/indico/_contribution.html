@@ -15,8 +15,7 @@
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title {{ 'nested' if nested }}" data-anchor="{{ anchor }}">
-                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-                    {{- contrib.title | safe -}}
+                    {{- contrib.title -}}
                 </span>
                 {% if contrib.duration -%}
                     <span class="icon-time timetable-duration">

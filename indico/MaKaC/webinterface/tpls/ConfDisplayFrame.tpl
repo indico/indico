@@ -23,7 +23,7 @@ else:
                                    ${ logo }
                                 </div>
                             % endif
-                            <span itemprop="title">${ confTitle }</span>
+                            <span itemprop="title">${ escape(confTitle) }</span>
                         </span>
                     </a>
                 </h1>

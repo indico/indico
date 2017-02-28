@@ -23,8 +23,7 @@
             {% endif %}
 
             <h1 itemprop="name">
-                {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-                {{- event.title | safe -}}
+                {{- event.title -}}
             </h1>
             <div class="details">
                 <div class="event-date">

@@ -12,8 +12,7 @@
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
                 <span class="timetable-title {{ 'top-level' if not nested }} break">
-                    {# TODO: remove '| safe' once we start enforcing no-HTML policy #}
-                    {{- item.title | safe -}}
+                    {{- item.title -}}
                 </span>
                 {% if item.duration -%}
                     <span class="icon-time timetable-duration">

@@ -17,7 +17,7 @@ cloned_from = event.cloned_from if event.cloned_from_id is not None and not even
         <div class="banner full-width">
             <div class="title">
                 <a href="${ UHConferenceModification.getURL(conf) }">
-                    ${ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | remove_tags }
+                    ${ escape(event.get_verbose_title(show_series_pos=(event.type == 'lecture'))) }
                     <span class="date">
                         % if startDate == endDate:
                             ${ startDate }
