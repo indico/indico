@@ -30,6 +30,7 @@ from flask import g, has_app_context, request
 from flask.helpers import get_root_path
 from werkzeug.urls import url_parse
 
+import indico
 import MaKaC
 from indico.util.contextManager import ContextManager
 
@@ -342,7 +343,7 @@ class Config:
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
             'ImagesBaseURL'             : self.getImagesBaseURL(),
             'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
-            'Version'                   : MaKaC.__version__,
+            'Version'                   : indico.__version__,
             'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
         })
 

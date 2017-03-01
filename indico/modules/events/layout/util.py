@@ -23,6 +23,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
 from werkzeug.urls import url_parse
 
+import indico
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
@@ -33,7 +34,6 @@ from indico.util.signals import named_objects_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
 
-import MaKaC
 from MaKaC.common.cache import GenericCache
 
 _cache = GenericCache('updated-menus')
@@ -151,7 +151,7 @@ def _get_menu_cache_data(event):
     from indico.core.plugins import plugin_engine
     cache_key = unicode(event.id)
     plugin_hash = crc32(','.join(sorted(plugin_engine.get_active_plugins())))
-    cache_version = '{}:{}'.format(MaKaC.__version__, plugin_hash)
+    cache_version = '{}:{}'.format(indico.__version__, plugin_hash)
     return cache_key, cache_version
 
 

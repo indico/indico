@@ -23,6 +23,7 @@ from urlparse import urljoin
 from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, RequestException, Timeout
 
+import indico
 from indico.core.config import Config
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
@@ -34,7 +35,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
-import MaKaC
 from MaKaC.webinterface.rh.base import RH
 
 
@@ -56,7 +56,7 @@ class RHCephalopod(RHCephalopodBase):
                                             affiliation=core_settings.get('site_organization'),
                                             enabled=enabled,
                                             form=form,
-                                            indico_version=MaKaC.__version__,
+                                            indico_version=indico.__version__,
                                             instance_url=instance_url,
                                             language=language,
                                             python_version=python_version(),

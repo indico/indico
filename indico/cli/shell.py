@@ -26,7 +26,7 @@ import sqlalchemy.orm
 from flask import current_app
 from flask_script import Shell, Option
 
-import MaKaC
+import indico
 from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import Config
@@ -80,7 +80,7 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
 
 class IndicoShell(Shell):
     def __init__(self):
-        banner = cformat('%{yellow!}Indico v{} is ready for your commands!').format(MaKaC.__version__)
+        banner = cformat('%{yellow!}Indico v{} is ready for your commands!').format(indico.__version__)
         super(IndicoShell, self).__init__(banner=banner, use_bpython=False)
         self._context = None
         self._info = None

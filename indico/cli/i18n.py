@@ -75,12 +75,11 @@ def wrap_distutils_command(command_class):
     @wraps(command_class)
     def _wrapper(**kwargs):
 
-        from MaKaC import __version__
         import indico
 
         command = command_class(Distribution({
             'name': 'indico',
-            'version': __version__,
+            'version': indico.__version__,
             'packages': find_packages(indico.__path__, indico.__name__)
             }))
 
