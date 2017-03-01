@@ -64,7 +64,6 @@ def main():
 
     forRPM = False
     existingPath = None
-    upgrade_config = True
 
     for o,a in optlist:
         if o == '--rpm':
@@ -75,8 +74,6 @@ def main():
             wwwUid = a
         elif o == "--www-gid":
             wwwGid = a
-        elif o == '--no-upgrade-config':
-            upgrade_config = False
 
     if forRPM:
         # TODO: post-install for RPMs
@@ -108,8 +105,7 @@ def main():
                                      'common'),
                         eggDir,
                         uid=wwwUid,
-                        gid=wwwGid,
-                        upgrade_config=upgrade_config)
+                        gid=wwwGid)
 
 
 if __name__ == '__main__':
