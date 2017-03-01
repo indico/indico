@@ -186,3 +186,69 @@
         margin-right: 5px;
     }
 }
+
+.paper-content {
+    .paper-file {
+        background-color: $light-gray !important;
+        border-color: $gray !important;
+    }
+
+    .spotlight-file {
+        max-width: 50%;
+        margin: 10px 0 20px 0;
+    }
+
+    .spotlight-file-icon {
+        font-size: 2em;
+        display: flex;
+        margin-right: 5px;
+    }
+
+    .spotlight-file-name {
+        @extend %font-family-title;
+        font-size: 1.2em;
+        color: $light-black;
+
+        &:hover {
+            color: $black;
+        }
+    }
+
+    .submission-metadata {
+        align-self: flex-end;
+        color: $gray;
+
+        .submission-dt {
+            border-bottom: 1px dotted $gray;
+            color: $gray;
+
+            &:hover {
+                color: $light-black;
+            }
+        }
+    }
+
+    .paper-files-list {
+        align-self: flex-start;
+        margin-bottom: 10px;
+    }
+
+    .paper-files-list-label {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .paper-files {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+
+        li {
+            margin: 3px 5px;
+
+            a {
+                max-width: 150px;
+            }
+        }
+    }
+}

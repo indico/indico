@@ -1,14 +1,29 @@
 {% from 'events/reviews/_common.html' import render_summary_state, render_user_avatar, render_review_state %}
 {% from 'forms/_form.html' import form_header, form_row, form_footer %}
 
-{% macro _render_file_list(files) %}
+{% macro _render_paper_file_list(files) %}
     <ul class="file-list">
         {% for file in files %}
             {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
-            <li>
+            <li class="truncate-text">
                 <a class="attachment {{ icon }}" href="{{ url_for('.download_file', file) }}"
                    title="{{ file.filename }}">
                     <span class="title">{{ file.filename }}</span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+{% macro _render_paper_files(files, spotlight_file=none) %}
+    <ul class="paper-files flexrow f-wrap">
+        {% for file in files if file != spotlight_file %}
+            {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
+            <li>
+                <a href="{{ url_for('.download_file', file) }}"
+                   class="attachment paper-file i-button text-color outline dashed {{ icon }}"
+                   title="{{ file.filename }}">
+                    <span class="title truncate-text">{{ file.filename }}</span>
                 </a>
             </li>
         {% endfor %}
@@ -42,10 +57,21 @@
                 </div>
                 {% set submission_info_class = 'weak-hidden' if not revision.is_last_revision %}
                 <div class="i-box-content submission-info {{ submission_info_class }}">
-                    {{ _render_file_list(revision.files) }}
+                    {{ _render_paper_file_list(revision.files) }}
                 </div>
             </div>
         </div>
+    </div>
+{% endmacro %}
+
+{% macro _render_spotlight_file(file) %}
+    {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
+    <div class="flexrow f-a-center spotlight-file i-button text-color outline dashed paper-file"
+         title="{{ file.filename }}">
+        <a class="attachment spotlight-file-icon {{ icon }}"></a>
+        <a href="{{ url_for('.download_file', file) }}" class="attachment spotlight-file-name truncate-text">
+            <span class="title">{{ file.filename }}</span>
+        </a>
     </div>
 {% endmacro %}
 
@@ -60,9 +86,36 @@
     </div>
     <div id="paper-public">
         {{ _render_paper_summary(paper) }}
-        <div class="review-item-content paper-content">
-            <h3>{% trans %}Files of the last paper revision{% endtrans %}</h3>
-            {{ _render_file_list(paper.last_revision.files) }}
+        <div class="review-item-content paper-content flexcol f-a-center">
+            {% set spotlight_file = paper.last_revision.get_spotlight_file() %}
+            {% if spotlight_file %}
+                {{ _render_spotlight_file(spotlight_file) }}
+                <div class="paper-files-list flexrow f-a-baseline">
+                    <div class="paper-files-list-label f-self-no-shrink">
+                        {%- trans %}Additional files:{% endtrans -%}
+                    </div>
+                    {{ _render_paper_files(paper.last_revision.files, spotlight_file) }}
+                </div>
+            {% else %}
+                <div class="paper-files-list flexrow f-a-baseline">
+                    <div class="paper-files-list-label f-self-no-shrink">
+                        {%- trans %}Paper files:{% endtrans -%}
+                    </div>
+                    {{ _render_paper_files(paper.last_revision.files) }}
+                </div>
+            {% endif %}
+            <div class="submission-metadata">
+                {% set submission_dt -%}
+                    <a class="submission-dt" href="#revision-info-{{ paper.last_revision.id }}">
+                        <time datetime="{{ paper.last_revision.submitted_dt.isoformat() }}">
+                            {{- paper.last_revision.submitted_dt|format_human_date -}}
+                        </time>
+                    </a>
+                {%- endset %}
+                {%- trans submitter=paper.last_revision.submitter.full_name -%}
+                    Submitted on {{ submission_dt }} by {{ submitter }}
+                {%- endtrans -%}
+            </div>
         </div>
     </div>
 {% endmacro %}
