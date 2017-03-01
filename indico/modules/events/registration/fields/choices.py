@@ -394,7 +394,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             return '' if for_humans else {}
         unversioned_data = registration_data.field_data.field.data
         friendly_data['choice'] = unversioned_data['captions'][friendly_data['choice']]
-        if not friendly_data['is_no_accommodation']:
+        if not friendly_data.get('is_no_accommodation'):
             friendly_data['arrival_date'] = _to_date(friendly_data['arrival_date'])
             friendly_data['departure_date'] = _to_date(friendly_data['departure_date'])
             friendly_data['nights'] = (friendly_data['departure_date'] - friendly_data['arrival_date']).days
