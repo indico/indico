@@ -211,7 +211,6 @@ class Config:
         'BaseURL'                   : 'http://localhost/',
         'BaseSecureURL'             : 'https://localhost/',
         'ConfigurationDir'          : "/opt/indico/etc",
-        'DocumentationDir'          : "/opt/indico/doc",
         'HtdocsDir'                 : "/opt/indico/htdocs",
         'LogDir'                    : "/opt/indico/log" ,
         'BinDir'                    : "/opt/indico/bin",
@@ -281,7 +280,6 @@ class Config:
     if sys.platform == 'win32':
         default_values.update({
             "ConfigurationDir"     : "C:\\indico\\etc",
-            "DocumentationDir"     : "C:\\indico\\doc",
             "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\MaKaC",
             "LogDir"               : "C:\\indico\\log",
             "BinDir"               : "C:\\indico\\archive",

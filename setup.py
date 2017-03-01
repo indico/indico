@@ -35,18 +35,6 @@ from setuptools import setup, find_packages, findall
 DEPENDENCY_URLS = ["https://github.com/indico/indico-fonts/releases/"]
 
 
-class vars(object):
-    '''Variable holder.'''
-    packageDir = None
-    versionVal = 'None'
-    accessuser = None
-    accessgroup = None
-    binDir = None
-    documentationDir = None
-    configurationDir = None
-    htdocsDir = None
-
-
 def compile_languages(cmd):
     """
     Compile all language files
@@ -259,14 +247,6 @@ if __name__ == '__main__':
     from MaKaC.consoleScripts.installBase import setIndicoInstallMode, upgrade_indico_conf
 
     setIndicoInstallMode(True)
-
-    x = vars()
-    x.packageDir = os.path.join(get_python_lib(), 'MaKaC')
-
-    x.binDir = 'bin'
-    x.documentationDir = 'doc'
-    x.configurationDir = 'etc'
-    x.htdocsDir = 'htdocs'
 
     dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 
