@@ -18,6 +18,7 @@
 import ez_setup
 ez_setup.use_setuptools()
 
+import ast
 import os
 import re
 import shutil
@@ -80,15 +81,10 @@ def _getInstallRequires():
     return read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
 
-def _versionInit():
-    """Retrieves the version number from indico/MaKaC/__init__.py and returns it"""
-
-    from indico.MaKaC import __version__
-    v = __version__
-
-    print 'Indico %s' % v
-
-    return v
+def get_version():
+    _version_re = re.compile(r'__version__\s+=\s+(.*)')
+    with open('indico/__init__.py', 'rb') as f:
+        return str(ast.literal_eval(_version_re.search(f.read().decode('utf-8')).group(1)))
 
 
 # Commands
@@ -269,7 +265,7 @@ if __name__ == '__main__':
 
     setup(name="indico",
           cmdclass=cmdclass,
-          version=_versionInit(),
+          version=get_version(),
           description="Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool",
           author="Indico Team",
           author_email="indico-team@cern.ch",

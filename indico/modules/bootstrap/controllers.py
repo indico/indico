@@ -35,7 +35,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
 
-import MaKaC
+import indico
 from MaKaC.webinterface.rh.base import RH
 
 # TODO: set the time zone here once communities settings are available.
@@ -50,7 +50,7 @@ class RHBootstrap(RH):
         return render_template('bootstrap/bootstrap.html',
                                form=BootstrapForm(),
                                timezone=Config.getInstance().getDefaultTimezone(),
-                               indico_version=MaKaC.__version__,
+                               indico_version=indico.__version__,
                                python_version=python_version())
 
     def _process_POST(self):
