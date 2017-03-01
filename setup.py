@@ -240,9 +240,7 @@ if __name__ == '__main__':
     #if not os.path.exists(PWD_INDICO_CONF):
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
 
-    from MaKaC.consoleScripts.installBase import setIndicoInstallMode, upgrade_indico_conf
-
-    setIndicoInstallMode(True)
+    from MaKaC.consoleScripts.installBase import upgrade_indico_conf
 
     dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 

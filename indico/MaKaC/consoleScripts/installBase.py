@@ -33,28 +33,11 @@ if sys.platform == 'linux2':
 
 import MaKaC
 
-globals()['INDICO_INSTALL'] = False
 
 # Egg directory + etc/indico.conf
 PWD_INDICO_CONF = os.path.abspath(os.path.join(
     os.path.split(os.path.dirname(MaKaC.__file__))[0],'etc', 'indico.conf'
     ))
-
-def setIndicoInstallMode(newmode):
-    """
-    Sets indico install mode.
-    This function and getIndicoInstallMode are used by some __init__.py inside
-    MaKaC to load or not some modules. At installation time those modules are not
-    available. That's why we need to skip them. They are imported there only as
-    shortcuts.
-    """
-    global INDICO_INSTALL
-    INDICO_INSTALL = newmode
-
-
-def getIndicoInstallMode():
-    global INDICO_INSTALL
-    return INDICO_INSTALL
 
 
 def createDirs(directories):
