@@ -44,3 +44,13 @@
     @include transition(transform $delay ease-out);
     -webkit-transform-origin: 50% 51%; // improve blurry text on rotate with chrome
 }
+
+
+@keyframes highlight {
+    0% {
+        background-color: $blue;
+    }
+    100% {
+        background-color: inherit;
+    }
+}
