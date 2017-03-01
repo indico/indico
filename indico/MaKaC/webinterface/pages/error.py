@@ -17,8 +17,8 @@
 from flask import render_template, session
 from sqlalchemy.exc import OperationalError
 
+from indico.core.config import Config
 from MaKaC.accessControl import AccessWrapper
-from MaKaC.common import Config
 from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 

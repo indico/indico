@@ -22,6 +22,7 @@ import qrcode
 from flask import flash, json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
@@ -34,7 +35,6 @@ from indico.web.flask.util import url_for, send_file, secure_filename
 from indico.web.util import jsonify_data, jsonify_template
 
 from MaKaC.PDFinterface.conference import TicketToPDF
-from MaKaC.common import Config
 
 
 class RHRegistrationFormTickets(RHManageRegFormBase):

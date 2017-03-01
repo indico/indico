@@ -25,7 +25,7 @@ import os, sys
 import getopt
 
 
-from installBase import setIndicoInstallMode, indico_pre_install, indico_post_install, copyTreeSilently
+from installBase import indico_pre_install, indico_post_install, copyTreeSilently
 
 # The directory where the egg is located
 eggDir = os.path.join(os.path.dirname(__file__), '..', '..')
@@ -77,8 +77,6 @@ def main():
             wwwGid = a
         elif o == '--no-upgrade-config':
             upgrade_config = False
-
-    setIndicoInstallMode(True)
 
     if forRPM:
         # TODO: post-install for RPMs
