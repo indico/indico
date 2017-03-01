@@ -159,12 +159,6 @@ class develop_config(develop_indico):
             print 'Creating new etc/indico.conf..'
             shutil.copy('etc/indico.conf.sample', local)
 
-        upgrade_indico_conf(local, 'etc/indico.conf.sample', {
-                'BaseURL': 'http://localhost:{0}'.format(self.http_port),
-                'BaseSecureURL': 'https://localhost:{0}'.format(self.https_port),
-                'SmtpServer': ("localhost", int(self.smtp_port))
-                })
-
         if not os.path.exists('etc/logging.conf'):
             shutil.copy('etc/logging.conf.sample', 'etc/logging.conf')
 
@@ -239,8 +233,6 @@ if __name__ == '__main__':
     #PWD_INDICO_CONF = 'etc/indico.conf'
     #if not os.path.exists(PWD_INDICO_CONF):
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
-
-    from MaKaC.consoleScripts.installBase import upgrade_indico_conf
 
     dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 

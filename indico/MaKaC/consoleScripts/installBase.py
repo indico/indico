@@ -46,96 +46,6 @@ def createDirs(directories):
         if not os.path.exists(directories[d]):
             os.makedirs(directories[d])
 
-def upgrade_indico_conf(existing_conf, new_conf, mixinValues={}):
-    """
-    Copies new_conf values to existing_conf file preserving existing_conf's values
-
-    If mixinValues is given its items will be preserved above existing_conf's values and new_conf's values
-    """
-
-    # We retrieve values from newest indico.conf
-    execfile(new_conf)
-    new_values = locals().copy()
-    # We retrieve values from existing indico.conf
-    execfile(existing_conf)
-    existing_values = locals().copy()
-
-    new_values.update(existing_values)
-    new_values.update(mixinValues)
-
-    # We have to preserve options not currently present in the bundled indico.conf because they
-    # may belong to a plugin. This functionality can lead to forget adding new options to
-    # config.py so be careful my friend.
-
-    # We remove vars defined here that aren't options
-    for k in ('new_values', 'new_conf', 'existing_conf', 'mixinValues'):
-        new_values.pop(k)
-
-    result_values = new_values
-
-    # We update a current copy of indico.conf with the new values
-    new_contents = open(new_conf).read()
-
-    for k in new_values:
-        if new_values[k].__class__ == str:
-            regexp = re.compile('^(%s\s*=\s*)([\'"])([^\'"]*)([\'"])' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%r" % result_values[k], new_contents)
-            else:
-                new_contents = "%s\n%s = %r" % (new_contents, k, result_values[k])
-        elif new_values[k].__class__ == int:
-            regexp = re.compile('^(%s\s*=\s*)([0-9]+)' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
-            else:
-                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-
-        elif new_values[k].__class__ == bool:
-            regexp = re.compile('^(%s\s*=\s*)(True|False)' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s" % result_values[k], new_contents)
-            else:
-                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-
-        elif new_values[k].__class__ == tuple:
-            regexp = re.compile('^(%s\s*=\s*)[\(]{1}([^\)]+)[\)]{1}' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
-            else:
-                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-
-        elif new_values[k].__class__ == dict:
-            regexp = re.compile('^(%s\s*=\s*)[\{](.+)[\}$]' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
-            else:
-                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-
-        elif new_values[k].__class__ == list:
-            regexp = re.compile('^(%s\s*=\s*)[\[]{1}([^\]]+)[\]]{1}' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
-            else:
-                new_contents = "%s\n%s = %s" % (new_contents, k, str(result_values[k]))
-
-        elif new_values[k].__class__ == set:
-            regexp = re.compile(r'^(%s\s*=\s*)\{([^}]+)}' % k, re.MULTILINE)
-            if regexp.search(new_contents):
-                new_contents = re.sub(regexp, "\\g<1>%s" % str(result_values[k]), new_contents)
-            else:
-                new_contents = "%s\n%s = %s" % (new_contents, k, repr(result_values[k]))
-
-        else:
-            raise Exception('Invalid config value "%s = %s"' % (k, new_values[k]))
-
-    # We write unknown options to the end of the file
-    with open(existing_conf, 'w') as f:
-        f.write(new_contents)
-
-
-def modifyOnDiskIndicoConfOption(indico_conf, optionName, optionValue):
-    upgrade_indico_conf(indico_conf, indico_conf, {optionName: optionValue})
-
 
 def _updateMaKaCEggCache(file, path):
     fdata = open(file).read()
@@ -344,10 +254,7 @@ What do you want to do [c/a]? ''')
                 for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
 
 
-def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, uid=None,
-                        gid=None, upgrade_config=True):
-    from indico.core.config import Config
-
+def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, uid=None, gid=None):
     print "Creating directories for resources... ",
     # Create the directories where the resources will be installed
     createDirs(targetDirs)
@@ -359,15 +266,9 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
     sourceConf = os.path.join(sourceDirs['etc'], 'indico.conf.sample')
 
     # if there is a source config
-    if os.path.exists(sourceConf):
-        if not os.path.exists(newConf):
-            # just copy if there is no config yet
-            shutil.copy(sourceConf, newConf)
-        elif upgrade_config:
-            print "Upgrading indico.conf...",
-            # upgrade the existing one
-            upgrade_indico_conf(newConf, sourceConf)
-            print "done!"
+    if os.path.exists(sourceConf) and not os.path.exists(newConf):
+        # just copy if there is no config yet
+        shutil.copy(sourceConf, newConf)
 
     # copy the logging config
     fpath = os.path.join(targetDirs['etc'], 'logging.conf')
