@@ -87,7 +87,7 @@ def main():
         targetDirs = { 'etc': '/opt/indico/etc' }
         PWD_INDICO_CONF = os.path.join(os.path.dirname(__file__), '..', '..', 'etc', 'indico.conf.sample')
 
-        targetDirs = indico_pre_install('/opt/indico', False, existingConfig=existingPath)
+        targetDirs = indico_pre_install('/opt/indico', existingConfig=existingPath)
         # we need to copy htdocs/ bin/ doc/ etc/ to its proper place
         print "Copying Indico tree... "
         copy_egg_datafiles_to_base(targetDirs)

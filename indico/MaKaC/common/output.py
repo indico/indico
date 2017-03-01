@@ -68,7 +68,7 @@ def _set_ssl_port(url):
     """
     Returns url with port changed to SSL one.
     If url has no port specified, it returns the same url.
-    SSL port is extracted from loginURL (MaKaCConfig)
+    SSL port is extracted from base secure url
     """
     # Set proper PORT for images requested via SSL
     sslURL = Config.getInstance().getBaseSecureURL()
