@@ -14,10 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-"""Contains the machinery that allows to access and modify in a more comfortable
-and transparent way the system configuration (this is mainly done through the
-Config class).
-"""
+from __future__ import absolute_import
 
 import ast
 import copy
@@ -25,9 +22,12 @@ import os
 import socket
 import sys
 import urlparse
+from datetime import timedelta
 
 import pytz
+from celery.schedules import crontab
 from flask import g, has_app_context, request
+from flask.helpers import get_root_path
 from werkzeug.urls import url_parse
 
 import MaKaC
@@ -274,7 +274,8 @@ class Config:
         'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
         'AttachmentStorage'         : 'default',
         'StaticSiteStorage'         : None,
-        'TrackerURL'                : 'http://localhost:5000/api'
+        'TrackerURL'                : 'http://localhost:5000/api',
+        'ConfigFilePath'            : None
     }
 
     if sys.platform == 'win32':
@@ -347,6 +348,28 @@ class Config:
             'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
         })
 
+    def __get_config_path(self):
+        # env var has priority
+        try:
+            return os.path.expanduser(os.environ['INDICO_CONFIG'])
+        except KeyError:
+            pass
+        # try finding the config in various common
+        paths = [os.path.normpath(os.path.join(get_root_path('indico'), 'indico.conf')),
+                 os.path.expanduser('~/.indico.conf'),
+                 '/etc/indico.conf']
+        for path in paths:
+            if os.path.exists(path):
+                return os.readlink(path) if os.path.islink(path) else path
+        raise Exception('No indico config found. Point the INDICO_CONFIG env var to your config file or or '
+                        'move/symlink the config in one of the following locations: {}'.format(', '.join(paths)))
+
+    def __load_config(self, path):
+        gvalues = {'timedelta': timedelta, 'crontab': crontab}
+        values = {}
+        execfile(path, gvalues, values)
+        return values
+
     def __readConfigFile(self):
         """initializes configuration parameters (Search order: indico.conf, default_values)
 
@@ -359,17 +382,13 @@ class Config:
 
         self._configVars = {}
 
-        from MaKaC.common import MaKaCConfig
         from MaKaC.errors import MaKaCError
 
-        declared_values = dir(MaKaCConfig)
-
         # When populating configuration variables indico.conf's values have priority
-        for k in self.default_values:
-            if k in declared_values:
-                self._configVars[k] = MaKaCConfig.__getattribute__(k) # declared_values[k] doesn't work, don't ask me why
-            else: # key is not declared in indico.conf, using its default value
-                self._configVars[k] = self.default_values[k]
+        config_path = self.__get_config_path()
+        config_vars = self.__load_config(config_path)
+        self._configVars = {k: config_vars.get(k, default) for k, default in self.default_values.iteritems()}
+        self._configVars['ConfigFilePath'] = config_path
 
         # options that are derived automatically
         self._deriveOptions()

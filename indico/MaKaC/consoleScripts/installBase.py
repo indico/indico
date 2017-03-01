@@ -155,13 +155,6 @@ def modifyOnDiskIndicoConfOption(indico_conf, optionName, optionValue):
     upgrade_indico_conf(indico_conf, indico_conf, {optionName: optionValue})
 
 
-def updateIndicoConfPathInsideMaKaCConfig(indico_conf_path, makacconfigpy_path):
-    '''Modifies the location of indico.conf referenced inside makacconfigpy_path to
-    point to indico_conf_path'''
-    fdata = open(makacconfigpy_path).read()
-    fdata = re.sub(r'indico_conf\s*=\s*[\'"]([^\'"]*)[\'"]', "indico_conf = \"%s\"" % indico_conf_path, fdata)
-    open(makacconfigpy_path, 'w').write(fdata)
-
 def _updateMaKaCEggCache(file, path):
     fdata = open(file).read()
     fdata = re.sub('\/opt\/indico\/tmp', path, fdata)
@@ -285,33 +278,6 @@ def _checkDirPermissions(directories, accessuser=None, accessgroup=None):
                 os.chown(dir, pwd.getpwnam(accessuser).pw_uid, grp.getgrnam(accessgroup).gr_gid)
 
 
-def _existingConfiguredEgg():
-    '''Returns true if an existing EGG has been detected.'''
-
-    # remove '.' and './indico'
-    path = copy.copy(sys.path)
-    path = path[2:]
-
-    env = pkg_resources.Environment(search_path=path)
-    env.scan(search_path=path)
-
-    # search for all indico dists
-    indico_dists = env['indico']
-
-    for dist in indico_dists:
-        eggPath = dist.location
-
-        print "* EGG found at %s..." % eggPath,
-        fdata = open(os.path.join(eggPath,'MaKaC','common','MaKaCConfig.py'), 'r').read()
-
-        m = re.search('^\s*indico_conf\s*=\s*[\'"]{1}([^\'"]*)[\'"]{1}', fdata, re.MULTILINE)
-        if m and m.group(1) != '':
-            print '%s' % m.group(1)
-            return m.group(1)
-        else:
-            print 'unconfigured'
-    return None
-
 def _extractDirsFromConf(conf):
     execfile(conf)
     values = locals().copy()
@@ -331,7 +297,7 @@ def _replacePrefixInConf(filePath, prefix):
     open(filePath, 'w').write(fdata)
 
 
-def indico_pre_install(defaultPrefix, force_upgrade=False, existingConfig=None):
+def indico_pre_install(defaultPrefix, existingConfig=None):
     """
     defaultPrefix is the default prefix dir where Indico will be installed
     """
@@ -343,41 +309,6 @@ def indico_pre_install(defaultPrefix, force_upgrade=False, existingConfig=None):
         existing = existingConfig
         # upgrade is mandatory
         upgrade = True
-    else:
-        # Config not specified
-        # automatically find an EGG in the site-packages path
-        existing = _existingConfiguredEgg()
-
-        # if an EGG was found but upgrade is not forced
-        if existing and not force_upgrade:
-
-            # Ask the user
-            opt = None
-
-            while opt not in ('', 'e', 'E', 'u'):
-                opt = raw_input('''
-An existing Indico configuration has been detected at:
-
-    %s
-
-At this point you can:
-
-    [u]pgrade the existing installation
-
-    [E]xit this installation process
-
-What do you want to do [u/E]? ''' % existing)
-            if opt in ('', 'e', 'E'):
-                print "\nExiting installation..\n"
-                sys.exit()
-            elif opt == 'u':
-                upgrade = True
-            else:
-                print "\nInvalid answer. Exiting installation..\n"
-                sys.exit()
-        # if and EGG was found and upgrade is forced
-        elif existing and force_upgrade:
-            upgrade = True
 
     if upgrade:
         print 'Upgrading the existing Indico installation..'
@@ -428,9 +359,6 @@ What do you want to do [c/a]? ''')
         print "\nInvalid answer. Exiting installation..\n"
         sys.exit()
 
-    activemakacconfig = os.path.join(os.path.dirname(os.path.abspath(MaKaC.__file__)), 'common', 'MaKaCConfig.py')
-    updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
-
     return dict((dirName, os.path.join(prefixDir, dirName))
                 for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
 
@@ -459,9 +387,6 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
             # upgrade the existing one
             upgrade_indico_conf(newConf, sourceConf)
             print "done!"
-
-    # change MaKaCConfig.py to include the config
-    updateIndicoConfPathInsideMaKaCConfig(newConf, os.path.join(makacconfig_base_dir, 'MaKaCConfig.py'))
 
     # copy the logging config
     fpath = os.path.join(targetDirs['etc'], 'logging.conf')
@@ -492,12 +417,16 @@ def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_di
 Congratulations!
 Indico has been installed correctly.
 
-    indico.conf:      %s/indico.conf
+    indico.conf:      {conf}
 
-    BinDir:           %s
-    DocumentationDir: %s
-    ConfigurationDir: %s
-    HtdocsDir:        %s
+    BinDir:           {bin}
+    DocumentationDir: {docs}
+    ConfigurationDir: {etc}
+    HtdocsDir:        {htdocs}
+
+To run Indico, you need to set the INDICO_CONFIG environment variable
+to {conf} or add `indico_config: {conf}` to /etc/indico.yaml
+or ~/.indico.yaml (not recommended for production):
 
 For information on how to configure Apache HTTPD, take a look at:
 
@@ -507,4 +436,5 @@ http://indico.readthedocs.org/en/latest/installation/#configuring-the-web-server
 Please do not forget to start the Celery worker in order to use background tasks
 such as event reminders and periodic cleanups. You can run it using this command:
 $ indico celery worker -B
-""" % (targetDirs['etc'], targetDirs['bin'], targetDirs['doc'], targetDirs['etc'], targetDirs['htdocs'])
+""".format(conf='{}/indico.conf'.format(targetDirs['etc']), etc=targetDirs['etc'], bin=targetDirs['bin'],
+           docs=targetDirs['doc'], htdocs=targetDirs['htdocs'])
