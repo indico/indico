@@ -169,6 +169,12 @@
                 {%- trans %}Configure teams and competences{% endtrans -%}
             </div>
             <div class="toolbar">
+                <a class="i-button icon-mail" href="#"
+                   data-href="{{ url_for('.manage_contact', event) }}"
+                   data-title="{% trans %}Send emails to paper reviewers and judges{% endtrans %}"
+                   data-ajax-dialog>
+                    {%- trans %}Contact{% endtrans -%}
+                </a>
                 <a class="i-button icon-users" href="#"
                    data-href="{{ url_for('.manage_teams', event) }}"
                    data-title="{% trans %}Manage paper reviewing managers, reviewers and judges{% endtrans %}"

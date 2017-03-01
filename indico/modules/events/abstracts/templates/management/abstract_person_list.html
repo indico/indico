@@ -13,7 +13,7 @@
     {%- else -%}
         {% set submitter_title = _("This person hasn't submitted any abstracts") %}
     {% endif -%}
-    <i class="icon-user-check submitter-icon {{ 'inactive' if not is_submitter }}"
+    <i class="icon-user-check icon {{ 'inactive' if not is_submitter }}"
        title="{{ submitter_title }}"></i>
 {% endblock %}
 

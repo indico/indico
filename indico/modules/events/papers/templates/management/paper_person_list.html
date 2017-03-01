@@ -1,0 +1,65 @@
+{% extends 'events/management/_base_person.html' %}
+
+{% block selection_toolbar %}
+    <input type="checkbox" id="filter-judges" data-filter="judge" checked>
+    <label for="filter-judges" class="i-button">{% trans %}Judges{% endtrans %}</label>
+    <input type="checkbox" name="content-reviewers" id="filter-content" data-filter="content_reviewer" checked>
+    <label for="filter-content" class="i-button">{% trans %}Content reviewers{% endtrans %}</label>
+    <input type="checkbox" name="layout-reviewers" id="filter-layout" data-filter="layout_reviewer" checked>
+    <label for="filter-layout" class="i-button">{% trans %}Layout reviewers{% endtrans %}</label>
+{% endblock %}
+
+{% block table_head %}
+    <th class="i-table thin-column" data-sorter="false"></th>
+    <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
+    <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
+    <th class="i-table roles-column" data-sorter="false">{% trans %}Roles{% endtrans %}</th>
+{% endblock %}
+
+{% block table_body %}
+    {% for event_person, person_roles in event_persons.iteritems() -%}
+        {% set is_judge = person_roles.judge %}
+        {% set is_content_reviewer = person_roles.content_reviewer %}
+        {% set is_layout_reviewer = person_roles.layout_reviewer %}
+        <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
+            <td class="i-table thin-column">
+                <input type="checkbox" value="{{ event_person.id }}" class="select-row"
+                       name={{ 'person_id' if event_person.user_id is defined else 'user_id' }}
+                       {{ 'disabled' if not event_person.email }}>
+            </td>
+            <td class="i-table name-column">{{ event_person.full_name }}</td>
+            <td class="i-table email-column">{{ event_person.email }}</td>
+            <td class="i-table roles-column">
+                {%- if is_judge %}
+                    {% set judge_title = _('This person is a judge') %}
+                {%- else -%}
+                    {% set judge_title = _('This person is not a judge') %}
+                {% endif -%}
+                <i class="icon-hammer icon {{ 'inactive' if not is_judge }}"
+                   title="{{ judge_title }}"></i>
+                {% if event.cfp.content_reviewing_enabled %}
+                    {%- if is_content_reviewer %}
+                        {% set content_reviewer_title = _('This person is a content reviewer') %}
+                    {%- else -%}
+                        {% set content_reviewer_title = _('This person is not a content reviewer') %}
+                    {% endif -%}
+                    <i class="icon-file-content icon {{ 'inactive' if not is_content_reviewer }}"
+                       title="{{ content_reviewer_title }}"></i>
+                {% endif %}
+                {% if event.cfp.layout_reviewing_enabled %}
+                    {%- if is_layout_reviewer %}
+                        {% set layout_reviewer_title = _('This person is a layout reviewer') %}
+                    {%- else -%}
+                        {% set layout_reviewer_title = _('This person is not a layout reviewer') %}
+                    {% endif -%}
+                    <i class="icon-layout {{ 'inactive' if not is_layout_reviewer }}"
+                       title="{{ layout_reviewer_title }}"></i>
+                {% endif %}
+            </td>
+        </tr>
+    {%- else -%}
+        <tr class="i-table">
+            <td colspan="6">{% trans %}There is no reviewing team assigned yet{% endtrans %}</td>
+        </tr>
+    {%- endfor %}
+{% endblock %}
