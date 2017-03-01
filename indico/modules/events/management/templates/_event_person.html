@@ -46,7 +46,7 @@
                 {%- else -%}
                     {% set speaker_title = _('This person is not a speaker') %}
                 {% endif -%}
-                <i class="icon-mic speaker-icon {{ 'inactive' if not is_speaker }}"
+                <i class="icon-mic {{ 'inactive' if not is_speaker }}"
                    title="{{ speaker_title }}"></i>
             </td>
         </tr>

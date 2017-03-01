@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
 from flask import request, render_template, flash, session
 
 from indico.modules.events.papers import logger
@@ -121,6 +123,25 @@ class RHManageCompetences(RHManagePapersBase):
             return jsonify_data()
         return WPManagePapers.render_template('management/competences.html', self._conf, event=self.event_new,
                                               form=form)
+
+
+class RHManageContact(RHManagePapersBase):
+    """Allow to send emails to members of reviewing team"""
+
+    def _process(self):
+        paper_persons_dict = {}
+        for p in self.event_new.acl_entries:
+            user = p.principal
+            is_judge = p.has_management_role('paper_judge', explicit=True)
+            is_content_reviewer = (self.event_new.cfp.content_reviewing_enabled and
+                                   p.has_management_role('paper_content_reviewer', explicit=True))
+            is_layout_reviewer = (self.event_new.cfp.layout_reviewing_enabled and
+                                  p.has_management_role('paper_layout_reviewer', explicit=True))
+            if is_judge or is_content_reviewer or is_layout_reviewer:
+                paper_persons_dict[user] = {'judge': is_judge, 'content_reviewer': is_content_reviewer,
+                                            'layout_reviewer': is_layout_reviewer}
+        return jsonify_template('events/papers/management/paper_person_list.html',
+                                event_persons=paper_persons_dict, event=self.event_new)
 
 
 class RHScheduleCFP(RHManagePapersBase):
