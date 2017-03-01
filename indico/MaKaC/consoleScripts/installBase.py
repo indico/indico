@@ -60,7 +60,7 @@ def getIndicoInstallMode():
 
 def createDirs(directories):
     '''Creates directories that are not automatically created by setup.install or easy_install'''
-    for d in ['log', 'tmp', 'cache', 'archive']:
+    for d in ['log', 'tmp', 'cache']:
         if not os.path.exists(directories[d]):
             os.makedirs(directories[d])
 
@@ -276,7 +276,7 @@ def _checkDirPermissions(directories, accessuser=None, accessgroup=None):
     print "\nWe need to 'sudo' in order to set the permissions of some directories..."
 
     if sys.platform == "linux2":
-        dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache', 'archive'] if directories.has_key(x))
+        dirs2check = list(directories[x] for x in ['htdocs', 'log', 'tmp', 'cache'] if directories.has_key(x))
         for dir in dirs2check:
             stat_info = os.stat(dir)
             if pwd.getpwuid(int(stat_info.st_uid)).pw_name != accessuser or os.path.basename(dir) == 'htdocs':
@@ -432,7 +432,7 @@ What do you want to do [c/a]? ''')
     updateIndicoConfPathInsideMaKaCConfig(indicoconfpath, activemakacconfig)
 
     return dict((dirName, os.path.join(prefixDir, dirName))
-                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache','archive'])
+                for dirName in ['bin','doc','etc','htdocs','tmp','log','cache'])
 
 
 def indico_post_install(targetDirs, sourceDirs, makacconfig_base_dir, package_dir, uid=None,
