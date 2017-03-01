@@ -96,6 +96,10 @@
         &.content-indicator-left {
             @include indicator-left();
         }
+
+        &:target {
+            animation: highlight 0.5s linear;
+        }
     }
 
     .i-timeline-item-content {

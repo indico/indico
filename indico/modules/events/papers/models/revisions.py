@@ -209,3 +209,8 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
                 return bool(layout_review)
             elif user in self._contribution.paper_content_reviewers:
                 return bool(content_review)
+
+
+    def get_spotlight_file(self):
+        pdf_files = [paper_file for paper_file in self.files if paper_file.content_type == 'application/pdf']
+        return pdf_files[0] if len(pdf_files) == 1 else None
