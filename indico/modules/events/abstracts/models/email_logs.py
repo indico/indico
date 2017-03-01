@@ -77,7 +77,8 @@ class AbstractEmailLogEntry(db.Model):
         backref=db.backref(
             'email_logs',
             order_by=sent_dt,
-            lazy=True
+            lazy=True,
+            cascade='all, delete-orphan'
         )
     )
     email_template = db.relationship(
