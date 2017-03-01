@@ -21,8 +21,8 @@ from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetai
                                                        WPRoomBookingNewBookingConfirm)
 from indico.modules.rb.views.user.rooms import WPRoomBookingRoomDetails
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
-from MaKaC.webinterface.wcomponents import TabControl, WTabControl, WTemplated
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
+from indico.legacy.webinterface.wcomponents import TabControl, WTabControl, WTemplated
 
 
 class WPRoomBookingEventBase(WPConferenceModifBase):

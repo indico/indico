@@ -20,7 +20,7 @@ from flask import request, redirect, current_app
 from indico.modules.events.registration.models.legacy_mapping import LegacyRegistrationMapping
 
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RHSimple
+from indico.legacy.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function

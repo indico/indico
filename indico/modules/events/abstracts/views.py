@@ -20,8 +20,8 @@ from flask import render_template, session
 
 from indico.modules.events.abstracts.util import get_visible_reviewed_for_tracks
 from indico.util.mathjax import MathjaxMixin
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 
 
 class WPManageAbstracts(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):

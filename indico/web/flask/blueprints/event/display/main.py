@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 
 from indico.web.flask.blueprints.event.display import event
-from MaKaC.webinterface.rh import conferenceDisplay
+from indico.legacy.webinterface.rh import conferenceDisplay
 
 
 # Event access

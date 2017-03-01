@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from MaKaC.webinterface.rh import helpDisplay, lang, resetTimezone, contact, errors
+from indico.legacy.webinterface.rh import helpDisplay, lang, resetTimezone, contact, errors
 
 
 misc = IndicoBlueprint('misc', __name__)

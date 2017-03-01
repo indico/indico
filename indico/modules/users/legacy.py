@@ -23,8 +23,8 @@ from indico.util.caching import memoize_request
 from indico.util.fossilize import fossilizes, Fossilizable
 from indico.util.locators import locator_property
 from indico.util.string import to_unicode, return_ascii, encode_utf8
-from MaKaC.common.cache import GenericCache
-from MaKaC.fossils.user import IAvatarFossil, IAvatarMinimalFossil
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.fossils.user import IAvatarFossil, IAvatarMinimalFossil
 
 
 AVATAR_FIELD_MAP = {

@@ -60,9 +60,9 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from MaKaC.PDFinterface.conference import ContribsToPDF, ContributionBook
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.PDFinterface.conference import ContribsToPDF, ContributionBook
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _render_subcontribution_list(contrib):

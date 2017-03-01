@@ -21,10 +21,10 @@ from flask import request
 from indico.modules.users import User
 from indico.util.i18n import _
 
-from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+from indico.legacy.webinterface.pages.admins import WPAdminsBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
 class WPUser(WPJinjaMixin, WPMainBase):

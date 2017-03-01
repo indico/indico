@@ -179,7 +179,7 @@ class IndicoTranslations(Translations):
         msg = ('Using the gettext function (`_`) patched into the builtins is disallowed.\n'
                'Please import it from `indico.util.i18n` instead.\n'
                'The offending code was found in this location:\n{}').format(frame_msg)
-        if 'MaKaC/' in frame[0]:
+        if 'indico/legacy/' in frame[0]:
             # legacy code gets off with a warning
             warnings.warn(msg, RuntimeWarning)
         else:

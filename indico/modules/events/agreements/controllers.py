@@ -33,9 +33,9 @@ from indico.modules.events.agreements.util import get_agreement_definitions, sen
 from indico.util.i18n import _
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHAgreementManagerBase(RHConferenceModifBase):

@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.util.mathjax import MathjaxMixin
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManageTracks(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):

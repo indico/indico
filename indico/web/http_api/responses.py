@@ -26,7 +26,7 @@ from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossi
 
 # indico legacy imports
 from indico.core.config import Config
-from MaKaC.common.fossilize import fossilizes, Fossilizable
+from indico.legacy.common.fossilize import fossilizes, Fossilizable
 
 class HTTPAPIError(Exception, Fossilizable):
     fossilizes(IHTTPAPIErrorFossil)

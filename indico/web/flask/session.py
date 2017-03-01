@@ -30,8 +30,8 @@ from indico.core.config import Config
 from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _, set_best_lang
-from MaKaC.common.cache import GenericCache
-from MaKaC.common.timezoneUtils import DisplayTZ
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.timezoneUtils import DisplayTZ
 
 
 class BaseSession(CallbackDict, SessionMixin):

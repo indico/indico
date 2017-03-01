@@ -60,7 +60,7 @@ from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
-from MaKaC.webinterface.pages.error import render_error
+from indico.legacy.webinterface.pages.error import render_error
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name

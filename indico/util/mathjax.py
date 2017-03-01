@@ -16,7 +16,7 @@
 
 from __future__ import absolute_import
 
-from MaKaC.common.TemplateExec import render
+from indico.legacy.common.TemplateExec import render
 
 
 class MathjaxMixin:

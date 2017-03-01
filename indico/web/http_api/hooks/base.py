@@ -38,7 +38,7 @@ from indico.web.http_api.metadata.atom import AtomSerializer
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
-from MaKaC.common.mail import GenericMailer
+from indico.legacy.common.mail import GenericMailer
 
 
 class HTTPAPIHook(object):

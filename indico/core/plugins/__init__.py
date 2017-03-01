@@ -44,7 +44,7 @@ from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from indico.web.menu import SideMenuItem
 
-from MaKaC.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
 
 
 class PluginCategory(unicode, IndicoEnum):

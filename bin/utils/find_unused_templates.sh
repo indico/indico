@@ -25,4 +25,4 @@ fi
 echo 'Searching for potentially unused templates.'
 echo 'This will take a long time. Why not get some cookies in the meantime?'
 echo
-find indico/MaKaC/webinterface/tpls/ -maxdepth 1 -name '*.tpl' -exec sh -c 'TPL=$(basename {} .tpl); ag -c --nofilename --silent --ignore indico/translations/ --ignore ext_modules/ $TPL > /dev/null || echo "UNUSED: $TPL"' \;
+find indico/legacy/webinterface/tpls/ -maxdepth 1 -name '*.tpl' -exec sh -c 'TPL=$(basename {} .tpl); ag -c --nofilename --silent --ignore indico/translations/ --ignore ext_modules/ $TPL > /dev/null || echo "UNUSED: $TPL"' \;

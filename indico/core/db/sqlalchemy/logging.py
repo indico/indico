@@ -17,7 +17,6 @@
 from __future__ import absolute_import
 
 import logging
-import os
 import pprint
 import time
 import traceback
@@ -43,9 +42,7 @@ def _interesting_tb_item(item, paths):
 
 
 def _get_sql_line():
-    indico_path = current_app.root_path
-    makac_path = os.path.abspath(os.path.join(indico_path, '..', 'MaKaC'))
-    paths = [indico_path, makac_path] + [p.root_path for p in plugin_engine.get_active_plugins().itervalues()]
+    paths = [current_app.root_path] + [p.root_path for p in plugin_engine.get_active_plugins().itervalues()]
     stack = [item for item in reversed(traceback.extract_stack()) if _interesting_tb_item(item, paths)]
     for i, item in enumerate(stack):
         return {'file': item[0],

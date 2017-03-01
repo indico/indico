@@ -21,7 +21,7 @@ from werkzeug.exceptions import NotFound, Forbidden
 
 from indico.modules.categories.models.categories import Category
 from indico.util.i18n import _
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.base import RH
 
 
 class RHCategoryBase(RH):

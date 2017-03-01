@@ -21,7 +21,7 @@ from functools import wraps
 from celery import current_task
 
 from indico.core.logger import Logger
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 def locked_task(f):

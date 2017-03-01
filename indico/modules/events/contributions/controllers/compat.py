@@ -21,7 +21,7 @@ from flask import redirect, current_app
 from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
                                                                        LegacySubContributionMapping)
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RHSimple
+from indico.legacy.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function

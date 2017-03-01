@@ -27,9 +27,9 @@ from indico.modules.events.timetable.util import (render_entry_info_balloon, ser
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
-from MaKaC.webinterface.pages.conferences import WPTPLConferenceDisplay
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
+from indico.legacy.webinterface.pages.conferences import WPTPLConferenceDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHTimetable(RHConferenceBaseDisplay):

@@ -28,9 +28,9 @@ from indico.modules.attachments.controllers.event_package import AttachmentPacka
 from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
 from indico.modules.events.util import get_object_from_args
 from indico.web.flask.templating import get_template_module
-from MaKaC.webinterface.rh.base import RHProtected
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):

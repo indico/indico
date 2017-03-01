@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from MaKaC.webinterface.rh import conferenceDisplay
+from indico.legacy.webinterface.rh import conferenceDisplay
 from indico.web.flask.blueprints.event.display import event
 
 

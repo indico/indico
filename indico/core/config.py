@@ -31,7 +31,6 @@ from flask.helpers import get_root_path
 from werkzeug.urls import url_parse
 
 import indico
-import MaKaC
 from indico.util.contextManager import ContextManager
 
 
@@ -281,7 +280,7 @@ class Config:
     if sys.platform == 'win32':
         default_values.update({
             "ConfigurationDir"     : "C:\\indico\\etc",
-            "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\MaKaC",
+            "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\indico",
             "LogDir"               : "C:\\indico\\log",
             "BinDir"               : "C:\\indico\\archive",
             "UploadedFilesTempDir" : "C:\\indico\\temp",
@@ -311,7 +310,7 @@ class Config:
         self._deriveOptions()
 
     def _deriveOptions(self):
-        webinterface_dir = os.path.join(os.path.dirname(MaKaC.__file__), 'webinterface')
+        webinterface_dir = os.path.join(os.path.dirname(indico.__file__), 'legacy/webinterface')
 
         override = os.environ.get('INDICO_CONF_OVERRIDE')
         if override:
@@ -323,7 +322,7 @@ class Config:
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
         # config.py will become fat again if you don't follow this advice.
         self._configVars.update({
-            'TPLVars'                   : {"MaKaCHomeURL": self.getBaseURL()},
+            'TPLVars'                   : {},
             'FileTypes'                 : FILE_TYPES,
             'HelpDir'                   : os.path.join(self.getHtdocsDir(), 'ihelp'),
             'StylesheetsDir'            : os.path.join(webinterface_dir, 'stylesheets'),
@@ -381,7 +380,7 @@ class Config:
 
         self._configVars = {}
 
-        from MaKaC.errors import MaKaCError
+        from indico.legacy.errors import MaKaCError
 
         # When populating configuration variables indico.conf's values have priority
         config_path = self.__get_config_path()

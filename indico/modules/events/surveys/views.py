@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.meeting import WPMeetingDisplay
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from MaKaC.webinterface.simple_event import WPSimpleEventDisplay
+from indico.legacy.webinterface.meeting import WPMeetingDisplay
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.simple_event import WPSimpleEventDisplay
 
 
 class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):

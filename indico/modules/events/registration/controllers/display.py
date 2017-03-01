@@ -41,7 +41,7 @@ from indico.modules.events.registration.views import (WPDisplayRegistrationFormC
 from indico.modules.events.payment import event_settings as payment_event_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):

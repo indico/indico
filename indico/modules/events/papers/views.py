@@ -21,8 +21,8 @@ from flask import session, render_template
 from indico.modules.events.papers.forms import (PaperCommentForm, build_review_form, PaperJudgmentForm,
                                                 PaperSubmissionForm)
 from indico.util.mathjax import MathjaxMixin
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
 
 
 class WPManagePapers(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):

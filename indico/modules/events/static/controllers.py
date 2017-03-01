@@ -25,7 +25,7 @@ from indico.modules.events.static.tasks import build_static_site
 from indico.modules.events.static.views import WPStaticSites
 from indico.web.flask.util import url_for
 
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHStaticSiteBase(RHConferenceModifBase):

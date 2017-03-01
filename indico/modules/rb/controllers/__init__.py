@@ -22,7 +22,7 @@ from werkzeug.exceptions import NotFound, Forbidden
 from indico.core.config import Config
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.i18n import _
-from MaKaC.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.base import RHProtected
 
 
 class RHRoomBookingProtected(RHProtected):

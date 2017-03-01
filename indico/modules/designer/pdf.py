@@ -30,7 +30,7 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import Paragraph
 
 from indico.modules.designer import PageOrientation
-from MaKaC.PDFinterface.base import setTTFonts
+from indico.legacy.PDFinterface.base import setTTFonts
 
 
 FONT_STYLES = {

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, request, url_for, current_app
 from werkzeug.exceptions import NotFound
 
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceDisplay
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping

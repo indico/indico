@@ -22,7 +22,7 @@ from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
-from MaKaC.webinterface.wcomponents import WTemplated
+from indico.legacy.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):

@@ -21,8 +21,8 @@ from enum import Enum
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class SessionManagementLevel(Enum):

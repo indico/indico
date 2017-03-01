@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.util.i18n import _
-from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin, WPDecorated
+from indico.legacy.webinterface.pages.admins import WPAdminsBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin, WPDecorated
 
 
 class WPNews(WPJinjaMixin, WPDecorated):

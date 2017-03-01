@@ -23,7 +23,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.string import return_ascii
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 class OAuthToken(db.Model):

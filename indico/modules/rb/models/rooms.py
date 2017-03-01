@@ -45,7 +45,7 @@ from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, natural_sort_key
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 _cache = GenericCache('Rooms')

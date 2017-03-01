@@ -78,7 +78,7 @@ def loads(string):
 
 def _is_no_report_error(exc):
     from indico.core import errors as indico_errors
-    from MaKaC import errors as makac_errors
+    from indico.legacy import errors as makac_errors
     return isinstance(exc, (indico_errors.NoReportError, makac_errors.NoReportError))
 
 

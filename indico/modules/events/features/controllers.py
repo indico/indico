@@ -31,8 +31,8 @@ from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
 from indico.web.util import jsonify_data
 
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHFeaturesBase(RHConferenceModifBase):

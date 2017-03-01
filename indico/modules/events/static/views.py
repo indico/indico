@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
-from MaKaC.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
 
 
 class WPStaticSites(WPConferenceModifBase, WPJinjaMixin):

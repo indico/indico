@@ -34,7 +34,7 @@ from indico.util.signals import named_objects_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
 
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 _cache = GenericCache('updated-menus')
 

@@ -39,9 +39,9 @@ from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 from indico.web.util import _pop_injected_js, jsonify_data
 
-from MaKaC.webinterface.rh.base import RHProtected
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):

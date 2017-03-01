@@ -23,7 +23,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.modules.categories import LegacyCategoryMapping
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RHSimple
+from indico.legacy.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function

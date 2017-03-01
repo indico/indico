@@ -47,9 +47,9 @@ from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.flask.util import ResponseUtil
 
-from MaKaC.common.fossilize import fossilize, clearCache
-from MaKaC.accessControl import AccessWrapper
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.fossilize import fossilize, clearCache
+from indico.legacy.accessControl import AccessWrapper
+from indico.legacy.common.cache import GenericCache
 
 
 # Remove the extension at the end or before the querystring

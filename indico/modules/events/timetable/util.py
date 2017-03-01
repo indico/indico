@@ -306,7 +306,7 @@ def shift_following_entries(entry, shift, session_=None):
 
 
 def get_timetable_offline_pdf_generator(event):
-    from MaKaC.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
+    from indico.legacy.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
     pdf_format = TimetablePDFFormat()
     return TimeTablePlain(event, session.user, sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4',
                           fontsize='normal')

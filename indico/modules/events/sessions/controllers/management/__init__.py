@@ -20,8 +20,8 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RH
 
 
 class RHManageSessionsBase(RHConferenceModifBase):

@@ -18,8 +18,8 @@ from __future__ import unicode_literals
 
 from indico.modules.events.models.events import EventType
 from indico.web.flask.templating import get_template_module
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceModifBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
 
 
 class WPEventManagement(WPJinjaMixin, WPConferenceModifBase):

@@ -38,7 +38,7 @@ from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import url_for_index, jsonify_data, jsonify_template
-from MaKaC.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.base import RHProtected
 
 
 class RHCreateEvent(RHProtected):

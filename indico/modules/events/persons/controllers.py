@@ -42,7 +42,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, jsonify_data
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_template
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHPersonsBase(RHConferenceModifBase):

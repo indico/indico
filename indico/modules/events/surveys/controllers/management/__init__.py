@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import request
 
 from indico.modules.events.surveys.models.surveys import Survey
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHManageSurveysBase(RHConferenceModifBase):

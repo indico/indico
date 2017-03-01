@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb.views import WPRoomBookingBase
-from MaKaC.webinterface.wcomponents import WTemplated
+from indico.legacy.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):

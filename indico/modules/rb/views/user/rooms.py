@@ -19,9 +19,9 @@ from datetime import datetime, date
 from dateutil.relativedelta import relativedelta
 from flask import request, session
 
-from MaKaC.common.cache import GenericCache
-from MaKaC.webinterface.pages.base import WPNotDecorated
-from MaKaC.webinterface.wcomponents import WTemplated
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.webinterface.pages.base import WPNotDecorated
+from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.modules.rb.util import rb_is_admin

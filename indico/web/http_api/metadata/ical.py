@@ -24,7 +24,7 @@ from pytz import timezone, utc
 
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
-from MaKaC.common.timezoneUtils import nowutc
+from indico.legacy.common.timezoneUtils import nowutc
 
 
 class vRecur(ical.vRecur):

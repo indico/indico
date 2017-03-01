@@ -20,7 +20,7 @@ from indico.core.auth import multipass
 from indico.modules.groups import GroupProxy
 from indico.util.fossilize import Fossilizable, fossilizes
 from indico.util.string import to_unicode, return_ascii, encode_utf8
-from MaKaC.fossils.user import IGroupFossil
+from indico.legacy.fossils.user import IGroupFossil
 
 
 class GroupWrapper(Fossilizable):

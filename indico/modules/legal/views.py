@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from MaKaC.webinterface.pages.admins import WPAdminsBase
-from MaKaC.webinterface.pages.base import WPDecorated, WPJinjaMixin
+from indico.legacy.webinterface.pages.admins import WPAdminsBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
 class WPLegalMixin:

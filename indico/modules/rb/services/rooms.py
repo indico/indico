@@ -21,7 +21,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import get_datetime_from_request
-from MaKaC.services.implementation.base import LoggedOnlyService, ServiceBase
+from indico.legacy.services.implementation.base import LoggedOnlyService, ServiceBase
 
 
 class RoomBookingAvailabilitySearchRooms(ServiceBase):

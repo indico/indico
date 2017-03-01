@@ -36,7 +36,7 @@ from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.util import generate_public_auth_request
 from indico.web.util import jsonify_data
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.base import RH
 
 
 class RHAPIAdminSettings(RHAdminBase):
