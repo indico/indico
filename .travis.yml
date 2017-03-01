@@ -4,6 +4,9 @@ python:
   - 2.7
 addons:
   postgresql: 9.4
+env:
+  global:
+    - INDICO_CONFIG=/dev/null
 install:
   - pip install -U pip setuptools
   - grep -v indico-fonts requirements.txt | pip install -r /dev/stdin
