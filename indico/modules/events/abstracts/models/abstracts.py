@@ -90,7 +90,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     """Represents an abstract that can be associated to a Contribution."""
 
     __tablename__ = 'abstracts'
-    __auto_table_args = (db.UniqueConstraint('friendly_id', 'event_id'),
+    __auto_table_args = (db.Index(None, 'friendly_id', 'event_id', unique=True,
+                                  postgresql_where=db.text('NOT is_deleted')),
                          db.CheckConstraint('(state = {}) OR (accepted_track_id IS NULL)'
                                             .format(AbstractState.accepted),
                                             name='accepted_track_id_only_accepted'),
