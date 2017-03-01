@@ -25,7 +25,6 @@ import re
 import shutil
 import sys
 import pkg_resources
-import copy
 
 
 if sys.platform == 'linux2':
@@ -283,7 +282,6 @@ def _extractDirsFromConf(conf):
     values = locals().copy()
 
     return {'bin': values['BinDir'],
-            'doc': values['DocumentationDir'],
             'etc': values['ConfigurationDir'],
             'htdocs': values['HtdocsDir'],
             'tmp': values['UploadedFilesTempDir'],
@@ -420,7 +418,6 @@ Indico has been installed correctly.
     indico.conf:      {conf}
 
     BinDir:           {bin}
-    DocumentationDir: {docs}
     ConfigurationDir: {etc}
     HtdocsDir:        {htdocs}
 
@@ -437,4 +434,4 @@ Please do not forget to start the Celery worker in order to use background tasks
 such as event reminders and periodic cleanups. You can run it using this command:
 $ indico celery worker -B
 """.format(conf='{}/indico.conf'.format(targetDirs['etc']), etc=targetDirs['etc'], bin=targetDirs['bin'],
-           docs=targetDirs['doc'], htdocs=targetDirs['htdocs'])
+           htdocs=targetDirs['htdocs'])
