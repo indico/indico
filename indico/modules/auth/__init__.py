@@ -30,7 +30,7 @@ from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
-from MaKaC.common.timezoneUtils import SessionTZ
+from indico.legacy.common.timezoneUtils import SessionTZ
 
 
 logger = Logger.get('auth')

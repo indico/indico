@@ -35,8 +35,8 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_form
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 TEMPLATE_DATA_JSON_SCHEMA = {
     'type': 'object',

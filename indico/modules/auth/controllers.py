@@ -43,8 +43,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.util import url_for_index
 
-from MaKaC.common.mail import GenericMailer
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.common.mail import GenericMailer
+from indico.legacy.webinterface.rh.base import RH
 
 
 def _get_provider(name, external):

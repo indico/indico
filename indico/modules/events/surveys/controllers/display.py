@@ -31,7 +31,7 @@ from indico.modules.events.surveys.views import (WPDisplaySurveyConference, WPDi
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _can_redirect_to_single_survey(surveys):

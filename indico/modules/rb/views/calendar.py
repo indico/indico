@@ -32,7 +32,7 @@ from indico.util.serializer import Serializer
 from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.wcomponents import WTemplated
+from indico.legacy.webinterface.wcomponents import WTemplated
 
 
 class RoomBookingCalendarWidget(object):

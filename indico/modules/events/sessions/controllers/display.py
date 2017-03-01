@@ -28,7 +28,7 @@ from indico.modules.events.sessions.util import (get_sessions_for_user, get_sess
 from indico.modules.events.sessions.views import WPDisplaySession, WPDisplayMySessionsConference
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHDisplaySessionList(RHConferenceBaseDisplay):

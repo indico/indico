@@ -309,7 +309,7 @@ def sanitize_for_platypus(text):
     return etree.tostring(doc)
 
 
-# TODO: reference implementation from MaKaC
+# TODO: reference implementation from indico.legacy
 # but, it's not totally correct according to RFC, see test cases
 # However, this regex is pretty good in term of practicality
 # but it may be updated to cover all cases

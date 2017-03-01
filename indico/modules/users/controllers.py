@@ -55,10 +55,10 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
-from MaKaC.common.cache import GenericCache
-from MaKaC.common.mail import GenericMailer
-from MaKaC.common.timezoneUtils import DisplayTZ
-from MaKaC.webinterface.rh.base import RHProtected
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.mail import GenericMailer
+from indico.legacy.common.timezoneUtils import DisplayTZ
+from indico.legacy.webinterface.rh.base import RHProtected
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}

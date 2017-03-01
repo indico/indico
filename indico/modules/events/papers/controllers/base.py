@@ -20,8 +20,8 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.contributions.models.contributions import Contribution
-from MaKaC.webinterface.rh.base import RHModificationBaseProtected
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHPapersBase(RHConferenceBaseDisplay):

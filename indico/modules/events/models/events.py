@@ -69,10 +69,10 @@ class EventType(RichIntEnum):
     @property
     def web_factory(self):
         if self == EventType.meeting:
-            from MaKaC.webinterface.meeting import WebFactory
+            from indico.legacy.webinterface.meeting import WebFactory
             return WebFactory
         elif self == EventType.lecture:
-            from MaKaC.webinterface.simple_event import WebFactory
+            from indico.legacy.webinterface.simple_event import WebFactory
             return WebFactory
         else:
             # conferences have no WebFactory
@@ -588,7 +588,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def display_tzinfo(self):
         """The tzinfo of the event as preferred by the current user"""
-        from MaKaC.common.timezoneUtils import DisplayTZ
+        from indico.legacy.common.timezoneUtils import DisplayTZ
         return DisplayTZ(conf=self).getDisplayTZ(as_timezone=True)
 
     @property

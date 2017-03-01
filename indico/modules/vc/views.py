@@ -17,10 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
-from MaKaC.webinterface.pages.main import WPMainBase
-from MaKaC.webinterface.wcomponents import WSimpleNavigationDrawer
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
 class WPVCJinjaMixin(WPJinjaMixin):

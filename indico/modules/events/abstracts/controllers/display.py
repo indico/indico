@@ -27,7 +27,7 @@ from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-from MaKaC.PDFinterface.conference import AbstractsToPDF
+from indico.legacy.PDFinterface.conference import AbstractsToPDF
 
 
 class RHCallForAbstracts(RHAbstractsBase):

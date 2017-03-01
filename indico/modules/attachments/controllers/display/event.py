@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from flask import request, session, redirect
 from werkzeug.exceptions import Forbidden
 
-from MaKaC.webinterface.rh.conferenceBase import RHConferenceBase
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.controllers.util import SpecificFolderMixin

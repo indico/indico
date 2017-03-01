@@ -32,9 +32,9 @@ from indico.util.date_time import now_utc
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 
-from MaKaC.accessControl import AccessWrapper
-from MaKaC.common.offlineWebsiteCreator import OfflineEvent
-from MaKaC.webinterface.rh.conferenceBase import RHCustomizable
+from indico.legacy.accessControl import AccessWrapper
+from indico.legacy.common.offlineWebsiteCreator import OfflineEvent
+from indico.legacy.webinterface.rh.conferenceBase import RHCustomizable
 
 
 @celery.task(request_context=True)

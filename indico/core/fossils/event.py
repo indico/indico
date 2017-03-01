@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
-from MaKaC.common.fossilize import IFossil
+from indico.legacy.common.fossilize import IFossil
 
 
 class IErrorReportFossil(IFossil):

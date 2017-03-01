@@ -96,7 +96,7 @@ class LoggerUtils:
         else:
             formatters = {}
 
-        # Really ugly.. but logging fails to import MaKaC.common.logger.IndicoMailFormatter
+        # Really ugly.. but logging fails to import indico.legacy.common.logger.IndicoMailFormatter
         # when using it in the class= option...
         if 'mailFormatter' in formatters:
             f = formatters.get('mailFormatter')

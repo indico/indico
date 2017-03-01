@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.logs.models.entries import EventLogEntry
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHEventLogs(RHConferenceModifBase):

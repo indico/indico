@@ -20,7 +20,7 @@ from flask import current_app, redirect
 
 from indico.modules.events.layout.models.legacy_mapping import LegacyPageMapping, LegacyImageMapping
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RHSimple
+from indico.legacy.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function

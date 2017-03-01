@@ -23,8 +23,8 @@ from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.lists import RegistrationListGenerator
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHManageRegFormsBase(RHConferenceModifBase):

@@ -33,9 +33,9 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.events.views import WPEventDisplay
 from indico.web.flask.util import send_file, jsonify_data
-from MaKaC.PDFinterface.conference import ContribToPDF, ContribsToPDF
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.PDFinterface.conference import ContribToPDF, ContribsToPDF
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _get_persons(event, condition):

@@ -49,9 +49,9 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
-from MaKaC.common.cache import GenericCache
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 poster_cache = GenericCache('poster-printing')

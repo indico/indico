@@ -18,7 +18,7 @@ from functools import wraps
 from types import GeneratorType
 
 from indico.core.config import Config
-from MaKaC.common.mail import GenericMailer
+from indico.legacy.common.mail import GenericMailer
 
 
 def email_sender(fn):

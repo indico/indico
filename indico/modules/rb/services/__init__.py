@@ -17,7 +17,7 @@
 from indico.util.date_time import get_datetime_from_request, format_date, is_weekend
 from indico.util.i18n import _
 from indico.modules.rb.models.holidays import Holiday
-from MaKaC.services.implementation.base import ServiceBase
+from indico.legacy.services.implementation.base import ServiceBase
 
 
 class GetDateWarning(ServiceBase):

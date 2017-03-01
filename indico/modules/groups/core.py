@@ -28,7 +28,7 @@ from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 class GroupProxy(object):

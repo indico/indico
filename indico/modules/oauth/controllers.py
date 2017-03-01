@@ -34,7 +34,7 @@ from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from MaKaC.webinterface.rh.base import RH, RHProtected
+from indico.legacy.webinterface.rh.base import RH, RHProtected
 
 
 class RHOAuthAuthorize(RHProtected):

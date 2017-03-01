@@ -35,7 +35,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.base import RH
 
 
 class RHCephalopodBase(RHAdminBase):

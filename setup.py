@@ -23,7 +23,7 @@ import os
 import re
 import shutil
 import sys
-from distutils.sysconfig import get_python_lib, get_python_version
+from distutils.sysconfig import get_python_version
 from distutils.cmd import Command
 from distutils.command import bdist
 
@@ -73,11 +73,7 @@ def _generateDataPaths(x):
     return dataFiles
 
 
-def _getInstallRequires():
-    """Returns external packages required by Indico
-
-    These are the ones needed for runtime."""
-
+def get_requirements():
     return read_requirements_file(os.path.join(os.path.dirname(__file__), 'requirements.txt'))
 
 
@@ -120,11 +116,6 @@ def _bdist_egg_indico(dataFiles):
 class develop_indico(develop.develop):
     def run(self):
         develop.develop.run(self)
-
-        # create symlink to legacy MaKaC dir
-        # this is so that the ".egg-link" created by the "develop" command works
-        if sys.platform in ["linux2", "darwin"] and not os.path.exists('MaKaC'):
-            os.symlink('indico/MaKaC', 'MaKaC')
 
         # install dev dependencies
         env = pkg_resources.Environment()
@@ -188,11 +179,6 @@ Please specify the directory where you'd like it to be placed.
         # avoid modifying the htdocs folder permissions (it brings problems with git)
         directories.pop('htdocs')
 
-        from MaKaC.consoleScripts.installBase import _updateMaKaCEggCache
-
-        _updateMaKaCEggCache(os.path.join(os.path.dirname(__file__), 'indico', 'MaKaC', '__init__.py'),
-                             directories['tmp'])
-
         compile_languages(self)
 
     def _update_conf_dir_paths(self, filePath, dirs):
@@ -236,16 +222,6 @@ if __name__ == '__main__':
 
     dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
 
-    foundPackages = list('MaKaC.{}'.format(pkg) for pkg in find_packages(where='indico/MaKaC'))
-    foundPackages.append('MaKaC')
-    foundPackages.append('htdocs')
-
-    # add our namespace package
-    foundPackages += ['indico.{}'.format(pkg) for pkg in find_packages(where='indico', exclude=['htdocs*', 'MaKaC*'])]
-    foundPackages.append('indico')
-    foundPackages += ['indico_zodbimport.{}'.format(pkg) for pkg in find_packages(where='indico_zodbimport')]
-    foundPackages.append('indico_zodbimport')
-
     cmdclass = {'sdist': sdist_indico,
                 'bdist': _bdist_indico(dataFiles),
                 'bdist_egg': _bdist_egg_indico(dataFiles),
@@ -268,7 +244,7 @@ if __name__ == '__main__':
           license="http://www.gnu.org/licenses/gpl-3.0.txt",
           entry_points="""
             [console_scripts]
-            indico_initial_setup = MaKaC.consoleScripts.indicoInitialSetup:main
+            indico_initial_setup = indico.legacy.consoleScripts.indicoInitialSetup:main
             indico = indico.cli.manage:main
             indico-zodbimport = indico_zodbimport.cli:main
 
@@ -321,12 +297,9 @@ if __name__ == '__main__':
             event_data = indico_zodbimport.modules.event_data:EventDataImporter
             """,
           zip_safe=False,
-          packages=foundPackages,
-          package_dir={'indico': 'indico',
-                       'htdocs': os.path.join('indico', 'htdocs'),
-                       'MaKaC': os.path.join('indico', 'MaKaC')},
+          packages=find_packages(),
           package_data={'indico': ['*.*']},
           include_package_data=True,
-          install_requires=_getInstallRequires(),
+          install_requires=get_requirements(),
           data_files=dataFiles,
           dependency_links=DEPENDENCY_URLS)

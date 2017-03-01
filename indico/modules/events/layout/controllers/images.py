@@ -31,8 +31,8 @@ from indico.modules.events.layout.views import WPImages
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.util import jsonify_data
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _render_image_list(event):

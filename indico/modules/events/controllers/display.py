@@ -23,7 +23,7 @@ from flask import request
 from indico.modules.events.util import serialize_event_for_ical
 from indico.web.http_api.metadata import Serializer
 from indico.web.flask.util import send_file
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHExportEventICAL(RHConferenceBaseDisplay):

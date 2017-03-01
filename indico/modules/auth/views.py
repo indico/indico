@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.modules.users.views import WPUser
-from MaKaC.webinterface.pages.base import WPJinjaMixin
-from MaKaC.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.main import WPMainBase
 
 
 class WPAuth(WPJinjaMixin, WPMainBase):

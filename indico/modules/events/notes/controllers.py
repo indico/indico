@@ -30,7 +30,7 @@ from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import get_object_from_args
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
-from MaKaC.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.base import RHProtected
 
 
 class RHNoteBase(RHProtected):

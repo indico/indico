@@ -33,7 +33,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.validators import IndicoEmail
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 _cache = GenericCache('Rooms')

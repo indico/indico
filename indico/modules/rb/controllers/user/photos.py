@@ -22,7 +22,7 @@ from indico.core.config import Config
 from indico.web.flask.util import send_file
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.photos import Photo
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 _cache = GenericCache('Rooms')

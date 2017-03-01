@@ -36,9 +36,9 @@ from indico.util.string import to_unicode, crc32
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
-from MaKaC.webinterface.pages.conferences import WPConfModifPreviewCSS
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.pages.conferences import WPConfModifPreviewCSS
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHLayoutBase(RHConferenceModifBase):

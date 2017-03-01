@@ -279,7 +279,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def display_tzinfo(self):
         """The tzinfo of the category or the one specified by the user"""
-        from MaKaC.common.timezoneUtils import DisplayTZ
+        from indico.legacy.common.timezoneUtils import DisplayTZ
         return DisplayTZ(conf=self).getDisplayTZ(as_timezone=True)
 
     def can_create_events(self, user):

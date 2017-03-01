@@ -24,7 +24,7 @@ from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFol
 from indico.modules.events import LegacyEventMapping
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.base import RHSimple, RH
+from indico.legacy.webinterface.rh.base import RHSimple, RH
 
 
 def _clean_args(kwargs):

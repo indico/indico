@@ -27,7 +27,7 @@ from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
-from MaKaC.PDFinterface.conference import ConfManagerAbstractsToPDF, AbstractsToPDF
+from indico.legacy.PDFinterface.conference import ConfManagerAbstractsToPDF, AbstractsToPDF
 
 
 class DisplayAbstractListMixin:

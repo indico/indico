@@ -36,7 +36,7 @@ from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
 
 import indico
-from MaKaC.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.base import RH
 
 # TODO: set the time zone here once communities settings are available.
 

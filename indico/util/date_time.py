@@ -32,7 +32,7 @@ from dateutil.relativedelta import relativedelta
 from indico.core.config import Config
 from indico.util.i18n import get_current_locale, _, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
-from MaKaC.common.timezoneUtils import DisplayTZ
+from indico.legacy.common.timezoneUtils import DisplayTZ
 
 
 def now_utc(exact=True):

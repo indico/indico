@@ -63,7 +63,7 @@ class Conversion(object):
     @classmethod
     def duration(cls, duration, units='minutes', truncate=True):
         if duration:
-            from MaKaC.common.utils import formatDuration
+            from indico.legacy.common.utils import formatDuration
             return formatDuration(duration, units, truncate)
         else:
             return None

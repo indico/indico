@@ -39,7 +39,7 @@ from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, W
                                                 WPRoomBookingEventNewBookingConfirm)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _get_object_type(obj):

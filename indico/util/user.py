@@ -20,7 +20,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.util.decorators import smart_decorator
 
-from MaKaC.common.cache import GenericCache
+from indico.legacy.common.cache import GenericCache
 
 
 def iter_acl(acl):

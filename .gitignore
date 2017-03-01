@@ -5,9 +5,6 @@
 *.pyo
 __pycache__/
 
-# makac symlink
-/MaKaC
-
 # configs
 /etc/*.conf
 

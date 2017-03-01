@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.blueprints.event.management import event_mgmt
-from MaKaC.webinterface.rh import conferenceModif
+from indico.legacy.webinterface.rh import conferenceModif
 
 
 # Tools: Clone

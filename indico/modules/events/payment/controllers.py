@@ -31,8 +31,8 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHPaymentAdminSettings(RHAdminBase):

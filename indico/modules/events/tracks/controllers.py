@@ -35,10 +35,10 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_data
-from MaKaC.PDFinterface.conference import ProgrammeToPDF
-from MaKaC.webinterface.rh.base import RH
-from MaKaC.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from MaKaC.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.legacy.PDFinterface.conference import ProgrammeToPDF
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _render_track_list(event):
