@@ -210,7 +210,6 @@ class Config:
         'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost/',
         'BaseSecureURL'             : 'https://localhost/',
-        'HtdocsDir'                 : "/opt/indico/htdocs",
         'LogDir'                    : "/opt/indico/log" ,
         'TempDir'                   : "/opt/indico/tmp",
         'SharedTempDir'             : "",
@@ -278,7 +277,6 @@ class Config:
 
     if sys.platform == 'win32':
         default_values.update({
-            "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\indico",
             "LogDir"               : "C:\\indico\\log",
             "TempDir"              : "C:\\indico\\temp",
             "CacheDir"             : "C:\\indico\\cache",
@@ -606,6 +604,9 @@ class Config:
 
     def getSharedTempDir(self):
         return self._configVars.get('SharedTempDir') or self.getTempDir()
+
+    def getHtdocsDir(self):
+        return os.path.join(get_root_path('indico'), 'htdocs')
 
     def getImagesBaseURL(self):
         if has_app_context() and g.get('static_site'):
