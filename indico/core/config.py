@@ -464,6 +464,8 @@ class Config:
         config_path = self.getConfigFilePath()
         if os.path.islink(config_path):
             config_path = os.readlink(config_path)
+        if config_path == os.devnull:
+            return os.path.join(get_root_path('indico'), 'logging.conf.sample')
         return os.path.join(os.path.dirname(config_path), self.getLoggingConfigFile())
 
     @classmethod
