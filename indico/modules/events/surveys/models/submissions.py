@@ -26,7 +26,12 @@ from indico.util.string import return_ascii
 
 class SurveySubmission(db.Model):
     __tablename__ = 'submissions'
-    __table_args__ = {'schema': 'event_surveys'}
+    __table_args__ = (db.CheckConstraint('is_anonymous OR user_id IS NOT NULL', 'anonymous_or_user'),
+                      db.CheckConstraint('is_submitted = (submitted_dt IS NOT NULL)',
+                                         'dt_set_when_submitted'),
+                      db.CheckConstraint('(is_submitted AND is_anonymous) = (user_id IS NULL)',
+                                         'submitted_and_anonymous_no_user'),
+                      {'schema': 'event_surveys'})
 
     #: The ID of the submission
     id = db.Column(
@@ -50,8 +55,19 @@ class SurveySubmission(db.Model):
     #: The date/time when the survey was submitted
     submitted_dt = db.Column(
         UTCDateTime,
+        nullable=True,
+    )
+    #: Whether the survey submission is anonymous
+    is_anonymous = db.Column(
+        db.Boolean,
         nullable=False,
-        default=now_utc,
+        default=False
+    )
+    #: Whether the survey was submitted
+    is_submitted = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
 
     #: The user who submitted the survey
@@ -80,10 +96,6 @@ class SurveySubmission(db.Model):
     @property
     def locator(self):
         return dict(self.survey.locator, submission_id=self.id)
-
-    @property
-    def is_anonymous(self):
-        return self.user is None
 
     @return_ascii
     def __repr__(self):

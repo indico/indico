@@ -142,7 +142,7 @@ class Survey(db.Model):
         nullable=False,
         default=[]
     )
-    #: Email addresses t notify about new submissions
+    #: Email addresses to notify about new submissions
     new_submission_emails = db.Column(
         ARRAY(db.String),
         nullable=False,
