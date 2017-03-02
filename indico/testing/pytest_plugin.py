@@ -23,9 +23,9 @@ import tempfile
 
 import py
 
-from indico.core.config import Config
-from indico.core.logger import Logger
 
+# Ignore config file in case there is one
+os.environ['INDICO_CONFIG'] = os.devnull
 
 pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.category',
                   'indico.testing.fixtures.contribution', 'indico.testing.fixtures.database',
@@ -34,6 +34,8 @@ pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.catego
 
 
 def pytest_configure(config):
+    from indico.core.config import Config
+    from indico.core.logger import Logger
     # Load all the plugins defined in pytest_plugins
     config.pluginmanager.consider_module(sys.modules[__name__])
     config.indico_temp_dir = py.path.local(tempfile.mkdtemp(prefix='indicotesttmp.'))
