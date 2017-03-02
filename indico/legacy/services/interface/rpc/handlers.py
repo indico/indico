@@ -16,7 +16,7 @@
 
 from importlib import import_module
 
-from indico.legacy.services.implementation import resources, error
+from indico.legacy.services.implementation import error
 from indico.legacy.services.interface.rpc import description
 from indico.modules.rb import services as rb_services
 from indico.modules.rb.services import (
@@ -26,7 +26,6 @@ from indico.modules.rb.services import (
 )
 
 methodMap = {
-    'resources.timezones.getAll': resources.GetTimezones,
     # rb base
     'roomBooking.getDateWarning': rb_services.GetDateWarning,
     # rb rooms

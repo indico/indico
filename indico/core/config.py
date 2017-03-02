@@ -287,13 +287,14 @@ class Config:
         self.__readConfigFile()
         self._shelf = None
 
-    def reset(self, custom={}):
+    def reset(self, custom=None):
         """
         Resets the config to the default values (ignoring indico.conf) and
         sets custom options if provided
         """
         self._configVars = copy.deepcopy(self.default_values)
-        self._configVars.update(custom)
+        if custom:
+            self._configVars.update(custom)
         self._deriveOptions()
 
     def update(self, **options):
@@ -388,8 +389,6 @@ class Config:
         # options that are derived automatically
         self._deriveOptions()
 
-        self.__tplFiles = {}
-
         if self.getSanitizationLevel() not in range(4):
             raise MaKaCError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
 
@@ -447,9 +446,6 @@ class Config:
     def getProfile(self):
         return self._yesOrNoVariable('Profile')
 
-    def getUseXSendFile(self):
-        raise NotImplementedError('Deprecated Method')
-
     def getStaticFileMethod(self):
         val = self._configVars['StaticFileMethod']
         if not val:
@@ -484,28 +480,6 @@ class Config:
     def setInstance(cls, instance):
         cls.__instance = instance
 
-    def getCurrentDBDir(self):
-        """gives back the path of the directory where the current database
-           files are kept
-        """
-        raise NotImplementedError("Deprecated Method")
-        # return raw_input("\n\nPlease enter the path to the directory that contains the database files")
-
-
-    def getDBBackupsDir(self):
-        """gives back the path of the directory where the backups of the
-           database files are kept
-        """
-        raise NotImplementedError("Deprecated Method")
-        # return raw_input("\n\nPlease enter the path to the directory that will contain the database backups [OPTIONAL]\n\n")
-
-
-    def getTimezoneList(self):
-        # Dont move outside, we need to call Config.getInstance() from setup.py and if
-        # the system has no pytz module then the import will break
-        from pytz import all_timezones as Timezones
-        return Timezones
-
     def getCssStylesheetName(self):
         return 'Default.css'
 
@@ -519,20 +493,6 @@ class Config:
 
         return "%s/css/confTemplates" % baseURL
 
-    def getTPLFile(self, tplId):
-        """gives back the template file name associated to a certain page of
-           the web interface. If no TPL file was specified it returns the
-           empty string.
-           Params:
-                tplId -- unique identifier of the web interface page (normally
-                    the web page class string)
-        """
-        if tplId in self.__tplFiles:
-            return self.__tplFiles[tplId]
-        else:
-            return ""
-
-
     def getTPLVars(self):
         """gives back the user configured variables that must be available in
            any template file.
@@ -541,56 +501,12 @@ class Config:
         vars["imagesDir"] = self.getImagesBaseURL()
         return vars
 
-
-    def getCategoryIconPath(self, categid):
-        return "%s/categicon/%s.png" % (self.getImagesDir(), categid)
-
-
-    def getCategoryIconURL(self, categid):
-        return "%s/categicon/%s.png" % (self.getImagesBaseURL(), categid)
-
-
-    def getFileType(self, fileExtension):
-        """returns the file type corresponding to the specified file extension
-        """
-        if fileExtension.strip().upper() in self.getFileTypes():
-            return fileExtension.strip().upper()
-        return ""
-
-
-    def getFileTypeDescription(self, fileType):
-        """returns the configured file type description for the specified file
-            type.
-        """
-        if fileType in self.getFileTypes():
-            return self.getFileTypes()[fileType][0]
-        return ""
-
-
     def getFileTypeMimeType(self, fileType):
         """returns the configured mime-type for the specified file type
         """
         if fileType in self.getFileTypes():
             return self.getFileTypes()[fileType][1]
         return "unknown"
-
-
-    def getFileTypeIconURL(self, fileType):
-        if fileType == "":
-            return ""
-        try:
-            icon = self.getFileTypes()[fileType][2]
-        except IndexError:
-            return ""
-        except KeyError:
-            return ""
-        if icon == "":
-            return ""
-        iconPath = os.path.join( self.getImagesDir(), icon )
-        if not os.access( iconPath, os.F_OK ):
-            return ""
-        return "%s/%s"%( self.getImagesBaseURL(), icon )
-
 
     def getSystemIconURL( self, id ):
         if id not in self.__systemIcons:
@@ -625,12 +541,6 @@ class Config:
             return "static/css"
         else:
             return url_parse("%s/css" % self.getBaseURL()).path
-
-    def getFontsBaseURL(self):
-        if g.get('static_site'):
-            return "static/fonts"
-        else:
-            return url_parse("%s/fonts" % self.getBaseURL()).path
 
     def getScriptBaseURL(self):
         if g.get('static_site'):

@@ -14,21 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import datetime
-from indico.core.config import Config
-import time
+from pytz import all_timezones
 
 from indico.legacy.services.implementation.base import ServiceBase
-from indico.legacy.services.interface.rpc.common import ServiceError
+
 
 class GetTimezones(ServiceBase):
-
-    def _checkParams(self):
-        ServiceBase._checkParams(self)
-
     def _getAnswer(self):
-        return {"timezones": Config.getInstance().getTimezoneList()}
+        return {"timezones": all_timezones}
 
-methodMap = {
-    "getTimezones": GetTimezones
-}
+
+methodMap = {'getTimezones': GetTimezones}
