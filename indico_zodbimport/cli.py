@@ -113,7 +113,7 @@ class Importer(object):
             app.debug = True
             apply_db_loggers(app)
         import_all_models()
-        alembic_migrate.init_app(app, db, os.path.join(app.root_path, '..', 'migrations'))
+        alembic_migrate.init_app(app, db, os.path.join(app.root_path, 'migrations'))
 
         self.connect_zodb()
 

@@ -12,6 +12,5 @@ include ez_setup.py
 recursive-include bin *
 recursive-include etc *
 recursive-include indico *
-graft migrations
 
 global-exclude *.pyc etc/zdctl.conf etc/zodb.conf etc/indico.conf
