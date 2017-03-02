@@ -215,7 +215,7 @@ class Config:
         'BinDir'                    : "/opt/indico/bin",
         'UploadedFilesTempDir'      : "/opt/indico/tmp",
         'UploadedFilesSharedTempDir': "",
-        'XMLCacheDir'               : "/opt/indico/cache",
+        'CacheDir'                  : "/opt/indico/cache",
         'CacheBackend'              : 'files',
         'MemcachedServers'          : [],
         'RedisCacheURL'             : None,
@@ -283,7 +283,7 @@ class Config:
             "LogDir"               : "C:\\indico\\log",
             "BinDir"               : "C:\\indico\\archive",
             "UploadedFilesTempDir" : "C:\\indico\\temp",
-            "XMLCacheDir"          : "C:\\indico\\cache",
+            "CacheDir"             : "C:\\indico\\cache",
         })
 
     def __init__(self, filePath = None):
@@ -384,6 +384,10 @@ class Config:
         # When populating configuration variables indico.conf's values have priority
         config_path = self.__get_config_path()
         config_vars = self.__load_config(config_path)
+
+        if 'XMLCacheDir' in config_vars:
+            raise Exception('XMLCacheDir has been renamed to CacheDir. Please update the config.')
+
         self._configVars = {k: config_vars.get(k, default) for k, default in self.default_values.iteritems()}
         self._configVars['ConfigFilePath'] = config_path
 

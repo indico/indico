@@ -44,7 +44,7 @@ def pytest_configure(config):
         'CacheBackend': 'null',
         'Loggers': [],
         'UploadedFilesTempDir': config.indico_temp_dir.strpath,
-        'XMLCacheDir': config.indico_temp_dir.strpath,
+        'CacheDir': config.indico_temp_dir.strpath,
         'StorageBackends': {'default': config.indico_temp_dir},
         'AttachmentStorage': 'default',
         'Plugins': plugins,

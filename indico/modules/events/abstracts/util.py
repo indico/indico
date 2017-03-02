@@ -280,7 +280,7 @@ def create_boa(event):
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
     filename = 'boa-{}.pdf'.format(event.id)
-    full_path = os.path.join(Config.getInstance().getXMLCacheDir(), filename)
+    full_path = os.path.join(Config.getInstance().getCacheDir(), filename)
     shutil.move(tmp_path, full_path)
     boa_settings.set(event, 'cache_path', filename)
     return full_path
@@ -291,7 +291,7 @@ def clear_boa_cache(event):
     path = boa_settings.get(event, 'cache_path')
     if path:
         try:
-            os.remove(os.path.join(Config.getInstance().getXMLCacheDir(), path))
+            os.remove(os.path.join(Config.getInstance().getCacheDir(), path))
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise

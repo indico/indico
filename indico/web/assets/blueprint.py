@@ -41,7 +41,7 @@ def js_vars_global():
     """
     config = Config.getInstance()
     config_hash = crc32(repr(make_hashable(sorted(config._configVars.items()))))
-    cache_file = os.path.join(config.getXMLCacheDir(), 'assets_global_{}.js'.format(config_hash))
+    cache_file = os.path.join(config.getCacheDir(), 'assets_global_{}.js'.format(config_hash))
 
     if not os.path.exists(cache_file):
         data = generate_global_file(config)
@@ -85,7 +85,7 @@ def i18n_locale(locale_name):
     config = Config.getInstance()
     root_path = os.path.join(current_app.root_path, 'translations')
     plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
-    cache_file = os.path.join(config.getXMLCacheDir(), 'assets_i18n_{}_{}.js'.format(locale_name, crc32(plugin_key)))
+    cache_file = os.path.join(config.getCacheDir(), 'assets_i18n_{}_{}.js'.format(locale_name, crc32(plugin_key)))
 
     if not os.path.exists(cache_file):
         i18n_data = locale_data(root_path, locale_name, 'indico')
