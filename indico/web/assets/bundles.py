@@ -19,15 +19,13 @@
 This file declares all core JS/CSS assets used by Indico
 """
 
-# stdlib imports
+import errno
 import os
 from urlparse import urlparse
 
-# 3rd party libs
 from markupsafe import Markup
 from webassets import Bundle, Environment
 
-# legacy imports
 from indico.core.config import Config
 from indico.modules.events.layout import theme_settings
 
@@ -43,14 +41,36 @@ def configure_pyscss(environment):
     ]
 
 
-class IndicoEnvironment(Environment):
+def get_webassets_cache_dir(plugin_name=None):
+    cfg = Config.getInstance()
+    suffix = 'core' if not plugin_name else 'plugin-{}'.format(plugin_name)
+    return os.path.join(cfg.getCacheDir(), 'webassets-{}-{}'.format(cfg.getWorkerName(), suffix))
+
+
+class LazyCacheEnvironment(Environment):
+    def _get_cache(self):
+        # Create the cache dir if it doesn't exist. Like this we wait until
+        # it is actually accessed instead of doing it at import time.
+        # Not sure why webassets only lazily creates the cache dir when using
+        # the default path but not when using a custom one...
+        if isinstance(self._storage['cache'], basestring):
+            try:
+                os.mkdir(self._storage['cache'])
+            except OSError as exc:
+                if exc.errno != errno.EEXIST:
+                    raise
+        return Environment.cache.fget(self)
+    cache = property(_get_cache, Environment.cache.fset)
+    del _get_cache
+
+
+class IndicoEnvironment(LazyCacheEnvironment):
     def __init__(self):
         config = Config.getInstance()
         url_path = urlparse(config.getBaseURL()).path
         output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets')
         url = '{0}/static/assets/'.format(url_path)
-
-        super(IndicoEnvironment, self).__init__(output_dir, url)
+        super(IndicoEnvironment, self).__init__(output_dir, url, cache=get_webassets_cache_dir())
         self.debug = config.getDebug()
         configure_pyscss(self)
 

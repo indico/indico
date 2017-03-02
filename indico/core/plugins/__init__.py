@@ -24,7 +24,7 @@ from flask_babelex import Domain
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from markupsafe import Markup
-from webassets import Environment, Bundle
+from webassets import Bundle
 from werkzeug.utils import cached_property
 
 from indico.core import signals
@@ -39,6 +39,7 @@ from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import _, NullDomain
 from indico.util.struct.enum import IndicoEnum
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
+from indico.web.assets.bundles import get_webassets_cache_dir, LazyCacheEnvironment
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -125,7 +126,8 @@ class IndicoPlugin(Plugin):
         output_url = '{}/static/assets/plugins/{}'.format(url_base_path, self.name)
         static_dir = os.path.join(self.root_path, 'static')
         static_url = '{}/static/plugins/{}'.format(url_base_path, self.name)
-        self.assets = Environment(output_dir, output_url, debug=config.getDebug())
+        self.assets = LazyCacheEnvironment(output_dir, output_url, debug=config.getDebug(),
+                                           cache=get_webassets_cache_dir(self.name))
         self.assets.append_path(output_dir, output_url)
         self.assets.append_path(static_dir, static_url)
         configure_pyscss(self.assets)
