@@ -18,6 +18,7 @@
 import ast
 import os
 import re
+from distutils.command.build import build
 from setuptools import setup, find_packages
 
 
@@ -94,10 +95,24 @@ def get_version():
         return str(ast.literal_eval(_version_re.search(f.read().decode('utf-8')).group(1)))
 
 
+class BuildWithTranslations(build):
+    def _compile_languages(self):
+        from babel.messages import frontend
+        compile_cmd = frontend.compile_catalog(self.distribution)
+        self.distribution._set_command_options(compile_cmd)
+        compile_cmd.finalize_options()
+        compile_cmd.run()
+
+    def run(self):
+        self._compile_languages()
+        build.run(self)
+
+
 if __name__ == '__main__':
     setup(
         name='indico',
         version=get_version(),
+        cmdclass={'build': BuildWithTranslations},
         description='Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool',
         author='Indico Team',
         author_email='indico-team@cern.ch',
