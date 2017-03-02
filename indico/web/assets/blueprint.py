@@ -16,7 +16,7 @@
 
 import os
 
-from flask import current_app, json, session, render_template, Response
+from flask import current_app, json, session, render_template, send_from_directory, Response
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
@@ -109,3 +109,13 @@ def i18n_locale(locale_name):
 
     return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/x-javascript',
                      no_cache=False, conditional=True)
+
+
+@assets_blueprint.route('!/static/assets/core/<path:path>')
+@assets_blueprint.route('!/static/assets/plugin-<plugin>/<path:path>')
+def static_asset(path, plugin=None):
+    if plugin and not plugin_engine.get_plugin(plugin):
+        # Ensure there's no weird stuff in the plugin name
+        raise NotFound
+    path = os.path.join('core' if not plugin else 'plugin-{}'.format(plugin), path)
+    return send_from_directory(Config.getInstance().getAssetsDir(), path)

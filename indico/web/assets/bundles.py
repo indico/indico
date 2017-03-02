@@ -68,8 +68,8 @@ class IndicoEnvironment(LazyCacheEnvironment):
     def __init__(self):
         config = Config.getInstance()
         url_path = urlparse(config.getBaseURL()).path
-        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets')
-        url = '{0}/static/assets/'.format(url_path)
+        output_dir = os.path.join(config.getAssetsDir(), 'core')
+        url = '{0}/static/assets/core/'.format(url_path)
         super(IndicoEnvironment, self).__init__(output_dir, url, cache=get_webassets_cache_dir())
         self.debug = config.getDebug()
         configure_pyscss(self)

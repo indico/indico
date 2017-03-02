@@ -213,6 +213,7 @@ class Config:
         'LogDir'                    : "/opt/indico/log" ,
         'TempDir'                   : "/opt/indico/tmp",
         'SharedTempDir'             : "",
+        'AssetsDir'                 : '/opt/indico/assets',
         'CacheDir'                  : "/opt/indico/cache",
         'CacheBackend'              : 'files',
         'MemcachedServers'          : [],

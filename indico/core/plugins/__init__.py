@@ -122,8 +122,8 @@ class IndicoPlugin(Plugin):
     def _setup_assets(self):
         config = Config.getInstance()
         url_base_path = urlparse(config.getBaseURL()).path
-        output_dir = os.path.join(config.getHtdocsDir(), 'static', 'assets', 'plugins', self.name)
-        output_url = '{}/static/assets/plugins/{}'.format(url_base_path, self.name)
+        output_dir = os.path.join(config.getAssetsDir(), 'plugin-{}'.format(self.name))
+        output_url = '{}/static/assets/plugin-{}'.format(url_base_path, self.name)
         static_dir = os.path.join(self.root_path, 'static')
         static_url = '{}/static/plugins/{}'.format(url_base_path, self.name)
         self.assets = LazyCacheEnvironment(output_dir, output_url, debug=config.getDebug(),
