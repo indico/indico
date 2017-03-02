@@ -128,7 +128,7 @@ class Storage(object):
         :param file_id: The ID of the file within the storage backend.
         """
         with self.open(file_id) as fd:
-            with NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getUploadedFilesTempDir()) as tmpfile:
+            with NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir()) as tmpfile:
                 copyfileobj(fd, tmpfile, 1024 * 1024)
                 tmpfile.flush()
                 yield tmpfile.name

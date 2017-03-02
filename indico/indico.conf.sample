@@ -112,11 +112,12 @@ BaseSecureURL        = "https://localhost:8443"
 #------------------------------------------------------------------------------
 # DIRECTORIES
 #------------------------------------------------------------------------------
-BinDir               = "/opt/indico/bin"
-HtdocsDir            = "/opt/indico/htdocs"
-LogDir               = "/opt/indico/log"
-UploadedFilesTempDir = "/opt/indico/tmp"
-CacheDir          = "/opt/indico/cache"
+BinDir          = "/opt/indico/bin"
+HtdocsDir       = "/opt/indico/htdocs"
+LogDir          = "/opt/indico/log"
+TempDir         = "/opt/indico/tmp"
+SharedTempDir   = "/opt/indico/tmp"
+CacheDir        = "/opt/indico/cache"
 # You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
 # CacheDir while the Memcached backend uses one or more memcached servers.
 #CacheBackend         = 'files'
