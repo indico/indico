@@ -199,7 +199,7 @@ class Logger:
         config = Config.getInstance()
 
         if 'files' in config.getLoggers():
-            logConfFilepath = os.path.join(config.getConfigurationDir(), 'logging.conf')
+            logConfFilepath = config.getLoggingConfigFilePath()
             smtpServer = config.getSmtpServer()
             serverName = config.getWorkerName()
             if not serverName:

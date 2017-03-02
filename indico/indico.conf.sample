@@ -113,7 +113,6 @@ BaseSecureURL        = "https://localhost:8443"
 # DIRECTORIES
 #------------------------------------------------------------------------------
 BinDir               = "/opt/indico/bin"
-ConfigurationDir     = "/opt/indico/etc"
 HtdocsDir            = "/opt/indico/htdocs"
 LogDir               = "/opt/indico/log"
 UploadedFilesTempDir = "/opt/indico/tmp"
@@ -241,6 +240,10 @@ MaxUploadFileSize = 0
 #  * Simple log files (default)
 #  * Sentry (https://github.com/getsentry/sentry)
 #
+# If the LoggingConfigFile is not an absolute path, it is relative to the
+# location of this file.
+#
+# LoggingConfigFile    = 'logging.conf'
 # Loggers              = ['sentry', 'files']
 # SentryDSN            = 'http://user:password@logger.example.com/n'
 # SentryLoggingLevel   = 'ERROR'  # default: 'WARNING'

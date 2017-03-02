@@ -210,7 +210,6 @@ class Config:
         'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost/',
         'BaseSecureURL'             : 'https://localhost/',
-        'ConfigurationDir'          : "/opt/indico/etc",
         'HtdocsDir'                 : "/opt/indico/htdocs",
         'LogDir'                    : "/opt/indico/log" ,
         'BinDir'                    : "/opt/indico/bin",
@@ -274,12 +273,12 @@ class Config:
         'AttachmentStorage'         : 'default',
         'StaticSiteStorage'         : None,
         'TrackerURL'                : 'http://localhost:5000/api',
-        'ConfigFilePath'            : None
+        'ConfigFilePath'            : None,
+        'LoggingConfigFile'         : 'logging.conf',
     }
 
     if sys.platform == 'win32':
         default_values.update({
-            "ConfigurationDir"     : "C:\\indico\\etc",
             "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\indico",
             "LogDir"               : "C:\\indico\\log",
             "BinDir"               : "C:\\indico\\archive",
@@ -358,7 +357,7 @@ class Config:
                  '/etc/indico.conf']
         for path in paths:
             if os.path.exists(path):
-                return os.readlink(path) if os.path.islink(path) else path
+                return path
         raise Exception('No indico config found. Point the INDICO_CONFIG env var to your config file or or '
                         'move/symlink the config in one of the following locations: {}'.format(', '.join(paths)))
 
@@ -466,6 +465,12 @@ class Config:
 
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
+
+    def getLoggingConfigFilePath(self):
+        config_path = self.getConfigFilePath()
+        if os.path.islink(config_path):
+            config_path = os.readlink(config_path)
+        return os.path.join(os.path.dirname(config_path), self.getLoggingConfigFile())
 
     @classmethod
     def getInstance(cls):

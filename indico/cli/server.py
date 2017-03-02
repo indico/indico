@@ -223,7 +223,7 @@ class WerkzeugServer(object):
             assert self._server is None  # otherwise the socket is already bound
             self._test_socket()
             cfg = Config.getInstance()
-            extra_files = [os.path.join(cfg.getConfigurationDir(), 'logging.conf'), cfg.getConfigFilePath()]
+            extra_files = [cfg.getConfigFilePath(), cfg.getLoggingConfigFilePath()]
             werkzeug.serving.run_with_reloader(self._run_new_server, extra_files)
 
 
