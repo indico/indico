@@ -27,7 +27,6 @@ ENTRY_POINTS = {
         'indico = indico.cli.manage:main',
         'indico-setup = indico.cli.setup:cli',
         'indico-zodbimport = indico_zodbimport.cli:main',
-        'indico_initial_setup = indico.legacy.consoleScripts.indicoInitialSetup:main',
     ],
     'pytest11': [
         'indico = indico.testing.pytest_plugin',
