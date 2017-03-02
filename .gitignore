@@ -6,7 +6,7 @@
 __pycache__/
 
 # configs
-/etc/*.conf
+*.conf
 
 # python packaging
 /dist
