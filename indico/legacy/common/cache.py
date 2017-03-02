@@ -283,7 +283,7 @@ class GenericCache(object):
         elif backend == 'redis':
             self._client = RedisCacheClient(Config.getInstance().getRedisCacheURL())
         elif backend == 'files':
-            self._client = FileCacheClient(Config.getInstance().getXMLCacheDir())
+            self._client = FileCacheClient(Config.getInstance().getCacheDir())
         else:
             self._client = NullCacheClient()
 

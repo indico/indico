@@ -116,9 +116,9 @@ BinDir               = "/opt/indico/bin"
 HtdocsDir            = "/opt/indico/htdocs"
 LogDir               = "/opt/indico/log"
 UploadedFilesTempDir = "/opt/indico/tmp"
-XMLCacheDir          = "/opt/indico/cache"
+CacheDir          = "/opt/indico/cache"
 # You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
-# XMLCacheDir while the Memcached backend uses one or more memcached servers.
+# CacheDir while the Memcached backend uses one or more memcached servers.
 #CacheBackend         = 'files'
 # When using memcached, provide a tuple containing 'ip:port' entries for the
 # memcached servers. Do not forget to firewall those servers as memcached has no
