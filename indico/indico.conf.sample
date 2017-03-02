@@ -112,7 +112,6 @@ BaseSecureURL        = "https://localhost:8443"
 #------------------------------------------------------------------------------
 # DIRECTORIES
 #------------------------------------------------------------------------------
-HtdocsDir       = "/opt/indico/htdocs"
 LogDir          = "/opt/indico/log"
 TempDir         = "/opt/indico/tmp"
 SharedTempDir   = "/opt/indico/tmp"
