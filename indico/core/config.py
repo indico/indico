@@ -460,11 +460,15 @@ class Config:
     def getAuthenticatedEnforceSecure(self):
         return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
 
-    def getLoggingConfigFilePath(self):
+    def getFinalConfigFilePath(self):
         config_path = self.getConfigFilePath()
         if os.path.islink(config_path):
             config_path = os.readlink(config_path)
-        if config_path == os.devnull:
+        return None if config_path == os.devnull else config_path
+
+    def getLoggingConfigFilePath(self):
+        config_path = self.getFinalConfigFilePath()
+        if config_path is None:
             return os.path.join(get_root_path('indico'), 'logging.conf.sample')
         return os.path.join(os.path.dirname(config_path), self.getLoggingConfigFile())
 
