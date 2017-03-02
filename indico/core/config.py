@@ -212,7 +212,6 @@ class Config:
         'BaseSecureURL'             : 'https://localhost/',
         'HtdocsDir'                 : "/opt/indico/htdocs",
         'LogDir'                    : "/opt/indico/log" ,
-        'BinDir'                    : "/opt/indico/bin",
         'TempDir'                   : "/opt/indico/tmp",
         'SharedTempDir'             : "",
         'CacheDir'                  : "/opt/indico/cache",
@@ -281,7 +280,6 @@ class Config:
         default_values.update({
             "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\indico",
             "LogDir"               : "C:\\indico\\log",
-            "BinDir"               : "C:\\indico\\archive",
             "TempDir"              : "C:\\indico\\temp",
             "CacheDir"             : "C:\\indico\\cache",
         })
