@@ -220,7 +220,7 @@ if __name__ == '__main__':
     #if not os.path.exists(PWD_INDICO_CONF):
     #    shutil.copy('etc/indico.conf.sample', PWD_INDICO_CONF)
 
-    dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc'), ('migrations', 'migrations')))
+    dataFiles = _generateDataPaths((('bin', 'bin'), ('doc', 'doc'), ('etc', 'etc')))
 
     cmdclass = {'sdist': sdist_indico,
                 'bdist': _bdist_indico(dataFiles),
