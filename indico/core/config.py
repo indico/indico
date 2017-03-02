@@ -380,14 +380,15 @@ class Config:
         config_path = self.__get_config_path()
         config_vars = self.__load_config(config_path)
 
-        if 'XMLCacheDir' in config_vars:
-            raise Exception('XMLCacheDir has been renamed to CacheDir. Please update the config.')
-
         self._configVars = {k: config_vars.get(k, default) for k, default in self.default_values.iteritems()}
         self._configVars['ConfigFilePath'] = config_path
 
         # options that are derived automatically
         self._deriveOptions()
+
+        if ('XMLCacheDir' in config_vars and ('CacheDir' not in config_vars or
+                                              config_vars['XMLCacheDir'] != config_vars['CacheDir'])):
+            raise ValueError('XMLCacheDir has been renamed to CacheDir. Please update the config.')
 
         if self.getSanitizationLevel() not in range(4):
             raise MaKaCError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
