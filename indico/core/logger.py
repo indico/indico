@@ -258,10 +258,14 @@ class Logger:
 
     @classmethod
     def _log_path(cls, fname):
-        config = Config.getInstance()
-        configDir = config.getLogDir()
+        cfg = Config.getInstance()
 
-        for fpath in (os.path.join(configDir, fname), os.path.join(os.getcwd(), '.indico.log')):
+        # If we have no config file we are most likely running tests.
+        # Doesn't make sense to log anything in this case.
+        if cfg.getFinalConfigFilePath() is None:
+            return os.devnull
+
+        for fpath in (os.path.join(cfg.getLogDir(), fname), os.path.join(os.getcwd(), '.indico.log')):
             if os.access(os.path.dirname(fpath), os.W_OK):
                 return fpath.replace('\\', '\\\\')
         else:
