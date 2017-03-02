@@ -43,7 +43,7 @@ def pytest_configure(config):
         'SmtpServer': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
         'CacheBackend': 'null',
         'Loggers': [],
-        'UploadedFilesTempDir': config.indico_temp_dir.strpath,
+        'TempDir': config.indico_temp_dir.strpath,
         'CacheDir': config.indico_temp_dir.strpath,
         'StorageBackends': {'default': config.indico_temp_dir},
         'AttachmentStorage': 'default',

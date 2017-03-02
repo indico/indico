@@ -213,8 +213,8 @@ class Config:
         'HtdocsDir'                 : "/opt/indico/htdocs",
         'LogDir'                    : "/opt/indico/log" ,
         'BinDir'                    : "/opt/indico/bin",
-        'UploadedFilesTempDir'      : "/opt/indico/tmp",
-        'UploadedFilesSharedTempDir': "",
+        'TempDir'                   : "/opt/indico/tmp",
+        'SharedTempDir'             : "",
         'CacheDir'                  : "/opt/indico/cache",
         'CacheBackend'              : 'files',
         'MemcachedServers'          : [],
@@ -282,7 +282,7 @@ class Config:
             "HtdocsDir"            : "C:\\Program Files\\Apache Group\\Apache2\\htdocs\\indico",
             "LogDir"               : "C:\\indico\\log",
             "BinDir"               : "C:\\indico\\archive",
-            "UploadedFilesTempDir" : "C:\\indico\\temp",
+            "TempDir"              : "C:\\indico\\temp",
             "CacheDir"             : "C:\\indico\\cache",
         })
 
@@ -329,8 +329,6 @@ class Config:
             'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
             'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),
             'SystemIcons'               : self.__systemIcons,
-            'TempDir'                   : self.getUploadedFilesTempDir(),
-            'UploadedFilesSharedTempDir': self.getSharedTempDir(),
             'RoomPhotosDir'             : os.path.join(self.getHtdocsDir(), 'images', "rooms", "large_photos"),
             'RoomSmallPhotosDir'        : os.path.join(self.getHtdocsDir(), 'images', "rooms", "small_photos"),
             'CssDir'                    : "%s/css/" % (self.getHtdocsDir()),
@@ -609,10 +607,7 @@ class Config:
         return self.__systemIcons[id]
 
     def getSharedTempDir(self):
-        std = self.getUploadedFilesSharedTempDir()
-        if std == "":
-            std = self.getUploadedFilesTempDir()
-        return std
+        return self._configVars.get('SharedTempDir') or self.getTempDir()
 
     def getImagesBaseURL(self):
         if has_app_context() and g.get('static_site'):
