@@ -23,7 +23,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
 from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
 from indico.modules.events.models.reviews import ProposalRevisionMixin
-from indico.modules.events.papers.models.reviews import PaperReviewType
+from indico.modules.events.papers.models.reviews import PaperReviewType, PaperJudgmentProxy
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -170,7 +170,8 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     def get_timeline(self, user=None):
         comments = [x for x in self.comments if x.can_view(user)] if user else self.comments
         reviews = [x for x in self.reviews if x.can_view(user)] if user else self.reviews
-        return sorted(chain(comments, reviews), key=attrgetter('created_dt'))
+        judgment = [PaperJudgmentProxy(self)] if self.state == PaperRevisionState.to_be_corrected else []
+        return sorted(chain(comments, reviews, judgment), key=attrgetter('created_dt'))
 
     def get_reviews(self, group=None, user=None):
         reviews = []
