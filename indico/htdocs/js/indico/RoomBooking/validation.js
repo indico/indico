@@ -75,10 +75,20 @@
         }
 
         // Booked for validator
-        $('#contact_email, #booking_reason').each(function() {
+        function validInput($element) {
+            if ($element.attr('id') === 'other-user') {
+                return $('input[name=other_user]:checked').val() !== undefined;
+            } else if ($element.attr('id') === 'booked-for-user-wrapper') {
+                return !!$('#booked_for_user').val();
+            } else {
+                return !!$element.val().trim();
+            }
+        };
+
+        $('#other-user, #booked-for-user-wrapper, #booking_reason').each(function() {
             var $this = $(this);
             if (!validatingConflicts) {
-                var valid = !!$this.val().trim();
+                var valid = validInput($this);
                 isValid = isValid && valid;
                 $this.toggleClass('hasError', !valid);
             } else {

@@ -26,7 +26,7 @@ from wtforms.fields.simple import TextAreaField, SubmitField
 
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
-from indico.web.forms.validators import IndicoEmail, UsedIf
+from indico.web.forms.validators import UsedIf
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.util.i18n import _
 
@@ -111,8 +111,6 @@ class NewBookingPeriodForm(NewBookingFormBase):
 
 class NewBookingConfirmForm(NewBookingPeriodForm):
     booked_for_user = PrincipalField(_(u'User'), [DataRequired()], allow_external=True)
-    contact_email = StringField(_(u'Email'), [InputRequired(), IndicoEmail(multi=True)])
-    contact_phone = StringField(_(u'Telephone'))
     booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])
     uses_vc = BooleanField(_(u'I will use videoconference equipment'))
     used_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'VC equipment'), get_label=lambda x: x.name)

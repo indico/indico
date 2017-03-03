@@ -606,11 +606,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             if not room:
                 raise IndicoError('Invalid room')
             # Show step 3 page
-            confirm_form_defaults = FormDefaults(form.data,
-                                                 booked_for_user=session.user,
-                                                 booked_for_name=session.user.full_name,
-                                                 contact_email=session.user.email,
-                                                 contact_phone=session.user.phone)
+            confirm_form_defaults = FormDefaults(form.data, booked_for_user=session.user)
             return self._show_confirm(room, form, self._step, confirm_form_defaults)
 
     def _process_confirm(self):
