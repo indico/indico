@@ -22,7 +22,7 @@ pytest-mock==1.5.0
 python-dateutil==2.6.0
 pytz
 reportlab==3.3.0
-simplejson==2.6.2
+simplejson==3.10.0
 termcolor==1.1.0
 webassets==0.12.1
 wsgiref==0.1.2
