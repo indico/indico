@@ -30,15 +30,14 @@
                             {{ render_comment(item, proposal) }}
                         {% elif item.timeline_item_type == 'review' %}
                             {{ render_review(item, form=form) }}
+                        {% elif item.timeline_item_type == 'judgment' %}
+                            {{ caller('revision-judgment', revision) }}
                         {% endif %}
                     {% endfor %}
                     {% if not loop.last %}
                         {{ caller('revision-judgment', revision) }}
                     {% endif %}
                     {% if loop.last and (can_comment or can_review) %}
-                        {% if not proposal.is_in_final_state %}
-                            {{ caller('revision-judgment', revision) }}
-                        {% endif %}
                         {% set caller_ = caller %}
                         {% call(block) render_omnibox(proposal, comment_form, review_form) %}
                             {{ caller_(block) }}

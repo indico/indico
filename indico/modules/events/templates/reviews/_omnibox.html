@@ -5,7 +5,7 @@
 {% macro render_omnibox(proposal, comment_form, review_form=none) %}
     {% set can_comment = proposal.can_comment(session.user) %}
     {% set reviewer_data = proposal.get_last_revision().get_reviewer_render_data(session.user) %}
-    {% if can_comment or reviewer_data.groups %}
+    {% if (can_comment and comment_form) or reviewer_data.groups %}
         <div id="review-timeline-input" class="i-timeline-item review-timeline-input">
             {{ render_user_avatar(session.user) }}
             <div class="i-timeline-item-box footer-only header-indicator-left">

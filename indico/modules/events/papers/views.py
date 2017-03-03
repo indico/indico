@@ -56,7 +56,8 @@ class WPDisplayJudgingArea(WPDisplayPapersBase):
 
 
 def render_paper_page(paper, view_class=None):
-    comment_form = PaperCommentForm(paper=paper, user=session.user, formdata=None)
+    comment_form = (PaperCommentForm(paper=paper, user=session.user, formdata=None)
+                    if not paper.is_in_final_state else None)
     review_form = None
     reviewed_for_groups = list(paper.last_revision.get_reviewed_for_groups(session.user))
     if len(reviewed_for_groups) == 1:

@@ -46,6 +46,23 @@ class PaperTypeProxy(ProposalGroupProxy):
         return {'review_type': self.instance.name}
 
 
+class PaperJudgmentProxy(object):
+    """Represents a timeline item for the non final judgments"""
+
+    timeline_item_type = 'judgment'
+
+    def __init__(self, paper):
+        self.paper = paper
+
+    @property
+    def created_dt(self):
+        return self.paper.judgment_dt
+
+    @return_ascii
+    def __repr__(self):
+        return '<PaperJudgmentProxy: {}>'.format(self.paper)
+
+
 class PaperCommentVisibility(RichIntEnum):
     """Most to least restrictive visibility for paper comments"""
     __titles__ = [None,
