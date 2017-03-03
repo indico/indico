@@ -32,6 +32,7 @@ from werkzeug.urls import url_parse
 
 import indico
 from indico.util.contextManager import ContextManager
+from indico.util.packaging import package_is_editable
 
 
 __all__ = ['Config']
@@ -348,9 +349,11 @@ class Config:
         except KeyError:
             pass
         # try finding the config in various common
-        paths = [os.path.normpath(os.path.join(get_root_path('indico'), 'indico.conf')),
-                 os.path.expanduser('~/.indico.conf'),
-                 '/etc/indico.conf']
+        paths = [os.path.expanduser('~/.indico.conf'), '/etc/indico.conf']
+        # If it's an editable setup (ie usually a dev instance) allow having
+        # the config in the package's root path
+        if package_is_editable('indico'):
+            paths.insert(0, os.path.normpath(os.path.join(get_root_path('indico'), 'indico.conf')))
         for path in paths:
             if os.path.exists(path):
                 return path
