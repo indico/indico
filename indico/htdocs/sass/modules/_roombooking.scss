@@ -150,10 +150,42 @@
         @include border-radius();
         width: 370px;
     }
+
+    #booked-for-user-wrapper {
+        width: 240px;
+        display: none;
+        min-height: 0;
+
+        &.hasError {
+            @include border-all($red);
+        }
+    }
+
+    #other-user {
+        display: inline-flex;
+        flex-direction: column;
+
+        &.hasError {
+            @include border-all($red);
+        }
+
+        input {
+            margin-right: 3px;
+            font-weight: bold;
+        }
+
+        .input-line {
+            display: inline;
+        }
+    }
 }
 
 #videoconferenceOptions {
     list-style: none;
+
+    li {
+        max-width: 700px;
+    }
 }
 
 .tip {
