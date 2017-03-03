@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect
+from flask import redirect, request
 
 from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
@@ -32,6 +32,7 @@ from indico.modules.categories.controllers.management import (RHCreateCategory, 
                                                               RHManageCategoryProtection, RHManageCategorySettings,
                                                               RHMoveCategory, RHMoveEvents, RHMoveSubcategories,
                                                               RHSortSubcategories, RHSplitCategory)
+from indico.modules.users import User
 from indico.web.flask.util import make_compat_redirect_func, redirect_view, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -96,6 +97,13 @@ _bp.add_url_rule('!/category/search', 'search', RHCategorySearch)
 
 # Administration
 _bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingEvents, methods=('GET', 'POST'))
+
+
+@_bp.before_request
+def _redirect_to_bootstrap():
+    # No users in Indico yet? Redirect from index page to bootstrap form
+    if request.endpoint == 'categories.display' and not request.view_args['category_id'] and not User.query.has_rows():
+        return redirect(url_for('bootstrap.index'))
 
 
 _compat_bp = IndicoBlueprint('compat_categories', __name__)
