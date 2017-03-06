@@ -1,0 +1,12 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <input type="text" id="{{ field.id }}" value="{{ field._value() }}" name="{{ field.name }}"
+           {{ input_args | html_params }}>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('#{{ field.id }}').datepicker();
+    </script>
+{% endblock %}
