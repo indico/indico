@@ -27,12 +27,34 @@ from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
 from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
-from dateutil.relativedelta import relativedelta
+from dateutil.relativedelta import relativedelta as _relativedelta
 
 from indico.core.config import Config
 from indico.util.i18n import get_current_locale, _, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
 from indico.legacy.common.timezoneUtils import DisplayTZ
+
+
+class relativedelta(_relativedelta):
+    """Improved `relativedelta`"""
+
+    def __abs__(self):
+        return self.__class__(years=abs(self.years),
+                              months=abs(self.months),
+                              days=abs(self.days),
+                              hours=abs(self.hours),
+                              minutes=abs(self.minutes),
+                              seconds=abs(self.seconds),
+                              microseconds=abs(self.microseconds),
+                              leapdays=self.leapdays,
+                              year=self.year,
+                              month=self.month,
+                              day=self.day,
+                              weekday=self.weekday,
+                              hour=self.hour,
+                              minute=self.minute,
+                              second=self.second,
+                              microsecond=self.microsecond)
 
 
 def now_utc(exact=True):
