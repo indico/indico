@@ -190,18 +190,12 @@
 .paper-content {
     .paper-file {
         background-color: $light-gray !important;
-        border-color: $gray !important;
+        border-bottom: 1px solid $pastel-gray !important;
     }
 
     .spotlight-file {
         max-width: 50%;
-        margin: 10px 0 20px 0;
-    }
-
-    .spotlight-file-icon {
-        font-size: 2em;
-        display: flex;
-        margin-right: 5px;
+        justify-content: flex-start;
     }
 
     .spotlight-file-name {
@@ -212,43 +206,53 @@
         &:hover {
             color: $black;
         }
+
+        &::before {
+            font-size: 2em;
+            margin-right: 5px;
+        }
     }
 
-    .submission-metadata {
-        align-self: flex-end;
-        color: $gray;
+    .paper-files-list-label {
+        color: $light-black;
+    }
 
-        .submission-dt {
-            border-bottom: 1px dotted $gray;
-            color: $gray;
+    .paper-files {
+        margin: 0 0 0 10px;
+        padding: 0;
+        list-style-type: none;
+        margin-bottom: -5px;  // In order to remove the margin of the last list items row
 
-            &:hover {
-                color: $light-black;
+        li {
+            margin-right: 5px;
+
+            a {
+                max-width: 150px;
+                margin-bottom: 5px;
             }
         }
     }
 
-    .paper-files-list {
-        align-self: flex-start;
-        margin-bottom: 10px;
+    .spotlight-file, .paper-files {
+        &.full-width {
+            width: 100%;
+            max-width: 100%;
+        }
     }
+}
 
-    .paper-files-list-label {
-        margin-right: 10px;
-        font-weight: bold;
-    }
+.paper-metadata {
+    align-self: flex-end;
+    color: $gray;
+    margin-top: 10px;
 
-    .paper-files {
-        margin: 0;
-        padding: 0;
-        list-style-type: none;
+    .paper-metadata-dt {
+        border-bottom: 1px dotted $gray;
+        color: $gray;
+        margin: 0 3px 0 3px;
 
-        li {
-            margin: 3px 5px;
-
-            a {
-                max-width: 150px;
-            }
+        &:hover {
+            color: $light-black;
         }
     }
 }
