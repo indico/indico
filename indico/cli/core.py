@@ -63,6 +63,11 @@ def setup():
     """Setup Indico."""
 
 
+@cli.group(cls=LazyGroup, import_name='indico.cli.admin:cli')
+def admin():
+    """Manage Indico users."""
+
+
 @cli.command(short_help='Runs a shell in the app context.')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on the available objects')
 @with_appcontext
