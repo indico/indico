@@ -29,7 +29,7 @@ from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.validators import StopValidation
 
 from indico.core.config import Config
-from indico.util.date_time import localize_as_utc
+from indico.util.date_time import localize_as_utc, relativedelta
 from indico.util.i18n import _
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
@@ -108,6 +108,80 @@ class TimeDeltaField(Field):
             return '', ''
         else:
             return int(self.data.total_seconds()) // self.magnitudes[self.best_unit], self.best_unit
+
+
+class RelativeDeltaField(Field):
+    """A field that lets the user select a simple timedelta.
+
+    It does not support mixing multiple units, but it is smart enough
+    to switch to a different unit to represent a timedelta that could
+    not be represented otherwise.
+
+    :param units: The available units. Must be a tuple containing any
+                  any of 'seconds', 'minutes', 'hours' and 'days'.
+                  If not specified, ``('hours', 'days')`` is assumed.
+    """
+
+    widget = JinjaWidget('forms/timedelta_widget.html', single_line=True, single_kwargs=True)
+    # XXX: do not translate, "Minutes" is ambiguous without context
+    unit_names = {
+        'seconds': 'Seconds',
+        'minutes': 'Minutes',
+        'hours': 'Hours',
+        'days': 'Days',
+        'weeks': 'Weeks',
+        'months': 'Months',
+        'years': 'Years'
+    }
+    magnitudes = OrderedDict([
+        ('years', relativedelta(years=1)),
+        ('months', relativedelta(months=1)),
+        ('weeks', relativedelta(weeks=1)),
+        ('days', relativedelta(days=1)),
+        ('hours', relativedelta(hours=1)),
+        ('minutes', relativedelta(minutes=1)),
+        ('seconds', relativedelta(seconds=1))
+    ])
+
+    def __init__(self, *args, **kwargs):
+        self.units = kwargs.pop('units', ('hours', 'days'))
+        super(RelativeDeltaField, self).__init__(*args, **kwargs)
+
+    @property
+    def split_data(self):
+        if self.data is None:
+            return None, None
+        for unit in self.magnitudes:
+            number = getattr(self.data, unit)
+            if number:
+                return number, unit
+        raise ValueError('Unsupported relativedelta() unit')
+
+    @property
+    def choices(self):
+        choices = [(unit, self.unit_names[unit]) for unit in self.units]
+        number, unit = self.split_data
+        if number is not None and unit not in self.units:
+            # Add whatever unit is necessary to represent the currenet value if we have one
+            choices.append((unit, '({})'.format(self.unit_names[unit])))
+        return choices
+
+    def process_formdata(self, valuelist):
+        if valuelist and len(valuelist) == 2:
+            value = int(valuelist[0])
+            unit = valuelist[1]
+            if unit not in self.magnitudes:
+                raise ValueError('Invalid unit')
+            self.data = (self.magnitudes[unit] * value).normalized()
+
+    def pre_validate(self, form):
+        if self.object_data is None:
+            raise ValueError(_('Please choose a valid unit.'))
+
+    def _value(self):
+        if self.data is None:
+            return '', ''
+        return self.split_data
 
 
 class IndicoDateTimeField(DateTimeField):
