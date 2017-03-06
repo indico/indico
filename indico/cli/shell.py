@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import datetime
 import itertools
 import os
@@ -22,6 +24,7 @@ import sys
 from functools import partial
 from operator import itemgetter, attrgetter
 
+import click
 import sqlalchemy.orm
 from flask import current_app
 from flask_script import Shell, Option
@@ -138,46 +141,70 @@ class IndicoShell(Shell):
 
     def get_context(self):
         if self._context is None:
-            self._context = context = {}
-            self._info = []
-
-            add_to_context = partial(_add_to_context, context, self._info)
-            add_to_context_multi = partial(_add_to_context_multi, context, self._info)
-            add_to_context_smart = partial(_add_to_context_smart, context, self._info)
-            # Common stdlib modules
-            self._info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
-            DATETIME_ATTRS = ('date', 'time', 'datetime', 'timedelta')
-            ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload', 'subqueryload', 'undefer',
-                         'undefer_group', 'load_only')
-            add_to_context_multi([getattr(datetime, attr) for attr in DATETIME_ATTRS] +
-                                 [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
-                                 [itertools, re, sys, os],
-                                 color='yellow')
-            # Models
-            self._info.append(cformat('*** %{magenta!}Models%{reset} ***'))
-            models = [cls for name, cls in sorted(db.Model._decl_class_registry.items(), key=itemgetter(0))
-                      if hasattr(cls, '__table__')]
-            add_to_context_smart(models)
-            # Tasks
-            self._info.append(cformat('*** %{magenta!}Tasks%{reset} ***'))
-            tasks = [task for task in sorted(celery.tasks.values()) if not task.name.startswith('celery.')]
-            add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
-            # Plugins
-            self._info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
-            plugins = [type(plugin) for plugin in sorted(plugin_engine.get_active_plugins().values(),
-                                                         key=attrgetter('name'))]
-            add_to_context_multi(plugins, color='yellow!')
-            # Utils
-            self._info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
-            add_to_context(celery, 'celery', doc='celery app', color='blue!')
-            add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
-            add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
-            add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
-            add_to_context(current_app, 'app', doc='flask app')
-            add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
-                           doc='like datetime() but converted from localtime to utc')
-            add_to_context(Event.get, 'EE', doc='get event by id (Event)')
-            # Stuff from plugins
-            signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
-
+            self._context, self._info = _make_shell_context()
         return self._context
+
+
+def _make_shell_context():
+    context = {}
+    info = []
+    add_to_context = partial(_add_to_context, context, info)
+    add_to_context_multi = partial(_add_to_context_multi, context, info)
+    add_to_context_smart = partial(_add_to_context_smart, context, info)
+    # Common stdlib modules
+    info.append(cformat('*** %{magenta!}stdlib%{reset} ***'))
+    DATETIME_ATTRS = ('date', 'time', 'datetime', 'timedelta')
+    ORM_ATTRS = ('joinedload', 'defaultload', 'contains_eager', 'lazyload', 'noload', 'subqueryload', 'undefer',
+                 'undefer_group', 'load_only')
+    add_to_context_multi([getattr(datetime, attr) for attr in DATETIME_ATTRS] +
+                         [getattr(sqlalchemy.orm, attr) for attr in ORM_ATTRS] +
+                         [itertools, re, sys, os],
+                         color='yellow')
+    # Models
+    info.append(cformat('*** %{magenta!}Models%{reset} ***'))
+    models = [cls for name, cls in sorted(db.Model._decl_class_registry.items(), key=itemgetter(0))
+              if hasattr(cls, '__table__')]
+    add_to_context_smart(models)
+    # Tasks
+    info.append(cformat('*** %{magenta!}Tasks%{reset} ***'))
+    tasks = [task for task in sorted(celery.tasks.values()) if not task.name.startswith('celery.')]
+    add_to_context_smart(tasks, get_name=lambda x: x.name.replace('.', '_'), color='blue!')
+    # Plugins
+    info.append(cformat('*** %{magenta!}Plugins%{reset} ***'))
+    plugins = [type(plugin) for plugin in sorted(plugin_engine.get_active_plugins().values(),
+                                                 key=attrgetter('name'))]
+    add_to_context_multi(plugins, color='yellow!')
+    # Utils
+    info.append(cformat('*** %{magenta!}Misc%{reset} ***'))
+    add_to_context(celery, 'celery', doc='celery app', color='blue!')
+    add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
+    add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
+    add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
+    add_to_context(current_app, 'app', doc='flask app')
+    add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
+                   doc='like datetime() but converted from localtime to utc')
+    add_to_context(Event.get, 'EE', doc='get event by id (Event)')
+    # Stuff from plugins
+    signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
+    return context, info
+
+
+def shell_cmd(verbose):
+    import indico
+    from indico.util.console import cformat
+
+    try:
+        import IPython
+    except ImportError:
+        click.echo(cformat('%{red!}You need to `pip install ipython` to use the Indico shell'))
+        sys.exit(1)
+
+    current_app.config['REPL'] = True  # disables e.g. memoize_request
+    context, info = _make_shell_context()
+    banner = cformat('%{yellow!}Indico v{} is ready for your commands').format(indico.__version__)
+    if verbose:
+        banner = '\n'.join(info + ['', banner])
+    ctx = current_app.make_shell_context()
+    ctx.update(context)
+    clearCache()
+    IPython.embed(banner1=banner, user_ns=ctx)

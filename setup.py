@@ -26,6 +26,7 @@ DEPENDENCY_URLS = ['https://github.com/indico/indico-fonts/releases/']
 ENTRY_POINTS = {
     'console_scripts': [
         'indico = indico.cli.manage:main',
+        'indico2 = indico.cli.core:cli',
         'indico-setup = indico.cli.setup:cli',
         'indico-zodbimport = indico_zodbimport.cli:main',
     ],
