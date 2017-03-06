@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from operator import attrgetter
 
-from flask import request, render_template
 from indico.util.decorators import cached_classproperty
 
 from indico.core import signals
@@ -71,34 +71,32 @@ class EventCloner(object):
 
     @classmethod
     def get_form_items(cls, old_event):
-        cloners = sorted([cloner_cls(old_event) for cloner_cls in get_event_cloners().itervalues()],
-                         key=lambda x: x.friendly_name)
-        return render_template('events/cloner_options.html', cloners=cloners)
+        return sorted([cloner_cls(old_event) for cloner_cls in get_event_cloners().itervalues()],
+                      key=attrgetter('friendly_name'))
 
     @classmethod
-    def run_cloners(cls, old_event, new_event):
-        selected = {x[7:] for x in request.values.getlist('cloners') if x.startswith('cloner_')}
+    def run_cloners(cls, old_event, new_event, cloners):
         all_cloners = OrderedDict((name, cloner_cls(old_event))
                                   for name, cloner_cls in get_event_cloners().iteritems())
-        if any(cloner.is_internal for name, cloner in all_cloners.iteritems() if name in selected):
+        if any(cloner.is_internal for name, cloner in all_cloners.iteritems() if name in cloners):
             raise Exception('An internal cloner was selected')
         # enable internal cloners that are enabled by default or required by another cloner
-        selected |= {c.name
-                     for c in all_cloners.itervalues()
-                     if c.is_internal and (c.is_default or c.required_by_deep & selected)}
+        cloners |= {c.name
+                    for c in all_cloners.itervalues()
+                    if c.is_internal and (c.is_default or c.required_by_deep & cloners)}
         # enable unavailable cloners that may be pulled in as a dependency nonetheless
         extra = {c.name
                  for c in all_cloners.itervalues()
-                 if not c.is_available and c.always_available_dep and c.required_by_deep & selected}
-        selected |= extra
-        active_cloners = OrderedDict((name, cloner) for name, cloner in all_cloners.iteritems() if name in selected)
+                 if not c.is_available and c.always_available_dep and c.required_by_deep & cloners}
+        cloners |= extra
+        active_cloners = OrderedDict((name, cloner) for name, cloner in all_cloners.iteritems() if name in cloners)
         if not all((c.is_internal or c.is_visible) and c.is_available
                    for c in active_cloners.itervalues()
                    if c.name not in extra):
             raise Exception('An invisible/unavailable cloner was selected')
         for name, cloner in active_cloners.iteritems():
-            if not (selected >= cloner.requires_deep):
-                raise Exception('Cloner {} requires {}'.format(name, ', '.join(cloner.requires_deep - selected)))
+            if not (cloners >= cloner.requires_deep):
+                raise Exception('Cloner {} requires {}'.format(name, ', '.join(cloner.requires_deep - cloners)))
         shared_data = {}
         cloner_names = set(active_cloners)
         for name, cloner in active_cloners.iteritems():

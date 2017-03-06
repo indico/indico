@@ -17,12 +17,14 @@
 from __future__ import unicode_literals
 
 from flask import session
+from pytz import utc
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.events import Event, EventLogKind, EventLogRealm, logger
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.logs.util import make_diff_log
@@ -116,6 +118,40 @@ def update_event(event, update_timetable=False, **data):
     signals.event.updated.send(event, changes=changes)
     logger.info('Event %r updated with %r by %r', event, data, session.user)
     _log_event_update(event, changes, visible_person_link_changes=visible_person_link_changes)
+
+
+def clone_event(event, start_dt, cloners, category=None):
+    """Clone an event on a given date/time.
+
+    Runs all required cloners.
+
+    :param start_dt: The start datetime of the new event;
+    :param cloners: A set containing the names of all enabled cloners;
+    :param category: The `Category` the new event will be created in.
+    """
+    end_dt = start_dt + event.duration
+    data = {
+        'start_dt': start_dt,
+        'end_dt': end_dt,
+        'timezone': event.timezone,
+        'title': event.title,
+        'description': event.description,
+        'visibility': event.visibility
+    }
+    new_event = create_event(category or event.category, event.type_, data,
+                             features=features_event_settings.get(event, 'enabled'),
+                             add_creator_as_manager=False)
+
+    # Run the modular cloning system
+    EventCloner.run_cloners(event, new_event, cloners)
+    signals.event.cloned.send(event, new_event=new_event)
+
+    # Grant access to the event creator -- must be done after modular cloners
+    # since cloning the event ACL would result in a duplicate entry
+    with new_event.logging_disabled:
+        new_event.update_principal(session.user, full_access=True)
+
+    return new_event
 
 
 def _log_event_update(event, changes, visible_person_link_changes=False):
