@@ -59,8 +59,14 @@
                 </li>
             </ul>
             {{ _create_category_button(classes='highlight icon-plus') }}
-            <button class="i-button icon-sort-alpha-asc js-sort-categories"
-                    title="{% trans %}Sort categories alphabetically{% endtrans %}"></button>
+            <div class="group">
+                <button class="i-button icon-sort-alpha-asc js-sort-categories"
+                        title="{% trans %}Sort categories alphabetically (ascending){% endtrans %}"
+                        data-sort-order="1"></button>
+                <button class="i-button icon-sort-alpha-desc js-sort-categories"
+                        title="{% trans %}Sort categories alphabetically (descending){% endtrans %}"
+                        data-sort-order="-1"></button>
+            </div>
         </div>
         <div class="toolbar">
             <span class="i-button label icon-list"
