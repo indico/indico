@@ -83,6 +83,11 @@ def pyenv_cmd(cmd, **kwargs):
     return local('{0}/pyenv {1}'.format(cmd_dir, cmd), **kwargs)
 
 
+def grunt(args):
+    cmd = 'grunt' if not env.system_node else os.path.join(env.src_dir, 'node_modules/.bin/grunt')
+    local('{} {}'.format(cmd, args))
+
+
 # Util functions
 
 def _yes_no_input(message, default):
@@ -221,7 +226,7 @@ def install_angular():
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'angular')):
             local('npm install')
-            local('grunt clean buildall copy write compress')
+            grunt('clean buildall copy write compress')
             dest_dir_js = lib_dir(env.src_dir, 'js')
             dest_dir_css = lib_dir(env.src_dir, 'css')
             local('mkdir -p {0}'.format(dest_dir_js))
@@ -263,7 +268,7 @@ def install_jquery():
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'jquery')):
             local('npm install')
-            local('grunt uglify dist')
+            grunt('uglify dist')
             dest_dir = lib_dir(env.src_dir, 'js')
             local('mkdir -p {0}'.format(dest_dir))
             local('cp dist/jquery.js {0}/'.format(dest_dir))
@@ -316,7 +321,7 @@ def install_qtip2():
     with node_env():
         with lcd(os.path.join(env.ext_dir, 'qtip2')):
             local('npm install')
-            local('grunt --plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
+            grunt('--plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
             dest_dir_js, dest_dir_css = lib_dir(env.src_dir, 'js'), lib_dir(env.src_dir, 'css')
             local('mkdir -p {0} {1}'.format(dest_dir_js, dest_dir_css))
             local('cp dist/jquery.qtip.js {0}/'.format(dest_dir_js))
@@ -448,7 +453,7 @@ def install_typewatch():
 def install_fullcalendar_js():
     with node_env(), lcd(os.path.join(env.ext_dir, 'fullcalendar')):
             local('npm install')
-            local('grunt lumbar:build')
+            grunt('lumbar:build')
             dest_js_dir = lib_dir(env.src_dir, 'js')
             dest_css_dir = lib_dir(env.src_dir, 'css')
             local('mkdir -p {0}'.format(dest_js_dir))
@@ -516,7 +521,7 @@ def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=None):
             create_node_env()
 
         with node_env():
-            local('npm install -g grunt-cli')
+            local('npm install grunt-cli')
 
         _install_deps()
 
