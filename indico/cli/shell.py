@@ -91,6 +91,7 @@ class IndicoShell(Shell):
 
     def run(self, no_ipython, use_bpython, quiet):
         current_app.config['REPL'] = True  # disables e.g. memoize_request
+        self.get_context()  # populates self._info
         if not quiet:
             self.banner = '\n'.join(self._info + ['', self.banner])
         if use_bpython:
@@ -102,12 +103,10 @@ class IndicoShell(Shell):
 
     def run_shell(self, no_ipython, no_bpython, quiet):
         # based on the flask-script Shell.run() method
-        context = self.get_context()
-
         if not no_bpython:
             try:
                 from bpython import embed
-                embed(banner=self.banner, locals_=context)
+                embed(banner=self.banner, locals_=self._context)
                 return
             except ImportError:
                 pass
@@ -115,7 +114,7 @@ class IndicoShell(Shell):
         if not no_ipython:
             try:
                 from IPython.terminal.ipapp import TerminalIPythonApp
-                ipython_app = TerminalIPythonApp.instance(user_ns=context, display_banner=not quiet)
+                ipython_app = TerminalIPythonApp.instance(user_ns=self._context, display_banner=not quiet)
                 ipython_app.initialize(argv=[])
                 ipython_app.shell.show_banner(self.banner)
                 ipython_app.start()
@@ -125,7 +124,7 @@ class IndicoShell(Shell):
 
         # Use basic python shell
         import code
-        code.interact(self.banner, local=context)
+        code.interact(self.banner, local=self._context)
 
     def get_options(self):
         return (
