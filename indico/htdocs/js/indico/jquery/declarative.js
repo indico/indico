@@ -45,7 +45,8 @@
     };
 
     global.getFormParams = function getFormParams($form) {
-        return getParamsFromSelectors($form.find('input[type=text]:not(:disabled), input[type=hidden]:not(:disabled), \
+        return getParamsFromSelectors($form.find('input[type=text]:not(:disabled), input[type=time]:not(:disabled), \
+                                                  input[type=number]:not(:disabled), input[type=hidden]:not(:disabled), \
                                                   input:checked:not(:disabled), textarea:not(:disabled), \
                                                   select:not(:disabled)'));
     };
