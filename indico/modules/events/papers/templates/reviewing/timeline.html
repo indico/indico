@@ -1,27 +1,91 @@
 {% from 'events/reviews/_common.html' import render_summary_state, render_user_avatar, render_review_state %}
 {% from 'forms/_form.html' import form_header, form_row, form_footer %}
 
-{% macro _render_paper_file_list(files) %}
-    <ul class="file-list">
-        {% for file in files %}
-            {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
-            <li class="truncate-text">
-                <a class="attachment {{ icon }}" href="{{ url_for('.download_file', file) }}"
-                   title="{{ file.filename }}">
-                    <span class="title">{{ file.filename }}</span>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+
+{% macro render_paper_info(paper) %}
+    <div class="submission-title flexrow">
+        <h3 class="f-self-stretch">
+            {% trans contribution_title=paper.contribution.title%}Paper for {{ contribution_title }}{% endtrans %}
+            <span class="submission-id">
+                #{{ paper.contribution.friendly_id }}
+            </span>
+        </h3>
+    </div>
+    <div id="paper-public">
+        {{ _render_paper_summary(paper) }}
+        <div class="review-item-content">
+            {{ render_paper_content(paper) }}
+        </div>
+    </div>
 {% endmacro %}
 
-{% macro _render_paper_files(files, spotlight_file=none) %}
-    <ul class="paper-files flexrow f-wrap">
+
+{% macro _render_paper_summary(paper) %}
+    <div class="review-summary flexrow f-a-baseline">
+        <div class="review-summary-badge">
+            {{ render_summary_state(paper.state) }}
+        </div>
+        <div class="review-summary-content f-self-stretch">
+            <div>
+                {% trans name=paper.last_revision.submitter.name -%}
+                    <strong>{{ name }}</strong> submitted this paper for the contribution
+                {%- endtrans %}
+                <a href="{{ url_for('contributions.display_contribution', paper.contribution) }}">
+                    {{- paper.contribution.title -}}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
+
+{% macro render_paper_content(paper, contribution_page=false) %}
+    <div class="paper-content flexcol">
+        <div class="flexrow">
+            {% set spotlight_file = paper.last_revision.get_spotlight_file() %}
+            {% if spotlight_file %}
+                {% set only_spotlight = paper.last_revision.files | length == 1 %}
+                {{ _render_spotlight_file(spotlight_file, full_width=only_spotlight and not contribution_page) }}
+                {% if not only_spotlight %}
+                    {{ _render_paper_files(paper.last_revision.files, spotlight_file) }}
+                {% endif %}
+            {% else %}
+                <div class="paper-files-list flexrow f-a-baseline">
+                    <div class="paper-files-list-label f-self-no-shrink">
+                        {%- trans %}Paper files:{% endtrans -%}
+                    </div>
+                    {{ _render_paper_files(paper.last_revision.files, full_width=true) }}
+                </div>
+            {% endif %}
+        </div>
+        {% if not contribution_page %}
+            {{ render_paper_metadata(paper) }}
+        {% endif %}
+    </div>
+{% endmacro %}
+
+
+{% macro _render_spotlight_file(file, full_width=false) %}
+    {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
+    {% set class = 'full-width' if full_width else None %}
+    <div class="flexrow f-a-center spotlight-file i-button text-color borderless paper-file {{ class }}"
+         title="{{ file.filename }}">
+        <a href="{{ url_for('papers.download_file', file) }}"
+           class="attachment spotlight-file-name flexrow f-a-center truncate-text {{ icon }}">
+            <span class="title truncate-text">{{ file.filename }}</span>
+        </a>
+    </div>
+{% endmacro %}
+
+
+{% macro _render_paper_files(files, spotlight_file=none, full_width=false) %}
+    {% set class = 'full-width' if full_width else None %}
+    <ul class="paper-files flexrow f-wrap f-a-center {{ class }}">
         {% for file in files if file != spotlight_file %}
             {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
             <li>
-                <a href="{{ url_for('.download_file', file) }}"
-                   class="attachment paper-file i-button text-color outline dashed {{ icon }}"
+                <a href="{{ url_for('papers.download_file', file) }}"
+                   class="attachment paper-file i-button text-color borderless {{ icon }}"
                    title="{{ file.filename }}">
                     <span class="title truncate-text">{{ file.filename }}</span>
                 </a>
@@ -29,6 +93,43 @@
         {% endfor %}
     </ul>
 {% endmacro %}
+
+
+{% macro render_paper_metadata(paper, contribution_page=False) %}
+    <div class="paper-metadata flexrow f-j-end">
+        {% set date_time %}
+            {% if contribution_page %}
+                {% if paper.can_manage(session.user) %}
+                    <a class="paper-metadata-dt" href="{{ url_for('papers.paper_timeline', paper, management=false) }}">
+                        <time datetime="{{ paper.last_revision.judgment_dt.isoformat() }}">
+                            {{- paper.last_revision.judgment_dt|format_human_date -}}
+                        </time>
+                    </a>
+                {% else %}
+                    <time datetime="{{ paper.last_revision.judgment_dt.isoformat() }}">
+                        {{- paper.last_revision.judgment_dt|format_human_date -}}
+                    </time>
+                {% endif %}
+            {% else %}
+                <a class="paper-metadata-dt" href="#revision-info-{{ paper.last_revision.id }}">
+                    <time datetime="{{ paper.last_revision.submitted_dt.isoformat() }}">
+                        {{- paper.last_revision.submitted_dt|format_human_date -}}
+                    </time>
+                </a>
+            {% endif %}
+        {% endset %}
+        {% if contribution_page %}
+            {%- trans judge=paper.last_revision.judge.full_name -%}
+                Accepted on {{ date_time }} by {{ judge }}
+            {%- endtrans -%}
+        {% else %}
+            {%- trans submitter=paper.last_revision.submitter.full_name -%}
+                Submitted on {{ date_time }} by {{ submitter }}
+            {%- endtrans -%}
+        {% endif %}
+    </div>
+{% endmacro %}
+
 
 {% macro render_submission_info(revision) %}
     <div class="i-timeline">
@@ -57,86 +158,28 @@
                 </div>
                 {% set submission_info_class = 'weak-hidden' if not revision.is_last_revision %}
                 <div class="i-box-content submission-info {{ submission_info_class }}">
-                    {{ _render_paper_file_list(revision.files) }}
+                    {{ _render_timeline_file_list(revision.files) }}
                 </div>
             </div>
         </div>
     </div>
 {% endmacro %}
 
-{% macro _render_spotlight_file(file) %}
-    {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
-    <div class="flexrow f-a-center spotlight-file i-button text-color outline dashed paper-file"
-         title="{{ file.filename }}">
-        <a class="attachment spotlight-file-icon {{ icon }}"></a>
-        <a href="{{ url_for('.download_file', file) }}" class="attachment spotlight-file-name truncate-text">
-            <span class="title">{{ file.filename }}</span>
-        </a>
-    </div>
-{% endmacro %}
 
-{% macro render_paper_info(paper) %}
-    <div class="submission-title flexrow">
-        <h3 class="f-self-stretch">
-            {% trans contribution_title=paper.contribution.title%}Paper for {{ contribution_title }}{% endtrans %}
-            <span class="submission-id">
-                #{{ paper.contribution.friendly_id }}
-            </span>
-        </h3>
-    </div>
-    <div id="paper-public">
-        {{ _render_paper_summary(paper) }}
-        <div class="review-item-content paper-content flexcol f-a-center">
-            {% set spotlight_file = paper.last_revision.get_spotlight_file() %}
-            {% if spotlight_file %}
-                {{ _render_spotlight_file(spotlight_file) }}
-                <div class="paper-files-list flexrow f-a-baseline">
-                    <div class="paper-files-list-label f-self-no-shrink">
-                        {%- trans %}Additional files:{% endtrans -%}
-                    </div>
-                    {{ _render_paper_files(paper.last_revision.files, spotlight_file) }}
-                </div>
-            {% else %}
-                <div class="paper-files-list flexrow f-a-baseline">
-                    <div class="paper-files-list-label f-self-no-shrink">
-                        {%- trans %}Paper files:{% endtrans -%}
-                    </div>
-                    {{ _render_paper_files(paper.last_revision.files) }}
-                </div>
-            {% endif %}
-            <div class="submission-metadata">
-                {% set submission_dt -%}
-                    <a class="submission-dt" href="#revision-info-{{ paper.last_revision.id }}">
-                        <time datetime="{{ paper.last_revision.submitted_dt.isoformat() }}">
-                            {{- paper.last_revision.submitted_dt|format_human_date -}}
-                        </time>
-                    </a>
-                {%- endset %}
-                {%- trans submitter=paper.last_revision.submitter.full_name -%}
-                    Submitted on {{ submission_dt }} by {{ submitter }}
-                {%- endtrans -%}
-            </div>
-        </div>
-    </div>
-{% endmacro %}
-
-{% macro _render_paper_summary(paper) %}
-    <div class="review-summary flexrow f-a-baseline">
-        <div class="review-summary-badge">
-            {{ render_summary_state(paper.state) }}
-        </div>
-        <div class="review-summary-content f-self-stretch">
-            <div>
-                {% trans name=paper.last_revision.submitter.name -%}
-                    <strong>{{ name }}</strong> submitted this paper for the contribution
-                {%- endtrans %}
-                <a href="{{ url_for('contributions.display_contribution', paper.contribution) }}">
-                    {{- paper.contribution.title -}}
+{% macro _render_timeline_file_list(files) %}
+    <ul class="file-list">
+        {% for file in files %}
+            {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
+            <li class="truncate-text">
+                <a class="attachment {{ icon }}" href="{{ url_for('papers.download_file', file) }}"
+                   title="{{ file.filename }}">
+                    <span class="title">{{ file.filename }}</span>
                 </a>
-            </div>
-        </div>
-    </div>
+            </li>
+        {% endfor %}
+    </ul>
 {% endmacro %}
+
 
 {% macro render_paper_review_action_text(review) %}
     {% set action = render_review_state(review) %}
@@ -149,6 +192,7 @@
         {%- trans %}Proposed to {{ action }}correct{{ endaction }}{% endtrans -%}
     {% endif %}
 {% endmacro %}
+
 
 {% macro render_paper_judgment(revision) %}
     {% if revision.state.name != 'submitted' %}
@@ -195,6 +239,7 @@
     {% endif %}
 {% endmacro %}
 
+
 {% macro _render_paper_judgment_action(revision) %}
     {% set action = revision.state.name %}
     {% set judge_name = revision.judge.name %}
@@ -206,6 +251,7 @@
         {%- trans %}<strong>{{ judge_name }}</strong> asked for changes{% endtrans -%}
     {% endif %}
 {% endmacro %}
+
 
 {% macro render_paper_revision_submission_form(paper, form) %}
     {%if paper.state.name == 'to_be_corrected' %}

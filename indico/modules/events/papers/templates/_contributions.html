@@ -1,3 +1,5 @@
+{% from 'events/papers/reviewing/timeline.html' import render_paper_content, render_paper_metadata %}
+
 {% macro render_paper_section(contribution) %}
     {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
     {% set paper = contribution.paper %}
@@ -10,14 +12,17 @@
             <div class="header">
                 <div class="header-row">
                     <h3 class="icon-file">{% trans %}Paper{% endtrans %}</h3>
+                    {% if show_paper and paper.state.name == 'accepted' %}
+                        {{ render_paper_metadata(paper, contribution_page=true) }}
+                    {% endif %}
                 </div>
             </div>
 
             {% if show_paper %}
-                {# TODO: Implement new accepted paper widget #}
+                {{ render_paper_content(paper, contribution_page=true) }}
             {% endif %}
 
-            {% if show_paper_status %}
+            {% if show_paper_status and paper.state.name != 'accepted' %}
                 {{ _render_paper_status_box(paper) }}
             {% elif not show_paper and show_paper_submission %}
                 {{ _render_paper_submission_box(contribution) }}
@@ -29,7 +34,6 @@
 
 {% macro _render_paper_status_box(paper) %}
     {% set state_mapping = {'submitted': '',
-                            'accepted': 'accept',
                             'rejected': 'danger',
                             'to_be_corrected': 'warning'} %}
     <div class="action-box {{state_mapping[paper.last_revision.state.name]}}">
@@ -83,13 +87,6 @@
         </div>
         <div>
             {%- trans %}Please wait until the reviewers come back to you{% endtrans -%}
-        </div>
-    {% elif paper.state.name == 'accepted' %}
-        <div class="label">
-            {%- trans %}Your paper was accepted{% endtrans -%}
-        </div>
-        <div>
-            {%- trans %}You can check the review history in the timeline{% endtrans -%}
         </div>
     {% elif paper.state.name == 'rejected' %}
     <div class="label">
