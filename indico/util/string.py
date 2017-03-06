@@ -46,7 +46,7 @@ BLEACH_ALLOWED_TAGS = bleach.ALLOWED_TAGS + [
     'sup', 'sub', 'small', 'br', 'p', 'table', 'thead', 'tbody', 'th', 'tr', 'td', 'img', 'hr', 'h1', 'h2', 'h3', 'h4',
     'h5', 'h6', 'pre'
 ]
-BLEACH_ALLOWED_ATTRIBUTES = dict(bleach.ALLOWED_ATTRIBUTES, img=['src', 'alt'])
+BLEACH_ALLOWED_ATTRIBUTES = dict(bleach.ALLOWED_ATTRIBUTES, img=['src', 'alt', 'style'])
 # extended list of tags, used for HTML content
 BLEACH_ALLOWED_TAGS_HTML = BLEACH_ALLOWED_TAGS + [
     'address', 'area', 'bdo', 'big', 'caption', 'center', 'cite', 'col', 'colgroup', 'dd', 'del', 'dfn', 'dir', 'div',
