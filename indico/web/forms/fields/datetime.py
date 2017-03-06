@@ -25,7 +25,7 @@ import pytz
 from flask import session
 from markupsafe import escape
 from wtforms import Field, SelectField
-from wtforms.ext.dateutil.fields import DateTimeField
+from wtforms.ext.dateutil.fields import DateField, DateTimeField
 from wtforms.validators import StopValidation
 
 from indico.core.config import Config
@@ -182,6 +182,14 @@ class RelativeDeltaField(Field):
         if self.data is None:
             return '', ''
         return self.split_data
+
+
+class IndicoDateField(DateField):
+    widget = JinjaWidget('forms/date_widget.html', single_line=True, single_kwargs=True)
+
+    def __init__(self, *args, **kwargs):
+        super(IndicoDateField, self).__init__(*args, parse_kwargs={'dayfirst': True},
+                                              display_format='%d/%m/%Y', **kwargs)
 
 
 class IndicoDateTimeField(DateTimeField):
