@@ -40,13 +40,15 @@
         var categoryRowSelector = 'tr[data-category-id]';
         var checkboxSelector = 'input[name=category_id]';
 
+
         $('.js-sort-categories').on('click', function() {
+            var sortOrder = $(this).data('sort-order');
             var currentOrder = getSortedCategories();
             function undo() {
                 restoreCategoryOrder(currentOrder);
                 return setOrderAjax(currentOrder);
             }
-            sortCategories();
+            sortCategories(sortOrder);
             setOrderAjax(getSortedCategories());
             cornerMessage({
                 actionLabel: $T.gettext("Undo"),
@@ -127,9 +129,9 @@
             });
         }
 
-        function sortCategories() {
+        function sortCategories(sortOrder) {
             $tbody.find(categoryRowSelector).sort(function(a, b) {
-                return $(a).data('category-title').localeCompare($(b).data('category-title'));
+                return sortOrder * strnatcmp($(a).data('category-title'), $(b).data('category-title'));
             }).detach().appendTo($tbody);
         }
 
