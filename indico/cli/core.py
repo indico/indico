@@ -16,8 +16,11 @@
 
 from __future__ import unicode_literals
 
+from importlib import import_module
+
 import click
 from flask.cli import FlaskGroup, with_appcontext
+from werkzeug.utils import cached_property
 
 click.disable_unicode_literals_warning = True
 
@@ -30,6 +33,23 @@ def _create_app(info):
     return make_app(set_path=True)
 
 
+class LazyGroup(click.Group):
+    def __init__(self, import_name, **kwargs):
+        self._import_name = import_name
+        super(LazyGroup, self).__init__(**kwargs)
+
+    @cached_property
+    def _impl(self):
+        module, name = self._import_name.split(':', 1)
+        return getattr(import_module(module), name)
+
+    def get_command(self, ctx, cmd_name):
+        return self._impl.get_command(ctx, cmd_name)
+
+    def list_commands(self, ctx):
+        return self._impl.list_commands(ctx)
+
+
 @click.group(cls=FlaskGroup, create_app=_create_app, add_default_commands=False)
 def cli(**kwargs):
     """
@@ -38,7 +58,12 @@ def cli(**kwargs):
     """
 
 
-@cli.command()
+@cli.group(cls=LazyGroup, import_name='indico.cli.setup:cli')
+def setup():
+    """Setup Indico."""
+
+
+@cli.command(short_help='Runs a shell in the app context.')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on the available objects')
 @with_appcontext
 def shell(verbose):
