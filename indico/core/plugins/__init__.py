@@ -17,7 +17,6 @@
 import json
 import os
 import re
-from copy import deepcopy
 from urlparse import urlparse
 
 from flask_babelex import Domain
@@ -113,7 +112,6 @@ class IndicoPlugin(Plugin):
         """
         assert self.configurable or not self.settings_form, 'Non-configurable plugin cannot have a settings form'
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
-        self.connect(signals.plugin.cli, self.add_cli_command)
         self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
         self._setup_assets()
@@ -178,10 +176,6 @@ class IndicoPlugin(Plugin):
         """Return the domain for this plugin's translation_path"""
         path = self.translation_path
         return Domain(path) if path else NullDomain()
-
-    def add_cli_command(self, manager):
-        """Add custom commands/submanagers to the manager of the `indico` cli tool."""
-        pass
 
     def register_assets(self):
         """Add assets to the plugin's webassets environment.
@@ -337,19 +331,6 @@ def get_plugin_template_module(template_name, **context):
     """Like :func:`~indico.web.flask.templating.get_template_module`, but using plugin templates"""
     template_name = '{}:{}'.format(current_plugin.name, template_name)
     return get_template_module(template_name, **context)
-
-
-def wrap_cli_manager(manager, plugin):
-    """Wraps all commands of a flask-script `Manager` in a plugin context.
-
-    This actually clones the manager, so the original one is left untouched.
-    """
-    manager = deepcopy(manager)
-    for name, command in manager._commands.iteritems():
-        command = deepcopy(command)
-        command.run = wrap_in_plugin_context(plugin, command.run)
-        manager._commands[name] = command
-    return manager
 
 
 class IndicoPluginEngine(PluginEngine):

@@ -20,9 +20,10 @@ _signals = Namespace()
 
 
 cli = _signals.signal('cli', """
-Called before running the Flask-Script manager of the `indico`
-commandline script. *sender* is the Flask-Script manager which
-can be used to register additional commands/managers
+Expected to return one or more click commands/groups.
+If they use `indico.cli.core.cli_command` / `indico.cli.core.cli_group`
+they will be automatically executed within a plugin context and run
+within a Flask app context by default.
 """)
 
 shell_context = _signals.signal('shell-context', """
