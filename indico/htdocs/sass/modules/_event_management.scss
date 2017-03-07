@@ -651,3 +651,40 @@ th.i-table {
         }
     }
 }
+
+.clone-event-dialog-content {
+    width: 600px;
+    height: 400px;
+    overflow-y: auto;
+}
+
+.qtip.cloned-event-list-qtip ul {
+    list-style-type: none;
+
+    li {
+        @include border-radius();
+        display: inline-block;
+        background: $light-black;
+        padding: 0.3em;
+        margin: 0.2em;
+    }
+}
+
+form.horizontal .clone-event-dialog-content {
+    .i-checkbox {
+        font-size: 1.1em;
+
+        &.checkbox-disabled {
+            color: $pastel-gray;
+        }
+    }
+}
+
+form.horizontal .clone-event-dialog-footer .form-field {
+    margin-top: 10px;
+    width: 100%;
+
+    .clone-action-button {
+        margin-left: auto;
+    }
+}

@@ -21,9 +21,9 @@ from indico.modules.events.management.controllers import (RHEventSettings, RHEdi
                                                           RHEditEventLocation, RHEditEventPersons,
                                                           RHEditEventContactInfo, RHEditEventClassification,
                                                           RHDeleteEvent, RHChangeEventType, RHLockEvent, RHUnlockEvent,
-                                                          RHShowNonInheriting, RHEventProtection,
+                                                          RHShowNonInheriting, RHEventProtection, RHCloneEvent,
                                                           RHMoveEvent, RHEventACL, RHEventACLMessage,
-                                                          RHPrintEventPoster, RHPosterPrintSettings)
+                                                          RHPrintEventPoster, RHPosterPrintSettings, RHClonePreview)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -47,6 +47,8 @@ _bp.add_url_rule('/protection', 'protection', RHEventProtection, methods=('GET',
 _bp.add_url_rule('/protection/acl', 'acl', RHEventACL)
 _bp.add_url_rule('/protection/acl-message', 'acl_message', RHEventACLMessage)
 _bp.add_url_rule('/move', 'move', RHMoveEvent, methods=('POST',))
+_bp.add_url_rule('/clone', 'clone', RHCloneEvent, methods=('GET', 'POST'))
+_bp.add_url_rule('/clone/preview', 'clone_preview', RHClonePreview, methods=('GET', 'POST'))
 
 _bp.add_url_rule('/print-poster/settings', 'poster_settings', RHPosterPrintSettings, methods=('GET', 'POST'))
 _bp.add_url_rule('/print-poster/<int:template_id>/<uuid>', 'print_poster', RHPrintEventPoster)

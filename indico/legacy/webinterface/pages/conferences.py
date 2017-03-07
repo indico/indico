@@ -465,6 +465,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         # TODO: find way to check if the user is able to manage
         # anything inside the conference (sessions, ...)
         modules += (self._includeJSPackage('Management') +
+                    self._asset_env['modules_event_cloning_js'].urls() +
                     self._asset_env['modules_vc_js'].urls() +
                     self._asset_env['modules_event_display_js'].urls() +
                     self._asset_env['clipboard_js'].urls())
@@ -522,6 +523,7 @@ class WPConferenceModifBase(main.WPMainBase):
     def getJSFiles(self):
         return (main.WPMainBase.getJSFiles(self) +
                 self._includeJSPackage('Management') +
+                self._asset_env['modules_event_cloning_js'].urls() +
                 self._asset_env['modules_event_management_js'].urls())
 
     def _getSiteArea(self):

@@ -1,0 +1,108 @@
+{% from 'forms/_form.html' import form_header, form_fieldset, form_footer, form_row, form_rows %}
+{% from 'message_box.html' import message_box %}
+
+{% macro invisible_field(field) -%}
+    {% set field_value = field._value() if field._value else field.data %}
+    {% set data = [field_value] if field_value is string else ([field_value|tojson] if field_value is mapping else field_value) %}
+    {% for value in data %}
+        <input type="hidden" name="{{ field.name }}" value="{{ value | forceescape }}">
+    {% endfor %}
+{%- endmacro %}
+
+{% macro invisible_fields(form, skip) %}
+    {% for field in form if field.short_name not in skip %}
+        {{ invisible_field(field) }}
+    {% endfor %}
+{% endmacro %}
+
+{% block content %}
+    <div id="event-clone-form-container"
+         data-preview-url="{{ url_for('.clone_preview', event) }}"
+         data-cloner-dependencies="{{ cloner_dependencies | tojson | forceescape }}"
+         data-step="{{ step }}">
+        {% call form_header(form, id='event-clone-form', classes='step-%d'|format(step),
+                            action=url_for('.clone', event)) %}
+            data-ajax-form
+        {% endcall %}
+
+
+        <div class="clone-event-dialog-content">
+            {% if step == 1 %}
+                {% call form_fieldset(_("How should the event be cloned?")) %}
+                    {{ form_rows(form) }}
+                {% endcall %}
+
+            {% elif step == 2 %}
+                {% call form_fieldset(_("What should be cloned?")) %}
+                    {{ form_rows(form, skip=('repeatability',), skip_labels=true) }}
+                    {{ invisible_field(form.repeatability) }}
+                {% endcall %}
+
+            {% elif step == 3 %}
+                {% call form_fieldset(_("Where should the events be placed?")) %}
+                    {{ form_row(form.category) }}
+                    {{ invisible_fields(form, skip=('category',)) }}
+                {% endcall %}
+
+            {% elif step == 4 %}
+                {% call form_fieldset(step_title) %}
+                    {% if form.repeatability.data == 'once' %}
+                        {% set visible_fields = ('start_dt',) %}
+                        {{ form_row(form.start_dt) }}
+                    {% elif form.repeatability.data == 'interval' %}
+                        {% set visible_fields = ('start_dt', 'stop_criterion', 'until_dt', 'num_times', 'recurrence') %}
+                        {{ form_row(form.recurrence) }}
+                        {{ form_rows(form, fields=visible_fields|reject('equalto', 'recurrence')) }}
+                    {% elif form.repeatability.data == 'pattern' %}
+                        {% set visible_fields = ('start_dt', 'day_number', 'week_day', 'num_months', 'stop_criterion',
+                                                 'until_dt', 'num_times') %}
+                        {{ form_rows(form, fields=visible_fields, skip_labels=true) }}
+                    {% endif %}
+                    {{ invisible_fields(form, skip=visible_fields) }}
+                    {% if form.repeatability.data != 'once' %}
+                        {% call message_box('info', fixed_width=True, id='event-count') -%}
+                            {% set count %}
+                                <span class="count"></span>
+                            {% endset %}
+                            {% trans link='<a class="event-list">'|safe, endlink="</a>"|safe -%}
+                                {{ count }} new events will be created. {{ link }}When?{{ endlink}}
+                            {%- endtrans %}
+                        {%- endcall %}
+                        {{ message_box('error', '-', fixed_width=True, id='clone-errors') }}
+                    {% endif %}
+                {% endcall %}
+            {% endif %}
+        </div>
+        {% call form_footer(form, skip_label=true, classes='clone-event-dialog-footer') %}
+            {% set button_message %}
+                {% if step == 4 %}
+                    {% trans %}Clone{% endtrans %}
+                {% else %}
+                    {% trans %}Next{% endtrans %}
+                {% endif %}
+            {% endset %}
+
+            <div class="flexrow f-j-space-between">
+                {% if step > 1 %}
+                    <button class="i-button icon-prev back-action-button"
+                            type="submit"
+                            name="step"
+                            value="{{ step - 1 }}">
+                            {% trans %}Previous{% endtrans %}
+                    </button>
+                {% endif %}
+                <button class="i-button icon-next highlight clone-action-button"
+                        type="submit"
+                        name="step"
+                        value="{{ step + 1 }}"
+                        {{ 'data-disabled-until-change' if step == 1 and form.repeatability.data is none }}>
+                    {{ button_message }}
+                </button>
+            </div>
+        {% endcall %}
+    </div>
+
+    <script>
+        setupCloneDialog();
+    </script>
+{% endblock %}

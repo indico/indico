@@ -100,8 +100,12 @@
         <div class="toolbar">
             {% if event.can_manage(session.user) %}
                 <div class="group">
-                    <a class="i-button icon-copy" href="{{ url_for('event_mgmt.confModifTools-clone', event) }}"
-                       title="{% trans %}Clone event{% endtrans %}">Clone</a>
+                    <a class="i-button icon-copy" title="{% trans %}Clone event{% endtrans %}"
+                       data-href="{{ url_for('event_management.clone', event) }}"
+                       data-title="{% trans %}Clone Event{% endtrans %}"
+                       data-ajax-dialog>
+                        {% trans %}Clone{% endtrans %}
+                   </a>
                     {% if clones %}
                         <a id="event-action-menu-clones-target" class="i-button label clickable arrow">
                             {{- clones|length -}}

@@ -17,28 +17,35 @@
 from __future__ import unicode_literals
 
 import uuid
-from collections import defaultdict
+from collections import defaultdict, OrderedDict
+from datetime import datetime
 
-from flask import flash, redirect, session, request, signals
-from werkzeug.exceptions import Forbidden, NotFound
+from dateutil import rrule
+from flask import flash, jsonify, redirect, session, request
+from pytz import utc
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events import EventLogRealm, EventLogKind
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
                                                                 AuthorType)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.management.forms import (EventProtectionForm, EventDataForm, EventDatesForm,
                                                     EventLocationForm, EventPersonsForm, EventContactInfoForm,
-                                                    EventClassificationForm, PosterPrintingForm)
+                                                    EventClassificationForm, PosterPrintingForm, CloneRepeatabilityForm,
+                                                    CloneContentsForm, CloneCategorySelectForm, CloneRepeatOnceForm,
+                                                    CloneRepeatIntervalForm, CloneRepeatPatternForm,
+                                                    CLONE_REPEAT_CHOICES)
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.management.views import (WPEventSettings, WPEventProtection,
                                                     render_event_management_header_right)
 from indico.modules.events.models.events import EventType
 from indico.modules.events.operations import (update_event_protection, update_event, update_event_type,
-                                              lock_event, unlock_event)
+                                              lock_event, unlock_event, clone_event)
 from indico.modules.events.posters import PosterPDF
 from indico.modules.events.sessions import session_settings, COORDINATOR_PRIV_SETTINGS
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
@@ -52,6 +59,80 @@ from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_fo
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+
+
+REPEAT_FORM_MAP = {
+    'once': CloneRepeatOnceForm,
+    'interval': CloneRepeatIntervalForm,
+    'pattern': CloneRepeatPatternForm
+}
+
+RRULE_FREQ_MAP = OrderedDict([
+    ('years', rrule.YEARLY),
+    ('months', rrule.MONTHLY),
+    ('weeks', rrule.WEEKLY),
+    ('days', rrule.DAILY),
+    ('hours', rrule.HOURLY),
+    ('minutes', rrule.MINUTELY),
+    ('seconds', rrule.SECONDLY)
+])
+
+
+def relativedelta_to_rrule_interval(rdelta):
+    for unit, freq in RRULE_FREQ_MAP.viewitems():
+        value = getattr(rdelta, unit)
+        if value:
+            return freq, value
+    raise ValueError('Invalid relativedelta(...) object')
+
+
+def get_clone_calculator(repeatability, event):
+    if repeatability == 'interval':
+        return IntervalCloneCalculator(event)
+    elif repeatability == 'pattern':
+        return PatternCloneCalculator(event)
+    else:
+        raise BadRequest
+
+
+class CloneCalculator(object):
+    def __init__(self, event):
+        self.event = event
+
+    def _calc_stop_criteria(self, form):
+        args = {}
+        if form.stop_criterion.data == 'day':
+            args['until'] = utc.localize(datetime.combine(form.until_dt.data, form.start_dt.data.time()))
+        else:
+            args['count'] = form.num_times.data
+        return args
+
+    def calculate(self, formdata):
+        form = self.form_class(self.event, formdata=formdata)
+        if form.validate():
+            return self._calculate(form)
+        else:
+            raise ValueError([(unicode(getattr(form, k).label.text), v) for k, v in form.errors.viewitems()])
+
+
+class PatternCloneCalculator(CloneCalculator):
+    form_class = CloneRepeatPatternForm
+
+    def _calculate(self, form):
+        args = {'dtstart': form.start_dt.data}
+        args.update(self._calc_stop_criteria(form))
+        return list(rrule.rrule(rrule.MONTHLY, interval=form.num_months.data, byweekday=form.week_day.data,
+                                bysetpos=form.day_number.data, **args))
+
+
+class IntervalCloneCalculator(CloneCalculator):
+    form_class = CloneRepeatIntervalForm
+
+    def _calculate(self, form):
+        args = {'dtstart': form.start_dt.data}
+        args.update(self._calc_stop_criteria(form))
+        freq, interval = relativedelta_to_rrule_interval(form.recurrence.data)
+        return list(rrule.rrule(freq, interval=interval, **args))
 
 
 poster_cache = GenericCache('poster-printing')
@@ -326,6 +407,77 @@ class RHMoveEvent(RHManageEventBase):
         flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, self.target_category.title),
               'success')
         return jsonify_data(flash=False)
+
+
+class RHClonePreview(RHManageEventBase):
+    def _process(self):
+        form = CloneRepeatabilityForm()
+        clone_calculator = get_clone_calculator(form.repeatability.data, self.event_new)
+        try:
+            dates = clone_calculator.calculate(request.form)
+            if len(dates) > 100:
+                raise ValueError(_("You can clone maximum of 100 times at once"))
+        except ValueError as e:
+            return jsonify(error={'message': e.message})
+        return jsonify_data(count=len(dates), dates=dates, flash=False)
+
+
+class RHCloneEvent(RHManageEventBase):
+    """Create copies of the event."""
+
+    def _form_for_step(self, step, set_defaults=True):
+        if step == 1:
+            return CloneRepeatabilityForm()
+        elif step == 2:
+            return CloneContentsForm(self.event_new, set_defaults=set_defaults)
+        elif step == 3:
+            default_category = (self.event_new.category if self.event_new.category.can_create_events(session.user)
+                                else None)
+            return CloneCategorySelectForm(self.event_new, category=default_category)
+        elif step == 4:
+            return REPEAT_FORM_MAP[request.form['repeatability']](self.event_new, set_defaults=set_defaults)
+        else:
+            return None
+
+    def _process(self):
+        step = int(request.form.get('step', 1))
+        tpl_args = {}
+        form = self._form_for_step(step, set_defaults=True)
+        prev_form = self._form_for_step(step - 1)
+
+        if prev_form and not prev_form.validate():
+            form = prev_form
+            step = step - 1
+
+        if step == 4:
+            tpl_args.update({
+                'step_title': dict(CLONE_REPEAT_CHOICES)[request.form['repeatability']],
+            })
+        elif step > 4:
+            # last step - perform actual cloning
+            form = REPEAT_FORM_MAP[request.form['repeatability']](self.event_new)
+
+            if form.validate_on_submit():
+                if form.repeatability.data == 'once':
+                    dates = [form.start_dt.data]
+                else:
+                    clone_calculator = get_clone_calculator(form.repeatability.data, self.event_new)
+                    dates = clone_calculator.calculate(request.form)
+                clones = [clone_event(self.event_new, start_dt, set(form.selected_items.data), form.category.data)
+                          for start_dt in dates]
+                if len(clones) == 1:
+                    flash(_('Welcome to your cloned event!'), 'success')
+                    return jsonify_data(redirect=url_for('event_management.settings', clones[0]), flash=False)
+                else:
+                    flash(_('{} new events created.').format(len(dates)), 'success')
+                    return jsonify_data(redirect=form.category.data.url, flash=False)
+            else:
+                # back to step 4, since there's been an error
+                step = 4
+        dependencies = {c.name: {'requires': list(c.requires_deep), 'required_by': list(c.required_by_deep)}
+                        for c in EventCloner.get_form_items(self.event_new)}
+        return jsonify_template('events/management/clone_event.html', event=self.event_new, step=step, form=form,
+                                cloner_dependencies=dependencies, **tpl_args)
 
 
 class RHPosterPrintSettings(RHConferenceModifBase):
