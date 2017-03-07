@@ -33,7 +33,9 @@
         {% endcall %}
     {% endfor %}
     {% call form_footer(form) %}
-        <input class="i-button big highlight" type="submit" value="{% trans %}Save answers{% endtrans %}">
+        <input class="i-button big" type="submit" name="save_answers" value="{% trans %}Save answers{% endtrans %}"
+               title="Your answered questions will be saved but the survey won't be submitted">
+        <input class="i-button big highlight" type="submit" value="{% trans %}Submit{% endtrans %}">
         {% if back_button_endpoint is not none %}
             <a href="{{ url_for(back_button_endpoint, event) }}" class="i-button big" data-button-back>
                 {%- trans %}Back{% endtrans -%}

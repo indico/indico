@@ -30,16 +30,21 @@
                         {% if was_survey_submitted(survey) %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}Survey already filled out{% endtrans %}">
-                                {% trans %}Fill out{% endtrans %}
+                                {%- trans %}Fill out{% endtrans -%}
                             </a>
                         {% elif not survey.is_active %}
                             <a class="i-button highlight disabled"
                                title="{% trans %}Survey is closed{% endtrans %}">
-                                {% trans %}Fill out{% endtrans %}
+                                {%- trans %}Fill out{% endtrans -%}
+                            </a>
+                        {% elif is_submission_in_progress(survey) %}
+                            <a href="{{ url_for('.display_survey_form', survey) }}"
+                               class="i-button text-color highlight outline">
+                                {%- trans %}Continue{% endtrans -%}
                             </a>
                         {% else %}
                             <a href="{{ url_for('.display_survey_form', survey) }}" class="i-button highlight">
-                                {% trans %}Fill out{% endtrans %}
+                                {%- trans %}Fill out{% endtrans -%}
                             </a>
                         {% endif %}
                     </td>
@@ -47,7 +52,7 @@
             {% else %}
                 <tr>
                     <td colspan="4">
-                        {% trans %}No surveys available for this event{% endtrans %}
+                        {%- trans %}No surveys available for this event{% endtrans -%}
                     </td>
                 </tr>
             {% endfor %}
