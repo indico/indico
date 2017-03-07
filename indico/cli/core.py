@@ -19,10 +19,20 @@ from __future__ import unicode_literals
 from importlib import import_module
 
 import click
-from flask.cli import FlaskGroup, pass_script_info
+from flask.cli import FlaskGroup, pass_script_info, AppGroup
 from werkzeug.utils import cached_property
 
 click.disable_unicode_literals_warning = True
+
+
+# We never use the group but expose cli_command and cli_group for
+# plugins to have access to the flask-enhanced command and group
+# decorators that use the app context by default
+_cli = AppGroup()
+cli_command = _cli.command
+cli_group = _cli.group
+del _cli
+__all__ = ('cli_command', 'cli_group')
 
 
 def _create_app(info):
