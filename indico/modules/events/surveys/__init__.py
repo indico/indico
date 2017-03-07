@@ -115,3 +115,11 @@ class SurveysRole(ManagementRole):
     name = 'surveys'
     friendly_name = _('Surveys')
     description = _('Grants management access to surveys.')
+
+
+@signals.get_placeholders.connect_via('survey-link-email')
+def _get_placeholders(sender, event, survey, **kwargs):
+    from indico.modules.events.surveys import placeholders
+    yield placeholders.EventTitlePlaceholder
+    yield placeholders.SurveyTitlePlaceholder
+    yield placeholders.SurveyLinkPlaceholder

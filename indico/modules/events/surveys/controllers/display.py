@@ -50,7 +50,7 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
 class RHSurveyList(RHSurveyBaseDisplay):
     def _process(self):
         surveys = (Survey.query.with_parent(self.event_new)
-                   .filter(Survey.is_visible)
+                   .filter(Survey.is_visible, ~Survey.private)
                    .options(joinedload('questions'),
                             joinedload('submissions'))
                    .all())
