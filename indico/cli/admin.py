@@ -17,9 +17,9 @@
 from __future__ import unicode_literals, print_function
 
 import click
-from flask.cli import with_appcontext
 from flask_script import Manager, prompt, prompt_bool
 
+from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
@@ -31,7 +31,7 @@ click.disable_unicode_literals_warning = True
 IndicoAdminManager = Manager(usage="Manages administration actions")
 
 
-@click.group()
+@cli_group()
 def cli():
     pass
 
@@ -47,7 +47,6 @@ def print_user_info(user):
 
 
 @cli.command()
-@with_appcontext
 @click.option('--admin/--no-admin', '-a/', 'grant_admin', is_flag=True, help='Grant admin rights')
 @IndicoAdminManager.option('-a', '--admin', action='store_true', dest="grant_admin",
                            help="Grants administration rights")
@@ -89,7 +88,6 @@ def user_create(grant_admin):
 
 @cli.command()
 @click.argument('user_id', type=int)
-@with_appcontext
 @IndicoAdminManager.option('user_id', type=int, help="ID of user to be granted admin rights")
 def user_grant(user_id):
     """Grants administration rights to a given user"""
@@ -109,7 +107,6 @@ def user_grant(user_id):
 
 @cli.command()
 @click.argument('user_id', type=int)
-@with_appcontext
 @IndicoAdminManager.option('user_id', help="ID of user to be revoked from admin rights")
 def user_revoke(user_id):
     """Revokes administration rights from a given user"""

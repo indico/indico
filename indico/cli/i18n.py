@@ -27,11 +27,12 @@ from flask.helpers import get_root_path
 from flask_script import Manager, Command, Option
 from pkgutil import walk_packages
 
+from indico.cli.core import cli_group
 
 IndicoI18nManager = Manager(usage="Takes care of i18n-related operations")
 
 
-@click.group()
+@cli_group()
 def cli():
     # TODO: cd to indico and update the paths below accordingly
     os.chdir(os.path.join(get_root_path('indico'), '..'))
