@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global showFormErrors:false */
+/* global showFormErrors:false strnatcmp:false */
 
 (function(global) {
     'use strict';
@@ -116,8 +116,11 @@
             $coauthorList.empty();
             $otherList.empty();
 
-            var sortedPeople = _.sortBy(people, function(person) {
-                return [person.displayOrder, person.name];
+            var sortedPeople = _.clone(people);
+            sortedPeople.sort(function(person1, person2) {
+                var k1 = person1.displayOrder + ' ' + person1.name;
+                var k2 = person2.displayOrder + ' ' + person2.name;
+                return strnatcmp(k1, k2);
             });
 
             // Set default values
@@ -321,9 +324,7 @@
             allowEmptyEmail: options.allow.emptyEmail,
             multiChoice: true,
             overwriteChoice: false,
-            render: function(people) {
-                renderPeople(people);
-            },
+            render: renderPeople,
             onAdd: function(people) {
                 people.forEach(function(person) {
                     if (person.authorType === undefined) {
