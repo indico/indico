@@ -71,6 +71,11 @@ def admin():
     """Manage Indico users."""
 
 
+@cli.group(cls=LazyGroup, import_name='indico.cli.i18n:cli')
+def i18n():
+    """Perform i18n-related operations."""
+
+
 @cli.command(context_settings={'ignore_unknown_options': True, 'allow_extra_args': True}, add_help_option=False)
 @click.pass_context
 def celery(ctx):

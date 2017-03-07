@@ -1,14 +1,41 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
 import os
 import re
-
 from functools import wraps
+
+import click
+from babel.messages import frontend
 from distutils.dist import Distribution
+from flask.helpers import get_root_path
+from flask_script import Manager, Command, Option
 from pkgutil import walk_packages
 
-from flask_script import Manager, Command, Option
-from babel.messages import frontend
 
 IndicoI18nManager = Manager(usage="Takes care of i18n-related operations")
+
+
+@click.group()
+def cli():
+    # TODO: cd to indico and update the paths below accordingly
+    os.chdir(os.path.join(get_root_path('indico'), '..'))
+
 
 TRANSLATIONS_DIR = 'indico/translations'
 MESSAGES_POT = os.path.join(TRANSLATIONS_DIR, 'messages.pot')
@@ -19,42 +46,35 @@ DEFAULT_OPTIONS = {
         'output_file': MESSAGES_POT,
         'output_dir': TRANSLATIONS_DIR
     },
-
     'extract_messages': {
         'keywords': 'N_:1,2',
-        'width': 120,
+        'width': '120',
         'output_file': MESSAGES_POT,
         'mapping_file': 'babel.cfg'
     },
-
     'compile_catalog': {
         'domain': 'messages',
         'directory': TRANSLATIONS_DIR
     },
-
     'update_catalog': {
         'input_file': MESSAGES_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages'
     },
 
-
     # JavaScript
-
     'init_catalog_js': {
         'output_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
         'domain': 'messages-js'
     },
-
     'extract_messages_js': {
         'keywords': '$T',
-        'width': 120,
+        'width': '120',
         'output_file': MESSAGES_JS_POT,
         'mapping_file': 'babel-js.cfg',
-        'no_default_keywords': 1
+        'no_default_keywords': '1'
     },
-
     'update_catalog_js': {
         'input_file': MESSAGES_JS_POT,
         'output_dir': TRANSLATIONS_DIR,
@@ -101,9 +121,8 @@ for cmd_name in cmd_list:
     cmd_class = getattr(frontend, re.sub(r'_js$', '', cmd_name))
 
     command = Command(wrap_distutils_command(cmd_class))
-
+    cmd = click.command(cmd_name)(wrap_distutils_command(cmd_class))
     for opt, short_opt, description in cmd_class.user_options:
-
         long_opt_name = opt.rstrip('=')
         var_name = long_opt_name.replace('-', '_')
         opts = ['--' + long_opt_name]
@@ -111,8 +130,12 @@ for cmd_name in cmd_list:
         if short_opt:
             opts.append('-' + short_opt)
 
-        command.add_option(Option(*opts, dest=var_name,
-                                  action=(None if opt.endswith('=') else 'store_true'), help=description,
-                                  default=DEFAULT_OPTIONS.get(cmd_name, {}).get(var_name)))
+        default = DEFAULT_OPTIONS.get(cmd_name, {}).get(var_name)
+        is_flag = not opt.endswith('=')
+
+        cmd = click.option(*(opts + [var_name]), is_flag=is_flag, default=default, help=description)(cmd)
+        command.add_option(Option(*opts, dest=var_name, action=('store_true' if not is_flag else None),
+                                  help=description, default=default))
 
     IndicoI18nManager.add_command(cmd_name, command)
+    cli.add_command(cmd)
