@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from importlib import import_module
 
 import click
-from flask.cli import FlaskGroup
+from flask.cli import FlaskGroup, pass_script_info
 from werkzeug.utils import cached_property
 
 click.disable_unicode_literals_warning = True
@@ -76,7 +76,51 @@ def celery(ctx):
     celery_cmd(ctx.args)
 
 
-@cli.command(short_help='Runs a shell in the app context.')
+@cli.command(with_appcontext=False)
+@click.option('--host', '-h', default='127.0.0.1', metavar='HOST', help='The ip/host to bind to.')
+@click.option('--port', '-p', default=None, type=int, metavar='PORT', help='The port to bind to.')
+@click.option('--url', '-u', default=None, metavar='URL',
+              help='The URL used to access indico. Defaults to `http(s)://host:port`')
+@click.option('--ssl', '-s', is_flag=True, help='Use SSL.')
+@click.option('--ssl-key', '-K', type=click.Path(exists=True, dir_okay=False), help='The SSL private key to use.')
+@click.option('--ssl-cert', '-C', type=click.Path(exists=True, dir_okay=False), help='The SSL cert key to use.')
+@click.option('--quiet', '-q', is_flag=True, help='Disable logging of requests for most static files.')
+@click.option('--enable-evalex', is_flag=True,
+              help="Enable the werkzeug debugger's python shell in tracebacks and via /console")
+@click.option('--evalex-from', multiple=True,
+              help='Restrict the debugger shell to the given ips (can be used multiple times)')
+@click.option('--proxy', is_flag=True, help='Use the ip and protocol provided by the proxy.')
+@pass_script_info
+def run(info, **kwargs):
+    """Run the development webserver.
+
+    If no port is set, 8000 or 8443 will be used (depending on whether
+    SSL is enabled or not).
+
+    Enabling SSL without specifying key and certificate will use a
+    self-signed one.
+
+    Specifying a custom URL allows you to run the dev server e.g. behind
+    nginx to access it on the standard ports and serve static files
+    much faster. Note that you MUST use `--proxy` when running behind
+    another server; otherwise all requests will be considered to
+    originate from that server's IP which is especially dangerous
+    when using the evalex whitelist with `127.0.0.1` in it.
+
+    Note that even behind nginx the dev server is NOT SUITABLE for a
+    production setup.
+    """
+    from indico.cli.devserver import run_cmd
+    if bool(kwargs['ssl_key']) != bool(kwargs['ssl_cert']):
+        raise click.BadParameter('ssl-key and ssl-cert must be used together')
+    if kwargs['url']:
+        proto = 'https://' if kwargs['ssl'] else 'http://'
+        if not kwargs['url'].startswith(proto):
+            raise click.BadParameter('must start with {}'.format(proto), param_hint='url')
+    run_cmd(info, **kwargs)
+
+
+@cli.command(short_help='Run a shell in the app context.')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on the available objects')
 def shell(verbose):
     from .shell import shell_cmd
