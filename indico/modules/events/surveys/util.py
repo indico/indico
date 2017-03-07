@@ -60,12 +60,17 @@ def save_submitted_survey_to_session(submission):
 @memoize_request
 def was_survey_submitted(survey):
     """Check whether the current user has submitted a survey"""
-    if session.user and session.user.survey_submissions.filter_by(survey=survey).has_rows():
+    if session.user and session.user.survey_submissions.filter_by(survey=survey, is_submitted=True).has_rows():
         return True
     submission_id = session.get('submitted_surveys', {}).get(survey.id)
     if submission_id is None:
         return False
-    return SurveySubmission.find(id=submission_id).has_rows()
+    return SurveySubmission.find(id=submission_id, is_submitted=True).has_rows()
+
+
+def is_submission_in_progress(survey):
+    """Check whether the current user has a survey submission in progress"""
+    return session.user and session.user.survey_submissions.filter_by(survey=survey, is_submitted=False).has_rows()
 
 
 def generate_spreadsheet_from_survey(survey, submission_ids):
