@@ -1,0 +1,16 @@
+{% macro get_subject() -%}
+    Survey "{survey_title}" for event "{event_title}" has started.
+{%- endmacro %}
+
+{% macro get_html_body() -%}
+    Dear user,<br>
+    <br>
+    The survey "{survey_title}" on the event "{event_title}" is now open.<br>
+    <br>
+    <br>
+    You may answer the survey by clicking the link below:<br>
+    {survey_link}<br>
+    <br>
+    Best regards<br>
+    {{ session.user.full_name }}
+{%- endmacro %}

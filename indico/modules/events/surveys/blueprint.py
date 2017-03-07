@@ -32,7 +32,8 @@ from indico.modules.events.surveys.controllers.management.results import (RHSurv
                                                                           RHDisplaySubmission)
 from indico.modules.events.surveys.controllers.management.survey import (RHManageSurveys, RHManageSurvey, RHEditSurvey,
                                                                          RHDeleteSurvey, RHCreateSurvey,
-                                                                         RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey)
+                                                                         RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey,
+                                                                         RHSendSurveyLinks)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -64,6 +65,7 @@ _bp.add_url_rule('/manage/surveys/<int:survey_id>/submissions', 'delete_submissi
                  methods=('DELETE',))
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/submission/<int:submission_id>', 'display_submission',
                  RHDisplaySubmission)
+_bp.add_url_rule('/manage/surveys/<int:survey_id>/send-links', 'send_links', RHSendSurveyLinks, methods=('POST',))
 
 # Survey questionnaire management
 _bp.add_url_rule('/manage/surveys/<int:survey_id>/questionnaire/', 'manage_questionnaire', RHManageSurveyQuestionnaire)
