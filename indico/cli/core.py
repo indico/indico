@@ -49,6 +49,9 @@ class LazyGroup(click.Group):
     def list_commands(self, ctx):
         return self._impl.list_commands(ctx)
 
+    def invoke(self, ctx):
+        return self._impl.invoke(ctx)
+
 
 @click.group(cls=FlaskGroup, create_app=_create_app, add_default_commands=False)
 def cli(**kwargs):
