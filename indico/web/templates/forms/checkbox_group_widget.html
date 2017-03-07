@@ -3,8 +3,9 @@
 
 {% block html %}
     {% for subfield in field %}
-        <div class="i-checkbox">
-            {{ subfield(**input_args) }}
+        {% set disabled = subfield.data in field.disabled_choices %}
+        <div class="i-checkbox {{ 'checkbox-disabled' if disabled}}">
+            {{ subfield(disabled=disabled, **input_args) }}
             {{ subfield.label }}
         </div>
     {% endfor %}
