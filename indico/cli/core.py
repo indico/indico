@@ -68,6 +68,14 @@ def admin():
     """Manage Indico users."""
 
 
+@cli.command(context_settings={'ignore_unknown_options': True, 'allow_extra_args': True}, add_help_option=False)
+@click.pass_context
+def celery(ctx):
+    """Manage the Celery task daemon."""
+    from indico.core.celery.cli import celery_cmd
+    celery_cmd(ctx.args)
+
+
 @cli.command(short_help='Runs a shell in the app context.')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on the available objects')
 @with_appcontext
