@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from importlib import import_module
 
 import click
-from flask.cli import FlaskGroup, with_appcontext
+from flask.cli import FlaskGroup
 from werkzeug.utils import cached_property
 
 click.disable_unicode_literals_warning = True
@@ -78,7 +78,6 @@ def celery(ctx):
 
 @cli.command(short_help='Runs a shell in the app context.')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on the available objects')
-@with_appcontext
 def shell(verbose):
     from .shell import shell_cmd
     shell_cmd(verbose)
