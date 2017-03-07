@@ -99,9 +99,9 @@
 {% endmacro %}
 
 {# `form` and `i_form` args are there in case we need them in the future #}
-{% macro form_footer(form, i_form=true, skip_label=false, align_right=false) -%}
+{% macro form_footer(form, i_form=true, skip_label=false, align_right=false, classes='') -%}
     {% if caller %}
-        <div class="form-group form-group-footer">
+        <div class="form-group form-group-footer {{ classes }}">
             {% if not skip_label -%}
                 <div class="form-label"></div>
             {%- endif %}
