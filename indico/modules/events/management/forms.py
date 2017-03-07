@@ -17,37 +17,57 @@
 from __future__ import unicode_literals
 
 import re
-from datetime import timedelta
+from datetime import timedelta, datetime
 from operator import itemgetter, attrgetter
 
+from flask import request, session
 from markupsafe import escape
 from pytz import timezone
-from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField
-from wtforms.validators import InputRequired, DataRequired, ValidationError, Optional
+from werkzeug.datastructures import ImmutableMultiDict
+from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField, IntegerField
+from wtforms.validators import InputRequired, DataRequired, ValidationError, Optional, NumberRange
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.categories import Category
+from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
 from indico.modules.designer import PageSize
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import Event, LegacyEventMapping
+from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import EventReference
 from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
 from indico.modules.events.timetable.util import get_top_level_entries
-from indico.util.date_time import format_human_timedelta
-from indico.util.i18n import _
+from indico.util.date_time import format_human_timedelta, now_utc, relativedelta
+from indico.util.i18n import _, get_current_locale
 from indico.util.string import is_valid_mail
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
                                      IndicoEnumSelectField, IndicoPasswordField, IndicoDateTimeField,
                                      IndicoTimezoneSelectField, IndicoLocationField, MultiStringField,
-                                     IndicoTagListField)
-from indico.web.forms.validators import LinkedDateTime
+                                     IndicoTagListField, IndicoRadioField, RelativeDeltaField, IndicoDateField,
+                                     IndicoSelectMultipleCheckboxField)
+from indico.web.forms.validators import LinkedDateTime, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
+
+
+CLONE_REPEAT_CHOICES = (
+    ('once', _('Clone Once')),
+    ('interval', _('Clone with fixed Interval')),
+    ('pattern', _('Clone with recurring Pattern'))
+)
+
+WEEK_DAY_NUMBER_CHOICES = (
+    (1, _('first')),
+    (2, _('second')),
+    (3, _('third')),
+    (4, _('fourth')),
+    (-1, _('last'))
+)
 
 
 class EventDataForm(IndicoForm):
@@ -249,6 +269,9 @@ class EventProtectionForm(IndicoForm):
             cls.priv_fields.add(name)
 
 
+EventProtectionForm._create_coordinator_priv_fields()
+
+
 class PosterPrintingForm(IndicoForm):
     template = SelectField(_('Template'))
     margin_horizontal = FloatField(_('Horizontal margins'), [InputRequired()], default=0)
@@ -262,4 +285,97 @@ class PosterPrintingForm(IndicoForm):
         self.template.choices = sorted(((unicode(tpl.id), tpl.title) for tpl in poster_templates), key=itemgetter(1))
 
 
-EventProtectionForm._create_coordinator_priv_fields()
+class CloneRepeatabilityForm(IndicoForm):
+    repeatability = IndicoRadioField(_('How to repeat'), choices=CLONE_REPEAT_CHOICES, coerce=lambda x: x or None)
+
+
+class CloneContentsForm(CloneRepeatabilityForm):
+    selected_items = IndicoSelectMultipleCheckboxField(_('What to clone'))
+
+    def __init__(self, event, set_defaults=False, **kwargs):
+        options = EventCloner.get_form_items(event)
+        visible_options = filter(attrgetter('is_visible'), options)
+        default_selected_items = kwargs.get('selected_items', [option.name for option in options if option.is_default])
+
+        if set_defaults:
+            default_category = kwargs['category']['id'] if 'category' in kwargs else None
+            form_params = {
+                'repeatability': request.form.get('repeatability', kwargs.pop('repeatability', None)),
+                'selected_items': (request.form.getlist('selected_items') or default_selected_items),
+                'category': request.form.get('category', default_category),
+                'csrf_token': request.form.get('csrf_token')
+            }
+            kwargs['formdata'] = ImmutableMultiDict(form_params)
+
+        super(CloneContentsForm, self).__init__(**kwargs)
+        self.selected_items.choices = [(option.name, option.friendly_name) for option in visible_options]
+        self.selected_items.disabled_choices = [option.name for option in visible_options if not option.is_available]
+
+
+class CloneCategorySelectForm(CloneContentsForm):
+    category = CategoryField(_('Category'), require_event_creation_rights=True, allow_subcats=False)
+
+    def validate_category(self, field):
+        if not field.data:
+            raise ValidationError(_("You have to select a category"))
+        elif not field.data.can_create_events(session.user):
+            raise ValidationError(_("You can't create events in this category"))
+
+
+class CloneRepeatFormBase(CloneCategorySelectForm):
+    def _calc_start_dt(self, event):
+        local_now_date = now_utc().astimezone(event.tzinfo).date()
+        if event.start_dt_local.date() >= local_now_date:
+            start_dt = event.start_dt_local + timedelta(days=7)
+        else:
+            start_dt = event.tzinfo.localize(datetime.combine(local_now_date, event.start_dt_local.time()))
+        if start_dt < now_utc():
+            # if the combination of 'today' with the original start time is
+            # still in the past, then let's set it for tomorrow instead
+            start_dt += timedelta(days=1)
+        return start_dt
+
+    def __init__(self, event, **kwargs):
+        kwargs['start_dt'] = self._calc_start_dt(event)
+        super(CloneRepeatFormBase, self).__init__(event, **kwargs)
+
+
+class CloneRepeatOnceForm(CloneRepeatFormBase):
+    start_dt = IndicoDateTimeField(_('Starting'), allow_clear=False)
+
+
+class CloneRepeatUntilFormBase(CloneRepeatOnceForm):
+    stop_criterion = IndicoRadioField(_('Clone'), [DataRequired()], default='num_times',
+                                      choices=(('day', _('Until a given day (inclusive)')),
+                                               ('num_times', _('A number of times'))))
+    until_dt = IndicoDateField(_('Day'), [HiddenUnless('stop_criterion', 'day'), DataRequired()])
+    num_times = IntegerField(_('Number of times'),
+                             [HiddenUnless('stop_criterion', 'num_times'), DataRequired(),
+                              NumberRange(1, 100, message=_("You can clone a maximum of 100 times"))],
+                             default=2)
+
+    def __init__(self, event, **kwargs):
+        kwargs['until_dt'] = (self._calc_start_dt(event) + timedelta(days=14)).date()
+        super(CloneRepeatUntilFormBase, self).__init__(event, **kwargs)
+
+
+class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
+    recurrence = RelativeDeltaField(_('Every'), [DataRequired(), NumberRange(min=1)],
+                                    units=('years', 'months', 'weeks', 'days'),
+                                    default=relativedelta(weeks=1))
+
+    def validate_recurrence(self, field):
+        if field.data != abs(field.data):
+            raise ValidationError(_("The time period must be positive"))
+
+
+class CloneRepeatPatternForm(CloneRepeatUntilFormBase):
+    day_number = SelectField(None, choices=WEEK_DAY_NUMBER_CHOICES, coerce=int)
+    week_day = SelectField(None, coerce=int)
+    num_months = IntegerField(None, [DataRequired()], default=1)
+
+    def __init__(self, event, **kwargs):
+        locale = get_current_locale()
+        super(CloneRepeatPatternForm, self).__init__(event, **kwargs)
+        self.week_day.choices = [(n, locale.weekday(n, short=False)) for n in xrange(7)]
+        self.week_day.choices.append((-1, _('Any day')))

@@ -19,6 +19,6 @@ from indico.legacy.webinterface.rh import conferenceModif
 
 
 # Tools: Clone
-event_mgmt.add_url_rule('/clone', 'confModifTools-clone', conferenceModif.RHConfClone)
-event_mgmt.add_url_rule('/clone', 'confModifTools-performCloning', conferenceModif.RHConfPerformCloning,
+event_mgmt.add_url_rule('/clone-old', 'confModifTools-clone', conferenceModif.RHConfClone)
+event_mgmt.add_url_rule('/clone-old', 'confModifTools-performCloning', conferenceModif.RHConfPerformCloning,
                         methods=('POST',))
