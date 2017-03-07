@@ -59,6 +59,12 @@ class RHPaperTimeline(RHPaperBase):
     def _process(self):
         return render_paper_page(self.paper, view_class=WPDisplayCallForPapers)
 
+    def _check_paper_protection(self):
+        return (self.contribution.is_user_associated(session.user, check_abstract=True) or
+                self.event_new.cfp.is_manager(session.user) or
+                self.paper.can_review(session.user) or
+                self.paper.can_judge(session.user))
+
 
 class RHDownloadPaperFile(RHPaperBase):
     """Download a paper file"""
