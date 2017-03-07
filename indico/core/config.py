@@ -77,6 +77,25 @@ FILE_TYPES = {"DOC": ["Ms Word", "application/msword", "word_big.png"],
               }
 
 
+def get_config_path():
+    # env var has priority
+    try:
+        return os.path.expanduser(os.environ['INDICO_CONFIG'])
+    except KeyError:
+        pass
+    # try finding the config in various common
+    paths = [os.path.expanduser('~/.indico.conf'), '/etc/indico.conf']
+    # If it's an editable setup (ie usually a dev instance) allow having
+    # the config in the package's root path
+    if package_is_editable('indico'):
+        paths.insert(0, os.path.normpath(os.path.join(get_root_path('indico'), 'indico.conf')))
+    for path in paths:
+        if os.path.exists(path):
+            return path
+    raise Exception('No indico config found. Point the INDICO_CONFIG env var to your config file or or '
+                    'move/symlink the config in one of the following locations: {}'.format(', '.join(paths)))
+
+
 class Config:
     """This class provides a common way to access and modify the configuration
        parameters of the application. This configuration information will be
@@ -342,24 +361,6 @@ class Config:
             'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
         })
 
-    def __get_config_path(self):
-        # env var has priority
-        try:
-            return os.path.expanduser(os.environ['INDICO_CONFIG'])
-        except KeyError:
-            pass
-        # try finding the config in various common
-        paths = [os.path.expanduser('~/.indico.conf'), '/etc/indico.conf']
-        # If it's an editable setup (ie usually a dev instance) allow having
-        # the config in the package's root path
-        if package_is_editable('indico'):
-            paths.insert(0, os.path.normpath(os.path.join(get_root_path('indico'), 'indico.conf')))
-        for path in paths:
-            if os.path.exists(path):
-                return path
-        raise Exception('No indico config found. Point the INDICO_CONFIG env var to your config file or or '
-                        'move/symlink the config in one of the following locations: {}'.format(', '.join(paths)))
-
     def __load_config(self, path):
         gvalues = {'timedelta': timedelta, 'crontab': crontab}
         values = {}
@@ -381,7 +382,7 @@ class Config:
         from indico.legacy.errors import MaKaCError
 
         # When populating configuration variables indico.conf's values have priority
-        config_path = self.__get_config_path()
+        config_path = get_config_path()
         config_vars = self.__load_config(config_path)
 
         self._configVars = {k: config_vars.get(k, default) for k, default in self.default_values.iteritems()}
