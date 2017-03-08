@@ -144,6 +144,11 @@ def i18n():
     """Perform i18n-related operations."""
 
 
+@cli.group(cls=LazyGroup, import_name='indico.cli.database:cli')
+def db():
+    """Perform database operations."""
+
+
 @cli.command(context_settings={'ignore_unknown_options': True, 'allow_extra_args': True}, add_help_option=False)
 @click.pass_context
 def celery(ctx):

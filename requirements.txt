@@ -52,7 +52,7 @@ enum34
 ipaddress
 blinker==1.4
 alembic==0.6.7
-Flask-Migrate==1.2.0
+Flask-Migrate==2.0.3
 https://github.com/indico/flask-pluginengine/archive/master.zip#egg=flask_pluginengine
 https://github.com/indico/flask-multipass/archive/master.zip#egg=flask_multipass
 click==6.7
