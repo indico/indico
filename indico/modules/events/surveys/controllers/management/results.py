@@ -108,7 +108,8 @@ class RHDeleteSubmissions(RHManageSurveyBase):
                 logger.info('Submission %s deleted from survey %s', submission, self.survey)
                 self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
                                    'Submission removed from survey "{}"'.format(self.survey.title),
-                                   data={'Submitter': submission.user.full_name if submission.user else 'Anonymous'})
+                                   data={'Submitter': submission.user.full_name
+                                         if not submission.is_anonymous else 'Anonymous'})
         return jsonify(success=True)
 
 
