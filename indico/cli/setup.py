@@ -54,10 +54,6 @@ def _get_dirs(target_dir):
 @click.group()
 def cli():
     """This script helps with the initial steps of installing Indico"""
-    # XXX: Using a standalone CLI instead of manage.py since
-    # this code must be able to run without having an indico.conf.
-    # In the future this can most likely be merged into the `indico`
-    # cli (once we don't need config access at import time)
 
 
 @cli.command()

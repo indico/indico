@@ -27,7 +27,6 @@ from operator import itemgetter, attrgetter
 import click
 import sqlalchemy.orm
 from flask import current_app
-from flask_script import Shell, Option
 
 import indico
 from indico.core import signals
@@ -36,7 +35,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
-from indico.util.console import strip_ansi, cformat
+from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.util import IndicoConfigWrapper
@@ -79,70 +78,6 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
     for module, items in itertools.groupby(sorted(items, key=itemgetter(0, 1)), key=itemgetter(0)):
         names, elements = zip(*((x[1], x[2]) for x in items))
         _add_to_context_multi(namespace, info, elements, names, doc=module, color=color)
-
-
-class IndicoShell(Shell):
-    def __init__(self):
-        banner = cformat('%{yellow!}Indico v{} is ready for your commands!').format(indico.__version__)
-        super(IndicoShell, self).__init__(banner=banner, use_bpython=False)
-        self._context = None
-        self._info = None
-
-    def __call__(self, app, *args, **kwargs):
-        with app.test_request_context(base_url=Config.getInstance().getBaseURL()):
-            return self.run(*args, **kwargs)
-
-    def run(self, no_ipython, use_bpython, quiet):
-        current_app.config['REPL'] = True  # disables e.g. memoize_request
-        self.get_context()  # populates self._info
-        if not quiet:
-            self.banner = '\n'.join(self._info + ['', self.banner])
-        if use_bpython:
-            # bpython does not support escape sequences :(
-            # https://github.com/bpython/bpython/issues/396
-            self.banner = strip_ansi(self.banner)
-        clearCache()
-        self.run_shell(no_ipython or use_bpython, not use_bpython, quiet)
-
-    def run_shell(self, no_ipython, no_bpython, quiet):
-        # based on the flask-script Shell.run() method
-        if not no_bpython:
-            try:
-                from bpython import embed
-                embed(banner=self.banner, locals_=self._context)
-                return
-            except ImportError:
-                pass
-
-        if not no_ipython:
-            try:
-                from IPython.terminal.ipapp import TerminalIPythonApp
-                ipython_app = TerminalIPythonApp.instance(user_ns=self._context, display_banner=not quiet)
-                ipython_app.initialize(argv=[])
-                ipython_app.shell.show_banner(self.banner)
-                ipython_app.start()
-                return
-            except ImportError:
-                pass
-
-        # Use basic python shell
-        import code
-        code.interact(self.banner, local=self._context)
-
-    def get_options(self):
-        return (
-            Option('--no-ipython', action='store_true', dest='no_ipython', default=False,
-                   help="Do not use the IPython shell"),
-            Option('--use-bpython', action='store_true', dest='use_bpython', default=False,
-                   help="Use the BPython shell"),
-            Option('--quiet', '-q', action='store_true', dest='quiet', default=False,
-                   help="Do not print the shell context")
-        )
-
-    def get_context(self):
-        if self._context is None:
-            self._context, self._info = _make_shell_context()
-        return self._context
 
 
 def _make_shell_context():
@@ -190,9 +125,6 @@ def _make_shell_context():
 
 
 def shell_cmd(verbose):
-    import indico
-    from indico.util.console import cformat
-
     try:
         import IPython
     except ImportError:

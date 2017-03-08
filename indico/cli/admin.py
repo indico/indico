@@ -17,7 +17,6 @@
 from __future__ import unicode_literals, print_function
 
 import click
-from flask_script import Manager, prompt, prompt_bool
 
 from indico.cli.core import cli_group
 from indico.core.db import db
@@ -28,7 +27,6 @@ from indico.util.console import cformat, prompt_email, prompt_pass, success, err
 from indico.util.string import to_unicode
 
 click.disable_unicode_literals_warning = True
-IndicoAdminManager = Manager(usage="Manages administration actions")
 
 
 @cli_group()
@@ -48,8 +46,6 @@ def print_user_info(user):
 
 @cli.command()
 @click.option('--admin/--no-admin', '-a/', 'grant_admin', is_flag=True, help='Grant admin rights')
-@IndicoAdminManager.option('-a', '--admin', action='store_true', dest="grant_admin",
-                           help="Grants administration rights")
 def user_create(grant_admin):
     """Creates new user"""
     user_type = 'user' if not grant_admin else 'admin'
@@ -61,12 +57,12 @@ def user_create(grant_admin):
         if not User.find(User.all_emails.contains(email), ~User.is_deleted, ~User.is_pending).count():
             break
         error('Email already exists')
-    first_name = prompt("First name")
-    last_name = prompt("Last name")
-    affiliation = prompt("Affiliation", '')
+    first_name = click.prompt("First name").strip()
+    last_name = click.prompt("Last name").strip()
+    affiliation = click.prompt("Affiliation", '').strip()
     print()
     while True:
-        username = prompt("Enter username").lower()
+        username = click.prompt("Enter username").lower().strip()
         if not Identity.find(provider='indico', identifier=username).count():
             break
         error('Username already exists')
@@ -80,7 +76,7 @@ def user_create(grant_admin):
     user.is_admin = grant_admin
     print_user_info(user)
 
-    if prompt_bool(cformat("%{yellow}Create the new {}?").format(user_type), default=True):
+    if click.confirm(cformat("%{yellow}Create the new {}?").format(user_type), default=True):
         db.session.add(user)
         db.session.commit()
         success("New {} created successfully with ID: {}".format(user_type, user.id))
@@ -88,7 +84,6 @@ def user_create(grant_admin):
 
 @cli.command()
 @click.argument('user_id', type=int)
-@IndicoAdminManager.option('user_id', type=int, help="ID of user to be granted admin rights")
 def user_grant(user_id):
     """Grants administration rights to a given user"""
     user = User.get(user_id)
@@ -99,7 +94,7 @@ def user_grant(user_id):
     if user.is_admin:
         warning("This user already has administration rights")
         return
-    if prompt_bool(cformat("%{yellow}Grant administration rights to this user?")):
+    if click.confirm(cformat("%{yellow}Grant administration rights to this user?")):
         user.is_admin = True
         db.session.commit()
         success("Administration rights granted successfully")
@@ -107,7 +102,6 @@ def user_grant(user_id):
 
 @cli.command()
 @click.argument('user_id', type=int)
-@IndicoAdminManager.option('user_id', help="ID of user to be revoked from admin rights")
 def user_revoke(user_id):
     """Revokes administration rights from a given user"""
     user = User.get(user_id)
@@ -118,7 +112,7 @@ def user_revoke(user_id):
     if not user.is_admin:
         warning("This user does not have administration rights")
         return
-    if prompt_bool(cformat("%{yellow}Revoke administration rights from this user?")):
+    if click.confirm(cformat("%{yellow}Revoke administration rights from this user?")):
         user.is_admin = False
         db.session.commit()
         success("Administration rights revoked successfully")
