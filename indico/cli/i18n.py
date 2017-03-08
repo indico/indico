@@ -24,17 +24,13 @@ import click
 from babel.messages import frontend
 from distutils.dist import Distribution
 from flask.helpers import get_root_path
-from flask_script import Manager, Command, Option
 from pkgutil import walk_packages
 
 from indico.cli.core import cli_group
 
-IndicoI18nManager = Manager(usage="Takes care of i18n-related operations")
-
 
 @cli_group()
 def cli():
-    # TODO: cd to indico and update the paths below accordingly
     os.chdir(os.path.join(get_root_path('indico'), '..'))
 
 
@@ -102,7 +98,7 @@ def wrap_distutils_command(command_class):
             'name': 'indico',
             'version': indico.__version__,
             'packages': find_packages(indico.__path__, indico.__name__)
-            }))
+        }))
 
         for key, val in kwargs.items():
             setattr(command, key, val)
@@ -121,7 +117,6 @@ cmd_list.append('compile_catalog')
 for cmd_name in cmd_list:
     cmd_class = getattr(frontend, re.sub(r'_js$', '', cmd_name))
 
-    command = Command(wrap_distutils_command(cmd_class))
     cmd = click.command(cmd_name)(wrap_distutils_command(cmd_class))
     for opt, short_opt, description in cmd_class.user_options:
         long_opt_name = opt.rstrip('=')
@@ -133,10 +128,6 @@ for cmd_name in cmd_list:
 
         default = DEFAULT_OPTIONS.get(cmd_name, {}).get(var_name)
         is_flag = not opt.endswith('=')
-
         cmd = click.option(*(opts + [var_name]), is_flag=is_flag, default=default, help=description)(cmd)
-        command.add_option(Option(*opts, dest=var_name, action=('store_true' if not is_flag else None),
-                                  help=description, default=default))
 
-    IndicoI18nManager.add_command(cmd_name, command)
     cli.add_command(cmd)

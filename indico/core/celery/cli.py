@@ -16,33 +16,16 @@
 
 from __future__ import unicode_literals
 
-import click
 import os
 import sys
 
 from celery.bin.celery import CeleryCommand, command_classes
-from flask_script import Command
 
 from indico.core.config import Config
 from indico.core.celery import celery
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.util.console import cformat
 from indico.web.flask.util import url_for
-
-
-class IndicoCeleryCommand(Command):
-    """Runs the celery commands within the indico environment"""
-
-    capture_all_args = True
-    help_args = ()
-
-    def __call__(self, app=None, *args, **kwargs):
-        # We don't need no request context here.
-        with app.app_context():
-            return self.run(*args, **kwargs)
-
-    def run(self, args):
-        celery_cmd(args)
 
 
 def celery_cmd(args):
