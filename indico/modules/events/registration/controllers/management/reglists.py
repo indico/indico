@@ -199,7 +199,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
                                               registration=registration)
             template = get_template_module('events/registration/emails/custom_email.html',
                                            email_subject=form.subject.data, email_body=email_body)
-            email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data,
+            bcc = [session.user.email] if form.copy_for_sender.data else []
+            email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
                                from_address=form.from_address.data, template=template, html=True)
             send_email(email, self.event_new, 'Registration')
 
