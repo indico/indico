@@ -86,7 +86,7 @@
         {% trans %}Submissions{% endtrans %}
     </h2>
 
-    {% if survey.submissions %}
+    {% if submitted_surveys %}
         <div class="toolbars space-after">
             <div class="toolbar">
                 <a class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
@@ -140,7 +140,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for submission in survey.submissions %}
+                {% for submission in submitted_surveys %}
                     {{ _render_submission_row(submission) }}
                 {% endfor %}
             </tbody>

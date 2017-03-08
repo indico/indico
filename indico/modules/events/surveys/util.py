@@ -109,7 +109,7 @@ def _format_title(question):
 def _filter_submissions(survey, submission_ids):
     if submission_ids:
         return SurveySubmission.find_all(SurveySubmission.id.in_(submission_ids), survey=survey)
-    return survey.submissions
+    return [x for x in survey.submissions if x.is_submitted]
 
 
 def get_events_with_submitted_surveys(user, dt=None):
