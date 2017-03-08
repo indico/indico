@@ -10,7 +10,7 @@
 {% block body -%}
     {%- filter dedent -%}
         A new submission has been made for the survey "{{ survey.title }}" on the event "{{ survey.event_new.title }}"
-        {%- if submission.user %} by {{ submission.user.full_name }}{% endif -%}.
+        {%- if not submission.is_anonymous %} by {{ submission.user.full_name }}{% endif -%}.
 
         You can access all the submissions by clicking on the link below:
         {{ url_for('surveys.manage_survey', survey, _external=true) }}

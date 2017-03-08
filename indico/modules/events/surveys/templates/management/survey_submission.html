@@ -5,7 +5,7 @@
 {% endblock %}
 
 {% block description %}
-    {% if submission.user %}
+    {% if not submission.is_anonymous %}
         {% trans submitter_name=submission.user.full_name -%}
             Submitter: {{ submitter_name }}
         {%- endtrans %}
