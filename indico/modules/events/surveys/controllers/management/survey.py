@@ -50,7 +50,9 @@ class RHManageSurvey(RHManageSurveyBase):
     """Specific survey management (overview)"""
 
     def _process(self):
-        return WPManageSurvey.render_template('management/survey.html', self._conf, survey=self.survey)
+        submitted_surveys = [s for s in self.survey.submissions if s.is_submitted]
+        return WPManageSurvey.render_template('management/survey.html', self._conf, survey=self.survey,
+                                              submitted_surveys=submitted_surveys)
 
 
 class RHEditSurvey(RHManageSurveyBase):
