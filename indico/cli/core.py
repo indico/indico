@@ -114,9 +114,15 @@ class LazyGroup(click.Group):
     def invoke(self, ctx):
         return self._impl.invoke(ctx)
 
+    def get_usage(self, ctx):
+        return self._impl.get_usage(ctx)
+
+    def get_params(self, ctx):
+        return self._impl.get_params(ctx)
+
 
 @click.group(cls=IndicoFlaskGroup)
-def cli(**kwargs):
+def cli():
     """
     This script lets you control various aspects of Indico from the
     command line.
