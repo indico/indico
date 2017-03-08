@@ -21,16 +21,18 @@ from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.session import no_autoflush
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.models.events import EventType
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
-from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
-from indico.modules.events.surveys.views import WPDisplaySurveyConference, WPDisplaySurveySimpleEvent
+from indico.modules.events.surveys.util import (make_survey_form, was_survey_submitted, is_submission_in_progress,
+                                                save_submitted_survey_to_session)
+from indico.modules.events.surveys.views import (WPDisplaySurveyConference, WPDisplaySurveySimpleEvent)
+from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _can_redirect_to_single_survey(surveys):
@@ -55,6 +57,7 @@ class RHSurveyList(RHSurveyBaseDisplay):
 
         return self.view_class.render_template('display/survey_list.html', self._conf, surveys=surveys,
                                                event=self.event_new, states=SurveyState,
+                                               is_submission_in_progress=is_submission_in_progress,
                                                was_survey_submitted=was_survey_submitted)
 
 
@@ -80,7 +83,8 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
                        .options(joinedload('submissions'),
                                 joinedload('sections').joinedload('children'))
                        .one())
-
+        self.submission = (session.user.survey_submissions.filter_by(survey=self.survey, is_submitted=False).first()
+                           if session.user else None)
         if not self.survey.is_active:
             flash(_('This survey is not active'), 'error')
             return redirect(url_for('.display_survey_list', self.event_new))
@@ -89,12 +93,26 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
             return redirect(url_for('.display_survey_list', self.event_new))
 
     def _process(self):
-        form = make_survey_form(self.survey)()
-        if form.validate_on_submit():
-            submission = self._save_answers(form)
+        survey_form_class = make_survey_form(self.survey)
+        if self.submission:
+            survey_question_values = {'question_{}'.format(x.question_id): x.data for x in self.submission.answers}
+            defaults = FormDefaults(self.submission, **survey_question_values)
+            form = survey_form_class(obj=defaults, submission=self.submission, event=self.event_new)
+        else:
+            form = survey_form_class()
+
+        if 'save_answers' in request.values:
+            self._save_answers(form, self.submission)
+            flash(_('Your answers have been saved'), 'success')
+        elif form.validate_on_submit():
+            submission = self._save_answers(form, self.submission)
+            if submission.is_anonymous:
+                submission.user = None
+            submission.submitted_dt = now_utc()
+            submission.is_submitted = True
             save_submitted_survey_to_session(submission)
             self.survey.send_submission_notification(submission)
-            flash(_('Your answers has been saved'), 'success')
+            flash(_('The survey has been submitted'), 'success')
             return redirect(url_for('.display_survey_list', self.event_new))
 
         surveys = Survey.query.with_parent(self.event_new).filter(Survey.is_visible).all()
@@ -108,13 +126,18 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
                                                event=self.event_new, survey=self.survey,
                                                back_button_endpoint=back_button_endpoint)
 
-    def _save_answers(self, form):
+    @no_autoflush
+    def _save_answers(self, form, submission):
         survey = self.survey
-        submission = SurveySubmission(survey=survey)
-        if not survey.anonymous:
-            submission.user = session.user
+        if not submission:
+            submission = SurveySubmission(survey=survey, user=session.user)
+        submission.is_anonymous = survey.anonymous
         for question in survey.questions:
-            answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
-            submission.answers.append(answer)
+            saved_answer = SurveyAnswer.find_first(submission=submission, question=question)
+            if saved_answer:
+                saved_answer.data = getattr(form, 'question_{}'.format(question.id)).data
+            else:
+                answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
+                submission.answers.append(answer)
         db.session.flush()
         return submission
