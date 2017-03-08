@@ -69,6 +69,11 @@ class SurveySubmission(db.Model):
         nullable=False,
         default=False
     )
+    #: List of non-submitted answers
+    pending_answers = db.Column(
+        JSON,
+        default={}
+    )
 
     #: The user who submitted the survey
     user = db.relationship(
