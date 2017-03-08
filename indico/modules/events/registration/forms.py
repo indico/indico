@@ -225,6 +225,8 @@ class EmailRegistrantsForm(IndicoForm):
                                                 "registrant."))
     subject = StringField(_("Subject"), [DataRequired()])
     body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
+    copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
+                                   description=_('Send copy of each email to my mailbox'))
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')

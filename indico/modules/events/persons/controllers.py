@@ -200,7 +200,9 @@ class RHEmailEventPersons(RHConferenceModifBase):
             email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
                                                  event=self.event_new, register_link=self.no_account)
             tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
-            email = make_email(to_list=recipient.email, from_address=form.from_address.data, template=tpl, html=True)
+            bcc = [session.user.email] if form.copy_for_sender.data else []
+            email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=form.from_address.data,
+                               template=tpl, html=True)
             send_email(email, self.event_new, 'Event Persons')
 
     def _find_event_persons(self, person_ids, not_invited_only):
