@@ -14,23 +14,45 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import os
 import sys
-from copy import deepcopy
+from functools import partial
 
 import alembic.command
+import click
 from alembic.script import ScriptDirectory
 from flask import current_app
-from flask_migrate import MigrateCommand as DatabaseManager
+from flask.cli import with_appcontext
 from flask_migrate import stamp
+from flask_migrate.cli import db as flask_migrate_cli
 from flask_pluginengine import current_plugin
-from flask_script import Command
 
+from indico.cli.core import cli_group
 from indico.core.db import db
+from indico.core.db.sqlalchemy.migration import migrate
 from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.core.plugins import plugin_engine
 from indico.util.console import colored, cformat
+
+
+@cli_group()
+@click.option('--plugin', metavar='PLUGIN', help='Execute the command for the given plugin')
+@click.option('--all-plugins', is_flag=True, help='Execute the command for all plugins')
+@click.pass_context
+@with_appcontext
+def cli(ctx, plugin=None, all_plugins=False):
+    if plugin and all_plugins:
+        raise click.BadParameter('cannot combine --plugin and --all-plugins')
+    if all_plugins and ctx.invoked_subcommand in ('migrate', 'revision', 'downgrade', 'stamp', 'edit'):
+        raise click.UsageError('this command requires an explicit plugin')
+    if (all_plugins or plugin) and ctx.invoked_subcommand == 'prepare':
+        raise click.UsageError('this command is not available for plugins (use `upgrade` instead)')
+    if plugin and not plugin_engine.get_plugin(plugin):
+        raise click.BadParameter('plugin does not exist or is not loaded', param_hint='plugin')
+    migrate.init_app(current_app, db, os.path.join(current_app.root_path, 'migrations'))
 
 
 def _require_extensions(*names):
@@ -44,7 +66,18 @@ def _require_extensions(*names):
     return False
 
 
-@DatabaseManager.command
+def _require_pg_version(version):
+    # convert version string such as '9.4.10' to `90410` which is the
+    # format used by server_version_num
+    req_version = sum(segment * 10**(4 - 2*i) for i, segment in enumerate(map(int, version.split('.'))))
+    cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
+    if cur_version >= req_version:
+        return True
+    print colored('Postgres version too old; you need at least {} (or newer)'.format(version), 'red')
+    return False
+
+
+@cli.command()
 def prepare():
     """Initializes an empty database (creates tables, sets alembic rev to HEAD)"""
     tables = get_all_tables(db)
@@ -74,17 +107,16 @@ def prepare():
             for t in schema_tables:
                 print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
         return
+    if not _require_pg_version('9.4'):
+        return
     if not _require_extensions('unaccent', 'pg_trgm'):
         return
     print colored('Creating tables', 'green')
     db.create_all()
 
 
-del DatabaseManager._commands['init']  # not useful since we already have a migration environment
-run_downgrade = DatabaseManager._commands['downgrade'].run
-
-
 def _safe_downgrade(*args, **kwargs):
+    func = kwargs.pop('_func')
     print cformat('%{yellow!}*** DANGER')
     print cformat('%{yellow!}***%{reset} '
                   '%{red!}This operation may %{yellow!}PERMANENTLY ERASE %{red!}some data!%{reset}')
@@ -101,10 +133,7 @@ def _safe_downgrade(*args, **kwargs):
         print cformat('%{green}Aborted%{reset}')
         sys.exit(1)
     else:
-        return run_downgrade(*args, **kwargs)
-
-
-DatabaseManager._commands['downgrade'].run = _safe_downgrade
+        return func(*args, **kwargs)
 
 
 class PluginScriptDirectory(ScriptDirectory):
@@ -128,66 +157,43 @@ class PluginScriptDirectory(ScriptDirectory):
         return instance
 
 
-class PluginDBCommand(Command):
-    """Like `Command`, but specific to plugin DB migrations.
+def _call_with_plugins(*args, **kwargs):
+    func = kwargs.pop('_func')
+    ctx = click.get_current_context()
+    all_plugins = ctx.parent.params['all_plugins']
+    plugin = ctx.parent.params['plugin']
+    if plugin:
+        plugins = {plugin_engine.get_plugin(plugin)}
+    elif all_plugins:
+        plugins = set(plugin_engine.get_active_plugins().viewvalues())
+    else:
+        plugins = None
 
-    Executes its underlying function for all plugins and makes
-    flask-migrate use the plugin's migrations.
-    """
-    @classmethod
-    def from_command(cls, command, require_plugin_arg):
-        """Clones an existing command.
-
-        :param command: A Flask-Script `Command`
-        """
-        new_command = cls()
-        new_command.run = command.run
-        new_command.__doc__ = command.__doc__
-        new_command.help_args = command.help_args
-        new_command.option_list = tuple(command.option_list)
-        new_command.require_plugin_arg = require_plugin_arg
-        return new_command
-
-    def __call__(self, app=None, *args, **kwargs):
-        PluginScriptDirectory.dir = os.path.join(app.root_path, 'core', 'plugins', 'alembic')
+    if plugins is None:
+        func(*args, **kwargs)
+    else:
+        PluginScriptDirectory.dir = os.path.join(current_app.root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
-
-        with app.app_context():
-            active_plugins = plugin_engine.get_active_plugins()
-            plugins = set(kwargs.pop('plugins'))
-            if plugins:
-                invalid_plugins = plugins - active_plugins.viewkeys()
-                if invalid_plugins:
-                    print cformat('%{red!}Invalid plugin(s) specified: {}').format(', '.join(invalid_plugins))
-                    sys.exit(1)
-            for plugin in active_plugins.itervalues():
-                if plugins and plugin.name not in plugins:
-                    continue
-                if not os.path.exists(plugin.alembic_versions_path):
-                    print cformat("%{cyan}skipping plugin '{}' (no migrations folder)").format(plugin.name)
-                    continue
-                print cformat("%{cyan!}executing command for plugin '{}'").format(plugin.name)
-                with plugin.plugin_context():
-                    super(PluginDBCommand, self).__call__(app, *args, **kwargs)
-
-    def create_parser(self, *args, **kwargs):
-        parser = super(PluginDBCommand, self).create_parser(*args, **kwargs)
-        parser.add_argument('--plugin', dest='plugins', action='append', default=[], metavar='PLUGIN',
-                            required=self.require_plugin_arg,
-                            help='Plugin name to work on - can be used multiple times')
-        return parser
+        for plugin in plugins:
+            if not os.path.exists(plugin.alembic_versions_path):
+                print cformat("%{cyan}skipping plugin '{}' (no migrations folder)").format(plugin.name)
+                continue
+            print cformat("%{cyan!}executing command for plugin '{}'").format(plugin.name)
+            with plugin.plugin_context():
+                func(*args, **kwargs)
 
 
-def _make_plugin_database_manager():
-    """Clones DatabaseManager and adapts its commands to plugin database migrations"""
-    manager = deepcopy(DatabaseManager)
-    manager.description += ' for plugins'
-    manager.help += ' for plugins'
-    del manager._commands['prepare']  # not needed for plugins
-    single_plugin_commands = {'migrate', 'revision', 'downgrade', 'stamp'}
-    for name, command in manager._commands.iteritems():
-        manager._commands[name] = PluginDBCommand.from_command(command, name in single_plugin_commands)
-    return manager
+def _setup_cli():
+    for command in flask_migrate_cli.commands.itervalues():
+        if command.name == 'init':
+            continue
+        # XXX: skip commands not supported by our alembic version
+        if command.name in ('edit', 'merge', 'show', 'heads'):
+            continue
+        command.callback = partial(with_appcontext(_call_with_plugins), _func=command.callback)
+        if command.name == 'downgrade':
+            command.callback = partial(with_appcontext(_safe_downgrade), _func=command.callback)
+        cli.add_command(command)
 
-
-PluginDatabaseManager = _make_plugin_database_manager()
+_setup_cli()
+del _setup_cli

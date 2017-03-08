@@ -160,7 +160,7 @@ class Importer(object):
         count = db.engine.execute(db.text(sql), name='plugin_{}'.format(name)).scalar()
         if not count:
             print(cformat('%{red!}Plugin schema does not exist%{reset}'))
-            print(cformat('Run %{yellow!}indico plugindb upgrade --plugin {}%{reset} to create it').format(name))
+            print(cformat('Run %{yellow!}indico db --plugin {} upgrade%{reset} to create it').format(name))
             return False
         return True
 
