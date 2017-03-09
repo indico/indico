@@ -21,7 +21,8 @@ import pprint
 import time
 import traceback
 
-from flask import current_app, g, request_tearing_down, request_started, request, has_request_context
+from flask import (current_app, g, appcontext_tearing_down, request_tearing_down, request_started, request,
+                   has_request_context)
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
@@ -71,6 +72,7 @@ def apply_db_loggers(app):
         if not g.get('req_start_sent'):
             g.req_start_sent = True
             logger.debug('Request started', extra={'sql_log_type': 'start_request',
+                                                   'repl': app.config.get('REPL'),
                                                    'req_verb': request.method if has_request_context() else None,
                                                    'req_path': request.path if has_request_context() else None,
                                                    'req_url': request.url if has_request_context() else None})
@@ -119,20 +121,36 @@ def apply_db_loggers(app):
 
     @request_started.connect_via(app)
     def on_request_started(sender, **kwargs):
-        g.req_query_duration = 0.0
-        g.req_start_ts = time.time()
-        g.req_start_sent = False
+        db_logger_request_started(app)
 
+    @appcontext_tearing_down.connect_via(app)
     @request_tearing_down.connect_via(app)
-    def on_request_tearing_down(sender, **kwargs):
+    def on_tearing_down(sender, **kwargs):
+        if g.get('req_end_sent'):
+            return
+        g.req_end_sent = True
         query_count = g.get('sql_query_count', 0)
         if not query_count:
             return
         duration = (time.time() - g.req_start_ts) if 'req_start_ts' in g else 0
         logger.debug('Request finished', extra={'sql_log_type': 'end_request',
                                                 'sql_query_count': query_count,
+                                                'repl': app.config.get('REPL'),
                                                 'req_verb': request.method if has_request_context() else None,
                                                 'req_url': request.url if has_request_context() else None,
                                                 'req_path': request.path if has_request_context() else None,
                                                 'req_duration': duration,
                                                 'req_query_duration': g.req_query_duration})
+
+
+def db_logger_request_started(app):
+    """Run DB-logger specific request-start code.
+
+    This should be called from all places that will run loggable
+    queries, even if no actual request context is used.
+    """
+    if not app.debug:
+        return
+    g.req_query_duration = 0.0
+    g.req_start_ts = time.time()
+    g.req_start_sent = False
