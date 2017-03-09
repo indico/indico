@@ -94,8 +94,10 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
     def _format_request(self, obj):
         if obj['repl']:
             return '\x1b[38;5;243m<shell>\x1b[0m'
-        else:
+        elif obj['req_verb'] and obj['req_url']:
             return '{} {}'.format(obj['req_verb'], obj['req_url'])
+        else:
+            return '\x1b[38;5;243m<unknown>\x1b[0m'
 
     def handle_log(self, obj):
         if any(p.match(obj.get('req_path') or '') for p in self.server.ignored_request_paths):
