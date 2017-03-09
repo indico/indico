@@ -199,6 +199,7 @@ def run(info, **kwargs):
 
 @cli.command(short_help='Run a shell in the app context.')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on the available objects')
-def shell(verbose):
+@click.option('-r', '--request-context', is_flag=True, help='Run the shell inside a Flask request context')
+def shell(verbose, request_context):
     from .shell import shell_cmd
-    shell_cmd(verbose)
+    shell_cmd(verbose, request_context)
