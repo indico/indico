@@ -1,0 +1,23 @@
+{% macro render_steps() %}
+    <ul class="steps flexrow f-a-start f-j-center">
+        {{ caller() }}
+    </ul>
+{% endmacro %}
+
+{% macro render_step(label, text=none, label_position='top', current=false, before_current=false, completed=false) %}
+    <li class="{{ 'completed' if completed }} {{ 'before-current' if before_current -}} {{- 'current' if current }}">
+        {% if label_position == 'top' %}
+            <div class="label top">{{ label }}</div>
+        {% endif %}
+        <div class="horizontal-line"></div>
+        <div class="circle flexrow f-j-center"></div>
+        {% if text %}
+            <div class="text flexrow f-j-center">
+                <span>{{ text }}</span>
+            </div>
+        {% endif %}
+        {% if label_position == 'bottom' %}
+            <div class="label bottom">{{ label }}</div>
+        {% endif %}
+    </li>
+{% endmacro %}

@@ -1,5 +1,6 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer %}
 {% from 'message_box.html' import message_box %}
+{% from 'steps.html' import render_steps, render_step %}
 
 {% macro render_edited_hint(dt, user=None) %}
     {% if user %}
@@ -108,25 +109,25 @@
 
 {% macro render_timeline_section(cfp) %}
     {% set tz = cfp.event.display_tzinfo %}
-    <section>
-        <ul class="steps flexrow f-a-center f-j-center">
-            {{ render_timestamp(_("Opening day"), cfp.start_dt, tz, cfp.has_started) }}
-            {{ render_timestamp(_("Submission deadline"), cfp.end_dt, tz, cfp.has_ended, _("No deadline")) }}
-        </ul>
-    </section>
-{% endmacro %}
+    {% set start_date %}
+        <time datetime="{{ cfp.start_dt.isoformat() }}">
+            {{- cfp.start_dt|format_datetime(timezone=tz) -}}
+        </time>
+    {% endset %}
+    {% set end_date %}
+        {% if cfp.end_dt %}
+            <time datetime="{{ cfp.end_dt.isoformat() }}">
+                {{- cfp.end_dt|format_datetime(timezone=tz) -}}
+            </time>
+        {% else %}
+            {%- trans %}No deadline{% endtrans -%}
+        {% endif %}
+    {% endset %}
 
-{% macro render_timestamp(label, date, tz, completed=false, alternative_text=none) %}
-    <li class="{{ 'completed' if completed }}">
-        <div class="label">{{ label }}</div>
-        <div class="timestamp flexcol f-a-center">
-            {% if date %}
-                <time datetime="{{ date.isoformat() }}">
-                    {{- date|format_datetime(timezone=tz) -}}
-                </time>
-            {% elif alternative_text %}
-                <span>{{ alternative_text }}</span>
-            {% endif %}
-        </div>
-    </li>
+    <section>
+        {% call render_steps() %}
+            {{ render_step(_("Opening day"), text=start_date, completed=cfp.has_started) }}
+            {{ render_step(_("Submission deadline"), text=end_date, completed=cfp.has_ended) }}
+        {% endcall %}
+    </section>
 {% endmacro %}
