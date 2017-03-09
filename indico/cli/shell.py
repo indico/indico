@@ -84,7 +84,7 @@ def _add_to_context_smart(namespace, info, objects, get_name=attrgetter('__name_
 
 def _make_shell_context():
     context = {}
-    info = []
+    info = [cformat('%{white!}Available objects')]
     add_to_context = partial(_add_to_context, context, info)
     add_to_context_multi = partial(_add_to_context_multi, context, info)
     add_to_context_smart = partial(_add_to_context_smart, context, info)
@@ -120,7 +120,7 @@ def _make_shell_context():
     add_to_context(current_app, 'app', doc='flask app')
     add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
                    doc='like datetime() but converted from localtime to utc')
-    add_to_context(Event.get, 'EE', doc='get event by id (Event)')
+    add_to_context(Event.get, 'EE', doc='get event by id')
     # Stuff from plugins
     signals.plugin.shell_context.send(add_to_context=add_to_context, add_to_context_multi=add_to_context_multi)
     return context, info
@@ -128,7 +128,7 @@ def _make_shell_context():
 
 def shell_cmd(verbose, with_req_context):
     try:
-        import IPython
+        from IPython.terminal.ipapp import TerminalIPythonApp
     except ImportError:
         click.echo(cformat('%{red!}You need to `pip install ipython` to use the Indico shell'))
         sys.exit(1)
@@ -146,4 +146,7 @@ def shell_cmd(verbose, with_req_context):
     if with_req_context:
         stack.enter_context(current_app.test_request_context(base_url=Config.getInstance().getBaseURL()))
     with stack:
-        IPython.embed(banner1=banner, user_ns=ctx)
+        ipython_app = TerminalIPythonApp.instance(user_ns=ctx, display_banner=False)
+        ipython_app.initialize(argv=[])
+        ipython_app.shell.show_banner(banner)
+        ipython_app.start()
