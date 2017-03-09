@@ -1,0 +1,130 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+ @keyframes step-fade-in-background {
+     0% {
+         background-color: $pastel-gray;
+     }
+
+     100% {
+         background-color: $indico-blue;
+     }
+ }
+
+ @keyframes step-fade-in-border {
+     0% {
+         border-color: $pastel-gray;
+     }
+
+     100% {
+         border-color: $indico-blue;
+     }
+ }
+
+ul.steps {
+    list-style-type: none;
+    padding: 0;
+    color: $light-black;
+
+    li {
+        flex-grow: 1;
+        flex-basis: 0;
+
+        &.completed {
+            .circle::before {
+                background-color: $indico-blue;
+                border-color: $indico-blue;
+            }
+
+            .text {
+                color: $indico-blue;
+            }
+
+            .horizontal-line {
+                background-color: $indico-blue;
+            }
+        }
+
+        &.current {
+            .circle::before {
+                border-color: $indico-blue;
+                animation: step-fade-in-border .5s linear;
+            }
+
+            .horizontal-line {
+                background-color: $indico-blue;
+                animation: step-fade-in-background .5s linear;
+            }
+        }
+
+        &.before-current {
+            .circle::before {
+                animation: step-fade-in-background .5s linear;
+            }
+        }
+
+        &:first-child {
+            .horizontal-line {
+                @include border-left-radius();
+            }
+        }
+
+        &:last-child {
+            .horizontal-line {
+                @include border-right-radius();
+            }
+        }
+    }
+
+    .label {
+        @extend %font-family-title-light;
+        color: $light-black;
+        font-size: 1.1em;
+        text-align: center;
+
+        &.top {
+            margin-bottom: 20px;
+        }
+
+        &.bottom {
+            margin-top: 10px;
+        }
+    }
+
+    .horizontal-line {
+        height: 3px;
+        background-color: $pastel-gray;
+    }
+
+    .circle {
+        &::before {
+            @include border-all($width: 2px);
+            @include border-radius(25px);
+            content: '';
+            width: 25px;
+            height: 25px;
+            background-color: white;
+            margin-top: -15px;
+        }
+    }
+
+    .text {
+        position: relative;
+        font-weight: bold;
+        margin-top: 10px;
+    }
+}
