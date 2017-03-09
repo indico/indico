@@ -23,7 +23,7 @@ def _include_symbol(tablename, schema):
     # We ignore plugin tables in migrations
     if schema and schema.startswith('plugin_'):
         return False
-    return not tablename.startswith('alembic_version_')
+    return tablename != 'alembic_version' and not tablename.startswith('alembic_version_')
 
 
 def _render_item(type_, obj, autogen_context):

@@ -83,7 +83,7 @@ def prepare():
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
         print cformat('%{green}Setting the alembic version to HEAD')
-        stamp()
+        stamp(revision='heads')
         PluginScriptDirectory.dir = os.path.join(current_app.root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
         plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
@@ -93,7 +93,7 @@ def prepare():
                 continue
             print plugin_msg.format(plugin.name)
             with plugin.plugin_context():
-                stamp()
+                stamp(revision='heads')
         # Retrieve the table list again, just in case we created unexpected hables
         tables = get_all_tables(db)
 
@@ -141,19 +141,21 @@ class PluginScriptDirectory(ScriptDirectory):
 
     This is a pretty ugly hack but alembic doesn't give us a nice way to do it...
     """
+
     dir = None
     versions = None
 
     def __init__(self, *args, **kwargs):
         super(PluginScriptDirectory, self).__init__(*args, **kwargs)
         self.dir = PluginScriptDirectory.dir
-        self.versions = current_plugin.alembic_versions_path
+        # use __dict__ since it's a memoized property
+        self.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
 
     @classmethod
     def from_config(cls, config):
         instance = super(PluginScriptDirectory, cls).from_config(config)
         instance.dir = PluginScriptDirectory.dir
-        instance.versions = current_plugin.alembic_versions_path
+        instance.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
         return instance
 
 
@@ -186,9 +188,6 @@ def _call_with_plugins(*args, **kwargs):
 def _setup_cli():
     for command in flask_migrate_cli.commands.itervalues():
         if command.name == 'init':
-            continue
-        # XXX: skip commands not supported by our alembic version
-        if command.name in ('edit', 'merge', 'show', 'heads'):
             continue
         command.callback = partial(with_appcontext(_call_with_plugins), _func=command.callback)
         if command.name == 'downgrade':
