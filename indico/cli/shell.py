@@ -26,6 +26,7 @@ from operator import itemgetter, attrgetter
 
 import click
 import sqlalchemy.orm
+from contextlib2 import ExitStack
 from flask import current_app
 
 import indico
@@ -125,7 +126,7 @@ def _make_shell_context():
     return context, info
 
 
-def shell_cmd(verbose):
+def shell_cmd(verbose, with_req_context):
     try:
         import IPython
     except ImportError:
@@ -141,4 +142,8 @@ def shell_cmd(verbose):
     ctx = current_app.make_shell_context()
     ctx.update(context)
     clearCache()
-    IPython.embed(banner1=banner, user_ns=ctx)
+    stack = ExitStack()
+    if with_req_context:
+        stack.enter_context(current_app.test_request_context(base_url=Config.getInstance().getBaseURL()))
+    with stack:
+        IPython.embed(banner1=banner, user_ns=ctx)
