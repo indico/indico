@@ -654,8 +654,7 @@ th.i-table {
 
 .clone-event-dialog-content {
     width: 600px;
-    height: 400px;
-    overflow-y: auto;
+    min-height: 500px;
 }
 
 .qtip.cloned-event-list-qtip ul {
