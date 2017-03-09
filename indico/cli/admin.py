@@ -54,7 +54,7 @@ def _safe_lower(s):
 
 @cli.command()
 @click.option('--substring', is_flag=True,
-              help='Whether to require exact matches (the default) or do substring matches (slower)')
+              help='Whether to require exact matches (default) or do substring matches (slower)')
 @click.option('--include-deleted', '-D', is_flag=True,
               help='Include deleted users in the results')
 @click.option('--include-pending', '-P', is_flag=True,

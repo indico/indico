@@ -83,7 +83,7 @@ def get_config_path():
         return os.path.expanduser(os.environ['INDICO_CONFIG'])
     except KeyError:
         pass
-    # try finding the config in various common
+    # try finding the config in various common paths
     paths = [os.path.expanduser('~/.indico.conf'), '/etc/indico.conf']
     # If it's an editable setup (ie usually a dev instance) allow having
     # the config in the package's root path
