@@ -194,10 +194,6 @@ def run(info, **kwargs):
     from indico.cli.devserver import run_cmd
     if bool(kwargs['ssl_key']) != bool(kwargs['ssl_cert']):
         raise click.BadParameter('ssl-key and ssl-cert must be used together')
-    if kwargs['url']:
-        proto = 'https://' if kwargs['ssl'] else 'http://'
-        if not kwargs['url'].startswith(proto):
-            raise click.BadParameter('must start with {}'.format(proto), param_hint='url')
     run_cmd(info, **kwargs)
 
 
