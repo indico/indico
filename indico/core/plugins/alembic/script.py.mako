@@ -1,7 +1,7 @@
 <% from flask_pluginengine import current_plugin %>"""${message}
 
 Revision ID: ${up_revision}
-Revises: ${down_revision}
+Revises: ${down_revision | comma,n}
 Create Date: ${create_date}
 """
 
@@ -16,6 +16,8 @@ from sqlalchemy.sql.ddl import CreateSchema, DropSchema
 # revision identifiers, used by Alembic.
 revision = ${repr(up_revision)}
 down_revision = ${repr(down_revision)}
+branch_labels = ${repr(branch_labels)}
+depends_on = ${repr(depends_on)}
 
 
 def upgrade():
