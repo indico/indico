@@ -22,7 +22,6 @@ import struct
 import sys
 import termios
 import time
-from operator import itemgetter
 from getpass import getpass
 
 from colorclass import Color
@@ -30,19 +29,8 @@ from colorclass import Color
 from indico.util.string import is_valid_mail, to_unicode
 
 
-def strip_ansi(s, _re=re.compile(r'\x1b\[[;\d]*[A-Za-z]')):
-    return _re.sub('', s)
 
 
-def yesno(message):
-    """
-    A simple yes/no question (returns True/False)
-    """
-    inp = raw_input("%s [y/N] " % message)
-    if inp == 'y' or inp == 'Y':
-        return True
-    else:
-        return False
 
 
 def prompt_email(prompt="Enter email: "):
@@ -125,31 +113,6 @@ def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
         yield item
 
     print()
-
-
-def conferenceHolderIterator(ch, verbose=True, deepness='subcontrib'):
-    """
-    Goes over all conferences, printing a status message (ideal for scripts)
-    """
-
-    def _eventIterator(conference, tabs):
-        for contrib in conference.as_event.contributions:
-            yield ('contrib', contrib)
-
-            if deepness == 'subcontrib':
-                for scontrib in contrib.subcontributions:
-                    yield ('subcontrib', scontrib)
-
-    idx = ch._getIdx()
-    iterator = idx.iteritems()
-    if verbose:
-        iterator = verbose_iterator(iterator, len(idx.keys()), itemgetter(0), lambda x: '')
-
-    for id_, conf in iterator:
-        yield 'event', conf
-        if deepness in {'contrib', 'subcontrib'}:
-            for contrib in _eventIterator(conf, 0):
-                yield contrib
 
 
 # Coloring
