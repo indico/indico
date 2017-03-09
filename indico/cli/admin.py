@@ -34,7 +34,7 @@ def cli():
     pass
 
 
-def print_user_info(user):
+def _print_user_info(user):
     print()
     print('User info:')
     print("  First name: {}".format(user.first_name))
@@ -74,7 +74,7 @@ def user_create(grant_admin):
     user = create_user(email, {'first_name': to_unicode(first_name), 'last_name': to_unicode(last_name),
                                'affiliation': to_unicode(affiliation)}, identity)
     user.is_admin = grant_admin
-    print_user_info(user)
+    _print_user_info(user)
 
     if click.confirm(cformat("%{yellow}Create the new {}?").format(user_type), default=True):
         db.session.add(user)
@@ -90,7 +90,7 @@ def user_grant(user_id):
     if user is None:
         error("This user does not exist")
         return
-    print_user_info(user)
+    _print_user_info(user)
     if user.is_admin:
         warning("This user already has administration rights")
         return
@@ -108,7 +108,7 @@ def user_revoke(user_id):
     if user is None:
         error("This user does not exist")
         return
-    print_user_info(user)
+    _print_user_info(user)
     if not user.is_admin:
         warning("This user does not have administration rights")
         return
