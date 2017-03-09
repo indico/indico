@@ -1,7 +1,7 @@
 import time
 from math import isinf
 
-from indico.util.console import colored
+from indico.util.console import cformat
 
 
 class Benchmark(object):
@@ -13,6 +13,7 @@ class Benchmark(object):
         do_stuff()
     b.print_result()
     """
+
     def __init__(self, start=False):
         self._start_time = None
         self._end_time = None
@@ -50,12 +51,12 @@ class Benchmark(object):
     def print_result(self, slow=float('inf'), veryslow=float('inf')):
         duration = float(self)
         if duration == float('-inf'):
-            print colored('skipped', 'blue', attrs=['bold'])
+            print cformat('%{blue!}skipped')
         elif duration == float('inf'):
-            print colored('running', 'red')
+            print cformat('%{red}running')
         elif duration >= veryslow:
-            print colored(str(self), 'red', attrs=['bold'])
+            print cformat('%{red!}{}').format(self)
         elif duration >= slow:
-            print colored(str(self), 'yellow', attrs=['bold'])
+            print cformat('%{yellow!}{}').format(self)
         else:
-            print colored(str(self), 'green', attrs=['bold'])
+            print cformat('%{green!}{}').format(self)

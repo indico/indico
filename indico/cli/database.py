@@ -35,7 +35,7 @@ from indico.core.db.sqlalchemy.migration import migrate
 from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.core.plugins import plugin_engine
-from indico.util.console import colored, cformat
+from indico.util.console import cformat
 
 
 @cli_group()
@@ -59,10 +59,10 @@ def _require_extensions(*names):
     missing = sorted(name for name in names if not has_extension(db.engine, name))
     if not missing:
         return True
-    print colored('Required Postgres extensions missing: {}'.format(', '.join(missing)), 'red')
-    print colored('Create them using these SQL commands (as a Postgres superuser):', 'yellow')
+    print cformat('%{red}Required Postgres extensions missing: {}').format(', '.join(missing))
+    print cformat('%{yellow}Create them using these SQL commands (as a Postgres superuser):')
     for name in missing:
-        print colored('  CREATE EXTENSION {};'.format(name), 'white', attrs={'bold': True})
+        print cformat('%{white!}  CREATE EXTENSION {};').format(name)
     return False
 
 
@@ -73,7 +73,7 @@ def _require_pg_version(version):
     cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
     if cur_version >= req_version:
         return True
-    print colored('Postgres version too old; you need at least {} (or newer)'.format(version), 'red')
+    print cformat('%{red}Postgres version too old; you need at least {} (or newer)').format(version)
     return False
 
 
@@ -82,7 +82,7 @@ def prepare():
     """Initializes an empty database (creates tables, sets alembic rev to HEAD)"""
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
-        print colored('Setting the alembic version to HEAD', 'green')
+        print cformat('%{green}Setting the alembic version to HEAD')
         stamp()
         PluginScriptDirectory.dir = os.path.join(current_app.root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
@@ -99,8 +99,8 @@ def prepare():
 
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
     if any(tables.viewvalues()):
-        print colored('Your database is not empty!', 'red')
-        print colored('If you just added a new table/model, create an alembic revision instead!', 'yellow')
+        print cformat('%{red}Your database is not empty!')
+        print cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!')
         print
         print 'Tables in your database:'
         for schema, schema_tables in sorted(tables.items()):
@@ -111,7 +111,7 @@ def prepare():
         return
     if not _require_extensions('unaccent', 'pg_trgm'):
         return
-    print colored('Creating tables', 'green')
+    print cformat('%{green}Creating tables')
     db.create_all()
 
 

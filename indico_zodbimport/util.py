@@ -32,7 +32,7 @@ from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.legacy import GroupWrapper
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.console import colored
+from indico.util.console import cformat
 
 
 class NotBroken(Broken):
@@ -67,11 +67,11 @@ class UnbreakingDB(DB):
 def get_storage(zodb_uri):
     uri_parts = urlparse(str(zodb_uri))
 
-    print colored("Trying to open {}...".format(zodb_uri), 'green')
+    print cformat("%{green}Trying to open {}...").format(zodb_uri)
 
     if uri_parts.scheme == 'zeo':
         if uri_parts.port is None:
-            print colored("No ZEO port specified. Assuming 9675", 'yellow')
+            print cformat("%{yellow}No ZEO port specified. Assuming 9675")
 
         storage = ClientStorage((uri_parts.hostname, uri_parts.port or 9675),
                                 username=uri_parts.username,
@@ -82,7 +82,7 @@ def get_storage(zodb_uri):
         storage = FileStorage.FileStorage(uri_parts.path)
     else:
         raise Exception("URI scheme not known: {}".format(uri_parts.scheme))
-    print colored("Done!", 'green')
+    print cformat("%{green}Done!")
     return storage
 
 

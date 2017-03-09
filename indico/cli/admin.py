@@ -23,7 +23,7 @@ from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.modules.users.operations import create_user
-from indico.util.console import cformat, prompt_email, prompt_pass, success, error, warning
+from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.string import to_unicode
 
 click.disable_unicode_literals_warning = True
@@ -56,7 +56,7 @@ def user_create(grant_admin):
         email = email.lower()
         if not User.find(User.all_emails.contains(email), ~User.is_deleted, ~User.is_pending).count():
             break
-        error('Email already exists')
+        print(cformat('%{red}Email already exists'))
     first_name = click.prompt("First name").strip()
     last_name = click.prompt("Last name").strip()
     affiliation = click.prompt("Affiliation", '').strip()
@@ -65,7 +65,7 @@ def user_create(grant_admin):
         username = click.prompt("Enter username").lower().strip()
         if not Identity.find(provider='indico', identifier=username).count():
             break
-        error('Username already exists')
+        print(cformat('%{red}Username already exists'))
     password = prompt_pass()
     if password is None:
         return
@@ -79,7 +79,7 @@ def user_create(grant_admin):
     if click.confirm(cformat("%{yellow}Create the new {}?").format(user_type), default=True):
         db.session.add(user)
         db.session.commit()
-        success("New {} created successfully with ID: {}".format(user_type, user.id))
+        print(cformat("%{green}New {} created successfully with ID: %{green!}{}").format(user_type, user.id))
 
 
 @cli.command()
@@ -88,16 +88,16 @@ def user_grant(user_id):
     """Grants administration rights to a given user"""
     user = User.get(user_id)
     if user is None:
-        error("This user does not exist")
+        print(cformat("%{red}This user does not exist"))
         return
     _print_user_info(user)
     if user.is_admin:
-        warning("This user already has administration rights")
+        print(cformat("%{yellow}This user already has administration rights"))
         return
     if click.confirm(cformat("%{yellow}Grant administration rights to this user?")):
         user.is_admin = True
         db.session.commit()
-        success("Administration rights granted successfully")
+        print(cformat("%{green}Administration rights granted successfully"))
 
 
 @cli.command()
@@ -106,13 +106,13 @@ def user_revoke(user_id):
     """Revokes administration rights from a given user"""
     user = User.get(user_id)
     if user is None:
-        error("This user does not exist")
+        print(cformat("%{red}This user does not exist"))
         return
     _print_user_info(user)
     if not user.is_admin:
-        warning("This user does not have administration rights")
+        print(cformat("%{yellow}This user does not have administration rights"))
         return
     if click.confirm(cformat("%{yellow}Revoke administration rights from this user?")):
         user.is_admin = False
         db.session.commit()
-        success("Administration rights revoked successfully")
+        print(cformat("%{green}Administration rights revoked successfully"))
