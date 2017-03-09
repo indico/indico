@@ -26,6 +26,7 @@ import time
 import click
 from click.types import convert_type
 from colorclass import Color
+from termcolor import colored
 
 from indico.util.string import is_valid_mail, to_unicode
 
@@ -97,19 +98,6 @@ def verbose_iterator(iterable, total, get_id, get_title, print_every=10):
     print()
 
 
-# Coloring
-
-try:
-    from termcolor import colored
-except ImportError:
-    def colored(text, *__, **___):
-        """
-        just a dummy function that returns the same string
-        (in case termcolor is not available)
-        """
-        return text
-
-
 def _cformat_sub(m):
     bg = u'on_{}'.format(m.group('bg')) if m.group('bg') else None
     attrs = ['bold'] if m.group('fg_bold') else None
@@ -127,33 +115,3 @@ def cformat(string):
     if not string.endswith(reset):
         string += reset
     return Color(string)
-
-
-# Error/warning/info message util methods
-
-def error(message):
-    """
-    Print a red error message
-    """
-    print(colored(message, 'red'))
-
-
-def warning(message):
-    """
-    Print a yellow warning message
-    """
-    print(colored(message, 'yellow'))
-
-
-def info(message):
-    """
-    Print a blue information message
-    """
-    print(colored(message, 'cyan', attrs=['bold']))
-
-
-def success(message):
-    """
-    Print a green success message
-    """
-    print(colored(message, 'green'))

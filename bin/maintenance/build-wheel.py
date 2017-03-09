@@ -21,22 +21,21 @@ import sys
 
 import click
 from setuptools import find_packages
-from termcolor import colored
 
 
 def fail(message, *args, **kwargs):
-    print >> sys.stderr, colored('Error: ' + message.format(*args), 'red', attrs=['bold'])
+    click.echo(click.style('Error: ' + message.format(*args), fg='red', bold=True), err=True)
     if 'verbose_msg' in kwargs:
-        print >> sys.stderr, kwargs['verbose_msg']
+        click.echo(kwargs['verbose_msg'], err=True)
     sys.exit(1)
 
 
 def warn(message, *args):
-    print >> sys.stderr, colored(message.format(*args), 'yellow', attrs=['bold'])
+    click.echo(click.style(message.format(*args), fg='yellow', bold=True), err=True)
 
 
 def info(message, *args):
-    print >> sys.stderr, colored(message.format(*args), 'green', attrs=['bold'])
+    click.echo(click.style(message.format(*args), fg='green', bold=True), err=True)
 
 
 def get_highest_mtime(path):
