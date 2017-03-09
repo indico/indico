@@ -22,37 +22,29 @@ import struct
 import sys
 import termios
 import time
-from getpass import getpass
 
+import click
+from click.types import convert_type
 from colorclass import Color
 
 from indico.util.string import is_valid_mail, to_unicode
 
 
+def prompt_email(prompt=u'Email', default=None, confirm=False):
+    conv = convert_type(None)
+
+    def _proc_email(val):
+        val = conv(val).strip()
+        if not is_valid_mail(val, multi=False):
+            raise click.UsageError(u'invalid email')
+        return val
+
+    return click.prompt(prompt, default=default, confirmation_prompt=confirm, value_proc=_proc_email)
 
 
-
-
-def prompt_email(prompt="Enter email: "):
+def prompt_pass(prompt=u'Password', min_length=8, confirm=True):
     while True:
-        try:
-            email = unicode(raw_input(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
-        except (EOFError, KeyboardInterrupt):  # ^D or ^C
-            print()
-            return None
-        if is_valid_mail(email):
-            return email
-        else:
-            warning(u"Email format is invalid")
-
-
-def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: ", min_length=8, confirm=True):
-    while True:
-        try:
-            password = unicode(getpass(prompt.encode(sys.stderr.encoding)), sys.stdin.encoding).strip()
-        except (EOFError, KeyboardInterrupt):  # ^D or ^C
-            print()
-            return None
+        password = click.prompt(prompt, hide_input=True, confirmation_prompt=confirm).strip()
         # Empty, just prompt again
         if not password:
             continue
@@ -60,17 +52,7 @@ def prompt_pass(prompt=u"Enter password: ", confirm_prompt=u"Confirm password: "
         if min_length and len(password) < min_length:
             warning(u"Password is too short (must be at least {} chars)".format(min_length))
             continue
-        # Confirm password if requested
-        if not confirm:
-            return password
-        while True:
-            confirmation = prompt_pass(confirm_prompt, min_length=0, confirm=False)
-            if not confirmation:
-                return None
-            elif confirmation == password:
-                return password
-            else:
-                warning(u"Passwords don't match")
+        return password
 
 
 def terminal_size():
