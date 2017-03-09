@@ -17,12 +17,15 @@
 from __future__ import unicode_literals, print_function
 
 import click
+from flask_multipass import IdentityInfo
+from terminaltables import AsciiTable
 
 from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.modules.auth import Identity
 from indico.modules.users import User
 from indico.modules.users.operations import create_user
+from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.string import to_unicode
 
@@ -37,11 +40,64 @@ def cli():
 def _print_user_info(user):
     print()
     print('User info:')
+    print("  ID: {}".format(user.id))
     print("  First name: {}".format(user.first_name))
     print("  Family name: {}".format(user.last_name))
     print("  Email: {}".format(user.email))
     print("  Affiliation: {}".format(user.affiliation))
     print()
+
+
+def _safe_lower(s):
+    return (s or '').lower()
+
+
+@cli.command()
+@click.option('--substring', is_flag=True,
+              help='Whether to require exact matches (the default) or do substring matches (slower)')
+@click.option('--include-deleted', '-D', is_flag=True,
+              help='Include deleted users in the results')
+@click.option('--include-pending', '-P', is_flag=True,
+              help='Include pending users in the results')
+@click.option('--include-external', '-X', is_flag=True,
+              help='Also include external users (e.g. from LDAP). This is potentially very slow in substring mode')
+@click.option('--first-name', '-n', help='First name of the user')
+@click.option('--last-name', '-s', help='Last name of the user')
+@click.option('--email', '-e', help='Email address of the user')
+@click.option('--affiliation', '-a', help='Affiliation of the user')
+def user_search(substring, include_deleted, include_pending, include_external, **criteria):
+    """Searches users matching some criteria"""
+    assert criteria.viewkeys() == {'first_name', 'last_name', 'email', 'affiliation'}
+    criteria = {k: v for k, v in criteria.viewitems() if v is not None}
+    res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
+                       external=include_external, **criteria)
+    if not res:
+        print(cformat('%{yellow}No results found'))
+        return
+    elif len(res) > 100:
+        click.confirm('{} results found. Show them anyway?'.format(len(res)), abort=True)
+    users = sorted((u for u in res if isinstance(u, User)), key=lambda x: (x.first_name.lower(), x.last_name.lower(),
+                                                                           x.email))
+    externals = sorted((ii for ii in res if isinstance(ii, IdentityInfo)),
+                       key=lambda x: (_safe_lower(x.data.get('first_name')), _safe_lower(x.data.get('last_name')),
+                                      _safe_lower(x.data['email'])))
+    if users:
+        table_data = [['ID', 'First Name', 'Last Name', 'Email', 'Affiliation']]
+        for user in users:
+            table_data.append([unicode(user.id), user.first_name, user.last_name, user.email, user.affiliation])
+        table = AsciiTable(table_data, cformat('%{white!}Users%{reset}'))
+        table.justify_columns[0] = 'right'
+        print(table.table)
+    if externals:
+        if users:
+            print()
+        table_data = [['First Name', 'Last Name', 'Email', 'Affiliation', 'Source', 'Identifier']]
+        for ii in externals:
+            data = ii.data
+            table_data.append([data.get('first_name', ''), data.get('last_name', ''), data['email'],
+                               data.get('affiliation', '-'), ii.provider.name, ii.identifier])
+        table = AsciiTable(table_data, cformat('%{white!}Externals%{reset}'))
+        print(table.table)
 
 
 @cli.command()
