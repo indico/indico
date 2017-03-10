@@ -9,7 +9,7 @@ env:
     - INDICO_CONFIG=/dev/null
 install:
   - pip install -U pip setuptools
-  - grep -v indico-fonts requirements.txt | pip install -r /dev/stdin
+  - pip install -r requirements.txt
   - python setup.py develop
 script:
   - pytest -v
