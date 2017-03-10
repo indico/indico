@@ -220,7 +220,7 @@ class RestrictedHTMLParser( HTMLParser ):
 def restrictedHTML(txt, sanitizationLevel):
     try:
         parser = RestrictedHTMLParser(sanitizationLevel)
-        parser.feed(txt)
+        parser.feed(txt + '>')
         parser.close()
     except (HarmfulHTMLException, HTMLParseError),e :
         return e.msg
