@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.surveys.controllers.display import RHSurveyList, RHSubmitSurvey
+from indico.modules.events.surveys.controllers.display import RHSurveyList, RHSubmitSurvey, RHSaveSurveyAnswers
 from indico.modules.events.surveys.controllers.management.questionnaire import (RHManageSurveyQuestionnaire,
                                                                                 RHExportSurveyQuestionnaire,
                                                                                 RHImportSurveyQuestionnaire,
@@ -43,6 +43,7 @@ _bp = IndicoBlueprint('surveys', __name__, template_folder='templates', virtual_
 # survey display/submission
 _bp.add_url_rule('/surveys/', 'display_survey_list', RHSurveyList)
 _bp.add_url_rule('/surveys/<int:survey_id>', 'display_survey_form', RHSubmitSurvey, methods=('GET', 'POST'))
+_bp.add_url_rule('/surveys/<int:survey_id>/save', 'display_save_answers', RHSaveSurveyAnswers, methods=('POST',))
 
 # survey management
 _bp.add_url_rule('/manage/surveys/', 'manage_survey_list', RHManageSurveys)

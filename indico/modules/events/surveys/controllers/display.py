@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from flask import redirect, flash, session, request
 from sqlalchemy.orm import joinedload
+from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
@@ -61,7 +62,7 @@ class RHSurveyList(RHSurveyBaseDisplay):
                                                was_survey_submitted=was_survey_submitted)
 
 
-class RHSubmitSurvey(RHSurveyBaseDisplay):
+class RHSubmitSurveyBase(RHSurveyBaseDisplay):
     CSRF_ENABLED = True
 
     normalize_url_spec = {
@@ -92,20 +93,12 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
             flash(_('You have already answered this survey'), 'error')
             return redirect(url_for('.display_survey_list', self.event_new))
 
-    def _process(self):
-        survey_form_class = make_survey_form(self.survey)
-        if self.submission:
-            survey_question_values = {'question_{}'.format(x.question_id): x.data for x in self.submission.answers}
-            defaults = FormDefaults(self.submission, **survey_question_values)
-            form = survey_form_class(obj=defaults, submission=self.submission, event=self.event_new)
-        else:
-            form = survey_form_class()
 
-        if 'save_answers' in request.values:
-            self._save_answers(form, self.submission)
-            flash(_('Your answers have been saved'), 'success')
-        elif form.validate_on_submit():
-            submission = self._save_answers(form, self.submission)
+class RHSubmitSurvey(RHSubmitSurveyBase):
+    def _process(self):
+        form = self._make_form()
+        if form.validate_on_submit():
+            submission = self._save_answers(form)
             if submission.is_anonymous:
                 submission.user = None
             submission.submitted_dt = now_utc()
@@ -126,18 +119,30 @@ class RHSubmitSurvey(RHSurveyBaseDisplay):
                                                event=self.event_new, survey=self.survey,
                                                back_button_endpoint=back_button_endpoint)
 
+    def _make_form(self):
+        survey_form_class = make_survey_form(self.survey)
+        if self.submission and request.method == 'GET':
+            return survey_form_class(formdata=MultiDict(self.submission.pending_answers))
+        else:
+            return survey_form_class()
+
     @no_autoflush
-    def _save_answers(self, form, submission):
+    def _save_answers(self, form):
         survey = self.survey
-        if not submission:
-            submission = SurveySubmission(survey=survey, user=session.user)
-        submission.is_anonymous = survey.anonymous
+        if not self.submission:
+            self.submission = SurveySubmission(survey=survey, user=session.user)
+        self.submission.is_anonymous = survey.anonymous
         for question in survey.questions:
-            saved_answer = SurveyAnswer.find_first(submission=submission, question=question)
-            if saved_answer:
-                saved_answer.data = getattr(form, 'question_{}'.format(question.id)).data
-            else:
-                answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
-                submission.answers.append(answer)
+            answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
+            self.submission.answers.append(answer)
         db.session.flush()
-        return submission
+        return self.submission
+
+
+class RHSaveSurveyAnswers(RHSubmitSurveyBase):
+    def _process(self):
+        pending_answers = {k: v for k, v in request.form.iterlists() if k.startswith('question_')}
+        if not self.submission:
+            self.submission = SurveySubmission(survey=self.survey, user=session.user)
+        self.submission.pending_answers = pending_answers
+        self.submission.is_anonymous = self.survey.anonymous
