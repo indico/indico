@@ -577,30 +577,62 @@ th.i-table {
     }
 }
 
-.recipients {
-    @extend .flexrow;
-    justify-content: space-between;
+#form-group-recipients {
+    position: relative;
 
-    .static-text-widget {
-        width: inherit;
+    .recipients-box {
+        @include border-all();
+        @include border-radius();
+
+        display: inline-block;
+        padding-left: 5px;
+        width: 100%;
+
+        button {
+            position: absolute;
+            right: 15px;
+            top: 0;
+            background: none;
+            border: none;
+            padding: 0 5px;
+        }
     }
 
-    .static-text-widget p {
+    .text p{
+        word-wrap: break-word;
+        width: 90%;
+        margin-top: 7px;
+        margin-bottom: 5px;
+    }
+
+    .recipients-smaller {
+        @extend .flexrow;
+        justify-content: space-between;
+        width: 85%;
+        margin-right: 15px;
         max-height: 200px;
         overflow-y: auto;
         white-space: normal;
+
+        a {
+            height: 30px;
+        }
+
+        button {
+            right: 120px;
+        }
     }
 
-    a {
-        height: 30px;
-    }
-}
+    .truncate {
+        .text p {
+            @include ellipsis;
 
-.truncate {
-    .static-text-widget p {
-        @include ellipsis;
-
-        max-height: 30px;
+            max-height: 30px;
+        }
+        
+        button {
+            right: 110px;
+        }
     }
 }
 
