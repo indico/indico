@@ -62,7 +62,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         RHManageRegFormBase._checkParams(self, params)
         self._doNotSanitizeFields.append('email_from')
 
-    def _create_invitation(self, user, skip_moderation, email_from, email_body):
+    def _create_invitation(self, user, skip_moderation, email_from, email_subject, email_body):
         invitation = RegistrationInvitation(
             skip_moderation=skip_moderation,
             email=user['email'],
@@ -72,18 +72,18 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         )
         self.regform.invitations.append(invitation)
         db.session.flush()
-        notify_invitation(invitation, email_body, email_from)
+        notify_invitation(invitation, email_subject, email_body, email_from)
 
     def _process(self):
-        tpl = get_template_module('events/registration/emails/invitation_default_body.html', event=self.event_new)
-        default_body = tpl.get_html_body()
+        tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event_new)
         form_cls = InvitationFormExisting if request.args.get('existing') == '1' else InvitationFormNew
-        defaults = FormDefaults(email_body=default_body)
+        defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
         form = form_cls(obj=defaults, regform=self.regform)
         skip_moderation = form.skip_moderation.data if 'skip_moderation' in form else False
         if form.validate_on_submit():
             for user in form.users.data:
-                self._create_invitation(user, skip_moderation, form.email_from.data, form.email_body.data)
+                self._create_invitation(user, skip_moderation, form.email_from.data,
+                                        form.email_subject.data, form.email_body.data)
             num = len(form.users.data)
             flash(ngettext("The invitation has been sent.",
                            "{n} invitations have been sent.",

@@ -1,0 +1,17 @@
+{% macro get_subject() %}Invitation to register{% endmacro %}
+
+{% macro get_html_body() %}
+    Dear {first_name},<br>
+    <br>
+    We'd like to invite you to register for the following event:<br>
+    <strong>{{ event.title }}</strong><br><br>
+
+    You can register (or decline the invitation) by using this link:<br>
+    {invitation_link}
+
+    {% if session %}
+        <br><br>
+        Best regards<br>
+        {{ session.user.full_name }}
+    {% endif %}
+{% endmacro %}

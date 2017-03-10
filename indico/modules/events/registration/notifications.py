@@ -23,10 +23,11 @@ from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 
 
-def notify_invitation(invitation, email_body, from_address):
+def notify_invitation(invitation, email_subject, email_body, from_address):
     """Send a notification about a new registration invitation."""
     email_body = replace_placeholders('registration-invitation-email', email_body, invitation=invitation)
-    template = get_template_module('events/registration/emails/invitation.html', email_body=email_body)
+    email_subject = replace_placeholders('registration-invitation-email', email_subject, invitation=invitation)
+    template = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
     email = make_email(invitation.email, from_address=from_address, template=template, html=True)
     send_email(email, invitation.registration_form.event_new, 'Registration', session.user)
 
