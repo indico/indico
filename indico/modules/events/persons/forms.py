@@ -24,15 +24,16 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoStaticTextField, HiddenFieldList, IndicoEnumSelectField
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
+from indico.web.forms.fields import HiddenFieldList, IndicoEnumSelectField
+from indico.web.forms.fields.simple import IndicoEmailRecipientsField
 
 
 class EmailEventPersonsForm(IndicoForm):
     from_address = SelectField(_('From'), [DataRequired()])
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
-    recipients = IndicoStaticTextField(_('Recipients'))
+    recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))
     person_id = HiddenFieldList()

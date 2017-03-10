@@ -1,0 +1,11 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="recipients-box left" {% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
+        <div class="text">
+            {{- field._value()|markdown -}}
+        </div>
+        <button class="i-button icon-clipboard js-copy-to-clipboard" title="{% trans %}Copy emails to clipboard{% endtrans %}"
+            data-clipboard-target="#form-group-recipients p"></button>
+    </div>
+{% endblock %}
