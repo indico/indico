@@ -57,7 +57,24 @@
     {% endcall %}
 
     <script>
-        // allow deselecting a horizontal radio button unless it's required
-        $('#survey-questionnaire .inline-vcentered input:radio:not([required])').resettableRadioButtons();
+        (function() {
+            'use strict';
+            // allow deselecting a horizontal radio button unless it's required
+            $('#survey-questionnaire .inline-vcentered input:radio:not([required])').resettableRadioButtons();
+            $('.js-save-answers').on('declarative:success', function() {
+                var $form = $(this).closest('form');
+                cornerMessage({
+                    actionLabel: $T.gettext('Submit'),
+                    progressMessage: $T.gettext('Submitting...'),
+                    message: $T.gettext('Your answers have been saved, do not forget to submit the survey when you ' +
+                    'finish!'),
+                    class: 'highlight',
+                    duration: 10000,
+                    actionCallback: function() {
+                        $form.submit();
+                    }
+                });
+            });
+        })();
     </script>
 {% endblock %}
