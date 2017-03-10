@@ -144,8 +144,9 @@ class _UsersField(PrincipalListField):
 
 class InvitationFormBase(IndicoForm):
     _invitation_fields = ('skip_moderation',)
-    _email_fields = ('email_from', 'email_body')
+    _email_fields = ('email_from', 'email_subject', 'email_body')
     email_from = SelectField(_('From'), [DataRequired()])
+    email_subject = StringField(_("Email subject"), [DataRequired()])
     email_body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
     skip_moderation = BooleanField(_("Skip moderation"), widget=SwitchWidget(),
                                    description=_("If enabled, the user's registration will be approved automatically."))

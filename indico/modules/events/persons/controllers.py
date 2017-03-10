@@ -199,7 +199,7 @@ class RHEmailEventPersons(RHConferenceModifBase):
                                               event=self.event_new, register_link=self.no_account)
             email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
                                                  event=self.event_new, register_link=self.no_account)
-            tpl = get_template_module('events/persons/emails/email.html', subject=email_subject, body=email_body)
+            tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
             email = make_email(to_list=recipient.email, from_address=form.from_address.data, template=tpl, html=True)
             send_email(email, self.event_new, 'Event Persons')
 
