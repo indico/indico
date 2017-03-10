@@ -22,7 +22,6 @@ from distutils.command.build import build
 from setuptools import setup, find_packages
 
 
-DEPENDENCY_URLS = ['https://github.com/indico/indico-fonts/releases/']
 ENTRY_POINTS = {
     'console_scripts': [
         'indico = indico.cli.core:cli',
@@ -127,5 +126,4 @@ if __name__ == '__main__':
         packages=find_packages(),
         include_package_data=True,
         install_requires=get_requirements(),
-        dependency_links=DEPENDENCY_URLS,
         entry_points=ENTRY_POINTS)

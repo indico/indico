@@ -1,4 +1,3 @@
---find-links https://github.com/indico/indico-fonts/releases/
 Babel==2.3.4
 Mako==0.9.1
 MarkupSafe==0.23
