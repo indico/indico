@@ -124,14 +124,15 @@
             container = $('<div id="corner-message-container">').appendTo('body');
         }
 
-        box = $('<div class="corner-message">').text(options.message).prependTo(container);
+        box = $('<div class="corner-message flexrow f-a-stretch">').prependTo(container);
+        $('<div class="corner-message-text">').text(options.message).appendTo(box);
 
         if (options.class) {
             box.addClass(options.class);
         }
 
         if (options.actionLabel) {
-            var text = $('<a class="corner-message-text" href="#">').text(options.actionLabel).appendTo(box);
+            var text = $('<a class="corner-message-action flexrow f-a-center" href="#">').text(options.actionLabel).appendTo(box);
 
             text.on('click', function(evt) {
                 evt.preventDefault();
