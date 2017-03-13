@@ -6,6 +6,27 @@
             {{- field._value()|markdown -}}
         </div>
         <button class="i-button icon-clipboard js-copy-to-clipboard" title="{% trans %}Copy emails to clipboard{% endtrans %}"
-            data-clipboard-target="#form-group-recipients p"></button>
+                data-clipboard-target="#form-group-recipients p"></button>
     </div>
 {% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            var $recipients = $('#form-group-recipients').find('.recipients-box');
+            var emails = $recipients.find('.text').text();
+            var count = (emails.match(/@/g) || []).length;
+            if (count > 10) {
+                $recipients.addClass('recipients-smaller truncate');
+                var $link = $('<a>', {text: $T.gettext('Show more')});
+                $link.on('click', function() {
+                    $recipients.toggleClass('truncate');
+                    $link.text($recipients.hasClass('truncate') ? $T.gettext('Show more') : $T.gettext('Show less'));
+                });
+                $('#form-group-recipients').find('.form-field').append($link);
+            }
+        })();
+    </script>
+{%- endblock %}

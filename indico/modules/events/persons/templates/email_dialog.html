@@ -1,20 +1,3 @@
 {% from 'forms/_form.html' import simple_form %}
 
-{{ simple_form(form, submit=_('Send'), disabled_until_change=disabled_until_change) }}
-<script>
-    (function() {
-        'use strict';
-
-        var $recipients = $('#form-group-recipients').find('.recipients-box');
-        var count = {{ emails_count }};
-        if (count > 10) {
-            $recipients.addClass('recipients-smaller truncate');
-            var $link = $('<a>', {text: $T.gettext('Show more')});
-            $link.on('click', function() {
-                $recipients.toggleClass('truncate');
-                $link.text($recipients.hasClass('truncate') ? $T.gettext('Show more') : $T.gettext('Show less'));
-            });
-            $('#form-group-recipients').find('.form-field').append($link);
-        }
-    })();
-</script>
+{{ simple_form(form, submit=_('Send')) }}

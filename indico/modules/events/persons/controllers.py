@@ -189,7 +189,7 @@ class RHEmailEventPersons(RHConferenceModifBase):
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data()
         return jsonify_template('events/persons/email_dialog.html', form=form,
-                                disabled_until_change=disabled_until_change, emails_count=len(recipients))
+                                disabled_until_change=disabled_until_change)
 
     def _send_emails(self, form, recipients):
         for recipient in recipients:

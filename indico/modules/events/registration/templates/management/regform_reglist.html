@@ -95,9 +95,12 @@
                     </a>
                     <ul class="dropdown">
                         <li>
-                            <a href="#" class="icon-mail js-dialog-send-email js-requires-selected-row disabled"
+                            <a href="#" class="icon-mail js-requires-selected-row disabled"
                                data-href="{{ url_for('.email_registrants', regform) }}"
-                               data-title="{% trans %}Send email{% endtrans %}">
+                               data-title="{% trans %}Send email{% endtrans %}"
+                               data-params-selector="#registration-list tr input[type=checkbox]:checked"
+                               data-method="POST"
+                               data-ajax-dialog>
                                 {%- trans %}Email{% endtrans -%}
                             </a>
                         </li>
