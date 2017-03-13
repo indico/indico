@@ -207,7 +207,9 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     def _process(self):
         tpl = get_template_module('events/registration/emails/custom_email_default.html')
         default_body = tpl.get_html_body()
-        form = EmailRegistrantsForm(body=default_body, regform=self.regform)
+        registration_ids = request.form.getlist('registration_id')
+        form = EmailRegistrantsForm(body=default_body, regform=self.regform, registration_id=registration_ids,
+                                    recipients=', '.join(sorted(x.email for x in self.registrations)))
         if form.validate_on_submit():
             self._send_emails(form)
             num_emails_sent = len(self.registrations)

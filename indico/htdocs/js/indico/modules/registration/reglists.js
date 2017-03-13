@@ -27,12 +27,6 @@
             }).trigger('change');
         }
 
-        $('.js-dialog-send-email').ajaxDialog({
-            getExtraData: function() {
-                return {registration_id: getSelectedRows()};
-            }
-        });
-
         $('body').on('click', '#preview-email', function() {
             var $this = $(this);
             ajaxDialog({

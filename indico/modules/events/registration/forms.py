@@ -40,6 +40,7 @@ from indico.util.placeholders import render_placeholder_info, get_missing_placeh
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField,
                                      JSONField)
+from indico.web.forms.fields.simple import IndicoEmailRecipientsField, HiddenFieldList
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, IndicoEmail
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
@@ -225,8 +226,11 @@ class EmailRegistrantsForm(IndicoForm):
                                                 "registrant."))
     subject = StringField(_("Subject"), [DataRequired()])
     body = TextAreaField(_("Email body"), [DataRequired()], widget=CKEditorWidget(simple=True))
+    recipients = IndicoEmailRecipientsField(_('Recipients'))
     copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget(),
                                    description=_('Send copy of each email to my mailbox'))
+    registration_id = HiddenFieldList()
+    submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
@@ -240,6 +244,9 @@ class EmailRegistrantsForm(IndicoForm):
         missing = get_missing_placeholders('registration-email', field.data, regform=self.regform, registration=None)
         if missing:
             raise ValidationError(_('Missing placeholders: {}').format(', '.join(missing)))
+
+    def is_submitted(self):
+        return super(EmailRegistrantsForm, self).is_submitted() and 'submitted' in request.form
 
 
 class TicketsForm(IndicoForm):
