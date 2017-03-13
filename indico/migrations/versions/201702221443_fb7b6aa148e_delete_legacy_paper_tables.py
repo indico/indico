@@ -28,7 +28,7 @@ def upgrade():
         conn = op.get_bind()
         has_new_papers = conn.execute("SELECT EXISTS (SELECT 1 FROM event_paper_reviewing.legacy_paper_files)").scalar()
         has_old_papers = conn.execute("SELECT EXISTS (SELECT 1 FROM event_paper_reviewing.revisions)").scalar()
-        if has_new_papers != has_old_papers:
+        if has_old_papers and not has_new_papers:
             raise Exception('Upgrade to {} and run the event_papers zodb import first!'.format(down_revision))
 
     op.drop_table('legacy_paper_files', schema='event_paper_reviewing')
@@ -37,7 +37,7 @@ def upgrade():
 
 def downgrade():
     op.create_table(
-        'contribution_roles',
+        'legacy_contribution_roles',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True),
         sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
@@ -49,7 +49,7 @@ def downgrade():
     )
 
     op.create_table(
-        'paper_files',
+        'legacy_paper_files',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('contribution_id', sa.Integer(), nullable=False, index=True),
         sa.Column('revision_id', sa.Integer(), nullable=True),
