@@ -48,5 +48,5 @@ class SurveyLinkPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, event, survey, **kwargs):
-        url = url_for('.display_survey_form', survey, token=survey.uuid, _external=True)
+        url = url_for('.display_survey_form', survey, survey.locator.uuid, _external=True)
         return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=url, title=escape(survey.title)))
