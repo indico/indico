@@ -61,6 +61,11 @@
                 </div>
             </div>
         % endif
+        <div class="error-message-box booking-limit-warning hidden">
+            <div class="message-text">
+                ${_('It is not possible to book rooms for more than {0} days'.format(booking_limit)) }
+            </div>
+        </div>
     </div>
 </div>
 
@@ -208,6 +213,17 @@ ${ form.repeat_interval(type='hidden') }
             }
         }
 
+        function checkBookingLimit() {
+            var oneDay = 86400 * 1000;
+            var startDate = $('#sDatePlace').datepicker('getDate');
+            var endDate = $('#eDatePlace').datepicker('getDate');
+            var bookingDaysLimit = ${ booking_limit };
+            var selectedDaysPeriod = (endDate - startDate) / oneDay;
+            var islimitExceeded = endDate > startDate && selectedDaysPeriod > bookingDaysLimit;
+            $('.booking-limit-warning').toggleClass('hidden', !islimitExceeded);
+            $('#searchForm :submit').attr('disabled', islimitExceeded);
+        }
+
         var validEndDates = null;
         var frequencies = {
             '1' : RRule.DAILY,
@@ -257,10 +273,18 @@ ${ form.repeat_interval(type='hidden') }
 
             selectEndDate();
             commonOnSelect();
+            checkBookingLimit();
         });
-        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
 
-        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
+        $('#eDatePlace').datepicker('option', 'onSelect', function() {
+            commonOnSelect();
+            checkBookingLimit();
+        });
+
+        $('#eDatePlace').datepicker('option', 'onChangeMonthYear', function() {
+            disableInvalidDays();
+            checkBookingLimit();
+        });
 
         $('#sDatePlace').datepicker('setDate', "${ form.start_dt.data.strftime('%d/%m/%Y') }");
         $('#eDatePlace').datepicker('setDate', "${ form.end_dt.data.strftime('%d/%m/%Y') }");
