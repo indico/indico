@@ -40,7 +40,8 @@ settings = SettingsProxy('roombooking', {
     'vc_support_emails': [],
     'notification_hour': 6,
     'notification_before_days': 1,
-    'notifications_enabled': True
+    'notifications_enabled': True,
+    'booking_limit': 365
 }, acls={'admin_principals', 'authorized_principals'})
 
 
