@@ -32,6 +32,7 @@ from werkzeug.urls import url_parse
 
 import indico
 from indico.util.contextManager import ContextManager
+from indico.util.fs import resolve_link
 from indico.util.packaging import package_is_editable
 
 
@@ -469,7 +470,7 @@ class Config:
     def getFinalConfigFilePath(self):
         config_path = self.getConfigFilePath()
         if os.path.islink(config_path):
-            config_path = os.readlink(config_path)
+            config_path = resolve_link(config_path)
         return None if config_path == os.devnull else config_path
 
     def getLoggingConfigFilePath(self):
