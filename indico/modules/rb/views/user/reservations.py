@@ -124,6 +124,7 @@ def _get_serializable_rooms(room_ids):
 class WPRoomBookingNewBookingSelectRoom(WPRoomBookingNewBookingBase):
     def _getBody(self, params):
         params['serializable_rooms'] = _get_serializable_rooms([r.id for r in params['rooms']])
+        params['booking_limit'] = rb_settings.get('booking_limit')
         return WTemplated('RoomBookingNewBookingSelectRoom').getHTML(params)
 
 
