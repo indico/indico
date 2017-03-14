@@ -299,7 +299,7 @@ class EventPerson(PersonMixin, db.Model):
 
         for session_block_link in other.session_block_links:
             existing_session_block_link = next((link for link in self.session_block_links
-                                                if link.session_block_id == session_block_link.contribution_id),
+                                                if link.session_block_id == session_block_link.session_block_id),
                                                None)
             if existing_session_block_link is None:
                 session_block_link.person = self
