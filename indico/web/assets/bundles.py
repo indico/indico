@@ -233,6 +233,7 @@ selectize_css = Bundle('css/lib/selectize.js/selectize.css',
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
 fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
+outdated_browser_js = rjs_bundle('outdated_browser_js', 'js/lib/outdatedbrowser.js')
 typewatch_js = rjs_bundle('typewatch_js', 'js/lib/jquery.typewatch.js')
 
 palette = rjs_bundle('palette', 'js/palette.js')
@@ -416,7 +417,7 @@ widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
 
 base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
                  indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
-                 widgets_js, module_js['event_creation'])
+                 outdated_browser_js, widgets_js, module_js['event_creation'])
 
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
@@ -529,7 +530,8 @@ def register_all_css(env, main_css_file):
                    'lib/fullcalendar.css',
                    'jquery.colorbox.css',
                    'jquery-ui-custom.css',
-                   'jquery.colorpicker.css'),
+                   'jquery.colorpicker.css',
+                   'lib/outdatedbrowser.css'),
         filters=("cssmin", "cssrewrite"),
         output='css/base_%(version)s.min.css')
 

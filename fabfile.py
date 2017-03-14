@@ -456,6 +456,16 @@ def install_fullcalendar_js():
             local('cp dist/fullcalendar.css {0}'.format(dest_css_dir))
 
 
+@recipe('outdated-browser')
+def install_outdated_browser():
+    with lcd(os.path.join(env.ext_dir, 'outdated-browser')):
+        dest_js_dir = lib_dir(env.src_dir, 'js')
+        dest_css_dir = lib_dir(env.src_dir, 'css')
+        local('mkdir -p {0}'.format(dest_js_dir))
+        local('cp outdatedbrowser/outdatedbrowser.js {0}'.format(dest_js_dir))
+        local('cp outdatedbrowser/outdatedbrowser.css {0}'.format(dest_css_dir))
+
+
 # Tasks
 @task
 def install(recipe_name):
