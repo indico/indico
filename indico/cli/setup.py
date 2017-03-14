@@ -66,8 +66,8 @@ def create_symlinks(target_dir):
     updating Indico.
     """
     root_dir, target_dir = _get_dirs(target_dir)
-    _copy(os.path.join(root_dir, 'web', 'indico.wsgi'), os.path.join(target_dir, 'indico.wsgi'), force=True)
     _link(os.path.join(root_dir, 'htdocs'), os.path.join(target_dir, 'htdocs'))
+    _copy(os.path.join(root_dir, 'web', 'indico.wsgi'), os.path.join(target_dir, 'indico.wsgi'), force=True)
 
 
 @cli.command()
