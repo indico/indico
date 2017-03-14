@@ -53,7 +53,7 @@
     @include border-all($red);
 }
 
-@include apply-to-text-inputs('%text-input');
+@include apply-to-inputs('%text-input');
 
 input[type=file] {
     &.hasError {
