@@ -31,6 +31,7 @@ from indico.core.notifications import make_email, send_email
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.surveys import logger
 from indico.util.date_time import now_utc
+from indico.util.locators import locator_property
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 from indico.web.flask.templating import get_template_module
@@ -208,10 +209,15 @@ class Survey(db.Model):
     def has_started(cls):
         return (cls.start_dt != None) & (cls.start_dt <= now_utc())  # noqa
 
-    @property
+    @locator_property
     def locator(self):
         return {'confId': self.event_id,
                 'survey_id': self.id}
+
+    @locator.uuid
+    def locator(self):
+        """A locator that uses uuid instead of id"""
+        return dict(self.locator, token=self.uuid)
 
     @property
     def state(self):
