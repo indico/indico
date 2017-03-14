@@ -24,7 +24,8 @@ from flask import request, session
 from markupsafe import escape
 from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
-from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField, IntegerField
+from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField
+from wtforms.fields.html5 import IntegerField
 from wtforms.validators import InputRequired, DataRequired, ValidationError, Optional, NumberRange
 
 from indico.core.config import Config
@@ -370,9 +371,10 @@ class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
 
 
 class CloneRepeatPatternForm(CloneRepeatUntilFormBase):
-    day_number = SelectField(None, choices=WEEK_DAY_NUMBER_CHOICES, coerce=int)
-    week_day = SelectField(None, coerce=int)
-    num_months = IntegerField(None, [DataRequired()], default=1)
+    day_number = SelectField(_('Every'), choices=WEEK_DAY_NUMBER_CHOICES, coerce=int)
+    week_day = SelectField('', coerce=int)
+    num_months = IntegerField(_('Months'), [DataRequired(), NumberRange(min=1)], default=1,
+                              description=_("Number of months between repetitions"))
 
     def __init__(self, event, **kwargs):
         locale = get_current_locale()

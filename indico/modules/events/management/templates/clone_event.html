@@ -83,7 +83,7 @@
                     {% elif form.repeatability.data == 'pattern' %}
                         {% set visible_fields = ('start_dt', 'day_number', 'week_day', 'num_months', 'stop_criterion',
                                                  'until_dt', 'num_times') %}
-                        {{ form_rows(form, fields=visible_fields, skip_labels=true) }}
+                        {{ form_rows(form, fields=visible_fields) }}
                     {% endif %}
                     {{ invisible_fields(form, skip=visible_fields) }}
                     {% if form.repeatability.data != 'once' %}
