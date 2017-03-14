@@ -42,3 +42,11 @@ def secure_filename(filename, fallback):
     if not filename:
         return fallback
     return _secure_filename(unicode_to_ascii(to_unicode(filename))) or fallback
+
+
+def resolve_link(link):
+    """Resolve a link to an absolute path.
+
+    :param link: An absolute path to a symlink.
+    """
+    return os.path.normpath(os.path.join(os.path.dirname(link), os.readlink(link)))
