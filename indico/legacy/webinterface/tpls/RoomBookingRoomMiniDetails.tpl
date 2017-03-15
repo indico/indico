@@ -13,7 +13,7 @@
                     >
                     % for roomItem in rooms:
                         <% selected = '' %>
-                        % if room.name == roomItem.name:
+                        % if room.id == roomItem.id:
                             <% selected = 'selected' %>
                         % endif
                         <option data-location="${ roomItem.location_name }" data-id="${ roomItem.id }" ${ selected } class="${ roomItem.kind }">
