@@ -19,7 +19,7 @@
         {% endif %}
     {% endcall %}
 
-    {% set instructions = proposal.cfp.instructions %}
+    {% set instructions = proposal.cfp.reviewing_instructions %}
     {% if instructions %}
         {% call(link, endlink) render_instruction_box(form_id, instructions, _("Reviewing instructions")) %}
            {% trans -%}
