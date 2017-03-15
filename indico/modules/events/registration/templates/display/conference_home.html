@@ -34,7 +34,11 @@
                 {%- endif -%}
             </div>
             {% if user_has_registered %}
-                <div>{% trans %}You have registered for this event.{% endtrans %}</div>
+                {% if user_has_registered < regforms|length %}
+                    <div>{% trans %} You have registered for this event, but there are more registration forms available.{% endtrans %}</div>
+                {% else %}
+                    <div>{% trans %} You have registered for this event.{% endtrans %}</div>
+                {%  endif %}
                 <div class="toolbar">
                     {{ _render_ticket_dropdown() }}
                     <a class="i-button next highlight"
@@ -52,6 +56,13 @@
                     {%- endif -%}
                 </div>
                 <div class="toolbar">
+                    {%- if regforms[0].publish_number_of_registrations and regforms|length == 1 %}
+                        <span class="i-button icon-user label" title="{% trans %}Total registrations{% endtrans %}">{{ regforms[0].active_registrations|length }}
+                            {%- if regforms[0].registration_limit %}
+                                / {{ regforms[0].registration_limit }}
+                            {%- endif -%}
+                        </span>
+                    {%  endif %}
                     <a href="{{ url_for('event_registration.display_regform_list', event) }}"
                        class="i-button next highlight">
                         {%- if is_form_moderated %}

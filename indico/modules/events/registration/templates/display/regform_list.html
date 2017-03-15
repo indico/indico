@@ -15,6 +15,9 @@
                 <th></th>
                 <th>{% trans %}Opens{% endtrans %}</th>
                 <th>{% trans %}Closes{% endtrans %}</th>
+                {% if registration_counts %}
+                    <th>{% trans %}Registered{% endtrans %}</th>
+                {% endif %}
                 <th></th>
             </tr>
         </thead>
@@ -37,6 +40,17 @@
                     </td>
                     <td>{{ regform.start_dt | format_datetime(timezone=event.display_tzinfo) if regform.start_dt else _('Not started') }}</td>
                     <td>{{ regform.end_dt | format_datetime(timezone=event.display_tzinfo) if regform.end_dt else _('No deadline') }}</td>
+                    {% if registration_counts %}
+                        <td>
+                        {%- if regform.publish_number_of_registrations %}
+                            <span class="icon-user"> {{ registration_counts.get(regform.id, 0) }}
+                                {%- if regform.registration_limit %}
+                                    / {{ regform.registration_limit }}
+                                {%- endif -%}
+                            </span>
+                        {% endif %}
+                        </td>
+                    {% endif %}
                     <td class="regform-actions">
                         {% if session.user and regform.get_registration(user=session.user) %}
                             <a href="{{ url_for('.display_regform', regform) }}"
