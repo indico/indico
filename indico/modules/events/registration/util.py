@@ -76,13 +76,13 @@ def user_registered_in_event(user, event):
     :param user: the `User` object
     :param event: the event in question
     """
-    return bool(Registration
-                .find(Registration.user == user,
-                      RegistrationForm.event_id == int(event.id),
-                      ~RegistrationForm.is_deleted,
-                      Registration.is_active)
-                .join(Registration.registration_form)
-                .count())
+    return int(Registration
+               .find(Registration.user == user,
+                     RegistrationForm.event_id == int(event.id),
+                     ~RegistrationForm.is_deleted,
+                     Registration.is_active)
+               .join(Registration.registration_form)
+               .count())
 
 
 def get_event_section_data(regform, management=False, registration=None):
