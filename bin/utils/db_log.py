@@ -72,7 +72,7 @@ class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
             chunk = self.connection.recv(4)
             if len(chunk) < 4:
                 break
-            size = struct.unpack('>L', chunk)[0]
+            size = struct.unpack(b'>L', chunk)[0]
             chunk = self.connection.recv(size)
             while len(chunk) < size:
                 chunk = chunk + self.connection.recv(size - len(chunk))
@@ -171,7 +171,7 @@ class LogRecordSocketReceiver(SocketServer.ThreadingTCPServer):
 
 
 def terminal_size():
-    h, w, hp, wp = struct.unpack('HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack('HHHH', 0, 0, 0, 0)))
+    h, w, hp, wp = struct.unpack(b'HHHH', fcntl.ioctl(0, termios.TIOCGWINSZ, struct.pack(b'HHHH', 0, 0, 0, 0)))
     return w, h
 
 
