@@ -24,6 +24,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError, NotFoundError
+from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
@@ -556,6 +557,11 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             flexible_days = form.flexible_dates_range.data
             day_start_dt = datetime.combine(form.start_dt.data.date(), time())
             day_end_dt = datetime.combine(form.end_dt.data.date(), time(23, 59))
+            selected_period_days = (day_end_dt - day_start_dt).days
+            booking_limit_days = rb_settings.get('booking_limit')  # TODO: check customizable admin limit as well
+            if selected_period_days > booking_limit_days:
+                flash(_(u'Room booking period limit is {} days'.format(booking_limit_days)), 'error')
+                return self._redirect(url_for('rooms.book'))
 
             selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
             occurrences, candidates = self._get_all_occurrences(form.room_ids.data, form, flexible_days)
