@@ -136,6 +136,12 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
+    #: Whether number of registrations should be displayed
+    publish_number_of_registrations = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: Whether checked-in status should be displayed in the event pages and participant list
     publish_checkin_enabled = db.Column(
         db.Boolean,

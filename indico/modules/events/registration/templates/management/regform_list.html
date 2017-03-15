@@ -81,7 +81,11 @@
                         <div class="group">
                             <a href="{{ url_for('.manage_reglist', regform) }}" class="i-button icon-users">
                                 {% trans %}Registrations{% endtrans %}
-                                <span class="badge">{{ registration_counts.get(regform.id, 0) }}</span>
+                                <span class="badge">{{ registration_counts.get(regform.id, 0) }}
+                                    {%- if regform.registration_limit %}
+                                        / {{ regform.registration_limit }}
+                                    {%- endif -%}
+                                </span>
                             </a>
                         </div>
                         <div class="group">
