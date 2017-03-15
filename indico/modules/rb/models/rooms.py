@@ -184,6 +184,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     max_advance_days = db.Column(
         db.Integer
     )
+    booking_limit_days = db.Column(
+        db.Integer
+    )
 
     attributes = db.relationship(
         'RoomAttributeAssociation',
