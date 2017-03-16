@@ -108,15 +108,15 @@ def configure_app(app, set_path=False):
     if static_file_method:
         app.config['USE_X_SENDFILE'] = True
         method, args = static_file_method
-        if method in ('xsendfile', 'lighttpd'):  # apache mod_xsendfile, lighttpd
+        if method == 'xsendfile':  # apache mod_xsendfile, lighttpd
             pass
-        elif method in ('xaccelredirect', 'nginx'):  # nginx
+        elif method == 'xaccelredirect':  # nginx
             if not args or not hasattr(args, 'items'):
                 raise ValueError('StaticFileMethod args must be a dict containing at least one mapping')
             app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
         else:
             raise ValueError('Invalid static file method: %s' % method)
-    if Config.getInstance().getUseProxy():
+    if cfg.getUseProxy():
         app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
