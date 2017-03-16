@@ -495,7 +495,7 @@ class XAccelMiddleware(object):
             if xsf_path:
                 uri = self.make_x_accel_header(xsf_path)
                 if not uri:
-                    raise ValueError('Could not map %s to an URI' % xsf_path)
+                    raise ValueError('Could not map {} to a URI'.format(xsf_path))
                 new_headers.append(('X-Accel-Redirect', uri))
             return start_response(status, new_headers, exc_info)
 
