@@ -121,8 +121,8 @@ class PatternCloneCalculator(CloneCalculator):
     def _calculate(self, form):
         args = {'dtstart': form.start_dt.data}
         args.update(self._calc_stop_criteria(form))
-        return list(rrule.rrule(rrule.MONTHLY, interval=form.num_months.data, byweekday=form.week_day.data,
-                                bysetpos=form.day_number.data, **args))
+        return list(rrule.rrule(rrule.MONTHLY, interval=form.num_months.data, byweekday=form.week_day.week_day_data,
+                                bysetpos=form.week_day.day_number_data, **args))
 
 
 class IntervalCloneCalculator(CloneCalculator):

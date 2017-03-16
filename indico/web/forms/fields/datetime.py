@@ -30,7 +30,7 @@ from wtforms.validators import StopValidation
 
 from indico.core.config import Config
 from indico.util.date_time import localize_as_utc, relativedelta
-from indico.util.i18n import _
+from indico.util.i18n import _, get_current_locale
 from indico.web.forms.fields import JSONField
 from indico.web.forms.validators import DateTimeRange, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget
@@ -340,3 +340,44 @@ class IndicoTimezoneSelectField(SelectField):
         super(IndicoTimezoneSelectField, self).process_data(value)
         if self.data is not None and self.data not in pytz.common_timezones_set:
             self.choices.append((self.data, self.data))
+
+
+class IndicoWeekDayRepetitionField(Field):
+    """ Field that lets you select an ordinal day of the week."""
+
+    widget = JinjaWidget('forms/week_day_repetition_widget.html', single_line=True)
+
+    WEEK_DAY_NUMBER_CHOICES = (
+        (1, _('first')),
+        (2, _('second')),
+        (3, _('third')),
+        (4, _('fourth')),
+        (-1, _('last'))
+    )
+
+    def __init__(self, *args, **kwargs):
+        locale = get_current_locale()
+        self.day_number_options = self.WEEK_DAY_NUMBER_CHOICES
+        self.week_day_options = [(n, locale.weekday(n, short=False)) for n in xrange(7)]
+        self.week_day_options.append((-1, _('Any day')))
+        self.day_number_missing = False
+        self.week_day_missing = False
+        super(IndicoWeekDayRepetitionField, self).__init__(*args, **kwargs)
+
+    def process_formdata(self, valuelist):
+        self.data = ()
+        if any(valuelist):
+            if not valuelist[0]:
+                self.day_number_missing = True
+            if not valuelist[1]:
+                self.week_day_missing = True
+        if valuelist:
+            self.data = tuple(map(int, valuelist))
+
+    @property
+    def day_number_data(self):
+        return self.data[0] if len(self.data) > 0 else None
+
+    @property
+    def week_day_data(self):
+        return self.data[1] if len(self.data) > 1 else None
