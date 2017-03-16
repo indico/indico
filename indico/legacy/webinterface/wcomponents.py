@@ -17,13 +17,12 @@
 import os
 import urllib
 import pkg_resources
-from flask import session
+from flask import g, session
 from speaklater import _LazyString
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
 from indico.legacy.common.timezoneUtils import DisplayTZ
-from indico.legacy.common.contextManager import ContextManager
 import indico.legacy.common.TemplateExec as templateEngine
 
 from indico.core import signals
@@ -67,7 +66,7 @@ class WTemplated:
         if tpl_name is not None:
             self.tplId = tpl_name
 
-        self._rh = ContextManager.get('currentRH', None)
+        self._rh = g.get('rh')
 
     def _getSpecificTPL(self, dir, tplId, extension="tpl"):
         """
@@ -105,7 +104,7 @@ class WTemplated:
            Classes inheriting from this one will have to take care of adding
             their variables to the ones returned by this method.
         """
-        self._rh = ContextManager.get('currentRH', None)
+        self._rh = g.get('rh')
 
         cfg = Config.getInstance()
         vars = cfg.getTPLVars()
@@ -123,7 +122,7 @@ class WTemplated:
                 params -- additional paramters received from the caller
         """
 
-        self._rh = ContextManager.get('currentRH', None)
+        self._rh = g.get('rh')
         if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
         self._setTPLFile()

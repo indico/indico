@@ -40,7 +40,6 @@ from werkzeug.wrappers import Response
 from indico.legacy.accessControl import AccessWrapper
 
 from indico.legacy.common import fossilize, security
-from indico.legacy.common.contextManager import ContextManager
 from indico.legacy.common.mail import GenericMailer
 
 from indico.legacy.errors import (
@@ -635,9 +634,6 @@ class RH(RequestHandlerBase):
 
         self._startTime = datetime.now()
 
-        # clear the context
-        ContextManager.destroy()
-        ContextManager.set('currentRH', self)
         g.rh = self
 
         # redirect to https if necessary

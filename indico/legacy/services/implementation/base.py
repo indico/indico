@@ -18,16 +18,15 @@ import os
 import sys
 import traceback
 
-from flask import request, session
+from flask import g, request, session
 
 from indico.core.config import Config
-from indico.util.string import unicode_struct_to_utf8
 from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common import security
-from indico.legacy.common.contextManager import ContextManager
 from indico.legacy.errors import MaKaCError, HtmlForbiddenTag
 from indico.legacy.services.interface.rpc.common import ServiceAccessError, HTMLSecurityError
 from indico.legacy.webinterface.rh.base import RequestHandlerBase
+from indico.util.string import unicode_struct_to_utf8
 
 
 class ServiceBase(RequestHandlerBase):
@@ -91,7 +90,7 @@ class ServiceBase(RequestHandlerBase):
         _getAnswer() method (implemented by derived classes)
         """
 
-        ContextManager.set('currentRH', self)
+        g.rh = self
 
         self._checkParams()
         self._checkProtection()
