@@ -24,7 +24,6 @@ from sqlalchemy.orm import joinedload
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import get_attached_folders, get_event
-from indico.legacy.common.contextManager import ContextManager
 
 
 def build_material_legacy_api_data(linked_object):
@@ -46,8 +45,7 @@ def build_material_legacy_api_data(linked_object):
 
 
 def _build_folder_legacy_api_data(folder):
-    avatar = ContextManager.get("currentAW").getUser()
-    user = avatar.user if avatar else None
+    user = g.current_api_user
     if not folder.can_access(user):
         return None
 
@@ -98,8 +96,7 @@ def build_folders_api_data(linked_object):
 
 
 def _build_folder_api_data(folder):
-    avatar = ContextManager.get("currentAW").getUser()
-    user = avatar.user if avatar else None
+    user = g.current_api_user
     if not folder.can_view(user):
         return None
 

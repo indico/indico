@@ -27,7 +27,6 @@ from indico.core.notifications import make_email, email_sender
 from indico.core.storage import StorageReadOnlyError
 from indico.modules.events.static import logger
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
-from indico.util.contextManager import ContextManager
 from indico.util.date_time import now_utc
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -49,7 +48,6 @@ def build_static_site(static_site):
         rh._conf = rh._target = static_site.event_new.as_legacy
 
         g.rh = rh
-        ContextManager.set('currentRH', rh)
         g.static_site = True
 
         # Get event type
@@ -66,7 +64,7 @@ def build_static_site(static_site):
 
         logger.info('Building static site successful: %s', static_site)
         g.static_site = False
-        ContextManager.set('currentRH', None)
+        g.rh = None
         notify_static_site_success(static_site)
     except Exception:
         logger.exception('Building static site failed: %s', static_site)
@@ -75,7 +73,7 @@ def build_static_site(static_site):
         raise
     finally:
         g.static_site = False
-        ContextManager.set('currentRH', None)
+        g.rh = None
 
 
 @email_sender

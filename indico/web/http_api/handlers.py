@@ -38,7 +38,6 @@ from indico.modules.api import settings as api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
-from indico.util.contextManager import ContextManager
 from indico.util.string import to_unicode
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
@@ -130,7 +129,6 @@ def buildAW(ak, onlyPublic=False):
 
 def handler(prefix, path):
     path = posixpath.join('/', prefix, path)
-    ContextManager.destroy()
     clearCache()  # init fossil cache
     logger = Logger.get('httpapi')
     if request.method == 'POST':
@@ -238,7 +236,7 @@ def handler(prefix, path):
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
         if result is None:
-            ContextManager.set("currentAW", aw)
+            g.current_api_user = aw.user
             # Perform the actual exporting
             res = hook(aw)
             if isinstance(res, current_app.response_class):

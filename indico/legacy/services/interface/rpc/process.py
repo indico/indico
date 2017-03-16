@@ -21,7 +21,6 @@ from flask import request, session
 from sqlalchemy.exc import DatabaseError
 
 from indico.legacy.errors import NoReportError
-from indico.legacy.common.contextManager import ContextManager
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.services.interface.rpc import handlers
 from indico.legacy.services.interface.rpc.common import (CausedError,
@@ -79,7 +78,6 @@ class ServiceRunner(object):
         result = None
 
         try:
-            ContextManager.destroy()
             fossilize.clearCache()
             GenericMailer.flushQueue(False)
             try:

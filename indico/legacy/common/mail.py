@@ -15,19 +15,19 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import smtplib
-from email.mime.multipart import MIMEMultipart
-from email.mime.application import MIMEApplication
-from email.mime.text import MIMEText
 from email import charset
+from email.mime.application import MIMEApplication
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+
+from flask import g
 
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.legacy.errors import MaKaCError
 from indico.util.event import unify_event_args
 from indico.util.i18n import _
 from indico.util.string import to_unicode
-from indico.legacy.errors import MaKaCError
-
-from indico.legacy.common.contextManager import ContextManager
 
 # Prevent base64 encoding of utf-8 e-mails
 charset.add_charset('utf-8', charset.SHORTEST)
@@ -42,18 +42,18 @@ class GenericMailer:
             from indico.legacy.webinterface.mail import GenericNotification
             notification = GenericNotification(notification)
         # enqueue emails if we have a rh and do not skip queuing, otherwise send immediately
-        rh = ContextManager.get('currentRH', None)
+        rh = g.get('rh')
         mailData = cls._prepare(notification)
 
         if mailData:
             if skipQueue or not rh:
                 cls._send(mailData)
             else:
-                ContextManager.setdefault('emailQueue', []).append(mailData)
+                g.setdefault('email_queue', []).append(mailData)
 
     @classmethod
     def flushQueue(cls, send):
-        queue = ContextManager.get('emailQueue', None)
+        queue = g.get('email_queue', None)
         if not queue:
             return
         if send:

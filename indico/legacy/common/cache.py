@@ -22,12 +22,12 @@ import time
 from itertools import izip
 
 import redis
+from flask import g
 
 from indico.core.config import Config
 from indico.core.logger import Logger
-from indico.util.fs import silentremove
-from indico.legacy.common.contextManager import ContextManager
 from indico.legacy.common.utils import OSSpecific
+from indico.util.fs import silentremove
 
 
 # To cache `None` we need to actually store something else since memcached
@@ -271,7 +271,7 @@ class GenericCache(object):
         if self._client is not None:
             return
         # If not, we might have one from another instance
-        self._client = ContextManager.get('GenericCacheClient', None)
+        self._client = g.get('generic_cache_client', None)
 
         if self._client is not None:
             return
@@ -287,7 +287,7 @@ class GenericCache(object):
         else:
             self._client = NullCacheClient()
 
-        ContextManager.set('GenericCacheClient', self._client)
+        g.generic_cache_client = self._client
 
     def _hashKey(self, key):
         if hasattr(self._client, 'hash_key'):

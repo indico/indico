@@ -31,7 +31,6 @@ from flask.helpers import get_root_path
 from werkzeug.urls import url_parse
 
 import indico
-from indico.util.contextManager import ContextManager
 from indico.util.fs import resolve_link
 from indico.util.packaging import package_is_editable
 
@@ -497,7 +496,7 @@ class Config:
         return 'Default.css'
 
     def getCssConfTemplateBaseURL(self):
-        rh = ContextManager.get('currentRH', None)
+        rh = has_app_context() and g.get('rh')
 
         if rh and request.is_secure and self.getBaseSecureURL():
             baseURL = self.getBaseSecureURL()

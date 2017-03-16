@@ -14,21 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.common.contextManager import ContextManager
-
 
 class AccessWrapper:
-    """This class encapsulates the information about an access to the system. It
-            must be initialised by clients if they want to perform access
-            control operations over the objects in the system.
-    """
-
     def __init__(self, user=None):
         self._currentUser = user
 
     def setUser( self, newAvatar ):
         self._currentUser = newAvatar
-        ContextManager.set('currentUser', self._currentUser)
 
     def getUser( self ):
         return self._currentUser
