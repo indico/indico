@@ -56,7 +56,6 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
     os.environ.pop('FLASK_DEBUG', None)
     os.environ['INDICO_CONF_OVERRIDE'] = repr({
         'EmbeddedWebserver': True,
-        'StaticFileMethod': None,
         'BaseURL': url,
         'BaseSecureURL': '' if not ssl else url,
     })
