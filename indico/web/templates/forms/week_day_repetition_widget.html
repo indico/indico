@@ -1,0 +1,22 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div class="week-day-widget">
+        <select name="{{ field.name}}" id="{{ field.id }}-day-number"
+                {% if required %}required{% endif %}
+                {% if disabled %}disabled{% endif %}>
+            {% for option in field.day_number_options %}
+                {% set selected = option[0] == field.day_number_data %}
+                <option value="{{ option[0] }}" {% if selected %}selected{% endif %}>{{ option[1] }}</option>
+            {% endfor %}
+        </select>
+        <select name="{{ field.name }}" id="{{ field.id }}-week-day"
+                {% if required %}required{% endif %}
+                {% if disabled %}disabled{% endif %}>
+            {% for option in field.week_day_options %}
+                {% set selected = option[0] == field.week_day_data %}
+                <option value="{{ option[0] }}" {% if selected %}selected{% endif %}>{{ option[1] }}</option>
+            {% endfor %}
+        </select>
+    </div>
+{% endblock %}

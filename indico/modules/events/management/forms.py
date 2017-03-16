@@ -51,7 +51,7 @@ from indico.web.forms.fields import (AccessControlListField, IndicoProtectionFie
                                      IndicoEnumSelectField, IndicoPasswordField, IndicoDateTimeField,
                                      IndicoTimezoneSelectField, IndicoLocationField, MultiStringField,
                                      IndicoTagListField, IndicoRadioField, RelativeDeltaField, IndicoDateField,
-                                     IndicoSelectMultipleCheckboxField)
+                                     IndicoSelectMultipleCheckboxField, IndicoWeekDayRepetitionField)
 from indico.web.forms.validators import LinkedDateTime, HiddenUnless
 from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 
@@ -60,14 +60,6 @@ CLONE_REPEAT_CHOICES = (
     ('once', _('Clone Once')),
     ('interval', _('Clone with fixed Interval')),
     ('pattern', _('Clone with recurring Pattern'))
-)
-
-WEEK_DAY_NUMBER_CHOICES = (
-    (1, _('first')),
-    (2, _('second')),
-    (3, _('third')),
-    (4, _('fourth')),
-    (-1, _('last'))
 )
 
 
@@ -371,13 +363,6 @@ class CloneRepeatIntervalForm(CloneRepeatUntilFormBase):
 
 
 class CloneRepeatPatternForm(CloneRepeatUntilFormBase):
-    day_number = SelectField(_('Every'), choices=WEEK_DAY_NUMBER_CHOICES, coerce=int)
-    week_day = SelectField('', coerce=int)
+    week_day = IndicoWeekDayRepetitionField(_('Every'))
     num_months = IntegerField(_('Months'), [DataRequired(), NumberRange(min=1)], default=1,
                               description=_("Number of months between repetitions"))
-
-    def __init__(self, event, **kwargs):
-        locale = get_current_locale()
-        super(CloneRepeatPatternForm, self).__init__(event, **kwargs)
-        self.week_day.choices = [(n, locale.weekday(n, short=False)) for n in xrange(7)]
-        self.week_day.choices.append((-1, _('Any day')))

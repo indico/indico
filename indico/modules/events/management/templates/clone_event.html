@@ -81,7 +81,7 @@
                         {{ form_row(form.recurrence) }}
                         {{ form_rows(form, fields=visible_fields|reject('equalto', 'recurrence')) }}
                     {% elif form.repeatability.data == 'pattern' %}
-                        {% set visible_fields = ('start_dt', 'day_number', 'week_day', 'num_months', 'stop_criterion',
+                        {% set visible_fields = ('start_dt', 'week_day', 'num_months', 'stop_criterion',
                                                  'until_dt', 'num_times') %}
                         {{ form_rows(form, fields=visible_fields) }}
                     {% endif %}
