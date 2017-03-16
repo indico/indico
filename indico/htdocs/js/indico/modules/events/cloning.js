@@ -45,8 +45,18 @@
             }
         }
 
-        function updateCount() {
+        var updateCount = _.debounce(function(force) {
             var $cloneButton = $('.clone-action-button');
+            var serializedForm = $form.serialize();
+
+            // make sure the form was actually changed
+            if (!force && serializedForm === $form.data('initialData')) {
+                return;
+            }
+
+            // set 'intiialData' by hand here, so that the if we're in a 'keyup'
+            // event, the successive 'change' event will receive the updated version
+            $form.data('initialData', serializedForm);
 
             $form.ajaxSubmit({
                 url: $formContainer.data('preview-url'),
@@ -67,18 +77,18 @@
                     }
                 }
             });
-        }
+        }, 300);
 
         if (step === 4) {
-            $form.on('change', 'select, input', updateCount);
+            $form.on('change', 'select, input', _.partial(updateCount, false));
             $form.on('keyup', 'input', function(e) {
                 e.preventDefault();
-                updateCount();
+                updateCount(false);
             });
         }
 
         if ($eventCount.length) {
-            setTimeout(updateCount, 100);
+            _.defer(_.partial(updateCount, true));
         }
 
         $form.find('#form-group-selected_items').on('change', 'input[type=checkbox]', function() {
