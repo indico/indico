@@ -58,10 +58,15 @@ def notify_paper_review_submission(review):
 def notify_paper_judgment(paper, reset=False):
     event = paper.event_new
     receiver = paper.last_revision.submitter
+    template = None
     if reset:
         template = 'events/papers/emails/judgment_reset_to_author.html'
     elif paper_reviewing_settings.get(event, 'notify_author_on_judgment'):
         template = 'events/papers/emails/judgment_to_author.html'
+
+    if not template:
+        return
+
     template = get_template_module(template, event=event, paper=paper, contribution=paper.contribution,
                                    receiver=receiver)
     email = make_email(to_list=receiver.email, template=template, html=True)
