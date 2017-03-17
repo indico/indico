@@ -12,5 +12,6 @@ graft indico/htdocs/
 graft indico/migrations/
 graft indico/translations/
 graft indico/legacy/webinterface/stylesheets/
+prune indico/htdocs/static/assets
 
 global-exclude *.pyc __pycache__
