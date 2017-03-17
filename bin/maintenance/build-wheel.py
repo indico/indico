@@ -16,6 +16,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
+import re
 import subprocess
 import sys
 
@@ -128,6 +129,7 @@ def build_wheel():
 
 
 def git_is_clean():
+    libs_re = re.compile(r'^indico/htdocs/(css|sass|js)/lib')
     toplevel = list({x.split('.')[0] for x in find_packages()})
     cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
             ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel,
@@ -136,6 +138,11 @@ def git_is_clean():
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         if rv:
             return False, rv
+    rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/htdocs'],
+                                 stderr=subprocess.STDOUT)
+    garbage = [x for x in rv.splitlines() if not x.startswith('indico/htdocs/ihelp/') and not libs_re.match(x)]
+    if garbage:
+        return False, '\n'.join(garbage)
     return True, None
 
 
