@@ -2,14 +2,14 @@
 {% from 'events/timetable/display/administrative/_contribution.html' import render_contribution %}
 {% from 'events/timetable/display/administrative/_break.html' import render_break %}
 
-{% set previous_date = none %}
+{% set previous_date = [] %}
 <table class="dayList">
     {% set index = 1 %}
 
     {% for item in entries -%}
         {% set date = item.start_dt.astimezone(tz_object).date() %}
 
-        {%- if not previous_date or date != previous_date -%}
+        {%- if not previous_date or date != previous_date[-1] -%}
             <tr></tr>
             <tr>
                 <td class="itemHeaderDate" colspan="{{ 4 if theme_settings.print_mode else 2 }}">
@@ -61,6 +61,6 @@
             {% set index = index + 1 %}
         {% endif %}
 
-        {% set previous_date = date %}
+        {% set __ = previous_date.append(date) %}
     {%- endfor %}
 </table>

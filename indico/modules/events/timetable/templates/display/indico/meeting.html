@@ -4,16 +4,16 @@
 
 {% if entries %}
     <ul class="dayList">
-        {% set previous_date = none %}
+        {% set previous_date = [] %}
         {% for item in entries -%}
             {% set date = item.start_dt.astimezone(tz_object).date() %}
 
-            {% if previous_date and previous_date != date -%}
+            {% if previous_date and previous_date[-1] != date -%}
                     </ul>
                 </li>
             {%- endif -%}
 
-            {%- if not previous_date or date != previous_date -%}
+            {%- if not previous_date or date != previous_date[-1] -%}
                 {% set anchor -%}
                     day-{{ item.start_dt.date().isoformat() }}
                 {%- endset %}
@@ -54,7 +54,7 @@
                                 parent=event, show_location=show_siblings_location) }}
             {%- endif %}
 
-            {% set previous_date = date %}
+            {% set __ = previous_date.append(date) %}
         {%- endfor %}
 
         {% if entries -%}
