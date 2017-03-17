@@ -37,8 +37,8 @@ _notset = object()
 
 
 def assert_is_in_digest_window(room, expected, expected_with_exclude):
-    assert room.is_in_digest_window() == expected
-    assert room.is_in_digest_window(exclude_first_day=True) == expected_with_exclude
+    assert room.is_in_digest_window(room.reservation) == expected
+    assert room.is_in_digest_window(room.reservation, exclude_first_day=True) == expected_with_exclude
     assert Room.find_first(Room.is_in_digest_window()) == (room if expected else None)
     assert Room.find_first(Room.is_in_digest_window(exclude_first_day=True)) == (room if expected_with_exclude
                                                                                  else None)
@@ -782,36 +782,85 @@ def test_check_bookable_hours_no_user(db, dummy_room):
 
 @pytest.mark.parametrize(('current_date', 'notification_window', 'expected', 'expected_with_exclude'),
                          digest_window_cases)
-def test_is_in_digest_window(db, freeze_time, dummy_room,
-                             current_date, notification_window, expected, expected_with_exclude):
+def test_repeating_in_digest_window(db, freeze_time, dummy_room, create_reservation,
+                                    current_date, notification_window, expected, expected_with_exclude):
     freeze_time(current_date)
-    dummy_room.notification_before_days = notification_window
+    dummy_room.reservation = create_reservation()
+    dummy_room.reservation.repeat_frequency = RepeatFrequency.WEEK
+    dummy_room.notification_before_repeating = notification_window
     db.session.flush()
     assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
 
 
 @pytest.mark.parametrize(('current_date', 'notification_window', 'expected', 'expected_with_exclude'),
                          digest_window_cases)
-def test_is_in_digest_window_from_settings(db, freeze_time, dummy_room,
-                                           current_date, notification_window, expected, expected_with_exclude):
+def test_single_in_digest_window(db, freeze_time, dummy_room, create_reservation, current_date,
+                                 notification_window, expected, expected_with_exclude):
     freeze_time(current_date)
+    dummy_room.reservation = create_reservation()
+    dummy_room.reservation.repeat_frequency = RepeatFrequency.NEVER
+    dummy_room.notification_before_single = notification_window
+    db.session.flush()
+    assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
+
+
+@pytest.mark.parametrize(('current_date', 'notification_window', 'expected', 'expected_with_exclude'),
+                         digest_window_cases)
+def test_repeating_in_digest_window_from_settings(db, freeze_time, dummy_room, create_reservation, current_date,
+                                                  notification_window, expected, expected_with_exclude):
+    freeze_time(current_date)
+    dummy_room.reservation = create_reservation()
+    dummy_room.reservation.repeat_frequency = RepeatFrequency.WEEK
     dummy_room.notification_window = None
-    rb_settings.set('notification_before_days', notification_window)
+    rb_settings.set('notification_before_repeating', notification_window)
+    db.session.flush()
+    assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
+
+
+@pytest.mark.parametrize(('current_date', 'notification_window', 'expected', 'expected_with_exclude'),
+                         digest_window_cases)
+def test_single_in_digest_window_from_settings(db, freeze_time, dummy_room, create_reservation,
+                                               current_date, notification_window, expected, expected_with_exclude):
+    freeze_time(current_date)
+    dummy_room.reservation = create_reservation()
+    dummy_room.reservation.repeat_frequency = RepeatFrequency.NEVER
+    dummy_room.notification_window = None
+    rb_settings.set('notification_before_single', notification_window)
     db.session.flush()
     assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
 
 
 @pytest.mark.parametrize(('current_date', 'expected', 'expected_with_exclude'), (
     #                                W: window  T: today  B: both
-    #                                |              OCT              |
-    ('2014-10-30', False, False),  # |-----------------------------TW|
-    ('2014-10-31', True,  False),  # |------------------------------B|
-    ('2014-11-01', True,  True),   # |------------------------------W|T
-    ('2014-11-02', False, False),  # |------------------------------W|-T
+    #                                |              OCT              |          NOV
+    ('2014-10-17', False, False),  # |-----------------TW------------|--------------
+    ('2014-10-18', True,  False),  # |------------------B------------|--------------
+    ('2014-10-19', True,  True),   # |------------------WT-----------|--------------
+    ('2014-11-01', True,  True),   # |------------------W------------|T-------------
 ))
-def test_is_in_digest_window_from_settings_empty(db, freeze_time, dummy_room,
-                                                 current_date, expected, expected_with_exclude):
+def test_repeating_in_digest_window_from_settings_empty(db, freeze_time, dummy_room, create_reservation,
+                                                        current_date, expected, expected_with_exclude):
     freeze_time(current_date)
-    dummy_room.notification_before_days = None
+    dummy_room.reservation = create_reservation()
+    dummy_room.reservation.repeat_frequency = RepeatFrequency.WEEK
+    dummy_room.notification_before_repeating = None
+    db.session.flush()
+    assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
+
+
+@pytest.mark.parametrize(('current_date', 'expected', 'expected_with_exclude'), (
+    #                                W: window  T: today  B: both
+    #                                |              OCT              |          NOV
+    ('2014-10-29', False, False),  # |----------------------------TW-|--------------
+    ('2014-10-30', True,  False),  # |-----------------------------B-|--------------
+    ('2014-10-31', True,  True),   # |-----------------------------WT|--------------
+    ('2014-11-01', True,  True),   # |-----------------------------W-|T-------------
+))
+def test_single_in_digest_window_from_settings_empty(db, freeze_time, dummy_room, create_reservation,
+                                                     current_date, expected, expected_with_exclude):
+    freeze_time(current_date)
+    dummy_room.reservation = create_reservation()
+    dummy_room.reservation.repeat_frequency = RepeatFrequency.NEVER
+    dummy_room.notification_before_repeating = None
     db.session.flush()
     assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)

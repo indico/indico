@@ -32,8 +32,11 @@
     <div id="reservations_need_confirmationCH" class="tip">
         ${ _("Whether bookings must be accepted by person responsible.") }
     </div>
-    <div id="notification_before_daysCH" class="tip">
-        ${ _("Send booking reminders X days before an occurrence (leave empty to use default)")  }
+    <div id="notification_before_repeatingCH" class="tip">
+        ${ _("Send booking reminders X days before repeating occurrence (leave empty to use default)")  }
+    </div>
+    <div id="notification_before_singleCH" class="tip">
+        ${ _("Send booking reminders X days before single occurrence (leave empty to use default)")  }
     </div>
     <div id="notification_for_responsibleCH" class="tip">
         ${ _("Send reminders to the room manager, too.") }
@@ -162,15 +165,14 @@
                             <table>
                                 <%
                                     fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
-                                              'notification_for_assistance', 'notification_before_days',
-                                              'notification_for_responsible','notifications_enabled',
-                                              'booking_limit_days']
-                                    reminder_fields = {'notification_before_days', 'notification_for_responsible',
-                                                       'notifications_enabled'}
+                                              'notification_for_assistance', 'notification_before_repeating',
+                                              'notification_before_single', 'notification_for_responsible',
+                                              'notifications_enabled']
+                                    reminder_fields = {'notification_before_repeating', 'notification_before_single',
+                                                       'notification_for_responsible', 'notifications_enabled'}
                                     field_args = {
-                                        'notification_before_days': dict(style='width: 20px;', maxlength=1),
-                                        'booking_limit_days': dict(style='width: 40px;',
-                                                                   placeholder=rb_settings.get('booking_limit'))
+                                        'notification_before_repeating': dict(style='width: 25px;', maxlength=2),
+                                        'notification_before_single': dict(style='width: 25px;', maxlength=2)
                                     }
                                 %>
                                 % for field in fields:

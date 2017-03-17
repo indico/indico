@@ -289,21 +289,31 @@ class ReservationOccurrence(db.Model, Serializer):
         if self.start_dt.date() < date.today():
             return False
         days_until_occurrence = (self.start_dt.date() - date.today()).days
-        notification_window = (self.reservation.room.notification_before_days
-                               or rb_settings.get('notification_before_days', 1))
+        if self.reservation.is_repeating:
+            notification_window = (self.reservation.room.notification_before_repeating or
+                                   rb_settings.get('notification_before_repeating'))
+        else:
+            notification_window = (self.reservation.room.notification_before_single or
+                                   rb_settings.get('notification_before_single'))
         if exclude_first_day:
             return days_until_occurrence < notification_window
         else:
             return days_until_occurrence <= notification_window
 
     @is_in_notification_window.expression
-    def is_in_notification_window(self, exclude_first_day=False):
+    def is_in_notification_window(cls, exclude_first_day=False):
+        from indico.modules.rb import Reservation
         from indico.modules.rb import settings as rb_settings
+        from indico.modules.rb.models.reservations import RepeatFrequency
         from indico.modules.rb.models.rooms import Room
-        in_the_past = cast(self.start_dt, Date) < cast(func.now(), Date)
-        days_until_occurrence = cast(self.start_dt, Date) - cast(func.now(), Date)
-        notification_window = func.coalesce(Room.notification_before_days,
-                                            rb_settings.get('notification_before_days', 1))
+        in_the_past = cast(cls.start_dt, Date) < cast(func.now(), Date)
+        days_until_occurrence = cast(cls.start_dt, Date) - cast(func.now(), Date)
+        notification_window_single = func.coalesce(Room.notification_before_single,
+                                                   rb_settings.get('notification_before_single'))
+        notification_window_repeating = func.coalesce(Room.notification_before_repeating,
+                                                      rb_settings.get('notification_before_repeating'))
+        notification_window = db.case({RepeatFrequency.NEVER.value: notification_window_single},
+                                      else_=notification_window_repeating, value=Reservation.repeat_frequency)
         if exclude_first_day:
             return (days_until_occurrence < notification_window) & ~in_the_past
         else:

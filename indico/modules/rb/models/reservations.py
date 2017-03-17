@@ -591,7 +591,7 @@ class Reservation(Serializer, db.Model):
 
         # Mark occurrences created within the digest window as notified
         if self.repeat_frequency == RepeatFrequency.WEEK:
-            if self.room.is_in_digest_window():
+            if self.room.is_in_digest_window(self):
                 digest_start = round_up_month(date.today())
             else:
                 digest_start = date.today()
