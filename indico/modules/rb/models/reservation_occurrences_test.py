@@ -410,10 +410,25 @@ def test_overlaps_self(dummy_occurrence, skip_self):
     (2, True,  False),
     (3, True,  True),
 ))
-def test_is_in_notification_window(db, create_occurrence, dummy_room,
-                                   notification_window, expected, expected_with_exclude):
+def test_repeating_in_notification_window(db, create_occurrence, dummy_room,
+                                          notification_window, expected, expected_with_exclude):
     occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=2))
-    dummy_room.notification_before_days = notification_window
+    occurrence.reservation.repeat_frequency = RepeatFrequency.WEEK
+    dummy_room.notification_before_repeating = notification_window
+    db.session.flush()
+    assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
+
+
+@pytest.mark.parametrize(('notification_window', 'expected', 'expected_with_exclude'), (
+        (1, False, False,),
+        (2, True, False),
+        (3, True, True),
+))
+def test_single_in_notification_window(db, create_occurrence, dummy_room, notification_window,
+                                       expected, expected_with_exclude):
+    occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=2))
+    occurrence.reservation.repeat_frequency = RepeatFrequency.NEVER
+    dummy_room.notification_before_single = notification_window
     db.session.flush()
     assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
 
@@ -423,24 +438,55 @@ def test_is_in_notification_window(db, create_occurrence, dummy_room,
     (2, True,  False),
     (3, True,  True),
 ))
-def test_is_in_notification_window_from_settings(db, create_occurrence, dummy_room,
-                                                 notification_window, expected, expected_with_exclude):
+def test_repeating_in_notification_window_from_settings(db, create_occurrence, dummy_room,
+                                                        notification_window, expected, expected_with_exclude):
     from indico.modules.rb import settings as rb_settings
     occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=2))
-    dummy_room.notification_before_days = None
-    rb_settings.set('notification_before_days', notification_window)
+    occurrence.reservation.repeat_frequency = RepeatFrequency.WEEK
+    dummy_room.notification_before_repeating = None
+    rb_settings.set('notification_before_repeating', notification_window)
+    assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
+
+
+@pytest.mark.parametrize(('notification_window', 'expected', 'expected_with_exclude'), (
+    (1, False, False),
+    (2, True,  False),
+    (3, True,  True),
+))
+def test_single_in_notification_window_from_settings(db, create_occurrence, dummy_room,
+                                                     notification_window, expected, expected_with_exclude):
+    from indico.modules.rb import settings as rb_settings
+    occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=2))
+    occurrence.reservation.repeat_frequency = RepeatFrequency.NEVER
+    dummy_room.notification_before_single = None
+    rb_settings.set('notification_before_single', notification_window)
     assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
 
 
 @pytest.mark.parametrize(('days_delta', 'expected', 'expected_with_exclude'), (
-    (0, True, True),
-    (1, True, False),
-    (2, False,  False),
+    (13, True, True),
+    (14, True, False),
+    (15, False,  False),
 ))
-def test_is_in_notification_window_from_settings_empty(db, create_occurrence, dummy_room,
-                                                       days_delta, expected, expected_with_exclude):
+def test_repeating_in_notification_window_from_settings_empty(db, create_occurrence, dummy_room,
+                                                              days_delta, expected, expected_with_exclude):
     occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=days_delta))
-    dummy_room.notification_before_days = None
+    occurrence.reservation.repeat_frequency = RepeatFrequency.WEEK
+    dummy_room.notification_before_repeating = None
+    db.session.flush()
+    assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
+
+
+@pytest.mark.parametrize(('days_delta', 'expected', 'expected_with_exclude'), (
+    (1, True, True),
+    (2, True, False),
+    (3, False,  False),
+))
+def test_single_in_notification_window_from_settings_empty(db, create_occurrence, dummy_room,
+                                                           days_delta, expected, expected_with_exclude):
+    occurrence = create_occurrence(start_dt=datetime.now() + relativedelta(days=days_delta))
+    occurrence.reservation.repeat_frequency = RepeatFrequency.NEVER
+    dummy_room.notification_before_single = None
     db.session.flush()
     assert_is_in_notification_window(occurrence, expected, expected_with_exclude)
 

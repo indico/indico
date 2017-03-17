@@ -28,7 +28,9 @@ class SettingsForm(IndicoForm):
     assistance_emails = EmailListField(_(u'Assistance email addresses (one per line)'))
     notification_hour = IntegerField(_(u'Hour at which booking reminders should be sent'),
                                      [InputRequired(), NumberRange(0, 23)])
-    notification_before_days = IntegerField(_(u'Send booking reminders X days before'),
-                                            [InputRequired(), NumberRange(min=1, max=9)])
+    notification_before_repeating = IntegerField(_(u'Send booking reminders X days before repeating bookings'),
+                                                 [InputRequired(), NumberRange(min=1, max=30)])
+    notification_before_single = IntegerField(_(u'Send booking reminders X days before single bookings'),
+                                              [InputRequired(), NumberRange(min=1, max=30)])
     notifications_enabled = BooleanField(_(u'Reminders enabled'))
     vc_support_emails = EmailListField(_(u'Videoconference support email addresses (one per line)'))
