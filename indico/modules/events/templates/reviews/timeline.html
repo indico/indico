@@ -34,9 +34,6 @@
                             {{ caller('revision-judgment', revision) }}
                         {% endif %}
                     {% endfor %}
-                    {% if not loop.last %}
-                        {{ caller('revision-judgment', revision) }}
-                    {% endif %}
                     {% if loop.last and (can_comment or can_review) %}
                         {% set caller_ = caller %}
                         {% call(block) render_omnibox(proposal, comment_form, review_form) %}
