@@ -557,15 +557,15 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             flexible_days = form.flexible_dates_range.data
             day_start_dt = datetime.combine(form.start_dt.data.date(), time())
             day_end_dt = datetime.combine(form.end_dt.data.date(), time(23, 59))
-            selected_period_days = (day_end_dt - day_start_dt).days
-            booking_limit_days = rb_settings.get('booking_limit')  # TODO: check customizable admin limit as well
-            if selected_period_days > booking_limit_days:
-                flash(_(u'Room booking period limit is {} days'.format(booking_limit_days)), 'error')
-                return self._redirect(url_for('rooms.book'))
-
             selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
+            selected_period_days = (day_end_dt - day_start_dt).days
+            for room in selected_rooms:
+                booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+                if selected_period_days > booking_limit_days:
+                    flash(_(u'Bookings for the room "{}" may not be longer than {} days')
+                          .format(room.name, booking_limit_days), 'error')
+                    return self._redirect(url_for('rooms.book'))
             occurrences, candidates = self._get_all_occurrences(form.room_ids.data, form, flexible_days)
-
             period_form_defaults = FormDefaults(repeat_interval=form.repeat_interval.data,
                                                 repeat_frequency=form.repeat_frequency.data)
             period_form = self._make_select_period_form(period_form_defaults)
