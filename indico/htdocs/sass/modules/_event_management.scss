@@ -619,11 +619,15 @@ th.i-table {
         }
 
         button {
-            right: 120px;
+            right: 110px;
         }
     }
 
-    .truncate {
+    .scroll button {
+        right: 120px;
+    }
+
+   .truncate {
         .text p {
             @include ellipsis;
 

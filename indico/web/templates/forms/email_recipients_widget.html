@@ -17,12 +17,15 @@
 
             var $recipients = $('#form-group-recipients').find('.recipients-box');
             var emails = $recipients.find('.text').text();
-            var count = (emails.match(/@/g) || []).length;
+            var count = {{ field._count() }};
             if (count > 10) {
                 $recipients.addClass('recipients-smaller truncate');
                 var $link = $('<a>', {text: $T.gettext('Show more')});
                 $link.on('click', function() {
                     $recipients.toggleClass('truncate');
+                    if ($recipients[0].scrollHeight > $recipients[0].clientHeight){
+                        $recipients.addClass('scroll');
+                    }
                     $link.text($recipients.hasClass('truncate') ? $T.gettext('Show more') : $T.gettext('Show less'));
                 });
                 $('#form-group-recipients').find('.form-field').append($link);

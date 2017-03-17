@@ -42,12 +42,15 @@ class EmailEventPersonsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         register_link = kwargs.pop('register_link')
+        recipients = kwargs.pop('recipients')
         super(EmailEventPersonsForm, self).__init__(*args, **kwargs)
         from_addresses = ['{} <{}>'.format(session.user.full_name, email)
                           for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
         self.from_address.choices = zip(from_addresses, from_addresses)
         self.body.description = render_placeholder_info('event-persons-email', event=None, person=None,
                                                         register_link=register_link)
+        self.recipients.text_value = ', '.join(sorted(x.email for x in recipients))
+        self.recipients.count = len(recipients)
 
     def is_submitted(self):
         return super(EmailEventPersonsForm, self).is_submitted() and 'submitted' in request.form
