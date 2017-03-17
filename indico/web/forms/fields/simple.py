@@ -148,7 +148,11 @@ class IndicoStaticTextField(Field):
 
 
 class IndicoEmailRecipientsField(IndicoStaticTextField):
-    widget = JinjaWidget('forms/email_recipients_widget.html')
+    count = None
+    widget = JinjaWidget('forms/email_recipients_widget.html', single_kwargs=True)
+
+    def _count(self):
+        return self.count
 
 
 class IndicoTagListField(HiddenFieldList):
