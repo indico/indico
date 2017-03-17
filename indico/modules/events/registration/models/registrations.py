@@ -507,7 +507,7 @@ class RegistrationData(StoredFileMixin, db.Model):
     #: The submitted data for the field
     data = db.Column(
         JSONB,
-        default=JSONB.NULL,
+        default=lambda: None,
         nullable=False
     )
 
