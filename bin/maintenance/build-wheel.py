@@ -111,6 +111,14 @@ def build_docs(html, pdf, force):
     run(['make', '-C', 'doc/guides', 'clean'], 'cleaning up')
 
 
+def clean_build_dirs():
+    info('cleaning build dirs')
+    try:
+        subprocess.check_output([sys.executable, 'setup.py', 'clean', '-a'], stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        fail('clean failed', verbose_msg=exc.output)
+
+
 def build_wheel():
     info('building wheel')
     try:
@@ -151,7 +159,9 @@ def main(deps, html_docs, pdf_docs, force_docs):
         fail('cannot force doc rebuild with docs disabled')
     else:
         warn('building docs disabled')
+    clean_build_dirs()
     build_wheel()
+    clean_build_dirs()
 
 
 if __name__ == '__main__':
