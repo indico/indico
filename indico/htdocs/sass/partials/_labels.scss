@@ -106,6 +106,16 @@ $i-label-color: $light-black;
         }
     }
 
+    &[class*='icon-'] {
+        &::before {
+            font-size: 1.2em;
+        }
+
+        &:not(:empty)::before {
+            margin-right: 0.5em;
+        }
+    }
+
     /* Handle on the left of the i-box indicating it can be moved. */
     > .handle:first-child {
         @include icon-before('icon-handle');
