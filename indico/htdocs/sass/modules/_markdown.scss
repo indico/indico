@@ -148,6 +148,8 @@ $display-preview-bg-color: white;
     height: 2em;
     margin: 0;
     background-color: $light-gray;
+    display: flex;
+    align-items: center;
 }
 
 .wmd-spacer {

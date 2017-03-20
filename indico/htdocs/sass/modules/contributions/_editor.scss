@@ -42,9 +42,7 @@ $editor-preview-bg-color: $light-gray;
 
 .wmd-button-row
 {
-    @include border-all();
     max-width: 800px;
-    border-bottom: none;
     position: relative;
     padding: .5em;
     height: 2em;
