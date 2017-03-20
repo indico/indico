@@ -148,6 +148,12 @@ class Survey(db.Model):
         nullable=False,
         default=[]
     )
+    #: Whether answers can be saved without submitting the survey
+    partial_completion = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     #: The list of submissions
     submissions = db.relationship(
