@@ -22,8 +22,9 @@
 {% endmacro %}
 
 {% if not g.static_site %}
-    {% set is_form_moderated = regforms|length == 1 and regforms[0].moderation_enabled %}
-    {% set is_number_published = regforms|length == 1 and regforms[0].publish_number_of_registrations %}
+    {% set single_regform = regforms|first if regforms|length == 1 else none %}
+    {% set is_form_moderated = single_regform.moderation_enabled if single_regform %}
+    {% set is_number_published = single_regform.publish_registration_count if single_regform %}
     <div class="infoline announcement">
         <span class="icon icon-ticket"></span>
         <div class="text">
@@ -36,14 +37,26 @@
             </div>
             {% if user_registrations %}
                 {% if user_registrations < regforms|length %}
-                    <div>{% trans %} You have registered for this event, but there are more registration forms available.{% endtrans %}</div>
+                    <div>
+                        {% trans %}
+                            You have registered for this event, but there are more registration forms available.
+                        {% endtrans %}
+                    </div>
                 {% else %}
-                    <div>{% trans %} You have registered for this event.{% endtrans %}</div>
+                    <div>{% trans %}You have registered for this event.{% endtrans %}</div>
                 {%  endif %}
                 <div class="toolbar">
+                    {% if is_number_published %}
+                        <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                            {{- single_regform.active_registrations|length }}
+                            {%- if single_regform.registration_limit %}
+                                / {{ single_regform.registration_limit }}
+                            {%- endif -%}
+                        </span>
+                    {%  endif %}
                     {{ _render_ticket_dropdown() }}
                     <a class="i-button next highlight"
-                       href="{{ url_for('event_registration.display_regform', regforms[0]) if regforms|length == 1 else
+                       href="{{ url_for('event_registration.display_regform', single_regform) if single_regform else
                                 url_for('event_registration.display_regform_list', event) }}">
                         {% trans %}See details{% endtrans %}
                     </a>
@@ -58,10 +71,11 @@
                 </div>
                 <div class="toolbar">
                     {% if is_number_published %}
-                        <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">{{ regforms[0].active_registrations|length }}
-                            {% if regforms[0].registration_limit %}
-                                / {{ regforms[0].registration_limit }}
-                            {% endif %}
+                        <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                            {{- single_regform.active_registrations|length }}
+                            {%- if single_regform.registration_limit %}
+                                / {{ single_regform.registration_limit }}
+                            {%- endif -%}
                         </span>
                     {%  endif %}
                     <a href="{{ url_for('event_registration.display_regform_list', event) }}"

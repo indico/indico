@@ -92,7 +92,8 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
             return redirect(url_for('.display_regform', regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self._conf,
                                                event=self.event_new, regforms=regforms,
-                                               registration_counts=get_registration_counts_dict(self.event_new, True))
+                                               registration_counts=get_registration_counts_dict(self.event_new,
+                                                                                                publish=True))
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):

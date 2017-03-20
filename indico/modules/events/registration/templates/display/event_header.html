@@ -20,11 +20,12 @@
                         </div>
                         {% if not g.static_site %}
                             <div class="event-service-toolbar toolbar right">
-                                {% if regform.publish_number_of_registrations %}
-                                    <span class="i-button i-button-small icon-user label" title="{% trans %}Total registrations{% endtrans %}">{{ regform.active_registrations|length }}
-                                        {% if regform.registration_limit %}
+                                {% if regform.publish_registration_count %}
+                                    <span class="i-button i-button-small icon-user label" title="{% trans %}Total registrations{% endtrans %}">
+                                        {{- regform.active_registrations|length }}
+                                        {%- if regform.registration_limit %}
                                             / {{ regform.registration_limit }}
-                                        {% endif %}
+                                        {%- endif -%}
                                     </span>
                                 {% endif %}
                                 <div class="group">

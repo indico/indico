@@ -136,8 +136,8 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=False
     )
-    #: Whether number of registrations should be displayed
-    publish_number_of_registrations = db.Column(
+    #: Whether to display the number of registrations
+    publish_registration_count = db.Column(
         db.Boolean,
         nullable=False,
         default=False

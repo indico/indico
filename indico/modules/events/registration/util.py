@@ -68,23 +68,6 @@ def get_title_uuid(regform, title):
     return {uuid: 1} if uuid in valid_choices else None
 
 
-def user_registered_in_event(user, event):
-    """
-    Check whether there is a `Registration` entry for a user in any
-    form tied to a particular event.
-
-    :param user: the `User` object
-    :param event: the event in question
-    """
-    return int(Registration
-               .find(Registration.user == user,
-                     RegistrationForm.event_id == int(event.id),
-                     ~RegistrationForm.is_deleted,
-                     Registration.is_active)
-               .join(Registration.registration_form)
-               .count())
-
-
 def get_event_section_data(regform, management=False, registration=None):
     data = []
     if not registration:
@@ -458,34 +441,32 @@ def generate_ticket_qr_code(registration):
 
 
 def get_open_or_registered_regforms(event, user):
-    """Get registration forms of an event which are open or user has already registered to.
+    """Get registration forms which are open or user is registered for.
 
     :param event: the `Event` to get registrations for
     :param user: A `User`
     """
     if not event.has_feature('registration'):
         return []
-
     return (RegistrationForm.query.with_parent(event)
-            .filter((RegistrationForm.is_open) |
-                    (RegistrationForm.registrations.any((Registration.user == user) & (~Registration.is_deleted))))
+            .filter(db.or_(RegistrationForm.is_open,
+                           RegistrationForm.registrations.any((Registration.user == user) & ~Registration.is_deleted)))
             .order_by(db.func.lower(RegistrationForm.title))
             .all())
 
 
 def get_registration_counts_dict(event, publish=False):
-    """Get dictionary with number of registrations for each registration form of the event
+    """Get dictionary with number of registrations for each form of the event.
 
     :param event: the `Event` to get number of registration for
-    :param publish: include only registrations of forms that allow publishing the number
+    :param publish: include only forms that allow number publishing
     """
-    query = event.registrations.with_entities(Registration.registration_form_id, db.func.count()).\
-        filter(Registration.is_active)
-
+    query = (event.registrations
+             .with_entities(Registration.registration_form_id, db.func.count())
+             .filter(Registration.is_active))
     if publish:
-        query = query.join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id).\
-            filter(RegistrationForm.publish_number_of_registrations)
-
+        query = (query
+                 .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
+                 .filter(RegistrationForm.publish_registration_count))
     query = query.group_by(Registration.registration_form_id)
-
     return dict(query)
