@@ -57,19 +57,20 @@ $i-label-color: $light-black;
     &.accept {
         @include border-all(darken($green, $light-color-variation));
         background: $green;
-        color: #FDFDFD !important;
+        color: #fdfdfd !important;
     }
 
     &.danger {
         @include border-all(darken($red, $light-color-variation));
         background: $red;
-        color: #FDFDFD !important;
+        color: #fdfdfd !important;
     }
 
     &.highlight {
         @include border-all(darken($blue, $light-color-variation));
         background: $blue;
-        color: #FDFDFD !important;
+        color: #fdfdfd !important;
+
         &.striped {
             background-color: lighten($blue, $light-color-variation);
             background: repeating-linear-gradient(
@@ -87,10 +88,12 @@ $i-label-color: $light-black;
         background: lighten($yellow, 8 * $light-color-variation);
         color: darken($yellow, $light-color-variation) !important;
     }
+
     &.disabled {
         @include border-all(darken($pastel-gray, $light-color-variation));
         background: $pastel-gray;
         color: $light-black;
+
         &.striped {
             background-color: lighten($pastel-gray, $light-color-variation);
             background: repeating-linear-gradient(
@@ -116,10 +119,10 @@ $i-label-color: $light-black;
     display: inline-block;
 
     .i-label {
-        @include border-radius(0);
+        @include border-radius(none);
         margin: 0;
         float: left;
-        border-right-width: 0px;
+        border-right-width: 0;
 
         &:first-child {
             @include border-bottom-left-radius();
@@ -136,10 +139,10 @@ $i-label-color: $light-black;
             border-right-width: 1px;
 
             + .i-label {
-                border-left: 0;
+                border-left: none;
             }
 
-            > a:before {
+            > a::before {
                 color: white;
             }
         }
