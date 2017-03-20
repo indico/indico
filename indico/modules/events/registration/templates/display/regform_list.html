@@ -42,11 +42,12 @@
                     <td>{{ regform.end_dt | format_datetime(timezone=event.display_tzinfo) if regform.end_dt else _('No deadline') }}</td>
                     {% if registration_counts %}
                         <td>
-                        {%- if regform.publish_number_of_registrations %}
-                            <span class="icon-user"> {{ registration_counts.get(regform.id, 0) }}
-                                {% if regform.registration_limit %}
+                        {%- if regform.publish_registration_count %}
+                            <span class="icon-user">
+                                {{- registration_counts.get(regform.id, 0) -}}
+                                {%- if regform.registration_limit %}
                                     / {{ regform.registration_limit }}
-                                {% endif %}
+                                {%- endif -%}
                             </span>
                         {% endif %}
                         </td>
