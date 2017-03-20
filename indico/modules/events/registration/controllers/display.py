@@ -33,7 +33,8 @@ from indico.modules.events.registration.models.invitations import RegistrationIn
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     create_registration, check_registration_email, get_title_uuid)
+                                                     create_registration, check_registration_email, get_title_uuid,
+                                                     get_registration_counts_dict)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
@@ -86,17 +87,12 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         else:
             criteria = RegistrationForm.is_scheduled
         regforms = regforms.filter(criteria).order_by(db.func.lower(RegistrationForm.title)).all()
-        registration_counts = dict(self.event_new.registrations
-                                   .with_entities(Registration.registration_form_id, db.func.count())
-                                   .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
-                                   .filter(Registration.is_active)
-                                   .filter(RegistrationForm.publish_number_of_registrations)
-                                   .group_by(Registration.registration_form_id))
 
         if len(regforms) == 1:
             return redirect(url_for('.display_regform', regforms[0]))
-        return self.view_class.render_template('display/regform_list.html', self._conf, event=self.event_new,
-                                               regforms=regforms, registration_counts=registration_counts)
+        return self.view_class.render_template('display/regform_list.html', self._conf,
+                                               event=self.event_new, regforms=regforms,
+                                               registration_counts=get_registration_counts_dict(self.event_new, True))
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):
