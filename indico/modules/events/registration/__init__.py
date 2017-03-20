@@ -71,6 +71,8 @@ def _inject_regform_announcement(event, **kwargs):
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event,
                                user_registrations=user_registrations,
                                registrations_with_tickets=get_registrations_with_tickets(session.user, event))
+
+
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
     from indico.modules.events.registration.util import get_open_or_registered_regforms

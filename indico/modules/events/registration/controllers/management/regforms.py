@@ -36,8 +36,8 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.stats import OverviewStats, AccommodationStats
-from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields, \
-    get_registration_counts_dict
+from indico.modules.events.registration.util import (get_event_section_data, create_personal_data_fields,
+                                                     get_registration_counts_dict)
 from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
                                                       WPManageParticipants)
 from indico.modules.events.util import update_object_principals

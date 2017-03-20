@@ -80,9 +80,9 @@ class RegistrationFormForm(IndicoForm):
     publish_registrations_enabled = BooleanField(_('Publish registrations'), widget=SwitchWidget(),
                                                  description=_("Registrations from this form will be displayed in the "
                                                                "event page"))
-    publish_number_of_registrations = BooleanField(_("Publish number of registrations"), widget=SwitchWidget(),
-                                                   description=_("Number of registered participants will be displayed"
-                                                                 " in the event page"))
+    publish_registration_count = BooleanField(_("Publish number of registrations"), widget=SwitchWidget(),
+                                              description=_("Number of registered participants will be displayed in "
+                                                            "the event page"))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_("Check-in status will be shown publicly on the event page"))
     base_price = DecimalField(_('Registration fee'), [NumberRange(min=0), Optional(), _check_if_payment_required],
