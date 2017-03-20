@@ -118,7 +118,8 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             back_button_endpoint = None
         return self.view_class.render_template('display/survey_questionnaire.html', self._conf, form=form,
                                                event=self.event_new, survey=self.survey,
-                                               back_button_endpoint=back_button_endpoint)
+                                               back_button_endpoint=back_button_endpoint,
+                                               partial_completion=self.survey.partial_completion)
 
     def _make_form(self):
         survey_form_class = make_survey_form(self.survey)
@@ -141,6 +142,11 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
 
 
 class RHSaveSurveyAnswers(RHSubmitSurveyBase):
+    def _checkProtection(self):
+        RHSubmitSurveyBase._checkProtection(self)
+        if not self.survey.partial_completion:
+            raise Forbidden
+
     def _process(self):
         pending_answers = {k: v for k, v in request.form.iterlists() if k.startswith('question_')}
         if not self.submission:
