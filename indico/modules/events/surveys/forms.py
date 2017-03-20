@@ -51,6 +51,8 @@ class SurveyForm(IndicoForm):
                                     description=_("Maximum number of submissions accepted"))
     private = BooleanField(_("Private survey"), widget=SwitchWidget(),
                            description=_("Only selected people can answer the survey."))
+    partial_completion = BooleanField(_('Partial completion'), widget=SwitchWidget(),
+                                      description=_('Allow to save answers without submitting the survey.'))
     notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
                                          description=_('Send email notifications for specific events related to the '
                                                        'survey.'))
