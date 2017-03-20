@@ -3,7 +3,7 @@
 {% block html %}
     <div class="recipients-box left" {% if field.errors %} data-error="{{ _render_errors(field.errors) }}"{% endif %}>
         <div class="text">
-            {{- field._value()|markdown -}}
+            {{- field.text_value|markdown -}}
         </div>
         <button class="i-button icon-clipboard js-copy-to-clipboard" title="{% trans %}Copy emails to clipboard{% endtrans %}"
                 data-clipboard-target="#form-group-recipients p"></button>
@@ -17,7 +17,7 @@
 
             var $recipients = $('#form-group-recipients').find('.recipients-box');
             var emails = $recipients.find('.text').text();
-            var count = {{ field._count() }};
+            var count = {{ field.count }};
             if (count > 10) {
                 $recipients.addClass('recipients-smaller truncate');
                 var $link = $('<a>', {text: $T.gettext('Show more')});
