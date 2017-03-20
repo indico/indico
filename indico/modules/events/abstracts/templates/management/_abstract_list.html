@@ -29,6 +29,27 @@
     </td>
 {%- endmacro %}
 
+{% macro _render_abstract_state(abstract) %}
+    <div class="i-tag outline semantic-text state-badge {{ abstract.public_state.css_class }}">
+        {% if abstract.public_state.name == 'under_review' and abstract.can_judge(session.user) %}
+            {% trans count=abstract.reviews|length -%}
+                {{- count }} review
+            {%- pluralize -%}
+                {{- count }} reviews
+            {%- endtrans %}
+            (
+                {%- trans count=abstract.reviewed_for_tracks|length -%}
+                    {{- count }} track
+                {%- pluralize -%}
+                    {{- count }} tracks
+                {%- endtrans -%}
+            )
+        {% else %}
+            {{- abstract.public_state.title -}}
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% macro render_abstract_list(abstracts, dynamic_columns, static_columns, total_abstracts, context_track=none, reviewed_abstracts=none) %}
     {% if abstracts %}
         <form method="POST">
@@ -96,8 +117,8 @@
                                 </td>
                                 {% for item in static_columns %}
                                     {% if item.id == 'state' %}
-                                        <td class="i-table" data-searchable="{{ abstract.state.title | lower }}">
-                                            {{- abstract.state.title -}}
+                                        <td class="i-table" data-searchable="{{ abstract.public_state.title | lower }}">
+                                            {{ _render_abstract_state(abstract) }}
                                             {% if context_track is not none and abstract.state.name == 'accepted' and abstract.accepted_track != context_track  %}
                                                 <span class="icon-warning"></span>
                                             {% endif %}
