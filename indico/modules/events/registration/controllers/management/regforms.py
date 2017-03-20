@@ -36,7 +36,8 @@ from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.stats import OverviewStats, AccommodationStats
-from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
+from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields, \
+    get_registration_counts_dict
 from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
                                                       WPManageParticipants)
 from indico.modules.events.util import update_object_principals
@@ -52,13 +53,9 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
 
     def _process(self):
         regforms = sorted(self.event_new.registration_forms, key=lambda f: f.title.lower())
-        registration_counts = dict(self.event_new.registrations
-                                   .with_entities(Registration.registration_form_id, db.func.count())
-                                   .filter(Registration.is_active)
-                                   .group_by(Registration.registration_form_id))
         return WPManageRegistration.render_template('management/regform_list.html', self._conf,
                                                     event=self.event_new, regforms=regforms,
-                                                    registration_counts=registration_counts)
+                                                    registration_counts=get_registration_counts_dict(self.event_new))
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
