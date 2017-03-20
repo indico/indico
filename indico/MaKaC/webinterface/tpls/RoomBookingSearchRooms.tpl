@@ -79,7 +79,7 @@
 <select name="roomName" id="roomName">
     % for room in rooms:
         <option value="${ url_for('rooms.roomBooking-roomDetails', room) }" class="${ room.kind }">
-            ${ '{}: &nbsp; {}'.format(room.location_name, room.full_name) }
+            ${ u'{}: &nbsp; {}'.format(room.location_name, room.full_name) }
         </option>
     % endfor
 </select>
