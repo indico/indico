@@ -24,11 +24,11 @@ $i-label-color: $light-black;
     @include border-radius();
     @include border-all($gray);
     @include box-sizing(border-box);
-    display: inline-block;
+    display: inline-flex;
     color: $i-label-color !important;
     outline: none;
-    text-align: center;
-    vertical-align: middle;
+    justify-content: center;
+    align-items: center;
     line-height: 1em;
     padding: $i-label-vertical-padding $i-label-horizontal-padding;
 }
