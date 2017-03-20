@@ -16,7 +16,7 @@
                 <th>{% trans %}Opens{% endtrans %}</th>
                 <th>{% trans %}Closes{% endtrans %}</th>
                 {% if registration_counts %}
-                    <th>{% trans %}Registered{% endtrans %}</th>
+                    <th></th>
                 {% endif %}
                 <th></th>
             </tr>
@@ -44,9 +44,9 @@
                         <td>
                         {%- if regform.publish_number_of_registrations %}
                             <span class="icon-user"> {{ registration_counts.get(regform.id, 0) }}
-                                {%- if regform.registration_limit %}
+                                {% if regform.registration_limit %}
                                     / {{ regform.registration_limit }}
-                                {%- endif -%}
+                                {% endif %}
                             </span>
                         {% endif %}
                         </td>

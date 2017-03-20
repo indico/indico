@@ -61,29 +61,20 @@ def _extend_event_management_menu(sender, event, **kwargs):
                            section=registration_section)
 
 
-def _get_open_regforms(event):
-    from indico.modules.events.registration.models.forms import RegistrationForm
-    if not event.has_feature('registration'):
-        return []
-    return (RegistrationForm.query.with_parent(event)
-            .filter(RegistrationForm.is_open)
-            .order_by(db.func.lower(RegistrationForm.title))
-            .all())
-
-
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
-    from indico.modules.events.registration.util import user_registered_in_event, get_registrations_with_tickets
-    regforms = _get_open_regforms(event)
+    from indico.modules.events.registration.util import get_registrations_with_tickets, get_open_or_registered_regforms
+    regforms = get_open_or_registered_regforms(event, session.user)
+    user_registrations = sum(session.user in (registartion.user for registartion in regform.registrations
+                                              if registartion.is_deleted is False) for regform in regforms)
     if regforms:
         return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event,
-                               user_has_registered=(session.user and user_registered_in_event(session.user, event)),
+                               user_registrations=user_registrations,
                                registrations_with_tickets=get_registrations_with_tickets(session.user, event))
-
-
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    regforms = sorted((rf for rf in event.registration_forms if rf.is_open), key=lambda f: f.title.lower())
+    from indico.modules.events.registration.util import get_open_or_registered_regforms
+    regforms = sorted(get_open_or_registered_regforms(event, session.user), key=lambda f: f.title.lower())
     # A participant could appear more than once in the list in case he register to multiple registration form.
     # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
     return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)

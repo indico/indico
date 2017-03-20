@@ -3,12 +3,15 @@
         <td class="leftCol">{% trans %}Registration{% endtrans %}</td>
         <td>
             {% for regform in regforms %}
+                {% set registration = session.user and regform.get_registration(user=session.user) %}
                 <div class="event-service-row">
                     <div class="event-service-row-collapsed clearfix">
                         <div class="event-service-info left">
                             <i class="icon-ticket"></i>
                             <span class="event-service-title">
-                                {% if loop.length == 1%}
+                                {% if loop.length == 1 and registration %}
+                                    <em>{% trans %}You have registered for this event.{% endtrans %}</em>
+                                {% elif loop.length == 1 and regform.open %}
                                     <em>{% trans %}This event is open to new participants.{% endtrans %}</em>
                                 {% else %}
                                     {{ regform.title }}
@@ -17,8 +20,14 @@
                         </div>
                         {% if not g.static_site %}
                             <div class="event-service-toolbar toolbar right">
+                                {% if regform.publish_number_of_registrations %}
+                                    <span class="i-button i-button-small icon-user label" title="{% trans %}Total registrations{% endtrans %}">{{ regform.active_registrations|length }}
+                                        {% if regform.registration_limit %}
+                                            / {{ regform.registration_limit }}
+                                        {% endif %}
+                                    </span>
+                                {% endif %}
                                 <div class="group">
-                                   {% set registration = session.user and regform.get_registration(user=session.user) %}
                                    {% if registration  %}
                                         <a class="i-button i-button-small icon-edit highlight"
                                             href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
