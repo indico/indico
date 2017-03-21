@@ -39,16 +39,6 @@ def info(message, *args):
     click.echo(click.style(message.format(*args), fg='green', bold=True), err=True)
 
 
-def get_highest_mtime(path):
-    maxt = 0
-    for dirpath, _, fnames in os.walk(path):
-        for fname in fnames:
-            mtime = os.path.getmtime(os.path.join(dirpath, fname))
-            if mtime > maxt:
-                maxt = mtime
-    return maxt
-
-
 def run(cmd, title, shell=False):
     if shell:
         cmd = ' '.join(cmd)
@@ -72,44 +62,6 @@ def setup_deps():
         subprocess.check_output(['fab', 'setup_deps:system_node={}'.format(system_node)], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('setup_deps failed', verbose_msg=exc.output)
-
-
-def build_docs(html, pdf, force):
-    target_dir = os.path.join('indico', 'htdocs', 'ihelp')
-    has_html_docs = bool(set(os.listdir('indico/htdocs/ihelp/html/')) - {'.keep'})
-    has_pdf_docs = bool(set(os.listdir('indico/htdocs/ihelp/pdf/')) - {'.keep'})
-
-    info('building docs')
-    if ((not html or has_html_docs) and (not pdf or has_pdf_docs) and
-            get_highest_mtime(target_dir) > get_highest_mtime('doc')):
-        info('docs are up to date')
-        if force:
-            warn('force-rebuild enabled, building them anyway')
-        else:
-            return
-
-    if pdf:
-        try:
-            subprocess.check_output(['pdflatex', '--version'], stderr=subprocess.STDOUT)
-        except OSError as exc:
-            fail('pdflatex not found {}', exc)
-
-    if html:
-        info('building html docs')
-        run(['make', '-C', 'doc/guides', 'html'], 'building html docs')
-    else:
-        warn('building html docs disabled')
-    if pdf:
-        info('building pdf docs (takes some time)')
-        run(['make', '-C', 'doc/guides', 'latexpdf'], 'building pdf docs')
-    else:
-        warn('building pdf docs disabled')
-    run(['rm', '-rf', os.path.join(target_dir, 'html', '*'), os.path.join(target_dir, 'pdf', '*')], 'rm', shell=True)
-    if html:
-        run(['mv', 'doc/guides/build/html/*', os.path.join(target_dir, 'html', '')], 'moving html docs', shell=True)
-    if pdf:
-        run(['mv', 'doc/guides/build/latex/*.pdf', os.path.join(target_dir, 'pdf', '')], 'moving pdf docs', shell=True)
-    run(['make', '-C', 'doc/guides', 'clean'], 'cleaning up')
 
 
 def clean_build_dirs():
@@ -140,7 +92,7 @@ def git_is_clean():
             return False, rv
     rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/htdocs'],
                                  stderr=subprocess.STDOUT)
-    garbage = [x for x in rv.splitlines() if not x.startswith('indico/htdocs/ihelp/') and not libs_re.match(x)]
+    garbage = [x for x in rv.splitlines() if not libs_re.match(x)]
     if garbage:
         return False, '\n'.join(garbage)
     return True, None
@@ -148,10 +100,7 @@ def git_is_clean():
 
 @click.command()
 @click.option('--no-deps', 'deps', is_flag=True, flag_value=False, default=True, help='skip setup_deps')
-@click.option('--no-html-docs', 'html_docs', is_flag=True, flag_value=False, default=True, help='skip html docs')
-@click.option('--no-pdf-docs', 'pdf_docs', is_flag=True, flag_value=False, default=True, help='skip pdf docs')
-@click.option('--force-docs', is_flag=True, help='force rebuilding docs')
-def main(deps, html_docs, pdf_docs, force_docs):
+def main(deps):
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     clean, output = git_is_clean()
     if not clean:
@@ -160,12 +109,6 @@ def main(deps, html_docs, pdf_docs, force_docs):
         setup_deps()
     else:
         warn('building deps disabled')
-    if html_docs or pdf_docs:
-        build_docs(html_docs, pdf_docs, force_docs)
-    elif force_docs:
-        fail('cannot force doc rebuild with docs disabled')
-    else:
-        warn('building docs disabled')
     clean_build_dirs()
     build_wheel()
     clean_build_dirs()

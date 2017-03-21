@@ -1734,49 +1734,6 @@ div.fitInnerTimetableDialog {
     font-size:14px;
 }
 
-.indicoHelp {
-    width: 500px;
-    margin-left: 20px;
-    margin-bottom: 50px;
-    font-family: Verdana;
-}
-
-.indicoHelp, .indicoHelp em, .indicoHelp p {
-    color: #222;
-    line-height: 160%;
-}
-
-.indicoHelp ul {
-    padding-left: 25px;
-}
-
-.indicoHelp li {
-    margin: 4px 0;
-}
-
-.indicoHelp .title {
-    font-size: 1.4em;
-    color: #777;
-    font-family: 'Times New Roman';
-    padding-bottom: 5px;
-    padding-top: 20px;
-}
-
-.indicoHelp .icons {
-    float: right;
-    padding-right: 5px;
-    vertical-align: top;
-}
-
-.indicoHelp .content {
-    margin-left: 20px;
-}
-
-.indicoHelp .item {
-    padding: 4px 0;
-    border-bottom: 1px dotted #AAA;
-}
-
 .successfulAction {
     background-color: #DDFFDD;
     padding: 10px;

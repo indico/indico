@@ -34,17 +34,6 @@ after_process = _signals.signal('after-process', """
 Called after an Indico request has been processed.
 """)
 
-indico_help = _signals.signal('indico-help', """
-Expected to return a dict containing entries for the *Indico help* page::
-
-    entries = {
-        _('Section title'): {
-            _('Item title'): ('ihelp/.../item.html', 'ihelp/.../item.pdf'),
-            _('Item title 2'): ('ihelp/.../item2.html', 'ihelp/.../item2.pdf')
-        }
-    }
-""")
-
 indico_menu = _signals.signal('indico-menu', """
 Expected to return `HeaderMenuEntry` objects which are then added to the
 Indico head menu.

@@ -16,9 +16,6 @@
             ${protectionDisclaimerRestricted}
         % endif
     </div>
-    <div class="protectionWidgetSection">
-        <div><a href="http://indico.cern.ch/ihelp/html/UserGuide/Protection.html" target="blank">${ _("Learn more about Indico and Security") }</a></div>
-    </div>
 </div>
 
 <a id="protectionLink" class="${'icon-shield' if protection[0] != 'Public' else 'icon-earth'} arrow i-button protection-${protection[0].lower()}">${protection[1]}</a>

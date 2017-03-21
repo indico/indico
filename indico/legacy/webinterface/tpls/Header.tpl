@@ -74,7 +74,6 @@ ${ template_hook('global-announcement') }
         <ul class="dropdown">
             <li>
                 <a style="color: #777; cursor: initial;"
-                   ## href="${ url_for('misc.help') }"
                    title="We are working on updating the documentation. Stay tuned!">
                     ${ _("Indico help") }
                 </a>
