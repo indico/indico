@@ -16,6 +16,6 @@
 
 from indico.util.mimetypes import register_custom_mimetypes
 
-__version__ = '1.9.10.dev0'
+__version__ = '1.9.10.dev1'
 
 register_custom_mimetypes()
