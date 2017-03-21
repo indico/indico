@@ -114,10 +114,10 @@ type ("RoomBookingCalendarBar", [],
                 this.owner = barInfo.forReservation.bookedForName;
                 this.url = barInfo.forReservation.bookingUrl;
                 this.inDB = barInfo.forReservation.id !== null;
-            } else if (barInfo.type == 0 && barInfo.blocking_data == 'blocking') {
+            } else if (barInfo.type == 0 && barInfo.blocking_data.type == 'blocking') {
                 this.url = barInfo.blocking_data.blocking_url;
                 this.inDB = true
-            } else if (barInfo.type == 0 && barInfo.blocking_data == 'nonbookable') {
+            } else if (barInfo.type == 0 && barInfo.blocking_data.type == 'nonbookable') {
                 this.inDB = false
             } else {
                 this.inDB = false;

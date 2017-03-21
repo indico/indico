@@ -349,9 +349,7 @@ class Bar(Serializer):
 
     @property
     def blocking_data(self):
-        if not self.blocking:
-            return None
-        elif self.blocking:
+        if self.blocking:
             return {
                 'id': self.blocking.id,
                 'creator': self.blocking.created_by_user.full_name,
