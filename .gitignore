@@ -1,8 +1,7 @@
 # temporary/bytecode files
 *~
 .*.swp
-*.pyc
-*.pyo
+*.py[co]
 __pycache__/
 
 # configs
@@ -10,39 +9,21 @@ __pycache__/
 
 # python packaging
 /dist
-setuptools-*.zip
+/build
 *.egg-info
-*.egg
 
-# assets and generated stuff
-build/
-indico/htdocs/ihelp/html/
-indico/htdocs/ihelp/pdf/
-!indico/htdocs/ihelp/help/.*
-!indico/htdocs/ihelp/pdf/.*
-indico/htdocs/static/assets/
-indico/htdocs/sass/.sass-cache/
-.webassets-cache
-.sass-cache
-*.min.css
-*.min.js
-jquery_migrate_silencer_*.js
-indico/htdocs/js/indico/i18n/*.js
+# generated stuff
 *.mo
 
 # fetched external dependencies
 indico/htdocs/*/lib/
-node_env
 node_modules
 
 # IDE files
-.idea
+.idea/
 *.sublime-*
 
 # testing
-.noseids
-indico/tests/report/*.txt
-test.txt
 .coverage
 coverage.xml
 htmlcov/
