@@ -15,12 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.legacy.webinterface.rh import helpDisplay, lang, resetTimezone, contact, errors
+from indico.legacy.webinterface.rh import lang, resetTimezone, contact, errors
 
 
 misc = IndicoBlueprint('misc', __name__)
 
-misc.add_url_rule('/help', 'help', helpDisplay.RHHelp)
 misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=('POST',))
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
 misc.add_url_rule('/contact', 'contact', contact.RHContact)
