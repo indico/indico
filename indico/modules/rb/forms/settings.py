@@ -32,3 +32,4 @@ class SettingsForm(IndicoForm):
                                             [InputRequired(), NumberRange(min=1, max=9)])
     notifications_enabled = BooleanField(_(u'Reminders enabled'))
     vc_support_emails = EmailListField(_(u'Videoconference support email addresses (one per line)'))
+    booking_limit = IntegerField(_(u'Maximum length of booking (days)'), [InputRequired(), NumberRange(min=1)])
