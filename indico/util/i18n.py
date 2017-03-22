@@ -31,6 +31,7 @@ from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
 
+from indico.util.string import trim_inner_whitespace
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
 RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)
@@ -95,6 +96,14 @@ def smart_func(func_name, plugin_name=None, force_unicode=False):
         Returns either a translated string or a lazy-translatable object,
         depending on whether there is a session language or not (respectively)
         """
+
+        # TODO: Remove this once there's proper support in upstream Jinja
+        # https://github.com/pallets/jinja/pull/683
+        if func_name == 'ungettext':
+            args = (trim_inner_whitespace(args[0]), trim_inner_whitespace(args[1])) + args[2:]
+        else:
+            args = tuple(trim_inner_whitespace(arg) for arg in args)
+
         if has_request_context() or func_name != 'ugettext':
             # straight translation
             return gettext_unicode(*args, func_name=func_name, plugin_name=plugin_name, force_unicode=force_unicode,
