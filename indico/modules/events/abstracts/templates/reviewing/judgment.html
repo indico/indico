@@ -3,7 +3,7 @@
 {% from 'events/reviews/_common.html' import render_instruction_box, render_score, render_user_avatar %}
 
 {% macro _render_abstract_reviewing_state(abstract) %}
-    {% if abstract.reviewed_for_tracks > 1 %}
+    {% if abstract.reviewed_for_tracks|length > 1 %}
         {% set conflicting_msg = _("Proposed to accept in different tracks") %}
     {% else %}
         {% set conflicting_msg = _("All reviewers proposed to accept this abstract "
