@@ -267,7 +267,8 @@ class IndicoThemeSelectField(SelectField):
 class ReviewQuestionsField(MultipleItemsField):
     def __init__(self, *args, **kwargs):
         self.extra_fields = kwargs.pop('extra_fields', [])
-        self.fields = [{'id': 'text', 'caption': _("Question"), 'type': 'text', 'required': True}] + self.extra_fields
+        self.fields = ([{'id': 'text', 'caption': _("Question"), 'type': 'textarea', 'required': True}] +
+                       self.extra_fields)
         self.question_model = kwargs.pop('question_model')
         super(ReviewQuestionsField, self).__init__(*args, uuid_field='id', uuid_field_opaque=True, sortable=True,
                                                    **kwargs)

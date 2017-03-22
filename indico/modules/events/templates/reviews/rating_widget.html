@@ -8,12 +8,12 @@
             </span>
         </div>
         <div class="question-text f-self-stretch">
-            {{ field.label.text }}
-            {%- if field.flags.required %}
-                <i class="question-required" title="{% trans %}Rating this question is mandatory{% endtrans %}">*</i>
+            {{- field.label.text }}
+            {%- if field.flags.required -%}
+                <i class="question-required" title="{% trans %}Rating this question is mandatory{% endtrans %}"> *</i>
             {% endif -%}
         </div>
-        <div id="{{ field.id }}" class="rating-scale flexrow f-a-center">
+        <div id="{{ field.id }}" class="rating-scale flexrow f-a-start">
             <span class="score">{{ '-' if field.object_data is none else field.data }}</span>
             {% for bullet in range(rating_range[1], rating_range[0] - 1, -1) %}
                 {% set radio_id = '%s-%d'|format(field.id, bullet) %}
