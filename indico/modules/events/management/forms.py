@@ -225,7 +225,7 @@ class EventProtectionForm(IndicoForm):
                                                       'event'))
     managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True, allow_external=True,
                                   description=_('List of users allowed to modify the event'))
-    submitters = PrincipalListField(_('Submitters'), allow_emails=True, allow_external=True,
+    submitters = PrincipalListField(_('Submitters'), groups=True, allow_emails=True, allow_external=True,
                                     description=_('List of users with submission rights'))
     visibility = SelectField(_("Visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
                              description=_("""From which point in the category tree this event will be visible from """
