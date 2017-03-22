@@ -241,6 +241,15 @@
                 });
                 initNumberErrorMessage(numberInput, col.min, col.max);
                 return {html: numberInput};
+            } else if (col.type === 'textarea') {
+                return {
+                    html: $('<textarea>', {
+                        'class': 'js-table-input multiline',
+                        'value': item ? item[col.id] : '',
+                        'placeholder': col.caption,
+                        'data-required': col.required
+                    })
+                };
             } else { // Assuming the type is 'text'
                 return {
                     html: $('<input>', {
@@ -312,7 +321,11 @@
                 $('<td>', {class: 'sort-handle'}).appendTo(row);
             }
             options.columns.forEach(function(col) {
-                $('<td>', makeColData(item, col)).appendTo(row);
+                var column = $('<td>', makeColData(item, col));
+                if (col.type === 'textarea') {
+                    column.addClass('multiline');
+                }
+                column.appendTo(row);
             });
             $('<td>', {
                 html: item ? deleteButton.clone().add(editButton.clone())
@@ -325,7 +338,11 @@
 
         function updateRow(row, editMode, moveTooltips) {
             row.children('td:not(.sort-handle):not(.js-action-col)').each(function(i) {
-                $(this).replaceWith($('<td>', makeColData(data[row.index()], options.columns[i], editMode)));
+                var column = $('<td>', makeColData(data[row.index()], options.columns[i], editMode));
+                if (options.columns[i].type === 'textarea') {
+                    column.addClass('multiline');
+                }
+                $(this).replaceWith(column);
             });
             if (editMode) {
                 row.children('.js-action-col').html(cancelButton.clone().add(saveButton.clone()));

@@ -381,7 +381,8 @@
         color: $dark-gray;
         font-style: italic;
         padding: 0 1em;
-        word-break: break-word;
+        word-wrap: break-word;
+        white-space: pre-line;
     }
 
     .question-required {

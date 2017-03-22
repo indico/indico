@@ -66,6 +66,12 @@ i.info-helper {
     .thin-column {
         white-space: nowrap;
     }
+    .multiline {
+        white-space: pre-line;
+    }
+    textarea {
+        width: 100%;
+    }
 }
 
 .multiple-items-widget,
