@@ -150,7 +150,7 @@
                            with_container=with_container) %}
         <dl class="i-data-list">
             {% if event.type == 'lecture' %}
-                <dt>{% trans %}Organiser{% endtrans %}</dt>
+                <dt>{% trans %}Organizer{% endtrans %}</dt>
                 <dd>{{ with_default(event.organizer_info|truncate(200)) }}</dd>
             {% endif %}
 

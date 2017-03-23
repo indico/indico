@@ -179,7 +179,7 @@ class EventContactInfoForm(IndicoForm):
     contact_emails = MultiStringField(_('Emails'), field=('email', _('email')), unique=True, flat=True, sortable=True)
     contact_phones = MultiStringField(_('Phone numbers'), field=('phone', _('number')), unique=True, flat=True,
                                       sortable=True)
-    organizer_info = TextAreaField(_('Organisers'))
+    organizer_info = TextAreaField(_('Organizers'))
     additional_info = TextAreaField(_('Additional information'), widget=CKEditorWidget(),
                                     description=_("This text is displayed on the main conference page."))
 

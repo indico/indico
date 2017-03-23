@@ -22,7 +22,7 @@
                     </textarea>
                 </div>
             % else:
-                ${_("Could not generate LaTeX document! It is possible that there are errors in the document source code. Please contact the event organiser.")}
+                ${_("Could not generate LaTeX document! It is possible that there are errors in the document source code. Please contact the event organizer.")}
             % endif
         </div>
     </div>
