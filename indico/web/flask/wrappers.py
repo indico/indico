@@ -25,12 +25,14 @@ from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
-from jinja2 import FileSystemLoader, TemplateNotFound
+from jinja2 import ChoiceLoader, FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
 
+from indico.core.config import Config
 from indico.util.json import IndicoJSONEncoder
 from indico.web.flask.session import IndicoSessionInterface
+from indico.web.flask.templating import CustomizationLoader
 from indico.web.flask.util import make_view_func
 
 
@@ -79,6 +81,15 @@ class IndicoFlask(PluginFlaskMixin, Flask):
         if not request.is_secure:
             name += '_http'
         return name
+
+    def create_global_jinja_loader(self):
+        default_loader = super(IndicoFlask, self).create_global_jinja_loader()
+        cfg = Config.getInstance()
+        customization_dir = cfg.getCustomizationDir()
+        if not customization_dir:
+            return default_loader
+        return CustomizationLoader(default_loader, os.path.join(customization_dir, 'templates'),
+                                   cfg.getCustomizationDebug())
 
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         from indico.legacy.webinterface.rh.base import RHSimple

@@ -16,6 +16,7 @@
 
 import functools
 import itertools
+import posixpath
 import re
 from heapq import heappush
 
@@ -25,6 +26,7 @@ from jinja2 import environmentfilter
 from jinja2.ext import Extension
 from jinja2.filters import make_attrgetter, _GroupTuple
 from jinja2.lexer import Token
+from jinja2.loaders import split_template_path, BaseLoader, FileSystemLoader, TemplateNotFound
 from markupsafe import Markup
 
 from indico.core import signals
@@ -192,6 +194,43 @@ def call_template_hook(*name, **kwargs):
         return [x[1] for x in values]
     else:
         return Markup(u'\n').join(x[1] for x in values) if values else u''
+
+
+class CustomizationLoader(BaseLoader):
+    def __init__(self, fallback_loader, customization_dir, customization_debug=False):
+        from indico.core.logger import Logger
+        self.logger = Logger.get('customization')
+        self.debug = customization_debug
+        self.fallback_loader = fallback_loader
+        self.fs_loader = FileSystemLoader(customization_dir, followlinks=True)
+
+    def _get_fallback(self, environment, template, path):
+        rv = self.fallback_loader.get_source(environment, template)
+        if self.debug:
+            try:
+                orig_path = rv[1]
+            except TemplateNotFound:
+                orig_path = None
+            self.logger.debug('Customizable: %s (original: %s, reference: ~%s)', path, orig_path, template)
+        return rv
+
+    def get_source(self, environment, template):
+        path = posixpath.join(*split_template_path(template))
+        if template[0] == '~':
+            return self._get_fallback(environment, template[1:], path[1:])
+        try:
+            plugin, path = path.split(':', 1)
+        except ValueError:
+            plugin = None
+        prefix = posixpath.join('plugins', plugin) if plugin else 'core'
+        path = posixpath.join(prefix, path)
+        try:
+            rv = self.fs_loader.get_source(environment, path)
+            if self.debug:
+                self.logger.debug('Customized: %s', path)
+            return rv
+        except TemplateNotFound:
+            return self._get_fallback(environment, template, path)
 
 
 class EnsureUnicodeExtension(Extension):
