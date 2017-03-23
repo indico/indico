@@ -183,6 +183,8 @@ class WPBase:
                                         multi_value_types=list)
         plugin_js = values_from_signal(signals.plugin.inject_js.send(self.__class__), as_list=True,
                                        multi_value_types=list)
+        custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
+        custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
 
         return wcomponents.WHTMLHeader().getHTML({
             "area": area,
@@ -190,8 +192,8 @@ class WPBase:
             "conf": Config.getInstance(),
             "page": self,
             "printCSS": map(self._fix_path, self.getPrintCSSFiles()),
-            "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files()),
-            "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js),
+            "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files() + custom_css),
+            "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js + custom_js),
             "language": session.lang or Config.getInstance().getDefaultLocale(),
             "social": social_settings.get_all(),
             "assets": self._asset_env

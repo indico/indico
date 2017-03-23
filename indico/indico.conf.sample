@@ -452,10 +452,10 @@ MaxUploadFileSize = 0
 # Customization
 # ------------------------------------------------------------------------------
 
-# It is possible to override specific templates for advanced customizations.
-# When using this, be advised that depending on the modifications you perform
-# things may break after an Indico update.  Make sure to test all your
-# modifications whenever you update Indico!
+# It is possible to override specific templates and add CSS and JavaScript
+# for advanced customizations.  When using this, be advised that depending on
+# the modifications you perform things may break after an Indico update.  Make
+# sure to test all your modifications whenever you update Indico!
 #
 # Set the base directory for customizations.
 #CustomizationDir = '/opt/indico/custom'
@@ -472,3 +472,8 @@ MaxUploadFileSize = 0
 # "reference" path that can be used to reference the original template from the
 # customized one.
 #CustomizationDebug = False
+#
+# To include custom CSS and JavaScript, simply put *.scss and *.js files into
+# `<CustomizationDir>/scss` / `<CustomizationDir>/js`.  If there are multiple
+# files, they will be included in alphabetical order so prefixing them with
+# a number (e.g. `00-base.scss`, `10-events.scss`) is a good idea.
