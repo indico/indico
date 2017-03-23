@@ -253,7 +253,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
 class IndicoThemeSelectField(SelectField):
     def __init__(self, *args, **kwargs):
         allow_default = kwargs.pop('allow_default', False)
-        event_type = kwargs.pop('event_type').legacy_name
+        event_type = kwargs.pop('event_type').name
         super(IndicoThemeSelectField, self).__init__(*args, **kwargs)
         self.choices = sorted([(tid, theme['title'])
                                for tid, theme in theme_settings.get_themes_for(event_type).viewitems()

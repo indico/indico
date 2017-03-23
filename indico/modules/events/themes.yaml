@@ -1,12 +1,11 @@
 defaults:
     conference: static
-    simple_event: lecture
     lecture: lecture
     meeting: standard
 definitions:
   # Lectures - base
   lecture: &lecture
-    event_types: [simple_event]
+    event_types: [lecture]
     stylesheet: indico.scss
     template: indico/lecture.html
     title: Lecture
@@ -39,7 +38,7 @@ definitions:
 
   # Static
   static:
-    event_types: [conference, simple_event, meeting]
+    event_types: [conference, lecture, meeting]
     stylesheet: null
     template: null
     title: Parallel
@@ -113,7 +112,7 @@ definitions:
     title: EGEE meeting
   endotofpet:
     <<: *standard
-    event_types: [simple_event, meeting]
+    event_types: [lecture, meeting]
     stylesheet: endotofpet.scss
     title: EndoTOFPET
   openlab:
@@ -200,13 +199,13 @@ definitions:
 
   # XML
   jacow:
-    event_types: [conference, simple_event]
+    event_types: [conference, lecture]
     is_xml: true
     stylesheet: null
     template: JACoW.xsl
     title: JACoW XML
   xml:
-    event_types: [conference, simple_event, meeting]
+    event_types: [conference, lecture, meeting]
     is_xml: true
     stylesheet: null
     template: XML.xsl

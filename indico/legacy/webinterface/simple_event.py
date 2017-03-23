@@ -23,7 +23,7 @@ from indico.web.flask.util import url_for
 
 
 class WebFactory(WebFactory):
-    id = "simple_event"
+    id = 'lecture'
     iconURL = Config.getInstance().getSystemIconURL('lecture')
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """

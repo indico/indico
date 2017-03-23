@@ -121,8 +121,8 @@ class CategoryEventHook(HTTPAPIHook):
             self._idList.remove('favorites')
             self._wantFavorites = True
         self._eventType = get_query_parameter(self._queryParams, ['T', 'type'])
-        if self._eventType == 'lecture':
-            self._eventType = 'simple_event'
+        if self._eventType == 'simple_event':
+            self._eventType = 'lecture'
         self._occurrences = get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no') == 'yes'
         self._location = get_query_parameter(self._queryParams, ['l', 'location'])
         self._room = get_query_parameter(self._queryParams, ['r', 'room'])
@@ -489,7 +489,7 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
 
     def _filter_event(self, event):
         if self._room or self._location or self._eventType:
-            if self._eventType and event.type_.legacy_name != self._eventType:
+            if self._eventType and event.type_.name != self._eventType:
                 return False
             if self._location:
                 name = event.venue_name
