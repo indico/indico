@@ -2,6 +2,7 @@ from flask import render_template
 
 from indico.core.notifications import email_sender, make_email
 from indico.util.date_time import format_datetime
+from indico.util.string import to_unicode
 
 
 class ReservationNotification(object):
@@ -10,12 +11,12 @@ class ReservationNotification(object):
         self.start_dt = format_datetime(reservation.start_dt)
 
     def _get_email_subject(self, **mail_params):
-        return '{prefix}[{room}] {subject} {date} {suffix}'.format(
-            prefix=mail_params.get('subject_prefix', ''),
+        return u'{prefix}[{room}] {subject} {date} {suffix}'.format(
+            prefix=to_unicode(mail_params.get('subject_prefix', '')),
             room=self.reservation.room.full_name,
-            subject=mail_params.get('subject', ''),
-            date=self.start_dt,
-            suffix=mail_params.get('subject_suffix', '')
+            subject=to_unicode(mail_params.get('subject', '')),
+            date=to_unicode(self.start_dt),
+            suffix=to_unicode(mail_params.get('subject_suffix', ''))
         ).strip()
 
     def _make_body(self, mail_params, **body_params):
