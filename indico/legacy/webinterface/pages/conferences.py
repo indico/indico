@@ -399,18 +399,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         return WPConferenceBase._getHTMLHeader(self)
 
     def _getHeadContent( self ):
-        baseurl = self._getBaseURL()
-        # First include the default Indico stylesheet
-        try:
-            timestamp = os.stat(__file__).st_mtime
-        except OSError:
-            timestamp = 0
-        styleText = '<link rel="stylesheet" href="%s/css/Default.css?%d">\n' % (baseurl, timestamp)
-
+        theme_css_tag = ''
         theme_url = get_css_url(self._conf.as_event)
         if theme_url:
-            link = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
-            styleText += link
+            theme_css_tag = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
 
         confMetadata = WConfMetadata(self._conf).getHTML()
 
@@ -418,7 +410,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                   '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url) for url in
                              self._asset_env['mathjax_js'].urls()])
 
-        return styleText + confMetadata + mathJax
+        return theme_css_tag + confMetadata + mathJax
 
     def _getFooter(self):
         wc = wcomponents.WEventFooter(self._conf)
