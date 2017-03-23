@@ -8,7 +8,7 @@
 
 
 {% macro render_timeline(proposal, comment_form, review_form=none, revision_form=none) %}
-    {% set can_comment = proposal.can_comment(session.user) %}
+    {% set can_comment = proposal.can_comment(session.user, check_state=true) %}
     {% set can_review = proposal.can_review(session.user, check_state=true) %}
     {% for revision in proposal.get_revisions() %}
         {% set timeline = revision.get_timeline(session.user) %}

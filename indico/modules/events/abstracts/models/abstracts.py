@@ -491,8 +491,10 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return True
         return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
 
-    def can_comment(self, user):
+    def can_comment(self, user, check_state=False):
         if not user:
+            return False
+        if check_state and self.is_in_final_state:
             return False
         if not self.event_new.cfa.allow_comments:
             return False
