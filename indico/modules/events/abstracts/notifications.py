@@ -159,7 +159,9 @@ def send_abstract_notifications(abstract):
 
     :param abstract: the abstract that is going to be checked
                      against the event's notification rules
+    :return: whether an email has been sent
     """
+    sent = False
     for email_tpl in abstract.event_new.abstract_email_templates:
         matched = False
         for rule in email_tpl.rules:
@@ -181,5 +183,7 @@ def send_abstract_notifications(abstract):
                 send_email(email, event=abstract.event_new, user=session.user)
                 abstract.email_logs.append(AbstractEmailLogEntry.create_from_email(email, email_tpl=email_tpl,
                                                                                    user=session.user))
+                sent = True
         if email_tpl.stop_on_match and matched:
             break
+    return sent
