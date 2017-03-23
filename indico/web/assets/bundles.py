@@ -14,13 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
-"""
-This file declares all core JS/CSS assets used by Indico
-"""
-
 import errno
 import os
+from glob import glob
 from urlparse import urlparse
 
 from markupsafe import Markup
@@ -452,6 +448,17 @@ screen_sass = Bundle('sass/screen.scss',
                      depends=SASS_BASE_MODULES)
 
 
+def _get_custom_files(subdir, pattern):
+    cfg = Config.getInstance()
+    customization_dir = cfg.getCustomizationDir()
+    if not customization_dir:
+        return []
+    customization_dir = os.path.join(customization_dir, subdir)
+    if not os.path.exists(customization_dir):
+        return []
+    return sorted(glob(os.path.join(customization_dir, pattern)))
+
+
 def register_all_js(env):
     env.register('jquery', jquery)
     env.register('utils', utils)
@@ -475,9 +482,12 @@ def register_all_js(env):
     env.register('chartist_js', chartist_js)
     env.register('taggle_js', taggle_js)
     env.register('widgets_js', widgets_js)
-
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
+    # Build a bundle with customization JS if enabled
+    custom_js_files = _get_custom_files('js', '*.js')
+    if custom_js_files:
+        env.register('custom_js', rjs_bundle('custom', *custom_js_files))
 
 
 def register_theme_sass(env):
@@ -511,6 +521,12 @@ def register_all_css(env):
     env.register('screen_sass', screen_sass)
     env.register('fonts_sass', fonts_sass)
     register_theme_sass(env)
+
+    # Build a bundle with customization CSS if enabled
+    custom_css_files = _get_custom_files('scss', '*.scss')
+    if custom_css_files:
+        env.register('custom_sass', Bundle(*custom_css_files, filters=('pyscss', 'cssmin'),
+                                           output='sass/custom_sass_%(version)s.css'))
 
 
 core_env = IndicoEnvironment()
