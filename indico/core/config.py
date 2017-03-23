@@ -296,6 +296,7 @@ class Config:
         'LoggingConfigFile'         : 'logging.conf',
         'CustomizationDir'          : None,
         'CustomizationDebug'        : False,
+        'LogoURL'                   : None,
     }
 
     if sys.platform == 'win32':
