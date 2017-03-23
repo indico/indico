@@ -446,3 +446,29 @@ MaxUploadFileSize = 0
 # Static sites can be stored in a different backend.  If not set, the attachment
 # storage backend will be used.
 #StaticSiteStorage = None
+
+
+# ------------------------------------------------------------------------------
+# Customization
+# ------------------------------------------------------------------------------
+
+# It is possible to override specific templates for advanced customizations.
+# When using this, be advised that depending on the modifications you perform
+# things may break after an Indico update.  Make sure to test all your
+# modifications whenever you update Indico!
+#
+# Set the base directory for customizations.
+#CustomizationDir = '/opt/indico/custom'
+#
+# By enabling customization debugging indico will log all customizable
+# templates the first time they are accessed (note that you need to enable the
+# 'DEBUG' log level in your logging.conf for this).
+# The log message contains the path where you need to store the template. This
+# path is relative to `<CustomizationDir>/templates/`.
+# It will also log the full path of the original template in case you decide to
+# copy it.
+# However, instead of copying templates it is better to use Jinja inheritance
+# where possible. To make this easier the log entry will also contain a
+# "reference" path that can be used to reference the original template from the
+# customized one.
+#CustomizationDebug = False

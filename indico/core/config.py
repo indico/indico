@@ -294,6 +294,8 @@ class Config:
         'TrackerURL'                : 'http://localhost:5000/api',
         'ConfigFilePath'            : None,
         'LoggingConfigFile'         : 'logging.conf',
+        'CustomizationDir'          : None,
+        'CustomizationDebug'        : False,
     }
 
     if sys.platform == 'win32':
