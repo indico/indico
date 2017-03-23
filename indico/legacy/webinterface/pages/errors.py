@@ -25,7 +25,7 @@ from indico.legacy.webinterface.pages.base import WPDecorated
 from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.core.config import Config
-from indico.util.i18n import i18nformat, _
+from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
 
@@ -162,7 +162,7 @@ class WAccessError( WTemplated ):
     def getVars( self ):
         from indico.modules.events.legacy import LegacyConference
         vars = WTemplated.getVars( self )
-        vars["area"]= i18nformat(""" _("Authorisation") - """)
+        vars["area"]= _("Authorisation")
         vars["msg"] = _("The access to this page has been restricted by its owner and you are not authorised to view it")
         vars["contactInfo"] = ""
         if isinstance(self._rh._target, LegacyConference):
@@ -202,7 +202,7 @@ class WPKeyAccessError( WPDecorated ):
         msg = ""
         has_key = session.get("access_keys", {}).get(event._access_key_session_key) is not None
         if has_key:
-            msg = i18nformat("""<font color=red> _("Bad access key")!</font>""")
+            msg = '<font color=red>{}</font>'.format(_("Bad access key!"))
         wc = WAccessKeyError( self._rh, msg )
         return wc.getHTML()
 
@@ -409,4 +409,3 @@ class WError404( WTemplated ):
         vars = WTemplated.getVars( self )
         vars["goBack"] = self._goBack
         return vars
-

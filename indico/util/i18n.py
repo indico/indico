@@ -286,27 +286,6 @@ def parse_locale(locale):
     return IndicoLocale.parse(locale)
 
 
-def i18nformat(text):
-    """
-    ATTENTION: only used for backward-compatibility
-    Parses old '_() inside strings hack', translating as needed
-    """
-
-    # this is a bit of a dirty hack, but cannot risk emitting lazy proxies here
-    if not session.lang:
-        set_best_lang()
-
-    return RE_TR_FUNCTION.sub(lambda x: _(next(y for y in x.groups() if y is not None)), text)
-
-
-def extract(fileobj, keywords, commentTags, options):
-    """
-    Babel mini-extractor for old-style _() inside strings
-    """
-    astree = ast.parse(fileobj.read())
-    return extract_node(astree, keywords, commentTags, options)
-
-
 def extract_node(node, keywords, commentTags, options, parents=[None]):
     if isinstance(node, ast.Str) and isinstance(parents[-1], (ast.Assign, ast.Call)):
         matches = RE_TR_FUNCTION.findall(node.s)
