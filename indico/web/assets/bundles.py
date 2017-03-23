@@ -420,13 +420,30 @@ base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, i
                  indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
                  widgets_js, module_js['event_creation'])
 
+base_css = Bundle(
+    *namespace('css',
+               'Default.css',
+               'calendar-blue.css',
+               'jquery-ui.css',
+               'lib/angular.css',
+               'lib/jquery.qtip.css',
+               'lib/jquery.multiselect.css',
+               'lib/jquery.multiselect.filter.css',
+               'lib/jquery.typeahead.css',
+               'lib/fullcalendar.css',
+               'jquery.colorbox.css',
+               'jquery-ui-custom.css',
+               'jquery.colorpicker.css'),
+    filters=("cssmin", "cssrewrite"),
+    output='css/base_%(version)s.min.css')
+
+
 SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/base/*.scss",
                      "sass/custom/*.scss",
                      "sass/partials/*.scss",
                      "sass/modules/*.scss",
                      "sass/modules/*/*.scss"]
-
 
 screen_sass = Bundle('sass/screen.scss',
                      filters=("pyscss", "cssrewrite", "cssmin"),
@@ -482,25 +499,7 @@ def register_theme_sass(env):
                 env.register('themes_{}_print_sass'.format(theme_id), print_bundle)
 
 
-def register_all_css(env, main_css_file):
-
-    base_css = Bundle(
-        *namespace('css',
-                   main_css_file,
-                   'calendar-blue.css',
-                   'jquery-ui.css',
-                   'lib/angular.css',
-                   'lib/jquery.qtip.css',
-                   'lib/jquery.multiselect.css',
-                   'lib/jquery.multiselect.filter.css',
-                   'lib/jquery.typeahead.css',
-                   'lib/fullcalendar.css',
-                   'jquery.colorbox.css',
-                   'jquery-ui-custom.css',
-                   'jquery.colorpicker.css'),
-        filters=("cssmin", "cssrewrite"),
-        output='css/base_%(version)s.min.css')
-
+def register_all_css(env):
     env.register('base_css', base_css)
     env.register('jqplot_css', jqplot_css)
     env.register('dropzone_css', dropzone_css)

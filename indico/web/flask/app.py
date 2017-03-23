@@ -227,7 +227,7 @@ def setup_assets():
         return
     ASSETS_REGISTERED = True
     register_all_js(core_env)
-    register_all_css(core_env, Config.getInstance().getCssStylesheetName())
+    register_all_css(core_env)
 
 
 def configure_db(app):

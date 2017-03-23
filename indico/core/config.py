@@ -494,9 +494,6 @@ class Config:
     def setInstance(cls, instance):
         cls.__instance = instance
 
-    def getCssStylesheetName(self):
-        return 'Default.css'
-
     def getCssConfTemplateBaseURL(self):
         rh = has_app_context() and g.get('rh')
 
