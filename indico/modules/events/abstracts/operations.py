@@ -235,9 +235,8 @@ def judge_abstract(abstract, abstract_data, judgment, judge, contrib_session=Non
         if merge_persons:
             _merge_person_links(abstract.merged_into, abstract)
     db.session.flush()
-    log_data['Sent notifications'] = send_notifications
     if send_notifications:
-        send_abstract_notifications(abstract)
+        log_data['Notifications sent'] = send_abstract_notifications(abstract)
     logger.info('Abstract %s judged by %s', abstract, judge)
     abstract.event_new.log(EventLogRealm.management, EventLogKind.change, 'Abstracts',
                            'Abstract {} judged'.format(abstract.verbose_title), judge, data=log_data)
