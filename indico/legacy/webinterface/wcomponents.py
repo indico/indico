@@ -34,7 +34,7 @@ from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.legacy import LegacyConference
 from indico.modules.legal import legal_settings
-from indico.util.i18n import i18nformat, get_current_locale, get_all_locales, _
+from indico.util.i18n import get_current_locale, get_all_locales, _
 from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
 from indico.util.string import truncate
@@ -359,7 +359,8 @@ class WMenuConferenceHeader( WConferenceHeader ):
                     selected = "selected"
             else:
                 selectedDate = "all"
-            dates = [ i18nformat(""" <select name="showDate" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all days") - -</option> """)%selected]
+            dates = ["""<select name="showDate" onChange="document.forms[0].submit();" style="font-size:8pt;">
+                            <option value="all" {}>- - {} - -</option>""".format(selected, _("all days"))]
             while sdate.strftime("%Y-%m-%d") <= edate.strftime("%Y-%m-%d"):
                 selected = ""
                 if selectedDate == sdate.strftime("%d-%B-%Y"):
@@ -380,7 +381,8 @@ class WMenuConferenceHeader( WConferenceHeader ):
                     selected = "selected"
             else:
                 selectedSession = "all"
-            sessions = [ i18nformat(""" <select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;"><option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
+            sessions = ["""<select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;">
+                               <option value="all" {}>- - {} - -</option>""".format(selected, _("all sessions"))]
             for session in self._conf.as_event.sessions:
                 selected = ""
                 sid = session.friendly_id
@@ -453,7 +455,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 selected = "selected"
         else:
             selectedDate = "all"
-        dates = [ i18nformat(""" <option value="all" %s>- -  _("all days") - -</option> """)%selected]
+        dates = ['<option value="all" {}>- -  {} - -</option>'.format(selected, _("all days"))]
         while sdate.date() <= edate.date():
             iso_date = sdate.date().isoformat()
             selected = 'selected' if selectedDate == iso_date else ''
@@ -469,7 +471,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
                 selected = "selected"
         else:
             selectedSession = "all"
-        sessions = [ i18nformat(""" <option value="all" %s>- -  _("all sessions") - -</option> """)%selected]
+        sessions = ['<option value="all" {}>- - {} - -</option>'.format(selected, _("all sessions"))]
         for session_ in self._conf.as_event.sessions:
             selected = "selected" if unicode(session_.friendly_id) == selectedSession else ''
             title = session_.title

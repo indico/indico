@@ -23,7 +23,7 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.core.settings import social_settings
-from indico.util.i18n import i18nformat, _
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode, encode_if_unicode
 from indico.web import assets
@@ -175,9 +175,9 @@ class WPBase:
 
         area=""
         if self.MANAGEMENT or isinstance(self._rh, RHModificationBaseProtected):
-            area=i18nformat(""" - _("Management area")""")
+            area = ' - {}'.format(_("Management area"))
         elif isinstance(self._rh, RHAdminBase):
-            area=i18nformat(""" - _("Administrator area")""")
+            area = ' - {}'.format(_("Administrator area"))
 
         plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
                                         multi_value_types=list)
