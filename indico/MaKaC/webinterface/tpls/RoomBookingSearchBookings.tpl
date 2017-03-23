@@ -169,78 +169,71 @@
 </form>
 
 <script>
+    var userId = "rb-user-${ user.getId() if _session.user else 'not-logged' }";
+    var userData = "search-form-" + userId;
+    var rbUserData = $.jStorage.get(userData, {});
     var rooms = ${ [r.to_serializable('__public_exhaustive__') for r in rooms] | j, n };
     var myRooms = ${ my_rooms | j, n };
 
-    function adjustDates(s, e) {
-        if (s.datepicker('getDate') > e.datepicker('getDate'))
-            e.datepicker('setDate', s.datepicker('getDate'));
-    }
-
-    function initWidgets() {
-        $('#roomselector').roomselector({
-            allowEmpty: false,
-            rooms: rooms,
-            myRooms: myRooms,
-            selectName: 'room_ids',
-            simpleMode: true
-        });
-
-        $('#timerange').timerange({
-            sliderWidth: '320px'
-        });
-
-        var s = $('#start_date'), e = $('#end_date');
-        $('#start_date, #end_date').datepicker({
-            onSelect: function() {
-                adjustDates(s, e);
-                $('#searchBookings').trigger('change');
-            }
-        });
-        s.datepicker('setDate', '+0');
-        e.datepicker('setDate', '+6');
-    }
-
-    // Reads out the invalid textboxes and returns false if something is invalid.
-    // Returns true if form may be submited.
-    function forms_are_valid() {
-        // Clean up - make all textboxes white again
-        var searchForm = $('#searchBookings');
-        $(':input', searchForm).removeClass('hasError');
-
-        // Init
-        var isValid = true;
-
-        // Datepicker
-        if (!moment($('#start_date').val(), 'DD/MM/YYYY').isValid()) {
-            isValid = false;
-            $('#start_date').addClass('hasError');
-        }
-        if (!moment($('#end_date').val(), 'DD/MM/YYYY').isValid()) {
-            isValid = false;
-            $('#end_date').addClass('hasError');
-        }
-
-        // Time period
-        isValid = isValid && $('#timerange').timerange('validate');
-
-        return isValid;
-    }
-
-    $(function() {
+    $(document).ready(function() {
         initWidgets();
+        % if not ignore_userdata:
+            restoreSearchData();
+        % endif
 
-        $('#searchBookings').delegate(':input', 'keyup change', function() {
-            forms_are_valid();
-        }).submit(function(e) {
-            if (!forms_are_valid(true)) {
-                new AlertPopup($T('Error'), $T('There are errors in the form. Please correct fields with red background.')).open();
-                e.preventDefault();
+        function adjustDates(s, e) {
+            if (s.datepicker('getDate') > e.datepicker('getDate'))
+                e.datepicker('setDate', s.datepicker('getDate'));
+        }
+
+        function initWidgets() {
+            $('#roomselector').roomselector({
+                allowEmpty: false,
+                rooms: rooms,
+                myRooms: myRooms,
+                userData: ${ 'rbUserData' if not ignore_userdata else {}},
+                selectName: 'room_ids',
+                simpleMode: true
+            });
+
+            $('#timerange').timerange({
+                sliderWidth: '320px'
+            });
+
+            var s = $('#start_date'), e = $('#end_date');
+            $('#start_date, #end_date').datepicker({
+                onSelect: function() {
+                    adjustDates(s, e);
+                    $('#searchBookings').trigger('change');
+                }
+            });
+            s.datepicker('setDate', '+0');
+            e.datepicker('setDate', '+6');
+        }
+
+        function restoreSearchData() {
+            if (rbUserData.startDate) {
+                $('#start_date').datepicker('setDate', moment(rbUserData.startDate).toDate());
             }
-            else if(!$('#roomselector').roomselector('validate')) {
-                new AlertPopup($T('Select room'), $T('Please select a room (or several rooms).')).open();
-                e.preventDefault();
+            if (rbUserData.endDate) {
+                $('#end_date').datepicker('setDate', moment(rbUserData.endDate).toDate());
             }
-        });
+
+            $('input[name=booked_for_name]').val(rbUserData.bookedFor);
+            $('input[name=reason]').val(rbUserData.reason);
+            $('input[name=is_only_mine][value=' + rbUserData.booker + ']').prop('checked', true).change();
+            $('input[name=is_only_bookings]').prop('checked', rbUserData.typeBookings);
+            $('input[name=is_only_pre_bookings]').prop('checked', rbUserData.typePreBookings);
+            $('input[name=is_rejected]').prop('checked', rbUserData.stateRejected);
+            $('input[name=is_cancelled]').prop('checked', rbUserData.stateCanceled);
+            $('input[name=is_archived]').prop('checked', rbUserData.stateArchived);
+            $('input[name=uses_vc]').prop('checked', rbUserData.service);
+            $('input[name=needs_vc_assistance]').prop('checked', rbUserData.assistVc);
+            $('input[name=needs_assistance]').prop('checked', rbUserData.assistStartup);
+
+            if (rbUserData.startTime && rbUserData.endTime) {
+                $('#timerange').timerange('setStartTime', rbUserData.startTime).timerange('setEndTime', rbUserData.endTime);
+            }
+        }
     });
 </script>

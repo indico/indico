@@ -44,6 +44,36 @@ function refreshDates(){
 }
 
 // Store all fields in local storage
+function saveSearchData() {
+    var selectedRooms = $("#roomselector").roomselector("selection");
+    var filterData = $("#roomselector").roomselector("userdata");
+
+    var rbSearchDict = {
+        startDate: $('#start_date').datepicker('getDate'),
+        endDate: $('#end_date').datepicker('getDate'),
+        startTime: $('#timerange').timerange('getStartTime'),
+        endTime: $('#timerange').timerange('getEndTime'),
+        filter: filterData.search,
+        selectedRooms: selectedRooms,
+        bookedFor: $('input[name=booked_for_name]').val(),
+        reason: $('input[name=reason]').val(),
+        booker: $('input[name=is_only_mine]:checked').val(),
+        typeBookings: $('input[name=is_only_bookings]:checked').val(),
+        typePreBookings: $('input[name=is_only_pre_bookings]:checked').val(),
+        stateRejected: $('input[name=is_rejected]:checked').val(),
+        stateCanceled: $('input[name=is_cancelled]:checked').val(),
+        stateArchived: $('input[name=is_archived]:checked').val(),
+        service: $('input[name=uses_vc]:checked').val(),
+        assistVc: $('input[name=needs_vc_assistance]:checked').val(),
+        assistStartup: $('input[name=needs_assistance]:checked').val(),
+        roomIds: $('#room_ids').val()
+    };
+
+    $.jStorage.set(userData, rbSearchDict);
+    $.jStorage.setTTL(userData, 7200000); // 2 hours
+}
+
+// Store all fields in local storage
 function saveFormData() {
     var selectedRooms = $("#roomselector").roomselector("selection");
     var filterData = $("#roomselector").roomselector("userdata");

@@ -193,6 +193,50 @@
         return canSubmit;
     }
 
+    // Reads out the invalid textboxes and returns false if something is invalid.
+    // Returns true if form may be submited.
+    function validateSearchForm() {
+        // Clean up - make all textboxes white again
+        var searchForm = $('#searchBookings');
+        $(':input', searchForm).removeClass('hasError');
+
+        // Init
+        var isValid = true;
+
+        // Datepicker
+        if (!moment($('#start_date').val(), 'DD/MM/YYYY').isValid()) {
+            isValid = false;
+            $('#start_date').addClass('hasError');
+        }
+        if (!moment($('#end_date').val(), 'DD/MM/YYYY').isValid()) {
+            isValid = false;
+            $('#end_date').addClass('hasError');
+        }
+
+        // Time period
+        isValid = isValid && $('#timerange').timerange('validate');
+
+        return isValid;
+    }
+
+    $(function() {
+        $('#searchBookings').delegate(':input', 'keyup change', function() {
+            validateSearchForm();
+        }).submit(function(e) {
+            if (!validateSearchForm(true)) {
+                new AlertPopup($T('Error'), $T('There are errors in the form. Please correct fields with red background.')).open();
+                e.preventDefault();
+            }
+            else if(!$('#roomselector').roomselector('validate')) {
+                new AlertPopup($T('Select room'), $T('Please select a room (or several rooms).')).open();
+                e.preventDefault();
+            }
+            else {
+                saveSearchData();
+            }
+        });
+    })
+
     $(function() {
         $('#searchForm').on('submit', function(e) {
             validatingBooking = true;
