@@ -105,7 +105,7 @@ class OfflineEvent:
 
     def create(self):
         websiteCreator = None
-        if self._eventType in ("simple_event", "meeting"):
+        if self._eventType in ('lecture', 'meeting'):
             websiteCreator = OfflineEventCreator(self._rh, self._conf, self._eventType)
         elif self._eventType == "conference":
             websiteCreator = ConferenceOfflineCreator(self._rh, self._conf)

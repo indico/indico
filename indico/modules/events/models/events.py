@@ -79,11 +79,6 @@ class EventType(RichIntEnum):
             return None
 
 
-EventType.legacy_map = {'simple_event': EventType.lecture,
-                        'meeting': EventType.meeting,
-                        'conference': EventType.conference}
-
-
 class _EventSettingProperty(EventSettingProperty):
     # the Event is already an Event (duh!), no need to get any other attribute
     attr = staticmethod(lambda x: x)

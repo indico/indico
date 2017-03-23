@@ -421,10 +421,8 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         }
         return wc.getHTML(p)
 
-    def _getHeader( self ):
-        """
-        """
-        if self._type == "simple_event":
+    def _getHeader(self):
+        if self._type == 'lecture':
             wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._conf )
         elif self._type == "meeting":
             wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._conf )

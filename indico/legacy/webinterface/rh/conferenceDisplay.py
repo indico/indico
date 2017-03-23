@@ -77,11 +77,11 @@ class MeetingRendererMixin:
         if view in theme_settings.xml_themes:
             if hide_frame:
                 self._responseUtil.content_type = 'text/xml'
-            return conferences.WPXSLConferenceDisplay(self, conf, view, evt_type.legacy_name, self._reqParams)
+            return conferences.WPXSLConferenceDisplay(self, conf, view, evt_type.name, self._reqParams)
         elif view == "static":
             return conferences.WPConferenceDisplay(self, conf)
         else:
-            return conferences.WPTPLConferenceDisplay(self, conf, view, evt_type.legacy_name, self._reqParams)
+            return conferences.WPTPLConferenceDisplay(self, conf, view, evt_type.name, self._reqParams)
 
 
 class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
