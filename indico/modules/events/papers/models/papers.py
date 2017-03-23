@@ -78,8 +78,10 @@ class Paper(ProposalMixin):
     def is_in_final_state(self):
         return self.state in {PaperRevisionState.accepted, PaperRevisionState.rejected}
 
-    def can_comment(self, user):
+    def can_comment(self, user, check_state=False):
         if not user:
+            return False
+        if check_state and self.is_in_final_state:
             return False
         return self.can_submit(user) or self.can_judge(user) or self.can_review(user)
 
