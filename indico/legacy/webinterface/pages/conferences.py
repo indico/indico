@@ -405,8 +405,7 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             timestamp = os.stat(__file__).st_mtime
         except OSError:
             timestamp = 0
-        styleText = """<link rel="stylesheet" href="%s/css/%s?%d">\n""" % \
-            (baseurl, Config.getInstance().getCssStylesheetName(), timestamp)
+        styleText = '<link rel="stylesheet" href="%s/css/Default.css?%d">\n' % (baseurl, timestamp)
 
         theme_url = get_css_url(self._conf.as_event)
         if theme_url:
