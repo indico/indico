@@ -229,7 +229,6 @@ def setup_assets():
     ASSETS_REGISTERED = True
     register_all_js(core_env)
     register_all_css(core_env)
-    register_theme_sass()
 
 
 def configure_db(app):
@@ -360,6 +359,9 @@ def make_app(set_path=False, testing=False):
     oauth.init_app(app)
     setup_jinja(app)
 
+    with app.app_context():
+        setup_assets()
+
     configure_db(app)
     mm.init_app(app)
     extend_url_map(app)
@@ -371,8 +373,8 @@ def make_app(set_path=False, testing=False):
         raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
     # Below this points plugins are available, i.e. sending signals makes sense
     add_plugin_blueprints(app)
-    # assets include event themes which can be provided by plugins
+    # themes can be provided by plugins
     with app.app_context():
-        setup_assets()
+        register_theme_sass()
     signals.app_created.send(app)
     return app
