@@ -163,7 +163,7 @@ class Request(db.Model):
         :return: a dict mapping request types to a :class:`Request`
                  or if `type_` was specified, a single :class:`Request` or `None`
         """
-        query = event.requests
+        query = Request.query.with_parent(event)
         if type_ is not None:
             return (query.filter_by(type=type_)
                     .order_by(cls.created_dt.desc())

@@ -39,9 +39,9 @@ else:
                         <div class="timezone">${ timezone } timezone</div>
                     </div>
                     ${ template_hook('now-happening', event=conf.as_event, text_color=textColorStyle) }
-                    ${ template_hook('conference-header-subtitle', event=conf) }
+                    ${ template_hook('conference-header-subtitle', event=conf.as_event) }
                 </div>
-                ${ template_hook('conference-header-right-column', event=conf) }
+                ${ template_hook('conference-header-right-column', event=conf.as_event) }
             </div>
         </div>
         % if announcement:
