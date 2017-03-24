@@ -479,11 +479,9 @@ class RHCloneEvent(RHManageEventBase):
                                 cloner_dependencies=dependencies, **tpl_args)
 
 
-class RHPosterPrintSettings(RHConferenceModifBase):
-    CSRF_ENABLED = True
-
+class RHPosterPrintSettings(RHManageEventBase):
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self.template_id = request.args.get('template_id')
 
     def _process(self):
@@ -499,14 +497,13 @@ class RHPosterPrintSettings(RHConferenceModifBase):
         return jsonify_form(form, disabled_until_change=False, submit=_('Download PDF'), )
 
 
-class RHPrintEventPoster(RHConferenceModifBase):
-
+class RHPrintEventPoster(RHManageEventBase):
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
-        self.template = DesignerTemplate.find_one(id=request.view_args['template_id'])
+        RHManageEventBase._checkParams(self, params)
+        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
     def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
+        RHManageEventBase._checkProtection(self)
 
         # Check that template belongs to this event or a category that
         # is a parent
