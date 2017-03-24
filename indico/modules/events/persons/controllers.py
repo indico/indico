@@ -204,6 +204,8 @@ class RHEmailEventPersons(RHConferenceModifBase):
             send_email(email, self.event_new, 'Event Persons')
 
     def _find_event_persons(self, person_ids, not_invited_only):
+        if not person_ids:
+            return []
         query = self.event_new.persons
         query = query.filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
         if not_invited_only:
@@ -211,6 +213,8 @@ class RHEmailEventPersons(RHConferenceModifBase):
         return query.all()
 
     def _find_users(self, user_ids):
+        if not user_ids:
+            return []
         return User.query.filter(User.id.in_(user_ids), User.email != '').all()
 
 
