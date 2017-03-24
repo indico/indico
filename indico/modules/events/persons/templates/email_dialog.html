@@ -1,6 +1,6 @@
 {% from 'forms/_form.html' import simple_form %}
 
-{{ simple_form(form, submit=_('Send')) }}
+{{ simple_form(form, submit=_('Send'), disabled_until_change=disabled_until_change) }}
 <script>
     (function() {
         'use strict';
