@@ -18,50 +18,16 @@ import indico.legacy.webinterface.wcomponents as wcomponents
 import indico.legacy.webinterface.pages.conferences as conferences
 from indico.core.config import Config
 from indico.legacy.webinterface.general import WebFactory
-from indico.modules.events.cloning import EventCloner
-from indico.web.flask.util import url_for
 
 
 class WebFactory(WebFactory):
     id = 'lecture'
-    iconURL = Config.getInstance().getSystemIconURL('lecture')
     name = "Lecture"
     description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
-
-    def getIconURL():
-        return WebFactory.iconURL
-    getIconURL = staticmethod( getIconURL )
-
-    @staticmethod
-    def customiseToolsTabCtrl(tabCtrl):
-        tabCtrl.getTabById("posters").enable()
-        tabCtrl.getTabById("badges").disable()
-
-    def getConfClone(rh, conf):
-        return WPSEConfClone(rh, conf)
-    getConfClone = staticmethod(getConfClone)
 
 
 SimpleEventWebFactory = WebFactory
 
-
-#################Conference Modification#############################
-
-
-
-#####Tools # Stays the same as conference for now
-class WPSEConfClone(conferences.WPConfClone):
-    def _getPageContent(self, params):
-        p = conferences.WConferenceClone(self._conf)
-        pars = {
-            "cloning": url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event),
-            "startTime": self._conf.as_event.start_dt_local.isoformat(),
-            "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
-        }
-        return p.getHTML(pars)
-
-
-##################### Event Display ###################################
 
 class WPSimpleEventDisplay( conferences.WPConferenceDisplayBase ):
 

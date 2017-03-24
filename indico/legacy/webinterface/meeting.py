@@ -14,13 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import indico.legacy.webinterface.wcomponents as wcomponents
-import indico.legacy.webinterface.pages.conferences as conferences
-from indico.core.config import Config
+from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.general import WebFactory
 from indico.legacy.webinterface.pages.conferences import WPConferenceDisplayBase
-from indico.modules.events.cloning import EventCloner
-from indico.web.flask.util import url_for
 
 
 class WebFactory(WebFactory):
@@ -28,43 +24,11 @@ class WebFactory(WebFactory):
     ##_("Meeting")
     ##_("""this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions""")
     id = "meeting"
-    iconURL = Config.getInstance().getSystemIconURL('meeting')
     name = "Meeting"
     description = """this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions"""
 
 
-######### Conference Creation/Display/Modifications ##########################
-
-    @staticmethod
-    def getIconURL():
-        return WebFactory.iconURL
-
-    @staticmethod
-    def customiseToolsTabCtrl(tabCtrl):
-        tabCtrl.getTabById("badges").disable()
-        tabCtrl.getTabById("posters").enable()
-
-    @staticmethod
-    def getConfClone(rh, conf):
-        return WPMConfClone(rh, conf)
-
-
 MeetingWebFactory = WebFactory
-
-#################Conference Modification#############################
-
-
-class WPMConfClone(conferences.WPConfClone):
-
-    def _getPageContent(self, params):
-        p = conferences.WConferenceClone(self._conf)
-        pars = {
-            "cloning": url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event),
-            "startTime": self._conf.as_event.start_dt_local.isoformat(),
-            "cloneOptions": ''
-        }
-        pars['cloneOptions'] += EventCloner.get_form_items(self._conf.as_event).encode('utf-8')
-        return p.getHTML(pars)
 
 
 class WPMeetingDisplay( WPConferenceDisplayBase ):

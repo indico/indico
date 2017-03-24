@@ -18,5 +18,4 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>/manage')
 
-import indico.web.flask.blueprints.event.management.tools
 import indico.web.flask.blueprints.event.management.rooms

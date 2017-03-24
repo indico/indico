@@ -644,22 +644,6 @@ class WBannerModif(WTemplated):
         return WTemplated.getHTML(self, {"type" : self._type, "path": self._path, "title": self._title})
 
 
-class WConfirmation(WTemplated):
-
-    def getHTML(self, message, postURL, passingArgs, loading=False, severity="warning", **opts):
-        params = {}
-        params["message"] = message
-        params["postURL"] = postURL
-
-        params["severity"] = severity
-        params["passingArgs"] = passingArgs
-        params["loading"] = loading
-        params["confirmButtonCaption"] = opts.get("confirmButtonCaption", _("Yes"))
-        params["cancelButtonCaption"] = opts.get("cancelButtonCaption", _("Cancel"))
-        params["systemIconWarning"] = Config.getInstance().getSystemIconURL("warning")
-        return WTemplated.getHTML(self, params)
-
-
 class TabControl:
 
     def __init__( self, parent=None, child=None ):
