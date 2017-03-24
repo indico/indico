@@ -15,9 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- /* global getFormParams:false */
-
-
 (function(global) {
     'use strict';
 
@@ -91,23 +88,30 @@
             _.defer(_.partial(updateCount, true));
         }
 
-        $form.find('#form-group-selected_items').on('change', 'input[type=checkbox]', function() {
-            var $this = $(this);
-            var dependencies = clonerDependencies[$this.val()];
-            var $field = $this.closest('.form-field');
+        if (step === 2) {
+            $form.find('#form-group-selected_items').on('change', 'input[type=checkbox]', function() {
+                var $this = $(this);
+                var dependencies = clonerDependencies[$this.val()];
+                var $field = $this.closest('.form-field');
 
-            if ($this.prop('checked')) {
-                if (dependencies.requires) {
-                    dependencies.requires.forEach(function(optionName) {
-                        $field.find('[value={0}]:not(:disabled)'.format(optionName)).prop('checked', true);
+                if ($this.prop('checked')) {
+                    if (dependencies.requires) {
+                        dependencies.requires.forEach(function(optionName) {
+                            $field.find('[value={0}]:not(:disabled)'.format(optionName)).prop('checked', true);
+                        });
+                    }
+                } else if (dependencies.required_by) {
+                    dependencies.required_by.forEach(function(optionName) {
+                        $field.find('[value={0}]'.format(optionName)).prop('checked', false);
                     });
                 }
-            } else if (dependencies.required_by) {
-                dependencies.required_by.forEach(function(optionName) {
-                    $field.find('[value={0}]'.format(optionName)).prop('checked', false);
-                });
-            }
-        });
+            });
+
+            // first check requirements of checked items
+            $('#form-group-selected_items input[type=checkbox]:checked').trigger('change');
+            // then ensure that nothing is checked that shouldn't be checked
+            $('#form-group-selected_items input[type=checkbox]:not(:checked)').trigger('change');
+        }
 
         $eventList.qtip({
             style: {
