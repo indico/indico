@@ -43,13 +43,13 @@ def generate_global_file(config):
         'FileTypeIcons': file_type_icons,
 
         'Urls': {
+            'Base': config.getBaseURL(),
             'BasePath': url_parse(config.getBaseURL()).path.rstrip('/'),
             'JsonRpcService': url_for('api.jsonrpc'),
             'ExportAPIBase': url_for('api.httpapi', prefix='export'),
             'APIBase': url_for('api.httpapi', prefix='api'),
 
             'ImagesBase': config.getImagesBaseURL(),
-            'SecureImagesBase': config.getImagesBaseSecureURL(),
 
             'Login': url_for_login(),
             'Favorites': url_for('users.user_favorites'),

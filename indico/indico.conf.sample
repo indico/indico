@@ -45,10 +45,6 @@ SQLAlchemyDatabaseURI  = 'postgresql://localhost/indico'
 
 SanitizationLevel    = 2
 
-# AuthenticatedEnforceSecure controls whether HTTPS should be enforced for
-# authentication and while logged in.
-AuthenticatedEnforceSecure = "yes"
-
 # Possible values of CSRFLevel:
 #    0: Disable all CSRF checks (DANGEROUS!)
 #    1: Check CSRF token for service requests
@@ -89,23 +85,14 @@ SecretKey = ''
 #------------------------------------------------------------------------------
 # URLs
 #------------------------------------------------------------------------------
-# BaseURL is the url where Indico will be accessed:
+# BaseURL is the url where Indico will be accessed.
+# Except for development systems this should be a https URL and your web server
+# should be configured to redirect all HTTP requests to HTTPS.
+BaseURL = 'https://indico.yourdomain.tld'
 
-BaseURL              = "http://localhost:8000"
-
-# BaseSecureURL is the HTTPS location of Indico. Set empty string if you want to use http.
-
-BaseSecureURL        = "https://localhost:8443"
-
-
-# If you are using a custom user authentication system (see below) uncomment
-# the following lines and specify the new URLs.
-#
-#   LoginURL             = ""
-#   RegistrationURL      = ""
-
-# Support the old mod_python-style URLs (conferenceDisplay.py?confId=123 etc.) by redirecting
-# them to their new URL.
+# If you upgraded from an older Indico version (pre-2.0) and want to preserve
+# older URLs you should enable this option to avoid breaking links in search
+# engines and other websites.
 #RouteOldUrls = False
 
 

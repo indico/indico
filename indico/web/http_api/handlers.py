@@ -118,11 +118,6 @@ def checkAK(apiKey, signature, timestamp, path, query):
 def buildAW(ak, onlyPublic=False):
     aw = AccessWrapper()
     if ak and not onlyPublic:
-        # If we have an authenticated request, require HTTPS
-        # Dirty hack: Google calendar converts HTTP API requests from https to http
-        # Therefore, not working with Indico setup (requiring https for HTTP API authenticated)
-        if not request.is_secure and api_settings.get('require_https') and request.user_agent.browser != 'google':
-            raise HTTPAPIError('HTTPS is required', 403)
         aw.setUser(ak.user.as_avatar)
     return aw
 

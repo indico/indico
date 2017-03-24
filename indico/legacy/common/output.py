@@ -15,14 +15,12 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import re
 from collections import defaultdict
 from datetime import datetime
 
 from indico.modules.groups import GroupProxy
 from sqlalchemy.orm import joinedload, load_only
 
-import urlparse
 import string
 import StringIO
 
@@ -60,23 +58,6 @@ class XSLTransformer:
         result = self.__style(doc)
 
         return str(result)
-
-
-# XXX: This doesn't really belong here but it's legacy and only used in this file...
-def _set_ssl_port(url):
-    """
-    Returns url with port changed to SSL one.
-    If url has no port specified, it returns the same url.
-    SSL port is extracted from base secure url
-    """
-    # Set proper PORT for images requested via SSL
-    sslURL = Config.getInstance().getBaseSecureURL()
-    sslPort = ':%d' % (urlparse.urlsplit(sslURL).port or 443)
-
-    # If there is NO port, nothing will happen (production indico)
-    # If there IS a port, it will be replaced with proper SSL one, taken from loginURL
-    regexp = ':\d{2,5}'   # Examples:   :8080   :80   :65535
-    return re.sub(regexp, sslPort, url)
 
 
 class outputGenerator(object):

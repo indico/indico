@@ -20,51 +20,16 @@ if(!window.indicoOfflineSite) {
     include(ScriptRoot + '/ckeditor/ckeditor.js');
 }
 
-var indicoSource = null;
-var indicoRequest = null;
-var imageSrc = null;
-
 function imageFunctionGenerator(url) {
     return function (imageId, extension) {
         return url + '/' + imageId + '.' + (extension || 'png');
     };
 }
 
-if (location.protocol == "https:") {
-    function fixUrls(urls) {
-        for(var key in urls) {
-            // flask router -> skip
-            if(urls[key].type == 'flask_rules') {
-                continue;
-            }
 
-            // not a string -> assume object and recurse
-            if(urls[key].replace === undefined) {
-                fixUrls(urls[key]);
-                continue;
-            }
-
-            // skip if the url starts with https or it's ImagesBase
-            if(urls[key].indexOf('https:') === 0) {
-                continue;
-            }
-
-            if(urls['Secure' + key]) {
-                // we alraedy have a secure url, e.g. for ImageBase
-                urls[key] = urls['Secure' + key];
-            }
-            else {
-                urls[key] = urls[key].replace(/^http:/, 'https:');
-            }
-        }
-    }
-
-    fixUrls(Indico.Urls);
-}
-
-indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
-indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
-imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
+var indicoSource = curry(jsonRpcValue, Indico.Urls.JsonRpcService);
+var indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
+var imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 
 
 function getPx(pixVal) {

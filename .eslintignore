@@ -12,3 +12,4 @@ indico/htdocs/js/indico/MaterialEditor/
 indico/htdocs/js/indico/RoomBooking/
 indico/htdocs/js/indico/angular/
 indico/htdocs/js/indico/modules/timetable/timetable/*.js
+indico/web/templates/assets/*.js

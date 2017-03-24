@@ -123,7 +123,7 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     template_args = template_args or {}
     url_args = url_args or {}
     token = secure_serializer.dumps(data or email, salt=salt)
-    url = url_for(endpoint, token=token, _external=True, _secure=True, **url_args)
+    url = url_for(endpoint, token=token, _external=True, **url_args)
     template_module = get_template_module(template, email=email, url=url, **template_args)
     GenericMailer.send(make_email(email, template=template_module))
     flash(_('We have sent you a verification email. Please check your mailbox within the next hour and open '

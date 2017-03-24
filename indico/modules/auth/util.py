@@ -116,7 +116,7 @@ def redirect_to_login(next_url=None, reason=None):
 
 
 def url_for_login(next_url=None):
-    return url_for('auth.login', next=next_url, _external=True, _secure=True)
+    return url_for('auth.login', next=next_url, _external=True)
 
 
 def url_for_logout(next_url=None):
@@ -135,7 +135,7 @@ def url_for_register(next_url=None, email=None):
     """
     if Config.getInstance().getLocalIdentities():
         token = secure_serializer.dumps(email, salt='register-email-prevalidated') if email else None
-        return url_for('auth.register', token=token, next=next_url, _external=True, _secure=True)
+        return url_for('auth.register', token=token, next=next_url, _external=True)
 
     external_url = Config.getInstance().getExternalRegistrationURL()
     return external_url or url_for_login()

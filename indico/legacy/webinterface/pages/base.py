@@ -120,10 +120,7 @@ class WPBase:
         self._extraCSS = []
 
     def _getBaseURL(self):
-        if request.is_secure and Config.getInstance().getBaseSecureURL():
-            return Config.getInstance().getBaseSecureURL()
-        else:
-            return Config.getInstance().getBaseURL()
+        return Config.getInstance().getBaseURL()
 
     def _getTitle(self):
         return self._title

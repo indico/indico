@@ -110,13 +110,12 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
         checkin_app_client_id = config.getCheckinAppClientId()
         checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
 
-        base_url = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
         qr_data = {
             "event_id": self.event_new.id,
             "title": self.event_new.title,
             "date": format_date(self.event_new.start_dt_local),  # XXX: switch to utc+isoformat?
             "server": {
-                "baseUrl": base_url,
+                "baseUrl": config.getBaseURL(),
                 "consumerKey": checkin_app.client_id,
                 "auth_url": url_for('oauth.oauth_authorize', _external=True),
                 "token_url": url_for('oauth.oauth_token', _external=True)
