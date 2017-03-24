@@ -174,12 +174,12 @@ class RHEmailEventPersons(RHConferenceModifBase):
         user_ids = request.form.getlist('user_id')
         recipients = set(self._find_event_persons(person_ids, request.args.get('not_invited_only') == '1'))
         recipients |= set(self._find_users(user_ids))
-        disabled_until_change = True
         if self.no_account:
             tpl = get_template_module('events/persons/emails/invitation.html', event=self.event_new)
             disabled_until_change = False
         else:
             tpl = get_template_module('events/persons/emails/generic.html', event=self.event_new)
+            disabled_until_change = True
         form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
                                      recipients=', '.join(sorted(x.email for x in recipients)),
                                      body=tpl.get_html_body(), subject=tpl.get_subject(), register_link=self.no_account)
