@@ -21,6 +21,7 @@ from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
 from indico.core.plugins import plugin_engine
+from indico.modules.events.layout import theme_settings
 from indico.modules.users.util import serialize_user
 from indico.util.caching import make_hashable
 from indico.util.i18n import po_to_json
@@ -113,9 +114,17 @@ def i18n_locale(locale_name):
 
 @assets_blueprint.route('!/static/assets/core/<path:path>')
 @assets_blueprint.route('!/static/assets/plugin-<plugin>/<path:path>')
-def static_asset(path, plugin=None):
+@assets_blueprint.route('!/static/assets/theme-<theme>/<path:path>')
+def static_asset(path, plugin=None, theme=None):
+    # Ensure there's no weird stuff in the plugin/theme name
     if plugin and not plugin_engine.get_plugin(plugin):
-        # Ensure there's no weird stuff in the plugin name
         raise NotFound
-    path = os.path.join('core' if not plugin else 'plugin-{}'.format(plugin), path)
-    return send_from_directory(Config.getInstance().getAssetsDir(), path)
+    elif theme and theme not in theme_settings.themes:
+        raise NotFound
+    if plugin:
+        base = 'plugin-{}'.format(plugin)
+    elif theme:
+        base = 'theme-{}'.format(theme)
+    else:
+        base = 'core'
+    return send_from_directory(Config.getInstance().getAssetsDir(), os.path.join(base, path))

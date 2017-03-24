@@ -16,12 +16,9 @@
 
 from __future__ import unicode_literals
 
-import os
-
 from flask import session
 from jinja2.filters import do_filesizeformat
 
-import indico
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.modules.events.features.base import EventFeature
@@ -51,7 +48,7 @@ layout_settings = EventSettingsProxy('layout', {
     'timetable_detailed': False
 })
 
-theme_settings = ThemeSettingsProxy(os.path.join(os.path.dirname(indico.__file__), 'modules', 'events', 'themes.yaml'))
+theme_settings = ThemeSettingsProxy()
 
 
 @signals.event.created.connect

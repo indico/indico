@@ -62,3 +62,8 @@ depend on the hook.
 get_event_request_definitions = _signals.signal('get-event-request-definitions', """
 Expected to return one or more RequestDefinition subclasses.
 """)
+
+get_event_themes_files = _signals.signal('get-event-themes-files', """
+Expected to return the path of a themes yaml containing event theme
+definitions.
+""")

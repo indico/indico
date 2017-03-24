@@ -51,7 +51,8 @@ from indico.util.i18n import gettext_context, ngettext_context, babel, _
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum, crc32, slugify
-from indico.web.assets import core_env, register_all_css, register_all_js, include_js_assets, include_css_assets
+from indico.web.assets import (core_env, register_all_css, register_all_js, register_theme_sass,
+                               include_js_assets, include_css_assets)
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
                                          subclassof, call_template_hook, groupby, strip_tags)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -228,6 +229,7 @@ def setup_assets():
     ASSETS_REGISTERED = True
     register_all_js(core_env)
     register_all_css(core_env)
+    register_theme_sass()
 
 
 def configure_db(app):
@@ -358,9 +360,6 @@ def make_app(set_path=False, testing=False):
     oauth.init_app(app)
     setup_jinja(app)
 
-    with app.app_context():
-        setup_assets()
-
     configure_db(app)
     mm.init_app(app)
     extend_url_map(app)
@@ -372,5 +371,8 @@ def make_app(set_path=False, testing=False):
         raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
     # Below this points plugins are available, i.e. sending signals makes sense
     add_plugin_blueprints(app)
+    # assets include event themes which can be provided by plugins
+    with app.app_context():
+        setup_assets()
     signals.app_created.send(app)
     return app

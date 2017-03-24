@@ -440,12 +440,13 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                             "dark": True } )
 
     def getPrintCSSFiles(self):
-        theme_print_sass = (self._asset_env['themes_{}_print_sass'.format(self.theme_id)].urls()
-                            if self.theme.get('print_stylesheet') else [])
+        theme_print_sass = (self.theme['asset_env']['print_sass'].urls()
+                            if 'print_sass' in self.theme.get('asset_env', [])
+                            else [])
         return WPConferenceBase.getPrintCSSFiles(self) + theme_print_sass
 
     def getCSSFiles(self):
-        theme_sass = self._asset_env['themes_{}_sass'.format(self.theme_id)].urls() if self.theme['stylesheet'] else []
+        theme_sass = self.theme['asset_env']['display_sass'].urls() if self.theme.get('asset_env') else []
         return WPConferenceBase.getCSSFiles(self) + theme_sass
 
     def getJSFiles(self):
