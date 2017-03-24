@@ -1,32 +1,36 @@
-Indico Documentation
-====================
+Indico
+======
 
-============================
 Installation / Configuration
-============================
+++++++++++++++++++++++++++++
 
 .. toctree::
-   :maxdepth: 1
-   :numbered:
+    :maxdepth: 1
 
-   installation.rst
+    Installing Indico <installation.rst>
 
-===
-API
-===
+
+Python API
+++++++++++++++++++++++++++++
 
 .. toctree::
-   :maxdepth: 1
-   :numbered:
+    :maxdepth: 2
 
-   fossilize.rst
-   http_api/index.rst
-   plugins/index.rst
+    api/index.rst
+    plugins/index.rst
+
+
+HTTP API
+++++++++++++++++++++++++++++
+
+.. toctree::
+    :maxdepth: 1
+
+    HTTP API <http_api/index.rst>
 
 
 Indices and tables
-==================
+++++++++++++++++++
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

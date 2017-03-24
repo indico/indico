@@ -4,7 +4,6 @@ Extending Indico with plugins
 Contents:
 
 .. toctree::
-   :numbered:
    :maxdepth: 1
 
    plugin.rst
@@ -17,4 +16,3 @@ Contents:
 .. * :ref:`genindex`
 .. * :ref:`modindex`
 .. * :ref:`search`
-

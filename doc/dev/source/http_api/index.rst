@@ -1,21 +1,10 @@
-Indico's HTTP Export API
-========================
-
-Contents:
+Indico - HTTP API
+=================
 
 .. toctree::
-   :numbered:
-   :maxdepth: 1
+   :maxdepth: 2
 
    ./access.rst
    ./common.rst
    ./exporters/index.rst
    ./tools.rst
-
-.. Indices and tables
-.. ==================
-
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
-
