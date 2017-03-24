@@ -57,7 +57,6 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
     os.environ['INDICO_CONF_OVERRIDE'] = repr({
         'EmbeddedWebserver': True,
         'BaseURL': url,
-        'BaseSecureURL': '' if not ssl else url,
     })
 
     if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':

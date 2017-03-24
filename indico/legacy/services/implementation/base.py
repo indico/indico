@@ -18,7 +18,7 @@ import os
 import sys
 import traceback
 
-from flask import g, request, session
+from flask import g, session
 
 from indico.core.config import Config
 from indico.legacy.accessControl import AccessWrapper
@@ -47,7 +47,6 @@ class ServiceBase(RequestHandlerBase):
         self._aw.setUser(session.avatar)
         self._target = None
         self._startTime = None
-        self._tohttps = request.is_secure
         self._endTime = None
         self._doProcess = True  #Flag which indicates whether the RH process
                                 #   must be carried out; this is useful for

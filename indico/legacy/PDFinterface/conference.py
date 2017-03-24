@@ -1479,11 +1479,10 @@ class TicketToPDF(PDFBase):
             border=1
         )
         config = Config.getInstance()
-        baseURL = config.getBaseSecureURL() if config.getBaseSecureURL() else config.getBaseURL()
         qr_data = {"registrant_id": self._registration.id,
                    "checkin_secret": self._registration.ticket_uuid,
                    "event_id": self._event.id,
-                   "server_url": baseURL}
+                   "server_url": config.getBaseURL()}
         json_qr_data = json.dumps(qr_data)
         qr.add_data(json_qr_data)
         qr.make(fit=True)

@@ -26,7 +26,7 @@ from datetime import timedelta
 
 import pytz
 from celery.schedules import crontab
-from flask import g, has_app_context, request
+from flask import g, has_app_context
 from flask.helpers import get_root_path
 from werkzeug.urls import url_parse
 
@@ -228,8 +228,7 @@ class Config:
         'EnableRoomBooking'         : True,
         'SanitizationLevel'         : 1,
         'CSRFLevel'                 : 2,
-        'BaseURL'                   : 'http://localhost/',
-        'BaseSecureURL'             : 'https://localhost/',
+        'BaseURL'                   : 'http://localhost',
         'LogDir'                    : "/opt/indico/log" ,
         'TempDir'                   : "/opt/indico/tmp",
         'SharedTempDir'             : "",
@@ -247,7 +246,6 @@ class Config:
         'NoReplyEmail'              : 'noreply-root@localhost',
         'Profile'                   : 'no',
         'StaticFileMethod'          : None,
-        'AuthenticatedEnforceSecure': 'no',
         'MaxUploadFilesTotalSize'   : 0,
         'MaxUploadFileSize'         : 0,
         'PropagateAllExceptions'    : False,
@@ -342,6 +340,7 @@ class Config:
         # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
         # config.py will become fat again if you don't follow this advice.
         self._configVars.update({
+            'BaseURL'                   : self._configVars['BaseURL'].rstrip('/'),
             'TPLVars'                   : {},
             'FileTypes'                 : FILE_TYPES,
             'HelpDir'                   : os.path.join(self.getHtdocsDir(), 'ihelp'),
@@ -358,7 +357,6 @@ class Config:
             'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
             'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
             'ImagesBaseURL'             : self.getImagesBaseURL(),
-            'ImagesBaseSecureURL'       : self.getImagesBaseSecureURL(),
             'Version'                   : indico.__version__,
             'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
         })
@@ -442,12 +440,6 @@ class Config:
         else:
             return False
 
-    def getShortCategURL(self):
-        return '%s/c/' % (self.getBaseSecureURL() or self.getBaseURL())
-
-    def getShortEventURL(self):
-        return '%s/e/' % (self.getBaseSecureURL() or self.getBaseURL())
-
     def getSmtpUseTLS(self):
         return self._yesOrNoVariable('SmtpUseTLS')
 
@@ -464,9 +456,6 @@ class Config:
             return None
         else:
             return val
-
-    def getAuthenticatedEnforceSecure(self):
-        return self._yesOrNoVariable('AuthenticatedEnforceSecure') and self.getBaseSecureURL()
 
     def getFinalConfigFilePath(self):
         config_path = self.getConfigFilePath()
@@ -495,14 +484,7 @@ class Config:
         cls.__instance = instance
 
     def getCssConfTemplateBaseURL(self):
-        rh = has_app_context() and g.get('rh')
-
-        if rh and request.is_secure and self.getBaseSecureURL():
-            baseURL = self.getBaseSecureURL()
-        else:
-            baseURL = self.getBaseURL()
-
-        return "%s/css/confTemplates" % baseURL
+        return '{}/css/confTemplates'.format(self.getBaseURL())
 
     def getTPLVars(self):
         """gives back the user configured variables that must be available in
@@ -540,12 +522,6 @@ class Config:
             return "static/images"
         else:
             return url_parse("%s/images" % self.getBaseURL()).path
-
-    def getImagesBaseSecureURL(self):
-        if has_app_context() and g.get('static_site'):
-            return "static/images"
-        else:
-            return url_parse("%s/images" % self.getBaseSecureURL()).path
 
     def getCssBaseURL(self):
         if has_app_context() and g.get('static_site'):

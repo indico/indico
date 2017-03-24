@@ -38,7 +38,6 @@ class APIMode(int, IndicoEnum):
 
 
 settings = SettingsProxy('api', {
-    'require_https': False,
     'allow_persistent': False,
     'security_mode': APIMode.KEY.value,
     'cache_ttl': 600,

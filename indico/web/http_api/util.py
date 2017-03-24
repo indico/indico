@@ -64,10 +64,7 @@ def generate_public_auth_request(apiKey, path, params=None):
     else:
         key = secret_key = None
         persistent = False
-    if api_settings.get('require_https'):
-        baseURL = Config.getInstance().getBaseSecureURL()
-    else:
-        baseURL = Config.getInstance().getBaseURL()
+    baseURL = Config.getInstance().getBaseURL()
     publicRequestsURL = None
     authRequestURL = None
     if apiMode == APIMode.KEY:

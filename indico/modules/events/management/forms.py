@@ -72,7 +72,7 @@ class EventDataForm(IndicoForm):
         self.event = kwargs.pop('event')
         super(EventDataForm, self).__init__(*args, **kwargs)
         # TODO: Add a custom widget showing the prefix right before the field
-        prefix = Config.getInstance().getShortEventURL()
+        prefix = '{}/e/'.format(Config.getInstance().getBaseURL())
         self.url_shortcut.description = _('<strong>{}SHORTCUT</strong> - the URL shortcut must be unique within '
                                           'this Indico instance and is not case sensitive.').format(prefix)
 

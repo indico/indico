@@ -73,8 +73,6 @@ def _fix_url_path(path):
         path = path[7:]
     elif path.startswith(Config.getInstance().getBaseURL()):
         path = path[len(Config.getInstance().getBaseURL()):]
-    elif path.startswith(Config.getInstance().getBaseSecureURL()):
-        path = path[len(Config.getInstance().getBaseSecureURL()):]
     path = path.lstrip('/')
     path = _remove_qs(path)
     return path

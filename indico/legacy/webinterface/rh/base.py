@@ -13,6 +13,7 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 import copy
 import inspect
 import itertools
@@ -25,7 +26,6 @@ import StringIO
 import warnings
 from datetime import datetime
 from functools import wraps, partial
-from urlparse import urljoin
 from xml.sax.saxutils import escape
 
 import jsonschema
@@ -105,22 +105,6 @@ class RequestHandlerBase():
         """
         self._aw.setUser(new_user)
 
-    def getRequestURL(self, secure=False):
-        """
-        Reconstructs the request URL
-        """
-        query_string = ('?' + request.query_string) if request.query_string else ''
-        if secure:
-            return urljoin(Config.getInstance().getBaseSecureURL(), request.path) + query_string
-        else:
-            return request.url
-
-    def use_https(self):
-        """
-        If the RH must be HTTPS and there is a BaseSecurURL, then use it!
-        """
-        return self._tohttps and Config.getInstance().getBaseSecureURL()
-
     def getRequestParams(self):
         return self._params
 
@@ -169,7 +153,6 @@ class RH(RequestHandlerBase):
                  python data types. The key is the parameter name while the
                  value should be the received paramter value (or values).
     """
-    _tohttps = False  # set this value to True for the RH that must be HTTPS when there is a BaseSecureURL
     _doNotSanitizeFields = []
     _isMobile = True  # this value means that the generated web page can be mobile
     CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
@@ -269,14 +252,6 @@ class RH(RequestHandlerBase):
     def _changeRH(self, rh, params):
         """Calls the specified RH after processing this one"""
         self._responseUtil.call = lambda: rh().process(params)
-
-    def _checkHttpsRedirect(self):
-        """If HTTPS must be used but it is not, redirect!"""
-        if self.use_https() and not request.is_secure:
-            self._redirect(self.getRequestURL(secure=True))
-            return True
-        else:
-            return False
 
     def _normaliseListParam(self, param):
         if not isinstance(param, list):
@@ -417,10 +392,6 @@ class RH(RequestHandlerBase):
         # valid http referer
         if referer.startswith(Config.getInstance().getBaseURL()):
             return
-        # valid https referer - if https is enabled
-        base_secure = Config.getInstance().getBaseSecureURL()
-        if base_secure and referer.startswith(base_secure):
-            return
         raise BadRefererError('This operation is not allowed from an external referer.')
 
     def _check_event_feature(self):
@@ -477,22 +448,11 @@ class RH(RequestHandlerBase):
     @jsonify_error
     def _processKeyAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
-
-        # We are going to redirect to the page asking for access key
-        # and so it must be https if there is a BaseSecureURL. And that's
-        # why we set _tohttps to True.
-        self._tohttps = True
-        if self._checkHttpsRedirect():
-            return
         return errors.WPKeyAccessError(self).display()
 
     @jsonify_error
     def _processModificationError(self, e):
         """Handles modification errors occured during the process of a RH."""
-        # Redirect to HTTPS in case the user is logged in
-        self._tohttps = True
-        if self._checkHttpsRedirect():
-            return
         if not session.user:
             return redirect_to_login(reason=_("Please log in to access this page. If you have a modification key, you "
                                               "may enter it afterwards."))
@@ -560,11 +520,6 @@ class RH(RequestHandlerBase):
         self._setSessionUser()
         if session.user:
             Logger.get('requestHandler').info('Request authenticated: %r', session.user)
-            if not self._tohttps and Config.getInstance().getAuthenticatedEnforceSecure():
-                self._tohttps = True
-                if self._checkHttpsRedirect():
-                    return self._responseUtil.make_redirect()
-
         self._checkCSRF()
         self._reqParams = copy.copy(params)
 
@@ -635,10 +590,6 @@ class RH(RequestHandlerBase):
         self._startTime = datetime.now()
 
         g.rh = self
-
-        # redirect to https if necessary
-        if self._checkHttpsRedirect():
-            return self._responseUtil.make_redirect()
 
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()

@@ -30,7 +30,6 @@ class APIImporter(Importer):
     def migrate_settings(self):
         print cformat('%{white!}migrating settings')
         settings_map = {
-            '_apiHTTPSRequired': 'require_https',
             '_apiPersistentAllowed': 'allow_persistent',
             '_apiMode': 'security_mode',
             '_apiCacheTTL': 'cache_ttl',

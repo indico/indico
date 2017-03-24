@@ -14,19 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-"""
-HTTP API - Response objects
-"""
-
-# python stdlib imports
 import time
 
-# indico imports
-from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
-
-# indico legacy imports
 from indico.core.config import Config
 from indico.legacy.common.fossilize import fossilizes, Fossilizable
+from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
+
 
 class HTTPAPIError(Exception, Fossilizable):
     fossilizes(IHTTPAPIErrorFossil)
@@ -59,7 +52,7 @@ class HTTPAPIResult(Fossilizable):
         return self._ts
 
     def getURL(self):
-        prefix = Config.getInstance().getBaseSecureURL()
+        prefix = Config.getInstance().getBaseURL()
         if self._query:
             return prefix + self._path + '?' + self._query
         return prefix + self._path

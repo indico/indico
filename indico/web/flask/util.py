@@ -214,18 +214,9 @@ def url_for(endpoint, *targets, **values):
     The important special arguments you can put in `values` are:
 
     _external: if set to `True`, an absolute URL is generated
-    _secure: if True/False, set _scheme to https/http if possible (only with _external)
     _scheme: a string specifying the desired URL scheme (only with _external) - use _secure if possible!
     _anchor: if provided this is added as #anchor to the URL.
     """
-
-    secure = values.pop('_secure', None)
-    if secure is not None:
-        from indico.core.config import Config
-        if secure and Config.getInstance().getBaseSecureURL():
-            values['_scheme'] = 'https'
-        elif not secure:
-            values['_scheme'] = 'http'
 
     if targets:
         locator = {}
