@@ -67,12 +67,10 @@ _bp.add_url_rule('/manage/papers/templates/<int:template_id>-<filename>', 'delet
                  templates.RHDeletePaperTemplate, methods=('DELETE',))
 _bp.add_url_rule('/manage/papers/templates/<int:template_id>-<filename>/edit', 'edit_template',
                  templates.RHEditPaperTemplate, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/papers/teams/', 'manage_teams', management.RHManagePaperTeams,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/teams/', 'manage_teams', management.RHManagePaperTeams, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/teams/competences', 'manage_competences', management.RHManageCompetences,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/papers/teams/contact', 'manage_contact', management.RHManageContact,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/papers/teams/contact', 'contact_staff', management.RHContactStaff, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/papers/enable/<any(content,layout):reviewing_type>', 'switch',
                  management.RHSwitchReviewingType, methods=('PUT', 'DELETE'))
 

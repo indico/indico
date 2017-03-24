@@ -125,8 +125,8 @@ class RHManageCompetences(RHManagePapersBase):
                                               form=form)
 
 
-class RHManageContact(RHManagePapersBase):
-    """Allow to send emails to members of reviewing team"""
+class RHContactStaff(RHManagePapersBase):
+    """Send emails to reviewing staff"""
 
     def _process(self):
         paper_persons_dict = {}
