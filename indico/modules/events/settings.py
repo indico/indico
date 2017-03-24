@@ -16,16 +16,21 @@
 
 from __future__ import unicode_literals
 
+import os
+import re
 from functools import wraps
 
 import yaml
+from flask import current_app
 
+from indico.core import signals
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
 from indico.core.settings.converters import DatetimeConverter
 from indico.core.settings.proxy import SettingProperty
 from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
 from indico.modules.events.models.settings import EventSettingPrincipal, EventSetting
 from indico.util.caching import memoize
+from indico.util.signals import values_from_signal
 from indico.util.user import iter_acl
 
 
@@ -194,16 +199,49 @@ class EventSettingProperty(SettingProperty):
 
 
 class ThemeSettingsProxy(object):
-    def __init__(self, settings_file):
-        settings = self._load_settings(settings_file)
-        self.themes = settings['definitions']
-        self.defaults = settings['defaults']
-
-    @staticmethod
+    @property
     @memoize
-    def _load_settings(settings_file):
-        with open(settings_file) as f:
-            return yaml.load(f)
+    def settings(self):
+        core_path = os.path.join(current_app.root_path, 'modules', 'events', 'themes.yaml')
+        with open(core_path) as f:
+            core_data = f.read()
+        core_settings = yaml.safe_load(core_data)
+        # YAML doesn't give us access to anchors so we need to include the base yaml.
+        # Since duplicate keys are invalid (and may start failing in the future) we
+        # rename them - this also makes it easy to throw them away after parsing the
+        # file provided by a plugin.
+        core_data = re.sub(r'^(\S+:)$', r'__core_\1', core_data, flags=re.MULTILINE)
+        for plugin, path in values_from_signal(signals.plugin.get_event_themes_files.send(), return_plugins=True):
+            with open(path) as f:
+                data = f.read()
+            settings = {k: v
+                        for k, v in yaml.safe_load(core_data + '\n' + data).viewitems()
+                        if not k.startswith('__core_')}
+            # We assume there's no more than one theme plugin that provides defaults.
+            # If that's not the case the last one "wins". We could reject this but it
+            # is quite unlikely that people have multiple theme plugins in the first
+            # place, even more so theme plugins that specify defaults.
+            core_settings['defaults'].update(settings.get('defaults', {}))
+            # Same for definitions - we assume plugin authors are responsible enough
+            # to avoid using definition names that are likely to cause collisions.
+            # Either way, if someone does this on purpose changes are good they want
+            # to override a default style so let them do so...
+            for name, definition in settings.get('definitions', {}).viewitems():
+                definition['plugin'] = plugin
+                if definition.get('stylesheet'):
+                    definition['stylesheet'] = definition['stylesheet']
+                core_settings['definitions'][name] = definition
+        return core_settings
+
+    @property
+    @memoize
+    def themes(self):
+        return self.settings['definitions']
+
+    @property
+    @memoize
+    def defaults(self):
+        return self.settings['defaults']
 
     @memoize
     def get_themes_for(self, event_type):

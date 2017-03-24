@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from .bundles import (configure_pyscss, core_env, include_css_assets, register_all_css,
-                      register_all_js, include_js_assets, SASS_BASE_MODULES)
+                      register_all_js, include_js_assets, register_theme_sass, SASS_BASE_MODULES)
 
 __all__ = ('configure_pyscss', 'core_env', 'include_css_assets', 'include_js_assets',
-           'register_all_css', 'register_all_js', 'SASS_BASE_MODULES')
+           'register_all_css', 'register_all_js', 'register_theme_sass', 'SASS_BASE_MODULES')
