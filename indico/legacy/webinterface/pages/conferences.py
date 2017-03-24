@@ -476,7 +476,6 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             return ""
         return WPConferenceBase._getHTMLFooter(self)
 
-
     def _getBody(self, params):
         """Return main information about the event."""
 
@@ -486,12 +485,16 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
         else:
             outGen = outputGenerator(self._rh._aw)
             varsForGenerator = self._getBodyVariables()
-            kwargs = {}
-            kwargs['xml'] = outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)
+            kwargs = {'xml': outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)}
 
         kwargs['theme_settings'] = self.theme.get('settings', {})
-        return render_template(posixpath.join('events/display', self.theme['template']), event=self._conf.as_event,
-                               conf=self._conf, **kwargs).encode('utf-8')
+        plugin = self.theme.get('plugin')
+        tpl_name = self.theme['template']
+        tpl = ((plugin.name + tpl_name)
+               if (plugin and tpl_name[0] == ':')
+               else posixpath.join('events/display', tpl_name))
+        return (render_template(tpl, event=self._conf.as_event, conf=self._conf, **kwargs)
+                .encode('utf-8'))
 
 
 class WPrintPageFrame (wcomponents.WTemplated):
