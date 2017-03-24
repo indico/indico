@@ -1,6 +1,9 @@
 Hooking into Indico using Signals
 =================================
 
+.. contents::
+    :depth: 3
+
 Signals allow you to hook into certain parts of Indico without
 adding any code to the core (which is something a plugin can and
 should not do). Each signal has a *sender* which can be any object
@@ -15,13 +18,19 @@ For example, a receiver function could look like this::
     def receiver(sender, something, **kwargs):
         do_stuff_with(something)
 
+
+indico.core.signals
+-------------------
+
 .. exec::
     def main():
         from types import ModuleType
         from blinker import Signal
         from indico.core import signals
 
-        def generate_signal_doc(module):
+        separators = ['+', '*', '^', '\'']
+
+        def generate_signal_doc(module, nesting=0):
 
             sorted_attributes = sorted(
                 ((getattr(module, n), n) for n in dir(module)),
@@ -37,7 +46,9 @@ For example, a receiver function could look like this::
                 # don't recurse in those cases to avoid duplicate docs
                 elif (isinstance(attr, ModuleType) and
                         name != 'core' and module.__name__ != 'indico.core.signals.event'):
-                    generate_signal_doc(attr)
+                    print attr.__name__
+                    print separators[nesting] * len(attr.__name__)
+                    generate_signal_doc(attr, nesting=(nesting + 1))
 
         generate_signal_doc(signals)
 

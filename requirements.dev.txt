@@ -4,6 +4,7 @@ termcolor
 nodeenv
 fabric
 sphinx
+sphinx-autobuild
 repoze.sphinx.autointerface
 pygments
 sqlparse
