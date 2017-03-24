@@ -18,7 +18,7 @@ import os
 import re
 from collections import defaultdict
 from datetime import datetime
-from flask import request
+
 from indico.modules.groups import GroupProxy
 from sqlalchemy.orm import joinedload, load_only
 
@@ -29,7 +29,6 @@ import StringIO
 from lxml import etree
 
 from xmlGen import XMLGen
-from indico.legacy.common.TemplateExec import escapeHTMLForJS
 
 from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
@@ -107,10 +106,10 @@ class outputGenerator(object):
     def getOutput(self, conf, stylesheet, vars=None, includeSession=1, includeContribution=1, includeSubContribution=1, includeMaterial=1, showSession="all", showDate="all", showContribution="all"):
         # get xml conference
         xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
-        if not os.path.exists(stylesheet):
-            self.text = _("Cannot find stylesheet")
-        if os.path.basename(stylesheet) == 'XML.xsl':
+        if stylesheet is None:
             self.text = xml
+        elif not os.path.exists(stylesheet):
+            self.text = _("Cannot find stylesheet")
         else:
             # instantiate the XSL tool
             parser = XSLTransformer(stylesheet)
@@ -123,14 +122,7 @@ class outputGenerator(object):
         stylesheet: path to the xsl file
         """
         self.getOutput(conf, stylesheet, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution)
-        html = self.text
-        if request.is_secure:
-            # XXX: is this even needed anymore?!
-            baseURL = Config.getInstance().getBaseURL()
-            baseSecureURL = _set_ssl_port(Config.getInstance().getBaseSecureURL())
-            html = html.replace(baseURL, baseSecureURL)
-            html = html.replace(escapeHTMLForJS(baseURL), escapeHTMLForJS(baseSecureURL))
-        return html
+        return self.text
 
     def _getBasicXML(self, conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession="all", showDate="all", showContribution="all", showSubContribution="all", out=None):
         serializer = XMLEventSerializer(conf.as_event, include_timetable=includeContribution, event_tag_name='iconf')

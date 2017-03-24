@@ -345,7 +345,6 @@ class Config:
             'TPLVars'                   : {},
             'FileTypes'                 : FILE_TYPES,
             'HelpDir'                   : os.path.join(self.getHtdocsDir(), 'ihelp'),
-            'StylesheetsDir'            : os.path.join(webinterface_dir, 'stylesheets'),
             'ImagesDir'                 : os.path.join(self.getHtdocsDir(), 'images'),
             'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
             'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),

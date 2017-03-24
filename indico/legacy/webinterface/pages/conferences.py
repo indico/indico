@@ -330,9 +330,12 @@ class WPXSLConferenceDisplay(WPConferenceBase):
                 includeContribution = 1
             else:
                 includeContribution = 0
-            template_path = os.path.join(Config.getInstance().getStylesheetsDir(), 'events',
-                                         theme_settings.themes[self._view]['template'])
-            body = outGen.getFormattedOutput(self._rh, self._conf, template_path,
+            theme = theme_settings.themes[self._view]
+            stylesheet = None
+            if theme['template']:
+                assert theme.get('plugin')  # we don't have XSL-based themes in the core anymore
+                stylesheet = os.path.join(theme['plugin'].root_path, 'themes', theme['template'])
+            body = outGen.getFormattedOutput(self._rh, self._conf, stylesheet,
                                              body_vars, 1, includeContribution, 1, 1,
                                              self._params.get("showSession", ""), self._params.get("showDate", ""))
             return body
