@@ -16,7 +16,6 @@
 
 import os
 import posixpath
-from datetime import datetime
 
 from flask import session, render_template, request
 from pytz import timezone
@@ -25,7 +24,6 @@ from sqlalchemy.orm import load_only
 from indico.core.config import Config
 from indico.modules.auth.util import url_for_logout
 from indico.modules.core.settings import social_settings, core_settings
-from indico.modules.events.cloning import EventCloner
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
@@ -260,27 +258,14 @@ class WConfDetailsFull(wcomponents.WTemplated):
 #---------------------------------------------------------------------------
 
 
-class WConfDetails:
-
-    def __init__(self, aw, conf):
-        self._conf = conf
-        self._aw = aw
-
-    def getHTML( self, params ):
-        return WConfDetailsFull( self._aw, self._conf ).getHTML( params )
-
-
 class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
     menu_entry_name = 'overview'
 
     def _getBody(self, params):
-        wc = WConfDetails(self._getAW(), self._conf)
-        pars = {"modifyURL": url_for('event_management.settings', self._conf.as_event)}
-        return wc.getHTML(pars)
+        return WConfDetailsFull(self._getAW(), self._conf).getHTML()
 
     def _getFooter(self):
-        wc = wcomponents.WEventFooter(self._conf)
-        return wc.getHTML()
+        return wcomponents.WEventFooter(self._conf).getHTML()
 
 
 class WPXSLConferenceDisplay(WPConferenceBase):
@@ -316,11 +301,7 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         return ""
 
     def _getBodyVariables(self):
-        pars = {"modifyURL": url_for('event_management.settings', self._conf.as_event),
-                "cloneURL": url_for('event_mgmt.confModifTools-clone', self._conf.as_event)}
-
-        pars.update({ 'firstDay' : self._firstDay, 'lastDay' : self._lastDay, 'daysPerRow' : self._daysPerRow })
-        return pars
+        return {'firstDay': self._firstDay, 'lastDay': self._lastDay, 'daysPerRow': self._daysPerRow}
 
     def _getBody(self, params):
         body_vars = self._getBodyVariables()
@@ -558,79 +539,6 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
         # XXX: We show a message in the management frame but this class is used
         # in too many places so we keep it around for now.
         return ''
-
-
-class WPConfCloneConfirm(WPConferenceModifBase):
-
-    def __init__(self, rh, conf, nbClones):
-        WPConferenceModifBase.__init__(self, rh, conf)
-        self._nbClones = nbClones
-
-    def _getPageContent(self, params):
-
-        msg = _("This action will create {0} new events. Are you sure you want to proceed").format(self._nbClones)
-
-        wc = wcomponents.WConfirmation()
-        params = dict(self._rh._getRequestParams())
-        del params['confId']
-        url = url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event, **params)
-        return wc.getHTML(msg, url, {}, True, confirmButtonCaption=_("Yes"), cancelButtonCaption=_("No"))
-
-
-class WConferenceClone(wcomponents.WTemplated):
-
-    def __init__(self, conference):
-        self.__conf = conference
-
-    def _getSelectDay(self):
-        sd = ""
-        for i in range(31) :
-            selected = ""
-            if datetime.today().day == (i+1) :
-                selected = "selected=\"selected\""
-            sd += "<OPTION VALUE=\"%d\" %s>%d\n"%(i+1, selected, i+1)
-        return sd
-
-    def _getSelectMonth(self):
-        sm = ""
-        month = [ "January", "February", "March", "April", "May", "June",
-                "July", "August", "September", "October", "November", "December"]
-        for i in range(12) :
-            selected = ""
-            if datetime.today().month == (i+1) :
-                selected = "selected=\"selected\""
-            sm += "\t<OPTION VALUE=\"%d\" %s>%s\n"%(i+1, selected, _(month[i]))
-        return sm
-
-    def _getSelectYear(self):
-        sy = ""
-        i = 1995
-        while i < 2015 :
-            selected = ""
-            if datetime.today().year == i :
-                selected = "selected=\"selected\""
-            sy += "\t<OPTION VALUE=\"%d\" %s>%d\n"%(i, selected, i)
-            i += 1
-        return sy
-
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-        vars["confTitle"] = self.__conf.as_event.title.encode('utf-8')
-        vars["confId"] = self.__conf.id
-        vars["selectDay"] = self._getSelectDay()
-        vars["selectMonth"] = self._getSelectMonth()
-        vars["selectYear"] = self._getSelectYear()
-        return vars
-
-
-class WPConfClone(WPConferenceModifBase):
-    def _getPageContent(self, params):
-        p = WConferenceClone(self._conf)
-        pars = {"cloning": url_for('event_mgmt.confModifTools-performCloning', self._conf.as_event),
-                "startTime": self._conf.as_event.start_dt_local.isoformat(),
-                "cloneOptions": EventCloner.get_form_items(self._conf.as_event).encode('utf-8')}
-        return p.getHTML(pars)
 
 
 class WConfMyStuff(WConfDisplayBodyBase):

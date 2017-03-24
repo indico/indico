@@ -286,7 +286,7 @@ class CloneContentsForm(CloneRepeatabilityForm):
     selected_items = IndicoSelectMultipleCheckboxField(_('What to clone'))
 
     def __init__(self, event, set_defaults=False, **kwargs):
-        options = EventCloner.get_form_items(event)
+        options = EventCloner.get_cloners(event)
         visible_options = filter(attrgetter('is_visible'), options)
         default_selected_items = kwargs.get('selected_items', [option.name for option in options if option.is_default])
 

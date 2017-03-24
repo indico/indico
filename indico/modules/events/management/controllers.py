@@ -474,7 +474,7 @@ class RHCloneEvent(RHManageEventBase):
                 # back to step 4, since there's been an error
                 step = 4
         dependencies = {c.name: {'requires': list(c.requires_deep), 'required_by': list(c.required_by_deep)}
-                        for c in EventCloner.get_form_items(self.event_new)}
+                        for c in EventCloner.get_cloners(self.event_new)}
         return jsonify_template('events/management/clone_event.html', event=self.event_new, step=step, form=form,
                                 cloner_dependencies=dependencies, **tpl_args)
 
