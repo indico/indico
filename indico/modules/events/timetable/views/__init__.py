@@ -131,6 +131,8 @@ def inject_meeting_body(event, **kwargs):
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
     theme_id = view if view and view in theme_settings.themes else event.theme
+    if theme_id not in theme_settings.themes:
+        theme_id = theme_settings.defaults[event.type_.name]
     theme = theme_settings.themes[theme_id]
     plugin = theme.get('plugin')
     tpl_name = theme.get('tt_template', theme['template'])
