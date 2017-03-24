@@ -2,6 +2,7 @@ defaults:
     conference: static
     lecture: lecture
     meeting: standard
+
 definitions:
   # Lectures - base
   lecture: &lecture
@@ -9,6 +10,7 @@ definitions:
     stylesheet: indico.scss
     template: indico/lecture.html
     title: Lecture
+
   event:
     <<: *lecture
     title: Event
@@ -23,16 +25,19 @@ definitions:
     print_stylesheet: sass/themes/print/indico.scss
     template: indico/meeting.html
     title: Indico style
+
   standard_inline_minutes:
     <<: *standard
     title: Indico style - inline minutes
     settings:
       show_notes: true
+
   nicecompact:
     event_types: [conference, meeting]
     stylesheet: compact.scss
     template: compact.html
     title: Compact style
+
   indico-weeks-view:
     event_types: [conference, meeting]
     stylesheet: weeks.scss
@@ -201,15 +206,9 @@ definitions:
     title: Staff Association (administrative)
 
   # XML
-  jacow:
-    event_types: [conference, lecture]
-    is_xml: true
-    stylesheet: null
-    template: JACoW.xsl
-    title: JACoW XML
   xml:
     event_types: [conference, lecture, meeting]
     is_xml: true
     stylesheet: null
-    template: XML.xsl
+    template: null
     title: xml
