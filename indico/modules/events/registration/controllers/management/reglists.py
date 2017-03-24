@@ -346,7 +346,6 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
 
 
 class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
-
     normalize_url_spec = {
         'locators': {
             lambda self: self.regform
@@ -386,7 +385,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                               .filter(Registration.id.in_(ids),
                                       ~Registration.is_deleted)
                               .order_by(*Registration.order_by_name)
-                              .all())
+                              .all()) if ids else []
         self.template_id = request.args.get('template_id')
 
     def _process(self):

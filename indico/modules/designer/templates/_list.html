@@ -1,5 +1,5 @@
 {% macro _render_badge_form_button(regform, tpl, format='text', text='') %}
-    {% set no_registrations = not regform.registrations %}
+    {% set no_registrations = not regform.registrations|rejectattr('is_deleted')|list %}
     {% set no_registrations_msg %}
         {% trans %}Registration Form has no registrations{% endtrans %}
     {% endset %}
@@ -93,9 +93,9 @@
                            data-ajax-dialog>
                         </a>
                     {% elif event %}
-                        {% set single_form = event.registration_forms|length == 1 %}
+                        {% set single_form = event.registration_forms|first if event.registration_forms|length == 1 %}
                         {% if single_form %}
-                            {{ _render_badge_form_button(event.registration_forms[0], tpl, format='icon') }}
+                            {{ _render_badge_form_button(single_form, tpl, format='icon') }}
                         {% else %}
                             <a href="#" class="i-button icon-print icon-only highlight text-color js-dropdown borderless
                                               {{ 'disabled' if not event.registration_forms }}"
