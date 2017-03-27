@@ -101,8 +101,8 @@
             }
             options.columns.forEach(function(col, i) {
                 var inputField = row.find('.js-table-input').eq(i);
-                var value = inputField.val();
-                if (!value.trim() && inputField.data('required')) {
+                var value = inputField.val().trim();
+                if (!value && inputField.data('required')) {
                     requiredFieldIsEmpty = true;
                     inputField.addClass('hasError');
                 } else if (inputField.attr('type') === 'checkbox') {
