@@ -119,8 +119,9 @@ def include_css_assets(bundle_name):
                             for url in core_env[bundle_name].urls()))
 
 
-def rjs_bundle(name, *files):
-    return Bundle(*files, filters='rjsmin', output='js/{}_%(version)s.min.js'.format(name))
+def rjs_bundle(name, *files, **kwargs):
+    filters = kwargs.pop('filters', 'rjsmin')
+    return Bundle(*files, filters=filters, output='js/{}_%(version)s.min.js'.format(name))
 
 
 indico_core = rjs_bundle(
@@ -238,6 +239,8 @@ angular = rjs_bundle(
     'js/indico/angular/directives.js',
     'js/indico/angular/filters.js',
     'js/indico/angular/services.js')
+
+ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
 chartist_js = rjs_bundle('chartist_js',
                          'js/lib/chartist.js/chartist.js')
@@ -507,6 +510,7 @@ def register_all_js(env):
     env.register('clipboard_js', clipboard_js)
     env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
+    env.register('ckeditor', ckeditor)
     env.register('chartist_js', chartist_js)
     env.register('taggle_js', taggle_js)
     env.register('widgets_js', widgets_js)

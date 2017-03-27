@@ -5,10 +5,6 @@
     <meta charset="UTF-8">
     <link rel="shortcut icon" type="image/x-icon" href="{{ system_icon('addressBarIcon') }}">
 
-    <script>
-        var ScriptRoot = {{ indico_config.ScriptBaseURL | tojson }};
-    </script>
-
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 

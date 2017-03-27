@@ -21,9 +21,6 @@
         </script>
 % endif
 
-        <script>
-            var ScriptRoot = ${ conf.getScriptBaseURL() | n,j };
-        </script>
         <script type="text/javascript" src="${ url_for('assets.i18n_locale', locale_name=language) }"></script>
         <script type="text/javascript" src="${ url_for('assets.js_vars_global') }"></script>
 

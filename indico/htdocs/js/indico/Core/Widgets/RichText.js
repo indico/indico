@@ -244,32 +244,54 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
 
     try {
         var config = {
+            customConfig: false,
             language: userLanguage,
             entities: false,
-            width   : width,
-            height  : height - 75,
-            //CKEDITOR Custom Config
+            width: width,
+            height: height - 75,
             blockedKeystrokes: [9 /* TAB */, CKEDITOR.SHIFT + 9  /* SHIFT + TAB */],
-            keystrokes : [[CKEDITOR.CTRL + 75 /* CTRL + K */, 'link']],
-            removeButtons      : '',
+            keystrokes: [[CKEDITOR.CTRL + 75 /* CTRL + K */, 'link']],
+            removeButtons: '',
             disableNativeSpellChecker: false,
-            font_names: ['Sans Serif/"Liberation Sans", sans-serif',
-                         'Serif/"Liberation Serif", serif',
-                         'Monospace/"Liberation Mono", monospace'].join(';'),
-            contentsCss: _.union(CKEDITOR.getUrl( 'contents.css' ), Indico.Urls.FontSassBundle)
+            font_names: [
+                'Sans Serif/"Liberation Sans", sans-serif',
+                'Serif/"Liberation Serif", serif',
+                'Monospace/"Liberation Mono", monospace'
+            ].join(';'),
+            contentsCss: _.union(CKEDITOR.getUrl('contents.css'), Indico.Urls.FontSassBundle),
+            toolbarGroups: [
+                {name: 'clipboard', groups: ['clipboard', 'undo']},
+                {name: 'editing', groups: ['find', 'selection', 'spellchecker']},
+                {name: 'links'},
+                {name: 'insert'},
+                {name: 'forms'},
+                {name: 'tools'},
+                {name: 'document', groups: ['mode', 'document', 'doctools']},
+                {name: 'others'},
+                '/',
+                {name: 'basicstyles', groups: ['basicstyles', 'cleanup']},
+                {name: 'paragraph', groups: ['list', 'indent', 'blocks', 'align', 'bidi']},
+                {name: 'styles'},
+                {name: 'colors'},
+                {name: 'about'}
+            ],
+            removeButtons: 'Underline,Subscript,Superscript',
+            format_tags: 'p;h1;h2;h3;pre',
+            removeDialogTabs: 'image:advanced;link:advanced',
         };
+
         if (simple) {
             config.toolbar = [
-                { name: 'clipboard', items : [ 'Cut','Copy','Paste','PasteText','PasteFromWord','-','Undo','Redo' ] },
-                { name: 'editing', items : [ 'Find','Replace' ] },
-                { name: 'links', items : [ 'Link','Unlink','Anchor' ] },
-                { name: 'insert', items : [ 'HorizontalRule' ] },
-                { name: 'document', items : [ 'Source' ] },
-                { name: 'basicstyles', items : [ 'Bold','Italic','Underline','Strike','-','RemoveFormat' ] },
-                { name: 'paragraph', items : [ 'NumberedList','BulletedList','-','Outdent','Indent' ] },
-                { name: 'styles', items : [ 'Format' ] },
-                { name: 'colors', items : [ 'TextColor' ] },
-                {name: 'tools', items: [ 'Maximize' ] }
+                {name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
+                {name: 'editing', items: ['Find', 'Replace']},
+                {name: 'links', items: ['Link', 'Unlink', 'Anchor']},
+                {name: 'insert', items: ['HorizontalRule']},
+                {name: 'document', items: ['Source']},
+                {name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat']},
+                {name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']},
+                {name: 'styles', items: ['Format']},
+                {name: 'colors', items: ['TextColor']},
+                {name: 'tools', items: ['Maximize']}
             ];
         }
 
