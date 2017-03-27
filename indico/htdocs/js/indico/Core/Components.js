@@ -32,12 +32,6 @@ var indicoRequest = curry(jsonRpc, Indico.Urls.JsonRpcService);
 var imageSrc = imageFunctionGenerator(Indico.Urls.ImagesBase);
 
 
-function getPx(pixVal) {
-    var m = pixVal.match(/(\d+)px/);
-    return parseInt(m[1], 10);
-}
-
-
 function pixels(val){
     return val + 'px';
 }

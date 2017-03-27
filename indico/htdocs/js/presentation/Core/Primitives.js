@@ -4,10 +4,6 @@
 
 this.global = this;
 
-function isDefined(name) {
-    return name in global;
-}
-
 if (typeof(global.include) !== "function") {
     var include = function(script) {
         document.write("<script type=\"text/javascript\" src=\"" + script + "\"></script>");
