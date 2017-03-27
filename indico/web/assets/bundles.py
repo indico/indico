@@ -19,11 +19,21 @@ import os
 from glob import glob
 from urlparse import urlparse
 
+import csscompressor
 from markupsafe import Markup
 from webassets import Bundle, Environment
+from webassets.filter import register_filter, Filter
 
 from indico.core.config import Config
 from indico.modules.events.layout import theme_settings
+
+
+@register_filter
+class CSSCompressor(Filter):
+    name = 'csscompressor'
+
+    def output(self, _in, out, **kw):
+        out.write(csscompressor.compress(_in.read(), max_linelen=500))
 
 
 def configure_pyscss(environment):
@@ -207,7 +217,7 @@ indico_jquery = rjs_bundle(
 indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
 
 fonts_sass = Bundle('sass/partials/_fonts.scss',
-                    filters=('pyscss', 'cssmin'), output='css/indico_fonts_%(version)s.min.css')
+                    filters=('pyscss', 'csscompressor'), output='css/indico_fonts_%(version)s.min.css')
 
 indico_regform = rjs_bundle(
     'indico_regform',
@@ -234,7 +244,7 @@ chartist_js = rjs_bundle('chartist_js',
 
 chartist_css = Bundle('css/lib/chartist.js/chartist.scss',
                       'css/lib/chartist.js/settings/_chartist-settings.scss',
-                      filters=('pyscss', 'cssmin'), output='css/chartist_css_%(version)s.min.css')
+                      filters=('pyscss', 'csscompressor'), output='css/chartist_css_%(version)s.min.css')
 
 clipboard_js = rjs_bundle('clipboard_js',
                           'js/lib/clipboard.js/clipboard.js',
@@ -246,14 +256,14 @@ dropzone_js = rjs_bundle('dropzone_js',
 
 dropzone_css = Bundle('css/lib/dropzone.js/dropzone.css',
                       'sass/custom/_dropzone.scss',
-                      filters=('pyscss', 'cssmin'), output='css/dropzone_css_%(version)s.min.css')
+                      filters=('pyscss', 'csscompressor'), output='css/dropzone_css_%(version)s.min.css')
 
 selectize_js = rjs_bundle('selectize_js',
                           'js/lib/selectize.js/selectize.js')
 
 selectize_css = Bundle('css/lib/selectize.js/selectize.css',
                        'css/lib/selectize.js/selectize.default.css',
-                       filters='cssmin', output='css/selectize_css_%(version)s.min.css')
+                       filters='csscompressor', output='css/selectize_css_%(version)s.min.css')
 
 taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
 fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
@@ -361,7 +371,7 @@ jqplot_js = rjs_bundle('jqplot',
 
 jqplot_css = Bundle(
     'css/lib/jquery.jqplot.css',
-    filters='cssmin', output='css/jqplot_%(version)s.min.css'
+    filters='csscompressor', output='css/jqplot_%(version)s.min.css'
 )
 
 mathjax_js = rjs_bundle('mathjax', 'js/lib/mathjax/MathJax.js', 'js/custom/pagedown_mathjax.js')
@@ -450,7 +460,7 @@ base_css = Bundle(
                'jquery.colorbox.css',
                'jquery-ui-custom.css',
                'jquery.colorpicker.css'),
-    filters=("cssmin", "cssrewrite"),
+    filters=('csscompressor', 'cssrewrite'),
     output='css/base_%(version)s.min.css')
 
 
@@ -462,7 +472,7 @@ SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/modules/*/*.scss"]
 
 screen_sass = Bundle('sass/screen.scss',
-                     filters=("pyscss", "cssrewrite", "cssmin"),
+                     filters=('pyscss', 'cssrewrite', 'csscompressor'),
                      output="sass/screen_sass_%(version)s.css",
                      depends=SASS_BASE_MODULES)
 
@@ -515,7 +525,7 @@ def register_theme_sass():
         if stylesheet:
             bundle = Bundle('css/events/common.css',
                             stylesheet,
-                            filters=('pyscss', 'cssrewrite', 'cssmin'),
+                            filters=('pyscss', 'cssrewrite', 'csscompressor'),
                             output='{}_%(version)s.css'.format(theme_id),
                             depends=SASS_BASE_MODULES)
             data['asset_env'] = env = ThemeEnvironment(theme_id, data)
@@ -524,7 +534,7 @@ def register_theme_sass():
             print_stylesheet = data.get('print_stylesheet')
             if print_stylesheet:
                 print_bundle = Bundle(bundle, print_stylesheet,
-                                      filters=('pyscss', 'cssrewrite', 'cssmin'),
+                                      filters=('pyscss', 'cssrewrite', 'csscompressor'),
                                       output="{}_print_%(version)s.css".format(theme_id),
                                       depends=SASS_BASE_MODULES)
                 env.register('print_sass', print_bundle)
@@ -544,7 +554,7 @@ def register_all_css(env):
     # Build a bundle with customization CSS if enabled
     custom_css_files = _get_custom_files('scss', '*.scss')
     if custom_css_files:
-        env.register('custom_sass', Bundle(*custom_css_files, filters=('pyscss', 'cssmin'),
+        env.register('custom_sass', Bundle(*custom_css_files, filters=('pyscss', 'csscompressor'),
                                            output='sass/custom_sass_%(version)s.css'))
 
 

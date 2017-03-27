@@ -195,7 +195,7 @@ class IndicoPlugin(Plugin):
         """Registers an SCSS bundle in the plugin's webassets environment"""
         pretty_name = re.sub(r'_css$', '', name)
         bundle = Bundle(*files,
-                        filters=('pyscss', 'cssrewrite', 'cssmin'),
+                        filters=('pyscss', 'cssrewrite', 'csscompressor'),
                         output='css/{}_%(version)s.min.css'.format(pretty_name),
                         depends=SASS_BASE_MODULES)
         self.assets.register(name, bundle)

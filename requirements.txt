@@ -2,7 +2,7 @@ Babel==2.3.4
 Mako==0.9.1
 MarkupSafe==0.23
 indico-fonts==1.1
-cssmin==0.2.0
+csscompressor==0.9.4
 icalendar==3.11.3
 jsmin==2.2.1
 lxml==3.4.1
