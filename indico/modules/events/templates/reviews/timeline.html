@@ -143,8 +143,12 @@
                         {% elif proposal.proposal_type == 'paper' %}
                             {{ render_paper_review_action_text(review) }}
                         {% endif %}
-                        {% if review.score is not none %}
-                            · score {{ render_score(review.score, proposal.cfp.rating_range, classes='bold semantic-text') }}
+                        {% if ratings %}
+                            {% if review.score is not none %}
+                                {% set pretty_score = render_score(review.score, proposal.cfp.rating_range,
+                                                                   classes='bold semantic-text') %}
+                                · {% trans %}score {{ pretty_score }}{% endtrans %}
+                            {% endif %}
                             (<a class="js-ratings-toggle toggle-link i-link">{#--#}
                                 <span class="js-show-ratings">{% trans %}show ratings{% endtrans %}</span>{#--#}
                                 <span class="weak-hidden js-hide-ratings">{% trans %}hide ratings{% endtrans %}</span>{#--#}
