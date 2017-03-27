@@ -172,7 +172,7 @@ class RHEditEventDataBase(RHManageEventBase):
     section_name = None
 
     def render_form(self, form):
-        return jsonify_form(form)
+        return jsonify_form(form, footer_align_right=True)
 
     def render_settings_box(self):
         tpl = get_template_module('events/management/_settings.html')
@@ -494,7 +494,7 @@ class RHPosterPrintSettings(RHManageEventBase):
             poster_cache.set(key, data, time=1800)
             download_url = url_for('.print_poster', self.event_new, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url)
-        return jsonify_form(form, disabled_until_change=False, submit=_('Download PDF'), )
+        return jsonify_form(form, disabled_until_change=False, submit=_('Download PDF'))
 
 
 class RHPrintEventPoster(RHManageEventBase):
