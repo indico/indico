@@ -151,10 +151,9 @@ class IndicoEmailRecipientsField(Field):
     widget = JinjaWidget('forms/email_recipients_widget.html', single_kwargs=True)
 
     def process_data(self, data):
-        self.data = data
-        self.text_value = ', '.join(sorted(x.email for x in data))
+        self.data = sorted(data, key=unicode.lower)
+        self.text_value = ', '.join(data)
         self.count = len(data)
-        self.text_value = unicode(self.text_value)
 
 
 class IndicoTagListField(HiddenFieldList):

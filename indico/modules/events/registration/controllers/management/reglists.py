@@ -209,7 +209,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
         default_body = tpl.get_html_body()
         registration_ids = request.form.getlist('registration_id')
         form = EmailRegistrantsForm(body=default_body, regform=self.regform, registration_id=registration_ids,
-                                    recipients=self.registrations)
+                                    recipients=[x.email for x in self.registrations])
         if form.validate_on_submit():
             self._send_emails(form)
             num_emails_sent = len(self.registrations)
