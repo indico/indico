@@ -1,7 +1,6 @@
 *.tpl linguist-language=mako
 doc/* linguist-documentation
 indico/htdocs/js/calendar/* linguist-vendored
-indico/htdocs/js/ckeditor/* linguist-vendored
 indico/htdocs/js/moment/* linguist-vendored
 indico/htdocs/js/jquery/date.js linguist-vendored
 indico/htdocs/js/jquery/jquery-extra-selectors.js linguist-vendored
