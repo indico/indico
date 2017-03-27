@@ -29,6 +29,7 @@ from indico.modules.events.layout import theme_settings
 def configure_pyscss(environment):
     config = Config.getInstance()
     base_url_path = urlparse(config.getBaseURL()).path
+    environment.config['PYSCSS_STYLE'] = 'compact'
     environment.config['PYSCSS_DEBUG_INFO'] = environment.debug and config.getSCSSDebugInfo()
     environment.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(base_url_path)
     environment.config['PYSCSS_LOAD_PATHS'] = [
