@@ -15,11 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
-if(!window.indicoOfflineSite) {
-    include(ScriptRoot + '/ckeditor/ckeditor.js');
-}
-
 function imageFunctionGenerator(url) {
     return function (imageId, extension) {
         return url + '/' + imageId + '.' + (extension || 'png');

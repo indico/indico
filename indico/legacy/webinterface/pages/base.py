@@ -141,7 +141,9 @@ class WPBase:
         return []
 
     def getJSFiles(self):
+        ckeditor_js = self._asset_env['ckeditor'].urls() if not g.get('static_site') else []
         return (self._asset_env['base_js'].urls() +
+                ckeditor_js +
                 self._asset_env['dropzone_js'].urls() +
                 self._asset_env['modules_attachments_js'].urls())
 
