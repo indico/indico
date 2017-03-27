@@ -24,9 +24,8 @@ from indico.modules.users.models.users import UserTitle
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import HiddenFieldList, IndicoEnumSelectField, IndicoEmailRecipientsField
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
-from indico.web.forms.fields import HiddenFieldList, IndicoEnumSelectField
-from indico.web.forms.fields.simple import IndicoEmailRecipientsField
 
 
 class EmailEventPersonsForm(IndicoForm):
