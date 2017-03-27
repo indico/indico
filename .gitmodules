@@ -71,3 +71,7 @@
 [submodule "ext_modules/fullcalendar"]
 	path = ext_modules/fullcalendar
 	url = https://github.com/fullcalendar/fullcalendar.git
+[submodule "ext_modules/ckeditor"]
+	path = ext_modules/ckeditor
+	url = https://github.com/ckeditor/ckeditor-dev.git
+	ignore = dirty
