@@ -154,7 +154,6 @@ class RH(RequestHandlerBase):
                  value should be the received paramter value (or values).
     """
     _doNotSanitizeFields = []
-    _isMobile = True  # this value means that the generated web page can be mobile
     CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
 
@@ -222,9 +221,6 @@ class RH(RequestHandlerBase):
 
     def getTarget(self):
         return self._target
-
-    def isMobile(self):
-        return self._isMobile
 
     def _setSessionUser(self):
         self._aw.setUser(session.avatar)
