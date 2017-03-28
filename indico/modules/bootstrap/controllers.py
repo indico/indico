@@ -22,8 +22,10 @@ from flask import flash, redirect, render_template, request, session
 from markupsafe import Markup
 from requests.exceptions import HTTPError, RequestException, Timeout
 
+import indico
 from indico.core.config import Config
 from indico.core.db import db
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.auth import Identity, login_user
 from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
@@ -34,9 +36,6 @@ from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
-
-import indico
-from indico.legacy.webinterface.rh.base import RH
 
 # TODO: set the time zone here once communities settings are available.
 
