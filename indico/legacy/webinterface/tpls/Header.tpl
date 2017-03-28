@@ -1,7 +1,3 @@
-% if self_._rh and self_._rh.isMobile() and Config.getInstance().getMobileURL():
-    <%include file="MobileDetection.tpl"/>
-% endif
-
 <%
     from indico.web.flask.templating import get_template_module
     tpl = get_template_module('events/management/_create_event_button.html')

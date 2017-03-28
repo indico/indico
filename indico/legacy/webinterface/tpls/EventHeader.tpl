@@ -13,9 +13,6 @@ if dark is not UNDEFINED:
 else:
     dark_ = False;
 %>
-% if Config.getInstance().getMobileURL():
-    <%include file="MobileDetection.tpl" args="conf=conf"/>
-% endif
 ${ template_hook('global-announcement') }
 
 <div class="page-header ${"page-header-dark" if dark_ else ""}">

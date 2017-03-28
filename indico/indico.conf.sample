@@ -248,15 +248,6 @@ MaxUploadFileSize = 0
 # StrictLatex = True
 
 #------------------------------------------------------------------------------
-# INDICO MOBILE
-#------------------------------------------------------------------------------
-
-# If you have an installation of the mobile version of Indico, you can enable the
-# notification that encourages its usage when the user accesses the Desktop Indico
-# from a mobile device. One only needs to add the URL of Indico mobile here:
-# MobileURL = "http://m.indico.your.domain"
-
-#------------------------------------------------------------------------------
 # ACTIVE PLUGINS
 #------------------------------------------------------------------------------
 

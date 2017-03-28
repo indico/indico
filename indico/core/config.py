@@ -253,7 +253,6 @@ class Config:
         'DebugUnicode'              : 0,
         'EmbeddedWebserver'         : False,
         'OAuthGrantTokenTTL'        : 120,
-        'MobileURL'                 : '',
         'CheckinURL'                : 'http://old.indico-software.org/wiki/apps/check-in',
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,

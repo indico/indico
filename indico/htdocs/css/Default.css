@@ -460,35 +460,6 @@ div.pageOverHeader
 }
 
 
-/* Mobile Header */
-
-div.mobile-device-header {
-    display: none;
-    width:100%;
-    z-index: 10;
-    padding: 15px 5px;
-    border: 1px solid #AAA;
-    background-color: #F4F4F4;
-    color: #666;
-    text-align: center;
-    border-top: none;
-    box-shadow: 0 1px 8px rgba(100, 100, 100, 0.4);
-    box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-}
-
-div.mobile-device-header > .text {
-    display: block;
-    margin-bottom: 1em;
-    font-size: 3em;
-}
-
-div.mobile-device-header .i-button {
-    font-size: 3em;
-}
-
-
 /* Breadcrumb styles */
 
 .path {
@@ -637,20 +608,6 @@ a.active {
 .footer img
 {
     vertical-align: middle;
-}
-
-.mobile-footer {
-    text-align: center;
-    font-size:11px !important;
-    font-weight: normal;
-}
-.footerDark .mobile-footer {
-    color: white;
-}
-
-.footerDark .mobile-footer a {
-    color: #BBBBBB;
-    text-shadow: 1px 1px 1px #555555;
 }
 
 div.managersPRUserListDiv {

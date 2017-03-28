@@ -34,9 +34,6 @@ from indico.web.flask.util import send_file
 
 
 class RHConferenceAccessKey(RHConferenceBase):
-
-    _isMobile = False
-
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
         self._accesskey = params.get("accessKey", "").strip()
