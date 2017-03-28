@@ -174,6 +174,8 @@ class RHSendSurveyLinks(RHManageSurveyBase):
                                               survey=self.survey)
             email_subject = replace_placeholders('survey-link-email', form.subject.data, event=self.event_new,
                                                  survey=self.survey)
-            tpl = get_template_module('events/persons/emails/email.html', subject=email_subject, body=email_body)
-            email = make_email(to_list=recipient, from_address=form.from_address.data, template=tpl, html=True)
+            tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
+            bcc = [session.user.email] if form.copy_for_sender.data else []
+            email = make_email(to_list=recipient,  bcc_list=bcc, from_address=form.from_address.data,
+                               template=tpl, html=True)
             send_email(email, self.event_new, 'Surveys')

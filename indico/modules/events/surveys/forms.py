@@ -126,6 +126,7 @@ class EmailPeopleForm(IndicoForm):
     subject = StringField(_('Subject'), [DataRequired()])
     body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
     recipients = EmailListField(_('Recipients'), [DataRequired()], description=_('One email address per line.'))
+    copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget())
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
