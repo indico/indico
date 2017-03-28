@@ -83,8 +83,7 @@
                 }
                 tmp.push(value);
                 processed.push(part.name);
-            }
-            else {
+            } else {
                 tmp.push(part.data);
             }
         }
@@ -122,8 +121,7 @@
         if (typeof template === 'string') {
             url = template;
             qsParams = params || {};
-        }
-        else if (template.type === 'flask_rules') {
+        } else if (template.type === 'flask_rules') {
             var args = splitObj(params || {});
             for (var i = 0; i < template.rules.length; i++) {
                 var rule = template.rules[i];
@@ -142,7 +140,7 @@
                 throw new BuildError('Could not build an URL', template.endpoint, params);
             }
 
-            if (window.indicoOfflineSite) {
+            if ($('body').data('static-site')) {
                 // See url_to_static_filename() in modules/events/static/util.py
                 url = url.replace(/^\/event\/\d+/, '');
                 if (url.indexOf('static/') === 0) {
@@ -155,12 +153,11 @@
             } else {
                 url = Indico.Urls.BasePath + url;
             }
-        }
-        else {
+        } else {
             throw new BuildError('Invalid URL template', template);
         }
 
-        if (!window.indicoOfflineSite) {
+        if (!$('body').data('static-site')) {
             var qs = $.param(qsParams);
             if (qs) {
                 url += (~url.indexOf('?') ? '&' : '?') + qs;

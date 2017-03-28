@@ -30,10 +30,10 @@ from indico.modules.events.layout.util import (build_menu_entry_name, get_css_ur
 from indico.modules.events.models.events import Event
 from indico.util.date_time import format_date
 from indico.util.i18n import _
+from indico.util.mathjax import MathjaxMixin
 from indico.util.string import encode_if_unicode, to_unicode
 from indico.web.flask.util import url_for
 
-from indico.legacy.common.TemplateExec import render
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.legacy.common.utils import isStringHTML
@@ -75,7 +75,7 @@ class WPConferenceDisplayBase(WPConferenceBase):
     pass
 
 
-class WPConferenceDefaultDisplayBase( WPConferenceBase):
+class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
     menu_entry_plugin = None
     menu_entry_name = None
 
@@ -140,16 +140,12 @@ class WPConferenceDefaultDisplayBase( WPConferenceBase):
             timestamp = os.stat(__file__).st_mtime
         except OSError:
             timestamp = 0
-        printCSS = '<link rel="stylesheet" type="text/css" href="{}/css/Conf_Basic.css?{}">'.format(path, timestamp)
-
-        # Include MathJax
+        css = '<link rel="stylesheet" type="text/css" href="{}/css/Conf_Basic.css?{}">'.format(path, timestamp)
 
         return '\n'.join([
-            printCSS,
-            WConfMetadata(self._conf).getHTML(),                   # confMetadata
-            render('js/mathjax.config.js.tpl'),                    # mathJax
-            '\n'.join('<script src="{0}" type="text/javascript"></script>'.format(url)
-                      for url in self._asset_env['mathjax_js'].urls())
+            css,
+            WConfMetadata(self._conf).getHTML(),
+            MathjaxMixin._getHeadContent(self)
         ])
 
     def _applyDecoration( self, body ):
@@ -284,21 +280,8 @@ class WPXSLConferenceDisplay(WPConferenceBase):
         self._lastDay = params.get("lastDay")
         self._daysPerRow = params.get("daysPerRow")
 
-    def _getFooter(self):
-        """
-        """
-        return ""
-
-    def _getHTMLHeader(self):
-        return ""
-
     def _applyDecoration(self, body):
-        """
-        """
         return to_unicode(body)
-
-    def _getHTMLFooter(self):
-        return ""
 
     def _getBodyVariables(self):
         return {'firstDay': self._firstDay, 'lastDay': self._lastDay, 'daysPerRow': self._daysPerRow}
@@ -324,7 +307,7 @@ class WPXSLConferenceDisplay(WPConferenceBase):
             return _("Cannot find the %s stylesheet") % self._view
 
 
-class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
+class WPTPLConferenceDisplay(MathjaxMixin, WPXSLConferenceDisplay, object):
     """
     Overrides XSL related functions in WPXSLConferenceDisplay
     class and re-implements them using normal Indico templates.
@@ -379,22 +362,13 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
             # return Conference, Contribution or SubContribution
             return itemClass
 
-    def _getHTMLHeader( self ):
-        return WPConferenceBase._getHTMLHeader(self)
-
     def _getHeadContent( self ):
         theme_css_tag = ''
         theme_url = get_css_url(self._conf.as_event)
         if theme_url:
             theme_css_tag = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
-
         confMetadata = WConfMetadata(self._conf).getHTML()
-
-        mathJax = render('js/mathjax.config.js.tpl') + \
-                  '\n'.join(['<script src="{0}" type="text/javascript"></script>'.format(url) for url in
-                             self._asset_env['mathjax_js'].urls()])
-
-        return theme_css_tag + confMetadata + mathJax
+        return theme_css_tag + confMetadata + MathjaxMixin._getHeadContent(self)
 
     def _getFooter(self):
         wc = wcomponents.WEventFooter(self._conf)
@@ -445,17 +419,10 @@ class WPTPLConferenceDisplay(WPXSLConferenceDisplay, object):
                     self._asset_env['clipboard_js'].urls())
         return modules
 
-    def _applyDecoration( self, body ):
-        """
-        """
-        if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
-                return to_unicode(WPrintPageFrame().getHTML({"content":body}))
+    def _applyDecoration(self, body):
+        if self._params.get('frame', '') == 'no' or self._params.get('fr', '') == 'no':
+            return to_unicode(WPrintPageFrame().getHTML({'content': body}))
         return WPConferenceBase._applyDecoration(self, body)
-
-    def _getHTMLFooter( self ):
-        if self._params.get("frame","")=="no" or self._params.get("fr","")=="no":
-            return ""
-        return WPConferenceBase._getHTMLFooter(self)
 
     def _getBody(self, params):
         """Return main information about the event."""
@@ -598,11 +565,10 @@ class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
             timestamp = os.stat(__file__).st_mtime
         except OSError:
             timestamp = 0
-        printCSS = '<link rel="stylesheet" type="text/css" href="{}/Conf_Basic.css?{}">\n'.format(path, timestamp)
-
+        css = '<link rel="stylesheet" type="text/css" href="{}/Conf_Basic.css?{}">\n'.format(path, timestamp)
         if self._kwargs['css_url']:
-            printCSS += '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=self._kwargs['css_url'])
-        return printCSS
+            css += '<link rel="stylesheet" type="text/css" href="{url}">\n'.format(url=self._kwargs['css_url'])
+        return css
 
     def get_extra_css_files(self):
         return []

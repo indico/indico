@@ -18,12 +18,12 @@ from __future__ import unicode_literals
 
 from markupsafe import escape
 
-from indico.util.i18n import _
-from indico.legacy.common.TemplateExec import render
 from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WNavigationDrawer
+from indico.util.i18n import _
+from indico.util.mathjax import MathjaxMixin
 
 
 class WPManageUpcomingEvents(WPJinjaMixin, WPAdminsBase):
@@ -31,7 +31,7 @@ class WPManageUpcomingEvents(WPJinjaMixin, WPAdminsBase):
     template_prefix = 'categories/'
 
 
-class WPCategory(WPJinjaMixin, WPMainBase):
+class WPCategory(MathjaxMixin, WPJinjaMixin, WPMainBase):
     """WP for category display pages"""
 
     template_prefix = 'categories/'
@@ -61,9 +61,7 @@ class WPCategory(WPJinjaMixin, WPMainBase):
             head_content += ('<link rel="alternate" type="application/atom+xml" title="{}" href="{}">'
                              .format(escape(title), self.atom_feed_url))
         if self._mathjax:
-            head_content += render('js/mathjax.config.js.tpl')
-            head_content += '\n'.join('<script src="{0}"></script>'.format(url)
-                                      for url in self._asset_env['mathjax_js'].urls())
+            head_content += MathjaxMixin._getHeadContent(self)
         return head_content
 
     def _getNavigationDrawer(self):

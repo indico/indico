@@ -32,13 +32,3 @@ else:
 % if 'injected_js' in _g:
     ${'\n'.join(_g.injected_js)}
 % endif
-% if Config.getInstance().getWorkerName():
-  <!-- worker: ${ Config.getInstance().getWorkerName() } -->
-% endif
-% if _app.debug:
-  <!-- queries: ${ _g.get('sql_query_count', 0) } -->
-  <!-- endpoint: ${ _request.endpoint } -->
-  % if rh:
-  <!-- rh: ${ rh.__class__.__module__ }.${ rh.__class__.__name__ } -->
-  % endif
-% endif

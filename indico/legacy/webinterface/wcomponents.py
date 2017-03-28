@@ -159,12 +159,6 @@ class WTemplated:
         return text
 
 
-class WHTMLHeader(WTemplated):
-
-    def __init__(self, tpl_name=None):
-        WTemplated.__init__(self)
-
-
 class WHeader(WTemplated):
     """Templating web component for generating a common HTML header for
         the web interface.

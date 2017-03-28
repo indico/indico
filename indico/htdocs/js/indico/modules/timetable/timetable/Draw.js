@@ -706,7 +706,7 @@ function drawBalloon(self, evt, editable) {
     var timetableBlock = $(self.div.dom);
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
 
-    if (window.indicoOfflineSite) {
+    if ($('body').data('static-site')) {
         var url;
         if (self.eventData.entryType == 'Session') {
             url = build_url(Indico.Urls.Sessions.display_session, {

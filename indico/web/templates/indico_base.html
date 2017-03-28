@@ -1,0 +1,63 @@
+{#- Base template for indico pages (standard "indico look") -#}
+<!DOCTYPE html>
+
+<html prefix="og: http://ogp.me/ns# fb: http://ogp.me/ns/fb#">
+<head>
+    <title>{{ page_title }}</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ system_icon('addressBarIcon') }}">
+
+    {% if social.facebook_app_id -%}
+        <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
+    {% endif %}
+
+    <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
+    <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
+
+    {% for url in js_files -%}
+        <script type="text/javascript" src="{{ url }}"></script>
+    {% endfor %}
+
+    <script>
+        moment.locale({{ session.lang|tojson }});
+        IndicoGlobalVars.isUserAuthenticated = {{ session.user|bool|tojson }};
+    </script>
+
+    <script type="text/javascript" src="{{ url_for('assets.js_vars_user') }}"></script>
+
+    {{ head_content|safe }}
+
+    {% for url in css_files -%}
+        <link rel="stylesheet" type="text/css" href="{{ url }}">
+    {% endfor %}
+
+    {% for url in print_css_files -%}
+        <link rel="stylesheet" type="text/css" media="print" href="{{ url }}">
+    {% endfor %}
+
+    {{ template_hook('html-head') }}
+</head>
+<body data-user-id="{{ session.user.id if session.user else 'null' }}"
+      data-debug="{{ config.DEBUG|tojson|forceescape }}"
+      data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
+    {#-
+    XXX: Using a block and inheritance would be nicer but for now this
+    is only called from a WP so just passing the contents is much easier
+    #}
+    {{ body|safe }}
+</body>
+</html>
+<!--
+Worker: {{ indico_config.WorkerName }}
+{%- if config.DEBUG or (session.user and session.user.is_admin) %}
+{%- if config.DEBUG %}
+Queries: {{ g.get('sql_query_count', 0) }}
+{%- endif %}
+Endpoint: {{ request.endpoint }}
+{%- if g.rh %}
+RH: {{ g.rh.__class__.__module__ }}.{{ g.rh.__class__.__name__ }}
+{%- endif %}
+{%- endif %}
+-->

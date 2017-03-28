@@ -34,7 +34,7 @@
 
     $(document).ready(function() {
         $('.attachments > .dropdown').parent().dropdown();
-        if (!window.indicoOfflineSite) {
+        if (!$('body').data('static-site')) {
             setupAttachmentPreview();
         }
 
