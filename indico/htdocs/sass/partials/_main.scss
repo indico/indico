@@ -150,7 +150,7 @@ div.session-bar {
             @extend .i-button.danger;
         }
 
-        &.protection-domainprotected {
+        &.protection-network {
             @extend .i-button.warning;
         }
     }

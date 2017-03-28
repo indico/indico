@@ -1,5 +1,5 @@
 {% macro bootstrap_success(name) %}
-    {%- trans profile_link=url_for('users.user_dashboard') , settings_link=url_for('core.dashboard') -%}
+    {%- trans profile_link=url_for('users.user_dashboard'), settings_link=url_for('core.admin_dashboard') -%}
         Indico is now ready and you are logged as {{ name }} with administrative rights!<br>
         Don't forget to tweak <a href="{{ settings_link }}">Indico's settings</a> and update your
         <a href="{{ profile_link }}">profile</a>.

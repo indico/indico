@@ -46,10 +46,9 @@ from indico.legacy.webinterface.pages.base import WPDecorated
 class WPConferenceBase(base.WPDecorated):
 
     def __init__(self, rh, conference, **kwargs):
-        WPDecorated.__init__(self, rh, _protected_object=conference, _current_category=conference.as_event.category,
-                             **kwargs)
+        event = conference.as_event
+        WPDecorated.__init__(self, rh, _protected_object=event, _current_category=event.category, **kwargs)
         self._navigationTarget = self._conf = conference
-        event = self._conf.as_event
         self._tz = event.display_tzinfo.zone
         start_dt_local = event.start_dt_display.astimezone(event.display_tzinfo)
         end_dt_local = event.end_dt_display.astimezone(event.display_tzinfo)
