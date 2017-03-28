@@ -235,9 +235,7 @@ class WPDecorated(WPBase):
         return None
 
     def _getFooter( self):
-        """
-        """
-        wc = wcomponents.WFooter(isFrontPage=self._isFrontPage())
+        wc = wcomponents.WFooter()
         return wc.getHTML({ "subArea": self._getSiteArea() })
 
     def _applyDecoration(self, body):
