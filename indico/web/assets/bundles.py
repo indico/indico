@@ -147,7 +147,6 @@ indico_core = rjs_bundle(
                'Dialogs/PopupWidgets.js',
                'Browser.js',
                'Util.js',
-               'Login.js',
                'Dragndrop.js',
                'keymap.js'))
 
@@ -387,6 +386,8 @@ markdown_js = rjs_bundle(
                'Markdown.Sanitizer.js'))
 
 module_js = {
+    'global': rjs_bundle('modules_global', *namespace('js/indico/modules/global',
+                                                      'session_bar.js', 'impersonation.js')),
     'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
     'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
     'categories': rjs_bundle('modules_categories', *namespace('js/indico/modules/categories', 'display.js',
@@ -447,7 +448,7 @@ widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
 
 base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
                  indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
-                 outdated_browser_js, widgets_js, module_js['event_creation'])
+                 outdated_browser_js, widgets_js, module_js['event_creation'], module_js['global'])
 
 base_css = Bundle(
     *namespace('css',

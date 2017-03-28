@@ -76,11 +76,13 @@ def impersonate_user(user):
 
     current_user = session.user
     # We don't overwrite a previous entry - the original (admin) user should be kept there
-    session.setdefault('login_as_orig_user', {
-        'session_data': {k: session.pop(k) for k in session.keys() if k[0] != '_' or k in ('_timezone', '_lang')},
-        'user_id': session.user.id,
-        'user_name': session.user.get_full_name(last_name_first=False, last_name_upper=False)
-    })
+    # XXX: Don't change this to setdefault - building `session_data` pops stuff from the session
+    if 'login_as_orig_user' not in session:
+        session['login_as_orig_user'] = {
+            'session_data': {k: session.pop(k) for k in session.keys() if k[0] != '_' or k in ('_timezone', '_lang')},
+            'user_id': session.user.id,
+            'user_name': session.user.get_full_name(last_name_first=False, last_name_upper=False)
+        }
     login_user(user, admin_impersonation=True)
     logger.info('Admin %r is impersonating user %r', current_user, user)
 
@@ -93,7 +95,7 @@ def undo_impersonate_user():
     try:
         entry = session.pop('login_as_orig_user')
     except KeyError:
-        # The user probably already switched back from antoher tab
+        # The user probably already switched back from another tab
         return
     user = User.get_one(entry['user_id'])
     logger.info('Admin %r stopped impersonating user %r', user, session.user)
@@ -116,6 +118,8 @@ def redirect_to_login(next_url=None, reason=None):
 
 
 def url_for_login(next_url=None):
+    if next_url == '/':
+        next_url = None
     return url_for('auth.login', next=next_url, _external=True)
 
 

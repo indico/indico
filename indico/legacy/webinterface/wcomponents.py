@@ -16,23 +16,21 @@
 
 import os
 import urllib
-import pkg_resources
-from flask import g, session
-from speaklater import _LazyString
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
-from indico.legacy.common.timezoneUtils import DisplayTZ
-import indico.legacy.common.TemplateExec as templateEngine
+import pkg_resources
+from flask import g, session, render_template
+from speaklater import _LazyString
 
+import indico.legacy.common.TemplateExec as templateEngine
 from indico.core import signals
 from indico.core.config import Config
-from indico.core.db import db
+from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.legacy import LegacyConference
 from indico.modules.legal import legal_settings
 from indico.util.i18n import get_current_locale, get_all_locales, _
 from indico.util.date_time import format_date
@@ -159,12 +157,10 @@ class WTemplated:
         return text
 
 
-class WHeader(WTemplated):
-    """Templating web component for generating a common HTML header for
-        the web interface.
-    """
-    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, tpl_name=None, prot_obj=None):
-        WTemplated.__init__(self, tpl_name=tpl_name)
+class WHeader(object):
+    TEMPLATE = 'header.html'
+
+    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, prot_obj=None):
         self._currentuser = aw.getUser()
         self._locTZ = locTZ
         self._aw = aw
@@ -173,9 +169,30 @@ class WHeader(WTemplated):
         # The object for which to show the protection indicator
         self._prot_obj = prot_obj
 
-    """
-        Returns timezone string that is show to the user.
-    """
+    def getHTML(self, params):
+        protection_disclaimers = {
+            'network': legal_settings.get('network_protected_disclaimer'),
+            'restricted': legal_settings.get('restricted_disclaimer')
+        }
+        timezone_data = {
+            'active_tz': session.timezone,
+            'active_tz_display': self._getTimezoneDisplay(session.timezone),
+            'user_tz': session.avatar.getTimezone() if session.user else None,
+            'user_tz_display_mode': session.avatar.getDisplayTZMode() if session.user else None,
+        }
+        tpl = get_template_module('_session_bar.html')
+        session_bar = tpl.render_session_bar(protected_object=self._prot_obj,
+                                             protection_disclaimers=protection_disclaimers,
+                                             timezone_data=timezone_data,
+                                             languages=get_all_locales())
+
+        extra_menu_items = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
+        rv = render_template(self.TEMPLATE,
+                             session_bar=session_bar,
+                             category=self.__currentCategory,
+                             extra_menu_items=extra_menu_items)
+        return rv.encode('utf-8')
+
     def _getTimezoneDisplay( self, timezone ):
         if timezone == 'LOCAL':
             if self._locTZ:
@@ -185,37 +202,12 @@ class WHeader(WTemplated):
         else:
             return timezone
 
-    def _get_protection_new(self, obj):
-        if not obj.is_protected:
-            return ['Public', _('Public')]
-        else:
-            networks = [x.name for x in obj.get_access_list() if x.is_network]
-            if networks:
-                return ['DomainProtected', _('{} network only').format('/'.join(networks))]
-            else:
-                return ["Restricted", _("Restricted")]
-
-    def _getProtection(self, target):
-        """
-        Return a list with the status (Public, Protected, Restricted)
-        and extra info (domain list).
-        """
-        if isinstance(target, LegacyConference):
-            return self._get_protection_new(target.as_event)
-        elif isinstance(target, db.m.Category):
-            return self._get_protection_new(target)
-        else:
-            raise TypeError('Unexpected object: {}'.format(target))
-
     def getVars( self ):
-        vars = WTemplated.getVars(self)
-
+        vars = {}
         vars["currentUser"] = self._currentuser
 
         config =  Config.getInstance()
-        imgLogin = config.getSystemIconURL("login")
 
-        vars["imgLogin"] = imgLogin
         vars["isFrontPage"] = self._isFrontPage
         vars["currentCategory"] = self.__currentCategory
         vars['prot_obj'] = self._prot_obj
@@ -244,12 +236,11 @@ class WHeader(WTemplated):
         # Build a list of items for the administration menu
         adminItemList = []
         if session.user and session.user.is_admin:
-            adminItemList.append({'id': 'serverAdmin', 'url': url_for('core.dashboard'),
+            adminItemList.append({'id': 'serverAdmin', 'url': url_for('core.admin_dashboard'),
                                   'text': _("Server admin")})
 
         vars["adminItemList"] = adminItemList
         vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
-        vars["getProtection"] = self._getProtection
 
         vars["show_contact"] = config.getPublicSupportEmail() is not None
 
@@ -261,10 +252,12 @@ class WConferenceHeader(WHeader):
         the conferences' web interface.
     """
 
+    TEMPLATE = 'events/header.html'
+
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw = aw
-        WHeader.__init__(self, self._aw, prot_obj=self._conf, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, prot_obj=self._conf.as_event)
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 
@@ -410,6 +403,7 @@ class WMenuConferenceHeader( WConferenceHeader ):
 
         return vars
 
+
 class WMenuMeetingHeader( WConferenceHeader ):
     """Templating web component for generating the HTML header for
         the meetings web interface with a menu
@@ -417,7 +411,7 @@ class WMenuMeetingHeader( WConferenceHeader ):
     def __init__(self, aw, conf):
         self._conf = conf
         self._aw=aw
-        WHeader.__init__(self, self._aw, prot_obj=self._conf, tpl_name='EventHeader')
+        WHeader.__init__(self, self._aw, prot_obj=self._conf.as_event)
         tzUtil = DisplayTZ(self._aw,self._conf)
         self._locTZ = tzUtil.getDisplayTZ()
 

@@ -116,7 +116,9 @@ type("TimezoneSelector", ["RemoteWidget"], {
         // Add cancel and apply buttons
         var applyButton = Html.input('submit', {className: 'btn'}, $T('Apply'));
         var cancelButton = Html.input('button', {className: 'btn'}, $T('Cancel'));
-        cancelButton.observeClick(function(){$("#timezoneSelectorLink").qtip('hide');});
+        cancelButton.observeClick(function() {
+            $("#timezone-selector-link").qtip('hide');
+        });
         container.append(Html.div({style:{textAlign: 'center', marginTop: '15px'}}, applyButton, " ", cancelButton));
         if (this.activeTZ == 'LOCAL') {
             this.localTZRadio.set(true);

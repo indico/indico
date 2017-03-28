@@ -25,4 +25,4 @@ _bp = IndicoBlueprint('core', __name__, template_folder='templates', virtual_tem
 _bp.add_url_rule('/admin/settings/', 'settings', RHSettings, methods=('GET', 'POST'))
 
 # TODO: replace with an actual admin dashboard at some point
-_bp.add_url_rule('/admin/', 'dashboard', view_func=redirect_view('.settings'))
+_bp.add_url_rule('/admin/', 'admin_dashboard', view_func=redirect_view('.settings'))

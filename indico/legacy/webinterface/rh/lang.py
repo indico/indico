@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, session, redirect
+from __future__ import unicode_literals
+
+from flask import request, session
 
 from indico.legacy.webinterface.rh.base import RH
 
@@ -25,6 +27,4 @@ class RHChangeLang(RH):
         session.lang = language
         if session.user:
             session.user.settings.set('lang', language)
-
-        assert '://' not in request.form['next']  # avoid redirecting to external url
-        return redirect(request.form['next'])
+        return '', 204

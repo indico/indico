@@ -1,0 +1,120 @@
+{% from 'events/management/_create_event_button.html' import create_event_link %}
+
+{{ template_hook('global-announcement') }}
+
+<div class="page-header clearfix">
+    {{ session_bar|safe }}
+    {{ template_hook('page-header', category=category) }}
+
+    <a style="min-height: 60px;" href="{{ url_for_index() }}">
+        <img class="header-logo" src="{{ indico_config.LogoURL or system_icon('logo_indico_bw.png') }}">
+    </a>
+
+    <div class="global-menu toolbar">
+        <a href="{{ url_for_index() }}">{% trans %}Home{% endtrans %}</a>
+        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{% trans %}Create event{% endtrans %}</a>
+        <ul class="dropdown">
+            <li>
+                {{ create_event_link(category, 'lecture', _('Create lecture'), id='create-lecture') }}
+            </li>
+            <li>
+                {{ create_event_link(category, 'meeting', _('Create meeting'), id='create-meeting') }}
+            </li>
+            <li>
+                {{ create_event_link(category, 'conference', _('Create conference'), id='create-conference') }}
+            </li>
+        </ul>
+
+        {% if indico_config.IsRoomBookingActive %}
+            <a href="{{ url_for('rooms.roomBooking') }}">{% trans %}Room booking{% endtrans %}</a>
+        {% endif %}
+
+        {% if session.user and session.user.is_admin %}
+            <a href="{{ url_for('core.admin_dashboard') }}">{% trans %}Administration{% endtrans %}</a>
+        {% endif %}
+
+        {% for dropdown_title, items in extra_menu_items %}
+            {% if not dropdown_title %}
+                {% for item in items %}
+                    <a href="{{ item.url }}">{{ item.caption }}</a>
+                {% endfor %}
+            {% else %}
+                <a class="arrow js-dropdown" href="#" data-toggle="dropdown">
+                    {{- dropdown_title -}}
+                </a>
+                <ul class="dropdown">
+                    {% for item in items %}
+                        <li><a href="{{ item.url }}">{{ item.caption }}</a></li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        {% endfor %}
+
+        {% if session.user %}
+            <a href="{{ url_for('users.user_dashboard', user_id=none) }}">
+                {%- trans %}My profile{% endtrans -%}
+            </a>
+        {% endif %}
+
+        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{% trans %}Help{% endtrans %}</a>
+        <ul class="dropdown">
+            <li>
+                <a style="color: #777; cursor: initial;"
+                   title="{% trans %}We are working on updating the documentation. Stay tuned!{% endtrans %}">
+                    {% trans %}Indico help{% endtrans %}
+                </a>
+            </li>
+            {% if indico_config.PublicSupportEmail %}
+                <li><a href="{{ url_for('misc.contact') }}">{% trans %}Contact{% endtrans %}</a></li>
+            {% endif %}
+            <li><a href="http://indico-software.org">{% trans %}More about Indico{% endtrans %}</a></li>
+        </ul>
+    </div>
+</div>
+
+<script type="text/html" id="event-type-tooltip-lecture">
+    {%- trans -%}
+        A <strong>lecture</strong> is a simple event to annouce a talk.
+    {%- endtrans -%}
+    <br>
+    {%- trans -%}
+        <strong>Features</strong>:
+        poster creation, participant management, ...
+    {%- endtrans -%}
+</script>
+<script type="text/html" id="event-type-tooltip-meeting">
+    {%- trans -%}
+        A <strong>meeting</strong> is an event that defines an agenda with multiple talks.
+    {%- endtrans -%}
+    <br>
+    {%- trans -%}
+        <strong>Features</strong>:
+        timetable, minutes, poster creation, participants management, ...
+    {%- endtrans -%}
+</script>
+<script type="text/html" id="event-type-tooltip-conference">
+    {%- trans -%}
+        A <strong>conference</strong> is a complex event with features to manage the whole life cycle of a conference.
+    {%- endtrans -%}
+    <br>
+    {%- trans -%}
+        <strong>Features</strong>:
+        call for abstracts, registration, e-payment, timetable, badges creation, paper reviewing,...
+    {%- endtrans -%}
+</script>
+
+<script>
+    (function() {
+        'use strict';
+
+        ['lecture', 'meeting', 'conference'].forEach(function(evt_type) {
+            $('#create-' + evt_type).qtip({
+                content: $('#event-type-tooltip-' + evt_type).html(),
+                position: {
+                    my: 'left center',
+                    at: 'right center'
+                }
+            });
+        });
+    })();
+</script>
