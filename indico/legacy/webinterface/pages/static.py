@@ -24,9 +24,6 @@ from indico.legacy.webinterface.pages.conferences import WPTPLConferenceDisplay,
 
 
 class WPStaticEventBase:
-    def _getBaseURL(self):
-        return "static"
-
     def _getHeader(self):
         return ""
 

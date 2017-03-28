@@ -21,10 +21,10 @@ from xml.sax.saxutils import quoteattr
 
 from flask import session, request
 
-from indico.legacy.webinterface.pages.base import WPDecorated
-from indico.legacy.webinterface.wcomponents import WTemplated
-from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.core.config import Config
+from indico.legacy.webinterface.pages.base import WPDecorated
+from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
@@ -282,23 +282,20 @@ class WReportError( WTemplated ):
         return vars
 
 
-class WPReportError( WPDecorated ):
+class WPReportError(WPDecorated):
+    def __init__(self, rh):
+        WPDecorated.__init__(self, rh)
 
-    def __init__( self, rh):
-        WPDecorated.__init__(self, rh)#, True)
+    def _getBody(self, params):
+        wc = WReportError(params["userEmail"], params["msg"])
+        return wc.getHTML(params)
 
-    def _getHTMLHeader(self):
-        return ""
+    def _applyDecoration(self, body):
+        return body
 
-    def _getHeader(self):
-        return ""
+    def display(self, **params):
+        return WPDecorated._display(self, params)
 
-    def _getBody( self, params ):
-        wc = WReportError( params["userEmail"], params["msg"] )
-        return wc.getHTML( params )
-
-    def _getFooter( self ):
-        return ""
 
 class WNoReportError( WTemplated ):
 
@@ -311,40 +308,32 @@ class WNoReportError( WTemplated ):
         return vars
 
 
-class WPNoReportError( WPDecorated ):
-
-    def __init__( self, rh, msg ):
+class WPNoReportError(WPDecorated):
+    def __init__(self, rh, msg):
         self._msg = msg
-        WPDecorated. __init__( self, rh)
+        WPDecorated.__init__(self, rh)
 
-    def _getHeader(self):
-        return ""
+    def _getBody(self, params):
+        return WNoReportError(self._msg).getHTML(params)
 
-    def _getBody( self, params ):
-        wc = WNoReportError( self._msg )
-        return wc.getHTML( params )
 
 class WReportErrorSummary( WTemplated ):
     pass
 
 
-class WPReportErrorSummary( WPDecorated ):
+class WPReportErrorSummary(WPDecorated):
+    def __init__(self, rh):
+        WPDecorated.__init__(self, rh)
 
-    def __init__( self, rh ):
-        WPDecorated. __init__( self, rh)
+    def _getBody(self, params):
+        return WReportErrorSummary().getHTML()
 
-    def _getHTMLHeader( self ):
-        return ""
+    def _applyDecoration(self, body):
+        return body
 
-    def _getHeader( self ):
-        return ""
+    def display(self, **params):
+        return WPDecorated._display(self, params)
 
-    def _getBody( self, params ):
-        wc = WReportErrorSummary()
-        return wc.getHTML()
-
-    def _getFooter( self ):
-        return ""
 
 class WFormValuesError( WTemplated ):
 

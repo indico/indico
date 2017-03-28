@@ -20,6 +20,10 @@ from flask import Response, flash, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
+from indico.legacy.webinterface.pages.conferences import (WPXSLConferenceDisplay, WPConferenceDisplay,
+                                                          WPTPLConferenceDisplay, WPMyStuff)
+from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected, RHProtected
+from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.legacy import XMLEventSerializer
@@ -27,18 +31,14 @@ from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.web.flask.util import send_file
-from indico.legacy.webinterface.pages import conferences
-from indico.legacy.webinterface.rh import base, conferenceBase
-from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected
-from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 
 
-class RHConferenceAccessKey( conferenceBase.RHConferenceBase ):
+class RHConferenceAccessKey(RHConferenceBase):
 
     _isMobile = False
 
     def _checkParams(self, params):
-        conferenceBase.RHConferenceBase._checkParams(self, params)
+        RHConferenceBase._checkParams(self, params)
         self._accesskey = params.get("accessKey", "").strip()
         self._doNotSanitizeFields.append("accessKey")
 
@@ -66,22 +66,25 @@ class RHConferenceBaseDisplay( RHConferenceBase, RHDisplayBaseProtected ):
 
 
 class MeetingRendererMixin:
-    def render_meeting_page(self, conf, view, hide_frame=False):
+    def render_meeting_page(self, conf, view, params=None):
         evt_type = conf.as_event.type_
         view = view or conf.as_event.theme
+
+        if not params:
+            params = {}
 
         # if the current view is invalid, use the default
         if view not in theme_settings.themes:
             view = theme_settings.defaults[evt_type.name]
 
         if view in theme_settings.xml_themes:
-            if hide_frame:
-                self._responseUtil.content_type = 'text/xml'
-            return conferences.WPXSLConferenceDisplay(self, conf, view, evt_type.name, self._reqParams)
+            self._responseUtil.content_type = 'text/xml'
+            # XXX: _display to avoid getting the HTML around it
+            return WPXSLConferenceDisplay(self, conf, view, evt_type.name, self._reqParams)._display(params)
         elif view == "static":
-            return conferences.WPConferenceDisplay(self, conf)
+            return WPConferenceDisplay(self, conf).display(**params)
         else:
-            return conferences.WPTPLConferenceDisplay(self, conf, view, evt_type.name, self._reqParams)
+            return WPTPLConferenceDisplay(self, conf, view, evt_type.name, self._reqParams).display(**params)
 
 
 class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
@@ -100,22 +103,18 @@ class RHConferenceDisplay(MeetingRendererMixin, RHConferenceBaseDisplay):
         if not self._reqParams.has_key("detailLevel"):
             self._reqParams["detailLevel"] = "contribution"
 
-        warningText = ""
-
         # create the html factory
         if self.event_new.type_ == EventType.conference:
             if params.get("ovw", False):
-                p = conferences.WPConferenceDisplay( self, self._target )
+                return WPConferenceDisplay(self, self._target).display(**params)
             else:
                 event = self._conf.as_event
                 if event.default_page_id is None:
-                    p = conferences.WPConferenceDisplay(self, self._conf)
+                    return WPConferenceDisplay(self, self._conf).display(**params)
                 else:
-                    p = WPPage.render_template('page.html', self._conf, page=event.default_page)
+                    return WPPage.render_template('page.html', self._conf, page=event.default_page)
         else:
-            p = self.render_meeting_page(self._conf, self._reqParams.get("view"), self._reqParams.get('fr') == 'no')
-
-        return warningText + (p if isinstance(p, basestring) else p.display(**params))
+            return self.render_meeting_page(self._conf, self._reqParams.get('view'), params)
 
 
 class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
@@ -138,17 +137,15 @@ class RHConferenceOtherViews(MeetingRendererMixin, RHConferenceBaseDisplay):
                                             event_tag_name='iconf')
             return Response(serializer.serialize_event(), mimetype='text/xml')
         else:
-            p = self.render_meeting_page(self._conf, view, self._reqParams.get('fr') == 'no')
-            return p.display()
+            return self.render_meeting_page(self._conf, view)
 
 
-class RHMyStuff(RHConferenceBaseDisplay,base.RHProtected):
+class RHMyStuff(RHConferenceBaseDisplay, RHProtected):
     def _checkProtection(self):
-        base.RHProtected._checkProtection(self)
+        RHProtected._checkProtection(self)
 
     def _process(self):
-        p=conferences.WPMyStuff(self,self._target)
-        return p.display()
+        return WPMyStuff(self, self._target).display()
 
 
 class RHConferenceToXML(RHConferenceBaseDisplay):

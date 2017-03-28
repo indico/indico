@@ -155,7 +155,7 @@ class WPBase:
                 for pkg_name in pkg_names
                 for url in self._asset_env[prefix + pkg_name.lower()].urls()]
 
-    def _getHeadContent( self ):
+    def _getHeadContent(self):
         """
         Returns _additional_ content between <head></head> tags.
         Please note that <title>, <meta> and standard CSS are always included.
@@ -165,18 +165,27 @@ class WPBase:
         """
         return ""
 
-    def _getWarningMessage(self):
-        return ""
+    def _fix_path(self, path):
+        url_path = urlparse(Config.getInstance().getBaseURL()).path or '/'
+        if path[0] != '/':
+            path = posixpath.join(url_path, path)
+        return path
 
-    def _getHTMLHeader( self ):
+    def _display(self, params):
+        raise NotImplementedError
+
+    def _getAW(self):
+        return self._rh.getAW()
+
+    def display(self, **params):
         from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
         from indico.modules.admin import RHAdminBase
 
-        area=""
+        title_parts = [to_unicode(self._getTitle())]
         if self.MANAGEMENT or isinstance(self._rh, RHModificationBaseProtected):
-            area = ' - {}'.format(_("Management area"))
+            title_parts.append(_(u'Management area'))
         elif isinstance(self._rh, RHAdminBase):
-            area = ' - {}'.format(_("Administrator area"))
+            title_parts.append(_(u'Administrator area'))
 
         plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
                                         multi_value_types=list)
@@ -184,47 +193,18 @@ class WPBase:
                                        multi_value_types=list)
         custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
         custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
+        css_files = map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files() + custom_css)
+        print_css_files = map(self._fix_path, self.getPrintCSSFiles())
+        js_files = map(self._fix_path, self.getJSFiles() + plugin_js + custom_js)
 
-        return wcomponents.WHTMLHeader().getHTML({
-            "area": area,
-            "baseurl": self._getBaseURL(),
-            "conf": Config.getInstance(),
-            "page": self,
-            "printCSS": map(self._fix_path, self.getPrintCSSFiles()),
-            "extraCSS": map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files() + custom_css),
-            "extraJSFiles": map(self._fix_path, self.getJSFiles() + plugin_js + custom_js),
-            "language": session.lang or Config.getInstance().getDefaultLocale(),
-            "social": social_settings.get_all(),
-            "assets": self._asset_env
-        })
+        body = to_unicode(self._display(params))
 
-    def _fix_path(self, path):
-        url_path = urlparse(Config.getInstance().getBaseURL()).path or '/'
-        if path[0] != '/':
-            path = posixpath.join(url_path, path)
-        return path
-
-    def _getHTMLFooter( self ):
-        return """
-    </body>
-</html>
-               """
-
-    def _display( self, params ):
-        """
-        """
-        return _("no content")
-
-    def _getAW( self ):
-        return self._rh.getAW()
-
-    def display( self, **params ):
-        """
-        """
-        return "%s%s%s" % (self._getHTMLHeader(),
-                           encode_if_unicode(self._display(params)),
-                           self._getHTMLFooter())
-
+        return render_template(u'indico_base.html',
+                               css_files=css_files, print_css_files=print_css_files, js_files=js_files,
+                               social=social_settings.get_all(),
+                               page_title=u' - '.join(title_parts),
+                               head_content=to_unicode(self._getHeadContent()),
+                               body=body)
 
     # auxiliar functions
     def _escapeChars(self, text):
