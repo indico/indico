@@ -1,1 +1,12 @@
-{# footer #}
+<div id="footer" class="footer {{ 'dark' if dark }} {% block footer_classes %}{% endblock %}">
+    {% block footer -%}
+        {%- set indico -%}
+            <a href="http://indico-software.org">Indico</a>
+        {%- endset -%}
+        <img src="{{ system_icon('indico_small') }}" alt="Indico" style="vertical-align: middle; margin-right: 2px;">
+        <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
+        {{ template_hook('page-footer') }}
+    {% endblock %}
+</div>
+
+{{- g.get('injected_js', []) | join('\n') | safe -}}

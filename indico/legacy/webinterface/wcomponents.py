@@ -169,7 +169,7 @@ class WHeader(object):
         # The object for which to show the protection indicator
         self._prot_obj = prot_obj
 
-    def getHTML(self, params):
+    def getHTML(self, params=None):
         protection_disclaimers = {
             'network': legal_settings.get('network_protected_disclaimer'),
             'restricted': legal_settings.get('restricted_disclaimer')
@@ -504,36 +504,19 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
         return vars
 
 
+class WFooter(object):
+    TEMPLATE = 'footer.html'
 
-class WFooter(WTemplated):
-    """Templating web component for generating a common HTML footer for the
-        web interface.
-    """
-
-    def __init__(self, tpl_name=None, isFrontPage=False):
-        WTemplated.__init__(self, tpl_name)
-        self._isFrontPage = isFrontPage
-
-    def getVars( self ):
-        from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
-
-        vars = WTemplated.getVars(self)
-        vars["isFrontPage"] = self._isFrontPage
-        event = getattr(self._rh, '_conf', None)
-        vars['is_meeting'] = (event and event.as_event.type == 'meeting' and
-                              not isinstance(self._rh, RHConferenceModifBase))
-
-        if not vars.has_key("shortURL"):
-            vars["shortURL"] = ""
-        return vars
+    def getHTML(self, params=None):
+        # TODO: move this to the place(s) where WFooter is called
+        return render_template(self.TEMPLATE).encode('utf-8')
 
 
 class WEventFooter(WFooter):
-    """
-    Specialization of WFooter that provides extra info for events
-    """
-    def __init__(self, conf, tpl_name = None, isFrontPage = False):
-        WFooter.__init__(self, tpl_name, isFrontPage)
+    TEMPLATE = 'events/footer.html'
+
+    def __init__(self, conf):
+        WFooter.__init__(self)
         self._conf = conf
         self._event = conf.as_event
 
