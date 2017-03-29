@@ -23,10 +23,11 @@ $(document).ready(function() {
     /* Show a qTip with the given text under the given element. The qTip is
      * destroyed when hidden and thus will be shown only once. */
     function showQTip(element, text, hideAfterDelay) {
+        var $element = $(element);
         var container = $('<span>').qtip({
             overwrite: true,
             position: {
-                target: $(element)
+                target: $element
             },
             content: {
                 text: text
@@ -37,15 +38,17 @@ $(document).ready(function() {
             events: {
                 hide: function() {
                     $(this).qtip('destroy');
+                    $element.removeData('no-auto-tooltip');
                 }
             }
         });
+        $element.data('no-auto-tooltip', true).trigger('indico:closeAutoTooltip');
         container.qtip('show');
 
         if (hideAfterDelay) {
             setTimeout(function() {
                 container.qtip('hide');
-            }, 3000);
+            }, 1000);
         }
     }
 
