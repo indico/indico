@@ -19,26 +19,22 @@
 function inject_facebook(appId) {
     $.getScript('//connect.facebook.net/en_US/all.js#xfbml=1', function() {
         FB.init({appId: appId, status: true, cookie: false, xfbml: true});
-        FB.Event.subscribe('xfbml.render',
-                           function () {
-                               // when the "Like" button gets rendered, replace the
-                               // "loading" message with it
-                               $('#fb-loading').hide();
-                               $('#fb-like').css({'visibility':'visible'});
-                           });
+        FB.Event.subscribe('xfbml.render', function() {
+            // when the "Like" button gets rendered, replace the "loading" message
+            $('#fb-loading').hide();
+            $('#fb-like').css('visibility', 'visible');
+        });
         FB.XFBML.parse();
     });
 }
 
 $(function() {
-    var theme = $('#social').data('theme');
-
+    var dark = $('#social').data('dark-theme');
 
     $('#social_button').qtip({
-
         style: {
             width: '420px',
-            classes: 'qtip-rounded qtip-shadow social_share_tooltip' + (theme=='dark'?' qtip-dark':' qtip-blue')
+            classes: 'qtip-rounded qtip-shadow social_share_tooltip ' + (dark ? 'qtip-dark' : 'qtip-blue')
         },
         position: {
             my: 'bottom right',
@@ -53,22 +49,22 @@ $(function() {
             target: $('#social_button')
         },
         hide: {
-            event: 'unfocus click',
+            event: false,
             fixed: true,
             effect: function() {
                 $(this).fadeOut(300);
             }
         },
         events: {
-            render: function(event, api) {
+            render: function() {
                 inject_facebook($('#social').data('social-settings').facebook_app_id);
                 $.getScript('//apis.google.com/js/plusone.js');
                 $.getScript('//platform.twitter.com/widgets.js');
             },
-            hide: function(event, api) {
+            hide: function() {
                 $('#social').css('opacity', '');
             },
-            show: function(event, api) {
+            show: function() {
                 $('#social').css('opacity', 1.0);
             }
         }
