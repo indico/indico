@@ -1,5 +1,8 @@
-Installation guide
-=================================================
+Installation guide (production)
+===============================
+
+.. todo::
+    Update instructions
 
 ===============
 Before starting

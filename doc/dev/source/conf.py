@@ -93,7 +93,7 @@ pygments_style = 'sphinx'
 
 # include __init__() as well
 autoclass_content = "both"
-autodoc_default_flags = ['members', 'show-inheritance']
+autodoc_default_flags = ['show-inheritance']
 
 # -- Options for HTML output ---------------------------------------------------
 
