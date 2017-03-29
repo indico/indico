@@ -180,8 +180,7 @@ indico_common = rjs_bundle(
     'indico_common',
     *namespace('js/indico/Common',
                'Export.js',
-               'TimezoneSelector.js',
-               'Social.js'))
+               'TimezoneSelector.js'))
 
 indico_jquery = rjs_bundle(
     'indico_jquery',
@@ -396,7 +395,8 @@ module_js = {
     'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
     'event_creation': rjs_bundle('modules_event_creation', 'js/indico/modules/events/creation.js'),
     'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'events/display.js',
-                                                                    'list_generator.js', 'static_filters.js')),
+                                                                    'list_generator.js', 'static_filters.js',
+                                                                    'social.js')),
     'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/events/layout.js'),
     'event_management': rjs_bundle('modules_event_management',
                                    *namespace('js/indico/modules', 'events/management.js', 'list_generator.js',
