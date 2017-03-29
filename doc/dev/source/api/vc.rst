@@ -32,7 +32,7 @@ Plugins
 
 
 Exceptions
-++++++++
+++++++++++
 
 .. automodule:: indico.modules.vc.exceptions
     :members:

@@ -24,7 +24,7 @@ Utilities
 
 
 Placeholders
-++++++++++
+++++++++++++
 
 .. automodule:: indico.modules.events.agreements.placeholders
     :members:
