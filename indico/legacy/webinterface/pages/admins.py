@@ -14,12 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-
-from indico.util.i18n import _
-from indico.web.menu import render_sidemenu
-
 from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import render_header
+from indico.util.i18n import _
+from indico.web.menu import render_sidemenu
 
 
 class WPAdminsBase(WPMainBase):
@@ -32,14 +31,8 @@ class WPAdminsBase(WPMainBase):
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
 
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WHeader(self._getAW(), prot_obj=self._protected_object)
-        return wc.getHTML( { "subArea": self._getSiteArea(), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())), \
-                             "tabControl": self._getTabControl() } )
+    def _getHeader(self):
+        return render_header()
 
     def _getBody(self, params):
         self._createTabCtrl()
@@ -59,17 +52,16 @@ class WPAdminsBase(WPMainBase):
         pass
 
     def _getTabContent(self):
-        return "nothing"
+        raise NotImplementedError
 
     def _setActiveTab(self):
         pass
 
     def _getPageContent(self, params):
-        return "nothing"
+        raise NotImplementedError
 
 
 class WAdminFrame(wcomponents.WTemplated):
-
     def __init__( self ):
         pass
 

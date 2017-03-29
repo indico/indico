@@ -27,7 +27,7 @@ from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
-from indico.modules.events.models.events import Event
+from indico.modules.events.models.events import Event, EventType
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
@@ -41,6 +41,34 @@ from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.common.tools import strip_ml_tags, escape_html
 from indico.legacy.webinterface.pages import main, base
 from indico.legacy.webinterface.pages.base import WPDecorated
+from indico.legacy.webinterface.wcomponents import render_header
+
+
+def _get_print_url(event, theme):
+    if event.type_ == EventType.conference:
+        return url_for(u'event.conferenceOtherViews', event,
+                       showDate=request.args.get(u'showDate') or u'all',
+                       showSession=request.args.get(u'showSession') or u'all',
+                       fr=u'no',
+                       view=theme)
+    elif event.type_ == EventType.meeting:
+        return url_for(u'event.conferenceOtherViews', event,
+                       showDate=request.args.get(u'showDate') or u'all',
+                       showSession=request.args.get(u'showSession') or u'all',
+                       detailLevel=request.args.get(u'detailLevel') or u'all',
+                       fr=u'no',
+                       view=theme)
+    elif event.type_ == EventType.lecture:
+        return url_for(u'event.conferenceOtherViews', event, fr=u'no',  view=theme)
+
+
+def render_event_header(event, conference_layout=False):
+    theme = None  # TODO
+    print_url = None if conference_layout else _get_print_url(event, theme)
+    show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, u'show_nav_bar')
+    themes = {tid: data[u'title'] for tid, data in theme_settings.get_themes_for(event.type_.name).viewitems()}
+    return render_template(u'events/header.html',
+                           event=event, print_url=print_url, show_nav_bar=show_nav_bar, themes=themes, theme=theme)
 
 
 def render_event_footer(event, dark=False):
@@ -60,8 +88,8 @@ def render_event_footer(event, dark=False):
     }
 
     social_settings_data = social_settings.get_all()
-    show_social = social_settings_data['enabled'] and layout_settings.get(event, 'show_social_badges')
-    return render_template('events/footer.html',
+    show_social = social_settings_data[u'enabled'] and layout_settings.get(event, u'show_social_badges')
+    return render_template(u'events/footer.html',
                            event=event,
                            dark=dark,
                            social_settings=social_settings_data,
@@ -87,6 +115,9 @@ class WPConferenceBase(base.WPDecorated):
                                         format_date(end_dt_local, format='long'))
         self._setTitle("%s %s" % (strip_ml_tags(self._conf.as_event.title.encode('utf-8')), dates))
 
+    def getJSFiles(self):
+        return base.WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+
     def getLogoutURL(self):
         return url_for_logout(self._conf.as_event.external_url)
 
@@ -103,14 +134,8 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         theme_url = get_css_url(self._conf.as_event)
         return [theme_url] if theme_url else []
 
-    def _getHeader( self ):
-        """
-        """
-        wc = wcomponents.WConferenceHeader(self._getAW(), self._conf)
-        return wc.getHTML( { "loginURL": self.getLoginURL(),\
-                             "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.id,
-                             "dark": True} )
+    def _getHeader(self):
+        return render_event_header(self.event, conference_layout=True).encode('utf-8')
 
     @property
     def sidemenu_option(self):
@@ -364,18 +389,6 @@ class WPTPLConferenceDisplay(MathjaxMixin, WPXSLConferenceDisplay, object):
 
         return wvars
 
-    def _getItemType(self, item):
-        itemClass = item.__class__.__name__
-        if itemClass == 'BreakTimeSchEntry':
-            return 'Break'
-        elif itemClass == 'SessionSlot':
-            return 'Session'
-        elif itemClass == 'AcceptedContribution':
-            return 'Contribution'
-        else:
-            # return Conference, Contribution or SubContribution
-            return itemClass
-
     def _getHeadContent( self ):
         theme_css_tag = ''
         theme_url = get_css_url(self._conf.as_event)
@@ -388,22 +401,7 @@ class WPTPLConferenceDisplay(MathjaxMixin, WPXSLConferenceDisplay, object):
         return render_event_footer(self._conf.as_event, dark=True).encode('utf-8')
 
     def _getHeader(self):
-        if self._type == 'lecture':
-            wc = wcomponents.WMenuSimpleEventHeader( self._getAW(), self._conf )
-        elif self._type == "meeting":
-            wc = wcomponents.WMenuMeetingHeader( self._getAW(), self._conf )
-        else:
-            wc = wcomponents.WMenuConferenceHeader( self._getAW(), self._conf )
-        return wc.getHTML( { "loginURL": self.getLoginURL(),\
-                             "logoutURL": self.getLogoutURL(),\
-                             "confId": str(self._conf.id),
-                             "currentView": self._view,\
-                             "type": self._type,\
-                             "selectedDate": self._params.get("showDate",""),\
-                             "selectedSession": self._params.get("showSession",""),\
-                             "detailLevel": self._params.get("detailLevel",""),\
-                             "filterActive": self._params.get("filterActive",""),\
-                            "dark": True } )
+        return render_event_header(self._conf.as_event).encode('utf-8')
 
     def getPrintCSSFiles(self):
         theme_print_sass = (self.theme['asset_env']['print_sass'].urls()
@@ -423,7 +421,6 @@ class WPTPLConferenceDisplay(MathjaxMixin, WPXSLConferenceDisplay, object):
         modules += (self._includeJSPackage('Management') +
                     self._asset_env['modules_event_cloning_js'].urls() +
                     self._asset_env['modules_vc_js'].urls() +
-                    self._asset_env['modules_event_display_js'].urls() +
                     self._asset_env['clipboard_js'].urls())
         return modules
 
@@ -481,11 +478,8 @@ class WPConferenceModifBase(main.WPMainBase):
     def _getSiteArea(self):
         return "ModificationArea"
 
-    def _getHeader( self ):
-        wc = wcomponents.WHeader(self._getAW(), currentCategory=self._current_category, prot_obj=self._protected_object)
-        return wc.getHTML( { "subArea": self._getSiteArea(), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
+    def _getHeader(self):
+        return render_header(category=self._current_category, local_tz=self._conf.as_event.timezone)
 
     def _getNavigationDrawer(self):
         pars = {"target": self._conf.as_event, "isModif": True}
@@ -498,11 +492,11 @@ class WPConferenceModifBase(main.WPMainBase):
     def _getBody( self, params ):
         return self._applyFrame( self._getPageContent( params ) )
 
-    def _getTabContent( self, params ):
-        return "nothing"
+    def _getTabContent(self, params):
+        raise NotImplementedError
 
-    def _getPageContent( self, params ):
-        return "nothing"
+    def _getPageContent(self, params):
+        raise NotImplementedError
 
 
 class WPConferenceModificationClosed( WPConferenceModifBase ):
