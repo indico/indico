@@ -1,6 +1,8 @@
 Indico - HTTP API
 =================
 
+.. include:: _intro.rst
+
 .. toctree::
    :maxdepth: 2
 

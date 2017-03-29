@@ -1,6 +1,8 @@
 API reference
 =============
 
+.. include:: _intro.rst
+
 .. toctree::
     :maxdepth: 1
 

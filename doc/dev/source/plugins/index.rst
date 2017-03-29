@@ -1,7 +1,7 @@
 Extending Indico with plugins
 =============================
 
-Contents:
+.. include:: _intro.rst
 
 .. toctree::
    :maxdepth: 1
@@ -10,10 +10,3 @@ Contents:
    plugin.rst
    signals.rst
    models.rst
-
-.. Indices and tables
-.. ==================
-
-.. * :ref:`genindex`
-.. * :ref:`modindex`
-.. * :ref:`search`
