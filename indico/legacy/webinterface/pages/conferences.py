@@ -61,11 +61,6 @@ class WPConferenceBase(base.WPDecorated):
                                         format_date(end_dt_local, format='long'))
         self._setTitle("%s %s" % (strip_ml_tags(self._conf.as_event.title.encode('utf-8')), dates))
 
-    def _getFooter(self):
-        wc = wcomponents.WFooter()
-        p = {"subArea": self._getSiteArea()}
-        return wc.getHTML(p)
-
     def getLogoutURL(self):
         return url_for_logout(self._conf.as_event.external_url)
 
@@ -81,12 +76,6 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
     def get_extra_css_files(self):
         theme_url = get_css_url(self._conf.as_event)
         return [theme_url] if theme_url else []
-
-    def _getFooter( self ):
-        wc = wcomponents.WFooter()
-        p = {"subArea": self._getSiteArea(),
-             "shortURL": self._conf.as_event.short_external_url}
-        return wc.getHTML(p)
 
     def _getHeader( self ):
         """
