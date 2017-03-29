@@ -195,7 +195,7 @@ class Survey(db.Model):
         lazy=True,
         backref=db.backref(
             'surveys',
-            lazy='dynamic'
+            lazy=True
         )
     )
 

@@ -21,6 +21,7 @@ from operator import attrgetter
 from flask import session
 from sqlalchemy.orm import load_only, joinedload
 
+from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.submissions import SurveySubmission
@@ -60,7 +61,11 @@ def save_submitted_survey_to_session(submission):
 @memoize_request
 def was_survey_submitted(survey):
     """Check whether the current user has submitted a survey"""
-    if session.user and session.user.survey_submissions.filter_by(survey=survey, is_submitted=True).has_rows():
+    query = (Survey.query.with_parent(survey.event_new)
+             .filter(Survey.submissions.any(db.and_(SurveySubmission.is_submitted,
+                                                    SurveySubmission.user == session.user))))
+    user_submitted_surveys = set(query)
+    if session.user and survey in user_submitted_surveys:
         return True
     submission_id = session.get('submitted_surveys', {}).get(survey.id)
     if submission_id is None:
@@ -70,7 +75,14 @@ def was_survey_submitted(survey):
 
 def is_submission_in_progress(survey):
     """Check whether the current user has a survey submission in progress"""
-    return session.user and session.user.survey_submissions.filter_by(survey=survey, is_submitted=False).has_rows()
+    if session.user:
+        query = (Survey.query.with_parent(survey.event_new)
+                 .filter(Survey.submissions.any(db.and_(~SurveySubmission.is_submitted,
+                                                        SurveySubmission.user == session.user))))
+        user_incomplete_surveys = set(query)
+        return survey in user_incomplete_surveys
+    else:
+        return False
 
 
 def generate_spreadsheet_from_survey(survey, submission_ids):
