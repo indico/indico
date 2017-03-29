@@ -20,11 +20,21 @@
                 <h4>{% trans %}Social networks{% endtrans %}</h4>
                 <div class="social_site">
                     <span id="fb-loading">{% trans %}Loading...{% endtrans %}</span>
-                    <fb:like id="fb-like" send="false" layout="standard" width="100" show-faces="false"
-                             colorscheme="{{ 'dark' if dark else 'light' }}" font="verdana" />
+                    <div id="fb-like" class="fb-like"
+                         data-href="{{ url }}"
+                         data-size="small"
+                         data-width="100"
+                         data-layout="standard"
+                         data-colorscheme="{{ 'dark' if dark else 'light' }}"
+                         data-action="like"
+                         data-show-faces="false"
+                         data-share="true"></div>
                 </div>
                 <div class="social_site">
-                    <g:plusone size="medium" />
+                    <div class="g-plusone"
+                         data-annotation="inline"
+                         data-width="220"
+                         data-href="{{ url }}"></div>
                 </div>
                 <div class="social_site">
                     <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal">
@@ -44,7 +54,7 @@
 
         <div id="social"
              data-url="{{ url }}"
-             data-theme="{{ 'dark' if dark else 'light' }}"
+             data-dark-theme="{{ dark|tojson|forceescape }}"
              data-social-settings="{{ social_settings|tojson|forceescape }}">
             <img src="{{ system_icon('social.png') }}"
                  id="social_button"
