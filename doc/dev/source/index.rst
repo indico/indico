@@ -1,8 +1,21 @@
-Indico
-======
+Welcome to Indico's documentation!
+==================================
 
-Welcome to Indico's documentation. This documentation is split into several parts, from `installing Indico <installation.html>`_ to developing `Indico plugins <plugins>`_.
+
+.. raw:: html
+    :file: _static/github_star.html
+
+.. image:: images/indico.png
+    :width: 300 px
+    :align: center
+
+.. epigraph:: *Your swiss army knife event management system.*
+
+|build-status| |license| |pypi-ver|
+
+Welcome to Indico's documentation. This documentation is split into several parts, from `installing Indico <installation/>`_ to developing `Indico plugins <plugins>`_.
 To dive into the internals of Indico, check out the `API documentation <api>`_.
+
 
 Installation / Configuration
 ++++++++++++++++++++++++++++
@@ -64,3 +77,13 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
+
+.. |build-status| image:: https://travis-ci.org/indico/indico.png?branch=master
+                   :alt: Travis Build Status
+                   :target: https://travis-ci.org/indico/indico
+.. |pypi-ver| image:: https://img.shields.io/pypi/v/indico.png
+                   :alt: Available on PyPI
+                   :target: https://pypi.python.org/pypi/indico/
+.. |license| image:: https://img.shields.io/github/license/indico/indico.png
+                   :alt: License
+                   :target: https://github.com/indico/indico/blob/master/COPYING
