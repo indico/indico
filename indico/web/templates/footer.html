@@ -3,9 +3,16 @@
         {%- set indico -%}
             <a href="http://indico-software.org">Indico</a>
         {%- endset -%}
-        <img src="{{ system_icon('indico_small') }}" alt="Indico" style="vertical-align: middle; margin-right: 2px;">
-        <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
-        {{ template_hook('page-footer') }}
+        <div class="flexrow">
+            <div>
+                <img src="{{ system_icon('indico_small') }}" alt="Indico"
+                     style="vertical-align: middle; margin-right: 2px;">
+            </div>
+            <div style="margin-left: 1em;">
+                <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
+                {{ template_hook('page-footer') }}
+            </div>
+        </div>
     {% endblock %}
 </div>
 

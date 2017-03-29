@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import urllib
 from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
@@ -29,13 +28,12 @@ from indico.core.config import Config
 from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
-from indico.modules.core.settings import social_settings, core_settings
+from indico.modules.core.settings import core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.legal import legal_settings
 from indico.util.i18n import get_current_locale, get_all_locales, _
 from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
-from indico.util.string import truncate
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
@@ -502,58 +500,6 @@ class WMenuSimpleEventHeader( WMenuMeetingHeader ):
 
         vars["accessWrapper"] = self._aw
         return vars
-
-
-class WFooter(object):
-    TEMPLATE = 'footer.html'
-
-    def getHTML(self, params=None):
-        # TODO: move this to the place(s) where WFooter is called
-        return render_template(self.TEMPLATE).encode('utf-8')
-
-
-class WEventFooter(WFooter):
-    TEMPLATE = 'events/footer.html'
-
-    def __init__(self, conf):
-        WFooter.__init__(self)
-        self._conf = conf
-        self._event = conf.as_event
-
-    def _gCalDateFormat(self, dtime):
-        return dtime.strftime("%Y%m%dT%H%M%SZ")
-
-    def getVars(self):
-        v = WFooter.getVars(self)
-
-        location = self._event.venue_name
-        if self._event.room_name:
-            location = u'{} ({})'.format(self._event.room_name, location)
-
-        description = truncate(self._event.description, 1000).encode('utf-8')
-        if description:
-            description += '\n\n'
-
-        description += self._event.short_external_url
-
-        v['gc_params'] = urllib.urlencode({
-            'action': 'TEMPLATE',
-            'text': self._event.title.encode('utf-8'),
-            'dates': "%s/%s" % (self._gCalDateFormat(self._event.start_dt),
-                                self._gCalDateFormat(self._event.end_dt)),
-            'details': description,
-            'location': location.encode('utf-8'),
-            'trp': False,
-            'sprop': [self._event.external_url, 'name:indico']
-        })
-
-        social_settings_data = social_settings.get_all()
-        v["shortURL"] = self._event.short_external_url
-        v["showSocial"] = social_settings_data['enabled'] and layout_settings.get(self._conf, 'show_social_badges')
-        v["social_settings"] = social_settings_data
-        v['conf'] = self._conf
-
-        return v
 
 
 class WNavigationDrawer(WTemplated):
