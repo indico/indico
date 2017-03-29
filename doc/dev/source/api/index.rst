@@ -36,3 +36,4 @@ API reference
     designer.rst
     network.rst
     news.rst
+    fields.rst
