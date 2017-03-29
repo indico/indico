@@ -31,9 +31,6 @@ $(document).ready(function() {
             content: {
                 text: text
             },
-            show: {
-                solo: true
-            },
             hide: {
                 event: 'unfocus click'
             },
@@ -52,7 +49,7 @@ $(document).ready(function() {
         }
     }
 
-    /* Handle clicks on .js-copy-to-clipboard with cliboard.js.
+    /* Handle clicks on .js-copy-to-clipboard with clipboard.js.
      * For simple usage, the clipboard-text data attribute will be copied to
      * the system clipboard. For other possibilities, see https://clipboardjs.com/
      * */
