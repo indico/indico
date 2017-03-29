@@ -238,7 +238,5 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         return [(contrib.id, escape(_format_contrib(contrib))) for contrib in contribs]
 
     def _iter_event_days(self):
-        duration = (self.event_new.end_dt - self.event_new.start_dt).days
-        for offset in xrange(duration + 1):
-            day = (self.event_new.start_dt + timedelta(days=offset)).date()
+        for day in self.event_new.iter_days():
             yield day.isoformat(), format_date(day, 'short').decode('utf-8')

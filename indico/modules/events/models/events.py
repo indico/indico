@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 from contextlib import contextmanager
+from datetime import timedelta
 
 import pytz
 from flask import has_request_context, session
@@ -735,7 +736,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Get a session block of the event"""
         from indico.modules.events.sessions.models.blocks import SessionBlock
         query = SessionBlock.query.filter(SessionBlock.id == id_,
-                                          SessionBlock.session.has(event_new=self.event_new, is_deleted=False))
+                                          SessionBlock.session.has(event_new=self, is_deleted=False))
         if scheduled_only:
             query.filter(SessionBlock.timetable_entry != None)  # noqa
         return query.first()
@@ -838,6 +839,16 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
             new_dt = entry.start_dt + diff
             entry.move(new_dt)
         self.start_dt = start_dt
+
+    def iter_days(self, tzinfo=None):
+        start_dt = self.start_dt
+        end_dt = self.end_dt
+        if tzinfo:
+            start_dt = start_dt.astimezone(tzinfo)
+            end_dt = end_dt.astimezone(tzinfo)
+        duration = (end_dt - start_dt).days
+        for offset in xrange(duration + 1):
+            yield (start_dt + timedelta(days=offset)).date()
 
     def preload_all_acl_entries(self):
         db.m.Contribution.preload_acl_entries(self)

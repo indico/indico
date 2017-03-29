@@ -19,24 +19,32 @@ from datetime import timedelta
 from xml.sax.saxutils import escape, quoteattr
 
 import pkg_resources
-from flask import g, session, render_template
+from flask import g, render_template
 from speaklater import _LazyString
 
 import indico.legacy.common.TemplateExec as templateEngine
 from indico.core import signals
 from indico.core.config import Config
-from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.modules.api import APIMode
 from indico.modules.api import settings as api_settings
 from indico.modules.core.settings import core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.legal import legal_settings
-from indico.util.i18n import get_current_locale, get_all_locales, _
+from indico.util.i18n import _
 from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
+
+
+def render_header(category=None, protected_object=None, local_tz=None):
+    extra_menu_items = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
+    rv = render_template('header.html',
+                         category=category,
+                         extra_menu_items=extra_menu_items,
+                         protected_object=protected_object,
+                         local_tz=local_tz)
+    return rv.encode('utf-8')
 
 
 class WTemplated:
@@ -153,353 +161,6 @@ class WTemplated:
     def _escapeChars(self, text):
         # Does nothing right now - it used to replace % with %% for the old-style templates
         return text
-
-
-class WHeader(object):
-    TEMPLATE = 'header.html'
-
-    def __init__(self, aw, locTZ="", isFrontPage=False, currentCategory=None, prot_obj=None):
-        self._currentuser = aw.getUser()
-        self._locTZ = locTZ
-        self._aw = aw
-        self._isFrontPage = isFrontPage
-        self.__currentCategory = currentCategory
-        # The object for which to show the protection indicator
-        self._prot_obj = prot_obj
-
-    def getHTML(self, params=None):
-        protection_disclaimers = {
-            'network': legal_settings.get('network_protected_disclaimer'),
-            'restricted': legal_settings.get('restricted_disclaimer')
-        }
-        timezone_data = {
-            'active_tz': session.timezone,
-            'active_tz_display': self._getTimezoneDisplay(session.timezone),
-            'user_tz': session.avatar.getTimezone() if session.user else None,
-            'user_tz_display_mode': session.avatar.getDisplayTZMode() if session.user else None,
-        }
-        tpl = get_template_module('_session_bar.html')
-        session_bar = tpl.render_session_bar(protected_object=self._prot_obj,
-                                             protection_disclaimers=protection_disclaimers,
-                                             timezone_data=timezone_data,
-                                             languages=get_all_locales())
-
-        extra_menu_items = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
-        rv = render_template(self.TEMPLATE,
-                             session_bar=session_bar,
-                             category=self.__currentCategory,
-                             extra_menu_items=extra_menu_items)
-        return rv.encode('utf-8')
-
-    def _getTimezoneDisplay( self, timezone ):
-        if timezone == 'LOCAL':
-            if self._locTZ:
-                return self._locTZ
-            else:
-                return Config.getInstance().getDefaultTimezone()
-        else:
-            return timezone
-
-    def getVars( self ):
-        vars = {}
-        vars["currentUser"] = self._currentuser
-
-        config =  Config.getInstance()
-
-        vars["isFrontPage"] = self._isFrontPage
-        vars["currentCategory"] = self.__currentCategory
-        vars['prot_obj'] = self._prot_obj
-
-        current_locale = get_current_locale()
-        vars["ActiveTimezone"] = session.timezone
-        """
-            Get the timezone for displaying on top of the page.
-            1. If the user has "LOCAL" timezone then show the timezone
-            of the event/category. If that's not possible just show the
-            standard timezone.
-            2. If the user has a custom timezone display that one.
-        """
-        vars["ActiveTimezoneDisplay"] = self._getTimezoneDisplay(vars["ActiveTimezone"])
-
-        vars["SelectedLanguage"] = str(current_locale)
-        vars["SelectedLanguageName"] = current_locale.language_name
-        vars["Languages"] = get_all_locales()
-
-        vars["title"] = core_settings.get('site_title')
-        vars["organization"] = core_settings.get('site_organization')
-        vars['roomBooking'] = Config.getInstance().getIsRoomBookingActive()
-        vars['protectionDisclaimerProtected'] = legal_settings.get('network_protected_disclaimer')
-        vars['protectionDisclaimerRestricted'] = legal_settings.get('restricted_disclaimer')
-
-        # Build a list of items for the administration menu
-        adminItemList = []
-        if session.user and session.user.is_admin:
-            adminItemList.append({'id': 'serverAdmin', 'url': url_for('core.admin_dashboard'),
-                                  'text': _("Server admin")})
-
-        vars["adminItemList"] = adminItemList
-        vars['extra_items'] = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
-
-        vars["show_contact"] = config.getPublicSupportEmail() is not None
-
-        return vars
-
-
-class WConferenceHeader(WHeader):
-    """Templating web component for generating the HTML header for
-        the conferences' web interface.
-    """
-
-    TEMPLATE = 'events/header.html'
-
-    def __init__(self, aw, conf):
-        self._conf = conf
-        self._aw = aw
-        WHeader.__init__(self, self._aw, prot_obj=self._conf.as_event)
-        tzUtil = DisplayTZ(self._aw,self._conf)
-        self._locTZ = tzUtil.getDisplayTZ()
-
-    def getVars( self ):
-        from indico.web.http_api.util import generate_public_auth_request
-
-        vars = WHeader.getVars( self )
-        vars["categurl"] = self._conf.as_event.category.url
-
-        vars["conf"] = vars["target"] = self._conf
-
-        vars["imgLogo"] = Config.getInstance().getSystemIconURL("miniLogo")
-
-        # Default values to avoid NameError while executing the template
-        styles = theme_settings.get_themes_for("conference")
-
-        vars["viewoptions"] = [{'id': theme_id, 'name': data['title']}
-                               for theme_id, data in sorted(styles.viewitems(), key=lambda x: x[1]['title'])]
-        vars["SelectedStyle"] = ""
-        vars["pdfURL"] = ""
-        vars["displayURL"] = url_for('event.conferenceOtherViews', self._conf.as_event)
-
-        # Setting the buttons that will be displayed in the header menu
-        vars["showFilterButton"] = False
-        vars["showMoreButton"] = True
-        vars["showExportToICal"] = True
-        vars["showExportToPDF"] = False
-        vars["showDLMaterial"] = True
-        vars["showLayout"] = True
-
-        vars["displayNavigationBar"] = layout_settings.get(self._conf, 'show_nav_bar')
-
-        apiMode = api_settings.get('security_mode')
-
-        vars["icsIconURL"] = str(Config.getInstance().getSystemIconURL("ical_grey"))
-        vars["apiMode"] = apiMode
-        vars["signingEnabled"] = apiMode in {APIMode.SIGNED, APIMode.ONLYKEY_SIGNED, APIMode.ALL_SIGNED}
-        vars["persistentAllowed"] = api_settings.get('allow_persistent')
-        user = self._aw.getUser()
-        apiKey = user.api_key if user else None
-
-        topURLs = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.id)
-        urls = generate_public_auth_request(apiKey, '/export/event/%s.ics' % self._conf.id,
-                                            {'detail': 'contributions'})
-
-        vars["requestURLs"] = {
-            'publicRequestURL': topURLs["publicRequestURL"],
-            'authRequestURL':  topURLs["authRequestURL"],
-            'publicRequestDetailedURL': urls["publicRequestURL"],
-            'authRequestDetailedURL':  urls["authRequestURL"]
-        }
-
-        vars["persistentUserEnabled"] = apiKey.is_persistent_allowed if apiKey else False
-        vars["apiActive"] = apiKey is not None
-        vars["userLogged"] = user is not None
-        tpl = get_template_module('api/_messages.html')
-        vars['apiKeyUserAgreement'] = tpl.get_ical_api_key_msg()
-        vars['apiPersistentUserAgreement'] = tpl.get_ical_persistent_msg()
-
-        return vars
-
-
-class WMenuConferenceHeader( WConferenceHeader ):
-    """Templating web component for generating the HTML header for
-        the conferences' web interface with a menu
-    """
-    def __init__(self, aw, conf):
-        self._conf = conf
-        self._aw=aw
-        WConferenceHeader.__init__(self, self._aw, conf)
-
-    def getVars( self ):
-        vars = WConferenceHeader.getVars( self )
-        vars["categurl"] = self._conf.as_event.category.url
-
-        # Dates Menu
-        event = self._conf.as_event
-        sdate = event.start_dt.astimezone(event.display_tzinfo)
-        edate = event.end_dt.astimezone(event.display_tzinfo)
-        dates = []
-        if sdate.strftime("%Y-%m-%d") != edate.strftime("%Y-%m-%d"):
-            selected = ""
-            if vars.has_key("selectedDate"):
-                selectedDate = vars["selectedDate"]
-                if selectedDate == "all" or selectedDate == "":
-                    selected = "selected"
-            else:
-                selectedDate = "all"
-            dates = ["""<select name="showDate" onChange="document.forms[0].submit();" style="font-size:8pt;">
-                            <option value="all" {}>- - {} - -</option>""".format(selected, _("all days"))]
-            while sdate.strftime("%Y-%m-%d") <= edate.strftime("%Y-%m-%d"):
-                selected = ""
-                if selectedDate == sdate.strftime("%d-%B-%Y"):
-                    selected = "selected"
-                d = sdate.strftime("%d-%B-%Y")
-                dates.append(""" <option value="%s" %s>%s</option> """%(d, selected, d))
-                sdate = sdate + timedelta(days=1)
-            dates.append("</select>")
-        else:
-            dates.append("""<input type="hidden" name="showDate" value="all">""")
-        # Sessions Menu
-        sessions = []
-        if self._conf.as_event.sessions:
-            selected = ""
-            if vars.has_key("selectedSession"):
-                selectedSession = vars["selectedSession"]
-                if selectedSession == "all" or selectedSession == "":
-                    selected = "selected"
-            else:
-                selectedSession = "all"
-            sessions = ["""<select name="showSession" onChange="document.forms[0].submit();" style="font-size:8pt;">
-                               <option value="all" {}>- - {} - -</option>""".format(selected, _("all sessions"))]
-            for session in self._conf.as_event.sessions:
-                selected = ""
-                sid = session.friendly_id
-                if sid == selectedSession:
-                    selected = "selected"
-                sessions.append(""" <option value="%s" %s>%s</option> """ % (sid, selected, session.title))
-            sessions.append("</select>")
-        else:
-            sessions.append("""<input type="hidden" name="showSession" value="all">""")
-        # Handle hide/show contributions option
-        hideContributions = None;
-        if self._conf.as_event.sessions:
-            if vars.has_key("detailLevel"):
-                if vars["detailLevel"] == "session":
-                    hideContributions = "checked"
-                else:
-                    hideContributions = ""
-        # Save to session
-        vars["hideContributions"] = hideContributions
-
-        vars['printURL'] = url_for('event.conferenceOtherViews', event,
-                                   showDate=vars.get('selectedDate') or 'all',
-                                   showSession=vars.get('selectedSession') or 'all',
-                                   fr='no',
-                                   view=vars['currentView'])
-
-        vars["printIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("printer")))
-        vars["pdfURL"] = quoteattr(url_for('timetable.export_pdf', self._conf.as_event))
-        vars["pdfIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("pdf")))
-        vars["zipIMG"] = quoteattr(str(Config.getInstance().getSystemIconURL("smallzip")))
-
-        return vars
-
-
-class WMenuMeetingHeader( WConferenceHeader ):
-    """Templating web component for generating the HTML header for
-        the meetings web interface with a menu
-    """
-    def __init__(self, aw, conf):
-        self._conf = conf
-        self._aw=aw
-        WHeader.__init__(self, self._aw, prot_obj=self._conf.as_event)
-        tzUtil = DisplayTZ(self._aw,self._conf)
-        self._locTZ = tzUtil.getDisplayTZ()
-
-    def getVars( self ):
-        vars = WConferenceHeader.getVars( self )
-
-        vars["categurl"] = self._conf.as_event.category.url
-        view_options = [{'id': tid, 'name': data['title']} for tid, data in
-                        sorted(theme_settings.get_themes_for(vars["type"]).viewitems(), key=lambda x: x[1]['title'])]
-
-        vars["viewoptions"] = view_options
-        vars["SelectedStyle"] = theme_settings.themes[vars['currentView']]['title']
-        vars["displayURL"] = self._rh._conf.as_event.url
-
-        # Setting the buttons that will be displayed in the header menu
-        vars["showFilterButton"] = True
-        vars["showExportToPDF"] = True
-        vars["showDLMaterial"] = True
-        vars["showLayout"] = True
-
-        # Dates Menu
-        event = self._conf.as_event
-        sdate = event.start_dt.astimezone(event.display_tzinfo)
-        edate = event.end_dt.astimezone(event.display_tzinfo)
-        selected = ""
-        if vars.has_key("selectedDate"):
-            selectedDate = vars["selectedDate"]
-            if selectedDate == "all" or selectedDate == "":
-                selected = "selected"
-        else:
-            selectedDate = "all"
-        dates = ['<option value="all" {}>- -  {} - -</option>'.format(selected, _("all days"))]
-        while sdate.date() <= edate.date():
-            iso_date = sdate.date().isoformat()
-            selected = 'selected' if selectedDate == iso_date else ''
-            dates.append('<option value="{}" {}>{}</option>'.format(iso_date, selected, format_date(sdate)))
-            sdate = sdate + timedelta(days=1)
-        vars["datesMenu"] = "".join(dates);
-
-        # Sessions Menu
-        selected = ""
-        if vars.has_key("selectedSession"):
-            selectedSession = vars["selectedSession"]
-            if selectedSession == "all" or selectedSession == "":
-                selected = "selected"
-        else:
-            selectedSession = "all"
-        sessions = ['<option value="all" {}>- - {} - -</option>'.format(selected, _("all sessions"))]
-        for session_ in self._conf.as_event.sessions:
-            selected = "selected" if unicode(session_.friendly_id) == selectedSession else ''
-            title = session_.title
-            if len(title) > 60:
-                title = title[0:40] + u"..."
-            sessions.append(""" <option value="%s" %s>%s</option> """ % (session_.friendly_id, selected,
-                                                                         title.encode('utf-8')))
-        vars["sessionsMenu"] = "".join(sessions)
-
-        # Handle hide/show contributions option
-        hideContributions = None;
-        if self._conf.as_event.sessions:
-            if vars.has_key("detailLevel"):
-                if vars["detailLevel"] == "session":
-                    hideContributions = "checked"
-                else:
-                    hideContributions = ""
-        vars["hideContributions"] = hideContributions
-
-        vars['printURL'] = url_for('event.conferenceOtherViews', event,
-                                   showDate=vars.get('selectedDate') or 'all',
-                                   showSession=vars.get('selectedSession') or 'all',
-                                   detailLevel=vars.get('detailLevel') or 'all',
-                                   fr='no',
-                                   view=vars['currentView'])
-        vars["pdfURL"] = url_for('timetable.export_pdf', self._conf.as_event)
-        return vars
-
-
-class WMenuSimpleEventHeader( WMenuMeetingHeader ):
-    """Templating web component for generating the HTML header for
-        the simple event' web interface with a menu
-    """
-
-    def getVars( self ):
-        vars = WMenuMeetingHeader.getVars( self )
-        # Setting the buttons that will be displayed in the header menu
-        vars["showFilterButton"] = False
-        vars["showExportToPDF"] = False
-
-        vars["accessWrapper"] = self._aw
-        return vars
 
 
 class WNavigationDrawer(WTemplated):

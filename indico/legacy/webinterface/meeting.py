@@ -14,15 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.general import WebFactory
-from indico.legacy.webinterface.pages.conferences import WPConferenceDisplayBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDisplayBase, render_event_header
+from indico.legacy.webinterface.wcomponents import WNavigationDrawer
 
 
 class WebFactory(WebFactory):
-    ##Don't remove this commentary. Its purpose is to be sure that those words/sentences are in the dictionary after extraction. It also prevents the developper to create an init for this class and update the 283 Webfactory occurences...
-    ##_("Meeting")
-    ##_("""this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions""")
     id = "meeting"
     name = "Meeting"
     description = """this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions"""
@@ -31,29 +28,13 @@ class WebFactory(WebFactory):
 MeetingWebFactory = WebFactory
 
 
-class WPMeetingDisplay( WPConferenceDisplayBase ):
-
+class WPMeetingDisplay(WPConferenceDisplayBase):
     def _getNavigationDrawer(self):
         pars = {"target": self._conf.as_event, "isModif": False}
-        return wcomponents.WNavigationDrawer( pars )
+        return WNavigationDrawer(pars)
 
-    def _getHeader( self ):
-        """
-        """
-
-        if hasattr(self, "_view"):
-            currentView = self._view
-        else:
-            currentView = "static"
-
-        wc = wcomponents.WMenuMeetingHeader( self._getAW(),self._conf )
-        return wc.getHTML( { "loginURL": self.getLoginURL(),\
-                             "logoutURL": self.getLogoutURL(),\
-                             "confId": self._conf.id,
-                             "currentView": currentView,\
-                             "type": WebFactory.getId(),\
-                             "filterActive": False,\
-                             "dark": True } )
+    def _getHeader(self):
+        return render_event_header(self._conf.as_event).encode('utf-8')
 
     def _getBody(self, params):
         raise NotImplementedError

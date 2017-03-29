@@ -1,1 +1,268 @@
-{# event header #}
+{%- macro _render_nav_bar() -%}
+    {% set rel = event.get_relative_event_ids() %}
+
+    <a href="{{ url_for_index() }}"
+       title="{% trans %}Go to Indico Home Page{% endtrans %}"
+       style="background-image: url({{ system_icon('home') }}); margin-left: 10px;"></a>
+
+    <div class="separator"></div>
+
+    {% if rel.first is not none %}
+        <a href="{{ url_for('events.display', confId=rel.first) }}"
+           title="{% trans %}Oldest event{% endtrans %}"
+           style="background-image: url({{ system_icon('first_arrow') }})"></a>
+    {% endif %}
+
+    {% if rel.prev is not none %}
+        <a href="{{ url_for('events.display', confId=rel.prev) }}"
+           title="{% trans %}Older event{% endtrans %}"
+           style="background-image: url({{ system_icon('left_arrow') }})"></a>
+    {% endif %}
+
+    <a href="{{ event.category.url }}"
+       title="{% trans %}Up to category{% endtrans %}"
+       style="background-image: url({{ system_icon('upCategory') }})"></a>
+
+    {% if rel.next is not none %}
+        <a href="{{ url_for('events.display', confId=rel.next) }}"
+           title="{% trans %}Newer event{% endtrans %}"
+           style="background-image: url({{ system_icon('right_arrow') }})"></a>
+    {% endif %}
+
+    {% if rel.last is not none %}
+        <a href="{{ url_for('events.display', confId=rel.last) }}"
+           title="{% trans %}Newest event{% endtrans %}"
+           style="background-image: url({{ system_icon('last_arrow') }})"></a>
+    {% endif %}
+{%- endmacro -%}
+
+
+{%- macro _render_more_menu() -%}
+    <a id="moreMenu">
+        <div class="dropDownMenuGrey">{% trans %}More{% endtrans %}</div>
+        <div class="leftCorner"></div>
+    </a>
+
+    {# TODO: get rid of this awful legacy js... #}
+    {% set display_url = url_for('event.conferenceOtherViews', event) if event.type == 'conference' else event.url %}
+    <script>
+        (function() {
+            'use strict';
+            var moreMenu = $E('moreMenu');
+            var menuItems = {};
+            var layoutMenuItems = {};
+            var menu = new PopupMenu(menuItems, [moreMenu], 'darkPopupList');
+            var url = {{ display_url|tojson }};
+
+            {% for id, name in themes|dictsort(by='value') -%}
+                layoutMenuItems[{{ id|tojson }}] = {
+                    display: {{ name|tojson }},
+                    action: function() {
+                        location.href = build_url(url, {view: {{ id|tojson }}});
+                    }
+                };
+            {% endfor %}
+
+            {% if event.type == 'meeting' %}
+                menuItems.exportPDF = {
+                    action: {{ url_for('timetable.export_pdf', event)|tojson }},
+                    ajaxDialog: true,
+                    closeOnClick: true,
+                    display: $T.gettext('Export to PDF')
+                };
+            {% endif %}
+            menuItems.downloadMaterial = {
+                action: {{ url_for('attachments.package', event)|tojson }},
+                display: $T.gettext('Download material')
+            };
+            menuItems.layout = {
+                action: new PopupMenu(layoutMenuItems, [moreMenu, menu], 'darkPopupList', null, null, null, {{ theme|tojson }}),
+                display: $T.gettext('Layout')
+            };
+
+            var pos = moreMenu.getAbsolutePosition();
+            $('#moreMenu').on('click', function() {
+                menu.open(pos.x - 8, pos.y + 20);
+            });
+        })();
+    </script>
+{%- endmacro -%}
+
+
+{%- macro _render_filters() -%}
+    {%- set filter_link_tooltip -%}
+        {%- if filters_active -%}
+            {%- trans %}Filtering is enabled{% endtrans -%}
+        {%- else -%}
+            {%- trans %}Add a filter{% endtrans -%}
+        {%- endif -%}
+    {%- endset -%}
+
+    <a id="filterLink" href="#" style="{% if filters_active %}color:#D7FF99; font-weight: bold;{% endif %}"
+       title="{{ filter_link_tooltip|forceescape }}">
+        {% trans %}Filter{% endtrans %}
+        <div class="leftCorner"></div>
+    </a>
+
+    <div id="filterDiv" class="filterDiv">
+        <form id="filterForm" style="margin: 0;">
+            <div style="float: right;">
+                <input type="submit" class="btn" value="Apply filter">&nbsp;
+                <input type="button" id="removeFilterButton" class="btn" value="Remove filter">
+            </div>
+
+
+            <strong>{% trans %}Focus on:{% endtrans %}&nbsp;</strong>
+
+            <select id="datesSelect" name="showDate" style="font-size: 8pt;">
+                {% set selected_date = request.args.get('showDate', 'all') %}
+                <option value="all" {{ 'checked' if selected_date == 'all' }}>
+                    {%- trans %}All days{% endtrans -%}
+                </option>
+                {% for date in event.iter_days(tzinfo=event.tzinfo) %}
+                    <option value="{{ date.isoformat() }}" {{ 'selected' if selected_date == date.isoformat() }}>
+                        {{- date|format_date() -}}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <select id="showSessionSelect" name="showSession" style="font-size: 8pt;">
+                {% set selected_session = request.args.get('showSession', 'all') %}
+                <option value="all" {{ 'checked' if selected_session == 'all' }}>
+                    {%- trans %}All sessions{% endtrans -%}
+                </option>
+                {% for s in event.sessions|sort(attribute='title') %}
+                    <option value="{{ s.friendly_id }}" {{ 'selected' if selected_session == s.friendly_id|string }}>
+                        {{- s.title|truncate(50) -}}
+                    </option>
+                {% endfor %}
+            </select>
+
+            <span style="white-space: nowrap; margin-left: 65px;">
+                {% set hide_contribs = event.sessions and request.args.detailLevel == 'session' %}
+                <input id="hideContributionsCheckbox" type="checkbox" name="detailLevel" style="margin-right: 5px;"
+                       value="session" {{ 'checked' if hide_contribs }}>
+                <strong id="hideContributionsLabel">{% trans %}Hide Contributions{% endtrans %}</strong>
+            </span>
+        </form>
+    </div>
+
+    {# TODO: get rid of this awful legacy js... #}
+    <script>
+        (function() {
+            'use strict';
+
+            var filterButtonClicked = false;
+            var filterButtonState = false;
+            var filtersActive = {{ filters_active|tojson }};
+
+            function filterToggle() {
+                if (!filterButtonClicked) {
+                    // When clicked for the first time append the div to the correct container
+                    $('#pageSubHeader').append($('#filterDiv').detach());
+                    filterButtonClicked = true;
+                }
+
+                filterButtonState = !filterButtonState;
+                $('#filterDiv').toggle(filterButtonState);
+            }
+
+            // Setup the filter button in the toolbar
+            $('#filterLink').on('click', function(e) {
+                e.preventDefault();
+                filterToggle();
+            });
+
+            // When remove filter button clicked, if needed reset the form and do submit otherwise
+            // just hide the filter div
+            $('#removeFilterButton').on('click', function() {
+                // Reset the form
+                $('#hideContributionsCheckbox').prop('checked', false);
+                $('#datesSelect').val('all');
+                $('#showSessionSelect').val('all');
+
+                if (filtersActive) {
+                    $('#filterForm').submit();
+                } else {
+                    filterToggle();
+                }
+            });
+
+            // Setup the hide contributions checkbox
+            {% if not event.sessions %}
+                $('#hideContributionsLabel').hide();
+                $('#hideContributionsCheckbox').hide()
+            {% endif %}
+
+            // Make the hide contributions label clickable
+            $('#hideContributionsLabel').css('cursor', 'pointer').on('click', function() {
+                $('#hideContributionsCheckbox').trigger('click');
+            });
+
+            if (filtersActive) {
+                _.defer(filterToggle);
+            }
+        })();
+    </script>
+{%- endmacro -%}
+
+
+{%- set show_filter_button = event.type == 'meeting' -%}
+{%- set filters_active = show_filter_button and (request.args.get('showDate', 'all') != 'all' or
+                                                 request.args.get('showSession', 'all') != 'all' or
+                                                 request.args.get('detailLevel', 'contribution') != 'contribution') -%}
+{{ template_hook('global-announcement') }}
+
+<div class="page-header page-header-dark">
+    {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone) }}
+
+    <div class="eventHeaderButtonBar">
+        {% if event.type != 'conference' or show_nav_bar %}
+            {{ _render_nav_bar() }}
+
+            {% if print_url or show_filter_button %}
+                <div class="separator"></div>
+            {% endif %}
+
+        {% endif %}
+
+        {% if print_url %}
+            <a href="{{ print_url }}"
+               title="{% trans %}Printable version{% endtrans %}"
+               style="background-image: url({{ system_icon('printer') }})"></a>
+        {% endif %}
+
+        {% if show_filter_button %}
+            {{ _render_filters() }}
+        {% endif %}
+
+        <a href="#" id="exportIcal{{ event.id }}" class="js-export-ical" data-id="{{ event.id }}">
+            {% trans %}iCal export{% endtrans %}
+            <div class="leftCorner"></div>
+        </a>
+        {{ template_hook('event-ical-export', event=event) }}
+
+        {{ _render_more_menu() }}
+
+        <div class="separator"></div>
+
+        <a href="{{ url_for('event_management.settings', event) }}"
+           title="{% trans %}Switch to management area for this event{% endtrans %}"
+           style="background-image: url({{ system_icon('manage') }})"></a>
+    </div>
+
+
+    {# This div is used for inserting content under the header such as the filtering options for meetings #}
+    <div id="pageSubHeader"></div>
+</div>
+
+{% if event.type != 'conference' %}
+    {%- include 'flashed_messages.html' -%}
+{% endif %}
+
+<script>
+    $('.js-export-ical').on('click', function(evt) {
+        evt.preventDefault();
+        $(this).trigger('menu_select');
+    });
+</script>

@@ -61,6 +61,7 @@ from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
+from indico.web.views import render_session_bar
 from indico.legacy.webinterface.pages.error import render_error
 
 
@@ -183,6 +184,7 @@ def setup_jinja(app):
     app.add_template_global(render_sidemenu)
     app.add_template_global(slugify)
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
+    app.add_template_global(render_session_bar)
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)

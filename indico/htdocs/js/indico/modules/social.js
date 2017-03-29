@@ -57,7 +57,7 @@
                 target: $('#social_button')
             },
             hide: {
-                event: false,
+                event: 'unfocus click',
                 fixed: true,
                 effect: function() {
                     $(this).fadeOut(300);

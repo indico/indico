@@ -21,6 +21,7 @@ from flask import request, render_template, g
 
 from indico.core import signals
 from indico.core.config import Config
+from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.core.settings import social_settings
 from indico.util.i18n import _
@@ -224,12 +225,8 @@ class WPDecorated(WPBase):
         return url_for_logout(next_url=request.relative_url)
 
     def _getHeader(self):
-        wc = wcomponents.WHeader(self._getAW(), isFrontPage=self._isFrontPage(), locTZ=self._locTZ,
-                                 currentCategory=self._current_category, prot_obj=self._protected_object)
-
-        return wc.getHTML( { "subArea": self._getSiteArea(), \
-                             "loginURL": self._escapeChars(str(self.getLoginURL())),\
-                             "logoutURL": self._escapeChars(str(self.getLogoutURL())) } )
+        return render_header(category=self._current_category, protected_object=self._protected_object,
+                             local_tz=self._locTZ)
 
     def _getTabControl(self):
         return None
