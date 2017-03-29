@@ -234,9 +234,8 @@ class WPDecorated(WPBase):
     def _getTabControl(self):
         return None
 
-    def _getFooter( self):
-        wc = wcomponents.WFooter()
-        return wc.getHTML({ "subArea": self._getSiteArea() })
+    def _getFooter(self):
+        return render_template('footer.html').encode('utf-8')
 
     def _applyDecoration(self, body):
         return u'<div class="header">{}</div><div class="main">{}</div><div class="footer">{}</div>'.format(
