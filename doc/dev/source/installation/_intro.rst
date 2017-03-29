@@ -1,0 +1,1 @@
+To simply install and use Indico, follow the `production installation instructions </installation/installation_prod.html>`_. For those who are interested in developing new features and plugins for Indico, check out the `development installation instructions </installation/installation_dev.html>`_.

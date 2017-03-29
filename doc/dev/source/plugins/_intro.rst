@@ -1,0 +1,2 @@
+Indico can be extended through plugins, standalone packages of code that do not require any modifications to the Indico core itself. A plugin can perform something very simple such as adding a new command to the Indico CLI to more complex functionalities like introducing new payment methods, chat integration, etc.
+We suggest that you first have a look at `Getting started </plugins/getting_started.html>`_ and then head over to the more advance topics in the table of contents.
