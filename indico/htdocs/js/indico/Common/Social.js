@@ -61,11 +61,6 @@ $(function() {
         },
         events: {
             render: function(event, api) {
-
-                $('#direct_link').click(function(e){
-                    $(this).select();
-                });
-
                 inject_facebook($('#social').data('social-settings').facebook_app_id);
                 $.getScript('//apis.google.com/js/plusone.js');
                 $.getScript('//platform.twitter.com/widgets.js');

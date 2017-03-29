@@ -14,10 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import posixpath
 from urlparse import urlparse
 
-import posixpath
-from flask import request, session, render_template, g
+from flask import request, render_template, g
 
 from indico.core import signals
 from indico.core.config import Config
@@ -25,7 +25,7 @@ from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.core.settings import social_settings
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.string import to_unicode, encode_if_unicode
+from indico.util.string import to_unicode
 from indico.web import assets
 from indico.web.util import jsonify_template
 from indico.legacy.webinterface import wcomponents

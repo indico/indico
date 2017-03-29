@@ -31,7 +31,7 @@ from indico.modules.events.models.events import Event
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
-from indico.util.string import encode_if_unicode, to_unicode
+from indico.util.string import encode_if_unicode, to_unicode, truncate
 from indico.web.flask.util import url_for
 
 from indico.legacy.common.output import outputGenerator
@@ -41,6 +41,32 @@ from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.common.tools import strip_ml_tags, escape_html
 from indico.legacy.webinterface.pages import main, base
 from indico.legacy.webinterface.pages.base import WPDecorated
+
+
+def render_event_footer(event, dark=False):
+    location = event.venue_name
+    if event.room_name:
+        location = u'{} ({})'.format(event.room_name, location)
+    description = u'{}\n\n{}'.format(truncate(event.description, 1000), event.short_external_url).strip()
+    google_calendar_params = {
+        u'action': u'TEMPLATE',
+        u'text': event.title,
+        u'dates': u'{}/{}'.format(event.start_dt.strftime(u'%Y%m%dT%H%M%SZ'),
+                                  event.end_dt.strftime(u'%Y%m%dT%H%M%SZ')),
+        u'details': description,
+        u'location': location,
+        u'trp': False,
+        u'sprop': [event.external_url, u'name:indico']
+    }
+
+    social_settings_data = social_settings.get_all()
+    show_social = social_settings_data['enabled'] and layout_settings.get(event, 'show_social_badges')
+    return render_template('events/footer.html',
+                           event=event,
+                           dark=dark,
+                           social_settings=social_settings_data,
+                           show_social=show_social,
+                           google_calendar_params=google_calendar_params)
 
 
 class WPConferenceBase(base.WPDecorated):
@@ -249,7 +275,7 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
         return WConfDetailsFull(self._getAW(), self._conf).getHTML()
 
     def _getFooter(self):
-        return wcomponents.WEventFooter(self._conf).getHTML()
+        return render_event_footer(self.event).encode('utf-8')
 
 
 class WPXSLConferenceDisplay(WPConferenceBase):
@@ -359,13 +385,7 @@ class WPTPLConferenceDisplay(MathjaxMixin, WPXSLConferenceDisplay, object):
         return theme_css_tag + confMetadata + MathjaxMixin._getHeadContent(self)
 
     def _getFooter(self):
-        wc = wcomponents.WEventFooter(self._conf)
-        p = {
-            "subArea": self._getSiteArea(),
-            "dark": True,
-            "shortURL": self._conf.as_event.short_external_url
-        }
-        return wc.getHTML(p)
+        return render_event_footer(self._conf.as_event, dark=True).encode('utf-8')
 
     def _getHeader(self):
         if self._type == 'lecture':

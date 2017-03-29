@@ -1,2 +1,57 @@
-{# event footer #}
 {% extends 'footer.html' %}
+
+{% block footer %}
+    {%- set url = event.short_external_url -%}
+
+    {% if show_social %}
+        <div id="fb-root"></div>
+
+        <div id="social_share">
+            <h3>{% trans %}Share this page{% endtrans %}</h3>
+            <h4>{% trans %}Direct link{% endtrans %}</h4>
+            <a href="{{ url }}"
+               class="js-copy-to-clipboard"
+               title="{% trans %}Copy link to clipboard{% endtrans %}"
+               data-clipboard-text="{{ url }}"
+               data-clipboard-action="copy">
+                {{- url -}}
+            </a>
+            <div>
+                <h4>{% trans %}Social networks{% endtrans %}</h4>
+                <div class="social_site">
+                    <span id="fb-loading">{% trans %}Loading...{% endtrans %}</span>
+                    <fb:like id="fb-like" send="false" layout="standard" width="100" show-faces="false"
+                             colorscheme="{{ 'dark' if dark else 'light' }}" font="verdana" />
+                </div>
+                <div class="social_site">
+                    <g:plusone size="medium" />
+                </div>
+                <div class="social_site">
+                    <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal">
+                        {%- trans %}Tweet{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+            <div>
+                <h4>{% trans %}Calendaring{% endtrans %}</h4>
+            </div>
+            <div class="social_site">
+                <a href="https://www.google.com/calendar/event?{{ google_calendar_params|urlencode }}" target="_blank">
+                    <img src="//www.google.com/calendar/images/ext/gc_button1.gif" alt="" border="0">
+                </a>
+            </div>
+        </div>
+
+        <div id="social"
+             data-url="{{ url }}"
+             data-theme="{{ 'dark' if dark else 'light' }}"
+             data-social-settings="{{ social_settings|tojson|forceescape }}">
+            <img src="{{ system_icon('social.png') }}"
+                 id="social_button"
+                 alt="{% trans %}Social Networks{% endtrans %}"
+                 title="{% trans %}Social Networks{% endtrans %}">
+        </div>
+    {% endif %}
+
+    {{ super() }}
+{% endblock %}

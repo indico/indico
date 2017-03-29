@@ -2132,17 +2132,6 @@ div#social img#social_button:hover{
     color: #fff;
 }
 
-.social_share_tooltip input {
-    background: #ddd;
-    border: 1px solid #999;
-}
-
-.social_share_tooltip input[type=text] {
-    width: 100%;
-    cursor: text;
-    color: #000;
-}
-
 .social_share_tooltip.qtip-dark h3 {
     color: #aaa;
     font-size: 15px;
