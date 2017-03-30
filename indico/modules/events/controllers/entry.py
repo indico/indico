@@ -19,15 +19,15 @@ from __future__ import unicode_literals
 from flask import redirect, request, url_for, current_app
 from werkzeug.exceptions import NotFound
 
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceDisplay
 from indico.core.db import db
 from indico.modules.events import Event
+from indico.modules.events.controllers.display import RHDisplayEvent
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _
 from indico.util.string import is_legacy_id
 
 
-def event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
+def event_or_shorturl(confId, shorturl_namespace=False, force_overview=False):
     func = None
     event_ = Event.get(int(confId)) if confId.isdigit() else None
     if event_ and event_.is_deleted:
@@ -41,9 +41,8 @@ def event_or_shorturl(confId, shorturl_namespace=False, ovw=False):
         else:
             params = request.args.to_dict()
             params['confId'] = confId
-            if ovw:
-                params['ovw'] = 'True'
-            func = lambda: RHConferenceDisplay().process(params)
+            request.view_args['confId'] = int(request.view_args['confId'])
+            func = lambda: RHDisplayEvent().process(params)
     else:
         shorturl_event = (Event.query
                           .filter(db.func.lower(Event.url_shortcut) == confId.lower(),

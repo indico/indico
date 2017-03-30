@@ -20,6 +20,3 @@ from indico.web.flask.blueprints.event.display import event
 
 # My conference
 event.add_url_rule('/my-conference/', 'myconference', conferenceDisplay.RHMyStuff)
-
-# Other views
-event.add_url_rule('/other-view', 'conferenceOtherViews', conferenceDisplay.RHConferenceOtherViews)

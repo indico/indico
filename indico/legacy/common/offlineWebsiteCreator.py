@@ -34,7 +34,7 @@ from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStati
                                                      WPStaticContributionList, WPStaticCustomPage,
                                                      WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
                                                      WPStaticSpeakerList, WPStaticSubcontributionDisplay,
-                                                     WPStaticTimetable, WPTPLStaticConferenceDisplay)
+                                                     WPStaticTimetable, WPStaticSimpleEventDisplay)
 from indico.legacy.webinterface.rh.base import RH
 
 from indico.core.config import Config
@@ -45,7 +45,6 @@ from indico.modules.events.contributions.controllers.display import (RHAuthorLis
                                                                      RHSpeakerList, RHSubcontributionDisplay)
 from indico.modules.events.contributions.util import get_contribution_ical_file
 from indico.modules.events.layout.models.menu import MenuEntryType
-from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.modules.events.sessions.util import get_session_timetable_pdf, get_session_ical_file
@@ -54,6 +53,7 @@ from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
 from indico.util.string import remove_tags
+from indico.web.assets.util import get_asset_path
 from indico.web.flask.util import url_for
 
 
@@ -177,14 +177,21 @@ class OfflineEventCreator(object):
         self._fileHandler.close()
         return self._fileHandler.getPath()
 
+    def _static_url_to_path(self, url):
+        match = re.match(r'^static/assets/(core|plugin-(?P<plugin>[^/]+)|theme-(?P<theme>[^/]+))/(?P<path>.+)$', url)
+        if match is not None:
+            path = os.path.join(Config.getInstance().getAssetsDir(), get_asset_path(**match.groupdict()))
+        else:
+            path = os.path.join(Config.getInstance().getHtdocsDir(), url)
+        return re.sub(r'#.*$', '', path)
+
     def _get_static_files(self, html):
-        config = Config.getInstance()
         soup = BeautifulSoup(html, 'lxml')
         images = set(_fix_url_path(x['src']) for x in soup.select('img[src]'))
         scripts = set(_fix_url_path(x['src']) for x in soup.select('script[src]'))
         styles = set(_fix_url_path(x['href']) for x in soup.select('link[rel="stylesheet"]'))
         for path in itertools.chain(images, scripts, styles):
-            src_path = re.sub(r'#.*$', '', os.path.join(config.getHtdocsDir(), path))
+            src_path = self._static_url_to_path(path)
             dst_path = os.path.join(self._staticPath, path)
             if path in styles:
                 self._css_files.add(path)
@@ -220,7 +227,7 @@ class OfflineEventCreator(object):
         """Adds files referenced in stylesheets and rewrite the URLs inside those stylesheets"""
         config = Config.getInstance()
         for path in self._css_files:
-            src_path = os.path.join(config.getHtdocsDir(), path)
+            src_path = self._static_url_to_path(path)
             dst_path = os.path.join(self._staticPath, path)
             if dst_path in self._downloaded_files and not os.path.exists(src_path):
                 css = self._downloaded_files[dst_path]
@@ -257,13 +264,7 @@ class OfflineEventCreator(object):
             self._fileHandler.addNewFile(dst_path, css)
 
     def _create_home(self):
-        # get default/selected view
-        view = self._rh._target.as_event.theme
-        # if no default view was attributed, then get the configuration default
-        if not view or view not in theme_settings.themes or theme_settings.themes[view].get('is_xml'):
-            view = theme_settings.defaults[self._eventType]
-        p = WPTPLStaticConferenceDisplay(self._rh, self._rh._target, view, self._eventType, self._rh._reqParams)
-        self._html = p.display(**self._rh._getRequestParams())
+        self._html = WPStaticSimpleEventDisplay(self._rh, self._conf, self.event.theme).display()
 
     def _create_other_pages(self):
         pass
@@ -327,6 +328,8 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         for rh_cls, wp in rhs.iteritems():
             rh = rh_cls()
             rh.view_class = wp
+            if rh_cls is RHTimetable:
+                rh.view_class_simple = WPStaticSimpleEventDisplay
             self._menu_offline_items[wp.menu_entry_name] = rh
 
     def _create_home(self):

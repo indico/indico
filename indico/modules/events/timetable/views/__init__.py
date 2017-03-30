@@ -28,6 +28,7 @@ from indico.core import signals
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
+from indico.modules.events.util import get_theme
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import template_hook, register_template_hook
 
@@ -66,8 +67,7 @@ class WPDisplayTimetable(WPJinjaMixin, WPConferenceDefaultDisplayBase):
 @template_hook('meeting-body')
 def inject_meeting_body(event, **kwargs):
     event.preload_all_acl_entries()
-    event_tz_name = DisplayTZ(session.user, event.as_legacy).getDisplayTZ()
-    event_tz = timezone(event_tz_name)
+    event_tz = event.display_tzinfo
     show_date = request.args.get('showDate') or 'all'
     show_session = request.args.get('showSession') or 'all'
     detail_level = request.args.get('detailLevel') or 'contribution'
@@ -130,18 +130,14 @@ def inject_meeting_body(event, **kwargs):
     entries.sort(key=lambda entry: (entry.start_dt, entry.object.title if entry.object else entry.title))
 
     days = [(day, list(e)) for day, e in groupby(entries, lambda e: e.start_dt.astimezone(event_tz).date())]
-    theme_id = view if view and view in theme_settings.themes else event.theme
-    if theme_id not in theme_settings.themes:
-        theme_id = theme_settings.defaults[event.type_.name]
-    theme = theme_settings.themes[theme_id]
+    theme = theme_settings.themes[get_theme(event, view)[0]]
     plugin = theme.get('plugin')
     tpl_name = theme.get('tt_template', theme['template'])
     tt_tpl = ((plugin.name + tpl_name)
               if (plugin and tpl_name[0] == ':')
               else posixpath.join('events/timetable/display', tpl_name))
     total_days = (event.end_dt - event.start_dt).days + 1
-
     return render_template(tt_tpl, event=event, entries=entries, days=days,
-                           timezone=event_tz_name, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
+                           timezone=event_tz.zone, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
                            theme_settings=theme.get('settings', {}), show_siblings_location=show_siblings_location,
                            show_children_location=show_children_location, total_days=total_days, **kwargs)

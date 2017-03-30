@@ -14,29 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
+import StringIO
+import string
 from collections import defaultdict
 from datetime import datetime
 
-from indico.modules.groups import GroupProxy
+from lxml import etree
 from sqlalchemy.orm import joinedload, load_only
 
-import string
-import StringIO
-
-from lxml import etree
-
-from xmlGen import XMLGen
-
 from indico.core.config import Config
+from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.attachments.models.attachments import AttachmentType, Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
-from indico.modules.events.legacy import XMLEventSerializer
-from indico.modules.users.legacy import AvatarUserWrapper
-from indico.modules.users import User
+from indico.modules.groups import GroupProxy
 from indico.modules.groups.legacy import LDAPGroupWrapper
+from indico.modules.users import User
+from indico.modules.users.legacy import AvatarUserWrapper
 from indico.util.event import uniqueId, unify_event_args
-from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
@@ -61,12 +55,6 @@ class XSLTransformer:
 
 
 class outputGenerator(object):
-    """
-    this class generates the application standard XML (getBasicXML)
-    and also provides a method to format it using an XSLt stylesheet
-    (getFormattedOutput method)
-    """
-
     def __init__(self, aw, XG = None):
         self.__aw = aw
         if XG != None:
@@ -83,31 +71,6 @@ class outputGenerator(object):
             return "INDICOSEARCH.PRIVATE"
         else:
             return "INDICOSEARCH.PUBLIC"
-
-    def getOutput(self, conf, stylesheet, vars=None, includeSession=1, includeContribution=1, includeSubContribution=1, includeMaterial=1, showSession="all", showDate="all", showContribution="all"):
-        # get xml conference
-        xml = self._getBasicXML(conf, vars, includeSession,includeContribution,includeSubContribution,includeMaterial,showSession,showDate,showContribution)
-        if stylesheet is None:
-            self.text = xml
-        elif not os.path.exists(stylesheet):
-            self.text = _("Cannot find stylesheet")
-        else:
-            # instantiate the XSL tool
-            parser = XSLTransformer(stylesheet)
-            self.text = parser.process(xml)
-        return self.text
-
-    def getFormattedOutput(self, rh, conf, stylesheet, vars=None, includeSession=1,includeContribution=1,includeSubContribution=1,includeMaterial=1,showSession="all",showDate="all",showContribution="all"):
-        """
-        conf: conference object
-        stylesheet: path to the xsl file
-        """
-        self.getOutput(conf, stylesheet, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession, showDate, showContribution)
-        return self.text
-
-    def _getBasicXML(self, conf, vars, includeSession, includeContribution, includeSubContribution, includeMaterial, showSession="all", showDate="all", showContribution="all", showSubContribution="all", out=None):
-        serializer = XMLEventSerializer(conf.as_event, include_timetable=includeContribution, event_tag_name='iconf')
-        return serializer.serialize_event()
 
     def _generateACLDatafield(self, eType, memberList, objId, out):
         """

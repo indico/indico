@@ -27,9 +27,10 @@ from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
-from flask import session, request, g, current_app
+from flask import flash, redirect, session, request, g, current_app
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
+from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.config import Config
@@ -38,6 +39,7 @@ from indico.modules.api import settings as api_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.static_list_links import StaticListLink
@@ -46,9 +48,9 @@ from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.web.forms.colors import get_colors
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
+from indico.web.forms.colors import get_colors
 
 
 def get_object_from_args(args=None):
@@ -88,6 +90,29 @@ def get_object_from_args(args=None):
         return object_type, event, obj
     else:
         return object_type, None, None
+
+
+def get_theme(event, override_theme_id=None):
+    """Get the theme ID and whether it's an override.
+
+    This is useful for places where a user may specify a different
+    timetable theme.  If the override theme is not valid for the
+    event, a message is flashed and an exception redirecting the user
+    to the main event page is raised.
+
+    :raise BadRequest: if the override theme id is not valid
+    :return: a ``(theme_id, is_override)`` tuple
+    """
+    if not override_theme_id:
+        return event.theme, False
+    elif override_theme_id in theme_settings.get_themes_for(event.type_.name):
+        return override_theme_id, override_theme_id != event.theme
+    else:
+        if override_theme_id in theme_settings.themes:
+            flash(_("The theme '{}' is not valid for this event.").format(override_theme_id))
+        else:
+            flash(_("The theme '{}' does not exist.").format(override_theme_id))
+        raise BadRequest(response=redirect(event.url))
 
 
 def get_events_managed_by(user, dt=None):

@@ -242,10 +242,8 @@ class WPDecorated(WPBase):
         params = dict(params, **self._kwargs)
         return self._applyDecoration(self._getBody(params))
 
-    def _getBody( self, params ):
-        """
-        """
-        pass
+    def _getBody(self, params):
+        raise NotImplementedError
 
     def _getNavigationDrawer(self):
         return None

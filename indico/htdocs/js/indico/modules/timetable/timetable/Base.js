@@ -247,7 +247,7 @@ type("DisplayTimeTable", ["TimeTable"], {
     },
 
     pdf: function() {
-        if ($('body').data('static-site')) {
+        if ($('html').data('static-site')) {
             window.location = build_url(Indico.Urls.Timetable.default_pdf, {confId: this.eventInfo.id});
         } else {
             ajaxDialog({

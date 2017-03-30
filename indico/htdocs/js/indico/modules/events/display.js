@@ -15,10 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
+(function() {
     'use strict';
 
-    global.setupEventDisplay = function setupEventDisplay() {
+    function setupEventDisplay() {
         function openAjaxDialog($element) {
             ajaxDialog({
                 title: $element.data('title'),
@@ -42,7 +42,7 @@
         }).find('li a').on('menu_select', function() {
             var anchor = $(this).attr('href');
             $('body, html').animate({
-                'scrollTop': $(anchor).offset().top
+                scrollTop: $(anchor).offset().top
             }, {
                 duration: 700,
                 complete: function() {
@@ -62,9 +62,9 @@
         $(document).ready(function() {
             $('h1, .item-description, .timetable-title').mathJax();
         });
-    };
+    }
 
-    global.toggleNote = function toggleNote(element, visible, immediate) {
+    function toggleNote(element, visible, immediate) {
         // Note for event
         var note = element.closest('.event-note-section');
         // Note for other elements
@@ -77,7 +77,7 @@
         } else {
             content[visible === undefined ? 'slideToggle' : visible ? 'slideDown' : 'slideUp']();
         }
-    };
+    }
 
     $(document).ready(function() {
         $('.event-service-row > .trigger').on('click', function() {
@@ -135,7 +135,7 @@
                     start: function() {
                         toggler.removeClass('icon-collapse').addClass('icon-expand');
                     },
-                    complete: function(){
+                    complete: function() {
                         wrapper.addClass('collapsed');
                     }
                 });
@@ -164,6 +164,5 @@
         });
 
         setupEventDisplay();
-
     });
-})(window);
+})();

@@ -37,9 +37,7 @@ THEMES = [('', _('No theme selected')),
 
 
 def _get_timetable_theme_choices(event):
-    it = ((tid, data['title'])
-          for tid, data in theme_settings.get_themes_for(event.type).viewitems()
-          if not data.get('is_xml'))
+    it = ((tid, data['title']) for tid, data in theme_settings.get_themes_for(event.type).viewitems())
     return sorted(it, key=lambda x: x[1].lower())
 
 
@@ -68,7 +66,7 @@ class ConferenceLayoutForm(IndicoForm):
                                      description=_("Group the entries of the timetable by room by default"))
     timetable_detailed = BooleanField(_("Show detailed view"), widget=SwitchWidget(),
                                       description=_("Show the detailed view of the timetable by default."))
-    timetable_theme = SelectField(_('Theme'), [DataRequired()])
+    timetable_theme = SelectField(_('Theme'), [Optional()], coerce=lambda x: x or None)
     # Themes
     use_custom_css = BooleanField(_("Use custom CSS"), widget=SwitchWidget(),
                                   description=_("Use a custom CSS file as a theme for the conference page. Deactivate "
@@ -81,7 +79,7 @@ class ConferenceLayoutForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
         super(ConferenceLayoutForm, self).__init__(*args, **kwargs)
-        self.timetable_theme.choices = _get_timetable_theme_choices(self.event)
+        self.timetable_theme.choices = [('', _('Default'))] + _get_timetable_theme_choices(self.event)
 
     def validate_use_custom_css(self, field):
         if field.data and not self.event.has_stylesheet:

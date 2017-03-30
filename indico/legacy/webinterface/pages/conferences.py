@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import print_function
+
 import os
 import posixpath
 
@@ -34,7 +36,6 @@ from indico.util.mathjax import MathjaxMixin
 from indico.util.string import encode_if_unicode, to_unicode, truncate
 from indico.web.flask.util import url_for
 
-from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.legacy.common.utils import isStringHTML
 from indico.legacy.webinterface import wcomponents
@@ -44,27 +45,29 @@ from indico.legacy.webinterface.pages.base import WPDecorated
 from indico.legacy.webinterface.wcomponents import render_header
 
 
-def _get_print_url(event, theme):
+def _get_print_url(event, theme=None, theme_override=False):
+    view = theme if theme_override else None
+
     if event.type_ == EventType.conference:
-        return url_for(u'event.conferenceOtherViews', event,
-                       showDate=request.args.get(u'showDate') or u'all',
-                       showSession=request.args.get(u'showSession') or u'all',
-                       fr=u'no',
-                       view=theme)
+        return url_for(u'timetable.timetable', event, print=u'1', view=view)
     elif event.type_ == EventType.meeting:
-        return url_for(u'event.conferenceOtherViews', event,
-                       showDate=request.args.get(u'showDate') or u'all',
-                       showSession=request.args.get(u'showSession') or u'all',
-                       detailLevel=request.args.get(u'detailLevel') or u'all',
-                       fr=u'no',
-                       view=theme)
+        show_date = request.args.get(u'showDate')
+        show_session = request.args.get(u'showSession')
+        detail_level = request.args.get(u'detailLevel')
+        if show_date == u'all':
+            show_date = None
+        if show_session == u'all':
+            show_session = None
+        if detail_level in (u'all', u'contrinbution'):
+            detail_level = None
+        return url_for(u'events.display', event, showDate=show_date, showSession=show_session, detailLevel=detail_level,
+                       print=u'1', view=view)
     elif event.type_ == EventType.lecture:
-        return url_for(u'event.conferenceOtherViews', event, fr=u'no',  view=theme)
+        return url_for(u'events.display', event, print=u'1', view=view)
 
 
-def render_event_header(event, conference_layout=False):
-    theme = None  # TODO
-    print_url = None if conference_layout else _get_print_url(event, theme)
+def render_event_header(event, conference_layout=False, theme=None, theme_override=False):
+    print_url = _get_print_url(event, theme, theme_override) if not conference_layout else None
     show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, u'show_nav_bar')
     themes = {tid: data[u'title'] for tid, data in theme_settings.get_themes_for(event.type_.name).viewitems()}
     return render_template(u'events/header.html',
@@ -303,154 +306,7 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
         return render_event_footer(self.event).encode('utf-8')
 
 
-class WPXSLConferenceDisplay(WPConferenceBase):
-    """
-    Use this class just to transform to XML
-    """
-    menu_entry_name = 'overview'
-
-    def __init__(self, rh, conference, view, type, params):
-        WPConferenceBase.__init__(self, rh, conference)
-        self._params = params
-        self._view = view
-        self._conf = conference
-        self._type = type
-        self._firstDay = params.get("firstDay")
-        self._lastDay = params.get("lastDay")
-        self._daysPerRow = params.get("daysPerRow")
-
-    def _applyDecoration(self, body):
-        return to_unicode(body)
-
-    def _getBodyVariables(self):
-        return {'firstDay': self._firstDay, 'lastDay': self._lastDay, 'daysPerRow': self._daysPerRow}
-
-    def _getBody(self, params):
-        body_vars = self._getBodyVariables()
-        outGen = outputGenerator(self._getAW())
-        if self._view in theme_settings.xml_themes:
-            if self._params.get("detailLevel", "") == "contribution" or self._params.get("detailLevel", "") == "":
-                includeContribution = 1
-            else:
-                includeContribution = 0
-            theme = theme_settings.themes[self._view]
-            stylesheet = None
-            if theme['template']:
-                assert theme.get('plugin')  # we don't have XSL-based themes in the core anymore
-                stylesheet = os.path.join(theme['plugin'].root_path, 'themes', theme['template'])
-            body = outGen.getFormattedOutput(self._rh, self._conf, stylesheet,
-                                             body_vars, 1, includeContribution, 1, 1,
-                                             self._params.get("showSession", ""), self._params.get("showDate", ""))
-            return body
-        else:
-            return _("Cannot find the %s stylesheet") % self._view
-
-
-class WPTPLConferenceDisplay(MathjaxMixin, WPXSLConferenceDisplay, object):
-    """
-    Overrides XSL related functions in WPXSLConferenceDisplay
-    class and re-implements them using normal Indico templates.
-    """
-
-    def __init__(self, rh, conference, view, type, params):
-        WPXSLConferenceDisplay.__init__(self, rh, conference, view, type, params)
-        theme_id = self._view if self._view and self._view in theme_settings.themes else self._conf.as_event.theme
-        self.theme_id = theme_id
-        self.theme = theme_settings.themes[theme_id]
-
-    def _getVariables(self, conf):
-        event = conf.as_event
-        wvars = {}
-        wvars['INCLUDE'] = '../include'
-
-        wvars['accessWrapper'] = accessWrapper = self._rh._aw
-        wvars['category'] = event.category.title
-
-        timezoneUtil = DisplayTZ(accessWrapper, conf)
-        tz = timezoneUtil.getDisplayTZ()
-        wvars['timezone'] = timezone(tz)
-
-        attached_items = event.attached_items
-        folders = [folder for folder in attached_items.get('folders', []) if folder.title != "Internal Page Files"]
-
-        lectures = []
-        if event.series is not None and event.series.show_links:
-            lectures = (Event.query.with_parent(event.series)
-                        .filter(Event.id != event.id)
-                        .options(load_only('series_pos', 'id'))
-                        .order_by(Event.series_pos)
-                        .all())
-
-        wvars.update({
-            'files': attached_items.get('files', []),
-            'folders': folders,
-            'lectures': lectures
-        })
-
-        return wvars
-
-    def _getHeadContent( self ):
-        theme_css_tag = ''
-        theme_url = get_css_url(self._conf.as_event)
-        if theme_url:
-            theme_css_tag = '<link rel="stylesheet" type="text/css" href="{url}">'.format(url=theme_url)
-        confMetadata = WConfMetadata(self._conf).getHTML()
-        return theme_css_tag + confMetadata + MathjaxMixin._getHeadContent(self)
-
-    def _getFooter(self):
-        return render_event_footer(self._conf.as_event, dark=True).encode('utf-8')
-
-    def _getHeader(self):
-        return render_event_header(self._conf.as_event).encode('utf-8')
-
-    def getPrintCSSFiles(self):
-        theme_print_sass = (self.theme['asset_env']['print_sass'].urls()
-                            if 'print_sass' in self.theme.get('asset_env', [])
-                            else [])
-        return WPConferenceBase.getPrintCSSFiles(self) + theme_print_sass
-
-    def getCSSFiles(self):
-        theme_sass = self.theme['asset_env']['display_sass'].urls() if self.theme.get('asset_env') else []
-        return WPConferenceBase.getCSSFiles(self) + theme_sass
-
-    def getJSFiles(self):
-        modules = WPConferenceBase.getJSFiles(self)
-
-        # TODO: find way to check if the user is able to manage
-        # anything inside the conference (sessions, ...)
-        modules += (self._includeJSPackage('Management') +
-                    self._asset_env['modules_event_cloning_js'].urls() +
-                    self._asset_env['modules_vc_js'].urls() +
-                    self._asset_env['clipboard_js'].urls())
-        return modules
-
-    def _applyDecoration(self, body):
-        if self._params.get('frame', '') == 'no' or self._params.get('fr', '') == 'no':
-            return to_unicode(WPrintPageFrame().getHTML({'content': body}))
-        return WPConferenceBase._applyDecoration(self, body)
-
-    def _getBody(self, params):
-        """Return main information about the event."""
-
-        if self._view != 'xml':
-            kwargs = self._getVariables(self._conf)
-            kwargs['isStringHTML'] = isStringHTML
-        else:
-            outGen = outputGenerator(self._rh._aw)
-            varsForGenerator = self._getBodyVariables()
-            kwargs = {'xml': outGen._getBasicXML(self._conf, varsForGenerator, 1, 1, 1, 1)}
-
-        kwargs['theme_settings'] = self.theme.get('settings', {})
-        plugin = self.theme.get('plugin')
-        tpl_name = self.theme['template']
-        tpl = ((plugin.name + tpl_name)
-               if (plugin and tpl_name[0] == ':')
-               else posixpath.join('events/display', tpl_name))
-        return (render_template(tpl, event=self._conf.as_event, conf=self._conf, **kwargs)
-                .encode('utf-8'))
-
-
-class WPrintPageFrame (wcomponents.WTemplated):
+class WPrintPageFrame(wcomponents.WTemplated):
     pass
 
 

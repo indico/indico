@@ -470,8 +470,11 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def theme(self):
         from indico.modules.events.layout import layout_settings, theme_settings
-        return (layout_settings.get(self, 'timetable_theme') or
-                theme_settings.defaults[self.type])
+        theme = layout_settings.get(self, 'timetable_theme')
+        if theme and theme in theme_settings.get_themes_for(self.type):
+            return theme
+        else:
+            return theme_settings.defaults[self.type]
 
     @property
     def locator(self):
