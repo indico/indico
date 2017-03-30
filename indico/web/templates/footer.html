@@ -16,4 +16,6 @@
     {% endblock %}
 </div>
 
+{% include '_outdated_browser.html' %}
+
 {{- g.get('injected_js', []) | join('\n') | safe -}}

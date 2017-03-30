@@ -15,25 +15,17 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-from datetime import timedelta
-from xml.sax.saxutils import escape, quoteattr
+from xml.sax.saxutils import escape
 
 import pkg_resources
 from flask import g, render_template
 from speaklater import _LazyString
 
-import indico.legacy.common.TemplateExec as templateEngine
+from indico.legacy.common.TemplateExec import render as render_mako
 from indico.core import signals
 from indico.core.config import Config
-from indico.modules.api import APIMode
-from indico.modules.api import settings as api_settings
 from indico.modules.core.settings import core_settings
-from indico.modules.events.layout import layout_settings, theme_settings
-from indico.util.i18n import _
-from indico.util.date_time import format_date
 from indico.util.signals import values_from_signal
-from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for
 from indico.web.menu import HeaderMenuEntry
 
 
@@ -137,7 +129,7 @@ class WTemplated:
         vars = self.getVars()
         vars['__rh__'] = self._rh
         vars['self_'] = self
-        return templateEngine.render(self.tplFile, vars, self)
+        return render_mako(self.tplFile, vars, self)
 
     @staticmethod
     def htmlText(param):
@@ -202,24 +194,6 @@ class WSimpleNavigationDrawer(WTemplated):
 
     def getHTML(self, params=None):
         return WTemplated.getHTML(self, params)
-
-class WBannerModif(WTemplated):
-
-    def __init__(self, path = [], itemType = "", title = ""):
-        WTemplated.__init__( self, "BannerModif" )
-        self._path = path
-        self._title = title
-        self._type = itemType
-
-    def getHTML(self):
-        """ Retrieves the HTML of the banner of the modification interface
-            of the given target event / category / contribution / abstract / etc.
-            'track' argument should be provided for abstracts viewed inside a track.
-            If originUrl and originPageTitle is set then this link his added to the end
-            of the breadcrumb showed in the banner.
-        """
-
-        return WTemplated.getHTML(self, {"type" : self._type, "path": self._path, "title": self._title})
 
 
 class TabControl:
@@ -413,31 +387,4 @@ class WTabControl(WTemplated):
         vars['activeTab'] = self._getActiveTabId()
         vars['tabControlId'] = id(self)
 
-        return vars
-
-
-class WFilterCriteria(WTemplated):
-    """
-    Draws the options for a filter criteria object
-    This means rendering the actual table that contains
-    all the HTML for the several criteria
-    """
-
-    def __init__(self, options, filterCrit, extraInfo=""):
-        WTemplated.__init__(self, tpl_name = "FilterCriteria")
-        self._filterCrit = filterCrit
-        self._options = options
-        self._extraInfo = extraInfo
-
-    def _drawFieldOptions(self, formName, form):
-        raise Exception("Method WFilterCriteria._drawFieldOptions must be overwritten")
-
-    def getVars(self):
-
-        vars = WTemplated.getVars( self )
-
-        vars["extra"] = self._extraInfo
-
-        vars["content"] =  list((name, self._drawFieldOptions(name, form))
-                                for (name, form) in self._options)
         return vars

@@ -461,6 +461,7 @@ base_css = Bundle(
                'lib/jquery.multiselect.filter.css',
                'lib/jquery.typeahead.css',
                'lib/fullcalendar.css',
+               'lib/outdatedbrowser.css',
                'jquery.colorbox.css',
                'jquery-ui-custom.css',
                'jquery.colorpicker.css'),
