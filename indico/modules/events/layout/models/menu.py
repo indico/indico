@@ -291,6 +291,7 @@ class MenuEntry(MenuEntryMixin, db.Model):
         db.Integer,
         db.ForeignKey('events.pages.id'),
         nullable=True,
+        index=True,
         default=None
     )
     #: The type of the menu entry
