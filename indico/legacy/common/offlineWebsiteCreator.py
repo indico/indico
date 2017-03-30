@@ -96,10 +96,10 @@ def _override_request_endpoint(endpoint):
 
 class OfflineEvent:
 
-    def __init__(self, rh, conf, eventType):
+    def __init__(self, rh, conf):
         self._rh = rh
         self._conf = conf
-        self._eventType = eventType
+        self._eventType = conf.as_event.type_.name
 
     def create(self):
         websiteCreator = None

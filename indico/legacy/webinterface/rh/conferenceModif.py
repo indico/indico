@@ -19,24 +19,8 @@ from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 
 
 class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
-
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
 
     def _checkProtection(self):
         RHModificationBaseProtected._checkProtection(self)
-
-    def _displayCustomPage(self, wf):
-        return None
-
-    def _displayDefaultPage(self):
-        return None
-
-    def _process(self):
-        wf = self.getWebFactory()
-        if wf is not None:
-            res = self._displayCustomPage(wf)
-            if res is not None:
-                return res
-        return self._displayDefaultPage()
-

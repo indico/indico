@@ -57,7 +57,6 @@ from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
 from indico.legacy.common.cache import GenericCache
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -142,9 +141,6 @@ class RHManageEventBase(RHConferenceModifBase):
     """Base class for event management RHs"""
 
     CSRF_ENABLED = True
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHEventSettings(RHManageEventBase):

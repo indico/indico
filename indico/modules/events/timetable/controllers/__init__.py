@@ -21,7 +21,6 @@ from enum import Enum
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -63,9 +62,6 @@ class RHManageTimetableBase(RHConferenceModifBase):
                 raise Exception("Invalid session management level")
             if not func(session.user):
                 raise Forbidden
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHManageTimetableEntryBase(RHManageTimetableBase):

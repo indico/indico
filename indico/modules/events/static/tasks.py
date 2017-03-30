@@ -25,15 +25,14 @@ from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.notifications import make_email, email_sender
 from indico.core.storage import StorageReadOnlyError
+from indico.legacy.accessControl import AccessWrapper
+from indico.legacy.common.offlineWebsiteCreator import OfflineEvent
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.events.static import logger
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.date_time import now_utc
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-
-from indico.legacy.accessControl import AccessWrapper
-from indico.legacy.common.offlineWebsiteCreator import OfflineEvent
-from indico.legacy.webinterface.rh.conferenceBase import RHCustomizable
 
 
 @celery.task(request_context=True)
@@ -43,18 +42,14 @@ def build_static_site(static_site):
     try:
         logger.info('Building static site: %s', static_site)
         session.lang = static_site.creator.settings.get('lang')
-        rh = RHCustomizable()
+        rh = RH()
         rh._aw = AccessWrapper()
         rh._conf = rh._target = static_site.event_new.as_legacy
 
         g.rh = rh
         g.static_site = True
 
-        # Get event type
-        wf = rh.getWebFactory()
-        event_type = wf.getId() if wf else 'conference'
-
-        zip_file_path = OfflineEvent(rh, rh._conf, event_type).create()
+        zip_file_path = OfflineEvent(rh, rh._conf).create()
         static_site.state = StaticSiteState.success
         static_site.content_type = 'application/zip'
         static_site.filename = 'offline_site_{}.zip'.format(static_site.event_new.id)

@@ -21,19 +21,7 @@ from indico.util.i18n import _
 from indico.legacy.webinterface.rh.base import RH
 
 
-class RHCustomizable(RH):
-
-    def __init__(self):
-        RH.__init__(self)
-        self._wf = ""
-
-    def getWebFactory(self):
-        if self._wf == '':
-            self._wf = self._conf.as_event.web_factory
-        return self._wf
-
-
-class RHConferenceSite(RHCustomizable):
+class RHConferenceSite(RH):
     def _checkParams(self, params):
         self.event_new = Event.get(int(params['confId']))
         if self.event_new is None:

@@ -222,9 +222,6 @@ class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProt
 
 
 class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
-    def getWebFactory(self):
-        pass
-
     def _process_GET(self):
         return self._render_template('template.html', template=self.template, placeholders=get_placeholder_options(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target)

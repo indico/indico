@@ -245,15 +245,6 @@ class RH(RequestHandlerBase):
             raise MaKaCError(_("http header CRLF injection detected"))
         self._responseUtil.redirect = (targetURL, status)
 
-    def _changeRH(self, rh, params):
-        """Calls the specified RH after processing this one"""
-        self._responseUtil.call = lambda: rh().process(params)
-
-    def _normaliseListParam(self, param):
-        if not isinstance(param, list):
-            return [param]
-        return param
-
     def _processError(self, e):
         raise
 

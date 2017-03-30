@@ -36,7 +36,6 @@ from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_data
 from indico.legacy.PDFinterface.conference import ProgrammeToPDF
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -50,9 +49,6 @@ class RHManageTracksBase(RHConferenceModifBase):
     """Base class for all track management RHs"""
 
     CSRF_ENABLED = True
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHManageTrackBase(RHManageTracksBase):

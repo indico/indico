@@ -23,7 +23,6 @@ from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.lists import RegistrationListGenerator
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -32,9 +31,6 @@ class RHManageRegFormsBase(RHConferenceModifBase):
 
     CSRF_ENABLED = True
     ROLE = 'registration'
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):

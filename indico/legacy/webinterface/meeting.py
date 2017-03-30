@@ -14,18 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.webinterface.general import WebFactory
 from indico.legacy.webinterface.pages.conferences import WPConferenceDisplayBase, render_event_header
 from indico.legacy.webinterface.wcomponents import WNavigationDrawer
-
-
-class WebFactory(WebFactory):
-    id = "meeting"
-    name = "Meeting"
-    description = """this type is meant for events which contain several contributions or talks and that require schedulling and eventually organising of those contributions in sessions"""
-
-
-MeetingWebFactory = WebFactory
 
 
 class WPMeetingDisplay(WPConferenceDisplayBase):
