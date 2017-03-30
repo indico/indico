@@ -31,7 +31,6 @@ from indico.modules.events.contributions.views import WPMyContributions, WPContr
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
-from indico.modules.events.views import WPEventDisplay
 from indico.web.flask.util import send_file, jsonify_data
 from indico.legacy.PDFinterface.conference import ContribToPDF, ContribsToPDF
 from indico.legacy.webinterface.rh.base import RH
@@ -176,8 +175,8 @@ class RHContributionAuthor(RHContributionDisplayBase):
                            .filter(ContributionPersonLink.id == self.author.id,
                                    ContributionPersonLink.author_type != AuthorType.none)
                            .all())
-        return WPEventDisplay.render_template('person_display.html', self._conf,
-                                              author=self.author, contribs=author_contribs)
+        return WPContributions.render_template('display/contribution_author.html', self._conf,
+                                               author=self.author, contribs=author_contribs)
 
 
 class RHContributionExportToPDF(RHContributionDisplayBase):
