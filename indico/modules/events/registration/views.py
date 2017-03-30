@@ -20,7 +20,7 @@ from indico.modules.events.models.events import EventType
 from indico.legacy.webinterface.meeting import WPMeetingDisplay
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from indico.legacy.webinterface.simple_event import WPSimpleEventDisplay
+from indico.legacy.webinterface.simple_event import WPLectureDisplay
 
 
 class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
@@ -79,6 +79,6 @@ class WPDisplayRegistrationFormMeeting(DisplayRegistrationFormMixin, WPMeetingDi
     base_class = WPMeetingDisplay
 
 
-class WPDisplayRegistrationFormLecture(DisplayRegistrationFormMixin, WPSimpleEventDisplay):
+class WPDisplayRegistrationFormLecture(DisplayRegistrationFormMixin, WPLectureDisplay):
     template_prefix = 'events/registration/'
-    base_class = WPSimpleEventDisplay
+    base_class = WPLectureDisplay

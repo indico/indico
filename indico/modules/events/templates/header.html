@@ -44,7 +44,7 @@
     </a>
 
     {# TODO: get rid of this awful legacy js... #}
-    {% set display_url = url_for('event.conferenceOtherViews', event) if event.type == 'conference' else event.url %}
+    {% set display_url = url_for('timetable.timetable', event) if event.type == 'conference' else event.url %}
     <script>
         (function() {
             'use strict';
@@ -114,36 +114,42 @@
 
             <strong>{% trans %}Focus on:{% endtrans %}&nbsp;</strong>
 
-            <select id="datesSelect" name="showDate" style="font-size: 8pt;">
-                {% set selected_date = request.args.get('showDate', 'all') %}
-                <option value="all" {{ 'checked' if selected_date == 'all' }}>
-                    {%- trans %}All days{% endtrans -%}
-                </option>
-                {% for date in event.iter_days(tzinfo=event.tzinfo) %}
-                    <option value="{{ date.isoformat() }}" {{ 'selected' if selected_date == date.isoformat() }}>
-                        {{- date|format_date() -}}
+            {% if dates|length > 1 %}
+                <select id="datesSelect" name="showDate" style="font-size: 8pt;">
+                    {% set selected_date = request.args.get('showDate', 'all') %}
+                    <option value="all" {{ 'checked' if selected_date == 'all' }}>
+                        {%- trans %}All days{% endtrans -%}
                     </option>
-                {% endfor %}
-            </select>
+                    {% for date in dates %}
+                        <option value="{{ date.isoformat() }}" {{ 'selected' if selected_date == date.isoformat() }}>
+                            {{- date|format_date() -}}
+                        </option>
+                    {% endfor %}
+                </select>
+            {% endif %}
 
-            <select id="showSessionSelect" name="showSession" style="font-size: 8pt;">
-                {% set selected_session = request.args.get('showSession', 'all') %}
-                <option value="all" {{ 'checked' if selected_session == 'all' }}>
-                    {%- trans %}All sessions{% endtrans -%}
-                </option>
-                {% for s in event.sessions|sort(attribute='title') %}
-                    <option value="{{ s.friendly_id }}" {{ 'selected' if selected_session == s.friendly_id|string }}>
-                        {{- s.title|truncate(50) -}}
+            {% if event.sessions %}
+                <select id="showSessionSelect" name="showSession" style="font-size: 8pt;">
+                    {% set selected_session = request.args.get('showSession', 'all') %}
+                    <option value="all" {{ 'checked' if selected_session == 'all' }}>
+                        {%- trans %}All sessions{% endtrans -%}
                     </option>
-                {% endfor %}
-            </select>
+                    {% for s in event.sessions|sort(attribute='title') %}
+                        <option value="{{ s.friendly_id }}" {{ 'selected' if selected_session == s.friendly_id|string }}>
+                            {{- s.title|truncate(50) -}}
+                        </option>
+                    {% endfor %}
+                </select>
 
-            <span style="white-space: nowrap; margin-left: 65px;">
-                {% set hide_contribs = event.sessions and request.args.detailLevel == 'session' %}
-                <input id="hideContributionsCheckbox" type="checkbox" name="detailLevel" style="margin-right: 5px;"
-                       value="session" {{ 'checked' if hide_contribs }}>
-                <strong id="hideContributionsLabel">{% trans %}Hide Contributions{% endtrans %}</strong>
-            </span>
+                <span style="white-space: nowrap; margin-left: 65px;">
+                    {% set hide_contribs = event.sessions and request.args.detailLevel == 'session' %}
+                    <input id="hideContributionsCheckbox" type="checkbox" name="detailLevel" style="margin-right: 5px;"
+                           value="session" {{ 'checked' if hide_contribs }}>
+                    <strong id="hideContributionsLabel" style="cursor: pointer;">
+                        {%- trans %}Hide Contributions{% endtrans -%}
+                    </strong>
+                </span>
+            {% endif %}
         </form>
     </div>
 
@@ -188,14 +194,8 @@
                 }
             });
 
-            // Setup the hide contributions checkbox
-            {% if not event.sessions %}
-                $('#hideContributionsLabel').hide();
-                $('#hideContributionsCheckbox').hide()
-            {% endif %}
-
             // Make the hide contributions label clickable
-            $('#hideContributionsLabel').css('cursor', 'pointer').on('click', function() {
+            $('#hideContributionsLabel').on('click', function() {
                 $('#hideContributionsCheckbox').trigger('click');
             });
 
@@ -207,7 +207,8 @@
 {%- endmacro -%}
 
 
-{%- set show_filter_button = event.type == 'meeting' -%}
+{%- set dates = event.iter_days(tzinfo=event.tzinfo)|list -%}
+{%- set show_filter_button = event.type == 'meeting' and (dates|length > 1 or event.sessions) -%}
 {%- set filters_active = show_filter_button and (request.args.get('showDate', 'all') != 'all' or
                                                  request.args.get('showSession', 'all') != 'all' or
                                                  request.args.get('detailLevel', 'contribution') != 'contribution') -%}

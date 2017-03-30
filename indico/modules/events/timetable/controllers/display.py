@@ -20,37 +20,38 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 
+from indico.legacy.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.util import (render_entry_info_balloon, serialize_event_info,
                                                   get_timetable_offline_pdf_generator)
 from indico.modules.events.timetable.views import WPDisplayTimetable
+from indico.modules.events.util import get_theme
+from indico.modules.events.views import WPSimpleEventDisplay
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-from indico.legacy.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
-from indico.legacy.webinterface.pages.conferences import WPTPLConferenceDisplay
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHTimetable(RHConferenceBaseDisplay):
     view_class = WPDisplayTimetable
+    view_class_simple = WPSimpleEventDisplay
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self.layout = request.args.get('layout')
-        if not self.layout:
-            self.layout = request.args.get('ttLyt')
+        self.timetable_layout = request.args.get('layout') or request.args.get('ttLyt')
+        self.theme, self.theme_override = get_theme(self.event_new, request.args.get('view'))
 
     def _process(self):
         self.event_new.preload_all_acl_entries()
-        if self.event_new.theme == 'static':
+        if self.theme is None:
             event_info = serialize_event_info(self.event_new)
             timetable_data = TimetableSerializer().serialize_timetable(self.event_new, strip_empty_days=True)
             return self.view_class.render_template('display.html', self._conf, event_info=event_info,
-                                                   timetable_data=timetable_data, timetable_layout=self.layout)
+                                                   timetable_data=timetable_data,
+                                                   timetable_layout=self.timetable_layout)
         else:
-            page = WPTPLConferenceDisplay(self, self._conf, view=self.event_new.theme, type='meeting', params={})
-            return page.display()
+            return self.view_class_simple(self, self._conf, self.theme, self.theme_override).display()
 
 
 class RHTimetableEntryInfo(RHConferenceBaseDisplay):

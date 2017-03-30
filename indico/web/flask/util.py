@@ -240,7 +240,7 @@ def url_for(endpoint, *targets, **values):
         # we should really fine a better way to handle anything
         # related to offline site urls...
         from indico.modules.events.static.util import url_to_static_filename
-        url = url_to_static_filename(url)
+        url = url_to_static_filename(endpoint, url)
     return url
 
 

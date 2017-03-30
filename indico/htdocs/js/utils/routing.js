@@ -140,7 +140,7 @@
                 throw new BuildError('Could not build an URL', template.endpoint, params);
             }
 
-            if ($('body').data('static-site')) {
+            if ($('html').data('static-site')) {
                 // See url_to_static_filename() in modules/events/static/util.py
                 url = url.replace(/^\/event\/\d+/, '');
                 if (url.indexOf('static/') === 0) {
@@ -157,7 +157,7 @@
             throw new BuildError('Invalid URL template', template);
         }
 
-        if (!$('body').data('static-site')) {
+        if (!$('html').data('static-site')) {
             var qs = $.param(qsParams);
             if (qs) {
                 url += (~url.indexOf('?') ? '&' : '?') + qs;

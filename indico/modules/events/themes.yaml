@@ -1,5 +1,5 @@
 defaults:
-    conference: static
+    conference: ~
     lecture: lecture
     meeting: standard
 
@@ -43,18 +43,3 @@ definitions:
     stylesheet: weeks.scss
     template: weeks.html
     title: Indico Weeks View
-
-  # Static
-  static:
-    event_types: [conference, lecture, meeting]
-    stylesheet: null
-    template: null
-    title: Parallel
-
-  # XML
-  xml:
-    event_types: [conference, lecture, meeting]
-    is_xml: true
-    stylesheet: null
-    template: null
-    title: xml

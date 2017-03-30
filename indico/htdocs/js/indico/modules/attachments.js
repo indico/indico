@@ -34,7 +34,7 @@
 
     $(document).ready(function() {
         $('.attachments > .dropdown').parent().dropdown();
-        if (!$('body').data('static-site')) {
+        if (!$('html').data('static-site')) {
             setupAttachmentPreview();
         }
 

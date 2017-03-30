@@ -1,7 +1,8 @@
 {#- Base template for indico pages (standard "indico look") -#}
 <!DOCTYPE html>
 
-<html prefix="og: http://ogp.me/ns#">
+<html prefix="og: http://ogp.me/ns#"
+      data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
 <head>
     <title>{{ page_title }}</title>
     <meta charset="UTF-8">
@@ -40,8 +41,7 @@
     {{ template_hook('html-head') }}
 </head>
 <body data-user-id="{{ session.user.id if session.user else 'null' }}"
-      data-debug="{{ config.DEBUG|tojson|forceescape }}"
-      data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
+      data-debug="{{ config.DEBUG|tojson|forceescape }}">
     {#-
     XXX: Using a block and inheritance would be nicer but for now this
     is only called from a WP so just passing the contents is much easier

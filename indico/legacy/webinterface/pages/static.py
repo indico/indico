@@ -20,7 +20,8 @@ from indico.modules.events.registration.views import WPDisplayRegistrationPartic
 from indico.modules.events.sessions.views import WPDisplaySession
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.tracks.views import WPDisplayTracks
-from indico.legacy.webinterface.pages.conferences import WPTPLConferenceDisplay, WPConferenceDisplay
+from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
+from indico.modules.events.views import WPSimpleEventDisplay
 
 
 class WPStaticEventBase:
@@ -31,7 +32,7 @@ class WPStaticEventBase:
         return ""
 
 
-class WPTPLStaticConferenceDisplay(WPStaticEventBase, WPTPLConferenceDisplay):
+class WPStaticSimpleEventDisplay(WPStaticEventBase, WPSimpleEventDisplay):
     pass
 
 

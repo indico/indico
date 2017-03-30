@@ -248,12 +248,6 @@ class ThemeSettingsProxy(object):
         return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
                 if event_type in theme_data['event_types']}
 
-    @property
-    @memoize
-    def xml_themes(self):
-        return {theme_id: theme_data for theme_id, theme_data in self.themes.viewitems()
-                if theme_data.get('is_xml')}
-
 
 event_core_settings = EventSettingsProxy('core', {
     'start_dt_override': None,

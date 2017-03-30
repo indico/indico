@@ -26,6 +26,7 @@ from indico.modules.users.util import serialize_user
 from indico.util.caching import make_hashable
 from indico.util.i18n import po_to_json
 from indico.util.string import crc32
+from indico.web.assets.util import get_asset_path
 from indico.web.assets.vars_js import generate_global_file
 from indico.web.flask.util import send_file
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -121,10 +122,4 @@ def static_asset(path, plugin=None, theme=None):
         raise NotFound
     elif theme and theme not in theme_settings.themes:
         raise NotFound
-    if plugin:
-        base = 'plugin-{}'.format(plugin)
-    elif theme:
-        base = 'theme-{}'.format(theme)
-    else:
-        base = 'core'
-    return send_from_directory(Config.getInstance().getAssetsDir(), os.path.join(base, path))
+    return send_from_directory(Config.getInstance().getAssetsDir(), get_asset_path(path, plugin=plugin, theme=theme))

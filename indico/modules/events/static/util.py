@@ -23,7 +23,10 @@ _event_url_prefix_re = re.compile(r'^/event/\d+')
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
 
 
-def url_to_static_filename(url):
+def url_to_static_filename(endpoint, url):
+    if endpoint.endswith('.static') or endpoint in ('event_images.logo_display', 'event_layout.css_display'):
+        # these urls need to remain intact to be downloaded via a HTTP request
+        return url
     # get rid of /event/1234
     url = _event_url_prefix_re.sub('', url)
     # get rid of any other leading slash

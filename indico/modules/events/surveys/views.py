@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.legacy.webinterface.meeting import WPMeetingDisplay
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from indico.legacy.webinterface.simple_event import WPSimpleEventDisplay
+from indico.legacy.webinterface.simple_event import WPLectureDisplay
 
 
 class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
@@ -64,6 +64,6 @@ class WPDisplaySurveyMeeting(DisplaySurveyMixin, WPMeetingDisplay):
     base_class = WPMeetingDisplay
 
 
-class WPDisplaySurveyLecture(DisplaySurveyMixin, WPSimpleEventDisplay):
+class WPDisplaySurveyLecture(DisplaySurveyMixin, WPLectureDisplay):
     template_prefix = 'events/surveys/'
-    base_class = WPSimpleEventDisplay
+    base_class = WPLectureDisplay

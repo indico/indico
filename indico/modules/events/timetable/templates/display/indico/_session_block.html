@@ -14,11 +14,11 @@
 
     <li class="timetable-item timetable-block" id="{{ anchor }}">
         <span class="timetable-time top-level">
-            {{ render_time(block, timezone=timezone, hide_end_time=hide_end_time) }}
+            {{ render_time(block, timezone=timezone) }}
         </span>
         <div class="timetable-item-body flexcol">
             <div class="timetable-item-header flexrow">
-                <span class="timetable-title {{ 'top-level' if not nested }}" data-anchor="{{ anchor }}">
+                <span class="timetable-title top-level" data-anchor="{{ anchor }}">
                     {%- if block.title and block.title != session_.title -%}
                         {{- session_.title -}}: {{ block.title -}}
                     {%- else -%}
