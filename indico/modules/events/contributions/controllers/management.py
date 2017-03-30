@@ -61,7 +61,6 @@ from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from indico.legacy.PDFinterface.conference import ContribsToPDF, ContributionBook
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
@@ -81,9 +80,6 @@ class RHManageContributionsBase(RHConferenceModifBase):
     def _checkParams(self, params):
         RHConferenceModifBase._checkParams(self, params)
         self.list_generator = ContributionListGenerator(event=self.event_new)
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHManageContributionBase(RHManageContributionsBase):

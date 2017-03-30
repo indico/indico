@@ -14,17 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.webinterface.general import WebFactory
 from indico.legacy.webinterface.pages import conferences
-
-
-class WebFactory(WebFactory):
-    id = 'lecture'
-    name = "Lecture"
-    description = """select this type if you want to set up a simple event thing without schedule, sessions, contributions, ... """
-
-
-SimpleEventWebFactory = WebFactory
 
 
 class WPSimpleEventDisplay(conferences.WPConferenceDisplayBase):

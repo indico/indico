@@ -67,18 +67,6 @@ class EventType(RichIntEnum):
     def legacy_name(self):
         return 'simple_event' if self == EventType.lecture else self.name
 
-    @property
-    def web_factory(self):
-        if self == EventType.meeting:
-            from indico.legacy.webinterface.meeting import WebFactory
-            return WebFactory
-        elif self == EventType.lecture:
-            from indico.legacy.webinterface.simple_event import WebFactory
-            return WebFactory
-        else:
-            # conferences have no WebFactory
-            return None
-
 
 class _EventSettingProperty(EventSettingProperty):
     # the Event is already an Event (duh!), no need to get any other attribute
@@ -572,10 +560,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     def short_external_url(self):
         id_ = self.url_shortcut or self.id
         return url_for('events.shorturl', confId=id_, _external=True)
-
-    @property
-    def web_factory(self):
-        return self.type_.web_factory
 
     @property
     def tzinfo(self):

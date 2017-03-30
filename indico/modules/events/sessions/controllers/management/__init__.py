@@ -21,16 +21,12 @@ from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.sessions.models.sessions import Session
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
-from indico.legacy.webinterface.rh.base import RH
 
 
 class RHManageSessionsBase(RHConferenceModifBase):
     """Base RH for all session management RHs"""
 
     CSRF_ENABLED = True
-
-    def _process(self):
-        return RH._process(self)
 
 
 class RHManageSessionBase(RHManageSessionsBase):

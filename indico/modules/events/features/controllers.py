@@ -31,15 +31,11 @@ from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
 from indico.web.util import jsonify_data
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class RHFeaturesBase(RHConferenceModifBase):
-    def _process(self):
-        # ConferenceModifBase overrides this with functionality that
-        # doesn't even belong in there...
-        return RH._process(self)
+    CSRF_ENABLED = True
 
 
 class RHFeatures(RHFeaturesBase):
@@ -64,8 +60,6 @@ class RHFeatures(RHFeaturesBase):
 
 class RHSwitchFeature(RHFeaturesBase):
     """Enables/disables a feature"""
-
-    CSRF_ENABLED = True
 
     def render_event_menu(self):
         return render_sidemenu('event-management-sidemenu', active_item=WPFeatures.sidemenu_option,
