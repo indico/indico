@@ -146,7 +146,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
             return entry.id
 
     def _applyConfDisplayDecoration( self, body ):
-        frame = WConfDisplayFrame( self._getAW(), self._conf )
+        frame = WConfDisplayFrame(self._conf)
 
         announcement = ''
         if layout_settings.get(self._conf, 'show_announcement'):
@@ -210,8 +210,7 @@ class WConfMetadata(wcomponents.WTemplated):
 
 class WConfDisplayFrame(wcomponents.WTemplated):
 
-    def __init__(self, aw, conf):
-        self._aw = aw
+    def __init__(self, conf):
         self._conf = conf
         self.event = self._conf.as_event
 
@@ -252,14 +251,12 @@ class WConfDisplayFrame(wcomponents.WTemplated):
 
 class WConfDetailsFull(wcomponents.WTemplated):
 
-    def __init__(self, aw, conf):
+    def __init__(self, conf):
         self._conf = conf
-        self._aw = aw
 
     def getVars( self ):
         vars = wcomponents.WTemplated.getVars( self )
-        tz = DisplayTZ(self._aw,self._conf).getDisplayTZ()
-        vars["timezone"] = tz
+        vars['timezone'] = self._conf.as_event.display_tzinfo.zone
 
         description = self._conf.as_event.description.encode('utf-8')
         vars["description_html"] = isStringHTML(description)
@@ -296,7 +293,7 @@ class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
     menu_entry_name = 'overview'
 
     def _getBody(self, params):
-        return WConfDetailsFull(self._getAW(), self._conf).getHTML()
+        return WConfDetailsFull(self._conf).getHTML()
 
     def _getFooter(self):
         return render_event_footer(self.event).encode('utf-8')
@@ -357,11 +354,9 @@ class WPConferenceModificationClosed( WPConferenceModifBase ):
 
 
 class WConfMyStuff(WConfDisplayBodyBase):
-
     _linkname = 'my_conference'
 
-    def __init__(self, aw, conf):
-        self._aw = aw
+    def __init__(self, conf):
         self._conf = conf
 
     def getVars(self):
@@ -374,8 +369,7 @@ class WPMyStuff(WPConferenceDefaultDisplayBase):
     menu_entry_name = 'my_conference'
 
     def _getBody(self,params):
-        wc=WConfMyStuff(self._getAW(),self._conf)
-        return wc.getHTML()
+        return WConfMyStuff(self._conf).getHTML()
 
 
 class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
