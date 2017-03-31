@@ -38,15 +38,17 @@ class WPReferenceTypes(WPJinjaMixin, WPAdminsBase):
 
 
 class WPSimpleEventDisplayBase(MathjaxMixin, WPConferenceBase):
-    def __init__(self, rh, conf):
-        WPConferenceBase.__init__(self, rh, conf)
+    """Base class for displaying something on a lecture/meeting page"""
+
+    def __init__(self, rh, conf, **kwargs):
+        WPConferenceBase.__init__(self, rh, conf, **kwargs)
         self.event = conf.as_event
 
     def _getHeader(self):
         return render_event_header(self.event).encode('utf-8')
 
     def _getFooter(self):
-        return render_event_footer(self.event, dark=True).encode('utf-8')
+        return render_event_footer(self.event).encode('utf-8')
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
@@ -83,6 +85,9 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 
     def _getHeader(self):
         return render_event_header(self.event, theme=self.theme_id, theme_override=self.theme_override).encode('utf-8')
+
+    def _getFooter(self):
+        return render_event_footer(self.event, dark=True).encode('utf-8')
 
     def _getBody(self, params):
         attached_items = self.event.attached_items

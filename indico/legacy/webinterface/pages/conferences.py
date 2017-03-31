@@ -125,10 +125,6 @@ class WPConferenceBase(base.WPDecorated):
         return url_for_logout(self._conf.as_event.external_url)
 
 
-class WPConferenceDisplayBase(WPConferenceBase):
-    pass
-
-
 class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
     menu_entry_plugin = None
     menu_entry_name = None

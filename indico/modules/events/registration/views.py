@@ -16,11 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.models.events import EventType
-from indico.legacy.webinterface.meeting import WPMeetingDisplay
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
-from indico.legacy.webinterface.simple_event import WPLectureDisplay
+from indico.modules.events.models.events import EventType
+from indico.modules.events.views import WPSimpleEventDisplayBase
 
 
 class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
@@ -74,11 +73,6 @@ class WPDisplayRegistrationParticipantList(WPDisplayRegistrationFormConference):
     menu_entry_name = 'participants'
 
 
-class WPDisplayRegistrationFormMeeting(DisplayRegistrationFormMixin, WPMeetingDisplay):
+class WPDisplayRegistrationFormSimpleEvent(DisplayRegistrationFormMixin, WPSimpleEventDisplayBase):
     template_prefix = 'events/registration/'
-    base_class = WPMeetingDisplay
-
-
-class WPDisplayRegistrationFormLecture(DisplayRegistrationFormMixin, WPLectureDisplay):
-    template_prefix = 'events/registration/'
-    base_class = WPLectureDisplay
+    base_class = WPSimpleEventDisplayBase
