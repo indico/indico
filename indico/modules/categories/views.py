@@ -21,7 +21,7 @@ from markupsafe import escape
 from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
-from indico.legacy.webinterface.wcomponents import WNavigationDrawer
+from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
 
@@ -43,13 +43,15 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPMainBase):
         self.atom_feed_title = kwargs.get('atom_feed_title')
         if category:
             self._setTitle('Indico [{}]'.format(category.title).encode('utf-8'))
-        WPMainBase.__init__(self, rh, _protected_object=category, _current_category=category, **kwargs)
-        if category:
-            self._locTZ = category.display_tzinfo.zone
+        WPMainBase.__init__(self, rh, **kwargs)
         self._mathjax = kwargs.pop('mathjax', False)
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._asset_env['modules_categories_js'].urls()
+
+    def _getHeader(self):
+        return render_header(category=self.category, protected_object=self.category,
+                             local_tz=self.category.display_tzinfo.zone)
 
     def _getBody(self, params):
         return self._getPageContent(params)
@@ -77,8 +79,10 @@ class WPCategoryManagement(WPCategory):
     def __init__(self, rh, category, active_menu_item, **kwargs):
         kwargs['active_menu_item'] = active_menu_item
         WPCategory.__init__(self, rh, category, **kwargs)
-        # don't show protection header in management; anything besides 'restricted' would be misleading
-        self._protected_object = None
+
+    def _getHeader(self):
+        return render_header(category=self.category, protected_object=self.category,
+                             local_tz=self.category.timezone, force_local_tz=True)
 
     def getJSFiles(self):
         return WPCategory.getJSFiles(self) + self._asset_env['modules_categories_management_js'].urls()

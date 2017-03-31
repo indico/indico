@@ -3,7 +3,7 @@
 {{ template_hook('global-announcement') }}
 
 <div class="page-header clearfix">
-    {{ render_session_bar(protected_object=protected_object, local_tz=local_tz) }}
+    {{ render_session_bar(protected_object=protected_object, local_tz=local_tz, force_local_tz=force_local_tz) }}
     {{ template_hook('page-header', category=category) }}
 
     <a style="min-height: 60px;" href="{{ url_for_index() }}">

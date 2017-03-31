@@ -45,14 +45,20 @@
 
 
 {% macro _render_timezone_selector(timezone_data) %}
-    <a id="timezone-selector-link" class="i-button arrow icon-time"
-       data-active-timezone="{{ timezone_data.active_tz|tojson|forceescape }}"
-       data-active-timezone-display="{{ timezone_data.active_tz_display|tojson|forceescape }}"
-       data-user-timezone="{{ timezone_data.user_tz|tojson|forceescape }}"
-       data-user-timezone-display-mode="{{ timezone_data.user_tz_display_mode|tojson|forceescape }}"
-       data-href="{{ url_for('misc.resetSessionTZ') }}">
-        {{ timezone_data.active_tz_display }}
-    </a>
+    {% if timezone_data.disabled %}
+        <a class="i-button icon-time disabled">
+            {{- timezone_data.active_tz_display -}}
+        </a>
+    {% else %}
+        <a id="timezone-selector-link" class="i-button icon-time arrow"
+           data-active-timezone="{{ timezone_data.active_tz }}"
+           data-active-timezone-display="{{ timezone_data.active_tz_display }}"
+           data-user-timezone="{{ timezone_data.user_tz }}"
+           data-user-timezone-display-mode="{{ timezone_data.user_tz_display_mode }}"
+           data-href="{{ url_for('misc.resetSessionTZ') }}">
+            {{ timezone_data.active_tz_display }}
+        </a>
+    {% endif %}
 {% endmacro %}
 
 

@@ -25,23 +25,26 @@ from indico.util.i18n import get_all_locales
 from indico.web.flask.templating import get_template_module
 
 
-def _get_timezone_display(local_tz, timezone):
-    if timezone == 'LOCAL':
+def _get_timezone_display(local_tz, timezone, force=False):
+    if force and local_tz:
+        return local_tz
+    elif timezone == 'LOCAL':
         return local_tz or Config.getInstance().getDefaultTimezone()
     else:
         return timezone
 
 
-def render_session_bar(protected_object=None, local_tz=None):
+def render_session_bar(protected_object=None, local_tz=None, force_local_tz=False):
     protection_disclaimers = {
         'network': legal_settings.get('network_protected_disclaimer'),
         'restricted': legal_settings.get('restricted_disclaimer')
     }
     timezone_data = {
         'active_tz': session.timezone,
-        'active_tz_display': _get_timezone_display(local_tz, session.timezone),
+        'active_tz_display': _get_timezone_display(local_tz, session.timezone, force_local_tz),
         'user_tz': session.avatar.getTimezone() if session.user else None,
         'user_tz_display_mode': session.avatar.getDisplayTZMode() if session.user else None,
+        'disabled': force_local_tz
     }
     tpl = get_template_module('_session_bar.html')
     rv = tpl.render_session_bar(protected_object=protected_object,

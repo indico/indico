@@ -18,7 +18,7 @@
                 {{ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | strip_tags }}
             </a>
         </td>
-        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.category.display_tzinfo) }}</td>
+        <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.category.tzinfo) }}</td>
         <td class="i-table actions">
             <a href="#"
                class="i-link icon-remove"

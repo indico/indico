@@ -17,32 +17,27 @@
 from __future__ import print_function
 
 import os
-import posixpath
 
 from flask import session, render_template, request
-from pytz import timezone
-from sqlalchemy.orm import load_only
 
 from indico.core.config import Config
-from indico.modules.auth.util import url_for_logout
-from indico.modules.core.settings import social_settings, core_settings
-from indico.modules.events.layout import layout_settings, theme_settings
-from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
-                                               menu_entries_for_event)
-from indico.modules.events.models.events import Event, EventType
-from indico.util.date_time import format_date
-from indico.util.i18n import _
-from indico.util.mathjax import MathjaxMixin
-from indico.util.string import encode_if_unicode, to_unicode, truncate
-from indico.web.flask.util import url_for
-
-from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.legacy.common.utils import isStringHTML
 from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.common.tools import strip_ml_tags, escape_html
 from indico.legacy.webinterface.pages import main, base
 from indico.legacy.webinterface.pages.base import WPDecorated
 from indico.legacy.webinterface.wcomponents import render_header
+from indico.modules.auth.util import url_for_logout
+from indico.modules.core.settings import social_settings, core_settings
+from indico.modules.events.layout import layout_settings, theme_settings
+from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
+                                               menu_entries_for_event)
+from indico.modules.events.models.events import EventType
+from indico.util.date_time import format_date
+from indico.util.i18n import _
+from indico.util.mathjax import MathjaxMixin
+from indico.util.string import encode_if_unicode, to_unicode, truncate
+from indico.web.flask.util import url_for
 
 
 def _get_print_url(event, theme=None, theme_override=False):
@@ -101,10 +96,9 @@ def render_event_footer(event, dark=False):
 
 
 class WPConferenceBase(base.WPDecorated):
-
     def __init__(self, rh, conference, **kwargs):
         event = conference.as_event
-        WPDecorated.__init__(self, rh, _protected_object=event, _current_category=event.category, **kwargs)
+        WPDecorated.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = conference
         self._tz = event.display_tzinfo.zone
         start_dt_local = event.start_dt_display.astimezone(event.display_tzinfo)
@@ -117,6 +111,9 @@ class WPConferenceBase(base.WPDecorated):
                 dates = " (%s - %s)" % (format_date(start_dt_local, format='long'),
                                         format_date(end_dt_local, format='long'))
         self._setTitle("%s %s" % (strip_ml_tags(self._conf.as_event.title.encode('utf-8')), dates))
+
+    def _getHeader(self):
+        raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
 
     def getJSFiles(self):
         return base.WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
@@ -312,7 +309,7 @@ class WConfDisplayBodyBase(wcomponents.WTemplated):
 class WPConferenceModifBase(main.WPMainBase):
     def __init__(self, rh, conference, **kwargs):
         conference = getattr(conference, 'as_legacy', conference)
-        main.WPMainBase.__init__(self, rh, _current_category=conference.as_event.category, **kwargs)
+        main.WPMainBase.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = conference
 
     def getJSFiles(self):
@@ -322,7 +319,8 @@ class WPConferenceModifBase(main.WPMainBase):
                 self._asset_env['modules_event_management_js'].urls())
 
     def _getHeader(self):
-        return render_header(category=self._current_category, local_tz=self._conf.as_event.timezone)
+        return render_header(category=self._conf.as_event.category, local_tz=self._conf.as_event.timezone,
+                             force_local_tz=True)
 
     def _getNavigationDrawer(self):
         pars = {"target": self._conf.as_event, "isModif": True}
