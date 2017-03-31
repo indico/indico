@@ -502,6 +502,10 @@ a.active {
     font-size: 11px;
 }
 
+.footer.dark {
+    color: #999;
+}
+
 .footer.footerCERN {
     padding-bottom: 0;
 }
@@ -510,19 +514,6 @@ a.active {
     margin-top: 40px;
 }
 
-.footer.footerDark {
-    font-weight: bold;
-    color: #222;
-}
-
-.footer.footerDark a {
-    color: #222;
-    font-size: 11px;
-}
-
-.footer.footerDark a:hover {
-    text-decoration: underline;
-}
 
 .footer div.text {
     margin-top: 20px;
