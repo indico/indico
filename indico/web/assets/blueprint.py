@@ -33,6 +33,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 assets_blueprint = IndicoBlueprint('assets', __name__, url_prefix='/assets')
+assets_blueprint.add_url_rule('!/images/<path:filename>', 'image', build_only=True)
 
 
 @assets_blueprint.route('/js-vars/global.js')
