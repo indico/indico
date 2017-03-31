@@ -34,6 +34,7 @@
             var ul = elem.next('ul');
 
             elem.removeClass('open');
+            elem.removeData('no-auto-tooltip');
 
             this._effect('off', ul, effect);
             ul.find('ul').hide();
@@ -56,6 +57,7 @@
             var positionReference = this.options.relative_to || elem;
 
             elem.addClass('open');
+            elem.data('no-auto-tooltip', true).trigger('indico:closeAutoTooltip');
 
             this._effect('on', sibl);
             elem.data('on', true);
