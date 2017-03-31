@@ -474,65 +474,6 @@ div.pageOverHeader
    font-size: 12px;
 }
 
-
-div.eventHeaderButtonBar {
-    padding: 6px 0;
-    min-height: 24px;
-    min-width: 200px;
-}
-
-div.eventHeaderButtonBar a {
-    position: relative;
-    display: block;
-    float: left;
-    height: 13px;
-    padding: 4px 10px 7px 10px;
-    min-width: 4px;
-    margin-left: 4px;
-    background: transparent url(../images/button_bg.png) repeat-y scroll 0 0;
-    font-size: 13px;
-    font-family: arial, helvetica, sans-serif;
-    color: #cfcfcf;
-}
-
-div.eventHeaderButtonBar a div.leftCorner {
-    position: absolute;
-    top: 0;
-    right: 0;
-    background: transparent url(../images/button_bg.png) repeat-y scroll -198px 0;
-    width: 2px;
-    height: 24px;
-}
-
-div.eventHeaderButtonBar a:hover {
-    background-position: 0 -24px;
-    color: white;
-}
-
-div.eventHeaderButtonBar .separator {
-    float: left;
-    margin: 3px 6px 3px 10px;
-    width: 1px;
-    height: 18px;
-    border-right: 1px dotted #999;
-}
-
-div.filterDiv
-{
-    margin-top: 5px;
-    padding: 10px;
-    padding-left: 75px;
-    border-top: 1px solid black;
-    border-bottom: 1px solid black;
-    background-color: #777;
-    display: none;
-}
-
-div.filterDiv strong {
-    color: white;
-}
-
-
 /* Root Page */
 
 .container

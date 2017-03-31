@@ -40,7 +40,7 @@
 {%- macro _render_more_menu() -%}
     <a id="moreMenu">
         <div class="dropDownMenuGrey">{% trans %}More{% endtrans %}</div>
-        <div class="leftCorner"></div>
+        <div class="left-corner"></div>
     </a>
 
     {# TODO: get rid of this awful legacy js... #}
@@ -101,10 +101,10 @@
     <a id="filterLink" href="#" style="{% if filters_active %}color:#D7FF99; font-weight: bold;{% endif %}"
        title="{{ filter_link_tooltip|forceescape }}">
         {% trans %}Filter{% endtrans %}
-        <div class="leftCorner"></div>
+        <div class="left-corner"></div>
     </a>
 
-    <div id="filterDiv" class="filterDiv">
+    <div id="event-filters" class="event-filters">
         <form id="filterForm" style="margin: 0;">
             <div style="float: right;">
                 <input type="submit" class="btn" value="Apply filter">&nbsp;
@@ -165,12 +165,12 @@
             function filterToggle() {
                 if (!filterButtonClicked) {
                     // When clicked for the first time append the div to the correct container
-                    $('#pageSubHeader').append($('#filterDiv').detach());
+                    $('#pageSubHeader').append($('#event-filters').detach());
                     filterButtonClicked = true;
                 }
 
                 filterButtonState = !filterButtonState;
-                $('#filterDiv').toggle(filterButtonState);
+                $('#event-filters').toggle(filterButtonState);
             }
 
             // Setup the filter button in the toolbar
@@ -214,10 +214,10 @@
                                                  request.args.get('detailLevel', 'contribution') != 'contribution') -%}
 {{ template_hook('global-announcement') }}
 
-<div class="page-header page-header-dark">
+<div class="page-header page-header-dark event-page-header">
     {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone) }}
 
-    <div class="eventHeaderButtonBar">
+    <div class="button-bar">
         {% if event.type != 'conference' or show_nav_bar %}
             {{ _render_nav_bar() }}
 
@@ -239,7 +239,7 @@
 
         <a href="#" id="exportIcal{{ event.id }}" class="js-export-ical" data-id="{{ event.id }}">
             {% trans %}iCal export{% endtrans %}
-            <div class="leftCorner"></div>
+            <div class="left-corner"></div>
         </a>
         {{ template_hook('event-ical-export', event=event) }}
 
