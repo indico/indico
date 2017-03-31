@@ -203,7 +203,9 @@
         <a class="i-button icon-package-download" href="{{ url_for('attachments.package', event) }}"
            title="{% trans %}Download material{% endtrans %}"></a>
 
-        {{ _render_theme_selector() }}
+        {% if event.can_manage(session.user) %}
+            {{ _render_theme_selector() }}
+        {% endif %}
 
         <span class="separator"></span>
 
