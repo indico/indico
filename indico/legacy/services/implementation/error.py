@@ -56,7 +56,7 @@ class SendErrorReport(ServiceBase):
         body = [
             "-" * 20,
             "Error details\n",
-            self._code,
+            str(self._code),
             self._message,
             "Inner error: " + str(self._inner),
             request_info,
