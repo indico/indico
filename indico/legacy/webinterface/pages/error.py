@@ -14,11 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import render_template, session
+from flask import render_template
 from sqlalchemy.exc import OperationalError
 
 from indico.core.config import Config
-from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
@@ -52,9 +51,6 @@ class WPErrorWSGI(WPDecorated, WPJinjaMixin):
             'error_message': self._message,
             'error_description': self._description
         })
-
-    def _getAW(self):
-        return AccessWrapper(session.avatar)
 
     def getHTML(self):
         return self.display()

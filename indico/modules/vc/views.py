@@ -48,7 +48,6 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
     def __init__(self, rh, conf, **kwargs):
         WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
         self._conf = conf
-        self._aw = rh.getAW()
 
     def getJSFiles(self):
         return (WPConferenceDefaultDisplayBase.getJSFiles(self) +

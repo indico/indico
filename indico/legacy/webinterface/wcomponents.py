@@ -335,9 +335,8 @@ class Tab:
 
 
 class WTabControl(WTemplated):
-    def __init__(self, ctrl, accessWrapper, **params):
+    def __init__(self, ctrl, **params):
         self._tabCtrl = ctrl
-        self._aw = accessWrapper
 
     def _getTabs(self):
         tabs = []
@@ -370,7 +369,7 @@ class WTabControl(WTemplated):
         sub = tab.getSubTabControl()
         if not sub:
             return self._body
-        return WTabControl(sub, self._aw).getHTML(self._body)
+        return WTabControl(sub).getHTML(self._body)
 
     def getHTML(self, body):
         self._body = body

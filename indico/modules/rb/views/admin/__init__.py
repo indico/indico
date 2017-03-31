@@ -54,7 +54,7 @@ class WPRoomsBase(WPAdminsBase):
         )
 
     def _getPageContent(self, params):
-        return WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
+        return WTabControl(self._tabCtrl).getHTML(self._getTabContent(params))
 
 
 class WPRoomBookingAdminBase(WPRoomsBase):

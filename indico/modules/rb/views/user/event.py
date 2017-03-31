@@ -44,7 +44,7 @@ class WPRoomBookingEventBase(WPConferenceModifBase):
     def _getPageContent(self, params):
         self._createTabCtrl()
         params['event'] = self._conf
-        return WTabControl(self._tabCtrl, self._getAW()).getHTML(self._getTabContent(params))
+        return WTabControl(self._tabCtrl).getHTML(self._getTabContent(params))
 
     def _getTabContent(self, params):
         raise NotImplementedError

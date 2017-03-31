@@ -163,9 +163,6 @@ class WPBase:
     def _display(self, params):
         raise NotImplementedError
 
-    def _getAW(self):
-        return self._rh.getAW()
-
     def display(self, **params):
         from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
         from indico.modules.admin import RHAdminBase
