@@ -29,13 +29,14 @@ from indico.util.signals import values_from_signal
 from indico.web.menu import HeaderMenuEntry
 
 
-def render_header(category=None, protected_object=None, local_tz=None):
+def render_header(category=None, protected_object=None, local_tz=None, force_local_tz=False):
     extra_menu_items = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
     rv = render_template('header.html',
                          category=category,
                          extra_menu_items=extra_menu_items,
                          protected_object=protected_object,
-                         local_tz=local_tz)
+                         local_tz=local_tz,
+                         force_local_tz=force_local_tz)
     return rv.encode('utf-8')
 
 
