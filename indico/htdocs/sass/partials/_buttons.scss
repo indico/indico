@@ -292,7 +292,7 @@ a.i-big-button {
 
     .login-arrow {
         float: right;
-        @include icon-before('icon-arrow-right');
+        @include icon-before('icon-arrow-right-sparse');
     }
 }
 

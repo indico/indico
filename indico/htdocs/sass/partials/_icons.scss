@@ -105,7 +105,7 @@ i[class^="icon-"]:before {
 .icon-arrow-left:before {
     content: "\e3bf";
 }
-.icon-arrow-right:before {
+.icon-arrow-right-sparse:before {
     content: "\46";
 }
 .icon-arrow-up:before {
@@ -267,6 +267,9 @@ i[class^="icon-"]:before {
 .icon-filter:before {
     content: "\4a";
 }
+.icon-first:before {
+    content: "\edb5";
+}
 .icon-floppy:before {
     content: "\e134";
 }
@@ -312,8 +315,11 @@ i[class^="icon-"]:before {
 .icon-lamp:before {
     content: "\e24e";
 }
-.icon-lan2:before {
+.icon-lan:before {
     content: "\ec68";
+}
+.icon-last:before {
+    content: "\edb6";
 }
 .icon-layout:before {
     content: "\e905";
@@ -525,7 +531,6 @@ i[class^="icon-"]:before {
 .icon-id-badge:before {
     content: "\e907";
 }
-
 /* End of icomoon's icon definitions */
 
 /* animated spinner icon */

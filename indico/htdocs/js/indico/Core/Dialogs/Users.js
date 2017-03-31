@@ -1025,7 +1025,7 @@ type("UserListWidget", ["ListWidget"],
             if (pairProperties.get('isGroup')) {
                 className = 'item-group';
             } else if (pairProperties.get('_type') === 'IPNetworkGroup') {
-                className = 'icon-lan2';
+                className = 'icon-lan';
             } else if (pairProperties.get('_type') === 'Email') {
                 className = 'icon-mail';
             } else {

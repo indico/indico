@@ -188,7 +188,7 @@
                                 {% endif %}
                                 <td class="i-table">
                                     {% if abstract.state.name == 'accepted' and abstract.contribution %}
-                                        <a class="icon-arrow-right"
+                                        <a class="icon-arrow-right-sparse"
                                            href="{{ url_for('contributions.display_contribution', abstract.contribution) }}"
                                            title="{% trans %}Go to contribution{% endtrans %}"></a>
                                     {% endif %}
