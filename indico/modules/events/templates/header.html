@@ -171,49 +171,51 @@
 {{ template_hook('global-announcement') }}
 
 <div class="page-header page-header-dark event-page-header">
-    {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone) }}
+    <div class="flexrow f-j-space-between f-a-center">
+        <div class="button-bar flexrow f-j-start">
+            {% if event.type != 'conference' or show_nav_bar %}
+                {{ _render_nav_bar() }}
 
-    <div class="button-bar">
-        {% if event.type != 'conference' or show_nav_bar %}
-            {{ _render_nav_bar() }}
-
-            {% if print_url or show_filter_button %}
-                <span class="separator"></span>
+                {% if print_url or show_filter_button %}
+                    <span class="separator"></span>
+                {% endif %}
             {% endif %}
-        {% endif %}
 
-        {% if print_url %}
-            <a class="i-button icon-print" href="{{ print_url }}"
-               title="{% trans %}Printable version{% endtrans %}"></a>
-        {% endif %}
+            {% if print_url %}
+                <a class="i-button icon-print" href="{{ print_url }}"
+                   title="{% trans %}Printable version{% endtrans %}"></a>
+            {% endif %}
 
-        {% if show_filter_button %}
-            {{ _render_filters() }}
-        {% endif %}
+            {% if show_filter_button %}
+                {{ _render_filters() }}
+            {% endif %}
 
-        <a class="i-button icon-calendar js-export-ical" id="exportIcal{{ event.id }}" data-id="{{ event.id }}"
-           title="{% trans %}Export to iCal{% endtrans %}"></a>
-        {{ template_hook('event-ical-export', event=event) }}
+            <a class="i-button icon-calendar js-export-ical" id="exportIcal{{ event.id }}" data-id="{{ event.id }}"
+               title="{% trans %}Export to iCal{% endtrans %}"></a>
+            {{ template_hook('event-ical-export', event=event) }}
 
-        {% if event.type == 'meeting' %}
-            <a class="i-button icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
-               data-href="{{ url_for('timetable.export_pdf', event) }}"
-               data-ajax-dialog></a>
-        {% endif %}
+            {% if event.type == 'meeting' %}
+                <a class="i-button icon-file-pdf" title="{% trans %}Export to PDF{% endtrans %}"
+                   data-href="{{ url_for('timetable.export_pdf', event) }}"
+                   data-ajax-dialog></a>
+            {% endif %}
 
-        <a class="i-button icon-package-download" href="{{ url_for('attachments.package', event) }}"
-           title="{% trans %}Download material{% endtrans %}"></a>
+            <a class="i-button icon-package-download" href="{{ url_for('attachments.package', event) }}"
+               title="{% trans %}Download material{% endtrans %}"></a>
 
-        {% if event.can_manage(session.user) %}
-            {{ _render_theme_selector() }}
-        {% endif %}
+            {% if event.can_manage(session.user) %}
+                {{ _render_theme_selector() }}
+            {% endif %}
 
-        <span class="separator"></span>
+            <span class="separator"></span>
 
-        <a class="i-button icon-edit"
-           href="{{ url_for('event_management.settings', event) }}"
-           title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
+            <a class="i-button icon-edit"
+               href="{{ url_for('event_management.settings', event) }}"
+               title="{% trans %}Switch to the management area of this event{% endtrans %}"></a>
 
+        </div>
+
+        {{ render_session_bar(protected_object=event, local_tz=event.display_tzinfo.zone) }}
     </div>
 
     {# This div is used for inserting content under the header such as the filtering options for meetings #}
