@@ -32,7 +32,7 @@
 
 
 {%- macro _render_theme_selector() -%}
-    <a class="i-button icon-layout js-dropdown" data-toggle="dropdown"
+    <a class="i-button icon-layout arrow js-dropdown" data-toggle="dropdown"
        title="{% trans %}Change theme{% endtrans %}"></a>
     <ul class="dropdown">
         {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
