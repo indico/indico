@@ -145,8 +145,6 @@ class Config:
                      "bulletMenuConf": "bulletMenuConf.png",
                      "logoIndico": "logo_indico.png",
                      "logoIndicoWhite": "logo_indico_white.png",
-                     "indico_small": "indico_small.png",
-                     "indico_co": "indico_co.png",
                      "login": "pict_login.png",
                      "tt_time": "tt_time.png",
                      "miniLogo": "mini_logo_indico.png",

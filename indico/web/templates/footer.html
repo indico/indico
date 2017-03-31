@@ -5,8 +5,8 @@
         {%- endset -%}
         <div class="flexrow">
             <div>
-                <img src="{{ system_icon('indico_small') }}" alt="Indico"
-                     style="vertical-align: middle; margin-right: 2px;">
+                {% set filename = 'indico_small_white.png' if dark else 'indico_small.png' %}
+                <img src="{{ url_for('assets.image', filename=filename) }}" alt="Indico">
             </div>
             <div style="margin-left: 1em;">
                 <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
