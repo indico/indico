@@ -35,8 +35,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, check_registration_email, get_title_uuid)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
-                                                      WPDisplayRegistrationFormMeeting,
-                                                      WPDisplayRegistrationFormLecture,
+                                                      WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
 from indico.modules.events.payment import event_settings as payment_event_settings
 from indico.util.i18n import _
@@ -49,12 +48,9 @@ class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
 
     @property
     def view_class(self):
-        mapping = {
-            EventType.conference: WPDisplayRegistrationFormConference,
-            EventType.meeting: WPDisplayRegistrationFormMeeting,
-            EventType.lecture: WPDisplayRegistrationFormLecture
-        }
-        return mapping[self.event_new.type_]
+        return (WPDisplayRegistrationFormConference
+                if self.event_new.type_ == EventType.conference
+                else WPDisplayRegistrationFormSimpleEvent)
 
 
 class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBase):

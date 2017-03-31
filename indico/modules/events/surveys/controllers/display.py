@@ -26,8 +26,7 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.util import make_survey_form, was_survey_submitted, save_submitted_survey_to_session
-from indico.modules.events.surveys.views import (WPDisplaySurveyConference, WPDisplaySurveyMeeting,
-                                                 WPDisplaySurveyLecture)
+from indico.modules.events.surveys.views import WPDisplaySurveyConference, WPDisplaySurveySimpleEvent
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
@@ -41,10 +40,7 @@ def _can_redirect_to_single_survey(surveys):
 class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
     @property
     def view_class(self):
-        mapping = {EventType.conference: WPDisplaySurveyConference,
-                   EventType.meeting: WPDisplaySurveyMeeting,
-                   EventType.lecture: WPDisplaySurveyLecture}
-        return mapping[self.event_new.type_]
+        return WPDisplaySurveyConference if self.event_new.type_ == EventType.conference else WPDisplaySurveySimpleEvent
 
 
 class RHSurveyList(RHSurveyBaseDisplay):
