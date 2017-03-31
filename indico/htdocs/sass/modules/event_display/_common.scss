@@ -74,13 +74,12 @@
         .i-button {
             @include _i-button-states(#222, $black, $black, $dark-gray, $light-gray, false);
 
-            padding-top: 5px;
+            padding: 0.5em;
         }
 
         .separator {
             margin: 3px 6px 3px 10px;
             width: 1px;
-            height: 20px;
             border-right: 1px dotted $light-black;
         }
 
