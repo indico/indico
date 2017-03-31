@@ -40,7 +40,8 @@ def register_instance(contact, email):
                'contact': contact,
                'email': email,
                'organisation': core_settings.get('site_organization')}
-    response = requests.post(_get_url(), data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT)
+    response = requests.post(_get_url(), data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
+                             verify=(not Config.getInstance().getDebug()))
     try:
         response.raise_for_status()
     except HTTPError as err:
