@@ -10,7 +10,7 @@
                         <li class="icon-users">{{ group.name }}</li>
                     {% endfor %}
                     {% for network in acl | selectattr('is_network') | sort(attribute='name') %}
-                        <li class="icon-lan2">{{ network.name }}</li>
+                        <li class="icon-lan">{{ network.name }}</li>
                     {% endfor %}
                 </ul>
             </div>
