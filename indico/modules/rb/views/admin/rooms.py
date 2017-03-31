@@ -19,8 +19,6 @@ from indico.legacy.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingRoomForm(WPRoomBookingAdminBase):
-    _userData = ['favorite-user-list']
-
     def _setActiveTab(self):
         WPRoomBookingAdminBase._setActiveTab(self)
         self._subTabConfig.setActive()

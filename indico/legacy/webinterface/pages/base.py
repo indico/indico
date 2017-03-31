@@ -100,28 +100,16 @@ class WPJinjaMixin:
 class WPBase:
     _title = "Indico"
 
-    # required user-specific "data packages"
-    _userData = []
-
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
 
     def __init__(self, rh, _protected_object=None, _current_category=None, **kwargs):
-        config = Config.getInstance()
         self._rh = rh
         self._kwargs = kwargs
         self._locTZ = ""
-
-        self._dir = config.getTPLDir()
         self._asset_env = assets.core_env
         self._protected_object = _protected_object
         self._current_category = _current_category
-
-        #store page specific CSS and JS
-        self._extraCSS = []
-
-    def _getBaseURL(self):
-        return Config.getInstance().getBaseURL()
 
     def _getTitle(self):
         return self._title
@@ -207,17 +195,8 @@ class WPBase:
                                head_content=to_unicode(self._getHeadContent()),
                                body=body)
 
-    # auxiliar functions
-    def _escapeChars(self, text):
-        # Not doing anything right now - it used to convert % to %% for old-style templates
-        return text
-
 
 class WPDecorated(WPBase):
-
-    def _getSiteArea(self):
-        return "DisplayArea"
-
     def getLoginURL( self ):
         return url_for_login(next_url=request.relative_url)
 

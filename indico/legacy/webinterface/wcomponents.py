@@ -150,10 +150,6 @@ class WTemplated:
             return param
         return "&nbsp;"
 
-    def _escapeChars(self, text):
-        # Does nothing right now - it used to replace % with %% for the old-style templates
-        return text
-
 
 class WNavigationDrawer(WTemplated):
 
