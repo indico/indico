@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import pkg_resources
-from platform import python_version
+import platform
 from urlparse import urljoin
 
 from flask import flash, jsonify, redirect, request
@@ -25,6 +25,7 @@ from requests.exceptions import HTTPError, RequestException, Timeout
 
 import indico
 from indico.core.config import Config
+from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.cephalopod.forms import CephalopodForm
@@ -36,6 +37,19 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 
 from indico.legacy.webinterface.rh.base import RH
+
+
+def get_postgres_version():
+    version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
+    return '{}.{}.{}'.format(version // 10000, version % 10000 // 100, version % 100)
+
+
+def get_os():
+    system_name = platform.system()
+    if system_name == 'Linux':
+        return '{} {} {}'.format(system_name, platform.linux_distribution()[0], platform.linux_distribution()[1])
+    else:
+        return '{} {}'.format(system_name, platform.release()).rstrip()
 
 
 class RHCephalopodBase(RHAdminBase):
@@ -59,7 +73,9 @@ class RHCephalopod(RHCephalopodBase):
                                             indico_version=indico.__version__,
                                             instance_url=instance_url,
                                             language=language,
-                                            python_version=python_version(),
+                                            operating_system=get_os(),
+                                            postgres_version=get_postgres_version(),
+                                            python_version=platform.python_version(),
                                             tracker_url=tracker_url)
 
     def _process_POST(self):
@@ -111,7 +127,9 @@ class RHSystemInfo(RH):
             indico_version = pkg_resources.get_distribution('indico').version
         except pkg_resources.DistributionNotFound:
             indico_version = 'dev'
-        stats = {'python_version': python_version(),
+        stats = {'python_version': platform.python_version(),
                  'indico_version': indico_version,
+                 'operating_system': get_os(),
+                 'postgres_version': get_postgres_version(),
                  'language': Config.getInstance().getDefaultLocale()}
         return jsonify(stats)
