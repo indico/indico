@@ -22,7 +22,6 @@ from werkzeug.exceptions import Forbidden
 from indico.legacy.webinterface.pages.conferences import (WPMyStuff)
 from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected, RHProtected
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
-from indico.modules.events.legacy import XMLEventSerializer
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 
@@ -63,24 +62,18 @@ class RHMyStuff(RHConferenceBaseDisplay, RHProtected):
         return WPMyStuff(self, self._target).display()
 
 
-class RHConferenceToXML(RHConferenceBaseDisplay):
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
-
-    def _process(self):
-        filename = u'event-{}.xml'.format(self.event_new.id)
-        serializer = XMLEventSerializer(self.event_new, user=session.user, include_announcer_email=True)
-        return send_file(filename, StringIO(serializer.serialize_event()), 'XML')
-
-
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
-    def _process( self ):
+    def _process(self):
         from indico.legacy.common.xmlGen import XMLGen
         from indico.legacy.common.output import outputGenerator
         xmlgen = XMLGen()
         xmlgen.initXml()
         outgen = outputGenerator(self.getAW(), xmlgen)
-        xmlgen.openTag("marc:record", [["xmlns:marc","http://www.loc.gov/MARC21/slim"],["xmlns:xsi","http://www.w3.org/2001/XMLSchema-instance"],["xsi:schemaLocation", "http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"]])
+        xmlgen.openTag('marc:record', [
+            ['xmlns:marc', 'http://www.loc.gov/MARC21/slim'],
+            ['xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance'],
+            ['xsi:schemaLocation',
+             'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']])
         outgen.confToXMLMarc21(self._conf)
-        xmlgen.closeTag("marc:record")
+        xmlgen.closeTag('marc:record')
         return send_file(u'event-{}.marc.xml'.format(self.event_new.id), StringIO(xmlgen.getXml()), 'XML')

@@ -26,4 +26,3 @@ event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDispla
 
 # Machine-readable formats
 event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', conferenceDisplay.RHConferenceToMarcXML)
-event.add_url_rule('/event.xml', 'conferenceDisplay-xml', conferenceDisplay.RHConferenceToXML)
