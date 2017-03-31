@@ -63,44 +63,42 @@
 
 .event-page-header {
     .button-bar {
-        padding: 6px 0;
+        @extend .flexrow;
+        @extend .f-j-start;
+
+        margin: 0.5em;
+        padding-bottom: 0.5em;
         min-height: 24px;
         min-width: 200px;
 
-        a {
-            position: relative;
-            display: block;
-            float: left;
-            height: 13px;
-            padding: 4px 10px 7px 10px;
-            min-width: 4px;
-            margin-left: 4px;
-            background: transparent url('../images/button_bg.png') repeat-y scroll 0 0;
-            font-size: 13px;
-            font-family: arial, helvetica, sans-serif;
-            color: #cfcfcf;
-        }
+        .i-button {
+            @include _i-button-states(#222, $black, $black, $dark-gray, $light-gray, false);
 
-        a .left-corner {
-            position: absolute;
-            top: 0;
-            right: 0;
-            background: transparent url('../images/button_bg.png') repeat-y scroll -198px 0;
-            width: 2px;
-            height: 24px;
-        }
-
-        a:hover {
-            background-position: 0 -24px;
-            color: white;
+            padding-top: 5px;
         }
 
         .separator {
-            float: left;
             margin: 3px 6px 3px 10px;
             width: 1px;
-            height: 18px;
-            border-right: 1px dotted #999;
+            height: 20px;
+            border-right: 1px dotted $light-black;
+        }
+
+        .dropdown {
+            @include border-all($color: $black);
+            @include single-box-shadow($color: $black);
+
+            background: $dark-black;
+
+            li {
+                a {
+                    color: $dark-gray;
+                }
+
+                &:hover a:not(.disabled) {
+                    color: $light-gray;
+                }
+            }
         }
     }
 
