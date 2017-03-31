@@ -126,6 +126,7 @@ div.main-breadcrumb {
 div.session-bar {
     @extend %font-family-title;
 
+    align-self: flex-end;
     margin: 0.5em 0.5em;
 
     .toolbar {

@@ -147,8 +147,8 @@
 {% macro render_session_bar(protected_object, protection_disclaimers, timezone_data, languages) %}
     {% set is_protected = protected_object and protected_object.is_protected %}
 
-    <div id="session-bar" class="session-bar {{ 'ui-follow-scroll' if is_protected }}">
-        <div class="toolbar right">
+    <div id="session-bar" class="session-bar flexrow f-j-end {{ 'ui-follow-scroll' if is_protected }}">
+        <div class="toolbar">
             <div class="group">
                 {% if protected_object and (session.user or is_protected) %}
                     {{ _render_protection_info(protected_object, protection_disclaimers) }}

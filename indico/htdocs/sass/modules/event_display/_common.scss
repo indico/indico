@@ -63,11 +63,7 @@
 
 .event-page-header {
     .button-bar {
-        @extend .flexrow;
-        @extend .f-j-start;
-
-        margin: 0.5em;
-        padding-bottom: 0.5em;
+        margin-left: 0.5em;
         min-height: 24px;
         min-width: 200px;
 
