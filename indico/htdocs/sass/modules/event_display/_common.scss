@@ -99,6 +99,13 @@
                 }
             }
         }
+
+        .filter-link {
+            &.active, &.active:hover {
+                color: $bright-orange;
+                font-weight: bold;
+            }
+        }
     }
 
     .event-filters {

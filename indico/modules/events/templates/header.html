@@ -58,7 +58,8 @@
         {%- endif -%}
     {%- endset -%}
 
-    <a class="i-button icon-filter" id="filterLink" title="{{ filter_link_tooltip|forceescape }}"></a>
+    <a class="i-button icon-filter filter-link {{ 'active' if filters_active }}"
+       title="{{ filter_link_tooltip|forceescape }}"></a>
 
     <div id="event-filters" class="event-filters">
         <form id="filterForm" style="margin: 0;">
@@ -129,7 +130,7 @@
             }
 
             // Setup the filter button in the toolbar
-            $('#filterLink').on('click', function(e) {
+            $('.filter-link').on('click', function(e) {
                 e.preventDefault();
                 filterToggle();
             });
