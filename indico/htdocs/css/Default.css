@@ -66,10 +66,6 @@ pre {
    margin: 0px;
 }
 
-.tablepre {
-   table-layout:fixed;
-}
-
 /*
     .fakeLink is used on elements that should look
     like links but are not real links. For example
