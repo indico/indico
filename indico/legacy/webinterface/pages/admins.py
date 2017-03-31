@@ -22,12 +22,6 @@ from indico.web.menu import render_sidemenu
 
 
 class WPAdminsBase(WPMainBase):
-
-    _userData = ['favorite-user-ids']
-
-    def _getSiteArea(self):
-        return "AdministrationArea"
-
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage('Management')
 

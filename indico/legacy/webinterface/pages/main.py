@@ -33,7 +33,7 @@ class WPMainBase(base.WPDecorated):
         body = WMainBase(self._getBody(params), self._timezone, self._getNavigationDrawer(),
                          isFrontPage=self._isFrontPage(),
                          isRoomBooking=self._isRoomBooking(),
-                         sideMenu=self._getSideMenu()).getHTML({"subArea": self._getSiteArea()})
+                         sideMenu=self._getSideMenu()).getHTML()
 
         return self._applyDecoration(body)
 
@@ -57,7 +57,7 @@ class WMainBase(wcomponents.WTemplated):
     def getVars(self):
         vars = wcomponents.WTemplated.getVars(self)
 
-        vars['body'] = self._escapeChars(self._page)
+        vars['body'] = self._page
         vars["isFrontPage"] = self._isFrontPage
         vars["isRoomBooking"] = self._isRoomBooking
 

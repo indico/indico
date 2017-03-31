@@ -173,7 +173,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
-        path = self._getBaseURL()
+        path = Config.getInstance().getBaseURL()
         try:
             timestamp = os.stat(__file__).st_mtime
         except OSError:
@@ -313,9 +313,6 @@ class WConfDisplayBodyBase(wcomponents.WTemplated):
 
 
 class WPConferenceModifBase(main.WPMainBase):
-
-    _userData = ['favorite-user-ids']
-
     def __init__(self, rh, conference, **kwargs):
         conference = getattr(conference, 'as_legacy', conference)
         main.WPMainBase.__init__(self, rh, _current_category=conference.as_event.category, **kwargs)
@@ -326,9 +323,6 @@ class WPConferenceModifBase(main.WPMainBase):
                 self._includeJSPackage('Management') +
                 self._asset_env['modules_event_cloning_js'].urls() +
                 self._asset_env['modules_event_management_js'].urls())
-
-    def _getSiteArea(self):
-        return "ModificationArea"
 
     def _getHeader(self):
         return render_header(category=self._current_category, local_tz=self._conf.as_event.timezone)

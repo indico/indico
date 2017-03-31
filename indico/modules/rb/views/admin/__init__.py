@@ -63,6 +63,3 @@ class WPRoomBookingAdminBase(WPRoomsBase):
 
     def _setActiveTab(self):
         self._subTabRoomBooking.setActive()
-
-    def _getSiteArea(self):
-        return 'Room Booking Administration'
