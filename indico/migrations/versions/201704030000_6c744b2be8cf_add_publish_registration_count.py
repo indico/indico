@@ -1,7 +1,7 @@
 """add publish_registration_count
 
 Revision ID: 6c744b2be8cf
-Revises: e185a5089262
+Revises: f15eac2175f8
 Create Date: 2017-03-22 15:29:47.641528
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '6c744b2be8cf'
-down_revision = 'e185a5089262'
+down_revision = 'f15eac2175f8'
 
 
 def upgrade():
