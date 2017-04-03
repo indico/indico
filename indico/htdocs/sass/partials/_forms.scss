@@ -209,6 +209,10 @@ $i-form-button-line-height: 1.8;
     select {
         @extend %form-field-input;
         padding-left: 0.7em;
+
+        &[multiple] {
+            height: auto;
+        }
     }
 
     input[type=number],
