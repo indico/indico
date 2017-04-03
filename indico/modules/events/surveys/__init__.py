@@ -25,6 +25,8 @@ from indico.core.roles import ManagementRole
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
+from indico.modules.events.surveys.models.submissions import SurveySubmission
+from indico.modules.events.surveys.util import query_active_surveys
 from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
@@ -62,8 +64,7 @@ def _get_active_surveys(event):
     if not event.has_feature('surveys'):
         return []
     from indico.modules.events.surveys.models.surveys import Survey
-    return (Survey.query.with_parent(event)
-            .filter(Survey.is_active)
+    return (query_active_surveys(event)
             .order_by(db.func.lower(Survey.title))
             .all())
 

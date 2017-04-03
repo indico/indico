@@ -28,8 +28,9 @@ from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.models.events import EventType
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
-from indico.modules.events.surveys.util import (make_survey_form, was_survey_submitted, is_submission_in_progress,
-                                                save_submitted_survey_to_session)
+from indico.modules.events.surveys.util import (make_survey_form, is_submission_in_progress,
+                                                save_submitted_survey_to_session, was_survey_submitted,
+                                                query_active_surveys)
 from indico.modules.events.surveys.views import (WPDisplaySurveyConference, WPDisplaySurveySimpleEvent)
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
@@ -48,8 +49,7 @@ class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
 
 class RHSurveyList(RHSurveyBaseDisplay):
     def _process(self):
-        surveys = (Survey.query.with_parent(self.event_new)
-                   .filter(Survey.is_visible, ~Survey.private)
+        surveys = (query_active_surveys(self.event_new)
                    .options(joinedload('questions'),
                             joinedload('submissions'))
                    .all())
