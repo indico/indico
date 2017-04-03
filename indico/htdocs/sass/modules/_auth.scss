@@ -23,9 +23,6 @@
     margin: 0;
     padding: 0;
     text-align: center;
-}
-
-.login-page {
     display: table;
     position: absolute;
     height: 100%;
@@ -87,7 +84,7 @@
         @include login-form-button();
     }
 
-    form input:not([type="submit"]) {
+    form input:not([type='submit']) {
         height: 2.5em;
         padding: 0.5em 1em;
         line-height: 1.5;
@@ -111,11 +108,6 @@
     .login-providers {
         margin-top: 20px;
 
-        &.external {
-            .i-button {
-            }
-        }
-
         .i-button {
             @include login-form-button();
 
@@ -123,6 +115,7 @@
                 color: white !important;
                 background-color: #3b579d;
                 border-color: #3b579d;
+
                 &:hover {
                     background: #3f5da8;
                     border-color: #3f5da8;
@@ -197,6 +190,7 @@
 
 .app-auth-box {
     font-size: 1.1em;
+
     .row {
         padding: 20px;
 
@@ -232,9 +226,11 @@
 
     li {
         @include icon-before('icon-checkbox-checked');
-        &:before {
+
+        &::before {
             padding-right: 0.5em;
         }
+
         &.authorized {
             @extend .text-superfluous;
         }
