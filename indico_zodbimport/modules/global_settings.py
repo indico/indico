@@ -32,7 +32,6 @@ class GlobalSettingsImporter(Importer):
         core_settings.set_multi({
             'site_title': convert_to_unicode(minfo._title),
             'site_organization': convert_to_unicode(minfo._organisation),
-            'custom_template_set': convert_to_unicode(minfo._defaultTemplateSet) or None
         })
         social_settings.set_multi({
             'enabled': bool(minfo._socialAppConfig['active']),
