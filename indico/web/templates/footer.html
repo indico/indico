@@ -1,12 +1,14 @@
-<div id="footer" class="footer {{ 'dark' if dark }} {% block footer_classes %}{% endblock %}">
+<div class="footer {{ 'dark' if dark }}">
     {% block footer -%}
         {%- set indico -%}
             <a href="http://indico-software.org">Indico</a>
         {%- endset -%}
         <div class="flexrow">
             <div>
-                {% set filename = 'indico_small_white.png' if dark else 'indico_small.png' %}
-                <img src="{{ url_for('assets.image', filename=filename) }}" alt="Indico">
+                {% block footer_logo %}
+                    {% set filename = 'indico_small_white.png' if dark else 'indico_small.png' %}
+                    <img src="{{ url_for('assets.image', filename=filename) }}" alt="Indico">
+                {% endblock %}
             </div>
             <div style="margin-left: 1em;">
                 <span>{% trans %}Powered by {{ indico }}{% endtrans %}</span>
