@@ -126,35 +126,6 @@ def test_booked_for_user_after_change(db, dummy_reservation, create_user):
     assert dummy_reservation.booked_for_name == other_user.full_name
 
 
-def test_booked_for_user_email(dummy_reservation, dummy_avatar):
-    assert dummy_reservation.booked_for_user_email == dummy_avatar.email
-
-
-def test_booked_for_user_email_after_change(dummy_reservation, dummy_user, create_user):
-    dummy_user.email = 'new.email@example.com'
-    assert dummy_reservation.booked_for_user_email == dummy_user.email
-    other_user = create_user(123)
-    dummy_reservation.booked_for_user = other_user
-    assert dummy_reservation.booked_for_user_email == other_user.email
-
-
-def test_booked_for_user_email_with_no_user(dummy_reservation):
-    dummy_reservation.booked_for_user = None
-    assert dummy_reservation.booked_for_user_email is None
-
-
-@pytest.mark.parametrize(('emails', 'expected'), (
-    ('',             set()),
-    ('a@a.a',        {'a@a.a'}),
-    ('a@a.a, b@b.b', {'a@a.a', 'b@b.b'}),
-    ('b@b.b, b@b.b', {'b@b.b'}),
-    (' c@c.c',       {'c@c.c'}),
-))
-def test_contact_emails(create_reservation, emails, expected):
-    reservation = create_reservation(contact_email=emails)
-    assert reservation.contact_emails == expected
-
-
 def test_created_by_user(dummy_reservation, dummy_avatar):
     assert dummy_reservation.created_by_user == dummy_avatar
 
@@ -417,18 +388,13 @@ def test_get_vc_equipment(db, dummy_reservation, create_equipment_type):
     assert set(dummy_reservation.get_vc_equipment().all()) == {vc_items[0]}
 
 
-@pytest.mark.parametrize(('is_booked_for', 'contact_email', 'expected'), (
-    (True,  '', True),
-    (False, '', False),
-    (False, '1337@example.com', True),
-    (False, 'other@example.com', False),
-    (False, '1337@example.com, other@example.com', True),
-    (False, 'other1@example.com, other2@example.com', False),
+@pytest.mark.parametrize(('is_booked_for', 'expected'), (
+    (True, True),
+    (False, False),
 ))
-def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, contact_email, expected):
+def test_is_booked_for(dummy_reservation, dummy_user, create_user, is_booked_for, expected):
     if not is_booked_for:
         dummy_reservation.booked_for_user = create_user(123)
-    dummy_reservation.contact_email = contact_email
     assert dummy_reservation.is_booked_for(dummy_user) == expected
 
 

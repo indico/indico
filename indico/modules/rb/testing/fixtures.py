@@ -58,7 +58,6 @@ def create_reservation(db, dummy_room, dummy_avatar):
         params.setdefault('end_dt', date.today() + relativedelta(hour=17, minute=30))
         params.setdefault('repeat_frequency', RepeatFrequency.NEVER)
         params.setdefault('repeat_interval', int(params['repeat_frequency'] != RepeatFrequency.NEVER))
-        params.setdefault('contact_email', dummy_avatar.email)
         params.setdefault('is_accepted', True)
         params.setdefault('booking_reason', u'Testing')
         params.setdefault('room', dummy_room)
