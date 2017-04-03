@@ -21,7 +21,7 @@ import re
 from functools import wraps
 
 import yaml
-from flask import current_app
+from flask.helpers import get_root_path
 
 from indico.core import signals
 from indico.core.settings import SettingsProxyBase, ACLProxyBase
@@ -202,7 +202,7 @@ class ThemeSettingsProxy(object):
     @property
     @memoize
     def settings(self):
-        core_path = os.path.join(current_app.root_path, 'modules', 'events', 'themes.yaml')
+        core_path = os.path.join(get_root_path('indico'), 'modules', 'events', 'themes.yaml')
         with open(core_path) as f:
             core_data = f.read()
         core_settings = yaml.safe_load(core_data)
