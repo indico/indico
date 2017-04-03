@@ -35,6 +35,10 @@ def warn(message, *args):
     click.echo(click.style(message.format(*args), fg='yellow', bold=True), err=True)
 
 
+def noop(message, *args):
+    click.echo(click.style(message.format(*args), fg='green'), err=True)
+
+
 def info(message, *args):
     click.echo(click.style(message.format(*args), fg='green', bold=True), err=True)
 
@@ -74,6 +78,25 @@ def clean_build_dirs():
         subprocess.check_output([sys.executable, 'setup.py', 'clean', '-a'], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('clean failed', verbose_msg=exc.output)
+
+
+def compile_catalogs():
+    path = None
+    # find ./xxx/translations/ with at least one subdir
+    for root, dirs, files in os.walk('.'):
+        segments = root.split(os.sep)
+        if segments[-1] == 'translations' and len(segments) == 3 and dirs:
+            path = root
+            break
+    if path is None:
+        noop('plugin has no translations')
+        return
+    info('compiling translations')
+    try:
+        subprocess.check_output([sys.executable, 'setup.py', 'compile_catalog', '-d', path],
+                                stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as exc:
+        fail('compile_catalog failed', verbose_msg=exc.output)
 
 
 def build_wheel(target_dir):
@@ -173,6 +196,7 @@ def build_plugin(obj, plugin_dir):
     clean, output = git_is_clean_plugin()
     if not clean:
         fail('working tree is not clean', verbose_msg=output)
+    compile_catalogs()
     clean_build_dirs()
     build_wheel(target_dir)
     clean_build_dirs()
