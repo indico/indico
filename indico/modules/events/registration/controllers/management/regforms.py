@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from operator import attrgetter, itemgetter
 
 from flask import redirect, flash, session
+from sqlalchemy.orm import undefer
 
 from indico.core import signals
 from indico.core.db import db
@@ -34,10 +35,8 @@ from indico.modules.events.registration.forms import (RegistrationFormForm, Regi
                                                       RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.stats import OverviewStats, AccommodationStats
-from indico.modules.events.registration.util import (get_event_section_data, create_personal_data_fields,
-                                                     get_registration_counts_dict)
+from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
 from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
                                                       WPManageParticipants)
 from indico.modules.events.util import update_object_principals
@@ -52,10 +51,13 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
     """List all registrations forms for an event"""
 
     def _process(self):
-        regforms = sorted(self.event_new.registration_forms, key=lambda f: f.title.lower())
+        regforms = (RegistrationForm.query
+                    .with_parent(self.event_new)
+                    .options(undefer('active_registration_count'))
+                    .order_by(db.func.lower(RegistrationForm.title)).all())
+
         return WPManageRegistration.render_template('management/regform_list.html', self._conf,
-                                                    event=self.event_new, regforms=regforms,
-                                                    registration_counts=get_registration_counts_dict(self.event_new))
+                                                    event=self.event_new, regforms=regforms)
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):

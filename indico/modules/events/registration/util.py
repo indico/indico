@@ -20,7 +20,7 @@ from collections import OrderedDict
 
 from flask import current_app, session, json
 from qrcode import QRCode, constants
-from sqlalchemy.orm import load_only, joinedload
+from sqlalchemy.orm import load_only, joinedload, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
@@ -440,33 +440,16 @@ def generate_ticket_qr_code(registration):
     return qr.make_image()._img
 
 
-def get_open_or_registered_regforms(event, user):
-    """Get registration forms which are open or user is registered for.
+def get_event_regforms(event, user):
+    """Get registration forms with information about user registrations.
 
-    :param event: the `Event` to get registrations for
+    :param event: the `Event` to get registration forms for
     :param user: A `User`
     """
-    if not event.has_feature('registration'):
-        return []
+    registered_user = RegistrationForm.registrations.any((Registration.user == user) & Registration.is_active)
     return (RegistrationForm.query.with_parent(event)
-            .filter(db.or_(RegistrationForm.is_open,
-                           RegistrationForm.registrations.any((Registration.user == user) & ~Registration.is_deleted)))
+            .with_entities(RegistrationForm,
+                           registered_user if user else db.literal(False))
+            .options(undefer('active_registration_count'))
             .order_by(db.func.lower(RegistrationForm.title))
             .all())
-
-
-def get_registration_counts_dict(event, publish=False):
-    """Get dictionary with number of registrations for each form of the event.
-
-    :param event: the `Event` to get number of registration for
-    :param publish: include only forms that allow number publishing
-    """
-    query = (event.registrations
-             .with_entities(Registration.registration_form_id, db.func.count())
-             .filter(Registration.is_active))
-    if publish:
-        query = (query
-                 .join(RegistrationForm, Registration.registration_form_id == RegistrationForm.id)
-                 .filter(RegistrationForm.publish_registration_count))
-    query = query.group_by(Registration.registration_form_id)
-    return dict(query)

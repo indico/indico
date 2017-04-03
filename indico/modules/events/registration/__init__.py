@@ -63,23 +63,29 @@ def _extend_event_management_menu(sender, event, **kwargs):
 
 @template_hook('conference-home-info')
 def _inject_regform_announcement(event, **kwargs):
-    from indico.modules.events.registration.util import get_registrations_with_tickets, get_open_or_registered_regforms
-    regforms = get_open_or_registered_regforms(event, session.user)
-    user_registrations = sum(session.user in (registartion.user for registartion in regform.registrations
-                                              if registartion.is_deleted is False) for regform in regforms)
-    if regforms:
-        return render_template('events/registration/display/conference_home.html', regforms=regforms, event=event,
-                               user_registrations=user_registrations,
-                               registrations_with_tickets=get_registrations_with_tickets(session.user, event))
+    from indico.modules.events.registration.util import get_registrations_with_tickets, get_event_regforms
+    if event.has_feature('registration'):
+        all_regforms = get_event_regforms(event, session.user)
+        user_registrations = sum(regform[1] for regform in all_regforms)
+        open_and_registered_regforms = [regform[0] for regform in all_regforms if regform[0].is_open or regform[1]]
+        if open_and_registered_regforms:
+            return render_template('events/registration/display/conference_home.html',
+                                   regforms=open_and_registered_regforms, event=event,
+                                   user_registrations=user_registrations,
+                                   registrations_with_tickets=get_registrations_with_tickets(session.user, event))
 
 
 @template_hook('event-header')
 def _inject_event_header(event, **kwargs):
-    from indico.modules.events.registration.util import get_open_or_registered_regforms
-    regforms = sorted(get_open_or_registered_regforms(event, session.user), key=lambda f: f.title.lower())
-    # A participant could appear more than once in the list in case he register to multiple registration form.
-    # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
-    return render_template('events/registration/display/event_header.html', event=event, regforms=regforms)
+    from indico.modules.events.registration.util import get_event_regforms
+    if event.has_feature('registration'):
+        all_regforms = get_event_regforms(event, session.user)
+        open_and_registered_regforms = [regform[0] for regform in all_regforms if regform[0].is_open or regform[1]]
+        user_registrations = [regform[0].id for regform in all_regforms if regform[1]]
+        # A participant could appear more than once in the list in case he register to multiple registration form.
+        # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
+        return render_template('events/registration/display/event_header.html', event=event,
+                               regforms=open_and_registered_regforms, user_registrations=user_registrations)
 
 
 @signals.event.sidemenu.connect
