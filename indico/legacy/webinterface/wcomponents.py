@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
 from xml.sax.saxutils import escape
 
 import pkg_resources
@@ -24,7 +23,6 @@ from speaklater import _LazyString
 from indico.legacy.common.TemplateExec import render as render_mako
 from indico.core import signals
 from indico.core.config import Config
-from indico.modules.core.settings import core_settings
 from indico.util.signals import values_from_signal
 from indico.web.menu import HeaderMenuEntry
 
@@ -65,34 +63,17 @@ class WTemplated:
 
         self._rh = g.get('rh')
 
-    def _getSpecificTPL(self, dir, tplId, extension="tpl"):
-        """
-            Checks if there is a defined set of specific templates (i.e. CERN),
-            and if there is a specific file for this page, for this template set.
-            Returns the file that should be used.
-        """
-        custom = core_settings.get('custom_template_set')
-        if custom is not None:
-            custom_tpl = '{}.{}.{}'.format(tplId, custom, extension)
-            if os.path.exists(os.path.join(dir, custom_tpl)):
-                return custom_tpl
-        return '{}.{}'.format(tplId, extension)
-
     def _setTPLFile(self):
         """Sets the TPL (template) file for the object. It will try to get
             from the configuration if there's a special TPL file for it and
             if not it will look for a file called as the class name+".tpl"
             in the configured TPL directory.
         """
-        cfg = Config.getInstance()
-
         # because MANY classes skip the constructor...
-        tplDir = cfg.getTPLDir()
         if hasattr(self, '_for_module') and self._for_module:
-            self.tplFile = pkg_resources.resource_filename(self._for_module.__name__,
-                                                          'tpls/{0}.tpl'.format(self.tplId))
+            self.tplFile = pkg_resources.resource_filename(self._for_module.__name__, 'tpls/{}.tpl'.format(self.tplId))
         else:
-            self.tplFile = self._getSpecificTPL(tplDir, self.tplId)
+            self.tplFile = '{}.tpl'.format(self.tplId)
 
     def getVars( self ):
         """Returns a dictionary containing the TPL variables that will
