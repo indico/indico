@@ -51,6 +51,12 @@
             width: 2.5em;
             min-width: 2.5em;
         }
+
+        &[class*='icon-'] {
+            &:not(:empty)::before {
+                margin-right: 0.5em;
+            }
+        }
     }
 
     th {
