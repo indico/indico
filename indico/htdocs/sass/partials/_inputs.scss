@@ -344,7 +344,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 %tilted-strips-bg {
-    @include placeholder($color: $light-black);
+    @include placeholder-color($color: $light-black);
     background-color: lighten($gray, $light-color-variation);
     background: repeating-linear-gradient(
         -40deg,
