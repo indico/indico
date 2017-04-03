@@ -60,6 +60,8 @@ from indico.legacy.common.cache import GenericCache
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
+poster_cache = GenericCache('poster-printing')
+
 REPEAT_FORM_MAP = {
     'once': CloneRepeatOnceForm,
     'interval': CloneRepeatIntervalForm,
@@ -132,9 +134,6 @@ class IntervalCloneCalculator(CloneCalculator):
         args.update(self._calc_stop_criteria(form))
         freq, interval = relativedelta_to_rrule_interval(form.recurrence.data)
         return list(rrule.rrule(freq, interval=interval, **args))
-
-
-poster_cache = GenericCache('poster-printing')
 
 
 class RHManageEventBase(RHConferenceModifBase):
