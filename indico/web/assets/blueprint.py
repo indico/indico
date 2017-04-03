@@ -124,3 +124,12 @@ def static_asset(path, plugin=None, theme=None):
     elif theme and theme not in theme_settings.themes:
         raise NotFound
     return send_from_directory(Config.getInstance().getAssetsDir(), get_asset_path(path, plugin=plugin, theme=theme))
+
+
+@assets_blueprint.route('!/static/custom/<path:filename>', endpoint='custom')
+def static_custom(filename):
+    customization_dir = Config.getInstance().getCustomizationDir()
+    if not customization_dir:
+        raise NotFound
+    customization_dir = os.path.join(customization_dir, 'static')
+    return send_from_directory(customization_dir, filename)
