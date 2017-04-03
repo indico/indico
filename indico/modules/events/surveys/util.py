@@ -23,7 +23,6 @@ from sqlalchemy.orm import load_only, joinedload
 
 from indico.core.db import db
 from indico.modules.events import Event
-from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_datetime
@@ -61,6 +60,7 @@ def save_submitted_survey_to_session(submission):
 @memoize_request
 def was_survey_submitted(survey):
     """Check whether the current user has submitted a survey"""
+    from indico.modules.events.surveys.models.surveys import Survey
     query = (Survey.query.with_parent(survey.event_new)
              .filter(Survey.submissions.any(db.and_(SurveySubmission.is_submitted,
                                                     SurveySubmission.user == session.user))))
@@ -75,6 +75,7 @@ def was_survey_submitted(survey):
 
 def is_submission_in_progress(survey):
     """Check whether the current user has a survey submission in progress"""
+    from indico.modules.events.surveys.models.surveys import Survey
     if session.user:
         query = (Survey.query.with_parent(survey.event_new)
                  .filter(Survey.submissions.any(db.and_(~SurveySubmission.is_submitted,
@@ -131,6 +132,7 @@ def get_events_with_submitted_surveys(user, dt=None):
     :param dt: Only include events taking place on/after that date
     :return: A set of event ids
     """
+    from indico.modules.events.surveys.models.surveys import Survey
     # Survey submissions are not stored in links anymore, so we need to get them directly
     query = (user.survey_submissions
              .options(load_only('survey_id'))
@@ -139,3 +141,12 @@ def get_events_with_submitted_surveys(user, dt=None):
              .join(Event)
              .filter(~Survey.is_deleted, ~Event.is_deleted, Event.ends_after(dt)))
     return {submission.survey.event_id for submission in query}
+
+
+def query_active_surveys(event):
+    from indico.modules.events.surveys.models.surveys import Survey
+    private_criterion = ~Survey.private
+    if session.user:
+        user_pending_criterion = ~SurveySubmission.is_submitted & (SurveySubmission.user == session.user)
+        private_criterion |= Survey.submissions.any(user_pending_criterion)
+    return Survey.query.with_parent(event).filter(Survey.is_active, private_criterion)
