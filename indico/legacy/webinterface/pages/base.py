@@ -207,7 +207,7 @@ class WPDecorated(WPBase):
         return render_template('footer.html').encode('utf-8')
 
     def _applyDecoration(self, body):
-        return u'<div class="header">{}</div><div class="main">{}</div><div class="footer">{}</div>'.format(
+        return u'<div class="header">{}</div>\n<div class="main">{}</div>\n{}'.format(
             to_unicode(self._getHeader()), to_unicode(body), to_unicode(self._getFooter()))
 
     def _display(self, params):
