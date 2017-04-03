@@ -3,7 +3,7 @@
         <td class="leftCol">{% trans %}Registration{% endtrans %}</td>
         <td>
             {% for regform in regforms %}
-                {% set registration = session.user and regform.get_registration(user=session.user) %}
+                {% set registration = session.user and regform.id in user_registrations %}
                 <div class="event-service-row">
                     <div class="event-service-row-collapsed clearfix">
                         <div class="event-service-info left">
@@ -22,7 +22,7 @@
                             <div class="event-service-toolbar toolbar right">
                                 {% if regform.publish_registration_count %}
                                     <span class="i-button i-button-small icon-user label" title="{% trans %}Total registrations{% endtrans %}">
-                                        {{- regform.active_registrations|length }}
+                                        {{- regform.active_registration_count }}
                                         {%- if regform.registration_limit %}
                                             / {{ regform.registration_limit }}
                                         {%- endif -%}
@@ -31,7 +31,7 @@
                                 <div class="group">
                                    {% if registration  %}
                                         <a class="i-button i-button-small icon-edit highlight"
-                                            href="{{ url_for('event_registration.display_regform', registration.locator.registrant) }}">
+                                            href="{{ url_for('event_registration.display_regform', regform) }}">
                                             <strong>{% trans %}Modify registration{% endtrans %}</strong>
                                         </a>
                                    {% elif regform.limit_reached %}

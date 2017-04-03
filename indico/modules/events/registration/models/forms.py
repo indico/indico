@@ -20,9 +20,12 @@ from uuid import UUID
 
 from babel.numbers import format_currency
 from flask import session
+from sqlalchemy import orm
+from sqlalchemy import select
 from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import subqueryload
+from sqlalchemy.orm import subqueryload, column_property
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
@@ -391,3 +394,11 @@ class RegistrationForm(db.Model):
             if (isinstance(field, RegistrationFormPersonalDataField) and
                     field.personal_data_type == personal_data_type):
                 return field.id
+
+
+@listens_for(orm.mapper, 'after_configured', once=True)
+def _mappers_configured():
+    query = (select([db.func.count(Registration.id)])
+             .where((Registration.registration_form_id == RegistrationForm.id) & Registration.is_active)
+             .correlate_except(Registration))
+    RegistrationForm.active_registration_count = column_property(query, deferred=True)
