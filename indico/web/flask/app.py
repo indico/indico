@@ -185,6 +185,8 @@ def setup_jinja(app):
     app.add_template_global(slugify)
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
     app.add_template_global(render_session_bar)
+    app.add_template_global(lambda: 'custom_js' in core_env, 'has_custom_js')
+    app.add_template_global(lambda: 'custom_sass' in core_env, 'has_custom_sass')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)

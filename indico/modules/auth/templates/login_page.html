@@ -71,12 +71,7 @@
             <a class="icon-prev" href="/">{% trans %}Back{% endtrans %}</a>
         </div>
     </div>
-    <div id="footer" class="footer footerCERN">
-        <a id="cern_link" href="http://cern.ch">
-            <img src="{{ indico_config.config.getSystemIconURL('cern_small') }}" alt="CERN" class="cern_logo" style="vertical-align: middle; margin: 15px;">
-        </a>
-        <div class="text">{% trans %}Powered by{% endtrans %} <a href="http://indico-software.org">Indico</a></div>
-    </div>
+    {% include 'footer.html' %}
 
     <script>
         (function() {

@@ -506,23 +506,9 @@ a.active {
     color: #999;
 }
 
-.footer.footerCERN {
-    padding-bottom: 0;
-}
-
-.footer.footerCERN #social {
-    margin-top: 40px;
-}
-
 
 .footer div.text {
     margin-top: 20px;
-    float: left;
-    vertical-align: middle;
-}
-
-.footer a#cern_link {
-    margin: auto;
     float: left;
     vertical-align: middle;
 }
