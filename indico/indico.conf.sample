@@ -456,6 +456,9 @@ MaxUploadFileSize = 0
 # files, they will be included in alphabetical order so prefixing them with
 # a number (e.g. `00-base.scss`, `10-events.scss`) is a good idea.
 #
+# Static files may be added in `<CustomizationDir>/static`.  They can be
+# referenced in templates through the `assets.custom` endpoint.
+#
 # If you have a custom logo, specify the URL to it here.  If unset, the default
 # indico logo is used.
 #LogoURL = ''
