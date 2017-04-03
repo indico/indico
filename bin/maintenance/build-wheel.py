@@ -39,6 +39,10 @@ def info(message, *args):
     click.echo(click.style(message.format(*args), fg='green', bold=True), err=True)
 
 
+def step(message, *args):
+    click.echo(click.style(message.format(*args), fg='white', bold=True), err=True)
+
+
 def run(cmd, title, shell=False):
     if shell:
         cmd = ' '.join(cmd)
@@ -72,37 +76,72 @@ def clean_build_dirs():
         fail('clean failed', verbose_msg=exc.output)
 
 
-def build_wheel():
+def build_wheel(target_dir):
     info('building wheel')
     try:
-        subprocess.check_output([sys.executable, 'setup.py', 'bdist_wheel'], stderr=subprocess.STDOUT)
+        subprocess.check_output([sys.executable, 'setup.py', 'bdist_wheel', '-d', target_dir], stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as exc:
         fail('build failed', verbose_msg=exc.output)
 
 
-def git_is_clean():
-    libs_re = re.compile(r'^indico/htdocs/(css|sass|js)/lib')
+def git_is_clean_indico():
     toplevel = list({x.split('.')[0] for x in find_packages()})
     cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
             ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel,
-            ['git', 'clean', '-dn'] + toplevel]
+            ['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel]
     for cmd in cmds:
         rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
         if rv:
             return False, rv
     rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard', 'indico/htdocs'],
                                  stderr=subprocess.STDOUT)
-    garbage = [x for x in rv.splitlines() if not libs_re.match(x)]
+    garbage_re = re.compile(r'^indico/htdocs/(css|sass|js)/lib')
+    garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
     if garbage:
         return False, '\n'.join(garbage)
     return True, None
 
 
-@click.command()
+def git_is_clean_plugin():
+    toplevel = list({x.split('.')[0] for x in find_packages()})
+    cmds = [['git', 'diff', '--stat', '--color=always'] + toplevel,
+            ['git', 'diff', '--stat', '--color=always', '--staged'] + toplevel]
+    if toplevel:
+        # only check for ignored files if we have packages. for single-module
+        # plugins we don't have any package data to include anyway...
+        cmds.append(['git', 'clean', '-dn', '-e', '__pycache__'] + toplevel)
+    for cmd in cmds:
+        rv = subprocess.check_output(cmd, stderr=subprocess.STDOUT)
+        if rv:
+            return False, rv
+    if not toplevel:
+        # If we have just a single pyfile we don't need to check for ignored files
+        return True, None
+    rv = subprocess.check_output(['git', 'ls-files', '--others', '--ignored', '--exclude-standard'] + toplevel,
+                                 stderr=subprocess.STDOUT)
+    garbage_re = re.compile(r'(\.(py[co]|mo)$)|/(__pycache__/)')
+    garbage = [x for x in rv.splitlines() if not garbage_re.search(x)]
+    if garbage:
+        return False, '\n'.join(garbage)
+    return True, None
+
+
+@click.group()
+@click.option('--target-dir', '-d', type=click.Path(exists=True, file_okay=False, resolve_path=True), default='dist/',
+              help='target dir for build wheels relative to the current dir')
+@click.pass_obj
+def cli(obj, target_dir):
+    obj['target_dir'] = target_dir
+
+
+@cli.command('indico')
 @click.option('--no-deps', 'deps', is_flag=True, flag_value=False, default=True, help='skip setup_deps')
-def main(deps):
+@click.pass_obj
+def build_indico(obj, deps):
+    """Builds the indico wheel."""
+    target_dir = obj['target_dir']
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
-    clean, output = git_is_clean()
+    clean, output = git_is_clean_indico()
     if not clean:
         fail('working tree is not clean', verbose_msg=output)
     if deps:
@@ -110,9 +149,48 @@ def main(deps):
     else:
         warn('building deps disabled')
     clean_build_dirs()
-    build_wheel()
+    build_wheel(target_dir)
     clean_build_dirs()
 
 
+def _validate_plugin_dir(ctx, param, value):
+    if not os.path.exists(os.path.join(value, 'setup.py')):
+        raise click.BadParameter('no setup.py found in {}'.format(value))
+    return value
+
+
+@cli.command('plugin', short_help='Builds a plugin wheel.')
+@click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
+                callback=_validate_plugin_dir)
+@click.pass_obj
+def build_plugin(obj, plugin_dir):
+    """Builds a plugin wheel.
+
+    PLUGIN_DIR is the path to the folder containing the plugin's setup.py
+    """
+    target_dir = obj['target_dir']
+    os.chdir(plugin_dir)
+    clean, output = git_is_clean_plugin()
+    if not clean:
+        fail('working tree is not clean', verbose_msg=output)
+    clean_build_dirs()
+    build_wheel(target_dir)
+    clean_build_dirs()
+
+
+@cli.command('all-plugins', short_help='Builds all plugin wheels in a directory.')
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.pass_context
+def build_all_plugins(ctx, plugins_dir):
+    """Builds all plugin wheels in a directory.
+
+    PLUGINS_DIR is the path to the folder containing the plugin directories
+    """
+    plugins = sorted(d for d in os.listdir(plugins_dir) if os.path.exists(os.path.join(plugins_dir, d, 'setup.py')))
+    for plugin in plugins:
+        step('plugin: {}', plugin)
+        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin))
+
+
 if __name__ == '__main__':
-    main()
+    cli(obj={})
