@@ -1,7 +1,7 @@
 """Add survey UUID/private
 
 Revision ID: 2c87774642e7
-Revises: e185a5089262
+Revises: 6c744b2be8cf
 Create Date: 2017-03-07 14:25:54.829777
 """
 
@@ -12,7 +12,7 @@ from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = '2c87774642e7'
-down_revision = 'e185a5089262'
+down_revision = '6c744b2be8cf'
 
 
 def upgrade():
