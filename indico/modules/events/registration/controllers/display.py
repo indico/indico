@@ -23,7 +23,6 @@ from flask import request, session, redirect, flash, jsonify
 from sqlalchemy.orm import subqueryload, contains_eager
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core.db import db
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.models.events import EventType
 from indico.modules.events.registration import registration_settings
@@ -34,7 +33,7 @@ from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
 from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
                                                      create_registration, check_registration_email, get_title_uuid,
-                                                     get_registration_counts_dict)
+                                                     get_event_regforms)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormMeeting,
                                                       WPDisplayRegistrationFormLecture,
@@ -82,22 +81,15 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
     def _process(self):
-        regforms = RegistrationForm.query.with_parent(self.event_new)
-        if session.user:
-            criteria = db.or_(
-                RegistrationForm.is_scheduled,
-                RegistrationForm.registrations.any((Registration.user == session.user) & Registration.is_active),
-            )
-        else:
-            criteria = RegistrationForm.is_scheduled
-        regforms = regforms.filter(criteria).order_by(db.func.lower(RegistrationForm.title)).all()
-
-        if len(regforms) == 1:
-            return redirect(url_for('.display_regform', regforms[0]))
+        all_regforms = get_event_regforms(self.event_new, session.user)
+        scheduled_and_registered_regforms = [regform[0] for regform in all_regforms
+                                             if regform[0].is_scheduled or regform[1]]
+        user_registrations = [regform[0].id for regform in all_regforms if regform[1]]
+        if len(scheduled_and_registered_regforms) == 1:
+            return redirect(url_for('.display_regform', scheduled_and_registered_regforms[0]))
         return self.view_class.render_template('display/regform_list.html', self._conf,
-                                               event=self.event_new, regforms=regforms,
-                                               registration_counts=get_registration_counts_dict(self.event_new,
-                                                                                                publish=True))
+                                               event=self.event_new, regforms=scheduled_and_registered_regforms,
+                                               user_registrations=user_registrations)
 
 
 class RHParticipantList(RHRegistrationFormDisplayBase):
