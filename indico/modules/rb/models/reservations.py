@@ -104,7 +104,7 @@ class Reservation(Serializer, db.Model):
         ('booked_for_name', 'bookedForName'), ('details_url', 'bookingUrl'), ('booking_reason', 'reason'),
         ('uses_vc', 'usesAVC'), ('needs_vc_assistance', 'needsAVCSupport'),
         'needs_assistance', ('is_accepted', 'isConfirmed'), ('is_valid', 'isValid'), 'is_cancelled',
-        'is_rejected', ('location_name', 'location'), 'booked_for_user_email'
+        'is_rejected', ('location_name', 'location'), ('contact_email', 'booked_for_user_email')
     ]
 
     @declared_attr
@@ -168,12 +168,14 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         index=True
     )
-    contact_email = db.Column(
+    _legacy_contact_email = db.Column(
+        'contact_email',
         db.String,
         nullable=False,
         default=''
     )
-    contact_phone = db.Column(
+    _legacy_contact_phone = db.Column(
+        'contact_phone',
         db.String,
         nullable=False,
         default=''
@@ -298,8 +300,12 @@ class Reservation(Serializer, db.Model):
         return self.is_accepted & ~(self.is_rejected | self.is_cancelled)
 
     @property
-    def booked_for_user_email(self):
+    def contact_email(self):
         return self.booked_for_user.email if self.booked_for_user else None
+
+    @property
+    def contact_phone(self):
+        return self.booked_for_user.phone if self.booked_for_user else None
 
     @property
     def contact_emails(self):
