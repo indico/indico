@@ -16,8 +16,10 @@
 
 from __future__ import unicode_literals
 
+from uuid import uuid4
+
 from sqlalchemy import inspect
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.session import object_session
@@ -64,6 +66,12 @@ class Survey(db.Model):
         db.String,
         nullable=False
     )
+    uuid = db.Column(
+        UUID,
+        unique=True,
+        nullable=False,
+        default=lambda: unicode(uuid4())
+    )
     # An introduction text for users of the survey
     introduction = db.Column(
         db.Text,
@@ -81,6 +89,12 @@ class Survey(db.Model):
         db.Boolean,
         nullable=False,
         default=True
+    )
+    # #: Whether the survey is only for selected users
+    private = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     #: Maximum number of submissions allowed
     submission_limit = db.Column(

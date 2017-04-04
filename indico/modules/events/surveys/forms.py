@@ -18,16 +18,18 @@ from __future__ import unicode_literals
 
 from datetime import time
 
+from flask import request, session
 from markupsafe import escape
-from wtforms.fields import StringField, TextAreaField, BooleanField
+from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, HiddenField
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import DataRequired, Optional, NumberRange
 
 from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
+from indico.util.placeholders import render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoDateTimeField, EmailListField, FileField
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
 from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime, UsedIf
 from indico.util.i18n import _
 
@@ -47,6 +49,8 @@ class SurveyForm(IndicoForm):
     submission_limit = IntegerField(_("Capacity"),
                                     [HiddenUnless('limit_submissions'), DataRequired(), NumberRange(min=1)],
                                     description=_("Maximum number of submissions accepted"))
+    private = BooleanField(_("Private survey"), widget=SwitchWidget(),
+                           description=_("Only selected people can answer the survey."))
     notifications_enabled = BooleanField(_('Enabled'), widget=SwitchWidget(),
                                          description=_('Send email notifications for specific events related to the '
                                                        'survey.'))
@@ -115,3 +119,22 @@ class ImportQuestionnaireForm(IndicoForm):
     json_file = FileField(_('File'), accepted_file_types="application/json,.json",
                           description=_("Choose a previously exported survey content to import. "
                                         "Existing sections will be preserved."))
+
+
+class EmailPeopleForm(IndicoForm):
+    from_address = SelectField(_('From'), [DataRequired()])
+    subject = StringField(_('Subject'), [DataRequired()])
+    body = TextAreaField(_('Email body'), [DataRequired()], widget=CKEditorWidget(simple=True))
+    recipients = EmailListField(_('Recipients'), [DataRequired()], description=_('One email address per line.'))
+    copy_for_sender = BooleanField(_('Send copy to me'), widget=SwitchWidget())
+    submitted = HiddenField()
+
+    def __init__(self, *args, **kwargs):
+        super(EmailPeopleForm, self).__init__(*args, **kwargs)
+        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
+                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
+        self.from_address.choices = zip(from_addresses, from_addresses)
+        self.body.description = render_placeholder_info('survey-link-email', event=None, survey=None)
+
+    def is_submitted(self):
+        return super(EmailPeopleForm, self).is_submitted() and 'submitted' in request.form

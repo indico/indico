@@ -1,6 +1,38 @@
 {% extends 'events/surveys/management/_survey_base.html' %}
 
 {% block content %}
+    {% if survey.private and survey.state.name in ('active_and_clean', 'active_and_answered') %}
+        <div class="action-box highlight">
+            <div class="section">
+                <div class="icon icon-lock"></div>
+                <div class="text">
+                    <div class="label">
+                        {%- trans %}The survey is private{% endtrans -%}
+                    </div>
+                    {% trans -%}
+                        The survey is accessible only by people with this
+                    {%- endtrans %}
+                    <a href="{{ url_for('.display_survey_form', survey, token=survey.uuid, _external=True) }}"
+                       class="js-copy-to-clipboard"
+                       title="{% trans %}Copy link to clipboard{% endtrans %}"
+                       data-clipboard-text="{{ url_for('.display_survey_form', survey, token=survey.uuid, _external=True) }}"
+                       data-clipboard-action="copy">
+                        {%- trans %}link{% endtrans -%}
+                    </a>
+                </div>
+                <div class="toolbar">
+                    <a href="#" class="i-button icon-mail right highlight js-requires-selected-row send-mails-btn"
+                       data-href="{{ url_for('surveys.send_links', survey) }}"
+                       data-title="{% trans %}Send survey links{% endtrans %}"
+                       data-method="POST"
+                       data-ajax-dialog>
+                        {%- trans %}Send links{% endtrans -%}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% if survey.state.name == 'not_ready' %}
         {% include 'events/surveys/management/survey_actions/not_ready.html' %}
     {% elif survey.state.name == 'ready_to_open' %}
