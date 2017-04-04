@@ -221,27 +221,35 @@ ${ form.repeat_interval(type='hidden') }
             var startDate = $('#sDatePlace').datepicker('getDate');
             var endDate = $('#eDatePlace').datepicker('getDate');
             var selectedDaysPeriod = (endDate - startDate) / oneDay;
-            var selectedRooms = $("#roomselector").roomselector("selection");
+            var selectedRooms;
+            % if serializable_room:
+                // Individual booking
+                selectedRooms = [${ serializable_room | j, n }];
+            % else:
+                // Multiple select booking
+                var selectedRoomsIndexes = $("#roomselector").roomselector("selection");
+                selectedRooms = _.map(selectedRoomsIndexes, function(i) { return rooms[i]; });
+            % endif
             var selectedNotLimitedRooms = _.clone(selectedRooms);
             var limitedRoomsInvalid = [];
-            for (var i = 0; selectedDaysPeriod >= 0 && i < selectedRooms.length; i++) {
-                var roomBookingLimit = rooms[selectedRooms[i]].booking_limit_days;
+            _.each(selectedRooms, function(room) {
+                var roomBookingLimit = room.booking_limit_days;
                 if (roomBookingLimit) {
-                    selectedNotLimitedRooms.splice(selectedNotLimitedRooms.indexOf(selectedRooms[i]), 1);
+                    selectedNotLimitedRooms.splice(selectedNotLimitedRooms.indexOf(room), 1);
                     if (selectedDaysPeriod > roomBookingLimit) {
-                        limitedRoomsInvalid.push(rooms[selectedRooms[i]]);
+                        limitedRoomsInvalid.push(room);
                     }
                 }
-            }
+            });
             handleLimitedRoomsInvalid(limitedRoomsInvalid);
             if (selectedNotLimitedRooms.length) {
                 var bookingDaysLimit = ${ booking_limit };
                 var isLimitExceeded = endDate > startDate && selectedDaysPeriod > bookingDaysLimit;
                 $('.booking-limit-warning').toggleClass('hidden', !isLimitExceeded);
-                $('#searchForm :submit').prop('disabled', isLimitExceeded);
+                $('#searchForm :submit, #bookingForm :submit').prop('disabled', isLimitExceeded);
             } else {
                 $('.booking-limit-warning').addClass('hidden');
-                $('#searchForm :submit').prop('disabled', !!limitedRoomsInvalid.length);
+                $('#searchForm :submit, #bookingForm :submit').prop('disabled', !!limitedRoomsInvalid.length);
             }
         }
 
