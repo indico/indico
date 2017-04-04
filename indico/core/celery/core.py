@@ -36,6 +36,7 @@ from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.util.fossilize import clearCache
 from indico.util.string import return_ascii
+from indico.web.flask.stats import request_stats_request_started
 
 
 class IndicoCelery(Celery):
@@ -140,6 +141,7 @@ class IndicoCelery(Celery):
                 stack.enter_context(plugin_context(plugin))
                 clearCache()
                 with stack:
+                    request_stats_request_started()
                     return super(IndicoTask, s).__call__(*args, **kwargs)
 
         self.Task = IndicoTask

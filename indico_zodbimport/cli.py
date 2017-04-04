@@ -38,6 +38,7 @@ from indico.core.plugins import plugin_engine
 from indico.modules.users.models.users import User
 from indico.util.console import cformat, clear_line
 from indico.util.decorators import classproperty
+from indico.web.flask.stats import request_stats_request_started, setup_request_stats
 from indico.web.flask.wrappers import IndicoFlask
 from indico_zodbimport.util import UnbreakingDB, get_storage
 
@@ -109,6 +110,7 @@ class Importer(object):
                 ', '.join(plugin_engine.get_failed_plugins(app))))
             sys.exit(1)
         db.init_app(app)
+        setup_request_stats(app)
         if self.dblog:
             app.debug = True
             apply_db_loggers(app)
@@ -123,6 +125,8 @@ class Importer(object):
             self.tz = pytz.utc
 
         with app.app_context():
+            request_stats_request_started()
+
             if not self.pre_check():
                 sys.exit(1)
 

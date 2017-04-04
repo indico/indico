@@ -49,15 +49,16 @@
     {{ body|safe }}
 </body>
 </html>
+{%- set req_stats = get_request_stats() %}
 <!--
-Worker: {{ indico_config.WorkerName }}
-{%- if config.DEBUG or (session.user and session.user.is_admin) %}
-{%- if config.DEBUG %}
-Queries: {{ g.get('sql_query_count', 0) }}
+Queries:         {{ req_stats.query_count }}
+Duration (sql):  {{ '%.06fs'|format(req_stats.query_duration) }}
+Duration (req):  {{ '%.06fs'|format(req_stats.req_duration) }}
+{%- if session.user and session.user.is_admin %}
+Worker:          {{ indico_config.WorkerName }}
 {%- endif %}
-Endpoint: {{ request.endpoint }}
+Endpoint:        {{ request.endpoint }}
 {%- if g.rh %}
-RH: {{ g.rh.__class__.__module__ }}.{{ g.rh.__class__.__name__ }}
-{%- endif %}
+RH:              {{ g.rh.__class__.__module__ }}.{{ g.rh.__class__.__name__ }}
 {%- endif %}
 -->
