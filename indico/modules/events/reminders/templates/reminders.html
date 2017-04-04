@@ -12,7 +12,7 @@
         {% for reminder in reminders %}
             <li>
                 <strong>
-                    <a href="#" data-href="{{ url_for('.edit', reminder) }}"
+                    <a data-href="{{ url_for('.edit', reminder) }}"
                        data-title="{{ _("Reminder details") if reminder.is_sent else _("Edit reminder")}}"
                        data-ajax-dialog
                        data-reload-after>
