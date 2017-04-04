@@ -19,16 +19,12 @@ from __future__ import print_function, unicode_literals
 import os
 import sys
 import time
-import warnings
 from operator import itemgetter
 from pkg_resources import iter_entry_points
 
 import click
 import pytz
-from flask.exthook import ExtDeprecationWarning
 from sqlalchemy.sql import func, select
-
-warnings.simplefilter('ignore', ExtDeprecationWarning)  # some of our dependencies still use flask.ext :(
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
