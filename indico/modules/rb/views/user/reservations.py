@@ -165,6 +165,8 @@ class WPRoomBookingNewBookingSimple(WPRoomBookingNewBookingBase):
             params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
         else:
             params['calendar'] = ''
+        params['serializable_room'] = Room.get(params['room'].id).to_serializable('__public_exhaustive__')
+        params['booking_limit'] = rb_settings.get('booking_limit')
         return WTemplated('RoomBookingBookingForm').getHTML(params)
 
 
@@ -180,4 +182,6 @@ class WPRoomBookingModifyBooking(WPRoomBookingBase):
                                              repeat_frequency=params['repeat_frequency'],
                                              repeat_interval=params['repeat_interval'])
         params['calendar'] = calendar.render(show_navbar=False, details_in_new_tab=True)
+        params['serializable_room'] = Room.get(params['room'].id).to_serializable('__public_exhaustive__')
+        params['booking_limit'] = rb_settings.get('booking_limit')
         return WTemplated('RoomBookingBookingForm').getHTML(params)
