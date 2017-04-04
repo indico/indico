@@ -53,6 +53,7 @@ from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum, crc32, slugify
 from indico.web.assets import (core_env, register_all_css, register_all_js, register_theme_sass,
                                include_js_assets, include_css_assets)
+from indico.web.flask.stats import setup_request_stats, get_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
                                          subclassof, call_template_hook, groupby, strip_tags)
 from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
@@ -187,6 +188,7 @@ def setup_jinja(app):
     app.add_template_global(render_session_bar)
     app.add_template_global(lambda: 'custom_js' in core_env, 'has_custom_js')
     app.add_template_global(lambda: 'custom_sass' in core_env, 'has_custom_sass')
+    app.add_template_global(get_request_stats)
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
@@ -370,6 +372,7 @@ def make_app(set_path=False, testing=False):
     mm.init_app(app)
     extend_url_map(app)
     add_handlers(app)
+    setup_request_stats(app)
     add_blueprints(app)
     Logger.init_app(app)
     plugin_engine.init_app(app, Logger.get('plugins'))

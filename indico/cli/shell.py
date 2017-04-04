@@ -34,12 +34,12 @@ from indico.core import signals
 from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import db
-from indico.core.db.sqlalchemy.logging import db_logger_request_started
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
 from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
+from indico.web.flask.stats import request_stats_request_started
 from indico.web.flask.util import IndicoConfigWrapper
 
 
@@ -134,7 +134,7 @@ def shell_cmd(verbose, with_req_context):
         sys.exit(1)
 
     current_app.config['REPL'] = True  # disables e.g. memoize_request
-    db_logger_request_started(current_app)
+    request_stats_request_started()
     context, info = _make_shell_context()
     banner = cformat('%{yellow!}Indico v{} is ready for your commands').format(indico.__version__)
     if verbose:

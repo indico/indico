@@ -28,6 +28,7 @@ from sqlalchemy.event import listens_for
 
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
+from indico.web.flask.stats import get_request_stats
 
 
 def _prettify_sql(statement):
@@ -116,12 +117,6 @@ def apply_db_loggers(app):
                                                                      'sql_source': source,
                                                                      'sql_duration': total,
                                                                      'sql_verb': statement.split()[0]})
-        g.sql_query_count = g.get('sql_query_count', 0) + 1
-        g.req_query_duration = g.get('req_query_duration', 0) + total
-
-    @request_started.connect_via(app)
-    def on_request_started(sender, **kwargs):
-        db_logger_request_started(app)
 
     @appcontext_tearing_down.connect_via(app)
     @request_tearing_down.connect_via(app)
@@ -129,28 +124,14 @@ def apply_db_loggers(app):
         if g.get('req_end_sent'):
             return
         g.req_end_sent = True
-        query_count = g.get('sql_query_count', 0)
-        if not query_count:
+        stats = get_request_stats()
+        if not stats['query_count']:
             return
-        duration = (time.time() - g.req_start_ts) if 'req_start_ts' in g else 0
         logger.debug('Request finished', extra={'sql_log_type': 'end_request',
-                                                'sql_query_count': query_count,
+                                                'sql_query_count': stats['query_count'],
                                                 'repl': app.config.get('REPL'),
                                                 'req_verb': request.method if has_request_context() else None,
                                                 'req_url': request.url if has_request_context() else None,
                                                 'req_path': request.path if has_request_context() else None,
-                                                'req_duration': duration,
-                                                'req_query_duration': g.req_query_duration})
-
-
-def db_logger_request_started(app):
-    """Run DB-logger specific request-start code.
-
-    This should be called from all places that will run loggable
-    queries, even if no actual request context is used.
-    """
-    if not app.debug:
-        return
-    g.req_query_duration = 0.0
-    g.req_start_ts = time.time()
-    g.req_start_sent = False
+                                                'req_duration': stats['req_duration'],
+                                                'req_query_duration': stats['query_duration']})
