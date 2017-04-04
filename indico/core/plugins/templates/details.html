@@ -1,5 +1,5 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, form_fieldset %}
 
 {% block title %}{{ plugin.title }}{% endblock %}
 
@@ -18,7 +18,15 @@
         {% trans %}This plugin does not have any settings.{% endtrans %}
     {% else %}
         {{ form_header(form) }}
-        {{ form_rows(form, widget_attrs=plugin.settings_form_field_opts) }}
+        {% if form._fieldsets %}
+            {% for legend, fields in form._fieldsets %}
+                {% call form_fieldset(legend) %}
+                    {{ form_rows(form, fields=fields) }}
+                {% endcall %}
+            {% endfor %}
+        {% else %}
+            {{ form_rows(form, widget_attrs=plugin.settings_form_field_opts) }}
+        {% endif %}
         {% call form_footer(form) %}
             <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
             <a href="{{ back_url }}" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</a>
