@@ -32,6 +32,15 @@
                 handleFlashes(response, true);
             });
 
+            $('#upload-images').on('submit', function(evt) {
+                $.each(dropzone.getRejectedFiles(), function(i, file) {
+                    dropzone.removeFile(file);
+                });
+                // prevent regular form submission - when selecting only invalid files the form was
+                // submitted normally (not even ajax) resulting in ugly json being shown to the user
+                evt.preventDefault();
+            });
+
             $('.image-container').on('indico:confirmed', '.menu .delete', function(e) {
                 var $this = $(this);
                 e.preventDefault();
