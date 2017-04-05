@@ -55,6 +55,7 @@ class RHImages(RHManageImagesBase):
 class RHImageUpload(RHManageImagesBase):
     def _process(self):
         files = request.files.getlist('image')
+        num = 0
         for f in files:
             filename = secure_filename(f.filename, 'image')
             data = BytesIO()
@@ -66,15 +67,21 @@ class RHImageUpload(RHManageImagesBase):
                 # Invalid image data
                 continue
             data.seek(0)
-            if image_type not in {'jpeg', 'gif', 'png'}:
+            # XXX: mpo is basically JPEG and JPEGs from some cameras are (wrongfully) detected as mpo
+            if image_type == 'mpo':
+                image_type = 'jpeg'
+            elif image_type not in {'jpeg', 'gif', 'png'}:
+                flash(_("The image '{name}' has an invalid type ({type}); only JPG, GIF and PNG are allowed.")
+                      .format(name=f.filename, type=image_type), 'error')
                 continue
             content_type = 'image/' + image_type
             image = ImageFile(event_new=self.event_new, filename=filename, content_type=content_type)
             image.save(data)
+            num += 1
             db.session.flush()
             logger.info('Image %s uploaded by %s', image, session.user)
             signals.event_management.image_created.send(image, user=session.user)
-        flash(ngettext("The image has been uploaded", "{count} images have been uploaded", len(files))
+        flash(ngettext("The image has been uploaded", "{count} images have been uploaded", num)
               .format(count=len(files)), 'success')
         return jsonify_data(image_list=_render_image_list(self.event_new))
 

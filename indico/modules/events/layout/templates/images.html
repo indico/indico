@@ -29,6 +29,7 @@
                     dropzone.removeAllFiles();
                 }, 2000);
                 $('.image-container').html(response.image_list);
+                handleFlashes(response, true);
             });
 
             $('.image-container').on('indico:confirmed', '.menu .delete', function(e) {
