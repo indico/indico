@@ -26,3 +26,6 @@ _bp.add_url_rule('/admin/settings/', 'settings', RHSettings, methods=('GET', 'PO
 
 # TODO: replace with an actual admin dashboard at some point
 _bp.add_url_rule('/admin/', 'admin_dashboard', view_func=redirect_view('.settings'))
+
+# Allow loadbalancers etc to easily check whether the service is alive
+_bp.add_url_rule('/ping', 'ping', lambda: ('', 204))
