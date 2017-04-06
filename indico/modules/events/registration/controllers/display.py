@@ -123,7 +123,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                  .options(subqueryload('data').joinedload('field_data'),
                           contains_eager('registration_form')))
         registrations = sorted(_deduplicate_reg_data(_process_registration(reg, column_names) for reg in query),
-                               key=lambda x: x['columns'])
+                               key=lambda reg: tuple(x['text'].lower() for x in reg['columns']))
         return {'headers': headers,
                 'rows': registrations,
                 'show_checkin': any(registration['checked_in'] for registration in registrations)}
