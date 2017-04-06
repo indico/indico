@@ -31,7 +31,7 @@ from indico.modules.events.abstracts.lists import AbstractListGeneratorManagemen
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, judge_abstract)
-from indico.modules.events.abstracts.schemas import abstracts_schema
+from indico.modules.events.abstracts.schemas import abstracts_schema, abstract_review_questions_schema
 from indico.modules.events.abstracts.util import make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType
@@ -188,14 +188,16 @@ class RHAbstractsExportJSON(RHManageAbstractsActionsBase):
                                joinedload('accepted_track'),
                                joinedload('accepted_contrib_type'),
                                joinedload('submitted_contrib_type'),
+                               subqueryload('comments'),
                                subqueryload('field_values'),
                                subqueryload('submitted_for_tracks'),
                                subqueryload('reviewed_for_tracks'),
                                subqueryload('person_links'),
-                               subqueryload('reviews').joinedload('ratings'))
+                               subqueryload('reviews').joinedload('ratings').joinedload('question'))
 
     def _process(self):
-        sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
-        response = jsonify(version=1, abstracts=abstracts_schema.dump(sorted_abstracts).data)
+        abstracts = abstracts_schema.dump(sorted(self.abstracts, key=attrgetter('friendly_id'))).data
+        questions = abstract_review_questions_schema.dump(self.event_new.abstract_review_questions).data
+        response = jsonify(version=1, abstracts=abstracts, questions=questions)
         response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
         return response

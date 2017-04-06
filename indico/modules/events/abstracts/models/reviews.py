@@ -45,6 +45,8 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
     revision_attr = 'abstract'
     group_attr = 'track'
 
+    marshmallow_aliases = {'_comment': 'comment'}
+
     __tablename__ = 'abstract_reviews'
     __table_args__ = (db.UniqueConstraint('abstract_id', 'user_id', 'track_id'),
                       db.CheckConstraint("proposed_action = {} OR (proposed_contribution_type_id IS NULL)"

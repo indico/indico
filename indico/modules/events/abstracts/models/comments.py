@@ -30,6 +30,7 @@ from indico.util.string import format_repr, return_ascii, text_to_repr
 class AbstractComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
     __tablename__ = 'abstract_comments'
     __table_args__ = {'schema': 'event_abstracts'}
+    marshmallow_aliases = {'_text': 'text'}
     user_backref_name = 'abstract_comments'
     user_modified_backref_name = 'modified_abstract_comments'
 
