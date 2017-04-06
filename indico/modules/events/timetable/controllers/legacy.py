@@ -111,6 +111,9 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
 
     def _process(self):
         defaults = self._get_form_defaults(location_parent=self.session_block)
+        contrib_duration = self.session_block.session.default_contribution_duration if self.session_block else None
+        if contrib_duration:
+            defaults.duration = contrib_duration
         form = ContributionEntryForm(obj=defaults, to_schedule=True, **self._get_form_params())
         if form.validate_on_submit():
             contrib = Contribution()
