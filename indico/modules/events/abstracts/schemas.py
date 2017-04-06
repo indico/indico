@@ -20,12 +20,54 @@ from marshmallow.fields import Nested, Float
 
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.comments import AbstractComment
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
+from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.contributions.schemas import contribution_type_schema_basic, ContributionFieldValueSchema
 from indico.modules.events.schemas import PersonLinkSchema
 from indico.modules.events.tracks.schemas import track_schema_basic
 from indico.modules.users.schemas import UserSchema
 
 _basic_abstract_fields = ('id', 'friendly_id', 'title')
+
+
+class AbstractCommentSchema(mm.ModelSchema):
+    user = Nested(UserSchema)
+    modified_by = Nested(UserSchema)
+
+    class Meta:
+        model = AbstractComment
+        fields = ('id', 'visibility', 'text',
+                  'created_dt', 'user',
+                  'modified_dt', 'modified_by')
+
+
+class AbstractReviewQuestionSchema(mm.ModelSchema):
+    class Meta:
+        model = AbstractReviewQuestion
+        fields = ('id', 'no_score', 'position', 'text')
+
+
+class AbstractReviewRatingSchema(mm.ModelSchema):
+    class Meta:
+        model = AbstractReviewRating
+        fields = ('question', 'value')
+
+
+class AbstractReviewSchema(mm.ModelSchema):
+    track = Nested(track_schema_basic)
+    user = Nested(UserSchema)
+    proposed_related_abstract = Nested('AbstractSchema', only=_basic_abstract_fields)
+    proposed_contrib_type = Nested(contribution_type_schema_basic, attribute='proposed_contribution_type')
+    proposed_tracks = Nested(track_schema_basic, many=True)
+    ratings = Nested(AbstractReviewRatingSchema, many=True)
+
+    class Meta:
+        model = AbstractReview
+        fields = ('id', 'track', 'user', 'comment', 'created_dt', 'modified_dt',
+                  'proposed_action', 'proposed_contrib_type', 'proposed_related_abstract', 'proposed_tracks',
+                  'ratings')
 
 
 class AbstractSchema(mm.ModelSchema):
@@ -42,7 +84,8 @@ class AbstractSchema(mm.ModelSchema):
     persons = Nested(PersonLinkSchema, attribute='person_links', many=True)
     custom_fields = Nested(ContributionFieldValueSchema, attribute='field_values', many=True)
     score = Float()
-    # XXX: should we add comments and reviews too at some point?
+    comments = Nested(AbstractCommentSchema, many=True)
+    reviews = Nested(AbstractReviewSchema, many=True)
 
     class Meta:
         model = Abstract
@@ -56,7 +99,8 @@ class AbstractSchema(mm.ModelSchema):
                   'accepted_track', 'submitted_for_tracks', 'reviewed_for_tracks',
                   'duplicate_of', 'merged_into',
                   'persons', 'custom_fields',
-                  'score')
+                  'score', 'comments', 'reviews')
 
 
 abstracts_schema = AbstractSchema(many=True)
+abstract_review_questions_schema = AbstractReviewQuestionSchema(many=True)
