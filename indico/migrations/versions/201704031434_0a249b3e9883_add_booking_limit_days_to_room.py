@@ -1,7 +1,7 @@
 """Add booking_limit_days to Room
 
 Revision ID: 0a249b3e9883
-Revises: e185a5089262
+Revises: eb58b6e68c19
 Create Date: 2017-03-15 15:52:04.558105
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '0a249b3e9883'
-down_revision = '6c744b2be8cf'
+down_revision = 'eb58b6e68c19'
 branch_labels = None
 depends_on = None
 
