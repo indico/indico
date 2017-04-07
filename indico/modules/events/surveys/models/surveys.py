@@ -220,10 +220,11 @@ class Survey(db.Model):
         return {'confId': self.event_id,
                 'survey_id': self.id}
 
-    @locator.uuid
+    @locator.token
     def locator(self):
-        """A locator that uses uuid instead of id"""
-        return dict(self.locator, token=self.uuid)
+        """A locator that adds the UUID if the survey is private"""
+        token = self.uuid if self.private else None
+        return dict(self.locator, token=token)
 
     @property
     def state(self):
