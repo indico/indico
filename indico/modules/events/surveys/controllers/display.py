@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, flash, session, request
 from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import MultiDict
-from werkzeug.exceptions import Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -76,6 +76,9 @@ class RHSubmitSurveyBase(RHSurveyBaseDisplay):
         if self.survey.require_user and not session.user:
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to answer a survey '
                                                                 'that requires you to be logged in')))
+        if self.survey.private and request.args.get('token') != self.survey.uuid and not self.submission:
+            # We don't use forbidden since that would redirect to login - but logging in won't help here
+            raise NotFound
 
     def _checkParams(self, params):
         RHSurveyBaseDisplay._checkParams(self, params)
