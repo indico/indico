@@ -36,7 +36,7 @@ from indico.util.console import cformat, clear_line
 from indico.util.decorators import classproperty
 from indico.web.flask.stats import request_stats_request_started, setup_request_stats
 from indico.web.flask.wrappers import IndicoFlask
-from indico_zodbimport.util import UnbreakingDB, get_storage
+from indico_zodbimport.util import UnbreakingDB, get_storage, patch_makac
 
 click.disable_unicode_literals_warning = True
 
@@ -53,6 +53,7 @@ def cli(ctx, **kwargs):
     ZODB URI (both zeo:// and file:// work).
     """
     ctx.obj = kwargs
+    patch_makac()
 
 
 class Importer(object):

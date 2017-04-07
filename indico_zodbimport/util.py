@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import errno
+import importlib
 import os
 import re
 import sys
@@ -298,3 +299,23 @@ class LocalFileImporterMixin(object):
                 return self.symlink_backend, symlink_name, size
             else:
                 return self.storage_backend, rel_path, size
+
+
+def patch_makac():
+    """
+    For some reason iterating over conferences is abysmally slow
+    (3-4 times slower) with the MaKaC package gone so we use a
+    custom import hook to make all the `indico.legacy` packages
+    importable as `MaKaC`
+    """
+    class MakacImporter(object):
+        def find_module(self, fullname, path=None):
+            if fullname.startswith('MaKaC'):
+                return self
+            return None
+
+        def load_module(self, fullname):
+            sys.modules[fullname] = mod = importlib.import_module(fullname.replace('MaKaC', 'indico.legacy'))
+            return mod
+
+    sys.meta_path.append(MakacImporter())
