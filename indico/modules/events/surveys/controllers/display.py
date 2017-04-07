@@ -107,6 +107,7 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             submission.submitted_dt = now_utc()
             submission.is_submitted = True
             submission.pending_answers = {}
+            db.session.flush()
             save_submitted_survey_to_session(submission)
             self.survey.send_submission_notification(submission)
             flash(_('The survey has been submitted'), 'success')
@@ -140,7 +141,6 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
         for question in survey.questions:
             answer = SurveyAnswer(question=question, data=getattr(form, 'question_{}'.format(question.id)).data)
             self.submission.answers.append(answer)
-        db.session.flush()
         return self.submission
 
 

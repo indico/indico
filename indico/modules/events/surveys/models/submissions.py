@@ -20,7 +20,6 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
-from indico.util.date_time import now_utc
 from indico.util.string import return_ascii
 
 
