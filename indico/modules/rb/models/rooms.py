@@ -60,7 +60,8 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         'id', 'name', 'location_name', 'floor', 'number', 'building',
         'booking_url', 'capacity', 'comments', 'owner_id', 'details_url',
         'large_photo_url', 'small_photo_url', 'has_photo', 'is_active',
-        'is_reservable', 'is_auto_confirm', 'marker_description', 'kind'
+        'is_reservable', 'is_auto_confirm', 'marker_description', 'kind',
+        'booking_limit_days'
     ]
 
     __public_exhaustive__ = __public__ + [
@@ -182,6 +183,9 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         default=True
     )
     max_advance_days = db.Column(
+        db.Integer
+    )
+    booking_limit_days = db.Column(
         db.Integer
     )
 

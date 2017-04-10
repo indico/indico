@@ -44,6 +44,9 @@
     <div id="notifications_enabledCH" class="tip">
         ${ _("Enable/disable reminders for this room") }
     </div>
+    <div id="booking_limit_daysCH" class="tip">
+        ${ _("Maximum number of days a booking for this room may last") }
+    </div>
     <div id="key_locationCH" class="tip">
         ${ _("How to obtain a key. Typically a phone number.") }
     </div>
@@ -160,11 +163,14 @@
                                 <%
                                     fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
                                               'notification_for_assistance', 'notification_before_days',
-                                              'notification_for_responsible','notifications_enabled']
+                                              'notification_for_responsible','notifications_enabled',
+                                              'booking_limit_days']
                                     reminder_fields = {'notification_before_days', 'notification_for_responsible',
                                                        'notifications_enabled'}
                                     field_args = {
-                                        'notification_before_days': dict(style='width: 20px;', maxlength=1)
+                                        'notification_before_days': dict(style='width: 20px;', maxlength=1),
+                                        'booking_limit_days': dict(style='width: 40px;',
+                                                                   placeholder=rb_settings.get('booking_limit'))
                                     }
                                 %>
                                 % for field in fields:

@@ -39,7 +39,7 @@
         % if room and room.max_advance_days:
             <div class="info-message-box">
                 <div class="message-text">
-                    ${ _('This room can only be booked {0} days in advance'.format(room.max_advance_days)) }
+                    ${ _('This room can only be booked {0} days in advance').format(room.max_advance_days) }
                 </div>
             </div>
         % endif
@@ -61,6 +61,14 @@
                 </div>
             </div>
         % endif
+        <div class="error-message-box booking-limit-warning hidden">
+            <div class="message-text">
+                ${_('It is not possible to book the selected rooms for more than {0} days').format(booking_limit) }
+            </div>
+        </div>
+        <div class="error-message-box booking-limit-room-warning hidden">
+            <div class="message-text"></div>
+        </div>
     </div>
 </div>
 
@@ -208,6 +216,55 @@ ${ form.repeat_interval(type='hidden') }
             }
         }
 
+        function checkBookingLimit() {
+            var oneDay = 86400 * 1000;
+            var startDate = $('#sDatePlace').datepicker('getDate');
+            var endDate = $('#eDatePlace').datepicker('getDate');
+            var selectedDaysPeriod = (endDate - startDate) / oneDay;
+            var selectedRooms;
+            % if serializable_room:
+                // Individual booking
+                selectedRooms = [${ serializable_room | j, n }];
+            % else:
+                // Multiple select booking
+                var selectedRoomsIndexes = $("#roomselector").roomselector("selection");
+                selectedRooms = _.map(selectedRoomsIndexes, function(i) { return rooms[i]; });
+            % endif
+            var selectedNotLimitedRooms = _.clone(selectedRooms);
+            var limitedRoomsInvalid = [];
+            _.each(selectedRooms, function(room) {
+                var roomBookingLimit = room.booking_limit_days;
+                if (roomBookingLimit) {
+                    selectedNotLimitedRooms.splice(selectedNotLimitedRooms.indexOf(room), 1);
+                    if (selectedDaysPeriod > roomBookingLimit) {
+                        limitedRoomsInvalid.push(room);
+                    }
+                }
+            });
+            handleLimitedRoomsInvalid(limitedRoomsInvalid);
+            if (selectedNotLimitedRooms.length) {
+                var bookingDaysLimit = ${ booking_limit };
+                var isLimitExceeded = endDate > startDate && selectedDaysPeriod > bookingDaysLimit;
+                $('.booking-limit-warning').toggleClass('hidden', !isLimitExceeded);
+                $('#searchForm :submit, #bookingForm :submit').prop('disabled', isLimitExceeded);
+            } else {
+                $('.booking-limit-warning').addClass('hidden');
+                $('#searchForm :submit, #bookingForm :submit').prop('disabled', !!limitedRoomsInvalid.length);
+            }
+        }
+
+        function handleLimitedRoomsInvalid(rooms) {
+            if (rooms.length) {
+                var warningMsgRooms = [];
+                _.map(rooms, function(room) {
+                    warningMsgRooms.push("'{0}' for more than {1} days".format(room.name, room.booking_limit_days));
+                });
+                var warningMsg = $T.gettext("It is not possible to book room {0}").format(warningMsgRooms.join(", "));
+                $('.booking-limit-room-warning .message-text').html(warningMsg);
+            }
+            $('.booking-limit-room-warning').toggleClass('hidden', !rooms.length);
+        }
+
         var validEndDates = null;
         var frequencies = {
             '1' : RRule.DAILY,
@@ -254,11 +311,15 @@ ${ form.repeat_interval(type='hidden') }
         $('#sDatePlace').datepicker('option', 'onSelect', function startDateOnSelect(selectedDateText) {
             disableInvalidDays();
             refreshDatePicker($('#eDatePlace'));
-
             selectEndDate();
             commonOnSelect();
+            checkBookingLimit();
         });
-        $('#eDatePlace').datepicker('option', 'onSelect', commonOnSelect);
+
+        $('#eDatePlace').datepicker('option', 'onSelect', function() {
+            commonOnSelect();
+            checkBookingLimit();
+        });
 
         $('#eDatePlace').datepicker('option', 'onChangeMonthYear', disableInvalidDays);
 
@@ -267,6 +328,10 @@ ${ form.repeat_interval(type='hidden') }
 
         $('#repeatability input:radio[name=repeat_frequency]').change(function() {
             checkFrequency();
+        });
+
+        $('#roomselector').on('click', '.ui-multiselect-checkboxes :checkbox, .ui-multiselect-all, .ui-multiselect-none', function() {
+            checkBookingLimit();
         });
 
         checkFrequency();

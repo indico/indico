@@ -24,6 +24,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError, NotFoundError
+from indico.modules.rb import settings as rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
@@ -359,6 +360,12 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
         flash(_(u'Pre-Booking created') if booking.is_pending else _(u'Booking created'), 'success')
         return jsonify(success=True, url=self._get_success_url(booking))
 
+    def _validate_room_booking_limit(self, form, booking_limit_days):
+        day_start_dt = datetime.combine(form.start_dt.data.date(), time())
+        day_end_dt = datetime.combine(form.end_dt.data.date(), time(23, 59))
+        selected_period_days = (day_end_dt - day_start_dt).days
+        return selected_period_days <= booking_limit_days
+
 
 class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
     def _checkParams(self):
@@ -421,6 +428,11 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             only_conflicts = candidate_days <= conflicting_days
 
         if form.validate_on_submit() and not form.submit_check.data:
+            booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+            if not self._validate_room_booking_limit(form, booking_limit_days):
+                msg = (_(u'Bookings for the room "{}" may not be longer than {} days')
+                       .format(room.name, booking_limit_days))
+                return jsonify(success=False, url=url_for('rooms.room_book', room), msg=msg)
             return self._create_booking_response(form, room)
 
         can_override = room.can_be_overridden(session.user)
@@ -556,10 +568,15 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             flexible_days = form.flexible_dates_range.data
             day_start_dt = datetime.combine(form.start_dt.data.date(), time())
             day_end_dt = datetime.combine(form.end_dt.data.date(), time(23, 59))
-
             selected_rooms = [r for r in self._rooms if r.id in form.room_ids.data]
+            selected_period_days = (day_end_dt - day_start_dt).days
+            for room in selected_rooms:
+                booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+                if selected_period_days > booking_limit_days:
+                    flash(_(u'Bookings for the room "{}" may not be longer than {} days')
+                          .format(room.name, booking_limit_days), 'error')
+                    return self._redirect(url_for('rooms.book'))
             occurrences, candidates = self._get_all_occurrences(form.room_ids.data, form, flexible_days)
-
             period_form_defaults = FormDefaults(repeat_interval=form.repeat_interval.data,
                                                 repeat_frequency=form.repeat_frequency.data)
             period_form = self._make_select_period_form(period_form_defaults)
@@ -650,6 +667,12 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 
         if form.validate_on_submit() and not form.submit_check.data:
             try:
+                booking_limit_days = room.booking_limit_days or rb_settings.get('booking_limit')
+                if not self._validate_room_booking_limit(form, booking_limit_days):
+                    msg = (_(u'Bookings for the room "{}" may not be longer than {} days')
+                           .format(room.name, booking_limit_days))
+                    return jsonify(success=False, url=url_for('rooms.roomBooking-modifyBookingForm', self._reservation),
+                                   msg=msg)
                 self._reservation.modify(form.data, session.user)
                 flash(_(u'Booking updated'), 'success')
             except NoReportError as e:
