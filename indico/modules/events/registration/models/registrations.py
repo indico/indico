@@ -66,7 +66,8 @@ class Registration(db.Model):
     """Somebody's registration for an event through a registration form"""
     __tablename__ = 'registrations'
     __table_args__ = (db.CheckConstraint('email = lower(email)', 'lowercase_email'),
-                      db.Index(None, 'friendly_id', 'event_id', unique=True),
+                      db.Index(None, 'friendly_id', 'event_id', unique=True,
+                               postgresql_where=db.text('NOT is_deleted')),
                       db.Index(None, 'registration_form_id', 'user_id', unique=True,
                                postgresql_where=db.text('NOT is_deleted AND (state NOT IN (3, 4))')),
                       db.Index(None, 'registration_form_id', 'email', unique=True,
