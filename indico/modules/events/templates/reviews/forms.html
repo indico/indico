@@ -20,13 +20,11 @@
     {% endcall %}
 
     {% set instructions = proposal.cfp.reviewing_instructions %}
-    {% if instructions %}
-        {% call(link, endlink) render_instruction_box(form_id, instructions, _("Reviewing instructions")) %}
-           {% trans -%}
-               Please don't forget to read the {{ link }}reviewing instructions{{ endlink }} before submitting a review.
-           {%- endtrans %}
-        {% endcall %}
-    {% endif %}
+    {% call(link, endlink) render_instruction_box(form_id, instructions, _("Reviewing instructions")) %}
+       {% trans -%}
+           Please don't forget to read the {{ link }}reviewing instructions{{ endlink }} before submitting a review.
+       {%- endtrans %}
+    {% endcall %}
 
     {% set review_question_rows = form_rows(form, skip=form._order, skip_labels=true) | trim %}
     {% if not review %}
