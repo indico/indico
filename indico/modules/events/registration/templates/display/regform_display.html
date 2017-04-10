@@ -55,24 +55,26 @@
             {% endif %}
         {% endif %}
     {% elif login_required %}
-        <div class="infoline announcement">
-            <span class="icon icon-info"></span>
-            <div class="text">
-                <div class="label">
-                    {%- if regform.moderation_enabled %}
-                        {%- trans %}Account required to apply{% endtrans %}
-                    {%- else %}
-                        {%- trans %}Account required to register{% endtrans %}
-                    {%- endif -%}
+        <div class="action-box highlight">
+            <div class="section">
+                <span class="icon icon-info"></span>
+                <div class="text">
+                    <div class="label">
+                        {%- if regform.moderation_enabled %}
+                            {%- trans %}Account required to apply{% endtrans %}
+                        {%- else %}
+                            {%- trans %}Account required to register{% endtrans %}
+                        {%- endif -%}
+                    </div>
+                    <div>
+                        {%- if regform.moderation_enabled %}
+                            {%- trans %}In order to apply for this event you have to be logged in.{% endtrans %}
+                        {%- else %}
+                            {%- trans %}In order to register for this event you have to be logged in.{% endtrans %}
+                        {%- endif -%}
+                    </div>
                 </div>
-                <div>
-                    {%- if regform.moderation_enabled %}
-                        {%- trans %}In order to apply for this event you have to be logged in.{% endtrans %}
-                    {%- else %}
-                        {%- trans %}In order to register for this event you have to be logged in.{% endtrans %}
-                    {%- endif -%}
-                </div>
-                <div class="toolbar right">
+                <div class="toolbar">
                     <a href="{{ url_for_login(request.relative_url) }}" class="i-button next highlight">
                         {% trans %}Log in to proceed{% endtrans %}
                     </a>

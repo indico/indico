@@ -106,30 +106,3 @@
         list-style-type: none;
     }
 }
-
-.infoline.announcement {
-    @include border-all($blue);
-    background: $light-blue;
-    clear: both;
-    padding: 10px;
-    width: 100%;
-    overflow: visible;
-
-    .icon, .label {
-        color: $blue;
-    }
-
-    .date {
-        font-weight: bold;
-    }
-
-    .text {
-        position: relative;
-    }
-
-    .toolbar {
-        position: absolute;
-        right: 0;
-        top: 0;
-    }
-}
