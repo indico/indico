@@ -25,59 +25,54 @@
     {% set single_regform = regforms|first if regforms|length == 1 else none %}
     {% set is_form_moderated = single_regform.moderation_enabled if single_regform %}
     {% set is_number_published = single_regform.publish_registration_count if single_regform %}
-    <div class="infoline announcement">
-        <span class="icon icon-ticket"></span>
-        <div class="text">
-            <div class="label">
-                {%- if is_form_moderated %}
-                    {%- trans %}Application{% endtrans %}
-                {%- else %}
-                    {%- trans %}Registration{% endtrans %}
-                {%- endif -%}
-            </div>
-            {% if user_registrations %}
-                {% if user_registrations < regforms|length %}
-                    <div>
-                        {% trans %}
-                            You have registered for this event, but there are more registration forms available.
-                        {% endtrans %}
-                    </div>
-                {% else %}
-                    <div>{% trans %}You have registered for this event.{% endtrans %}</div>
-                {%  endif %}
-                <div class="toolbar">
-                    {% if is_number_published %}
-                        <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
-                            {{- single_regform.active_registrations|length }}
-                            {%- if single_regform.registration_limit %}
-                                / {{ single_regform.registration_limit }}
-                            {%- endif -%}
-                        </span>
+    <div class="action-box highlight">
+        <div class="section">
+            <span class="icon icon-ticket"></span>
+            <div class="text">
+                <div class="label">
+                    {%- if is_form_moderated %}
+                        {%- trans %}Application{% endtrans %}
+                    {%- else %}
+                        {%- trans %}Registration{% endtrans %}
+                    {%- endif -%}
+                </div>
+                {% if user_registrations %}
+                    {% if user_registrations < regforms|length %}
+                        <div>
+                            {% trans %}
+                                You have registered for this event, but there are more registration forms available.
+                            {% endtrans %}
+                        </div>
+                    {% else %}
+                        <div>{% trans %}You have registered for this event.{% endtrans %}</div>
                     {%  endif %}
+                {% else %}
+                    <div>
+                        {%- if is_form_moderated %}
+                            {%- trans %}Application for this event is currently open.{% endtrans %}
+                        {%- else %}
+                            {%- trans %}Registration for this event is currently open.{% endtrans %}
+                        {%- endif -%}
+                    </div>
+                {% endif %}
+            </div>
+            <div class="toolbar">
+                {% if is_number_published %}
+                    <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
+                        {{- single_regform.active_registrations|length }}
+                        {%- if single_regform.registration_limit %}
+                            / {{ single_regform.registration_limit }}
+                        {%- endif -%}
+                    </span>
+                {%  endif %}
+                {% if user_registrations %}
                     {{ _render_ticket_dropdown() }}
                     <a class="i-button next highlight"
                        href="{{ url_for('event_registration.display_regform', single_regform) if single_regform else
                                 url_for('event_registration.display_regform_list', event) }}">
                         {% trans %}See details{% endtrans %}
                     </a>
-                </div>
-            {% else %}
-                <div>
-                    {%- if is_form_moderated %}
-                        {%- trans %}Application for this event is currently open.{% endtrans %}
-                    {%- else %}
-                        {%- trans %}Registration for this event is currently open.{% endtrans %}
-                    {%- endif -%}
-                </div>
-                <div class="toolbar">
-                    {% if is_number_published %}
-                        <span class="i-label icon-user" title="{% trans %}Total registrations{% endtrans %}">
-                            {{- single_regform.active_registrations|length }}
-                            {%- if single_regform.registration_limit %}
-                                / {{ single_regform.registration_limit }}
-                            {%- endif -%}
-                        </span>
-                    {%  endif %}
+                {% else %}
                     <a href="{{ url_for('event_registration.display_regform_list', event) }}"
                        class="i-button next highlight">
                         {%- if is_form_moderated %}
@@ -86,8 +81,8 @@
                             {%- trans %}Register now{% endtrans %}
                         {%- endif -%}
                     </a>
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endif %}
