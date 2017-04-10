@@ -16,7 +16,7 @@
 
 import os
 
-from flask import current_app, json, session, render_template, send_from_directory, Response
+from flask import current_app, json, session, render_template, send_from_directory, Response, redirect
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
@@ -28,7 +28,7 @@ from indico.util.i18n import po_to_json
 from indico.util.string import crc32
 from indico.web.assets.util import get_asset_path
 from indico.web.assets.vars_js import generate_global_file
-from indico.web.flask.util import send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -133,3 +133,8 @@ def static_custom(filename):
         raise NotFound
     customization_dir = os.path.join(customization_dir, 'static')
     return send_from_directory(customization_dir, filename)
+
+
+@assets_blueprint.route('!/favicon.ico')
+def favicon():
+    return redirect(url_for('.image', filename='indico.ico'))
