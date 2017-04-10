@@ -14,6 +14,10 @@
         <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
     {% endif %}
 
+    <script>
+        window.CKEDITOR_BASEPATH = {{ url_for('assets.js', filename='lib/ckeditor/')|tojson() }};
+    </script>
+
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
