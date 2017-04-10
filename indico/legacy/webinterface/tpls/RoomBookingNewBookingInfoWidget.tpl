@@ -19,7 +19,7 @@
     <div id="other-user">
         <div class="input-line">
             <input type="radio" name="other_user" id="book-for-me" value="False">
-            <label for="book-for-me">${ _("I'll be using the room") }</label>
+            <label for="book-for-me">${ _("I'll be using the room myself") }</label>
         </div>
         <div class="input-line">
             <input type="radio" name="other_user" id="book-for-someone" value="True">
