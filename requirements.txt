@@ -41,7 +41,7 @@ bleach==1.4.3
 Flask-SQLAlchemy==2.1
 Flask-WTF==0.13
 Flask-BabelEx==0.9.3
-SQLAlchemy==1.1.8
+SQLAlchemy==1.1.9
 WTForms==2.1
 WTForms-Components==0.10.3
 psycopg2==2.7.1
@@ -69,6 +69,6 @@ xlsxwriter==0.9.6
 jsonschema==2.6.0
 html2text==2016.9.19
 marshmallow==2.13.4
-marshmallow-sqlalchemy==0.13.0
+marshmallow-sqlalchemy==0.13.1
 marshmallow-enum==1.0
 flask-marshmallow==0.7.0
