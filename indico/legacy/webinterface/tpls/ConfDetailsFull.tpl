@@ -68,9 +68,8 @@
       <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo }</div>
   </div>
   % endif
-
-  ${ template_hook('conference-home-info', event=conf.as_event) }
   </div>
+  ${ template_hook('conference-home-info', event=conf.as_event) }
 </div>
 
 ${ actions }

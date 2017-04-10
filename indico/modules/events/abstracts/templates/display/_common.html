@@ -1,22 +1,33 @@
 {% macro render_cfa_infoline(event, cfa, show_icon=true, redirect_first=false) %}
     {% set can_submit_abstracts = cfa.is_open or (session.user and cfa.can_submit_abstracts(session.user)) %}
-    <div class="infoline announcement">
-        {% if show_icon %}
-            <span class="icon icon-file-content"></span>
-        {% endif %}
-        <div class="text">
-            {%- if can_submit_abstracts %}
-                <div class="label">
-                    {% if cfa.is_open %}
-                        {%- trans %}The call for abstracts is open{% endtrans -%}
-                    {% else %}
-                        {%- trans %}You have been authorized to submit abstracts{% endtrans -%}
+    <div class="action-box highlight">
+        <div class="section">
+            {% if show_icon %}
+                <span class="icon icon-file-content"></span>
+            {% endif %}
+            <div class="text">
+                {%- if can_submit_abstracts %}
+                    <div class="label">
+                        {% if cfa.is_open %}
+                            {%- trans %}The call for abstracts is open{% endtrans -%}
+                        {% else %}
+                            {%- trans %}You have been authorized to submit abstracts{% endtrans -%}
+                        {% endif %}
+                    </div>
+                    <div>
+                        {%- trans %}You can submit an abstract for reviewing.{% endtrans -%}
+                    </div>
+                {% else %}
+                    <div class="label">{% trans %}The call for abstracts is closed.{% endtrans %}</div>
+                    {% if cfa.modification_end_dt and not cfa.modification_ended and abstracts %}
+                        <div>
+                            {%- trans %}You may still modify your abstracts.{% endtrans -%}
+                        </div>
                     {% endif %}
-                </div>
-                <div>
-                    {%- trans %}You can submit an abstract for reviewing.{% endtrans -%}
-                </div>
-                <div class="toolbar right">
+                {% endif -%}
+            </div>
+            {% if can_submit_abstracts %}
+                <div class="toolbar">
                     {% if session.user and not redirect_first %}
                         <a class="i-button highlight js-show-abstract-form"
                            data-title="{% trans %}Submit new abstract{% endtrans %}"
@@ -33,14 +44,7 @@
                         </a>
                     {% endif %}
                 </div>
-            {% else %}
-                <div class="label">{% trans %}The call for abstracts is closed.{% endtrans %}</div>
-                {% if cfa.modification_end_dt and not cfa.modification_ended and abstracts %}
-                    <div>
-                        {%- trans %}You may still modify your abstracts.{% endtrans -%}
-                    </div>
-                {% endif %}
-            {% endif -%}
+            {% endif %}
         </div>
     </div>
 {% endmacro %}

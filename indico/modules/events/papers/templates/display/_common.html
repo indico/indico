@@ -1,24 +1,30 @@
 {% macro render_cfp_infoline(event, cfp, contributions, show_icon=true) %}
-    <div class="infoline announcement">
-        {% if show_icon %}
-            <span class="icon icon-file-content"></span>
-        {% endif %}
-        <div class="text">
+    <div class="action-box highlight">
+        <div class="section">
+            {% if show_icon %}
+                <span class="icon icon-file-content"></span>
+            {% endif %}
+            <div class="text">
+                {%- if cfp.is_open %}
+                    <div class="label">
+                        {%- trans %}The call for papers is open{% endtrans -%}
+                    </div>
+                    <div>
+                        {% if contributions|length == 1 %}
+                            {% set contrib = contributions|first %}
+                            {% set contrib_title -%}
+                                <strong>{{ '#%d: %s' | format(contrib.friendly_id, contrib.title) | truncate(65) }}</strong>
+                            {%- endset %}
+                            {%- trans %}You can submit your paper for {{ contrib_title }}{% endtrans -%}
+                        {% else %}
+                            {%- trans %}You can submit a paper for reviewing{% endtrans -%}
+                        {% endif %}
+                    </div>
+                {% else %}
+                    <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
+                {% endif -%}
+            </div>
             {%- if cfp.is_open %}
-                <div class="label">
-                    {%- trans %}The call for papers is open{% endtrans -%}
-                </div>
-                <div>
-                    {% if contributions|length == 1 %}
-                        {% set contrib = contributions|first %}
-                        {% set contrib_title -%}
-                            <strong>{{ '#%d: %s' | format(contrib.friendly_id, contrib.title) | truncate(65) }}</strong>
-                        {%- endset %}
-                        {%- trans %}You can submit your paper for {{ contrib_title }}{% endtrans -%}
-                    {% else %}
-                        {%- trans %}You can submit a paper for reviewing{% endtrans -%}
-                    {% endif %}
-                </div>
                 <div class="toolbar">
                     {% if contributions|length == 1 %}
                         {% set contrib = contributions|first %}
@@ -39,9 +45,7 @@
                         </a>
                     {% endif %}
                 </div>
-            {% else %}
-                <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
-            {% endif -%}
+            {% endif %}
         </div>
     </div>
 {% endmacro %}
