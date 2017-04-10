@@ -62,19 +62,24 @@
 
 
 .event-page-header {
+    .main-action-bar {
+        min-height: 50px;
+    }
+
     .button-bar {
-        margin-left: 0.5em;
-        min-height: 24px;
-        min-width: 200px;
+        align-self: stretch;
 
         .i-button {
-            @include _i-button-states(#222, $black, $black, $dark-gray, $light-gray, false);
-
-            padding: 0.5em;
+            @include _i-button-states($black, transparent, transparent, $gray, white, false);
+            @include border-radius(0);
+            padding: 0 0.8em;
+            font-size: 1.1em;
+            margin: 0;
+            border: none;
         }
 
         .separator {
-            margin: 3px 6px 3px 10px;
+            margin: 10px 5px;
             width: 1px;
             border-right: 1px dotted $light-black;
         }
