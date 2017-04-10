@@ -316,9 +316,9 @@ class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
         data = request.json
         required_keys = {'contribution_ids', 'day'}
         allowed_keys = required_keys | {'session_block_id'}
-        if data.viewkeys() > allowed_keys:
+        if set(data.viewkeys()) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > data.viewkeys():
+        elif required_keys > set(data.viewkeys()):
             raise BadRequest('Required keys missing')
         entries = []
         day = dateutil.parser.parse(data['day']).date()

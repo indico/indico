@@ -79,7 +79,7 @@ class XMLSerializer(Serializer):
                 elem = etree.SubElement(felement, 'entry', {'key': unicode(k)})
             else:
                 elem = etree.SubElement(felement, k)
-            if isinstance(v, dict) and v.viewkeys() == {'date', 'time', 'tz'}:
+            if isinstance(v, dict) and set(v.viewkeys()) == {'date', 'time', 'tz'}:
                 v = _deserialize_date(v)
             if isinstance(v, (list, tuple)):
                 onlyDicts = all(type(subv) == dict for subv in v)

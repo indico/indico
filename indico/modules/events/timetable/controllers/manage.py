@@ -99,9 +99,9 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         data = request.json
         required_keys = {'start_dt'}
         allowed_keys = {'start_dt', 'contribution_id', 'session_block_id', 'force'}
-        if data.viewkeys() > allowed_keys:
+        if set(data.viewkeys()) > allowed_keys:
             raise BadRequest('Invalid keys found')
-        elif required_keys > data.viewkeys():
+        elif required_keys > set(data.viewkeys()):
             raise BadRequest('Required keys missing')
         updates = {'start_dt': dateutil.parser.parse(data['start_dt'])}
         if 'contribution_id' in data:
@@ -116,7 +116,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         """Update a timetable entry"""
         data = request.json
         # TODO: support breaks
-        if data.viewkeys() > {'start_dt'}:
+        if set(data.viewkeys()) > {'start_dt'}:
             raise BadRequest('Invalid keys found')
         updates = {}
         if 'start_dt' in data:
@@ -160,7 +160,7 @@ class RHBreakREST(RHManageTimetableBase):
 
     def _process_PATCH(self):
         data = request.json
-        if data.viewkeys() > {'colors'}:
+        if set(data.viewkeys()) > {'colors'}:
             raise BadRequest
         if 'colors' in data:
             colors = ColorTuple(**data['colors'])

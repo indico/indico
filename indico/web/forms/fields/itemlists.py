@@ -215,7 +215,7 @@ class OverrideMultipleItemsField(HiddenField):
                 # e.g. a row removed from field_data that had a value before
                 del self.data[key]
                 continue
-            if values.viewkeys() > self.edit_fields:
+            if set(values.viewkeys()) > self.edit_fields:
                 # e.g. a field that was editable before
                 self.data[key] = {k: v for k, v in values.iteritems() if k in self.edit_fields}
         # Remove anything empty

@@ -67,7 +67,7 @@ def _safe_lower(s):
 @click.option('--affiliation', '-a', help='Affiliation of the user')
 def user_search(substring, include_deleted, include_pending, include_external, **criteria):
     """Searches users matching some criteria"""
-    assert criteria.viewkeys() == {'first_name', 'last_name', 'email', 'affiliation'}
+    assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
     criteria = {k: v for k, v in criteria.viewitems() if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
                        external=include_external, **criteria)

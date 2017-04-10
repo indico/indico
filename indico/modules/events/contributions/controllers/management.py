@@ -241,7 +241,7 @@ class RHContributionREST(RHManageContributionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if data.viewkeys() > {'session_id', 'track_id'}:
+        if set(data.viewkeys()) > {'session_id', 'track_id'}:
             raise BadRequest
         if 'session_id' in data:
             updates.update(self._get_contribution_session_updates(data['session_id']))

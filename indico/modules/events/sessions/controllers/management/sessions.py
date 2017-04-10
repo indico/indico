@@ -142,7 +142,7 @@ class RHSessionREST(RHManageSessionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if data.viewkeys() > {'colors'}:
+        if set(data.viewkeys()) > {'colors'}:
             raise BadRequest
         if 'colors' in data:
             colors = ColorTuple(**data['colors'])

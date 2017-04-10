@@ -390,7 +390,7 @@ def test_get_with_data(db, create_room, create_equipment_type, only_active, data
     assert len(results) == len(rooms) - only_active
     for row in results:
         room = row.pop('room')
-        assert row.viewkeys() == set(data)
+        assert set(row.viewkeys()) == set(data)
         room_type = room_types[room]
         if room_type == 'inactive':
             assert not only_active

@@ -97,10 +97,10 @@ def create_event(category, event_type, data, add_creator_as_manager=True, featur
 
 
 def update_event(event, update_timetable=False, **data):
-    assert data.viewkeys() <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords', 'person_link_data',
-                               'start_dt', 'end_dt', 'timezone', 'keywords', 'references', 'organizer_info',
-                               'additional_info', 'contact_title', 'contact_emails', 'contact_phones',
-                               'start_dt_override', 'end_dt_override'}
+    assert set(data.viewkeys()) <= {'title', 'description', 'url_shortcut', 'location_data', 'keywords',
+                                    'person_link_data', 'start_dt', 'end_dt', 'timezone', 'keywords', 'references',
+                                    'organizer_info', 'additional_info', 'contact_title', 'contact_emails',
+                                    'contact_phones', 'start_dt_override', 'end_dt_override'}
     old_person_links = event.person_links[:]
     if (update_timetable or event.type == EventType.lecture) and 'start_dt' in data:
         # Lectures have no exposed timetable so if we have any timetable entries
@@ -190,7 +190,7 @@ def _log_event_update(event, changes, visible_person_link_changes=False):
         # anyway and allow other code to act on them?
         changes.pop('person_links', None)
     if changes:
-        if changes.viewkeys() <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
+        if set(changes.viewkeys()) <= {'timezone', 'start_dt', 'end_dt', 'start_dt_override', 'end_dt_override'}:
             what = 'Dates'
         elif len(changes) == 1:
             what = log_fields[changes.keys()[0]]
@@ -239,7 +239,7 @@ def _format_person(data):
 
 
 def update_event_protection(event, data):
-    assert data.viewkeys() <= {'protection_mode', 'own_no_access_contact', 'access_key', 'visibility'}
+    assert set(data.viewkeys()) <= {'protection_mode', 'own_no_access_contact', 'access_key', 'visibility'}
     changes = event.populate_from_dict(data)
     db.session.flush()
     signals.event.updated.send(event, changes=changes)
