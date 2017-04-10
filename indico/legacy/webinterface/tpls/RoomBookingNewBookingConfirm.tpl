@@ -78,7 +78,7 @@
 
     <h2 class="group-title">
         <i class="icon-user"></i>
-        ${ _('Booked for user') }
+        ${ _('Usage of the room') }
     </h2>
     <%include file="RoomBookingNewBookingInfoWidget.tpl" args="form=form"/>
 
