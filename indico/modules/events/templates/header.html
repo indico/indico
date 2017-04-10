@@ -28,6 +28,8 @@
         <a class="i-button icon-last" href="{{ url_for('events.display', confId=rel.last) }}"
            title="{% trans %}Newest event{% endtrans %}"></a>
     {% endif %}
+
+    <span class="separator"></span>
 {%- endmacro -%}
 
 
@@ -175,10 +177,6 @@
         <div class="button-bar flexrow f-j-start">
             {% if event.type != 'conference' or show_nav_bar %}
                 {{ _render_nav_bar() }}
-
-                {% if print_url or show_filter_button %}
-                    <span class="separator"></span>
-                {% endif %}
             {% endif %}
 
             {% if print_url %}
