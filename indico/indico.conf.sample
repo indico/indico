@@ -93,7 +93,7 @@ BaseURL = 'https://indico.yourdomain.tld'
 # If you upgraded from an older Indico version (pre-2.0) and want to preserve
 # older URLs you should enable this option to avoid breaking links in search
 # engines and other websites.
-#RouteOldUrls = False
+#RouteOldURLs = False
 
 
 #------------------------------------------------------------------------------

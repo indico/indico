@@ -252,7 +252,7 @@ class Config:
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,
         'UseProxy'                  : False,
-        'RouteOldUrls'              : False,
+        'RouteOldURLs'              : False,
         'CustomCountries'           : {},
         'PDFLatexProgram'           : 'xelatex',
         'StrictLatex'               : True,

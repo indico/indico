@@ -97,7 +97,7 @@ def configure_app(app, set_path=False):
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
     app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
-    app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldUrls()
+    app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldURLs()
     configure_multipass(app)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
