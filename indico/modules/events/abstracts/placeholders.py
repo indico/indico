@@ -184,7 +184,7 @@ class TargetAbstractIDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return unicode(abstract.friendly_id)
+        return unicode(abstract.merged_into.friendly_id)
 
 
 class TargetAbstractTitlePlaceholder(Placeholder):
@@ -193,7 +193,7 @@ class TargetAbstractTitlePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.title
+        return abstract.merged_into.title
 
 
 class TargetSubmitterNamePlaceholder(Placeholder):
@@ -203,7 +203,7 @@ class TargetSubmitterNamePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.submitter.full_name
+        return abstract.merged_into.submitter.full_name
 
 
 class TargetSubmitterFirstNamePlaceholder(Placeholder):
@@ -213,7 +213,7 @@ class TargetSubmitterFirstNamePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.submitter.first_name
+        return abstract.merged_into.submitter.first_name
 
 
 class TargetSubmitterLastNamePlaceholder(Placeholder):
@@ -223,7 +223,7 @@ class TargetSubmitterLastNamePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.submitter.last_name
+        return abstract.merged_into.submitter.last_name
 
 
 class JudgmentCommentPlaceholder(Placeholder):

@@ -115,7 +115,7 @@ def create_mock_abstract(event):
     Contribution = namedtuple('Contribution', ['title', 'track', 'session', 'type', 'locator'])
     Abstract = namedtuple('Abstract', ['friendly_id', 'title', 'event_new', 'submitter', 'contribution',
                                        'primary_authors', 'secondary_authors', 'locator', 'judgment_comment',
-                                       'accepted_track', 'accepted_contrib_type', 'state'])
+                                       'accepted_track', 'accepted_contrib_type', 'state', 'merged_into'])
 
     englert = User(full_name="Fran\xe7ois Englert", first_name="Fran\xe7ois", last_name="Englert", title="Prof.")
     brout = User(full_name="Robert Brout", first_name="Robert", last_name="Brout", title="Prof.")
@@ -132,6 +132,21 @@ def create_mock_abstract(event):
                                 session=session,
                                 type=contribution_type,
                                 locator={'confId': -314, 'contrib_id': 1234})
+
+    target_abstract = Abstract(friendly_id=315,
+                               title="Broken Symmetry",
+                               accepted_track=track,
+                               accepted_contrib_type=contribution_type,
+                               event_new=event,
+                               submitter=brout,
+                               state=AbstractState.accepted,
+                               contribution=contribution,
+                               primary_authors=[englert, brout],
+                               secondary_authors=[guralnik, hagen, kibble, higgs],
+                               locator={'confId': -314, 'abstract_id': 1235},
+                               judgment_comment='Vague but interesting!',
+                               merged_into=None)
+
     abstract = Abstract(friendly_id=314,
                         title="Broken Symmetry and the Mass of Gauge Vector Mesons",
                         accepted_track=track,
@@ -143,7 +158,8 @@ def create_mock_abstract(event):
                         primary_authors=[englert, brout],
                         secondary_authors=[guralnik, hagen, kibble, higgs],
                         locator={'confId': -314, 'abstract_id': 1234},
-                        judgment_comment='Vague but interesting!')
+                        judgment_comment='Vague but interesting!',
+                        merged_into=target_abstract)
 
     return abstract
 
