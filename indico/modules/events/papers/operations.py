@@ -320,15 +320,15 @@ def create_comment(paper, text, visibility, user):
     comment = PaperReviewComment(user=user, text=text, visibility=visibility)
     paper.last_revision.comments.append(comment)
     db.session.flush()
-    receivers = {x for x in paper.contribution.paper_judges}
+    recipients = {x for x in paper.contribution.paper_judges}
     if visibility == PaperCommentVisibility.contributors or visibility == PaperCommentVisibility.reviewers:
-        receivers |= paper.contribution.paper_layout_reviewers if paper.cfp.layout_reviewing_enabled else set()
-        receivers |= paper.contribution.paper_content_reviewers if paper.cfp.content_reviewing_enabled else set()
+        recipients |= paper.contribution.paper_layout_reviewers if paper.cfp.layout_reviewing_enabled else set()
+        recipients |= paper.contribution.paper_content_reviewers if paper.cfp.content_reviewing_enabled else set()
     if visibility == PaperCommentVisibility.contributors:
-        receivers |= {x.person for x in paper.contribution.person_links
-                      if x.person.email and x.person.email != user.email}
-    receivers.discard(user)
-    for receiver in receivers:
+        recipients |= {x.person for x in paper.contribution.person_links
+                       if x.person.email and x.person.email != user.email}
+    recipients.discard(user)
+    for receiver in recipients:
         notify_comment(receiver, paper, text, user)
     logger.info("Paper %r received a comment from %r", paper, session.user)
     paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
