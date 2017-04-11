@@ -57,20 +57,22 @@ def notify_paper_review_submission(review):
 
 def notify_paper_judgment(paper, reset=False):
     event = paper.event_new
-    receiver = paper.last_revision.submitter
-    template = None
+    authors = [x for x in paper.contribution.person_links if x.is_author]
+    recipients = ([x for x in authors if x.email] if paper.last_revision.submitter.is_janitor
+                  else [paper.last_revision.submitter])
+    template_file = None
     if reset:
-        template = 'events/papers/emails/judgment_reset_to_author.html'
+        template_file = 'events/papers/emails/judgment_reset_to_author.html'
     elif paper_reviewing_settings.get(event, 'notify_author_on_judgment'):
-        template = 'events/papers/emails/judgment_to_author.html'
+        template_file = 'events/papers/emails/judgment_to_author.html'
 
-    if not template:
+    if not template_file:
         return
-
-    template = get_template_module(template, event=event, paper=paper, contribution=paper.contribution,
-                                   receiver=receiver)
-    email = make_email(to_list=receiver.email, template=template, html=True)
-    send_email(email, event=event, module='Papers', user=session.user)
+    for receiver in recipients:
+        template = get_template_module(template_file, event=event, paper=paper, contribution=paper.contribution,
+                                       receiver=receiver)
+        email = make_email(to_list=receiver.email, template=template, html=True)
+        send_email(email, event=event, module='Papers', user=session.user)
 
 
 def _notify_changes_in_reviewing_team(user, template, event, role):
