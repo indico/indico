@@ -21,12 +21,14 @@ import re
 from heapq import heappush
 
 import bleach
-from flask import current_app as app
+from flask import current_app
+from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
 from jinja2.ext import Extension
 from jinja2.filters import make_attrgetter, _GroupTuple
 from jinja2.lexer import Token
 from jinja2.loaders import split_template_path, BaseLoader, FileSystemLoader, TemplateNotFound
+from jinja2.utils import internalcode
 from markupsafe import Markup
 
 from indico.core import signals
@@ -129,8 +131,8 @@ def get_template_module(template_name_or_list, **context):
     """Returns the python module of a template.
 
     This allows you to call e.g. macros inside it from Python code."""
-    app.update_template_context(context)
-    tpl = app.jinja_env.get_or_select_template(template_name_or_list)
+    current_app.update_template_context(context)
+    tpl = current_app.jinja_env.get_or_select_template(template_name_or_list)
     return tpl.make_module(context)
 
 
@@ -204,9 +206,9 @@ class CustomizationLoader(BaseLoader):
         self.fallback_loader = fallback_loader
         self.fs_loader = FileSystemLoader(customization_dir, followlinks=True)
 
-    def _get_fallback(self, environment, template, path):
+    def _get_fallback(self, environment, template, path, customization_ignored=False):
         rv = self.fallback_loader.get_source(environment, template)
-        if self.debug:
+        if not customization_ignored and self.debug:
             try:
                 orig_path = rv[1]
             except TemplateNotFound:
@@ -217,7 +219,7 @@ class CustomizationLoader(BaseLoader):
     def get_source(self, environment, template):
         path = posixpath.join(*split_template_path(template))
         if template[0] == '~':
-            return self._get_fallback(environment, template[1:], path[1:])
+            return self._get_fallback(environment, template[1:], path[1:], customization_ignored=True)
         try:
             plugin, path = path.split(':', 1)
         except ValueError:
@@ -231,6 +233,24 @@ class CustomizationLoader(BaseLoader):
             return rv
         except TemplateNotFound:
             return self._get_fallback(environment, template, path)
+
+    @internalcode
+    def load(self, environment, name, globals=None):
+        tpl = super(CustomizationLoader, self).load(environment, name, globals)
+        if ':' not in name:
+            return tpl
+        # This is almost exactly what PluginPrefixLoader.load() does, but we have
+        # to replicate it here since we need to handle `~` and use our custom
+        # `get_source` to get the overridden template
+        plugin_name, tpl_name = name.split(':', 1)
+        if plugin_name[0] == '~':
+            plugin_name = plugin_name[1:]
+        plugin = get_state(current_app).plugin_engine.get_plugin(plugin_name)
+        if plugin is None:
+            # that should never happen
+            raise RuntimeError('Plugin template {} has no plugin'.format(name))
+        tpl.plugin = plugin
+        return tpl
 
 
 class EnsureUnicodeExtension(Extension):
