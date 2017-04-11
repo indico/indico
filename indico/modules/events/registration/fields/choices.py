@@ -416,9 +416,10 @@ class AccommodationField(RegistrationFormBillableItemsField):
             return {}
         data = {}
         if value:
+            is_no_accommodation = value.get('isNoAccommodation', False)
             data = {'choice': value['choice'],
-                    'is_no_accommodation': value['isNoAccommodation']}
-            if not value['isNoAccommodation']:
+                    'is_no_accommodation': is_no_accommodation}
+            if not is_no_accommodation:
                 data.update({'arrival_date': value['arrivalDate'],
                              'departure_date': value['departureDate']})
         return super(AccommodationField, self).process_form_data(registration, data, old_data, billable_items_locked,
