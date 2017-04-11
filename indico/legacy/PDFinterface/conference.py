@@ -45,7 +45,7 @@ from indico.util.date_time import format_date, format_datetime, format_time, for
 from indico.util.i18n import ngettext, _
 from indico.util.string import html_color_to_rgb, to_unicode, truncate
 from indico.legacy.PDFinterface.base import (escape, PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak,
-                                     modifiedFontSize)
+                                             modifiedFontSize)
 from indico.legacy.common import utils
 from indico.legacy.common.timezoneUtils import DisplayTZ, nowutc
 from indico.legacy.webinterface.common.tools import strip_ml_tags
@@ -1075,12 +1075,13 @@ class SimplifiedTimeTablePlain(PDFBase):
                 title = e.title
                 res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
                                      .format(_(u"Session"), escape(title.encode('utf-8'))), self._styles["normal"]))
-                room_time = ""
+                room_time = u""
                 if session_slot.room_name:
-                    room_time = escape(session_slot.room_name.encode('utf-8'))
+                    room_time = to_unicode(escape(session_slot.room_name.encode('utf-8')))
                 room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
-                             .format(_(u"Time and Place"), room_time, format_time(entry.start_dt, timezone=self._tz),
-                                     format_time(entry.end_dt, timezone=self._tz)))
+                             .format(_(u"Time and Place"), room_time,
+                                     to_unicode(format_time(entry.start_dt, timezone=self._tz)),
+                                     to_unicode(format_time(entry.end_dt, timezone=self._tz))))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 conveners = [c.full_name for c in session_slot.person_links]
                 if conveners:
@@ -1102,14 +1103,15 @@ class SimplifiedTimeTablePlain(PDFBase):
                     room_time = escape(contrib.room_name.encode('utf-8'))
 
                 room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
-                             .format(_(u"Time and Place"), room_time, format_date(entry.start_dt, timezone=self._tz),
-                                     format_date(entry.end_dt, timezone=self._tz)))
+                             .format(_(u"Time and Place"), room_time,
+                                     to_unicode(format_date(entry.start_dt, timezone=self._tz)),
+                                     to_unicode(format_date(entry.end_dt, timezone=self._tz))))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 spks = [s.full_name for s in contrib.speakers]
                 if spks:
                     speaker_word = u'{}: '.format(ngettext(u'Presenter', u'Presenters', len(spks)))
-                    res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}')
-                                         .format("; ".join(speaker_word, spks), self._styles["normal"]))
+                    res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
+                                         .format(speaker_word, u"; ".join(spks)), self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
             elif self._ttPDFFormat.showBreaksAtConfLevel() and entry.type == TimetableEntryType.BREAK:
                 break_ = entry.object
