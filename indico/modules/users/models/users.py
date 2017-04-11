@@ -27,6 +27,7 @@ from sqlalchemy.orm import object_session
 from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
@@ -436,6 +437,10 @@ class User(PersonMixin, db.Model):
     def secondary_local_identities(self):
         """The local identities of the user except the main one"""
         return self.local_identities - {self.local_identity}
+
+    @property
+    def is_janitor(self):
+        return self.id == Config.getInstance().getJanitorUserId()
 
     @locator_property
     def locator(self):
