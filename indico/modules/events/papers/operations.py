@@ -322,8 +322,8 @@ def create_comment(paper, text, visibility, user):
     db.session.flush()
     receivers = {x for x in paper.contribution.paper_judges}
     if visibility == PaperCommentVisibility.contributors or visibility == PaperCommentVisibility.reviewers:
-        receivers |= paper.contribution.paper_layout_reviewers if paper.cfp.layout_reviewing_enabled else {}
-        receivers |= paper.contribution.paper_content_reviewers if paper.cfp.content_reviewing_enabled else {}
+        receivers |= paper.contribution.paper_layout_reviewers if paper.cfp.layout_reviewing_enabled else set()
+        receivers |= paper.contribution.paper_content_reviewers if paper.cfp.content_reviewing_enabled else set()
     if visibility == PaperCommentVisibility.contributors:
         receivers |= {x.person for x in paper.contribution.person_links
                       if x.person.email and x.person.email != user.email}
