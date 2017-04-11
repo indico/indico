@@ -1,6 +1,6 @@
-<tr>
-    <td class="leftCol">{% trans %}Surveys{% endtrans %}</td>
-    <td>
+<div class="event-details-row">
+    <div class="event-details-label align-top">{% trans %}Surveys{% endtrans %}</div>
+    <div class="event-details-content">
         {% for survey in surveys %}
             <div class="event-service-row">
                 <div class="event-service-row-collapsed clearfix">
@@ -30,5 +30,5 @@
                 </div>
             </div>
         {% endfor %}
-    </td>
-</tr>
+    </div>
+</div>

@@ -80,31 +80,6 @@ table p {
     margin-top: 0;
 }
 
-table.eventDetails {
-    margin: 0 40px 0 10px;
-    padding: 0;
-    font-size: 11pt;
-    width: 910px;
-}
-
-table.eventDetails td {
-    color: #222222;
-    vertical-align: top;
-    padding: 3px;
-    width: 700px;
-}
-
-table.eventDetails td.leftCol {
-    font-weight: bold;
-    text-align: right;
-    padding-right: 6px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-    max-width: 200px;
-    width: 120px;
-}
-
 .event-manage-button {
     margin-top: 10px;
     font-size: 10pt;

@@ -1,7 +1,7 @@
 {% if regforms %}
-    <tr>
-        <td class="leftCol">{% trans %}Registration{% endtrans %}</td>
-        <td>
+    <div class="event-details-row">
+        <div class="event-details-label align-top">{% trans %}Registration{% endtrans %}</div>
+        <div class="event-details-content">
             {% for regform in regforms %}
                 {% set registration = session.user and regform.id in user_registrations %}
                 <div class="event-service-row">
@@ -56,14 +56,14 @@
                     </div>
                 </div>
             {% endfor %}
-        </td>
-    </tr>
+        </div>
+    </div>
 {% endif %}
 
 {% if event.published_registrations %}
-    <tr>
-        <td class="leftCol">{% trans %}Participants{% endtrans %}</td>
-        <td>
+    <div class="event-details-row">
+        <div class="event-details-label">{% trans %}Participants{% endtrans %}</div>
+        <div class="event-details-content">
             <div class="participant-list-wrapper">
                 <ul class="participant-list">
                     {%- for participant in event.published_registrations|sort(attribute='display_full_name') -%}
@@ -74,6 +74,6 @@
                 </ul>
                 <a class="trigger icon-expand" title="{% trans %}See the full list{% endtrans %}"></a>
             </div>
-        </td>
-    </tr>
+        </div>
+    </div>
 {% endif %}

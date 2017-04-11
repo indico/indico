@@ -51,13 +51,9 @@
     {% block body %}
         {% if has_subheader %}
             <div class="event-sub-header">
-                <table class="eventDetails">
-                    <tbody>
-                        {# https://github.com/pallets/jinja/issues/603 #}
-                        {% set hook_event_header = hook_event_header %}
-                        {% include 'events/display/indico/_details.html' %}
-                    </tbody>
-                </table>
+                {# https://github.com/pallets/jinja/issues/603 #}
+                {% set hook_event_header = hook_event_header %}
+                {% include 'events/display/indico/_details.html' %}
             </div>
         {% endif %}
 

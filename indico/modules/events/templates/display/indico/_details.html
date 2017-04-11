@@ -4,63 +4,50 @@
 
 {# Do not forget to update the conditions in the parent template when you add a new row in the details table. #}
 
-<table class="eventDetails" id="eventDetails">
-    <tbody>
-        {% if event.description %}
-            <tr id="eventDescription">
-                <td class="leftCol">
-                    {%- trans %}Description{% endtrans -%}
-                </td>
-                <td>{{ render_description(event, class='event-description') }}</td>
-            </tr>
-        {% endif %}
+<div class="event-details">
+    {% if event.description %}
+        <div class="event-details-row">
+            <div class="event-details-label">{% trans %}Description{% endtrans %}</div>
+            <div class="event-details-content">{{ render_description(event, class='event-description') }}</div>
+        </div>
+    {% endif %}
+    {% if event.references and event.type_.name == "meeting" %}
+        <div class="event-details-row">
+            <div class="event-details-label">{% trans %}External references{% endtrans %}</div>
+            <div class="event-details-content">{{ render_references(event) }}</div>
+        </div>
+    {% endif %}
+    {% if files or folders %}
+        <div class="event-details-row">
+            <div class="event-details-label icon-attachment inline-attachments-icon"></div>
+            <div class="event-details-content material-list">
+                {{ render_attachments_folders(files=files, folders=folders) }}
+            </div>
+        </div>
+    {% endif %}
+    {% if lectures %}
+        <div class="event-details-row">
+            <div class="event-details-label">{% trans %}From the same series{% endtrans %}</div>
+            <div class="event-details-content">
+                {% for lecture in lectures %}
+                    <a href="{{ lecture.url }}" class="lecture-series-link">{{ lecture.series_pos }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    {% if event.organizer_info %}
+        <div class="event-details-row">
+            <div class="event-details-label">{% trans %}Organised by{% endtrans %}</div>
+            <div class="event-details-content">{{ event.organizer_info | markdown }}</div>
+        </div>
+    {% endif %}
 
-        {% if event.references and event.type_.name == "meeting" %}
-            <tr id="eventReportNumbers">
-                <td class="leftCol">
-                    {% trans %}External references{% endtrans %}
-                </td>
-                <td>
-                    {{ render_references(event) }}
-                </td>
-            </tr>
-        {% endif %}
+    {{ hook_event_header }}
 
-        {% if files or folders %}
-            <tr id="materialList">
-                <td class="leftCol icon-attachment inline-attachments-icon"></td>
-                <td>
-                    <div class="material-list clearfix">
-                        {{ render_attachments_folders(files=files, folders=folders) }}
-                    </div>
-                </td>
-            </tr>
-        {% endif %}
-
-        {% if lectures %}
-            <tr id="lectureLinks">
-                <td class="leftCol">{% trans %}From the same series{% endtrans %}</td>
-                <td>
-                    {% for lecture in lectures %}
-                        <a href="{{ lecture.url }}" class="lecture-series-link">{{ lecture.series_pos }}</a>
-                    {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-
-        {% if event.organizer_info %}
-            <tr>
-                <td class="leftCol">{% trans %}Organised by{% endtrans %}</td>
-                <td>{{ event.organizer_info | markdown }}</td>
-            </tr>
-        {% endif %}
-
-        {{ hook_event_header }}
-
-        {% if event.contact_emails or event.contact_phones %}
-            <tr>
-                <td class="leftCol">{{ event.contact_title }}</td>
-                <td class="support-info">
+    {% if event.contact_emails or event.contact_phones %}
+        <div class="event-details-row">
+            <div class="event-details-label">{{ event.contact_title }}</div>
+            <div class="event-details-content">
                 {% for email in event.contact_emails %}
                     <div>
                         <i class="icon-mail"></i>
@@ -73,8 +60,7 @@
                         <a href="tel:{{ phone }}">{{ phone }}</a>
                     </div>
                 {% endfor %}
-                </td>
-            </tr>
-        {% endif %}
-    </tbody>
-</table>
+            </div>
+        </div>
+    {% endif %}
+</div>
