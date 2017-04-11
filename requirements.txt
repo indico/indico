@@ -53,7 +53,7 @@ blinker==1.4
 alembic==0.9.1
 Flask-Migrate==2.0.3
 Flask-PluginEngine
-Flask-Multipass
+Flask-Multipass>=0.0.dev2
 click==6.7
 colorclass==2.2.0
 itsdangerous==0.24

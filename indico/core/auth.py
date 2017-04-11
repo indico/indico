@@ -21,6 +21,11 @@ from warnings import warn
 from flask import current_app
 from flask_multipass import Multipass
 
+from indico.core.logger import Logger
+
+
+logger = Logger.get('multipass')
+
 
 class IndicoMultipass(Multipass):
     @property
@@ -95,6 +100,10 @@ class IndicoMultipass(Multipass):
                 local_providers[0].settings['default'] = True
             else:
                 raise ValueError('There is no default auth provider')
+
+    def handle_auth_error(self, exc, redirect_to_login=False):
+        logger.error('Authentication failed: %s (%r)', exc, exc.details)
+        return super(IndicoMultipass, self).handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 
 multipass = IndicoMultipass()
