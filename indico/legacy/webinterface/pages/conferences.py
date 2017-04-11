@@ -127,7 +127,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
     menu_entry_name = None
 
     def get_extra_css_files(self):
-        theme_url = get_css_url(self._conf.as_event)
+        theme_url = self._kwargs.get('css_url_override', get_css_url(self._conf.as_event))
         return [theme_url] if theme_url else []
 
     def _getHeader(self):
@@ -183,10 +183,16 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
             MathjaxMixin._getHeadContent(self)
         ])
 
-    def _applyDecoration( self, body ):
+    def _applyDecoration(self, body):
         self.event = self._conf.as_event
         self.logo_url = self.event.logo_url if self.event.has_logo else None
-        body = self._applyConfDisplayDecoration( body )
+        body = self._applyConfDisplayDecoration(body)
+        css_override_form = self._kwargs.get('css_override_form')
+        if css_override_form:
+            override_html = render_template('events/layout/css_preview_header.html',
+                                            event=self.event, form=css_override_form,
+                                            download_url=self._kwargs['css_url_override']).encode('utf-8')
+            body = override_html + body
         return WPConferenceBase._applyDecoration(self, to_unicode(body))
 
 
@@ -368,51 +374,3 @@ class WPMyStuff(WPConferenceDefaultDisplayBase):
 
     def _getBody(self,params):
         return WConfMyStuff(self._conf).getHTML()
-
-
-class WPConfModifPreviewCSS( WPConferenceDefaultDisplayBase ):
-
-    def __init__(self, rh, conf, **kwargs):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
-
-        self._conf = conf
-
-    def _applyDecoration( self, body ):
-        """
-        """
-        return "%s%s%s"%( self._getHeader(), body, self._getFooter() )
-
-    def _getBody( self, params ):
-        params['confId'] = self._conf.id
-        params['conf'] = self._conf
-
-        ###############################
-        # injecting ConferenceDisplay #
-        ###############################
-        p = WPConferenceDisplay( self._rh, self._conf )
-        p.event = self._conf.as_event
-        p.logo_url = p.event.logo_url if p.event.has_logo else None
-        params["bodyConf"] = p._applyConfDisplayDecoration(p._getBody(params))
-        ###############################
-        ###############################
-
-        wc = WPreviewPage()
-        return wc.getHTML(params)
-
-    def _getHeadContent(self):
-        path = Config.getInstance().getCssBaseURL()
-        try:
-            timestamp = os.stat(__file__).st_mtime
-        except OSError:
-            timestamp = 0
-        css = '<link rel="stylesheet" type="text/css" href="{}/Conf_Basic.css?{}">\n'.format(path, timestamp)
-        if self._kwargs['css_url']:
-            css += '<link rel="stylesheet" type="text/css" href="{url}">\n'.format(url=self._kwargs['css_url'])
-        return css
-
-    def get_extra_css_files(self):
-        return []
-
-
-class WPreviewPage( wcomponents.WTemplated ):
-    pass

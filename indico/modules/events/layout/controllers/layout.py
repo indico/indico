@@ -36,7 +36,7 @@ from indico.util.string import to_unicode, crc32
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
-from indico.legacy.webinterface.pages.conferences import WPConfModifPreviewCSS
+from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
@@ -159,7 +159,7 @@ class RHLayoutCSSPreview(RHLayoutBase):
         css_url = None
         if form.validate():
             css_url = get_css_url(self.event_new, force_theme=form.theme.data, for_preview=True)
-        return WPConfModifPreviewCSS(self, self._conf, form=form, css_url=css_url).display()
+        return WPConferenceDisplay(self, self._conf, css_override_form=form, css_url_override=css_url).display()
 
 
 class RHLayoutCSSSaveTheme(RHLayoutBase):
