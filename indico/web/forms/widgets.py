@@ -121,9 +121,14 @@ class PasswordWidget(JinjaWidget):
 
 
 class CKEditorWidget(JinjaWidget):
-    """Renders a CKEditor WYSIWYG editor"""
-    def __init__(self, simple=False, height=475):
-        super(CKEditorWidget, self).__init__('forms/ckeditor_widget.html', simple=simple, height=height)
+    """Renders a CKEditor WYSIWYG editor
+
+    :param simple: Use a simpler version with less options.
+    :param images: Whether to allow images in simple mode.
+    :param height: The height of the editor.
+    """
+    def __init__(self, simple=False, images=False, height=475):
+        super(CKEditorWidget, self).__init__('forms/ckeditor_widget.html', simple=simple, images=images, height=height)
 
 
 class SwitchWidget(JinjaWidget):

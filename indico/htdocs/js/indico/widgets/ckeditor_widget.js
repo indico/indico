@@ -24,11 +24,12 @@
         options = $.extend(true, {
             fieldId: null,
             simple: false,
+            images: false,
             height: 475
         }, options);
 
         var field = $('#' + options.fieldId);
-        var editor = new RichTextEditor(600, options.height, options.simple);
+        var editor = new RichTextEditor(600, options.height, options.simple, options.images);
         editor.set(field.val());
         editor.onLoad(function() {
             editor.onChange(function() {

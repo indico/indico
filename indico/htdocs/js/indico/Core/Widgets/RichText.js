@@ -33,7 +33,8 @@ type("RichTextEditor", ["IWidget", "Accessor"],
                      self.callbacks,
                      self.width,
                      self.height,
-                     self.simple);
+                     self.simple,
+                     self.simpleAllowImages);
              },5);
              return this.div;
          },
@@ -86,12 +87,13 @@ type("RichTextEditor", ["IWidget", "Accessor"],
          }
 
      },
-     function(width, height, simple) {
+     function(width, height, simple, simpleAllowImages) {
          this.onLoadList = new WatchList();
          this.callbacks = new WatchList();
          this.width = width;
          this.height = height;
          this.simple = simple;
+         this.simpleAllowImages = simpleAllowImages;
 
          this.divId = Html.generateId();
      });
@@ -239,7 +241,7 @@ type("RichTextWidget", ["IWidget", "Accessor"],
       });
 
 
-function initializeEditor( wrapper, editorId, text, callbacks, width, height, simple ){
+function initializeEditor( wrapper, editorId, text, callbacks, width, height, simple, simpleAllowImages){
     // "wrapper" is the actual Indico API object that represents an editor
 
     try {
@@ -284,7 +286,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
                 {name: 'clipboard', items: ['Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord', '-', 'Undo', 'Redo']},
                 {name: 'editing', items: ['Find', 'Replace']},
                 {name: 'links', items: ['Link', 'Unlink', 'Anchor']},
-                {name: 'insert', items: ['HorizontalRule']},
+                {name: 'insert', items: simpleAllowImages ? ['Image', 'HorizontalRule'] : ['HorizontalRule']},
                 {name: 'document', items: ['Source']},
                 {name: 'basicstyles', items: ['Bold', 'Italic', 'Underline', 'Strike', '-', 'RemoveFormat']},
                 {name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']},
