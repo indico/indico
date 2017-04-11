@@ -359,7 +359,7 @@ class AccommodationField(RegistrationFormBillableItemsField):
             if not field.data:
                 return
             data = snakify_keys(field.data)
-            if not data['is_no_accommodation']:
+            if not data.get('is_no_accommodation'):
                 try:
                     arrival_date = data['arrival_date']
                     departure_date = data['departure_date']
