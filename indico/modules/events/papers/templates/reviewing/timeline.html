@@ -139,7 +139,8 @@
             <div class="i-timeline-item-box header-indicator-left {{ header_class }}" id="revision-info-{{ revision.id }}">
                 <div class="i-box-header flexrow">
                     <div class="f-self-stretch">
-                        {% trans name=revision.submitter.name, number=revision.number -%}
+                        {% set name = revision.submitter.name if not revision.submitter.is_janitor else _('A user') %}
+                        {% trans number=revision.number -%}
                             <strong>{{ name }}</strong> submitted paper revision #{{ number }}
                         {%- endtrans %}
                         <time datetime="{{ revision.submitted_dt.isoformat() }}">
