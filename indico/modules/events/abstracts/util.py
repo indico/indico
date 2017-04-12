@@ -291,8 +291,10 @@ def create_boa(event):
     :return: The path to the PDF file
     """
     path = boa_settings.get(event, 'cache_path')
-    if path and os.path.exists(path):
-        return path
+    if path:
+        path = os.path.join(Config.getInstance().getCacheDir(), path)
+        if os.path.exists(path):
+            return path
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
     filename = 'boa-{}.pdf'.format(event.id)
