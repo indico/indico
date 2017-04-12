@@ -235,6 +235,9 @@ class RHCallForPapers(RHPapersBase):
 
     def _checkParams(self, params):
         RHPapersBase._checkParams(self, params)
+        if not session.user:
+            # checkProtection aborts in this case, but the functions below fail with a None user
+            return
         self.papers = set(get_contributions_with_paper_submitted_by_user(self.event_new, session.user))
         contribs = set(get_contributions_with_user_paper_submission_rights(self.event_new, session.user))
         self.contribs = contribs - self.papers
