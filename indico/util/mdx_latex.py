@@ -250,9 +250,11 @@ def latex_render_image(src, alt, strict=False):
             raise ImageURLException("URL scheme not supported: {}".format(src))
         else:
             try:
-                resp = requests.get(src, verify=False)
+                resp = requests.get(src, verify=False, timeout=5)
             except InvalidURL:
                 raise ImageURLException("Cannot understand URL '{}'".format(src))
+            except requests.Timeout:
+                raise ImageURLException("Loading image timed out ({})".format(src))
             extension = None
 
             if resp.status_code != 200:
