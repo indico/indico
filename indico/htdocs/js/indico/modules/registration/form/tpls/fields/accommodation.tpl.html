@@ -13,7 +13,7 @@
                 </td>
             </tr>
             <tr ng-repeat="item in field.choices">
-                <td align="left" class="accommodation-option-item">
+                <td align="left" class="accommodation-option-item" ng-hide="!item.isEnabled && item.isNoAccommodation">
                     <input type="radio" nd-radio-extend
                         id="{{ item.id }}"
                         name="accommodationType-{{ field.id }}"
