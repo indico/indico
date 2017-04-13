@@ -362,9 +362,9 @@ class Reservation(Serializer, db.Model):
                         permissions, always use the given mode.
         """
 
-        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'booked_for_user',
-                           'contact_email', 'contact_phone', 'booking_reason', 'used_equipment',
-                           'needs_assistance', 'uses_vc', 'needs_vc_assistance')
+        populate_fields = ('start_dt', 'end_dt', 'repeat_frequency', 'repeat_interval', 'room_id', 'contact_email',
+                           'contact_phone', 'booking_reason', 'used_equipment', 'needs_assistance', 'uses_vc',
+                           'needs_vc_assistance')
 
         if data['repeat_frequency'] == RepeatFrequency.NEVER and data['start_dt'].date() != data['end_dt'].date():
             raise ValueError('end_dt != start_dt for non-repeating booking')
@@ -382,6 +382,8 @@ class Reservation(Serializer, db.Model):
             if field in data:
                 setattr(reservation, field, data[field])
         reservation.room = room
+        # if 'room_usage' is not specified, we'll take whatever is passed in 'booked_for_user'
+        reservation.booked_for_user = data['booked_for_user'] if data.get('room_usage') != 'current_user' else user
         reservation.booked_for_name = reservation.booked_for_user.full_name
         reservation.is_accepted = not prebook
         reservation.created_by_user = user

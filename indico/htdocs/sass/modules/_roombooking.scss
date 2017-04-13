@@ -161,22 +161,9 @@
         }
     }
 
-    #other-user {
-        display: inline-flex;
-        flex-direction: column;
-
-        &.hasError {
-            @include border-all($red);
-        }
-
-        input {
-            margin-right: 3px;
-            font-weight: bold;
-        }
-
-        .input-line {
-            display: inline;
-        }
+    #room_usage{
+        padding-left: 0;
+        list-style: none;
     }
 }
 

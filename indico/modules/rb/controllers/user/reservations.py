@@ -401,9 +401,7 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
             self.date_changed = False
         defaults = FormDefaults(room_id=self._room.id,
                                 start_dt=start_dt,
-                                end_dt=end_dt,
-                                booked_for_user=session.user)
-
+                                end_dt=end_dt)
         return self._make_confirm_form(self._room, defaults=defaults, form_class=NewBookingSimpleForm)
 
     def _get_view(self, **kwargs):
@@ -606,7 +604,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             if not room:
                 raise IndicoError('Invalid room')
             # Show step 3 page
-            confirm_form_defaults = FormDefaults(form.data, booked_for_user=session.user)
+            confirm_form_defaults = FormDefaults(form.data)
             return self._show_confirm(room, form, self._step, confirm_form_defaults)
 
     def _process_confirm(self):

@@ -76,16 +76,17 @@
 
         // Booked for validator
         function validInput($element) {
-            if ($element.attr('id') === 'other-user') {
-                return $('input[name=other_user]:checked').val() !== undefined;
+            if ($element.attr('id') === 'room_usage') {
+                return $('input[name=room_usage]:checked').val() !== undefined;
             } else if ($element.attr('id') === 'booked-for-user-wrapper') {
-                return !!$('#booked_for_user').val();
+                return ($('#booked_for_user').val() != '[]' && $('input[name=room_usage]:checked').val() === 'other_user'
+                        || $('#booked_for_user').val() == '[]' && $('input[name=room_usage]:checked').val() === 'current_user');
             } else {
                 return !!$element.val().trim();
             }
         };
 
-        $('#other-user, #booked-for-user-wrapper, #booking_reason').each(function() {
+        $('#room_usage, #booked-for-user-wrapper, #booking_reason').each(function() {
             var $this = $(this);
             if (!validatingConflicts) {
                 var valid = validInput($this);
