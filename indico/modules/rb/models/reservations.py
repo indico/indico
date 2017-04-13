@@ -309,7 +309,7 @@ class Reservation(Serializer, db.Model):
 
     @property
     def contact_emails(self):
-        return set(filter(None, map(unicode.strip, self.contact_email.split(u','))))
+        return set(filter(None, map(unicode.strip, self.contact_email.split(u',')))) if self.contact_email else set()
 
     @property
     def details_url(self):
