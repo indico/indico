@@ -79,8 +79,10 @@
             if ($element.attr('id') === 'room_usage') {
                 return $('input[name=room_usage]:checked').val() !== undefined;
             } else if ($element.attr('id') === 'booked-for-user-wrapper') {
-                return ($('#booked_for_user').val() != '[]' && $('input[name=room_usage]:checked').val() === 'other_user'
-                        || $('#booked_for_user').val() == '[]' && $('input[name=room_usage]:checked').val() === 'current_user');
+                if ($('input[name=room_usage]:checked').val() === 'other_user'){
+                    return $('#booked_for_user').val() != '[]';
+                }
+                return true;
             } else {
                 return !!$element.val().trim();
             }

@@ -138,6 +138,12 @@ class NewBookingSimpleForm(NewBookingConfirmForm):
     submit_check = SubmitField(_(u'Check conflicts'))
     booking_reason = TextAreaField(_(u'Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
                                                   DataRequired()])
+    room_usage = RadioField(validators=[UsedIf(lambda form, field: not form.submit_check.data), DataRequired()],
+                            choices=[('current_user', _("I'll be using the room myself")),
+                                     ('other_user', _("I'm booking the room for someone else"))])
+    booked_for_user = PrincipalField(_(u'User'), [UsedIf(lambda form, field: not form.submit_check.data),
+                                                  HiddenUnless('room_usage', 'other_user'),
+                                                  DataRequired()], allow_external=True)
 
 
 class ModifyBookingForm(NewBookingSimpleForm):
@@ -147,6 +153,8 @@ class ModifyBookingForm(NewBookingSimpleForm):
         self._old_start_dt = kwargs.pop('old_start_dt')
         self._old_end_dt = kwargs.pop('old_end_dt')
         super(ModifyBookingForm, self).__init__(*args, **kwargs)
+        if self.room_usage.data == 'None':
+            self.room_usage.data = 'current_user' if self.booked_for_user.data == session.user else 'other_user'
         del self.room_id
         del self.submit_book
         del self.submit_prebook

@@ -16,6 +16,7 @@
 
 from collections import defaultdict, OrderedDict
 from datetime import datetime, date
+from flask import session
 
 from sqlalchemy import Date, Time
 from sqlalchemy.event import listens_for
@@ -672,6 +673,8 @@ class Reservation(Serializer, db.Model):
 
         self.room.check_advance_days(data['end_dt'].date(), user)
         self.room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)
+        if data['room_usage'] == 'current_user':
+            data['booked_for_user'] = session.user
 
         changes = {}
         update_occurrences = False

@@ -34,9 +34,9 @@
 
     function checkRoomUsageState(selectedOption) {
         if (selectedOption == 'other_user') {
-            $('#booked-for-user-wrapper').show().find('input[type=hidden]').prop('disabled', '');
+            $('#booked-for-user-wrapper').slideDown().find('input[type=hidden]').prop('disabled', '');
         } else {
-            $('#booked-for-user-wrapper').hide().find('input[type=hidden]').prop('disabled', 'disabled');
+            $('#booked-for-user-wrapper').slideUp().find('input[type=hidden]').prop('disabled', 'disabled');
         }
     }
 
