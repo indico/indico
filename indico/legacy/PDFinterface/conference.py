@@ -1074,7 +1074,8 @@ class SimplifiedTimeTablePlain(PDFBase):
                     e = sess
                 title = e.title
                 res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_(u"Session"), escape(title.encode('utf-8'))), self._styles["normal"]))
+                                     .format(_("Session"), escape(title.encode('utf-8'))),
+                                     self._styles["normal"]))
                 room_time = u""
                 if session_slot.room_name:
                     room_time = to_unicode(escape(session_slot.room_name.encode('utf-8')))
