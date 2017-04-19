@@ -100,7 +100,7 @@
         {% set date_time %}
             {% if contribution_page %}
                 {% if paper.can_manage(session.user) %}
-                    <a class="paper-metadata-dt" href="{{ url_for('papers.paper_timeline', paper, management=false) }}">
+                    <a class="paper-metadata-dt" href="{{ url_for('papers.paper_timeline', paper) }}">
                         <time datetime="{{ paper.last_revision.judgment_dt.isoformat() }}">
                             {{- paper.last_revision.judgment_dt|format_human_date -}}
                         </time>
