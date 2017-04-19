@@ -224,30 +224,6 @@ class WPLaTeXError(WPDecorated):
         })
 
 
-class WTimingError( WTemplated ):
-
-    def __init__( self, rh, msg="" ):
-        self._rh = rh
-        self._msg = msg
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["msg"] = self._msg
-        vars["urlbase"] = Config.getInstance().getBaseURL()
-        return vars
-
-
-class WPTimingError( WPDecorated ):
-
-    def __init__( self, rh, msg="" ):
-        self._msg = msg
-        WPDecorated. __init__( self, rh)
-
-    def _getBody( self, params ):
-        wc = WTimingError( self._rh, self._msg )
-        return wc.getHTML()
-
-
 class WModificationError( WTemplated ):
 
     def __init__( self, rh ):

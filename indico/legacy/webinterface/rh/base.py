@@ -458,12 +458,6 @@ class RH(RequestHandlerBase):
         return WPConferenceModificationClosed(self, e._conf).display()
 
     @jsonify_error
-    def _processTimingError(self, e):
-        """Treats timing errors occured during the process of a RH."""
-
-        return errors.WPTimingError(self, e).display()
-
-    @jsonify_error
     def _processNoReportError(self, e):
         """Process errors without reporting"""
         return errors.WPNoReportError(self, e).display()
