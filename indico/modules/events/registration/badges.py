@@ -64,9 +64,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         config = self.config
         tpl_data = self.tpl_data
 
-        available_width = self.width - (config.left_margin - config.right_margin + config.margin_columns + 0.01) * cm
+        available_width = self.width - (config.left_margin - config.right_margin + config.margin_columns) * cm
         n_horizontal = int(available_width / ((tpl_data.width_cm + config.margin_columns) * cm))
-        available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows + 0.01) * cm
+        available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows) * cm
         n_vertical = int(available_height / ((tpl_data.height_cm + config.margin_rows) * cm))
 
         if not (n_horizontal and n_vertical):
