@@ -100,7 +100,7 @@
                                 {% set accepted_other_msg = '' %}
                             {% endif %}
                             <tr class="i-table abstract-row {{ 'accepted-on-other-track disabled' if accepted_other }}"
-                                title="{{ accepted_other_msg }}"
+                                title="{{ accepted_other_msg | forceescape }}"
                                 data-friendly-id="{{ abstract.friendly_id }}"
                                 data-title="{{ abstract.title }}">
                                 <td class="i-table id-column">
