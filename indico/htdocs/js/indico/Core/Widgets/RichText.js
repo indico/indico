@@ -292,6 +292,7 @@ function initializeEditor( wrapper, editorId, text, callbacks, width, height, si
                 {name: 'paragraph', items: ['NumberedList', 'BulletedList', '-', 'Outdent', 'Indent']},
                 {name: 'styles', items: ['Format']},
                 {name: 'colors', items: ['TextColor']},
+                {name: 'tables', items: ['Table']},
                 {name: 'tools', items: ['Maximize']}
             ];
         }
