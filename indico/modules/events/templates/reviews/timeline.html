@@ -41,16 +41,16 @@
                         {% endcall %}
                     {% endif %}
                 </div>
-                {% if loop.last %}
-                    <div class="i-timeline">
-                        {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
-                        <div class="i-timeline-connect-down to-separator"></div>
-                    </div>
-                    <div class="i-timeline-separator"></div>
-                    {{ caller('submit-revision') }}
-                    {% if proposal.is_in_final_state %}
-                        {{ caller('revision-judgment', revision) }}
-                    {% endif %}
+            {% endif %}
+            {% if loop.last %}
+                <div class="i-timeline">
+                    {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
+                    <div class="i-timeline-connect-down to-separator"></div>
+                </div>
+                <div class="i-timeline-separator"></div>
+                {{ caller('submit-revision') }}
+                {% if proposal.is_in_final_state %}
+                    {{ caller('revision-judgment', revision) }}
                 {% endif %}
             {% endif %}
         </div>
