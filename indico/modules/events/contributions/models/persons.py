@@ -73,6 +73,10 @@ class ContributionPersonLink(PersonLinkBase):
             raise Exception("No contribution to check submission rights against")
         return self.person.has_role('submit', self.contribution)
 
+    @property
+    def is_author(self):
+        return self.author_type != AuthorType.none
+
     @locator_property
     def locator(self):
         return dict(self.contribution.locator, person_id=self.id)
