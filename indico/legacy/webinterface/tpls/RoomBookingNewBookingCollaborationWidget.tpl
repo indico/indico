@@ -23,7 +23,7 @@
     </div>
     <ul id="videoconferenceOptions" class="weak-hidden">
         % for subfield in [form.needs_vc_assistance] + eq_list:
-            % if subfield.short_name == 'needs_vc_assistance' and start_dt.time() < work_start or start_dt.time() > work_end:
+            % if subfield.short_name == 'needs_vc_assistance' and (start_dt.time() < work_start or start_dt.time() > work_end):
                 <li class="js-vc-row semantic-text disabled" title="${ _('Assistance is not available because start time of booking is not within working hours.') }">
                     ${ subfield(disabled=True) }
                     ${ subfield.label(style='font-weight: normal;') }
