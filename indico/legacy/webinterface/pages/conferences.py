@@ -64,7 +64,8 @@ def _get_print_url(event, theme=None, theme_override=False):
 def render_event_header(event, conference_layout=False, theme=None, theme_override=False):
     print_url = _get_print_url(event, theme, theme_override) if not conference_layout else None
     show_nav_bar = event.type_ != EventType.conference or layout_settings.get(event, u'show_nav_bar')
-    themes = {tid: data[u'title'] for tid, data in theme_settings.get_themes_for(event.type_.name).viewitems()}
+    themes = {tid: {'name': data[u'title'], 'user_visible': data.get(u'user_visible')}
+              for tid, data in theme_settings.get_themes_for(event.type_.name).viewitems()}
     return render_template(u'events/header.html',
                            event=event, print_url=print_url, show_nav_bar=show_nav_bar, themes=themes, theme=theme)
 

@@ -10,6 +10,7 @@ definitions:
     stylesheet: indico.scss
     template: indico/lecture.html
     title: Lecture
+    user_visible: true
 
   event:
     <<: *lecture
@@ -25,6 +26,7 @@ definitions:
     print_stylesheet: sass/themes/print/indico.scss
     template: indico/meeting.html
     title: Indico style
+    user_visible: true
 
   standard_inline_minutes:
     <<: *standard
@@ -37,9 +39,11 @@ definitions:
     stylesheet: compact.scss
     template: compact.html
     title: Compact style
+    user_visible: true
 
   indico-weeks-view:
     event_types: [conference, meeting]
     stylesheet: weeks.scss
     template: weeks.html
     title: Indico Weeks View
+    user_visible: true

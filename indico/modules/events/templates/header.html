@@ -38,12 +38,13 @@
        title="{% trans %}Change theme{% endtrans %}"></a>
     <ul class="dropdown">
         {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
-        {% for id, name in themes|dictsort(by='value') %}
+        {% for id, data in themes.items()|sort(attribute='1.name')
+           if event.can_manage(session.user) or data.user_visible %}
             <li>
                 {% if id == theme %}
-                    <a class="disabled"><strong>{{ name }}</strong></a>
+                    <a class="disabled"><strong>{{ data.name }}</strong></a>
                 {% else %}
-                    <a href="{{ url_for(endpoint, event, view=id) }}">{{ name }}</a>
+                    <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
                 {% endif %}
             </li>
         {% endfor %}
@@ -201,9 +202,7 @@
             <a class="i-button icon-package-download" href="{{ url_for('attachments.package', event) }}"
                title="{% trans %}Download material{% endtrans %}"></a>
 
-            {% if event.can_manage(session.user) %}
-                {{ _render_theme_selector() }}
-            {% endif %}
+            {{ _render_theme_selector() }}
 
             <span class="separator"></span>
 
