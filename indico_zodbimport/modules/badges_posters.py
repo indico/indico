@@ -250,7 +250,7 @@ class TemplateMigrationBase(object):
 
             old_positions_map = getattr(old_tpl, '_{}__bgPositions'.format(self.tpl_class), None)
             old_used_bg_id = int(old_tpl_data[3])
-            if old_used_bg_id:
+            if old_used_bg_id >= 0:
                 new_bg_image = old_background_map.get(old_used_bg_id)
                 if new_bg_image:
                     tpl.background_image = new_bg_image
