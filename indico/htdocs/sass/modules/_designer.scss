@@ -16,25 +16,34 @@
  */
 
 #designer-control-tabs {
+    input[type=text],
+    input[type=number] {
+        @extend %text-input;
+    }
+
+    input[type=number] {
+        width: 5em;
+    }
+
     .designer-tab {
-        overflow: auto;
-        min-height: 170px;
+        min-height: 150px;
     }
 
-    .designer-tab > .left:not(:first-of-type) {
-        margin-left: 10px;
-    }
-
-    .designer-tab > .panel {
-        min-height: 11em;
-        padding-right: 2em;
+    .designer-tab-content > .panel {
+        padding-right: 1em;
+        margin-right: 1em;
+        display: flex;
 
         div {
-            margin-bottom: 1em;
+            margin-bottom: 0.5em;
+
+            &:last-child {
+                margin-bottom: 0;
+            }
         }
     }
 
-    .designer-tab > .panel:not(:last-of-type) {
+    .designer-tab-content > .panel:not(:last-of-type) {
         border-right: 1px solid #ddd;
     }
 
@@ -49,7 +58,7 @@
     }
 
     .panel .content {
-        margin-left: 4em;
+        margin-left: 1em;
     }
 
     .panel .content h4:first-child {
@@ -64,6 +73,11 @@
     #font-selector, #color-selector, #style-selector, #size-selector, #alignment-selector {
         display: block;
         width: 10em;
+        margin-bottom: 5px;
+
+        &:last-child {
+            margin-bottom: 0;
+        }
     }
 
     #bgForm input[type="file"] {
@@ -71,7 +85,17 @@
     }
 
     .move-button[data-direction='center'] {
-        margin: 0.3rem 0 0.3rem 0.3rem;
+        // margin: 0.3rem 0 0.3rem 0.3rem;
+    }
+
+    .positioning-box {
+        button {
+            padding: 10px;
+        }
+    }
+
+    .panel#fixed-text-container {
+        display: none;
     }
 }
 
@@ -93,8 +117,7 @@
     }
 
     .ruler#horizontal-ruler {
-        height: 10px;
-        top: -6px;
+        top: -16px;
     }
 
     .ruler#vertical-ruler {
@@ -149,6 +172,10 @@
         position: relative;
         left: 0;
         top: 0;
+    }
+
+    .new-element-heading {
+        margin-top: 0;
     }
 }
 
