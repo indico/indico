@@ -52,6 +52,13 @@ def build_note_legacy_api_data(note):
 
 def get_scheduled_notes(event):
     """Gets all notes of scheduled items inside an event"""
+    def _sort_note_by(note):
+        obj = note.object
+        if hasattr(obj, 'start_dt'):
+            return obj.start_dt, 0
+        else:
+            return obj.contribution.start_dt, obj.position
+
     tt_entries = (event.timetable_entries
                   .filter(TimetableEntry.type != TimetableEntryType.BREAK)
                   .options(joinedload('session_block').joinedload('contributions').joinedload('subcontributions'))
@@ -71,7 +78,7 @@ def get_scheduled_notes(event):
                 objects.add(contrib)
                 objects.update(sc for sc in contrib.subcontributions if not sc.is_deleted)
     notes = [x for x in event.all_notes.filter_by(is_deleted=False) if x.object in objects]
-    return sorted(notes, key=lambda x: x.object.start_dt)
+    return sorted(notes, key=_sort_note_by)
 
 
 def can_edit_note(obj, user):
