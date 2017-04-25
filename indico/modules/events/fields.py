@@ -238,7 +238,7 @@ class EventPersonLinkListField(PersonLinkListFieldBase):
     def _serialize_person_link(self, principal, extra_data=None):
         extra_data = extra_data or {}
         data = dict(extra_data, **serialize_person_link(principal))
-        data['isSubmitter'] = self.data[principal] if self.get_form().is_submitted() else None
+        data['isSubmitter'] = self.data[principal] if self.get_form().is_submitted() else principal.is_submitter
         return data
 
     def pre_validate(self, form):

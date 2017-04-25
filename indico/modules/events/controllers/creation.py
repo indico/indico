@@ -94,6 +94,7 @@ class RHCreateEvent(RHProtected):
                                                for col in get_simple_column_attrs(EventPersonLink)})
                 link_copy.person = EventPerson(**{col: getattr(link.person, col)
                                                   for col in get_simple_column_attrs(EventPerson)})
+                link_copy.person.user = link.person.user
                 yield link_copy, submitter
 
         occurrences = data.pop('occurrences')
