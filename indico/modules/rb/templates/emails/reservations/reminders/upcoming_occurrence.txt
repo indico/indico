@@ -2,7 +2,13 @@
 {% block recipient %}{{ owner.first_name if owner else 'user' }}{% endblock %}
 
 {% block email_body -%}
-This is a reminder about a booking under your name:
+{% if occurrences | length == 1 -%}
+    This is a reminder about a booking under your name:
+{% else -%}
+    This is a reminder about bookings under your name:
+{%- endif %}
+{%- for occurrence in occurrences %}
+
 
 Room: {{ occurrence.reservation.room.name }}
 {% if occurrence.reservation.repeat_frequency == RepeatFrequency.DAY -%}
@@ -12,7 +18,7 @@ Date: {{ occurrence.start_dt | format_date(locale='en_GB') }}
 {%- endif %}
 Time: {{ occurrence.start_dt | format_time(locale='en_GB') }} - {{ occurrence.end_dt | format_time(locale='en_GB') }}
 
-
 If you don't need to use the room, please cancel your occurrence on this page:
 {{ occurrence.reservation.details_url }}
+{% endfor %}
 {%- endblock %}

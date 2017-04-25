@@ -18,8 +18,8 @@ import ast
 import json
 from datetime import date
 
-from sqlalchemy import and_, func, or_, cast, Date
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy import and_, func, or_, cast
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager
 
 from indico.core.db.sqlalchemy import db
@@ -37,7 +37,6 @@ from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttribut
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.util.date_time import round_up_month
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -697,38 +696,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if not manager_group:
             return False
         return user in GroupProxy.get_named_default_group(manager_group)
-
-    @hybrid_method
-    def is_in_digest_window(self, reservation, exclude_first_day=False):
-        from indico.modules.rb import settings as rb_settings
-        from indico.modules.rb.models.reservations import RepeatFrequency
-        digest_start = round_up_month(date.today(), from_day=2)
-        days_until_next_digest = (digest_start - date.today()).days
-        if reservation.repeat_frequency == RepeatFrequency.NEVER:
-            digest_window = self.notification_before_single or rb_settings.get('notification_before_single')
-        else:
-            digest_window = self.notification_before_repeating or rb_settings.get('notification_before_repeating')
-        if exclude_first_day:
-            return days_until_next_digest < digest_window
-        else:
-            return days_until_next_digest <= digest_window
-
-    @is_in_digest_window.expression
-    def is_in_digest_window(cls, exclude_first_day=False):
-        from indico.modules.rb import settings as rb_settings
-        from indico.modules.rb.models.reservations import RepeatFrequency
-        digest_start = round_up_month(date.today(), from_day=2)
-        days_until_next_digest = cast(digest_start, Date) - cast(func.now(), Date)
-        digest_window_single = func.coalesce(cls.notification_before_single,
-                                             rb_settings.get('notification_before_single'))
-        digest_window_repeating = func.coalesce(cls.notification_before_repeating,
-                                                rb_settings.get('notification_before_repeating'))
-        digest_window = db.case({RepeatFrequency.NEVER.value: digest_window_single},
-                                else_=digest_window_repeating, value=Reservation.repeat_frequency)
-        if exclude_first_day:
-            return days_until_next_digest < digest_window
-        else:
-            return days_until_next_digest <= digest_window
 
     @classmethod
     def get_owned_by(cls, user):

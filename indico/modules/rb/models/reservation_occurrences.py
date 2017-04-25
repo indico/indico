@@ -318,3 +318,11 @@ class ReservationOccurrence(db.Model, Serializer):
             return (days_until_occurrence < notification_window) & ~in_the_past
         else:
             return (days_until_occurrence <= notification_window) & ~in_the_past
+
+    @property
+    def first_start_date(self):
+        from indico.modules.rb.models.reservations import RepeatFrequency
+        if self.reservation.repeat_frequency == RepeatFrequency.DAY:
+            return self.reservation.occurrences[0].start_dt.date()
+        else:
+            return self.start_dt.date()
