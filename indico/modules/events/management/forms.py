@@ -113,12 +113,12 @@ class EventDatesForm(IndicoForm):
                                     description=_("Move sessions/contributions/breaks in the timetable according "
                                                   "to the new event start time."))
     start_dt_override = IndicoDateTimeField(_("Start"), [Optional()], allow_clear=True,
-                                             description=_("Specifying this date overrides the start date displayed "
-                                                           "on the main conference page."))
+                                            description=_("Specifying this date overrides the start date displayed "
+                                                          "on the main conference page."))
     end_dt_override = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt_override', not_equal=True)],
-                                           allow_clear=True,
-                                           description=_("Specifying this date overrides the end date displayed "
-                                                         "on the main conference page."))
+                                          allow_clear=True,
+                                          description=_("Specifying this date overrides the end date displayed "
+                                                        "on the main conference page."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

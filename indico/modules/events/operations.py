@@ -17,7 +17,6 @@
 from __future__ import unicode_literals
 
 from flask import session
-from pytz import utc
 
 from indico.core import signals
 from indico.core.db import db
