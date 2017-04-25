@@ -1,3 +1,19 @@
+# This file is part of Indico.
+# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
 from datetime import date
 
 from flask import render_template
@@ -76,22 +92,10 @@ def notify_upcoming_occurrence(occurrence):
     if occurrence.start_dt.date() < date.today():
         raise ValueError("This reservation occurrence started in the past")
 
-    to_list = []
     reservation_user = occurrence.reservation.booked_for_user
-    if reservation_user is not None:
-        to_list.append(reservation_user.email)
-
-    cc_list = []
-    room = occurrence.reservation.room
-    if room.notification_for_responsible:
-        cc_list.append(room.owner.email)
-
-    if not to_list and not cc_list:
-        return
-
     subject = 'Reservation reminder'
     text = render_template('rb/emails/reservations/reminders/upcoming_occurrence.txt',
                            occurrence=occurrence,
                            owner=reservation_user,
                            RepeatFrequency=RepeatFrequency)
-    return make_email(to_list=to_list, cc_list=cc_list, subject=subject, body=text)
+    return make_email(to_list={reservation_user.email}, subject=subject, body=text)

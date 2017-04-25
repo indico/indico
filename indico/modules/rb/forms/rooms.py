@@ -113,7 +113,6 @@ class RoomForm(IndicoForm):
     notification_for_assistance = BooleanField(_(u'Assistance'))
     notification_before_days = IntegerField(_(u'Send booking reminders X days before'),
                                             [Optional(), NumberRange(min=1, max=9)], default=1)
-    notification_for_responsible = BooleanField(_(u'Remind room manager too'))
     notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
     booking_limit_days = IntegerField(_(u'Maximum length of booking (days)'), [Optional(), NumberRange(min=1)])
     owner = PrincipalField(_(u'Owner'), [DataRequired()], allow_external=True)
