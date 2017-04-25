@@ -265,7 +265,6 @@ class RoomBookingImporter(Importer):
                 notification_before_days=((old_room.resvStartNotificationBefore or None)
                                           if getattr(old_room, 'resvStartNotification', False)
                                           else None),
-                notification_for_responsible=getattr(old_room, 'resvNotificationToResponsible', False),
                 notification_for_assistance=getattr(old_room, 'resvNotificationAssistance', False),
 
                 reservations_need_confirmation=old_room.resvsNeedConfirmation,

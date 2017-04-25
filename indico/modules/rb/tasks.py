@@ -46,6 +46,7 @@ def roombooking_occurrences():
         Room.is_active,
         Room.notifications_enabled,
         Reservation.is_accepted,
+        Reservation.booked_for_id.isnot(None),
         Reservation.repeat_frequency != RepeatFrequency.WEEK,
         ReservationOccurrence.is_valid,
         ReservationOccurrence.start_dt >= datetime.now(),
