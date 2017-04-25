@@ -38,9 +38,6 @@
     <div id="notification_before_singleCH" class="tip">
         ${ _("Send booking reminders X days before single occurrence (leave empty to use default)")  }
     </div>
-    <div id="notification_for_responsibleCH" class="tip">
-        ${ _("Send reminders to the room manager, too.") }
-    </div>
     <div id="notification_for_assistanceCH" class="tip">
         ${ _("Send notifications asking for assistance with room setup") }
     </div>
@@ -166,10 +163,9 @@
                                 <%
                                     fields = ['is_active', 'is_reservable', 'reservations_need_confirmation',
                                               'notification_for_assistance', 'notification_before_repeating',
-                                              'notification_before_single', 'notification_for_responsible',
-                                              'notifications_enabled']
+                                              'notification_before_single', 'notifications_enabled']
                                     reminder_fields = {'notification_before_repeating', 'notification_before_single',
-                                                       'notification_for_responsible', 'notifications_enabled'}
+                                                       'notifications_enabled'}
                                     field_args = {
                                         'notification_before_repeating': dict(style='width: 25px;', maxlength=2),
                                         'notification_before_single': dict(style='width: 25px;', maxlength=2)
