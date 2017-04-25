@@ -58,8 +58,8 @@ BLEACH_ALLOWED_ATTRIBUTES_HTML = dict(BLEACH_ALLOWED_ATTRIBUTES, **{'*': [
     'align', 'abbr', 'alt', 'border', 'bgcolor', 'class', 'cellpadding', 'cellspacing', 'color', 'char', 'charoff',
     'cite', 'clear', 'colspan', 'compact', 'dir', 'disabled', 'face', 'href', 'height', 'headers', 'hreflang', 'hspace',
     'id', 'ismap', 'lang', 'name', 'noshade', 'nowrap', 'rel', 'rev', 'rowspan', 'rules', 'size', 'scope', 'shape',
-    'span', 'src', 'start', 'summary', 'tabindex', 'target', 'title', 'type', 'valign', 'value', 'vspace', 'width',
-    'wrap'
+    'span', 'src', 'start', 'style', 'summary', 'tabindex', 'target', 'title', 'type', 'valign', 'value', 'vspace',
+    'width', 'wrap'
 ]})
 BLEACH_ALLOWED_STYLES_HTML = [
     'background-color', 'border-top-color', 'border-top-style', 'border-top-width', 'border-top', 'border-right-color',
