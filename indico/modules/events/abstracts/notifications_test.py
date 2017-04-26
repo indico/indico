@@ -210,10 +210,10 @@ def test_notification_any_conditions(mocker, abstract_objects, create_email_temp
 def test_notification_stop_on_match(mocker, abstract_objects, create_email_template, dummy_user):
     event, abstract, track, contrib_type = abstract_objects
     event.abstract_email_templates = [
-        create_email_template(event, 0, 'merge', 'merged poster', [
+        create_email_template(event, 0, 'accept', 'accepted poster', [
             {'state': [AbstractState.accepted.value]}
         ], False),
-        create_email_template(event, 0, 'merge', 'merged poster 2', [
+        create_email_template(event, 0, 'accept', 'accepted poster 2', [
             {'state': [AbstractState.accepted.value]}
         ], True)
     ]
