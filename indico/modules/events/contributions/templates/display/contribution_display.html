@@ -151,7 +151,7 @@
 
     {% for field_value in contribution.field_values %}
         {% set field = field_value.contribution_field %}
-        {% if field.field_type == 'text' and field.field_data.multiline %}
+        {% if field.field_type == 'text' and field.field_data.multiline and field_value.data%}
             <h3>{{ field.title }}</h3>
             <div id="field-{{ field.id }}">
                 {{ field_value.data | markdown }}
@@ -162,7 +162,7 @@
     <table class="other-fields">
         {% for field_value in contribution.field_values %}
             {% set field = field_value.contribution_field %}
-            {% if field.field_type == 'single_choice' or not field.field_data.multiline %}
+            {% if (field.field_type == 'single_choice' or not field.field_data.multiline) and field_value.data %}
                 {{ _render_field_value(field_value) }}
             {% endif %}
         {% endfor %}
