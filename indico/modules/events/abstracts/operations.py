@@ -82,7 +82,7 @@ def add_abstract_files(abstract, files, log_action=True):
         else:
             msg = 'Added {} files to abstract {}'.format(num, abstract.verbose_title)
         abstract.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Abstracts', msg, session.user,
-                               data={'Files': ', '.join(f.filename for f in files)})
+                               data={'Files': ', '.join(f.filename for f in abstract.files)})
 
 
 def delete_abstract_files(abstract, files):
