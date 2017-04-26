@@ -374,7 +374,6 @@ class User(PersonMixin, db.Model):
     # - judged_abstracts (Abstract.judge)
     # - judged_papers (PaperRevision.judge)
     # - layout_reviewer_for_contributions (Contribution.paper_layout_reviewers)
-    # - legacy_paper_reviewing_roles (LegacyPaperReviewingRole.user)
     # - local_groups (LocalGroup.members)
     # - merged_from_users (User.merged_into_user)
     # - modified_abstract_comments (AbstractComment.modified_by)

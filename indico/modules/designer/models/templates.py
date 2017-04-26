@@ -96,6 +96,9 @@ class DesignerTemplate(db.Model):
         post_update=True
     )
 
+    # relationship backrefs:
+    # - images (DesignerImageFile.template)
+
     def __init__(self, **kwargs):
         data = kwargs.pop('data', None)
         tpl_type = kwargs.get('type')

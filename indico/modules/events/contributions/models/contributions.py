@@ -354,8 +354,6 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     # - _paper_revisions (PaperRevision._contribution)
     # - attachment_folders (AttachmentFolder.contribution)
     # - legacy_mapping (LegacyContributionMapping.contribution)
-    # - legacy_paper_files (LegacyPaperFile.contribution)
-    # - legacy_paper_reviewing_roles (LegacyPaperReviewingRole.contribution)
     # - note (EventNote.contribution)
     # - timetable_entry (TimetableEntry.contribution)
     # - vc_room_associations (VCRoomEventAssociation.linked_contrib)
