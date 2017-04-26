@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import session, flash
 from werkzeug.exceptions import Forbidden
 
+from indico.core.errors import NoReportError
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
@@ -56,7 +57,11 @@ class RHSubmitAbstract(RHAbstractsBase):
     """Submit a new abstract."""
 
     def _checkProtection(self):
-        if not session.user or not self.event_new.cfa.can_submit_abstracts(session.user):
+        cfa = self.event_new.cfa
+        if session.user and not cfa.is_open and not cfa.can_submit_abstracts(session.user):
+            raise NoReportError(_('The Call for Abstracts is closed. Please contact the event organiser for further '
+                                  'assistance.'), http_status_code=403)
+        elif not session.user or not cfa.can_submit_abstracts(session.user):
             raise Forbidden
         RHAbstractsBase._checkProtection(self)
 
