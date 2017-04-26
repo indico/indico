@@ -170,7 +170,7 @@ class RHEditPaperComment(RHPaperCommentBase):
         form = PaperCommentForm(obj=self.comment, paper=self.paper, user=session.user,
                                 prefix='edit-comment-{}-'.format(self.comment.id))
         if form.validate_on_submit():
-            visibility = form.visibility.data if form.visibility else None
+            visibility = form.visibility.data if form.visibility else self.comment.visibility
             update_comment(self.comment, form.text.data, visibility)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
