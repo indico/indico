@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.registration.util import generate_ticket_qr_code
-from indico.util.date_time import format_date
+from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder
 
@@ -77,7 +77,7 @@ class EventDatesPlaceholder(Placeholder):
         start_dt, end_dt = event.start_dt_local, event.end_dt_local
         interval = _("{} to {}").format(format_date(start_dt, format='long'), format_date(end_dt, format='long'))
         if start_dt.date() == end_dt.date():
-            interval = format_date(start_dt, format='long')
+            interval = format_datetime(start_dt)
         elif start_dt.date().replace(day=1) == end_dt.date().replace(day=1):
             interval = "{} - {} {}".format(start_dt.day, end_dt.day, format_date(start_dt, format='MMMM yyyy'))
         return interval
