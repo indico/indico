@@ -114,7 +114,7 @@ class RoomForm(IndicoForm):
     notification_before_repeating = IntegerField(_(u'Send booking reminders X days before repeating bookings'),
                                                  [Optional(), NumberRange(min=1, max=30)], default=7)
     notification_before_single = IntegerField(_(u'Send booking reminders X days before single bookings'),
-                                              [Optional(), NumberRange(min=1, max=30)], default=1)
+                                              [Optional(), NumberRange(min=1, max=30)], default=2)
     notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
     booking_limit_days = IntegerField(_(u'Maximum length of booking (days)'), [Optional(), NumberRange(min=1)])
     owner = PrincipalField(_(u'Owner'), [DataRequired()], allow_external=True)

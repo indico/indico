@@ -28,6 +28,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
+from indico.modules.rb.util import first_occurrence_date
 
 
 def _build_notification_window_filter():
@@ -64,7 +65,7 @@ def roombooking_occurrences():
             same_user_occurrences = []
             for other in occurrences:
                 if (other.reservation.booked_for_user == occ.reservation.booked_for_user and
-                        other.first_start_date == occ.first_start_date and not other.notification_sent):
+                        first_occurrence_date(other) == first_occurrence_date(occ) and not other.notification_sent):
                     other.notification_sent = True
                     if other.reservation.repeat_frequency == RepeatFrequency.DAY:
                         other.reservation.occurrences.update({'notification_sent': True})

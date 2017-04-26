@@ -4,7 +4,7 @@
 {% block email_body -%}
 {% if occurrences | length == 1 -%}
     This is a reminder about a booking under your name:
-{% else -%}
+{%- else -%}
     This is a reminder about bookings under your name:
 {%- endif %}
 {%- for occurrence in occurrences %}

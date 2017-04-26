@@ -306,8 +306,10 @@ class ReservationOccurrence(db.Model, Serializer):
         from indico.modules.rb import settings as rb_settings
         from indico.modules.rb.models.reservations import RepeatFrequency
         from indico.modules.rb.models.rooms import Room
-        in_the_past = cast(cls.start_dt, Date) < cast(func.now(), Date)
-        days_until_occurrence = cast(cls.start_dt, Date) - cast(func.now(), Date)
+        start_date = cast(cls.start_dt, Date)
+        today_date = cast(func.now(), Date)
+        in_the_past = start_date < today_date
+        days_until_occurrence = start_date - today_date
         notification_window_single = func.coalesce(Room.notification_before_single,
                                                    rb_settings.get('notification_before_single'))
         notification_window_repeating = func.coalesce(Room.notification_before_repeating,
@@ -318,11 +320,3 @@ class ReservationOccurrence(db.Model, Serializer):
             return (days_until_occurrence < notification_window) & ~in_the_past
         else:
             return (days_until_occurrence <= notification_window) & ~in_the_past
-
-    @property
-    def first_start_date(self):
-        from indico.modules.rb.models.reservations import RepeatFrequency
-        if self.reservation.repeat_frequency == RepeatFrequency.DAY:
-            return self.reservation.occurrences[0].start_dt.date()
-        else:
-            return self.start_dt.date()

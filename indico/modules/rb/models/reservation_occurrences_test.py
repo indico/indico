@@ -478,9 +478,9 @@ def test_repeating_in_notification_window_from_settings_empty(db, create_occurre
 
 
 @pytest.mark.parametrize(('days_delta', 'expected', 'expected_with_exclude'), (
-    (0, True, True),
-    (1, True, False),
-    (2, False,  False),
+    (1, True, True),
+    (2, True, False),
+    (3, False,  False),
 ))
 def test_single_in_notification_window_from_settings_empty(db, create_occurrence, dummy_room,
                                                            days_delta, expected, expected_with_exclude):

@@ -21,5 +21,6 @@ def upgrade():
 
 
 def downgrade():
-    op.add_column('rooms', sa.Column('notification_for_responsible', sa.BOOLEAN(), autoincrement=False, nullable=True),
-                  schema='roombooking')
+    op.add_column('rooms', sa.Column('notification_for_responsible', sa.Boolean(), nullable=False,
+                                     server_default='false'), schema='roombooking')
+    op.alter_column('rooms', 'notification_for_responsible', server_default=None, schema='roombooking')

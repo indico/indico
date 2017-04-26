@@ -16,8 +16,8 @@
 
 from collections import defaultdict, OrderedDict
 from datetime import datetime
-from flask import session
 
+from flask import session
 from sqlalchemy import Date, Time
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
