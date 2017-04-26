@@ -124,7 +124,7 @@ class DesignerPDFBase(object):
                     pass
 
                 p.drawOn(canvas, margin_x + item_x, self.height - margin_y - item_y - h)
-                item_y -= h
+                item_y += h
 
     def _draw_background(self, canvas, img_reader, pos_x, pos_y, width, height, stretch=True):
         tpl_data = self.tpl_data
