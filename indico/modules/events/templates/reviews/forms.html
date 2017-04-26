@@ -75,7 +75,7 @@
 {% endmacro %}
 
 
-{% macro render_comment_form(form, proposal, comment=none) %}
+{% macro render_comment_form(form, proposal, comment=none, edit=false) %}
     {% set url = proposal.get_save_comment_url(comment) %}
     {% set form_class = 'edit-comment' if edit else 'new-comment unfocused' %}
     {% call form_header(form, action=url, orientation='vertical', classes=form_class) %}

@@ -223,7 +223,7 @@ class RHEditAbstractComment(RHAbstractCommentBase):
             update_abstract_comment(self.comment, form.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/reviews/forms.html')
-        return jsonify(html=tpl.render_comment_form(form, proposal=self.abstract, comment=self.comment))
+        return jsonify(html=tpl.render_comment_form(form, proposal=self.abstract, comment=self.comment, edit=True))
 
 
 class RHDeleteAbstractComment(RHAbstractCommentBase):

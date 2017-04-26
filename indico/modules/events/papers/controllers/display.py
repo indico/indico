@@ -174,7 +174,7 @@ class RHEditPaperComment(RHPaperCommentBase):
             update_comment(self.comment, form.text.data, visibility)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
-        return jsonify(html=tpl.render_comment_form(form, proposal=self.paper, comment=self.comment))
+        return jsonify(html=tpl.render_comment_form(form, proposal=self.paper, comment=self.comment, edit=True))
 
 
 class RHDeletePaperComment(RHPaperCommentBase):
