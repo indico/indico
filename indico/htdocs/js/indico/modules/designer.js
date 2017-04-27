@@ -133,11 +133,11 @@
             left: item.x + 'px',
             top: item.y + 'px',
             zIndex: itemIdCounter + 10
-        }).data('id', item.id).appendTo('#template-div');
+        }).data('id', item.id).appendTo('.template-side.active');
 
         newDiv.draggable({
-            containment: '#template-div',
-            stack: '#template-div > div',
+            containment: '.template-side.active',
+            stack: '.template-side.active > div',
             opacity: 0.5,
             drag: function(e, ui) {
                 if (snapToGrid) {
@@ -174,7 +174,7 @@
         if (lastSelectedDiv) {
             delete items[lastSelectedDiv.data('id')];
             lastSelectedDiv.remove();
-            $('#selection-text').html('');
+            $('.selection-text').html('');
             lastSelectedDiv = null;
             $('#modify-panel').hide();
             $('#tab-format').hide();
@@ -186,7 +186,7 @@
         // Change the text that says which item is selected
         var id = selection.parent('.ui-draggable').data('id');
         var item = items[id];
-        $('#selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
+        $('.selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
 
         // Bring highlight to the element modification tab.
         if (controlTabs) {
@@ -304,7 +304,7 @@
 
 
     function changeTemplateSize(template) {
-        var tpl = $('#template-div');
+        var tpl = $('.template-container');
         tpl.width($('#badge_width').val() * pixelsPerCm);
         tpl.height($('#badge_height').val() * pixelsPerCm);
         previousTemplateDimensions.width = templateDimensions.width;
@@ -513,7 +513,7 @@
             $('#loadingIcon').hide();
             $('#remove-background').removeClass('hidden');
             setBackgroundPos($(this), template.data.background_position);
-        }).appendTo('#template-div');
+        }).appendTo('.template-side.active');
     }
 
     function removeBackground(template) {
@@ -547,15 +547,11 @@
         $(document).ready(function() {
             $('#bg-form input[type="file"]').on('change', function() {
                 var $this = $(this);
-                if ($this.val()) {
-                    $('#upload-background').removeClass('hidden');
-                } else {
-                    $('#upload-background').addClass('hidden');
-                }
+                $('#upload-background').toggleClass('disabled', !$this.val());
             });
 
-            if (template.backgroundId) {
-                $('#remove-background').removeClass('hidden');
+            if (template.background) {
+                $('#remove-background').removeClass('disabled');
             }
 
             // select and inline edit
@@ -645,6 +641,16 @@
             });
 
             controlTabs = $('#designer-control-tabs').tabs();
+
+            $('.js-toggle-side').on('click', function() {
+                var $this = $(this);
+                var flipSide = $this.hasClass('front') ? 'back' : 'front';
+                $('#template-div').toggleClass('flipped', flipSide === 'front');
+                $('.template-side.back').toggleClass('active', flipSide === 'front');
+                $('.template-side.front').toggleClass('active', flipSide === 'back');
+                $('.js-toggle-side').removeClass('highlight');
+                $this.toggleClass('highlight');
+            });
         });
 
         // We load the template if we are editing a template
@@ -652,7 +658,7 @@
             // We give the toHTML() method to each of the items
             templateDimensions = new Dimensions(template.data.width, template.data.height);
             $('#template-name').val(template.title);
-            $('#template-div').width(templateDimensions.width)
+            $('.template-container').width(templateDimensions.width)
                               .height(templateDimensions.height);
         } else {
             templateDimensions = new Dimensions(config.tpl_size[0], config.tpl_size[1]);
