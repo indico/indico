@@ -124,6 +124,10 @@ class RegistrationFormScheduleForm(IndicoForm):
                                    description=_("Moment when registrations will be open"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')], default_time=time(23, 59),
                                  description=_("Moment when registrations will be closed"))
+    modification_end_dt = IndicoDateTimeField(_("Modification deadline"), [Optional(), LinkedDateTime('end_dt')],
+                                              default_time=time(23, 59),
+                                              description=_("Deadline until which registration information can be "
+                                                            "modified (defaults to the end date if empty)"))
 
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')

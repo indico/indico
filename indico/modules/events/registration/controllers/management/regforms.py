@@ -255,6 +255,7 @@ class RHRegistrationFormSchedule(RHManageRegFormBase):
         if form.validate_on_submit():
             self.regform.start_dt = form.start_dt.data
             self.regform.end_dt = form.end_dt.data
+            self.regform.modification_end_dt = form.modification_end_dt.data
             flash(_("Registrations for {} have been scheduled").format(self.regform.title), 'success')
             logger.info("Registrations for %s scheduled by %s", self.regform, session.user)
             return jsonify_data(flash=False)
