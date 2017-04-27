@@ -60,29 +60,6 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel f-a-start">
-                    <i class="icon-image" title="{% trans %}Background{% endtrans %}"></i>
-                    <form id="bg-form" action="{{ url_for('designer.upload_image', template) }}" method="POST"
-                          enctype="multipart/form-data" class="content">
-                        <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
-                        <input name="file" type="file" style="margin-bottom: 1em;">
-                        <div>
-                            <label>{% trans %}Stretch{% endtrans %}</label>
-                            <input checked type="radio" id="bgPosStretch" name='bg_position' value="stretch">
-                            <label>{% trans %}Center{% endtrans %}</label>
-                            <input type='radio' id="bgPosCenter" name='bg_position' value="center">
-                        </div>
-                        <div class="toolbar hide-if-locked">
-                            <a class="i-button icon-upload hidden" id="upload-background"
-                               title="{% trans %}Upload file{% endtrans %}">
-                                {%- trans %}Upload{% endtrans -%}
-                            </a>
-                            <a class="i-button icon-cross hidden" id="remove-background">
-                                {%- trans %}Remove background{% endtrans -%}
-                            </a>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
         <div id="tabs-formatting" class="designer-tab flex-row">
@@ -204,67 +181,107 @@
             </div>
         </div>
     </div>
-    <table class="designer-table" border="0" cellpadding="0" cellspacing="0">
-        <tbody>
-            <tr>
-                <td rowspan="2" id="controls">
-
-                    <div class="panel">
-                        <h3 class="new-element-heading">{% trans %}Insert Elements{% endtrans %}</h3>
-                        <div class="flexrow f-a-baseline">
-                            <select name="Template Elements List" id="elementList">
-                                {% for group_id, group in placeholders.viewitems() | sort(attribute='1.title') %}
-                                    {% if group_id not in config.disallow_groups %}
-                                        <optgroup label="{{ group.title }}">
-                                            {% for option_id, option in group.options|dictsort(by='value') %}
-                                                <option value="{{ option_id }}">{{ option }}</option>
-                                            {% endfor %}
-                                        </optgroup>
-                                    {% endif %}
-                                {% endfor %}
-                                <optgroup label="{% trans %}Fixed data{% endtrans %}">
-                                    <option value="fixed">{% trans %}Fixed text{% endtrans %}</option>
-                                </optgroup>
-                            </select>
-                            <button id="insert-button" class="i-button highlight icon-next right"
-                                    title="{% trans %}Insert{% endtrans %}">
-                                {%- trans %}Insert{% endtrans -%}
-                            </button>
-                    </div>
+    <div class="designer-table-wrapper flexrow">
+        <div class="controls">
+            <div class="panel">
+                <h3>{% trans %}Select side{% endtrans %}</h3>
+                <div class="toolbar">
+                    <button class="i-button highlight js-toggle-side front">
+                        {%- trans %}Front side{% endtrans -%}
+                    </button>
+                    <button class="i-button js-toggle-side back">
+                        {%- trans %}Back side{% endtrans -%}
+                    </button>
                 </div>
-                <div id="modify-panel" class="panel overflow clear" style="display: none;">
-
-                    <div class="overflow">
-                        <h3>{% trans %}Selected Element{% endtrans %}</h3>
-                        <div id="selection-text" class="left">
-                        </div>
+            </div>
+            <div class="panel">
+                <h3 class="new-element-heading">{% trans %}Insert elements{% endtrans %}</h3>
+                <div class="flexrow f-a-baseline">
+                    <select name="Template Elements List" id="elementList">
+                        {% for group_id, group in placeholders.viewitems() | sort(attribute='1.title') %}
+                            {% if group_id not in config.disallow_groups %}
+                                <optgroup label="{{ group.title }}">
+                                    {% for option_id, option in group.options|dictsort(by='value') %}
+                                        <option value="{{ option_id }}">{{ option }}</option>
+                                    {% endfor %}
+                                </optgroup>
+                            {% endif %}
+                        {% endfor %}
+                        <optgroup label="{% trans %}Fixed data{% endtrans %}">
+                            <option value="fixed">{% trans %}Fixed text{% endtrans %}</option>
+                        </optgroup>
+                    </select>
+                    <button id="insert-button" class="insert-element-btn i-button highlight icon-next text-color subtle"
+                            title="{% trans %}Insert{% endtrans %}">
+                        {%- trans %}Insert{% endtrans -%}
+                    </button>
+                </div>
+            </div>
+            <div id="modify-panel" class="panel overflow clear" style="display: none;">
+                <div class="overflow">
+                    <h3>{% trans %}Selected element{% endtrans %}</h3>
+                    <div class="flexrow f-a-center">
+                        <div class="selection-text f-self-stretch"></div>
                         <a id="remove-button"
-                           class="right i-button icon-remove icon-only"
+                           class="i-button icon-remove icon-only text-color subtle"
                            title="{% trans %}Remove Element{% endtrans %}"></a>
                     </div>
-                </td>
-
-                <td></td>
-
-                <td align="left" valign="bottom" height="16px">
-                    <div id="horizontal-ruler" class="ruler">
+                </div>
+            </div>
+            <div class="panel background-image-panel">
+                <h3>{% trans %}Background image{% endtrans %}</h3>
+                <form id="bg-form" action="{{ url_for('designer.upload_image', template) }}" method="POST"
+                      enctype="multipart/form-data" class="content">
+                    <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+                    <input name="file" type="file">
+                    <div class="toolbar space-before space-after hide-if-locked">
+                        <a class="i-button icon-upload disabled" id="upload-background"
+                           title="{% trans %}Upload file{% endtrans %}">
+                            {%- trans %}Upload{% endtrans -%}
+                        </a>
+                        <a class="i-button icon-cross disabled" id="remove-background">
+                            {%- trans %}Remove background{% endtrans -%}
+                        </a>
                     </div>
-                </td>
-            </tr>
-            <tr>
-                <td valign="top" align="right" width="22px">
-                    <div id="vertical-ruler" class="ruler">
+                    <div>
+                        <label for="bgPosStretch">{% trans %}Stretch{% endtrans %}</label>
+                        <input checked type="radio" id="bgPosStretch" name='bg_position' value="stretch">
+                        <label for="bgPosCenter">{% trans %}Center{% endtrans %}</label>
+                        <input type='radio' id="bgPosCenter" name='bg_position' value="center">
                     </div>
-                </td>
+                </form>
+            </div>
+        </div>
+        <table class="designer-table" border="0" cellpadding="0" cellspacing="0">
+            <tbody>
+                <tr>
+                    <td align="left" valign="bottom" height="16px">
+                        <div id="horizontal-ruler" class="ruler">
+                        </div>
+                    </td>
+                </tr>
+                <tr>
+                    <td valign="top" align="right" width="16px">
+                        <div id="vertical-ruler" class="ruler">
+                        </div>
+                    </td>
 
-                <td align="left" valign="top">
-                    <div id="template-div">
-                        <img id="background">
-                    </div>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+                    <td align="left" valign="top">
+                        <div class="template-container">
+                            <div id="template-div">
+                                <div class="template-side front active">
+                                    <img id="background">
+                                </div>
+                                <div class="template-side back">
+                                    <img id="background">
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
     <script>
         (function() {
