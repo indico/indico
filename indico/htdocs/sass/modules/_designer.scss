@@ -15,112 +15,27 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#designer-control-tabs {
-    input[type=text],
-    input[type=number] {
-        @extend %text-input;
-    }
 
-    input[type=number] {
-        width: 5em;
-    }
+.designer-canvas-wrapper {
+    margin-top: 2em;
 
-    .designer-tab {
-        min-height: 150px;
-    }
-
-    .designer-tab-content > .panel {
-        padding-right: 1em;
-        margin-right: 1em;
-        display: flex;
-
-        div {
-            margin-bottom: 0.5em;
-
-            &:last-child {
-                margin-bottom: 0;
-            }
-        }
-    }
-
-    .designer-tab-content > .panel:not(:last-of-type) {
-        border-right: 1px solid #ddd;
-    }
-
-    .panel > i[class*='icon-'] {
-        margin-left: 0 !important;
-    }
-
-    .panel > i[class*='icon-']::before {
-        color: #ddd;
-        font-size: 2.5em;
-        margin-right: 0.2em;
-    }
-
-    .panel .content {
-        margin-left: 1em;
-    }
-
-    .panel .content h4:first-child {
-        margin-top: 0;
-    }
-
-    label[for="snap_checkbox"] {
-        font-weight: normal;
-        margin-left: 0.5em;
-    }
-
-    #font-selector, #color-selector, #style-selector, #size-selector, #alignment-selector {
-        display: block;
-        width: 10em;
-        margin-bottom: 5px;
-
-        &:last-child {
-            margin-bottom: 0;
-        }
-    }
-
-    #bgForm input[type="file"] {
-        max-width: 250px;
-    }
-
-    .positioning-box {
-        button {
-            padding: 10px;
-        }
-    }
-
-    .panel#fixed-text-container {
-        display: none;
-    }
-}
-
-.designer-table-wrapper {
     .controls {
-        .selection-text {
-            color: $dark-gray;
-            font-size: 1.2em;
+        .template-side-controls,
+        .insert-element-controls {
+            margin-bottom: 1em;
         }
 
-        .background-image-panel {
-            color: $dark-gray;
+        .insert-element-controls {
+            label {
+                font-weight: normal;
+                margin-right: 0.5em;
+                color: $light-black;
+            }
         }
 
         .insert-element-btn {
             margin-left: 1em;
         }
-
-        & > .panel:first-child h3 {
-            margin-top: 0;
-        }
-
-        .panel h3 {
-            margin-bottom: 0.5em;
-        }
-    }
-
-    .designer-table {
-        margin-left: 2em;
     }
 
     .ruler {
@@ -129,6 +44,7 @@
 
     .ruler#horizontal-ruler {
         top: -16px;
+        left: 16px;
     }
 
     .ruler#vertical-ruler {
@@ -185,7 +101,7 @@
         top: 0;
         perspective: 1000px;
 
-        #template-div {
+        .template-content {
             width: 100%;
             height: 100%;
             position: absolute;
@@ -198,7 +114,6 @@
 
             .template-side {
                 margin: 0;
-                display: block;
                 position: absolute;
                 width: 100%;
                 height: 100%;
@@ -263,4 +178,101 @@
 
 .custom-template-list {
     margin-top: 20px;
+}
+
+.designer-tools {
+    min-height: 120px;
+
+    .designer-tools-row {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: $light-gray;
+        color: $light-black;
+    }
+
+    input[type=text],
+    input[type=number] {
+        @extend %text-input;
+    }
+
+    input[type=number] {
+        width: 5em;
+    }
+
+    input[type=file] {
+        display: none;
+    }
+
+    label {
+        font-weight: normal;
+    }
+
+    .tool {
+        display: flex;
+        align-items: center;
+        margin: 1em 0;
+
+        &:not(:last-child) {
+            padding-right: 1em;
+            border-right: 1px solid $gray;
+        }
+
+        &:first-child {
+            margin-left: 1em;
+        }
+
+        &:not(:first-child) {
+            padding-left: 1em;
+        }
+
+        &:last-child {
+            margin-right: 1em;
+        }
+
+        i {
+            margin-right: 0.5em;
+            font-size: 1.5em;
+            color: $gray;
+        }
+
+        label {
+            margin-right: 0.3em;
+        }
+
+        .scale {
+            margin-left: 0.2em;
+            color: $dark-gray;
+        }
+
+        .background-label {
+            max-width: 10em;
+        }
+
+        &.font-tools .subtool {
+            margin-right: 0.5em;
+        }
+
+        .selection-text {
+            margin-right: 1em;
+            font-weight: bold;
+        }
+    }
+
+    .element-tools {
+        border-top: 1px dashed $pastel-gray;
+    }
+
+    .subtool {
+        display: flex;
+        align-items: center;
+
+        &:not(:last-child) {
+            margin-right: 1em;
+        }
+
+        &.background-position {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
 }
