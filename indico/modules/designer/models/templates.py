@@ -21,6 +21,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import TemplateType, DEFAULT_CONFIG
+from indico.modules.designer.models.images import DesignerImageFile
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -104,8 +105,20 @@ class DesignerTemplate(db.Model):
         tpl_type = kwargs.get('type')
         if data is None:
             data = {
-                'items': [],
-                'background_position': 'stretch'
+                'front': {
+                    'items': [],
+                    'background': {
+                        'image_id': '',
+                        'position': 'stretch'
+                    }
+                },
+                'back': {
+                    'items': [],
+                    'background': {
+                        'image_id': '',
+                        'position': 'stretch'
+                    }
+                }
             }
             size = DEFAULT_CONFIG[tpl_type]['tpl_size']
             data.update({'width': size[0], 'height': size[1]})
@@ -114,6 +127,16 @@ class DesignerTemplate(db.Model):
     @property
     def owner(self):
         return self.event_new if self.event_new else self.category
+
+    @property
+    def background_image_front(self):
+        image_id = self.data['front']['background']['image_id']
+        return DesignerImageFile.get(int(image_id)) if image_id else None
+
+    @property
+    def background_image_back(self):
+        image_id = self.data['back']['background']['image_id']
+        return DesignerImageFile.get(int(image_id)) if image_id else None
 
     @locator_property
     def locator(self):

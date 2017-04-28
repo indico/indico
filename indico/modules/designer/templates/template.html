@@ -5,199 +5,200 @@
 {% endblock %}
 
 {% block page_actions %}
-    <div style="float:right;">
-        <button class="i-button highlight icon-floppy hide-if-locked" id="save-button">
-            {% trans %}Save Template{% endtrans %}
+    <div class="toolbar f-j-end">
+        <button class="i-button highlight icon-floppy js-save-template hide-if-locked">
+            {%- trans %}Save Template{% endtrans -%}
         </button>
-        <a class="i-button" href="{{ url_for('.template_list', owner) }}">
-             {% trans %}Go back{% endtrans %}
-        </a>
+        <a class="i-button" href="{{ url_for('.template_list', owner) }}">{% trans %}Go back{% endtrans %}</a>
     </div>
 {% endblock %}
 
 {% block content %}
-    <div id="designer-control-tabs">
-        <ul>
-            <li>
-                <a href="#tabs-general">
-                    {% trans %}General Settings &amp; Layout{% endtrans %}
-                </a>
-            </li>
-            <li id="tab-format">
-                <a href="#tabs-formatting">
-                    {% trans %}Element Formatting{% endtrans %}
-                </a>
-            </li>
-        </ul>
-
-        <div id="tabs-general" class="designer-tab">
-            <div class="designer-tab-content flexrow">
-                <div class="panel f-a-start">
-                    <i class="icon-wrench" title="{% trans %}Template settings{% endtrans %}"></i>
-                    <div class="content">
-                        <div>{% trans %}Template Name{% endtrans %}</div>
-                        <input id="template-name" size="20" name="Template Name" type="text">
-                    </div>
+    <div class="designer-tools flexcol">
+        <div class="designer-tools-row">
+            <div class="tool">
+                <label>{% trans %}Name{% endtrans %}</label>
+                <input class="js-template-name" size="20" type="text">
+            </div>
+            <div class="tool">
+                <i class="icon-rulers" title="{% trans %}Template dimensions{% endtrans %}"></i>
+                <div class="subtool">
+                    <label>{% trans %}Width:{% endtrans %}</label>
+                    <input class="template-width" size="5" type="number">
+                    <span class="scale">cm</span>
                 </div>
-                <div class="panel f-a-start f-self-no-shrink">
-                    <i class="icon-rulers" title="{% trans %}Template dimensions{% endtrans %}"></i>
-                    <div class="content flexcol f-a-end">
-                        <div>
-                            <span>{% trans %}Width{% endtrans %}</span>
-                            <input id="badge_width" name="Badge Width" size="5" type="number">
-                            <span class="text-not-important">cm</span>
-                        </div>
-                        <div>
-                            <span>{% trans %}Height{% endtrans %}</span>
-                            <input id="badge_height" name="Badge Height" size="5" type="number">
-                            <span class="text-not-important">cm</span>
-                        </div>
-                        <div>
-                            <label for="snap_checkbox">
-                                {%- trans %}Snap to grid{% endtrans -%}
-                            </label>
-                            <input id="snap_checkbox" type="checkbox">
-                        </div>
-                    </div>
+                <div class="subtool">
+                    <label>{% trans %}Height:{% endtrans %}</label>
+                    <input class="template-height" size="5" type="number">
+                    <span class="scale">cm</span>
                 </div>
             </div>
+            <div class="tool">
+                <label for="grid-snap">{% trans %}Snap to grid{% endtrans %}</label>
+                <input id="grid-snap" type="checkbox">
+            </div>
+            <div class="tool">
+                <i class="icon-image" title="{% trans %}Template background{% endtrans %}"></i>
+                <form id="bg-form" class="content flexrow f-a-center"
+                      action="{{ url_for('designer.upload_image', template) }}"
+                      enctype="multipart/form-data"
+                      method="POST">
+                    <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+                    <input id="backgroundFile" name="file" type="file">
+                    <label for="backgroundFile" class="i-button background-label truncate-text">
+                        {%- trans %}Choose a file{% endtrans -%}
+                    </label>
+                    <div class="subtool">
+                        <div class="toolbar">
+                            <button class="i-button icon-upload icon-only js-upload-bg"
+                                    title="{% trans %}Upload file{% endtrans %}"></button>
+                            <button class="i-button icon-cross icon-only js-remove-bg" disabled
+                                    title="{% trans %}Remove background{% endtrans %}"></button>
+                        </div>
+                    </div>
+                    <div class="subtool background-position">
+                        <div>
+                            <input type="radio" id="bg-position-stretch" name='bg-position' value="stretch" checked>
+                            <label for="bg-position-stretch">{% trans %}Stretch{% endtrans %}</label>
+                        </div>
+                        <div>
+                            <input type='radio' id="bg-position-center" name='bg-position' value="center">
+                            <label for="bg-position-center">{% trans %}Center{% endtrans %}</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
         </div>
-        <div id="tabs-formatting" class="designer-tab flex-row">
-            <div class="designer-tab-content flexrow">
-                <div class="panel" id="text-formatting-container">
-                    <i class="icon-font-size" title="{% trans %}Font definitions{% endtrans %}"></i>
-                    <div class="content">
-                        <select id='font-selector' name="Template Element Font" class="attrSelect" data-attr="font">
-                            <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
-                                <option value="serif">Serif</option>
-                                <option value="courier">Courier</option>
-                                <option value="sans-serif">Sans Serif</option>
-                            </optgroup>
-                            <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
-                                <option>LinuxLibertine</option>
-                                <option>Kochi-Mincho</option>
-                                <option>Kochi-Gothic</option>
-                                <option>Uming-CN</option>
-                            </optgroup>
-                        </select>
-                        <select id='color-selector' name="Template Element Color" class="attrSelect" data-attr="color">
-                            <option value="black">{% trans %}black{% endtrans %}</option>
-                            <option value="red">{% trans %}red{% endtrans %}</option>
-                            <option value="blue">{% trans %}blue{% endtrans %}</option>
-                            <option value="green">{% trans %}green{% endtrans %}</option>
-                            <option value="yellow">{% trans %}yellow{% endtrans %}</option>
-                            <option value="brown">{% trans %}brown{% endtrans %}</option>
-                            <option value="gold">{% trans %}gold{% endtrans %}</option>
-                            <option value="pink">{% trans %}pink{% endtrans %}</option>
-                            <option value="gray">{% trans %}gray{% endtrans %}</option>
-                            <option value="white">{% trans %}white{% endtrans %}</option>
-                        </select>
-                        <select id='style-selector' name="Template Element Style" class="attrSelect" data-attr="style">
-                            <option value="normal">{% trans %}Normal{% endtrans %}</option>
-                            <option value="bold">{% trans %}Bold{% endtrans %}</option>
-                            <option value="italic">{% trans %}Italic{% endtrans %}</option>
-                            <option value="bold_italic">{% trans %}Bold &amp; Italic{% endtrans %}</option>
-                        </select>
-                        <select id='size-selector' name="Template Element Size" class="attrSelect" data-attr="size">
-                            <option value="160pt">160pt</option>
-                            <option value="150pt">150pt</option>
-                            <option value="140pt">140pt</option>
-                            <option value="130pt">130pt</option>
-                            <option value="120pt">120pt</option>
-                            <option value="110pt">110pt</option>
-                            <option value="100pt">100pt</option>
-                            <option value="90pt">90pt</option>
-                            <option value="80pt">80pt</option>
-                            <option value="70pt">70pt</option>
-                            <option value="60pt">60pt</option>
-                            <option value="50pt">50pt</option>
-                            <option value="40pt">40pt</option>
-                            <option value="30pt">30pt</option>
-                            <option value="24pt">24pt</option>
-                            <option value="20pt">20pt</option>
-                            <option value="18pt">18pt</option>
-                            <option value="15pt" selected>15pt</option>
-                            <option value="13.5pt">13.5pt</option>
-                            <option value="12pt">12pt</option>
-                            <option value="10pt">10pt</option>
-                            <option value="7.5pt">7.5pt</option>
-                            <option value="7pt">7pt</option>
-                        </select>
-                        <select id='alignment-selector' name="Template Element Alignment" class="attrSelect" data-attr="alignment">
-                            <option value="left">{% trans %}Left{% endtrans %}</option>
-                            <option value="right">{% trans %}Right{% endtrans %}</option>
-                            <option value="center">{% trans %}Center{% endtrans %}</option>
-                            <option value="justified">{% trans %}Justified{% endtrans %}</option>
-                        </select>
-                    </div>
+        <div class="designer-tools-row element-tools" style="display: none;">
+            <div class="tool">
+                <span class="selection-text f-self-stretch"></span>
+                <a class="js-remove-element i-button icon-remove icon-only text-color subtle"
+                   title="{% trans %}Remove element{% endtrans %}"></a>
+            </div>
+            <div class="tool font-tools">
+                <i class="icon-font-size" title="{% trans %}Font dimentions{% endtrans %}"></i>
+                <div class="subtool">
+                    <select id='font-selector' class="js-font-tool" data-attr="font">
+                        <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
+                            <option value="serif">Serif</option>
+                            <option value="courier">Courier</option>
+                            <option value="sans-serif">Sans Serif</option>
+                        </optgroup>
+                        <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
+                            <option>LinuxLibertine</option>
+                            <option>Kochi-Mincho</option>
+                            <option>Kochi-Gothic</option>
+                            <option>Uming-CN</option>
+                        </optgroup>
+                    </select>
                 </div>
-                <div class="panel f-j-end f-self-no-shrink">
-                    <i class="icon-rulers" title="{% trans %}Element dimensions{% endtrans %}"></i>
-                    <div>
-                        <span>{% trans %}Width{% endtrans %}</span>
-                        <input id="width_field" size="5" name="Element Size" type="number">
-                        <span class="text-not-important">cm</span>
-                    </div>
+                <div class="subtool">
+                    <select id='color-selector' class="js-font-tool" data-attr="color">
+                        <option value="black">{% trans %}black{% endtrans %}</option>
+                        <option value="red">{% trans %}red{% endtrans %}</option>
+                        <option value="blue">{% trans %}blue{% endtrans %}</option>
+                        <option value="green">{% trans %}green{% endtrans %}</option>
+                        <option value="yellow">{% trans %}yellow{% endtrans %}</option>
+                        <option value="brown">{% trans %}brown{% endtrans %}</option>
+                        <option value="gold">{% trans %}gold{% endtrans %}</option>
+                        <option value="pink">{% trans %}pink{% endtrans %}</option>
+                        <option value="gray">{% trans %}gray{% endtrans %}</option>
+                        <option value="white">{% trans %}white{% endtrans %}</option>
+                    </select>
                 </div>
-                <div class="panel">
-                    <i class="icon-layout" title="{% trans %}Positioning{% endtrans %}"></i>
-                    <div class="positioning-box">
-                        <div class="flexrow f-j-center">
-                            <button title="{% trans %}Move item to the top{% endtrans %}"
-                                    class="i-button move-button icon-only icon-collapse"
-                                    data-direction="top">
-                            </button>
-                        </div>
-                        <div class="flexrow">
-                            <button title="{% trans %}Move item to the left{% endtrans %}"
-                                    class="i-button move-button icon-only icon-prev"
-                                    data-direction="left">
-                            </button>
-                            <button title="{% trans %}Center item{% endtrans %}"
-                                    class="i-button move-button icon-only icon-circle-small"
-                                    data-direction="center">
-                            </button>
-                            <button title="{% trans %}Move item to the right{% endtrans %}"
-                                    class="i-button move-button icon-only icon-next"
-                                    data-direction="right">
-                            </button>
-                        </div>
-                        <div class="flexrow f-j-center">
-                            <button title="{% trans %}Move item to the bottom{% endtrans %}"
-                                    class="i-button move-button icon-only icon-expand"
-                                    value="{% trans %}Bottom{% endtrans %}"
-                                    data-direction="bottom">
-                            </button>
-                        </div>
-                    </div>
+                <div class="subtool">
+                    <select id='style-selector' class="js-font-tool" data-attr="style">
+                        <option value="normal">{% trans %}Normal{% endtrans %}</option>
+                        <option value="bold">{% trans %}Bold{% endtrans %}</option>
+                        <option value="italic">{% trans %}Italic{% endtrans %}</option>
+                        <option value="bold_italic">{% trans %}Bold &amp; Italic{% endtrans %}</option>
+                    </select>
                 </div>
-                <div class="panel" id="fixed-text-container">
-                    <i class="icon-type" title="{% trans %}Text{% endtrans %}"></i>
-                    <div>
-                        <div>{% trans %}Fixed text element{% endtrans %}</div>
-                        <input id="fixed-text-field" size="30" name="Element Text">
-                    </div>
+                <div class="subtool">
+                    <select id='size-selector' class="js-font-tool" data-attr="size">
+                        <option value="160pt">160pt</option>
+                        <option value="150pt">150pt</option>
+                        <option value="140pt">140pt</option>
+                        <option value="130pt">130pt</option>
+                        <option value="120pt">120pt</option>
+                        <option value="110pt">110pt</option>
+                        <option value="100pt">100pt</option>
+                        <option value="90pt">90pt</option>
+                        <option value="80pt">80pt</option>
+                        <option value="70pt">70pt</option>
+                        <option value="60pt">60pt</option>
+                        <option value="50pt">50pt</option>
+                        <option value="40pt">40pt</option>
+                        <option value="30pt">30pt</option>
+                        <option value="24pt">24pt</option>
+                        <option value="20pt">20pt</option>
+                        <option value="18pt">18pt</option>
+                        <option value="15pt" selected>15pt</option>
+                        <option value="13.5pt">13.5pt</option>
+                        <option value="12pt">12pt</option>
+                        <option value="10pt">10pt</option>
+                        <option value="7.5pt">7.5pt</option>
+                        <option value="7pt">7pt</option>
+                    </select>
+                </div>
+                <div class="subtool">
+                    <select id='alignment-selector' class="js-font-tool" data-attr="alignment">
+                        <option value="left">{% trans %}Left{% endtrans %}</option>
+                        <option value="right">{% trans %}Right{% endtrans %}</option>
+                        <option value="center">{% trans %}Center{% endtrans %}</option>
+                        <option value="justified">{% trans %}Justified{% endtrans %}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="tool">
+                <i class="icon-rulers" title="{% trans %}Element dimensions{% endtrans %}"></i>
+                <label for="element-width">{% trans %}Width:{% endtrans %}</label>
+                <input id="element-width" class="js-element-width" size="5" type="number">
+                <span class="scale">cm</span>
+            </div>
+            <div class="tool" style="display: none;">
+                <label for="fixed-text-field">{% trans %}Text:{% endtrans %}</label>
+                <input type="text" id="fixed-text-field">
+            </div>
+            <div class="tool">
+                <i class="icon-layout" title="{% trans %}Element positioning{% endtrans %}"></i>
+                <div class="toolbar thin">
+                    <button title="{% trans %}Move item to the top{% endtrans %}"
+                            class="i-button move-button icon-only text-color subtle icon-collapse"
+                            data-direction="top">
+                    </button>
+                    <button title="{% trans %}Move item to the left{% endtrans %}"
+                            class="i-button move-button icon-only text-color subtle icon-prev"
+                            data-direction="left">
+                    </button>
+                    <button title="{% trans %}Center item{% endtrans %}"
+                            class="i-button move-button icon-only text-color subtle icon-circle-small"
+                            data-direction="center">
+                    </button>
+                    <button title="{% trans %}Move item to the right{% endtrans %}"
+                            class="i-button move-button icon-only text-color subtle icon-next"
+                            data-direction="right">
+                    </button>
+                    <button title="{% trans %}Move item to the bottom{% endtrans %}"
+                            class="i-button move-button icon-only text-color subtle icon-expand"
+                            data-direction="bottom">
+                    </button>
                 </div>
             </div>
         </div>
     </div>
-    <div class="designer-table-wrapper flexrow">
+    <div class="designer-canvas-wrapper flexcol f-a-center">
         <div class="controls">
-            <div class="panel">
-                <h3>{% trans %}Select side{% endtrans %}</h3>
-                <div class="toolbar">
-                    <button class="i-button highlight js-toggle-side front">
-                        {%- trans %}Front side{% endtrans -%}
-                    </button>
-                    <button class="i-button js-toggle-side back">
-                        {%- trans %}Back side{% endtrans -%}
-                    </button>
+            <div class="template-side-controls">
+                <div class="toolbar f-j-center">
+                    <button class="i-button highlight js-toggle-side front">{% trans %}Front side{% endtrans %}</button>
+                    <button class="i-button js-toggle-side back">{% trans %}Back side{% endtrans %}</button>
                 </div>
             </div>
-            <div class="panel">
-                <h3 class="new-element-heading">{% trans %}Insert elements{% endtrans %}</h3>
+            <div class="insert-element-controls">
                 <div class="flexrow f-a-baseline">
-                    <select name="Template Elements List" id="elementList">
+                    <label for="element-list">{% trans %}Insert element:{% endtrans %}</label>
+                    <select id="element-list">
                         {% for group_id, group in placeholders.viewitems() | sort(attribute='1.title') %}
                             {% if group_id not in config.disallow_groups %}
                                 <optgroup label="{{ group.title }}">
@@ -217,40 +218,6 @@
                     </button>
                 </div>
             </div>
-            <div id="modify-panel" class="panel overflow clear" style="display: none;">
-                <div class="overflow">
-                    <h3>{% trans %}Selected element{% endtrans %}</h3>
-                    <div class="flexrow f-a-center">
-                        <div class="selection-text f-self-stretch"></div>
-                        <a id="remove-button"
-                           class="i-button icon-remove icon-only text-color subtle"
-                           title="{% trans %}Remove Element{% endtrans %}"></a>
-                    </div>
-                </div>
-            </div>
-            <div class="panel background-image-panel">
-                <h3>{% trans %}Background image{% endtrans %}</h3>
-                <form id="bg-form" action="{{ url_for('designer.upload_image', template) }}" method="POST"
-                      enctype="multipart/form-data" class="content">
-                    <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
-                    <input name="file" type="file">
-                    <div class="toolbar space-before space-after hide-if-locked">
-                        <a class="i-button icon-upload disabled" id="upload-background"
-                           title="{% trans %}Upload file{% endtrans %}">
-                            {%- trans %}Upload{% endtrans -%}
-                        </a>
-                        <a class="i-button icon-cross disabled" id="remove-background">
-                            {%- trans %}Remove background{% endtrans -%}
-                        </a>
-                    </div>
-                    <div>
-                        <label for="bgPosStretch">{% trans %}Stretch{% endtrans %}</label>
-                        <input checked type="radio" id="bgPosStretch" name='bg_position' value="stretch">
-                        <label for="bgPosCenter">{% trans %}Center{% endtrans %}</label>
-                        <input type='radio' id="bgPosCenter" name='bg_position' value="center">
-                    </div>
-                </form>
-            </div>
         </div>
         <table class="designer-table" border="0" cellpadding="0" cellspacing="0">
             <tbody>
@@ -265,15 +232,14 @@
                         <div id="vertical-ruler" class="ruler">
                         </div>
                     </td>
-
                     <td align="left" valign="top">
                         <div class="template-container">
-                            <div id="template-div">
-                                <div class="template-side front active">
-                                    <img id="background">
+                            <div class="template-content">
+                                <div class="template-side front active" data-side="front">
+                                    <img class="background-image">
                                 </div>
-                                <div class="template-side back">
-                                    <img id="background">
+                                <div class="template-side back" data-side="back">
+                                    <img class="background-image">
                                 </div>
                             </div>
                         </div>
@@ -290,7 +256,10 @@
             var template = {
                 title: {{ template.title | tojson }},
                 data: {{ template.data | tojson }},
-                background: {{ (template.background_image.download_url if template.background_image else none) | tojson }}
+                background_urls: {
+                    front: {{ (template.background_image_front.download_url if template.background_image_front else none) | tojson }},
+                    back: {{ (template.background_image_back.download_url if template.background_image_back else none) | tojson }}
+                }
             };
             setupDesigner(template, {{ config | tojson }}, {{ placeholders | tojson }});
         })();
