@@ -45,30 +45,76 @@ TEMPLATE_DATA_JSON_SCHEMA = {
     'properties': {
         'width': {'type': 'integer', 'minimum': 0},
         'height': {'type': 'integer', 'minimum': 0},
-        'background_position': {'type': 'string'},
-        'items': {
-            'type': 'array',
-            'items': {
-                'type': 'object',
-                'properties': {
-                    'id': {'type': 'integer'},
-                    'text': {'type': 'string'},
-                    'x': {'type': 'number', 'minimum': 0},
-                    'y': {'type': 'number', 'minimum': 0},
-                    'width': {'type': 'integer', 'minimum': 0},
-                    'color': {'type': 'string'},
-                    'font_family': {'type': 'string'},
-                    'font_size': {'type': 'string'},
-                    'text_align': {'type': 'string'},
-                    'bold': {'type': 'boolean'},
-                    'italic': {'type': 'boolean'}
-                }
+        'front': {
+            'type': 'object',
+            'properties': {
+                'background': {
+                    'type': 'object',
+                    'properties': {
+                        'position': {'type': 'string'},
+                        'image_id': {'type': 'integer'}
+                    }
+                },
+                'items': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'integer'},
+                            'text': {'type': 'string'},
+                            'x': {'type': 'number', 'minimum': 0},
+                            'y': {'type': 'number', 'minimum': 0},
+                            'width': {'type': 'integer', 'minimum': 0},
+                            'color': {'type': 'string'},
+                            'font_family': {'type': 'string'},
+                            'font_size': {'type': 'string'},
+                            'text_align': {'type': 'string'},
+                            'bold': {'type': 'boolean'},
+                            'italic': {'type': 'boolean'}
+                        }
+                    },
+                    'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
+                                 'bold', 'italic']
+                },
             },
-            'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
-                         'bold', 'italic']
+            'required': ['background', 'items']
         },
+        'back': {
+            'type': 'object',
+            'properties': {
+                'background': {
+                    'type': 'object',
+                    'properties': {
+                        'position': {'type': 'string'},
+                        'image_id': {'type': 'integer'}
+                    }
+                },
+                'items': {
+                    'type': 'array',
+                    'items': {
+                        'type': 'object',
+                        'properties': {
+                            'id': {'type': 'integer'},
+                            'text': {'type': 'string'},
+                            'x': {'type': 'number', 'minimum': 0},
+                            'y': {'type': 'number', 'minimum': 0},
+                            'width': {'type': 'integer', 'minimum': 0},
+                            'color': {'type': 'string'},
+                            'font_family': {'type': 'string'},
+                            'font_size': {'type': 'string'},
+                            'text_align': {'type': 'string'},
+                            'bold': {'type': 'boolean'},
+                            'italic': {'type': 'boolean'}
+                        }
+                    },
+                    'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
+                                 'bold', 'italic']
+                },
+            },
+            'required': ['background', 'items']
+        }
     },
-    'required': ['width', 'height', 'background_position', 'items']
+    'required': ['width', 'height', 'front']
 }
 
 
@@ -225,12 +271,9 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target)
 
     def _process_POST(self):
-        self.template.data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
+        self.template.data = dict(**request.json['template'])
         self.template.title = request.json['title']
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, self.template.data)
-
-        if request.json.pop('clear_background'):
-            self.template.background_image = None
 
         flash(_("Template successfully saved."), 'success')
         return jsonify_data()
@@ -268,10 +311,9 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
             return jsonify(error="File format not accepted!")
         content_type = 'image/' + image_type
         image = DesignerImageFile(template=self.template, filename=filename, content_type=content_type)
-        self.template.background_image = image
         image.save(data)
         flash(_("The image has been uploaded"), 'success')
-        return jsonify_data(image_url=image.download_url)
+        return jsonify_data(image_url=image.download_url, image_id=image.id)
 
 
 class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
