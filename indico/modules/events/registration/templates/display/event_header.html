@@ -3,7 +3,7 @@
         <div class="event-details-label align-top">{% trans %}Registration{% endtrans %}</div>
         <div class="event-details-content">
             {% for regform in regforms %}
-                {% set registration = session.user and regform.id in user_registrations %}
+                {% set registration = user_registrations.get(regform.id) %}
                 <div class="event-service-row">
                     <div class="event-service-row-collapsed clearfix">
                         <div class="event-service-info left">
@@ -29,11 +29,13 @@
                                     </span>
                                 {% endif %}
                                 <div class="group">
-                                   {% if registration  %}
-                                        <a class="i-button i-button-small icon-edit highlight"
-                                            href="{{ url_for('event_registration.display_regform', regform) }}">
-                                            <strong>{% trans %}Modify registration{% endtrans %}</strong>
-                                        </a>
+                                   {% if registration %}
+                                       {% if registration.can_be_modified %}
+                                           <a class="i-button i-button-small icon-edit highlight"
+                                              href="{{ url_for('event_registration.display_regform', regform) }}">
+                                               <strong>{% trans %}Modify registration{% endtrans %}</strong>
+                                           </a>
+                                       {% endif %}
                                    {% elif regform.limit_reached %}
                                        <a class="i-button i-button-small highlight disabled"
                                           title="{% trans %}There are no more places available.{% endtrans %}">
@@ -44,12 +46,12 @@
                                           href="{{ url_for('event_registration.display_regform', regform) }}">
                                            <strong>{% trans %}Apply for participation{% endtrans %}</strong>
                                        </a>
-                                    {% else %}
-                                        <a class="i-button i-button-small highlight icon-quill"
-                                            href="{{ url_for('event_registration.display_regform', regform) }}">
-                                            <strong>{% trans %}Register{% endtrans %}</strong>
-                                        </a>
-                                    {% endif %}
+                                   {% else %}
+                                       <a class="i-button i-button-small highlight icon-quill"
+                                          href="{{ url_for('event_registration.display_regform', regform) }}">
+                                           <strong>{% trans %}Register{% endtrans %}</strong>
+                                       </a>
+                                   {% endif %}
                                 </div>
                             </div>
                         {% endif %}
