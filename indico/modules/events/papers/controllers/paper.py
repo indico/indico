@@ -109,8 +109,8 @@ class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
     """Generate a ZIP file with paper files for a given list of contributions"""
 
     def _prepare_folder_structure(self, item):
-        paper_title = secure_filename('{}_{}'.format(item.paper.contribution.title, item.paper.contribution.id),
-                                      'paper')
+        paper_title = secure_filename('{}_{}'.format(item.paper.contribution.friendly_id,
+                                                     item.paper.contribution.title), 'paper')
         file_name = secure_filename('{}_{}'.format(item.id, item.filename), 'paper')
         return os.path.join(*self._adjust_path_length([paper_title, file_name]))
 
