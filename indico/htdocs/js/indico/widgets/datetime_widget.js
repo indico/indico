@@ -134,8 +134,8 @@
             updateTimeRequired(e);
             updateResetFieldAction();
         }).on('keydown', function(e) {
-            e.preventDefault();
             if (e.which === K.BACKSPACE) {
+                e.preventDefault();
                 clearDate();
             }
         });
