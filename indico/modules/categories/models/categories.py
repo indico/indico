@@ -233,7 +233,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @classmethod
     def get_root(cls):
-        """Get the root category or create if if needed"""
+        """Get the root category or create it if needed"""
         root = cls.query.filter(cls.is_root).one_or_none()
         if not root:
             root = cls(id=0, title='Home', protection_mode=ProtectionMode.public)
@@ -303,7 +303,8 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     def get_tree_cte(cls, col='id'):
         """Create a CTE for the category tree.
 
-        The CTE contains the followign columns:
+        The CTE contains the following columns:
+
         - ``id`` -- the category id
         - ``path`` -- an array containing the path from the root to
                       the category itself
