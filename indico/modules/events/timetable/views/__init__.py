@@ -136,11 +136,11 @@ def inject_meeting_body(event, **kwargs):
     tt_tpl = ((plugin.name + tpl_name)
               if (plugin and tpl_name[0] == ':')
               else posixpath.join('events/timetable/display', tpl_name))
-    total_days = (event.end_dt - event.start_dt).days + 1
+    multiple_days = event.start_dt.astimezone(event_tz).date() != event.end_dt.astimezone(event_tz).date()
     return render_template(tt_tpl, event=event, entries=entries, days=days,
                            timezone=event_tz.zone, tz_object=event_tz, hide_contribs=(detail_level == 'session'),
                            theme_settings=theme.get('settings', {}), show_siblings_location=show_siblings_location,
-                           show_children_location=show_children_location, total_days=total_days, **kwargs)
+                           show_children_location=show_children_location, multiple_days=multiple_days, **kwargs)
 
 
 def _entry_title_key(entry):

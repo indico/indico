@@ -18,7 +18,7 @@
                     day-{{ item.start_dt.date().isoformat() }}
                 {%- endset %}
                 <li id="{{ anchor }}">
-                    {% if total_days > 1 %}
+                    {% if multiple_days %}
                         <div class="day-header" style="width: 100%;">
                             <div class="day-title" data-anchor="{{ anchor }}">
                                 {{ item.start_dt | format_date(format='EEEE, d MMMM', timezone=timezone) }}
