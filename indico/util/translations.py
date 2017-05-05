@@ -38,4 +38,8 @@ def jinja2_babel_extract(fileobj, keywords, comment_tags, options):
     whitespace within ``{% trans %}`` tags.
     """
     for lineno, func, message, comments in babel_extract(fileobj, keywords, comment_tags, options):
-        yield lineno, func, trim_inner_whitespace(message), comments
+        if isinstance(message, tuple):
+            message = tuple(trim_inner_whitespace(x) if isinstance(x, basestring) else x for x in message)
+        else:
+            message = trim_inner_whitespace(message)
+        yield lineno, func, message, comments
