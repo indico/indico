@@ -11,18 +11,14 @@
 {% endblock %}
 
 {% block title %}
-    {% trans track_title=track.title -%}
-        Abstracts from <span class="track-name">{{ track_title }}</span>
-    {%- endtrans %}
+    {% trans track_title=track.title %}Abstracts from <span class="track-name">{{ track_title }}</span>{% endtrans %}
 {% endblock %}
 
 {% block content %}
     {% if not total_abstracts %}
         <div class="info-message-box">
             <span class="icon"></span>
-            <div class="message-text">
-                {%- trans -%}There are no abstracts in this track.{%- endtrans -%}
-            </div>
+            <div class="message-text">{% trans %}There are no abstracts in this track.{% endtrans %}</div>
         </div>
     {% else %}
         <div class="list abstracts">
@@ -40,7 +36,7 @@
                             data-dialog-classes="list-filter-dialog"
                             data-update='{"html": "#abstract-list", "filter_statistics": "#filter-statistics"}'
                             data-ajax-dialog>
-                        {% trans %}Customize list{% endtrans %}
+                        {%- trans %}Customize list{% endtrans -%}
                     </button>
                     <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
                        data-href="{{ url_for('.display_download_attachments', track) }}">
