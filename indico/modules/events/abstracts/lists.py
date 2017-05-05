@@ -245,6 +245,8 @@ class AbstractListGeneratorDisplay(AbstractListGeneratorBase):
         self.track = track
         self.default_list_config['items'] = ('accepted_contrib_type', 'state')
         items = {'submitted_contrib_type', 'submitter', 'accepted_contrib_type', 'state'}
+        if self.track.can_convene(session.user):
+            items.add('score')
         self.static_items = OrderedDict((key, value)
                                         for key, value in self.static_items.iteritems()
                                         if key in items)
