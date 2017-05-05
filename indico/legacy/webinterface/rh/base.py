@@ -71,6 +71,7 @@ from indico.web.flask.util import ResponseUtil, url_for
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
 
+logger = Logger.get('requestHandler')
 
 class RequestHandlerBase():
 
@@ -317,7 +318,7 @@ class RH(RequestHandlerBase):
                 except BuildError as e:
                     if current_app.debug:
                         raise
-                    Logger.get('requestHandler').warn('BuildError during normalization: %s', e)
+                    logger.warn('BuildError during normalization: %s', e)
                     raise NotFound
             else:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
@@ -500,7 +501,7 @@ class RH(RequestHandlerBase):
     def _check_auth(self, params):
         self._setSessionUser()
         if session.user:
-            Logger.get('requestHandler').info('Request authenticated: %r', session.user)
+            logger.info('Request authenticated: %r', session.user)
         self._checkCSRF()
         self._reqParams = copy.copy(params)
 
@@ -550,15 +551,6 @@ class RH(RequestHandlerBase):
                 res = self._process()
         return profile_name, res
 
-    def _process_success(self):
-        Logger.get('requestHandler').info('Request successful')
-        # request is succesfull, now, doing tasks that must be done only once
-        try:
-            GenericMailer.flushQueue(True)  # send emails
-            self._deleteTempFiles()
-        except:
-            Logger.get('mail').exception('Mail sending operation failed')
-
     def process(self, params):
         if request.method not in HTTP_VERBS:
             # Just to be sure that we don't get some crappy http verb we don't expect
@@ -576,8 +568,8 @@ class RH(RequestHandlerBase):
             self._check_event_feature()
 
         textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
-        Logger.get('requestHandler').info(u'Request started: %s %s [IP=%s] [PID=%s]',
-                                          request.method, request.relative_url, request.remote_addr, os.getpid())
+        logger.info(u'Request started: %s %s [IP=%s] [PID=%s]',
+                    request.method, request.relative_url, request.remote_addr, os.getpid())
 
         is_error_response = False
         try:
@@ -587,13 +579,22 @@ class RH(RequestHandlerBase):
                 self._check_auth(params)
                 profile_name, res = self._do_process(profile)
                 signals.after_process.send()
+
+                if self.commit:
+                    # ensure we fail early (before sending out e-mails)
+                    # in case there are DB constraint violations, etc...
+                    db.enforce_constraints()
+
+                # send e-mails
+                GenericMailer.flushQueue(True)
+
                 if self.commit:
                     db.session.commit()
                 else:
                     db.session.rollback()
             except DatabaseError:
                 handle_sqlalchemy_database_error()  # this will re-raise an exception
-            self._process_success()
+            logger.info('Request successful')
         except Exception as e:
             db.session.rollback()
             res = self._getMethodByExceptionName(e)(e)
