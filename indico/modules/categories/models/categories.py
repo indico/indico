@@ -233,12 +233,8 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
 
     @classmethod
     def get_root(cls):
-        """Get the root category or create it if needed"""
-        root = cls.query.filter(cls.is_root).one_or_none()
-        if not root:
-            root = cls(id=0, title='Home', protection_mode=ProtectionMode.public)
-            db.session.add(root)
-        return root
+        """Get the root category"""
+        return cls.query.filter(cls.is_root).one()
 
     @property
     def url(self):

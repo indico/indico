@@ -32,9 +32,12 @@ from flask_pluginengine import current_plugin
 from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import migrate
+from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.core.db.sqlalchemy.util.queries import has_extension
 from indico.core.plugins import plugin_engine
+from indico.modules.categories import Category
+from indico.modules.users import User
 from indico.util.console import cformat
 
 
@@ -113,6 +116,11 @@ def prepare():
         return
     print cformat('%{green}Creating tables')
     db.create_all()
+    print cformat('%{green}Creating system user')
+    db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
+    print cformat('%{green}Creating root category')
+    db.session.add(Category(id=0, title='Home', protection_mode=ProtectionMode.public))
+    db.session.commit()
 
 
 def _safe_downgrade(*args, **kwargs):
