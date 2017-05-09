@@ -440,16 +440,27 @@ def generate_ticket_qr_code(registration):
     return qr.make_image()._img
 
 
-def get_event_regforms(event, user):
+def get_event_regforms(event, user, with_registrations=False):
     """Get registration forms with information about user registrations.
 
     :param event: the `Event` to get registration forms for
     :param user: A `User`
+    :param with_registrations: Whether to return the user's
+                               registration instead of just
+                               whether they have one
     """
-    registered_user = RegistrationForm.registrations.any((Registration.user == user) & Registration.is_active)
-    return (RegistrationForm.query.with_parent(event)
-            .with_entities(RegistrationForm,
-                           registered_user if user else db.literal(False))
-            .options(undefer('active_registration_count'))
-            .order_by(db.func.lower(RegistrationForm.title))
-            .all())
+    if not user:
+        registered_user = db.literal(None if with_registrations else False)
+    elif with_registrations:
+        registered_user = Registration
+    else:
+        registered_user = RegistrationForm.registrations.any((Registration.user == user) & Registration.is_active)
+    query = (RegistrationForm.query.with_parent(event)
+             .with_entities(RegistrationForm, registered_user)
+             .options(undefer('active_registration_count'))
+             .order_by(db.func.lower(RegistrationForm.title)))
+    if with_registrations:
+        query = query.outerjoin(Registration, db.and_(Registration.registration_form_id == RegistrationForm.id,
+                                                      Registration.user == user,
+                                                      Registration.is_active))
+    return query.all()

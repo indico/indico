@@ -3,7 +3,7 @@
         <div class="event-details-label align-top">{% trans %}Registration{% endtrans %}</div>
         <div class="event-details-content">
             {% for regform in regforms %}
-                {% set registration = user_registrations.get(regform.id) %}
+                {% set registration = user_registrations[regform] %}
                 <div class="event-service-row">
                     <div class="event-service-row-collapsed clearfix">
                         <div class="event-service-info left">

@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from flask import session, render_template, flash
 
 from indico.core import signals
@@ -79,10 +77,10 @@ def _inject_regform_announcement(event, **kwargs):
 def _inject_event_header(event, **kwargs):
     from indico.modules.events.registration.util import get_event_regforms
     if event.has_feature('registration'):
-        all_regforms = get_event_regforms(event, session.user)
-        open_and_registered_regforms = [regform[0] for regform in all_regforms if regform[0].is_open or regform[1]]
-        user_registrations = {regform.id: regform.get_registration(user=session.user)
-                              for regform, user in all_regforms if user}
+        all_regforms = get_event_regforms(event, session.user, with_registrations=True)
+        open_and_registered_regforms = [regform for regform, registration in all_regforms
+                                        if regform.is_open or registration]
+        user_registrations = {regform: registration for regform, registration in all_regforms}
         # A participant could appear more than once in the list in case he register to multiple registration form.
         # This is deemed very unlikely in the case of meetings and lectures and thus not worth the extra complexity.
         return render_template('events/registration/display/event_header.html', event=event,
