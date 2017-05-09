@@ -2543,8 +2543,8 @@ ul.material_list ul li {
 }
 
 .user_list_icon_shield {
-	cursor: pointer;
-	margin-left: 5px;
-	vertical-align: -12%;
-	font-size: 15px;
+    cursor: pointer;
+    margin-left: 5px;
+    vertical-align: -12%;
+    font-size: 15px;
 }

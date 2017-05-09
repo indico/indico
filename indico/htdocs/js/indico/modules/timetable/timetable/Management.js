@@ -374,8 +374,8 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
                         this.__getCurrentDayText() + "," :
                         $T("the interval ") + this.__getIntervalTitle(),
                         $T(" to fill the gaps between them, so that their starting time don't change. " +
-                        		"If a time gap is specified, the duration will be extended up to the value of " +
-                        		"this time gap before the starting time of the next entry. "),
+                           "If a time gap is specified, the duration will be extended up to the value of " +
+                           "this time gap before the starting time of the next entry. "),
                         durationRescheduleExample));
 
         durationRescheduleLabel.dom.htmlFor = "durationRescheduleRB";

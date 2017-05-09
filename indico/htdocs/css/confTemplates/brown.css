@@ -22,11 +22,11 @@
 }
 
 
-	/* ------Menu------ */
-	/* here is layout and style for creating default menu for conferences */
+/* ------Menu------ */
+/* here is layout and style for creating default menu for conferences */
 
 
-    /* Styles for all menu Items */
+/* Styles for all menu Items */
 
 #outer {
     background: #dfe7e7;
@@ -48,14 +48,14 @@
 }
 
 .conf_leftMenu {
-	float:left;
-	width:200px;
-	background:transparent none repeat scroll 0 0;
+    float:left;
+    width:200px;
+    background:transparent none repeat scroll 0 0;
 }
 
 
 .menuConfTitle {
-	color:#0200C6;
+    color:#0200C6;
 }
 
 .menuConfTitle a {

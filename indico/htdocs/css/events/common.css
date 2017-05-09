@@ -37,39 +37,37 @@ ul.dayList {
 }
 
 .abstract {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: small;
-	color: #000000;
-	padding: 5px 5px 5px;
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+    font-size: small;
+    color: #000000;
+    padding: 5px 5px 5px;
 }
 .headers {
-	margin: 0px;
-	vertical-align: top;
+    margin: 0px;
+    vertical-align: top;
 }
 .speakers {
     text-align: right;
-	margin: 0px;
-	vertical-align: top;
+    margin: 0px;
+    vertical-align: top;
     float: right;
 }
 a.author:link {
-	color: #fff;
+    color: #fff;
 }
 
 a.material {
     padding: 2px 8px;
     height: 15px;
-	color: #333333;
-	float: left;
-	border-left: 1px dotted #AAA;
-    /*background-color: #F7EDD0;*/
-    background-color: #EEEEEE;
     color: #333333;
+    float: left;
+    border-left: 1px dotted #AAA;
+    background-color: #EEEEEE;
 }
 
 a.material:hover {
-	background-color: #444444;
-	color: white;
+    background-color: #444444;
+    color: white;
 }
 
 table pre {

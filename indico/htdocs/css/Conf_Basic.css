@@ -16,12 +16,12 @@
  */
 
 /*
-		Default Styles and layout for Conf-pages
-		Do not custom this CSS
-	*/
+        Default Styles and layout for Conf-pages
+        Do not custom this CSS
+    */
 
-	/* 	------Wrapper------ */
-	/* 	this is the wrapper of whole conference page */
+    /*     ------Wrapper------ */
+    /*     this is the wrapper of whole conference page */
 
 .conf {
     width: 100%;
@@ -33,38 +33,38 @@
     Header
 */
 .confheader {
-	background: #1a64a0;
+    background: #1a64a0;
 }
 
 .confLogoBox {
-	height: 100%;
-	float: left;
-	padding-right: 10px;
-	background: transparent none repeat scroll 0 0;
+    height: 100%;
+    float: left;
+    padding-right: 10px;
+    background: transparent none repeat scroll 0 0;
 }
 
 .confTitleBox {
-	color: white;
-	min-height: 90px;
-	text-align:left;
-	border-top: 3px solid #234173;
+    color: white;
+    min-height: 90px;
+    text-align:left;
+    border-top: 3px solid #234173;
     border-bottom: 1px solid #0f4c80;
     background: #1a64a0;
 }
 
 .confTitle {
-	width: 950px;
-	margin: 0 auto;
+    width: 950px;
+    margin: 0 auto;
 }
 
 .confTitle h1 {
-	font-weight: normal;
-	margin: 0;
+    font-weight: normal;
+    margin: 0;
 }
 
 .conferencetitlelink {
-	font-size:22pt;
-	display: block;
+    font-size:22pt;
+    display: block;
     padding: 25px 0;
     color: white;
 }
@@ -144,14 +144,14 @@ div.datePlace > div.timezone {
 }
 
 .conf_leftMenu {
-	float:left;
-	width:200px;
-	background:transparent none repeat scroll 0 0;
+    float:left;
+    width:200px;
+    background:transparent none repeat scroll 0 0;
 }
 
 
 .menuConfTitle {
-	text-align:left;
+    text-align:left;
 }
 
 .menuConfTitle a {
@@ -159,7 +159,7 @@ div.datePlace > div.timezone {
     padding: 7px 12px;
 }
 
-	/* sub menu item */
+    /* sub menu item */
 
 li.menuConfMiddleCell {
     font-weight: normal;
@@ -170,10 +170,10 @@ li.menuConfMiddleCell {
 }
 
 li.menuConfMiddleCell a {
-    padding: 0px 0px 0px 30px;
+    padding: 0 0 0 30px;
 }
 
-	/* selected menu item */
+    /* selected menu item */
 
 .menuConfSelected, .menuConfMiddleCellSelected {
     color: #BD891A;
@@ -183,15 +183,15 @@ li.menuConfMiddleCell a {
 }
 
 .menuConfBottomCell {
-	border-bottom:0px;
-	border-top:0px;
-	background:transparent none repeat scroll 0 0;
+    border-bottom:0px;
+    border-top:0px;
+    background:transparent none repeat scroll 0 0;
     display: none;
 }
 
-	/* Support link */
+    /* Support link */
 
-	/*For dynamic menu*/
+    /*For dynamic menu*/
 
 .inner {
     font-family: arial,sans-serif;
@@ -207,9 +207,9 @@ li.menuConfMiddleCell a {
 
 
 .conf_leftMenu ul {
-	list-style:none;
-	margin: 0px;
-	padding: 0px;
+    list-style:none;
+    margin: 0;
+    padding: 0;
 }
 
 
@@ -227,27 +227,27 @@ li ul.inner li a {
 li:hover ul, li.over ul { display: block; } /* For dynamic */
 
 
-	/* ------Content------ */
+/* ------Content------ */
 
-	/* wrapper of content and bradcrumps */
+/* wrapper of content and bradcrumps */
 
 .confBodyBox {
-	margin-left:230px;
-	background:transparent none repeat scroll 0 0;
+    margin-left:230px;
+    background:transparent none repeat scroll 0 0;
 
 }
 
 /* This is for if someday you have more than one column in content */
 
 .mainContent {
-	width:100%;
+    width:100%;
 }
 
 
 .col2 {
-	width:100%;
-	float:left;
-	font-family: verdana,arial,sans-serif;;
+    width:100%;
+    float:left;
+    font-family: verdana,arial,sans-serif;;
 }
 
 
@@ -265,21 +265,21 @@ table.conferenceDetails td {
 }
 
 table.conferenceDetails .displayField {
-	text-align:left;
-	font-weight: bold;
-	font-size: 10pt;
-	padding-right: 20px;
-	color: #444;
+    text-align:left;
+    font-weight: bold;
+    font-size: 10pt;
+    padding-right: 20px;
+    color: #444;
 }
 
 .italic {
-	font-style:italic;
+    font-style:italic;
 }
 
 .menuConfTopCell { display: none;}
 
 
-    /* General elements */
+/* General elements */
 
 pre {
     margin: 0;
@@ -302,8 +302,8 @@ pre {
 /* Elements not part of the conference itself */
 
 ul.chair_list {
-    padding: 0px;
-    margin: 0px;
+    padding: 0;
+    margin: 0;
     list-style-type: none;
 }
 
@@ -320,7 +320,6 @@ ul.chair_list {
 }
 
 .support_box > h3 {
-    margin: 10px;
     color: #f3f3f3;
     background: #1a64a0;
     margin: 0 0 5px 0;

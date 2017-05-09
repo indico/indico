@@ -1,6 +1,6 @@
 ﻿
 .confTitleBox {
-	border-top: 3px solid #e05e00;
+    border-top: 3px solid #e05e00;
     border-bottom: 1px solid #c05000;
     background: #fa6900 url("../../images/conf/sprites_orange.png") repeat-x 0 -24px;
 }
@@ -21,11 +21,11 @@
 }
 
 
-	/* ------Menu------ */
-	/* here is layout and style for creating default menu for conferences */
+/* ------Menu------ */
+/* here is layout and style for creating default menu for conferences */
 
 
-    /* Styles for all menu Items */
+/* Styles for all menu Items */
 
 #outer {
     background: #dfe7e7;
@@ -47,14 +47,14 @@
 }
 
 .conf_leftMenu {
-	float:left;
-	width:200px;
-	background:transparent none repeat scroll 0 0;
+    float:left;
+    width:200px;
+    background:transparent none repeat scroll 0 0;
 }
 
 .menuConfTitle {
-	text-align:left;
-	color:#0200C6;
+    text-align:left;
+    color:#0200C6;
 }
 
 .menuConfTitle a {
