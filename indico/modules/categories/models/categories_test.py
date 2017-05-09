@@ -88,7 +88,7 @@ def test_effective_protection_mode(db):
 
 @pytest.fixture
 def category_family(create_category, db):
-    grandpa = create_category(0, title='Grandpa', protection_mode=ProtectionMode.public, parent=None)
+    grandpa = Category.get_root()
     dad = create_category(1, title='Dad', parent=grandpa)
     son = create_category(2, title='Son', parent=dad)
     sibling = create_category(3, title='Sibling', parent=dad)

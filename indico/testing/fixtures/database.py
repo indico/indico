@@ -27,7 +27,7 @@ from sqlalchemy.engine import Engine
 from sqlalchemy import event
 
 from indico.core.db import db as db_
-from indico.core.db.sqlalchemy.util.management import delete_all_tables
+from indico.core.db.sqlalchemy.util.management import delete_all_tables, create_all_tables
 from indico.util.process import silent_check_call
 from indico.web.flask.app import configure_db
 
@@ -99,7 +99,7 @@ def database(app, postgresql):
         yield db_
         return
     with app.app_context():
-        db_.create_all()
+        create_all_tables(db_)
     yield db_
     db_.session.remove()
     with app.app_context():

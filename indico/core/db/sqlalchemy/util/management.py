@@ -18,6 +18,9 @@ from sqlalchemy import MetaData, ForeignKeyConstraint, Table
 from sqlalchemy.engine.reflection import Inspector
 from sqlalchemy.sql.ddl import DropConstraint, DropTable, DropSchema
 
+from indico.core.db.sqlalchemy.protection import ProtectionMode
+from indico.util.console import cformat
+
 
 def get_all_tables(db):
     """Returns a dict containing all tables grouped by schema"""
@@ -59,3 +62,19 @@ def delete_all_tables(db):
                 conn.execute(stmt)
             conn.execute(DropSchema(schema))
     transaction.commit()
+
+
+def create_all_tables(db, verbose=False):
+    """Create all tables and required initial objects"""
+    from indico.modules.categories import Category
+    from indico.modules.users import User
+    if verbose:
+        print cformat('%{green}Creating tables')
+    db.create_all()
+    if verbose:
+        print cformat('%{green}Creating system user')
+    db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
+    if verbose:
+        print cformat('%{green}Creating root category')
+    db.session.add(Category(id=0, title='Home', protection_mode=ProtectionMode.public))
+    db.session.commit()
