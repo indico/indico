@@ -691,7 +691,7 @@ class PDFLaTeXBase(object):
 
 class LaTeXRuntimeException(Exception):
     def __init__(self, source_file, log_file):
-        super(LaTeXRuntimeException, self).__init__('{} -> {}'.format(source_file, log_file))
+        super(LaTeXRuntimeException, self).__init__('LaTeX compilation of {} failed'.format(source_file))
         self.source_file = source_file
         self.log_file = log_file
 
