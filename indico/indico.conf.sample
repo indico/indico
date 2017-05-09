@@ -99,11 +99,10 @@ BaseURL = 'https://indico.yourdomain.tld'
 #------------------------------------------------------------------------------
 # DIRECTORIES
 #------------------------------------------------------------------------------
-LogDir          = "/opt/indico/log"
-TempDir         = "/opt/indico/tmp"
-SharedTempDir   = "/opt/indico/tmp"
-AssetsDir       = "/opt/indico/assets"
-CacheDir        = "/opt/indico/cache"
+LogDir    = '/opt/indico/log'
+TempDir   = '/opt/indico/tmp'
+AssetsDir = '/opt/indico/assets'
+CacheDir  = '/opt/indico/cache'
 # You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
 # CacheDir while the Memcached backend uses one or more memcached servers.
 #CacheBackend         = 'files'

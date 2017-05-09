@@ -226,7 +226,6 @@ class Config:
         'BaseURL'                   : 'http://localhost',
         'LogDir'                    : "/opt/indico/log" ,
         'TempDir'                   : "/opt/indico/tmp",
-        'SharedTempDir'             : "",
         'AssetsDir'                 : '/opt/indico/assets',
         'CacheDir'                  : "/opt/indico/cache",
         'CacheBackend'              : 'files',
@@ -504,9 +503,6 @@ class Config:
         if id not in self.__systemIcons:
             return id
         return self.__systemIcons[id]
-
-    def getSharedTempDir(self):
-        return self._configVars.get('SharedTempDir') or self.getTempDir()
 
     def getHtdocsDir(self):
         return os.path.join(get_root_path('indico'), 'htdocs')
