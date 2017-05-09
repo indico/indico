@@ -197,7 +197,6 @@ class RH(RequestHandlerBase):
         self._reqParams = {}
         self._startTime = None
         self._endTime = None
-        self._tempFilesToDelete = []
         self._doProcess = True  # Flag which indicates whether the RH process
                                 # must be carried out; this is useful for
                                 # the checkProtection methods when they
@@ -649,14 +648,6 @@ class RH(RequestHandlerBase):
         if isinstance(e, BadData):  # we also want its subclasses
             exception_name = 'BadData'
         return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
-
-    def _deleteTempFiles(self):
-        if len(self._tempFilesToDelete) > 0:
-            for f in self._tempFilesToDelete:
-                if f is not None:
-                    os.remove(f)
-
-    relativeURL = None
 
 
 class RHSimple(RH):

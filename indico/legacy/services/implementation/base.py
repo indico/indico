@@ -51,7 +51,6 @@ class ServiceBase(RequestHandlerBase):
         self._doProcess = True  #Flag which indicates whether the RH process
                                 #   must be carried out; this is useful for
                                 #   the checkProtection methods
-        self._tempFilesToDelete = []
 
     # Methods =============================================================
 
@@ -77,11 +76,6 @@ class ServiceBase(RequestHandlerBase):
         trace = traceback.format_exception(*sys.exc_info())
 
         return ''.join(trace)
-
-    def _deleteTempFiles( self ):
-        if len(self._tempFilesToDelete) > 0:
-            for file in self._tempFilesToDelete:
-                os.remove(file)
 
     def process(self):
         """
@@ -114,7 +108,6 @@ class ServiceBase(RequestHandlerBase):
                 os.remove(proffilename)
             else:
                 answer = self._getAnswer()
-            self._deleteTempFiles()
 
             return answer
 
