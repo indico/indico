@@ -574,14 +574,12 @@ class RH(RequestHandlerBase):
                 signals.after_process.send()
 
                 if self.commit:
-                    # ensure we fail early (before sending out e-mails)
-                    # in case there are DB constraint violations, etc...
-                    db.enforce_constraints()
+                    if GenericMailer.has_queue():
+                        # ensure we fail early (before sending out e-mails)
+                        # in case there are DB constraint violations, etc...
+                        db.enforce_constraints()
+                        GenericMailer.flushQueue(True)
 
-                # send e-mails
-                GenericMailer.flushQueue(True)
-
-                if self.commit:
                     db.session.commit()
                 else:
                     db.session.rollback()

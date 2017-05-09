@@ -52,6 +52,10 @@ class GenericMailer:
                 g.setdefault('email_queue', []).append(mailData)
 
     @classmethod
+    def has_queue(cls):
+        return bool(g.get('email_queue'))
+
+    @classmethod
     def flushQueue(cls, send):
         queue = g.get('email_queue', None)
         if not queue:
