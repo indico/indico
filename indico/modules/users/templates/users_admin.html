@@ -80,7 +80,13 @@
                                         {%- endif -%}
                                     </span>
                                     <span class="right">
-                                        {{ user_entry.email }}
+                                        {% if user_entry.user and user_entry.user.is_system %}
+                                            <em title="{% trans %}This is the system user.{% endtrans %}">
+                                                {%- trans %}System{% endtrans -%}
+                                            </em>
+                                        {% else %}
+                                            {{ user_entry.email }}
+                                        {% endif %}
                                         {% if user_entry.affiliation -%}
                                             ({{ user_entry.affiliation }})
                                         {%- endif -%}

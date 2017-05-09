@@ -62,7 +62,7 @@ from indico.legacy.webinterface.rh.base import RHProtected
 
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
-UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url'})
+UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'})
 
 
 class RHUserBase(RHProtected):
@@ -374,17 +374,19 @@ class RHUsersAdmin(RHAdminBase):
             include_pending = form_data.pop('include_pending')
             external = form_data.pop('external')
             form_data = {k: v for (k, v) in form_data.iteritems() if v and v.strip()}
-            matches = search_users(exact=exact, include_deleted=include_deleted,
-                                   include_pending=include_pending, external=external, **form_data)
+            matches = search_users(exact=exact, include_deleted=include_deleted, include_pending=include_pending,
+                                   external=external, allow_system_user=True, **form_data)
             for entry in matches:
                 if isinstance(entry, User):
                     search_results.append(UserEntry(
                         profile_url=url_for('.user_profile', entry),
+                        user=entry,
                         **{k: getattr(entry, k) for k in IDENTITY_ATTRIBUTES}
                     ))
                 else:
                     search_results.append(UserEntry(
                         profile_url=None,
+                        user=None,
                         full_name="{first_name} {last_name}".format(**entry.data.to_dict()),
                         **{k: entry.data.get(k) for k in (IDENTITY_ATTRIBUTES - {'full_name'})}
                     ))

@@ -171,7 +171,8 @@ def serialize_user(user):
     }
 
 
-def search_users(exact=False, include_deleted=False, include_pending=False, external=False, **criteria):
+def search_users(exact=False, include_deleted=False, include_pending=False, external=False, allow_system_user=False,
+                 **criteria):
     """Searches for users.
 
     :param exact: Indicates if only exact matches should be returned.
@@ -183,6 +184,8 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
                             pending should be returned.
     :param external: Indicates if identity providers should be searched
                      for matching users.
+    :param allow_system_user: Whether the system user may be returned
+                              in the search results.
     :param criteria: A dict containing any of the following keys:
                      first_name, last_name, email, affiliation, phone,
                      address
@@ -219,11 +222,14 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
 
     found_emails = {}
     found_identities = {}
+    system_user = set()
     for user in query:
         for identity in user.identities:
             found_identities[(identity.provider, identity.identifier)] = user
         for email in user.all_emails:
             found_emails[email] = user
+        if user.is_system and not user.all_emails and allow_system_user:
+            system_user = {user}
 
     # external user providers
     if external:
@@ -238,7 +244,7 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
                 found_emails[ident.data['email'].lower()] = ident
                 found_identities[(ident.provider, ident.identifier)] = ident
 
-    return set(found_emails.viewvalues())
+    return set(found_emails.viewvalues()) | system_user
 
 
 def get_user_by_email(email, create_pending=False):

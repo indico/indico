@@ -70,7 +70,7 @@ def user_search(substring, include_deleted, include_pending, include_external, *
     assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
     criteria = {k: v for k, v in criteria.viewitems() if v is not None}
     res = search_users(exact=(not substring), include_deleted=include_deleted, include_pending=include_pending,
-                       external=include_external, **criteria)
+                       external=include_external, allow_system_user=True, **criteria)
     if not res:
         print(cformat('%{yellow}No results found'))
         return
