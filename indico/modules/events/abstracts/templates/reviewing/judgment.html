@@ -78,7 +78,7 @@
                 <div class="group-review-summary">
                     <div class="group-review-summary__summary flexrow f-a-center">
                         {{ _render_abstract_track_reviewing_state_icon(abstract, track) }}
-                        <div class="f-self-stretch truncate-text">
+                        <div class="group-review-summary__track f-self-stretch truncate-text">
                             {{- track.title -}}
                         </div>
                         {% set score = abstract.get_track_score(track) %}
