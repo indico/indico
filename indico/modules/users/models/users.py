@@ -27,7 +27,6 @@ from sqlalchemy.orm import object_session
 from werkzeug.utils import cached_property
 
 from indico.core.auth import multipass
-from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.custom.unaccent import define_unaccented_lowercase_index
@@ -166,7 +165,10 @@ class User(PersonMixin, db.Model):
     principal_type = PrincipalType.user
 
     __tablename__ = 'users'
-    __table_args__ = (db.CheckConstraint('id != merged_into_id', 'not_merged_self'),
+    __table_args__ = (db.Index(None, 'is_system', unique=True, postgresql_where=db.text('is_system')),
+                      db.CheckConstraint('NOT is_system OR (NOT is_blocked AND NOT is_pending AND NOT is_deleted)',
+                                         'valid_system_user'),
+                      db.CheckConstraint('id != merged_into_id', 'not_merged_self'),
                       db.CheckConstraint("is_pending OR (first_name != '' AND last_name != '')",
                                          'not_pending_proper_names'),
                       {'schema': 'users'})
@@ -212,6 +214,12 @@ class User(PersonMixin, db.Model):
         db.Integer,
         db.ForeignKey('users.users.id'),
         nullable=True
+    )
+    #: if the user is the default system user
+    is_system = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
     #: if the user is an administrator with unrestricted access to everything
     is_admin = db.Column(
@@ -394,6 +402,10 @@ class User(PersonMixin, db.Model):
     # - survey_submissions (SurveySubmission.user)
     # - vc_rooms (VCRoom.created_by_user)
 
+    @staticmethod
+    def get_system_user():
+        return User.query.filter_by(is_system=True).one()
+
     @property
     def as_principal(self):
         """The serializable principal identifier of this user"""
@@ -436,10 +448,6 @@ class User(PersonMixin, db.Model):
     def secondary_local_identities(self):
         """The local identities of the user except the main one"""
         return self.local_identities - {self.local_identity}
-
-    @property
-    def is_janitor(self):
-        return self.id == Config.getInstance().getJanitorUserId()
 
     @locator_property
     def locator(self):

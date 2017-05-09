@@ -260,7 +260,6 @@ class Config:
         'SentryDSN'                 : None,
         'SentryLoggingLevel'        : 'WARNING',
         'CategoryCleanup'           : {},
-        'JanitorUserId'             : 0,
         'Plugins'                   : {},
         'AuthProviders'             : {},
         'IdentityProviders'         : {},

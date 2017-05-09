@@ -170,11 +170,6 @@ MaxUploadFileSize = 0
 # CategoryCleanup = {
 #   '2': 30  # delete events in category '2' that have been created more than 30 days ago
 # }
-#
-# If you want maintenance operations to be logged under a user other than the
-# the server administrator (id 0), you can customize it here:
-#
-# JanitorUserId = 0
 
 #------------------------------------------------------------------------------
 # STATIC FILE DELIVERY

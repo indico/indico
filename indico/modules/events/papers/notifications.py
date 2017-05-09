@@ -58,7 +58,7 @@ def notify_paper_review_submission(review):
 def notify_paper_judgment(paper, reset=False):
     event = paper.event_new
     authors = [x for x in paper.contribution.person_links if x.is_author]
-    recipients = ([x for x in authors if x.email] if paper.last_revision.submitter.is_janitor
+    recipients = ([x for x in authors if x.email] if paper.last_revision.submitter.is_system
                   else [paper.last_revision.submitter])
     template_file = None
     if reset:

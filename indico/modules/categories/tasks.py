@@ -62,7 +62,7 @@ def category_suggestions():
 def category_cleanup():
     from indico.modules.events import Event
     cfg = Config.getInstance()
-    janitor_user = User.get_one(cfg.getJanitorUserId())
+    janitor_user = User.get_system_user()
 
     logger.debug("Checking whether any categories should be cleaned up")
     for categ_id, days in cfg.getCategoryCleanup().iteritems():

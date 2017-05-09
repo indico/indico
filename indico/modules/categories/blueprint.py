@@ -102,7 +102,8 @@ _bp.add_url_rule('!/admin/upcoming-events', 'manage_upcoming', RHManageUpcomingE
 @_bp.before_request
 def _redirect_to_bootstrap():
     # No users in Indico yet? Redirect from index page to bootstrap form
-    if request.endpoint == 'categories.display' and not request.view_args['category_id'] and not User.query.has_rows():
+    if (request.endpoint == 'categories.display' and not request.view_args['category_id'] and
+            not User.query.filter_by(is_system=False).has_rows()):
         return redirect(url_for('bootstrap.index'))
 
 

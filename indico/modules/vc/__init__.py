@@ -85,7 +85,7 @@ def _session_deleted(sess, **kwargs):
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
-    user = session.user if has_request_context() and session.user else User.get(Config.getInstance().getJanitorUserId())
+    user = session.user if has_request_context() and session.user else User.get_system_user()
     for event_vc_room in VCRoomEventAssociation.find_for_event(event, include_hidden=True, include_deleted=True):
         event_vc_room.delete(user)
 
