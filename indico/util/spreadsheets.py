@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import csv
 import re
+from datetime import datetime
 from functools import partial
 from io import BytesIO
 
@@ -25,6 +26,7 @@ from markupsafe import Markup
 from speaklater import is_lazy_string
 from xlsxwriter import Workbook
 
+from indico.util.date_time import format_datetime
 from indico.web.flask.util import send_file
 
 
@@ -86,17 +88,19 @@ def generate_csv(headers, rows):
     return buf
 
 
-def _prepare_excel_data(data):
+def _prepare_excel_data(data, tz=None):
     if isinstance(data, (list, tuple)):
         data = ', '.join(data)
     elif isinstance(data, set):
         data = ', '.join(sorted(data, key=unicode.lower))
     elif is_lazy_string(data) or isinstance(data, Markup):
         data = unicode(data)
+    elif isinstance(data, datetime):
+        data = format_datetime(data, timezone=tz).decode('utf-8')
     return data
 
 
-def generate_xlsx(headers, rows):
+def generate_xlsx(headers, rows, tz=None):
     """Generates an XLSX file from a list of headers and rows.
 
     :param headers: a list of cell captions
@@ -116,7 +120,7 @@ def generate_xlsx(headers, rows):
         for col, name in enumerate(map(_prepare_header, headers)):
             sheet.write(0, col, name, bold)
         for row, values in enumerate(rows, 1):
-            sheet.write_row(row, 0, map(_prepare_excel_data, values))
+            sheet.write_row(row, 0, [_prepare_excel_data(data, tz) for data in values])
     buf.seek(0)
     return buf
 
@@ -133,13 +137,14 @@ def send_csv(filename, headers, rows):
     return send_file(filename, buf, 'text/csv', inline=False)
 
 
-def send_xlsx(filename, headers, rows):
+def send_xlsx(filename, headers, rows, tz=None):
     """Sends an XLSX file to the client
 
     :param filename: The name of the CSV file
     :param headers: a list of cell captions
     :param rows: a list of dicts mapping captions to values
+    :param tz: the timezone for the values that are datetime objects
     :return: a flask response containing the XLSX data
     """
-    buf = generate_xlsx(headers, rows)
+    buf = generate_xlsx(headers, rows, tz=tz)
     return send_file(filename, buf, 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', inline=False)
