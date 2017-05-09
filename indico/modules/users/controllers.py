@@ -67,6 +67,7 @@ UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url'})
 
 class RHUserBase(RHProtected):
     flash_user_status = True
+    allow_system_user = False
 
     def _checkParams(self):
         if not session.user:
@@ -87,6 +88,8 @@ class RHUserBase(RHProtected):
                 if self.user.is_pending:
                     flash(_('This user is marked as pending, i.e. it has been attached to something but never '
                             'logged in.'), 'warning')
+        if not self.allow_system_user and self.user.is_system:
+            return redirect(url_for('users.user_profile'))
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)
@@ -140,6 +143,8 @@ class RHUserDashboard(RHUserBase):
 
 
 class RHPersonalData(RHUserBase):
+    allow_system_user = True
+
     def _process(self):
         form = UserDetailsForm(obj=FormDefaults(self.user, skip_attrs={'title'}, title=self.user._title),
                                synced_fields=self.user.synced_fields, synced_values=self.user.synced_values)

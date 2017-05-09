@@ -110,8 +110,8 @@ def login_user(user, identity=None, admin_impersonation=False):
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
-def _extend_profile_sidemenu(sender, **kwargs):
-    yield SideMenuItem('accounts', _('Accounts'), url_for('auth.accounts'), 50)
+def _extend_profile_sidemenu(sender, user, **kwargs):
+    yield SideMenuItem('accounts', _('Accounts'), url_for('auth.accounts'), 50, disabled=user.is_system)
 
 
 @signals.users.registered.connect

@@ -67,12 +67,12 @@ def _category_deleted(category, **kwargs):
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
-def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('dashboard', _('Dashboard'), url_for('users.user_dashboard'), 100)
+def _sidemenu_items(sender, user, **kwargs):
+    yield SideMenuItem('dashboard', _('Dashboard'), url_for('users.user_dashboard'), 100, disabled=user.is_system)
     yield SideMenuItem('personal_data', _('Personal data'), url_for('users.user_profile'), 90)
-    yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 80)
-    yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 70)
-    yield SideMenuItem('favorites', _('Favourites'), url_for('users.user_favorites'), 60)
+    yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 80, disabled=user.is_system)
+    yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 70, disabled=user.is_system)
+    yield SideMenuItem('favorites', _('Favourites'), url_for('users.user_favorites'), 60, disabled=user.is_system)
 
 
 @template_hook('global-announcement', priority=-1)

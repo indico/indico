@@ -60,7 +60,13 @@ class RHAPIAdminKeys(RHAdminBase):
         return WPAPIAdmin.render_template('admin_keys.html', keys=keys)
 
 
-class RHAPIUserProfile(RHUserBase):
+class RHUserAPIBase(RHUserBase):
+    """Base class for user API management"""
+
+    allow_system_user = True
+
+
+class RHAPIUserProfile(RHUserAPIBase):
     """API key details (user)"""
 
     def _process(self):
@@ -75,7 +81,7 @@ class RHAPIUserProfile(RHUserBase):
                                                 can_modify=(not key or not key.is_blocked or session.user.is_admin))
 
 
-class RHAPICreateKey(RHUserBase):
+class RHAPICreateKey(RHUserAPIBase):
     """API key creation"""
 
     CSRF_ENABLED = True
@@ -110,7 +116,7 @@ class RHAPICreateKey(RHUserBase):
                                    is_persistent_allowed=key.is_persistent_allowed)
 
 
-class RHAPIDeleteKey(RHUserBase):
+class RHAPIDeleteKey(RHUserAPIBase):
     """API key deletion"""
 
     CSRF_ENABLED = True
@@ -122,7 +128,7 @@ class RHAPIDeleteKey(RHUserBase):
         return redirect(url_for('api.user_profile'))
 
 
-class RHAPITogglePersistent(RHUserBase):
+class RHAPITogglePersistent(RHUserAPIBase):
     """API key - persistent signatures on/off"""
 
     CSRF_ENABLED = True
@@ -139,13 +145,13 @@ class RHAPITogglePersistent(RHUserBase):
         return redirect_or_jsonify(url_for('api.user_profile'), flash=not quiet, enabled=key.is_persistent_allowed)
 
 
-class RHAPIBlockKey(RHUserBase):
+class RHAPIBlockKey(RHUserAPIBase):
     """API key blocking/unblocking"""
 
     CSRF_ENABLED = True
 
     def _checkProtection(self):
-        RHUserBase._checkProtection(self)
+        RHUserAPIBase._checkProtection(self)
         if self._doProcess and not session.user.is_admin:
             raise Forbidden
 
