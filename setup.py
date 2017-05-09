@@ -117,7 +117,6 @@ if __name__ == '__main__':
         author_email='indico-team@cern.ch',
         url='http://indico-software.org',
         download_url='https://github.com/indico/indico/releases',
-        platforms=['any'],
         long_description="Indico allows you to schedule conferences, from single talks to complex meetings with "
                          "sessions and contributions. It also includes an advanced user delegation mechanism, "
                          "allows paper reviewing, archival of conference information and electronic proceedings",
