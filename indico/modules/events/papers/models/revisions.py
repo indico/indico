@@ -44,6 +44,7 @@ class PaperRevision(ProposalRevisionMixin, RenderModeMixin, db.Model):
     __tablename__ = 'revisions'
     __table_args__ = (db.Index(None, 'contribution_id', unique=True,
                                postgresql_where=db.text('state = {}'.format(PaperRevisionState.accepted))),
+                      db.UniqueConstraint('contribution_id', 'submitted_dt'),
                       db.CheckConstraint('(state IN ({}, {}, {})) = (judge_id IS NOT NULL)'
                                          .format(PaperRevisionState.accepted, PaperRevisionState.rejected,
                                                  PaperRevisionState.to_be_corrected),
