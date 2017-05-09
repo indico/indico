@@ -17,10 +17,8 @@
 import cgi
 import math
 import os
-import shutil
 import subprocess
 import tempfile
-import uuid
 import xml.sax.saxutils as saxutils
 
 import markdown
@@ -669,7 +667,6 @@ class PDFLaTeXBase(object):
     _table_of_contents = False
 
     def __init__(self):
-
         # Markdown -> LaTeX renderer
         # safe_mode - strip out all HTML
         md = markdown.Markdown(safe_mode='remove')
@@ -693,15 +690,10 @@ class PDFLaTeXBase(object):
 
 
 class LaTeXRuntimeException(Exception):
-    def __init__(self, source_file, log_file, report_id, params):
-
-        super(LaTeXRuntimeException, self).__init__("{} -> {} ({}) [{}]".format(
-            source_file, log_file, report_id, params))
-
-        self.report_id = report_id
+    def __init__(self, source_file, log_file):
+        super(LaTeXRuntimeException, self).__init__('{} -> {}'.format(source_file, log_file))
         self.source_file = source_file
         self.log_file = log_file
-        self.params = params
 
     @property
     def message(self):
@@ -736,23 +728,6 @@ class LatexRunner(object):
                     log_file.flush()
                 raise
 
-    def _save_error_report(self, source_filename, log_filename):
-        config = Config.getInstance()
-
-        # create a unique report identifier
-        report_id = uuid.uuid4().hex
-        target_dir = os.path.join(config.getSharedTempDir(), 'reports', report_id)
-
-        if not os.path.exists(target_dir):
-            os.makedirs(target_dir)
-
-        shutil.copy(source_filename, os.path.join(target_dir, 'source.tex'))
-        shutil.copy(log_filename, os.path.join(target_dir, 'pdflatex.log'))
-
-        Logger.get('pdflatex').info("Error report saved under {0}".format(target_dir))
-
-        return report_id
-
     def run(self, template_name, **kwargs):
         template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
@@ -774,11 +749,7 @@ class LatexRunner(object):
             log_file.close()
 
             if not os.path.exists(target_filename):
-                report_no = self._save_error_report(source_filename, log_filename)
                 # something went terribly wrong, no LaTeX file was produced
-                raise LaTeXRuntimeException(source_filename, log_filename, report_no, kwargs)
+                raise LaTeXRuntimeException(source_filename, log_filename)
 
         return target_filename
-
-    def cleanup(self):
-        shutil.rmtree(self._dir)

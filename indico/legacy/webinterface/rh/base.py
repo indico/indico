@@ -484,12 +484,6 @@ class RH(RequestHandlerBase):
         return errors.WPFormValuesError(self, e).display()
 
     @jsonify_error
-    def _processLaTeXError(self, e):
-        """Treats access errors occured during the process of a RH."""
-
-        return errors.WPLaTeXError(self, e).display()
-
-    @jsonify_error
     def _processRestrictedHTML(self, e):
         return errors.WPRestrictedHTML(self, escape(str(e))).display()
 

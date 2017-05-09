@@ -24,4 +24,3 @@ misc.add_url_rule('/change-language', 'changeLang', lang.RHChangeLang, methods=(
 misc.add_url_rule('/change-timezone', 'resetSessionTZ', resetTimezone.RHResetTZ, methods=('GET', 'POST'))
 misc.add_url_rule('/contact', 'contact', contact.RHContact)
 misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('GET', 'POST'))
-misc.add_url_rule('/error-report/<report_id>/<filename>', 'error-report-download', errors.RHDownloadErrorReport)

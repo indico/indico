@@ -207,23 +207,6 @@ class WPKeyAccessError( WPDecorated ):
         return wc.getHTML()
 
 
-class WPLaTeXError(WPDecorated):
-
-    def __init__(self, rh, error):
-        WPDecorated.__init__(self, rh)
-        self._error = error
-
-    def _getBody( self, params ):
-        wc = WTemplated('LaTeXError')
-        conf = self._error.params['conf']
-        return wc.getHTML({
-            'report_id': self._error.report_id,
-            'is_manager': conf.as_event.can_manage(session.user),
-            'log': open(self._error.log_file, 'r').read(),
-            'source_code': open(self._error.source_file, 'r').read()
-        })
-
-
 class WModificationError( WTemplated ):
 
     def __init__( self, rh ):

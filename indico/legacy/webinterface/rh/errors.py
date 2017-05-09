@@ -15,20 +15,15 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import json
-import os
 from pprint import pformat
 
-
-from flask import request, send_from_directory
 from werkzeug.urls import url_parse
-from werkzeug.utils import secure_filename
 
-from indico.web.flask.templating import get_template_module
+from indico.core.config import Config
 from indico.core.notifications import make_email, send_email
 from indico.legacy.webinterface.pages import errors
 from indico.legacy.webinterface.rh.base import RH
-
-from indico.core.config import Config
+from indico.web.flask.templating import get_template_module
 
 
 class RHErrorReporting(RH):
@@ -67,20 +62,3 @@ class RHErrorReporting(RH):
         else:
             p = errors.WPReportError(self)
             return p.display(userEmail=self._userMail, msg=self._msg)
-
-
-class RHDownloadErrorReport(RH):
-    """
-    Allows error reports to be downloaded
-    """
-
-    def process(self, params):
-        config = Config.getInstance()
-
-        target_dir = os.path.join(
-            config.getSharedTempDir(), 'reports',
-            secure_filename(request.view_args['report_id']))
-
-        return send_from_directory(
-            target_dir, request.view_args['filename'],
-            mimetype='text/plain', as_attachment=True)
