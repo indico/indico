@@ -101,7 +101,7 @@ def generate_spreadsheet_from_survey(survey, submission_ids):
     for submission in submissions:
         submission_dict = {
             'Submitter': submission.user.full_name if not submission.is_anonymous else None,
-            'Submission Date': to_unicode(format_datetime(submission.submitted_dt)),
+            'Submission Date': submission.submitted_dt,
         }
         for key in field_names:
             submission_dict.setdefault(key, '')

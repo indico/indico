@@ -103,7 +103,7 @@ def generate_spreadsheet_from_contributions(contributions):
     for c in sorted(contributions, key=attrgetter('friendly_id')):
         contrib_data = {'Id': c.friendly_id, 'Title': c.title, 'Description': c.description,
                         'Duration': format_human_timedelta(c.duration),
-                        'Date': format_datetime(c.timetable_entry.start_dt) if c.timetable_entry else None,
+                        'Date': c.timetable_entry.start_dt if c.timetable_entry else None,
                         'Type': c.type.name if c.type else None,
                         'Session': c.session.title if c.session else None,
                         'Track': c.track.title if c.track else None,

@@ -94,7 +94,7 @@ class AbstractsExportExcel(_AbstractsExportBaseMixin):
     """Export list of abstracts to XLSX"""
 
     def _process(self):
-        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet())
+        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet(), tz=self.event_new.tzinfo)
 
 
 class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):

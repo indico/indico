@@ -344,7 +344,7 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
                                                                 self.export_config['static_item_ids'])
-        return send_xlsx('registrations.xlsx', headers, rows)
+        return send_xlsx('registrations.xlsx', headers, rows, tz=self.event_new.tzinfo)
 
 
 class RHRegistrationsPrintBadges(RHRegistrationsActionBase):

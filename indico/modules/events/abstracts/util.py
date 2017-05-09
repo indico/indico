@@ -77,9 +77,8 @@ def generate_spreadsheet_from_abstracts(abstracts, static_item_ids, dynamic_item
         ('submitted_contrib_type', ('Submitted type',
                                     lambda x: x.submitted_contrib_type.name if x.submitted_contrib_type else None)),
         ('score', ('Score', lambda x: round(x.score, 1) if x.score is not None else None)),
-        ('submitted_dt', ('Submission date', lambda x: to_unicode(format_datetime(x.submitted_dt)))),
-        ('modified_dt', ('Modification date', lambda x: (to_unicode(format_datetime(x.modified_dt)) if x.modified_dt
-                                                         else '')))
+        ('submitted_dt', ('Submission date', lambda x: x.submitted_dt)),
+        ('modified_dt', ('Modification date', lambda x: x.modified_dt if x.modified_dt else ''))
     ])
     field_names.extend(unique_col(item.title, item.id) for item in dynamic_items)
     field_names.extend(title for name, (title, fn) in static_item_mapping.iteritems() if name in static_item_ids)
