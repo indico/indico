@@ -437,7 +437,7 @@ class RHContributionsExportExcel(RHManageContributionsActionsBase):
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_contributions(self.contribs)
-        return send_xlsx('contributions.xlsx', headers, rows)
+        return send_xlsx('contributions.xlsx', headers, rows, tz=self.event_new.tzinfo)
 
 
 class RHContributionsExportPDF(RHManageContributionsActionsBase):

@@ -198,7 +198,9 @@
                                 IndicoUI.Dialogs.Util.progress();
                                 location.href = redirect;
                             } else if (data.redirect) {
-                                IndicoUI.Dialogs.Util.progress();
+                                if (!data.redirect_no_loading) {
+                                    IndicoUI.Dialogs.Util.progress();
+                                }
                                 location.href = data.redirect;
                             }
                         }

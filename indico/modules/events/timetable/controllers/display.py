@@ -86,7 +86,7 @@ class RHTimetableExportPDF(RHConferenceBaseDisplay):
                 return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
             else:
                 url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
-                return jsonify_data(flash=False, redirect=url)
+                return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
                                 back_url=url_for('.timetable', self.event_new))
 

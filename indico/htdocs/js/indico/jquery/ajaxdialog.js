@@ -292,7 +292,9 @@
                     if (data.close_dialog || data.success) {
                         closeDialog(data, true);
                         if (data.redirect) {
-                            IndicoUI.Dialogs.Util.progress();
+                            if (!data.redirect_no_loading) {
+                                IndicoUI.Dialogs.Util.progress();
+                            }
                             location.href = data.redirect;
                         }
                     } else if (data.html) {

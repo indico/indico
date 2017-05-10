@@ -3,56 +3,12 @@
 
 {% macro render_contribution_list(event, timezone, contributions, total_entries, with_session_info=true) %}
     {% if contributions %}
-        {% for contrib in contributions -%}
-            <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
-                <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
-                    <span class="value">
-                        <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
-                            <span class="contrib-id">{{ contrib.friendly_id }}.</span>
-                            {{ contrib.title }}
-                        </a>
-                    </span>
-                </div>
-                {% if contrib.speakers -%}
-                    <div class="speaker-list icon-user" data-searchable="{{ contrib.speakers|lower }}">
-                        {{ render_users(contrib.speakers|sort(attribute='display_order_key'),
-                                        span_class='speaker-item-inline') }}
-                    </div>
-                {%- endif %}
-                {% if contrib.timetable_entry -%}
-                    <div class="contrib-time icon-time">
-                        {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
-                    </div>
-                {%- endif %}
-                <div class="">
-                    {% if contrib.track -%}
-                        <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
-                            {{ contrib.track.title }}
-                        </div>
-                    {%- endif %}
-                    {% if contrib.type -%}
-                        <div class="contrib-type small" data-searchable="{{ contrib.type.name|lower }}">
-                            {{ contrib.type.name }}
-                        </div>
-                    {%- endif %}
-                    {% if contrib.session and with_session_info -%}
-                        <div class="contrib-session small" data-searchable="{{ contrib.session.title|lower }}"
-                             style="{{ contrib.session.colors.css }}">
-                            <a href="{{ url_for('sessions.display_session', contrib.session) }}"
-                               style="color: #{{ contrib.session.colors.text }}">{{ contrib.session.title }}</a>
-                            <span class="session-bg-color" style="background: #{{ contrib.session.colors.background }};"></span>
-                        </div>
-                    {%- endif %}
-                </div>
-                {% if contrib.description -%}
-                    <a href="{{ url_for('contributions.display_contribution', contrib) }}">
-                        <div class="description js-mathjax">
-                            {{ contrib.description|truncate(400) }}
-                        </div>
-                    </a>
-                {%- endif %}
-            </div>
-        {%- endfor %}
+        {% for contrib in contributions | selectattr('start_dt') | sort(attribute='title') | sort(attribute='start_dt') %}
+            {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
+        {% endfor %}
+        {% for contrib in contributions | rejectattr('start_dt') | sort(attribute='title') %}
+            {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
+        {% endfor %}
     {%- else %}
         {%- call message_box('info') %}
             {%- if total_entries %}
@@ -64,4 +20,55 @@
             {%- endif %}
         {%- endcall %}
     {%- endif %}
+{% endmacro %}
+
+{% macro _render_contribution_row(timezone, contrib, with_session_info=true) %}
+    <div class="contribution-row" data-friendly-id="{{ contrib.friendly_id }}">
+        <div class="contrib-title info" data-searchable="{{ contrib.title|lower }}">
+            <span class="value">
+                <a class="js-mathjax" href="{{ url_for('contributions.display_contribution', contrib) }}">
+                    <span class="contrib-id">{{ contrib.friendly_id }}.</span>
+                    {{ contrib.title }}
+                </a>
+            </span>
+        </div>
+        {% if contrib.speakers -%}
+            <div class="speaker-list icon-user" data-searchable="{{ contrib.speakers|lower }}">
+                {{ render_users(contrib.speakers|sort(attribute='display_order_key'),
+                                span_class='speaker-item-inline') }}
+            </div>
+        {%- endif %}
+        {% if contrib.timetable_entry -%}
+            <div class="contrib-time icon-time">
+                {{ contrib.timetable_entry.start_dt|format_datetime(format='short', timezone=timezone) }}
+            </div>
+        {%- endif %}
+        <div class="">
+            {% if contrib.track -%}
+                <div class="contrib-track small" data-searchable="{{ contrib.track.title|lower }}">
+                    {{ contrib.track.title }}
+                </div>
+            {%- endif %}
+            {% if contrib.type -%}
+                <div class="contrib-type small" data-searchable="{{ contrib.type.name|lower }}">
+                    {{ contrib.type.name }}
+                </div>
+            {%- endif %}
+            {% if contrib.session and with_session_info -%}
+                <div class="contrib-session small" data-searchable="{{ contrib.session.title|lower }}"
+                     style="{{ contrib.session.colors.css }}">
+                    <a href="{{ url_for('sessions.display_session', contrib.session) }}"
+                       style="color: #{{ contrib.session.colors.text }}">{{ contrib.session.title }}</a>
+                    <span class="session-bg-color" style="background: #{{ contrib.session.colors.background }};"></span>
+                </div>
+            {%- endif %}
+        </div>
+        {% if contrib.description -%}
+            <a href="{{ url_for('contributions.display_contribution', contrib) }}">
+                <div class="description js-mathjax">
+                    {{ contrib.description|truncate(400) }}
+                </div>
+            </a>
+        {%- endif %}
+    </div>
 {% endmacro %}

@@ -51,8 +51,6 @@ class RHExportSubmissionsBase(RHManageSurveyBase):
     """Export submissions from the survey"""
 
     CSRF_ENABLED = False
-    EXT = None
-    FUNC = None
 
     def _process(self):
         if not self.survey.submissions:
@@ -61,22 +59,25 @@ class RHExportSubmissionsBase(RHManageSurveyBase):
 
         submission_ids = set(map(int, request.form.getlist('submission_ids')))
         headers, rows = generate_spreadsheet_from_survey(self.survey, submission_ids)
-        filename = 'submissions-{}.{}'.format(self.survey.id, self.EXT)
-        return self.FUNC(filename, headers, rows)
+        filename = 'submissions-{}'.format(self.survey.id)
+        return self._export(filename, headers, rows)
+
+    def _export(self, filename, headers, rows):
+        raise NotImplementedError
 
 
 class RHExportSubmissionsCSV(RHExportSubmissionsBase):
     """Export submissions as CSV"""
 
-    EXT = 'csv'
-    FUNC = staticmethod(send_csv)
+    def _export(self, filename, headers, rows):
+        return send_csv(filename + '.csv', headers, rows)
 
 
 class RHExportSubmissionsExcel(RHExportSubmissionsBase):
     """Export submissions as XLSX"""
 
-    EXT = 'xlsx'
-    FUNC = staticmethod(send_xlsx)
+    def _export(self, filename, headers, rows):
+        return send_xlsx(filename + '.xlsx', headers, rows, tz=self.event_new.tzinfo)
 
 
 class RHSurveySubmissionBase(RHManageSurveysBase):

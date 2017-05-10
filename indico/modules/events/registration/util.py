@@ -287,12 +287,11 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
     """
     field_names = ['ID', 'Name']
     special_item_mapping = OrderedDict([
-        ('reg_date', ('Registration date', lambda x: to_unicode(format_datetime(x.submitted_dt)))),
+        ('reg_date', ('Registration date', lambda x: x.submitted_dt)),
         ('state', ('Registration state', lambda x: x.state.title)),
         ('price', ('Price', lambda x: x.render_price())),
         ('checked_in', ('Checked in', lambda x: x.checked_in)),
-        ('checked_in_date', ('Check-in date', lambda x: (to_unicode(format_datetime(x.checked_in_dt)) if x.checked_in
-                                                         else '')))
+        ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''))
     ])
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))
