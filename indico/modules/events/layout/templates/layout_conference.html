@@ -18,6 +18,9 @@
         {% endcall %}
         {% call form_fieldset(_('Timetable')) %}
             {{ form_rows(form, fields=('timetable_theme', 'timetable_by_room', 'timetable_detailed')) }}
+            {% if timetable_theme_settings_form %}
+                {{ form_rows(timetable_theme_settings_form) }}
+            {% endif %}
         {% endcall %}
         {% call form_fieldset(_('Theme')) %}
             {{ form_row(form.use_custom_css) }}
@@ -120,6 +123,11 @@
                         $form.trigger('indico:fieldsSaved', data);
                     }
                 });
+            });
+            showThemeSettingsForm({
+                formUrl: {{ url_for('.timetable_theme_form', event) | tojson }},
+                themeFieldId: '{{ form.timetable_theme.id }}',
+                lastFieldId: 'form-group-timetable_detailed'
             });
         });
     </script>

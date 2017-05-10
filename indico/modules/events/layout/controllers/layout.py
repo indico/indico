@@ -19,14 +19,16 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO
 
-from flask import flash, redirect, request, session
+from flask import flash, redirect, request, session, jsonify
 from PIL import Image
 from werkzeug.exceptions import NotFound
+from wtforms import fields as wtforms_fields
+from wtforms.validators import DataRequired
 
 from indico.core.db import db
 from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from indico.modules.events.layout import layout_settings, logger
+from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
 from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_logo_data
@@ -36,13 +38,48 @@ from indico.modules.events.models.events import EventType
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, to_unicode
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data
+from indico.web.forms.base import FormDefaults, IndicoForm
+from indico.web.forms import fields as indico_fields
+from indico.web.util import jsonify_data, _pop_injected_js
 
 
 class RHLayoutBase(RHManageEventBase):
     pass
+
+
+def _make_theme_settings_form(event, theme):
+    try:
+        settings = theme_settings.themes[theme]['user_settings']
+    except KeyError:
+        return None
+    form_class = type(b'ThemeSettingsForm', (IndicoForm,), {})
+    for name, field_data in settings.iteritems():
+        field_type = field_data['type']
+        field_class = getattr(indico_fields, field_type, None) or getattr(wtforms_fields, field_type, None)
+        if not field_class:
+            raise Exception('Invalid field type: {}'.format(field_type))
+        label = field_data['caption']
+        description = field_data.get('description')
+        validators = [DataRequired()] if field_data.get('required') else []
+        field = field_class(label, validators, description=description, **field_data.get('kwargs', {}))
+        setattr(form_class, name, field)
+
+    defaults = {name: field_data.get('defaults') for name, field_data in settings.iteritems()}
+    if theme == event.theme:
+        defaults.update(layout_settings.get(event, 'timetable_theme_settings'))
+
+    return form_class(csrf_enabled=False, obj=FormDefaults(defaults), prefix='tt-theme-settings-')
+
+
+class RHLayoutTimetableThemeForm(RHLayoutBase):
+    def _process(self):
+        form = _make_theme_settings_form(self.event_new, request.args['theme'])
+        if not form:
+            return jsonify()
+        tpl = get_template_module('forms/_form.html')
+        return jsonify(html=tpl.form_rows(form), js=_pop_injected_js())
 
 
 class RHLayoutEdit(RHLayoutBase):
@@ -59,18 +96,30 @@ class RHLayoutEdit(RHLayoutBase):
 
     def _process_lecture_meeting(self):
         form = LectureMeetingLayoutForm(obj=self._get_form_defaults(), event=self.event_new)
-        if form.validate_on_submit():
+        tt_theme_settings_form = _make_theme_settings_form(self.event_new, form.timetable_theme.data)
+        tt_form_valid = tt_theme_settings_form.validate_on_submit() if tt_theme_settings_form else True
+        if form.validate_on_submit() and tt_form_valid:
+            if tt_theme_settings_form:
+                layout_settings.set(self.event_new, 'timetable_theme_settings', tt_theme_settings_form.data)
+            else:
+                layout_settings.delete(self.event_new, 'timetable_theme_settings')
             layout_settings.set_multi(self.event_new, form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.index', self.event_new))
-        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self._conf, form=form, event=self.event_new)
+        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self._conf, form=form, event=self.event_new,
+                                            timetable_theme_settings_form=tt_theme_settings_form)
 
     def _process_conference(self):
         form = ConferenceLayoutForm(obj=self._get_form_defaults(), event=self.event_new)
         css_form = CSSForm()
         logo_form = LogoForm()
-
-        if form.validate_on_submit():
+        tt_theme_settings_form = _make_theme_settings_form(self.event_new, form.timetable_theme.data)
+        tt_form_valid = tt_theme_settings_form.validate_on_submit() if tt_theme_settings_form else True
+        if form.validate_on_submit() and tt_form_valid:
+            if tt_theme_settings_form:
+                layout_settings.set(self.event_new, 'timetable_theme_settings', tt_theme_settings_form.data)
+            else:
+                layout_settings.delete(self.event_new, 'timetable_theme_settings')
             data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
             layout_settings.set_multi(self.event_new, data)
             if form.theme.data == '_custom':
@@ -83,7 +132,8 @@ class RHLayoutEdit(RHLayoutBase):
             if self.event_new.has_stylesheet:
                 css_form.css_file.data = self.event_new
         return WPLayoutEdit.render_template('layout_conference.html', self._conf, form=form, event=self.event_new,
-                                            logo_form=logo_form, css_form=css_form)
+                                            logo_form=logo_form, css_form=css_form,
+                                            timetable_theme_settings_form=tt_theme_settings_form)
 
 
 class RHLayoutLogoUpload(RHLayoutBase):
