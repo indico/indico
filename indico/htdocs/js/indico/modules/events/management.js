@@ -195,4 +195,32 @@
             $(this).closest('tr').toggleClass('selected', this.checked);
         }).trigger('change');
     };
+
+    global.showThemeSettingsForm = function showThemeSettingsForm(options) {
+        options = $.extend(true, {
+            formUrl: null,
+            themeFieldId: null,
+            lastFieldId: null
+        }, options);
+        $('#' + options.themeFieldId).on('change', function() {
+            $.ajax({
+                url: options.formUrl,
+                data: {
+                    theme: $(this).val()
+                },
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    var lastField = $('#' + options.lastFieldId);
+                    lastField.nextAll(':not(.form-group-footer)').remove();
+                    if (data.html) {
+                        lastField.after(data.html);
+                    }
+                    if (data.js) {
+                        $('body').append(data.js);
+                    }
+                }
+            });
+        });
+    };
 })(window);

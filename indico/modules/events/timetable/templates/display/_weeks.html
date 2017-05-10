@@ -31,10 +31,11 @@
         {% endif %}
     </div>
 {% endmacro %}
-
+{% set px_per_5_minutes = 10 %}
 {% for week in week_table %}
     <div class="clearfix week-timetable {{ 'no-weekends' if not has_weekends else '' }}">
         <ul>
+            {% set prev_end = [] %}
             {% for day, day_entries in week %}
                 {% if not loop.first %}
                     <li class="spacer"></li>
@@ -44,16 +45,34 @@
                         {{ day | format_date(format='full', timezone=timezone) }}
                     </div>
                     {% set hidden_count = [] %}
+                    {% set short_contrib_count = [] %}
                     {% for start_time, slot_entries in day_entries.viewitems() %}
+                        {% set start_time_minutes = (start_time.strftime('%-H')|int*60 + start_time.strftime('%-M')|int) %}
+                        {% set next_entry = day_entries.keys()[loop.index] %}
+                        {% if next_entry %}
+                            {% set next_start_minutes = (next_entry.strftime('%-H')|int*60 + next_entry.strftime('%-M')|int)%}
+                        {% else %}
+                            {% set next_start_minutes = start_time_minutes %}
+                        {% endif %}
+                        {% set duration = next_start_minutes - start_time_minutes %}
+                        {% if prev_end[0] and not hidden_count[-1] %}
+                            {% set end_time = prev_end.pop().time() %}
+                            {% set new_dur  = start_time_minutes - (end_time.strftime('%-H')|int*60 + end_time.strftime('%-M')|int) %}
+                            {% if end_time < start_time and end_time.strftime('%-H')!= '0' %}
+                                <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ ((new_dur / 5) * px_per_5_minutes) - 1 }}px;">
+                                </div>
+                            {% endif %}
+                        {% endif %}
                         {% if not slot_entries %}
                             {% if hidden_count[-1] %}
                                 {% set __ = hidden_count.append(hidden_count[-1] - 1) %}
                             {% else %}
-                                <div class="row placeholder" data-slot="{{ start_time }}">
+                                <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ ((duration / 5) * px_per_5_minutes) - 1 }}px;">
                                 </div>
                             {% endif %}
                         {% else %}
                             {% for entry, count in slot_entries %}
+                                {% set __ = prev_end.append(entry.end_dt.astimezone(tz_object)) %}
                                 {% set session = entry.object.session %}
                                 {% set __ = hidden_count.append(count) %}
                                 {% set classes = ['row', 'contrib' if entry.type.name == 'CONTRIBUTION' else 'break'] %}
@@ -63,10 +82,32 @@
 
                                 {% set has_multi = false %}
                                 {% if loop.first %}
-                                    {% set extra_styles = ['height: %dpx'|format((18 + hidden_count[-1] * 19) if hidden_count[-1] else 18)] %}
+                                    {% set time_parts = (entry.duration.seconds/60) /5 %}
+                                    {% set height = (time_parts * px_per_5_minutes) %}
+                                    {% if short_contrib_count[-1] %}
+                                        {% set height = height - 7 * short_contrib_count| length %}
+                                        {% set __ = short_contrib_count.pop() %}
+                                    {% endif %}
+                                    {% if time_parts == 1 %}
+                                        {% set height = 17 %}
+                                        {% set __ = short_contrib_count.append(1) %}
+                                    {% endif %}
+                                    {% set extra_styles = ['height: %dpx'|format(height-1)] %}
                                     {% if slot_entries|length > 1 %}
                                         {% set has_multi = true %}
                                         {% set classes = classes + ['has-multi', has_multi|string] %}
+                                    {% endif %}
+                                    {% set entry_colors = timetable_settings.get('colors') %}
+                                    {% if entry_colors %}
+                                        {% if entry.type.name == 'CONTRIBUTION' %}
+                                            {% for keyword in entry.contribution.keywords %}
+                                                {% for entry_color in entry_colors %}
+                                                    {% if keyword in entry_color['entry'] %}
+                                                        {% set __ = extra_styles.append('background-color: %s'|format(entry_color['color']))  %}
+                                                    {% endif %}
+                                                {% endfor %}
+                                            {% endfor %}
+                                        {% endif %}
                                     {% endif %}
                                 {% else %}
                                     {% set classes = classes + ['js-same-time'] %}

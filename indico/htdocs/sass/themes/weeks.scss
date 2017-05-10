@@ -86,8 +86,6 @@
 }
 
 .week-timetable .row {
-    @include ellipsis;
-
     height: 18px;
     position: relative;
 }
@@ -155,8 +153,6 @@
 }
 
 .week-timetable .row .main {
-    @include ellipsis;
-
     position: absolute;
     padding-left: 40px;
     width: 100%;
