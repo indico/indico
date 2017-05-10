@@ -81,7 +81,9 @@ def _require_pg_version(version):
 
 
 @cli.command()
-def prepare():
+@click.option('--empty', is_flag=True, help='Do not create the root category or system user. Use this only if you '
+                                            'intend to import data from ZODB.')
+def prepare(empty):
     """Initializes an empty database (creates tables, sets alembic rev to HEAD)"""
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
@@ -114,7 +116,7 @@ def prepare():
         return
     if not _require_extensions('unaccent', 'pg_trgm'):
         return
-    create_all_tables(db, verbose=True)
+    create_all_tables(db, verbose=True, add_initial_data=(not empty))
 
 
 def _safe_downgrade(*args, **kwargs):
