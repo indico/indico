@@ -488,7 +488,7 @@ class RHPosterPrintSettings(RHManageEventBase):
             key = unicode(uuid.uuid4())
             poster_cache.set(key, data, time=1800)
             download_url = url_for('.print_poster', self.event_new, template_id=template_id, uuid=key)
-            return jsonify_data(flash=False, redirect=download_url)
+            return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_form(form, disabled_until_change=False, submit=_('Download PDF'))
 
 

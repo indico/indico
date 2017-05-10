@@ -194,7 +194,9 @@
                     if (updateOpts) {
                         updateHtml(updateOpts.element, data, updateOpts.replace, updateOpts.highlight);
                     } else if (data.redirect) {
-                        IndicoUI.Dialogs.Util.progress();
+                        if (!data.redirect_no_loading) {
+                            IndicoUI.Dialogs.Util.progress();
+                        }
                         location.href = data.redirect;
                     }
                 } else if (data.html) {
