@@ -24,24 +24,4 @@ in here but in your module instead.
 
 from __future__ import unicode_literals
 
-import os
-
 from indico.core.celery import celery
-from indico.core.logger import Logger
-from indico.util.fs import silentremove
-
-
-@celery.task(name='delete_file')
-def delete_file(path):
-    """Deletes a file.
-
-    This task is meant to be invoked with a delay, i.e. like this::
-
-        delete_file.apply_async(args=[file_path], countdown=3600)
-
-    :param path: The absolute path to the file.
-    """
-    if not os.path.isabs(path):
-        raise ValueError('Path is not absolute: {}'.format(path))
-    Logger.get().info('Deleting {}'.format(path))
-    silentremove(path)
