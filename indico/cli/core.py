@@ -81,6 +81,19 @@ def celery(ctx):
     celery_cmd(ctx.args)
 
 
+@cli.command(short_help='Delete old temporary files.')
+@click.option('--temp', is_flag=True, help='Delete old files in the temp dir')
+@click.option('--cache', is_flag=True, help='Delete old files in the cache dir')
+@click.option('--assets', is_flag=True, help='Delete old files in the assets dir.')
+@click.option('--verbose', '-v', is_flag=True, help="Be verbose and show what's being deleted")
+@click.option('--min-age', type=click.IntRange(1), default=1, metavar='N', help='Delete files at least N days old')
+def cleanup(temp, cache, assets, verbose, min_age):
+    from .cleanup import cleanup_cmd
+    if not temp and not cache and not assets:
+        raise click.UsageError('You need to specify what to delete')
+    cleanup_cmd(temp, cache, assets, min_age=min_age, verbose=verbose)
+
+
 @cli.command(with_appcontext=False)
 @click.option('--host', '-h', default='127.0.0.1', metavar='HOST', help='The ip/host to bind to.')
 @click.option('--port', '-p', default=None, type=int, metavar='PORT', help='The port to bind to.')
