@@ -587,7 +587,7 @@ class ZipGeneratorMixin:
 
         :param files_holder: An iterable (or an iterable containing) object that
                              contains the files to be added in the zip file.
-        :param name_prefix: The prifix to the zip file name
+        :param name_prefix: The prefix to the zip file name
         :param name_suffix: The suffix to the zip file name
         :return: The generated zip file.
         """
