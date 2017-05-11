@@ -31,6 +31,7 @@ from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
 
+from indico.util.caching import memoize_request
 from indico.util.string import trim_inner_whitespace
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
@@ -246,6 +247,7 @@ def set_best_lang(check_session=True):
     return resolved_lang
 
 
+@memoize_request
 def get_current_locale():
     return IndicoLocale.parse(set_best_lang())
 

@@ -29,6 +29,7 @@ from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
@@ -47,7 +48,7 @@ from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProv
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
 from indico.util import date_time as date_time_util
-from indico.util.i18n import gettext_context, ngettext_context, babel, _
+from indico.util.i18n import gettext_context, ngettext_context, babel, get_current_locale, _
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum, crc32, slugify
@@ -189,6 +190,8 @@ def setup_jinja(app):
     app.add_template_global(lambda: 'custom_js' in core_env, 'has_custom_js')
     app.add_template_global(lambda: 'custom_sass' in core_env, 'has_custom_sass')
     app.add_template_global(get_request_stats)
+    # Global variables
+    app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
