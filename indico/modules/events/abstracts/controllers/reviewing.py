@@ -83,8 +83,8 @@ class RHJudgeAbstract(RHAbstractBase):
             judgment_data, abstract_data = form.split_data
             judge_abstract(self.abstract, abstract_data, judge=session.user, **judgment_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
-        tpl = get_template_module('events/abstracts/reviewing/judge.html')
-        return jsonify(html=tpl.render_decision_box(self.abstract, form))
+        tpl = get_template_module('events/reviews/_common.html')
+        return jsonify(html=tpl.render_decision_box(self.abstract, form, session.user))
 
 
 class RHResetAbstractState(RHAbstractBase):

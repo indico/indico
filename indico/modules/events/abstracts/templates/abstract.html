@@ -1,7 +1,6 @@
 {% extends 'events/abstracts/management/_base.html' if management else 'events/abstracts/display/_base.html' %}
 
-{% from 'events/abstracts/reviewing/judgment.html' import render_decision_box, render_reviewed_for_tracks_box,
-                                                         render_review_summary_box %}
+{% from 'events/abstracts/reviewing/judgment.html' import render_reviewed_for_tracks_box, render_review_summary_box %}
 {% from 'events/abstracts/reviewing/public.html' import render_abstract_info, render_abstract_judgment,
                                                         render_submission_info %}
 {% from 'events/abstracts/reviewing/timeline.html' import render_multiple_review_group_text %}
