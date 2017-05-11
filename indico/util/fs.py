@@ -80,7 +80,7 @@ def removedirs(base, name):
         head, tail = os.path.split(head)
 
 
-def cleanup_dir(path, min_age, exclude=None):
+def cleanup_dir(path, min_age, dry_run=False, exclude=None):
     """Delete old files from a directory.
 
     This recurses into subdirectories and will also delete any empty
@@ -89,6 +89,8 @@ def cleanup_dir(path, min_age, exclude=None):
     :param path: The directory to clean up
     :param min_age: A timedelta specifying how old files need to be
                     so they are deleted.
+    :param dry_run: If true, this function will not delete anything
+                    but just return the files it would delete.
     :param exclude: A callable that is invoked with the subdirectory
                     (relative to `path`). If it returns ``True``, the
                     directory and all its subdirs will be ignored.
@@ -110,10 +112,10 @@ def cleanup_dir(path, min_age, exclude=None):
             filepath = os.path.join(root, filename)
             if os.path.getmtime(filepath) >= min_mtime:
                 has_files = True
-            elif not silentremove(filepath):
-                has_files = True
-            else:
+            elif dry_run or silentremove(filepath):
                 deleted.add(os.path.relpath(filepath, path))
-        if not has_files and not dirs and relroot:
+            else:
+                has_files = True  # deletion failed
+        if not dry_run and not has_files and not dirs and relroot:
             removedirs(path, relroot)
     return deleted

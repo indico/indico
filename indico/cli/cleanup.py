@@ -32,25 +32,28 @@ def _print_files(files):
         click.echo('  * ' + click.style(path, fg='yellow'))
 
 
-def cleanup_cmd(temp=False, cache=False, assets=False, min_age=1, verbose=False):
+def cleanup_cmd(temp=False, cache=False, assets=False, min_age=1, dry_run=False, verbose=False):
     if cache:
         cache_dir = Config.getInstance().getCacheDir()
         if verbose:
             click.echo(click.style('cleaning cache ({})'.format(cache_dir), fg='white', bold=True))
-        deleted = cleanup_dir(cache_dir, timedelta(days=min_age), exclude=lambda x: x.startswith('webassets-'))
+        deleted = cleanup_dir(cache_dir, timedelta(days=min_age), dry_run=dry_run,
+                              exclude=lambda x: x.startswith('webassets-'))
         if verbose:
             _print_files(deleted)
     if temp:
         temp_dir = Config.getInstance().getTempDir()
         if verbose:
             click.echo(click.style('cleaning temp ({})'.format(temp_dir), fg='white', bold=True))
-        deleted = cleanup_dir(temp_dir, timedelta(days=min_age))
+        deleted = cleanup_dir(temp_dir, timedelta(days=min_age), dry_run=dry_run)
         if verbose:
             _print_files(deleted)
     if assets:
         assets_dir = Config.getInstance().getAssetsDir()
         if verbose:
             click.echo(click.style('cleaning assets ({})'.format(assets_dir), fg='white', bold=True))
-        deleted = cleanup_dir(assets_dir, timedelta(days=min_age))
+        deleted = cleanup_dir(assets_dir, timedelta(days=min_age), dry_run=dry_run)
         if verbose:
             _print_files(deleted)
+    if dry_run:
+        click.echo(click.style('dry-run enabled, nothing has been deleted', fg='green', bold=True))
