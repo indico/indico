@@ -16,19 +16,23 @@
 
 from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.modules.rb.views.admin import WPRoomBookingAdminBase
+from indico.util.i18n import _
 
 
 class WPRoomBookingAdmin(WPRoomBookingAdminBase):
-    def _setActiveTab(self):
-        self._subTabConfig.setActive()
+    sidemenu_option = 'rb-rooms'
+    subtitle = _(u'Locations')
 
     def _getTabContent(self, params):
         return WTemplated('RoomBookingAdmin').getHTML(params)
 
 
 class WPRoomBookingAdminLocation(WPRoomBookingAdminBase):
-    def _setActiveTab(self):
-        self._subTabConfig.setActive()
+    sidemenu_option = 'rb-rooms'
+
+    @property
+    def subtitle(self):
+        return self._kwargs['location'].name
 
     def _getTabContent(self, params):
         return WTemplated('RoomBookingAdminLocation').getHTML(params)

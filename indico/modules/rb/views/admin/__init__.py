@@ -13,53 +13,16 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-
-from flask import session
+from flask import render_template
 
 from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.wcomponents import TabControl, WTabControl
-
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
 
 
-class WPRoomsBase(WPAdminsBase):
-    sidemenu_option = 'rb'
+class WPRoomBookingAdminBase(WPAdminsBase):
+    subtitle = u''
 
-    def _createTabCtrl(self):
-        self._tabCtrl = TabControl()
-        if session.user.is_admin:
-            self._subTabRoomBooking = self._tabCtrl.newTab(
-                'booking',
-                _('Room Booking'),
-                url_for('rooms_admin.settings')
-            )
-
-            self._subTabMain = self._subTabRoomBooking.newSubTab(
-                'settings',
-                _('Settings'),
-                url_for('rooms_admin.settings')
-            )
-        else:
-            self._subTabRoomBooking = self._tabCtrl.newTab(
-                'booking',
-                _('Room Booking'),
-                url_for('rooms_admin.roomBooking-admin')
-            )
-
-        self._subTabConfig = self._subTabRoomBooking.newSubTab(
-            'management',
-            _('Management'),
-            url_for('rooms_admin.roomBooking-admin')
-        )
+    def getJSFiles(self):
+        return WPAdminsBase.getJSFiles(self) + self._includeJSPackage('Management')
 
     def _getPageContent(self, params):
-        return WTabControl(self._tabCtrl).getHTML(self._getTabContent(params))
-
-
-class WPRoomBookingAdminBase(WPRoomsBase):
-    def getJSFiles(self):
-        return WPRoomsBase.getJSFiles(self) + self._includeJSPackage('Management')
-
-    def _setActiveTab(self):
-        self._subTabRoomBooking.setActive()
+        return render_template('rb/admin.html', body=self._getTabContent(params), subtitle=self.subtitle)

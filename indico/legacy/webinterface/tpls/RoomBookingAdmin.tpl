@@ -11,19 +11,11 @@
 
 <table align="center" width="95%">
 
-<tr>
-  <td class="formTitle">${ _("Room Booking Administration") }</td>
-</tr>
-
 <!-- ==================== Manage Locations  ==================== -->
 <!-- =========================================================== -->
 <tr>
   <td>
-    <br />
     <table>
-    <tr>
-      <td colspan="2" class="groupTitle">${ _("Manage Locations")}</td>
-    </tr>
     <tr>
       <td class="titleUpCellTD" style="width: 160px;">
         <span class="titleCellFormat">${ _('Available locations')}</span>

@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.views.admin import WPRoomBookingAdminBase
 from indico.legacy.webinterface.wcomponents import WTemplated
+from indico.modules.rb.views.admin import WPRoomBookingAdminBase
+from indico.util.i18n import _
 
 
 class WPRoomBookingSettings(WPRoomBookingAdminBase):
-    def _setActiveTab(self):
-        WPRoomBookingAdminBase._setActiveTab(self)
-        self._subTabMain.setActive()
+    sidemenu_option = 'rb-settings'
+    subtitle = _(u'Settings')
 
     def _getTabContent(self, params):
         params['field_opts'] = {
