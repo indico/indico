@@ -293,6 +293,8 @@ def create_boa(event):
     if path:
         path = os.path.join(Config.getInstance().getCacheDir(), path)
         if os.path.exists(path):
+            # update file mtime so it's not deleted during cache cleanup
+            os.utime(path, None)
             return path
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
