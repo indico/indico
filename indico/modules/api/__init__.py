@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.db import db
 from indico.core.settings import SettingsProxy
@@ -67,7 +69,8 @@ def _merge_users(target, source, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return SideMenuItem('api', _("API"), url_for('api.admin_settings'), section='integration')
+    if session.user.is_admin:
+        return SideMenuItem('api', _("API"), url_for('api.admin_settings'), section='integration')
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')

@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import check_roles, ManagementRole
@@ -58,8 +60,9 @@ def _sidemenu_items(sender, category, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('upcoming_events', _('Upcoming events'), url_for('categories.manage_upcoming'),
-                       section='homepage')
+    if session.user.is_admin:
+        yield SideMenuItem('upcoming_events', _('Upcoming events'), url_for('categories.manage_upcoming'),
+                           section='homepage')
 
 
 @signals.app_created.connect

@@ -193,8 +193,9 @@ class SubmitterRole(ManagementRole):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('reference_types', _('External ID Types'), url_for('events.reference_types'),
-                       section='customization')
+    if session.user.is_admin:
+        yield SideMenuItem('reference_types', _('External ID Types'), url_for('events.reference_types'),
+                           section='customization')
 
 
 @signals.app_created.connect

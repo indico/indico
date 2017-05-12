@@ -52,7 +52,8 @@ event_settings = EventSettingsProxy('payment', {
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return SideMenuItem('payment', _("Payment"), url_for('payment.admin_settings'), section='customization')
+    if session.user.is_admin:
+        return SideMenuItem('payment', _("Payment"), url_for('payment.admin_settings'), section='customization')
 
 
 @signals.menu.items.connect_via('event-management-sidemenu')

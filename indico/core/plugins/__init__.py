@@ -19,6 +19,7 @@ import os
 import re
 from urlparse import urlparse
 
+from flask import session
 from flask_babelex import Domain
 from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
@@ -363,7 +364,8 @@ class WPJinjaMixinPlugin(WPJinjaMixin):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return SideMenuItem(u'plugins', _(u"Plugins"), url_for(u'plugins.index'), 80, icon=u'puzzle')
+    if session.user.is_admin:
+        return SideMenuItem(u'plugins', _(u"Plugins"), url_for(u'plugins.index'), 80, icon=u'puzzle')
 
 
 plugin_engine = IndicoPluginEngine()

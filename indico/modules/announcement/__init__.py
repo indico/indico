@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template
+from flask import render_template, session
 
 from indico.core import signals
 from indico.core.settings import SettingsProxy
@@ -42,4 +42,5 @@ def _inject_announcement_header(**kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('announcement', _('Announcement'), url_for('announcement.manage'), section='homepage')
+    if session.user.is_admin:
+        yield SideMenuItem('announcement', _('Announcement'), url_for('announcement.manage'), section='homepage')

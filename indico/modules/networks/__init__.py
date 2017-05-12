@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import has_request_context, request
+from flask import has_request_context, request, session
 
 from indico.core import signals
 from indico.core.logger import Logger
@@ -32,7 +32,8 @@ logger = Logger.get('networks')
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _sidemenu_items(sender, **kwargs):
-    yield SideMenuItem('ip_networks', _('IP Networks'), url_for('networks.manage'), section='security')
+    if session.user.is_admin:
+        yield SideMenuItem('ip_networks', _('IP Networks'), url_for('networks.manage'), section='security')
 
 
 @signals.acl.can_access.connect_via(Attachment)

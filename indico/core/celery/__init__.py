@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from celery.signals import import_modules
+from flask import session
 
 from indico.core import signals
 from indico.core.celery.core import IndicoCelery
@@ -44,4 +45,5 @@ def _import_modules(*args, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
-    return SideMenuItem('celery', _("Tasks"), url_for('celery.index'), 20, icon='time')
+    if session.user.is_admin:
+        return SideMenuItem('celery', _("Tasks"), url_for('celery.index'), 20, icon='time')

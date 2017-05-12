@@ -63,8 +63,7 @@ def _extend_admin_menu(sender, **kwargs):
 
 @signals.menu.sections.connect_via('admin-sidemenu')
 def _sidemenu_sections(sender, **kwargs):
-    if session.user.is_admin:
-        yield SideMenuSection('roombooking', _("Room Booking"), 70, icon='location')
+    yield SideMenuSection('roombooking', _("Room Booking"), 70, icon='location')
 
 
 @signals.users.merged.connect
