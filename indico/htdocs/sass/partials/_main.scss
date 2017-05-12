@@ -110,12 +110,13 @@ div.main-breadcrumb {
             color: $dark-gray;
             padding: 0 0.5em;
         }
-    }
 
-    .path a {
-        color: $light-black;
+        .item {
+            color: $light-black;
+            font-size: 12px;
+        }
 
-        &:hover {
+        a.item:hover {
             color: $dark-blue;
         }
     }

@@ -15,22 +15,22 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.config import Config
-from indico.web.flask.util import url_for
-from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer, WTemplated
+from indico.util.i18n import _
 
 
 class WPContact(WPMainBase):
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer("Contact", lambda: url_for('misc.contact'))
+        return WSimpleNavigationDrawer(_('Contact'))
 
     def _getBody(self, params):
         wc = WContact()
         return wc.getHTML()
 
 
-class WContact(wcomponents.WTemplated):
+class WContact(WTemplated):
     def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
+        vars = WTemplated.getVars(self)
         vars["supportEmail"] = Config.getInstance().getPublicSupportEmail()
         return vars

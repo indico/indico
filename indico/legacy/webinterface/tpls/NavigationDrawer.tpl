@@ -35,7 +35,7 @@ arrowImage = systemIcon( "breadcrumb_arrow.png" )
                 <span class="sep">»</span>
             % endif
             <% name, url = l[i] %>
-            <a href="${ url }" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url">
+            <a href="${ url }" itemscope itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url" class="item">
                 <span itemprop="title">${ escape(truncateTitle(name, 40)) }</span>
             </a>
         % endfor

@@ -458,16 +458,9 @@ div.pageOverHeader
 
 /* Breadcrumb styles */
 
-.path {
-}
-
 .path img {
     padding-right: 5px;
     padding-left: 7px;
-}
-
-.path a {
-   font-size: 12px;
 }
 
 /* Root Page */

@@ -20,6 +20,7 @@ from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
+from indico.web.menu import get_menu_item
 
 
 class WPAdmin(WPJinjaMixin, WPMainBase):
@@ -30,7 +31,9 @@ class WPAdmin(WPJinjaMixin, WPMainBase):
         WPMainBase.__init__(self, rh, **kwargs)
 
     def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(_('Administration'), bgColor='white')
+        menu_item = get_menu_item('admin-sidemenu', self._kwargs['active_menu_item'])
+        items = [_('Administration'), menu_item.title]
+        return WSimpleNavigationDrawer(*items)
 
     def _getBody(self, params):
         return self._getPageContent(params)

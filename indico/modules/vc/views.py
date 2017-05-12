@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from indico.web.flask.util import url_for
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 from indico.legacy.webinterface.pages.main import WPMainBase
@@ -59,7 +58,7 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
 
 class WPVCService(WPVCJinjaMixin, WPMainBase):
     def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer('Videoconference', lambda: url_for('.vc_room_list'))
+        return WSimpleNavigationDrawer('Videoconference')
 
     def _getBody(self, params):
         return self._getPageContent(params)

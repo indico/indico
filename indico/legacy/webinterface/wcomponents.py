@@ -154,24 +154,15 @@ class WNavigationDrawer(WTemplated):
     def getHTML(self, params=None):
         return WTemplated.getHTML(self, params)
 
+
 class WSimpleNavigationDrawer(WTemplated):
+    def __init__(self, *items):
+        self._items = items
 
-    def __init__( self, title, handler = None, bgColor = None, **pars  ):
-        self._urlHandler = handler
-        self._pars = pars
-        self._title = title
-        self._bgColor = bgColor
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["urlHandler"] = self._urlHandler
-        vars["title"] = self._title
-        vars["pars"] = self._pars
-        vars["bgColor"] = self._bgColor
-        return vars
-
-    def getHTML(self, params=None):
-        return WTemplated.getHTML(self, params)
+    def getVars(self):
+        params = WTemplated.getVars(self)
+        params['items'] = self._items
+        return params
 
 
 class TabControl:

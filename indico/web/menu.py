@@ -123,8 +123,7 @@ class SideMenuItem(object):
 
 
 def build_menu_structure(menu_id, active_item=None, **kwargs):
-    """
-    Build a menu (list of entries) with sections/items.
+    """Build a menu (list of entries) with sections/items.
 
     Information is provided by specific signals and filtered
     by menu id.
@@ -134,7 +133,7 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
     :param menu_id: menu_id used to filter out signal calls
     :param active_item: ID of currently active menu item
     :param kwargs: extra arguments passed to the signals
-    :returns: properly sorted list (taking weights into account)
+    :return: properly sorted list (taking weights into account)
     """
     top_level = set()
     sections = {}
@@ -152,6 +151,17 @@ def build_menu_structure(menu_id, active_item=None, **kwargs):
             sections[item.section].add_item(item)
 
     return sorted(top_level, key=lambda x: (-x.weight, x.title))
+
+
+def get_menu_item(menu_id, item, **kwargs):
+    """Get a specific menu item.
+
+    :param menu_id: menu_id used to filter out signal calls
+    :param item: ID of the item to retrieve
+    :param kwargs: extra arguments passed to the signals
+    :return: the specified menu item or ``None``
+    """
+    return named_objects_from_signal(signals.menu.items.send(menu_id, **kwargs)).get(item)
 
 
 def render_sidemenu(menu_id, active_item=None, **kwargs):

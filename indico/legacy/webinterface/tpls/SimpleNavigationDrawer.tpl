@@ -1,13 +1,11 @@
-<div class="main-breadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>
+<div class="main-breadcrumb">
     <span class="path">
-        <a href="${ url_for_index() }">
-            ${ _("Home") }
-        </a>
-       <span class="sep">»</span>
+        <a href="${ url_for_index() }" class="item">${ _("Home") }</a>
 
-        <a href="${ urlHandler(**pars) if urlHandler else "#"}">
-            ${ title }
-        </a>
+        % for item in items:
+            <span class="sep">»</span>
+            <span class="item">${ item }</span>
+        % endfor
     </span>
 </span>
 </div>
