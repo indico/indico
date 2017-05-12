@@ -32,9 +32,19 @@ from indico.core.celery import celery
 from indico.util.fs import cleanup_dir
 
 
+def _log_deleted(logger, msg, files):
+    for name in sorted(files):
+        logger.info(msg, name)
+
+
 @celery.periodic_task(name='temp_cleanup', run_every=crontab(minute='0', hour='4'))
 def temp_cleanup():
     """Cleanup temp/cache dirs"""
     from indico.core.config import Config
-    cleanup_dir(Config.getInstance().getCacheDir(), timedelta(days=1), exclude=lambda x: x.startswith('webassets-'))
-    cleanup_dir(Config.getInstance().getTempDir(), timedelta(days=1))
+    from indico.core.logger import Logger
+    logger = Logger.get()
+    deleted = cleanup_dir(Config.getInstance().getCacheDir(), timedelta(days=1),
+                          exclude=lambda x: x.startswith('webassets-'))
+    _log_deleted(logger, 'Deleted from cache: %s', deleted)
+    deleted = cleanup_dir(Config.getInstance().getTempDir(), timedelta(days=1))
+    _log_deleted(logger, 'Deleted from temp: %s', deleted)
