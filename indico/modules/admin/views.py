@@ -32,7 +32,9 @@ class WPAdmin(WPJinjaMixin, WPMainBase):
 
     def _getNavigationDrawer(self):
         menu_item = get_menu_item('admin-sidemenu', self._kwargs['active_menu_item'])
-        items = [_('Administration'), menu_item.title]
+        items = [_('Administration')]
+        if menu_item:
+            items.append(menu_item.title)
         return WSimpleNavigationDrawer(*items)
 
     def _getBody(self, params):

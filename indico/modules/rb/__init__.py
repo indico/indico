@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask import session
 
-from indico.core import signals
+from indico.core import signals, Config
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -52,6 +52,8 @@ def _import_tasks(sender, **kwargs):
 
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
+    if not Config.getInstance().getIsRoomBookingActive():
+        return
     if session.user.is_admin:
         yield SideMenuItem('rb-settings', _("Settings"), url_for('rooms_admin.settings'),
                            section='roombooking', icon='location')
