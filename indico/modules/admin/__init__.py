@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask import session
+
 from indico.core import signals
 from indico.modules.admin.controllers.base import RHAdminBase
 from indico.util.i18n import _
-from indico.web.menu import SideMenuSection
-
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuSection, TopMenuItem
 
 __all__ = ('RHAdminBase',)
 
@@ -32,3 +34,9 @@ def _sidemenu_sections(sender, **kwargs):
     yield SideMenuSection('customization', _("Customization"), 50, icon='wrench')
     yield SideMenuSection('integration', _("Integration"), 30, icon='earth')
     yield SideMenuSection('homepage', _("Homepage"), 40, icon='home')
+
+
+@signals.menu.items.connect_via('top-menu')
+def _topmenu_items(sender, **kwargs):
+    if session.user and session.user.is_admin:
+        yield TopMenuItem('admin', _('Administration'), url_for('core.admin_dashboard'), 70)

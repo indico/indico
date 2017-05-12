@@ -34,11 +34,6 @@ after_process = _signals.signal('after-process', """
 Called after an Indico request has been processed.
 """)
 
-indico_menu = _signals.signal('indico-menu', """
-Expected to return `HeaderMenuEntry` objects which are then added to the
-Indico head menu.
-""")
-
 get_storage_backends = _signals.signal('get-storage-backends', """
 Expected to return one or more Storage subclasses.
 """)

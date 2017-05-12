@@ -20,18 +20,16 @@ import pkg_resources
 from flask import g, render_template
 from speaklater import _LazyString
 
-from indico.legacy.common.TemplateExec import render as render_mako
-from indico.core import signals
 from indico.core.config import Config
-from indico.util.signals import values_from_signal
-from indico.web.menu import HeaderMenuEntry
+from indico.legacy.common.TemplateExec import render as render_mako
+from indico.web.menu import build_menu_structure
 
 
 def render_header(category=None, protected_object=None, local_tz=None, force_local_tz=False):
-    extra_menu_items = HeaderMenuEntry.group(values_from_signal(signals.indico_menu.send()))
+    top_menu_items = build_menu_structure('top-menu')
     rv = render_template('header.html',
                          category=category,
-                         extra_menu_items=extra_menu_items,
+                         top_menu_items=top_menu_items,
                          protected_object=protected_object,
                          local_tz=local_tz,
                          force_local_tz=force_local_tz)

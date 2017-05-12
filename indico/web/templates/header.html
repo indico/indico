@@ -15,64 +15,31 @@
     </div>
 
     <div class="global-menu toolbar">
-        <a href="{{ url_for_index() }}">{% trans %}Home{% endtrans %}</a>
-        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{% trans %}Create event{% endtrans %}</a>
-        <ul class="dropdown">
-            <li>
-                {{ create_event_link(category, 'lecture', _('Create lecture'), id='create-lecture') }}
-            </li>
-            <li>
-                {{ create_event_link(category, 'meeting', _('Create meeting'), id='create-meeting') }}
-            </li>
-            <li>
-                {{ create_event_link(category, 'conference', _('Create conference'), id='create-conference') }}
-            </li>
-        </ul>
-
-        {% if indico_config.IsRoomBookingActive %}
-            <a href="{{ url_for('rooms.roomBooking') }}">{% trans %}Room booking{% endtrans %}</a>
-        {% endif %}
-
-        {% if session.user and session.user.is_admin %}
-            <a href="{{ url_for('core.admin_dashboard') }}">{% trans %}Administration{% endtrans %}</a>
-        {% endif %}
-
-        {% for dropdown_title, items in extra_menu_items %}
-            {% if not dropdown_title %}
-                {% for item in items %}
-                    <a href="{{ item.url }}">{{ item.caption }}</a>
-                {% endfor %}
-            {% else %}
-                <a class="arrow js-dropdown" href="#" data-toggle="dropdown">
-                    {{- dropdown_title -}}
-                </a>
+        {% for item in top_menu_items recursive %}
+            {% if loop.depth0 %}
+                {# we're inside a section #}
+                <li>
+                    {% if item.section == 'create-event' and item.url in ('lecture', 'meeting', 'conference') %}
+                        {# special handling for event creation links #}
+                        {{ create_event_link(category, item.url, item.title, id=item.name) }}
+                    {% elif item.section == 'help' and item.name == 'help' and item.url is none %}
+                        <a style="color: #777; cursor: initial;"
+                           title="{% trans %}We are working on updating the documentation. Stay tuned!{% endtrans %}">
+                            {{ item.title }}
+                        </a>
+                    {% else %}
+                        <a href="{{ item.url }}">{{ item.title }}</a>
+                    {% endif %}
+                </li>
+            {% elif not item.is_section %}
+                <a href="{{ item.url }}">{{ item.title }}</a>
+            {% elif item.items %}
+                <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{{ item.title }}</a>
                 <ul class="dropdown">
-                    {% for item in items %}
-                        <li><a href="{{ item.url }}">{{ item.caption }}</a></li>
-                    {% endfor %}
+                    {{ loop(item.items) }}
                 </ul>
             {% endif %}
         {% endfor %}
-
-        {% if session.user %}
-            <a href="{{ url_for('users.user_dashboard', user_id=none) }}">
-                {%- trans %}My profile{% endtrans -%}
-            </a>
-        {% endif %}
-
-        <a class="arrow js-dropdown" href="#" data-toggle="dropdown">{% trans %}Help{% endtrans %}</a>
-        <ul class="dropdown">
-            <li>
-                <a style="color: #777; cursor: initial;"
-                   title="{% trans %}We are working on updating the documentation. Stay tuned!{% endtrans %}">
-                    {% trans %}Indico help{% endtrans %}
-                </a>
-            </li>
-            {% if indico_config.PublicSupportEmail %}
-                <li><a href="{{ url_for('misc.contact') }}">{% trans %}Contact{% endtrans %}</a></li>
-            {% endif %}
-            <li><a href="http://indico-software.org">{% trans %}More about Indico{% endtrans %}</a></li>
-        </ul>
     </div>
 </div>
 

@@ -29,8 +29,7 @@ from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
 from indico.web.flask.util import url_for
 from indico.util.i18n import _
-from indico.web.menu import SideMenuSection, SideMenuItem
-
+from indico.web.menu import SideMenuSection, SideMenuItem, TopMenuItem
 
 logger = Logger.get('rb')
 
@@ -61,6 +60,12 @@ def _extend_admin_menu(sender, **kwargs):
                            section='roombooking', icon='location')
     else:
         yield SideMenuItem('rb-rooms', _("Rooms"), url_for('rooms_admin.roomBooking-admin'), 70, icon='location')
+
+
+@signals.menu.items.connect_via('top-menu')
+def _topmenu_items(sender, **kwargs):
+    if Config.getInstance().getIsRoomBookingActive():
+        yield TopMenuItem('rb', _('Room booking'), url_for('rooms.roomBooking'), 80)
 
 
 @signals.menu.sections.connect_via('admin-sidemenu')

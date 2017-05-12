@@ -16,61 +16,22 @@
 
 from __future__ import unicode_literals, absolute_import
 
-from operator import attrgetter
-
 from flask import render_template
 from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
-from indico.util.struct.iterables import group_list
 from indico.util.string import return_ascii, format_repr
 
 
-class HeaderMenuEntry(object):
-    """Defines a header menu entry.
-
-    :param url: the url the menu item points to
-    :param caption: the caption of the menu item
-    :param parent: when used, all menu entries with the same parent
-                   are shown in a dropdown with the parent name as its
-                   caption
-    """
-
-    def __init__(self, url, caption, parent=None):
-        self.url = url
-        self.caption = caption
-        self.parent = parent
-
-    @return_ascii
-    def __repr__(self):
-        return '<HeaderMenuEntry({}, {}, {})>'.format(self.caption, self.parent, self.url)
-
-    @classmethod
-    def group(cls, entries):
-        """Returns the given entries grouped by its parent"""
-        return sorted(group_list(entries, key=attrgetter('parent'), sort_by=attrgetter('caption')).items())
-
-
-class SideMenuSection(object):
-    """Defines a side menu section (item set).
-
-    :param name: the unique name of the section
-    :param title: the title of the section (displayed)
-    :param weight: the "weight" (higher means it shows up first)
-    :param active: whether the section should be shown expanded by default
-    :param icon: icon that will be displayed next to the section title.
-    """
-
+class _MenuSectionBase(object):
     is_section = True
 
-    def __init__(self, name, title, weight=-1, active=False, icon=None):
+    def __init__(self, name, title, weight=-1):
         self.name = name
         self.title = title
-        self._active = active
-        self._items = set()
-        self.icon = 'icon-' + icon
         self.weight = weight
+        self._items = set()
         self._sorted_items = None
 
     def add_item(self, item):
@@ -80,8 +41,24 @@ class SideMenuSection(object):
     @property
     def items(self):
         if self._sorted_items is None:
-            self._sorted_items = sorted(self._items, key=lambda x: (-x.weight, x.title))
+            self._sorted_items = sorted(self._items, key=lambda x: (-x.weight, x.title.lower()))
         return self._sorted_items
+
+
+class SideMenuSection(_MenuSectionBase):
+    """Defines a side menu section (item set).
+
+    :param name: the unique name of the section
+    :param title: the title of the section (displayed)
+    :param weight: the "weight" (higher means it shows up first)
+    :param active: whether the section should be shown expanded by default
+    :param icon: icon that will be displayed next to the section title.
+    """
+
+    def __init__(self, name, title, weight=-1, active=False, icon=None):
+        super(SideMenuSection, self).__init__(name, title, weight)
+        self._active = active
+        self.icon = 'icon-' + icon if icon else None
 
     @property
     def active(self):
@@ -120,6 +97,43 @@ class SideMenuItem(object):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'name', 'title', 'url', active=False, disabled=False)
+
+
+class TopMenuSection(_MenuSectionBase):
+    """Defines a top menu section (dropdown).
+
+    :param name: the unique name of the section
+    :param title: the title of the section (displayed)
+    :param weight: the "weight" (higher means it shows up first)
+    """
+
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'name', 'title')
+
+
+class TopMenuItem(object):
+    """Defines a top menu item.
+
+    :param name: the unique name (within the menu) of the item
+    :param title: the title of the menu item (displayed)
+    :param url: the URL that the link will point to
+    :param weight: the "weight" (higher means it shows up first)
+    :param section: dropdown section the item will be put in
+    """
+
+    is_section = False
+
+    def __init__(self, name, title, url, weight=-1, section=None):
+        self.name = name
+        self.title = title
+        self.url = url
+        self.section = section
+        self.weight = weight
+
+    @return_ascii
+    def __repr__(self):
+        return format_repr(self, 'name', 'title', 'url')
 
 
 def build_menu_structure(menu_id, active_item=None, **kwargs):

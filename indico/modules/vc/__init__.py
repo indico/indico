@@ -28,7 +28,7 @@ from indico.modules.vc.plugins import VCPluginMixin
 from indico.modules.vc.util import get_vc_plugins, get_managed_vc_plugins
 from indico.web.flask.templating import get_overridable_template_name, template_hook
 from indico.web.flask.util import url_for
-from indico.web.menu import HeaderMenuEntry, SideMenuItem
+from indico.web.menu import SideMenuItem, TopMenuItem
 from indico.util.i18n import _
 
 
@@ -90,11 +90,11 @@ def _event_deleted(event, **kwargs):
         event_vc_room.delete(user)
 
 
-@signals.indico_menu.connect
-def extend_header_menu(sender, **kwargs):
+@signals.menu.items.connect_via('top-menu')
+def _topmenu_items(sender, **kwargs):
     if not session.user or not get_managed_vc_plugins(session.user):
         return
-    return HeaderMenuEntry(url_for('vc.vc_room_list'), _('Videoconference'), _('Services'))
+    return TopMenuItem('services-vc', _('Videoconference'), url_for('vc.vc_room_list'), section='services')
 
 
 @signals.event_management.get_cloners.connect

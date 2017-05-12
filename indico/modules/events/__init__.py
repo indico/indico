@@ -31,8 +31,7 @@ from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem
-
+from indico.web.menu import SideMenuItem, TopMenuSection, TopMenuItem
 
 __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
 logger = Logger.get('events')
@@ -196,6 +195,18 @@ def _sidemenu_items(sender, **kwargs):
     if session.user.is_admin:
         yield SideMenuItem('reference_types', _('External ID Types'), url_for('events.reference_types'),
                            section='customization')
+
+
+@signals.menu.sections.connect_via('top-menu')
+def _topmenu_sections(sender, **kwargs):
+    yield TopMenuSection('create-event', _('Create event'), 90)
+
+
+@signals.menu.items.connect_via('top-menu')
+def _topmenu_items(sender, **kwargs):
+    yield TopMenuItem('create-lecture', _('Create lecture'), 'lecture', 30, section='create-event')
+    yield TopMenuItem('create-meeting', _('Create meeting'), 'meeting', 20, section='create-event')
+    yield TopMenuItem('create-conference', _('Create conference'), 'conference', 10, section='create-event')
 
 
 @signals.app_created.connect

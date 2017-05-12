@@ -30,8 +30,7 @@ from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem
-
+from indico.web.menu import SideMenuItem, TopMenuItem
 
 __all__ = ('ExtraUserPreferences', 'User', 'UserSetting', 'UserSettingsProxy', 'user_settings')
 
@@ -55,16 +54,16 @@ user_management_settings = SettingsProxy('user_management', {
 })
 
 
+@signals.category.deleted.connect
+def _category_deleted(category, **kwargs):
+    category.favorite_of.clear()
+
+
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
         yield SideMenuItem('admins', _("Admins"), url_for('users.admins'), section='user_management')
         yield SideMenuItem('users', _("Users"), url_for('users.users_admin'), section='user_management')
-
-
-@signals.category.deleted.connect
-def _category_deleted(category, **kwargs):
-    category.favorite_of.clear()
 
 
 @signals.menu.items.connect_via('user-profile-sidemenu')
@@ -74,6 +73,12 @@ def _sidemenu_items(sender, user, **kwargs):
     yield SideMenuItem('emails', _('Emails'), url_for('users.user_emails'), 80, disabled=user.is_system)
     yield SideMenuItem('preferences', _('Preferences'), url_for('users.user_preferences'), 70, disabled=user.is_system)
     yield SideMenuItem('favorites', _('Favourites'), url_for('users.user_favorites'), 60, disabled=user.is_system)
+
+
+@signals.menu.items.connect_via('top-menu')
+def _topmenu_items(sender, **kwargs):
+    if session.user:
+        yield TopMenuItem('profile', _('My profile'), url_for('users.user_dashboard', user_id=None), 50)
 
 
 @template_hook('global-announcement', priority=-1)
