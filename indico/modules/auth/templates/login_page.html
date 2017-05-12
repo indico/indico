@@ -42,9 +42,11 @@
         {% endif %}
         {% set external_providers = providers|selectattr('is_external')|sort(attribute='title') %}
         {% if external_providers %}
-            <div class="titled-rule">
-                {% trans %}or connect with{% endtrans %}
-            </div>
+            {% if active_provider %}
+                <div class="titled-rule">
+                    {% trans %}or connect with{% endtrans %}
+                </div>
+            {% endif %}
             <div class="login-providers external">
                 {% for provider in external_providers %}
                     <a href="{{ url_for('.login', provider=provider.name, _method='GET') }}"
