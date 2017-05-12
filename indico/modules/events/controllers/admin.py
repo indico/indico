@@ -52,7 +52,7 @@ class RHReferenceTypes(RHAdminBase):
 
     def _process(self):
         types = _get_all_reference_types()
-        return WPReferenceTypes.render_template('admin/reference_types.html', reference_types=types)
+        return WPReferenceTypes.render_template('admin/reference_types.html', 'reference_types', reference_types=types)
 
 
 class RHCreateReferenceType(RHAdminBase):

@@ -20,10 +20,9 @@ from indico.util.i18n import _
 
 
 class WPRoomBookingAdmin(WPRoomBookingAdminBase):
-    sidemenu_option = 'rb-rooms'
     subtitle = _(u'Locations')
 
-    def _getTabContent(self, params):
+    def _get_legacy_content(self, params):
         return WTemplated('RoomBookingAdmin').getHTML(params)
 
 
@@ -34,5 +33,5 @@ class WPRoomBookingAdminLocation(WPRoomBookingAdminBase):
     def subtitle(self):
         return self._kwargs['location'].name
 
-    def _getTabContent(self, params):
+    def _get_legacy_content(self, params):
         return WTemplated('RoomBookingAdminLocation').getHTML(params)

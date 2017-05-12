@@ -34,4 +34,4 @@ class RHAnnouncement(RHAdminBase):
             announcement_settings.set_multi(form.data)
             flash(_('Settings have been saved'), 'success')
             return redirect(url_for('announcement.manage'))
-        return WPAnnouncement.render_template('settings.html', form=form)
+        return WPAnnouncement.render_template('settings.html', 'announcement', form=form)

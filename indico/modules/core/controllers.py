@@ -55,7 +55,7 @@ class RHSettings(RHAdminBase):
             return redirect(url_for('.settings'))
 
         cephalopod_url, cephalopod_data = self._get_cephalopod_data()
-        return WPSettings.render_template('settings.html',
+        return WPSettings.render_template('settings.html', 'settings',
                                           form=form,
                                           core_settings=core_settings.get_all(),
                                           social_settings=social_settings.get_all(),

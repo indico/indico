@@ -57,7 +57,7 @@ class RHManageNewsBase(RHAdminBase):
 class RHManageNews(RHManageNewsBase):
     def _process(self):
         news = NewsItem.query.order_by(NewsItem.created_dt.desc()).all()
-        return WPManageNews.render_template('admin/news.html', news=news)
+        return WPManageNews.render_template('admin/news.html', 'news', news=news)
 
 
 class RHNewsSettings(RHManageNewsBase):

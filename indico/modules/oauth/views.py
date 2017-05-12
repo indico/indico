@@ -16,17 +16,17 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.users.views import WPUser
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.modules.admin.views import WPAdmin
+from indico.modules.users.views import WPUser
 
 
 class WPOAuthJinjaMixin(WPJinjaMixin):
     template_prefix = 'oauth/'
 
 
-class WPOAuthAdmin(WPOAuthJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'applications'
+class WPOAuthAdmin(WPOAuthJinjaMixin, WPAdmin):
+    pass
 
 
 class WPOAuthUserProfile(WPOAuthJinjaMixin, WPUser):

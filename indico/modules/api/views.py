@@ -16,14 +16,12 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.admin.views import WPAdmin
 from indico.modules.users.views import WPUser
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 
 
-class WPAPIAdmin(WPJinjaMixin, WPAdminsBase):
+class WPAPIAdmin(WPAdmin):
     template_prefix = 'api/'
-    sidemenu_option = 'api'
 
 
 class WPAPIUserProfile(WPUser):

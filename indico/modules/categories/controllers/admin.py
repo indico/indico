@@ -36,4 +36,4 @@ class RHManageUpcomingEvents(RHAdminBase):
             get_upcoming_events.clear_cached()
             flash(_('Settings saved!'), 'success')
             return redirect(url_for('categories.manage_upcoming'))
-        return WPManageUpcomingEvents.render_template('admin/upcoming_events.html', form=form)
+        return WPManageUpcomingEvents.render_template('admin/upcoming_events.html', 'upcoming_events', form=form)

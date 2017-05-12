@@ -42,7 +42,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_related_categories, get_suggested_categories,
                                        serialize_user, search_users, merge_users, get_linked_events)
-from indico.modules.users.views import WPUser, WPUsersAdmin, WPAdmins
+from indico.modules.users.views import WPUser, WPUsersAdmin
 from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
                                         AdminUserSettingsForm, AdminAccountRegistrationForm, AdminsForm)
 from indico.util.date_time import timedelta_split, now_utc
@@ -354,7 +354,7 @@ class RHAdmins(RHAdminBase):
                 flash(_('Admin removed: {name} ({email})').format(name=user.name, email=user.email), 'success')
             return redirect(url_for('.admins'))
 
-        return WPAdmins.render_template('admins.html', form=form)
+        return WPUsersAdmin.render_template('admins.html', 'admins', form=form)
 
 
 class RHUsersAdmin(RHAdminBase):
@@ -393,7 +393,7 @@ class RHUsersAdmin(RHAdminBase):
             search_results.sort(key=attrgetter('first_name', 'last_name'))
 
         num_reg_requests = RegistrationRequest.query.count()
-        return WPUsersAdmin.render_template('users_admin.html', form=form, search_results=search_results,
+        return WPUsersAdmin.render_template('users_admin.html', 'users', form=form, search_results=search_results,
                                             num_of_users=num_of_users, num_deleted_users=num_deleted_users,
                                             num_reg_requests=num_reg_requests)
 
@@ -473,7 +473,7 @@ class RHUsersAdminMerge(RHAdminBase):
             flash(_('The users have been successfully merged.'), 'success')
             return redirect(url_for('.user_profile', user_id=target.id))
 
-        return WPUsersAdmin.render_template('users_merge.html', form=form)
+        return WPUsersAdmin.render_template('users_merge.html', 'users', form=form)
 
 
 class RHUsersAdminMergeCheck(RHAdminBase):
@@ -489,7 +489,7 @@ class RHRegistrationRequestList(RHAdminBase):
 
     def _process(self):
         requests = RegistrationRequest.query.order_by(RegistrationRequest.email).all()
-        return WPUsersAdmin.render_template('registration_requests.html', pending_requests=requests)
+        return WPUsersAdmin.render_template('registration_requests.html', 'users', pending_requests=requests)
 
 
 class RHRegistrationRequestBase(RHAdminBase):

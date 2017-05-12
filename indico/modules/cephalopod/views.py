@@ -16,13 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.modules.admin.views import WPAdmin
 
 
-class WPCephalopod(WPJinjaMixin, WPAdminsBase):
+class WPCephalopod(WPAdmin):
     template_prefix = 'cephalopod/'
-    sidemenu_option = 'cephalopod'
 
     def getJSFiles(self):
-        return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
+        return WPAdmin.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()

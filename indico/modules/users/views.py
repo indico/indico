@@ -18,13 +18,12 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.users import User
-from indico.util.i18n import _
-
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
+from indico.modules.admin.views import WPAdmin
+from indico.modules.users import User
+from indico.util.i18n import _
 
 
 class WPUser(WPJinjaMixin, WPMainBase):
@@ -54,13 +53,8 @@ class WPUser(WPJinjaMixin, WPMainBase):
         return self._getPageContent(params)
 
 
-class WPUsersAdmin(WPJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'users'
+class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
 
     def getJSFiles(self):
-        return WPAdminsBase.getJSFiles(self) + self._asset_env['modules_users_js'].urls()
-
-
-class WPAdmins(WPUsersAdmin):
-    sidemenu_option = 'admins'
+        return WPAdmin.getJSFiles(self) + self._asset_env['modules_users_js'].urls()

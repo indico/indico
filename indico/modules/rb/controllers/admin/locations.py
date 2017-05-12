@@ -33,7 +33,7 @@ from indico.web.flask.util import url_for
 
 class RHRoomBookingAdmin(RHRoomBookingAdminBase):
     def _process(self):
-        return WPRoomBookingAdmin(self, locations=Location.find_all()).display()
+        return WPRoomBookingAdmin(self, 'rb-rooms', locations=Location.find_all()).display()
 
 
 class RHRoomBookingLocationMixin:
@@ -103,7 +103,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
                                             if room.is_reservable)
             kpi['booking_stats'] = compose_rooms_stats(self._location.rooms)
             kpi['booking_count'] = Reservation.find(Reservation.room.has(Room.location == self._location)).count()
-        return WPRoomBookingAdminLocation(self,
+        return WPRoomBookingAdminLocation(self, 'rb-rooms',
                                           location=self._location,
                                           rooms=rooms,
                                           action_succeeded=self._actionSucceeded,

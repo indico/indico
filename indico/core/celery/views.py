@@ -16,10 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.modules.admin.views import WPAdmin
 
 
-class WPCelery(WPJinjaMixin, WPAdminsBase):
+class WPCelery(WPAdmin):
     template_prefix = 'celery/'
-    sidemenu_option = 'celery'

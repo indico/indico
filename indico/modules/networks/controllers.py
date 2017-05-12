@@ -39,7 +39,7 @@ class RHManageNetworks(RHNetworkBase):
 
     def _process(self):
         network_groups = IPNetworkGroup.find().order_by(IPNetworkGroup.name).all()
-        return WPNetworksAdmin.render_template('networks.html', network_groups=network_groups)
+        return WPNetworksAdmin.render_template('networks.html', 'ip_networks', network_groups=network_groups)
 
 
 class RHCreateNetworkGroup(RHNetworkBase):

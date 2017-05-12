@@ -44,7 +44,8 @@ class RHPaymentAdminSettings(RHAdminBase):
             settings.set_multi(form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
-        return WPPaymentAdmin.render_template('admin_settings.html', form=form, plugins=get_payment_plugins().values())
+        return WPPaymentAdmin.render_template('admin_settings.html', 'payment',
+                                              form=form, plugins=get_payment_plugins().values())
 
 
 class RHPaymentAdminPluginSettings(RHPluginDetails):

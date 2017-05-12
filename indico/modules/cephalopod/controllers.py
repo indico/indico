@@ -66,7 +66,7 @@ class RHCephalopod(RHCephalopodBase):
         instance_url = config.getBaseURL()
         language = config.getDefaultLocale()
         tracker_url = urljoin(config.getTrackerURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
-        return WPCephalopod.render_template('cephalopod.html',
+        return WPCephalopod.render_template('cephalopod.html', 'cephalopod',
                                             affiliation=core_settings.get('site_organization'),
                                             enabled=enabled,
                                             form=form,

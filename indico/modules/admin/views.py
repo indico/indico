@@ -16,21 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template_string
-
-from indico.legacy.webinterface import wcomponents
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
 
 
-class WPAdminsBase(WPMainBase):
-    def _getBody(self, params):
-        body = self._getPageContent(params)
-        tpl = "{% extends 'layout/admin_page.html' %}{% block content %}{{ body | safe }}{% endblock %}"
-        return render_template_string(tpl, active_menu_item=self.sidemenu_option, body=body)
+class WPAdmin(WPJinjaMixin, WPMainBase):
+    """Base class for admin pages."""
+
+    def __init__(self, rh, active_menu_item, **kwargs):
+        kwargs['active_menu_item'] = active_menu_item
+        WPMainBase.__init__(self, rh, **kwargs)
 
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_('Administration'), bgColor='white')
+        return WSimpleNavigationDrawer(_('Administration'), bgColor='white')
 
-    def _getPageContent(self, params):
-        raise NotImplementedError
+    def _getBody(self, params):
+        return self._getPageContent(params)

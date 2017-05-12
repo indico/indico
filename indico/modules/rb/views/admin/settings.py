@@ -20,10 +20,9 @@ from indico.util.i18n import _
 
 
 class WPRoomBookingSettings(WPRoomBookingAdminBase):
-    sidemenu_option = 'rb-settings'
     subtitle = _(u'Settings')
 
-    def _getTabContent(self, params):
+    def _get_legacy_content(self, params):
         params['field_opts'] = {
             'assistance_emails': {'rows': 3, 'cols': 40},
             'notification_hour': {'size': 2},

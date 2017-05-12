@@ -16,10 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.modules.admin.views import WPAdmin
 
 
-class WPAnnouncement(WPJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'announcement'
+class WPAnnouncement(WPAdmin):
     template_prefix = 'announcement/'

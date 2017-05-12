@@ -49,7 +49,7 @@ class RHAPIAdminSettings(RHAdminBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
         count = APIKey.find(is_active=True).count()
-        return WPAPIAdmin.render_template('admin_settings.html', form=form, count=count)
+        return WPAPIAdmin.render_template('admin_settings.html', 'api', form=form, count=count)
 
 
 class RHAPIAdminKeys(RHAdminBase):
@@ -57,7 +57,7 @@ class RHAPIAdminKeys(RHAdminBase):
 
     def _process(self):
         keys = sorted(APIKey.find_all(is_active=True), key=lambda ak: (ak.use_count == 0, ak.user.full_name))
-        return WPAPIAdmin.render_template('admin_keys.html', keys=keys)
+        return WPAPIAdmin.render_template('admin_keys.html', 'api', keys=keys)
 
 
 class RHUserAPIBase(RHUserBase):

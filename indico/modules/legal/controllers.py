@@ -32,7 +32,7 @@ class RHManageLegalMessages(RHAdminBase):
         if form.validate_on_submit():
             legal_settings.set_multi(form.data)
             return redirect(url_for('legal.manage'))
-        return WPManageLegalMessages.render_template('manage_messages.html', form=form)
+        return WPManageLegalMessages.render_template('manage_messages.html', 'legal_messages', form=form)
 
 
 class RHDisplayLegalMessages(RH):

@@ -13,16 +13,23 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
+
 from flask import render_template
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
+from indico.modules.admin.views import WPAdmin
 
 
-class WPRoomBookingAdminBase(WPAdminsBase):
+class WPRoomBookingAdminBase(WPAdmin):
     subtitle = u''
 
     def getJSFiles(self):
-        return WPAdminsBase.getJSFiles(self) + self._includeJSPackage('Management')
+        return WPAdmin.getJSFiles(self) + self._includeJSPackage('Management')
 
     def _getPageContent(self, params):
-        return render_template('rb/admin.html', body=self._getTabContent(params), subtitle=self.subtitle)
+        return render_template('rb/admin.html', body=self._get_legacy_content(params), subtitle=self.subtitle,
+                               active_menu_item=self._kwargs['active_menu_item'])
+
+    def _get_legacy_content(self, params):
+        raise NotImplementedError

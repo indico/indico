@@ -38,4 +38,4 @@ class RHRoomBookingSettings(RHAdminBase):
             return redirect(url_for('.settings'))
 
         rb_active = Config.getInstance().getIsRoomBookingActive()
-        return WPRoomBookingSettings(self, rb_active=rb_active, form=form).display()
+        return WPRoomBookingSettings(self, 'rb-settings', rb_active=rb_active, form=form).display()

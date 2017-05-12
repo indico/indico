@@ -16,16 +16,16 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
+from indico.modules.admin.views import WPAdmin
 
 
 class WPLegalMixin:
     template_prefix = 'legal/'
 
 
-class WPManageLegalMessages(WPLegalMixin, WPJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'legal_messages'
+class WPManageLegalMessages(WPLegalMixin, WPAdmin):
+    pass
 
 
 class WPDisplayLegalMessages(WPLegalMixin, WPJinjaMixin, WPDecorated):

@@ -29,7 +29,6 @@ from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
 from indico.web import assets
 from indico.web.util import jsonify_template
-from indico.legacy.webinterface import wcomponents
 
 
 class WPJinjaMixin:

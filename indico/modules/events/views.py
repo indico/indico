@@ -21,10 +21,9 @@ import posixpath
 from flask import render_template, request
 from sqlalchemy.orm import load_only
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import (render_event_header, render_event_footer,
                                                           WPConferenceBase, WConfMetadata, WPrintPageFrame)
+from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import get_css_url
@@ -32,9 +31,8 @@ from indico.util.mathjax import MathjaxMixin
 from indico.util.string import to_unicode
 
 
-class WPReferenceTypes(WPJinjaMixin, WPAdminsBase):
+class WPReferenceTypes(WPAdmin):
     template_prefix = 'events/'
-    sidemenu_option = 'reference_types'
 
 
 class WPSimpleEventDisplayBase(MathjaxMixin, WPConferenceBase):

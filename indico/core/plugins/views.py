@@ -16,10 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.modules.admin.views import WPAdmin
 
 
-class WPPlugins(WPJinjaMixin, WPAdminsBase):
+class WPPlugins(WPAdmin):
     template_prefix = 'plugins/'
-    sidemenu_option = 'plugins'

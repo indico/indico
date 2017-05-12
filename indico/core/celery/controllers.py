@@ -52,4 +52,5 @@ class RHCeleryTasks(RHAdminBase):
                           'disabled': disabled})
         tasks.sort(key=itemgetter('disabled', 'name'))
 
-        return WPCelery.render_template('celery_tasks.html', flower_url=flower_url, tasks=tasks, timedelta=timedelta)
+        return WPCelery.render_template('celery_tasks.html', 'celery',
+                                        flower_url=flower_url, tasks=tasks, timedelta=timedelta)

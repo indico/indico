@@ -31,5 +31,5 @@ class WPRoomBookingRoomForm(WPRoomBookingAdminBase):
         else:
             return _(u'{location}: Create room').format(location=location.name)
 
-    def _getTabContent(self, params):
+    def _get_legacy_content(self, params):
         return WTemplated('RoomBookingRoomForm').getHTML(params)

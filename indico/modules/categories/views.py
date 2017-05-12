@@ -18,16 +18,15 @@ from __future__ import unicode_literals
 
 from markupsafe import escape
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
+from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
 
 
-class WPManageUpcomingEvents(WPJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'upcoming_events'
+class WPManageUpcomingEvents(WPAdmin):
     template_prefix = 'categories/'
 
 

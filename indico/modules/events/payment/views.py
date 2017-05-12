@@ -16,17 +16,17 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.modules.admin.views import WPAdmin
 
 
 class WPPaymentJinjaMixin(WPJinjaMixin):
     template_prefix = 'events/payment/'
 
 
-class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'payment'
+class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdmin):
+    pass
 
 
 class WPPaymentEventManagement(WPConferenceModifBase, WPPaymentJinjaMixin):

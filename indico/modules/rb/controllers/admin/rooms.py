@@ -136,8 +136,8 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
             self._save()
             return redirect(url_for('rooms.roomBooking-roomDetails', self._room))
         else:
-            return room_views.WPRoomBookingRoomForm(self, form=self._form, room=self._room, location=self._location,
-                                                    errors=self._form.error_list).display()
+            return room_views.WPRoomBookingRoomForm(self, 'rb-rooms', form=self._form, room=self._room,
+                                                    location=self._location, errors=self._form.error_list).display()
 
 
 class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):

@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.util.i18n import _
-from indico.legacy.webinterface.pages.admins import WPAdminsBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin, WPDecorated
+from indico.modules.admin.views import WPAdmin
+from indico.util.i18n import _
 
 
 class WPNews(WPJinjaMixin, WPDecorated):
@@ -31,6 +31,5 @@ class WPNews(WPJinjaMixin, WPDecorated):
         return WPDecorated._getTitle(self) + ' - ' + _("News")
 
 
-class WPManageNews(WPJinjaMixin, WPAdminsBase):
-    sidemenu_option = 'news'
+class WPManageNews(WPAdmin):
     template_prefix = 'news/'
