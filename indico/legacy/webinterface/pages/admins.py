@@ -40,7 +40,7 @@ class WPAdminsBase(WPMainBase):
         })
 
     def _getNavigationDrawer(self):
-        return wcomponents.WSimpleNavigationDrawer(_("Server Admin"), bgColor="white")
+        return wcomponents.WSimpleNavigationDrawer(_("Administration"), bgColor="white")
 
     def _createTabCtrl(self):
         pass
