@@ -16,14 +16,18 @@
 
 from __future__ import unicode_literals
 
+import sys
 from collections import defaultdict
 from operator import itemgetter
 
+import click
 from sqlalchemy import inspect
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.util.console import cformat
+
+click.disable_unicode_literals_warning = True
 
 
 def _find_backrefs():
@@ -52,8 +56,12 @@ def _write_backrefs(rels, new_source):
         new_source.append('    # - {} ({}.{})'.format(backref_name, target, target_rel_name))
 
 
-def main():
+@click.command()
+@click.option('--ci', is_flag=True, help='Indicate that the script is running during CI and should use a non-zero '
+                                         'exit code unless all backrefs were already up to date.')
+def main(ci):
     import_all_models()
+    has_missing = has_updates = False
     for cls, rels in sorted(_find_backrefs().iteritems(), key=lambda x: x[0].__name__):
         path = _get_source_file(cls)
         with open(path, 'r') as f:
@@ -83,10 +91,13 @@ def main():
             _write_backrefs(rels, new_source)
         if not backrefs_written:
             print cformat('%{yellow}Class {} has no comment for backref information').format(cls.__name__)
+            has_missing = True
         if source != new_source:
             print cformat('%{green!}Updating backref info for {} in {}').format(cls.__name__, path)
+            has_updates = True
             with open(path, 'w') as f:
                 f.writelines(line + '\n' for line in new_source)
+    sys.exit(1 if (has_missing or (ci and has_updates)) else 0)
 
 
 if __name__ == '__main__':
