@@ -79,7 +79,7 @@ def process():
             Logger.get('dev').exception('Exception not registered as fossil')
 
         # NoReport errors (i.e. not logged in) shouldn't be logged
-        if not isinstance(e, NoReportError):
+        if not isinstance(e, NoReportError) and not getattr(e, '_disallow_report', False):
             Logger.get('rpc').exception('Service request failed. '
                                         'Request text:\r\n{0}\r\n\r\n'.format(requestBody))
 

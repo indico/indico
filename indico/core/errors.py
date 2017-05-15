@@ -20,7 +20,8 @@ Module containing the Indico exception class hierarchy
 
 import traceback
 
-from werkzeug.exceptions import Forbidden, NotFound, BadRequest
+from flask import session
+from werkzeug.exceptions import Forbidden, NotFound, BadRequest, HTTPException
 
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -81,9 +82,11 @@ class IndicoError(Exception):
         return self._explanation
 
     def toDict(self):
+        reportable = not isinstance(self, NoReportError) and not getattr(self, '_disallow_report', False)
         return {
             'code': self.code,
-            'type': 'noReport' if isinstance(self, NoReportError) else 'unknown',
+            'hasUser': bool(session.user),
+            'type': 'noReport' if not reportable else 'unknown',
             'message': self.getMessage(),
             'data': self.__dict__,
             'requestInfo': {},
@@ -96,7 +99,11 @@ class FormValuesError(IndicoError):
 
 
 class NoReportError(IndicoError):
-    pass
+    @classmethod
+    def wrap_exc(cls, exc):
+        assert isinstance(exc, HTTPException)
+        exc._disallow_report = True
+        return exc
 
 
 class NotFoundError(IndicoError):

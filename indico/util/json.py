@@ -79,7 +79,8 @@ def loads(string):
 def _is_no_report_error(exc):
     from indico.core import errors as indico_errors
     from indico.legacy import errors as makac_errors
-    return isinstance(exc, (indico_errors.NoReportError, makac_errors.NoReportError))
+    return (isinstance(exc, (indico_errors.NoReportError, makac_errors.NoReportError)) or
+            getattr(exc, '_disallow_report', False))
 
 
 def create_json_error_answer(exception, status=200):
@@ -95,6 +96,7 @@ def create_json_error_answer(exception, status=200):
             exception_data = {}
         details = {
             'code': type(exception).__name__,
+            'hasUser': bool(session.user),
             'type': 'noReport' if ((not session.user and isinstance(exception, Forbidden)) or
                                    _is_no_report_error(exception)) else 'unknown',
             'message': unicode(get_error_description(exception)),
