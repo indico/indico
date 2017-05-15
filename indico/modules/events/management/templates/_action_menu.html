@@ -7,7 +7,7 @@
 
 
 {% macro _render_change_event_type(event, event_types) %}
-    <button class="i-button borderless icon-wrench arrow js-dropdown" data-toggle="dropdown">
+    <button class="i-button borderless icon-wrench arrow js-dropdown hide-if-locked" data-toggle="dropdown">
         {% trans %}Change type{% endtrans %}
     </button>
     <ul class="dropdown">
@@ -72,7 +72,7 @@
 
 
 {% macro _render_move_event(event) %}
-    <button class="i-button borderless icon-transmission"
+    <button class="i-button borderless icon-transmission hide-if-locked"
             id="event-action-move-to-category"
             title="{% trans %}Move event to another category{% endtrans %}"
             data-href="{{ url_for('event_management.move', event) }}"
@@ -83,7 +83,7 @@
 
 
 {% macro _render_delete_event(event) %}
-    <button class="i-button borderless icon-remove danger"
+    <button class="i-button borderless icon-remove danger hide-if-locked"
             title="{% trans %}Delete event{% endtrans %}"
             data-qtip-style="danger"
             data-href="{{ url_for('event_management.delete', event) }}"
@@ -117,7 +117,7 @@
                    title="{% trans %}Event actions{% endtrans %}"></a>
 
                 <div id="event-action-menu-actions">
-                    <div class="action-menu-buttons">
+                    <div class="action-menu-buttons {{ 'event-locked' if event.is_locked }}">
                         {{ _render_move_event(event) }}
                         {{ _render_lock_event(event) }}
                         {{ _render_delete_event(event) }}

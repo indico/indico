@@ -24,19 +24,20 @@ from PIL import Image
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG
 from indico.modules.designer.forms import AddTemplateForm
-from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.models.images import DesignerImageFile
+from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_placeholder_options, get_inherited_templates
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
+from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_form
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
 
 TEMPLATE_DATA_JSON_SCHEMA = {
     'type': 'object',
@@ -119,6 +120,8 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
     def _checkProtection(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
+        elif isinstance(self.target, Event):
+            check_event_locked(self, self.target)
 
     def _checkParams(self):
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])

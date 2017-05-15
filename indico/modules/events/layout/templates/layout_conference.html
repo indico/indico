@@ -6,7 +6,7 @@
 {% endblock %}
 
 {%- block content %}
-    {% call simple_form(form, save_reminder=true) %}
+    {% call simple_form(form, save_reminder=true, back_button=false) %}
         {% call form_fieldset(_('General')) %}
             {{ form_rows(form, fields=('is_searchable', 'show_nav_bar', 'show_banner', 'show_social_badges')) }}
         {% endcall %}
@@ -23,7 +23,7 @@
             {{ form_row(form.use_custom_css) }}
             {% call form_row(form.theme) %}
                 <a href="{{ url_for('event_layout.css_preview', event) }}" target="_blank"
-                   class="i-button js-theme-preview-btn icon-eye">
+                   class="i-button js-theme-preview-btn icon-eye hide-if-locked">
                     {%- trans %}Preview{% endtrans -%}
                 </a>
             {% endcall %}

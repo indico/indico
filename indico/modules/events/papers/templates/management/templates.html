@@ -12,7 +12,7 @@
 {%- endblock %}
 
 {% block content -%}
-    <div class="toolbar space-after">
+    <div class="toolbar space-after hide-if-locked">
         <button class="i-button icon-plus highlight"
                 data-href="{{ url_for('.upload_template', event) }}"
                 data-title="{% trans %}Upload new paper template{% endtrans %}"

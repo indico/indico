@@ -8,7 +8,7 @@
                     <th class="small-column"></th>
                     <th>{% trans %}Name{% endtrans %}</th>
                     <th>{% trans %}Description{% endtrans %}</th>
-                    <th class="action-column"></th>
+                    <th class="action-column hide-if-locked"></th>
                 </tr>
             </thead>
             <tbody>
@@ -20,7 +20,7 @@
                             <a href="{{ url_for('.download_template', tpl) }}">{{ tpl.name }}</a>
                         </td>
                         <td>{{ tpl.description }}</td>
-                        <td class="action-column">
+                        <td class="action-column hide-if-locked">
                             <a class="icon-edit"
                                data-href="{{ url_for('.edit_template', tpl) }}"
                                data-title="{% trans %}Edit paper template{% endtrans %}"

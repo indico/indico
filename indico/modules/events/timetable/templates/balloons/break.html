@@ -1,10 +1,10 @@
 {% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location, render_palette_picker %}
 
-<div class="balloon">
+<div class="balloon {{ 'event-locked' if event_locked }}">
     <div class="title-container">
         <div class="title">{{ break_.title }}</div>
         {% if editable %}
-            <div class="group right entry-action-buttons">
+            <div class="group right entry-action-buttons hide-if-locked">
                 {{ render_palette_picker(break_, 'timetable.legacy_break_rest', color_list) }}
                 <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"
                    title="{% trans %}Edit break{% endtrans %}"

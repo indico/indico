@@ -20,7 +20,7 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.models.abstracts import Abstract
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
+from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -64,6 +64,7 @@ class RHAbstractsBase(RHConferenceBaseDisplay):
         # Only let event managers access the management versions.
         if self.management and not self.event_new.can_manage(session.user):
             raise Forbidden
+        check_event_locked(self, self.event_new)
 
     @property
     def management(self):

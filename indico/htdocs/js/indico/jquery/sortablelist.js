@@ -23,6 +23,11 @@
          * web/templates/_sortable_list.html
          */
 
+        if ($wrapper.filter('.disable-if-locked').closest('.event-locked').length ||
+            $wrapper.closest('.disable-if-locked').closest('.event-locked').length) {
+            return;
+        }
+
         // Render the lists sortable
         if ($wrapper.data('disable-dragging') === undefined) {
             var $lists = $wrapper.find('ul');

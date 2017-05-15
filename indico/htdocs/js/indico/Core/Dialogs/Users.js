@@ -1059,7 +1059,7 @@ type("UserListWidget", ["ListWidget"],
                  editPopup.open();
             });
 
-            var remove_button = $('<i class="remove-user icon-close">').click(function() {
+            var remove_button = $('<i class="remove-user icon-close hide-if-locked">').click(function() {
                 var currentUserId = $('body').data('user-id');
                 var userId = userData.get('id');
                 var confirmed;
@@ -1230,7 +1230,7 @@ type("UserListField", ["IWidget"], {
 
         if (this.allowSearch || this.includeFavourites || exists(this.suggestedUsers)) {
             var chooseUserButton = Html.input("button", {style: {marginRight: pixels(5)},
-                                                         className: 'i-button', type: 'button'},
+                                                         className: 'i-button hide-if-locked', type: 'button'},
                                               this.enableGroups ? $T('Add User / Group'): $T('Add user'));
             var chooseIpNetwork = Html.a({href: '#', style: {marginRight: pixels(5)},
                                           className: 'i-button arrow js-dropdown',

@@ -81,6 +81,8 @@ class RHPapersList(RHPapersListBase):
 class RHCustomizePapersList(RHPapersListBase):
     """Filter options and columns to display for the paper list"""
 
+    ALLOW_LOCKED = True
+
     def _process_GET(self):
         list_config = self.list_generator.list_config
         return jsonify_template('events/papers/paper_list_filter.html',
@@ -107,6 +109,8 @@ class RHPapersActionBase(RHPapersListBase):
 
 class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
     """Generate a ZIP file with paper files for a given list of contributions"""
+
+    ALLOW_LOCKED = True
 
     def _prepare_folder_structure(self, item):
         paper_title = secure_filename('{}_{}'.format(item.paper.contribution.friendly_id,

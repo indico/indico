@@ -45,7 +45,6 @@ from indico.legacy.common.mail import GenericMailer
 from indico.legacy.errors import (
     AccessError,
     BadRefererError,
-    ConferenceClosedError,
     KeyAccessError,
     MaKaCError,
     ModificationError,
@@ -53,12 +52,11 @@ from indico.legacy.errors import (
     NotFoundError)
 import indico.legacy.webinterface.pages.errors as errors
 from indico.legacy.webinterface.pages.error import render_error
-from indico.legacy.webinterface.pages.conferences import WPConferenceModificationClosed
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.core.errors import get_error_description
+from indico.core.errors import get_error_description, NoReportError
 from indico.core.logger import Logger
 from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.modules.events.legacy import LegacyConference
@@ -452,12 +450,6 @@ class RH(RequestHandlerBase):
         return errors.WPFormValuesError(self, msg).display()
 
     @jsonify_error
-    def _processConferenceClosedError(self, e):
-        """Treats access to modification pages for conferences when they are closed."""
-
-        return WPConferenceModificationClosed(self, e._conf).display()
-
-    @jsonify_error
     def _processNoReportError(self, e):
         """Process errors without reporting"""
         return errors.WPNoReportError(self, e).display()
@@ -711,7 +703,7 @@ class RHDisplayBaseProtected(RHProtected):
 
 class RHModificationBaseProtected(RHProtected):
 
-    _allowClosed = False
+    ALLOW_LOCKED = False
     ROLE = None
 
     def _checkProtection(self):
@@ -723,5 +715,9 @@ class RHModificationBaseProtected(RHProtected):
                 self._checkSessionUser()
             else:
                 raise ModificationError()
-        if not self._allowClosed and event.is_locked:
-            raise ConferenceClosedError(self._target)
+        check_event_locked(self, event)
+
+
+def check_event_locked(rh, event, force=False):
+    if (not getattr(rh, 'ALLOW_LOCKED', False) or force) and event.is_locked and request.method not in ('GET', 'HEAD'):
+        raise NoReportError.wrap_exc(Forbidden(_(u'This event has been locked so no modifications are possible.')))

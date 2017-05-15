@@ -24,6 +24,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
+from indico.legacy.webinterface.rh.base import check_event_locked
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -98,6 +99,7 @@ class RHManageContributionBase(RHManageContributionsBase):
     def _checkProtection(self):
         if not self.contrib.can_manage(session.user):
             raise Forbidden
+        check_event_locked(self, self.event_new)
 
 
 class RHManageSubContributionBase(RHManageContributionBase):
@@ -145,6 +147,8 @@ class RHContributions(ContributionListMixin, RHManageContributionsBase):
 class RHContributionListCustomize(RHManageContributionsBase):
     """Filter options for the contributions list of an event"""
 
+    ALLOW_LOCKED = True
+
     def _process_GET(self):
         return WPManageContributions.render_template('contrib_list_filter.html', self._conf,
                                                      event=self.event_new,
@@ -158,6 +162,8 @@ class RHContributionListCustomize(RHManageContributionsBase):
 
 class RHContributionListStaticURL(RHManageContributionsBase):
     """Generate a static URL for the configuration of the contribution list"""
+
+    ALLOW_LOCKED = True
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())
@@ -281,6 +287,7 @@ class RHContributionPersonList(RHContributionPersonListMixin, RHManageContributi
     """List of persons in the contribution"""
 
     template = 'events/contributions/management/contribution_person_list.html'
+    ALLOW_LOCKED = True
 
     @property
     def _membership_filter(self):
@@ -411,10 +418,15 @@ class RHContributionUpdateDuration(RHManageContributionBase):
         return jsonify_form(form, back_button=False, disabled_until_change=True)
 
 
-class RHContributionsMaterialPackage(RHManageContributionsActionsBase, AttachmentPackageGeneratorMixin):
+class RHManageContributionsExportActionsBase(RHManageContributionsActionsBase):
+    ALLOW_LOCKED = True
+
+
+class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, AttachmentPackageGeneratorMixin):
     """Generate a ZIP file with materials for a given list of contributions"""
 
     ALLOW_UNSCHEDULED = True
+    ALLOW_LOCKED = True
 
     def _process(self):
         attachments = self._filter_by_contributions({c.id for c in self.contribs}, None)
@@ -424,7 +436,7 @@ class RHContributionsMaterialPackage(RHManageContributionsActionsBase, Attachmen
         return self._generate_zip_file(attachments, name_suffix=self.event_new.id)
 
 
-class RHContributionsExportCSV(RHManageContributionsActionsBase):
+class RHContributionsExportCSV(RHManageContributionsExportActionsBase):
     """Export list of contributions to CSV"""
 
     def _process(self):
@@ -432,7 +444,7 @@ class RHContributionsExportCSV(RHManageContributionsActionsBase):
         return send_csv('contributions.csv', headers, rows)
 
 
-class RHContributionsExportExcel(RHManageContributionsActionsBase):
+class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
     """Export list of contributions to XLSX"""
 
     def _process(self):
@@ -440,19 +452,19 @@ class RHContributionsExportExcel(RHManageContributionsActionsBase):
         return send_xlsx('contributions.xlsx', headers, rows, tz=self.event_new.tzinfo)
 
 
-class RHContributionsExportPDF(RHManageContributionsActionsBase):
+class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
     def _process(self):
         pdf = ContribsToPDF(self._conf, self.contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHContributionsExportPDFBook(RHManageContributionsActionsBase):
+class RHContributionsExportPDFBook(RHManageContributionsExportActionsBase):
     def _process(self):
         pdf = ContributionBook(self.event_new, session.user, self.contribs, tz=self.event_new.timezone)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
-class RHContributionsExportPDFBookSorted(RHManageContributionsActionsBase):
+class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase):
     def _process(self):
         pdf = ContributionBook(self.event_new, session.user, self.contribs, tz=self.event_new.timezone,
                                sort_by='board_number')

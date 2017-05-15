@@ -28,7 +28,7 @@ from indico.modules.attachments.controllers.event_package import AttachmentPacka
 from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
 from indico.modules.events.util import get_object_from_args
 from indico.web.flask.templating import get_template_module
-from indico.legacy.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.base import RHProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
@@ -52,6 +52,7 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
         RHProtected._checkProtection(self)
         if not can_manage_attachments(self.object, session.user):
             raise Forbidden
+        check_event_locked(self, self.event_new)
 
 
 class RHManageEventAttachments(ManageAttachmentsMixin, RHEventAttachmentManagementBase):
@@ -104,3 +105,4 @@ class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHConferenceMo
     wp = WPPackageEventAttachmentsManagement
     management = True
     CSRF_ENABLED = True
+    ALLOW_LOCKED = True

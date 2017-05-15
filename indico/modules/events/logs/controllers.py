@@ -24,8 +24,6 @@ from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 class RHEventLogs(RHConferenceModifBase):
     """Shows the modification/action log for the event"""
 
-    _allowClosed = True
-
     def _process(self):
         entries = self.event_new.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
         realms = {e.realm for e in entries}

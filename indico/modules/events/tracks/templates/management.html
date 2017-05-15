@@ -40,7 +40,7 @@
 
     <div class="flexrow f-a-center">
         <h3 class="f-self-stretch">{% trans %}List of tracks{% endtrans %}</h3>
-        <a class="i-button highlight icon-plus"
+        <a class="i-button highlight icon-plus hide-if-locked"
            data-href="{{ url_for('.create_track', event) }}"
            data-title="{% trans %}Add new track{% endtrans %}"
            data-update="#track-list-container"

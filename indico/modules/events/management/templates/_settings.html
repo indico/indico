@@ -21,7 +21,7 @@
             {{ caller() }}
         </div>
         <div class="toolbar">
-            <button class="i-button borderless text-color icon-only icon-edit"
+            <button class="i-button borderless text-color icon-only icon-edit hide-if-locked"
                     title="{{ edit_title }}"
                     data-href="{{ url_for(edit_endpoint, event) }}"
                     data-title="{{ edit_title }}"

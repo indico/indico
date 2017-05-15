@@ -45,24 +45,26 @@
     {% endif %}
 
     <div class="action-box">
-        <div class="section">
-            <div class="icon icon-settings"></div>
-            <div class="text">
-                <div class="label">
-                    {% trans %}General settings{% endtrans %}
+        {% if not survey.event_new.is_locked %}
+            <div class="section">
+                <div class="icon icon-settings"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}General settings{% endtrans %}
+                    </div>
+                    {% trans %}Edit settings for this survey.{% endtrans %}
                 </div>
-                {% trans %}Edit settings for this survey.{% endtrans %}
+                <div class="toolbar">
+                    <a href="#" class="i-button icon-edit"
+                       data-href="{{ url_for('.edit_survey', survey) }}"
+                       data-title="{% trans %}Edit survey{% endtrans %}"
+                       data-ajax-dialog
+                       data-reload-after>
+                        {% trans %}Edit{% endtrans %}
+                    </a>
+                </div>
             </div>
-            <div class="toolbar">
-                <a href="#" class="i-button icon-edit"
-                   data-href="{{ url_for('.edit_survey', survey) }}"
-                   data-title="{% trans %}Edit survey{% endtrans %}"
-                   data-ajax-dialog
-                   data-reload-after>
-                    {% trans %}Edit{% endtrans %}
-                </a>
-            </div>
-        </div>
+        {% endif %}
 
         {% if survey.state.name != 'not_ready' %}
             <div class="section">
@@ -121,6 +123,7 @@
                     </li>
                 </ul>
                 <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
+                        class="hide-if-locked"
                         data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
                         data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
                         data-method="DELETE" class="i-button icon-remove" disabled>
@@ -171,7 +174,7 @@
             {% endif %}
         </td>
         <td>
-            <a href="#" class="icon-remove right js-delete-submission"
+            <a href="#" class="icon-remove right js-delete-submission hide-if-locked"
                data-href="{{ url_for('.delete_submissions', survey) }}"
                data-method="DELETE"
                data-title="{% trans %}Remove submission?{% endtrans %}"

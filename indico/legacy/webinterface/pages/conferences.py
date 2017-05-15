@@ -347,17 +347,6 @@ class WPConferenceModifBase(main.WPMainBase):
         raise NotImplementedError
 
 
-class WPConferenceModificationClosed( WPConferenceModifBase ):
-
-    def __init__(self, rh, target):
-        WPConferenceModifBase.__init__(self, rh, target)
-
-    def _getPageContent( self, params ):
-        # XXX: We show a message in the management frame but this class is used
-        # in too many places so we keep it around for now.
-        return ''
-
-
 class WConfMyStuff(WConfDisplayBodyBase):
     _linkname = 'my_conference'
 

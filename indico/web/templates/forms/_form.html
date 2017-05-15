@@ -9,9 +9,9 @@
 {%- endmacro %}
 
 {% macro form_header(form, method='post', action='', orientation='horizontal', id=none, classes='', multipart=false,
-                     i_form=true, no_ajax=false) -%}
+                     i_form=true, no_ajax=false, disable_if_locked=true) -%}
     <form method="{{ method }}" {%- if action %} action="{{ action }}"{% endif %}
-          class="{% if i_form %}i-form {% endif %}{{ orientation }} {{ classes }}"
+          class="{{ 'i-form' if i_form }} {{ 'disable-fields-if-locked' if disable_if_locked }} {{ orientation }} {{ classes }}"
           {% if id %}id="{{ id }}"{% endif %}
           {% if multipart %}enctype="multipart/form-data"{% endif %}
           {% if caller %}{{ caller() }}{% endif %}
@@ -150,17 +150,18 @@
 {# Renders a form with the most common default markup #}
 {% macro simple_form(form, fields=none, submit=none, back=none, back_url=none, back_button=true,
                      disabled_until_change=true, disabled_fields=(), form_header_kwargs={}, skip_labels=false,
-                     save_reminder=false, footer_align_right=false) %}
+                     save_reminder=false, footer_align_right=false, disable_if_locked=true) %}
     {% set submit = submit or _('Save') %}
     {% set back = back or _('Back') %}
-    {{ form_header(form, **form_header_kwargs) }}
+    {{ form_header(form, disable_if_locked=disable_if_locked, **form_header_kwargs) }}
     {% if caller %}
         {{ caller() }}
     {% else %}
         {{ form_rows(form, fields=fields, disable=disabled_fields, skip_labels=skip_labels) }}
     {% endif %}
     {% call form_footer(form, skip_label=skip_labels, align_right=footer_align_right) %}
-        <input class="i-button big highlight" type="submit" value="{{ submit }}"
+        <input class="i-button big highlight {{ 'hide-if-locked' if disable_if_locked }}" type="submit"
+               value="{{ submit }}"
                {%- if disabled_until_change %} data-disabled-until-change{% endif %}
                {%- if save_reminder %} data-save-reminder{% endif %}>
         {% if back_button %}

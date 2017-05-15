@@ -6,7 +6,7 @@
 
 {% block page_actions %}
     <div style="float:right;">
-        <button class="i-button highlight icon-floppy" id="save-button">
+        <button class="i-button highlight icon-floppy hide-if-locked" id="save-button">
             {% trans %}Save Template{% endtrans %}
         </button>
         <a class="i-button" href="{{ url_for('.template_list', owner) }}">
@@ -69,7 +69,7 @@
                         <label>{% trans %}Center{% endtrans %}</label>
                         <input type='radio' id="bgPosCenter" name='bg_position' value="center">
                     </div>
-                    <div class="toolbar">
+                    <div class="toolbar hide-if-locked">
                         <div class="group">
                             <a class="i-button icon-upload icon-only hidden"
                                id="upload-background"

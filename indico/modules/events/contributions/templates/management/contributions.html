@@ -56,7 +56,7 @@
                         <a href="#" data-select-none="#contribution-list input:checkbox">{% trans %}None{% endtrans %}</a>
                     </li>
                 </ul>
-                <button class="i-button highlight icon-plus js-dialog-action"
+                <button class="i-button highlight icon-plus js-dialog-action hide-if-locked"
                         title="{% trans %}Add new contribution{% endtrans %}"
                         data-title="{% trans %}Add new contribution{% endtrans %}"
                         data-href="{{ url_for('.manage_create_contrib', event) }}"
@@ -64,7 +64,7 @@
                         data-ajax-dialog>
                     {%- trans %}New contribution{% endtrans -%}
                 </button>
-                <button class="i-button js-enable-if-checked icon-remove disabled"
+                <button class="i-button js-enable-if-checked icon-remove disabled hide-if-locked"
                         title="{% trans %}Remove{% endtrans %}"
                         data-method="POST"
                         data-href="{{ url_for('.manage_delete_contribs', event) }}"

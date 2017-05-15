@@ -30,7 +30,7 @@
                         {% endif %}
                         <div class="actions">
                             <input type="hidden" class="js-user-data">
-                            <a class="add-user i-button borderless icon-plus">
+                            <a class="add-user i-button borderless icon-plus hide-if-locked">
                                 {%- trans %}Add{% endtrans -%}
                             </a>
                         </div>
@@ -42,7 +42,7 @@
                         {% for user_id in users %}
                             <li class="event-user" data-user-id="{{ user_id }}">
                                 {{- user_data[user_id].name -}}
-                                <a class="icon-cross remove-user" href="#"></a>
+                                <a class="icon-cross remove-user hide-if-locked" href="#"></a>
                             </li>
                         {% endfor %}
                     </ul>

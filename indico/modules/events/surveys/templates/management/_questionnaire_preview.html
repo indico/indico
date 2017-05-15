@@ -3,7 +3,7 @@
 {% macro render_questionnaire_preview(survey, preview_form, field_types) %}
     {% for section in survey.sections %}
         <div class="i-box js-sortable-survey-section" data-section-id="{{ section.id }}">
-            <div class="ui-i-box-sortable-handle"></div>
+            <div class="ui-i-box-sortable-handle hide-if-locked"></div>
             <div class="i-box-header">
                 <div class="i-box-title">
                     {% if section.display_as_section %}
@@ -16,7 +16,7 @@
                            title="{% trans %}This section will not be displayed as a section but its contents will show up standalone.{% endtrans %}"></i>
                     {% endif %}
                 </div>
-                <div class="i-box-buttons toolbar right">
+                <div class="i-box-buttons toolbar right hide-if-locked">
                     <div class="group">
                         <a href="#" data-href="{{ url_for('.edit_section', section) }}"
                            title="{% trans %}Edit section{% endtrans %}"
@@ -85,7 +85,7 @@
 
 
 {% macro _render_item() %}
-    <div class="ui-sortable-handle">
+    <div class="ui-sortable-handle hide-if-locked">
         <div class="handle"></div>
     </div>
     <div class="ui-sortable-content item-row flexrow f-a-center">
@@ -99,7 +99,7 @@
         <div class="i-form">
             {{ form_row(preview_form['question_{}'.format(question.id)], disabled=true, orientation='vertical') }}
         </div>
-        <div class="item-action-buttons toolbar">
+        <div class="item-action-buttons toolbar hide-if-locked">
             <div class="group">
                 <a href="#" data-href="{{ url_for('.add_question', question.parent, type=question.field_type, clone=question.id) }}"
                    data-title="{% trans %}Clone question{% endtrans %}"

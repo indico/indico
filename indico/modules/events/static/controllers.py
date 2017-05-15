@@ -40,6 +40,8 @@ class RHStaticSiteList(RHStaticSiteBase):
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):
+    ALLOW_LOCKED = True
+
     def _process(self):
         static_site = StaticSite(creator=session.user, event_new=self.event_new)
         db.session.add(static_site)

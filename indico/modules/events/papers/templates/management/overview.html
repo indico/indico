@@ -27,7 +27,7 @@
                     {%- trans %}The content reviewing process is enabled{% endtrans -%}
                 {% endif -%}
             </div>
-            <div class="toolbar">
+            <div class="toolbar hide-if-locked">
                 {% if cfp.content_reviewing_enabled %}
                     <a href="#" class="i-button icon-time"
                        data-href="{{ url_for('.manage_deadline', event, role='content_reviewer') }}"
@@ -73,7 +73,7 @@
                     {%- trans %}The layout reviewing process is enabled{% endtrans -%}
                 {% endif -%}
             </div>
-            <div class="toolbar">
+            <div class="toolbar hide-if-locked">
                 {% if cfp.layout_reviewing_enabled %}
                     <a href="#" class="i-button icon-time"
                        data-href="{{ url_for('.manage_deadline', event, role='layout_reviewer') }}"
@@ -117,7 +117,7 @@
                     {%- trans %}There is no deadline for paper judging.{% endtrans -%}
                 {% endif %}
             </div>
-            <div class="toolbar">
+            <div class="toolbar hide-if-locked">
                 <a href="#" class="i-button icon-time"
                    data-href="{{ url_for('.manage_deadline', event, role='judge') }}"
                    data-title="{% trans %}Set paper judging deadline{% endtrans %}"
@@ -169,7 +169,7 @@
                 {%- trans %}Configure teams and competences{% endtrans -%}
             </div>
             <div class="toolbar">
-                <a class="i-button icon-mail" href="#"
+                <a class="i-button icon-mail hide-if-locked" href="#"
                    data-href="{{ url_for('.contact_staff', event) }}"
                    data-title="{% trans %}Send emails to paper reviewers and judges{% endtrans %}"
                    data-ajax-dialog>

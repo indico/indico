@@ -531,7 +531,6 @@ type("TimetableBlockWholeDayBase", ["TimetableBlockBase"],
    );
 
 function loadBalloonContent(self, api, editable) {
-    var timetableBlock = $(self.div.dom);
     var entryId = self.eventData.scheduleEntryId ? self.eventData.scheduleEntryId : self.eventData.id.substring(1);
     var url = editable ? Indico.Urls.Timetable.entries.info.manage : Indico.Urls.Timetable.entries.info.display;
     var urlParams = {

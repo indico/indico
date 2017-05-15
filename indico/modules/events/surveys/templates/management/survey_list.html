@@ -36,7 +36,7 @@
                     {% endif %}
                 </div>
                 <div class="toolbar">
-                    <div class="group">
+                    <div class="group hide-if-locked">
                         <a href="#" class="i-button icon-remove"
                            data-href="{{ url_for('.delete_survey', survey) }}"
                            data-method="POST"
@@ -58,7 +58,7 @@
             {% trans %}There are no surveys yet.{% endtrans %}
         {%- endcall %}
     {% endfor %}
-    <div class="toolbar f-j-end">
+    <div class="toolbar f-j-end hide-if-locked">
         <a href="#" class="i-button"
            data-href="{{ url_for('.create', event) }}"
            data-title="{% trans %}Create survey{% endtrans %}"

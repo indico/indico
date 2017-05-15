@@ -955,24 +955,24 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
         this.addMenuLink = this.contextInfo.isPoster ?
             $('<a href="#" data-toggle="menu_select"/>').text($T('Add poster')).bind('menu_select', function() {
                 self.managementActions.addContribution();
-            }) : $('<a href="#" id="add_new" class="arrow" data-toggle="dropdown"/>').text($T('Add new'));
+            }) : $('<a href="#" id="add_new" class="arrow hide-if-locked" data-toggle="dropdown">').text($T('Add new'));
 
 
-        this.rescheduleLink = $('<a href="#" data-toggle="menu_select"/>').text($T('Reschedule'));
+        this.rescheduleLink = $('<a href="#" class="hide-if-locked" data-toggle="menu_select">').text($T('Reschedule'));
         this.rescheduleLink.bind('menu_select', function() {
             var popup = new RescheduleDialog(self);
             popup.open();
             return false;
         });
 
-        this.fitInnerTimetableLink = $('<a href="#" data-toggle="menu_select"/>').text($T('Fit to content'));
+        this.fitInnerTimetableLink = $('<a href="#" class="hide-if-locked" data-toggle="menu_select">').text($T('Fit to content'));
         this.fitInnerTimetableLink.bind('menu_select', function() {
             var popup = new FitInnerTimetableDialog(self);
             popup.open();
             return false;
         });
 
-        this.addIntervalLink = $('<a href="#" data-toggle="menu_select"/>').text($T('Add new block'))
+        this.addIntervalLink = $('<a href="#" class="hide-if-locked" data-toggle="menu_select"/>').text($T('Add new block'))
         this.addIntervalLink.bind('menu_select', function() {
             self.managementActions.addSessionSlot(self.eventInfo.timetableSession);
             return false;
@@ -981,7 +981,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var customLinks = $();
         for(var linkName in this.customLinks){
-            var link = $('<a href="#">').text(linkName)
+            var link = $('<a href="#" class="hide-if-locked">').text(linkName)
                                          .addClass('js-{0}'.format(this.customLinks[linkName]))
                                          .data('timetable', self);
             customLinks = customLinks.add(link);

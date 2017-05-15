@@ -14,7 +14,7 @@
 {% endblock %}
 
 {% block table_head %}
-    <th class="i-table thin-column" data-sorter="false"></th>
+    <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>
     <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
     <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
     <th class="i-table roles-column" data-sorter="false">{% trans %}Roles{% endtrans %}</th>
@@ -26,7 +26,7 @@
         {% set is_content_reviewer = person_roles.content_reviewer %}
         {% set is_layout_reviewer = person_roles.layout_reviewer %}
         <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
-            <td class="i-table thin-column">
+            <td class="i-table thin-column hide-if-locked">
                 <input type="checkbox" value="{{ event_person.id }}" class="select-row"
                        name={{ 'person_id' if event_person.user_id is defined else 'user_id' }}
                        {{ 'disabled' if not event_person.email }}>

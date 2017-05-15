@@ -280,7 +280,7 @@ class RHUnlockEvent(RHManageEventBase):
     """Unlock an event."""
 
     def _checkProtection(self):
-        self._allowClosed = self.event_new.can_lock(session.user)
+        self.ALLOW_LOCKED = self.event_new.can_lock(session.user)
         RHManageEventBase._checkProtection(self)
 
     def _process(self):
@@ -404,6 +404,8 @@ class RHMoveEvent(RHManageEventBase):
 
 
 class RHClonePreview(RHManageEventBase):
+    ALLOW_LOCKED = True
+
     def _process(self):
         form = CloneRepeatabilityForm()
         clone_calculator = get_clone_calculator(form.repeatability.data, self.event_new)
@@ -418,6 +420,8 @@ class RHClonePreview(RHManageEventBase):
 
 class RHCloneEvent(RHManageEventBase):
     """Create copies of the event."""
+
+    ALLOW_LOCKED = True
 
     def _form_for_step(self, step, set_defaults=True):
         if step == 1:
@@ -475,6 +479,8 @@ class RHCloneEvent(RHManageEventBase):
 
 
 class RHPosterPrintSettings(RHManageEventBase):
+    ALLOW_LOCKED = True
+
     def _checkParams(self, params):
         RHManageEventBase._checkParams(self, params)
         self.template_id = request.args.get('template_id')

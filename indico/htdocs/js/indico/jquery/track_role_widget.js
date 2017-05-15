@@ -45,7 +45,7 @@
                     $placeholder.toggle(!people.length);
                     _.sortBy(people, _.property('name')).forEach(function(person) {
                         $list.append($('<li class="event-user">').text(person.name)
-                                     .append('<a class="remove-user icon-cross">')
+                                     .append('<a class="remove-user icon-cross hide-if-locked">')
                                      .attr('data-user-id', +person.id));
                     });
                 },

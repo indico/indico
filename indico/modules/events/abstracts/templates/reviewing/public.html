@@ -27,7 +27,7 @@
                                 {% trans %}This operation is irreversible.{% endtrans %}
                             {% endif %}
                         {% endset %}
-                        <a class="i-button text-color color-on-hover danger"
+                        <a class="i-button text-color color-on-hover danger hide-if-locked"
                            title="{% trans %}Withdraw abstract{% endtrans %}"
                            data-title="{% trans %}Withdraw Abstract{% endtrans %}"
                            data-confirm="{{ message }}"
@@ -48,7 +48,7 @@
                             {% trans %}Withdraw{% endtrans %}
                         </a>
                     {% elif abstract.state.name == 'withdrawn' and can_manage %}
-                        <a class="i-button accept icon-lamp"
+                        <a class="i-button accept icon-lamp hide-if-locked"
                            title="{% trans %}This abstract has been withdrawn but can be restored.{% endtrans %}"
                            data-title="{% trans %}Restore Abstract{% endtrans %}"
                            data-confirm="{% trans %}Do you really want to restore this abstract?{% endtrans %}"
@@ -64,7 +64,7 @@
             {% if can_manage or abstract.user_owns(session.user) %}
                 <div class="group">
                     {% if abstract.can_edit(session.user) %}
-                        <a href="#" class="i-button icon-edit"
+                        <a href="#" class="i-button icon-edit hide-if-locked"
                            title="{% trans %}Edit abstract{% endtrans %}"
                            data-href="{{ url_for('.edit_abstract', abstract) }}"
                            data-title="{% trans %}Edit abstract{% endtrans %}"

@@ -67,7 +67,7 @@
                 {{ render_sidemenu('event-management-sidemenu', active_item=active_menu_item, event=event) }}
             </div>
         </div>
-        <div class="content-column">
+        <div class="content-column {{ 'event-locked' if event.is_locked }}">
             {% if event.is_locked %}
                 {% call message_box('warning', fixed_width=true) %}
                     {% trans %}This event has been locked and cannot be modified.{% endtrans %}

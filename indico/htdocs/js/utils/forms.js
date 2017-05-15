@@ -167,7 +167,7 @@
             var $cornerMessage = $('.save-corner-message');
             $this.find('[data-disabled-until-change]').prop('disabled', untouched);
             $this.closest('form').data('fieldsChanged', !untouched);
-            if ($this.find('[data-save-reminder]').length) {
+            if ($this.find('[data-save-reminder]').length && !$this.data('locked-event-disabled')) {
                 if (!isElementInView($this.find('[data-save-reminder]'))
                     && !untouched && !$cornerMessage.length) {
                     showSaveCornerMessage($this);
@@ -205,6 +205,13 @@
                 $this.find('legend').trigger('click');
             }
         });
+
+        if (forms.closest('.event-locked').length) {
+            var lockedForms = forms.filter('.disable-fields-if-locked');
+            lockedForms.data('locked-event-disabled', true);
+            lockedForms.find(':input:not([type=hidden]):not([data-button-back])').prop('disabled', true);
+            lockedForms.find(':input:submit').hide();
+        }
     };
 
     global.toggleAclField = function toogleAclField(aclField, state) {

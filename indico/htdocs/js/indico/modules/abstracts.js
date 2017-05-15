@@ -90,6 +90,11 @@
             evt.preventDefault();
             var $this = $(this);
             var stopOnMatch = !$this.data('stop-on-match');
+
+            if ($this.hasClass('disabled')) {
+                return;
+            }
+
             $.ajax({
                 url: $this.data('href'),
                 method: $this.data('method'),
@@ -99,7 +104,7 @@
                 error: handleAjaxError,
                 success: function() {
                     $this.data('stop-on-match', stopOnMatch);
-                    $this.toggleClass('danger text-color', stopOnMatch);
+                    $this.toggleClass('stop-processing-enabled', stopOnMatch);
                 }
             });
         });

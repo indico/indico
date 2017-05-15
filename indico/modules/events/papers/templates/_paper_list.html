@@ -192,10 +192,10 @@
                     data-ajax-dialog>
                 {%- trans %}Customize list{% endtrans -%}
             </button>
-            <a class="i-button arrow js-dropdown js-enable-if-checked disabled" data-toggle="dropdown">
+            <a class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked" data-toggle="dropdown">
                 {%- trans %}Assign{% endtrans -%}
             </a>
-            <ul class="dropdown">
+            <ul class="dropdown hide-if-locked">
                 {% if management %}
                     <li>
                         <a class="js-requires-selected-row disabled"
@@ -236,10 +236,10 @@
                     </li>
                 {% endif %}
             </ul>
-            <a class="i-button arrow js-dropdown js-enable-if-checked disabled" data-toggle="dropdown">
+            <a class="i-button arrow js-dropdown js-enable-if-checked disabled hide-if-locked" data-toggle="dropdown">
                 {%- trans %}Unassign{% endtrans -%}
             </a>
-            <ul class="dropdown">
+            <ul class="dropdown hide-if-locked">
                 {% if management %}
                     <li>
                         <a class="js-requires-selected-row disabled"
@@ -280,10 +280,11 @@
                     </li>
                 {% endif %}
             </ul>
-            <a class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled" data-toggle="dropdown">
+            <a class="i-button arrow js-dropdown icon-hammer js-requires-selected-row disabled hide-if-locked"
+               data-toggle="dropdown">
                 {%- trans %}Judge{% endtrans -%}
             </a>
-            <ul class="dropdown">
+            <ul class="dropdown hide-if-locked">
                 <li>
                     <a class="js-requires-selected-row js-dialog-action"
                        data-href="{{ url_for('.judge_papers', event) }}"

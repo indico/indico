@@ -3,7 +3,7 @@
         class="regform-field"
         ng-class="{disabled: !field.isEnabled, 'billable-disabled': field.billableDisabled, editable: editMode}">
         <tr>
-            <td ng-if="editMode" class="field-sortable-handle"/>
+            <td ng-if="editMode" class="field-sortable-handle hide-if-locked"/>
             <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
                     <label for="field-{{ section.id }}-{{ field.id }}">
@@ -23,18 +23,18 @@
             <td ng-if="editMode" class="field-actions">
                 <a ng-if="canBeDeleted(field)"
                     ng-click="fieldApi.removeField(field)"
-                    class="icon-remove"
+                    class="icon-remove hide-if-locked"
                     title="{{ 'Remove field' | i18n }}"/>
                 <a ng-if="!field.isEnabled"
                     ng-click="fieldApi.enableField(field)"
-                    class="icon-checkmark"
+                    class="icon-checkmark hide-if-locked"
                     title="{{ 'Enable field' | i18n }}"/>
                 <a ng-if="canBeDisabled(field) && field.isEnabled"
                     ng-click="fieldApi.disableField(field)"
-                    class="icon-disable"
+                    class="icon-disable hide-if-locked"
                     title="{{ 'Disable field' | i18n }}"/>
                 <a ng-click="openFieldSettings()"
-                    class="icon-settings"
+                    class="icon-settings hide-if-locked"
                     title="{{ 'Configure field' | i18n }}"/>
             </td>
 

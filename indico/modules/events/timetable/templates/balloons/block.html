@@ -1,7 +1,7 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location, render_palette_picker %}
 
-<div class="balloon">
+<div class="balloon {{ 'event-locked' if event_locked }}">
     <div class="title-container session-block">
         <div class="title">
             {{- block.session.title }}
@@ -19,7 +19,7 @@
             <div class="title-caption">{% trans %}Block{% endtrans %}</div>
             {% if editable and can_manage_blocks %}
                 {% set title="'%s'" | format(block.title) if block.title else '' %}
-                <div class="group right entry-action-buttons">
+                <div class="group right entry-action-buttons hide-if-locked">
                     <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"
                        title="{% trans %}Edit session block{% endtrans %}"
                        data-title="{% trans %}Edit session block {{ title }}{% endtrans %}"></a>
@@ -38,7 +38,7 @@
         <div class="title-header">
             <div class="title-caption">{% trans %}Session{% endtrans %}</div>
             <div class="group right entry-action-buttons">
-                {% if editable %}
+                {% if editable and not block.event_new.is_locked %}
                     {% if can_manage_session %}
                         {{ render_palette_picker(block.session, 'timetable.session_rest', color_list) }}
                         <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"

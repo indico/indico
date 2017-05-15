@@ -108,7 +108,11 @@ class RHDeleteSessions(RHManageSessionsActionsBase):
         return jsonify_data(html=_render_session_list(self.event_new))
 
 
-class RHExportSessionsCSV(RHManageSessionsActionsBase):
+class RHManageSessionsExportBase(RHManageSessionsActionsBase):
+    ALLOW_LOCKED = True
+
+
+class RHExportSessionsCSV(RHManageSessionsExportBase):
     """Export list of sessions to a CSV"""
 
     def _process(self):
@@ -116,7 +120,7 @@ class RHExportSessionsCSV(RHManageSessionsActionsBase):
         return send_csv('sessions.csv', headers, rows)
 
 
-class RHExportSessionsExcel(RHManageSessionsActionsBase):
+class RHExportSessionsExcel(RHManageSessionsExportBase):
     """Export list of sessions to a XLSX"""
 
     def _process(self):
@@ -124,7 +128,7 @@ class RHExportSessionsExcel(RHManageSessionsActionsBase):
         return send_xlsx('sessions.xlsx', headers, rows)
 
 
-class RHExportSessionsPDF(RHManageSessionsActionsBase):
+class RHExportSessionsPDF(RHManageSessionsExportBase):
     """Export list of sessions to a PDF"""
 
     def _process(self):
@@ -157,6 +161,7 @@ class RHSessionPersonList(RHContributionPersonListMixin, RHManageSessionsActions
     """List of persons in the session's contributions"""
 
     template = 'events/sessions/management/session_person_list.html'
+    ALLOW_LOCKED = True
 
     @property
     def _membership_filter(self):

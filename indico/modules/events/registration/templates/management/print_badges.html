@@ -1,8 +1,8 @@
 {% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
 
 {% block content %}
-    {% call simple_form(settings_form, form_header_kwargs={'id': 'badge-settings-form'}, submit=_("Download PDF"),
-                        disabled_until_change=false) %}
+    {% call simple_form(settings_form, form_header_kwargs={'id': 'badge-settings-form'},
+                        submit=_("Download PDF"), disabled_until_change=false, disable_if_locked=false) %}
         {{ form_row(settings_form.template) }}
 
         {% call form_fieldset(_('Page configuration')) %}
@@ -14,7 +14,7 @@
                 {{ form_row(settings_form.top_margin, orientation='vertical') }}
                 <div class="flexrow f-a-center">
                     {{ form_row(settings_form.left_margin, orientation='vertical') }}
-                    <img src="/images/badge_margins.png">
+                    <img src="{{ url_for('assets.image', filename='badge_margins.png') }}">
                     {{ form_row(settings_form.right_margin, orientation='vertical') }}
                 </div>
                 {{ form_row(settings_form.bottom_margin, orientation='vertical') }}

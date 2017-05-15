@@ -98,10 +98,13 @@ class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
 
 class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
     view_class = WPManageAbstracts
+    ALLOW_LOCKED = True
 
 
 class RHAbstractListStaticURL(RHAbstractListBase):
     """Generate a static URL for the configuration of the abstract list"""
+
+    ALLOW_LOCKED = True
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())
@@ -145,6 +148,8 @@ class RHDeleteAbstracts(RHManageAbstractsActionsBase):
 class RHAbstractPersonList(RHManageAbstractsActionsBase):
     """List of persons somehow related to abstracts (co-authors, speakers...)"""
 
+    ALLOW_LOCKED = True
+
     @property
     def _membership_filter(self):
         abstract_ids = {abstract.id for abstract in self.abstracts}
@@ -167,23 +172,27 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
                                 event_persons=abstract_persons_dict, event=self.event_new)
 
 
-class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsActionsBase):
+class RHManageAbstractsExportActionsBase(RHManageAbstractsActionsBase):
+    ALLOW_LOCKED = True
+
+
+class RHAbstractsDownloadAttachments(AbstractsDownloadAttachmentsMixin, RHManageAbstractsExportActionsBase):
     pass
 
 
-class RHAbstractsExportPDF(AbstractsExportPDFMixin, RHManageAbstractsActionsBase):
+class RHAbstractsExportPDF(AbstractsExportPDFMixin, RHManageAbstractsExportActionsBase):
     pass
 
 
-class RHAbstractsExportCSV(AbstractsExportCSV, RHManageAbstractsActionsBase):
+class RHAbstractsExportCSV(AbstractsExportCSV, RHManageAbstractsExportActionsBase):
     pass
 
 
-class RHAbstractsExportExcel(AbstractsExportExcel, RHManageAbstractsActionsBase):
+class RHAbstractsExportExcel(AbstractsExportExcel, RHManageAbstractsExportActionsBase):
     pass
 
 
-class RHAbstractsExportJSON(RHManageAbstractsActionsBase):
+class RHAbstractsExportJSON(RHManageAbstractsExportActionsBase):
     _abstract_query_options = (joinedload('submitter'),
                                joinedload('accepted_track'),
                                joinedload('accepted_contrib_type'),

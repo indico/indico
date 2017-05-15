@@ -11,10 +11,10 @@
         <ul id="track-list" class="i-box-group vert" data-url="{{ url_for('.sort_tracks', event) }}">
             {% for track in event.tracks %}
                 <li class="track-row i-box" data-id="{{ track.id }}">
-                    <div class="ui-i-box-sortable-handle"></div>
+                    <div class="ui-i-box-sortable-handle hide-if-locked"></div>
                     <div class="i-box-header">
                         <span class="i-box-title">{{ track.title }}</span>
-                        <div class="i-box-buttons toolbar right">
+                        <div class="i-box-buttons toolbar right hide-if-locked">
                             <div class="group">
                                 <a href="#" class="i-button icon-edit js-edit-item"
                                    title="{% trans %}Edit track{% endtrans %}"

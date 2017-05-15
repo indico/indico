@@ -14,7 +14,7 @@
     <div class="event-roles js-event-person-list">
         <div class="flashed-messages"></div>
         <div class="toolbars space-after">
-            <div class="toolbar">
+            <div class="toolbar hide-if-locked">
                 <div class="group">
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
                     <ul class="dropdown">
@@ -165,7 +165,7 @@
             <table class="i-table-widget tablesorter">
                 <thead>
                     <tr class="i-table">
-                        <th class="i-table thin-column" data-sorter="false"></th>
+                        <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>
                         <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
                         <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
                         <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>

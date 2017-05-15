@@ -3,7 +3,7 @@
     {% set event = tt_entry.event_new %}
     {% set tz = event.tzinfo if use_event_tz else event.display_tzinfo %}
     <dl class="i-data-list">
-        {% if editable %}
+        {% if editable and not event.is_locked %}
             <dt>
                 <a class="i-link icon-time js-edit-time"
                    title="{% trans %}Change time{% endtrans %}"></a>

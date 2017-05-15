@@ -2,7 +2,7 @@
     <tr class="i-table">
         <td class="i-table name-column">{{ contrib_type.name }}</td>
         <td class="i-table">{{ contrib_type.description }}</td>
-        <td class="i-table action-column">
+        <td class="i-table action-column hide-if-locked">
             <a class="js-edit-contribution-type icon-edit"
                data-ajax-dialog
                data-href="{{ url_for('.manage_type', contrib_type) }}"

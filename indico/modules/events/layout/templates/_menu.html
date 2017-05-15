@@ -1,9 +1,10 @@
 {% macro menu_entry(entry) -%}
+    {% set event_locked = entry.event_new.is_locked %}
     <div class="menu-entry {%- if entry.is_root and entry.children %} with-children{% endif %}"
          data-position="{{ entry.position }}"
          data-position-url="{{ url_for('.menu_entry_position', entry) }}"
          data-entry-id="{{ entry.id }}">
-        <div class="i-label drag-handle
+        <div class="i-label {{ 'drag-handle' if not event_locked }}
             {%- if entry.type.name == 'separator' %} disabled
             {%- elif entry.type.name in ('user_link', 'page') %} highlight{% endif -%}
             {%- if not entry.is_enabled %} striped{% endif %}">
@@ -12,7 +13,7 @@
                 {% if config.DEBUG %}<span class="position">{{ entry.position + 1}}</span>{% endif %}
                 {{ entry.localized_title }}
             </span>
-            <span class="right actions">
+            <span class="right actions hide-if-locked">
                 {% if entry.type.name == 'page' %}
                     <a class="{% if not entry.page.is_default %}not-{% endif %}default" href="#"
                        data-href="{{ url_for('.menu_entry_toggle_default', entry) }}"

@@ -87,6 +87,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
 class RHRegistrationsListCustomize(RHManageRegFormBase):
     """Filter options and columns to display for a registrations list of an event"""
 
+    ALLOW_LOCKED = True
+
     def _process_GET(self):
         reg_list_config = self.list_generator._get_config()
         return WPManageRegistration.render_template('management/reglist_filter.html', self._conf, regform=self.regform,
@@ -102,6 +104,8 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
 class RHRegistrationListStaticURL(RHManageRegFormBase):
     """Generate a static URL for the configuration of the registrations list"""
+
+    ALLOW_LOCKED = True
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())
@@ -298,6 +302,8 @@ class RHRegistrationCreateMultiple(RHManageRegFormBase):
 class RHRegistrationsExportBase(RHRegistrationsActionBase):
     """Base class for all registration list export RHs"""
 
+    ALLOW_LOCKED = True
+
     def _checkParams(self, params):
         RHRegistrationsActionBase._checkParams(self, params)
         self.export_config = self.list_generator.get_list_export_config()
@@ -348,6 +354,7 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
 
 
 class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
+    ALLOW_LOCKED = True
     normalize_url_spec = {
         'locators': {
             lambda self: self.regform
@@ -380,6 +387,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations"""
 
+    ALLOW_LOCKED = True
+
     def _checkParams(self, params):
         RHManageRegFormBase._checkParams(self, params)
         ids = set(request.form.getlist('registration_id'))
@@ -396,12 +405,14 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         settings = event_badge_settings.get_all(self.event_new.id)
         form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
+        if self.event_new.is_locked:
+            del form.save_values
 
         if form.validate_on_submit():
             data = form.data
             data.pop('submitted', None)
             template_id = data.pop('template')
-            if data.pop('save_values'):
+            if data.pop('save_values', False):
                 event_badge_settings.set_multi(self.event_new, data)
             data['registration_ids'] = [x.id for x in registrations]
 

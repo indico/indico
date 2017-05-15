@@ -3,10 +3,10 @@
     {% for item in items %}
         <li class="i-label sortable-item{% if draggable %} draggable{% endif %}" data-item-id="{{ item.id }}">
             {% if draggable or invisible_handle %}
-                <div class="handle{% if invisible_handle %} invisible{% endif %}"></div>
+                <div class="handle{% if invisible_handle %} invisible{% endif %} hide-if-locked"></div>
             {% endif %}
             {% if toggle_enabled %}
-                <div class="actions">
+                <div class="actions hide-if-locked">
                     <div class="toggle-enabled"></div>
                 </div>
             {% endif %}
@@ -52,7 +52,7 @@
             <div class="titled-rule">{{ enabled_title }}</div>
             <ul class="enabled">
                 {% call(item) sortable_items(enabled_items, draggable, true, invisible_handle) %}
-                        {{ _caller(item) if _caller else '' }}
+                    {{ _caller(item) if _caller else '' }}
                 {% endcall %}
             </ul>
         </div>
@@ -60,7 +60,7 @@
             <div class="titled-rule">{{ disabled_title }}</div>
             <ul class="disabled">
                 {% call(item) sortable_items(disabled_items, draggable, true, invisible_handle) %}
-                        {{ _caller(item) if _caller else '' }}
+                    {{ _caller(item) if _caller else '' }}
                 {% endcall %}
             </ul>
         </div>

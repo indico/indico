@@ -31,7 +31,7 @@
                         {% trans %}Customize list{% endtrans %}
                     </button>
                 </div>
-                <div class="group">
+                <div class="group hide-if-locked">
                     <div id="indico-user-to-add" class="hidden"></div>
                     <a class="i-button arrow icon-plus" data-toggle="dropdown">
                         {% trans %}Register{% endtrans %}
@@ -94,7 +94,7 @@
                         {%- trans %}Actions{% endtrans -%}
                     </a>
                     <ul class="dropdown">
-                        <li>
+                        <li class="hide-if-locked">
                             <a href="#" class="icon-mail js-requires-selected-row disabled"
                                data-href="{{ url_for('.email_registrants', regform) }}"
                                data-title="{% trans %}Send email{% endtrans %}"
@@ -104,7 +104,7 @@
                                 {%- trans %}Email{% endtrans -%}
                             </a>
                         </li>
-                        <li>
+                        <li class="hide-if-locked">
                             <a href="#" class="icon-tag js-requires-selected-row disabled"
                                data-href="{{ url_for('.registrations_config_badges', regform) }}"
                                data-title="{% trans %}Badge Printing Settings{% endtrans %}"
@@ -123,7 +123,7 @@
                         </li>
                     </ul>
                     {% set pending_registrations = registrations | selectattr('state.name', 'equalto', 'pending') | list %}
-                    {% if regform.moderation_enabled or pending_registrations %}
+                    {% if (regform.moderation_enabled or pending_registrations) and not event.is_locked %}
                         <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                             {%- trans %}Moderation{% endtrans -%}
                         </a>
@@ -148,29 +148,31 @@
                             </li>
                         </ul>
                     {% endif %}
-                    <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
-                        {%- trans %}Check-in control{% endtrans -%}
-                    </a>
-                    <ul class="dropdown">
-                        <li>
-                            <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
-                               data-method="POST"
-                               data-check-in="1"
-                               data-href="{{ url_for('.registrations_check_in', regform) }}">
-                                {%- trans %}Check-in{% endtrans -%}
-                            </a>
-                        </li>
-                        <li>
-                            <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
-                               data-href="{{ url_for('.registrations_check_in', regform) }}"
-                               data-method="POST"
-                               data-check-in="0"
-                               data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
-                               data-title="{% trans %}Reset check-in{% endtrans %}">
-                                {%- trans %}Reset check-in{% endtrans -%}
-                            </a>
-                        </li>
-                    </ul>
+                    {% if not event.is_locked %}
+                        <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
+                            {%- trans %}Check-in control{% endtrans -%}
+                        </a>
+                        <ul class="dropdown">
+                            <li>
+                                <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
+                                   data-method="POST"
+                                   data-check-in="1"
+                                   data-href="{{ url_for('.registrations_check_in', regform) }}">
+                                    {%- trans %}Check-in{% endtrans -%}
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
+                                   data-href="{{ url_for('.registrations_check_in', regform) }}"
+                                   data-method="POST"
+                                   data-check-in="0"
+                                   data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
+                                   data-title="{% trans %}Reset check-in{% endtrans %}">
+                                    {%- trans %}Reset check-in{% endtrans -%}
+                                </a>
+                            </li>
+                        </ul>
+                    {% endif %}
                 </div>
                 <div class="group">
                     <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>

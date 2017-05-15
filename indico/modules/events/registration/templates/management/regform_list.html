@@ -22,7 +22,7 @@
                     </div>
                     {% trans %}Payments are disabled for this event{% endtrans %}
                 </div>
-                <div class="toolbar">
+                <div class="toolbar hide-if-locked">
                     <a href="#" class="js-enable-payments"
                        data-href="{{ url_for('event_features.switch', event, feature='payment') }}"
                        data-method="PUT"
@@ -94,7 +94,7 @@
                                 {% trans %}Manage{% endtrans %}
                             </a>
                         </div>
-                        <div class="group">
+                        <div class="group hide-if-locked">
                             <a href="#" class="i-button icon-remove danger text-color"
                                title="{% trans %}Delete this registration form{% endtrans %}"
                                data-qtip-style="danger"
@@ -113,7 +113,7 @@
         {% endfor %}
     </div>
 
-    <div class="toolbar f-j-end">
+    <div class="toolbar f-j-end hide-if-locked">
         <a href="{{ url_for('.create_regform', event) }}" class="i-button icon-plus">
             {%- trans %}Create form{% endtrans -%}
         </a>

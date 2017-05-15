@@ -101,6 +101,14 @@
                 color: $bright-orange;
             }
         }
+
+        .stop-processing-enabled {
+            color: $red !important;
+
+            &.disabled {
+                cursor: default;
+            }
+        }
     }
 }
 

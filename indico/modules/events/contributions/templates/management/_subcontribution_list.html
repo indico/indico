@@ -3,7 +3,7 @@
 {% macro render_subcontribution_list(event, contrib, subcontributions) %}
     <div class="flashed-messages"></div>
     <div id="subcontribution-list">
-        <div>
+        <div class="hide-if-locked">
             <div class="toolbar form-group space-after">
                 <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
                 <ul class="dropdown">
@@ -42,8 +42,8 @@
                 <table class="i-table-widget tablesorter">
                     <thead>
                         <tr class="i-table">
-                            <th class="i-table" data-sorter="false"></th>
-                            <th class="i-table thin-column" data-sorter="false"></th>
+                            <th class="i-table hide-if-locked" data-sorter="false"></th>
+                            <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>
                             <th class="i-table id-column">
                                 {% trans %}ID{% endtrans %}
                             </th>
@@ -56,7 +56,7 @@
                             <th class="i-table" data-sorter="false">
                                 {% trans %}Material{% endtrans %}
                             </th>
-                            <th data-sorter="false">
+                            <th data-sorter="false" class="hide-if-locked">
                                 {# Actions #}
                             </th>
                         </tr>
@@ -66,8 +66,8 @@
                             <tr class="i-table js-sortable-subcontribution-row"
                                 id="{{ subcontribution.id }}"
                                 data-sort-url="{{ url_for('.sort_subcontributions', contrib) }}">
-                                <td class="ui-sortable-handle"></td>
-                                <td class="i-table">
+                                <td class="ui-sortable-handle hide-if-locked"></td>
+                                <td class="i-table hide-if-locked">
                                     <input type="checkbox" class="select-row" name="subcontribution_id"
                                            value="{{ subcontribution.id }}">
                                 </td>
@@ -75,7 +75,7 @@
                                 <td class="i-table subcontribution-title">{{ subcontribution.title }}</td>
                                 <td class="i-table">{{ subcontribution.duration | format_timedelta(format='medium') }}</td>
                                 {{ render_attachment_info(subcontribution) }}
-                                <td class="i-table">
+                                <td class="i-table hide-if-locked">
                                     <div class="group right">
                                         <a href="#" class="icon-edit i-link"
                                            data-title="{% trans %}Edit the subcontribution{% endtrans %}"

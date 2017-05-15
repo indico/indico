@@ -150,6 +150,9 @@
             }, false, false);
 
             popup.draw = function() {
+                if (options.trigger && $(options.trigger).closest('.event-locked').length) {
+                    this.canvas.addClass('event-locked');
+                }
                 this.ExclusivePopup.prototype.draw.call(this, dialogData.html);
                 if (options.subtitle) {
                     this.canvas.prepend($('<div>', {

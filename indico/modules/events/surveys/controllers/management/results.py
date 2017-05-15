@@ -51,6 +51,7 @@ class RHExportSubmissionsBase(RHManageSurveyBase):
     """Export submissions from the survey"""
 
     CSRF_ENABLED = False
+    ALLOW_LOCKED = True
 
     def _process(self):
         if not self.survey.submissions:

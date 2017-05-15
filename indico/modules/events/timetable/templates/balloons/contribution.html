@@ -1,10 +1,10 @@
 {% from 'attachments/_management_info_column.html' import render_attachment_info %}
 {% from 'events/timetable/balloons/_balloon_utils.html' import render_time_and_location %}
 
-<div class="balloon">
+<div class="balloon {{ 'event-locked' if event_locked }}">
     <div class="title-container">
         <div class="title">{{ contrib.title }}</div>
-        <div class="group right entry-action-buttons">
+        <div class="group right entry-action-buttons hide-if-locked">
             {% if editable %}
                 {% if can_manage_contributions %}
                     <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"

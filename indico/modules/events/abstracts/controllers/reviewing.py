@@ -45,6 +45,8 @@ from indico.web.util import jsonify_data, jsonify_template
 class RHListOtherAbstracts(RHAbstractsBase):
     """AJAX endpoint that lists all abstracts in the event (dict representation)."""
 
+    ALLOW_LOCKED = True
+
     def _checkProtection(self):
         if not session.user:
             raise Forbidden

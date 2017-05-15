@@ -22,7 +22,7 @@
                 {% endif %}
             </div>
             <div class="i-box-content">
-                {{ form_header(form) }}
+                {{ form_header(form, disable_if_locked=false) }}
                 {{ form_rows(form) }}
                 {% call form_footer(form) %}
                     <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">

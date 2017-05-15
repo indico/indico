@@ -4,10 +4,10 @@
 {{ form_header(form, id="js-registration-form-columns") }}
 {{ form_rows(form) }}
 
-<div id="participant-list-form-columns">
+<div id="participant-list-form-columns" class="disable-if-locked">
     {{ sortable_lists(_("Shown columns"), enabled_columns,
                       _("Hidden columns"), disabled_columns,
-                      classes="i-box titled two-columns") }}
+                      classes="i-box titled two-columns disable-if-locked") }}
 </div>
 <button class="i-button big highlight" type="submit">{% trans %}Save{% endtrans %}</button>
 <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
@@ -27,7 +27,7 @@
                 data.columns.push($(this).data('item-id'));
             });
             $form.find('#json').val(JSON.stringify(data));
-        };
+        }
 
         $('#js-registration-form-columns').on('submit', function() {
             updateHiddenField();

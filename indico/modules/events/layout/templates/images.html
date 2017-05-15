@@ -6,40 +6,44 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{% trans %}Upload images{% endtrans %}</h2>
+    {% if not event.is_locked %}
+        <h2>{% trans %}Upload images{% endtrans %}</h2>
 
-    {{ form_header(form, id='upload-images', classes='full-width', orientation='vertical', action=url_for('.images_upload', event)) }}
-    {{ form_rows(form, skip_labels=true) }}
+        {{ form_header(form, id='upload-images', classes='full-width', orientation='vertical', action=url_for('.images_upload', event)) }}
+        {{ form_rows(form, skip_labels=true) }}
 
-    {% call form_footer(attach_form) %}
-        <button class="i-button highlight js-dropzone-upload icon-upload right" data-disabled-until-change>
-            {% trans %}Upload{% endtrans %}
-        </button>
-    {% endcall %}
+        {% call form_footer(attach_form) %}
+            <button class="i-button highlight js-dropzone-upload icon-upload right" data-disabled-until-change>
+                {% trans %}Upload{% endtrans %}
+            </button>
+        {% endcall %}
+    {% endif %}
 
     <h2>{% trans %}Existing Images{% endtrans %}</h2>
     {% include 'events/layout/image_list.html' %}
 
     <script>
         $(document).ready(function() {
-            var dropzone = Dropzone.forElement('#upload-images');
+            {% if not event.is_locked %}
+                var dropzone = Dropzone.forElement('#upload-images');
 
-            dropzone.on("success", function(e, response) {
-                setTimeout(function() {
-                    dropzone.removeAllFiles();
-                }, 2000);
-                $('.image-container').html(response.image_list);
-                handleFlashes(response, true);
-            });
-
-            $('#upload-images').on('submit', function(evt) {
-                $.each(dropzone.getRejectedFiles(), function(i, file) {
-                    dropzone.removeFile(file);
+                dropzone.on("success", function(e, response) {
+                    setTimeout(function() {
+                        dropzone.removeAllFiles();
+                    }, 2000);
+                    $('.image-container').html(response.image_list);
+                    handleFlashes(response, true);
                 });
-                // prevent regular form submission - when selecting only invalid files the form was
-                // submitted normally (not even ajax) resulting in ugly json being shown to the user
-                evt.preventDefault();
-            });
+
+                $('#upload-images').on('submit', function(evt) {
+                    $.each(dropzone.getRejectedFiles(), function(i, file) {
+                        dropzone.removeFile(file);
+                    });
+                    // prevent regular form submission - when selecting only invalid files the form was
+                    // submitted normally (not even ajax) resulting in ugly json being shown to the user
+                    evt.preventDefault();
+                });
+            {% endif %}
 
             $('.image-container').on('indico:confirmed', '.menu .delete', function(e) {
                 var $this = $(this);

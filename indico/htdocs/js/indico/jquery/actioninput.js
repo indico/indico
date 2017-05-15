@@ -32,7 +32,7 @@
 
             self._super();
 
-            self.actionIcon = $('<a class="i-link accept {0}"></a>'.format(self.options.actionIcon))
+            self.actionIcon = $('<a class="i-link accept hide-if-locked {0}"></a>'.format(self.options.actionIcon))
                 .css("line-height", input.css("height"))
                 .click(function() {
                     self._action();

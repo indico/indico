@@ -35,7 +35,7 @@
                     <td class="affiliation">
                         {{ invitation.affiliation }}
                     </td>
-                    <td class="actions">
+                    <td class="actions hide-if-locked">
                         {% if invitation.state.name == 'pending' %}
                             <a class="icon-disable js-invitation-action"
                                title="{% trans %}Mark as declined{% endtrans %}"

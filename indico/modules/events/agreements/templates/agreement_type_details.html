@@ -42,7 +42,8 @@
                 <div class="toolbar">
                     {{ switch(id='toggle-manager-notifications',
                               checked=definition.event_settings.get(event, 'manager_notifications_enabled'),
-                              data_href=url_for_plugin('.toggle_notifications', event, definition)) }}
+                              data_href=url_for_plugin('.toggle_notifications', event, definition),
+                              disabled=event.is_locked) }}
                 </div>
             </div>
             {% if definition.paper_form_url %}
@@ -66,7 +67,7 @@
         </div>
 
         {% if not_sent or pending %}
-            <div class="action-box highlight">
+            <div class="action-box highlight hide-if-locked">
                 {% if not_sent %}
                     <div class="section">
                         <div class="icon icon-agreement"></div>
@@ -118,7 +119,7 @@
 
         <div class="agreement-list i-box{% if not (not_sent or pending) %} titled{% endif %}">
             {% if not_sent %}
-                <div class="toolbar">
+                <div class="toolbar hide-if-locked">
                     <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                     <ul class="dropdown">
                         <li>
@@ -134,12 +135,12 @@
                     </a>
                 </div>
                 <div class="titled-rule">
-                    {% trans %}Agreements requests to be sent{% endtrans %}
+                    {% trans %}Agreement requests to be sent{% endtrans %}
                 </div>
                 <table class="agreement-table">
                     {% for person in not_sent|sort(attribute='name') %}
                         <tr>
-                            <td class="agreement-checkbox" {%- if not person.email %} title="{% trans -%}
+                            <td class="agreement-checkbox hide-if-locked" {%- if not person.email %} title="{% trans -%}
                                 This person has no email address set so he cannot receive an agreement email.
                                 However, you can upload a signed agreement form for him.
                                 {%- endtrans %}"{% endif %}>
@@ -160,7 +161,7 @@
                                 {%- endif -%}
                             </td>
                             {{ extra_columns(person.data) }}
-                            <td class="agreement-actions">
+                            <td class="agreement-actions hide-if-locked">
                                 <span class="right">
                                     {% if person.email %}
                                         <a class="icon-mail js-ajax-dialog-email-one" href="#"
@@ -179,7 +180,7 @@
             {% endif %}
 
             {% if pending %}
-                <div class="toolbar">
+                <div class="toolbar hide-if-locked">
                     <a href="#" class="i-button icon-checkbox-checked arrow js-dropdown" data-toggle="dropdown"></a>
                     <ul class="dropdown">
                         <li>
@@ -200,7 +201,7 @@
                 <table class="agreement-table">
                     {% for agreement in pending|sort(attribute='person_name') %}
                         <tr>
-                            <td class="agreement-checkbox">
+                            <td class="agreement-checkbox hide-if-locked">
                                 <input type="checkbox" class="pending-agreement" autocomplete="off"
                                        id="agreement-{{ agreement.id }}" value="{{ agreement.id }}">
                             </td>
@@ -217,7 +218,7 @@
                                 {%- endif -%}
                             </td>
                             {{ extra_columns(agreement.data) }}
-                            <td class="agreement-actions">
+                            <td class="agreement-actions hide-if-locked">
                                 <span class="right">
                                     {% if agreement.person_email %}
                                         <a class="icon-alarm js-ajax-dialog-email-one" href="#"

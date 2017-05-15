@@ -20,7 +20,7 @@ from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
+from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
@@ -66,6 +66,7 @@ class RHJudgingAreaBase(RHPapersBase):
         RHPapersBase._checkProtection(self)
         if not session.user or not self.event_new.cfp.can_access_judging_area(session.user):
             raise Forbidden
+        check_event_locked(self, self.event_new)
 
 
 class RHPaperBase(RHPapersBase):
@@ -88,6 +89,7 @@ class RHPaperBase(RHPapersBase):
         RHPapersBase._checkProtection(self)
         if not self._check_paper_protection():
             raise Forbidden
+        check_event_locked(self, self.event_new)
 
     def _check_paper_protection(self):
         """Perform a permission check on the current paper.

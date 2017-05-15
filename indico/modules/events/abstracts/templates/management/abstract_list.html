@@ -41,7 +41,7 @@
                     </button>
                 </div>
                 <div class="group">
-                    <a class="i-button icon-plus js-dialog-action"
+                    <a class="i-button icon-plus js-dialog-action hide-if-locked"
                        title="{% trans %}Add new abstract{% endtrans %}"
                        data-title="{% trans %}Add new abstract{% endtrans %}"
                        data-href="{{ url_for('.manage_create_abstract', event) }}"
@@ -51,7 +51,7 @@
                         {% trans %}New abstract{% endtrans %}
                     </a>
                 </div>
-                <div class="group">
+                <div class="group hide-if-locked">
                     <a class="i-button arrow icon-remove js-requires-selected-row disabled"
                        data-toggle="dropdown">
                         {%- trans %}Remove{% endtrans -%}
@@ -81,7 +81,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="group">
+                <div class="group hide-if-locked">
                     <a class="i-button arrow icon-hammer js-requires-selected-row disabled"
                        data-toggle="dropdown">
                         {%- trans %}Judge{% endtrans -%}

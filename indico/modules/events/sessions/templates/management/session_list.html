@@ -26,7 +26,7 @@
                         </li>
                     </ul>
                 </div>
-                <div class="group">
+                <div class="group hide-if-locked">
                     <a id="add-new-session" class="i-button highlight icon-plus"
                        data-href="{{ url_for('.create_session', event) }}"
                        data-title="{% trans %}Add new session{% endtrans %}"
@@ -35,7 +35,7 @@
                         {% trans %}Add new session{% endtrans %}
                     </a>
                 </div>
-                <div class="group">
+                <div class="group hide-if-locked">
                     <a id="remove-selected-sessions"
                        class="i-button icon-remove js-requires-selected-row disabled"
                        data-title="{% trans %}Remove selected sessions{% endtrans %}"

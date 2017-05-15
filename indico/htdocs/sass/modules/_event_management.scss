@@ -727,3 +727,10 @@ form.horizontal .clone-event-dialog-footer .form-field {
         margin-left: auto;
     }
 }
+
+
+.event-locked {
+    .hide-if-locked {
+        display: none !important;
+    }
+}

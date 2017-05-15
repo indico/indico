@@ -33,11 +33,11 @@
                                     <div class="toolbar vc-toolbar">
                                         <div class="group">
                                             {% if vc_room.status.name != 'deleted' %}
-                                                <a class="i-button icon-loop js-vcroom-refresh"
+                                                <a class="i-button icon-loop js-vcroom-refresh hide-if-locked"
                                                    title="{% trans %}Check videoconference room status{% endtrans %}"
                                                    data-href="{{ url_for('.manage_vc_rooms_refresh', event_vc_room)}}">
                                                 </a>
-                                                <a href="#" class="i-button icon-edit js-vcroom-edit"
+                                                <a href="#" class="i-button icon-edit js-vcroom-edit hide-if-locked"
                                                    data-href="{{ url_for('.manage_vc_rooms_modify', event_vc_room) }}"
                                                    title="{% trans %}Edit{% endtrans %}"
                                                    data-title="{% trans %}Edit room{% endtrans %}"
@@ -47,7 +47,7 @@
                                             {% endif %}
                                             <a data-href="{{ url_for('.manage_vc_rooms_remove', event_vc_room) }}"
                                                data-num-events="{{ vc_room.events | count }}"
-                                               class="i-button icon-remove js-vcroom-remove"
+                                               class="i-button icon-remove js-vcroom-remove hide-if-locked"
                                                title="{% trans %}Detach{% endtrans %}"></a>
                                             {% if vc_room.status.name != 'deleted' and vc_room.plugin %}
                                                 {{ vc_room.plugin.render_buttons(vc_room, event_vc_room) | safe }}
@@ -71,7 +71,7 @@
                     <div class="message-text">{% trans %}No videoconference rooms have been added yet.{% endtrans %}</div>
                 </div>
             {% endif %}
-            <div class="add-room-options right">
+            <div class="add-room-options right hide-if-locked">
                 {% if plugins|length == 1 %}
                     <a class="i-button js-create-room"
                        data-vc-system="{{ plugins[0].service_name }}"

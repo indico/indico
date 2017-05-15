@@ -30,6 +30,7 @@
                         <div class="toolbar">
                             {{ switch(id='toggle-menu-customization',
                                       checked=custom_menu_enabled,
+                                      disabled=event.is_locked,
                                       data_href=url_for('.menu_toggle_custom', event),
                                       data_confirm_disable=_('Disabling menu customizations will revert to the default menu and PERMANENTLY DELETE all menu customizations including custom pages.')) }}
                         </div>
@@ -47,7 +48,7 @@
                 <div id="menu-entries" class="column col-40">
                     {{ menu_entries(menu, connect_menu=true) }}
                 </div>
-                <div class="column col-60">
+                <div class="column col-60 hide-if-locked">
                     {% call message_box('info') %}
                         {%- trans -%}
                             Click and drag the blocks to reorder the menu entries.

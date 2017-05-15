@@ -71,20 +71,6 @@ class AccessControlError(MaKaCError):
         return str(self)
 
 
-class ConferenceClosedError(MaKaCError):
-    """
-    """
-    fossilizes(IErrorNoReportFossil)
-
-    def __init__(self, conf):
-        MaKaCError.__init__(self)
-        self._conf = conf
-
-    @ensure_str
-    def __str__(self):
-        return _("the event has been closed")
-
-
 class AccessError(AccessControlError):
     """
     """
