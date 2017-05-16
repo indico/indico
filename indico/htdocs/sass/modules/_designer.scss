@@ -284,3 +284,26 @@
         }
     }
 }
+
+.back-side-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $light-gray;
+    height: 100%;
+
+    .placeholder-content {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+
+        > div {
+            color: $gray;
+
+            &:first-child {
+                font-size: 2em;
+            }
+        }
+    }
+}
