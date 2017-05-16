@@ -26,11 +26,14 @@
         }
 
         .insert-element-controls {
+            @include transition(opacity .2s);
+
             label {
                 font-weight: normal;
                 margin-right: 0.5em;
                 color: $light-black;
             }
+
         }
 
         .insert-element-btn {
@@ -129,6 +132,10 @@
             }
         }
     }
+}
+
+.disappear {
+    opacity: 0;
 }
 
 #badge-settings-form .form-group-footer {
@@ -259,6 +266,7 @@
     }
 
     .element-tools {
+        @include transition(opacity .2s);
         border-top: 1px dashed $pastel-gray;
     }
 

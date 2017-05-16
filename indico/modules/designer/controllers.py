@@ -45,76 +45,36 @@ TEMPLATE_DATA_JSON_SCHEMA = {
     'properties': {
         'width': {'type': 'integer', 'minimum': 0},
         'height': {'type': 'integer', 'minimum': 0},
-        'front': {
+        'background': {
             'type': 'object',
             'properties': {
-                'background': {
-                    'type': 'object',
-                    'properties': {
-                        'position': {'type': 'string'},
-                        'image_id': {'type': 'integer'}
-                    }
-                },
-                'items': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'object',
-                        'properties': {
-                            'id': {'type': 'integer'},
-                            'text': {'type': 'string'},
-                            'x': {'type': 'number', 'minimum': 0},
-                            'y': {'type': 'number', 'minimum': 0},
-                            'width': {'type': 'integer', 'minimum': 0},
-                            'color': {'type': 'string'},
-                            'font_family': {'type': 'string'},
-                            'font_size': {'type': 'string'},
-                            'text_align': {'type': 'string'},
-                            'bold': {'type': 'boolean'},
-                            'italic': {'type': 'boolean'}
-                        }
-                    },
-                    'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
-                                 'bold', 'italic']
-                },
-            },
-            'required': ['background', 'items']
+                'position': {'type': 'string'},
+                'image_id': {'type': 'integer'}
+            }
         },
-        'back': {
-            'type': 'object',
-            'properties': {
-                'background': {
-                    'type': 'object',
-                    'properties': {
-                        'position': {'type': 'string'},
-                        'image_id': {'type': 'integer'}
-                    }
-                },
-                'items': {
-                    'type': 'array',
-                    'items': {
-                        'type': 'object',
-                        'properties': {
-                            'id': {'type': 'integer'},
-                            'text': {'type': 'string'},
-                            'x': {'type': 'number', 'minimum': 0},
-                            'y': {'type': 'number', 'minimum': 0},
-                            'width': {'type': 'integer', 'minimum': 0},
-                            'color': {'type': 'string'},
-                            'font_family': {'type': 'string'},
-                            'font_size': {'type': 'string'},
-                            'text_align': {'type': 'string'},
-                            'bold': {'type': 'boolean'},
-                            'italic': {'type': 'boolean'}
-                        }
-                    },
-                    'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
-                                 'bold', 'italic']
-                },
+        'items': {
+            'type': 'array',
+            'items': {
+                'type': 'object',
+                'properties': {
+                    'id': {'type': 'integer'},
+                    'text': {'type': 'string'},
+                    'x': {'type': 'number', 'minimum': 0},
+                    'y': {'type': 'number', 'minimum': 0},
+                    'width': {'type': 'integer', 'minimum': 0},
+                    'color': {'type': 'string'},
+                    'font_family': {'type': 'string'},
+                    'font_size': {'type': 'string'},
+                    'text_align': {'type': 'string'},
+                    'bold': {'type': 'boolean'},
+                    'italic': {'type': 'boolean'}
+                }
             },
-            'required': ['background', 'items']
-        }
+            'required': ['id', 'text', 'x', 'y', 'width', 'color', 'font_family', 'font_size', 'text_align',
+                         'bold', 'italic']
+        },
     },
-    'required': ['width', 'height', 'front']
+    'required': ['width', 'height']
 }
 
 

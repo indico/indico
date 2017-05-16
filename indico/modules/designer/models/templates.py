@@ -105,20 +105,8 @@ class DesignerTemplate(db.Model):
         tpl_type = kwargs.get('type')
         if data is None:
             data = {
-                'front': {
-                    'items': [],
-                    'background': {
-                        'image_id': '',
-                        'position': 'stretch'
-                    }
-                },
-                'back': {
-                    'items': [],
-                    'background': {
-                        'image_id': '',
-                        'position': 'stretch'
-                    }
-                }
+                'items': [],
+                'background_position': 'stretch'
             }
             size = DEFAULT_CONFIG[tpl_type]['tpl_size']
             data.update({'width': size[0], 'height': size[1]})
@@ -129,13 +117,8 @@ class DesignerTemplate(db.Model):
         return self.event_new if self.event_new else self.category
 
     @property
-    def background_image_front(self):
-        image_id = self.data['front']['background']['image_id']
-        return DesignerImageFile.get(int(image_id)) if image_id else None
-
-    @property
-    def background_image_back(self):
-        image_id = self.data['back']['background']['image_id']
+    def background_image(self):
+        image_id = self.data['background']['image_id']
         return DesignerImageFile.get(int(image_id)) if image_id else None
 
     @locator_property
