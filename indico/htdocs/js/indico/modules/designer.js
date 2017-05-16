@@ -27,9 +27,8 @@
     var itemIdCounter = -1;
     // Pointer for the jQuery-UI tabs controller
     var editing = false;
-    var items = {front: {}, back: {}};
+    var items = {};
     var itemTitles = {};
-    var currentSideUp = 'front';
 
     var DEFAULT_PIXEL_CM = 50;
 
@@ -106,10 +105,10 @@
         return item;
     }
 
-    function createItemFromObject(obj, side) {
+    function createItemFromObject(obj) {
         delete obj.id;
         var newItem = _.extend(createItem(), obj);
-        items[side][newItem.id] = newItem;
+        items[newItem.id] = newItem;
 
         return newItem;
     }
@@ -123,13 +122,13 @@
     }
 
     // This function creates a new draggable div
-    function createDiv(item, side) {
+    function createDiv(item) {
         // Each div has:
         // -a unique id, which is a natural number (0, 1, 2, ...)
         // -a type (stored in the name attribute)
         // -absolute x,y position
         // -an inner HTML with its content
-        var templateSide = '.template-side.' + side;
+        var templateSide = '.template-side.front';
         var newDiv = $('<div/>').css({
             position: 'absolute',
             left: item.x + 'px',
@@ -149,8 +148,8 @@
             },
             stop: function(e, ui) {
                 var itemId = $(this).data('id');
-                items[side][itemId].x = unzoom(ui.position.left);
-                items[side][itemId].y = unzoom(ui.position.top);
+                items[itemId].x = unzoom(ui.position.left);
+                items[itemId].y = unzoom(ui.position.top);
             }
         });
 
@@ -161,10 +160,10 @@
     function insertElement() {
         var selectedType = $('#element-list').val();
         var newItem = createItem(selectedType);
-        var newDiv = createDiv(newItem, currentSideUp);
+        var newDiv = createDiv(newItem);
         var itemHtml = newItem.toHTML().appendTo(newDiv);
 
-        items[currentSideUp][newItem.id] = newItem;
+        items[newItem.id] = newItem;
         selectItem(itemHtml);
         initialOffset += pixelsPerCm;
         initialOffset %= (templateDimensions.height - 20);
@@ -175,17 +174,16 @@
         var selectedItem = getSelectedItemData();
 
         if (selectedItem) {
-            delete items[currentSideUp][selectedItem.id];
+            delete items[selectedItem.id];
             $selectedItem.remove();
-            $('.element-tools').fadeOut('fast');
+            $('.element-tools').addClass('disappear');
         }
     }
 
     function getItemData($item) {
         if ($item.length) {
             var id = $item.closest('.ui-draggable').data('id');
-            var side = $item.closest('.template-side').data('side');
-            return items[side][id];
+            return items[id];
         }
         return;
     }
@@ -206,7 +204,7 @@
     function selectItem($item) {
         var item = getItemData($item);
 
-        $('.element-tools').fadeIn('fast');
+        $('.element-tools').removeClass('disappear');
 
         $('.selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
 
@@ -298,18 +296,16 @@
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
     function displayItems() {
-        $.each(items, function(side) {
-            $.each(items[side], function(i, item) {
-                var newDiv = createDiv(item, side);
-                newDiv.css({
-                    left: zoom(item.x) + 'px',
-                    top: zoom(item.y) + 'px'
-                });
-                newDiv.append(item.toHTML());
-                if (item.selected) {
-                    selectItem(newDiv.find('.designer-item'));
-                }
+        $.each(items, function(i, item) {
+            var newDiv = createDiv(item);
+            newDiv.css({
+                left: zoom(item.x) + 'px',
+                top: zoom(item.y) + 'px'
             });
+            newDiv.append(item.toHTML());
+            if (item.selected) {
+                selectItem(newDiv.find('.designer-item'));
+            }
         });
     }
 
@@ -322,7 +318,7 @@
         templateDimensions = new Dimensions($('.template-width').val() * DEFAULT_PIXEL_CM,
                                             $('.template-height').val() * DEFAULT_PIXEL_CM);
         updateRulers();
-        displayBothSidesBackground(template);
+        displayBackground(template);
     }
 
     function moveSelectedItem(direction) {
@@ -430,28 +426,15 @@
             template: {
                 width: templateDimensions.realWidth,
                 height: templateDimensions.realHeight,
-                front: {
-                    items: _.values(items['front']).map(function(item) {
-                        var itemCopy = $.extend(true, {}, item);
-                        itemCopy.font_size = unzoomFont(item.font_size);
-                        return item;
-                    }),
-                    background: {
-                        position: template.data.front.background.position,
-                        image_id: template.data.front.background.image_id
-                    }
-                },
-                back: {
-                    items: _.values(items['back']).map(function(item) {
-                        var itemCopy = $.extend(true, {}, item);
-                        itemCopy.font_size = unzoomFont(item.font_size);
-                        return item;
-                    }),
-                    background: {
-                        position: template.data.back.background.position,
-                        image_id: template.data.back.background.image_id
-                    }
-                },
+                items: _.values(items).map(function(item) {
+                    var itemCopy = $.extend(true, {}, item);
+                    itemCopy.font_size = unzoomFont(item.font_size);
+                    return item;
+                }),
+                background: {
+                    position: template.data.background.position,
+                    image_id: template.data.background.image_id
+                }
             },
             title: $('.js-template-name').val(),
         };
@@ -515,12 +498,12 @@
         }
     }
 
-    function displaySideBackground(template, side) {
-        var $backgroundElement = $('.template-side.' + side + ' .background-image');
-        var backgroundPos = template.data[side].background.position;
+    function displayBackground(template) {
+        var $backgroundElement = $('.template-side.front .background-image');
+        var backgroundPos = template.data.background.position;
 
         $backgroundElement.attr({
-            src: template.background_urls[side]
+            src: template.background_url
         }).css({
             position: 'absolute',
             left: 0,
@@ -531,19 +514,14 @@
         }).on('load', function() {
             $('#loadingIcon').hide();
             setBackgroundPos($(this), backgroundPos);
-        }).appendTo('.template-side.' + side);
-    }
-
-    function displayBothSidesBackground(template) {
-        displaySideBackground(template, 'front');
-        displaySideBackground(template, 'back');
+        }).appendTo('.template-side.front');
     }
 
     function removeBackground(template) {
-        if (template.background_urls[currentSideUp]) {
-            template.background_urls[currentSideUp] = null;
-            template.data[currentSideUp].background.image_id = '';
-            $('.template-side.' + currentSideUp).trigger('indico:backgroundChanged');
+        if (template.background_url) {
+            template.background_url = null;
+            template.data.background.image_id = '';
+            $('.template-side.front').trigger('indico:backgroundChanged');
         }
     }
 
@@ -585,6 +563,7 @@
             });
 
             $('.js-upload-bg').click(function() {
+                $('.js-toggle-side.front').click();
                 $('#bg-form').submit();
                 return false;
             });
@@ -602,20 +581,20 @@
                         new AlertPopup($T("Error"), data.error).open();
                         return;
                     }
-                    template.background_urls[currentSideUp] = data.image_url;
-                    template.data[currentSideUp].background.image_id = data.image_id;
-                    displaySideBackground(template, currentSideUp);
-                    $('.template-side.active').trigger('indico:backgroundChanged');
+                    template.background_url = data.image_url;
+                    template.data.background.image_id = data.image_id;
+                    displayBackground(template);
+                    $('.template-side.front').trigger('indico:backgroundChanged');
                 }
             });
 
             $('input[name=bg-position]').change(function(e) {
                 e.preventDefault();
                 var newPosition = $(this).val();
-                var $backgroundElement = $('.template-side.' + currentSideUp + ' .background-image');
+                var $backgroundElement = $('.template-side.front .background-image');
 
                 setBackgroundPos($backgroundElement, newPosition);
-                template.data[currentSideUp].background.position = newPosition;
+                template.data.background.position = newPosition;
             });
 
             $('.js-remove-bg').click(function(e) {
@@ -637,6 +616,7 @@
 
             $('.insert-element-btn').click(function(e) {
                 e.preventDefault();
+                $('.js-toggle-side.front').click();
                 insertElement();
             });
 
@@ -672,37 +652,31 @@
                 $('.template-side.front').toggleClass('active', newFaceUp === 'front');
                 $('.js-toggle-side').removeClass('highlight');
                 $this.toggleClass('highlight');
-                currentSideUp = $('.template-side.active').data('side');
                 if ($selectedItem && $selectedItem[0]) {
                     deselectItem($selectedItem);
                 }
-                $('.element-tools').fadeOut('fast');
+                $('.element-tools').addClass('disappear');
                 $('.template-side.active').trigger('indico:backgroundChanged');
             });
 
             $('.template-side').on('indico:backgroundChanged', function() {
-                var $this = $(this);
-                var side = $this.data('side');
                 var $backgroundFile = $('#backgroundFile');
+                var $templateSide = $('.template-side.front');
+                var $templateSideBackground = $templateSide.find('.background-image');
 
-                $.each(template.background_urls, function(templateSide) {
-                    var $templateSide = $('.template-side.' + templateSide);
-                    var $templateSideBackground = $templateSide.find('.background-image');
-                    if (!template.background_urls[templateSide] && $templateSideBackground.attr('src')) {
-                        $templateSideBackground.remove();
-                        $templateSide.append($('<img>', {class: 'background'}));
-                        $backgroundFile.val('');
-                        $backgroundFile.next('label').addClass('i-button').text($T.gettext('Choose a file'));
-                    }
-                });
-
+                if (!template.background_url && $templateSideBackground.attr('src')) {
+                    $templateSideBackground.remove();
+                    $templateSide.append($('<img>', {class: 'background'}));
+                    $backgroundFile.val('');
+                    $backgroundFile.next('label').addClass('i-button').text($T.gettext('Choose a file'));
+                }
                 $('.js-upload-bg').attr('disabled', !$backgroundFile.val());
-                $('.js-remove-bg').attr('disabled', !template.background_urls[side]);
-                $('#bg-position-stretch').prop('checked', template.data[side].background.position === 'stretch');
-                $('#bg-position-center').prop('checked', template.data[side].background.position === 'center');
+                $('.js-remove-bg').attr('disabled', !template.background_url);
+                $('#bg-position-stretch').prop('checked', template.data.background.position === 'stretch');
+                $('#bg-position-center').prop('checked', template.data.background.position === 'center');
             });
 
-            $('.template-side.active').trigger('indico:backgroundChanged');
+            $('.template-side.front').trigger('indico:backgroundChanged');
         });
 
         // We load the template if we are editing a template
@@ -724,11 +698,8 @@
         updateRulers(); // creates the initial rulers
         changeTemplateSize(template);
 
-        template.data.front.items.forEach(function(item) {
-            createItemFromObject(item, 'front');
-        });
-        template.data.back.items.forEach(function(item) {
-            createItemFromObject(item, 'back');
+        template.data.items.forEach(function(item) {
+            createItemFromObject(item);
         });
 
         // This function displays the items, if any have been loaded, on the screen
