@@ -155,7 +155,7 @@ class RH(RequestHandlerBase):
                  value should be the received paramter value (or values).
     """
     _doNotSanitizeFields = []
-    CSRF_ENABLED = False  # require a csrf_token when accessing the RH with anything but GET
+    CSRF_ENABLED = None  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
 
     #: A dict specifying how the url should be normalized.
@@ -361,7 +361,7 @@ class RH(RequestHandlerBase):
             msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
                     u"button, reload the page and try again.")
             raise BadRequest(msg)
-        elif not self.CSRF_ENABLED and current_app.debug and request.method != 'GET':
+        elif self.CSRF_ENABLED is None and current_app.debug and request.method != 'GET':
             # Warn if CSRF is not enabled for a RH in new code
             module = self.__class__.__module__
             if module.startswith('indico.modules.') or module.startswith('indico.core.'):

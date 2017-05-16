@@ -60,6 +60,12 @@ def _get_provider(name, external):
 class RHLogin(RH):
     """The login page"""
 
+    # Disable global CSRF check. The form might not be an IndicoForm
+    # but a normal WTForm from Flask-WTF which does not use the same
+    # CSRF token as Indico forms use. But since the form has its own
+    # CSRF check anyway disabling the global check is perfectly fine.
+    CSRF_ENABLED = False
+
     def _process(self):
         login_reason = session.pop('login_reason', None)
 
