@@ -592,8 +592,6 @@ class ZipGeneratorMixin:
         :return: The generated zip file.
         """
 
-        from indico.util.tasks import delete_file
-
         temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()
@@ -603,10 +601,6 @@ class ZipGeneratorMixin:
                 with item.storage.get_local_path(item.storage_file_id) as filepath:
                     zip_handler.write(filepath.encode('utf-8'), name)
 
-        # Delete the temporary file after some time.  Even for a large file we don't
-        # need a higher delay since the webserver will keep it open anyway until it's
-        # done sending it to the client.
-        delete_file.apply_async(args=[temp_file.name], countdown=3600)
         temp_file.delete = False
         zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)

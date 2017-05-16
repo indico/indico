@@ -184,7 +184,7 @@ def serialize_session_for_ical(sess):
 
 def get_session_ical_file(sess):
     from indico.web.http_api.metadata.serializer import Serializer
-    data = {'results': serialize_session_for_ical(sess)}
+    data = {'results': serialize_session_for_ical(sess) if sess.start_dt and sess.end_dt else []}
     serializer = Serializer.create('ics')
     return BytesIO(serializer(data))
 

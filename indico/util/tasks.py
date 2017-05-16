@@ -24,24 +24,27 @@ in here but in your module instead.
 
 from __future__ import unicode_literals
 
-import os
+from datetime import timedelta
+
+from celery.schedules import crontab
 
 from indico.core.celery import celery
-from indico.core.logger import Logger
-from indico.util.fs import silentremove
+from indico.util.fs import cleanup_dir
 
 
-@celery.task(name='delete_file')
-def delete_file(path):
-    """Deletes a file.
+def _log_deleted(logger, msg, files):
+    for name in sorted(files):
+        logger.info(msg, name)
 
-    This task is meant to be invoked with a delay, i.e. like this::
 
-        delete_file.apply_async(args=[file_path], countdown=3600)
-
-    :param path: The absolute path to the file.
-    """
-    if not os.path.isabs(path):
-        raise ValueError('Path is not absolute: {}'.format(path))
-    Logger.get().info('Deleting {}'.format(path))
-    silentremove(path)
+@celery.periodic_task(name='temp_cleanup', run_every=crontab(minute='0', hour='4'))
+def temp_cleanup():
+    """Cleanup temp/cache dirs"""
+    from indico.core.config import Config
+    from indico.core.logger import Logger
+    logger = Logger.get()
+    deleted = cleanup_dir(Config.getInstance().getCacheDir(), timedelta(days=1),
+                          exclude=lambda x: x.startswith('webassets-'))
+    _log_deleted(logger, 'Deleted from cache: %s', deleted)
+    deleted = cleanup_dir(Config.getInstance().getTempDir(), timedelta(days=1))
+    _log_deleted(logger, 'Deleted from temp: %s', deleted)
