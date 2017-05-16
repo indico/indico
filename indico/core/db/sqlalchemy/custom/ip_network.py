@@ -69,6 +69,5 @@ class PyIPNetwork(TypeDecorator):
         return _ip_network(value) if value is not None else None
 
     def alembic_render_type(self, autogen_context):
-        imports = autogen_context['imports']
-        imports.add('from indico.core.db.sqlalchemy import PyIPNetwork')
+        autogen_context.imports.add('from indico.core.db.sqlalchemy import PyIPNetwork')
         return '{}()'.format(type(self).__name__)

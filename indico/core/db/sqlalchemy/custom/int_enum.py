@@ -74,9 +74,8 @@ class PyIntEnum(TypeDecorator, SchemaType):
         return self.enum(value)
 
     def alembic_render_type(self, autogen_context):
-        imports = autogen_context['imports']
-        imports.add('from indico.core.db.sqlalchemy import PyIntEnum')
-        imports.add('from {} import {}'.format(self.enum.__module__, self.enum.__name__))
+        autogen_context.imports.add('from indico.core.db.sqlalchemy import PyIntEnum')
+        autogen_context.imports.add('from {} import {}'.format(self.enum.__module__, self.enum.__name__))
         if self.exclude_values:
             return '{}({}, exclude_values={{{}}})'.format(type(self).__name__, self.enum.__name__, ', '.join(
                 '{}.{}'.format(self.enum.__name__, x.name) for x in sorted(self.exclude_values)

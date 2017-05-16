@@ -64,7 +64,5 @@ class UTCDateTime(types.TypeDecorator):
             return value.replace(tzinfo=pytz.utc)
 
     def alembic_render_type(self, autogen_context):
-        # This method can go away once this change is in the Alembic version we are using:
-        # https://bitbucket.org/zzzeek/alembic/issue/229/#comment-13123225
-        autogen_context['imports'].add('from indico.core.db.sqlalchemy import UTCDateTime')
+        autogen_context.imports.add('from indico.core.db.sqlalchemy import UTCDateTime')
         return type(self).__name__
