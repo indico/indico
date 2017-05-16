@@ -546,6 +546,8 @@
         // Item class
         $(document).ready(function() {
             var removeBackgroundQtip = $('.js-remove-bg').qtip();
+            var templateWidth = $('.template-width').val();
+            var templateHeight = $('.template-height').val();
 
             $('#bg-form input[type="file"]').on('change', function() {
                 var $this = $(this);
@@ -642,6 +644,17 @@
                 setSelectedItemAttribute('text', config);
             });
 
+            $('.js-preset-tool').on('change', function() {
+                var $selectedOption = $(this).find('option:selected');
+
+                if ($selectedOption.val() !== 'custom') {
+                    $('.template-width').val($selectedOption.data('width'));
+                    $('.template-height').val($selectedOption.data('height'));
+                    changeTemplateSize(template);
+                }
+                $('.js-template-dimension').prop('disabled', $selectedOption.val() !== 'custom');
+            });
+
             $('.js-toggle-side').on('click', function() {
                 var $this = $(this);
                 var newFaceUp = $this.hasClass('front') ? 'front' : 'back';
@@ -677,6 +690,22 @@
             });
 
             $('.template-side.front').trigger('indico:backgroundChanged');
+
+            $('.js-preset-tool option').each(function() {
+                var $this = $(this);
+
+                if ($this.val() === 'custom') {
+                    return;
+                }
+
+                var width = $this.data('width').toString();
+                var height = $this.data('height').toString();
+
+                if (width === templateWidth && height === templateHeight) {
+                    $this.prop('selected', true);
+                    $('.js-template-dimansion').attr('disabled', true);
+                }
+            });
         });
 
         // We load the template if we are editing a template
