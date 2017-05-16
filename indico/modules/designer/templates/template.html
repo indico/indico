@@ -69,7 +69,7 @@
                 </form>
             </div>
         </div>
-        <div class="designer-tools-row element-tools" style="display: none;">
+        <div class="designer-tools-row element-tools disappear">
             <div class="tool">
                 <span class="selection-text f-self-stretch"></span>
                 <a class="js-remove-element i-button icon-remove icon-only text-color subtle"
@@ -256,10 +256,7 @@
             var template = {
                 title: {{ template.title | tojson }},
                 data: {{ template.data | tojson }},
-                background_urls: {
-                    front: {{ (template.background_image_front.download_url if template.background_image_front else none) | tojson }},
-                    back: {{ (template.background_image_back.download_url if template.background_image_back else none) | tojson }}
-                }
+                background_url: {{ (template.background_image.download_url if template.background_image else none) | tojson }}
             };
             setupDesigner(template, {{ config | tojson }}, {{ placeholders | tojson }});
         })();
