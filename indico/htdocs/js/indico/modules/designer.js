@@ -433,7 +433,7 @@
         };
 
         $.ajax({
-            url: '',
+            url: location.pathname,
             data: JSON.stringify(templateData),
             contentType: 'application/json',
             method: 'POST',

@@ -31,12 +31,12 @@ from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.util import get_placeholder_options, get_inherited_templates
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_form
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 TEMPLATE_DATA_JSON_SCHEMA = {
     'type': 'object',
@@ -187,7 +187,7 @@ class AddTemplateMixin(TargetFromURLMixin):
         return jsonify_form(form, disabled_until_change=False)
 
 
-class RHListEventTemplates(TemplateListMixin, RHConferenceModifBase):
+class RHListEventTemplates(TemplateListMixin, RHManageEventBase):
     pass
 
 
@@ -195,7 +195,7 @@ class RHListCategoryTemplates(TemplateListMixin, RHManageCategoryBase):
     pass
 
 
-class RHAddEventTemplate(AddTemplateMixin, RHConferenceModifBase):
+class RHAddEventTemplate(AddTemplateMixin, RHManageEventBase):
     pass
 
 
@@ -203,9 +203,9 @@ class RHAddCategoryTemplate(AddTemplateMixin, RHManageCategoryBase):
     pass
 
 
-class RHCloneEventTemplate(CloneTemplateMixin, RHConferenceModifBase):
+class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         CloneTemplateMixin._checkParams(self)
 
 
@@ -216,6 +216,8 @@ class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
 
 
 class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProtected):
+    CSRF_ENABLED = True
+
     def _checkParams(self, params):
         RHModificationBaseProtected._checkParams(self, params)
         SpecificTemplateMixin._checkParams(self)
