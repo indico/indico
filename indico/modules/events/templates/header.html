@@ -224,8 +224,10 @@
 {% endif %}
 
 <script>
-    $('.js-export-ical').on('click', function(evt) {
-        evt.preventDefault();
-        $(this).trigger('menu_select');
+    $(document).ready(function() {
+        $('.js-export-ical').on('click', function(evt) {
+            evt.preventDefault();
+            $(this).trigger('menu_select');
+        });
     });
 </script>
