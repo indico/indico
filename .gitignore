@@ -31,4 +31,7 @@ htmlcov/
 /.cache/
 
 # sphinx
-/doc/dev/source/extension.rst
+/docs/build/
+
+# logs
+*.log
