@@ -8,8 +8,9 @@
 
 
 {% macro render_timeline(proposal, comment_form, review_form=none, revision_form=none) %}
-    {% set can_comment = proposal.can_comment(session.user, check_state=true) %}
-    {% set can_review = proposal.can_review(session.user, check_state=true) %}
+    {% set event_locked = proposal.event_new.is_locked %}
+    {% set can_comment = not event_locked and proposal.can_comment(session.user, check_state=true) %}
+    {% set can_review = not event_locked and proposal.can_review(session.user, check_state=true) %}
     {% for revision in proposal.get_revisions() %}
         {% set timeline = revision.get_timeline(session.user) %}
         {% if not loop.first %}
@@ -77,7 +78,7 @@
                         {% endif %}
                     </div>
                     {% if comment.can_edit(session.user) %}
-                        <div class="review-comment-actions">
+                        <div class="review-comment-actions hide-if-locked">
                             <a class="i-link icon-edit js-edit-comment"
                                title="{% trans %}Edit comment{% endtrans %}"
                                data-href="{{ proposal.get_save_comment_url(comment) }}"
@@ -156,7 +157,7 @@
                         {% endif %}
                     </div>
                     {% if review.can_edit(session.user, check_state=true) %}
-                        <div class="review-comment-actions">
+                        <div class="review-comment-actions hide-if-locked">
                             <a class="i-link icon-edit js-edit-review"
                                title="{% trans %}Edit review{% endtrans %}"
                                data-href="{{ proposal.get_save_review_url(review=review) }}"

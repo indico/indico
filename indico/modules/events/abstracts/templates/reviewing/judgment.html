@@ -167,7 +167,7 @@
                     </div>
                     {% if abstract.edit_track_mode.name != 'none' %}
                         <div>
-                            <a href="#"
+                            <a href="#" class="hide-if-locked"
                                data-href="{{ url_for('.edit_review_tracks', abstract) }}"
                                data-form-container="#edit-reviewed-for-track-list"
                                data-update="#reviewing-page"

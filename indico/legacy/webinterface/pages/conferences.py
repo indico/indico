@@ -145,13 +145,14 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
 
     def _applyConfDisplayDecoration( self, body ):
         frame = WConfDisplayFrame(self._conf)
+        event = self._conf.as_event
 
         announcement = ''
-        if layout_settings.get(self._conf, 'show_announcement'):
-            announcement = layout_settings.get(self._conf, 'announcement')
+        if layout_settings.get(event, 'show_announcement'):
+            announcement = layout_settings.get(event, 'announcement')
 
         frameParams = {
-            "confModifURL": url_for('event_management.settings', self._conf.as_event),
+            "confModifURL": url_for('event_management.settings', event),
             "logoURL": self.logo_url,
             "currentURL": request.url,
             "announcement": announcement,
@@ -160,14 +161,14 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         if self.event.has_logo:
             frameParams["logoURL"] = self.logo_url
         body = '''
-            <div class="confBodyBox clearfix">
+            <div class="confBodyBox clearfix {}">
                 <div class="mainContent">
                     <div class="col2">
                         {}
                     </div>
                 </div>
             </div>
-        '''.format(encode_if_unicode(body))
+        '''.format('event-locked' if event.is_locked else '', encode_if_unicode(body))
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):

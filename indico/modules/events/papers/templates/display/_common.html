@@ -24,7 +24,7 @@
                     <div class="label">{% trans %}The call for papers is closed.{% endtrans %}</div>
                 {% endif -%}
             </div>
-            {%- if cfp.is_open %}
+            {%- if cfp.is_open and not event.is_locked %}
                 <div class="toolbar">
                     {% if contributions|length == 1 %}
                         {% set contrib = contributions|first %}

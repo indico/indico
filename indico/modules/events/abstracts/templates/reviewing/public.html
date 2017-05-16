@@ -186,7 +186,7 @@
                     </time>
                 </div>
                 {% if abstract.event_new.can_manage(session.user) %}
-                    <div>
+                    <div class="hide-if-locked">
                         <a class="i-link icon-remove"
                            title="{% trans %}Reset judgment{% endtrans %}"
                            data-href="{{ url_for('.reset_abstract_state', abstract) }}"

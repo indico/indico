@@ -30,7 +30,7 @@ from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import get_object_from_args
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
-from indico.legacy.webinterface.rh.base import RHProtected
+from indico.legacy.webinterface.rh.base import RHProtected, check_event_locked
 
 
 class RHNoteBase(RHProtected):
@@ -51,6 +51,7 @@ class RHManageNoteBase(RHNoteBase):
         RHNoteBase._checkProtection(self)
         if not can_edit_note(self.object, session.user):
             raise Forbidden
+        check_event_locked(self, self.event_new)
 
 
 class RHEditNote(RHManageNoteBase):

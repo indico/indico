@@ -42,7 +42,7 @@
             </div>
         {% endif %}
 
-        {% if abstract.can_judge(session.user, check_state=true) %}
+        {% if not abstract.event_new.is_locked and abstract.can_judge(session.user, check_state=true) %}
             <div id="proposal-decision-box" class="i-timeline-item">
                 {{ render_decision_box(abstract, judgment_form, session.user) }}
             </div>
