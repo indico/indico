@@ -43,7 +43,7 @@ def _pop_injected_js():
 
 def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_button=True, disabled_until_change=True,
                  disabled_fields=(), form_header_kwargs=None, skip_labels=False, save_reminder=False,
-                 footer_align_right=False):
+                 footer_align_right=False, disable_if_locked=True):
     """Returns a json response containing a rendered WTForm.
 
     This ia shortcut to the ``simple_form`` jinja macro to avoid
@@ -67,6 +67,9 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
                           visible
     :param footer_align_right: Whether the buttons in the event footer
                                should be aligned to the right.
+    :param disable_if_locked: Whether the form should be disabled when
+                              the associated event is locked (based on
+                              a CSS class in the DOM structure)
     """
     if submit is None:
         submit = _('Save')
@@ -78,7 +81,7 @@ def jsonify_form(form, fields=None, submit=None, back=None, back_url=None, back_
     html = tpl.simple_form(form, fields=fields, submit=submit, back=back, back_url=back_url, back_button=back_button,
                            disabled_until_change=disabled_until_change, disabled_fields=disabled_fields,
                            form_header_kwargs=form_header_kwargs, skip_labels=skip_labels, save_reminder=save_reminder,
-                           footer_align_right=footer_align_right)
+                           footer_align_right=footer_align_right, disable_if_locked=disable_if_locked)
     return jsonify(html=html, js=_pop_injected_js())
 
 

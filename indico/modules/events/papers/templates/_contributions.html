@@ -1,12 +1,11 @@
 {% from 'events/papers/reviewing/timeline.html' import render_paper_content, render_paper_metadata %}
 
 {% macro render_paper_section(contribution) %}
-    {% set event = contribution.event_new %}
     {% set paper = contribution.paper %}
     {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
     {% set show_paper = paper and paper.accepted_revision %}
     {% set show_paper_status = paper and can_submit %}
-    {% set show_paper_submission = event.cfp.is_open and can_submit and not event.is_locked %}
+    {% set show_paper_submission = contribution.event_new.cfp.is_open and can_submit %}
 
     {% if show_paper or show_paper_status or show_paper_submission %}
         <section>

@@ -41,6 +41,7 @@ from indico.web.util import jsonify_form, jsonify_data, jsonify, jsonify_templat
 
 class RHSubmitPaper(RHPaperBase):
     PAPER_REQUIRED = False
+    ALLOW_LOCKED = True
 
     def _process(self):
         form = PaperSubmissionForm()
@@ -52,7 +53,7 @@ class RHSubmitPaper(RHPaperBase):
             else:
                 create_paper_revision(self.paper, session.user, form.files.data)
                 return jsonify_data(flash=False, html=render_paper_page(self.paper))
-        return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
+        return jsonify_form(form, form_header_kwargs={'action': request.relative_url}, disable_if_locked=False)
 
 
 class RHPaperTimeline(RHPaperBase):

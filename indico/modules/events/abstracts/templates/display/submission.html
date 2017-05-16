@@ -9,4 +9,5 @@
         {%- endtrans %}
     {% endcall %}
 </div>
-{{ simple_form(form, form_header_kwargs={'action': request.relative_url}, submit=_("Submit"), back=_("Cancel")) }}
+{{ simple_form(form, form_header_kwargs={'action': request.relative_url}, submit=_("Submit"), back=_("Cancel"),
+               disable_if_locked=false) }}

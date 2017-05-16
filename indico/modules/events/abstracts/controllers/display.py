@@ -56,6 +56,8 @@ class RHMyAbstractsExportPDF(RHAbstractsBase):
 class RHSubmitAbstract(RHAbstractsBase):
     """Submit a new abstract."""
 
+    ALLOW_LOCKED = True
+
     def _checkProtection(self):
         cfa = self.event_new.cfa
         if session.user and not cfa.is_open and not cfa.can_submit_abstracts(session.user):
