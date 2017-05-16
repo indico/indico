@@ -250,6 +250,16 @@
                                     <img class="background-image">
                                 </div>
                                 <div class="template-side back" data-side="back">
+                                    <div class="back-side-placeholder">
+                                        <div class="placeholder-content">
+                                            <div>{% trans %}The back side is empty.{% endtrans %}</div>
+                                            <div>
+                                                {%- trans link_start='<a href="#">'|safe, link_end='</a>'|safe -%}
+                                                    {{ link_start }}Select an existing template{{ link_end }} to be used as the back side of this template.
+                                                {%- endtrans -%}
+                                            </div>
+                                        </div>
+                                    </div>
                                     <img class="background-image">
                                 </div>
                             </div>
