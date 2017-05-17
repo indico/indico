@@ -15,9 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict, OrderedDict
-from datetime import datetime, date
-from flask import session
+from datetime import datetime
 
+from flask import session
 from sqlalchemy import Date, Time
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -31,17 +31,17 @@ from indico.core.db.sqlalchemy.custom import static_array, PyIntEnum
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
+from indico.modules.rb.models.equipment import (ReservationEquipmentAssociation, EquipmentType,
+                                                RoomEquipmentAssociation)
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.modules.rb.models.equipment import (ReservationEquipmentAssociation, EquipmentType,
-                                                RoomEquipmentAssociation)
 from indico.modules.rb.models.util import unimplemented
 from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
                                                           notify_creation, notify_modification,
                                                           notify_rejection)
 from indico.modules.rb.util import rb_is_admin
-from indico.util.date_time import now_utc, format_date, format_time, get_month_end, round_up_month
+from indico.util.date_time import now_utc, format_date, format_time
 from indico.util.i18n import _, N_
 from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
@@ -583,21 +583,6 @@ class Reservation(Serializer, db.Model):
                 # Reject OTHER occurrences
                 for conflict in conflicts['pending']:
                     conflict.reject(user, u'Rejected due to collision with a confirmed reservation')
-
-        # Mark occurrences created within the notification window as notified
-        for occurrence in self.occurrences:
-            if occurrence.is_valid and occurrence.is_in_notification_window():
-                occurrence.notification_sent = True
-
-        # Mark occurrences created within the digest window as notified
-        if self.repeat_frequency == RepeatFrequency.WEEK:
-            if self.room.is_in_digest_window():
-                digest_start = round_up_month(date.today())
-            else:
-                digest_start = date.today()
-            digest_end = get_month_end(digest_start)
-            self.occurrences.filter(ReservationOccurrence.start_dt <= digest_end).update({'notification_sent': True},
-                                                                                         synchronize_session='fetch')
 
     def find_excluded_days(self):
         return self.occurrences.filter(~ReservationOccurrence.is_valid)

@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date
+from datetime import datetime
 from math import ceil
 
 from dateutil import rrule
-from sqlalchemy import Date, or_, func
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy import Date, or_
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import defaultload
 from sqlalchemy.sql import cast
 
@@ -282,29 +282,3 @@ class ReservationOccurrence(db.Model, Serializer):
         if skip_self and self.reservation and occurrence.reservation and self.reservation == occurrence.reservation:
             return False
         return date_time.overlaps((self.start_dt, self.end_dt), (occurrence.start_dt, occurrence.end_dt))
-
-    @hybrid_method
-    def is_in_notification_window(self, exclude_first_day=False):
-        from indico.modules.rb import rb_settings
-        if self.start_dt.date() < date.today():
-            return False
-        days_until_occurrence = (self.start_dt.date() - date.today()).days
-        notification_window = (self.reservation.room.notification_before_days
-                               or rb_settings.get('notification_before_days', 1))
-        if exclude_first_day:
-            return days_until_occurrence < notification_window
-        else:
-            return days_until_occurrence <= notification_window
-
-    @is_in_notification_window.expression
-    def is_in_notification_window(self, exclude_first_day=False):
-        from indico.modules.rb import rb_settings
-        from indico.modules.rb.models.rooms import Room
-        in_the_past = cast(self.start_dt, Date) < cast(func.now(), Date)
-        days_until_occurrence = cast(self.start_dt, Date) - cast(func.now(), Date)
-        notification_window = func.coalesce(Room.notification_before_days,
-                                            rb_settings.get('notification_before_days', 1))
-        if exclude_first_day:
-            return (days_until_occurrence < notification_window) & ~in_the_past
-        else:
-            return (days_until_occurrence <= notification_window) & ~in_the_past
