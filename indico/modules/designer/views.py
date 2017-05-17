@@ -22,7 +22,6 @@ from indico.modules.events.management.views import WPEventManagement
 
 class WPEventManagementDesigner(WPEventManagement):
     template_prefix = 'designer'
-    sidemenu_option = 'designer'
 
     def getJSFiles(self):
         return WPEventManagement.getJSFiles(self) + self._asset_env['modules_designer_js'].urls()

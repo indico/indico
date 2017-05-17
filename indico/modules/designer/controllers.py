@@ -93,12 +93,8 @@ class TemplateDesignerMixin:
         return self.target if self.object_type == 'event' else None
 
     def _render_template(self, tpl_name, **kwargs):
-        if self.object_type == 'event':
-            return WPEventManagementDesigner.render_template(tpl_name, self.target.as_legacy, target=self.target,
-                                                             event=self.target, **kwargs)
-        else:
-            return WPCategoryManagementDesigner.render_template(tpl_name, self.target, 'designer', target=self.target,
-                                                                **kwargs)
+        view_class = WPEventManagementDesigner if self.object_type == 'event' else WPCategoryManagementDesigner
+        return view_class.render_template(tpl_name, self.target, 'designer', target=self.target, **kwargs)
 
 
 class SpecificTemplateMixin(TemplateDesignerMixin):
