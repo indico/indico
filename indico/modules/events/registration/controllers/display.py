@@ -37,7 +37,7 @@ from indico.modules.events.registration.util import (get_event_section_data, mak
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
-from indico.modules.events.payment import event_settings as payment_event_settings
+from indico.modules.events.payment import payment_event_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay

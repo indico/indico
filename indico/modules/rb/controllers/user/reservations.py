@@ -24,7 +24,7 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError, NotFoundError
-from indico.modules.rb import settings as rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
                                                   NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)

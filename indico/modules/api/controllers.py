@@ -21,7 +21,7 @@ from werkzeug.exceptions import Forbidden, BadRequest
 
 from indico.core.db import db
 from indico.modules.api import APIMode
-from indico.modules.api import settings as api_settings
+from indico.modules.api import api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile

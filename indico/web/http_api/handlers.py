@@ -34,7 +34,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.api import APIMode
-from indico.modules.api import settings as api_settings
+from indico.modules.api import api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token

@@ -35,7 +35,7 @@ from indico.web.menu import SideMenuSection, SideMenuItem
 logger = Logger.get('rb')
 
 
-settings = SettingsProxy('roombooking', {
+rb_settings = SettingsProxy('roombooking', {
     'assistance_emails': [],
     'vc_support_emails': [],
     'notification_hour': 6,
@@ -62,7 +62,7 @@ def _merge_users(target, source, **kwargs):
     Reservation.find(created_by_id=source.id).update({Reservation.created_by_id: target.id})
     Reservation.find(booked_for_id=source.id).update({Reservation.booked_for_id: target.id})
     Room.find(owner_id=source.id).update({Room.owner_id: target.id})
-    settings.acls.merge_users(target, source)
+    rb_settings.acls.merge_users(target, source)
 
 
 @signals.event.deleted.connect

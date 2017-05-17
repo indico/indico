@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db import db
-from indico.modules.api import settings as api_settings
+from indico.modules.api import api_settings
 from indico.util.console import cformat
 
 from indico_zodbimport import Importer

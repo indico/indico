@@ -1,4 +1,4 @@
-<% from indico.modules.rb import settings as rb_settings %>
+<% from indico.modules.rb import rb_settings %>
 
 <!-- CONTEXT HELP DIVS -->
 <div id="tooltipPool" style="display: none;">

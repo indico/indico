@@ -37,7 +37,7 @@ class APIMode(int, IndicoEnum):
     ALL_SIGNED = 4  # all requests require an api key and a signature
 
 
-settings = SettingsProxy('api', {
+api_settings = SettingsProxy('api', {
     'allow_persistent': False,
     'security_mode': APIMode.KEY.value,
     'cache_ttl': 600,

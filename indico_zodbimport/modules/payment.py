@@ -21,8 +21,7 @@ from functools import partial
 
 from indico.core.db import db
 from indico.modules.events.models.settings import EventSetting
-from indico.modules.events.payment import event_settings as payment_event_settings
-from indico.modules.events.payment import settings as global_settings
+from indico.modules.events.payment import payment_settings, payment_event_settings
 from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.util.console import cformat
 from indico.util.date_time import as_utc
@@ -53,11 +52,11 @@ class PaymentImporter(Importer):
         print cformat("%{white!}migrating global payment settings")
 
         currency_opt = self.zodb_root['plugins']['EPayment']._PluginBase__options['customCurrency']
-        global_settings.delete_all()
+        payment_settings.delete_all()
 
         currencies = [{'code': oc['abbreviation'], 'name': oc['name']} for oc in currency_opt._PluginOption__value]
 
-        global_settings.set('currencies', currencies)
+        payment_settings.set('currencies', currencies)
         for currency in currencies:
             print cformat("%{cyan}saving currency: name='{name}', code={code}").format(**currency)
 
@@ -76,9 +75,9 @@ class PaymentImporter(Importer):
         EventSetting.delete_all(payment_event_settings.module)
         for event in committing_iterator(self._iter_events()):
             old_payment = event._modPay
-            default_conditions = global_settings.get('conditions')
-            default_register_email = global_settings.get('register_email')
-            default_success_email = global_settings.get('success_email')
+            default_conditions = payment_settings.get('conditions')
+            default_register_email = payment_settings.get('register_email')
+            default_success_email = payment_settings.get('success_email')
             register_email = getattr(old_payment, 'receiptMsg', default_register_email)
             success_email = getattr(old_payment, 'successMsg', default_success_email)
             conditions = (getattr(old_payment, 'paymentConditions', default_conditions)

@@ -28,7 +28,7 @@ import click
 from babel import dates
 
 from indico.core.db.sqlalchemy import db
-from indico.modules.rb import settings as rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal

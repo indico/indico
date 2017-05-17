@@ -22,7 +22,7 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import db
-from indico.modules.rb import settings as rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb import logger
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency

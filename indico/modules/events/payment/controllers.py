@@ -21,7 +21,7 @@ from werkzeug.exceptions import NotFound, BadRequest
 
 from indico.core.plugins.controllers import RHPluginDetails
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.payment import settings, event_settings
+from indico.modules.events.payment import payment_settings, payment_event_settings
 from indico.modules.events.payment.forms import AdminSettingsForm, EventSettingsForm
 from indico.modules.events.payment.util import get_payment_plugins, get_active_payment_plugins
 from indico.modules.events.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
@@ -39,9 +39,9 @@ class RHPaymentAdminSettings(RHAdminBase):
     """Payment settings in server admin area"""
 
     def _process(self):
-        form = AdminSettingsForm(obj=FormDefaults(**settings.get_all()))
+        form = AdminSettingsForm(obj=FormDefaults(**payment_settings.get_all()))
         if form.validate_on_submit():
-            settings.set_multi(form.data)
+            payment_settings.set_multi(form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.admin_settings'))
         return WPPaymentAdmin.render_template('admin_settings.html', form=form, plugins=get_payment_plugins().values())
@@ -77,7 +77,7 @@ class RHPaymentSettings(RHPaymentManagementBase):
         enabled_methods = [method for method in methods.itervalues()
                            if method.event_settings.get(self.event_new, 'enabled')]
         return WPPaymentEventManagement.render_template('management/payments.html', self._conf, event=self.event_new,
-                                                        settings=event_settings.get_all(self.event_new),
+                                                        settings=payment_event_settings.get_all(self.event_new),
                                                         methods=methods.items(), enabled_methods=enabled_methods)
 
 
@@ -85,11 +85,11 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
     """Edit payment settings"""
 
     def _process(self):
-        current_event_settings = event_settings.get_all(self.event_new)
-        defaults = FormDefaults(current_event_settings, **settings.get_all())
+        current_event_settings = payment_event_settings.get_all(self.event_new)
+        defaults = FormDefaults(current_event_settings, **payment_settings.get_all())
         form = EventSettingsForm(prefix='payment-', obj=defaults)
         if form.validate_on_submit():
-            event_settings.set_multi(self.event_new, form.data)
+            payment_event_settings.set_multi(self.event_new, form.data)
             flash(_('Settings saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
@@ -174,5 +174,5 @@ class RHPaymentConditions(RHConferenceBaseDisplay):
     EVENT_FEATURE = 'payment'
 
     def _process(self):
-        conditions = event_settings.get(self.event_new, 'conditions')
+        conditions = payment_event_settings.get(self.event_new, 'conditions')
         return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)

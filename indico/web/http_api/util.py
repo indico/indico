@@ -21,7 +21,7 @@ import urllib
 
 from indico.core.config import Config
 from indico.modules.api import APIMode
-from indico.modules.api import settings as api_settings
+from indico.modules.api import api_settings
 
 
 def get_query_parameter(queryParams, keys, default=None, integer=False):
