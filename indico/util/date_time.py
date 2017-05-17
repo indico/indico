@@ -30,9 +30,9 @@ from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from dateutil.relativedelta import relativedelta as _relativedelta
 
 from indico.core.config import Config
+from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.util.i18n import get_current_locale, _, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
-from indico.legacy.common.timezoneUtils import DisplayTZ
 
 
 class relativedelta(_relativedelta):
@@ -441,18 +441,6 @@ def get_month_start(date):
 
 def get_month_end(date):
     return date + relativedelta(day=1, months=+1, days=-1)
-
-
-def round_up_month(date, from_day=1):
-    """Rounds up a date to the next month unless its day is before *from_day*.
-
-    :param date: date object
-    :param from_day: day from which one to round *date* up
-    """
-    if date.day >= from_day:
-        return date + relativedelta(day=1, months=+1)
-    else:
-        return date
 
 
 def strftime_all_years(dt, fmt):
