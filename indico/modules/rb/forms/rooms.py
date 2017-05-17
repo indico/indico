@@ -111,8 +111,12 @@ class RoomForm(IndicoForm):
     is_reservable = BooleanField(_(u'Public'), default=True)
     reservations_need_confirmation = BooleanField(_(u'Confirmations'))
     notification_for_assistance = BooleanField(_(u'Assistance'))
-    notification_before_days = IntegerField(_(u'Send booking reminders X days before'),
-                                            [Optional(), NumberRange(min=1, max=9)], default=1)
+    notification_before_days = IntegerField(_(u'Send booking reminders X days before (single/daily)'),
+                                            [Optional(), NumberRange(min=1, max=30)])
+    notification_before_days_weekly = IntegerField(_(u'Send booking reminders X days before (weekly)'),
+                                                   [Optional(), NumberRange(min=1, max=30)])
+    notification_before_days_monthly = IntegerField(_(u'Send booking reminders X days before (monthly)'),
+                                                    [Optional(), NumberRange(min=1, max=30)])
     notifications_enabled = BooleanField(_(u'Reminders enabled'), default=True)
     booking_limit_days = IntegerField(_(u'Maximum length of booking (days)'), [Optional(), NumberRange(min=1)])
     owner = PrincipalField(_(u'Owner'), [DataRequired()], allow_external=True)
