@@ -122,7 +122,7 @@ class RoomForm(IndicoForm):
     owner = PrincipalField(_(u'Owner'), [DataRequired()], allow_external=True)
     key_location = StringField(_(u'Where is key?'))
     telephone = StringField(_(u'Telephone'))
-    capacity = IntegerField(_(u'Capacity'), [DataRequired(), NumberRange(min=1)], default=20)
+    capacity = IntegerField(_(u'Capacity'), [Optional(), NumberRange(min=1)], default=20)
     division = StringField(_(u'Department'))
     surface_area = IntegerField(_(u'Surface area'), [Optional(), NumberRange(min=0)])
     max_advance_days = IntegerField(_(u'Maximum advance time for bookings'), [Optional(), NumberRange(min=1)])
