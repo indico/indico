@@ -24,7 +24,9 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
+from indico.legacy.PDFinterface.conference import ContribsToPDF, ContributionBook
 from indico.legacy.webinterface.rh.base import check_event_locked
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -46,7 +48,7 @@ from indico.modules.events.contributions.util import (contribution_type_row, mak
                                                       generate_spreadsheet_from_contributions)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogRealm, EventLogKind
-from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
@@ -61,8 +63,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from indico.legacy.PDFinterface.conference import ContribsToPDF, ContributionBook
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _render_subcontribution_list(contrib):

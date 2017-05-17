@@ -24,7 +24,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.management.controllers import RHContributionPersonListMixin
+from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
                                                                    RHManageSessionsActionsBase)
 from indico.modules.events.sessions.forms import SessionForm, SessionProtectionForm, MeetingSessionBlockForm
