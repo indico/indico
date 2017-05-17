@@ -88,14 +88,9 @@ def notify_rejection(occurrence):
 
 
 @email_sender
-def notify_upcoming_occurrence(occurrence):
-    if occurrence.start_dt.date() < date.today():
-        raise ValueError("This reservation occurrence started in the past")
-
-    reservation_user = occurrence.reservation.booked_for_user
+def notify_upcoming_occurrences(user, occurrences):
     subject = 'Reservation reminder'
     text = render_template('rb/emails/reservations/reminders/upcoming_occurrence.txt',
-                           occurrence=occurrence,
-                           owner=reservation_user,
-                           RepeatFrequency=RepeatFrequency)
-    return make_email(to_list={reservation_user.email}, subject=subject, body=text)
+                           occurrences=occurrences,
+                           user=user)
+    return make_email(to_list={user.email}, subject=subject, body=text)

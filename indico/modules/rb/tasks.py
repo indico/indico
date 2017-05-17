@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime
+from datetime import datetime, date
+from itertools import groupby
+from operator import attrgetter
 
 from celery.schedules import crontab
+from sqlalchemy.orm import contains_eager
 
 from indico.core.celery import celery
 from indico.core.config import Config
@@ -27,7 +30,22 @@ from indico.modules.rb import rb_settings, logger
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrence
+from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
+
+
+def _make_occurrence_date_filter():
+    _default = rb_settings.get('notification_before_days')
+    _default_weekly = rb_settings.get('notification_before_days_weekly')
+    _default_monthly = rb_settings.get('notification_before_days_monthly')
+    notification_before_days_room = db.case({RepeatFrequency.WEEK.value: Room.notification_before_days_weekly,
+                                             RepeatFrequency.MONTH.value: Room.notification_before_days_monthly},
+                                            else_=Room.notification_before_days, value=Reservation.repeat_frequency)
+    notification_before_days_default = db.case({RepeatFrequency.WEEK.value: _default_weekly,
+                                                RepeatFrequency.MONTH.value: _default_monthly},
+                                               else_=_default, value=Reservation.repeat_frequency)
+    notification_before_days = db.func.coalesce(notification_before_days_room, notification_before_days_default)
+    days_until_occurrence = db.cast(ReservationOccurrence.start_dt, db.Date) - date.today()
+    return days_until_occurrence == notification_before_days
 
 
 @celery.periodic_task(name='roombooking_occurrences', run_every=crontab(minute='15', hour='8'))
@@ -39,28 +57,30 @@ def roombooking_occurrences():
         logger.info('Notifications not sent because they are globally disabled')
         return
 
-    # TODO: adapt this
-    raise NotImplementedError('needs to be updated')
-
-    occurrences = ReservationOccurrence.find(
-        Room.is_active,
-        Room.notifications_enabled,
-        Reservation.is_accepted,
-        Reservation.booked_for_id.isnot(None),
-        Reservation.repeat_frequency != RepeatFrequency.WEEK,
-        ReservationOccurrence.is_valid,
-        ReservationOccurrence.start_dt >= datetime.now(),
-        ~ReservationOccurrence.notification_sent,
-        # TODO: filter for notification delay
-        # TODO: proper sqlalchemy instead of find()
-        _join=[Reservation, Room]
-    )
+    occurrences = (ReservationOccurrence.query
+                   .join(ReservationOccurrence.reservation)
+                   .join(Reservation.room)
+                   .filter(Room.is_active,
+                           Room.notifications_enabled,
+                           Reservation.is_accepted,
+                           Reservation.booked_for_id.isnot(None),
+                           ReservationOccurrence.is_valid,
+                           ReservationOccurrence.start_dt >= datetime.now(),
+                           ~ReservationOccurrence.notification_sent,
+                           _make_occurrence_date_filter())
+                   .order_by(Reservation.booked_for_id, Room.id)
+                   .options(contains_eager('reservation').contains_eager('room'))
+                   .all())
 
     try:
-        for occ in occurrences:
-            notify_upcoming_occurrence(occ)
-            occ.notification_sent = True
-            if occ.reservation.repeat_frequency == RepeatFrequency.DAY:
-                occ.reservation.occurrences.update({'notification_sent': True})
+        for user, user_occurrences in groupby(occurrences, key=attrgetter('reservation.booked_for_user')):
+            user_occurrences = list(user_occurrences)
+            notify_upcoming_occurrences(user, user_occurrences)
+            for occ in user_occurrences:
+                occ.notification_sent = True
+                if occ.reservation.repeat_frequency == RepeatFrequency.DAY:
+                    future_occurrences_query = (occ.reservation.occurrences
+                                                .filter(ReservationOccurrence.start_dt >= datetime.now()))
+                    future_occurrences_query.update({'notification_sent': True})
     finally:
         db.session.commit()
