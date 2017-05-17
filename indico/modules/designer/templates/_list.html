@@ -132,7 +132,7 @@
 
     <section class="custom-template-list {{ 'hide-if-locked' if not templates }}">
         <div class="flexrow f-a-center f-j-space-between">
-            <h3>Custom templates</h3>
+            <h3>{% trans %}Custom templates{% endtrans %}</h3>
             <button class="i-button highlight icon-plus hide-if-locked"
                     data-href="{{ url_for('.add_template', target) }}"
                     data-title="{% trans %}Add a new blank designer template{% endtrans %}"
