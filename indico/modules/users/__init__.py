@@ -43,7 +43,7 @@ user_settings = UserSettingsProxy('users', {
     'show_past_events': False,
     'name_format': NameFormat.first_last,
     'use_previewer_pdf': True,
-    'synced_fields': None,  # None to synchronise all fields, empty set to not synchronize
+    'synced_fields': None,  # None to synchronize all fields, empty set to not synchronize
     'suggest_categories': False  # whether the user should receive category suggestions
 }, converters={
     'name_format': EnumConverter(NameFormat)

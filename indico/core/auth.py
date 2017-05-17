@@ -59,7 +59,7 @@ class IndicoMultipass(Multipass):
         """The keys to be synchronized
 
         This is the set of keys to be synced to user data.
-        The ``email`` can never be synchronised.
+        The ``email`` can never be synchronized.
         """
         provider = self.sync_provider
         if provider is None:
