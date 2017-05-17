@@ -13,6 +13,7 @@ API reference
     Event feature <feature.rst>
     Event layout <layout.rst>
     Event log <log.rst>
+    Event management <event_management.rst>
     Event note <note.rst>
     Event paper <paper.rst>
     Event payment <payment.rst>
