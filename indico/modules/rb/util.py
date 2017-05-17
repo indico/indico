@@ -92,3 +92,11 @@ def get_default_booking_interval(duration=90, precision=15, force_today=False):
         start_dt = work_start + timedelta(days=1)
         end_dt = start_dt + timedelta(minutes=duration)
     return start_dt, end_dt, date_changed
+
+
+def first_occurrence_date(occurrence):
+    from indico.modules.rb.models.reservations import RepeatFrequency
+    if occurrence.reservation.repeat_frequency == RepeatFrequency.DAY:
+        return occurrence.reservation.occurrences[0].start_dt.date()
+    else:
+        return occurrence.start_dt.date()
