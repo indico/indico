@@ -26,8 +26,6 @@ class SettingsForm(IndicoForm):
     admin_principals = PrincipalListField(_(u'Administrators'), groups=True)
     authorized_principals = PrincipalListField(_(u'Authorized users/groups'), groups=True)
     assistance_emails = EmailListField(_(u'Assistance email addresses (one per line)'))
-    notification_hour = IntegerField(_(u'Hour at which booking reminders should be sent'),
-                                     [InputRequired(), NumberRange(0, 23)])
     notification_before_days = IntegerField(_(u'Send booking reminders X days before'),
                                             [InputRequired(), NumberRange(min=1, max=9)])
     notifications_enabled = BooleanField(_(u'Reminders enabled'))

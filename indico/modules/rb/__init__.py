@@ -38,7 +38,6 @@ logger = Logger.get('rb')
 rb_settings = SettingsProxy('roombooking', {
     'assistance_emails': [],
     'vc_support_emails': [],
-    'notification_hour': 6,
     'notification_before_days': 1,
     'notifications_enabled': True,
     'booking_limit': 365

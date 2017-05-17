@@ -144,7 +144,6 @@ class RoomBookingImporter(Importer):
                   if is_valid_mail(email, False)]
         rb_settings.set('assistance_emails', emails)
         # Simple settings
-        rb_settings.set('notification_hour', opts['notificationHour']._PluginOption__value)
         rb_settings.set('notification_before_days', opts['notificationBefore']._PluginOption__value)
         db.session.commit()
 
