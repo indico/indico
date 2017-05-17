@@ -82,7 +82,7 @@ class RHOAuthAdmin(RHAdminBase):
 
     def _process(self):
         applications = OAuthApplication.find().order_by(db.func.lower(OAuthApplication.name)).all()
-        return WPOAuthAdmin.render_template('apps.html', 'applications', applications=applications)
+        return WPOAuthAdmin.render_template('apps.html', applications=applications)
 
 
 class RHOAuthAdminApplicationBase(RHAdminBase):
@@ -101,7 +101,7 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
             logger.info("Application %s updated by %s", self.application, session.user)
             flash(_("Application {} was modified").format(self.application.name), 'success')
             return redirect(url_for('.apps'))
-        return WPOAuthAdmin.render_template('app_details.html', 'applications', application=self.application, form=form)
+        return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form)
 
 
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
@@ -127,7 +127,7 @@ class RHOAuthAdminApplicationNew(RHAdminBase):
             logger.info("Application %s created by %s", application, session.user)
             flash(_("Application {} registered successfully").format(application.name), 'success')
             return redirect(url_for('.app_details', application))
-        return WPOAuthAdmin.render_template('app_new.html', 'applications', form=form)
+        return WPOAuthAdmin.render_template('app_new.html', form=form)
 
 
 class RHOAuthAdminApplicationReset(RHOAuthAdminApplicationBase):

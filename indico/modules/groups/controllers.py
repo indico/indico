@@ -56,7 +56,7 @@ class RHGroups(RHAdminBase):
             search_results.sort(key=attrgetter('provider', 'name'))
         provider_titles = {p.name: p.title for p in multipass.identity_providers.itervalues()}
         provider_titles[None] = _('Local')
-        return WPGroupsAdmin.render_template('groups.html', 'groups', groups=groups, providers=providers, form=form,
+        return WPGroupsAdmin.render_template('groups.html', groups=groups, providers=providers, form=form,
                                              search_results=search_results, provider_titles=provider_titles)
 
 
@@ -77,7 +77,7 @@ class RHGroupDetails(RHGroupBase):
     def _process(self):
         group = self.group
         provider_title = multipass.identity_providers[group.provider].title if not group.is_local else _('Local')
-        return WPGroupsAdmin.render_template('group_details.html', 'groups', group=group, provider_title=provider_title)
+        return WPGroupsAdmin.render_template('group_details.html', group=group, provider_title=provider_title)
 
 
 class RHGroupMembers(RHGroupBase):
@@ -115,7 +115,7 @@ class RHGroupEdit(RHAdminBase):
             db.session.flush()
             flash(msg.format(name=self.group.name), 'success')
             return redirect(url_for('.groups'))
-        return WPGroupsAdmin.render_template('group_edit.html', 'groups', group=existing_group, form=form)
+        return WPGroupsAdmin.render_template('group_edit.html', group=existing_group, form=form)
 
 
 class RHLocalGroupBase(RHAdminBase):

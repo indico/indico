@@ -52,7 +52,7 @@ class RHPlugins(RHPluginsBase):
         ordered_categories = OrderedDict(sorted(categories.items()))
         if other:
             ordered_categories[PluginCategory.other] = other
-        return WPPlugins.render_template('index.html', 'plugins', categorized_plugins=ordered_categories)
+        return WPPlugins.render_template('index.html', categorized_plugins=ordered_categories)
 
 
 class RHPluginDetails(RHPluginsBase):
@@ -74,5 +74,5 @@ class RHPluginDetails(RHPluginsBase):
                     plugin.settings.set_multi(form.data)
                     flash(_('Settings saved ({0})').format(plugin.title), 'success')
                     return redirect_or_jsonify(request.url)
-            return WPPlugins.render_template('details.html', 'plugins', plugin=plugin, form=form,
+            return WPPlugins.render_template('details.html', plugin=plugin, form=form,
                                              back_url=url_for(self.back_button_endpoint))

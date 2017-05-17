@@ -26,8 +26,8 @@ from indico.web.menu import get_menu_item
 class WPAdmin(WPJinjaMixin, WPMainBase):
     """Base class for admin pages."""
 
-    def __init__(self, rh, active_menu_item, **kwargs):
-        kwargs['active_menu_item'] = active_menu_item
+    def __init__(self, rh, active_menu_item=None, **kwargs):
+        kwargs['active_menu_item'] = active_menu_item or self.sidemenu_option
         WPMainBase.__init__(self, rh, **kwargs)
 
     def _getNavigationDrawer(self):

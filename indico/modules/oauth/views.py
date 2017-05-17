@@ -26,7 +26,7 @@ class WPOAuthJinjaMixin(WPJinjaMixin):
 
 
 class WPOAuthAdmin(WPOAuthJinjaMixin, WPAdmin):
-    pass
+    sidemenu_option = 'applications'
 
 
 class WPOAuthUserProfile(WPOAuthJinjaMixin, WPUser):

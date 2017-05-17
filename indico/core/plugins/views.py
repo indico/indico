@@ -21,3 +21,4 @@ from indico.modules.admin.views import WPAdmin
 
 class WPPlugins(WPAdmin):
     template_prefix = 'plugins/'
+    sidemenu_option = 'plugins'

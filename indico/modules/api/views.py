@@ -22,6 +22,7 @@ from indico.modules.users.views import WPUser
 
 class WPAPIAdmin(WPAdmin):
     template_prefix = 'api/'
+    sidemenu_option = 'api'
 
 
 class WPAPIUserProfile(WPUser):
