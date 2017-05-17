@@ -11,16 +11,18 @@
                     {% block display_view_button %}{% endblock %}
                 </div>
             {% endif %}
-            <div class="content-column">
-                <div class="banner {% block banner_class %}{% endblock %}">
-                    <div class="title">
-                        {% block banner_title %}{% endblock %}
-                    </div>
-                    <div class="action-menu">
-                        {% block banner_actions %}{% endblock %}
+            {% block banner %}
+                <div class="content-column">
+                    <div class="banner {% block banner_class %}{% endblock %}">
+                        <div class="title">
+                            {% block banner_title %}{% endblock %}
+                        </div>
+                        <div class="action-menu">
+                            {% block banner_actions %}{% endblock %}
+                        </div>
                     </div>
                 </div>
-            </div>
+            {% endblock %}
         </div>
     {% endif %}
     <div class="layout-side-menu">
@@ -30,7 +32,10 @@
             </div>
         {% endif %}
         <div class="content-column">
-            {% include 'flashed_messages.html' %}
+            {% block before_page %}{% endblock %}
+            {% block flashed_messages %}
+                {%- include 'flashed_messages.html' -%}
+            {% endblock %}
             {{ super() }}
         </div>
     </div>

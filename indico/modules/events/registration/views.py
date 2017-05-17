@@ -27,7 +27,7 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
 
     @property
     def sidemenu_option(self):
-        if self._conf.as_event.type_ != EventType.conference:
+        if self.event.type_ != EventType.conference:
             regform = self._kwargs.get('regform')
             if not regform:
                 registration = self._kwargs.get('registration')

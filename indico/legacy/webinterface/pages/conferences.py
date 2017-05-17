@@ -18,22 +18,23 @@ from __future__ import print_function
 
 import os
 
-from flask import session, render_template, request
+from flask import session, render_template, request, render_template_string
 
 from indico.core.config import Config
 from indico.legacy.common.utils import isStringHTML
 from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.common.tools import strip_ml_tags, escape_html
-from indico.legacy.webinterface.pages import main, base
+from indico.legacy.webinterface.pages import base
 from indico.legacy.webinterface.pages.base import WPDecorated
-from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.auth.util import url_for_logout
 from indico.modules.core.settings import social_settings, core_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
+from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.models.events import EventType
 from indico.util.date_time import format_date
+from indico.util.event import unify_event_args
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
 from indico.util.string import encode_if_unicode, to_unicode, truncate
@@ -314,32 +315,24 @@ class WConfDisplayBodyBase(wcomponents.WTemplated):
         return entry.localized_title
 
 
-class WPConferenceModifBase(main.WPMainBase):
-    def __init__(self, rh, conference, **kwargs):
-        conference = getattr(conference, 'as_legacy', conference)
-        main.WPMainBase.__init__(self, rh, **kwargs)
-        self._navigationTarget = self._conf = conference
+class WPConferenceModifBase(WPEventManagement):
+    """Base class for event management pages without Jinja inheritance.
 
-    def getJSFiles(self):
-        return (main.WPMainBase.getJSFiles(self) +
-                self._includeJSPackage('Management') +
-                self._asset_env['modules_event_cloning_js'].urls() +
-                self._asset_env['modules_event_management_js'].urls())
+    Do not use this for anything new.  Instead, use `WPEventManagement`
+    directly (or inherit from it) and inherit the associated Jinja template
+    from ``events/management/base.html``.
+    """
 
-    def _getHeader(self):
-        return render_header(category=self._conf.as_event.category, local_tz=self._conf.as_event.timezone,
-                             force_local_tz=True)
+    @unify_event_args
+    def __init__(self, rh, event_, **kwargs):
+        WPEventManagement.__init__(self, rh, event_, **kwargs)
+        self._conf = self.event.as_legacy
 
-    def _getNavigationDrawer(self):
-        pars = {"target": self._conf.as_event, "isModif": True}
-        return wcomponents.WNavigationDrawer( pars, bgColor="white" )
-
-    def _applyFrame(self, body):
-        from indico.modules.events.management.views import render_event_management_frame
-        return render_event_management_frame(self._conf.as_event, body, self.sidemenu_option)
-
-    def _getBody( self, params ):
-        return self._applyFrame( self._getPageContent( params ) )
+    def _getBody(self, params):
+        # Legacy handling for pages that do not use Jinja inheritance.
+        tpl = u"{% extends 'events/management/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
+        body = to_unicode(self._getPageContent(params))
+        return render_template_string(tpl, _body=body, **self._kwargs)
 
     def _getTabContent(self, params):
         raise NotImplementedError

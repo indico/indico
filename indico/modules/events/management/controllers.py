@@ -27,6 +27,8 @@ from werkzeug.exceptions import Forbidden, NotFound, BadRequest
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 from indico.modules.categories.models.categories import Category
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events import EventLogRealm, EventLogKind
@@ -56,8 +58,6 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template, jsonify_data, jsonify_form, url_for_index
-from indico.legacy.common.cache import GenericCache
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 poster_cache = GenericCache('poster-printing')
@@ -159,7 +159,7 @@ class RHEventSettings(RHManageEventBase):
         RHManageEventBase._checkProtection(self)  # mainly to trigger the legacy "event locked" check
 
     def _process(self):
-        return WPEventSettings.render_template('settings.html', self._conf, event=self.event_new)
+        return WPEventSettings.render_template('settings.html', self.event_new, 'settings')
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -361,7 +361,7 @@ class RHEventProtection(RHManageEventBase):
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event_new))
-        return WPEventProtection.render_template('event_protection.html', self._conf, form=form, event=self.event_new)
+        return WPEventProtection.render_template('event_protection.html', self.event_new, 'protection', form=form)
 
     def _get_defaults(self):
         acl = {p.principal for p in self.event_new.acl_entries if p.read_access}

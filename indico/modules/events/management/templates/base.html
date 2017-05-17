@@ -1,0 +1,51 @@
+{% extends 'layout/management_page.html' %}
+{% from 'events/management/_management_frame.html' import render_event_management_header_right %}
+{% from 'message_box.html' import message_box %}
+
+
+{% block banner %}
+    <div class="content-column" id="event-management-header-right">
+        {{ render_event_management_header_right(event, base_layout_params.event_types) }}
+    </div>
+{% endblock %}
+
+
+{% block side_menu %}
+    <div id="event-side-menu">
+        {{ render_sidemenu('event-management-sidemenu', event=event, active_item=base_layout_params.active_menu_item) }}
+    </div>
+{% endblock %}
+
+
+{% block display_view_button %}
+    <div class="group">
+        <a href="{{ event.url }}"
+           class="icon-switchon highlight i-button"
+           title="{% trans %}See the display page of the event{% endtrans %}">
+            {%- trans %}Switch to display view{% endtrans -%}
+        </a>
+    </div>
+{% endblock %}
+
+
+{% block before_page %}
+    {% if event.is_locked %}
+        {% call message_box('warning', fixed_width=true) %}
+            {% trans %}This event has been locked and cannot be modified.{% endtrans %}
+        {% endcall %}
+    {% endif %}
+{% endblock %}
+
+
+{% block flashed_messages -%}
+    {% with fixed_width=true %}
+        {%- include 'flashed_messages.html' -%}
+    {% endwith %}
+{%- endblock %}
+
+
+{% block page %}
+    <div class="{{ 'event-locked' if event.is_locked }}">
+        {{ super() }}
+    </div>
+{% endblock %}

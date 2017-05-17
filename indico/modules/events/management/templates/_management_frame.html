@@ -5,10 +5,12 @@
 {%- macro _render_clone_info(event) -%}
     {% set cloned_from = event.cloned_from %}
     {% if cloned_from and not cloned_from.is_deleted %}
-        {% set link_start %}
+        {% set link_start -%}
             <a href="{{ url_for('event_management.settings', cloned_from) }}" title="{{ cloned_from.title }}">
-        {% endset %}
-        {% set link_end = '</a>'|safe %}
+        {%- endset %}
+        {% set link_end -%}
+            </a>
+        {%- endset %}
         {% set date = cloned_from.start_dt_local | format_date('medium', timezone=cloned_from.tzinfo) %}
 
         {% trans name=event.creator.full_name, email=event.creator.email -%}
@@ -43,38 +45,5 @@
             </div>
         </div>
         {{ render_action_menu(event, event_types) }}
-    </div>
-{% endmacro %}
-
-
-{% macro render_management_frame(event, body, active_menu_item, event_types) %}
-    <div class="layout-side-menu">
-        <div class="menu-column">
-            <div class="group">
-                <a href="{{ event.url }}" class="icon-switchon highlight i-button"
-                   title="{% trans %}See the display page of the event{% endtrans %}">
-                    {%- trans %}Switch to display view{% endtrans -%}
-                </a>
-            </div>
-        </div>
-        <div class="content-column" id="event-management-header-right">
-            {{ render_event_management_header_right(event, event_types) }}
-        </div>
-    </div>
-    <div class="layout-side-menu">
-        <div class="menu-column">
-            <div id="event-side-menu" class="menu-column">
-                {{ render_sidemenu('event-management-sidemenu', active_item=active_menu_item, event=event) }}
-            </div>
-        </div>
-        <div class="content-column {{ 'event-locked' if event.is_locked }}">
-            {% if event.is_locked %}
-                {% call message_box('warning', fixed_width=true) %}
-                    {% trans %}This event has been locked and cannot be modified.{% endtrans %}
-                {% endcall %}
-            {% endif %}
-            {% include 'flashed_messages.html' %}
-            {{ body | safe }}
-        </div>
     </div>
 {% endmacro %}
