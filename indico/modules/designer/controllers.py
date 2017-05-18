@@ -49,7 +49,7 @@ TEMPLATE_DATA_JSON_SCHEMA = {
             'type': 'object',
             'properties': {
                 'position': {'type': 'string'},
-                'image_id': {'type': 'integer'}
+                'image_id': {'type': 'string'}
             }
         },
         'items': {
@@ -227,8 +227,22 @@ class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProt
 
 class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_GET(self):
+        bs_template = self.template.backside_template
+        template_data = {
+            'title': self.template.title,
+            'data': self.template.data,
+            'background_url': self.template.background_image.download_url if self.template.background_image else None
+        }
+        backside_template_data = {
+            'id': bs_template.id if bs_template else None,
+            'title': bs_template.title if bs_template else None,
+            'data': bs_template.data if bs_template else None,
+            'background_url': (bs_template.background_image.download_url
+                               if bs_template and bs_template.background_image else None)
+        }
         return self._render_template('template.html', template=self.template, placeholders=get_placeholder_options(),
-                                     config=DEFAULT_CONFIG[self.template.type], owner=self.target)
+                                     config=DEFAULT_CONFIG[self.template.type], owner=self.target,
+                                     template_data=template_data, backside_template_data=backside_template_data)
 
     def _process_POST(self):
         self.template.data = dict(**request.json['template'])

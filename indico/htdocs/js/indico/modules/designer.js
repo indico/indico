@@ -28,6 +28,7 @@
     // Pointer for the jQuery-UI tabs controller
     var editing = false;
     var items = {};
+    var backsideItems = {};
     var itemTitles = {};
 
     var DEFAULT_PIXEL_CM = 50;
@@ -105,10 +106,14 @@
         return item;
     }
 
-    function createItemFromObject(obj) {
+    function createItemFromObject(obj, isBackside) {
         delete obj.id;
         var newItem = _.extend(createItem(), obj);
-        items[newItem.id] = newItem;
+        if (!isBackside) {
+            items[newItem.id] = newItem;
+        } else {
+            backsideItems[newItem.id] = newItem;
+        }
 
         return newItem;
     }
@@ -122,19 +127,23 @@
     }
 
     // This function creates a new draggable div
-    function createDiv(item) {
+    function createDiv(item, isBackside) {
         // Each div has:
         // -a unique id, which is a natural number (0, 1, 2, ...)
         // -a type (stored in the name attribute)
         // -absolute x,y position
         // -an inner HTML with its content
-        var templateSide = '.template-side.front';
+        var templateSide = isBackside ? '.template-side.back' : '.template-side.front';
         var newDiv = $('<div/>').css({
             position: 'absolute',
             left: item.x + 'px',
             top: item.y + 'px',
             zIndex: itemIdCounter + 10
         }).data('id', item.id).appendTo(templateSide);
+
+        if (isBackside) {
+            return newDiv;
+        }
 
         newDiv.draggable({
             containment: templateSide,
@@ -295,21 +304,22 @@
 
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
-    function displayItems() {
-        $.each(items, function(i, item) {
-            var newDiv = createDiv(item);
+    function displayItems(isBackside) {
+        var itemsList = isBackside ? backsideItems : items;
+        $.each(itemsList, function(i, item) {
+            var newDiv = createDiv(item, isBackside);
             newDiv.css({
                 left: zoom(item.x) + 'px',
                 top: zoom(item.y) + 'px'
             });
             newDiv.append(item.toHTML());
-            if (item.selected) {
+            if (item.selected && !isBackside) {
                 selectItem(newDiv.find('.designer-item'));
             }
         });
     }
 
-    function changeTemplateSize(template) {
+    function changeTemplateSize(template, backsideTemplate) {
         var tpl = $('.template-container');
         tpl.width($('.template-width').val() * pixelsPerCm);
         tpl.height($('.template-height').val() * pixelsPerCm);
@@ -318,7 +328,7 @@
         templateDimensions = new Dimensions($('.template-width').val() * DEFAULT_PIXEL_CM,
                                             $('.template-height').val() * DEFAULT_PIXEL_CM);
         updateRulers();
-        displayBackground(template);
+        displayAllBackgrounds(template, backsideTemplate);
     }
 
     function moveSelectedItem(direction) {
@@ -414,7 +424,7 @@
             }
         })[attribute]();
 
-        div.html(selectedItem.toHTML());
+        div.replaceWith(selectedItem.toHTML());
     }
 
     function save(template) {
@@ -433,7 +443,7 @@
                 }),
                 background: {
                     position: template.data.background.position,
-                    image_id: template.data.background.image_id
+                    image_id: template.data.background.image_id.toString()
                 }
             },
             title: $('.js-template-name').val(),
@@ -498,8 +508,9 @@
         }
     }
 
-    function displayBackground(template) {
-        var $backgroundElement = $('.template-side.front .background-image');
+    function displayBackground(template, isBackside) {
+        var templateSideClass = isBackside ? '.template-side.back' : '.template-side.front';
+        var $backgroundElement = $(templateSideClass).find('.background-image');
         var backgroundPos = template.data.background.position;
 
         $backgroundElement.attr({
@@ -514,7 +525,14 @@
         }).on('load', function() {
             $('#loadingIcon').hide();
             setBackgroundPos($(this), backgroundPos);
-        }).appendTo('.template-side.front');
+        }).appendTo(templateSideClass);
+    }
+
+    function displayAllBackgrounds(template, backsideTemplate) {
+        displayBackground(template);
+        if (backsideTemplate.background_url) {
+            displayBackground(backsideTemplate, true);
+        }
     }
 
     function removeBackground(template) {
@@ -531,7 +549,19 @@
                   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
-    global.setupDesigner = function setupDesigner(template, config, placeholders) {
+    function displayTemplate(template, backside) {
+        if (template.data) {
+            template.data.items.forEach(function(item) {
+                createItemFromObject(item, backside);
+            });
+            displayItems(backside);
+        }
+        if (backside && template.data && (template.data.items.length || template.background_url)) {
+            $('.back-side-placeholder').hide();
+        }
+    }
+
+    global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
         editing = !!template;
         itemTitles = _.partial(_.extend, {}).apply(null, _.map(_.values(placeholders), _.property('options')));
 
@@ -542,6 +572,8 @@
         // Number of pixels, both horizontal and vertical, that are between the top left corner
         // and the position where items are inserted
         initialOffset = pixelsPerCm;
+
+        backsideTemplateID = backsideTemplate.id;
 
         // Item class
         $(document).ready(function() {
@@ -584,7 +616,7 @@
                         return;
                     }
                     template.background_url = data.image_url;
-                    template.data.background.image_id = data.image_id;
+                    template.data.background.image_id = data.image_id.toString();
                     displayBackground(template);
                     $('.template-side.front').trigger('indico:backgroundChanged');
                 }
@@ -633,7 +665,7 @@
             });
 
             $('.template-width, .template-height').on('keyup click', function() {
-                changeTemplateSize(template);
+                changeTemplateSize(template, backsideTemplate);
             });
 
             $('.js-element-width').on('keyup click', function() {
@@ -650,7 +682,7 @@
                 if ($selectedOption.val() !== 'custom') {
                     $('.template-width').val($selectedOption.data('width'));
                     $('.template-height').val($selectedOption.data('height'));
-                    changeTemplateSize(template);
+                    changeTemplateSize(template, backsideTemplate);
                 }
                 $('.js-template-dimension').prop('disabled', $selectedOption.val() !== 'custom');
             });
@@ -725,13 +757,8 @@
         $('.template-height').val(templateDimensions.height / pixelsPerCm);
 
         updateRulers(); // creates the initial rulers
-        changeTemplateSize(template);
-
-        template.data.items.forEach(function(item) {
-            createItemFromObject(item);
-        });
-
-        // This function displays the items, if any have been loaded, on the screen
-        displayItems();
+        changeTemplateSize(template, backsideTemplate);
+        displayTemplate(template);
+        displayTemplate(backsideTemplate, true);
     };
 })(window);
