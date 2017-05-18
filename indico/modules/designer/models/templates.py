@@ -70,8 +70,12 @@ class DesignerTemplate(db.Model):
         db.ForeignKey('indico.designer_image_files.id'),
         index=False,
         nullable=True
+      )
+    backside_template_id = db.Column(
+        db.ForeignKey('indico.designer_templates.id'),
+        index=True,
+        nullable=True
     )
-
     category = db.relationship(
         'Category',
         lazy=True,
@@ -95,6 +99,11 @@ class DesignerTemplate(db.Model):
         lazy=True,
         foreign_keys=background_image_id,
         post_update=True
+    )
+    backside_template = db.relationship(
+        'DesignerTemplate',
+        lazy=True,
+        remote_side=id
     )
 
     # relationship backrefs:
