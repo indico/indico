@@ -76,6 +76,16 @@ def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):
         )
 
 
+def _notify_occurrences(user, occurrences):
+    notify_upcoming_occurrences(user, occurrences)
+    for occ in occurrences:
+        occ.notification_sent = True
+        if occ.reservation.repeat_frequency == RepeatFrequency.DAY:
+            future_occurrences_query = (occ.reservation.occurrences
+                                        .filter(ReservationOccurrence.start_dt >= datetime.now()))
+            future_occurrences_query.update({'notification_sent': True})
+
+
 @celery.periodic_task(name='roombooking_occurrences', run_every=crontab(minute='15', hour='8'))
 def roombooking_occurrences(debug=False):
     if not Config.getInstance().getIsRoomBookingActive():
@@ -105,14 +115,8 @@ def roombooking_occurrences(debug=False):
             user_occurrences = list(user_occurrences)
             if debug:
                 _print_occurrences(user, user_occurrences)
-                continue
-            notify_upcoming_occurrences(user, user_occurrences)
-            for occ in user_occurrences:
-                occ.notification_sent = True
-                if occ.reservation.repeat_frequency == RepeatFrequency.DAY:
-                    future_occurrences_query = (occ.reservation.occurrences
-                                                .filter(ReservationOccurrence.start_dt >= datetime.now()))
-                    future_occurrences_query.update({'notification_sent': True})
+            else:
+                _notify_occurrences(user, user_occurrences)
     finally:
         if not debug:
             db.session.commit()
