@@ -1,0 +1,38 @@
+{% extends 'rb/emails/base_email.html' %}
+
+
+{% block header_recipient %}{{ user.first_name }}{% endblock %}
+{% block subject %}Reservation reminder{% endblock %}
+
+
+{% block body -%}
+    {%- if occurrences | length == 1 -%}
+        This is a reminder about a booking under your name:<br>
+    {%- else -%}
+        This is a reminder about bookings under your name:<br>
+    {%- endif %}
+    <ul>
+        {% for occurrence in occurrences %}
+            <li style="{{ 'margin-top: 2em;' if not loop.first }}">
+                {{ _render_occurrence(occurrence) }}
+            </li>
+        {%- endfor -%}
+    </ul>
+{%- endblock %}
+
+
+{% macro _render_time(occurrence) -%}
+    {{ occurrence.start_dt | format_time(locale='en_GB') }} - {{ occurrence.end_dt | format_time(locale='en_GB') }}
+{%- endmacro %}
+
+
+{% macro _render_occurrence(occurrence) -%}
+    {% set reservation = occurrence.reservation -%}
+
+    <strong>{{ occurrence.start_dt | format_date(locale='en_GB') }}</strong> (<strong>{{ _render_time(occurrence) }}</strong>)<br>
+    Room: <strong>{{ reservation.room.full_name }}</strong><br>
+    Reason: <strong>{{ reservation.booking_reason }}</strong><br>
+    <br>
+    If you do not need to use the room, please <a href="{{ reservation.details_url }}">cancel the
+    {{ 'occurrence' if reservation.repeat_frequency.name != 'NEVER' else 'reservation' }} in Indico</a>.
+{%- endmacro %}

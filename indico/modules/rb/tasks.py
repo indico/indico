@@ -106,7 +106,7 @@ def roombooking_occurrences(debug=False):
                            ReservationOccurrence.start_dt >= datetime.now(),
                            ~ReservationOccurrence.notification_sent,
                            _make_occurrence_date_filter())
-                   .order_by(Reservation.booked_for_id, Room.id)
+                   .order_by(Reservation.booked_for_id, ReservationOccurrence.start_dt, Room.id)
                    .options(contains_eager('reservation').contains_eager('room'))
                    .all())
 

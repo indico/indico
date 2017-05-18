@@ -14,14 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import date
-
-from flask import render_template
-
 from indico.core.notifications import email_sender, make_email
-from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.notifications.reservations import ReservationNotification
 from indico.util.date_time import format_datetime
+from indico.web.flask.templating import get_template_module
 
 
 class ReservationOccurrenceNotification(ReservationNotification):
@@ -89,8 +85,6 @@ def notify_rejection(occurrence):
 
 @email_sender
 def notify_upcoming_occurrences(user, occurrences):
-    subject = 'Reservation reminder'
-    text = render_template('rb/emails/reservations/reminders/upcoming_occurrence.txt',
-                           occurrences=occurrences,
-                           user=user)
-    return make_email(to_list={user.email}, subject=subject, body=text)
+    tpl = get_template_module('rb/emails/reservations/reminders/upcoming_occurrence.html',
+                              occurrences=occurrences, user=user)
+    return make_email(to_list={user.email}, template=tpl, html=True)
