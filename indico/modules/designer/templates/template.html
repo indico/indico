@@ -80,120 +80,140 @@
                 </form>
             </div>
         </div>
-        <div class="designer-tools-row element-tools disappear">
-            <div class="tool">
-                <span class="selection-text f-self-stretch"></span>
-                <a class="js-remove-element i-button icon-remove icon-only text-color subtle"
-                   title="{% trans %}Remove element{% endtrans %}"></a>
-            </div>
-            <div class="tool font-tools">
-                <i class="icon-font-size" title="{% trans %}Font dimentions{% endtrans %}"></i>
-                <div class="subtool">
-                    <select id='font-selector' class="js-font-tool" data-attr="font">
-                        <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
-                            <option value="serif">Serif</option>
-                            <option value="courier">Courier</option>
-                            <option value="sans-serif">Sans Serif</option>
-                        </optgroup>
-                        <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
-                            <option>LinuxLibertine</option>
-                            <option>Kochi-Mincho</option>
-                            <option>Kochi-Gothic</option>
-                            <option>Uming-CN</option>
-                        </optgroup>
-                    </select>
+        <div class="designer-tools-row second-row disappear">
+            <div class="backside-tools hidden">
+                <div class="tool">
+                    <span>{% trans %}Back side template:{% endtrans %}</span>
+                    <span class="backside-template-title">
+                        {{- template.backside_template.title -}}
+                    </span>
+                    <button class="js-remove-backside i-button icon-remove icon-only text-color subtle"
+                    title="{% trans %}Remove back side{% endtrans %}"></button>
                 </div>
-                <div class="subtool">
-                    <select id='color-selector' class="js-font-tool" data-attr="color">
-                        <option value="black">{% trans %}black{% endtrans %}</option>
-                        <option value="red">{% trans %}red{% endtrans %}</option>
-                        <option value="blue">{% trans %}blue{% endtrans %}</option>
-                        <option value="green">{% trans %}green{% endtrans %}</option>
-                        <option value="yellow">{% trans %}yellow{% endtrans %}</option>
-                        <option value="brown">{% trans %}brown{% endtrans %}</option>
-                        <option value="gold">{% trans %}gold{% endtrans %}</option>
-                        <option value="pink">{% trans %}pink{% endtrans %}</option>
-                        <option value="gray">{% trans %}gray{% endtrans %}</option>
-                        <option value="white">{% trans %}white{% endtrans %}</option>
-                    </select>
-                </div>
-                <div class="subtool">
-                    <select id='style-selector' class="js-font-tool" data-attr="style">
-                        <option value="normal">{% trans %}Normal{% endtrans %}</option>
-                        <option value="bold">{% trans %}Bold{% endtrans %}</option>
-                        <option value="italic">{% trans %}Italic{% endtrans %}</option>
-                        <option value="bold_italic">{% trans %}Bold &amp; Italic{% endtrans %}</option>
-                    </select>
-                </div>
-                <div class="subtool">
-                    <select id='size-selector' class="js-font-tool" data-attr="size">
-                        <option value="160pt">160pt</option>
-                        <option value="150pt">150pt</option>
-                        <option value="140pt">140pt</option>
-                        <option value="130pt">130pt</option>
-                        <option value="120pt">120pt</option>
-                        <option value="110pt">110pt</option>
-                        <option value="100pt">100pt</option>
-                        <option value="90pt">90pt</option>
-                        <option value="80pt">80pt</option>
-                        <option value="70pt">70pt</option>
-                        <option value="60pt">60pt</option>
-                        <option value="50pt">50pt</option>
-                        <option value="40pt">40pt</option>
-                        <option value="30pt">30pt</option>
-                        <option value="24pt">24pt</option>
-                        <option value="20pt">20pt</option>
-                        <option value="18pt">18pt</option>
-                        <option value="15pt" selected>15pt</option>
-                        <option value="13.5pt">13.5pt</option>
-                        <option value="12pt">12pt</option>
-                        <option value="10pt">10pt</option>
-                        <option value="7.5pt">7.5pt</option>
-                        <option value="7pt">7pt</option>
-                    </select>
-                </div>
-                <div class="subtool">
-                    <select id='alignment-selector' class="js-font-tool" data-attr="alignment">
-                        <option value="left">{% trans %}Left{% endtrans %}</option>
-                        <option value="right">{% trans %}Right{% endtrans %}</option>
-                        <option value="center">{% trans %}Center{% endtrans %}</option>
-                        <option value="justified">{% trans %}Justified{% endtrans %}</option>
-                    </select>
+                <div class="tool">
+                    <button class="i-button icon-transmission"
+                            data-href="{{ url_for('.backside_template_list', template) }}"
+                            data-title="{% trans %}Select a template for the back side{% endtrans %}"
+                            data-ajax-dialog>
+                        {%- trans %}Change back side{% endtrans -%}
+                    </button>
                 </div>
             </div>
-            <div class="tool">
-                <i class="icon-rulers" title="{% trans %}Element dimensions{% endtrans %}"></i>
-                <label for="element-width">{% trans %}Width:{% endtrans %}</label>
-                <input id="element-width" class="js-element-width" size="5" type="number">
-                <span class="scale">cm</span>
-            </div>
-            <div class="tool" style="display: none;">
-                <label for="fixed-text-field">{% trans %}Text:{% endtrans %}</label>
-                <input type="text" id="fixed-text-field">
-            </div>
-            <div class="tool">
-                <i class="icon-layout" title="{% trans %}Element positioning{% endtrans %}"></i>
-                <div class="toolbar thin">
-                    <button title="{% trans %}Move item to the top{% endtrans %}"
-                            class="i-button move-button icon-only text-color subtle icon-collapse"
-                            data-direction="top">
-                    </button>
-                    <button title="{% trans %}Move item to the left{% endtrans %}"
-                            class="i-button move-button icon-only text-color subtle icon-prev"
-                            data-direction="left">
-                    </button>
-                    <button title="{% trans %}Center item{% endtrans %}"
-                            class="i-button move-button icon-only text-color subtle icon-circle-small"
-                            data-direction="center">
-                    </button>
-                    <button title="{% trans %}Move item to the right{% endtrans %}"
-                            class="i-button move-button icon-only text-color subtle icon-next"
-                            data-direction="right">
-                    </button>
-                    <button title="{% trans %}Move item to the bottom{% endtrans %}"
-                            class="i-button move-button icon-only text-color subtle icon-expand"
-                            data-direction="bottom">
-                    </button>
+            <div class="element-tools">
+                <div class="tool">
+                    <span class="selection-text f-self-stretch"></span>
+                    <a class="js-remove-element i-button icon-remove icon-only text-color subtle"
+                       title="{% trans %}Remove element{% endtrans %}"></a>
+                </div>
+                <div class="tool font-tools">
+                    <i class="icon-font-size" title="{% trans %}Font dimensions{% endtrans %}"></i>
+                    <div class="subtool">
+                        <select id='font-selector' class="js-font-tool" data-attr="font">
+                            <optgroup label="{% trans %}Normal Fonts{% endtrans %}">
+                                <option value="serif">Serif</option>
+                                <option value="courier">Courier</option>
+                                <option value="sans-serif">Sans Serif</option>
+                            </optgroup>
+                            <optgroup label="{% trans %}Special Character Fonts{% endtrans %}">
+                                <option>LinuxLibertine</option>
+                                <option>Kochi-Mincho</option>
+                                <option>Kochi-Gothic</option>
+                                <option>Uming-CN</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <div class="subtool">
+                        <select id='color-selector' class="js-font-tool" data-attr="color">
+                            <option value="black">{% trans %}black{% endtrans %}</option>
+                            <option value="red">{% trans %}red{% endtrans %}</option>
+                            <option value="blue">{% trans %}blue{% endtrans %}</option>
+                            <option value="green">{% trans %}green{% endtrans %}</option>
+                            <option value="yellow">{% trans %}yellow{% endtrans %}</option>
+                            <option value="brown">{% trans %}brown{% endtrans %}</option>
+                            <option value="gold">{% trans %}gold{% endtrans %}</option>
+                            <option value="pink">{% trans %}pink{% endtrans %}</option>
+                            <option value="gray">{% trans %}gray{% endtrans %}</option>
+                            <option value="white">{% trans %}white{% endtrans %}</option>
+                        </select>
+                    </div>
+                    <div class="subtool">
+                        <select id='style-selector' class="js-font-tool" data-attr="style">
+                            <option value="normal">{% trans %}Normal{% endtrans %}</option>
+                            <option value="bold">{% trans %}Bold{% endtrans %}</option>
+                            <option value="italic">{% trans %}Italic{% endtrans %}</option>
+                            <option value="bold_italic">{% trans %}Bold &amp; Italic{% endtrans %}</option>
+                        </select>
+                    </div>
+                    <div class="subtool">
+                        <select id='size-selector' class="js-font-tool" data-attr="size">
+                            <option value="160pt">160pt</option>
+                            <option value="150pt">150pt</option>
+                            <option value="140pt">140pt</option>
+                            <option value="130pt">130pt</option>
+                            <option value="120pt">120pt</option>
+                            <option value="110pt">110pt</option>
+                            <option value="100pt">100pt</option>
+                            <option value="90pt">90pt</option>
+                            <option value="80pt">80pt</option>
+                            <option value="70pt">70pt</option>
+                            <option value="60pt">60pt</option>
+                            <option value="50pt">50pt</option>
+                            <option value="40pt">40pt</option>
+                            <option value="30pt">30pt</option>
+                            <option value="24pt">24pt</option>
+                            <option value="20pt">20pt</option>
+                            <option value="18pt">18pt</option>
+                            <option value="15pt" selected>15pt</option>
+                            <option value="13.5pt">13.5pt</option>
+                            <option value="12pt">12pt</option>
+                            <option value="10pt">10pt</option>
+                            <option value="7.5pt">7.5pt</option>
+                            <option value="7pt">7pt</option>
+                        </select>
+                    </div>
+                    <div class="subtool">
+                        <select id='alignment-selector' class="js-font-tool" data-attr="alignment">
+                            <option value="left">{% trans %}Left{% endtrans %}</option>
+                            <option value="right">{% trans %}Right{% endtrans %}</option>
+                            <option value="center">{% trans %}Center{% endtrans %}</option>
+                            <option value="justified">{% trans %}Justified{% endtrans %}</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="tool">
+                    <i class="icon-rulers" title="{% trans %}Element dimensions{% endtrans %}"></i>
+                    <label for="element-width">{% trans %}Width:{% endtrans %}</label>
+                    <input id="element-width" class="js-element-width" size="5" type="number">
+                    <span class="scale">cm</span>
+                </div>
+                <div class="tool" style="display: none;">
+                    <label for="fixed-text-field">{% trans %}Text:{% endtrans %}</label>
+                    <input type="text" id="fixed-text-field">
+                </div>
+                <div class="tool">
+                    <i class="icon-layout" title="{% trans %}Element positioning{% endtrans %}"></i>
+                    <div class="toolbar thin">
+                        <button title="{% trans %}Move item to the top{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-collapse"
+                                data-direction="top">
+                        </button>
+                        <button title="{% trans %}Move item to the left{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-prev"
+                                data-direction="left">
+                        </button>
+                        <button title="{% trans %}Center item{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-circle-small"
+                                data-direction="center">
+                        </button>
+                        <button title="{% trans %}Move item to the right{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-next"
+                                data-direction="right">
+                        </button>
+                        <button title="{% trans %}Move item to the bottom{% endtrans %}"
+                                class="i-button move-button icon-only text-color subtle icon-expand"
+                                data-direction="bottom">
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -254,8 +274,15 @@
                                         <div class="placeholder-content">
                                             <div>{% trans %}The back side is empty.{% endtrans %}</div>
                                             <div>
-                                                {%- trans link_start='<a href="#">'|safe, link_end='</a>'|safe -%}
-                                                    {{ link_start }}Select an existing template{{ link_end }} to be used as the back side of this template.
+                                                {% set link_start %}
+                                                    <a href="#" data-href="{{ url_for('.backside_template_list', template) }}"
+                                                       data-title="{% trans %}Select a template for the back side{% endtrans %}"
+                                                       data-ajax-dialog>
+                                                {% endset %}
+                                                {% set link_end %}</a>{% endset %}
+                                                {%- trans link_start=link_start|safe, link_end=link_end|safe -%}
+                                                    {{ link_start }}Select an existing template{{ link_end }} to be used
+                                                    as the back side of this template.
                                                 {%- endtrans -%}
                                             </div>
                                         </div>

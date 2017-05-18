@@ -195,6 +195,11 @@
         flex-wrap: wrap;
         background-color: $light-gray;
         color: $light-black;
+
+        &:not(:first-child) {
+            @include transition(opacity .2s);
+            border-top: 1px dashed $pastel-gray;
+        }
     }
 
     input[type=text],
@@ -265,11 +270,6 @@
         }
     }
 
-    .element-tools {
-        @include transition(opacity .2s);
-        border-top: 1px dashed $pastel-gray;
-    }
-
     .subtool {
         display: flex;
         align-items: center;
@@ -282,6 +282,11 @@
             flex-direction: column;
             align-items: flex-start;
         }
+    }
+
+    .backside-tools,
+    .element-tools {
+        display: flex;
     }
 }
 
@@ -308,6 +313,28 @@
     }
 }
 
-.template-side.back {
+.backside-template-title {
+    font-weight: bold;
+    margin-left: 0.5em;
+    margin-right: 1em;
+}
+
+.badge-backside-list {
+    li {
+        padding: 0 !important;
+
+        a {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .template-icon-badge {
+            margin-right: 1em;
+        }
+    }
+}
+
+.template-side.back:not(.empty) {
     pointer-events: none;
 }
