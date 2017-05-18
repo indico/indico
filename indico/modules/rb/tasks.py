@@ -31,6 +31,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
+from indico.util.console import cformat
 
 
 def _make_occurrence_date_filter():
@@ -48,8 +49,35 @@ def _make_occurrence_date_filter():
     return days_until_occurrence == notification_before_days
 
 
+def _print_occurrences(user, occurrences, _defaults={}, _overrides={}):
+    if not _defaults or not _overrides:
+        _defaults.update({RepeatFrequency.WEEK: rb_settings.get('notification_before_days_weekly'),
+                          RepeatFrequency.MONTH: rb_settings.get('notification_before_days_monthly'),
+                          RepeatFrequency.NEVER: rb_settings.get('notification_before_days'),
+                          RepeatFrequency.DAY: rb_settings.get('notification_before_days')})
+        _overrides.update({RepeatFrequency.WEEK: lambda r: r.notification_before_days_weekly,
+                           RepeatFrequency.MONTH: lambda r: r.notification_before_days_monthly,
+                           RepeatFrequency.NEVER: lambda r: r.notification_before_days,
+                           RepeatFrequency.DAY: lambda r: r.notification_before_days})
+    print cformat('%{grey!}*** {} ({}) ***').format(user.full_name, user.email)
+    for occ in occurrences:
+        default = _defaults[occ.reservation.repeat_frequency]
+        override = _overrides[occ.reservation.repeat_frequency](occ.reservation.room)
+        days = default if override is None else override
+        days_until = (occ.start_dt.date() - date.today()).days
+        print cformat('  * %{yellow}{}%{reset} %{green}{:5}%{reset} {} {} {} \t %{blue!}{}%{reset} {} ({})').format(
+            occ.start_dt.date(), occ.reservation.repeat_frequency.name,
+            days,
+            default if override is not None and override != default else ' ',
+            days_until,
+            occ.reservation.id,
+            occ.reservation.room.full_name,
+            occ.reservation.room.id
+        )
+
+
 @celery.periodic_task(name='roombooking_occurrences', run_every=crontab(minute='15', hour='8'))
-def roombooking_occurrences():
+def roombooking_occurrences(debug=False):
     if not Config.getInstance().getIsRoomBookingActive():
         logger.info('Notifications not sent because room booking is disabled')
         return
@@ -75,6 +103,9 @@ def roombooking_occurrences():
     try:
         for user, user_occurrences in groupby(occurrences, key=attrgetter('reservation.booked_for_user')):
             user_occurrences = list(user_occurrences)
+            if debug:
+                _print_occurrences(user, user_occurrences)
+                continue
             notify_upcoming_occurrences(user, user_occurrences)
             for occ in user_occurrences:
                 occ.notification_sent = True
@@ -83,4 +114,5 @@ def roombooking_occurrences():
                                                 .filter(ReservationOccurrence.start_dt >= datetime.now()))
                     future_occurrences_query.update({'notification_sent': True})
     finally:
-        db.session.commit()
+        if not debug:
+            db.session.commit()
