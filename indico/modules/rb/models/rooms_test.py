@@ -174,8 +174,8 @@ def test_marker_description(db, create_room, create_equipment_type,
     assert room.marker_description == expected
 
 
-def test_owner(dummy_room, dummy_avatar):
-    assert dummy_room.owner == dummy_avatar
+def test_owner(dummy_room, dummy_user):
+    assert dummy_room.owner == dummy_user
 
 
 def test_owner_after_change(dummy_room, dummy_user):
@@ -417,11 +417,11 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
-def test_find_with_filters(db, dummy_room, create_room, dummy_avatar, create_equipment_type, create_room_attribute,
+def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equipment_type, create_room_attribute,
                            dummy_reservation):
     # Simple testcase that ensures we find the room when many filters are used
     other_room = create_room()
-    assert set(Room.find_with_filters({}, dummy_avatar)) == {dummy_room, other_room}
+    assert set(Room.find_with_filters({}, dummy_user)) == {dummy_room, other_room}
     create_room_attribute(u'attr')
     eq = create_equipment_type(u'eq')
     dummy_room.capacity = 100
@@ -438,7 +438,7 @@ def test_find_with_filters(db, dummy_room, create_room, dummy_avatar, create_equ
                'repeatability': 'None',
                'start_dt': dummy_reservation.start_dt,
                'end_dt': dummy_reservation.end_dt}
-    assert set(Room.find_with_filters(filters, dummy_avatar)) == {dummy_room}
+    assert set(Room.find_with_filters(filters, dummy_user)) == {dummy_room}
 
 
 def test_find_with_filters_equipment(db, dummy_room, create_room, create_equipment_type):

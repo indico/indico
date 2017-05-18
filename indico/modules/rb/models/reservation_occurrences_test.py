@@ -262,13 +262,13 @@ def test_find_with_filters():
     (False, 'cancelled'),
     (False, ''),
 ))
-def test_cancel(smtp, create_reservation, dummy_avatar, silent, reason):
+def test_cancel(smtp, create_reservation, dummy_user, silent, reason):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
                                      end_dt=date.today() + relativedelta(days=1, hour=17),
                                      repeat_frequency=RepeatFrequency.DAY)
     assert reservation.occurrences.count() > 1
     occurrence = reservation.occurrences[0]
-    occurrence.cancel(user=dummy_avatar, reason=reason, silent=silent)
+    occurrence.cancel(user=dummy_user, reason=reason, silent=silent)
     assert occurrence.is_cancelled
     assert occurrence.rejection_reason == reason
     assert not occurrence.reservation.is_cancelled
@@ -277,7 +277,7 @@ def test_cancel(smtp, create_reservation, dummy_avatar, silent, reason):
         assert not smtp.outbox
     else:
         assert occurrence.reservation.edit_logs.count() == 1
-        assert occurrence.reservation.edit_logs[0].user_name == dummy_avatar.user.full_name
+        assert occurrence.reservation.edit_logs[0].user_name == dummy_user.full_name
         extract_emails(smtp, count=2, regex=True, subject=r'Booking cancelled on .+ \(SINGLE OCCURRENCE\)')
         if reason:
             assert len(occurrence.reservation.edit_logs[0].info) == 2
@@ -287,8 +287,8 @@ def test_cancel(smtp, create_reservation, dummy_avatar, silent, reason):
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_avatar, silent):
-    dummy_occurrence.cancel(user=dummy_avatar, reason='cancelled', silent=silent)
+def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
+    dummy_occurrence.cancel(user=dummy_user, reason='cancelled', silent=silent)
     assert dummy_occurrence.is_cancelled
     assert dummy_occurrence.rejection_reason == 'cancelled'
     assert dummy_occurrence.reservation.is_cancelled
@@ -303,13 +303,13 @@ def test_cancel_single_occurrence(smtp, dummy_occurrence, dummy_avatar, silent):
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_reject(smtp, create_reservation, dummy_avatar, silent):
+def test_reject(smtp, create_reservation, dummy_user, silent):
     reservation = create_reservation(start_dt=date.today() + relativedelta(hour=8),
                                      end_dt=date.today() + relativedelta(days=1, hour=17),
                                      repeat_frequency=RepeatFrequency.DAY)
     assert reservation.occurrences.count() > 1
     occurrence = reservation.occurrences[0]
-    occurrence.reject(user=dummy_avatar, reason='cancelled', silent=silent)
+    occurrence.reject(user=dummy_user, reason='cancelled', silent=silent)
     assert occurrence.is_rejected
     assert occurrence.rejection_reason == 'cancelled'
     assert not occurrence.reservation.is_rejected
@@ -318,15 +318,15 @@ def test_reject(smtp, create_reservation, dummy_avatar, silent):
         assert not smtp.outbox
     else:
         assert occurrence.reservation.edit_logs.count() == 1
-        assert occurrence.reservation.edit_logs[0].user_name == dummy_avatar.user.full_name
+        assert occurrence.reservation.edit_logs[0].user_name == dummy_user.full_name
         assert len(occurrence.reservation.edit_logs[0].info) == 2
         extract_emails(smtp, count=2, regex=True, subject=r'Booking rejected on .+ \(SINGLE OCCURRENCE\)')
     assert not smtp.outbox
 
 
 @pytest.mark.parametrize('silent', (True, False))
-def test_reject_single_occurrence(smtp, dummy_occurrence, dummy_avatar, silent):
-    dummy_occurrence.reject(user=dummy_avatar, reason='rejected', silent=silent)
+def test_reject_single_occurrence(smtp, dummy_occurrence, dummy_user, silent):
+    dummy_occurrence.reject(user=dummy_user, reason='rejected', silent=silent)
     assert dummy_occurrence.is_rejected
     assert dummy_occurrence.rejection_reason == 'rejected'
     assert dummy_occurrence.reservation.is_rejected
