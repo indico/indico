@@ -19,7 +19,8 @@ from __future__ import unicode_literals
 from indico.modules.designer.controllers import (RHListEventTemplates, RHListCategoryTemplates, RHEditDesignerTemplate,
                                                  RHDownloadTemplateImage, RHUploadBackgroundImage,
                                                  RHDeleteDesignerTemplate, RHCloneEventTemplate, RHAddEventTemplate,
-                                                 RHCloneCategoryTemplate, RHAddCategoryTemplate)
+                                                 RHCloneCategoryTemplate, RHAddCategoryTemplate,
+                                                 RHListBacksideTemplates, RHGetTemplateData)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -46,6 +47,8 @@ for object_type in ('event', 'category'):
     prefix += '/manage/designer'
     _bp.add_url_rule(prefix + '/', 'template_list', _dispatch(RHListEventTemplates, RHListCategoryTemplates),
                      defaults={'object_type': object_type})
+    _bp.add_url_rule(prefix + '/<int:template_id>/backsides', 'backside_template_list', RHListBacksideTemplates,
+                     defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/add', 'add_template', _dispatch(RHAddEventTemplate, RHAddCategoryTemplate),
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditDesignerTemplate,
@@ -55,6 +58,8 @@ for object_type in ('event', 'category'):
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template',
                      _dispatch(RHCloneEventTemplate, RHCloneCategoryTemplate),
                      defaults={'object_type': object_type}, methods=('POST',))
+    _bp.add_url_rule(prefix + '/<int:template_id>/data', 'get_template_data',
+                     RHGetTemplateData, defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/<int:template_id>/images/<int:image_id>/<filename>', 'download_image',
                      RHDownloadTemplateImage, defaults={'object_type': object_type})
     _bp.add_url_rule(prefix + '/<int:template_id>/images', 'upload_image',

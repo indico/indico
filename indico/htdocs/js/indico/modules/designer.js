@@ -185,14 +185,14 @@
         if (selectedItem) {
             delete items[selectedItem.id];
             $selectedItem.remove();
-            $('.element-tools').addClass('disappear');
+            $('.element-tools').addClass('hidden');
         }
     }
 
-    function getItemData($item) {
+    function getItemData($item, isBackside) {
         if ($item.length) {
             var id = $item.closest('.ui-draggable').data('id');
-            return items[id];
+            return isBackside ? backsideItems[id] : items[id];
         }
         return;
     }
@@ -213,7 +213,8 @@
     function selectItem($item) {
         var item = getItemData($item);
 
-        $('.element-tools').removeClass('disappear');
+        $('.element-tools').removeClass('hidden');
+        $('.second-row').removeClass('disappear');
 
         $('.selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
 
@@ -550,6 +551,8 @@
     }
 
     function displayTemplate(template, backside) {
+        var $placeholder = $('.back-side-placeholder');
+
         if (template.data) {
             template.data.items.forEach(function(item) {
                 createItemFromObject(item, backside);
@@ -557,8 +560,28 @@
             displayItems(backside);
         }
         if (backside && template.data && (template.data.items.length || template.background_url)) {
-            $('.back-side-placeholder').hide();
+            $placeholder.hide();
+            $placeholder.parent().removeClass('empty');
+        } else {
+            $placeholder.parent().addClass('empty');
         }
+        if (template.background_url) {
+            displayBackground(template, isBackside);
+        }
+    }
+
+    function clearBacksideTemplate(template) {
+        var $templateSide = $('.template-side.back');
+        if (template.background_url) {
+            template.background_url = null;
+            template.data.background.image_id = '';
+            $templateSide.find('.background-image').remove();
+            $templateSide.append($('<img>', {class: 'background-image'}));
+        }
+        $templateSide.find('.designer-item').remove();
+        template.title = null;
+        template.data = null;
+        backsideItems = {};
     }
 
     global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
@@ -691,16 +714,20 @@
                 var $this = $(this);
                 var newFaceUp = $this.hasClass('front') ? 'front' : 'back';
                 var $selectedItem = $('.designer-item.selected');
+                var hasBackside = (backsideTemplate.data &&
+                                   (backsideTemplate.data.items.length || backsideTemplate.background_url));
 
                 $('.template-content').toggleClass('flipped', newFaceUp === 'back');
                 $('.template-side.back').toggleClass('active', newFaceUp === 'back');
                 $('.template-side.front').toggleClass('active', newFaceUp === 'front');
+                $('.backside-tools').toggleClass('hidden', newFaceUp === 'front' || !hasBackside);
+                $('.second-row').toggleClass('disappear', newFaceUp === 'front');
                 $('.js-toggle-side').removeClass('highlight');
+                $('.element-tools').addClass('hidden');
                 $this.toggleClass('highlight');
                 if ($selectedItem && $selectedItem[0]) {
                     deselectItem($selectedItem);
                 }
-                $('.element-tools').addClass('disappear');
                 $('.template-side.active').trigger('indico:backgroundChanged');
             });
 
@@ -737,6 +764,13 @@
                     $this.prop('selected', true);
                     $('.js-template-dimansion').attr('disabled', true);
                 }
+            });
+
+            $('.template-side.back').on('indico:backsideUpdated', function(evt, data) {
+                clearBacksideTemplate(backsideTemplate);
+                displayTemplate(data.template, true);
+                backsideTemplate = data.template;
+                $('.backside-template-title').text(data.template.title);
             });
         });
 

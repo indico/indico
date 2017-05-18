@@ -26,7 +26,7 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.modules.categories.controllers.management import RHManageCategoryBase
-from indico.modules.designer import DEFAULT_CONFIG
+from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
@@ -37,7 +37,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 TEMPLATE_DATA_JSON_SCHEMA = {
@@ -295,3 +295,23 @@ class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
         db.session.delete(self.template)
         flash(_('The template has been removed'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
+
+
+class RHListBacksideTemplates(RHModifyDesignerTemplateBase, RHListEventTemplates):
+    def _process(self):
+        inherited_templates = [tpl for tpl in get_inherited_templates(self.target)
+                               if not tpl.backside_template and tpl.type == TemplateType.badge]
+        custom_templates = [tpl for tpl in self.target.designer_templates
+                            if not tpl.backside_template and tpl != self.template]
+        return jsonify_template('designer/backside_list.html', target=self.target, custom_templates=custom_templates,
+                                inherited_templates=inherited_templates, current_template=self.template)
+
+
+class RHGetTemplateData(RHModifyDesignerTemplateBase):
+    def _process(self):
+        template_data = {
+            'title': self.template.title,
+            'data': self.template.data,
+            'background_url': self.template.background_image.download_url if self.template.background_image else None
+        }
+        return jsonify_data(template=template_data)
