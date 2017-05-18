@@ -274,12 +274,8 @@
         (function() {
             'use strict';
 
-            var template = {
-                title: {{ template.title | tojson }},
-                data: {{ template.data | tojson }},
-                background_url: {{ (template.background_image.download_url if template.background_image else none) | tojson }}
-            };
-            setupDesigner(template, {{ config | tojson }}, {{ placeholders | tojson }});
+            setupDesigner({{ template_data | tojson }}, {{ backside_template_data | tojson}}, {{ config | tojson }},
+                          {{ placeholders | tojson }});
         })();
     </script>
 {% endblock %}
