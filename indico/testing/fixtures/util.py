@@ -19,6 +19,7 @@ from datetime import datetime
 
 import freezegun
 import pytest
+from sqlalchemy import cast, DateTime
 from sqlalchemy.sql.functions import _FunctionGenerator
 
 
@@ -54,7 +55,7 @@ def freeze_time(monkeypatch):
 
     def FunctionGenerator_call(self, *args, **kwargs):
         if self._FunctionGenerator__names == ['now']:
-            return datetime.now()
+            return cast(datetime.now().isoformat(), DateTime)
         return orig_call(self, *args, **kwargs)
 
     monkeypatch.setattr(_FunctionGenerator, '__call__', FunctionGenerator_call)
