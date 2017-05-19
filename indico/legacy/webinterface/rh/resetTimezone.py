@@ -17,12 +17,14 @@
 from flask import session, request, redirect
 
 from indico.core.config import Config
+from indico.legacy.webinterface.rh.base import RH
 from indico.util.string import to_unicode
 from indico.web.util import url_for_index
-import indico.legacy.webinterface.rh.base as base
 
 
-class RHResetTZ(base.RH):
+class RHResetTZ(RH):
+    CSRF_ENABLED = True
+
     def _process(self):
         if 'activeTimezone' not in request.values or request.values['activeTimezone'] == 'My':
             tz = Config.getInstance().getDefaultTimezone()

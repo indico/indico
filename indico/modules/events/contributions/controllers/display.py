@@ -204,6 +204,8 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
 class RHContributionListFilter(RHContributionList):
     """Display dialog with filters"""
 
+    CSRF_ENABLED = True
+
     def _process(self):
         return RH._process(self)
 
@@ -219,6 +221,8 @@ class RHContributionListFilter(RHContributionList):
 
 class RHContributionListDisplayStaticURL(RHContributionList):
     """Generate static URL for the current set of filters"""
+
+    CSRF_ENABLED = True
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())

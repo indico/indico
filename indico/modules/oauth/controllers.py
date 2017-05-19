@@ -38,6 +38,8 @@ from indico.legacy.webinterface.rh.base import RH, RHProtected
 
 
 class RHOAuthAuthorize(RHProtected):
+    CSRF_ENABLED = False
+
     def _checkParams(self):
         try:
             UUID(hex=request.args['client_id'])
@@ -72,6 +74,8 @@ class RHOAuthErrors(RHProtected):
 
 
 class RHOAuthToken(RH):
+    CSRF_ENABLED = False
+
     @oauth.token_handler
     def _process(self, **kwargs):
         return None

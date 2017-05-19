@@ -129,8 +129,7 @@ _bp.add_url_rule('/room/<roomLocation>/<int:roomID>/',
 
 _bp.add_url_rule('/room/<roomLocation>/<int:roomID>/stats',
                  'roomBooking-roomStats',
-                 room_handlers.RHRoomBookingRoomStats,
-                 methods=('GET', 'POST'))
+                 room_handlers.RHRoomBookingRoomStats)
 
 
 # Room blocking

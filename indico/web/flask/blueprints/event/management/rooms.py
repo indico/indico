@@ -55,5 +55,4 @@ event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/book', 'rooms_r
 event_mgmt.add_url_rule('/rooms/book', 'rooms_book', RHRoomBookingEventNewBooking, methods=('GET', 'POST'))
 
 # Room details
-event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/', 'rooms_room_details', RHRoomBookingEventRoomDetails,
-                        methods=('GET', 'POST'))
+event_mgmt.add_url_rule('/rooms/room/<roomLocation>/<int:roomID>/', 'rooms_room_details', RHRoomBookingEventRoomDetails)

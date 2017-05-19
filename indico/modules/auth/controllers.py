@@ -144,6 +144,8 @@ class RHLinkAccount(RH):
     email address and an existing user was found.
     """
 
+    CSRF_ENABLED = True
+
     def _checkParams(self):
         self.identity_info = load_identity_info()
         if not self.identity_info or self.identity_info['indico_user_id'] is None:
@@ -211,6 +213,8 @@ class RHRegister(RH):
     - creation of a new user with a locally stored username and password
     - creation of a new user based on information from an identity provider
     """
+
+    CSRF_ENABLED = True
 
     def _checkParams(self):
         self.identity_info = None
@@ -556,6 +560,8 @@ class LocalRegistrationHandler(RegistrationHandler):
 
 class RHResetPassword(RH):
     """Resets the password for a local identity."""
+
+    CSRF_ENABLED = True
 
     def _checkParams(self):
         if not Config.getInstance().getLocalIdentities():

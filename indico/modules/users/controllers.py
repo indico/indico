@@ -68,6 +68,7 @@ UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'
 class RHUserBase(RHProtected):
     flash_user_status = True
     allow_system_user = False
+    CSRF_ENABLED = True
 
     def _checkParams(self):
         if not session.user:

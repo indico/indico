@@ -174,12 +174,17 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 
 class RHReachableCategoriesInfo(RH):
+    CSRF_ENABLED = True
+
     def _get_reachable_categories(self, id_, excluded_ids):
         cat = Category.query.filter_by(id=id_).options(joinedload('children').load_only('id')).one()
-        ids = {c.id for c in cat.children} | {c.id for c in cat.parent_chain_query}
+        ids = ({c.id for c in cat.children} | {c.id for c in cat.parent_chain_query}) - excluded_ids
+        if not ids:
+            return []
         return (Category.query
-                .filter(Category.id.in_(ids - excluded_ids))
-                .options(*RHCategoryInfo._category_query_options))
+                .filter(Category.id.in_(ids))
+                .options(*RHCategoryInfo._category_query_options)
+                .all())
 
     def _process(self):
         excluded_ids = set(request.json.get('exclude', set())) if request.json else set()

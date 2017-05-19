@@ -30,6 +30,8 @@ from indico.legacy.webinterface.rh.base import RH
 class RHAPIRegistrant(RH):
     """RESTful registrant API"""
 
+    CSRF_ENABLED = False
+
     @oauth.require_oauth('registrants')
     def _checkProtection(self):
         if not self.event.can_manage(request.oauth.user, role='registration'):

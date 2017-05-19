@@ -55,6 +55,7 @@ type("TimezoneSelector", ["RemoteWidget"], {
         this.div.append(Html.div({className: 'tzHeader'}, $T('Change timezone')));
 
         this.form = Html.form({method: "post", action: this.formTarget, style: {margin: 0}});
+        this.form.append(Html.input('hidden', {name: 'csrf_token'}, $('meta[name=csrf-token]').attr('content')));
         this.div.append(this.form);
 
         var container = Html.div({className: 'tzContainer'});

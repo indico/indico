@@ -46,6 +46,8 @@ class RHRoomBookingBlockingDetails(RHRoomBookingBase):
 
 
 class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
+    CSRF_ENABLED = True
+
     def _process(self):
         if self._form.validate_on_submit():
             self._save()

@@ -7,6 +7,7 @@
     <tr>
         <td align="center">
         <form action="${ url }" method="POST">
+        <input type="hidden" name="csrf_token" value="${ _session.csrf_token }">
         %if not _session.user:
             <a class="loginHighlighted" style="padding:4px 17px" href="${ url_for_login(_request.relative_url) }"><strong style="color: white;">Login</strong></a>&nbsp;${ _("or enter the access key here:")}
         %else:

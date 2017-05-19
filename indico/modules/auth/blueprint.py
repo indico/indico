@@ -30,7 +30,7 @@ _bp.add_url_rule('/login/', 'login', RHLogin, methods=('GET', 'POST'))
 _bp.add_url_rule('/login/<provider>/', 'login', RHLogin)
 _bp.add_url_rule('/login/<provider>/form', 'login_form', RHLoginForm)
 _bp.add_url_rule('/login/<provider>/link-account', 'link_account', RHLinkAccount, methods=('GET', 'POST'))
-_bp.add_url_rule('/logout/', 'logout', RHLogout, methods=('GET', 'POST'))
+_bp.add_url_rule('/logout/', 'logout', RHLogout)
 
 _bp.add_url_rule('/register/', 'register', RHRegister, methods=('GET', 'POST'), defaults={'provider': None})
 _bp.add_url_rule('/register/<provider>', 'register', RHRegister, methods=('GET', 'POST'))

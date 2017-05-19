@@ -37,6 +37,11 @@ class RHErrorReporting(RH):
     report errors.
     """
 
+    # XXX: legacy page and we don't know under which cirucmstances
+    # an error happens, i.e. whether we even have the ability to
+    # store a CSRF token in the session.
+    CSRF_ENABLED = False
+
     def _checkParams(self, params):
         self._sendIt = "confirm" in params
         self._comments = ""

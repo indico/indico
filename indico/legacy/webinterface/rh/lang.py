@@ -22,6 +22,8 @@ from indico.legacy.webinterface.rh.base import RH
 
 
 class RHChangeLang(RH):
+    CSRF_ENABLED = True
+
     def _process(self):
         language = request.form['lang']
         session.lang = language

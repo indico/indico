@@ -67,6 +67,8 @@ class RHTimetableEntryInfo(RHConferenceBaseDisplay):
 
 
 class RHTimetableExportPDF(RHConferenceBaseDisplay):
+    CSRF_ENABLED = True
+
     def _process(self):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():

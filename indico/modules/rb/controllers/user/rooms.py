@@ -59,6 +59,7 @@ class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
 
 class RHRoomBookingSearchRooms(RHRoomBookingBase):
     menu_item = 'search_rooms'
+    CSRF_ENABLED = False
 
     def _get_form_data(self):
         return request.form

@@ -163,6 +163,7 @@ class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 class RHRoomBookingSearchBookings(RHRoomBookingBase):
     menu_item = 'search_bookings'
     show_blockings = True
+    CSRF_ENABLED = False
 
     def _get_form_data(self):
         return request.form
@@ -258,6 +259,7 @@ class RHRoomBookingSearchPendingBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSear
 class RHRoomBookingNewBookingBase(RHRoomBookingBase):
     DEFAULT_START_TIME_PRECISION = 15  # minutes
     DEFAULT_BOOKING_DURATION = 90  # minutes
+    CSRF_ENABLED = True
 
     def _make_confirm_form(self, room, step=None, defaults=None, form_class=NewBookingConfirmForm):
         # Note: ALWAYS pass defaults as a kwargs! For-Event room booking depends on it!
