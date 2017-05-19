@@ -552,21 +552,17 @@
                   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
-    function displayTemplate(template, backside) {
-        var $placeholder = $('.back-side-placeholder');
-
+    function displayTemplate(template, isBackside) {
         if (template.data) {
             template.data.items.forEach(function(item) {
-                createItemFromObject(item, backside);
+                createItemFromObject(item, isBackside);
             });
-            displayItems(backside);
+            displayItems(isBackside);
         }
-        if (backside && template.data && (template.data.items.length || template.background_url)) {
-            $placeholder.hide();
-            $placeholder.parent().removeClass('empty');
-        } else {
-            $placeholder.parent().addClass('empty');
-        }
+
+        var hasBackside = isBackside && template.data && (template.data.items.length || template.background_url);
+        toggleBacksidePlaceholder(!hasBackside);
+
         if (template.background_url) {
             displayBackground(template, isBackside);
         }
@@ -584,6 +580,14 @@
         template.title = null;
         template.data = null;
         backsideItems = {};
+    }
+
+    function toggleBacksidePlaceholder(showPlaceholder) {
+        var $placeholder = $('.back-side-placeholder');
+
+        $placeholder.parent().toggleClass('empty', showPlaceholder);
+        $placeholder.toggle(showPlaceholder);
+        $('.backside-tools').toggleClass('hidden', showPlaceholder);
     }
 
     global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
@@ -774,6 +778,12 @@
                 displayTemplate(data.template, true);
                 backsideTemplate = data.template;
                 $('.backside-template-title').text(data.template.title);
+            });
+
+            $('.js-remove-backside').on('click', function() {
+                backsideTemplateID = null;
+                clearBacksideTemplate(backsideTemplate);
+                toggleBacksidePlaceholder(true);
             });
         });
 
