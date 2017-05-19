@@ -162,24 +162,25 @@ class RoomBookingCalendarWidget(object):
                 blocking = blocked_room.blocking
                 if blocking.can_be_overridden(session.user, explicit_only=True):
                     attrs['className'] = 'blocked_permitted'
-                    attrs['tooltip'] = _('Blocked by {0}:\n{1}\n\n<b>You are permitted to override the blocking.</b>') \
-                        .format(blocking.created_by_user.full_name, blocking.reason)
+                    attrs['tooltip'] = (_(u'Blocked by {0}:\n{1}\n\n'
+                                          u'<strong>You are permitted to override the blocking.</strong>')
+                                        .format(blocking.created_by_user.full_name, blocking.reason))
                 elif blocked_room.state == BlockedRoom.State.accepted:
                     if blocking.can_be_overridden(session.user, room=self.specific_room):
                         attrs['className'] = 'blocked_override'
                         attrs['tooltip'] = _(
-                            'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
-                            'and are thus permitted to override the blocking. Please use this '
-                            'privilege with care!</b>').format(blocking.created_by_user.full_name, blocking.reason)
+                            u'Blocked by {0}:\n{1}\n\n<b>You own this room or are an administrator '
+                            u'and are thus permitted to override the blocking. Please use this '
+                            u'privilege with care!</b>').format(blocking.created_by_user.full_name, blocking.reason)
                     else:
                         attrs['className'] = 'blocked'
-                        attrs['tooltip'] = _('Blocked by {0}:\n{1}').format(blocking.created_by_user.full_name,
+                        attrs['tooltip'] = _(u'Blocked by {0}:\n{1}').format(blocking.created_by_user.full_name,
                                                                             blocking.reason)
                 elif blocked_room.state == BlockedRoom.State.pending:
                     attrs['className'] = 'preblocked'
                     attrs['tooltip'] = _(
-                        'Blocking requested by {0}:\n{1}\n\n'
-                        '<b>If this blocking is approved, any colliding bookings will be rejected!</b>') \
+                        u'Blocking requested by {0}:\n{1}\n\n'
+                        u'<b>If this blocking is approved, any colliding bookings will be rejected!</b>') \
                         .format(blocking.created_by_user.full_name, blocking.reason)
             days_data[str(day)] = attrs
 
