@@ -21,7 +21,6 @@ import itertools
 import os
 import pstats
 import random
-import warnings
 from datetime import datetime
 from functools import wraps, partial
 from xml.sax.saxutils import escape
@@ -114,7 +113,7 @@ class RequestHandlerBase(object):
 
 class RH(RequestHandlerBase):
     _doNotSanitizeFields = []
-    CSRF_ENABLED = None  # require a csrf_token when accessing the RH with anything but GET
+    CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
 
     #: A dict specifying how the url should be normalized.
@@ -309,13 +308,6 @@ class RH(RequestHandlerBase):
             msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
                     u"button, reload the page and try again.")
             raise BadRequest(msg)
-        elif self.CSRF_ENABLED is None and current_app.debug and request.method != 'GET':
-            # Warn if CSRF is not enabled for a RH in new code
-            module = self.__class__.__module__
-            if module.startswith('indico.modules.') or module.startswith('indico.core.'):
-                msg = (u'{} request sent to {} which has no CSRF checks. Set `CSRF_ENABLED = True` in the class to '
-                       u'enable them.').format(request.method, self.__class__.__name__)
-                warnings.warn(msg, RuntimeWarning)
         # legacy csrf check (referer-based):
         # Check referer for POST requests. We do it here so we can properly use indico's error handling
         if Config.getInstance().getCSRFLevel() < 3 or request.method != 'POST':
