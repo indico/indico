@@ -64,7 +64,8 @@ HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
 
 logger = Logger.get('requestHandler')
 
-class RequestHandlerBase():
+
+class RequestHandlerBase(object):
 
     def _checkProtection(self):
         """This method is called after _checkParams and is a good place
