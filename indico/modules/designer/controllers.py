@@ -245,6 +245,8 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                                      template_data=template_data, backside_template_data=backside_template_data)
 
     def _process_POST(self):
+        backside_template_id = request.json['backside_template_id']
+        self.template.backside_template = DesignerTemplate.get(backside_template_id) if backside_template_id else None
         self.template.data = dict(**request.json['template'])
         self.template.title = request.json['title']
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, self.template.data)
@@ -314,4 +316,4 @@ class RHGetTemplateData(RHModifyDesignerTemplateBase):
             'data': self.template.data,
             'background_url': self.template.background_image.download_url if self.template.background_image else None
         }
-        return jsonify_data(template=template_data)
+        return jsonify(template=template_data, backside_template_id=self.template.id)

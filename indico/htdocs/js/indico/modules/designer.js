@@ -29,6 +29,7 @@
     var editing = false;
     var items = {};
     var backsideItems = {};
+    var backsideTemplateID = null;
     var itemTitles = {};
 
     var DEFAULT_PIXEL_CM = 50;
@@ -448,6 +449,7 @@
                 }
             },
             title: $('.js-template-name').val(),
+            backside_template_id: backsideTemplateID
         };
 
         $.ajax({
@@ -767,6 +769,7 @@
             });
 
             $('.template-side.back').on('indico:backsideUpdated', function(evt, data) {
+                backsideTemplateID = data.backside_template_id;
                 clearBacksideTemplate(backsideTemplate);
                 displayTemplate(data.template, true);
                 backsideTemplate = data.template;
