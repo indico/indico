@@ -41,7 +41,6 @@ class ServiceBase(RequestHandlerBase):
         if not self.UNICODE_PARAMS:
             params = unicode_struct_to_utf8(params)
         self._reqParams = self._params = params
-        self._requestStarted = False
         # Fill in the aw instance with the current information
         self._aw = AccessWrapper()
         self._aw.setUser(session.avatar)

@@ -73,8 +73,6 @@ logger = Logger.get('requestHandler')
 
 class RequestHandlerBase():
 
-    _uh = None
-
     def _checkProtection(self):
         """This method is called after _checkParams and is a good place
         to check if the user is permitted to perform some actions.
@@ -121,37 +119,6 @@ class RequestHandlerBase():
 
 
 class RH(RequestHandlerBase):
-    """This class is the base for request handlers of the application. A request
-        handler will be instantiated when a web request arrives to mod_python;
-        the mp layer will forward the request to the corresponding request
-        handler which will know which action has to be performed (displaying a
-        web page or performing some operation and redirecting to another page).
-        Request handlers will be responsible for parsing the parameters coming
-        from a mod_python request, handle the errors which occurred during the
-        action to perform, managing the sessions, checking security for each
-        operation (thus they implement the access control system of the web
-        interface).
-        It is important to encapsulate all this here as in case of changing
-        the web application framework we'll just need to adapt this layer (the
-        rest of the system wouldn't need any change).
-
-        Attributes:
-            _uh - (URLHandler) Associated URLHandler which points to the
-                current rh.
-            _req - UNUSED/OBSOLETE, always None
-            _requestStarted - (bool) Flag which tells whether a DB transaction
-                has been started or not.
-            _aw - (AccessWrapper) Current access information for the rh.
-            _target - (Locable) Reference to an object which is the destination
-                of the operations needed to carry out the rh. If set it must
-                provide (through the standard Locable interface) the methods
-                to get the url parameters in order to reproduce the access to
-                the rh.
-            _reqParams - (dict) Dictionary containing the received HTTP
-                 parameters (independently of the method) transformed into
-                 python data types. The key is the parameter name while the
-                 value should be the received paramter value (or values).
-    """
     _doNotSanitizeFields = []
     CSRF_ENABLED = None  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
@@ -189,17 +156,12 @@ class RH(RequestHandlerBase):
     def __init__(self):
         self.commit = True
         self._responseUtil = ResponseUtil()
-        self._requestStarted = False
         self._aw = AccessWrapper()  # Fill in the aw instance with the current information
         self._target = None
         self._reqParams = {}
         self._startTime = None
         self._endTime = None
-        self._doProcess = True  # Flag which indicates whether the RH process
-                                # must be carried out; this is useful for
-                                # the checkProtection methods when they
-                                # detect that an immediate redirection is
-                                # needed
+        self._doProcess = True
 
     # Methods =============================================================
 
@@ -217,9 +179,6 @@ class RH(RequestHandlerBase):
         except jsonschema.ValidationError as e:
             raise BadRequest('Invalid JSON payload: {}'.format(e.message))
 
-    def getTarget(self):
-        return self._target
-
     def _setSessionUser(self):
         self._aw.setUser(session.avatar)
 
@@ -227,11 +186,8 @@ class RH(RequestHandlerBase):
     def csrf_token(self):
         return session.csrf_token if session.csrf_protected else ''
 
-    def _getRequestParams(self):
-        return self._reqParams
-
     def getRequestParams(self):
-        return self._getRequestParams()
+        return self._reqParams
 
     def _redirect(self, targetURL, status=303):
         if isinstance(targetURL, Response):
@@ -702,7 +658,6 @@ class RHDisplayBaseProtected(RHProtected):
 
 
 class RHModificationBaseProtected(RHProtected):
-
     ALLOW_LOCKED = False
     ROLE = None
 
