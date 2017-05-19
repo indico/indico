@@ -1,6 +1,9 @@
+{% from 'events/display/_event_header_message.html' import render_event_header_msg %}
 {% from 'events/display/common/_manage_button.html' import render_manage_button %}
 {% from 'events/display/indico/_common.html' import render_location, render_users, render_event_time %}
 {% from 'events/notes/_note.html' import render_note %}
+
+{{ render_event_header_msg(event) }}
 
 {% set hook_event_header = template_hook('event-header', event=event) | trim %}
 {% set has_subheader = event.description or files or folders or lectures or event.organizer_info
