@@ -21,7 +21,7 @@ from operator import itemgetter
 import pytest
 
 from indico.core.errors import IndicoError
-from indico.modules.rb import settings as rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.reservations import RepeatFrequency

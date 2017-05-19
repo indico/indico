@@ -40,7 +40,7 @@ class ReservationNotification(object):
         return make_email(to_list=to_list, subject=subject, body=body)
 
     def compose_email_to_vc_support(self, **mail_params):
-        from indico.modules.rb import settings as rb_settings
+        from indico.modules.rb import rb_settings
 
         if self.reservation.is_accepted and self.reservation.uses_vc:
             to_list = rb_settings.get('vc_support_emails')
@@ -50,7 +50,7 @@ class ReservationNotification(object):
                 return make_email(to_list=to_list, subject=subject, body=body)
 
     def compose_email_to_assistance(self, **mail_params):
-        from indico.modules.rb import settings as rb_settings
+        from indico.modules.rb import rb_settings
 
         if self.reservation.room.notification_for_assistance:
             if self.reservation.needs_assistance or mail_params.get('assistance_cancelled'):

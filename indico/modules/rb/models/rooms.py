@@ -702,7 +702,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @hybrid_method
     def is_in_digest_window(self, exclude_first_day=False):
-        from indico.modules.rb import settings as rb_settings
+        from indico.modules.rb import rb_settings
         digest_start = round_up_month(date.today(), from_day=2)
         days_until_next_digest = (digest_start - date.today()).days
         digest_window = self.notification_before_days or rb_settings.get('notification_before_days')
@@ -713,7 +713,7 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
 
     @is_in_digest_window.expression
     def is_in_digest_window(self, exclude_first_day=False):
-        from indico.modules.rb import settings as rb_settings
+        from indico.modules.rb import rb_settings
         digest_start = round_up_month(date.today(), from_day=2)
         days_until_next_digest = cast(digest_start, Date) - cast(func.now(), Date)
         digest_window = func.coalesce(self.notification_before_days, rb_settings.get('notification_before_days'))

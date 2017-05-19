@@ -20,7 +20,7 @@ from wtforms.fields.core import SelectField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.modules.events.payment import settings
+from indico.modules.events.payment import payment_settings
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import MultipleItemsField
@@ -50,7 +50,7 @@ class AdminSettingsForm(IndicoForm):
         self._set_currencies()
 
     def _set_currencies(self):
-        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in settings.get('currencies')]
+        currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]
         self.currency.choices = sorted(currencies, key=lambda x: x[1].lower())
 
     def validate_currency(self, field):

@@ -17,7 +17,7 @@
 import pytest
 
 from indico.modules.groups.models.groups import LocalGroup
-from indico.modules.rb import settings as rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.users import User
 
 

@@ -35,7 +35,7 @@ from werkzeug.exceptions import BadRequest
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.errors import UserValueError
-from indico.modules.api import settings as api_settings
+from indico.modules.api import api_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution

@@ -62,20 +62,22 @@ class MultiStringField(HiddenField):
                         item[self.uuid_field] = unicode(uuid.uuid4())
 
     def pre_validate(self, form):
-        if not all(isinstance(item, dict) for item in self.data):
-            raise ValueError('Invalid data. Expected list of dicts.')
-        if self.unique:
-            unique_values = {item[self.field_name] for item in self.data}
-            if len(unique_values) != len(self.data):
-                raise ValueError('Items must be unique')
-        if self.uuid_field:
-            unique_uuids = {uuid.UUID(item[self.uuid_field], version=4) for item in self.data}
-            if len(unique_uuids) != len(self.data):
-                raise ValueError('UUIDs must be unique')
-        if not all(item[self.field_name].strip() for item in self.data):
-            raise ValueError('Empty items are not allowed')
-        if self.flat:
-            self.data = [x[self.field_name] for x in self.data]
+        try:
+            if not all(isinstance(item, dict) for item in self.data):
+                raise ValueError('Invalid data. Expected list of dicts.')
+            if self.unique:
+                unique_values = {item[self.field_name] for item in self.data}
+                if len(unique_values) != len(self.data):
+                    raise ValueError('Items must be unique')
+            if self.uuid_field:
+                unique_uuids = {uuid.UUID(item[self.uuid_field], version=4) for item in self.data}
+                if len(unique_uuids) != len(self.data):
+                    raise ValueError('UUIDs must be unique')
+            if not all(item[self.field_name].strip() for item in self.data):
+                raise ValueError('Empty items are not allowed')
+        finally:
+            if self.flat:
+                self.data = [x[self.field_name] for x in self.data]
 
     def _value(self):
         if not self.data:

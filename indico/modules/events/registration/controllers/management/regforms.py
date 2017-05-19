@@ -26,7 +26,7 @@ from indico.core.db import db
 from indico.modules.events.features.util import set_feature_enabled
 from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
 from indico.modules.events.models.events import EventType
-from indico.modules.events.payment import settings as payment_global_settings
+from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
                                                                        RHManageRegFormsBase)
@@ -148,7 +148,7 @@ class RHManageParticipants(RHManageRegFormsBase):
         set_feature_enabled(self.event_new, 'registration', True)
         if not regform:
             regform = RegistrationForm(event_new=self.event_new, title="Participants", is_participation=True,
-                                       currency=payment_global_settings.get('currency'))
+                                       currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()

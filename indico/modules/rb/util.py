@@ -26,7 +26,7 @@ from indico.util.user import unify_user_args
 @memoize_request
 def rb_check_user_access(user):
     """Checks if the user has access to the room booking system"""
-    from indico.modules.rb import settings as rb_settings
+    from indico.modules.rb import rb_settings
     if rb_is_admin(user):
         return True
     if not rb_settings.acls.get('authorized_principals'):  # everyone has access
@@ -37,7 +37,7 @@ def rb_check_user_access(user):
 @unify_user_args
 def rb_is_admin(user):
     """Checks if the user is a room booking admin"""
-    from indico.modules.rb import settings as rb_settings
+    from indico.modules.rb import rb_settings
     if user.is_admin:
         return True
     return rb_settings.acls.contains_user('admin_principals', user)

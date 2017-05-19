@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb import Room
-from indico.modules.rb import settings as rb_settings
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.views import WPRoomBookingBase

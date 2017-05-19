@@ -29,7 +29,7 @@ from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
 
 
-__all__ = ('settings', 'event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
+__all__ = ('payment_settings', 'payment_event_settings', 'PaymentPluginMixin', 'PaymentPluginSettingsFormBase',
            'PaymentEventSettingsFormBase')
 
 CONDITIONS = ("CANCELLATION:\n"
@@ -38,13 +38,13 @@ CONDITIONS = ("CANCELLATION:\n"
               "case of late cancellation. However, each case of cancellation would be considered individually.")
 
 
-settings = SettingsProxy('payment', {
+payment_settings = SettingsProxy('payment', {
     'currencies': [{'code': 'EUR', 'name': 'Euro'}, {'code': 'USD', 'name': 'US Dollar'}],
     'currency': 'EUR',
     'conditions': CONDITIONS
 })
 
-event_settings = EventSettingsProxy('payment', {
+payment_event_settings = EventSettingsProxy('payment', {
     'currency': None,
     'conditions': None,
 })
@@ -77,6 +77,6 @@ class PaymentFeature(EventFeature):
     @classmethod
     def enabled(cls, event):
         for setting in ('currency', 'conditions'):
-            if event_settings.get(event, setting) is None:
-                value = settings.get(setting)
-                event_settings.set(event, setting, value)
+            if payment_event_settings.get(event, setting) is None:
+                value = payment_settings.get(setting)
+                payment_event_settings.set(event, setting, value)
