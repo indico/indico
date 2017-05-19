@@ -115,6 +115,7 @@ class RH(RequestHandlerBase):
     _doNotSanitizeFields = []
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
+    DENY_FRAMES = False  # whether to send an X-Frame-Options:DENY header
 
     #: A dict specifying how the url should be normalized.
     #: `args` is a dictionary mapping view args keys to callables
@@ -545,7 +546,10 @@ class RH(RequestHandlerBase):
         if not self._doProcess or res is None:
             return self._responseUtil.make_empty()
 
-        return self._responseUtil.make_response(res)
+        response = self._responseUtil.make_response(res)
+        if self.DENY_FRAMES:
+            response.headers['X-Frame-Options'] = 'DENY'
+        return response
 
     def _getMethodByExceptionName(self, e):
         exception_name = {
@@ -588,7 +592,6 @@ class RHSimple(RH):
 
 
 class RHProtected(RH):
-
     def _getLoginURL(self):
         return url_for_login(request.relative_url)
 

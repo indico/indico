@@ -78,6 +78,8 @@ class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
     management permissions
     """
 
+    DENY_FRAMES = True
+
     @property
     def management(self):
         """Whether the RH is currently used in the management area"""

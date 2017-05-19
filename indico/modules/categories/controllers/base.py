@@ -62,6 +62,8 @@ class RHDisplayCategoryBase(RHCategoryBase):
 
 
 class RHManageCategoryBase(RHCategoryBase):
+    DENY_FRAMES = True
+
     def _checkProtection(self):
         if not self.category.can_manage(session.user):
             raise Forbidden

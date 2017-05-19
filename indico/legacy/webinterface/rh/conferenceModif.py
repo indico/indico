@@ -19,6 +19,8 @@ from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 
 
 class RHConferenceModifBase(RHConferenceBase, RHModificationBaseProtected):
+    DENY_FRAMES = True
+
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
 

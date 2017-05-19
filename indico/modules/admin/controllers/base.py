@@ -26,7 +26,7 @@ from indico.legacy.webinterface.rh.base import RHProtected
 class RHAdminBase(RHProtected):
     """Base class for all admin-only RHs"""
 
-    CSRF_ENABLED = True
+    DENY_FRAMES = True
 
     def _checkProtection(self):
         RHProtected._checkProtection(self)

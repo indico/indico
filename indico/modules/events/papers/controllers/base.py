@@ -49,6 +49,7 @@ class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
     """
 
     ROLE = 'paper_manager'
+    DENY_FRAMES = True
 
     def _checkProtection(self):
         RHModificationBaseProtected._checkProtection(self)
