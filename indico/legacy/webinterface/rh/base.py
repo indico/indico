@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import cProfile
 import copy
 import inspect
 import itertools
 import os
-import cProfile as profiler
 import pstats
-import sys
 import random
-import StringIO
 import warnings
 from datetime import datetime
 from functools import wraps, partial
@@ -37,27 +35,22 @@ from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidde
 from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
 
-from indico.legacy.accessControl import AccessWrapper
-
-from indico.legacy.common import fossilize, security
-from indico.legacy.common.mail import GenericMailer
-
-from indico.legacy.errors import (
-    AccessError,
-    BadRefererError,
-    KeyAccessError,
-    MaKaCError,
-    ModificationError,
-    NotLoggedError,
-    NotFoundError)
-import indico.legacy.webinterface.pages.errors as errors
-from indico.legacy.webinterface.pages.error import render_error
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import get_error_description, NoReportError
 from indico.core.logger import Logger
+from indico.legacy.accessControl import AccessWrapper
+from indico.legacy.common import fossilize
+from indico.legacy.common.mail import GenericMailer
+from indico.legacy.common.security import Sanitization
+from indico.legacy.errors import (AccessError, BadRefererError, KeyAccessError, MaKaCError, ModificationError,
+                                  NotLoggedError, NotFoundError)
+from indico.legacy.webinterface.pages.error import render_error
+from indico.legacy.webinterface.pages.errors import (WPGenericError, WPUnexpectedError, WPAccessError, WPKeyAccessError,
+                                                     WPModificationError, WPFormValuesError, WPNoReportError,
+                                                     WPRestrictedHTML)
 from indico.modules.auth.util import url_for_login, redirect_to_login
 from indico.modules.events.legacy import LegacyConference
 from indico.util.decorators import jsonify_error
@@ -347,7 +340,7 @@ class RH(RequestHandlerBase):
 
         if Config.getInstance().getPropagateAllExceptions():
             raise
-        return errors.WPGenericError(self).display()
+        return WPGenericError(self).display()
 
     @jsonify_error(status=500, logging_level='exception')
     def _processUnexpectedError(self, e):
@@ -356,7 +349,7 @@ class RH(RequestHandlerBase):
         self._responseUtil.redirect = None
         if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
             raise
-        return errors.WPUnexpectedError(self).display()
+        return WPUnexpectedError(self).display()
 
     @jsonify_error(status=403)
     def _processForbidden(self, e):
@@ -384,12 +377,12 @@ class RH(RequestHandlerBase):
     @jsonify_error(status=403)
     def _processAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
-        return errors.WPAccessError(self).display()
+        return WPAccessError(self).display()
 
     @jsonify_error
     def _processKeyAccessError(self, e):
         """Treats access errors occured during the process of a RH."""
-        return errors.WPKeyAccessError(self).display()
+        return WPKeyAccessError(self).display()
 
     @jsonify_error
     def _processModificationError(self, e):
@@ -397,23 +390,23 @@ class RH(RequestHandlerBase):
         if not session.user:
             return redirect_to_login(reason=_("Please log in to access this page. If you have a modification key, you "
                                               "may enter it afterwards."))
-        return errors.WPModificationError(self).display()
+        return WPModificationError(self).display()
 
     @jsonify_error(status=400)
     def _processBadRequestKeyError(self, e):
         """Request lacks a necessary key for processing"""
         msg = _('Required argument missing: %s') % e.message
-        return errors.WPFormValuesError(self, msg).display()
+        return WPFormValuesError(self, msg).display()
 
     @jsonify_error
     def _processNoReportError(self, e):
         """Process errors without reporting"""
-        return errors.WPNoReportError(self, e).display()
+        return WPNoReportError(self, e).display()
 
     @jsonify_error(status=400)
     def _processUserValueError(self, e):
         """Process errors without reporting"""
-        return errors.WPNoReportError(self, e).display()
+        return WPNoReportError(self, e).display()
 
     @jsonify_error(status=404)
     def _processNotFoundError(self, e):
@@ -429,15 +422,15 @@ class RH(RequestHandlerBase):
     def _processFormValuesError(self, e):
         """Treats user input related errors occured during the process of a RH."""
 
-        return errors.WPFormValuesError(self, e).display()
+        return WPFormValuesError(self, e).display()
 
     @jsonify_error
     def _processRestrictedHTML(self, e):
-        return errors.WPRestrictedHTML(self, escape(str(e))).display()
+        return WPRestrictedHTML(self, escape(str(e))).display()
 
     @jsonify_error
     def _processHtmlForbiddenTag(self, e):
-        return errors.WPRestrictedHTML(self, escape(str(e))).display()
+        return WPRestrictedHTML(self, escape(str(e))).display()
 
     def _check_auth(self, params):
         self._setSessionUser()
@@ -477,16 +470,13 @@ class RH(RequestHandlerBase):
         if func:
             func()
 
-        security.Sanitization.sanitizationCheck(self._target,
-                                                self._reqParams,
-                                                self._aw,
-                                                self._doNotSanitizeFields)
+        Sanitization.sanitizationCheck(self._target, self._reqParams, self._aw, self._doNotSanitizeFields)
 
         if self._doProcess:
             if profile:
                 profile_name = os.path.join(Config.getInstance().getTempDir(), 'stone{}.prof'.format(random.random()))
                 result = [None]
-                profiler.runctx('result[0] = self._process()', globals(), locals(), profile_name)
+                cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_name)
                 res = result[0]
             else:
                 res = self._process()
@@ -550,21 +540,6 @@ class RH(RequestHandlerBase):
             stats = pstats.Stats(profile_name)
             stats.sort_stats('cumulative', 'time', 'calls')
             stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))
-            output = StringIO.StringIO()
-            sys.stdout = output
-            stats.print_stats(100)
-            sys.stdout = sys.__stdout__
-            s = output.getvalue()
-            f = file(os.path.join(rep, 'IndicoRequest.log'), 'a+')
-            f.write('--------------------------------\n')
-            f.write('URL     : {}\n'.format(request.url))
-            f.write('{} : start request\n'.format(self._startTime))
-            f.write('params:{}'.format(params))
-            f.write('\n'.join(textLog))
-            f.write(s)
-            f.write('--------------------------------\n\n')
-            f.close()
-        if profile and profile_name and os.path.exists(profile_name):
             os.remove(profile_name)
 
         if self._responseUtil.call:
