@@ -126,7 +126,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
 
     @staticmethod
     def _validate_duration(entry, field, start_dt):
-        if entry.children:
+        if entry.children and start_dt.data is not None:
             end_dt = start_dt.data + field.data
             if end_dt < max(x.end_dt for x in entry.children):
                 raise ValidationError(_("This duration is too short to fit the entries within."))
@@ -134,7 +134,7 @@ class SessionBlockEntryForm(EntryFormMixin, SessionBlockForm):
     def validate_duration(self, field):
         super(SessionBlockEntryForm, self).validate_duration(field)
         if self.session_block and self.start_dt.data:
-            self._validate_duration(self.session_block.timetable_entry, self.start_dt, field)
+            self._validate_duration(self.session_block.timetable_entry, field, self.start_dt)
 
 
 class BaseEntryForm(EntryFormMixin, IndicoForm):
@@ -149,7 +149,7 @@ class BaseEntryForm(EntryFormMixin, IndicoForm):
     def validate_duration(self, field):
         super(BaseEntryForm, self).validate_duration(field)
         if self.entry.type == TimetableEntryType.SESSION_BLOCK and self.entry.children:
-            SessionBlockEntryForm._validate_duration(self.entry, self.start_dt, field)
+            SessionBlockEntryForm._validate_duration(self.entry, field, self.start_dt)
 
 
 _DOCUMENT_SETTINGS_CHOICES = [('showCoverPage', _('Include cover page')),
