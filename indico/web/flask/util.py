@@ -392,9 +392,6 @@ class ResponseUtil(object):
     The purpose of this is to allow e.g. an Indico RH to trigger a redirect but revoke
     it later in case of an error or to simply have something to pass around to functions
     which want to modify headers while there is no response available.
-
-    When you want a RH to call another RH assign a lambda performing the call to `.call`.
-    This ensures it's called after the current RH has finished and cleaned everything up.
     """
 
     def __init__(self):
@@ -430,13 +427,6 @@ class ResponseUtil(object):
         if self.call:
             raise Exception('Cannot use make_redirect when a callable is set')
         return redirect(*self.redirect)
-
-    def make_call(self):
-        if self.modified:
-            # If we receive a callabke - e.g. a lambda calling another RH - we do not allow any
-            # external modifications
-            raise Exception('Cannot combine callable with custom modifications or a return value')
-        return self.call()
 
     def make_response(self, res):
         if self.call:

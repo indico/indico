@@ -535,9 +535,6 @@ class RH(RequestHandlerBase):
             stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))
             os.remove(profile_name)
 
-        if self._responseUtil.call:
-            return self._responseUtil.make_call()
-
         if is_error_response and isinstance(res, (current_app.response_class, Response)):
             # if we went through error handling code, responseUtil._status has been changed
             # so make_response() would fail
