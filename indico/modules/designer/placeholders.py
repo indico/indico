@@ -53,7 +53,7 @@ class RegistrationPDPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, registration):
-        return registration.get_personal_data().get(cls.field, '')
+        return registration.get_personal_data().get(cls.field) or ''
 
 
 class FullNamePlaceholderBase(Placeholder):

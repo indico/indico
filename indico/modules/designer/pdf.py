@@ -160,14 +160,14 @@ class DesignerPDFBase(object):
 
         canvas.drawImage(img_reader, bg_x, bg_y, bg_width, bg_height)
 
-    def _build_config(self, config):
+    def _build_config(self, config_data):
         """Build a structured configuration object.
 
         Should be implemented by inheriting classes
         """
         return NotImplementedError
 
-    def _build_pdf(self):
+    def _build_pdf(self, canvas):
         """Generate the actual PDF.
 
         Should be implemented by inheriting classes.
