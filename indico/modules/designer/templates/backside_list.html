@@ -70,7 +70,7 @@
                 dataType: 'json',
                 error: handleAjaxError,
                 success: function(data) {
-                    $('.template-side.back').trigger('indico:backsideUpdated', data.template);
+                    $('.template-side.back').trigger('indico:backsideUpdated', data);
                     $this.trigger('ajaxDialog:close');
                 }
             });
