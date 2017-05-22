@@ -16,21 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import session, jsonify
-from werkzeug.exceptions import NotFound, Forbidden
+from flask import jsonify, session
+from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.attachments.controllers.management.base import (ManageAttachmentsMixin, AddAttachmentFilesMixin,
-                                                                    AddAttachmentLinkMixin, EditAttachmentMixin,
-                                                                    CreateFolderMixin, EditFolderMixin,
-                                                                    DeleteFolderMixin, DeleteAttachmentMixin)
-from indico.modules.attachments.util import can_manage_attachments
-from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
-from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
-from indico.modules.events.util import get_object_from_args
-from indico.web.flask.templating import get_template_module
 from indico.legacy.webinterface.rh.base import RHProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
+from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
+                                                                    CreateFolderMixin, DeleteAttachmentMixin,
+                                                                    DeleteFolderMixin, EditAttachmentMixin,
+                                                                    EditFolderMixin, ManageAttachmentsMixin)
+from indico.modules.attachments.util import can_manage_attachments
+from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
+from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.util import get_object_from_args
+from indico.web.flask.templating import get_template_module
 
 
 class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
@@ -101,7 +101,7 @@ class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagement
         DeleteAttachmentMixin._checkParams(self)
 
 
-class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHConferenceModifBase):
+class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHManageEventBase):
     wp = WPPackageEventAttachmentsManagement
     management = True
     CSRF_ENABLED = True

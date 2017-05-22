@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden
 
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.sessions.models.sessions import Session
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHManageSessionsBase(RHConferenceModifBase):
+class RHManageSessionsBase(RHManageEventBase):
     """Base RH for all session management RHs"""
 
     CSRF_ENABLED = True

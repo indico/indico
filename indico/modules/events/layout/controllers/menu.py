@@ -18,23 +18,23 @@ from __future__ import unicode_literals
 
 from itertools import count
 
-from flask import flash, request, session, jsonify
-from werkzeug.exceptions import BadRequest, NotFound, Forbidden
+from flask import flash, jsonify, request, session
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import (MenuLinkForm, MenuPageForm, MenuBuiltinEntryForm)
-from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, EventPage
+from indico.modules.events.layout.forms import MenuBuiltinEntryForm, MenuLinkForm, MenuPageForm
+from indico.modules.events.layout.models.menu import EventPage, MenuEntry, MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.layout.views import WPMenuEdit, WPPage
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _render_menu_entry(entry):
@@ -47,11 +47,11 @@ def _render_menu_entries(event, connect_menu=False):
     return tpl.menu_entries(menu_entries_for_event(event), connect_menu=connect_menu)
 
 
-class RHMenuBase(RHConferenceModifBase):
+class RHMenuBase(RHManageEventBase):
     CSRF_ENABLED = True
 
     def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
+        RHManageEventBase._checkProtection(self)
         if self.event_new.type_ != EventType.conference:
             raise NotFound('Only conferences have a menu')
 

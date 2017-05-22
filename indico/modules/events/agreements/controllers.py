@@ -20,25 +20,25 @@ import os
 from io import BytesIO
 
 from flask import flash, jsonify, redirect, request, session
-from werkzeug.exceptions import NotFound, Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
-from indico.modules.auth.util import redirect_to_login
-from indico.modules.events.agreements.forms import AgreementForm, AgreementEmailForm, AgreementAnswerSubmissionForm
-from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
-from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
-from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
-from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
-from indico.util.i18n import _
-from indico.web.flask.util import url_for, send_file
-from indico.web.forms.base import FormDefaults
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.agreements.forms import AgreementAnswerSubmissionForm, AgreementEmailForm, AgreementForm
+from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
+from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
+from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
+from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
+from indico.modules.events.management.controllers import RHManageEventBase
+from indico.util.i18n import _
+from indico.web.flask.util import send_file, url_for
+from indico.web.forms.base import FormDefaults
 
 
-class RHAgreementManagerBase(RHConferenceModifBase):
+class RHAgreementManagerBase(RHManageEventBase):
     """Base class for agreement management RHs"""
 
     CSRF_ENABLED = True

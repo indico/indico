@@ -19,16 +19,17 @@ from __future__ import unicode_literals
 import itertools
 from collections import defaultdict
 
-from flask import request, flash, session, redirect
-from sqlalchemy.orm import joinedload, contains_eager
+from flask import flash, redirect, request, session
+from sqlalchemy.orm import contains_eager, joinedload
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
-from indico.modules.events import EventLogRealm, EventLogKind
-from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.views import WPManagePersons
@@ -36,16 +37,15 @@ from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users import User
 from indico.util.date_time import now_utc
-from indico.util.i18n import ngettext, _
+from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for, jsonify_data
+from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_template
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHPersonsBase(RHConferenceModifBase):
+class RHPersonsBase(RHManageEventBase):
     CSRF_ENABLED = True
 
     def get_persons(self):
@@ -159,7 +159,7 @@ class RHPersonsList(RHPersonsBase):
                                                persons=person_list, num_no_account=num_no_account)
 
 
-class RHEmailEventPersons(RHConferenceModifBase):
+class RHEmailEventPersons(RHManageEventBase):
     """Send emails to selected EventPersons"""
 
     CSRF_ENABLED = True
@@ -167,7 +167,7 @@ class RHEmailEventPersons(RHConferenceModifBase):
     def _checkParams(self, params):
         self._doNotSanitizeFields.append('from_address')
         self.no_account = request.args.get('no_account') == '1'
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
 
     def _process(self):
         person_ids = request.form.getlist('person_id')
@@ -220,7 +220,7 @@ class RHEmailEventPersons(RHConferenceModifBase):
         return User.query.filter(User.id.in_(user_ids), User.email != '').all()
 
 
-class RHGrantSubmissionRights(RHConferenceModifBase):
+class RHGrantSubmissionRights(RHManageEventBase):
     """Grants submission rights to all contribution speakers"""
 
     CSRF_ENABLED = True
@@ -243,7 +243,7 @@ class RHGrantSubmissionRights(RHConferenceModifBase):
         return redirect(url_for('.person_list', self.event_new))
 
 
-class RHGrantModificationRights(RHConferenceModifBase):
+class RHGrantModificationRights(RHManageEventBase):
     """Grants session modification rights to all session conveners"""
 
     CSRF_ENABLED = True
@@ -263,7 +263,7 @@ class RHGrantModificationRights(RHConferenceModifBase):
         return redirect(url_for('.person_list', self.event_new))
 
 
-class RHRevokeSubmissionRights(RHConferenceModifBase):
+class RHRevokeSubmissionRights(RHManageEventBase):
     """Revokes submission rights"""
 
     CSRF_ENABLED = True

@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.logs.models.entries import EventLogEntry
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.events.logs.views import WPEventLogs
+from indico.modules.events.management.controllers import RHManageEventBase
 
 
-class RHEventLogs(RHConferenceModifBase):
+class RHEventLogs(RHManageEventBase):
     """Shows the modification/action log for the event"""
 
     def _process(self):

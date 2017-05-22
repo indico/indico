@@ -16,25 +16,24 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session, flash
+from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 from wtforms.fields import BooleanField
 
 from indico.modules.events.features import logger
-from indico.modules.events.features.util import (get_feature_definitions, get_enabled_features, set_feature_enabled,
-                                                 get_feature_definition, get_disallowed_features, format_feature_names)
+from indico.modules.events.features.util import (format_feature_names, get_disallowed_features, get_enabled_features,
+                                                 get_feature_definition, get_feature_definitions, set_feature_enabled)
 from indico.modules.events.features.views import WPFeatures
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.i18n import _, ngettext
-from indico.web.forms.base import IndicoForm, FormDefaults
+from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 from indico.web.menu import render_sidemenu
 from indico.web.util import jsonify_data
 
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-
-class RHFeaturesBase(RHConferenceModifBase):
+class RHFeaturesBase(RHManageEventBase):
     CSRF_ENABLED = True
 
 

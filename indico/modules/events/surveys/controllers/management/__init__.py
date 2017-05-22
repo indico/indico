@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 from flask import request
 
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.surveys.models.surveys import Survey
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHManageSurveysBase(RHConferenceModifBase):
+class RHManageSurveysBase(RHManageEventBase):
     """Base class for all survey management RHs"""
 
     CSRF_ENABLED = True

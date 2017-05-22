@@ -17,11 +17,10 @@
 from __future__ import unicode_literals
 
 from enum import Enum
-
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.events.management.controllers import RHManageEventBase
 
 
 class SessionManagementLevel(Enum):
@@ -32,14 +31,14 @@ class SessionManagementLevel(Enum):
     coordinate = 4
 
 
-class RHManageTimetableBase(RHConferenceModifBase):
+class RHManageTimetableBase(RHManageEventBase):
     """Base class for all timetable management RHs"""
 
     CSRF_ENABLED = True
     session_management_level = SessionManagementLevel.none
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self.session = None
         if 'session_id' in request.view_args:
             self.session = self.event_new.get_session(request.view_args['session_id'])
@@ -48,7 +47,7 @@ class RHManageTimetableBase(RHConferenceModifBase):
 
     def _checkProtection(self):
         if not self.session or self.session_management_level == SessionManagementLevel.none:
-            RHConferenceModifBase._checkProtection(self)
+            RHManageEventBase._checkProtection(self)
         else:
             if self.session_management_level == SessionManagementLevel.manage:
                 func = lambda u: self.session.can_manage(u)

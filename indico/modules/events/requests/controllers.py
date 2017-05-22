@@ -16,16 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import request, flash, redirect, session
-from werkzeug.exceptions import NotFound, BadRequest, Forbidden
+from flask import flash, redirect, request, session
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.requests import get_request_definitions
 from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.events.requests.util import is_request_manager
 from indico.modules.events.requests.views import WPRequestsEventManagement
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 class EventOrRequestManagerMixin:
@@ -40,10 +40,10 @@ class EventOrRequestManagerMixin:
         can_manage_event = self.event_new.can_manage(session.user)
         self.protection_overridden = can_manage_request and not can_manage_event
         if not can_manage_request and not can_manage_event:
-            RHConferenceModifBase._checkProtection(self)
+            RHManageEventBase._checkProtection(self)
 
 
-class RHRequestsEventRequests(EventOrRequestManagerMixin, RHConferenceModifBase):
+class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
     """Overview of existing requests (event)"""
 
     CSRF_ENABLED = True
@@ -61,7 +61,7 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHConferenceModifBase)
                                                          definitions=definitions, requests=requests)
 
 
-class RHRequestsEventRequestBase(RHConferenceModifBase):
+class RHRequestsEventRequestBase(RHManageEventBase):
     """Base class for pages handling a specific request type"""
 
     CSRF_ENABLED = True
@@ -70,7 +70,7 @@ class RHRequestsEventRequestBase(RHConferenceModifBase):
     _require_request = True
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         try:
             self.definition = get_request_definitions()[request.view_args['type']]
         except KeyError:

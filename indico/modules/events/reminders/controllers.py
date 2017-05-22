@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session, redirect, flash, jsonify, render_template
+from flask import flash, jsonify, redirect, render_template, request, session
 
 from indico.core.db import db
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.forms import ReminderForm
 from indico.modules.events.reminders.models.reminders import EventReminder
@@ -30,10 +31,9 @@ from indico.util.string import to_unicode
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_template
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHRemindersBase(RHConferenceModifBase):
+class RHRemindersBase(RHManageEventBase):
     CSRF_ENABLED = True
 
 

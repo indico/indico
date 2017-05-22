@@ -18,49 +18,49 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import flash, request, jsonify, redirect, session
+from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
+from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.legacy.PDFinterface.conference import ContribsToPDF, ContributionBook
 from indico.legacy.webinterface.rh.base import check_event_locked
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions import get_contrib_field_types
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
-from indico.modules.events.contributions.forms import (ContributionProtectionForm, SubContributionForm,
-                                                       ContributionStartDateForm, ContributionDurationForm,
-                                                       ContributionTypeForm)
+from indico.modules.events.contributions.forms import (ContributionDurationForm, ContributionProtectionForm,
+                                                       ContributionStartDateForm, ContributionTypeForm,
+                                                       SubContributionForm)
 from indico.modules.events.contributions.lists import ContributionListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.contributions.operations import (create_contribution, update_contribution,
-                                                            delete_contribution, create_subcontribution,
-                                                            update_subcontribution, delete_subcontribution)
-from indico.modules.events.contributions.util import (contribution_type_row, make_contribution_form,
-                                                      generate_spreadsheet_from_contributions)
+from indico.modules.events.contributions.operations import (create_contribution, create_subcontribution,
+                                                            delete_contribution, delete_subcontribution,
+                                                            update_contribution, update_subcontribution)
+from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
+                                                      make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogKind, EventLogRealm
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import update_object_principals, track_time_changes, get_field_values
+from indico.modules.events.util import get_field_values, track_time_changes, update_object_principals
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for, send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -74,12 +74,12 @@ def _render_subcontribution_list(contrib):
     return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
 
 
-class RHManageContributionsBase(RHConferenceModifBase):
+class RHManageContributionsBase(RHManageEventBase):
     """Base class for all contributions management RHs"""
     CSRF_ENABLED = True
 
     def _checkParams(self, params):
-        RHConferenceModifBase._checkParams(self, params)
+        RHManageEventBase._checkParams(self, params)
         self.list_generator = ContributionListGenerator(event=self.event_new)
 
 

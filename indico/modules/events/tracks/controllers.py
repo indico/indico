@@ -19,25 +19,25 @@ from __future__ import unicode_literals
 from io import BytesIO
 from operator import itemgetter
 
-from flask import request, flash
+from flask import flash, request
 from sqlalchemy.orm import subqueryload
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
+from indico.legacy.PDFinterface.conference import ProgrammeToPDF
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout.util import get_menu_entry_by_name
-from indico.modules.events.tracks.forms import TrackForm, ProgramForm
+from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.tracks.forms import ProgramForm, TrackForm
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.tracks.operations import create_track, update_track, delete_track, update_program
+from indico.modules.events.tracks.operations import create_track, delete_track, update_program, update_track
 from indico.modules.events.tracks.settings import track_settings
-from indico.modules.events.tracks.views import WPManageTracks, WPDisplayTracks
+from indico.modules.events.tracks.views import WPDisplayTracks, WPManageTracks
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form, jsonify_data
-from indico.legacy.PDFinterface.conference import ProgrammeToPDF
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.web.util import jsonify_data, jsonify_form
 
 
 def _render_track_list(event):
@@ -45,7 +45,7 @@ def _render_track_list(event):
     return tpl.render_track_list(event)
 
 
-class RHManageTracksBase(RHConferenceModifBase):
+class RHManageTracksBase(RHManageEventBase):
     """Base class for all track management RHs"""
 
     CSRF_ENABLED = True

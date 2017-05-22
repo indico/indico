@@ -19,20 +19,20 @@ from __future__ import unicode_literals
 import shutil
 from io import BytesIO
 
-from flask import flash, request, session, render_template
+from flask import flash, render_template, request, session
 from PIL import Image
 
 from indico.core import signals
 from indico.core.db import db
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout import logger
 from indico.modules.events.layout.forms import AddImagesForm
 from indico.modules.events.layout.models.images import ImageFile
 from indico.modules.events.layout.views import WPImages
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
 from indico.util.i18n import _, ngettext
 from indico.web.util import jsonify_data
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 def _render_image_list(event):
@@ -40,7 +40,7 @@ def _render_image_list(event):
     return render_template('events/layout/image_list.html', images=images)
 
 
-class RHManageImagesBase(RHConferenceModifBase):
+class RHManageImagesBase(RHManageEventBase):
     EVENT_FEATURE = 'images'
     CSRF_ENABLED = True
 

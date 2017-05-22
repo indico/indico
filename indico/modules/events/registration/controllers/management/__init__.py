@@ -19,14 +19,14 @@ from __future__ import unicode_literals
 from flask import request
 from sqlalchemy.orm import contains_eager, defaultload
 
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.controllers import RegistrationFormMixin
 from indico.modules.events.registration.lists import RegistrationListGenerator
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.registrations import Registration
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
-class RHManageRegFormsBase(RHConferenceModifBase):
+class RHManageRegFormsBase(RHManageEventBase):
     """Base class for all registration management RHs"""
 
     CSRF_ENABLED = True

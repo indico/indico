@@ -14,32 +14,35 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from operator import attrgetter
 
-from flask import request, flash
+from flask import flash, request
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.controllers.user.reservations import (RHRoomBookingBookingDetails, RHRoomBookingModifyBooking,
-                                                             RHRoomBookingCloneBooking, RHRoomBookingNewBookingSimple,
-                                                             RHRoomBookingNewBooking, RHRoomBookingCancelBooking,
-                                                             RHRoomBookingRejectBooking, RHRoomBookingAcceptBooking,
+from indico.modules.rb.controllers.user.reservations import (RHRoomBookingAcceptBooking, RHRoomBookingBookingDetails,
+                                                             RHRoomBookingCancelBooking,
                                                              RHRoomBookingCancelBookingOccurrence,
+                                                             RHRoomBookingCloneBooking, RHRoomBookingModifyBooking,
+                                                             RHRoomBookingNewBooking, RHRoomBookingNewBookingSimple,
+                                                             RHRoomBookingRejectBooking,
                                                              RHRoomBookingRejectBookingOccurrence)
 from indico.modules.rb.controllers.user.rooms import RHRoomBookingRoomDetails
 from indico.modules.rb.models.reservations import RepeatFrequency
-from indico.modules.rb.views.user.event import (WPRoomBookingEventRoomDetails, WPRoomBookingEventBookingList,
-                                                WPRoomBookingEventBookingDetails, WPRoomBookingEventModifyBooking,
-                                                WPRoomBookingEventNewBookingSimple, WPRoomBookingEventChooseEvent,
-                                                WPRoomBookingEventNewBookingSelectRoom,
+from indico.modules.rb.views.user.event import (WPRoomBookingEventBookingDetails, WPRoomBookingEventBookingList,
+                                                WPRoomBookingEventChooseEvent, WPRoomBookingEventModifyBooking,
+                                                WPRoomBookingEventNewBookingConfirm,
                                                 WPRoomBookingEventNewBookingSelectPeriod,
-                                                WPRoomBookingEventNewBookingConfirm)
+                                                WPRoomBookingEventNewBookingSelectRoom,
+                                                WPRoomBookingEventNewBookingSimple, WPRoomBookingEventRoomDetails)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
 
 def _get_object_type(obj):
@@ -73,9 +76,9 @@ def _assign_room(obj, room, flash_message=True):
     obj.room = room
 
 
-class RHRoomBookingEventBase(RHConferenceModifBase, RHRoomBookingBase):
+class RHRoomBookingEventBase(RHManageEventBase, RHRoomBookingBase):
     def _checkProtection(self):
-        RHConferenceModifBase._checkProtection(self)
+        RHManageEventBase._checkProtection(self)
         RHRoomBookingBase._checkProtection(self)
 
 

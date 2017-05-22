@@ -20,15 +20,14 @@ from flask import redirect, request, session
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.modules.events.static.tasks import build_static_site
 from indico.modules.events.static.views import WPStaticSites
 from indico.web.flask.util import url_for
 
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
 
-
-class RHStaticSiteBase(RHConferenceModifBase):
+class RHStaticSiteBase(RHManageEventBase):
     CSRF_ENABLED = True
 
 

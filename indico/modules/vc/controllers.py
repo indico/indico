@@ -16,32 +16,31 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from operator import itemgetter
 
-from flask import request, session, redirect, flash, jsonify
+from flask import flash, jsonify, redirect, request, session
 from sqlalchemy import func, inspect
 from sqlalchemy.orm import joinedload, lazyload
-from werkzeug.exceptions import NotFound, BadRequest, Forbidden
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
-from indico.modules.vc.forms import VCRoomListFilterForm
-from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomStatus, VCRoomLinkType
-from indico.modules.vc.notifications import notify_created
-from indico.modules.vc.util import get_vc_plugins, resolve_title, get_managed_vc_plugins, find_event_vc_rooms
-from indico.modules.vc.views import WPVCManageEvent, WPVCEventPage, WPVCService
-from indico.util.date_time import as_utc, now_utc, get_day_start, get_day_end
-from indico.util.i18n import _
-from indico.util.struct.iterables import group_list
-from indico.web.flask.util import url_for, redirect_or_jsonify
-from indico.web.forms.base import FormDefaults
-from indico.web.util import _pop_injected_js, jsonify_data
-
 from indico.legacy.webinterface.rh.base import RHProtected
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
+from indico.modules.vc.forms import VCRoomListFilterForm
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType, VCRoomStatus
+from indico.modules.vc.notifications import notify_created
+from indico.modules.vc.util import find_event_vc_rooms, get_managed_vc_plugins, get_vc_plugins, resolve_title
+from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent, WPVCService
+from indico.util.date_time import as_utc, get_day_end, get_day_start, now_utc
+from indico.util.i18n import _
+from indico.util.struct.iterables import group_list
+from indico.web.flask.util import redirect_or_jsonify, url_for
+from indico.web.forms.base import FormDefaults
+from indico.web.util import _pop_injected_js, jsonify_data
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
@@ -79,7 +78,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
         return event_vc_room
 
 
-class RHVCManageEventBase(RHConferenceModifBase):
+class RHVCManageEventBase(RHManageEventBase):
     CSRF_ENABLED = True
 
 

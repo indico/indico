@@ -18,17 +18,24 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
-from indico.modules.events.contributions.models.persons import (ContributionPersonLink, SubContributionPersonLink,
-                                                                AuthorType)
+from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
+from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
+                                                                SubContributionPersonLink)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.web.util import jsonify_template
 
 
-class RHManageEventBase(RHConferenceModifBase):
+class RHManageEventBase(RHConferenceBase, RHModificationBaseProtected):
     """Base class for event management RHs"""
 
-    CSRF_ENABLED = True
+    DENY_FRAMES = True
+
+    def _checkParams(self, params):
+        RHConferenceBase._checkParams(self, params)
+
+    def _checkProtection(self):
+        RHModificationBaseProtected._checkProtection(self)
 
 
 class RHContributionPersonListMixin:

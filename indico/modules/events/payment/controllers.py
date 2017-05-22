@@ -16,23 +16,23 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash, request, session, jsonify
-from werkzeug.exceptions import NotFound, BadRequest
+from flask import flash, jsonify, redirect, request, session
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.plugins.controllers import RHPluginDetails
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.payment import payment_settings, payment_event_settings
+from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.payment import payment_event_settings, payment_settings
 from indico.modules.events.payment.forms import AdminSettingsForm, EventSettingsForm
-from indico.modules.events.payment.util import get_payment_plugins, get_active_payment_plugins
-from indico.modules.events.payment.views import WPPaymentAdmin, WPPaymentEventManagement, WPPaymentEvent
+from indico.modules.events.payment.util import get_active_payment_plugins, get_payment_plugins
+from indico.modules.events.payment.views import WPPaymentAdmin, WPPaymentEvent, WPPaymentEventManagement
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template, jsonify_data, jsonify_form
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHPaymentAdminSettings(RHAdminBase):
@@ -53,7 +53,7 @@ class RHPaymentAdminPluginSettings(RHPluginDetails):
     back_button_endpoint = 'payment.admin_settings'
 
 
-class RHPaymentManagementBase(RHConferenceModifBase):
+class RHPaymentManagementBase(RHManageEventBase):
     """Base RH for event management pages"""
 
     EVENT_FEATURE = 'payment'

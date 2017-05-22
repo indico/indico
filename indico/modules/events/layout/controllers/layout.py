@@ -24,24 +24,24 @@ from PIL import Image
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db
+from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout import layout_settings, logger
-from indico.modules.events.layout.forms import (ConferenceLayoutForm, LectureMeetingLayoutForm, LogoForm, CSSForm,
-                                                CSSSelectionForm)
-from indico.modules.events.layout.util import get_css_url, get_logo_data, get_css_file_data
+from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
+                                                LectureMeetingLayoutForm, LogoForm)
+from indico.modules.events.layout.util import get_css_file_data, get_css_url, get_logo_data
 from indico.modules.events.layout.views import WPLayoutEdit
+from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
-from indico.util.string import to_unicode, crc32
-from indico.web.flask.util import url_for, send_file
+from indico.util.string import crc32, to_unicode
+from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data
-from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
-from indico.legacy.webinterface.rh.conferenceModif import RHConferenceModifBase
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
-class RHLayoutBase(RHConferenceModifBase):
+class RHLayoutBase(RHManageEventBase):
     CSRF_ENABLED = True
 
 
