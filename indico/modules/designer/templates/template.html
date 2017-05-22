@@ -288,9 +288,9 @@
                                             <div>{% trans %}The back side is empty.{% endtrans %}</div>
                                             <div>
                                                 {% set link_start %}
-                                                    <a href="#" data-href="{{ url_for('.backside_template_list', template) }}"
-                                                       data-title="{% trans %}Select a template for the back side{% endtrans %}"
-                                                       data-ajax-dialog>
+                                                    <a href="#" class="js-backside-list-dialog"
+                                                       data-href="{{ url_for('.backside_template_list', template) }}"
+                                                       data-title="{% trans %}Select a template for the back side{% endtrans %}">
                                                 {% endset %}
                                                 {% set link_end %}</a>{% endset %}
                                                 {%- trans link_start=link_start|safe, link_end=link_end|safe -%}
