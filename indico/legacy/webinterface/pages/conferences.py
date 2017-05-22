@@ -18,16 +18,16 @@ from __future__ import print_function
 
 import os
 
-from flask import session, render_template, request, render_template_string
+from flask import render_template, render_template_string, request, session
 
 from indico.core.config import Config
 from indico.legacy.common.utils import isStringHTML
 from indico.legacy.webinterface import wcomponents
-from indico.legacy.webinterface.common.tools import strip_ml_tags, escape_html
+from indico.legacy.webinterface.common.tools import escape_html, strip_ml_tags
 from indico.legacy.webinterface.pages import base
 from indico.legacy.webinterface.pages.base import WPDecorated
 from indico.modules.auth.util import url_for_logout
-from indico.modules.core.settings import social_settings, core_settings
+from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import (build_menu_entry_name, get_css_url, get_menu_entry_by_name,
                                                menu_entries_for_event)
@@ -98,13 +98,14 @@ def render_event_footer(event, dark=False):
 
 
 class WPConferenceBase(base.WPDecorated):
-    def __init__(self, rh, conference, **kwargs):
-        event = conference.as_event
+    @unify_event_args
+    def __init__(self, rh, event_, **kwargs):
+        assert event_ == kwargs.setdefault('event', event_)
         WPDecorated.__init__(self, rh, **kwargs)
-        self._navigationTarget = self._conf = conference
-        self._tz = event.display_tzinfo.zone
-        start_dt_local = event.start_dt_display.astimezone(event.display_tzinfo)
-        end_dt_local = event.end_dt_display.astimezone(event.display_tzinfo)
+        self._navigationTarget = self._conf = event_.as_legacy
+        self._tz = event_.display_tzinfo.zone
+        start_dt_local = event_.start_dt_display.astimezone(event_.display_tzinfo)
+        end_dt_local = event_.end_dt_display.astimezone(event_.display_tzinfo)
         dates = " (%s)" % format_date(start_dt_local, format='long')
         if start_dt_local.strftime("%d%B%Y") != end_dt_local.strftime("%d%B%Y"):
             if start_dt_local.strftime("%B%Y") == end_dt_local.strftime("%B%Y"):
