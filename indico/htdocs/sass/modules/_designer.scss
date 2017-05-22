@@ -332,6 +332,15 @@
         .template-icon-badge {
             margin-right: 1em;
         }
+
+        &.not-selectable-backside {
+            background-color: $light-gray;
+
+            * {
+                cursor: not-allowed;
+                color: $dark-gray;
+            }
+        }
     }
 }
 

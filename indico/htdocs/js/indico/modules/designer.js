@@ -798,6 +798,20 @@
                 $height.val(widthValue);
                 changeTemplateSize(template, backsideTemplate);
             });
+
+            $('.js-backside-list-dialog').on('click', function() {
+                var $this = $(this);
+
+                ajaxDialog({
+                    trigger: $this,
+                    url: $this.data('href'),
+                    data: {
+                        width: templateDimensions.realWidth,
+                        height: templateDimensions.realHeight
+                    },
+                    title: $this.data('title'),
+                });
+            });
         });
 
         // We load the template if we are editing a template
