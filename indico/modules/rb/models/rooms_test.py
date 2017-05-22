@@ -36,30 +36,6 @@ pytest_plugins = 'indico.modules.rb.testing.fixtures'
 _notset = object()
 
 
-def assert_is_in_digest_window(room, expected, expected_with_exclude):
-    assert room.is_in_digest_window() == expected
-    assert room.is_in_digest_window(exclude_first_day=True) == expected_with_exclude
-    assert Room.find_first(Room.is_in_digest_window()) == (room if expected else None)
-    assert Room.find_first(Room.is_in_digest_window(exclude_first_day=True)) == (room if expected_with_exclude
-                                                                                 else None)
-
-
-digest_window_cases = (
-    #                                    W: window  T: today  B: both
-    #                                    |              OCT              |
-    ('2014-10-01', 99, True,  True),   # |T------------------------------|
-    ('2014-10-01', 99, True,  True),   # |-T-----------------------------|
-    ('2014-10-16', 31, True,  True),   # |W--------------T---------------|
-    ('2014-10-16', 17, True,  True),   # |--------------WT---------------|
-    ('2014-10-16', 16, True,  False),  # |---------------B---------------|
-    ('2014-10-16', 15, False, False),  # |---------------TW--------------|
-    ('2014-10-30', 1,  False, False),  # |-----------------------------TW|
-    ('2014-10-31', 1,  True,  False),  # |------------------------------B|
-    ('2014-11-01', 1,  True,  True),   # |------------------------------W|T
-    ('2014-11-02', 1,  False, False),  # |------------------------------W|-T
-)
-
-
 @pytest.mark.parametrize('need_confirmation', (True, False))
 def test_is_auto_confirm(create_room, need_confirmation):
     room = create_room(reservations_need_confirmation=need_confirmation)
@@ -198,8 +174,8 @@ def test_marker_description(db, create_room, create_equipment_type,
     assert room.marker_description == expected
 
 
-def test_owner(dummy_room, dummy_avatar):
-    assert dummy_room.owner == dummy_avatar
+def test_owner(dummy_room, dummy_user):
+    assert dummy_room.owner == dummy_user
 
 
 def test_owner_after_change(dummy_room, dummy_user):
@@ -441,11 +417,11 @@ def test_filter_available(dummy_room, create_reservation, create_blocking,
     assert set(Room.find_all(availabilty_filter)) == (set() if filtered else {dummy_room})
 
 
-def test_find_with_filters(db, dummy_room, create_room, dummy_avatar, create_equipment_type, create_room_attribute,
+def test_find_with_filters(db, dummy_room, create_room, dummy_user, create_equipment_type, create_room_attribute,
                            dummy_reservation):
     # Simple testcase that ensures we find the room when many filters are used
     other_room = create_room()
-    assert set(Room.find_with_filters({}, dummy_avatar)) == {dummy_room, other_room}
+    assert set(Room.find_with_filters({}, dummy_user)) == {dummy_room, other_room}
     create_room_attribute(u'attr')
     eq = create_equipment_type(u'eq')
     dummy_room.capacity = 100
@@ -462,7 +438,7 @@ def test_find_with_filters(db, dummy_room, create_room, dummy_avatar, create_equ
                'repeatability': 'None',
                'start_dt': dummy_reservation.start_dt,
                'end_dt': dummy_reservation.end_dt}
-    assert set(Room.find_with_filters(filters, dummy_avatar)) == {dummy_room}
+    assert set(Room.find_with_filters(filters, dummy_user)) == {dummy_room}
 
 
 def test_find_with_filters_equipment(db, dummy_room, create_room, create_equipment_type):
@@ -778,40 +754,3 @@ def test_check_bookable_hours_no_user(db, dummy_room):
     dummy_room.bookable_hours = [BookableHours(start_time=time(12), end_time=time(14))]
     db.session.flush()
     assert not dummy_room.check_bookable_hours(time(8), time(9), quiet=True)
-
-
-@pytest.mark.parametrize(('current_date', 'notification_window', 'expected', 'expected_with_exclude'),
-                         digest_window_cases)
-def test_is_in_digest_window(db, freeze_time, dummy_room,
-                             current_date, notification_window, expected, expected_with_exclude):
-    freeze_time(current_date)
-    dummy_room.notification_before_days = notification_window
-    db.session.flush()
-    assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
-
-
-@pytest.mark.parametrize(('current_date', 'notification_window', 'expected', 'expected_with_exclude'),
-                         digest_window_cases)
-def test_is_in_digest_window_from_settings(db, freeze_time, dummy_room,
-                                           current_date, notification_window, expected, expected_with_exclude):
-    freeze_time(current_date)
-    dummy_room.notification_window = None
-    rb_settings.set('notification_before_days', notification_window)
-    db.session.flush()
-    assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)
-
-
-@pytest.mark.parametrize(('current_date', 'expected', 'expected_with_exclude'), (
-    #                                W: window  T: today  B: both
-    #                                |              OCT              |
-    ('2014-10-30', False, False),  # |-----------------------------TW|
-    ('2014-10-31', True,  False),  # |------------------------------B|
-    ('2014-11-01', True,  True),   # |------------------------------W|T
-    ('2014-11-02', False, False),  # |------------------------------W|-T
-))
-def test_is_in_digest_window_from_settings_empty(db, freeze_time, dummy_room,
-                                                 current_date, expected, expected_with_exclude):
-    freeze_time(current_date)
-    dummy_room.notification_before_days = None
-    db.session.flush()
-    assert_is_in_digest_window(dummy_room, expected, expected_with_exclude)

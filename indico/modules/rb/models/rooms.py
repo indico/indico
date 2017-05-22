@@ -18,8 +18,8 @@ import ast
 import json
 from datetime import date
 
-from sqlalchemy import and_, func, or_, cast, Date
-from sqlalchemy.ext.hybrid import hybrid_property, hybrid_method
+from sqlalchemy import and_, func, or_, cast
+from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager
 
 from indico.core.db.sqlalchemy import db
@@ -27,17 +27,17 @@ from indico.core.db.sqlalchemy.custom import static_array
 from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.core.errors import NoReportError
+from indico.legacy.common.cache import GenericCache
 from indico.modules.groups import GroupProxy
-from indico.modules.rb.util import rb_check_user_access, rb_is_admin
-from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
+from indico.modules.rb.models.blockings import Blocking
+from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
-from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
-from indico.util.date_time import round_up_month
+from indico.modules.rb.util import rb_check_user_access, rb_is_admin
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -45,8 +45,6 @@ from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, natural_sort_key
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
-from indico.legacy.common.cache import GenericCache
-
 
 _cache = GenericCache('Rooms')
 
@@ -123,10 +121,11 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
     notification_before_days = db.Column(
         db.Integer
     )
-    notification_for_responsible = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
+    notification_before_days_weekly = db.Column(
+        db.Integer
+    )
+    notification_before_days_monthly = db.Column(
+        db.Integer
     )
     notification_for_assistance = db.Column(
         db.Boolean,
@@ -699,28 +698,6 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         if not manager_group:
             return False
         return user in GroupProxy.get_named_default_group(manager_group)
-
-    @hybrid_method
-    def is_in_digest_window(self, exclude_first_day=False):
-        from indico.modules.rb import rb_settings
-        digest_start = round_up_month(date.today(), from_day=2)
-        days_until_next_digest = (digest_start - date.today()).days
-        digest_window = self.notification_before_days or rb_settings.get('notification_before_days')
-        if exclude_first_day:
-            return days_until_next_digest < digest_window
-        else:
-            return days_until_next_digest <= digest_window
-
-    @is_in_digest_window.expression
-    def is_in_digest_window(self, exclude_first_day=False):
-        from indico.modules.rb import rb_settings
-        digest_start = round_up_month(date.today(), from_day=2)
-        days_until_next_digest = cast(digest_start, Date) - cast(func.now(), Date)
-        digest_window = func.coalesce(self.notification_before_days, rb_settings.get('notification_before_days'))
-        if exclude_first_day:
-            return days_until_next_digest < digest_window
-        else:
-            return days_until_next_digest <= digest_window
 
     @classmethod
     def get_owned_by(cls, user):

@@ -25,8 +25,9 @@ class WPRoomBookingSettings(WPRoomBookingAdminBase):
     def _get_legacy_content(self, params):
         params['field_opts'] = {
             'assistance_emails': {'rows': 3, 'cols': 40},
-            'notification_hour': {'size': 2},
             'notification_before_days': {'size': 2},
+            'notification_before_days_weekly': {'size': 2},
+            'notification_before_days_monthly': {'size': 2},
             'vc_support_emails': {'rows': 3, 'cols': 40},
             'booking_limit': {'size': 3},
         }

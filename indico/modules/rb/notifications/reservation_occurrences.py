@@ -1,11 +1,23 @@
-from datetime import date
-
-from flask import render_template
+# This file is part of Indico.
+# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+#
+# Indico is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 3 of the
+# License, or (at your option) any later version.
+#
+# Indico is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.notifications import email_sender, make_email
-from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.notifications.reservations import ReservationNotification
 from indico.util.date_time import format_datetime
+from indico.web.flask.templating import get_template_module
 
 
 class ReservationOccurrenceNotification(ReservationNotification):
@@ -72,60 +84,7 @@ def notify_rejection(occurrence):
 
 
 @email_sender
-def notify_upcoming_occurrence(occurrence):
-    if occurrence.start_dt.date() < date.today():
-        raise ValueError("This reservation occurrence started in the past")
-
-    to_list = []
-    reservation_user = occurrence.reservation.booked_for_user
-    if reservation_user is not None:
-        to_list.append(reservation_user.email)
-
-    cc_list = []
-    room = occurrence.reservation.room
-    if room.notification_for_responsible:
-        cc_list.append(room.owner.email)
-
-    if not to_list and not cc_list:
-        return
-
-    subject = 'Reservation reminder'
-    text = render_template('rb/emails/reservations/reminders/upcoming_occurrence.txt',
-                           occurrence=occurrence,
-                           owner=reservation_user,
-                           RepeatFrequency=RepeatFrequency)
-    return make_email(to_list=to_list, cc_list=cc_list, subject=subject, body=text)
-
-
-@email_sender
-def notify_reservation_digest(reservation, occurrences):
-    if not occurrences:
-        return
-    if reservation.end_dt.date() < date.today():
-        raise ValueError("This reservation has already ended")
-    if reservation.repeat_frequency != RepeatFrequency.WEEK:
-        raise ValueError("This reservation is not weekly")
-    if any(occ.reservation != reservation for occ in occurrences):
-        raise ValueError("Some occurrences don't belong to the reservation")
-    if any(occurrences[0].start_dt.month != occ.start_dt.month for occ in occurrences):
-        raise ValueError("Occurrences happening in different months")
-
-    to_list = []
-    reservation_user = reservation.booked_for_user
-    if reservation_user is not None:
-        to_list.append(reservation_user.email)
-
-    cc_list = []
-    room = reservation.room
-    if room.notification_for_responsible:
-        cc_list.append(room.owner.email)
-
-    if not to_list and not cc_list:
-        return
-
-    subject = 'Reservation reminder digest'
-    text = render_template('rb/emails/reservations/reminders/reservation_digest.txt',
-                           reservation=reservation,
-                           occurrences=occurrences,
-                           owner=reservation_user)
-    return make_email(to_list=to_list, cc_list=cc_list, subject=subject, body=text)
+def notify_upcoming_occurrences(user, occurrences):
+    tpl = get_template_module('rb/emails/reservations/reminders/upcoming_occurrence.html',
+                              occurrences=occurrences, user=user)
+    return make_email(to_list={user.email}, template=tpl, html=True)

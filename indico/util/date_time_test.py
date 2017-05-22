@@ -17,18 +17,8 @@
 from datetime import timedelta, datetime
 
 import pytest
-from dateutil.parser import parse
 
-from indico.util.date_time import round_up_month, format_human_timedelta, strftime_all_years
-
-
-@pytest.mark.parametrize(('current_date', 'from_day', 'expected_month'), (
-    ('2014-10-01', None, 11),
-    ('2014-10-01', 1,    11),
-    ('2014-10-01', 2,    10),
-))
-def test_round_up_month(current_date, from_day, expected_month):
-    assert round_up_month(parse(current_date), from_day=from_day).month == expected_month
+from indico.util.date_time import format_human_timedelta, strftime_all_years
 
 
 @pytest.mark.parametrize(('delta', 'granularity', 'expected'), (
