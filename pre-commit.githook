@@ -72,6 +72,17 @@ if [[ -n "$RESULT" ]] ; then
 fi
 
 
+# isort
+if ! RESULT=$(python -c 'import sys; from isort.hooks import git_hook; sys.exit(git_hook(strict=True))'); then
+    STATUS=1
+    echo "${RED}There are isort issues in your code:${RESET}"
+    echo "$RESULT"
+    echo
+    echo "${CYAN}Run this command to sort the imports:${RESET}"
+    echo 'git diff --staged --name-only --diff-filter d | xargs isort'
+fi
+
+
 if [[ $STATUS != 0 ]] ; then
     # claim stdin back
     exec < /dev/tty
@@ -86,4 +97,4 @@ if [[ $STATUS != 0 ]] ; then
     exec <&-
 fi
 
-exit $STATUS 
+exit $STATUS
