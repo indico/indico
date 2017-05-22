@@ -1,5 +1,34 @@
 {% extends 'layout/dialog_base.html' %}
 
+{% macro _render_template_list(templates) %}
+    {% if templates %}
+        <div class="i-box just-group-list">
+            <div class="i-box-content">
+                <ul class="group-list no-content-before badge-backside-list">
+                    {% for tpl in templates | sort(attribute='title') %}
+                        {% set different_size = tpl.data.width != width or tpl.data.height != height %}
+                        <li {% if different_size %}
+                                class="not-selectable-backside"
+                                title="{% trans %}This template has different dimension than your template{% endtrans %}"
+                            {% endif %}>
+                            <a href="#" class="backside-template"
+                               data-href="{{ url_for('.get_template_data', tpl) }}">
+                                <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
+                                   title="{{ tpl.type.title }}"></i>
+                                <span>{{ tpl.title }}</span>
+                            </a>
+                       </li>
+                   {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <div class="italic text-not-important">
+            {%- trans %}No templates{% endtrans -%}
+        </div>
+    {% endif %}
+{% endmacro %}
+
 {% block description %}
     {%- trans -%}
         The following badge templates can be used as the back side for your template. Note that only single-sided
@@ -8,61 +37,17 @@
 {%- endblock %}
 
 {% block content %}
-    {% set template_width = current_template.data.width %}
-    {% set template_height = current_template.data.height %}
     <section>
         <h3>{% trans %}Inherited templates{% endtrans %}</h3>
-        {% if inherited_templates %}
-            <div class="i-box just-group-list">
-                <div class="i-box-content">
-                    <ul class="group-list no-content-before badge-backside-list">
-                        {% for tpl in inherited_templates | sort(attribute='title') if tpl.data.width == template_width and tpl.data.height == template_height %}
-                            <li>
-                                <a href="#" class="backside-template"
-                                   data-href="{{ url_for('.get_template_data', tpl) }}">
-                                    <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
-                                       title="{{ tpl.type.title }}"></i>
-                                    <span>{{ tpl.title }}</span>
-                                </a>
-                           </li>
-                       {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        {% else %}
-            <div class="italic text-not-important">
-                {% trans %}No templates{% endtrans %}
-            </div>
-        {% endif %}
+        {{ _render_template_list(inherited_templates) }}
     </section>
     <section class="custom-template-list">
         <h3>{% trans %}Custom templates{% endtrans %}</h3>
-        {% if custom_templates %}
-            <div class="i-box just-group-list">
-                <div class="i-box-content">
-                    <ul class="group-list no-content-before badge-backside-list">
-                        {% for tpl in custom_templates | sort(attribute='title') if tpl.data.width == template_width and tpl.data.height == template_height %}
-                            <li>
-                                <a href="#" class="backside-template"
-                                   data-href="{{ url_for('.get_template_data', tpl) }}">
-                                    <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
-                                       title="{{ tpl.type.title }}"></i>
-                                    <span>{{ tpl.title }}</span>
-                                </a>
-                           </li>
-                       {% endfor %}
-                    </ul>
-                </div>
-            </div>
-        {% else %}
-            <div class="italic text-not-important">
-                {% trans %}No templates{% endtrans %}
-            </div>
-        {% endif %}
+        {{ _render_template_list(custom_templates) }}
     </section>
 
     <script>
-        $('.backside-template').on('click', function() {
+        $('li:not(.not-selectable-backside) .backside-template').on('click', function() {
             var $this = $(this);
             $.ajax({
                 url: $this.data('href'),
