@@ -27,15 +27,15 @@ from werkzeug.utils import cached_property
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.papers.controllers.base import RHJudgingAreaBase
 from indico.modules.events.papers.forms import BulkPaperJudgmentForm
-from indico.modules.events.papers.lists import PaperJudgingAreaListGeneratorDisplay, PaperAssignmentListGenerator
+from indico.modules.events.papers.lists import PaperAssignmentListGenerator, PaperJudgingAreaListGeneratorDisplay
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.modules.events.papers.operations import judge_paper, update_reviewing_roles
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.papers.views import WPDisplayJudgingArea, WPManagePapers
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
-from indico.util.i18n import ngettext, _
-from indico.web.util import jsonify_data, jsonify_template, jsonify_form
+from indico.util.i18n import _, ngettext
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 CFP_ROLE_MAP = {
@@ -70,8 +70,7 @@ class RHPapersList(RHPapersListBase):
         return WPManagePapers if self.management else WPDisplayJudgingArea
 
     def _process(self):
-        return self.view_class.render_template(self.template, self._conf, event=self.event_new,
-                                               **self.list_generator.get_list_kwargs())
+        return self.view_class.render_template(self.template, self.event_new, **self.list_generator.get_list_kwargs())
 
     @cached_property
     def template(self):

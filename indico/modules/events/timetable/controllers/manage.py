@@ -17,19 +17,19 @@
 from __future__ import unicode_literals
 
 import dateutil.parser
-from flask import request, jsonify, session
+from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
+from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
+                                                         SessionManagementLevel)
 from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info, serialize_session
 from indico.modules.events.timetable.models.entries import TimetableEntryType
-from indico.modules.events.timetable.controllers import (RHManageTimetableBase, SessionManagementLevel,
-                                                         RHManageTimetableEntryBase)
-from indico.modules.events.timetable.operations import (create_timetable_entry, update_timetable_entry,
-                                                        delete_timetable_entry)
+from indico.modules.events.timetable.operations import (create_timetable_entry, delete_timetable_entry,
+                                                        update_timetable_entry)
 from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import track_time_changes
@@ -44,7 +44,7 @@ class RHManageTimetable(RHManageTimetableBase):
     def _process(self):
         event_info = serialize_event_info(self.event_new)
         timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
-        return WPManageTimetable.render_template('management.html', self._conf, event_info=event_info,
+        return WPManageTimetable.render_template('management.html', self.event_new, event_info=event_info,
                                                  timetable_data=timetable_data)
 
 

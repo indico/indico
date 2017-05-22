@@ -149,8 +149,7 @@ class RHContributionListCustomize(RHManageContributionsBase):
     ALLOW_LOCKED = True
 
     def _process_GET(self):
-        return WPManageContributions.render_template('contrib_list_filter.html', self._conf,
-                                                     event=self.event_new,
+        return WPManageContributions.render_template('contrib_list_filter.html', self.event_new,
                                                      filters=self.list_generator.list_config['filters'],
                                                      static_items=self.list_generator.static_items)
 

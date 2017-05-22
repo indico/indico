@@ -16,10 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPManagePersons(WPJinjaMixin, WPConferenceModifBase):
+class WPManagePersons(WPEventManagement):
     template_prefix = 'events/persons/'
     sidemenu_option = 'persons'

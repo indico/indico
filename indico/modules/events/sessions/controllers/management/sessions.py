@@ -16,23 +16,23 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify
+from flask import jsonify, request
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
-from indico.core.db.sqlalchemy.protection import render_acl, ProtectionMode
+from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
-from indico.modules.events.sessions.controllers.management import (RHManageSessionsBase, RHManageSessionBase,
-                                                                   RHManageSessionsActionsBase)
-from indico.modules.events.sessions.forms import SessionForm, SessionProtectionForm, MeetingSessionBlockForm
+from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
+                                                                   RHManageSessionsBase)
+from indico.modules.events.sessions.forms import MeetingSessionBlockForm, SessionForm, SessionProtectionForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.operations import (create_session, update_session, delete_session,
+from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
                                                        update_session_block)
-from indico.modules.events.sessions.util import generate_spreadsheet_from_sessions, generate_pdf_from_sessions
+from indico.modules.events.sessions.util import generate_pdf_from_sessions, generate_spreadsheet_from_sessions
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import get_random_color, update_object_principals
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -64,9 +64,9 @@ class RHSessionsList(RHManageSessionsBase):
     def _process(self):
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
-        return WPManageSessions.render_template('management/session_list.html', self._conf,
+        return WPManageSessions.render_template('management/session_list.html', self.event_new,
                                                 selected_entry=selected_entry,
-                                                event=self.event_new, **_get_session_list_args(self.event_new))
+                                                **_get_session_list_args(self.event_new))
 
 
 class RHCreateSession(RHManageSessionsBase):

@@ -18,33 +18,32 @@ from __future__ import unicode_literals
 
 from operator import attrgetter, itemgetter
 
-from flask import redirect, flash, session
+from flask import flash, redirect, session
 from sqlalchemy.orm import undefer
 
 from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.features.util import set_feature_enabled
-from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration import logger, registration_settings
-from indico.modules.events.registration.controllers.management import (RHManageRegFormBase,
-                                                                       RHManageRegFormsBase)
-from indico.modules.events.registration.forms import (RegistrationFormForm, RegistrationFormScheduleForm,
-                                                      ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
+from indico.modules.events.registration.controllers.management import RHManageRegFormBase, RHManageRegFormsBase
+from indico.modules.events.registration.forms import (ParticipantsDisplayForm, ParticipantsDisplayFormColumnsForm,
+                                                      RegistrationFormForm, RegistrationFormScheduleForm,
                                                       RegistrationManagersForm)
 from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.modules.events.registration.models.items import PersonalDataType
-from indico.modules.events.registration.stats import OverviewStats, AccommodationStats
-from indico.modules.events.registration.util import get_event_section_data, create_personal_data_fields
-from indico.modules.events.registration.views import (WPManageRegistration, WPManageRegistrationStats,
-                                                      WPManageParticipants)
+from indico.modules.events.registration.stats import AccommodationStats, OverviewStats
+from indico.modules.events.registration.util import create_personal_data_fields, get_event_section_data
+from indico.modules.events.registration.views import (WPManageParticipants, WPManageRegistration,
+                                                      WPManageRegistrationStats)
 from indico.modules.events.util import update_object_principals
-from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.web.forms.base import FormDefaults
 from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManageRegistrationForms(RHManageRegFormsBase):
@@ -55,9 +54,7 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
                     .with_parent(self.event_new)
                     .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
-
-        return WPManageRegistration.render_template('management/regform_list.html', self._conf,
-                                                    event=self.event_new, regforms=regforms)
+        return WPManageRegistration.render_template('management/regform_list.html', self.event_new, regforms=regforms)
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
@@ -109,7 +106,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         disabled_forms.sort(key=attrgetter('title'))
 
         merge_forms = registration_settings.get(self.event_new, 'merge_registration_forms')
-        return WPManageRegistration.render_template('management/regform_display.html', self._conf, event=self.event_new,
+        return WPManageRegistration.render_template('management/regform_display.html', self.event_new,
                                                     regforms=regforms, enabled_columns=enabled_columns,
                                                     disabled_columns=disabled_columns, enabled_forms=enabled_forms,
                                                     disabled_forms=disabled_forms, merge_forms=merge_forms, form=form)
@@ -161,9 +158,8 @@ class RHManageParticipants(RHManageRegFormsBase):
         regform = self.event_new.participation_regform
         registration_enabled = self.event_new.has_feature('registration')
         if not regform or not registration_enabled:
-            return WPManageParticipants.render_template('management/participants.html', self._conf,
-                                                        event=self.event_new, regform=regform,
-                                                        registration_enabled=registration_enabled)
+            return WPManageParticipants.render_template('management/participants.html', self.event_new,
+                                                        regform=regform, registration_enabled=registration_enabled)
         return redirect(url_for('event_registration.manage_regform', regform))
 
 
@@ -184,7 +180,7 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
             self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
                                'Registration form "{}" has been created'.format(regform.title), session.user)
             return redirect(url_for('.manage_regform', regform))
-        return WPManageRegistration.render_template('management/regform_edit.html', self._conf, event=self.event_new,
+        return WPManageRegistration.render_template('management/regform_edit.html', self.event_new,
                                                     form=form, regform=None)
 
 
@@ -192,7 +188,7 @@ class RHRegistrationFormManage(RHManageRegFormBase):
     """Specific registration form management"""
 
     def _process(self):
-        return WPManageRegistration.render_template('management/regform.html', self._conf, regform=self.regform)
+        return WPManageRegistration.render_template('management/regform.html', self.event_new, regform=self.regform)
 
 
 class RHRegistrationFormEdit(RHManageRegFormBase):
@@ -208,8 +204,8 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
             db.session.flush()
             flash(_('Registration form has been successfully modified'), 'success')
             return redirect(url_for('.manage_regform', self.regform))
-        return WPManageRegistration.render_template('management/regform_edit.html', self._conf, form=form,
-                                                    event=self.event_new, regform=self.regform)
+        return WPManageRegistration.render_template('management/regform_edit.html', self.event_new, form=form,
+                                                    regform=self.regform)
 
 
 class RHRegistrationFormDelete(RHManageRegFormBase):
@@ -266,7 +262,7 @@ class RHRegistrationFormModify(RHManageRegFormBase):
     """Modify the form of a registration form"""
 
     def _process(self):
-        return WPManageRegistration.render_template('management/regform_modify.html', self._conf, event=self.event_new,
+        return WPManageRegistration.render_template('management/regform_modify.html', self.event_new,
                                                     sections=get_event_section_data(self.regform, management=True),
                                                     regform=self.regform)
 
@@ -277,7 +273,7 @@ class RHRegistrationFormStats(RHManageRegFormBase):
     def _process(self):
         regform_stats = [OverviewStats(self.regform)]
         regform_stats += [AccommodationStats(x) for x in self.regform.active_fields if x.input_type == 'accommodation']
-        return WPManageRegistrationStats.render_template('management/regform_stats.html', self._conf,
+        return WPManageRegistrationStats.render_template('management/regform_stats.html', self.event_new,
                                                          regform=self.regform, regform_stats=regform_stats)
 
 

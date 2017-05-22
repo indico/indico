@@ -21,13 +21,13 @@ from operator import attrgetter
 
 from flask import redirect
 
+from indico.legacy.pdfinterface.conference import AbstractsToPDF, ConfManagerAbstractsToPDF
 from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstracts
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
 from indico.web.util import jsonify_data
-from indico.legacy.pdfinterface.conference import ConfManagerAbstractsToPDF, AbstractsToPDF
 
 
 class DisplayAbstractListMixin:
@@ -42,7 +42,7 @@ class DisplayAbstractListMixin:
         return self._render_template(**self.list_generator.get_list_kwargs())
 
     def _render_template(self, **kwargs):
-        return self.view_class.render_template(self.template, self._conf, event=self.event_new, **kwargs)
+        return self.view_class.render_template(self.template, self.event_new, **kwargs)
 
 
 class CustomizeAbstractListMixin:
@@ -52,8 +52,8 @@ class CustomizeAbstractListMixin:
 
     def _process_GET(self):
         list_config = self.list_generator._get_config()
-        return self.view_class.render_template('management/abstract_list_filter.html', self._conf,
-                                               event=self.event_new, visible_items=list_config['items'],
+        return self.view_class.render_template('management/abstract_list_filter.html', self.event_new,
+                                               visible_items=list_config['items'],
                                                static_items=self.list_generator.static_items,
                                                extra_filters=self.list_generator.extra_filters,
                                                contrib_fields=self.list_generator.get_all_contribution_fields(),

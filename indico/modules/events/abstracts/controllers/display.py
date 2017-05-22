@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import session, flash
+from flask import flash, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.errors import NoReportError
+from indico.legacy.pdfinterface.conference import AbstractsToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
@@ -28,7 +29,6 @@ from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-from indico.legacy.pdfinterface.conference import AbstractsToPDF
 
 
 class RHCallForAbstracts(RHAbstractsBase):
@@ -36,8 +36,8 @@ class RHCallForAbstracts(RHAbstractsBase):
 
     def _process(self):
         abstracts = get_user_abstracts(self.event_new, session.user) if session.user else []
-        return WPDisplayCallForAbstracts.render_template('display/call_for_abstracts.html', self._conf,
-                                                         event=self.event_new, abstracts=abstracts)
+        return WPDisplayCallForAbstracts.render_template('display/call_for_abstracts.html', self.event_new,
+                                                         abstracts=abstracts)
 
 
 class RHMyAbstractsExportPDF(RHAbstractsBase):

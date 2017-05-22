@@ -17,12 +17,13 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.models.events import EventType
 from indico.modules.events.views import WPSimpleEventDisplayBase
 
 
-class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
+class WPManageRegistration(WPEventManagement):
     template_prefix = 'events/registration/'
 
     @property
@@ -38,7 +39,7 @@ class WPManageRegistration(WPJinjaMixin, WPConferenceModifBase):
         return 'registration'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
+        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
 
 
 class WPManageRegistrationStats(WPManageRegistration):

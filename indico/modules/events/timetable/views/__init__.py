@@ -21,35 +21,33 @@ from itertools import groupby
 from operator import attrgetter
 
 from flask import render_template, request, session
-from pytz import timezone
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from indico.modules.events.layout import theme_settings
+from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
 from indico.modules.events.util import get_theme
 from indico.util.signals import values_from_signal
-from indico.web.flask.templating import template_hook, register_template_hook
-
-from indico.legacy.common.timezoneUtils import DisplayTZ
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.web.flask.templating import register_template_hook, template_hook
 
 
 register_template_hook('week-meeting-body', inject_week_timetable)
 
 
-class WPManageTimetable(WPJinjaMixin, WPConferenceModifBase):
+class WPManageTimetable(WPEventManagement):
     template_prefix = 'events/timetable/'
     sidemenu_option = 'timetable'
 
-    def __init__(self, rh, conference, **kwargs):
+    def __init__(self, rh, event_, **kwargs):
         custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))
-        WPConferenceModifBase.__init__(self, rh, conference, custom_links=custom_links, **kwargs)
+        WPEventManagement.__init__(self, rh, event_, custom_links=custom_links, **kwargs)
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls() +
+        return (WPEventManagement.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls() +
                 self._asset_env['modules_contributions_js'].urls())
 
 

@@ -18,17 +18,17 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
-from flask import redirect, flash, session
+from flask import flash, redirect, session
 
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
-from indico.modules.events.abstracts.forms import (AbstractSubmissionSettingsForm, AbstractReviewingRolesForm,
-                                                   AbstractReviewingSettingsForm, AbstractsScheduleForm)
+from indico.modules.events.abstracts.forms import (AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
+                                                   AbstractsScheduleForm, AbstractSubmissionSettingsForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.operations import schedule_cfa, open_cfa, close_cfa
-from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
+from indico.modules.events.abstracts.operations import close_cfa, open_cfa, schedule_cfa
+from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
 from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.util import update_object_principals
@@ -47,10 +47,10 @@ class RHAbstractsDashboard(RHManageAbstractsBase):
 
     def _process(self):
         if not self.event_new.has_feature('abstracts'):
-            return WPManageAbstracts.render_template('management/disabled.html', self._conf, event=self.event_new)
+            return WPManageAbstracts.render_template('management/disabled.html', self.event_new)
         else:
             abstracts_count = Abstract.query.with_parent(self.event_new).count()
-            return WPManageAbstracts.render_template('management/overview.html', self._conf, event=self.event_new,
+            return WPManageAbstracts.render_template('management/overview.html', self.event_new,
                                                      abstracts_count=abstracts_count, cfa=self.event_new.cfa)
 
 

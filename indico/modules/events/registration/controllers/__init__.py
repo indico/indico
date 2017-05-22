@@ -20,7 +20,7 @@ from flask import flash, redirect, request, session
 from sqlalchemy.orm import defaultload
 
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.util import modify_registration, get_event_section_data, make_registration_form
+from indico.modules.events.registration.util import get_event_section_data, make_registration_form, modify_registration
 from indico.util.string import camelize_keys
 
 
@@ -66,7 +66,7 @@ class RegistrationEditMixin:
             'manager': self.management
         }
 
-        return self.view_class.render_template(self.template_file, self._conf, event=self.event_new,
+        return self.view_class.render_template(self.template_file, self.event_new,
                                                sections=section_data, regform=self.regform,
                                                registration_data=registration_data,
                                                registration_metadata=registration_metadata,

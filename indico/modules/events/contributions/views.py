@@ -17,15 +17,16 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPManageContributions(WPJinjaMixin, WPConferenceModifBase):
+class WPManageContributions(WPEventManagement):
     template_prefix = 'events/contributions/'
     sidemenu_option = 'contributions'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
+        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
 
 
 class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):

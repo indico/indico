@@ -153,7 +153,7 @@ class RHPersonsList(RHPersonsBase):
                 persons[principal.email]['roles']['no_account'] = True
                 num_no_account += 1
 
-        return WPManagePersons.render_template('management/person_list.html', self._conf, event=self.event_new,
+        return WPManagePersons.render_template('management/person_list.html', self.event_new,
                                                persons=person_list, num_no_account=num_no_account)
 
 

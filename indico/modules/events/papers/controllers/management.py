@@ -18,17 +18,17 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import request, render_template, flash, session
+from flask import flash, render_template, request, session
 
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
-from indico.modules.events.papers.forms import (make_competences_form, PapersScheduleForm,
-                                                PaperTeamsForm, PaperReviewingSettingsForm, DeadlineForm)
+from indico.modules.events.papers.forms import (DeadlineForm, PaperReviewingSettingsForm, PapersScheduleForm,
+                                                PaperTeamsForm, make_competences_form)
 from indico.modules.events.papers.models.reviews import PaperReviewType
-from indico.modules.events.papers.operations import (set_reviewing_state, update_team_members, create_competences,
-                                                     update_competences, schedule_cfp, open_cfp, close_cfp,
-                                                     set_deadline)
-from indico.modules.events.papers.settings import paper_reviewing_settings, PaperReviewingRole
+from indico.modules.events.papers.operations import (close_cfp, create_competences, open_cfp, schedule_cfp,
+                                                     set_deadline, set_reviewing_state, update_competences,
+                                                     update_team_members)
+from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
@@ -38,9 +38,9 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 def _render_paper_dashboard(event, view_class=None):
     if view_class:
-        return view_class.render_template('management/overview.html', event.as_legacy, event=event)
+        return view_class.render_template('management/overview.html', event)
     else:
-        return render_template('events/papers/management/overview.html', event=event)
+        return render_template('events/papers/management/overview.html', event=event, standalone=True)
 
 
 class RHPapersDashboard(RHManagePapersBase):
@@ -51,7 +51,7 @@ class RHPapersDashboard(RHManagePapersBase):
 
     def _process(self):
         if not self.event_new.has_feature('papers'):
-            return WPManagePapers.render_template('management/disabled.html', self._conf, event=self.event_new)
+            return WPManagePapers.render_template('management/disabled.html', self.event_new)
         else:
             return _render_paper_dashboard(self.event_new, view_class=WPManagePapers)
 
@@ -121,8 +121,7 @@ class RHManageCompetences(RHManagePapersBase):
                     create_competences(self.event_new, users[user_id], competences)
             flash(_("Team competences were updated successfully"), 'success')
             return jsonify_data()
-        return WPManagePapers.render_template('management/competences.html', self._conf, event=self.event_new,
-                                              form=form)
+        return jsonify_template('events/papers/management/competences.html', event=self.event_new, form=form)
 
 
 class RHContactStaff(RHManagePapersBase):

@@ -16,19 +16,19 @@
 
 from __future__ import unicode_literals
 
-from flask import request, flash
+from flask import flash, request
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import InvitationFormExisting, InvitationFormNew
-from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
+from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.notifications import notify_invitation
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.util.i18n import ngettext
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template, jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
 
 
 def _query_invitation_list(regform):
@@ -51,7 +51,7 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 
     def _process(self):
         invitations = _query_invitation_list(self.regform)
-        return WPManageRegistration.render_template('management/regform_invitations.html', self._conf,
+        return WPManageRegistration.render_template('management/regform_invitations.html', self.event_new,
                                                     regform=self.regform, invitations=invitations)
 
 

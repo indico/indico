@@ -16,24 +16,24 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, request, session, jsonify
+from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase, RHAbstractsBase
-from indico.modules.events.abstracts.controllers.common import (DisplayAbstractListMixin, CustomizeAbstractListMixin,
-                                                                AbstractsExportPDFMixin, AbstractsExportCSV,
-                                                                AbstractsExportExcel, AbstractsDownloadAttachmentsMixin)
+from indico.modules.events.abstracts.controllers.common import (AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
+                                                                AbstractsExportExcel, AbstractsExportPDFMixin,
+                                                                CustomizeAbstractListMixin, DisplayAbstractListMixin)
 from indico.modules.events.abstracts.forms import (AbstractCommentForm, AbstractJudgmentForm,
                                                    AbstractReviewedForTracksForm, build_review_form)
 from indico.modules.events.abstracts.lists import AbstractListGeneratorDisplay
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.abstracts.operations import (judge_abstract, reset_abstract_state, withdraw_abstract,
-                                                        create_abstract_comment, delete_abstract_comment,
-                                                        update_abstract_comment, create_abstract_review,
-                                                        update_abstract_review, update_reviewed_for_tracks)
+from indico.modules.events.abstracts.operations import (create_abstract_comment, create_abstract_review,
+                                                        delete_abstract_comment, judge_abstract, reset_abstract_state,
+                                                        update_abstract_comment, update_abstract_review,
+                                                        update_reviewed_for_tracks, withdraw_abstract)
 from indico.modules.events.abstracts.util import get_track_reviewer_abstract_counts, get_user_tracks
 from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing, render_abstract_page
 from indico.modules.events.tracks.models.tracks import Track
@@ -242,7 +242,7 @@ class RHDisplayReviewableTracks(RHAbstractsBase):
 
     def _process(self):
         track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event_new, session.user)
-        return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self._conf, event=self.event_new,
+        return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self.event_new,
                                                            abstract_count=track_reviewer_abstract_count,
                                                            tracks=get_user_tracks(self.event_new, session.user))
 

@@ -16,26 +16,27 @@
 
 from __future__ import unicode_literals
 
-from flask import session, render_template
+from flask import render_template, session
 
-from indico.modules.events.papers.forms import (PaperCommentForm, build_review_form, PaperJudgmentForm,
-                                                PaperSubmissionForm)
-from indico.util.mathjax import MathjaxMixin
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.papers.forms import (PaperCommentForm, PaperJudgmentForm, PaperSubmissionForm,
+                                                build_review_form)
+from indico.util.mathjax import MathjaxMixin
 
 
-class WPManagePapers(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
+class WPManagePapers(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/papers/'
     sidemenu_option = 'papers'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) +
+        return (WPEventManagement.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_papers_js'].urls())
 
     def _getHeadContent(self):
-        return WPConferenceModifBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):

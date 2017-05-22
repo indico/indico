@@ -18,28 +18,29 @@ from __future__ import unicode_literals
 
 from flask import render_template, session
 
-from indico.modules.events.abstracts.util import get_visible_reviewed_for_tracks
-from indico.util.mathjax import MathjaxMixin
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from indico.modules.events.abstracts.util import get_visible_reviewed_for_tracks
+from indico.modules.events.management.views import WPEventManagement
+from indico.util.mathjax import MathjaxMixin
 
 
-class WPManageAbstracts(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
+class WPManageAbstracts(MathjaxMixin, WPJinjaMixin, WPEventManagement):
     template_prefix = 'events/abstracts/'
     sidemenu_option = 'abstracts'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) +
+        return (WPEventManagement.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['selectize_js'].urls() +
                 self._asset_env['modules_reviews_js'].urls() +
                 self._asset_env['modules_abstracts_js'].urls())
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
+        return WPEventManagement.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def _getHeadContent(self):
-        return WPConferenceModifBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPDisplayAbstractsBase(MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
@@ -96,6 +97,6 @@ def render_abstract_page(abstract, view_class=None, management=False):
               'visible_tracks': get_visible_reviewed_for_tracks(abstract, session.user),
               'management': management}
     if view_class:
-        return view_class.render_template('abstract.html', abstract.event_new.as_legacy, **params)
+        return view_class.render_template('abstract.html', abstract.event_new, **params)
     else:
-        return render_template('events/abstracts/abstract.html', no_javascript=True, **params)
+        return render_template('events/abstracts/abstract.html', no_javascript=True, standalone=True, **params)

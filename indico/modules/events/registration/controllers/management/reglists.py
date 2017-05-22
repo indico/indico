@@ -21,36 +21,36 @@ import uuid
 from io import BytesIO
 from operator import attrgetter
 
-from flask import session, request, redirect, jsonify, flash, render_template
+from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
-
-from indico.core import signals
 from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_all_templates
 from indico.modules.events import EventLogKind, EventLogRealm
+from indico.modules.events.payment.models.transactions import TransactionAction
+from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF
 from indico.modules.events.registration.controllers import RegistrationEditMixin
-from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegistrationBase,
-                                                                       RHManageRegFormsBase)
-from indico.modules.events.registration.forms import (EmailRegistrantsForm, CreateMultipleRegistrationsForm,
-                                                      BadgeSettingsForm)
-from indico.modules.events.registration.models.items import RegistrationFormItemType, PersonalDataType
+from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
+                                                                       RHManageRegistrationBase)
+from indico.modules.events.registration.forms import (BadgeSettingsForm, CreateMultipleRegistrationsForm,
+                                                      EmailRegistrantsForm)
+from indico.modules.events.registration.models.items import PersonalDataType, RegistrationFormItemType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
+from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
+                                                     get_event_section_data, get_title_uuid, make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
-from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     create_registration, generate_spreadsheet_from_registrations,
-                                                     get_title_uuid)
-from indico.modules.events.payment.models.transactions import TransactionAction
-from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.users import User
 from indico.util.fs import secure_filename
@@ -58,10 +58,8 @@ from indico.util.i18n import _, ngettext
 from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for, send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
-from indico.legacy.common.cache import GenericCache
-from indico.legacy.pdfinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 
 
 badge_cache = GenericCache('badge-printing')
@@ -80,8 +78,8 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        return WPManageRegistration.render_template('management/regform_reglist.html', self._conf,
-                                                    regform=self.regform, event=self.event_new, **reg_list_kwargs)
+        return WPManageRegistration.render_template('management/regform_reglist.html', self.event_new,
+                                                    regform=self.regform, **reg_list_kwargs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -91,7 +89,8 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_GET(self):
         reg_list_config = self.list_generator._get_config()
-        return WPManageRegistration.render_template('management/reglist_filter.html', self._conf, regform=self.regform,
+        return WPManageRegistration.render_template('management/reglist_filter.html', self.event_new,
+                                                    regform=self.regform,
                                                     RegistrationFormItemType=RegistrationFormItemType,
                                                     visible_items=reg_list_config['items'],
                                                     static_items=self.list_generator.static_items,
@@ -116,7 +115,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 
     def _process(self):
         registration_details_html = _render_registration_details(self.registration)
-        return WPManageRegistration.render_template('management/registration_details.html', self._conf,
+        return WPManageRegistration.render_template('management/registration_details.html', self.event_new,
                                                     registration=self.registration,
                                                     registration_details_html=registration_details_html)
 
@@ -270,7 +269,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
                 flash(error, 'error')
-        return WPManageRegistration.render_template('display/regform_display.html', self._conf, event=self.event_new,
+        return WPManageRegistration.render_template('display/regform_display.html', self.event_new,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     post_url=url_for('.create_registration', self.regform),
                                                     user_data=self._get_user_data(), management=True)

@@ -31,4 +31,4 @@ class ContributionListMixin:
         return self._render_template(**self.list_generator.get_list_kwargs())
 
     def _render_template(self, selected_entry, **kwargs):
-        return self.view_class.render_template(self.template, self._conf, event=self.event_new, **kwargs)
+        return self.view_class.render_template(self.template, self.event_new, **kwargs)
