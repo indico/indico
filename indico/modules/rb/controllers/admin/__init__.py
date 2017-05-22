@@ -28,8 +28,6 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
     tasks should be derived from this class.
     """
 
-    CSRF_ENABLED = True
-
     def _checkProtection(self):
         if session.user is None:
             self._checkSessionUser()

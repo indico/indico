@@ -14,19 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, flash, redirect
+from flask import flash, redirect, request
 
-from indico.core.errors import IndicoError, FormValuesError, NoReportError
 from indico.core.db import db
-from indico.util.i18n import _
+from indico.core.errors import FormValuesError, IndicoError, NoReportError
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.models.room_attributes import RoomAttribute
-from indico.modules.rb.models.equipment import EquipmentType
+from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
 from indico.modules.rb.views.admin.locations import WPRoomBookingAdmin, WPRoomBookingAdminLocation
+from indico.util.i18n import _
 from indico.util.string import natural_sort_key
 from indico.web.flask.util import url_for
 
@@ -45,7 +45,6 @@ class RHRoomBookingLocationMixin:
 
 
 class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
-    CSRF_ENABLED = True
 
     def _process(self):
         db.session.delete(self._location)
@@ -54,7 +53,6 @@ class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdmin
 
 
 class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         self._locationName = request.form.get('newLocationName').strip()
@@ -73,7 +71,6 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSetDefaultLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
-    CSRF_ENABLED = True
 
     def _process(self):
         self._location.set_default()
@@ -113,7 +110,6 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         name = request.view_args.get('locationId')
@@ -130,7 +126,6 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         name = request.view_args.get('locationId')
@@ -171,7 +166,6 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         RHRoomBookingEquipmentBase._checkParams(self, 'removeEquipmentName')
@@ -184,7 +178,6 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
 
 
 class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         RHRoomBookingEquipmentBase._checkParams(self, 'newEquipmentName')

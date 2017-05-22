@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, redirect, request, flash, render_template, jsonify
+from flask import flash, jsonify, redirect, render_template, request, session
 from itsdangerous import BadData, BadSignature
 from markupsafe import Markup
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
@@ -26,25 +26,24 @@ from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.notifications import make_email
+from indico.legacy.common.mail import GenericMailer
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
-from indico.modules.auth import logger, Identity, login_user
-from indico.modules.auth.forms import (SelectEmailForm, MultipassRegistrationForm, LocalRegistrationForm,
-                                       RegistrationEmailForm, ResetPasswordEmailForm, ResetPasswordForm,
-                                       AddLocalIdentityForm, EditLocalIdentityForm)
+from indico.modules.auth import Identity, logger, login_user
+from indico.modules.auth.forms import (AddLocalIdentityForm, EditLocalIdentityForm, LocalRegistrationForm,
+                                       MultipassRegistrationForm, RegistrationEmailForm, ResetPasswordEmailForm,
+                                       ResetPasswordForm, SelectEmailForm)
 from indico.modules.auth.models.registration_requests import RegistrationRequest
-from indico.modules.auth.util import load_identity_info, register_user, impersonate_user, undo_impersonate_user
+from indico.modules.auth.util import impersonate_user, load_identity_info, register_user, undo_impersonate_user
 from indico.modules.auth.views import WPAuth, WPAuthUser
 from indico.modules.users import User
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.util.signing import secure_serializer
-from indico.web.flask.util import url_for
 from indico.web.flask.templating import get_template_module
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.util import url_for_index
-
-from indico.legacy.common.mail import GenericMailer
-from indico.legacy.webinterface.rh.base import RH
 
 
 def _get_provider(name, external):
@@ -144,8 +143,6 @@ class RHLinkAccount(RH):
     email address and an existing user was found.
     """
 
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         self.identity_info = load_identity_info()
         if not self.identity_info or self.identity_info['indico_user_id'] is None:
@@ -213,8 +210,6 @@ class RHRegister(RH):
     - creation of a new user with a locally stored username and password
     - creation of a new user based on information from an identity provider
     """
-
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         self.identity_info = None
@@ -366,8 +361,6 @@ class RHAccounts(RHUserBase):
 
 class RHRemoveAccount(RHUserBase):
     """Removes an identity linked to a user"""
-
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         RHUserBase._checkParams(self)
@@ -560,8 +553,6 @@ class LocalRegistrationHandler(RegistrationHandler):
 
 class RHResetPassword(RH):
     """Resets the password for a local identity."""
-
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         if not Config.getInstance().getLocalIdentities():

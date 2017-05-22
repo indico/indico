@@ -19,18 +19,16 @@ from __future__ import unicode_literals
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.attachments.controllers.management.base import (ManageAttachmentsMixin, AddAttachmentFilesMixin,
-                                                                    AddAttachmentLinkMixin, EditAttachmentMixin,
-                                                                    CreateFolderMixin, EditFolderMixin,
-                                                                    DeleteFolderMixin, DeleteAttachmentMixin)
+from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
+                                                                    CreateFolderMixin, DeleteAttachmentMixin,
+                                                                    DeleteFolderMixin, EditAttachmentMixin,
+                                                                    EditFolderMixin, ManageAttachmentsMixin)
 from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.categories.controllers.base import RHManageCategoryBase
 from indico.modules.categories.views import WPCategoryManagement
 
 
 class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self, params):
         RHManageCategoryBase._checkParams(self)
         self.object_type = 'category'

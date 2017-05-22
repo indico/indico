@@ -34,7 +34,7 @@ from indico.web.util import jsonify_data, jsonify_template
 
 
 class RHRemindersBase(RHManageEventBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHSpecificReminderBase(RHRemindersBase):

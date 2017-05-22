@@ -48,8 +48,6 @@ def _render_track_list(event):
 class RHManageTracksBase(RHManageEventBase):
     """Base class for all track management RHs"""
 
-    CSRF_ENABLED = True
-
 
 class RHManageTrackBase(RHManageTracksBase):
     """Base class for track management RHs related to a specific track"""

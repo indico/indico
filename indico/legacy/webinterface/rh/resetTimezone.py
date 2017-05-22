@@ -14,7 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, request, redirect
+from __future__ import unicode_literals
+
+from flask import redirect, request, session
 
 from indico.core.config import Config
 from indico.legacy.webinterface.rh.base import RH
@@ -23,8 +25,6 @@ from indico.web.util import url_for_index
 
 
 class RHResetTZ(RH):
-    CSRF_ENABLED = True
-
     def _process(self):
         if 'activeTimezone' not in request.values or request.values['activeTimezone'] == 'My':
             tz = Config.getInstance().getDefaultTimezone()

@@ -19,33 +19,30 @@ from __future__ import unicode_literals
 from operator import attrgetter
 from uuid import UUID
 
-from flask import request, session, redirect, flash, jsonify
-from sqlalchemy.orm import subqueryload, contains_eager
+from flask import flash, jsonify, redirect, request, session
+from sqlalchemy.orm import contains_eager, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.models.events import EventType
+from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
 from indico.modules.events.registration.controllers import RegistrationEditMixin, RegistrationFormMixin
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
+from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
 from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.registration.models.registrations import Registration, RegistrationState
-from indico.modules.events.registration.util import (get_event_section_data, make_registration_form,
-                                                     create_registration, check_registration_email, get_title_uuid,
-                                                     get_event_regforms)
+from indico.modules.events.registration.util import (check_registration_email, create_registration, get_event_regforms,
+                                                     get_event_section_data, get_title_uuid, make_registration_form)
 from indico.modules.events.registration.views import (WPDisplayRegistrationFormConference,
                                                       WPDisplayRegistrationFormSimpleEvent,
                                                       WPDisplayRegistrationParticipantList)
-from indico.modules.events.payment import payment_event_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
-
     @property
     def view_class(self):
         return (WPDisplayRegistrationFormConference

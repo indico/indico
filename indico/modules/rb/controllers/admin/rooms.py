@@ -14,34 +14,32 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, flash, redirect
+from flask import flash, redirect, request
 from wtforms import StringField
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
+from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
+from indico.modules.rb.controllers.decorators import requires_location, requires_room
 from indico.modules.rb.forms.rooms import RoomForm
 from indico.modules.rb.models.equipment import EquipmentType
-from indico.modules.rb.models.room_attributes import RoomAttributeAssociation, RoomAttribute
-from indico.modules.rb.controllers.decorators import requires_location, requires_room
+from indico.modules.rb.models.photos import Photo
+from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.views.admin import rooms as room_views
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.validators import IndicoEmail
-from indico.legacy.common.cache import GenericCache
 
 
 _cache = GenericCache('Rooms')
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         self._room = Room.get(request.view_args['roomID'])
         self._target = self._room

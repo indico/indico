@@ -16,27 +16,26 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, session, request
-from werkzeug.exceptions import Forbidden, BadRequest
+from flask import flash, redirect, request, session
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
-from indico.modules.api import APIMode
-from indico.modules.api import api_settings
+from indico.legacy.webinterface.rh.base import RH
+from indico.modules.admin import RHAdminBase
+from indico.modules.api import APIMode, api_settings
 from indico.modules.api.forms import AdminSettingsForm
 from indico.modules.api.models.keys import APIKey
 from indico.modules.api.views import WPAPIAdmin, WPAPIUserProfile
-from indico.modules.admin import RHAdminBase
 from indico.modules.categories.models.categories import Category
-from indico.modules.events.models.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.models.events import Event
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
-from indico.web.flask.util import url_for, redirect_or_jsonify
+from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.util import generate_public_auth_request
 from indico.web.util import jsonify_data
-from indico.legacy.webinterface.rh.base import RH
 
 
 class RHAPIAdminSettings(RHAdminBase):
@@ -84,8 +83,6 @@ class RHAPIUserProfile(RHUserAPIBase):
 class RHAPICreateKey(RHUserAPIBase):
     """API key creation"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         quiet = request.form.get('quiet') == '1'
         force = request.form.get('force') == '1'
@@ -119,8 +116,6 @@ class RHAPICreateKey(RHUserAPIBase):
 class RHAPIDeleteKey(RHUserAPIBase):
     """API key deletion"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         key = self.user.api_key
         key.is_active = False
@@ -130,8 +125,6 @@ class RHAPIDeleteKey(RHUserAPIBase):
 
 class RHAPITogglePersistent(RHUserAPIBase):
     """API key - persistent signatures on/off"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         quiet = request.form.get('quiet') == '1'
@@ -147,8 +140,6 @@ class RHAPITogglePersistent(RHUserAPIBase):
 
 class RHAPIBlockKey(RHUserAPIBase):
     """API key blocking/unblocking"""
-
-    CSRF_ENABLED = True
 
     def _checkProtection(self):
         RHUserAPIBase._checkProtection(self)
@@ -166,8 +157,6 @@ class RHAPIBlockKey(RHUserAPIBase):
 
 
 class RHAPIBuildURLs(RH):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         data = request.json
         self.object = None

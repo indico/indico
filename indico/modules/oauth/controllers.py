@@ -18,23 +18,23 @@ from __future__ import unicode_literals
 
 from uuid import UUID
 
-from flask import flash, redirect, request, render_template, session
+from flask import flash, redirect, render_template, request, session
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.legacy.webinterface.rh.base import RH, RHProtected
 from indico.modules.admin import RHAdminBase
-from indico.modules.users.controllers import RHUserBase
 from indico.modules.oauth import logger
-from indico.modules.oauth.provider import oauth
 from indico.modules.oauth.forms import ApplicationForm
-from indico.modules.oauth.models.applications import OAuthApplication, SCOPES
+from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthToken
-from indico.modules.oauth.views import WPOAuthUserProfile, WPOAuthAdmin
+from indico.modules.oauth.provider import oauth
+from indico.modules.oauth.views import WPOAuthAdmin, WPOAuthUserProfile
+from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.legacy.webinterface.rh.base import RH, RHProtected
 
 
 class RHOAuthAuthorize(RHProtected):
@@ -164,8 +164,6 @@ class RHOAuthUserProfile(RHUserBase):
 
 class RHOAuthUserTokenRevoke(RHUserBase):
     """Revokes user token"""
-
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         RHUserBase._checkParams(self)

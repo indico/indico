@@ -79,7 +79,7 @@ def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None
 
 
 class RHVCManageEventBase(RHManageEventBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHEventVCRoomMixin:
@@ -236,8 +236,6 @@ class RHVCManageEventModify(RHVCSystemEventBase):
 class RHVCManageEventRefresh(RHVCSystemEventBase):
     """Refreshes an existing VC room, fetching information from the VC system"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event_new):
             flash(_('You are not allowed to refresh {plugin_name} rooms for this event.').format(
@@ -262,8 +260,6 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
 
 class RHVCManageEventRemove(RHVCSystemEventBase):
     """Removes an existing VC room"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         if not self.plugin.can_manage_vc_rooms(session.user, self.event_new):
@@ -295,8 +291,6 @@ class RHVCEventPage(RHConferenceBaseDisplay):
 
 class RHVCManageAttach(RHVCManageEventCreateBase):
     """Attaches a room to the event"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         defaults = FormDefaults(self.plugin.get_vc_room_attach_form_defaults(self.event_new))

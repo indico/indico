@@ -16,20 +16,21 @@
 
 from __future__ import unicode_literals
 
-from datetime import time, datetime
+from datetime import datetime, time
 
 from dateutil.relativedelta import relativedelta
-from flask import flash, redirect, request, render_template
+from flask import flash, redirect, render_template, request
 from markupsafe import Markup
 from pytz import timezone
 from werkzeug.utils import cached_property
 
 from indico.core.config import Config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.categories import Category
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
-from indico.modules.events.models.persons import EventPersonLink, EventPerson
+from indico.modules.events.models.persons import EventPerson, EventPersonLink
 from indico.modules.events.models.series import EventSeries
 from indico.modules.events.notifications import notify_event_creation
 from indico.modules.events.operations import create_event
@@ -37,14 +38,11 @@ from indico.util.date_time import now_utc
 from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import url_for_index, jsonify_data, jsonify_template
-from indico.legacy.webinterface.rh.base import RHProtected
+from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
 
 class RHCreateEvent(RHProtected):
     """Create a new event"""
-
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         self.event_type = EventType[request.view_args['event_type']]

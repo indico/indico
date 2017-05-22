@@ -17,22 +17,22 @@
 from collections import defaultdict
 from datetime import date
 
-from flask import flash, request, session, redirect
+from flask import flash, redirect, request, session
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
 from indico.core.errors import IndicoError
-from indico.modules.rb.forms.blockings import CreateBlockingForm, BlockingForm
-from indico.modules.rb.notifications.blockings import notify_request
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
-from indico.web.forms.base import FormDefaults
 from indico.modules.rb.controllers import RHRoomBookingBase
+from indico.modules.rb.forms.blockings import BlockingForm, CreateBlockingForm
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.views.user.blockings import (WPRoomBookingBlockingList, WPRoomBookingBlockingDetails,
-                                                    WPRoomBookingBlockingsForMyRooms, WPRoomBookingBlockingForm)
+from indico.modules.rb.notifications.blockings import notify_request
+from indico.modules.rb.views.user.blockings import (WPRoomBookingBlockingDetails, WPRoomBookingBlockingForm,
+                                                    WPRoomBookingBlockingList, WPRoomBookingBlockingsForMyRooms)
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.forms.base import FormDefaults
 
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
@@ -46,8 +46,6 @@ class RHRoomBookingBlockingDetails(RHRoomBookingBase):
 
 
 class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         if self._form.validate_on_submit():
             self._save()
@@ -138,8 +136,6 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
 
 
 class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         self._block = Blocking.get(request.view_args['blocking_id'])
         if not self._block:

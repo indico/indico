@@ -25,7 +25,6 @@ from indico.modules.events.surveys.models.surveys import Survey
 class RHManageSurveysBase(RHManageEventBase):
     """Base class for all survey management RHs"""
 
-    CSRF_ENABLED = True
     ROLE = 'surveys'
 
 

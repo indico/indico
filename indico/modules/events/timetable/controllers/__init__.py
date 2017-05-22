@@ -34,7 +34,6 @@ class SessionManagementLevel(Enum):
 class RHManageTimetableBase(RHManageEventBase):
     """Base class for all timetable management RHs"""
 
-    CSRF_ENABLED = True
     session_management_level = SessionManagementLevel.none
 
     def _checkParams(self, params):

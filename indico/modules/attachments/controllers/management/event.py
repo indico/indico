@@ -34,8 +34,6 @@ from indico.web.flask.templating import get_template_module
 
 
 class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
-    CSRF_ENABLED = True
-
     normalize_url_spec = {
         'locators': {
             lambda self: self.object
@@ -104,5 +102,4 @@ class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagement
 class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHManageEventBase):
     wp = WPPackageEventAttachmentsManagement
     management = True
-    CSRF_ENABLED = True
     ALLOW_LOCKED = True

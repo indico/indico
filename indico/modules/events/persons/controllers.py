@@ -46,8 +46,6 @@ from indico.web.util import jsonify_form, jsonify_template
 
 
 class RHPersonsBase(RHManageEventBase):
-    CSRF_ENABLED = True
-
     def get_persons(self):
         abstract_strategy = joinedload('abstract_links')
         abstract_strategy.joinedload('abstract')
@@ -162,8 +160,6 @@ class RHPersonsList(RHPersonsBase):
 class RHEmailEventPersons(RHManageEventBase):
     """Send emails to selected EventPersons"""
 
-    CSRF_ENABLED = True
-
     def _checkParams(self, params):
         self._doNotSanitizeFields.append('from_address')
         self.no_account = request.args.get('no_account') == '1'
@@ -223,8 +219,6 @@ class RHEmailEventPersons(RHManageEventBase):
 class RHGrantSubmissionRights(RHManageEventBase):
     """Grants submission rights to all contribution speakers"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         count = 0
         for cont in self.event_new.contributions:
@@ -246,8 +240,6 @@ class RHGrantSubmissionRights(RHManageEventBase):
 class RHGrantModificationRights(RHManageEventBase):
     """Grants session modification rights to all session conveners"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         count = 0
         for sess in self.event_new.sessions:
@@ -265,8 +257,6 @@ class RHGrantModificationRights(RHManageEventBase):
 
 class RHRevokeSubmissionRights(RHManageEventBase):
     """Revokes submission rights"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         count = 0

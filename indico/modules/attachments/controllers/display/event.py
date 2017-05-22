@@ -16,17 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session, redirect
+from flask import redirect, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
-
+from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.controllers.util import SpecificFolderMixin
-from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
-from indico.modules.attachments.views import (WPEventFolderDisplay, WPPackageEventAttachmentsDisplayConference,
-                                              WPPackageEventAttachmentsDisplay)
+from indico.modules.attachments.views import (WPEventFolderDisplay, WPPackageEventAttachmentsDisplay,
+                                              WPPackageEventAttachmentsDisplayConference)
 from indico.modules.events.models.events import EventType
 
 
@@ -54,8 +53,6 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
 
 
 class RHPackageEventAttachmentsDisplay(AttachmentPackageMixin, RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
-
     @property
     def wp(self):
         if self.event_new.type_ == EventType.conference:

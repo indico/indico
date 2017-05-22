@@ -21,16 +21,20 @@ from datetime import datetime
 from operator import attrgetter
 
 from dateutil.relativedelta import relativedelta
-from flask import session, request, flash, jsonify, redirect
+from flask import flash, jsonify, redirect, request, session
 from markupsafe import Markup, escape
 from pytz import timezone
-from sqlalchemy.orm import undefer, joinedload, subqueryload, load_only
-from werkzeug.exceptions import Forbidden, NotFound, BadRequest
+from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.notifications import make_email, send_email
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.mail import GenericMailer
+from indico.legacy.common.timezoneUtils import DisplayTZ
+from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -38,14 +42,14 @@ from indico.modules.auth.util import register_user
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.modules.users import User, logger, user_management_settings
+from indico.modules.users.forms import (AdminAccountRegistrationForm, AdminsForm, AdminUserSettingsForm, MergeForm,
+                                        SearchForm, UserDetailsForm, UserEmailsForm, UserPreferencesForm)
 from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.operations import create_user
-from indico.modules.users.util import (get_related_categories, get_suggested_categories,
-                                       serialize_user, search_users, merge_users, get_linked_events)
+from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
+                                       search_users, serialize_user)
 from indico.modules.users.views import WPUser, WPUsersAdmin
-from indico.modules.users.forms import (UserDetailsForm, UserPreferencesForm, UserEmailsForm, SearchForm, MergeForm,
-                                        AdminUserSettingsForm, AdminAccountRegistrationForm, AdminsForm)
-from indico.util.date_time import timedelta_split, now_utc
+from indico.util.date_time import now_utc, timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -55,11 +59,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
-from indico.legacy.common.cache import GenericCache
-from indico.legacy.common.mail import GenericMailer
-from indico.legacy.common.timezoneUtils import DisplayTZ
-from indico.legacy.webinterface.rh.base import RHProtected
-
 
 IDENTITY_ATTRIBUTES = {'first_name', 'last_name', 'email', 'affiliation', 'full_name'}
 UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'})
@@ -68,7 +67,6 @@ UserEntry = namedtuple('UserEntry', IDENTITY_ATTRIBUTES | {'profile_url', 'user'
 class RHUserBase(RHProtected):
     flash_user_status = True
     allow_system_user = False
-    CSRF_ENABLED = True
 
     def _checkParams(self):
         if not session.user:
@@ -191,8 +189,6 @@ class RHUserFavorites(RHUserBase):
 
 
 class RHUserFavoritesUsersAdd(RHUserBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         users = [User.get(int(id_)) for id_ in request.form.getlist('user_id')]
         self.user.favorite_users |= set(filter(None, users))
@@ -202,8 +198,6 @@ class RHUserFavoritesUsersAdd(RHUserBase):
 
 
 class RHUserFavoritesUserRemove(RHUserBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         user = User.get(int(request.view_args['fav_user_id']))
         if user in self.user.favorite_users:
@@ -212,8 +206,6 @@ class RHUserFavoritesUserRemove(RHUserBase):
 
 
 class RHUserFavoritesCategoryAPI(RHUserBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         RHUserBase._checkParams(self)
         self.category = Category.get_one(request.view_args['category_id'])
@@ -238,8 +230,6 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
 
 
 class RHUserSuggestionsRemove(RHUserBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         suggestion = self.user.suggested_categories.filter_by(category_id=request.view_args['category_id']).first()
         if suggestion:
@@ -313,8 +303,6 @@ class RHUserEmailsVerify(RHUserBase):
 
 
 class RHUserEmailsDelete(RHUserBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         email = request.view_args['email']
         if email in self.user.secondary_emails:
@@ -323,8 +311,6 @@ class RHUserEmailsDelete(RHUserBase):
 
 
 class RHUserEmailsSetPrimary(RHUserBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         email = request.form['email']
         if email in self.user.secondary_emails:

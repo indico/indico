@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, timedelta, date, time
+from datetime import date, datetime, time, timedelta
 from functools import partial
 from io import BytesIO
 from itertools import chain, groupby, imap
@@ -26,18 +26,19 @@ from time import mktime
 
 import dateutil
 from dateutil.relativedelta import relativedelta
-from flask import jsonify, request, session, Response
+from flask import Response, jsonify, request, session
 from pytz import utc
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer, undefer_group
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
-from indico.modules.categories.serialize import (serialize_category_atom, serialize_categories_ical,
-                                                 serialize_category_chain, serialize_category)
+from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
+                                                 serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
 from indico.modules.categories.views import WPCategory, WPCategoryStatistics
 from indico.modules.events.models.events import Event
@@ -46,7 +47,7 @@ from indico.modules.events.util import get_base_ical_parameters
 from indico.modules.news.util import get_recent_news
 from indico.modules.users import User
 from indico.modules.users.models.favorites import favorite_category_table
-from indico.util.date_time import format_date, now_utc, format_number
+from indico.util.date_time import format_date, format_number, now_utc
 from indico.util.decorators import classproperty
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
@@ -54,7 +55,6 @@ from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.util import jsonify_data
-from indico.legacy.webinterface.rh.base import RH
 
 
 CALENDAR_COLOR_PALETTE = [
@@ -174,8 +174,6 @@ class RHCategoryInfo(RHDisplayCategoryBase):
 
 
 class RHReachableCategoriesInfo(RH):
-    CSRF_ENABLED = True
-
     def _get_reachable_categories(self, id_, excluded_ids):
         cat = Category.query.filter_by(id=id_).options(joinedload('children').load_only('id')).one()
         ids = ({c.id for c in cat.children} | {c.id for c in cat.parent_chain_query}) - excluded_ids

@@ -48,8 +48,6 @@ def _render_menu_entries(event, connect_menu=False):
 
 
 class RHMenuBase(RHManageEventBase):
-    CSRF_ENABLED = True
-
     def _checkProtection(self):
         RHManageEventBase._checkProtection(self)
         if self.event_new.type_ != EventType.conference:

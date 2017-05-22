@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import shutil
 from io import BytesIO
 
-from flask import request, session, flash, jsonify
+from flask import flash, jsonify, request, session
 from PIL import Image
 from werkzeug.exceptions import Forbidden
 
@@ -30,7 +30,7 @@ from indico.modules.designer import DEFAULT_CONFIG
 from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.designer.util import get_placeholder_options, get_inherited_templates
+from indico.modules.designer.util import get_inherited_templates, get_placeholder_options
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -38,6 +38,7 @@ from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_data, jsonify_form
+
 
 TEMPLATE_DATA_JSON_SCHEMA = {
     'type': 'object',
@@ -143,8 +144,6 @@ class TemplateListMixin(TargetFromURLMixin):
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
-    CSRF_ENABLED = True
-
     def _checkProtection(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
@@ -215,8 +214,6 @@ class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
 
 
 class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProtected):
-    CSRF_ENABLED = True
-
     def _checkParams(self, params):
         RHModificationBaseProtected._checkParams(self, params)
         SpecificTemplateMixin._checkParams(self)
@@ -255,8 +252,6 @@ class RHDownloadTemplateImage(RHModifyDesignerTemplateBase):
 
 
 class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
-    CSRF_ENABLED = True
-
     def _process(self):
         f = request.files['file']
         filename = secure_filename(f.filename, 'image')

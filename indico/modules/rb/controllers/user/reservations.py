@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, time, timedelta, date
 from collections import defaultdict
+from datetime import date, datetime, time, timedelta
 
 import dateutil
-from flask import request, session, jsonify, flash
+from flask import flash, jsonify, request, session
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import Forbidden
 
@@ -26,19 +26,18 @@ from indico.core.db import db
 from indico.core.errors import IndicoError, NoReportError, NotFoundError
 from indico.modules.rb import rb_settings
 from indico.modules.rb.controllers import RHRoomBookingBase
-from indico.modules.rb.forms.reservations import (BookingSearchForm, NewBookingCriteriaForm, NewBookingPeriodForm,
-                                                  NewBookingConfirmForm, NewBookingSimpleForm, ModifyBookingForm)
+from indico.modules.rb.forms.reservations import (BookingSearchForm, ModifyBookingForm, NewBookingConfirmForm,
+                                                  NewBookingCriteriaForm, NewBookingPeriodForm, NewBookingSimpleForm)
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import get_default_booking_interval, rb_is_admin
-from indico.modules.rb.views.user.reservations import (WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults,
-                                                       WPRoomBookingCalendar, WPRoomBookingNewBookingSelectRoom,
+from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingCalendar,
+                                                       WPRoomBookingModifyBooking, WPRoomBookingNewBookingConfirm,
                                                        WPRoomBookingNewBookingSelectPeriod,
-                                                       WPRoomBookingNewBookingConfirm,
-                                                       WPRoomBookingNewBookingSimple, WPRoomBookingModifyBooking,
-                                                       WPRoomBookingBookingDetails)
+                                                       WPRoomBookingNewBookingSelectRoom, WPRoomBookingNewBookingSimple,
+                                                       WPRoomBookingSearchBookings, WPRoomBookingSearchBookingsResults)
 from indico.util.date_time import get_datetime_from_request, round_up_to_minutes
 from indico.util.i18n import _
 from indico.util.string import natural_sort_key
@@ -69,8 +68,6 @@ class _SuccessUrlDetailsMixin:
 
 
 class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         if not self._reservation.can_be_accepted(session.user):
@@ -86,8 +83,6 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _checkProtection(self):
         RHRoomBookingBase._checkProtection(self)
         if not self._reservation.can_be_cancelled(session.user):
@@ -101,8 +96,6 @@ class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         self._reason = request.form.get('reason', u'')
@@ -120,8 +113,6 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
@@ -140,8 +131,6 @@ class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
 
 class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    CSRF_ENABLED = True
-
     def _checkParams(self):
         RHRoomBookingBookingMixin._checkParams(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
@@ -259,7 +248,6 @@ class RHRoomBookingSearchPendingBookingsMyRooms(_MyRoomsMixin, RHRoomBookingSear
 class RHRoomBookingNewBookingBase(RHRoomBookingBase):
     DEFAULT_START_TIME_PRECISION = 15  # minutes
     DEFAULT_BOOKING_DURATION = 90  # minutes
-    CSRF_ENABLED = True
 
     def _make_confirm_form(self, room, step=None, defaults=None, form_class=NewBookingConfirmForm):
         # Note: ALWAYS pass defaults as a kwargs! For-Event room booking depends on it!

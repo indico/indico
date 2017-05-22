@@ -17,12 +17,13 @@
 from __future__ import unicode_literals
 
 from flask import redirect, render_template, session
-from werkzeug.exceptions import NotFound, Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.legacy.webinterface.rh.base import RHProtected, check_event_locked
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
@@ -30,7 +31,6 @@ from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import get_object_from_args
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
-from indico.legacy.webinterface.rh.base import RHProtected, check_event_locked
 
 
 class RHNoteBase(RHProtected):
@@ -44,8 +44,6 @@ class RHNoteBase(RHProtected):
 
 class RHManageNoteBase(RHNoteBase):
     """Base handler for managing notes attached to an object inside an event"""
-
-    CSRF_ENABLED = True
 
     def _checkProtection(self):
         RHNoteBase._checkProtection(self)

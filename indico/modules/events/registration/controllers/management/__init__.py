@@ -29,7 +29,6 @@ from indico.modules.events.registration.models.registrations import Registration
 class RHManageRegFormsBase(RHManageEventBase):
     """Base class for all registration management RHs"""
 
-    CSRF_ENABLED = True
     ROLE = 'registration'
 
 

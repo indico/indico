@@ -19,15 +19,14 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.modules.events.contributions.models.contributions import Contribution
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.contributions.models.contributions import Contribution
 
 
 class RHPapersBase(RHConferenceBaseDisplay):
     """Base class for all paper-related RHs"""
 
-    CSRF_ENABLED = True
     EVENT_FEATURE = 'papers'
 
     def _checkProtection(self):

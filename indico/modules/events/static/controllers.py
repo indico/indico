@@ -28,7 +28,7 @@ from indico.web.flask.util import url_for
 
 
 class RHStaticSiteBase(RHManageEventBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHStaticSiteList(RHStaticSiteBase):

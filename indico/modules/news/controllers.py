@@ -18,26 +18,24 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from flask import flash, request, redirect, session
+from flask import flash, redirect, request, session
 
 from indico.core.db import db
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
-from indico.modules.news import news_settings, logger
-from indico.modules.news.forms import NewsSettingsForm, NewsForm
+from indico.modules.news import logger, news_settings
+from indico.modules.news.forms import NewsForm, NewsSettingsForm
 from indico.modules.news.models.news import NewsItem
 from indico.modules.news.util import get_recent_news
-from indico.modules.news.views import WPNews, WPManageNews
+from indico.modules.news.views import WPManageNews, WPNews
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form
-from indico.legacy.webinterface.rh.base import RH
 
 
 class RHNews(RH):
-    CSRF_ENABLED = True
-
     @staticmethod
     def _is_new(item):
         days = news_settings.get('new_days')

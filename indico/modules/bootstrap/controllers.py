@@ -37,12 +37,8 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
 
-# TODO: set the time zone here once communities settings are available.
-
 
 class RHBootstrap(RH):
-    CSRF_ENABLED = True
-
     def _process_GET(self):
         if User.query.filter_by(is_system=False).has_rows():
             return redirect(url_for_index())

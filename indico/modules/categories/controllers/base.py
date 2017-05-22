@@ -17,16 +17,14 @@
 from __future__ import unicode_literals
 
 from flask import request, session
-from werkzeug.exceptions import NotFound, Forbidden
+from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.categories.models.categories import Category
 from indico.util.i18n import _
-from indico.legacy.webinterface.rh.base import RH
 
 
 class RHCategoryBase(RH):
-    CSRF_ENABLED = True
-
     _category_query_options = ()
 
     @property

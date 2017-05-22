@@ -20,12 +20,12 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 
-from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
+from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
-from indico.modules.events.timetable.util import (render_entry_info_balloon, serialize_event_info,
-                                                  get_timetable_offline_pdf_generator)
+from indico.modules.events.timetable.util import (get_timetable_offline_pdf_generator, render_entry_info_balloon,
+                                                  serialize_event_info)
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.util import get_theme
 from indico.modules.events.views import WPSimpleEventDisplay
@@ -67,8 +67,6 @@ class RHTimetableEntryInfo(RHConferenceBaseDisplay):
 
 
 class RHTimetableExportPDF(RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
-
     def _process(self):
         form = TimetablePDFExportForm(formdata=request.args, csrf_enabled=False)
         if form.validate_on_submit():

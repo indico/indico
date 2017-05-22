@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.abstracts.models.abstracts import Abstract
 
 
 class SpecificAbstractMixin:
@@ -56,7 +56,6 @@ class SpecificAbstractMixin:
 class RHAbstractsBase(RHConferenceBaseDisplay):
     """Base class for all abstract-related RHs"""
 
-    CSRF_ENABLED = True
     EVENT_FEATURE = 'abstracts'
 
     def _checkProtection(self):

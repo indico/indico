@@ -42,7 +42,6 @@ def _render_image_list(event):
 
 class RHManageImagesBase(RHManageEventBase):
     EVENT_FEATURE = 'images'
-    CSRF_ENABLED = True
 
 
 class RHImages(RHManageImagesBase):

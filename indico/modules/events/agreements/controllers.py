@@ -41,13 +41,9 @@ from indico.web.forms.base import FormDefaults
 class RHAgreementManagerBase(RHManageEventBase):
     """Base class for agreement management RHs"""
 
-    CSRF_ENABLED = True
-
 
 class RHAgreementForm(RHConferenceBaseDisplay):
     """Agreement form page"""
-
-    CSRF_ENABLED = True
 
     normalize_url_spec = {
         'locators': {

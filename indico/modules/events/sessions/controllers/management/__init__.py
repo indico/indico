@@ -26,8 +26,6 @@ from indico.modules.events.sessions.models.sessions import Session
 class RHManageSessionsBase(RHManageEventBase):
     """Base RH for all session management RHs"""
 
-    CSRF_ENABLED = True
-
 
 class RHManageSessionBase(RHManageSessionsBase):
     """Base RH for management of a single session"""

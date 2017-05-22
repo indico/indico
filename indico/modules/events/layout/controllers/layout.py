@@ -42,7 +42,7 @@ from indico.web.util import jsonify_data
 
 
 class RHLayoutBase(RHManageEventBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHLayoutEdit(RHLayoutBase):

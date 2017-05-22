@@ -46,8 +46,6 @@ class EventOrRequestManagerMixin:
 class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
     """Overview of existing requests (event)"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         definitions = get_request_definitions()
         if not definitions:
@@ -63,8 +61,6 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
 
 class RHRequestsEventRequestBase(RHManageEventBase):
     """Base class for pages handling a specific request type"""
-
-    CSRF_ENABLED = True
 
     #: if a request must be present in the database
     _require_request = True

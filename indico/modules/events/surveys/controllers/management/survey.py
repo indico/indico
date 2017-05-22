@@ -16,13 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session, redirect
+from flask import flash, redirect, session
 
 from indico.core.db import db
 from indico.core.notifications import make_email, send_email
 from indico.modules.events.surveys import logger
-from indico.modules.events.surveys.controllers.management import RHManageSurveysBase, RHManageSurveyBase
-from indico.modules.events.surveys.forms import SurveyForm, ScheduleSurveyForm, InvitationForm
+from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
+from indico.modules.events.surveys.forms import InvitationForm, ScheduleSurveyForm, SurveyForm
 from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
 from indico.modules.events.surveys.views import WPManageSurvey
@@ -153,8 +153,6 @@ class RHOpenSurvey(RHManageSurveyBase):
 
 class RHSendSurveyLinks(RHManageSurveyBase):
     """Send emails with URL of the survey"""
-
-    CSRF_ENABLED = True
 
     def _checkParams(self, params):
         self._doNotSanitizeFields.append('from_address')

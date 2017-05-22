@@ -16,25 +16,25 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request, jsonify
-from sqlalchemy.orm import load_only, joinedload
+from flask import jsonify, request, session
+from sqlalchemy.orm import joinedload, load_only
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
+from indico.legacy.pdfinterface.conference import ContribsToPDF, ContribToPDF
+from indico.legacy.webinterface.rh.base import RH
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.persons import ContributionPersonLink, AuthorType
+from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.util import (get_contribution_ical_file,
                                                       get_contributions_with_user_as_submitter)
-from indico.modules.events.contributions.views import WPMyContributions, WPContributions, WPAuthorList, WPSpeakerList
+from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
-from indico.web.flask.util import send_file, jsonify_data
-from indico.legacy.pdfinterface.conference import ContribToPDF, ContribsToPDF
-from indico.legacy.webinterface.rh.base import RH
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.web.flask.util import jsonify_data, send_file
 
 
 def _get_persons(event, condition):
@@ -47,8 +47,6 @@ def _get_persons(event, condition):
 
 
 class RHContributionDisplayBase(RHConferenceBaseDisplay):
-    CSRF_ENABLED = True
-
     normalize_url_spec = {
         'locators': {
             lambda self: self.contrib
@@ -204,8 +202,6 @@ class RHContributionExportToICAL(RHContributionDisplayBase):
 class RHContributionListFilter(RHContributionList):
     """Display dialog with filters"""
 
-    CSRF_ENABLED = True
-
     def _process(self):
         return RH._process(self)
 
@@ -221,8 +217,6 @@ class RHContributionListFilter(RHContributionList):
 
 class RHContributionListDisplayStaticURL(RHContributionList):
     """Generate static URL for the current set of filters"""
-
-    CSRF_ENABLED = True
 
     def _process(self):
         return jsonify(url=self.list_generator.generate_static_url())

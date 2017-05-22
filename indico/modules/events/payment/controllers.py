@@ -57,7 +57,6 @@ class RHPaymentManagementBase(RHManageEventBase):
     """Base RH for event management pages"""
 
     EVENT_FEATURE = 'payment'
-    CSRF_ENABLED = True
 
 
 class RHPaymentBase(RHRegistrationFormRegistrationBase):

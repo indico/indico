@@ -34,7 +34,7 @@ from indico.web.util import jsonify_data
 
 
 class RHFeaturesBase(RHManageEventBase):
-    CSRF_ENABLED = True
+    pass
 
 
 class RHFeatures(RHFeaturesBase):

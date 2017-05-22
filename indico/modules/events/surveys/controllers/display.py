@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, flash, session, request
+from flask import flash, redirect, request, session
 from sqlalchemy.orm import joinedload
 from werkzeug.datastructures import MultiDict
 from werkzeug.exceptions import Forbidden, NotFound
@@ -28,10 +28,9 @@ from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.models.events import EventType
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
-from indico.modules.events.surveys.util import (make_survey_form, is_submission_in_progress,
-                                                save_submitted_survey_to_session, was_survey_submitted,
-                                                query_active_surveys)
-from indico.modules.events.surveys.views import (WPDisplaySurveyConference, WPDisplaySurveySimpleEvent)
+from indico.modules.events.surveys.util import (is_submission_in_progress, make_survey_form, query_active_surveys,
+                                                save_submitted_survey_to_session, was_survey_submitted)
+from indico.modules.events.surveys.views import WPDisplaySurveyConference, WPDisplaySurveySimpleEvent
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -63,8 +62,6 @@ class RHSurveyList(RHSurveyBaseDisplay):
 
 
 class RHSubmitSurveyBase(RHSurveyBaseDisplay):
-    CSRF_ENABLED = True
-
     normalize_url_spec = {
         'locators': {
             lambda self: self.survey

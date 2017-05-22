@@ -76,7 +76,6 @@ def _render_subcontribution_list(contrib):
 
 class RHManageContributionsBase(RHManageEventBase):
     """Base class for all contributions management RHs"""
-    CSRF_ENABLED = True
 
     def _checkParams(self, params):
         RHManageEventBase._checkParams(self, params)
