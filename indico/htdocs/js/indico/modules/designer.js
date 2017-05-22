@@ -321,16 +321,37 @@
         });
     }
 
+    function updatePreset(templateWidth, templateHeight) {
+        $('.js-preset-tool option').each(function() {
+            var $this = $(this);
+
+            if ($this.val() === 'custom') {
+                return;
+            }
+
+            var width = $this.data('width');
+            var height = $this.data('height');
+
+            if (width === templateWidth && height === templateHeight) {
+                $this.prop('selected', true);
+                $('.js-template-dimension').prop('disabled', true);
+            }
+        });
+    }
+
     function changeTemplateSize(template, backsideTemplate) {
         var tpl = $('.template-container');
-        tpl.width($('.template-width').val() * pixelsPerCm);
-        tpl.height($('.template-height').val() * pixelsPerCm);
+        var templateWidth = parseFloat($('.template-width').val());
+        var templateHeight = parseFloat($('.template-height').val());
+
+        tpl.width(templateWidth * pixelsPerCm);
+        tpl.height(templateHeight * pixelsPerCm);
         previousTemplateDimensions.width = templateDimensions.width;
         previousTemplateDimensions.height = templateDimensions.height;
-        templateDimensions = new Dimensions($('.template-width').val() * DEFAULT_PIXEL_CM,
-                                            $('.template-height').val() * DEFAULT_PIXEL_CM);
+        templateDimensions = new Dimensions(templateWidth * DEFAULT_PIXEL_CM, templateHeight * DEFAULT_PIXEL_CM);
         updateRulers();
         displayAllBackgrounds(template, backsideTemplate);
+        updatePreset(templateWidth, templateHeight);
     }
 
     function moveSelectedItem(direction) {
@@ -607,8 +628,6 @@
         // Item class
         $(document).ready(function() {
             var removeBackgroundQtip = $('.js-remove-bg').qtip();
-            var templateWidth = $('.template-width').val();
-            var templateHeight = $('.template-height').val();
 
             $('#bg-form input[type="file"]').on('change', function() {
                 var $this = $(this);
@@ -756,22 +775,6 @@
 
             $('.template-side.front').trigger('indico:backgroundChanged');
 
-            $('.js-preset-tool option').each(function() {
-                var $this = $(this);
-
-                if ($this.val() === 'custom') {
-                    return;
-                }
-
-                var width = $this.data('width').toString();
-                var height = $this.data('height').toString();
-
-                if (width === templateWidth && height === templateHeight) {
-                    $this.prop('selected', true);
-                    $('.js-template-dimansion').attr('disabled', true);
-                }
-            });
-
             $('.template-side.back').on('indico:backsideUpdated', function(evt, data) {
                 backsideTemplateID = data.backside_template_id;
                 clearBacksideTemplate(backsideTemplate);
@@ -784,6 +787,16 @@
                 backsideTemplateID = null;
                 clearBacksideTemplate(backsideTemplate);
                 toggleBacksidePlaceholder(true);
+            });
+
+            $('.js-change-orientation').on('click', function() {
+                var $width = $('.template-width');
+                var $height = $('.template-height');
+                var widthValue = $width.val();
+
+                $width.val($height.val());
+                $height.val(widthValue);
+                changeTemplateSize(template, backsideTemplate);
             });
         });
 

@@ -28,6 +28,10 @@
                     <span class="scale">cm</span>
                 </div>
                 <div class="subtool">
+                    <button class="js-change-orientation i-button icon-transmission text-color subtle"
+                            title="{% trans %}Change orientation{% endtrans %}"></button>
+                </div>
+                <div class="subtool">
                     <label>{% trans %}Height:{% endtrans %}</label>
                     <input class="template-height js-template-dimension" size="5" type="number">
                     <span class="scale">cm</span>
@@ -36,11 +40,20 @@
                     <label>{% trans %}Preset:{% endtrans %}</label>
                     <select class="js-preset-tool" data-attr="preset">
                         <option value="custom">{% trans %}Custom size{% endtrans %}</option>
-                        <option value="a6" data-width="10.5" data-height="14.8">A6</option>
-                        <option value="a7" data-width="7.4" data-height="10.5">A7</option>
-                        <option value="business_card" data-width="8.5" data-height="5.4">
-                            {%- trans %}Business card{% endtrans -%}
-                        </option>
+                        <optgroup label="{% trans %}Landscape orientation{% endtrans %}">
+                            <option value="a6" data-width="14.8" data-height="10.5">A6</option>
+                            <option value="a7" data-width="10.5" data-height="7.4">A7</option>
+                            <option value="business_card" data-width="8.5" data-height="5.4">
+                                {%- trans %}Business card{% endtrans -%}
+                            </option>
+                        </optgroup>
+                        <optgroup label="{% trans %}Portrait orientation{% endtrans %}">
+                            <option value="a6" data-width="10.5" data-height="14.8">A6</option>
+                            <option value="a7" data-width="7.4" data-height="10.5">A7</option>
+                            <option value="business_card" data-width="5.4" data-height="8.5">
+                                {%- trans %}Business card{% endtrans -%}
+                            </option>
+                        </optgroup>
                     </select>
                 </div>
             </div>
