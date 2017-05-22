@@ -79,7 +79,7 @@ if ! RESULT=$(python -c 'import sys; from isort.hooks import git_hook; sys.exit(
     echo "$RESULT"
     echo
     echo "${CYAN}Run this command to sort the imports:${RESET}"
-    echo 'git diff --staged --name-only --diff-filter d | xargs isort'
+    echo "git diff --staged --name-only --diff-filter d '*.py' | xargs isort"
 fi
 
 
