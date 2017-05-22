@@ -44,7 +44,7 @@ from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
 from indico.util.i18n import ngettext, _
 from indico.util.string import html_color_to_rgb, to_unicode, truncate
-from indico.legacy.PDFinterface.base import (escape, PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak,
+from indico.legacy.pdfinterface.base import (escape, PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak,
                                              modifiedFontSize)
 from indico.legacy.common import utils
 from indico.legacy.common.timezoneUtils import DisplayTZ, nowutc

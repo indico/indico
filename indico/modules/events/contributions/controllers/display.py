@@ -32,7 +32,7 @@ from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file, jsonify_data
-from indico.legacy.PDFinterface.conference import ContribToPDF, ContribsToPDF
+from indico.legacy.pdfinterface.conference import ContribToPDF, ContribsToPDF
 from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 

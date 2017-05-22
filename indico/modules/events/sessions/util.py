@@ -33,7 +33,7 @@ from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.legacy.PDFinterface.base import PDFBase, Paragraph
+from indico.legacy.pdfinterface.base import PDFBase, Paragraph
 
 
 def can_manage_sessions(user, event, role=None):
@@ -190,7 +190,7 @@ def get_session_ical_file(sess):
 
 
 def get_session_timetable_pdf(sess, **kwargs):
-    from indico.legacy.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat
+    from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat
     pdf_format = TimetablePDFFormat(params={'coverPage': False})
     return TimeTablePlain(sess.event_new, session.user, showSessions=[sess.id], showDays=[],
                           sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',

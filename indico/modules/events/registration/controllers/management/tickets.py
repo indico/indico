@@ -34,7 +34,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for, send_file, secure_filename
 from indico.web.util import jsonify_data, jsonify_template
 
-from indico.legacy.PDFinterface.conference import TicketToPDF
+from indico.legacy.pdfinterface.conference import TicketToPDF
 
 
 class RHRegistrationFormTickets(RHManageRegFormBase):

@@ -40,7 +40,7 @@ from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
-from indico.legacy.PDFinterface.conference import AbstractBook
+from indico.legacy.pdfinterface.conference import AbstractBook
 
 
 def build_default_email_template(event, tpl_type):

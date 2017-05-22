@@ -20,7 +20,7 @@ from io import BytesIO
 
 from flask import jsonify, request, session
 
-from indico.legacy.PDFinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
+from indico.legacy.pdfinterface.conference import TimeTablePlain, TimetablePDFFormat, SimplifiedTimeTablePlain
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer

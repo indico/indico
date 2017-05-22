@@ -61,7 +61,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
 from indico.web.util import jsonify_data, jsonify_template
 from indico.legacy.common.cache import GenericCache
-from indico.legacy.PDFinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
+from indico.legacy.pdfinterface.conference import RegistrantsListToPDF, RegistrantsListToBookPDF
 
 
 badge_cache = GenericCache('badge-printing')

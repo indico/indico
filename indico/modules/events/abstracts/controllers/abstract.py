@@ -29,7 +29,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from indico.legacy.PDFinterface.conference import ConfManagerAbstractToPDF, AbstractToPDF
+from indico.legacy.pdfinterface.conference import ConfManagerAbstractToPDF, AbstractToPDF
 
 
 class RHDisplayAbstract(RHAbstractBase):

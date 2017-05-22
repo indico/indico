@@ -23,7 +23,7 @@ from flask import flash, request
 from sqlalchemy.orm import subqueryload
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
-from indico.legacy.PDFinterface.conference import ProgrammeToPDF
+from indico.legacy.pdfinterface.conference import ProgrammeToPDF
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.management.controllers import RHManageEventBase

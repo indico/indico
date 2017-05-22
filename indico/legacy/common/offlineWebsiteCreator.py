@@ -28,7 +28,7 @@ from werkzeug.utils import secure_filename
 
 from indico.legacy.common.contribPacker import ZIPFileHandler
 from indico.legacy.common import timezoneUtils
-from indico.legacy.PDFinterface.conference import ProgrammeToPDF, AbstractBook, ContribToPDF, ContribsToPDF
+from indico.legacy.pdfinterface.conference import ProgrammeToPDF, AbstractBook, ContribToPDF, ContribsToPDF
 from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
                                                      WPStaticConferenceProgram, WPStaticContributionDisplay,
                                                      WPStaticContributionList, WPStaticCustomPage,
