@@ -21,9 +21,9 @@ from flask import session
 from indico.core import signals
 from indico.core.settings import SettingsProxy
 from indico.modules.events.features.base import EventFeature
+from indico.modules.events.payment.plugins import (PaymentEventSettingsFormBase, PaymentPluginMixin,
+                                                   PaymentPluginSettingsFormBase)
 from indico.modules.events.settings import EventSettingsProxy
-from indico.modules.events.payment.plugins import (PaymentPluginMixin, PaymentPluginSettingsFormBase,
-                                                   PaymentEventSettingsFormBase)
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -45,8 +45,7 @@ payment_settings = SettingsProxy('payment', {
 })
 
 payment_event_settings = EventSettingsProxy('payment', {
-    'currency': None,
-    'conditions': None,
+    'conditions': None
 })
 
 
@@ -76,7 +75,7 @@ class PaymentFeature(EventFeature):
 
     @classmethod
     def enabled(cls, event):
-        for setting in ('currency', 'conditions'):
+        for setting in ('conditions',):
             if payment_event_settings.get(event, setting) is None:
                 value = payment_settings.get(setting)
                 payment_event_settings.set(event, setting, value)
