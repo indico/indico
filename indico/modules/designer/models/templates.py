@@ -125,11 +125,6 @@ class DesignerTemplate(db.Model):
     def owner(self):
         return self.event_new if self.event_new else self.category
 
-    @property
-    def background_image(self):
-        image_id = self.data['background']['image_id']
-        return DesignerImageFile.get(int(image_id)) if image_id else None
-
     @locator_property
     def locator(self):
         return dict(self.owner.locator, template_id=self.id)

@@ -45,13 +45,7 @@ TEMPLATE_DATA_JSON_SCHEMA = {
     'properties': {
         'width': {'type': 'integer', 'minimum': 0},
         'height': {'type': 'integer', 'minimum': 0},
-        'background': {
-            'type': 'object',
-            'properties': {
-                'position': {'type': 'string'},
-                'image_id': {'type': 'string'}
-            }
-        },
+        'background_position': {'type': 'string'},
         'items': {
             'type': 'array',
             'items': {
@@ -74,7 +68,7 @@ TEMPLATE_DATA_JSON_SCHEMA = {
                          'bold', 'italic']
         },
     },
-    'required': ['width', 'height']
+    'required': ['width', 'height', 'background_position', 'items']
 }
 
 
@@ -247,9 +241,12 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         backside_template_id = request.json['backside_template_id']
         self.template.backside_template = DesignerTemplate.get(backside_template_id) if backside_template_id else None
-        self.template.data = dict(**request.json['template'])
+        self.template.data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.template.title = request.json['title']
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, self.template.data)
+
+        if request.json.pop('clear_background'):
+            self.template.background_image = None
 
         flash(_("Template successfully saved."), 'success')
         return jsonify_data()
@@ -287,9 +284,10 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
             return jsonify(error="File format not accepted!")
         content_type = 'image/' + image_type
         image = DesignerImageFile(template=self.template, filename=filename, content_type=content_type)
+        self.template.background_image = image
         image.save(data)
         flash(_("The image has been uploaded"), 'success')
-        return jsonify_data(image_url=image.download_url, image_id=image.id)
+        return jsonify_data(image_url=image.download_url)
 
 
 class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
