@@ -459,16 +459,14 @@
             template: {
                 width: templateDimensions.realWidth,
                 height: templateDimensions.realHeight,
+                background_position: $('input[name=bg-position]:checked').val(),
                 items: _.values(items).map(function(item) {
                     var itemCopy = $.extend(true, {}, item);
                     itemCopy.font_size = unzoomFont(item.font_size);
                     return item;
-                }),
-                background: {
-                    position: template.data.background.position,
-                    image_id: template.data.background.image_id.toString()
-                }
+                })
             },
+            clear_background: !template.background_url,
             title: $('.js-template-name').val(),
             backside_template_id: backsideTemplateID
         };
@@ -535,7 +533,7 @@
     function displayBackground(template, isBackside) {
         var templateSideClass = isBackside ? '.template-side.back' : '.template-side.front';
         var $backgroundElement = $(templateSideClass).find('.background-image');
-        var backgroundPos = template.data.background.position;
+        var backgroundPos = template.data.background_position;
 
         $backgroundElement.attr({
             src: template.background_url
@@ -562,7 +560,6 @@
     function removeBackground(template) {
         if (template.background_url) {
             template.background_url = null;
-            template.data.background.image_id = '';
             $('.template-side.front').trigger('indico:backgroundChanged');
         }
     }
@@ -593,7 +590,6 @@
         var $templateSide = $('.template-side.back');
         if (template.background_url) {
             template.background_url = null;
-            template.data.background.image_id = '';
             $templateSide.find('.background-image').remove();
             $templateSide.append($('<img>', {class: 'background-image'}));
         }
@@ -664,7 +660,6 @@
                         return;
                     }
                     template.background_url = data.image_url;
-                    template.data.background.image_id = data.image_id.toString();
                     displayBackground(template);
                     $('.template-side.front').trigger('indico:backgroundChanged');
                 }
@@ -676,7 +671,7 @@
                 var $backgroundElement = $('.template-side.front .background-image');
 
                 setBackgroundPos($backgroundElement, newPosition);
-                template.data.background.position = newPosition;
+                template.data.background_position = newPosition;
             });
 
             $('.js-remove-bg').click(function(e) {
@@ -769,8 +764,8 @@
                 }
                 $('.js-upload-bg').attr('disabled', !$backgroundFile.val());
                 $('.js-remove-bg').attr('disabled', !template.background_url);
-                $('#bg-position-stretch').prop('checked', template.data.background.position === 'stretch');
-                $('#bg-position-center').prop('checked', template.data.background.position === 'center');
+                $('#bg-position-stretch').prop('checked', template.data.background_position === 'stretch');
+                $('#bg-position-center').prop('checked', template.data.background_position === 'center');
             });
 
             $('.template-side.front').trigger('indico:backgroundChanged');
@@ -812,6 +807,8 @@
                     title: $this.data('title'),
                 });
             });
+
+            $('.backside-tools').addClass('hidden');
         });
 
         // We load the template if we are editing a template
