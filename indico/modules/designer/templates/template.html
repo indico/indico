@@ -94,24 +94,25 @@
             </div>
         </div>
         <div class="designer-tools-row second-row disappear">
-            <div class="backside-tools hidden">
-                <div class="tool">
-                    <span>{% trans %}Back side template:{% endtrans %}</span>
-                    <span class="backside-template-title">
-                        {{- template.backside_template.title -}}
-                    </span>
-                    <button class="js-remove-backside i-button icon-remove icon-only text-color subtle"
-                    title="{% trans %}Remove back side{% endtrans %}"></button>
+            {% if template.type.name == 'badge' %}
+                <div class="backside-tools hidden">
+                    <div class="tool">
+                        <span>{% trans %}Back side template:{% endtrans %}</span>
+                        <span class="backside-template-title">
+                            {{- template.backside_template.title -}}
+                        </span>
+                        <button class="js-remove-backside i-button icon-remove icon-only text-color subtle"
+                        title="{% trans %}Remove back side{% endtrans %}"></button>
+                    </div>
+                    <div class="tool">
+                        <button class="js-backside-list-dialog i-button icon-transmission"
+                                data-href="{{ url_for('.backside_template_list', template) }}"
+                                data-title="{% trans %}Select a template for the back side{% endtrans %}">
+                            {%- trans %}Change back side{% endtrans -%}
+                        </button>
+                    </div>
                 </div>
-                <div class="tool">
-                    <button class="i-button icon-transmission"
-                            data-href="{{ url_for('.backside_template_list', template) }}"
-                            data-title="{% trans %}Select a template for the back side{% endtrans %}"
-                            data-ajax-dialog>
-                        {%- trans %}Change back side{% endtrans -%}
-                    </button>
-                </div>
-            </div>
+            {% endif %}
             <div class="element-tools">
                 <div class="tool">
                     <span class="selection-text f-self-stretch"></span>
@@ -233,12 +234,14 @@
     </div>
     <div class="designer-canvas-wrapper flexcol f-a-center">
         <div class="controls">
-            <div class="template-side-controls">
-                <div class="toolbar f-j-center">
-                    <button class="i-button highlight js-toggle-side front">{% trans %}Front side{% endtrans %}</button>
-                    <button class="i-button js-toggle-side back">{% trans %}Back side{% endtrans %}</button>
+            {% if template.type.name == 'badge' %}
+                <div class="template-side-controls">
+                    <div class="toolbar f-j-center">
+                        <button class="i-button highlight js-toggle-side front">{% trans %}Front side{% endtrans %}</button>
+                        <button class="i-button js-toggle-side back">{% trans %}Back side{% endtrans %}</button>
+                    </div>
                 </div>
-            </div>
+            {% endif %}
             <div class="insert-element-controls">
                 <div class="flexrow f-a-baseline">
                     <label for="element-list">{% trans %}Insert element:{% endtrans %}</label>
