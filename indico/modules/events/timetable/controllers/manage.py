@@ -63,7 +63,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
             'can_manage_blocks': self.session.can_manage_blocks(session.user),
             'can_manage_contributions': self.session.can_manage_contributions(session.user)
         }
-        return WPManageTimetable.render_template('session_management.html', self._conf, event_info=event_info,
+        return WPManageTimetable.render_template('session_management.html', self.event_new, event_info=event_info,
                                                  timetable_data=timetable_data, session_=self.session,
                                                  **management_rights)
 
