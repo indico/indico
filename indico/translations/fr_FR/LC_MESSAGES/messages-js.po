@@ -7,14 +7,14 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2011
 # Thomas Baron <thomas.baron@cern.ch>, 2013-2015
 # Thomas Baron <thomas.baron@cern.ch>, 2011, 2012
-# Thomas Baron <thomas.baron@cern.ch>, 2015
+# Thomas Baron <thomas.baron@cern.ch>, 2015,2017
 msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-05-08 16:43+0200\n"
-"PO-Revision-Date: 2017-05-08 14:48+0000\n"
-"Last-Translator: Adrian Mönnich\n"
+"PO-Revision-Date: 2017-05-23 13:36+0000\n"
+"Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -163,11 +163,11 @@ msgstr "Ajouter à votre liste d'utilisateurs favoris"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:108
 msgid "This person exists in the event"
-msgstr ""
+msgstr "Cette personne existe dans l'événement"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:176
 msgid "Users with no Indico account"
-msgstr ""
+msgstr "Utilisateurs sans compte Indico"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:202
 msgid "Search"
@@ -179,7 +179,7 @@ msgstr "Donner les droits de dépôt aux utilisateurs sélectionnés"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:234
 msgid "You can use the form above to search for users..."
-msgstr ""
+msgstr "Vous pouvez utiliser le formulaire ci-dessus pour chercher des utilisateurs..."
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:276
 msgid "Family name"
@@ -390,15 +390,15 @@ msgstr "Vous avez ajouté un utilisateur sans adresse électronique. Cet utilisa
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1234
 msgid "Add User / Group"
-msgstr ""
+msgstr "Ajouter Utilisateurs / Groupes"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1234
 msgid "Add user"
-msgstr ""
+msgstr "Ajouter un utilisateur"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1237
 msgid "Add IP Network"
-msgstr ""
+msgstr "Ajouter un réseau IP"
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1260
 msgid "Add Users and Groups"
@@ -597,7 +597,7 @@ msgstr "Bloquée"
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:37
 msgid "Too early to book"
-msgstr ""
+msgstr "Impossible de réserver si en avance"
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:257
 msgid "Click to book it"
@@ -620,11 +620,11 @@ msgstr "Motif"
 msgid ""
 "Booking not allowed for this period.<br>This room can only be booked {0} "
 "days in advance."
-msgstr ""
+msgstr "Réservation impossible à cette période.<br>Cette salle ne peut être réservée que {0} jours en avance."
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:347
 msgid "This room cannot booked more than {0} days in advance."
-msgstr ""
+msgstr "Cette salle ne peut pas être réservée plus de {0} jours à l'avance"
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:357
 msgid ""
@@ -652,7 +652,7 @@ msgstr "Cette salle est bloquée à cette date et vous n'avez pas l'autorisation
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:401
 msgid "This room is not available on this date."
-msgstr ""
+msgstr "Cette salle n'est pas disponible à cette date."
 
 #: indico/htdocs/js/indico/RoomBooking/RoomBookingCalendar.js:430
 msgid "Unable to book"
@@ -796,7 +796,7 @@ msgstr "Capacité"
 
 #: indico/htdocs/js/indico/RoomBooking/roomselector.js:351
 msgid "Videoconference available"
-msgstr ""
+msgstr "Visioconférence disponible"
 
 #: indico/htdocs/js/indico/RoomBooking/roomselector.js:352
 msgid "Webcast/Recording available"
@@ -812,7 +812,7 @@ msgstr "Capacité maximum"
 
 #: indico/htdocs/js/indico/RoomBooking/roomselector.js:356
 msgid "Videoconference not available"
-msgstr ""
+msgstr "Visioconférence non disponible"
 
 #: indico/htdocs/js/indico/RoomBooking/roomselector.js:357
 msgid "Webcast/Recording not available"
@@ -877,11 +877,11 @@ msgstr "Le contenu de ce dialogue n'est actuellement pas disponible."
 msgid ""
 "You have unsaved changes. Do you really want to close the dialog without "
 "saving?"
-msgstr ""
+msgstr "Certains changements ne sont pas sauvegardés. Voulez-vous vraiment fermer ce dialogue sans sauvegarder?"
 
 #: indico/htdocs/js/indico/jquery/ajaxdialog.js:140
 msgid "Unsaved changes"
-msgstr ""
+msgstr "Modifications non sauvegardées"
 
 #: indico/htdocs/js/indico/jquery/authors.js:38
 msgid "author"
@@ -893,11 +893,11 @@ msgstr "auteurs"
 
 #: indico/htdocs/js/indico/jquery/categorynavigator.js:452
 msgid "Make the search more specific for more accurate results"
-msgstr ""
+msgstr "Entrer des critères de recherche plus spécifiques pour des résultats plus précis"
 
 #: indico/htdocs/js/indico/jquery/declarative.js:230
 msgid "Confirm action"
-msgstr ""
+msgstr "Confirmer l'action"
 
 #: indico/htdocs/js/indico/jquery/defaults.js:41
 msgid "Choose the start date"
@@ -914,52 +914,52 @@ msgstr "Supprimer"
 
 #: indico/htdocs/js/indico/jquery/multitextfield.js:344
 msgid "Empty values are not allowed."
-msgstr ""
+msgstr "Les champs vides ne sont pas acceptés."
 
 #: indico/htdocs/js/indico/jquery/principalfield.js:112
 msgid "Choose person"
-msgstr ""
+msgstr "Choisissez une personne"
 
 #: indico/htdocs/js/indico/jquery/principalfield.js:124
 msgid "Edit information"
-msgstr ""
+msgstr "Modifier l'information"
 
 #: indico/htdocs/js/indico/jquery/principalfield.js:132
 msgid "Enter person"
-msgstr ""
+msgstr "Choisissez une personne"
 
 #: indico/htdocs/js/indico/modules/attachments.js:160
 msgid "You are not authorized to access this file."
-msgstr ""
+msgstr "Vous n'êtes pas autorisé à accéder à ce fichier."
 
 #: indico/htdocs/js/indico/modules/attachments.js:160
 #: indico/htdocs/js/indico/modules/attachments.js:163
 msgid "Access Denied"
-msgstr ""
+msgstr "Accès refusé"
 
 #: indico/htdocs/js/indico/modules/attachments.js:162
 msgid "This file is protected. You will be redirected to the login page."
-msgstr ""
+msgstr "L'accès à ce fichier est restreint. Vous allez être redirigé vers la page d'authentification."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:43
 msgid "Unknown error while contacting the Community Hub"
-msgstr ""
+msgstr "Erreur inconnue en contactant la plateforme communautaire"
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:45
 msgid "Internal error: Parse error on the reply of the Community Hub."
-msgstr ""
+msgstr "Erreur interne: Erreur d'analyse de la réponse de la plateforme communautaire."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:47
 msgid "Unable to contact the Community Hub."
-msgstr ""
+msgstr "Impossible de contacter la plateforme communautaire."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:49
 msgid "The connection to the Community Hub timed out."
-msgstr ""
+msgstr "La connexion avec la plateforme communautaire a expiré."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:51
 msgid "Your server is not registered with the Community Hub."
-msgstr ""
+msgstr "Votre serveur n'est pas enregistré sur la plateforme communautaire."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:90
 msgid "Disabled"
@@ -967,35 +967,35 @@ msgstr "Désactivé"
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:91
 msgid "This server is not registered as part of the community."
-msgstr ""
+msgstr "Ce serveur n'est pas enregistré sur la plateforme communautaire."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:107
 msgid "Synchronized"
-msgstr ""
+msgstr "Synchronisé"
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:108
 msgid "This server is registered as part of the community and is up to date."
-msgstr ""
+msgstr "Ce serveur est enregistré sur la plateforme communautaire et est à jour."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:115
 msgid "Out of sync"
-msgstr ""
+msgstr "Non synchronisé"
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:116
 msgid ""
 "Your Indico server is out of sync. Synchronize it with the button on the "
 "right."
-msgstr ""
+msgstr "Votre serveur Indico n'est pas synchronisé. Veuillez le synchroniser en utilisant le bouton de droite."
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:123
 msgid "Error!"
-msgstr ""
+msgstr "Erreur!"
 
 #: indico/htdocs/js/indico/modules/cephalopod.js:135
 msgid ""
 "Your Indico server is not synchronized with the Community Hub! You can solve"
 " this <a href=\"{0}\">here</a>."
-msgstr ""
+msgstr "Votre serveur Indico n'est pas synchronisé avec la plateforme communautaire. Vous pouvez résoudre ce problème <a href=\"{0}\">ici</a>."
 
 #: indico/htdocs/js/indico/modules/designer.js:82
 msgid "Fixed text"
@@ -1017,11 +1017,11 @@ msgstr "Cliquer pour déplier/replier"
 
 #: indico/htdocs/js/indico/modules/events/display.js:157
 msgid "Edit minutes"
-msgstr ""
+msgstr "Modifier le compte-rendu"
 
 #: indico/htdocs/js/indico/modules/global/impersonation.js:43
 msgid "Select user to impersonate"
-msgstr ""
+msgstr "Sélectionnez l'identité à usurper"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:144
 msgid "New Field"
@@ -1037,7 +1037,7 @@ msgstr "Mettre à jour"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:359
 msgid "Checkbox"
-msgstr ""
+msgstr "Case à cocher"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:382
 msgid "Country"
@@ -1057,7 +1057,7 @@ msgstr "Numéro"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:590
 msgid "Choice"
-msgstr ""
+msgstr "Choix"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:650
 #: indico/htdocs/js/indico/modules/registration/form/field.js:1073
@@ -1085,12 +1085,12 @@ msgstr "nombre de places maximum"
 #: indico/htdocs/js/indico/modules/registration/form/field.js:654
 #: indico/htdocs/js/indico/modules/registration/form/field.js:1077
 msgid "Max. extra slots"
-msgstr ""
+msgstr "Nombre de places supplémentaires max"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:655
 #: indico/htdocs/js/indico/modules/registration/form/field.js:1078
 msgid "Extra slots pay"
-msgstr ""
+msgstr "Paiement pour places supplémentaires"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:656
 #: indico/htdocs/js/indico/modules/registration/form/field.js:999
@@ -1100,7 +1100,7 @@ msgstr "Activé"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:745
 msgid "Phone"
-msgstr ""
+msgstr "Téléphone"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:759
 msgid "Text"
@@ -1116,23 +1116,23 @@ msgstr "Oui/Non"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:793
 msgid "yes"
-msgstr ""
+msgstr "oui"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:793
 msgid "no"
-msgstr ""
+msgstr "non"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:809
 msgid "Email address"
-msgstr ""
+msgstr "Adresse électronique"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:911
 msgid "Title of the \"None\" option"
-msgstr ""
+msgstr "Titre pour l'option \"Aucun\""
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:918
 msgid "Accommodation"
-msgstr ""
+msgstr "Hébergement"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:995
 msgid "Accommodation option"
@@ -1140,7 +1140,7 @@ msgstr "Option d'hébergement"
 
 #: indico/htdocs/js/indico/modules/registration/form/field.js:1062
 msgid "Multi choice"
-msgstr ""
+msgstr "Choix multiple"
 
 #: indico/htdocs/js/indico/modules/registration/form/sectiontoolbar.js:53
 msgid "Add new field"
@@ -1197,7 +1197,7 @@ msgstr "Tous les jours "
 
 #: indico/htdocs/js/indico/modules/timetable/timetable/Base.js:631
 msgid "You are viewing the contents of the session block:"
-msgstr ""
+msgstr "Vous visualisez le contenu du bloc de session"
 
 #: indico/htdocs/js/indico/modules/timetable/timetable/Base.js:713
 msgid "Your changes triggered the automatic modification of some settings:"
@@ -1246,7 +1246,7 @@ msgstr "à"
 
 #: indico/htdocs/js/indico/modules/timetable/timetable/Base.js:916
 msgid "Session block"
-msgstr ""
+msgstr "Bloc de session"
 
 #: indico/htdocs/js/indico/modules/timetable/timetable/Base.js:930
 msgid "Contribution"
@@ -1313,7 +1313,7 @@ msgstr "Relacher pour transférer le bloc dans la session"
 
 #: indico/htdocs/js/indico/modules/timetable/timetable/Draw.js:207
 msgid "et al."
-msgstr ""
+msgstr "et al."
 
 #: indico/htdocs/js/indico/modules/timetable/timetable/Draw.js:293
 msgid "This poster session has "
@@ -1598,51 +1598,51 @@ msgstr "Modifier"
 
 #: indico/htdocs/js/indico/widgets/multiple_items_widget.js:297
 msgid "Please fill in the required fields."
-msgstr ""
+msgstr "Veuillez renseigner les champs obligatoires."
 
 #: indico/legacy/webinterface/tpls/ConfDetailsFull.tpl:82
 msgid "Login to see email address"
-msgstr ""
+msgstr "Identifiez-vous afin de voir l'adresse électronique"
 
 #: indico/legacy/webinterface/tpls/RoomBookingAdminLocation.tpl:259
 msgid "Delete room"
-msgstr ""
+msgstr "Effacer la salle"
 
 #: indico/legacy/webinterface/tpls/RoomBookingAdminLocation.tpl:259
 msgid ""
 "Are you sure you want to delete this room? All related bookings will also be"
 " deleted. this action is PERMANENT!"
-msgstr ""
+msgstr "Êtes-vous sur de vouloir supprimer cette salle? Toutes les réservations l'utilisant seront aussi supprimées. Cette action ne peux pas être annulée!"
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:116
 msgid "Please add at least one room."
-msgstr ""
+msgstr "Veuillez ajouter au moins une salle."
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:120
 msgid "Create blocking"
-msgstr ""
+msgstr "Créer un blocage"
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:120
 msgid ""
 "Do you want to create the blocking? Please note that the start and end date "
 "cannot be changed after creation."
-msgstr ""
+msgstr "Etes-vous sûr de vouloir créer ce blocage? Veuillez noter que les dates de début et de fin ne peuvent être modifiées après création."
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:166
 msgid "Add Room"
-msgstr ""
+msgstr "Ajouter une salle"
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingList.tpl:50
 msgid "Hide rooms"
-msgstr ""
+msgstr "Cacher les salles"
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingList.tpl:50
 msgid "Show rooms"
-msgstr ""
+msgstr "Afficher les salles"
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingsForMyRooms.tpl:77
 msgid "Processing..."
-msgstr ""
+msgstr "En cours de traitement..."
 
 #: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:21
 msgid "This applies to all the following occurrences ({0} in total):"
