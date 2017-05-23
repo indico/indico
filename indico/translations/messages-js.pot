@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 1.9.10\n"
+"Project-Id-Version: indico 1.9.11.dev3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-05-08 16:43+0200\n"
+"POT-Creation-Date: 2017-05-23 18:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -29,31 +29,31 @@ msgstr ""
 msgid "Change timezone"
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:67
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:68
 msgid " Use the events' local timezone "
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:69
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:70
 msgid " Your saved timezone"
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:71
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:72
 msgid " Specify a timezone"
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:74
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:75
 msgid "Loading list of timezones..."
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:112
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:113
 msgid " Remember these settings next time I log in"
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:117
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:118
 msgid "Apply"
 msgstr ""
 
-#: indico/htdocs/js/indico/Common/TimezoneSelector.js:118 indico/htdocs/js/indico/Core/Dialogs/Popup.js:405
+#: indico/htdocs/js/indico/Common/TimezoneSelector.js:119 indico/htdocs/js/indico/Core/Dialogs/Popup.js:405
 #: indico/htdocs/js/indico/Core/Dialogs/PopupWidgets.js:29 indico/htdocs/js/indico/Core/Dialogs/Users.js:744
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:890 indico/htdocs/js/indico/Management/RoomBookingMapOfRooms.js:76
 #: indico/htdocs/js/indico/angular/directives.js:78 indico/htdocs/js/indico/modules/timetable/timetable/Management.js:552
@@ -844,7 +844,7 @@ msgstr ""
 msgid "Make the search more specific for more accurate results"
 msgstr ""
 
-#: indico/htdocs/js/indico/jquery/declarative.js:230
+#: indico/htdocs/js/indico/jquery/declarative.js:232
 msgid "Confirm action"
 msgstr ""
 
@@ -1532,7 +1532,7 @@ msgstr ""
 msgid "Please fill in the required fields."
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/ConfDetailsFull.tpl:82
+#: indico/legacy/webinterface/tpls/ConfDetailsFull.tpl:81
 msgid "Login to see email address"
 msgstr ""
 
