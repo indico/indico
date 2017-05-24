@@ -76,6 +76,11 @@ class DesignerTemplate(db.Model):
         index=True,
         nullable=True
     )
+    is_clonable = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     category = db.relationship(
         'Category',
         lazy=True,
