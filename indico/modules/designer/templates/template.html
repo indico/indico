@@ -61,7 +61,7 @@
                 <label for="grid-snap">{% trans %}Snap to grid{% endtrans %}</label>
                 <input id="grid-snap" type="checkbox">
             </div>
-            <div class="tool">
+            <div class="tool js-hide-on-flip">
                 <i class="icon-image" title="{% trans %}Template background{% endtrans %}"></i>
                 <form id="bg-form" class="content flexrow f-a-center"
                       action="{{ url_for('designer.upload_image', template) }}"
@@ -242,7 +242,7 @@
                     </div>
                 </div>
             {% endif %}
-            <div class="insert-element-controls">
+            <div class="insert-element-controls js-hide-on-flip">
                 <div class="flexrow f-a-baseline">
                     <label for="element-list">{% trans %}Insert element:{% endtrans %}</label>
                     <select id="element-list">
