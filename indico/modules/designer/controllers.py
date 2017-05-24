@@ -177,9 +177,10 @@ class AddTemplateMixin(TargetFromURLMixin):
             raise Forbidden
 
     def _process(self):
-        form = AddTemplateForm()
+        form = AddTemplateForm(target=self.target)
         if form.validate_on_submit():
-            new_template = DesignerTemplate(title=form.title.data, type=form.type.data, **self.target_dict)
+            new_template = DesignerTemplate(title=form.title.data, type=form.type.data,
+                                            is_clonable=form.is_clonable.data, **self.target_dict)
             flash(_("Added new template '{}'").format(new_template.title), 'success')
             return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
         return jsonify_form(form, disabled_until_change=False)
