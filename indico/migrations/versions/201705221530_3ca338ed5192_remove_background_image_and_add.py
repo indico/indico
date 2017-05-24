@@ -22,9 +22,12 @@ def upgrade():
                           'designer_templates', 'designer_templates',
                           ['backside_template_id'], ['id'],
                           source_schema='indico', referent_schema='indico')
+    op.create_index('ix_designer_templates_backside_template_id', 'designer_templates', ['backside_template_id'],
+                    unique=False, schema='indico')
 
 
 def downgrade():
+    op.drop_index('ix_designer_templates_backside_template_id', table_name='designer_templates', schema='indico')
     op.drop_constraint('fk_designer_templates_backside_template_id_designer_templates', 'designer_templates',
                        schema='indico')
     op.drop_column('designer_templates', 'backside_template_id', schema='indico')
