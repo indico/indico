@@ -60,27 +60,31 @@
         <td>
             <div class="thin toolbar right">
                 <div class="group">
+                    {% if tpl.is_clonable %}
+                        <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
+                                title="{% trans %}Clone this template{% endtrans %}"
+                                data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
+                                data-method="POST"
+                                data-update="#template-list"
+                                data-confirm="{% trans title=tpl.title -%}
+                                                  Are you sure you want to clone template '{{ title }}''?
+                                              {%- endtrans %}">
+                        </button>
+                    {% endif %}
                     {% if not inherited %}
                         <a class="i-button icon-edit icon-only text-color borderless hide-if-locked"
-                           href="{{ url_for('.edit_template', tpl) }}"></a>
+                           href="{{ url_for('.edit_template', tpl) }}"
+                           title="{% trans %}Edit template{% endtrans %}"></a>
                     {% endif %}
-                    <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
-                            title="{% trans %}Clone this template{% endtrans %}"
-                            data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
-                            data-method="POST"
-                            data-update="#template-list"
-                            data-confirm="{% trans title=tpl.title -%}
-                                               Are you sure you want to clone template '{{ title }}''?
-                                          {%- endtrans %}">
-                    </button>
                     {% if not inherited %}
                         <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked"
-                                 data-href="{{ url_for('.delete_template', tpl) }}"
-                                 data-method="DELETE"
-                                 data-update="#template-list"
-                                 data-confirm="{% trans title=tpl.title -%}
-                                                    Are you sure you want to delete template '{{ title }}'?
-                                               {%- endtrans %}">
+                                title="{% trans %}Delete tempalte{% endtrans %}"
+                                data-href="{{ url_for('.delete_template', tpl) }}"
+                                data-method="DELETE"
+                                data-update="#template-list"
+                                data-confirm="{% trans title=tpl.title -%}
+                                                  Are you sure you want to delete template '{{ title }}'?
+                                              {%- endtrans %}">
                         </button>
                     {%- endif %}
                 </div>

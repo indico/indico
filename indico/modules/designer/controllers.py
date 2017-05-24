@@ -172,14 +172,20 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
 
 class AddTemplateMixin(TargetFromURLMixin):
+    always_clonable = False
+
     def _checkProtection(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
 
     def _process(self):
         form = AddTemplateForm()
+        if self.always_clonable:
+            del form.is_clonable
         if form.validate_on_submit():
-            new_template = DesignerTemplate(title=form.title.data, type=form.type.data, **self.target_dict)
+            is_clonable = form.is_clonable.data if form.is_clonable else True
+            new_template = DesignerTemplate(title=form.title.data, type=form.type.data, is_clonable=is_clonable,
+                                            **self.target_dict)
             flash(_("Added new template '{}'").format(new_template.title), 'success')
             return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
         return jsonify_form(form, disabled_until_change=False)
@@ -194,11 +200,11 @@ class RHListCategoryTemplates(TemplateListMixin, RHManageCategoryBase):
 
 
 class RHAddEventTemplate(AddTemplateMixin, RHManageEventBase):
-    pass
+    always_clonable = True
 
 
 class RHAddCategoryTemplate(AddTemplateMixin, RHManageCategoryBase):
-    pass
+    always_clonable = False
 
 
 class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
