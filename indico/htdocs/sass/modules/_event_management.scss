@@ -194,6 +194,8 @@
                 width: 100%;
                 text-align: left;
                 font-weight: bold;
+                justify-content: flex-start;
+
                 &.drag-handle {
                     cursor: move;
                 }
@@ -217,8 +219,7 @@
                 > .title {
                     @include ellipsis;
 
-                    display: inline-block;
-                    max-width: 63%;
+                    flex: 1;
 
                     .position {
                         margin-left: 0.2em;
@@ -333,24 +334,13 @@
 // sub list of entries
 .menu-entry  {
     > .menu-entries {
-        @include border-all(darken($pastel-gray, $light-color-variation));
-        @include border-bottom-radius();
-
         margin-left: 20px;
-        padding-right: 10px;
+        padding-right: 0;
         padding-left: 10px;
 
-        border-top: 0;
-        background-color: $pastel-gray;
         > li > .menu-entry > .i-label {
             font-weight: normal;
             margin: 0;
-            > .title {
-                max-width: 59%;
-            }
-            > .actions {
-                max-width: 37%;
-            }
         }
         .menu-entry-placeholder {
             margin-left: 0px;
@@ -633,7 +623,7 @@ th.i-table {
 
             max-height: 30px;
         }
-        
+
         button {
             right: 110px;
         }
