@@ -744,6 +744,7 @@
                 $('.second-row').toggleClass('disappear', newFaceUp === 'front');
                 $('.js-toggle-side').removeClass('highlight');
                 $('.element-tools').addClass('hidden');
+                $('.js-hide-on-flip').toggleClass('disappear', newFaceUp === 'back');
                 $this.toggleClass('highlight');
                 if ($selectedItem && $selectedItem[0]) {
                     deselectItem($selectedItem);
