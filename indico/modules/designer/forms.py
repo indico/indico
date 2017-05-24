@@ -16,15 +16,18 @@
 
 from __future__ import unicode_literals
 
-from wtforms import StringField
+from wtforms import StringField, BooleanField
 from wtforms.validators import DataRequired
 
 from indico.modules.designer.models.templates import TemplateType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoEnumSelectField
+from indico.web.forms.widgets import SwitchWidget
 
 
 class AddTemplateForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     type = IndicoEnumSelectField(_('Template'), enum=TemplateType, default=TemplateType.poster)
+    is_clonable = BooleanField(_('Allow cloning'), widget=SwitchWidget(), default=True,
+                               description=_("Allow event managers to clone this template."))
