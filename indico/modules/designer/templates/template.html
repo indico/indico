@@ -1,5 +1,7 @@
 {% extends 'categories/management/full_width_base.html' if category else 'events/management/full_width_base.html' %}
 
+{% from 'message_box.html' import message_box %}
+
 {% block title %}
     {% trans %}Poster and Badge Designer{% endtrans %}
 {% endblock %}
@@ -14,6 +16,36 @@
 {% endblock %}
 
 {% block content %}
+    {% if related_tpls_per_type %}
+        <div class="affected-targets-warning weak-hidden">
+            {% call message_box('warning', fixed_width=true) %}
+                <p>
+                    {%- trans strong_start='<strong>'|safe, strong_end='</strong>'|safe,
+                              link_start='<a href="#" class="js-affected-objects">'|safe, link_end='</a>'|safe,
+                              count=tpls_count -%}
+                        This template is used as the back side of
+                        {{ link_start }}another template{{ link_end }}.
+                        The back side of that template {{ strong_start }}will be removed{{ strong_end }} if the
+                        dimensions of this template change.
+                    {%- pluralize -%}
+                        This template is used as the back side of
+                        {{ link_start }}{{ tpls_count }} templates{{ link_end }}.
+                        The back side of those templates {{ strong_start }}will be removed{{ strong_end }} if the
+                        dimensions of this template change.
+                    {%- endtrans -%}
+                </p>
+            {% endcall %}
+        </div>
+        <div class="warning-qtip-content hidden">
+            <ul class="js-affected-templates qbubble-item-list">
+                {% for related_tpls_owner, related_tpls in related_tpls_per_owner.iteritems() %}
+                    {% for related_tpl in related_tpls %}
+                        <li>{{ related_tpl.title }} ({{ related_tpls_owner.title }})</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
     <div class="designer-tools flexcol">
         <div class="designer-tools-row">
             <div class="tool">

@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import shutil
+from collections import defaultdict
 from io import BytesIO
 
 from flask import flash, jsonify, request, session
@@ -240,9 +241,16 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
             'background_url': (bs_template.background_image.download_url
                                if bs_template and bs_template.background_image else None)
         }
+        backside_templates = (DesignerTemplate.query
+                              .filter(DesignerTemplate.backside_template_id == self.template.id)
+                              .all())
+        related_tpls_per_owner = defaultdict(list)
+        for bs_tpl in backside_templates:
+            related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
         return self._render_template('template.html', template=self.template, placeholders=get_placeholder_options(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
-                                     template_data=template_data, backside_template_data=backside_template_data)
+                                     template_data=template_data, backside_template_data=backside_template_data,
+                                     related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
 
     def _process_POST(self):
         backside_template_id = request.json['backside_template_id']
