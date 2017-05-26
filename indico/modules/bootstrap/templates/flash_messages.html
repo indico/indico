@@ -28,7 +28,7 @@
 
 {% macro community_exception(exc) %}
     {%- trans error=exc.message -%}
-        A unexpected exception happened while registering the server to the Community Hub: {{ error }}.
+        An unexpected exception happened while registering the server to the Community Hub: {{ error }}.
     {%- endtrans %}<br>
     {%- trans link=url_for('cephalopod.index') -%}
         See the logs for details and try again <a href="{{ link }}">here</a>.

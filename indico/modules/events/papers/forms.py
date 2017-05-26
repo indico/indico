@@ -92,7 +92,7 @@ class PaperTeamsForm(IndicoForm):
     managers = PrincipalListField(_('Paper managers'), groups=True,
                                   description=_('List of users allowed to manage the call for papers'))
     judges = PrincipalListField(_('Judges'),
-                                description=_('List of users allowed to judge a paper reviewing process'))
+                                description=_('List of users allowed to judge papers'))
     content_reviewers = PrincipalListField(_('Content reviewers'),
                                            description=_('List of users allowed to review the content of the assigned '
                                                          'papers'))

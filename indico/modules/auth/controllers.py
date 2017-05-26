@@ -163,7 +163,7 @@ class RHLinkAccount(RH):
                 raise BadData('Emails do not match')
             session['login_identity_info']['email_verified'] = True
             session.modified = True
-            flash(_('You have successfully validated your email address and can now proceeed with the login.'),
+            flash(_('You have successfully validated your email address and can now proceed with the login.'),
                   'success')
             return redirect(url_for('.link_account', provider=self.identity_info['provider']))
 

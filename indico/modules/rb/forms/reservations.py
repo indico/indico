@@ -127,7 +127,7 @@ class NewBookingConfirmForm(NewBookingPeriodForm):
         if field.data and not self.uses_vc.data:
             raise ValidationError(_(u'Videoconference equipment is not used.'))
         elif not field.data and self.uses_vc.data:
-            raise ValidationError(_(u'You need to select some Videoconference equipment'))
+            raise ValidationError(_(u'Please select the type of videoconference that you will use.'))
 
     def validate_needs_vc_assistance(self, field):
         if field.data and not self.uses_vc.data:

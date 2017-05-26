@@ -269,8 +269,8 @@ class RHRevokeSubmissionRights(RHManageEventBase):
             count += 1
         self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
                            'Submission privileges have been revoked from event submitters', session.user)
-        flash(ngettext('Submission rights have been revoked from one principal',
-                       'Submission rights have been revoked from {} principals', count).format(count))
+        flash(ngettext('Submission rights have been revoked from one user',
+                       'Submission rights have been revoked from {} users', count).format(count))
         return redirect(url_for('.person_list', self.event_new))
 
 

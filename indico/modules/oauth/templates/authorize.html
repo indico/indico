@@ -27,7 +27,7 @@
                             <span class="bold">{{ application.name }}</span> {% trans %}is requesting the following permissions:{% endtrans %}
                             <ul>
                                 {% for scope in authorized_scopes|sort %}
-                                    <li class="authorized" title="{% trans %}Permission already authorized{% endtrans %}">{{ scope }}</li>
+                                    <li class="authorized" title="{% trans %}Permission already granted{% endtrans %}">{{ scope }}</li>
                                 {% endfor %}
                                 {% for scope in new_scopes|sort %}
                                     <li>{{ scope }}</li>
