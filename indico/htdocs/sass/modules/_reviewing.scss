@@ -331,7 +331,7 @@
 
             .details-content-row {
                 color: $dark-gray;
-                padding: 5px 10px 5px calc(20px + 1em);
+                padding: 5px 10px 5px calc(22px + 2em);
 
                 &:not(:first-child) {
                     @include border-top($style: dashed);
