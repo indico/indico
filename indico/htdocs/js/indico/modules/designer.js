@@ -31,6 +31,8 @@
     var backsideItems = {};
     var backsideTemplateID = null;
     var itemTitles = {};
+    var initialWidth = null;
+    var initialHeight = null;
 
     var DEFAULT_PIXEL_CM = 50;
 
@@ -607,6 +609,15 @@
         $('.backside-tools').toggleClass('hidden', showPlaceholder);
     }
 
+    function toggleWarningOnDimensionChange(xDimension, yDimension, initialXDimention, initialYDimention) {
+        var $backsideTplsWarning = $('.affected-targets-warning');
+        if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimention) {
+            $backsideTplsWarning.show('fast');
+        } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimention) {
+            $backsideTplsWarning.hide('fast');
+        }
+    }
+
     global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
         editing = !!template;
         itemTitles = _.partial(_.extend, {}).apply(null, _.map(_.values(placeholders), _.property('options')));
@@ -707,7 +718,7 @@
                 save(template);
             });
 
-            $('.template-width, .template-height').on('keyup click', function() {
+            $('.template-width, .template-height').on('input', function() {
                 changeTemplateSize(template, backsideTemplate);
             });
 
@@ -723,8 +734,8 @@
                 var $selectedOption = $(this).find('option:selected');
 
                 if ($selectedOption.val() !== 'custom') {
-                    $('.template-width').val($selectedOption.data('width'));
-                    $('.template-height').val($selectedOption.data('height'));
+                    $('.template-width').val($selectedOption.data('width')).change();
+                    $('.template-height').val($selectedOption.data('height')).change();
                     changeTemplateSize(template, backsideTemplate);
                 }
                 $('.js-template-dimension').prop('disabled', $selectedOption.val() !== 'custom');
@@ -790,8 +801,8 @@
                 var $height = $('.template-height');
                 var widthValue = $width.val();
 
-                $width.val($height.val());
-                $height.val(widthValue);
+                $width.val($height.val()).change();
+                $height.val(widthValue).change();
                 changeTemplateSize(template, backsideTemplate);
             });
 
@@ -810,6 +821,33 @@
             });
 
             $('.backside-tools').addClass('hidden');
+
+            if ($('.affected-targets-warning').length) {
+                var $templateWidth = $('.template-width');
+                var $templateHeight = $('.template-height');
+                $templateWidth.on('change input', function() {
+                    toggleWarningOnDimensionChange($(this), $templateHeight, initialWidth, initialHeight);
+                });
+                $templateHeight.on('change input', function() {
+                    toggleWarningOnDimensionChange($(this), $templateWidth, initialHeight, initialWidth);
+                });
+            }
+
+            $('.js-affected-objects').qbubble({
+                overwrite: true,
+                position: {
+                    target: $('.js-affected-objects')
+                },
+                content: {
+                    text: $('.warning-qtip-content').html()
+                },
+                hide: {
+                    event: 'unfocus click'
+                },
+                show: {
+                    event: 'click'
+                }
+            });
         });
 
         // We load the template if we are editing a template
@@ -827,6 +865,9 @@
 
         $('.template-width').val(templateDimensions.width / pixelsPerCm);
         $('.template-height').val(templateDimensions.height / pixelsPerCm);
+
+        initialWidth = templateDimensions.width;
+        initialHeight = templateDimensions.height;
 
         updateRulers(); // creates the initial rulers
         changeTemplateSize(template, backsideTemplate);
