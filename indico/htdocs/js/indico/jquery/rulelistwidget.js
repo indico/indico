@@ -89,7 +89,7 @@
             // Simplify rule data by removing "field: any"
             this.ruleData.forEach(function(rule) {
                 _.keys(rule).forEach(function(k) {
-                    if (rule[k] === '*') {
+                    if (_.isEqual(rule[k], ['*'])) {
                         delete rule[k];
                     }
                 });
