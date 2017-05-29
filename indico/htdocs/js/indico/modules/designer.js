@@ -33,6 +33,7 @@
     var itemTitles = {};
     var initialWidth = null;
     var initialHeight = null;
+    var showConfirmationDialog = false;
 
     var DEFAULT_PIXEL_CM = 50;
 
@@ -473,16 +474,24 @@
             backside_template_id: backsideTemplateID
         };
 
-        $.ajax({
-            url: location.pathname,
-            data: JSON.stringify(templateData),
-            contentType: 'application/json',
-            method: 'POST',
-            complete: IndicoUI.Dialogs.Util.progress(),
-            error: handleAjaxError,
-            success: function(data) {
-                handleFlashes(data, true);
-            }
+        var confirmed = showConfirmationDialog ? confirmPrompt(
+            $T.gettext("Are you sure you want to change the dimensions of this template?") +
+            $T.gettext("The back side of the templates that use this one as the back side will be removed."),
+            $T.gettext("Disassociate back sides")
+        ) : $.Deferred().resolve();
+
+        confirmed.then(function() {
+            $.ajax({
+                url: location.pathname,
+                data: JSON.stringify(templateData),
+                contentType: 'application/json',
+                method: 'POST',
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    handleFlashes(data, true);
+                }
+            });
         });
     }
 
@@ -613,8 +622,10 @@
         var $backsideTplsWarning = $('.affected-targets-warning');
         if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimention) {
             $backsideTplsWarning.show('fast');
+            showConfirmationDialog = true;
         } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimention) {
             $backsideTplsWarning.hide('fast');
+            showConfirmationDialog = false;
         }
     }
 
