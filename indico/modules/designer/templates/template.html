@@ -16,21 +16,21 @@
 {% endblock %}
 
 {% block content %}
-    {% if related_tpls_per_type %}
+    {% if tpls_count %}
         <div class="affected-targets-warning weak-hidden">
             {% call message_box('warning', fixed_width=true) %}
                 <p>
-                    {%- trans strong_start='<strong>'|safe, strong_end='</strong>'|safe,
-                              link_start='<a href="#" class="js-affected-objects">'|safe, link_end='</a>'|safe,
-                              count=tpls_count -%}
+                    {% set link_start %}<a href="#" class="js-affected-objects">{% endset %}
+                    {% set link_end %}</a>{% endset %}
+                    {%- trans count=tpls_count -%}
                         This template is used as the back side of
                         {{ link_start }}another template{{ link_end }}.
-                        The back side of that template {{ strong_start }}will be removed{{ strong_end }} if the
+                        The back side of that template <strong>will be removed</strong> if the
                         dimensions of this template change.
                     {%- pluralize -%}
                         This template is used as the back side of
                         {{ link_start }}{{ tpls_count }} templates{{ link_end }}.
-                        The back side of those templates {{ strong_start }}will be removed{{ strong_end }} if the
+                        The back side of those templates <strong>will be removed</strong> if the
                         dimensions of this template change.
                     {%- endtrans -%}
                 </p>
