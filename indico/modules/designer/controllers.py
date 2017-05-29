@@ -33,6 +33,7 @@ from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_inherited_templates, get_placeholder_options
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
+from indico.modules.designer.operations import update_template
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
@@ -253,15 +254,11 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
 
     def _process_POST(self):
-        backside_template_id = request.json['backside_template_id']
-        self.template.backside_template = DesignerTemplate.get(backside_template_id) if backside_template_id else None
-        self.template.data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
-        self.template.title = request.json['title']
+        data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, self.template.data)
-
-        if request.json.pop('clear_background'):
-            self.template.background_image = None
-
+        update_template(self.template, title=request.json['title'], data=data,
+                        backside_template_id=request.json['backside_template_id'],
+                        clear_background=request.json['clear_background'])
         flash(_("Template successfully saved."), 'success')
         return jsonify_data()
 
