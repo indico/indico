@@ -230,7 +230,6 @@
                 > .actions {
                     max-width: 33%;
                     margin-right: -5px;
-                    visibility: hidden;
                     a, a:active, a:focus {
                         outline: none;
                     }
@@ -238,6 +237,7 @@
                         padding: 0 2px;
 
                         color: $dark-gray;
+                        opacity: 0.6;
                         &:hover {
                             color: $blue;
                         }
@@ -250,6 +250,7 @@
                     }
                     > .not-enabled {
                         @extend %not-enabled-action;
+                        opacity: 1;
                         &:hover {
                             @extend %enabled-action;
                         }
@@ -257,10 +258,10 @@
                     > .default {
                         @include icon-before('icon-home');
                         color: #46F936 !important;
+                        opacity: 1;
                     }
                     > .not-default {
                         @include icon-before('icon-home');
-                        display: none;
                     }
                     > .edit-entry {
                         @include icon-before('icon-edit');
@@ -292,7 +293,9 @@
                     }
                 }
                 &:hover > .actions {
-                    visibility: visible;
+                    > * {
+                        opacity: 1;
+                    }
                     > .not-default {
                         display: inline !important;
                     }
@@ -347,10 +350,6 @@
             margin-right: 0px;
         }
     }
-     > .highlight + .menu-entries {
-        @include border-all(darken($pastel-blue, $light-color-variation));
-        background-color: $light-blue;
-     }
 }
 
 .info-message-box > .message-text > i.icon-grid2 {
