@@ -92,7 +92,7 @@ def get_config_path():
     for path in paths:
         if os.path.exists(path):
             return path
-    raise Exception('No indico config found. Point the INDICO_CONFIG env var to your config file or or '
+    raise Exception('No indico config found. Point the INDICO_CONFIG env var to your config file or '
                     'move/symlink the config in one of the following locations: {}'.format(', '.join(paths)))
 
 
