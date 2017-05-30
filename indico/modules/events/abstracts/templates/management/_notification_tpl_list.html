@@ -91,10 +91,6 @@
                                                     {%- trans -%}
                                                        in <strong>no track</strong>
                                                     {%- endtrans -%}
-                                                {% elif rule.track[0] == '*' %}
-                                                    {%- trans -%}
-                                                       in <strong>any track</strong>
-                                                    {%- endtrans -%}
                                                 {% else %}
                                                     {%- trans %}in{% endtrans -%}
                                                     {% set track = tracks[rule.track[0]] %}
@@ -116,10 +112,6 @@
                                                     {% if not rule.contribution_type %}
                                                         {%- trans -%}
                                                             as <strong>no type</strong>
-                                                        {%- endtrans -%}
-                                                    {% elif rule.contribution_type[0] == '*' %}
-                                                        {%- trans -%}
-                                                            as <strong>any type</strong>
                                                         {%- endtrans -%}
                                                     {% else %}
                                                         {%- trans %}as{% endtrans -%}

@@ -89,6 +89,10 @@ class EmailRuleListField(JSONField):
         super(EmailRuleListField, self).pre_validate(form)
         if not all(self.data):
             raise ValueError(_('Rules may not be empty'))
+        if any('*' in crit for rule in self.data for crit in rule.itervalues()):
+            # '*' (any) rules should never be included in the JSON, and having
+            # such an entry would result in the rule never passing.
+            raise ValueError('Unexpected "*" criterion')
 
     def _value(self):
         return super(EmailRuleListField, self)._value() if self.data else '[]'
