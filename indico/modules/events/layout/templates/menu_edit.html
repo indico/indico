@@ -45,10 +45,10 @@
         </script>
         {% if custom_menu_enabled %}
             <div class="row">
-                <div id="menu-entries" class="column col-40">
+                <div id="menu-entries" class="column col-50">
                     {{ menu_entries(menu, connect_menu=true) }}
                 </div>
-                <div class="column col-60 hide-if-locked">
+                <div class="column col-50 hide-if-locked">
                     {% call message_box('info') %}
                         {%- trans -%}
                             Click and drag the blocks to reorder the menu entries.
