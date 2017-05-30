@@ -31,6 +31,7 @@ from reportlab.platypus import Paragraph
 
 from indico.modules.designer import PageOrientation
 from indico.legacy.PDFinterface.base import setTTFonts
+from indico.web.flask.templating import strip_tags
 
 
 FONT_STYLES = {
@@ -114,6 +115,7 @@ class DesignerPDFBase(object):
             canvas.drawImage(ImageReader(content), margin_x + item_x, self.height - margin_y - item_height - item_y,
                              item_width, item_height)
         else:
+            content = strip_tags(content)
             for line in content.splitlines():
                 p = Paragraph(line, style)
                 available_height = (tpl_data.height_cm - (item_y / PIXELS_CM)) * cm
