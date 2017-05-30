@@ -134,7 +134,7 @@
             background-color: $pastel-blue;
 
             &:hover:not(.listMessage) {
-                background-color: transparentize($pastel-blue, 10%);
+                background-color: transparentize($pastel-blue, 0.1);
             }
         }
 
@@ -185,7 +185,7 @@
                 margin: 0.2em 0.2em 0 0;
                 padding: 0.2em;
                 border-radius: 0.3em;
-                background-color: transparentize($blue, 20%);
+                background-color: transparentize($blue, 0.2);
                 color: $light-gray;
             }
 
