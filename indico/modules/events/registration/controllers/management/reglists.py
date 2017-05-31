@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 import os
 import uuid
 from io import BytesIO
-from operator import attrgetter
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload
