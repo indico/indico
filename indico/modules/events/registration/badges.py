@@ -62,24 +62,22 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
     def _build_pdf(self, canvas):
         config = self.config
-        tpl_data = self.tpl_data
 
         available_width = self.width - (config.left_margin - config.right_margin + config.margin_columns) * cm
-        n_horizontal = int(available_width / ((tpl_data.width_cm + config.margin_columns) * cm))
+        n_horizontal = int(available_width / ((self.tpl_data.width_cm + config.margin_columns) * cm))
         available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows) * cm
-        n_vertical = int(available_height / ((tpl_data.height_cm + config.margin_rows) * cm))
+        n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
         if not (n_horizontal and n_vertical):
             raise ValueError(_("The template dimensions are too large for the page size you selected"))
 
         # Print a badge for each registration
         for registration, (x, y) in izip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
-            self._draw_badge(canvas, registration, x * cm, y * cm)
+            self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
 
-    def _draw_badge(self, canvas, registration, pos_x, pos_y):
+    def _draw_badge(self, canvas, registration, template, tpl_data, pos_x, pos_y):
         """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner)."""
         config = self.config
-        tpl_data = self.tpl_data
 
         badge_rect = (pos_x, self.height - pos_y - tpl_data.height_cm * cm,
                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)
@@ -90,9 +88,9 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             canvas.rect(*badge_rect)
             canvas.restoreState()
 
-        if self.template.background_image:
-            with self.template.background_image.open() as f:
-                self._draw_background(canvas, ImageReader(f), *badge_rect)
+        if template.background_image:
+            with template.background_image.open() as f:
+                self._draw_background(canvas, ImageReader(f), tpl_data, *badge_rect)
 
         placeholders = get_placeholders('designer-fields')
 
@@ -107,4 +105,4 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
             elif item['text']:
                 text = item['text']
 
-            self._draw_item(canvas, item, text, pos_x, pos_y)
+            self._draw_item(canvas, item, tpl_data, text, pos_x, pos_y)
