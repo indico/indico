@@ -6,7 +6,8 @@
         {{ form_row(settings_form.template) }}
 
         {% call form_fieldset(_('Page configuration')) %}
-            {{ form_rows(settings_form, fields=('save_values', 'dashed_border', 'page_size', 'page_orientation')) }}
+            {{ form_rows(settings_form,
+                         fields=('save_values', 'dashed_border', 'page_size', 'page_orientation', 'page_layout')) }}
         {% endcall %}
 
         <div class="flexrow margin-editor f-j-center">
@@ -42,4 +43,27 @@
             <input type="hidden" name="registration_id" value="{{ registration.id }}">
         {% endfor %}
     {% endcall %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            var templates = {{ templates | tojson }};
+            var $pageLayout = $('#page_layout');
+            var $dashedBorder = $('#dashed_border');
+            var $marginEditor = $('.margin-editor');
+
+            $('#badge-settings-form #template').on('change', function() {
+                var $this = $(this);
+                var template = templates[parseInt($this.val())];
+
+                $pageLayout.closest('.form-group').toggle(!!template.backside_tpl_id);
+            }).change();
+
+            $pageLayout.on('change', function() {
+                $marginEditor.toggle($(this).val() != 'foldable')
+                $dashedBorder.closest('.form-group').toggle($(this).val() != 'foldable')
+            }).change();
+        })();
+    </script>
 {% endblock %}

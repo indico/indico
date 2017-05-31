@@ -32,8 +32,9 @@ from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
+from indico.modules.designer import PageLayout
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.designer.util import get_all_templates
+from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
@@ -399,8 +400,9 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         self.template_id = request.args.get('template_id')
 
     def _process(self):
-        badge_templates = sorted((tpl for tpl in get_all_templates(self.event_new) if tpl.type.name == 'badge'),
-                                 key=attrgetter('title'))
+        all_templates = set(self.event_new.designer_templates) | get_inherited_templates(self.event_new)
+        badge_templates = ({tpl.id: {'data': tpl.data, 'backside_tpl_id': tpl.backside_template_id}
+                           for tpl in all_templates if tpl.type.name == 'badge'})
         settings = event_badge_settings.get_all(self.event_new.id)
         form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
@@ -409,6 +411,14 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
         if form.validate_on_submit():
             data = form.data
+            if data['page_layout'] == PageLayout.foldable:
+                data['top_margin'] = 0
+                data['bottom_margin'] = 0
+                data['left_margin'] = 0
+                data['right_margin'] = 0
+                data['margin_columns'] = 0
+                data['margin_rows'] = 0
+                data['dashed_border'] = False
             data.pop('submitted', None)
             template_id = data.pop('template')
             if data.pop('save_values', False):
