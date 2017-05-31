@@ -106,3 +106,15 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                 text = item['text']
 
             self._draw_item(canvas, item, tpl_data, text, pos_x, pos_y)
+
+
+class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):
+    def _build_pdf(self, canvas):
+        # Only one badge per page
+        n_horizontal = 1
+        n_vertical = 1
+
+        for registration, (x, y) in izip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
+            self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
+            self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
+                             self.tpl_data.width_cm * cm, y * cm)

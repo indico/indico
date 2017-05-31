@@ -69,6 +69,8 @@ class DesignerPDFBase(object):
         self.config = self._build_config(config)
         self.template = template
         self.tpl_data = self._process_tpl_data(template.data)
+        if template.backside_template:
+            self.backside_tpl_data = self._process_tpl_data(template.backside_template.data)
         self.page_size = getattr(pagesizes, self.config.page_size.name)
         if self.config.page_orientation == PageOrientation.landscape:
             self.page_size = pagesizes.landscape(self.page_size)
