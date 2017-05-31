@@ -49,6 +49,13 @@ class PageSize(RichIntEnum):
     Letter = 7
 
 
+class PageLayout(RichIntEnum):
+    __titles__ = [None, _("Single sided (foldable)"), _("Double sided"), _("Only front side")]
+    foldable = 1
+    double_sided = 2
+    front_only = 3
+
+
 DEFAULT_CONFIG = {
     TemplateType.poster: {
         'tpl_size': [1050, 1484],  # A4 50 px/cm
