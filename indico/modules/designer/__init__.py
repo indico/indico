@@ -46,7 +46,7 @@ class PageSize(RichIntEnum):
     A3 = 4
     A4 = 5
     A5 = 6
-    Letter = 7
+    letter = 7
 
 
 class PageLayout(RichIntEnum):

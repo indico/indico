@@ -38,7 +38,8 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
+from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable,
+                                                       RegistrantsListToBadgesPDFDoubleSided)
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
@@ -380,6 +381,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
             raise NotFound
         if config_params['page_layout'] == PageLayout.foldable:
             pdf_class = RegistrantsListToBadgesPDFFoldable
+        elif config_params['page_layout'] == PageLayout.double_sided:
+            pdf_class = RegistrantsListToBadgesPDFDoubleSided
         registration_ids = config_params.pop('registration_ids')
         pdf = pdf_class(self.template, config_params, self.event_new, registration_ids)
         return send_file('Badges-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'PDF')
