@@ -119,8 +119,16 @@ class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):
 
         for registration, (x, y) in izip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
             self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
-            self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
-                             self.tpl_data.width_cm * cm, y * cm)
+            if self.tpl_data.width > self.tpl_data.height:
+                canvas.translate(self.width, self.height)
+                canvas.rotate(180)
+                self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
+                                 self.width - self.tpl_data.width_cm * cm, y * cm)
+                canvas.translate(0, 0)
+                canvas.rotate(180)
+            else:
+                self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
+                                 self.tpl_data.width_cm * cm, y * cm)
 
 
 class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
