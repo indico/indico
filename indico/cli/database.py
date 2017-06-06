@@ -22,22 +22,14 @@ from functools import partial
 
 import alembic.command
 import click
-from alembic.script import ScriptDirectory
 from flask import current_app
 from flask.cli import with_appcontext
-from flask_migrate import stamp
 from flask_migrate.cli import db as flask_migrate_cli
-from flask_pluginengine import current_plugin
 
 from indico.cli.core import cli_group
 from indico.core.db import db
-from indico.core.db.sqlalchemy.migration import migrate
-from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.core.db.sqlalchemy.util.management import get_all_tables, create_all_tables
-from indico.core.db.sqlalchemy.util.queries import has_extension
+from indico.core.db.sqlalchemy.migration import PluginScriptDirectory, migrate, prepare_db
 from indico.core.plugins import plugin_engine
-from indico.modules.categories import Category
-from indico.modules.users import User
 from indico.util.console import cformat
 
 
@@ -58,65 +50,12 @@ def cli(ctx, plugin=None, all_plugins=False):
     migrate.init_app(current_app, db, os.path.join(current_app.root_path, 'migrations'))
 
 
-def _require_extensions(*names):
-    missing = sorted(name for name in names if not has_extension(db.engine, name))
-    if not missing:
-        return True
-    print cformat('%{red}Required Postgres extensions missing: {}').format(', '.join(missing))
-    print cformat('%{yellow}Create them using these SQL commands (as a Postgres superuser):')
-    for name in missing:
-        print cformat('%{white!}  CREATE EXTENSION {};').format(name)
-    return False
-
-
-def _require_pg_version(version):
-    # convert version string such as '9.4.10' to `90410` which is the
-    # format used by server_version_num
-    req_version = sum(segment * 10**(4 - 2*i) for i, segment in enumerate(map(int, version.split('.'))))
-    cur_version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
-    if cur_version >= req_version:
-        return True
-    print cformat('%{red}Postgres version too old; you need at least {} (or newer)').format(version)
-    return False
-
-
 @cli.command()
 @click.option('--empty', is_flag=True, help='Do not create the root category or system user. Use this only if you '
                                             'intend to import data from ZODB.')
 def prepare(empty):
     """Initializes an empty database (creates tables, sets alembic rev to HEAD)"""
-    tables = get_all_tables(db)
-    if 'alembic_version' not in tables['public']:
-        print cformat('%{green}Setting the alembic version to HEAD')
-        stamp(revision='heads')
-        PluginScriptDirectory.dir = os.path.join(current_app.root_path, 'core', 'plugins', 'alembic')
-        alembic.command.ScriptDirectory = PluginScriptDirectory
-        plugin_msg = cformat("%{cyan}Setting the alembic version of the %{cyan!}{}%{reset}%{cyan} "
-                             "plugin to HEAD%{reset}")
-        for plugin in plugin_engine.get_active_plugins().itervalues():
-            if not os.path.exists(plugin.alembic_versions_path):
-                continue
-            print plugin_msg.format(plugin.name)
-            with plugin.plugin_context():
-                stamp(revision='heads')
-        # Retrieve the table list again, just in case we created unexpected hables
-        tables = get_all_tables(db)
-
-    tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
-    if any(tables.viewvalues()):
-        print cformat('%{red}Your database is not empty!')
-        print cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!')
-        print
-        print 'Tables in your database:'
-        for schema, schema_tables in sorted(tables.items()):
-            for t in schema_tables:
-                print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
-        return
-    if not _require_pg_version('9.4'):
-        return
-    if not _require_extensions('unaccent', 'pg_trgm'):
-        return
-    create_all_tables(db, verbose=True, add_initial_data=(not empty))
+    return prepare_db(empty=empty)
 
 
 def _safe_downgrade(*args, **kwargs):
@@ -138,29 +77,6 @@ def _safe_downgrade(*args, **kwargs):
         sys.exit(1)
     else:
         return func(*args, **kwargs)
-
-
-class PluginScriptDirectory(ScriptDirectory):
-    """Like `ScriptDirectory` but lets you override the paths from outside.
-
-    This is a pretty ugly hack but alembic doesn't give us a nice way to do it...
-    """
-
-    dir = None
-    versions = None
-
-    def __init__(self, *args, **kwargs):
-        super(PluginScriptDirectory, self).__init__(*args, **kwargs)
-        self.dir = PluginScriptDirectory.dir
-        # use __dict__ since it's a memoized property
-        self.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
-
-    @classmethod
-    def from_config(cls, config):
-        instance = super(PluginScriptDirectory, cls).from_config(config)
-        instance.dir = PluginScriptDirectory.dir
-        instance.__dict__['_version_locations'] = [current_plugin.alembic_versions_path]
-        return instance
 
 
 def _call_with_plugins(*args, **kwargs):
