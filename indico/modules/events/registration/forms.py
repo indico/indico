@@ -356,9 +356,9 @@ class BadgeSettingsForm(IndicoForm):
     page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize)
     page_orientation = IndicoEnumSelectField(_('Page orientation'), enum=PageOrientation)
     page_layout = IndicoEnumSelectField(_('Page layout'), enum=PageLayout,
-                                        description=_('Single sided (foldable) option is only available if the '
-                                                      'template orientation is the same as the page orientation and its'
-                                                      ' width is exactly half of the page width'))
+                                        description=_('The single sided (foldable) option is only available if the '
+                                                      'template orientation is the same as the page orientation and '
+                                                      'its width is exactly half of the page width'))
 
     top_margin = FloatField(_('Top margin'), [InputRequired()])
     left_margin = FloatField(_('Left margin'), [InputRequired()])
