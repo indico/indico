@@ -78,7 +78,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
     def _draw_badge(self, canvas, registration, template, tpl_data, pos_x, pos_y):
         """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner)."""
 
-        if registration == 'empty':
+        if registration is None:
             return
         config = self.config
 
@@ -153,15 +153,14 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
             badges_mix.append(reg)
             to_repeat.append(reg)
             if counter == one_page:
-                for rep in to_repeat:
-                    badges_mix.append(rep)
+                badges_mix += to_repeat
                 to_repeat = []
                 counter = 0
 
         on_last_page = len(to_repeat)
         # if the last page is not full add empty placeholders to make it "full" for proper printing of back sides
         for n in range(0, one_page - on_last_page):
-            badges_mix.append('empty')
+            badges_mix.append(None)
         for rep in to_repeat:
             badges_mix.append(rep)
 

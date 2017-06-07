@@ -69,6 +69,7 @@ class DesignerPDFBase(object):
         self.config = self._build_config(config)
         self.template = template
         self.tpl_data = self._process_tpl_data(template.data)
+        self.backside_tpl_data = None
         if template.backside_template:
             self.backside_tpl_data = self._process_tpl_data(template.backside_template.data)
         self.page_size = getattr(pagesizes, self.config.page_size.name)
