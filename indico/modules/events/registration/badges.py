@@ -22,6 +22,7 @@ from itertools import izip, product
 
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+from werkzeug.exceptions import BadRequest
 
 from indico.modules.designer.pdf import DesignerPDFBase
 from indico.modules.events.registration.models.registrations import Registration
@@ -69,7 +70,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
         if not (n_horizontal and n_vertical):
-            raise ValueError(_("The template dimensions are too large for the page size you selected"))
+            raise BadRequest('The template dimensions are too large for the page size you selected')
 
         # Print a badge for each registration
         for registration, (x, y) in izip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
