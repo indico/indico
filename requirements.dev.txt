@@ -8,3 +8,4 @@ sphinx-autobuild
 repoze.sphinx.autointerface
 pygments
 sqlparse
+requests
