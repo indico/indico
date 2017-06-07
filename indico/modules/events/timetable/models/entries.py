@@ -276,7 +276,7 @@ class TimetableEntry(db.Model):
         elif self.type == TimetableEntryType.SESSION_BLOCK:
             if self.object.can_access(user):
                 return True
-            return any(x.can_access(user) for x in self.object.contributions if not x.is_inheriting)
+            return any(x.can_access(user) for x in self.object.contributions)
 
     def extend_start_dt(self, start_dt):
         assert start_dt < self.start_dt

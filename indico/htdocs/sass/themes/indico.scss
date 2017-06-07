@@ -131,6 +131,8 @@
 
     color: $light-gray;
     background-color: transparent;
+    display: flex;
+    align-items: center;
 }
 
 .event-location {

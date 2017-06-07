@@ -31,7 +31,7 @@
                 </div>
                 {% if event.has_location_info or event.address %}
                     <div class="event-location">
-                        {{ render_location(event, class='header-data') }}
+                        {{ render_location(event, class='header-data', header=true) }}
                     </div>
                 {% endif %}
                 {% set chairpersons = event.person_links | sort(attribute='display_order_key') %}
