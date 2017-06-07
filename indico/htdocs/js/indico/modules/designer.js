@@ -892,6 +892,7 @@
         var $pageSize = $('#page_size');
         var $pageOrientation = $('#page_orientation');
         var $marginEditor = $('.margin-editor');
+        var $infoMessage = $('.info');
 
         function toggleFoldableOption(template, pageSize, pageOrientation) {
             var foldablePairs = {
@@ -923,7 +924,7 @@
         }).change();
 
         $pageLayout.on('change', function() {
-            $marginEditor.toggle($(this).val() !== 'foldable');
+            $marginEditor.add($infoMessage).toggle($(this).val() !== 'foldable');
             $dashedBorder.closest('.form-group').toggle($(this).val() !== 'foldable');
         }).change();
         $pageSize.add($pageOrientation).on('change', function() {
