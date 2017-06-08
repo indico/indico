@@ -21,7 +21,7 @@ from datetime import time
 from operator import itemgetter
 
 import jsonschema
-from flask import session, request
+from flask import request
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField, FloatField, HiddenField
 from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError, InputRequired
@@ -161,12 +161,11 @@ class InvitationFormBase(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
+        event = self.regform.event_new
         super(InvitationFormBase, self).__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
-        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
-                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
-        self.email_from.choices = zip(from_addresses, from_addresses)
+        self.email_from.choices = event.get_allowed_sender_emails().items()
         self.email_body.description = render_placeholder_info('registration-invitation-email', invitation=None)
 
     def validate_email_body(self, field):
@@ -241,10 +240,9 @@ class EmailRegistrantsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
+        event = self.regform.event_new
         super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
-        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
-                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
-        self.from_address.choices = zip(from_addresses, from_addresses)
+        self.from_address.choices = event.get_allowed_sender_emails().items()
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)
 
     def validate_body(self, field):
