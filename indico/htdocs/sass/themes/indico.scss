@@ -15,54 +15,54 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
- @import 'base';
+@import 'base';
 
- $indico-theme-color: #1a63a0;
- $header-bg-color: $indico-theme-color !default;
- $header-icon-color: $light-gray !default;
- $header-text-color: $light-gray !default;
- $tt-primary-color: $indico-theme-color !default;
- $tt-secondary-color: #05b3b3 !default;
- $tt-secondary-pastel: #a8dede !default;
- $tt-nested-time-color: $light-black !default;
- $tt-additional-text-color: $light-black !default;
- $selected-color: $indico-blue !default;
+$indico-theme-color: #1a63a0;
+$header-bg-color: $indico-theme-color !default;
+$header-icon-color: $light-gray !default;
+$header-text-color: $light-gray !default;
+$tt-primary-color: $indico-theme-color !default;
+$tt-secondary-color: #05b3b3 !default;
+$tt-secondary-pastel: #a8dede !default;
+$tt-nested-time-color: $light-black !default;
+$tt-additional-text-color: $light-black !default;
+$selected-color: $indico-blue !default;
 
- @mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
-     div.event-header {
-         background: $header-bg-color url($image) left top no-repeat;
-         background-position: $position;
-         background-size: $scale;
-         padding-left: $padding-left;
-     }
- }
+@mixin header-logo($image, $position: 15px, $padding-left: 150px, $scale: none) {
+    div.event-header {
+        background: $header-bg-color url($image) left top no-repeat;
+        background-position: $position;
+        background-size: $scale;
+        padding-left: $padding-left;
+    }
+}
 
- @mixin drop-shadow {
-     box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
- }
+@mixin drop-shadow {
+    box-shadow: 0 2px 10px 1px rgba(50, 50, 50, 0.4);
+}
 
- @mixin ribbon($color) {
-     @include transition(.5s background-color linear);
-     @include border-radius(0 2px 2px 0);
-     $darkened-color: darken($color, 10%);
+@mixin ribbon($color) {
+    @include transition(.5s background-color linear);
+    @include border-radius(0 2px 2px 0);
+    $darkened-color: darken($color, 10%);
 
-     background-color: $color;
-     &:before {
-         content: ' ';
-         position: absolute;
-         width: 0;
-         height: 0;
-         left: 0px;
-         top: 100%;
-         border-width: 5px 5px;
-         border-style: solid;
-         border-color: $darkened-color $darkened-color transparent transparent;
-     }
- }
+    background-color: $color;
+    &:before {
+        content: ' ';
+        position: absolute;
+        width: 0;
+        height: 0;
+        left: 0px;
+        top: 100%;
+        border-width: 5px 5px;
+        border-style: solid;
+        border-color: $darkened-color $darkened-color transparent transparent;
+    }
+}
 
- body {
-     background: #424242;
- }
+body {
+    background: #424242;
+}
 
 .contrib-description {
     &.plain {
@@ -466,7 +466,7 @@ div.event-header {
     padding: 3px 10px;
 }
 
-.note-area-wrapper .note-area{
+.note-area-wrapper .note-area {
     @extend %font-family-modern-body;
     margin-top: 10px;
 }
@@ -524,7 +524,7 @@ a.lecture-series-link {
     }
 }
 
-.agenda-placeholder{
+.agenda-placeholder {
     @include border-radius;
     background-color: white;
     margin-top: 10px;
