@@ -26,14 +26,18 @@ from indico.modules.events.views import WPSimpleEventDisplayBase
 class WPManageRegistration(WPEventManagement):
     template_prefix = 'events/registration/'
 
+    def __init__(self, rh, event_, active_menu_item=None, **kwargs):
+        self.regform = kwargs.get('regform')
+        self.registration = kwargs.get('registration')
+        WPEventManagement.__init__(self, rh, event_, active_menu_item, **kwargs)
+
     @property
     def sidemenu_option(self):
         if self.event.type_ != EventType.conference:
-            regform = self._kwargs.get('regform')
+            regform = self.regform
             if not regform:
-                registration = self._kwargs.get('registration')
-                if registration:
-                    regform = registration.registration_form
+                if self.registration:
+                    regform = self.registration.registration_form
             if regform and regform.is_participation:
                 return 'participants'
         return 'registration'
