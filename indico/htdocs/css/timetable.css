@@ -107,7 +107,7 @@ div#wholeLegend {
 div.legendCloseButton {
     float: right;
     cursor: pointer;
-    background-image: url('../images/popup_close_button.png');
+    background-image: url('/images/popup_close_button.png');
     width: 15px;
     height: 15px;
     margin: 1px 2px 0px 2px;

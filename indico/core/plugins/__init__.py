@@ -21,7 +21,7 @@ from urlparse import urlparse
 
 from flask import session
 from flask_babelex import Domain
-from flask_pluginengine import (PluginEngine, Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin,
+from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from markupsafe import Markup
 from webassets import Bundle
@@ -33,19 +33,18 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
-from indico.util.i18n import _, NullDomain
+from indico.util.i18n import NullDomain, _
 from indico.util.struct.enum import IndicoEnum
 from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
-from indico.web.assets.bundles import get_webassets_cache_dir, LazyCacheEnvironment
+from indico.web.assets.bundles import LazyCacheEnvironment, get_webassets_cache_dir
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from indico.web.menu import SideMenuItem
-
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 
 
 class PluginCategory(unicode, IndicoEnum):
@@ -196,7 +195,7 @@ class IndicoPlugin(Plugin):
         """Registers an SCSS bundle in the plugin's webassets environment"""
         pretty_name = re.sub(r'_css$', '', name)
         bundle = Bundle(*files,
-                        filters=('pyscss', 'cssrewrite', 'csscompressor'),
+                        filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
                         output='css/{}_%(version)s.min.css'.format(pretty_name),
                         depends=SASS_BASE_MODULES)
         self.assets.register(name, bundle)

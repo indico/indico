@@ -22,18 +22,44 @@ from urlparse import urlparse
 import csscompressor
 from markupsafe import Markup
 from webassets import Bundle, Environment
-from webassets.filter import register_filter, Filter
+from webassets.filter import Filter, register_filter
+from webassets.filter.cssrewrite import CSSRewrite
 
 from indico.core.config import Config
 from indico.modules.events.layout import theme_settings
 
 
-@register_filter
 class CSSCompressor(Filter):
     name = 'csscompressor'
 
     def output(self, _in, out, **kw):
         out.write(csscompressor.compress(_in.read(), max_linelen=500))
+
+
+class IndicoCSSRewrite(CSSRewrite):
+    name = 'indico_cssrewrite'
+
+    def __init__(self):
+        super(IndicoCSSRewrite, self).__init__()
+        self.base_url_path = urlparse(Config.getInstance().getBaseURL().rstrip('/')).path
+
+    def replace_url(self, url):
+        parsed = urlparse(url)
+        if parsed.scheme or parsed.netloc:
+            return url
+        elif parsed.path.startswith('/'):
+            # Prefix absolute urls with the base path. Like this we avoid
+            # the mess that comes with relative URLs in CSS while still
+            # supporting Indico running in a subdirectory (e.g. /indico)
+            return self.base_url_path + url
+        else:
+            return super(IndicoCSSRewrite, self).replace_url(url)
+
+
+# XXX: DO NOT move this to decorators. this function returns None,
+# so super() calls using the decorated class name fail...
+register_filter(CSSCompressor)
+register_filter(IndicoCSSRewrite)
 
 
 def configure_pyscss(environment):
@@ -464,7 +490,7 @@ base_css = Bundle(
                'jquery.colorbox.css',
                'jquery-ui-custom.css',
                'jquery.colorpicker.css'),
-    filters=('csscompressor', 'cssrewrite'),
+    filters=('csscompressor', 'indico_cssrewrite'),
     output='css/base_%(version)s.min.css')
 
 
@@ -476,7 +502,7 @@ SASS_BASE_MODULES = ["sass/*.scss",
                      "sass/modules/*/*.scss"]
 
 screen_sass = Bundle('sass/screen.scss',
-                     filters=('pyscss', 'cssrewrite', 'csscompressor'),
+                     filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
                      output="sass/screen_sass_%(version)s.css",
                      depends=SASS_BASE_MODULES)
 
@@ -530,7 +556,7 @@ def register_theme_sass():
         if stylesheet:
             bundle = Bundle('css/events/common.css',
                             stylesheet,
-                            filters=('pyscss', 'cssrewrite', 'csscompressor'),
+                            filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
                             output='{}_%(version)s.css'.format(theme_id),
                             depends=SASS_BASE_MODULES)
             data['asset_env'] = env = ThemeEnvironment(theme_id, data)
@@ -539,7 +565,7 @@ def register_theme_sass():
             print_stylesheet = data.get('print_stylesheet')
             if print_stylesheet:
                 print_bundle = Bundle(bundle, print_stylesheet,
-                                      filters=('pyscss', 'cssrewrite', 'csscompressor'),
+                                      filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
                                       output="{}_print_%(version)s.css".format(theme_id),
                                       depends=SASS_BASE_MODULES)
                 env.register('print_sass', print_bundle)
