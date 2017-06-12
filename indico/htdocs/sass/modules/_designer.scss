@@ -295,6 +295,7 @@
     align-items: center;
     justify-content: center;
     background-color: $light-gray;
+    width: 100%;
     height: 100%;
 
     .placeholder-content {
@@ -311,6 +312,12 @@
             }
         }
     }
+}
+
+.to-be-removed {
+    position: absolute;
+    z-index: 1000;
+    opacity: 0.9;
 }
 
 .backside-template-title {

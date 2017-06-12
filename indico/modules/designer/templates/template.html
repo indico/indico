@@ -17,10 +17,10 @@
 
 {% block content %}
     {% if tpls_count %}
-        <div class="affected-targets-warning weak-hidden">
+        <div id="back-side-warning" class="affected-targets-warning weak-hidden">
             {% call message_box('warning', fixed_width=true) %}
                 <p>
-                    {% set link_start %}<a href="#" class="js-affected-objects">{% endset %}
+                    {% set link_start %}<a href="#" class="js-back-affected">{% endset %}
                     {% set link_end %}</a>{% endset %}
                     {%- trans count=tpls_count -%}
                         This template is used as the back side of
@@ -36,8 +36,8 @@
                 </p>
             {% endcall %}
         </div>
-        <div class="warning-qtip-content hidden">
-            <ul class="js-affected-templates qbubble-item-list">
+        <div class="back-warning-qtip-content hidden">
+            <ul class="js-back-affected qbubble-item-list">
                 {% for related_tpls_owner, related_tpls in related_tpls_per_owner.iteritems() %}
                     {% for related_tpl in related_tpls %}
                         <li>{{ related_tpl.title }} ({{ related_tpls_owner.title }})</li>
@@ -46,6 +46,24 @@
             </ul>
         </div>
     {% endif %}
+    <div id="front-side-warning" class="affected-targets-warning weak-hidden">
+        {% call message_box('warning', fixed_width=true) %}
+            <p>
+                {% set link_start %}<a href="#" class="js-front-affected">{% endset %}
+                {% set link_end %}</a>{% endset %}
+                {%- trans -%}
+                    If you change the dimensions of this template,
+                    its {{ link_start }}back side template{{ link_end }} <strong>will be removed</strong> because it has
+                    different dimensions.
+                {%- endtrans -%}
+            </p>
+        {% endcall %}
+    </div>
+    <div class="front-warning-qtip-content hidden">
+        <div class="js-front-affected qbubble-item-list">
+            {{ backside_template_data.title }}
+        </div>
+    </div>
     <div class="designer-tools flexcol">
         <div class="designer-tools-row">
             <div class="tool">
@@ -320,8 +338,8 @@
                                 <div class="template-side back" data-side="back">
                                     <div class="back-side-placeholder">
                                         <div class="placeholder-content">
-                                            <div>{% trans %}The back side is empty.{% endtrans %}</div>
-                                            <div>
+                                            <div class="placeholder-text">{% trans %}The back side is empty.{% endtrans %}</div>
+                                            <div class="placeholder-link">
                                                 {% set link_start %}
                                                     <a href="#" class="js-backside-list-dialog"
                                                        data-href="{{ url_for('.backside_template_list', template) }}"
