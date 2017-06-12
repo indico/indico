@@ -14,25 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session, g, request, render_template
-from flask import current_app as app
-import os.path
-import re
+import os
 import posixpath
-from indico.core.config import Config
-from indico.legacy.common.utils import formatDateTime, formatDate, formatTime, formatDuration
-from mako.lookup import TemplateLookup
-import mako.exceptions as exceptions
-import indico.legacy
+import re
 import xml.sax.saxutils
 
-from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.util.date_time import format_number, format_datetime, format_date, format_time, format_human_timedelta
-from indico.util.i18n import ngettext
-from indico.util.mdx_latex import latex_escape
-from indico.util.string import safe_upper
-from indico.web.util import url_for_index
-from indico.web.flask.util import url_for, url_rule_to_js
+from flask import current_app as app
+from flask import g, render_template, request, session
+from mako import exceptions
+from mako.lookup import TemplateLookup
+
+from indico.core.config import Config
+from indico.legacy.common.utils import formatDate, formatDateTime, formatDuration, formatTime
 
 
 # The main template directory
@@ -290,6 +283,14 @@ def registerHelpers(objDict):
     Adds helper methods to the dictionary.
     Does it only if symbol does not exist - backward compatibility.
     """
+    from indico.modules.auth.util import url_for_login, url_for_logout
+    from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_number, format_time
+    from indico.util.i18n import ngettext
+    from indico.util.mdx_latex import latex_escape
+    from indico.util.string import safe_upper
+    from indico.web.flask.util import url_for, url_rule_to_js
+    from indico.web.util import url_for_index
+
     if not 'contextHelp' in objDict:
         objDict['contextHelp'] = contextHelp
     if not 'inlineContextHelp' in objDict:

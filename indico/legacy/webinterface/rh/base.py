@@ -592,9 +592,6 @@ class RHSimple(RH):
 
 
 class RHProtected(RH):
-    def _getLoginURL(self):
-        return url_for_login(request.relative_url)
-
     def _checkSessionUser(self):
         if self._getUser() is None:
             if request.headers.get("Content-Type", "text/html").find("application/json") != -1:

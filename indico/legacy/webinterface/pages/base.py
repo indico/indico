@@ -22,12 +22,9 @@ from flask import request, render_template, g
 from indico.core import signals
 from indico.core.config import Config
 from indico.legacy.webinterface.wcomponents import render_header
-from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.core.settings import social_settings
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
-from indico.web import assets
 from indico.web.util import jsonify_template
 
 
@@ -103,9 +100,10 @@ class WPBase:
     MANAGEMENT = False
 
     def __init__(self, rh, **kwargs):
+        from indico.web.assets import core_env
         self._rh = rh
         self._kwargs = kwargs
-        self._asset_env = assets.core_env
+        self._asset_env = core_env
 
     def _getTitle(self):
         return self._title
@@ -162,6 +160,7 @@ class WPBase:
     def display(self, **params):
         from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
         from indico.modules.admin import RHAdminBase
+        from indico.modules.core.settings import social_settings
 
         title_parts = [to_unicode(self._getTitle())]
         if self.MANAGEMENT or isinstance(self._rh, RHModificationBaseProtected):
@@ -190,12 +189,6 @@ class WPBase:
 
 
 class WPDecorated(WPBase):
-    def getLoginURL( self ):
-        return url_for_login(next_url=request.relative_url)
-
-    def getLogoutURL( self ):
-        return url_for_logout(next_url=request.relative_url)
-
     def _getHeader(self):
         return render_header()
 
@@ -231,13 +224,6 @@ class WPDecorated(WPBase):
 
 
 class WPNotDecorated(WPBase):
-
-    def getLoginURL(self):
-        return url_for_login(next_url=request.relative_url)
-
-    def getLogoutURL(self):
-        return url_for_logout(next_url=request.relative_url)
-
     def _display(self, params):
         params = dict(params, **self._kwargs)
         return self._getBody(params)

@@ -121,9 +121,6 @@ class WPConferenceBase(base.WPDecorated):
     def getJSFiles(self):
         return base.WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
 
-    def getLogoutURL(self):
-        return url_for_logout(self._conf.as_event.external_url)
-
 
 class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
     menu_entry_plugin = None
