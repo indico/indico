@@ -453,7 +453,6 @@ base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, i
 base_css = Bundle(
     *namespace('css',
                'Default.css',
-               'calendar-blue.css',
                'jquery-ui.css',
                'lib/angular.css',
                'lib/jquery.qtip.css',
