@@ -145,18 +145,15 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
             raise ValueError(_("The template dimensions are too large for the page size you selected"))
 
         badges_mix = []
-        counter = 0
         to_repeat = []
         one_page = n_horizontal * n_vertical
         # make batch of as many badges as we can fit into one page and add duplicates for printing back sides
-        for reg in self.registrations:
-            counter += 1
+        for i, reg in enumerate(self.registrations, 1):
             badges_mix.append(reg)
             to_repeat.append(reg)
-            if counter == one_page:
+            if (i % one_page) == 0:
                 badges_mix += to_repeat
                 to_repeat = []
-                counter = 0
 
         on_last_page = len(to_repeat)
         # if the last page is not full add empty placeholders to make it "full" for proper printing of back sides

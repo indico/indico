@@ -17,7 +17,7 @@
 
 {% block content %}
     {% if tpls_count %}
-        <div id="back-side-warning" class="affected-targets-warning weak-hidden">
+        <div id="backside-warning" class="affected-targets-warning weak-hidden">
             {% call message_box('warning', fixed_width=true) %}
                 <p>
                     {% set link_start %}<a href="#" class="js-back-affected">{% endset %}
@@ -46,7 +46,7 @@
             </ul>
         </div>
     {% endif %}
-    <div id="front-side-warning" class="affected-targets-warning weak-hidden">
+    <div id="frontside-warning" class="affected-targets-warning weak-hidden">
         {% call message_box('warning', fixed_width=true) %}
             <p>
                 {% set link_start %}<a href="#" class="js-front-affected">{% endset %}
@@ -336,7 +336,7 @@
                                     <img class="background-image">
                                 </div>
                                 <div class="template-side back" data-side="back">
-                                    <div class="back-side-placeholder">
+                                    <div class="backside-placeholder">
                                         <div class="placeholder-content">
                                             <div class="placeholder-text">{% trans %}The back side is empty.{% endtrans %}</div>
                                             <div class="placeholder-link">

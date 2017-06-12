@@ -626,7 +626,7 @@
     }
 
     function toggleBacksidePlaceholder(showPlaceholder) {
-        var $placeholder = $('.back-side-placeholder');
+        var $placeholder = $('.backside-placeholder');
 
         $placeholder.parent().toggleClass('empty', showPlaceholder);
         $placeholder.toggle(showPlaceholder);
@@ -637,14 +637,14 @@
         toggleBacksidePlaceholder(showPlaceholder);
         $('.backside-tools').toggleClass('hidden', !showPlaceholder);
         if (showPlaceholder) {
-            $('.back-side-placeholder').addClass('to-be-removed');
+            $('.backside-placeholder').addClass('to-be-removed');
             $('.placeholder-text').html($T.gettext('This back side template will be removed'));
             $('.placeholder-link').hide();
             confirmMessage = $T.gettext('The back side of this template will be removed');
             confirmTitle = $T.gettext('Disassociate back side');
             removeBackSide = true;
         } else {
-            $('.back-side-placeholder').removeClass('to-be-removed');
+            $('.backside-placeholder').removeClass('to-be-removed');
             $('.placeholder-text').html($T.gettext('The back side is empty.'));
             $('.placeholder-link').show();
             confirmMessage = $T.gettext("The back side of the templates that use this one as the back side will be removed.");
@@ -654,33 +654,34 @@
     }
 
     function toggleWarningOnDimensionChange(xDimension, yDimension, initialXDimension, initialYDimension) {
-        if ($('#back-side-warning').length || backsideTemplateID !== null) {
-            var $backsideTplsWarning = null;
-            if ($('#back-side-warning').length && backsideTemplateID !== null) {
-                $backsideTplsWarning = $('.affected-targets-warning');
-            } else if ($('#back-side-warning').length) {
-                $backsideTplsWarning = $('#back-side-warning');
-            } else  if (backsideTemplateID !== null) {
-                $backsideTplsWarning = $('#front-side-warning');
+        if (!$('#backside-warning').length && backsideTemplateID === null) {
+            return;
+        }
+        var $backsideTplsWarning = null;
+        if ($('#backside-warning').length && backsideTemplateID !== null) {
+            $backsideTplsWarning = $('.affected-targets-warning');
+        } else if ($('#backside-warning').length) {
+            $backsideTplsWarning = $('#backside-warning');
+        } else if (backsideTemplateID !== null) {
+            $backsideTplsWarning = $('#frontside-warning');
+        }
+        if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimension) {
+            if (backsideTemplateID !== null) {
+                togglePlaceholderToBeRemoved(true);
             }
-            if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimension) {
-                if (backsideTemplateID !== null) {
-                    togglePlaceholderToBeRemoved(true);
-                }
-                $backsideTplsWarning.show('fast');
-                showConfirmationDialog = true;
-            } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimension) {
-                $backsideTplsWarning.hide('fast');
-                if (backsideTemplateID !== null) {
-                    togglePlaceholderToBeRemoved(false);
-                }
-                showConfirmationDialog = false;
+            $backsideTplsWarning.show('fast');
+            showConfirmationDialog = true;
+        } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimension) {
+            $backsideTplsWarning.hide('fast');
+            if (backsideTemplateID !== null) {
+                togglePlaceholderToBeRemoved(false);
             }
+            showConfirmationDialog = false;
         }
     }
 
     function removeWarning() {
-        $('#front-side-warning').hide('fast');
+        $('#frontside-warning').hide('fast');
         togglePlaceholderToBeRemoved(false);
         removeBackSide = false;
         showConfirmationDialog = false;
@@ -986,7 +987,7 @@
             } else {
                 $("#page_layout option[value='foldable']").prop('disabled', true);
                 if ($('#page_layout :selected').val() === 'foldable') {
-                    $('#page_layout :selected').next().attr('selected', 'selected');
+                    $('#page_layout :selected').next().prop('selected', true);
                 }
             }
         }
