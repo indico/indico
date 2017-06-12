@@ -34,6 +34,9 @@
     var initialWidth = null;
     var initialHeight = null;
     var showConfirmationDialog = false;
+    var confirmMessage = $T.gettext("The back side of the templates that use this one as the back side will be removed.");
+    var confirmTitle = $T.gettext("Disassociate back sides");
+    var removeBackSide = false;
 
     var DEFAULT_PIXEL_CM = 50;
 
@@ -458,6 +461,9 @@
             new AlertPopup($T("Warning"), $T.gettext("Please choose a name for the template")).open();
             return;
         }
+        if (removeBackSide) {
+            backsideTemplateID = null;
+        }
         var templateData = {
             template: {
                 width: templateDimensions.realWidth,
@@ -476,8 +482,8 @@
 
         var confirmed = showConfirmationDialog ? confirmPrompt(
             $T.gettext("Are you sure you want to change the dimensions of this template?") +
-            $T.gettext("The back side of the templates that use this one as the back side will be removed."),
-            $T.gettext("Disassociate back sides")
+            confirmMessage,
+            confirmTitle
         ) : $.Deferred().resolve();
 
         confirmed.then(function() {
@@ -489,6 +495,15 @@
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: function(data) {
+                    initialWidth = templateDimensions.width;
+                    initialHeight = templateDimensions.height;
+                    if (removeBackSide) {
+                        $('.affected-targets-warning').hide('fast');
+                        togglePlaceholderToBeRemoved(false);
+                        $('.js-remove-backside').click();
+                        removeBackSide = false;
+                        showConfirmationDialog = false;
+                    }
                     handleFlashes(data, true);
                 }
             });
@@ -618,15 +633,57 @@
         $('.backside-tools').toggleClass('hidden', showPlaceholder);
     }
 
-    function toggleWarningOnDimensionChange(xDimension, yDimension, initialXDimention, initialYDimention) {
-        var $backsideTplsWarning = $('.affected-targets-warning');
-        if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimention) {
-            $backsideTplsWarning.show('fast');
-            showConfirmationDialog = true;
-        } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimention) {
-            $backsideTplsWarning.hide('fast');
-            showConfirmationDialog = false;
+    function togglePlaceholderToBeRemoved(showPlaceholder) {
+        toggleBacksidePlaceholder(showPlaceholder);
+        $('.backside-tools').toggleClass('hidden', !showPlaceholder);
+        if (showPlaceholder) {
+            $('.back-side-placeholder').addClass('to-be-removed');
+            $('.placeholder-text').html($T.gettext('This back side template will be removed'));
+            $('.placeholder-link').hide();
+            confirmMessage = $T.gettext('The back side of this template will be removed');
+            confirmTitle = $T.gettext('Disassociate back side');
+            removeBackSide = true;
+        } else {
+            $('.back-side-placeholder').removeClass('to-be-removed');
+            $('.placeholder-text').html($T.gettext('The back side is empty.'));
+            $('.placeholder-link').show();
+            confirmMessage = $T.gettext("The back side of the templates that use this one as the back side will be removed.");
+            confirmTitle = $T.gettext("Disassociate back sides");
+            removeBackSide = false;
         }
+    }
+
+    function toggleWarningOnDimensionChange(xDimension, yDimension, initialXDimension, initialYDimension) {
+        if ($('#back-side-warning').length || backsideTemplateID !== null) {
+            var $backsideTplsWarning = null;
+            if ($('#back-side-warning').length && backsideTemplateID !== null) {
+                $backsideTplsWarning = $('.affected-targets-warning');
+            } else if ($('#back-side-warning').length) {
+                $backsideTplsWarning = $('#back-side-warning');
+            } else  if (backsideTemplateID !== null) {
+                $backsideTplsWarning = $('#front-side-warning');
+            }
+            if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimension) {
+                if (backsideTemplateID !== null) {
+                    togglePlaceholderToBeRemoved(true);
+                }
+                $backsideTplsWarning.show('fast');
+                showConfirmationDialog = true;
+            } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimension) {
+                $backsideTplsWarning.hide('fast');
+                if (backsideTemplateID !== null) {
+                    togglePlaceholderToBeRemoved(false);
+                }
+                showConfirmationDialog = false;
+            }
+        }
+    }
+
+    function removeWarning() {
+        $('#front-side-warning').hide('fast');
+        togglePlaceholderToBeRemoved(false);
+        removeBackSide = false;
+        showConfirmationDialog = false;
     }
 
     global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
@@ -798,12 +855,18 @@
                 clearBacksideTemplate(backsideTemplate);
                 displayTemplate(data.template, true);
                 backsideTemplate = data.template;
+                if (removeBackSide) {
+                    removeWarning();
+                }
                 $('.backside-template-title').text(data.template.title);
             });
 
             $('.js-remove-backside').on('click', function() {
                 backsideTemplateID = null;
                 clearBacksideTemplate(backsideTemplate);
+                if (removeBackSide) {
+                    removeWarning();
+                }
                 toggleBacksidePlaceholder(true);
             });
 
@@ -833,24 +896,38 @@
 
             $('.backside-tools').addClass('hidden');
 
-            if ($('.affected-targets-warning').length) {
-                var $templateWidth = $('.template-width');
-                var $templateHeight = $('.template-height');
-                $templateWidth.on('change input', function() {
-                    toggleWarningOnDimensionChange($(this), $templateHeight, initialWidth, initialHeight);
-                });
-                $templateHeight.on('change input', function() {
-                    toggleWarningOnDimensionChange($(this), $templateWidth, initialHeight, initialWidth);
-                });
-            }
+            var $templateWidth = $('.template-width');
+            var $templateHeight = $('.template-height');
+            $templateWidth.on('change input', function() {
+                toggleWarningOnDimensionChange($(this), $templateHeight, initialWidth, initialHeight);
+            });
+            $templateHeight.on('change input', function() {
+                toggleWarningOnDimensionChange($(this), $templateWidth, initialHeight, initialWidth);
+            });
 
-            $('.js-affected-objects').qbubble({
+            $('.js-back-affected').qbubble({
                 overwrite: true,
                 position: {
-                    target: $('.js-affected-objects')
+                    target: $('.js-back-affected')
                 },
                 content: {
-                    text: $('.warning-qtip-content').html()
+                    text: $('.back-warning-qtip-content').html()
+                },
+                hide: {
+                    event: 'unfocus click'
+                },
+                show: {
+                    event: 'click'
+                }
+            });
+
+            $('.js-front-affected').qbubble({
+                overwrite: true,
+                position: {
+                    target: $('.js-front-affected')
+                },
+                content: {
+                    text: $('.front-warning-qtip-content').html()
                 },
                 hide: {
                     event: 'unfocus click'
