@@ -375,7 +375,6 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
             raise Forbidden
 
     def _process(self):
-        pdf_class = RegistrantsListToBadgesPDF
         config_params = badge_cache.get(request.view_args['uuid'])
         if not config_params:
             raise NotFound
@@ -383,6 +382,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
             pdf_class = RegistrantsListToBadgesPDFFoldable
         elif config_params['page_layout'] == PageLayout.double_sided:
             pdf_class = RegistrantsListToBadgesPDFDoubleSided
+        else:
+            pdf_class = RegistrantsListToBadgesPDF
         registration_ids = config_params.pop('registration_ids')
         pdf = pdf_class(self.template, config_params, self.event_new, registration_ids)
         return send_file('Badges-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'PDF')
@@ -418,20 +419,20 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         self.template_id = request.args.get('template_id')
 
     def _get_format(self, tpl):
-        format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
         from indico.modules.designer.pdf import PIXELS_CM
+        format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
         return next((frm for frm, frm_size in format_map.iteritems()
                      if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM) and
                          frm_size[1] == float(tpl.data['height']) / PIXELS_CM), 'custom')
 
     def _process(self):
         all_templates = set(self.event_new.designer_templates) | get_inherited_templates(self.event_new)
-        badge_templates = ({tpl.id: {
+        badge_templates = {tpl.id: {
             'data': tpl.data,
             'backside_tpl_id': tpl.backside_template_id,
             'orientation': 'landscape' if tpl.data['width'] > tpl.data['height'] else 'portrait',
             'format': self._get_format(tpl)
-        } for tpl in all_templates if tpl.type.name == 'badge'})
+        } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = event_badge_settings.get_all(self.event_new.id)
         form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
