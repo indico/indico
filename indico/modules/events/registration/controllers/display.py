@@ -140,7 +140,14 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     # no data available for the field
                     return ''
 
-            columns = [{'text': _content(column_id)} for column_id in column_ids]
+            def _sort_key_date(column_id):
+                data = data_by_field.get(column_id)
+                if data and data.field_data.field.input_type == 'date':
+                    return data.data
+                else:
+                    return None
+
+            columns = [{'text': _content(column_id), 'sort_key': _sort_key_date(column_id)} for column_id in column_ids]
             return {'checked_in': self._is_checkin_visible(reg), 'columns': columns}
 
         active_fields = {field.id: field for field in regform.active_fields}
