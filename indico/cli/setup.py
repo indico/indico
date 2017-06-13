@@ -469,7 +469,7 @@ class SetupWizard(object):
             # as e.g. https://stackoverflow.com/a/12523283/298479 suggests
             # since this is ambiguous and we rather have the user type their
             # timezone if we don't have a very likely match.
-            return next((unicode(tz) for tz in candidates if tz in common_timezones), None)
+            return next((unicode(tz) for tz in candidates if tz in common_timezones), '')
 
         self.default_locale = _prompt('Default locale', default='en_GB', list_=_get_all_locales(),
                                       help='Specify the default language/locale used by Indico.')
