@@ -1,7 +1,9 @@
 {% extends 'emails/base.html' %}
 
 {% block subject -%}
-    [{{ plugin.friendly_name }}] Videoconference room deleted: {{ vc_room.name }}
+    {% autoescape false -%}
+        [{{ plugin.friendly_name }}] Videoconference room deleted: {{ vc_room.name }}
+    {%- endautoescape %}
 {%- endblock %}
 
 {% block header -%}

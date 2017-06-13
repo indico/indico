@@ -5,8 +5,10 @@
 {% set event = registration.registration_form.event_new %}
 
 {% block subject -%}
-    {% block subject_message %}{% endblock %} for {{ event.title }}
-    {%- block subject_name %}: {{ registration.full_name }}{% endblock %}
+    {% autoescape false -%}
+        {% block subject_message %}{% endblock %} for {{ event.title }}
+        {%- block subject_name %}: {{ registration.full_name }}{% endblock %}
+    {%- endautoescape %}
 {%- endblock %}
 
 {% block body %}
