@@ -79,12 +79,13 @@ def _require_pg_version(version):
     return False
 
 
-def prepare_db(empty=False, root_path=None):
+def prepare_db(empty=False, root_path=None, verbose=True):
     """Initialize an empty database (create tables, set alembic rev to HEAD)."""
     root_path = root_path or current_app.root_path
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
-        print cformat('%{green}Setting the alembic version to HEAD')
+        if verbose:
+            print cformat('%{green}Setting the alembic version to HEAD')
         stamp(directory=os.path.join(root_path, 'migrations'), revision='heads')
         PluginScriptDirectory.dir = os.path.join(root_path, 'core', 'plugins', 'alembic')
         alembic.command.ScriptDirectory = PluginScriptDirectory
@@ -93,7 +94,8 @@ def prepare_db(empty=False, root_path=None):
         for plugin in plugin_engine.get_active_plugins().itervalues():
             if not os.path.exists(plugin.alembic_versions_path):
                 continue
-            print plugin_msg.format(plugin.name)
+            if verbose:
+                print plugin_msg.format(plugin.name)
             with plugin.plugin_context():
                 stamp(revision='heads')
         # Retrieve the table list again, just in case we created unexpected hables
@@ -101,16 +103,17 @@ def prepare_db(empty=False, root_path=None):
 
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
     if any(tables.viewvalues()):
-        print cformat('%{red}Your database is not empty!')
-        print cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!')
-        print
-        print 'Tables in your database:'
-        for schema, schema_tables in sorted(tables.items()):
-            for t in schema_tables:
-                print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
+        if verbose:
+            print cformat('%{red}Your database is not empty!')
+            print cformat('%{yellow}If you just added a new table/model, create an alembic revision instead!')
+            print
+            print 'Tables in your database:'
+            for schema, schema_tables in sorted(tables.items()):
+                for t in schema_tables:
+                    print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
         return
     if not _require_pg_version('9.4'):
         return
     if not _require_extensions('unaccent', 'pg_trgm'):
         return
-    create_all_tables(db, verbose=True, add_initial_data=(not empty))
+    create_all_tables(db, verbose=verbose, add_initial_data=(not empty))
