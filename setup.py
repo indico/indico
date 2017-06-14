@@ -25,7 +25,6 @@ from setuptools import setup, find_packages
 ENTRY_POINTS = {
     'console_scripts': [
         'indico = indico.cli.core:cli',
-        'indico-setup = indico.cli.setup:cli',
         'indico-zodbimport = indico_zodbimport.cli:main',
     ],
     'pytest11': [
