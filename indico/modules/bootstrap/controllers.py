@@ -31,7 +31,7 @@ from indico.modules.bootstrap.forms import BootstrapForm
 from indico.modules.cephalopod.util import register_instance
 from indico.modules.core.settings import core_settings
 from indico.modules.users import User
-from indico.util.i18n import _
+from indico.util.i18n import _, get_all_locales
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -45,6 +45,7 @@ class RHBootstrap(RH):
         return render_template('bootstrap/bootstrap.html',
                                form=BootstrapForm(),
                                timezone=Config.getInstance().getDefaultTimezone(),
+                               languages=get_all_locales(),
                                indico_version=indico.__version__,
                                python_version=python_version())
 

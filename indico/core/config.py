@@ -144,7 +144,6 @@ class Config:
                      "meetingIcon": "meeting.png",
                      "bulletMenuConf": "bulletMenuConf.png",
                      "logoIndico": "logo_indico.png",
-                     "logoIndicoWhite": "logo_indico_white.png",
                      "login": "pict_login.png",
                      "tt_time": "tt_time.png",
                      "miniLogo": "mini_logo_indico.png",

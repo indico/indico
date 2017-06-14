@@ -12,18 +12,30 @@
 
 {% block body %}
     <div class="bootstrap-header">
-        <img class="header-logo" src="{{ system_icon('logoIndicoWhite') }}">
+        <img class="header-logo" src="{{ url_for('assets.image', filename='logo_indico_white.png') }}">
         <div class="header-title">{% trans %}Hello there!{% endtrans %}</div>
         <div class="header-subtitle">{% trans %}Indico needs just a little bit more data from you...{% endtrans %}</div>
         <div id="language-selector" class="toolbar language-selector">
-            <form id="language-form" method="POST" action="{{ url_for('misc.changeLang') }}">
-                <input id="language-hidden" type="hidden" name="lang" value="{{ session.lang }}">
-                <input type="hidden" name="next" value="{{ url_for('bootstrap.index') }}">
-            </form>
-            <a class="i-button transparent-button icon-earth arrow" data-toggle="dropdown">{{ selected_lang_name }}</a>
+            <a class="i-button transparent-button borderless icon-earth arrow js-dropdown" data-toggle="dropdown">
+                {{ languages[session.lang] }}
+            </a>
             <ul class="dropdown">
-                {% for code, lang in language_options -%}
-                    <li class="language-option" data-language-code="{{ code }}"><a>{{ lang }}</a></li>
+                {% for name, title in languages|dictsort(by='value') %}
+                    <li>
+                        {% if name == session.lang %}
+                            <a class="disabled" title="{% trans %}This is your current language.{% endtrans %}">
+                                {{- title -}}
+                            </a>
+                        {% else %}
+                            <a data-href="{{ url_for('misc.changeLang') }}"
+                               data-method="POST"
+                               data-params='{{ {'lang': name}|tojson|forceescape }}'
+                               data-reload-after
+                               data-ajax>
+                                {{- title -}}
+                            </a>
+                        {% endif %}
+                    </li>
                 {% endfor %}
             </ul>
         </div>

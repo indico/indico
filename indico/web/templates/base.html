@@ -4,6 +4,7 @@
 <head>
     <title>Indico{% if self.title() %} - {% endif %}{% block title %}{% endblock %}</title>
     <meta charset="UTF-8">
+    <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ system_icon('addressBarIcon') }}">
 
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>

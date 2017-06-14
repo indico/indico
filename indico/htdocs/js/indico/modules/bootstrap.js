@@ -16,9 +16,11 @@
  */
 
 $(document).ready(function() {
+    'use strict';
+
     // Header shrinking function
     $(window).scroll(function() {
-        if (($(window).scrollTop() >= $('.bootstrap-header').outerHeight()/2) &&
+        if (($(window).scrollTop() >= $('.bootstrap-header').outerHeight() / 2) &&
                 !$('.bootstrap-header').hasClass('mini')) {
             $('.bootstrap-header').addClass('mini');
             $('.bootstrap-body').addClass('mini');
@@ -50,16 +52,4 @@ $(document).ready(function() {
         }
     });
     $('#form-group-enable_tracking .switch-input').trigger('change');
-
-    // Language selector
-    $('.language-option')
-        .on('click', function setLanguage() {
-            var currentLangInput = $('#language-hidden');
-            var newLang = $(this).data('language-code');
-            if (newLang !== currentLangInput.val()) {
-                currentLangInput.val(newLang);
-                $('#language-form').submit();
-            }
-        })
-        .dropdown();
 });
