@@ -19,6 +19,8 @@ Except for minor differences, this guide applies to both vanilla CentOS7
 and the CERN flavor of CentOS, CC7 (CentOS CERN 7).
 
 
+.. _centos-epel:
+
 1. Enable EPEL
 ^^^^^^^^^^^^^^
 
@@ -30,6 +32,8 @@ and the CERN flavor of CentOS, CC7 (CentOS CERN 7).
 
     If you use CC7, EPEL is already enabled and this step is not necessary
 
+
+.. _centos-pkg:
 
 2. Install Packages
 ^^^^^^^^^^^^^^^^^^^
@@ -48,6 +52,8 @@ to the ``[base]`` and ``[updates]`` sections, as described in the
     systemctl start postgresql-9.6.service redis.service
 
 
+.. _centos-db:
+
 3. Create a Database
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -65,6 +71,8 @@ Postgres extensions (which can only be done by the Postgres superuser)
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
+
+.. _centos-web:
 
 4. Configure uWSGI & nginx
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -179,6 +187,8 @@ most cases.
     EOF
 
 
+.. _centos-ssl:
+
 5. Create an SSL Certificate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -213,6 +223,8 @@ commercial certification authority or get a free one from
 as ``/etc/ssl/nginx/indico.key`` and ``/etc/ssl/nginx/indico.crt``.
 
 
+.. _centos-selinux:
+
 6. Configure SELinux
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -244,6 +256,8 @@ should be handled.
     EOF
     semodule -i /tmp/indico.cil
 
+
+.. _centos-install:
 
 7. Install Indico
 ^^^^^^^^^^^^^^^^^
@@ -293,6 +307,12 @@ You are now ready to install Indico:
     If you use a custom-built indico wheel, use ``pip install /path/to/indico-*.whl``
     instead of ``pip install indico``
 
+
+.. _centos-config:
+
+8. Configure Indico
+^^^^^^^^^^^^^^^^^^^
+
 Once Indico is installed, you can run the configuration wizard.  You can
 keep the defaults for most options, but make sure to use ``https://YOURHOSTNAME``
 when prompted for the Indico URL. Also specify valid email addresses when asked
@@ -304,14 +324,7 @@ default timezone make sure this is the main time zone used in your Indico instan
     indico setup wizard
 
 
-After running the wizard you can create the database schema:
-
-.. code-block:: shell
-
-    indico db prepare
-
-
-Now finish setting up the directory structure and permissions and switch back to *root*:
+Now finish setting up the directory structure and permissions:
 
 .. code-block:: shell
 
@@ -322,11 +335,23 @@ Now finish setting up the directory structure and permissions and switch back to
     chmod g+w ~/log/nginx
     restorecon -R ~/
     echo -e "\nStaticFileMethod = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
+
+
+9. Create database schema
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Finally you can create the database schema and switch back to *root*:
+
+.. code-block:: shell
+
+    indico db prepare
     exit
 
 
-8. Launch Indico
-^^^^^^^^^^^^^^^^
+.. _centos-launch:
+
+10. Launch Indico
+^^^^^^^^^^^^^^^^^
 
 You can now start Indico and set it up to start automatically when the
 server is rebooted:
@@ -337,8 +362,10 @@ server is rebooted:
     systemctl enable uwsgi.service nginx.service postgresql-9.6.service redis.service indico-celery.service
 
 
-9. Open the Firewall
-^^^^^^^^^^^^^^^^^^^^
+.. _centos-firewall:
+
+11. Open the Firewall
+^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: shell
 
@@ -351,7 +378,9 @@ server is rebooted:
     by default
 
 
-10. Create an Indico user
+.. _centos-user:
+
+12. Create an Indico user
 ^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
@@ -364,6 +393,8 @@ Debian / Ubuntu
 
 Except for minor differences, this guide applies to both Debian and Ubuntu.
 
+
+.. _deb-pkg:
 
 1. Install Packages
 ^^^^^^^^^^^^^^^^^^^
@@ -395,6 +426,8 @@ If you use Ubuntu, run this instead:
     apt install -y libjpeg-turbo8-dev zlib1g-dev
 
 
+.. _deb-db:
+
 2. Create a Database
 ^^^^^^^^^^^^^^^^^^^^
 
@@ -412,6 +445,8 @@ Postgres extensions (which can only be done by the Postgres superuser)
     Do not forget to setup a cronjob that creates regular database
     backups once you start using Indico in production!
 
+
+.. _deb-web:
 
 3. Configure uWSGI & nginx
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -526,6 +561,8 @@ most cases.
     EOF
 
 
+.. _deb-ssl:
+
 4. Create an SSL Certificate
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -560,7 +597,9 @@ commercial certification authority or get a free one from
 as ``/etc/ssl/nginx/indico.key`` and ``/etc/ssl/nginx/indico.crt``.
 
 
-6. Install Indico
+.. _deb-install:
+
+5. Install Indico
 ^^^^^^^^^^^^^^^^^
 
 Celery runs as a background daemon. Add a systemd unit file for it:
@@ -609,6 +648,11 @@ You are now ready to install Indico:
     instead of ``pip install indico``
 
 
+.. _deb-config:
+
+6. Configure Indico
+^^^^^^^^^^^^^^^^^^^
+
 Once Indico is installed, you can run the configuration wizard.  You can
 keep the defaults for most options, but make sure to use ``https://YOURHOSTNAME``
 when prompted for the Indico URL. Also specify valid email addresses when asked
@@ -620,14 +664,7 @@ default timezone make sure this is the main time zone used in your Indico instan
     indico setup wizard
 
 
-After running the wizard you can create the database schema:
-
-.. code-block:: shell
-
-    indico db prepare
-
-
-Now finish setting up the directory structure and permissions and switch back to *root*:
+Now finish setting up the directory structure and permissions:
 
 .. code-block:: shell
 
@@ -637,10 +674,22 @@ Now finish setting up the directory structure and permissions and switch back to
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/nginx
     echo -e "\nStaticFileMethod = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
+
+
+7. Create database schema
+^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Finally, you can create the database schema and switch back to *root*:
+
+.. code-block:: shell
+
+    indico db prepare
     exit
 
 
-7. Launch Indico
+.. _deb-launch:
+
+8. Launch Indico
 ^^^^^^^^^^^^^^^^
 
 You can now start Indico and set it up to start automatically when the
@@ -652,8 +701,10 @@ server is rebooted:
     systemctl enable uwsgi.service nginx.service postgresql.service redis-server.service indico-celery.service
 
 
-8. Create an Indico user
-^^^^^^^^^^^^^^^^^^^^^^^^
+.. _deb-user:
+
+9. Create an Indico user
+^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
