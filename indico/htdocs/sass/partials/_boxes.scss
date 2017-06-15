@@ -443,7 +443,7 @@ $i-box-padding: 10px;
 
     &.content-after {
         > li:last-child {
-            @include border-bottom(lighten($default-border-color, $color-variation));
+            @include border-bottom();
         }
     }
 
