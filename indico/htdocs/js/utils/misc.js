@@ -143,7 +143,7 @@
                 if (options.actionCallback) {
                     var promise = options.actionCallback();
 
-                    box.addClass('progress').text(options.progressMessage);
+                    box.addClass('progress').find('.corner-message-text').text(options.progressMessage);
                     text.remove();
 
                     promise.then(function() {
