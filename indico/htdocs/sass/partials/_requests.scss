@@ -16,7 +16,7 @@
  */
 
 @mixin i-request-state($state, $color, $light-color, $dark-color) {
-    &.i-request-$state {
+    &.i-request-#{$state} {
         background-color: $light-color;
         &, & * { color: $color; }
         &:hover { background-color: darken($light-color, $light-color-variation); }
