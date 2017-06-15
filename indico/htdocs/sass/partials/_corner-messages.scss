@@ -67,6 +67,8 @@
     @include indico-animation(_fadein, 0.5s, normal forwards ease-in-out, 1);
     @include _progress(darken($light-gray, 0.3*$color-variation), $light-gray);
 
+    display: flex;
+    flex: 1;
     margin-bottom: 1em;
     color: $light-black;
     background-color: $light-gray;
@@ -107,6 +109,8 @@
 
     .corner-message-action {
         @include border-left($pastel-gray, solid);
+        display: flex;
+        align-items: center;
         font-weight: bold;
         text-transform: uppercase;
         flex: none;
