@@ -20,6 +20,8 @@ import warnings
 import sphinx_rtd_theme
 from sqlalchemy.exc import SAWarning
 
+# set sample config when building docs
+os.environ['INDICO_CONFIG'] = os.path.join(os.path.dirname(__file__), '..', '..', 'indico', 'indico.conf.sample')
 
 # silence sqlalchemy SAWarning
 warnings.simplefilter('ignore', SAWarning)
