@@ -4,6 +4,12 @@ Upgrade Indico from an older version
 Upgrading from versions < 2.0
 -----------------------------
 
+.. warning::
+    **ATTENTION: This process is not yet fully tested, use it at your own risk!**
+    We are currently working with some of our users running Indico 1.2 in order to ensure migration works reliably
+    and without any data loss. If you'd like to help, please `let us know <http://indico-software.org/contact/>`_!
+
+
 If you're running a version that is lower than 2.0, you will have to run a special migration command provided by the
 ``indico-migrate`` package. This document will guide you over the steps needed to perform the upgrade.
 
@@ -135,7 +141,7 @@ You should then install the package using:
 
 ``indico-migrate`` requires a series of parameters that have to be tuned according to your current setup. We now provide
 a list of values that should work in most standard Indico installations. However, please **carefully read** the
-`documentation of the indico-migrate command <https://github.com/indico/indico-migrate#migration-settings>`_, to make
+`documentation of the indico-migrate command <https://github.com/indico/indico-migrate>`_, to make
 sure there are no option conflicts with your setup.
 
 Most frequenty, ``indico-migrate postgresql:///indico fs:///opt/indico-legacy/db/Data.fs`` will work, followed by the following
