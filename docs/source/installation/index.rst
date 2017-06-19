@@ -6,6 +6,6 @@ Installation guides
 .. toctree::
     :maxdepth: 1
 
-    Production <production.rst>
+    Production <production/index.rst>
     Development <development.rst>
     Upgrade <upgrade.rst>
