@@ -1,9 +1,7 @@
-nginx
-=====
+Apache
+======
 
-.. include:: ../_sso_note.rst
-
-.. _centos-epel:
+.. _centos-apache-epel:
 
 1. Enable EPEL
 --------------
@@ -17,7 +15,7 @@ nginx
     If you use CC7, EPEL is already enabled and this step is not necessary
 
 
-.. _centos-pkg:
+.. _centos-apache-pkg:
 
 2. Install Packages
 -------------------
@@ -30,13 +28,14 @@ to the ``[base]`` and ``[updates]`` sections, as described in the
 
     yum install -y https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
     yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
-    yum install -y gcc redis nginx uwsgi uwsgi-plugin-python
+    yum install -y httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
+    yum install -y gcc redis uwsgi uwsgi-plugin-python
     yum install -y python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel
     /usr/pgsql-9.6/bin/postgresql96-setup initdb
     systemctl start postgresql-9.6.service redis.service
 
 
-.. _centos-db:
+.. _centos-apache-db:
 
 3. Create a Database
 --------------------
@@ -56,12 +55,12 @@ Postgres extensions (which can only be done by the Postgres superuser)
     backups once you start using Indico in production!
 
 
-.. _centos-web:
+.. _centos-apache-web:
 
-4. Configure uWSGI & nginx
---------------------------
+4. Configure uWSGI & Apache
+---------------------------
 
-The default uWSGI and nginx configuration files should work fine in
+The default uWSGI and Apache configuration files should work fine in
 most cases.
 
 .. code-block:: shell
@@ -69,13 +68,12 @@ most cases.
     cat > /etc/uwsgi.ini <<'EOF'
     [uwsgi]
     uid = indico
-    gid = nginx
+    gid = apache
     pidfile = /run/uwsgi/uwsgi.pid
 
     processes = 4
     enable-threads = false
-    chmod-socket = 770
-    socket = /opt/indico/web/uwsgi.sock
+    socket = 127.0.0.1:8008
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
 
@@ -100,6 +98,8 @@ most cases.
     reload-on-rss = 2048
     evil-reload-on-rss = 8192
     EOF
+    echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
+
 
 
 .. note::
@@ -110,68 +110,48 @@ most cases.
 
 .. code-block:: shell
 
-    cat > /etc/nginx/conf.d/indico.conf <<'EOF'
-    server {
-      listen 80;
-      listen [::]:80;
-      server_name YOURHOSTNAME;
-      return 301 https://$server_name$request_uri;
-    }
+    cat > /etc/httpd/conf.d/indico.conf <<'EOF'
+    <VirtualHost *:80>
+        ServerName YOURHOSTNAME
+        RewriteEngine On
+        RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
+    </VirtualHost>
 
-    server {
-      listen       *:443 ssl http2;
-      listen       [::]:443 ssl http2 default ipv6only=on;
-      server_name  YOURHOSTNAME;
 
-      ssl on;
+    <VirtualHost *:443>
+        ServerName YOURHOSTNAME
+        DocumentRoot "/var/empty/apache"
 
-      ssl_certificate           /etc/ssl/indico/indico.crt;
-      ssl_certificate_key       /etc/ssl/indico/indico.key;
-      ssl_session_cache         shared:SSL:10m;
-      ssl_session_timeout       5m;
-      ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
-      ssl_ciphers               ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS;
-      ssl_prefer_server_ciphers on;
+        SSLEngine             on
+        SSLCertificateFile    /etc/ssl/indico/indico.crt
+        SSLCertificateKeyFile /etc/ssl/indico/indico.key
+        SSLProtocol           all -SSLv2 -SSLv3
+        SSLCipherSuite        ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+        SSLHonorCipherOrder   on
 
-      access_log            /opt/indico/log/nginx/access.log combined;
-      error_log             /opt/indico/log/nginx/error.log;
+        XSendFile on
+        XSendFilePath /opt/indico
+        CustomLog /opt/indico/log/apache/access.log combined
+        ErrorLog /opt/indico/log/apache/error.log
+        LogLevel error
+        ServerSignature Off
 
-      location /.xsf/indico/ {
-        internal;
-        alias /opt/indico/;
-      }
+        AliasMatch "^/static/assets/(core|(?:plugin|theme)-[^/]+)/(.*)$" "/opt/indico/assets/$1/$2"
+        AliasMatch "^/(ihelp|css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$" "/opt/indico/web/htdocs/$1$2"
+        Alias /robots.txt /opt/indico/web/htdocs/robots.txt
 
-      location ~ ^/static/assets/(core|(?:plugin|theme)-[^/]+)/(.*)$ {
-        alias /opt/indico/assets/$1/$2;
-        access_log off;
-      }
+        SetEnv UWSGI_SCHEME https
+        ProxyPass / uwsgi://127.0.0.1:8008/
 
-      location ~ ^/(ihelp|css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$ {
-        alias /opt/indico/web/htdocs/$1$2;
-        access_log off;
-      }
-
-      location /robots.txt {
-        alias /opt/indico/web/htdocs/robots.txt;
-        access_log off;
-      }
-
-      location / {
-        root /var/empty/nginx;
-        include /etc/nginx/uwsgi_params;
-        uwsgi_pass unix:/opt/indico/web/uwsgi.sock;
-        uwsgi_param UWSGI_SCHEME $scheme;
-        uwsgi_read_timeout 15m;
-        uwsgi_buffers 32 32k;
-        uwsgi_busy_buffers_size 128k;
-        uwsgi_hide_header X-Sendfile;
-        client_max_body_size 1G;
-      }
-    }
+        <Directory /opt/indico>
+            AllowOverride None
+            Require all granted
+        </Directory>
+    </VirtualHost>
     EOF
 
 
-.. _centos-ssl:
+.. _centos-apache-ssl:
 
 5. Create an SSL Certificate
 ----------------------------
@@ -207,7 +187,7 @@ commercial certification authority or get a free one from
 as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
 
 
-.. _centos-selinux:
+.. _centos-apache-selinux:
 
 6. Configure SELinux
 --------------------
@@ -236,12 +216,12 @@ should be handled.
 
     ; set proper types for our log dirs
     (filecon "/opt/indico/log(/.*)?" any (system_u object_r indico_log_t ((s0)(s0))))
-    (filecon "/opt/indico/log/nginx(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
+    (filecon "/opt/indico/log/apache(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
     EOF
     semodule -i /tmp/indico.cil
 
 
-.. _centos-install:
+.. _centos-apache-install:
 
 7. Install Indico
 -----------------
@@ -260,7 +240,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Restart=always
     SyslogIdentifier=indico-celery
     User=indico
-    Group=nginx
+    Group=apache
     Type=simple
 
     [Install]
@@ -273,7 +253,7 @@ Now create a user that will be used to run Indico and switch to it:
 
 .. code-block:: shell
 
-    useradd -rm -g nginx -d /opt/indico -s /bin/bash indico
+    useradd -rm -g apache -d /opt/indico -s /bin/bash indico
     su - indico
 
 
@@ -292,7 +272,7 @@ You are now ready to install Indico:
     instead of ``pip install indico``
 
 
-.. _centos-config:
+.. _centos-apache-config:
 
 8. Configure Indico
 -------------------
@@ -312,11 +292,11 @@ Now finish setting up the directory structure and permissions:
 
 .. code-block:: shell
 
-    mkdir ~/log/nginx
+    mkdir ~/log/apache
     chmod go-rwx ~/* ~/.*
     chmod 710 ~/ ~/archive ~/assets ~/cache ~/log ~/tmp
     chmod 750 ~/web ~/.venv
-    chmod g+w ~/log/nginx
+    chmod g+w ~/log/apache
     restorecon -R ~/
     echo -e "\nStaticFileMethod = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
 
@@ -332,7 +312,7 @@ Finally you can create the database schema and switch back to *root*:
     exit
 
 
-.. _centos-launch:
+.. _centos-apache-launch:
 
 10. Launch Indico
 -----------------
@@ -342,11 +322,11 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service nginx.service indico-celery.service
-    systemctl enable uwsgi.service nginx.service postgresql-9.6.service redis.service indico-celery.service
+    systemctl restart uwsgi.service httpd.service indico-celery.service
+    systemctl enable uwsgi.service httpd.service postgresql-9.6.service redis.service indico-celery.service
 
 
-.. _centos-firewall:
+.. _centos-apache-firewall:
 
 11. Open the Firewall
 ---------------------
@@ -362,7 +342,7 @@ server is rebooted:
     by default
 
 
-.. _centos-user:
+.. _centos-apache-user:
 
 12. Create an Indico user
 -------------------------
