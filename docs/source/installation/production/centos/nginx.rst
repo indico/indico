@@ -123,8 +123,8 @@ most cases.
 
       ssl on;
 
-      ssl_certificate           /etc/ssl/nginx/indico.crt;
-      ssl_certificate_key       /etc/ssl/nginx/indico.key;
+      ssl_certificate           /etc/ssl/indico/indico.crt;
+      ssl_certificate_key       /etc/ssl/indico/indico.key;
       ssl_session_cache         shared:SSL:10m;
       ssl_session_timeout       5m;
       ssl_protocols             TLSv1 TLSv1.1 TLSv1.2;
@@ -179,9 +179,9 @@ permissions on them:
 
 .. code-block:: shell
 
-    mkdir /etc/ssl/nginx
-    chown root:root /etc/ssl/nginx/
-    chmod 700 /etc/ssl/nginx
+    mkdir /etc/ssl/indico
+    chown root:root /etc/ssl/indico/
+    chmod 700 /etc/ssl/indico
 
 If you are just trying out Indico you can simply use a self-signed
 certificate (your browser will show a warning which you will have
@@ -195,14 +195,14 @@ to confirm when accessing your Indico instance for the first time).
 
 .. code-block:: shell
 
-    openssl req -x509 -nodes -newkey rsa:4096 -subj /CN=YOURHOSTNAME -keyout /etc/ssl/nginx/indico.key -out /etc/ssl/nginx/indico.crt
+    openssl req -x509 -nodes -newkey rsa:4096 -subj /CN=YOURHOSTNAME -keyout /etc/ssl/indico/indico.key -out /etc/ssl/indico/indico.crt
 
 
 While a self-signed certificate works for testing, it is not suitable
 for a production system.  You can either buy a certificate from any
 commercial certification authority or get a free one from
 `Let's Encrypt`_. Once you have a proper key/certificate, save them
-as ``/etc/ssl/nginx/indico.key`` and ``/etc/ssl/nginx/indico.crt``.
+as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
 
 
 .. _centos-selinux:
