@@ -7,5 +7,6 @@ CentOS7 / CC7
     :maxdepth: 1
 
     nginx <nginx.rst>
+    Apache <apache.rst>
 
 .. include:: ../_sso_note.rst
