@@ -351,5 +351,47 @@ Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
+Optional: Shibboleth
+--------------------
+
+If your organization uses Shibboleth/SAML-based SSO, follow these steps to use
+it in Indico:
+
+1. Install Shibboleth
+^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: shell
+
+    yum install -y shibboleth shibboleth-selinux xmltooling-schemas opensaml-schemas
+    setsebool httpd_can_network_connect 1
+
+2. Configure Shibboleth
+^^^^^^^^^^^^^^^^^^^^^^^
+
+This is outside the scope of this documentation and depends on your
+environment (Shibboleth, SAML, ADFS, etc).  Please contact whoever
+runs your SSO infrastructure if you need assistance.
+
+3. Enable Shibboleth in Apache
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Add the following code to your ``/etc/httpd/conf.d/indico.conf`` right
+before the ``AliasMatch`` lines:
+
+.. code-block:: apache
+
+    <LocationMatch /Shibboleth\.sso/ADFS|/login/shib-sso/shibboleth>
+        AuthType shibboleth
+        ShibRequestSetting requireSession 1
+        ShibExportAssertion Off
+        Require valid-user
+    </LocationMatch>
+
+
+4. Enable Shibboleth in Indico
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. include:: ../_sso_indico.rst
+
+
 .. _PostgreSQL wiki: https://wiki.postgresql.org/wiki/YUM_Installation#Configure_your_YUM_repository
 .. _Let's Encrypt: https://letsencrypt.org/
