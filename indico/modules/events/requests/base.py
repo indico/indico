@@ -62,6 +62,8 @@ class RequestDefinitionBase(object):
     manager_form = RequestManagerForm
     #: default values to use if there's no existing request
     form_defaults = {}
+    #: can request be modified
+    modifiable = True
 
     @classmethod
     def render_form(cls, event, **kwargs):

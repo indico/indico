@@ -20,6 +20,10 @@ from blinker import Namespace
 
 _signals = Namespace()
 
+registration_modified = _signals.signal('registration_modified', """
+Called when the registration is modified.  The `sender` is the
+registration; the change is passed in the `change` kwarg.
+""")
 
 registration_state_updated = _signals.signal('registration-state-updated', """
 Called when the state of registration changes.  The `sender` is the
@@ -39,4 +43,9 @@ Called when a new registration form is created.  The `sender` is the
 generate_ticket_qr_code = _signals.signal('generate-ticket-qr-code', """
 Called when generating the QR code for a ticket. The data included in the QR code is passed
 in the `ticket_data` kwarg and may be modified.
+""")
+
+registration_form_deleted = _signals.signal('registration-form-deleted', """
+Called when a registration form is removed.  The `sender` is the
+`RegistrationForm` object.
 """)
