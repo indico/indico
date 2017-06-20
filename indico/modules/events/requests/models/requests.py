@@ -143,6 +143,8 @@ class Request(db.Model):
     @property
     def can_be_modified(self):
         """Determines if the request can be modified or if a new one must be sent"""
+        if (self.definition.modifiable is False):
+            return False
         return self.state in {RequestState.pending, RequestState.accepted}
 
     @property

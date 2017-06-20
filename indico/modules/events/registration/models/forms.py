@@ -73,6 +73,7 @@ class RegistrationForm(db.Model):
         db.String,
         nullable=False
     )
+    #: Whether it's the 'Participants' form of a meeting/lecture
     is_participation = db.Column(
         db.Boolean,
         nullable=False,

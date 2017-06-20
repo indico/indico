@@ -238,6 +238,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
 
 def modify_registration(registration, data, management=False, notify_user=True):
     old_price = registration.price
+    change = {}
     with db.session.no_autoflush:
         regform = registration.registration_form
         data_by_field = registration.data_by_field
@@ -265,13 +266,17 @@ def modify_registration(registration, data, management=False, notify_user=True):
             for key, val in attrs.iteritems():
                 setattr(data_by_field[form_item.id], key, val)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-                setattr(registration, form_item.personal_data_type.column, value)
+                key = form_item.personal_data_type.column
+                if getattr(registration, key) != value:
+                    change[key] = value
+                setattr(registration, key, value)
         registration.sync_state()
     db.session.flush()
     # sanity check
     if billable_items_locked and old_price != registration.price:
         raise Exception("There was an error while modifying your registration (price mismatch: %s / %s)",
                         old_price, registration.price)
+    signals.event.registration_modified.send(registration, change=change)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     regform.event_new.log(EventLogRealm.management if management else EventLogRealm.participants,
