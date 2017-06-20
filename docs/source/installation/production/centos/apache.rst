@@ -98,8 +98,6 @@ most cases.
     reload-on-rss = 2048
     evil-reload-on-rss = 8192
     EOF
-    echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
-
 
 
 .. note::
@@ -149,6 +147,13 @@ most cases.
         </Directory>
     </VirtualHost>
     EOF
+
+
+Now enable the uwsgi proxy module in apache:
+
+.. code-block:: shell
+
+    echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
 
 
 .. _centos-apache-ssl:
