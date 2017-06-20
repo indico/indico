@@ -284,12 +284,7 @@ You are now ready to install Indico:
     virtualenv ~/.venv
     source ~/.venv/bin/activate
     pip install -U pip setuptools
-    pip install indico
-
-.. note::
-
-    If you use a custom-built indico wheel, use ``pip install /path/to/indico-*.whl``
-    instead of ``pip install indico``
+    pip install --pre indico
 
 
 .. _centos-config:
