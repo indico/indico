@@ -24,11 +24,11 @@ import yaml
 from flask.helpers import get_root_path
 
 from indico.core import signals
-from indico.core.settings import SettingsProxyBase, ACLProxyBase
+from indico.core.settings import ACLProxyBase, SettingsProxyBase
 from indico.core.settings.converters import DatetimeConverter
 from indico.core.settings.proxy import SettingProperty
-from indico.core.settings.util import get_setting, get_all_settings, get_setting_acl
-from indico.modules.events.models.settings import EventSettingPrincipal, EventSetting
+from indico.core.settings.util import get_all_settings, get_setting, get_setting_acl
+from indico.modules.events.models.settings import EventSetting, EventSettingPrincipal
 from indico.util.caching import memoize
 from indico.util.signals import values_from_signal
 from indico.util.user import iter_acl
@@ -224,12 +224,10 @@ class ThemeSettingsProxy(object):
             core_settings['defaults'].update(settings.get('defaults', {}))
             # Same for definitions - we assume plugin authors are responsible enough
             # to avoid using definition names that are likely to cause collisions.
-            # Either way, if someone does this on purpose changes are good they want
+            # Either way, if someone does this on purpose chances are good they want
             # to override a default style so let them do so...
             for name, definition in settings.get('definitions', {}).viewitems():
                 definition['plugin'] = plugin
-                if definition.get('stylesheet'):
-                    definition['stylesheet'] = definition['stylesheet']
                 core_settings['definitions'][name] = definition
         return core_settings
 
