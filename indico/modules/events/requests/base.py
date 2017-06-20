@@ -16,14 +16,14 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template
 from flask_pluginengine import plugin_context
-from wtforms.fields import TextAreaField, SubmitField
+from wtforms.fields import SubmitField, TextAreaField
 
 from indico.core.db import db
 from indico.modules.events.requests.models.requests import RequestState
-from indico.modules.events.requests.notifications import (notify_new_modified_request, notify_withdrawn_request,
-                                                          notify_accepted_request, notify_rejected_request)
+from indico.modules.events.requests.notifications import (notify_accepted_request, notify_new_modified_request,
+                                                          notify_rejected_request, notify_withdrawn_request)
+from indico.modules.events.requests.views import WPRequestsEventManagement
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.templating import get_overridable_template_name, get_template_module
@@ -64,13 +64,14 @@ class RequestDefinitionBase(object):
     form_defaults = {}
 
     @classmethod
-    def render_form(cls, **kwargs):
+    def render_form(cls, event, **kwargs):
         """Renders the request form
 
+        :param event: the event the request is for
         :param kwargs: arguments passed to the template
         """
         tpl = get_overridable_template_name('event_request_details.html', cls.plugin, 'events/requests/')
-        return render_template(tpl, **kwargs)
+        return WPRequestsEventManagement.render_template(tpl, event, **kwargs)
 
     @classmethod
     def create_form(cls, event, existing_request=None):

@@ -55,7 +55,7 @@ class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
             definitions = {name: def_ for name, def_ in definitions.iteritems() if def_.can_be_managed(session.user)}
             requests = {name: req for name, req in requests.iteritems()
                         if req.definition and req.definition.can_be_managed(session.user)}
-        return WPRequestsEventManagement.render_template('event_requests.html', self._conf, event=self.event_new,
+        return WPRequestsEventManagement.render_template('events/requests/event_requests.html', self.event_new,
                                                          definitions=definitions, requests=requests)
 
 
@@ -96,11 +96,10 @@ class RHRequestsEventRequestDetailsBase(EventOrRequestManagerMixin, RHRequestsEv
         if rv:
             return rv
 
-        form_html = self.definition.render_form(event=self.event_new, definition=self.definition, req=self.request,
-                                                form=self.form, manager_form=self.manager_form,
-                                                is_manager=self.is_manager,
-                                                protection_overridden=self.protection_overridden)
-        return WPRequestsEventManagement.render_string(form_html, self._conf)
+        return self.definition.render_form(event=self.event_new, definition=self.definition, req=self.request,
+                                           form=self.form, manager_form=self.manager_form,
+                                           is_manager=self.is_manager,
+                                           protection_overridden=self.protection_overridden)
 
     def process_form(self):
         raise NotImplementedError

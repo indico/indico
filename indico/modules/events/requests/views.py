@@ -16,16 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPRequestsJinjaMixin(WPJinjaMixin):
-    template_prefix = 'events/requests/'
-
-
-class WPRequestsEventManagement(WPConferenceModifBase, WPRequestsJinjaMixin):
+class WPRequestsEventManagement(WPEventManagement):
     sidemenu_option = 'requests'
-
-    def _getPageContent(self, params):
-        return WPRequestsJinjaMixin._getPageContent(self, params)
