@@ -27,9 +27,7 @@
 }
 
 .i-timeline {
-    @extend .i-box-group;
-    @extend .i-box-group.vert;
-
+    z-index: 0;
     position: relative;
 
     & .i-timeline {

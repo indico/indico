@@ -300,7 +300,7 @@ $dropdown-transition: $dropdown-transition-step ease-out;
 }
 
 .i-radio, .i-checkbox {
-    @extend .flexrow;
+    display: flex;
 
     input {
         flex-shrink: 0;
@@ -321,26 +321,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     color: #af0000;
     font-size: 1.4em;
     top: 0.03em;
-}
-
-.i-select-box {
-    @include border-all();
-    @include border-radius();
-    display: block;
-    height: 2.5em;
-    line-height: 1.5;
-    color: $black;
-    @include transition-property(border-color, box-shadow);
-    @include transition-duration(0.12s, 0.12s);
-    @include transition-timing-function(ease-in-out, ease-in-out);
-    width: 400px;
-    background-color: white;
-    padding: 0.5em 1em 0.5em 0;
-
-    &:-moz-focusring {
-        color: transparent;
-        text-shadow: 0 0 0 #000;
-    }
 }
 
 %tilted-strips-bg {
