@@ -42,7 +42,7 @@ def _localized_time(dt, tz):
 
 
 def inject_week_timetable(event, days, tz_name, tpl='events/timetable/display/_weeks.html'):
-    first_week_day = request.args.get('first_week_day', 'monday')  # monday/sunday/event
+    first_week_day = layout_settings.get(event, 'timetable_theme_settings').get('start_day')
     sunday_first = (first_week_day == 'sunday')
     show_end_times = request.args.get('showEndTimes') == '1'
 

@@ -65,3 +65,15 @@ definitions:
             color: '#ff0000'
           - entry: bar
             color: '#00ffff'
+      start_day:
+        caption: Week start day
+        description: 'First day of weeks view'
+        type: SelectField
+        required: true
+        kwargs:
+          choices:
+            - [event, Event start day]
+            - [monday, Monday]
+            - [sunday, Sunday]
+        defaults:
+            sunday
