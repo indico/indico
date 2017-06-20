@@ -73,6 +73,8 @@ class RHTimetableExportPDF(RHConferenceBaseDisplay):
             form_data = form.data_for_format
             pdf_format = TimetablePDFFormat(form_data)
             if not form.advanced.data:
+                pdf_format.contribsAtConfLevel = True
+                pdf_format.breaksAtConfLevel = True
                 pdf_class = SimplifiedTimeTablePlain
                 additional_params = {}
             else:
