@@ -74,7 +74,7 @@ $default-spacing: 10px;
     padding: 0 4px;
 }
 
-.infoMessage {
+.info-message {
     color: #3A87AD;
     background-color: #D9EDF7;
     padding: 8px 14px 8px 14px;
@@ -87,7 +87,7 @@ $default-spacing: 10px;
     text-align: center;
 }
 
-.errorMessage {
+.error-message {
     color: #A76766;
     background-color: #F2DEDE;
     padding: 8px 14px 8px 14px;
@@ -100,7 +100,7 @@ $default-spacing: 10px;
     text-align: center;
 }
 
-.warningMessage {
+.warning-message {
     color: #BE9056;
     background-color: #FFF3E2;
     padding: 8px 14px 8px 14px;
@@ -113,7 +113,7 @@ $default-spacing: 10px;
     text-align: center;
 }
 
-.successMessage {
+.success-message {
     color: #638864;
     background-color: #DBEED3;
     padding: 8px 14px 8px 14px;

@@ -19,10 +19,10 @@
     form-data="formData.choices">
 </nd-table>
 
-<div ng-if="validationStarted && !hasRadioItems()" class="errorMessage">
+<div ng-if="validationStarted && !hasRadioItems()" class="error-message">
     {{ 'Add at least one item' | i18n }}
 </div>
-<div ng-if="validationStarted && settingsError" class="errorMessage">
+<div ng-if="validationStarted && settingsError" class="error-message">
     {{ "Some fields have errors. Correct them before saving the configuration." | i18n }}
 </div>
 

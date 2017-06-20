@@ -162,7 +162,7 @@
             </span><br /> <!-- PRE-Booking or Booking -->
             <!-- Action result message-->
             % if actionSucceeded:
-              <p class="successMessage">${ title } <br/> ${ description }</p>
+              <p class="success-message">${ title } <br/> ${ description }</p>
             % endif
 
             <!-- Warning for pre-bookings -->

@@ -587,7 +587,7 @@ type ("RoomBookingManyRoomsCalendarDrawer", ["RoomBookingCalendarDrawer"],
                     days.push(self.drawDay(day, highlight));
                 });
 
-                return this.data.days.length != 0 ? Html.div({},days) : Html.div({style:{width:pixels(700), margin: '2em auto'}, className: 'infoMessage'}, $T('No results found in the given period of time.'));
+                return this.data.days.length != 0 ? Html.div({},days) : Html.div({style:{width:pixels(700), margin: '2em auto'}, className: 'info-message'}, $T('No results found in the given period of time.'));
             }
         },
         /**

@@ -31,7 +31,7 @@
                     <tr>
                         <td class="maincell">
                             % if errors:
-                                <p class="errorMessage">${ _("Saving failed.") }<br>${ '<br>'.join(errors) }</p>
+                                <p class="error-message">${ _("Saving failed.") }<br>${ '<br>'.join(errors) }</p>
                             % endif
                             <table width="100%" align="left" border="0">
                                 <!-- WHEN -->
