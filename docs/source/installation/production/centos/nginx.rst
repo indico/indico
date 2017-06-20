@@ -313,7 +313,7 @@ Now finish setting up the directory structure and permissions:
 .. code-block:: shell
 
     mkdir ~/log/nginx
-    chmod go-rwx ~/* ~/.*
+    chmod go-rwx ~/* ~/.[^.]*
     chmod 710 ~/ ~/archive ~/assets ~/cache ~/log ~/tmp
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/nginx
