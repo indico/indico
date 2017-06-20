@@ -1,37 +1,160 @@
-{% from 'events/display/indico/_common.html' import render_users %}
+{% from 'events/display/indico/_common.html' import render_user_data, render_users %}
 
 {% macro _render_contribution(item, count) %}
-    <a class="week-anchor"
-       href="{{ url_for('contributions.display_contribution', item) }}">
-        <span class="main">
-            <span class="title">{{ item.title }}</span>
-            {% set speakers = item.person_links|selectattr("is_speaker")|list %}
-            {% if speakers %}
-                - {{ render_users(speakers, span_class="compact-speakers", separator=' ', title=false) }}
-            {% endif %}
-        </span>
-    </a>
+    <span class="main">
+        <span class="title">{{ item.title }}</span>
+        {% set speakers = item.person_links|selectattr("is_speaker")|list %}
+        {% if speakers %}
+           <span class="dash">-</span> {{ render_users(speakers, span_class="compact-speakers", separator=' ', title=false) }}
+        {% endif %}
+    </span>
+{% endmacro %}
+
+{% macro _render_contrib_list(session) %}
+    <div class="contrib-list">
+        <strong> Contributions</strong>
+        <ul>
+            {% for contrib in session.contributions | sort(attribute='start_dt') %}
+                <li>
+                    <div class="tooltip-contrib">
+                        <span class="time">
+                            {{- contrib.start_dt|format_time(timezone=timezone) -}}
+                        </span>
+                        <span>
+                            <span class="title">{{ contrib.title }}</span>
+                            {% if contrib.speakers %}
+                                -
+                                <span>
+                                    {{ render_users(contrib.speakers, separator=' ', title=false) }}
+                                </span>
+                            {% endif %}
+                        </span>
+                    </div>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
 {% endmacro %}
 
 {% macro _render_tooltip(entry, timezone) %}
     <div class="tooltip hidden">
-        <strong>{{ entry.title }}</strong>
-        <br>
+        {% if entry.object.title %}
+            <span class="title">{{ entry.object.title }}</span>
+        {% endif %}
         {% set speakers = entry.object.person_links|selectattr("is_speaker")|list %}
+        {% if entry.type.name == 'CONTRIBUTION' and entry.object.track %}
+            <span class="track">
+                ({{ entry.object.track.title }})
+            </span>
+        {% endif %}
         {% if entry.type.name == 'CONTRIBUTION' and speakers %}
-             {{ render_users(speakers, span_class="compact-speakers", separator=' ', title=false) }}<br>
+            <ul>
+                {% for link in speakers -%}
+                    <li>{{ render_user_data(link, show_title=false, italic_affiliation=italic_affiliation) }}</li>
+                {% endfor %}
+            </ul>
         {% endif %}
-        {{ entry.start_dt | format_time(timezone=timezone) }} -
-        {{ entry.end_dt | format_time(timezone=timezone) }}
-        {% if entry.room_name %}
-            Room: {{ entry.room_name }}<br>
+        <div class="entry-time">
+            {{- entry.start_dt | format_time(timezone=timezone) }} -
+            {{ entry.end_dt | format_time(timezone=timezone) -}}
+        </div>
+        {% if entry.object.room_name %}
+            <span>Room: {{ entry.object.room_name }}</span>
         {% endif %}
-        {% if entry.object.session %}
-            Session: {{ entry.object.session.title }}<br>
+        {% if entry.type.name == 'CONTRIBUTION' %}
+            <span class="description"> {{ entry.object._description }}</span>
+        {% elif entry.type.name == 'SESSION_BLOCK' %}
+            {% if entry.object.contributions %}
+                {{ _render_contrib_list(entry.object) }}
+            {% endif %}
         {% endif %}
     </div>
 {% endmacro %}
-{% set px_per_5_minutes = 10 %}
+
+{% macro _render_time_slots(start_time, slot_entries, prev_end, hidden_count, short_contrib_count)%}
+    {% for entry, count in slot_entries %}
+        {% set __ = prev_end.append(entry.end_dt.astimezone(tz_object)) %}
+        {% set session = entry.object.session %}
+        {% set __ = hidden_count.append(count) %}
+        {% set classes = ['row'] %}
+        {% if entry.type.name == 'CONTRIBUTION' %}
+            {% set classes = classes + ['contrib'] %}
+        {% elif entry.type.name == 'BREAK' %}
+            {% set classes = classes + ['break'] %}
+        {% endif %}
+
+        {% set has_multi = false %}
+        {% if loop.first %}
+            {% set time_parts = (entry.duration.seconds/60) /5 %}
+            {% set height = (time_parts * px_per_5_minutes) %}
+            {% set min_height = 17 %}
+            {% if short_contrib_count[-1] %}
+                {% set height = height - (min_height - px_per_5_minutes) * short_contrib_count| length %}
+                {% set __ = short_contrib_count.pop() %}
+            {% endif %}
+            {% if height < min_height %}
+                {% set height = min_height %}
+                {% set __ = short_contrib_count.append(1) %}
+            {% endif %}
+            {% set extra_styles = ['height: %dpx'|format(height)] %}
+            {% if slot_entries|length > 1 %}
+                {% set has_multi = true %}
+                {% set classes = classes + ['has-multi', has_multi|string] %}
+            {% endif %}
+            {% set entry_colors = timetable_settings.get('colors') %}
+            {% if entry_colors %}
+                {% if entry.type.name == 'CONTRIBUTION' %}
+                    {% for keyword in entry.contribution.keywords %}
+                        {% for entry_color in entry_colors %}
+                            {% if keyword in entry_color['entry'] %}
+                                {% set __ = extra_styles.append('background-color: %s'|format(entry_color['color']))  %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endfor %}
+                {% elif session %}
+                    {% set __ = extra_styles.append('background-color: #%s'|format(session.background_color))  %}
+                {% endif %}
+            {% endif %}
+        {% else %}
+            {% set classes = classes + ['js-same-time'] %}
+            {% set extra_styles = ['display: none'] %}
+        {% endif %}
+        {% if entry.type.name == 'CONTRIBUTION' %}
+            <a class="week-anchor" href="{{ url_for('contributions.display_contribution', entry.object) }}">
+        {% elif session %}
+            <a class="week-anchor" href="{{  url_for('sessions.display_session', session) }}">
+        {% endif %}
+        <div class="{{ ' '.join(classes) }}" style="{{ '; '.join(extra_styles) }}" data-slot="{{ start_time }}">
+            <span class="time">
+                {{ start_time|format_time(timezone=timezone) if loop.first else '' }}
+                {% if hide_placeholders and show_end_times %}
+                    <span class="end-time">
+                        {{ entry.end_dt | format_time(timezone=timezone) }}
+                    </span>
+                {% endif %}
+            </span>
+            {% if entry.type.name == 'CONTRIBUTION' %}
+                {{ _render_contribution(entry.object) }}
+            {% else %}
+                <span class="main">
+                    <span class="title">{{ entry.object.title }}</span>
+                </span>
+            {% endif %}
+            {{ _render_tooltip(entry, timezone) }}
+            {% if has_multi %}
+                <i class="icon-expand more-contribs"
+                   title="There are {{ slot_entries|length - 1 }} more contributions at this time. Click this icon to show them."
+                   data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'>
+               </i>
+            {% endif %}
+        </div>
+        {% if session or entry.type.name == 'CONTRIBUTION' %}
+            </a>
+        {% endif %}
+    {% endfor %}
+{% endmacro %}
+
+{% set px_per_5_minutes = 5 %}
 {% for week in week_table %}
     <div class="clearfix week-timetable {{ 'no-weekends' if not has_weekends else '' }}">
         <ul>
@@ -71,80 +194,7 @@
                                 </div>
                             {% endif %}
                         {% else %}
-                            {% for entry, count in slot_entries %}
-                                {% set __ = prev_end.append(entry.end_dt.astimezone(tz_object)) %}
-                                {% set session = entry.object.session %}
-                                {% set __ = hidden_count.append(count) %}
-                                {% set classes = ['row', 'contrib' if entry.type.name == 'CONTRIBUTION' else 'break'] %}
-                                {% if session %}
-                                    {% set classes = classes + ['has-session'] %}
-                                {% endif %}
-
-                                {% set has_multi = false %}
-                                {% if loop.first %}
-                                    {% set time_parts = (entry.duration.seconds/60) /5 %}
-                                    {% set height = (time_parts * px_per_5_minutes) %}
-                                    {% if short_contrib_count[-1] %}
-                                        {% set height = height - 7 * short_contrib_count| length %}
-                                        {% set __ = short_contrib_count.pop() %}
-                                    {% endif %}
-                                    {% if time_parts == 1 %}
-                                        {% set height = 17 %}
-                                        {% set __ = short_contrib_count.append(1) %}
-                                    {% endif %}
-                                    {% set extra_styles = ['height: %dpx'|format(height-1)] %}
-                                    {% if slot_entries|length > 1 %}
-                                        {% set has_multi = true %}
-                                        {% set classes = classes + ['has-multi', has_multi|string] %}
-                                    {% endif %}
-                                    {% set entry_colors = timetable_settings.get('colors') %}
-                                    {% if entry_colors %}
-                                        {% if entry.type.name == 'CONTRIBUTION' %}
-                                            {% for keyword in entry.contribution.keywords %}
-                                                {% for entry_color in entry_colors %}
-                                                    {% if keyword in entry_color['entry'] %}
-                                                        {% set __ = extra_styles.append('background-color: %s'|format(entry_color['color']))  %}
-                                                    {% endif %}
-                                                {% endfor %}
-                                            {% endfor %}
-                                        {% endif %}
-                                    {% endif %}
-                                {% else %}
-                                    {% set classes = classes + ['js-same-time'] %}
-                                    {% set extra_styles = ['display: none'] %}
-                                {% endif %}
-                                <div class="{{ ' '.join(classes) }}" style="{{ '; '.join(extra_styles) }}"
-                                     data-slot="{{ start_time }}">
-                                    <span class="time">
-                                        {{ start_time|format_time(timezone=timezone) if loop.first else '' }}
-                                        {% if hide_placeholders and show_end_times %}
-                                            <span class="end-time">
-                                                {{ entry.end_dt | format_time(timezone=timezone) }}
-                                            </span>
-                                        {% endif %}
-                                    </span>
-                                    {% if entry.type.name == 'CONTRIBUTION' %}
-                                        {{ _render_contribution(entry.object) }}
-                                    {% else %}
-                                        <span class="main">
-                                            <span class="title">{{ entry.object.title }}</span>
-                                        </span>
-                                    {% endif %}
-                                    {{ _render_tooltip(entry, timezone) }}
-                                    {% if session %}
-                                        <i class="icon-circle-small session-mark" title="Session: {{ session.title }}"
-                                           data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'
-                                           style="color: #{{ session.background_color }};">
-                                       </i>
-                                    {% endif %}
-                                    {% if has_multi %}
-                                        <i class="icon-expand more-contribs"
-                                           title="There are {{ slot_entries|length - 1 }} more contributions at this time. Click this icon to show them."
-                                           data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'>
-                                       </i>
-                                    {% endif %}
-                                </div>
-                            {% endfor %}
+                            {{ _render_time_slots(start_time, slot_entries, prev_end, hidden_count, short_contrib_count) }}
                         {% endif %}
                     {% endfor %}
                 </li>
@@ -186,5 +236,23 @@
         style: {
             classes: 'informational'
         }
+    });
+
+    $(window).on('load', function() {
+        $('.row.contrib, .row.break').each(function() {
+            var $this = $(this);
+            var $main = $this.find('.main');
+            var $title = $main.find('.title');
+            var $speakers = $this.find('.compact-speakers');
+
+            if ($main.outerHeight() > $this.height() && ($main.outerHeight() - parseInt($main.css('line-height'), 10)) > 1) {
+                $speakers.hide();
+                $this.find('.dash').hide();
+            }
+
+            while ($main.outerHeight() > $this.height() && ($main.outerHeight() - parseInt($main.css('line-height'), 10)) > 1) {
+                $title.html($title.text().slice(0, -5) + '&#8230;');
+            }
+        });
     });
 </script>

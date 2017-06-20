@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/palette";
+@import "base/defaults";
+@import "base/borders";
 @import "compass";
 
 .event-info-header {
@@ -134,7 +137,7 @@
 
 .week-timetable .row .time {
     position: absolute;
-    background: #ddd;
+    background: rgba(0,0,0,0.3);
     color: #000;
     width: 35px;
     height: 100%;
@@ -169,14 +172,7 @@
     padding-right: 29px;
 }
 
-.week-timetable .row.contrib .time {
-    background: #5D95EA;
-    color: white;
-    font-weight: bold;
-}
-
-.week-timetable .row.break .time {
-    background: #999;
+.week-timetable .row .time {
     color: white;
     font-weight: bold;
 }
@@ -204,4 +200,56 @@
 
 .week-anchor {
     color: black !important;
+}
+
+.qtip-content {
+    display: inline-block;
+    padding: 10px;
+    box-sizing: border-box;
+
+    span {
+        line-height: 1.1em;
+    }
+
+    .title {
+        width: 100%;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .entry-time {
+        margin: 0.5em 0 0.5em 0;
+    }
+
+    .description {
+        font-size: 0.8em;
+    }
+
+    .contrib-list {
+        width: 100%;
+        text-align: left;
+        ul {
+            padding-left: 0 !important;
+        }
+
+        strong {
+            @include border-bottom($dark-gray);
+            width: 100%;
+            display: block;
+            margin-top: 0.5em
+        }
+
+        .tooltip-contrib {
+            display: inline-flex;
+            justify-content: space-between;
+            .time {
+                height: 100%;
+                margin-right: 5px;
+            }
+
+            .title {
+                width: auto;
+            }
+        }
+    }
 }
