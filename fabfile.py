@@ -102,7 +102,7 @@ def pyenv_cmd(cmd, **kwargs):
 
 
 def grunt(args):
-    cmd = 'grunt' if not env.system_node else os.path.join(env.src_dir, 'node_modules/.bin/grunt')
+    cmd = os.path.join(env.src_dir, 'node_modules/.bin/grunt')
     local('{} {}'.format(cmd, args))
 
 
