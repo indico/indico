@@ -84,23 +84,31 @@ of the installation guides.
 
 On a **Debian/Ubuntu** system:
 
- * :ref:`deb-pkg`
- * :ref:`deb-db`
- * :ref:`deb-web`
- * :ref:`deb-ssl`
- * :ref:`deb-install`
- * :ref:`deb-config`
+=========================  =========================
+nginx                      Apache
+-------------------------  -------------------------
+:ref:`deb-pkg`             :ref:`deb-apache-pkg`
+:ref:`deb-db`              :ref:`deb-apache-db`
+:ref:`deb-web`             :ref:`deb-apache-web`
+:ref:`deb-ssl`             :ref:`deb-apache-ssl`
+:ref:`deb-install`         :ref:`deb-apache-install`
+:ref:`deb-config`          :ref:`deb-apache-config`
+=========================  =========================
 
 On a **CentOS7-based system**:
 
- * :ref:`centos-epel`
- * :ref:`centos-pkg`
- * :ref:`centos-db`
- * :ref:`centos-web`
- * :ref:`centos-ssl`
- * :ref:`centos-selinux`
- * :ref:`centos-install`
- * :ref:`centos-config`
+============================  ============================
+nginx                         Apache
+----------------------------  ----------------------------
+:ref:`centos-epel`            :ref:`centos-apache-epel`
+:ref:`centos-pkg`             :ref:`centos-apache-pkg`
+:ref:`centos-db`              :ref:`centos-apache-db`
+:ref:`centos-web`             :ref:`centos-apache-web`
+:ref:`centos-ssl`             :ref:`centos-apache-ssl`
+:ref:`centos-selinux`         :ref:`centos-apache-selinux`
+:ref:`centos-install`         :ref:`centos-apache-install`
+:ref:`centos-config`          :ref:`centos-apache-config`
+============================  ============================
 
 
 Configuration Wizard
@@ -204,15 +212,23 @@ You can now proceed with the remaining migration steps:
 
 On a **Debian/Ubuntu** system:
 
- * :ref:`deb-launch`
- * :ref:`deb-user`
+========================  ========================
+nginx                     Apache
+------------------------  ------------------------
+:ref:`deb-launch`         :ref:`deb-apache-launch`
+:ref:`deb-user`           :ref:`deb-apache-user`
+========================  ========================
 
 
 On a **CentOS7-based system**:
 
- * :ref:`centos-launch`
- * :ref:`centos-firewall`
- * :ref:`centos-user`
+=============================  =============================
+nginx                          Apache
+-----------------------------  -----------------------------
+:ref:`centos-launch`           :ref:`centos-apache-launch`
+:ref:`centos-firewall`         :ref:`centos-apache-firewall`
+:ref:`centos-user`             :ref:`centos-apache-user`
+=============================  =============================
 
 
 Removing old data
