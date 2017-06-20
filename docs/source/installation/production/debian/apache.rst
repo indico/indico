@@ -1,43 +1,38 @@
 Apache
 ======
 
-.. _centos-apache-epel:
+.. _deb-apache-pkg:
 
-1. Enable EPEL
---------------
-
-.. code-block:: shell
-
-    yum install -y epel-release
-
-.. note::
-
-    If you use CC7, EPEL is already enabled and this step is not necessary
-
-
-.. _centos-apache-pkg:
-
-2. Install Packages
+1. Install Packages
 -------------------
 
-Edit ``/etc/yum.repos.d/CentOS-Base.repo`` and add ``exclude=postgresql*``
-to the ``[base]`` and ``[updates]`` sections, as described in the
-`PostgreSQL wiki`_.
+PostgreSQL is installed from its upstream repos to get a much more recent version.
 
 .. code-block:: shell
 
-    yum install -y https://download.postgresql.org/pub/repos/yum/9.6/redhat/rhel-7-x86_64/pgdg-centos96-9.6-3.noarch.rpm
-    yum install -y postgresql96 postgresql96-server postgresql96-libs postgresql96-devel postgresql96-contrib
-    yum install -y httpd mod_proxy_uwsgi mod_ssl mod_xsendfile
-    yum install -y gcc redis uwsgi uwsgi-plugin-python
-    yum install -y python-devel python-virtualenv libjpeg-turbo-devel libxslt-devel libxml2-devel libffi-devel pcre-devel libyaml-devel
-    /usr/pgsql-9.6/bin/postgresql96-setup initdb
-    systemctl start postgresql-9.6.service redis.service
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
+    apt update
+    apt install -y postgresql-9.6 libpq-dev apache2 libapache2-mod-proxy-uwsgi libapache2-mod-xsendfile python-dev python-virtualenv libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev build-essential redis-server uwsgi uwsgi-plugin-python
 
 
-.. _centos-apache-db:
+If you use Debian, run this command:
 
-3. Create a Database
+.. code-block:: shell
+
+    apt install -y libjpeg62-turbo-dev
+
+
+If you use Ubuntu, run this instead:
+
+.. code-block:: shell
+
+    apt install -y libjpeg-turbo8-dev zlib1g-dev
+
+
+.. _deb-apache-db:
+
+2. Create a Database
 --------------------
 
 We create a user and database for indico and enable the necessary
@@ -55,9 +50,9 @@ Postgres extensions (which can only be done by the Postgres superuser)
     backups once you start using Indico in production!
 
 
-.. _centos-apache-web:
+.. _deb-apache-web:
 
-4. Configure uWSGI & Apache
+3. Configure uWSGI & Apache
 ---------------------------
 
 The default uWSGI and Apache configuration files should work fine in
@@ -65,11 +60,11 @@ most cases.
 
 .. code-block:: shell
 
-    cat > /etc/uwsgi.ini <<'EOF'
+    ln -s /etc/uwsgi/apps-available/indico.ini /etc/uwsgi/apps-enabled/indico.ini
+    cat > /etc/uwsgi/apps-available/indico.ini <<'EOF'
     [uwsgi]
     uid = indico
-    gid = apache
-    pidfile = /run/uwsgi/uwsgi.pid
+    gid = www-data
 
     processes = 4
     enable-threads = false
@@ -98,8 +93,6 @@ most cases.
     reload-on-rss = 2048
     evil-reload-on-rss = 8192
     EOF
-    echo 'LoadModule proxy_uwsgi_module modules/mod_proxy_uwsgi.so' > /etc/httpd/conf.modules.d/proxy_uwsgi.conf
-
 
 
 .. note::
@@ -110,7 +103,7 @@ most cases.
 
 .. code-block:: shell
 
-    cat > /etc/httpd/conf.d/indico.conf <<'EOF'
+    cat > /etc/apache2/sites-available/indico.conf <<'EOF'
     <VirtualHost *:80>
         ServerName YOURHOSTNAME
         RewriteEngine On
@@ -151,9 +144,17 @@ most cases.
     EOF
 
 
-.. _centos-apache-ssl:
+Now enable the necessary modules and the indico site in apache:
 
-5. Create an SSL Certificate
+.. code-block:: shell
+
+    a2enmod proxy_uwsgi rewrite ssl xsendfile
+    a2ensite indico
+
+
+.. _deb-apache-ssl:
+
+4. Create an SSL Certificate
 ----------------------------
 
 First, create the folders for the certificate/key and set restrictive
@@ -187,43 +188,9 @@ commercial certification authority or get a free one from
 as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
 
 
-.. _centos-apache-selinux:
+.. _deb-apache-install:
 
-6. Configure SELinux
---------------------
-
-Indico works fine with SELinux enabled, but you need to load a custom
-SELinux module to tell SELinux about Indico's files and how they
-should be handled.
-
-.. code-block:: shell
-
-    cat > /tmp/indico.cil <<'EOF'
-    ; define custom type that logrotate can access
-    (type indico_log_t)
-    (typeattributeset file_type (indico_log_t))
-    (typeattributeset logfile (indico_log_t))
-    (roletype object_r indico_log_t)
-
-    ; allow logrotate to reload systemd services
-    (allow logrotate_t init_t (service (start)))
-    (allow logrotate_t policykit_t (dbus (send_msg)))
-    (allow policykit_t logrotate_t (dbus (send_msg)))
-
-    ; make sure the uwsgi socket is writable by the webserver
-    (typetransition unconfined_service_t usr_t sock_file "uwsgi.sock" httpd_sys_rw_content_t)
-    (filecon "/opt/indico/web/uwsgi\.sock" socket (system_u object_r httpd_sys_rw_content_t ((s0)(s0))))
-
-    ; set proper types for our log dirs
-    (filecon "/opt/indico/log(/.*)?" any (system_u object_r indico_log_t ((s0)(s0))))
-    (filecon "/opt/indico/log/apache(/.*)?" any (system_u object_r httpd_log_t ((s0)(s0))))
-    EOF
-    semodule -i /tmp/indico.cil
-
-
-.. _centos-apache-install:
-
-7. Install Indico
+5. Install Indico
 -----------------
 
 Celery runs as a background daemon. Add a systemd unit file for it:
@@ -240,7 +207,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Restart=always
     SyslogIdentifier=indico-celery
     User=indico
-    Group=apache
+    Group=www-data
     Type=simple
 
     [Install]
@@ -253,7 +220,7 @@ Now create a user that will be used to run Indico and switch to it:
 
 .. code-block:: shell
 
-    useradd -rm -g apache -d /opt/indico -s /bin/bash indico
+    useradd -rm -g www-data -d /opt/indico -s /bin/bash indico
     su - indico
 
 
@@ -272,9 +239,9 @@ You are now ready to install Indico:
     instead of ``pip install indico``
 
 
-.. _centos-apache-config:
+.. _deb-apache-config:
 
-8. Configure Indico
+6. Configure Indico
 -------------------
 
 Once Indico is installed, you can run the configuration wizard.  You can
@@ -297,14 +264,13 @@ Now finish setting up the directory structure and permissions:
     chmod 710 ~/ ~/archive ~/assets ~/cache ~/log ~/tmp
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/apache
-    restorecon -R ~/
     echo -e "\nStaticFileMethod = 'xsendfile'" >> ~/etc/indico.conf
 
 
-9. Create database schema
+7. Create database schema
 -------------------------
 
-Finally you can create the database schema and switch back to *root*:
+Finally, you can create the database schema and switch back to *root*:
 
 .. code-block:: shell
 
@@ -312,40 +278,24 @@ Finally you can create the database schema and switch back to *root*:
     exit
 
 
-.. _centos-apache-launch:
+.. _deb-apache-launch:
 
-10. Launch Indico
------------------
+8. Launch Indico
+----------------
 
 You can now start Indico and set it up to start automatically when the
 server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service httpd.service indico-celery.service
-    systemctl enable uwsgi.service httpd.service postgresql-9.6.service redis.service indico-celery.service
+    systemctl restart uwsgi.service apache2.service indico-celery.service
+    systemctl enable uwsgi.service apache2.service postgresql.service redis-server.service indico-celery.service
 
 
-.. _centos-apache-firewall:
+.. _deb-apache-user:
 
-11. Open the Firewall
----------------------
-
-.. code-block:: shell
-
-    firewall-cmd --permanent --add-port 443/tcp --add-port 80/tcp
-    firewall-cmd --reload
-
-.. note::
-
-    This is only needed if you use CC7 as CentOS7 has no firewall enabled
-    by default
-
-
-.. _centos-apache-user:
-
-12. Create an Indico user
--------------------------
+9. Create an Indico user
+------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
