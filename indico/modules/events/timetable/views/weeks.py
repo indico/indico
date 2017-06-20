@@ -24,17 +24,12 @@ from flask import render_template, request
 from pytz import timezone
 
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.util.date_time import iterdays
 
 
 def _flatten_timetable(entries):
     for entry in entries:
-        if entry.type == TimetableEntryType.SESSION_BLOCK:
-            for sub_entry in entry.children:
-                yield sub_entry
-        else:
-            yield entry
+        yield entry
 
 
 def _localized_time(dt, tz):
@@ -58,7 +53,6 @@ def inject_week_timetable(event, days, tz_name, tpl='events/timetable/display/_w
         week_start = 6 if sunday_first else 0
         if first_day.weekday() != week_start:
             first_day -= timedelta(days=first_day.weekday()) + timedelta(days=int(has_weekends and sunday_first))
-
     week_table_shallow = []
     skipped_days = 0
     for i, dt in enumerate(iterdays(first_day, last_day)):
