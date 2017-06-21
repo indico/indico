@@ -248,6 +248,14 @@ td, th {
         vertical-align: middle;
     }
 
+    tr:first-child td {
+        border-top: 0;
+    }
+
+    th {
+        @include border-bottom();
+    }
+
     .col-50 {
         width: 50%;
     }
