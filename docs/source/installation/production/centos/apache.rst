@@ -102,30 +102,32 @@ most cases.
 
 .. note::
 
-    Replace ``YOURHOSTNAME`` in the next file with the hostname on which
+    Replace ``YOURHOSTNAME`` in the next files with the hostname on which
     your Indico instance should be available, e.g. ``indico.yourdomain.com``
 
 
 .. code-block:: shell
 
-    cat > /etc/httpd/conf.d/indico.conf <<'EOF'
+    cat > /etc/httpd/conf.d/indico-sslredir.conf <<'EOF'
     <VirtualHost *:80>
         ServerName YOURHOSTNAME
         RewriteEngine On
         RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
     </VirtualHost>
+    EOF
 
-
+    cat > /etc/httpd/conf.d/indico.conf <<'EOF'
     <VirtualHost *:443>
         ServerName YOURHOSTNAME
         DocumentRoot "/var/empty/apache"
 
-        SSLEngine             on
-        SSLCertificateFile    /etc/ssl/indico/indico.crt
-        SSLCertificateKeyFile /etc/ssl/indico/indico.key
-        SSLProtocol           all -SSLv2 -SSLv3
-        SSLCipherSuite        ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
-        SSLHonorCipherOrder   on
+        SSLEngine               on
+        SSLCertificateFile      /etc/ssl/indico/indico.crt
+        SSLCertificateChainFile /etc/ssl/indico/indico.crt
+        SSLCertificateKeyFile   /etc/ssl/indico/indico.key
+        SSLProtocol             all -SSLv2 -SSLv3
+        SSLCipherSuite          ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:ECDHE-ECDSA-AES128-SHA:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA:ECDHE-ECDSA-AES256-SHA384:ECDHE-ECDSA-AES256-SHA:ECDHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA256:DHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES256-SHA:ECDHE-ECDSA-DES-CBC3-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA256:AES256-GCM-SHA384:AES128-SHA256:AES256-SHA256:AES128-SHA:AES256-SHA:DES-CBC3-SHA:!DSS
+        SSLHonorCipherOrder     on
 
         XSendFile on
         XSendFilePath /opt/indico
@@ -188,8 +190,15 @@ to confirm when accessing your Indico instance for the first time).
 While a self-signed certificate works for testing, it is not suitable
 for a production system.  You can either buy a certificate from any
 commercial certification authority or get a free one from
-`Let's Encrypt`_. Once you have a proper key/certificate, save them
-as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
+`Let's Encrypt`_.
+
+
+.. note::
+
+    There's an optional step later in this guide to get a certificate
+    from Let's Encrypt. We can't do it right now since the Apache
+    config references a directory yet to be created, which prevents
+    Apache from starting.
 
 
 .. _centos-apache-selinux:
@@ -342,9 +351,28 @@ server is rebooted:
     by default
 
 
+.. _centos-apache-letsencrypt:
+
+12. Optional: Get a Certificate from Let's Encrypt
+--------------------------------------------------
+
+To avoid ugly SSL warnings in your browsers, the easiest option is to
+get a free certificate from Let's Encrypt. We also enable the cronjob
+to renew it automatically:
+
+
+.. code-block:: shell
+
+    yum install -y python-certbot-apache
+    certbot --apache --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -rf /etc/ssl/indico
+    systemctl start certbot-renew.timer
+    systemctl enable certbot-renew.timer
+
+
 .. _centos-apache-user:
 
-12. Create an Indico user
+13. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps

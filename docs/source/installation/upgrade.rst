@@ -208,27 +208,29 @@ reflect the new path:
 Finishing up
 ++++++++++++
 
-You can now proceed with the remaining migration steps:
+You can now proceed with the remaining installation steps:
 
 On a **Debian/Ubuntu** system:
-
-========================  ========================
-nginx                     Apache
-------------------------  ------------------------
-:ref:`deb-launch`         :ref:`deb-apache-launch`
-:ref:`deb-user`           :ref:`deb-apache-user`
-========================  ========================
-
-
-On a **CentOS7-based system**:
 
 =============================  =============================
 nginx                          Apache
 -----------------------------  -----------------------------
-:ref:`centos-launch`           :ref:`centos-apache-launch`
-:ref:`centos-firewall`         :ref:`centos-apache-firewall`
-:ref:`centos-user`             :ref:`centos-apache-user`
+:ref:`deb-launch`              :ref:`deb-apache-launch`
+:ref:`deb-letsencrypt`         :ref:`deb-apache-letsencrypt`
+:ref:`deb-user`                :ref:`deb-apache-user`
 =============================  =============================
+
+
+On a **CentOS7-based system**:
+
+================================  ================================
+nginx                             Apache
+--------------------------------  --------------------------------
+:ref:`centos-launch`              :ref:`centos-apache-launch`
+:ref:`centos-firewall`            :ref:`centos-apache-firewall`
+:ref:`centos-letsencrypt`         :ref:`centos-apache-letsencrypt`
+:ref:`centos-user`                :ref:`centos-apache-user`
+================================  ================================
 
 
 Removing old data

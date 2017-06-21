@@ -97,20 +97,21 @@ most cases.
 
 .. note::
 
-    Replace ``YOURHOSTNAME`` in the next file with the hostname on which
+    Replace ``YOURHOSTNAME`` in the next files with the hostname on which
     your Indico instance should be available, e.g. ``indico.yourdomain.com``
 
 
 .. code-block:: shell
 
-    cat > /etc/apache2/sites-available/indico.conf <<'EOF'
+    cat > /etc/apache2/sites-available/indico-sslredir.conf <<'EOF'
     <VirtualHost *:80>
         ServerName YOURHOSTNAME
         RewriteEngine On
         RewriteRule ^(.*)$ https://%{HTTP_HOST}$1 [R=301,L]
     </VirtualHost>
+    EOF
 
-
+    cat > /etc/apache2/sites-available/indico.conf <<'EOF'
     <VirtualHost *:443>
         ServerName YOURHOSTNAME
         DocumentRoot "/var/empty/apache"
@@ -149,7 +150,8 @@ Now enable the necessary modules and the indico site in apache:
 .. code-block:: shell
 
     a2enmod proxy_uwsgi rewrite ssl xsendfile
-    a2ensite indico
+    a2dissite 000-default
+    a2ensite indico indico-sslredir
 
 
 .. _deb-apache-ssl:
@@ -184,8 +186,15 @@ to confirm when accessing your Indico instance for the first time).
 While a self-signed certificate works for testing, it is not suitable
 for a production system.  You can either buy a certificate from any
 commercial certification authority or get a free one from
-`Let's Encrypt`_. Once you have a proper key/certificate, save them
-as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
+`Let's Encrypt`_.
+
+
+.. note::
+
+    There's an optional step later in this guide to get a certificate
+    from Let's Encrypt. We can't do it right now since the Apache
+    config references a directory yet to be created, which prevents
+    Apache from starting.
 
 
 .. _deb-apache-install:
@@ -287,10 +296,45 @@ server is rebooted:
     systemctl enable uwsgi.service apache2.service postgresql.service redis-server.service indico-celery.service
 
 
+.. _deb-apache-letsencrypt:
+
+9. Optional: Get a Certificate from Let's Encrypt
+-------------------------------------------------
+
+.. note::
+
+    You need to use at least Debian 9 (Stretch) to use certbot.
+    If you are still using Debian 8 (Jessie), consider updating
+    or install certbot from backports.
+
+
+If you use Ubuntu, install the certbot PPA:
+
+.. code-block:: shell
+
+    apt install -y software-properties-common
+    add-apt-repository -y ppa:certbot/certbot
+    apt update
+
+
+To avoid ugly SSL warnings in your browsers, the easiest option is to
+get a free certificate from Let's Encrypt. We also enable the cronjob
+to renew it automatically:
+
+
+.. code-block:: shell
+
+    apt install -y python-certbot-apache
+    certbot --apache --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -rf /etc/ssl/indico
+    systemctl start certbot.timer
+    systemctl enable certbot.timer
+
+
 .. _deb-apache-user:
 
-9. Create an Indico user
-------------------------
+10. Create an Indico user
+-------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.

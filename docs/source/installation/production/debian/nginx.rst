@@ -202,8 +202,15 @@ to confirm when accessing your Indico instance for the first time).
 While a self-signed certificate works for testing, it is not suitable
 for a production system.  You can either buy a certificate from any
 commercial certification authority or get a free one from
-`Let's Encrypt`_. Once you have a proper key/certificate, save them
-as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
+`Let's Encrypt`_.
+
+
+.. note::
+
+    There's an optional step later in this guide to get a certificate
+    from Let's Encrypt. We can't do it right now since the nginx
+    config references a directory yet to be created, which prevents
+    nginx from starting.
 
 
 .. _deb-install:
@@ -305,10 +312,45 @@ server is rebooted:
     systemctl enable uwsgi.service nginx.service postgresql.service redis-server.service indico-celery.service
 
 
+.. _deb-letsencrypt:
+
+9. Optional: Get a Certificate from Let's Encrypt
+-------------------------------------------------
+
+.. note::
+
+    You need to use at least Debian 9 (Stretch) to use certbot.
+    If you are still using Debian 8 (Jessie), consider updating
+    or install certbot from backports.
+
+
+If you use Ubuntu, install the certbot PPA:
+
+.. code-block:: shell
+
+    apt install -y software-properties-common
+    add-apt-repository -y ppa:certbot/certbot
+    apt update
+
+
+To avoid ugly SSL warnings in your browsers, the easiest option is to
+get a free certificate from Let's Encrypt. We also enable the cronjob
+to renew it automatically:
+
+
+.. code-block:: shell
+
+    apt install -y python-certbot-nginx
+    certbot --nginx --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -rf /etc/ssl/indico
+    systemctl start certbot.timer
+    systemctl enable certbot.timer
+
+
 .. _deb-user:
 
-9. Create an Indico user
-------------------------
+10. Create an Indico user
+-------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
