@@ -287,11 +287,6 @@
     }
 }
 
-// TODO: remove this once Undo is working fine again
-.icon-undo {
-    display: none !important;
-}
-
 .bottomTip {
     @include border-all();
     @include border-radius();
