@@ -442,6 +442,13 @@ $i-box-padding: 10px;
     }
 
     &.content-after {
+        margin-top: -$i-box-padding;
+        margin-bottom: $i-box-padding;
+
+        > li:first-child {
+            border-top: none;
+        }
+
         > li:last-child {
             @include border-bottom();
         }
