@@ -360,10 +360,26 @@ it in Indico:
 1. Install Shibboleth
 ^^^^^^^^^^^^^^^^^^^^^
 
+Add the Shibboleth yum repository:
+
+.. note::
+
+    If you use CC7, Shibboleth is already available and there is no
+    need to add the repo manually.
+
+
 .. code-block:: shell
 
-    yum install -y shibboleth shibboleth-selinux xmltooling-schemas opensaml-schemas
+    curl -fsSL -o /etc/yum.repos.d/shibboleth.repo 'https://shibboleth.net/cgi-bin/sp_repo.cgi?platform=CentOS_7'
+
+
+Now install Shibboleth itself.  When prompted to accept the GPG key
+of the Shibboleth yum repo, confirm the prompt.
+
+.. code-block:: shell
+
     setsebool httpd_can_network_connect 1
+    yum install -y shibboleth xmltooling-schemas opensaml-schemas
 
 2. Configure Shibboleth
 ^^^^^^^^^^^^^^^^^^^^^^^
