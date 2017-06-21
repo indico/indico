@@ -203,8 +203,15 @@ to confirm when accessing your Indico instance for the first time).
 While a self-signed certificate works for testing, it is not suitable
 for a production system.  You can either buy a certificate from any
 commercial certification authority or get a free one from
-`Let's Encrypt`_. Once you have a proper key/certificate, save them
-as ``/etc/ssl/indico/indico.key`` and ``/etc/ssl/indico/indico.crt``.
+`Let's Encrypt`_.
+
+
+.. note::
+
+    There's an optional step later in this guide to get a certificate
+    from Let's Encrypt. We can't do it right now since the nginx
+    config references a directory yet to be created, which prevents
+    nginx from starting.
 
 
 .. _centos-selinux:
@@ -357,9 +364,28 @@ server is rebooted:
     by default
 
 
+.. _centos-letsencrypt:
+
+12. Optional: Get a Certificate from Let's Encrypt
+--------------------------------------------------
+
+To avoid ugly SSL warnings in your browsers, the easiest option is to
+get a free certificate from Let's Encrypt. We also enable the cronjob
+to renew it automatically:
+
+
+.. code-block:: shell
+
+    yum install -y python-certbot-nginx
+    certbot --nginx --rsa-key-size 4096 --no-redirect --staple-ocsp -d YOURHOSTNAME
+    rm -rf /etc/ssl/indico
+    systemctl start certbot-renew.timer
+    systemctl enable certbot-renew.timer
+
+
 .. _centos-user:
 
-12. Create an Indico user
+13. Create an Indico user
 -------------------------
 
 Access ``https://YOURHOSTNAME`` in your browser and follow the steps
