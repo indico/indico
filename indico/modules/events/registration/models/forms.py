@@ -331,6 +331,10 @@ class RegistrationForm(db.Model):
         return [x for x in self.form_items if x.is_section]
 
     @property
+    def disabled_sections(self):
+        return [x for x in self.sections if not x.is_visible and not x.is_deleted]
+
+    @property
     def limit_reached(self):
         return self.registration_limit and len(self.active_registrations) >= self.registration_limit
 

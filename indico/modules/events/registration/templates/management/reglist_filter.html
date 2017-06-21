@@ -35,9 +35,9 @@
 {% macro _render_regform_item_col_selector(section) %}
     <h3>{{ section.title }}</h3>
     <div class="flexrow f-wrap">
-        {% for child_item in section.children if child_item.is_field and not child_item.is_deleted %}
-            {% set filter_choices = child_item.field_impl.filter_choices %}
-            {{ _render_column_selector(child_item.id, child_item, filter_choices) }}
+        {% for field in section.active_fields %}
+            {% set filter_choices = field.field_impl.filter_choices %}
+            {{ _render_column_selector(field.id, field, filter_choices) }}
         {% endfor %}
     </div>
 {% endmacro %}
@@ -85,9 +85,22 @@
         {% endfor %}
     </div>
 
-    {% for section in regform.sections if not section.is_deleted %}
+    {% for section in regform.sections if section.is_visible and section.active_fields %}
         {{ _render_regform_item_col_selector(section) }}
     {% endfor %}
+
+    {% set disabled_sections = regform.disabled_sections|selectattr('active_fields')|list %}
+    {% if disabled_sections %}
+        <h1 class="disabled-caption">
+            {%- trans %}Disabled sections{% endtrans -%}
+            <a class="button icon-next js-toggle-disabled" title="Click to show/hide disabled sections"></a>
+        </h1>
+        <div class="disabled-sections">
+            {% for section in disabled_sections %}
+                {{ _render_regform_item_col_selector(section) }}
+            {% endfor %}
+        </div>
+    {% endif %}
 
     <div class="bottom-buttons">
         <input class="i-button big highlight" type="submit" data-disabled-until-change
@@ -96,5 +109,18 @@
     </div>
 </form>
 <script>
-    setupListFilter();
+    (function() {
+        'use strict';
+
+        setupListFilter();
+
+        $('.js-toggle-disabled').on('click', function() {
+            var $this = $(this);
+            $('.disabled-sections').slideToggle({
+                start: function() {
+                    $this.toggleClass('icon-next icon-expand');
+                }
+            });
+        });
+    })();
 </script>
