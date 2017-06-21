@@ -15,16 +15,16 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import pkg_resources
 from copy import copy
 from importlib import import_module
 
+import pkg_resources
 from flask import g
-from flask_sqlalchemy import Model, BaseQuery, Pagination
+from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import inspect, orm
-from sqlalchemy.event import listens_for, listen
+from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import joinedload, contains_eager
+from sqlalchemy.orm import contains_eager, joinedload
 from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
@@ -420,10 +420,3 @@ def override_attr(attr_name, parent_name, fget=None):
         return getattr(cls, own_attr_name)
 
     return hybrid_property(_get, _set, expr=_expr)
-
-
-def get_model_by_table_name(table_name):
-    """Get the model class based on the name of the table"""
-    from indico.core.db import db
-    return next((x for x in db.Model._decl_class_registry.itervalues()
-                 if hasattr(x, '__table__') and x.__table__.fullname == 'events.events'), None)
