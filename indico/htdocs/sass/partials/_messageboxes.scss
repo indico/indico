@@ -57,7 +57,7 @@ $default-spacing: 10px;
     .message-box-footer {
         @include single-box-shadow($light-gray, 0, $default-spacing, $default-spacing, -$default-spacing, inset);
         flex: 1 100%;
-        margin: $default-spacing -$default-spacing -$default-spacing -$default-spacing;
+        margin: $default-spacing -#{$default-spacing} -#{$default-spacing} -#{$default-spacing};
         padding: $default-spacing;
     }
 }
