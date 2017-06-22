@@ -58,3 +58,11 @@
         }
     }
 }
+
+.dropup-menu {
+    @include icon-after('icon-arrow-down');
+
+    &:after {
+        @include rotate(-180deg);
+    }
+}

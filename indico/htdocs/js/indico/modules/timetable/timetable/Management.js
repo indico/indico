@@ -21,10 +21,10 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
         draw: function() {
             var self = this;
             var lastSort = 'id';
-            var selectAll = Html.span('fakeLink', $T('All'));
-            var selectNone = Html.span('fakeLink', $T('None'));
-            var sortById = Html.span({className: 'fakeLink', id: 'sortById', style: {fontWeight: 'bold'}}, $T('ID'));
-            var sortByTitle = Html.span({className: 'fakeLink', id: 'sortByTitle'}, $T('Title'));
+            var selectAll = Html.span('fake-link', $T('All'));
+            var selectNone = Html.span('fake-link', $T('None'));
+            var sortById = Html.span({className: 'fake-link', id: 'sortById', style: {fontWeight: 'bold'}}, $T('ID'));
+            var sortByTitle = Html.span({className: 'fake-link', id: 'sortByTitle'}, $T('Title'));
             var toolbar =  Html.div({className: 'toolbar', style: {margin: pixels(3)}},
                                     $T('Sort by: '), sortById, ', ', sortByTitle, ' ',
                                     $T('Select: '), selectAll, ', ', selectNone
@@ -761,7 +761,7 @@ type("SessionSectionPopupMenu", ["SectionPopupMenu"],
                 colorSquare = Html.div({style:{backgroundColor: color, color: color, cssFloat: 'right', width: '15px', height:'15px'}});
             }
 
-            var link = Html.a({className:'fakeLink', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(title));
+            var link = Html.a({className:'fake-link', style:{display: 'inline', padding: 0, paddingLeft: '4px', paddingRight: '4px'}}, Util.truncate(title));
             var divInput = Html.div({style:{height:'20px', overflow:'auto'}}, colorSquare, link);
 
             if(typeof value == "string" ) {

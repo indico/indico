@@ -63,7 +63,7 @@ type("ExportIcalInterface", [], {
                 self._showAuthLink();
             }else{
                 question = question || $T("Would you like to export private information to your calendar?");
-                var privateInfo = $("<span class='fakeLink'>"+question+"</span>");
+                var privateInfo = $("<span class='fake-link'>"+question+"</span>");
 
                 $('#authLinkWrapper'+self.id).append(privateInfo).show();
 

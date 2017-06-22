@@ -474,10 +474,10 @@ type("SelectableDynamicListWidgetBase", ["SelectableListWidget"],
 
             var progressSpan = Html.div({id: 'sdlw-progress'}, self.progress);
             var loadMore = Html.span({
-                className: 'fakeLink'},
+                className: 'fake-link'},
                 $T("See " + self.getInterval() + " results more"));
             var loadAll = Html.span({
-                className: 'fakeLink'},
+                className: 'fake-link'},
                 $T("See all"));
 
             loadMore.observeClick(function(evt) {

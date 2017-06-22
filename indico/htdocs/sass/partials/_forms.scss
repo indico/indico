@@ -36,6 +36,10 @@ $i-form-button-line-height: 1.8;
     height: $i-form-height;
 }
 
+form {
+    margin: 0;
+}
+
 .i-form-field-fixed-width {
     width: 400px;
 }

@@ -311,7 +311,7 @@
                                                     % if loop.first:
                                                         <td>
                                                             <span onclick="addNonBookablePeriod()">
-                                                                <a class="fakeLink">${ _('add period') }</a>
+                                                                <a class="fake-link">${ _('add period') }</a>
                                                             </span>
                                                         </td>
                                                     % endif
@@ -336,7 +336,7 @@
                                                         <td>
                                                             ${ contextHelp('dailyBookablePeriodsCH') }
                                                             <span onclick="addDailyBookablePeriod()">
-                                                                <a class="fakeLink">${ _('add period') }</a>
+                                                                <a class="fake-link">${ _('add period') }</a>
                                                             </span>
                                                         </td>
                                                     % endif

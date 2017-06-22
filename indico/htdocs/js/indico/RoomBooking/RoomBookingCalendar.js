@@ -755,7 +755,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     var rejectionLink;
                     // XXX is this still used?
                     if (bar.canReject){
-                        rejectionLink = Html.p({className:"fakeLink"},$T("Reject"));
+                        rejectionLink = Html.p({className:"fake-link"},$T("Reject"));
                         rejectionLink.observeClick(function() {
                             var textArea = Html.textarea({rows:4, cols:40});
                             var popup = new ConfirmPopup($T("Rejecting a booking"),
@@ -849,7 +849,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     var contentLoaded = false;
                     var showContent = false;
                     var arrowDown = Html.img({src:imageSrc("menu_arrow_black"), style:{display:"inline"}});
-                    var toggleSummary = Html.span({className:"fakeLink", style:{paddingRight:pixels(2)}},
+                    var toggleSummary = Html.span({className:"fake-link", style:{paddingRight:pixels(2)}},
                             $T("Display room booking summary "));
                     toggleSummary.observeClick(function(){
                         if(!contentLoaded) {
@@ -873,7 +873,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     var rejectAllDiv = null;
                     // XXX I'm pretty sure this it no used anymore
                     if (this.rejectAllLink) {
-                        rejectAllDiv = Html.div({className:"fakeLink", style:{width:pixels(800), textAlign:"center", paddingBottom:pixels(10)}},
+                        rejectAllDiv = Html.div({className:"fake-link", style:{width:pixels(800), textAlign:"center", paddingBottom:pixels(10)}},
                                 $T("Reject ALL Conflicting PRE-Bookings"));
                         rejectAllDiv.observeClick( function(){
                             new ConfirmPopup($T("Reject ALL Conflicting PRE-Bookings"),

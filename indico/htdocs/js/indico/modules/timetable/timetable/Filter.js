@@ -195,11 +195,11 @@ type("TimeTableFilter", ["IWidget"], {
         this.tableRow = Html.tr();
         content.append(Html.table({cellPadding: 0, cellSpacing: 1, border: 0}, Html.tbody({}, this.tableRow)));
 
-        var sessionsLink = Html.span('dropUpMenu fakeLink', $T('Sessions'));
+        var sessionsLink = Html.span('i-button borderless dropup-menu', $T('Sessions'));
         var sessionsMenu = new TimetableFilterList('session', self.timetableDrawer, [sessionsLink], $T('No sessions in the timetable'));
         this.setUpFilterMenu(sessionsLink, sessionsMenu);
 
-        var roomsLink = Html.span('dropUpMenu fakeLink', $T('Rooms'));
+        var roomsLink = Html.span('i-button borderless dropup-menu', $T('Rooms'));
         var roomsMenu = new TimetableFilterList('room', self.timetableDrawer, [roomsLink], $T('No rooms found in the timetable'));
         this.setUpFilterMenu(roomsLink, roomsMenu);
 

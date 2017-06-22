@@ -99,7 +99,7 @@ type("PopupMenu", ["ChainedPopupWidget"],
         _processItem: function(pair) {
             var self = this;
             var value = pair.get();
-            var link = Html.a('fakeLink', value.display);
+            var link = Html.a('fake-link', value.display);
             link.setAttribute("id", pair.key);
             link.setAttribute("title", value.description);
 

@@ -55,12 +55,21 @@
     font-size: 13px;
 }
 
+html,
+body {
+    height: 100%;
+}
+
 body {
     @extend %font-family-body;
     @extend %font-size-body;
     background: #fff;
     padding: 0px;
     margin: 0px;
+}
+
+h1, h2, h3, h4, h5, h6, td, dl, ol, blockquote {
+    color: $black;
 }
 
 h1 {
@@ -90,6 +99,14 @@ sub {
     top: 0.4em;
 }
 
+pre {
+   white-space: pre-wrap;       /* css-3 */
+   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+   white-space: -o-pre-wrap;    /* Opera 7 */
+   word-wrap: break-word;       /* Internet Explorer 5.5+ */
+   margin: 0px;
+}
+
 /* Elements */
 
 .page-title {
@@ -111,7 +128,6 @@ sub {
         vertical-align: middle;
     }
 }
-
 
 .groupTitle, .groupTitleNoBorder, .groupSubTitle {
    display: block;
@@ -281,7 +297,7 @@ a.small-link {
     font-size: 11px;
 }
 
-.mono {
+.mono, code {
   @extend %font-family-monospace;
 }
 

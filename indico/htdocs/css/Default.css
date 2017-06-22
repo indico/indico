@@ -35,75 +35,8 @@
     margin-top: 18px;
 }
 
-body, html {
-    height: 100%;
-}
-
-br,dl,h1,h2,h3,h4,h5,h6,td,blockquote,ol {
-   color: #444444;
-}
-br,dl,td,blockquote,ol {
-   font-size: 13px;
-}
-
-form {
-    margin: 0;
-}
-
 label.disabled{
     color: gray;
-}
-
-code {
-   font-family: monospace;
-}
-
-pre {
-   white-space: pre-wrap;       /* css-3 */
-   white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
-   white-space: -o-pre-wrap;    /* Opera 7 */
-   word-wrap: break-word;       /* Internet Explorer 5.5+ */
-   margin: 0px;
-}
-
-/*
-    .fakeLink is used on elements that should look
-    like links but are not real links. For example
-    activating javascript code
-*/
-
-.fakeLink {
-   text-decoration: none;
-   color: #0b63a5;
-}
-
-a.fakeLink span.infoBubble{
-    display: None;
-    margin-top: -7px;
-    visibility: hidden;
-}
-
-a.fakeLink:hover span.infoBubble{
-    display: inline;
-    position: absolute;
-    left: 102%;
-    background: white;
-    color: #777;
-    font-weight: normal;
-    font-style: normal;
-    font-size: 12px;
-    padding: 3px;
-    border: 1px solid #0b63a5;
-    border-left: 4px solid #0b63a5;
-    /*height: 150px; /* to decide the max */
-}
-
-a:active {
-   color: #E25300;
-}
-.fakeLink:hover {
-   color: #E25300;
-   cursor: pointer;
 }
 
 @media print {
@@ -113,28 +46,6 @@ a:active {
     .print {
         visibility: visible;
     }
-}
-
-.dropDownMenu, .dropDownMenuGrey, .dropUpMenu, .dropDownMenuWhite {
-    padding-right: 17px;
-    background: transparent url(/images/menu_arrow_black.png) scroll no-repeat center right;
-    cursor: pointer;
-}
-.dropDownMenuGrey {
-    background-image: url(/images/menu_arrow_grey.png);
-}
-
-.dropDownMenuWhite {
-    background-image: url(/images/menu_arrow_white.png);
-}
-
-.dropUpMenu {
-    background: transparent url(/images/menu_arrow_up_black.png) scroll no-repeat center right;
-}
-
-
-.separator {
-   font-weight: bold;
 }
 
 .subtitle {
