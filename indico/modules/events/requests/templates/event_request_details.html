@@ -76,7 +76,7 @@
     {% endif %}
 
     {% call form_footer(form) %}
-        <input class="i-button big highlight" type="submit" value="
+        <input id="send-request" class="i-button big highlight" type="submit" data-disabled-until-change value="
             {%- if not req -%}
                 {%- trans -%}Send request{%- endtrans -%}
             {%- elif req.can_be_modified -%}
