@@ -23,7 +23,7 @@ from requests.exceptions import HTTPError, RequestException, Timeout
 from werkzeug.urls import url_join
 
 from indico.core.config import Config
-from indico.modules.cephalopod import logger, cephalopod_settings
+from indico.modules.cephalopod import cephalopod_settings, logger
 from indico.modules.core.settings import core_settings
 
 
@@ -74,7 +74,8 @@ def register_instance(contact, email):
 def unregister_instance():
     payload = {'enabled': False}
     url = url_join(_get_url(), cephalopod_settings.get('uuid'))
-    response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT)
+    response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
+                              verify=(not Config.getInstance().getDebug()))
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -106,7 +107,8 @@ def sync_instance(contact, email):
                'email': email,
                'organisation': core_settings.get('site_organization')}
     url = url_join(_get_url(), cephalopod_settings.get('uuid'))
-    response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT)
+    response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
+                              verify=(not Config.getInstance().getDebug()))
     try:
         response.raise_for_status()
     except HTTPError as err:
