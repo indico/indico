@@ -64,9 +64,12 @@
                 });
 
             if (condition.required) {
-                $select.prepend($('<option disabled selected>', {
-                    value: ''
-                }).text($T.gettext('Select an option')));
+                var $opt = $('<option>', {
+                    value: '',
+                    text: $T.gettext('Select an option')
+                });
+                $select.prepend($opt).val('');
+                $opt.prop('disabled', true);
             }
 
             var $html = $('<div>', {

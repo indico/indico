@@ -20,7 +20,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
      {
         draw: function() {
             var self = this;
-            var lastSort = 'id';
+            var lastSort = 'friendly_id';
             var selectAll = Html.span('fake-link', $T('All'));
             var selectNone = Html.span('fake-link', $T('None'));
             var sortById = Html.span({className: 'fake-link', id: 'sortById', style: {fontWeight: 'bold'}}, $T('ID'));
@@ -31,8 +31,8 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
                                    );
 
             sortById.observeClick(function(){
-                self._sortList('id', lastSort == 'id');
-                lastSort = 'id';
+                self._sortList('friendly_id', lastSort == 'friendly_id');
+                lastSort = 'friendly_id';
             });
 
             sortByTitle.observeClick(function(){
@@ -60,7 +60,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              }).join(", ");
              var selected = false;
 
-             var id = Html.em({'data-id': elem.get('id'), style: {paddingLeft: "5px", fontSize: '0.9em'}},
+             var id = Html.em({'data-id': elem.get('friendly_id'), style: {paddingLeft: "5px", fontSize: '0.9em'}},
                               elem.get('friendly_id'));
              return Html.div({}, id, " - ", elem.get('title') + ( speakers ? (' (' + speakers + ')') : ''));
          },
@@ -70,7 +70,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              var selected = _(this.getSelectedList().getAll()).map(function(item){return item.get('id');});
              var initial = _(self.getAll());
 
-             $('#sortById').css('font-weight', (type == 'id') ? 'bold' : '');
+             $('#sortById').css('font-weight', (type == 'friendly_id') ? 'bold' : '');
              $('#sortByTitle').css('font-weight', (type == 'title') ? 'bold' : '');
 
              var sorted = initial.chain().map(function(value, key) {
@@ -95,8 +95,10 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
              self.clear();
 
              // Add sorted items
+             var counter = 0;
              sorted.each(function(item) {
-                 self.set(item.key, initial.value()[item.key]);
+                 self.set(counter + '', initial.value()[item.key]);
+                 counter++;
              });
 
              // Reselect items
@@ -132,7 +134,7 @@ type("UnscheduledContributionList", ["SelectableListWidget"],
          each(existing, function(item, index) {
              self.set(index, $O(item));
          });
-         this._sortList('id');
+         this._sortList('friendly_id');
      }
     );
 

@@ -160,7 +160,7 @@ class RHSendSurveyLinks(RHManageSurveyBase):
 
     def _process(self):
         tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event_new)
-        form = InvitationForm(body=tpl.get_html_body(), subject=tpl.get_subject())
+        form = InvitationForm(body=tpl.get_html_body(), subject=tpl.get_subject(), event=self.event_new)
         if form.validate_on_submit():
             self._send_emails(form, form.recipients.data)
             num = len(form.recipients.data)

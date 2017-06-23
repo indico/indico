@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, request
+from flask import request
 from wtforms.fields import StringField, TextAreaField, SelectField, HiddenField, BooleanField
 from wtforms.validators import DataRequired
 
@@ -41,10 +41,9 @@ class EmailEventPersonsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         register_link = kwargs.pop('register_link')
+        event = kwargs.pop('event')
         super(EmailEventPersonsForm, self).__init__(*args, **kwargs)
-        from_addresses = ['{} <{}>'.format(session.user.full_name, email)
-                          for email in sorted(session.user.all_emails, key=lambda x: x != session.user.email)]
-        self.from_address.choices = zip(from_addresses, from_addresses)
+        self.from_address.choices = event.get_allowed_sender_emails().items()
         self.body.description = render_placeholder_info('event-persons-email', event=None, person=None,
                                                         register_link=register_link)
 

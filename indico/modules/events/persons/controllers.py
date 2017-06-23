@@ -178,7 +178,7 @@ class RHEmailEventPersons(RHManageEventBase):
             disabled_until_change = True
         form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
                                      recipients=[x.email for x in recipients], body=tpl.get_html_body(),
-                                     subject=tpl.get_subject(), register_link=self.no_account)
+                                     subject=tpl.get_subject(), register_link=self.no_account, event=self.event_new)
         if form.validate_on_submit():
             self._send_emails(form, recipients)
             num = len(recipients)
