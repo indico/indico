@@ -102,6 +102,11 @@
             > * {
                 @extend %attachment-line;
             }
+
+            i {
+                float: none;
+                display: inline-block;
+            }
         }
         &:not(.sub-tree) {
             > td {
