@@ -43,7 +43,7 @@ class RHSettings(RHAdminBase):
                 'contact': cephalopod_settings.get('contact_name'),
                 'email': cephalopod_settings.get('contact_email'),
                 'url': Config.getInstance().getBaseURL(),
-                'organisation': core_settings.get('site_organization')}
+                'organization': core_settings.get('site_organization')}
         return url, data
 
     def _process(self):

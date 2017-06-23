@@ -39,7 +39,7 @@ def register_instance(contact, email):
     payload = {'url': Config.getInstance().getBaseURL(),
                'contact': contact,
                'email': email,
-               'organisation': core_settings.get('site_organization')}
+               'organization': core_settings.get('site_organization')}
     response = requests.post(_get_url(), data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
                              verify=(not Config.getInstance().getDebug()))
     try:
@@ -105,7 +105,7 @@ def sync_instance(contact, email):
                'url': Config.getInstance().getBaseURL(),
                'contact': contact,
                'email': email,
-               'organisation': core_settings.get('site_organization')}
+               'organization': core_settings.get('site_organization')}
     url = url_join(_get_url(), cephalopod_settings.get('uuid'))
     response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
                               verify=(not Config.getInstance().getDebug()))
