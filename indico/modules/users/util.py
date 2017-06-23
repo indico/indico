@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import itemgetter
 
-from sqlalchemy.orm import undefer, load_only, joinedload, contains_eager
+from sqlalchemy.orm import contains_eager, joinedload, load_only, undefer
 
 from indico.core import signals
 from indico.core.auth import multipass
@@ -35,6 +35,7 @@ from indico.modules.users.models.emails import UserEmail
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.util.event import truncate_path
 from indico.util.string import crc32
+
 
 # colors for user-specific avatar bubbles
 user_colors = ['#e06055', '#ff8a65', '#e91e63', '#f06292', '#673ab7', '#ba68c8', '#7986cb', '#3f51b5', '#5e97f6',
@@ -209,9 +210,9 @@ def search_users(exact=False, include_deleted=False, include_pending=False, exte
     if not include_deleted:
         query = query.filter(~User.is_deleted)
 
-    organisation = criteria.pop('affiliation', unspecified)
-    if organisation is not unspecified:
-        query = query.join(UserAffiliation).filter(unaccent_match(UserAffiliation.name, organisation, exact))
+    affiliation = criteria.pop('affiliation', unspecified)
+    if affiliation is not unspecified:
+        query = query.join(UserAffiliation).filter(unaccent_match(UserAffiliation.name, affiliation, exact))
 
     email = criteria.pop('email', unspecified)
     if email is not unspecified:

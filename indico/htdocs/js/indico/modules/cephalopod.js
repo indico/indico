@@ -100,7 +100,7 @@ function initCephalopdOnSettingsPage(cephalopodUrl) {
         'contact'     : $('#contact_name').val(),
         'email'       : $('#contact_email').val(),
         'url'         : $('#server-url').html(),
-        'organisation': $('#affiliation').html()
+        'organization': $('#affiliation').html()
     }, true).done(function onSuccess(synced) {
         if (synced) {
             defer.resolve({

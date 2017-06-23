@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, BooleanField
+from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.util.i18n import _
@@ -29,7 +29,7 @@ class SettingsForm(IndicoForm):
     # Core settings
     core_site_title = StringField(_('Title'), [DataRequired()], description=_("The global title of this Indico site."))
     core_site_organization = StringField(_('Organization'),
-                                         description=_("The organisation that runs this Indico site."))
+                                         description=_("The organization that runs this Indico site."))
 
     # Social settings
     social_enabled = BooleanField(_('Enabled'), widget=SwitchWidget())
