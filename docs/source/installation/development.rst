@@ -1,3 +1,5 @@
+.. _install-dev:
+
 Installation guide (development)
 ===============================
 
