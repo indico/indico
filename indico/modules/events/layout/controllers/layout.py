@@ -40,8 +40,8 @@ from indico.util.i18n import _
 from indico.util.string import crc32, to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.forms import fields as indico_fields
+from indico.web.forms.base import FormDefaults, IndicoForm
 from indico.web.util import jsonify_data, _pop_injected_js
 
 

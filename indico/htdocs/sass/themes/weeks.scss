@@ -137,7 +137,7 @@
 
 .week-timetable .row .time {
     position: absolute;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0, 0, 0, 0.3);
     color: #000;
     width: 35px;
     height: 100%;
@@ -182,7 +182,7 @@
     position: absolute;
     right: 0;
     display: inline-block;
-    margin: 1px 5px 0 0;
+    padding: 1px 5px 0 5px;
 }
 
 .week-timetable .row .session-mark + .more-contribs {
@@ -228,6 +228,7 @@
     .contrib-list {
         width: 100%;
         text-align: left;
+
         ul {
             padding-left: 0 !important;
         }
@@ -242,6 +243,7 @@
         .tooltip-contrib {
             display: inline-flex;
             justify-content: space-between;
+            
             .time {
                 height: 100%;
                 margin-right: 5px;
