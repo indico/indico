@@ -14,13 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import os
 from contextlib import contextmanager
 from uuid import uuid4
 
-from flask import Flask, Blueprint, request
+from flask import Blueprint, Flask, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
 from flask.wrappers import Request
@@ -53,7 +53,7 @@ class IndicoRequest(Request):
         This basically `full_path` but without the ugly trailing
         questionmark if there is no query string.
         """
-        return self.full_path.rstrip(u'?')
+        return self.full_path.rstrip('?')
 
     @cached_property
     def remote_addr(self):

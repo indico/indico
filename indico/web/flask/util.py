@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
@@ -22,15 +22,14 @@ import re
 import time
 from importlib import import_module
 
-from flask import Blueprint, g, redirect, request
-from flask import current_app as app
-from flask import url_for as _url_for
 from flask import send_file as _send_file
+from flask import url_for as _url_for
+from flask import Blueprint, current_app, g, redirect, request
 from flask.helpers import get_root_path
-from werkzeug.wrappers import Response as WerkzeugResponse
-from werkzeug.datastructures import Headers, FileStorage
+from werkzeug.datastructures import FileStorage, Headers
 from werkzeug.exceptions import NotFound
-from werkzeug.routing import BaseConverter, UnicodeConverter, BuildError
+from werkzeug.routing import BaseConverter, BuildError, UnicodeConverter
+from werkzeug.wrappers import Response as WerkzeugResponse
 
 from indico.util.caching import memoize
 from indico.util.fs import secure_filename
@@ -175,7 +174,7 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
             target = _url_for('%s.%s' % (getattr(blueprint, 'name', blueprint), endpoint), **view_args)
         except BuildError:
             raise NotFound
-        return redirect(target, 302 if app.debug else 301)
+        return redirect(target, 302 if current_app.debug else 301)
     return _redirect
 
 
@@ -280,7 +279,7 @@ def url_rule_to_js(endpoint):
                 'converters': dict((key, type(converter).__name__)
                                    for key, converter in rule._converters.iteritems()
                                    if type(converter) is not UnicodeConverter)
-            } for rule in app.url_map.iter_rules(endpoint)
+            } for rule in current_app.url_map.iter_rules(endpoint)
         ]
     }
 
@@ -346,7 +345,7 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         rv = _send_file(path_or_fd, mimetype=mimetype, as_attachment=not inline, attachment_filename=name,
                         conditional=conditional)
     except IOError:
-        if not app.debug:
+        if not current_app.debug:
             raise
         raise NotFound('File not found: %s' % path_or_fd)
     if safe:
@@ -431,7 +430,7 @@ class ResponseUtil(object):
         if self.call:
             raise Exception('Cannot use make_response when a callable is set')
 
-        if isinstance(res, (app.response_class, WerkzeugResponse, tuple)):
+        if isinstance(res, (current_app.response_class, WerkzeugResponse, tuple)):
             if self.modified:
                 # If we receive a response - most likely one created by send_file - we do not allow any
                 # external modifications.
@@ -445,7 +444,7 @@ class ResponseUtil(object):
         if not res and not self.modified:
             return ''
 
-        res = app.make_response((res, self.status, self.headers))
+        res = current_app.make_response((res, self.status, self.headers))
         if self.content_type:
             res.content_type = self.content_type
         return res

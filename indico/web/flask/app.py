@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import re
 import traceback
@@ -27,7 +27,7 @@ from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.exceptions import NotFound, BadRequest
+from werkzeug.exceptions import BadRequest, NotFound
 from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
@@ -42,28 +42,28 @@ from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
-from indico.core.plugins import plugin_engine, include_plugin_css_assets, include_plugin_js_assets, url_for_plugin
+from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
+from indico.legacy.webinterface.pages.error import render_error
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
 from indico.util import date_time as date_time_util
-from indico.util.i18n import gettext_context, ngettext_context, babel, get_current_locale, _
+from indico.util.i18n import _, babel, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum, crc32, slugify
-from indico.web.assets import (core_env, register_all_css, register_all_js, register_theme_sass,
-                               include_js_assets, include_css_assets)
-from indico.web.flask.stats import setup_request_stats, get_request_stats
-from indico.web.flask.templating import (EnsureUnicodeExtension, underline, markdown, dedent, natsort, instanceof,
-                                         subclassof, call_template_hook, groupby, strip_tags)
-from indico.web.flask.util import (XAccelMiddleware, make_compat_blueprint, ListConverter, url_for, url_rule_to_js,
-                                   IndicoConfigWrapper, discover_blueprints)
+from indico.web.assets import (core_env, include_css_assets, include_js_assets, register_all_css, register_all_js,
+                               register_theme_sass)
+from indico.web.flask.stats import get_request_stats, setup_request_stats
+from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
+                                         markdown, natsort, strip_tags, subclassof, underline)
+from indico.web.flask.util import (IndicoConfigWrapper, ListConverter, XAccelMiddleware, discover_blueprints,
+                                   make_compat_blueprint, url_for, url_rule_to_js)
 from indico.web.flask.wrappers import IndicoFlask
-from indico.web.forms.jinja_helpers import is_single_line_field, render_field, iter_form_fields
+from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
 from indico.web.views import render_session_bar
-from indico.legacy.webinterface.pages.error import render_error
 
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
@@ -124,7 +124,7 @@ def configure_multipass(app):
     app.config['MULTIPASS_LOGIN_ENDPOINT'] = 'auth.login'
     app.config['MULTIPASS_LOGIN_URLS'] = None  # registered in a blueprint
     app.config['MULTIPASS_SUCCESS_ENDPOINT'] = 'categories.display'
-    app.config['MULTIPASS_FAILURE_MESSAGE'] = _(u'Login failed: {error}')
+    app.config['MULTIPASS_FAILURE_MESSAGE'] = _('Login failed: {error}')
 
 
 def configure_multipass_local(app):

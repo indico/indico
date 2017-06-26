@@ -14,24 +14,24 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import cPickle
 import uuid
 from datetime import datetime, timedelta
 
-from flask import request, flash
+from flask import flash, request
 from flask.sessions import SessionInterface, SessionMixin
 from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
 from indico.core.config import Config
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.modules.users import User
 from indico.util.decorators import cached_writable_property
 from indico.util.i18n import _, set_best_lang
-from indico.legacy.common.cache import GenericCache
-from indico.legacy.common.timezoneUtils import DisplayTZ
 
 
 class BaseSession(CallbackDict, SessionMixin):
@@ -69,11 +69,10 @@ class IndicoSession(BaseSession):
             if not request.is_xhr and request.blueprint != 'assets':
                 self.clear()
                 if merged_into_user:
-                    msg = _(u'Your profile has been merged into <strong>{}</strong>. '
-                            u'Please log in using that profile.')
+                    msg = _('Your profile has been merged into <strong>{}</strong>. Please log in using that profile.')
                     flash(Markup(msg).format(merged_into_user.full_name), 'warning')
                 else:
-                    flash(_(u'Your profile has been deleted.'), 'error')
+                    flash(_('Your profile has been deleted.'), 'error')
         return user
 
     @user.setter

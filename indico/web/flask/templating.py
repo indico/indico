@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import functools
 import itertools
 import posixpath
@@ -25,22 +27,22 @@ from flask import current_app
 from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
 from jinja2.ext import Extension
-from jinja2.filters import make_attrgetter, _GroupTuple
+from jinja2.filters import _GroupTuple, make_attrgetter
 from jinja2.lexer import Token
-from jinja2.loaders import split_template_path, BaseLoader, FileSystemLoader, TemplateNotFound
+from jinja2.loaders import BaseLoader, FileSystemLoader, TemplateNotFound, split_template_path
 from jinja2.utils import internalcode
 from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import values_from_signal
-from indico.util.string import render_markdown, natural_sort_key
+from indico.util.string import natural_sort_key, render_markdown
 
 
 indentation_re = re.compile(r'^ +', re.MULTILINE)
 
 
 def underline(s, sep='-'):
-    return u'{0}\n{1}'.format(s, sep * len(s))
+    return '{0}\n{1}'.format(s, sep * len(s))
 
 
 def markdown(value):
@@ -90,7 +92,7 @@ def groupby(environment, value, attribute, reverse=False):
 
 def strip_tags(value):
     """Strips provided text of html tags"""
-    return bleach.clean(value, tags=[], strip=True).strip() if u'<' in value else value
+    return bleach.clean(value, tags=[], strip=True).strip() if '<' in value else value
 
 
 def instanceof(value, type_):
@@ -195,7 +197,7 @@ def call_template_hook(*name, **kwargs):
     if as_list:
         return [x[1] for x in values]
     else:
-        return Markup(u'\n').join(x[1] for x in values) if values else u''
+        return Markup('\n').join(x[1] for x in values) if values else ''
 
 
 class CustomizationLoader(BaseLoader):
