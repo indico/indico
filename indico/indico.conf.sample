@@ -45,13 +45,6 @@ SQLAlchemyDatabaseURI  = 'postgresql://localhost/indico'
 
 SanitizationLevel    = 2
 
-# Possible values of CSRFLevel:
-#    0: Disable all CSRF checks (DANGEROUS!)
-#    1: Check CSRF token for service requests
-#    2: Check CSRF token for service requests and cookie-based API requests
-#    3: The above & require an empty or valid referer for normal POST requests
-CSRFLevel = 2
-
 # To sign data such as activation tokens used in emails, Indico needs a secret
 # key.  It should be a random string; the preferred way to generate it is using
 # `import os; os.urandom(32)` in a Python shell.

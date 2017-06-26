@@ -44,8 +44,8 @@ from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
-from indico.legacy.errors import (AccessError, BadRefererError, KeyAccessError, MaKaCError, ModificationError,
-                                  NotLoggedError, NotFoundError)
+from indico.legacy.errors import (AccessError, KeyAccessError, MaKaCError, ModificationError, NotLoggedError,
+                                  NotFoundError)
 from indico.legacy.webinterface.pages.error import render_error
 from indico.legacy.webinterface.pages.errors import (WPGenericError, WPUnexpectedError, WPAccessError, WPKeyAccessError,
                                                      WPModificationError, WPFormValuesError, WPNoReportError,
@@ -309,18 +309,6 @@ class RH(RequestHandlerBase):
             msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
                     u"button, reload the page and try again.")
             raise BadRequest(msg)
-        # legacy csrf check (referer-based):
-        # Check referer for POST requests. We do it here so we can properly use indico's error handling
-        if Config.getInstance().getCSRFLevel() < 3 or request.method != 'POST':
-            return
-        referer = request.referrer
-        # allow empty - otherwise we might lock out paranoid users blocking referers
-        if not referer:
-            return
-        # valid http referer
-        if referer.startswith(Config.getInstance().getBaseURL()):
-            return
-        raise BadRefererError('This operation is not allowed from an external referer.')
 
     def _check_event_feature(self):
         from indico.modules.events.features.util import require_feature

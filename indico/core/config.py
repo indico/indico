@@ -220,7 +220,6 @@ class Config:
         'SQLAlchemyPoolRecycle'     : 120,
         'SQLAlchemyMaxOverflow'     : 3,
         'SanitizationLevel'         : 1,
-        'CSRFLevel'                 : 2,
         'BaseURL'                   : 'http://localhost',
         'LogDir'                    : "/opt/indico/log" ,
         'TempDir'                   : "/opt/indico/tmp",
@@ -386,9 +385,6 @@ class Config:
 
         if self.getSanitizationLevel() not in range(4):
             raise MaKaCError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
-
-        if self.getCSRFLevel() not in range(4):
-            raise MaKaCError("Invalid CSRFLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['CSRFLevel']))
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
             raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')

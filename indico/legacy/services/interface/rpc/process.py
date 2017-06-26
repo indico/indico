@@ -56,13 +56,12 @@ def lookupHandler(method):
     return handler
 
 
-def processRequest(method, params, internal=False):
+def processRequest(method, params):
     # lookup handler
     handler = lookupHandler(method)
 
-    if not internal and Config.getInstance().getCSRFLevel() >= 1:
-        if session.csrf_protected and session.csrf_token != request.headers.get('X-CSRF-Token'):
-            raise CSRFError()
+    if session.csrf_protected and session.csrf_token != request.headers.get('X-CSRF-Token'):
+        raise CSRFError()
 
     # invoke handler
     if hasattr(handler, 'process'):

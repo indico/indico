@@ -206,10 +206,9 @@ def handler(prefix, path):
                     cacheKey = 'signed_' + cacheKey
         else:
             # We authenticated using a session cookie.
-            if Config.getInstance().getCSRFLevel() >= 2:
-                token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
-                if used_session.csrf_protected and used_session.csrf_token != token:
-                    raise HTTPAPIError('Invalid CSRF token', 403)
+            token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
+            if used_session.csrf_protected and used_session.csrf_token != token:
+                raise HTTPAPIError('Invalid CSRF token', 403)
             aw = AccessWrapper()
             if not onlyPublic:
                 aw.setUser(used_session.avatar)

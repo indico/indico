@@ -119,7 +119,3 @@ class NotFoundError(MaKaCError):
 
 class HtmlForbiddenTag(NoReportError):
     pass
-
-
-class BadRefererError(MaKaCError):
-    pass
