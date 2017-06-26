@@ -56,7 +56,7 @@ definitions:
         kwargs:
           fields:
             - id: entry
-              caption: Entry type
+              caption: Keyword
             - id: color
               caption: Colour
           unique_field: entry
@@ -76,4 +76,4 @@ definitions:
             - [monday, Monday]
             - [sunday, Sunday]
         defaults:
-            sunday
+            monday

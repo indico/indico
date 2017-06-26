@@ -12,7 +12,7 @@
 
 {% macro _render_contrib_list(session) %}
     <div class="contrib-list">
-        <strong> Contributions</strong>
+        <strong>{% trans %}Contributions{% endtrans %}</strong>
         <ul>
             {% for contrib in session.contributions | sort(attribute='start_dt') %}
                 <li>
@@ -71,6 +71,33 @@
     </div>
 {% endmacro %}
 
+{% macro _render_entry(entry, start_time, classes, extra_styles, has_multi, slot_entries, loop) %}
+    <div class="{{ ' '.join(classes) }}" style="{{ '; '.join(extra_styles) }}" data-slot="{{ start_time }}">
+        <span class="time">
+            {{ start_time|format_time(timezone=timezone) if loop.first else '' }}
+            {% if hide_placeholders and show_end_times %}
+                <span class="end-time">
+                    {{ entry.end_dt | format_time(timezone=timezone) }}
+                </span>
+            {% endif %}
+        </span>
+        {% if entry.type.name == 'CONTRIBUTION' %}
+            {{ _render_contribution(entry.object) }}
+        {% else %}
+            <span class="main">
+                <span class="title">{{ entry.object.title }}</span>
+            </span>
+        {% endif %}
+        {{ _render_tooltip(entry, timezone) }}
+        {% if has_multi and entry.type.name == 'CONTRIBUTION' %}
+            <i class="icon-expand more-contribs"
+               title="{{ _('There are {0} more contributions at this time. Click this icon to show them.'.format(slot_entries|length - 1)) }}"
+               data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'>
+           </i>
+        {% endif %}
+    </div>
+{% endmacro %}
+
 {% macro _render_time_slots(start_time, slot_entries, prev_end, hidden_count, short_contrib_count)%}
     {% for entry, count in slot_entries %}
         {% set __ = prev_end.append(entry.end_dt.astimezone(tz_object)) %}
@@ -116,38 +143,17 @@
                 {% endif %}
             {% endif %}
         {% else %}
-            {% set classes = classes + ['js-same-time'] %}
-            {% set extra_styles = ['display: none'] %}
+            {% set same_time = True %}
         {% endif %}
-        {% if entry.type.name == 'CONTRIBUTION' %}
-            <a class="week-anchor" href="{{ url_for('contributions.display_contribution', entry.object) }}">
-        {% elif session %}
-            <a class="week-anchor" href="{{  url_for('sessions.display_session', session) }}">
-        {% endif %}
-        <div class="{{ ' '.join(classes) }}" style="{{ '; '.join(extra_styles) }}" data-slot="{{ start_time }}">
-            <span class="time">
-                {{ start_time|format_time(timezone=timezone) if loop.first else '' }}
-                {% if hide_placeholders and show_end_times %}
-                    <span class="end-time">
-                        {{ entry.end_dt | format_time(timezone=timezone) }}
-                    </span>
-                {% endif %}
-            </span>
+        {% if entry.type.name == 'CONTRIBUTION' or session %}
             {% if entry.type.name == 'CONTRIBUTION' %}
-                {{ _render_contribution(entry.object) }}
+                {% set entry_url = url_for('contributions.display_contribution', entry.object) %}
             {% else %}
-                <span class="main">
-                    <span class="title">{{ entry.object.title }}</span>
-                </span>
+                {% set entry_url = url_for('sessions.display_session', session) %}
             {% endif %}
-            {{ _render_tooltip(entry, timezone) }}
-            {% if has_multi %}
-                <i class="icon-expand more-contribs"
-                   title="There are {{ slot_entries|length - 1 }} more contributions at this time. Click this icon to show them."
-                   data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'>
-               </i>
-            {% endif %}
-        </div>
+            <a class="week-anchor {{ 'js-same-time weak-hidden' if same_time }}" href="{{ entry_url }}">
+        {% endif %}
+        {{ _render_entry(entry, start_time, classes, extra_styles, has_multi, slot_entries, loop) }}
         {% if session or entry.type.name == 'CONTRIBUTION' %}
             </a>
         {% endif %}
@@ -180,7 +186,7 @@
                         {% set duration = next_start_minutes - start_time_minutes %}
                         {% if prev_end[0] and not hidden_count[-1] %}
                             {% set end_time = prev_end.pop().time() %}
-                            {% set new_dur  = start_time_minutes - (end_time.strftime('%-H')|int*60 + end_time.strftime('%-M')|int) %}
+                            {% set new_dur = start_time_minutes - (end_time.strftime('%-H')|int*60 + end_time.strftime('%-M')|int) %}
                             {% if end_time < start_time and end_time.strftime('%-H')!= '0' %}
                                 <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ ((new_dur / 5) * px_per_5_minutes) - 1 }}px;">
                                 </div>
@@ -205,7 +211,7 @@
 
 <script>
     $('.more-contribs').css('cursor', 'pointer').on('click', function() {
-        var row = $(this).closest('.row');
+        var row = $(this).closest('.week-anchor');
         var additional = row.nextUntil(':not(.js-same-time)');
         additional.toggle();
         $(this).toggleClass('icon-expand icon-collapse');
@@ -218,6 +224,7 @@
         row.closest('li').siblings('li').find('.row').filter(function() {
             return $(this).data('slot') == row.data('slot');
         }).height(sameSlotHeight);
+        return false;
     });
 
     $('.week-timetable .row:has(.tooltip)').qtip({
