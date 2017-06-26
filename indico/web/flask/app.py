@@ -237,10 +237,7 @@ def configure_db(app):
             raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
 
         app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
-
-        # DB options
-        app.config['SQLALCHEMY_ECHO'] = cfg.getSQLAlchemyEcho()
-        app.config['SQLALCHEMY_RECORD_QUERIES'] = cfg.getSQLAlchemyRecordQueries()
+        app.config['SQLALCHEMY_RECORD_QUERIES'] = False
         app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
         app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
         app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()

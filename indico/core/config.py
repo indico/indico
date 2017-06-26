@@ -213,8 +213,6 @@ class Config:
     default_values = {
         'IsRoomBookingActive'       : True,
         'SQLAlchemyDatabaseURI'     : None,
-        'SQLAlchemyEcho'            : False,
-        'SQLAlchemyRecordQueries'   : False,
         'SQLAlchemyPoolSize'        : 5,
         'SQLAlchemyPoolTimeout'     : 10,
         'SQLAlchemyPoolRecycle'     : 120,

@@ -12,13 +12,7 @@
 # SQLAlchemy DB
 #------------------------------------------------------------------------------
 
-SQLAlchemyDatabaseURI  = 'postgresql://localhost/indico'
-
-# Uncomment to echo requests
-# SQLAlchemyEcho = True
-
-# Uncomment if you wish to record queries
-# SQLAlchemyRecordQueries = True
+SQLAlchemyDatabaseURI = 'postgresql:///indico'
 
 # Size of the connection pool (default = 5)
 # SQLAlchemyPoolSize = 5
