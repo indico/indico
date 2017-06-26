@@ -168,7 +168,7 @@ An example:
 
 .. code-block:: shell
 
-    indico-migrate postgresql:///indico zeo://localhost:9675/indico --archive-dir /opt/indico/archive --storage-backend legacy --default-email default@acme.example.com --default-currency EUR --symlink-target ~/archive/legacy_symlinks/ --symlink-backend legacy-symlinks
+    indico-migrate postgresql:///indico fs:///opt/indico-legacy/db/Data.fs --archive-dir /opt/indico/archive --storage-backend legacy --default-email default@acme.example.com --default-currency EUR --symlink-target ~/archive/legacy_symlinks/ --symlink-backend legacy-symlinks
 
 
 .. note::
@@ -231,6 +231,30 @@ nginx                             Apache
 :ref:`centos-letsencrypt`         :ref:`centos-apache-letsencrypt`
 :ref:`centos-user`                :ref:`centos-apache-user`
 ================================  ================================
+
+
+Sanitizing HTML
++++++++++++++++
+
+Indico 2.0 uses `Markdown <https://en.wikipedia.org/wiki/Markdown>`_ for the descriptions of contributions and
+categories. Contribution descriptions that previously contained HTML will still work, but new ones will only support
+Markdown syntax (including basic HTML).
+As for the descriptions of categories, they are interpreted as Markdown as of version 2.0, which means that some
+existing data may be broken. In order to make the lives of users who are migrating easier, we have included with
+``indico-migrate`` a command that automatically performs the migration of Category descriptions to Markdown.
+
+First of all, let's see what would be the impact of running the command:
+
+.. code-block:: shell
+
+    indico-html-sanitize --dry-run -v -l log.html category_descriptions
+
+By opening ``log.html`` you will be able to check if there are any special cases that will need manual intervention.
+If you're happy with the changes, you can just choose to save them:
+
+.. code-block:: shell
+
+    indico-html-sanitize category_descriptions
 
 
 Removing old data
