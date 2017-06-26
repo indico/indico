@@ -16,7 +16,6 @@
 
 from __future__ import absolute_import
 
-import os
 import re
 import traceback
 import uuid
@@ -69,19 +68,6 @@ from indico.legacy.webinterface.pages.error import render_error
 
 #: Blueprint names for which legacy rules are auto-generated based on the endpoint name
 AUTO_COMPAT_BLUEPRINTS = {'admin', 'event', 'event_creation', 'event_mgmt', 'misc', 'rooms', 'rooms_admin'}
-
-
-def fix_root_path(app):
-    """Fix the app's root path when using namespace packages.
-
-    Flask's get_root_path is not reliable in this case so we derive it from
-    __name__ and __file__ instead."""
-
-    # __name__:       'indico.web.flask.app'
-    # __file__:  '..../indico/web/flask/app.py'
-    # For each dot in the module name we go up one path segment
-    up_segments = ['..'] * __name__.count('.')
-    app.root_path = os.path.normpath(os.path.join(__file__, *up_segments))
 
 
 def configure_app(app, set_path=False):
@@ -359,7 +345,6 @@ def make_app(set_path=False, testing=False):
         return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
     app.config['TESTING'] = testing
-    fix_root_path(app)
     configure_app(app, set_path)
     celery.init_app(app)
 

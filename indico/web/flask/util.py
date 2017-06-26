@@ -26,6 +26,7 @@ from flask import Blueprint, g, redirect, request
 from flask import current_app as app
 from flask import url_for as _url_for
 from flask import send_file as _send_file
+from flask.helpers import get_root_path
 from werkzeug.wrappers import Response as WerkzeugResponse
 from werkzeug.datastructures import Headers, FileStorage
 from werkzeug.exceptions import NotFound
@@ -47,9 +48,7 @@ def discover_blueprints():
     :return: a ``blueprints, compat_blueprints`` tuple containing two
              sets of blueprints
     """
-    # Don't use pkg_resources since `indico` is still a namespace package...`
-    up_segments = ['..'] * __name__.count('.')
-    package_root = os.path.normpath(os.path.join(__file__, *up_segments))
+    package_root = get_root_path('indico')
     modules = set()
     for root, dirs, files in os.walk(package_root):
         for name in files:

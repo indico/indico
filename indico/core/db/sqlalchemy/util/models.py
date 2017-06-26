@@ -18,8 +18,8 @@ import os
 from copy import copy
 from importlib import import_module
 
-import pkg_resources
 from flask import g
+from flask.helpers import get_root_path
 from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import inspect, orm
 from sqlalchemy.event import listen, listens_for
@@ -251,21 +251,14 @@ def _mappers_configured():
             listen(model, 'load', model._populate_preloaded_relationships)
 
 
-def import_all_models(package_name=None):
+def import_all_models(package_name='indico'):
     """Utility that imports all modules in indico/**/models/
 
     :param package_name: Package name to scan for models. If unset,
                          the top-level package containing this file
                          is used.
     """
-    if package_name:
-        distribution = pkg_resources.get_distribution(package_name)
-        package_root = os.path.join(distribution.location, package_name)
-    else:
-        # Don't use pkg_resources since `indico` is still a namespace package...`
-        package_name = 'indico'
-        up_segments = ['..'] * __name__.count('.')
-        package_root = os.path.normpath(os.path.join(__file__, *up_segments))
+    package_root = get_root_path(package_name)
     modules = []
     for root, dirs, files in os.walk(package_root):
         if os.path.basename(root) == 'models':
