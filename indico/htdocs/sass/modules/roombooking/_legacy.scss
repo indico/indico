@@ -1,0 +1,106 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+.intermediateleftvtab {
+   display: none;
+}
+
+.bottomvtab {
+
+   color: #777777;
+}
+
+.blacktext {
+   color: #000000;
+   vertical-align: top;
+}
+
+.resvTable, .blockingTable {
+    border-collapse: collapse;
+}
+
+.resvHover:hover, .blockingHover:hover {
+    background-color: #f0f0f0;
+}
+
+/* tables used for room blocking. */
+.blockingTable td {
+    padding: 0px 5px;
+}
+/* some space between table header and body */
+.blockingTable thead tr td {
+    padding-bottom: 5px;
+}
+/* "my blocking" row blocks (per room) have a border */
+.blockingTable tbody.blockingForMyRoom {
+    border: 1px solid transparent;
+}
+
+.blockingTable tbody.blockingForMyRoom:hover {
+    border: 1px solid #aaa;
+}
+/* separate simply table rows with some more padding */
+.blockingTable tr.blockingPadding td {
+    padding: 2px 5px 3px 5px;
+}
+/* blocking room list is hidden by default */
+.blockingTable tr.blockingRoomList {
+    display:none;
+}
+/* since TBODY cannot have a padding/margin, we use an empty row for it */
+.blockingTable .blockingSpacer td {
+    height: 10px;
+}
+/* blockings with an open room list have a border */
+.blockingTable tbody.hasRoomList {
+    border: 1px solid transparent;
+}
+.blockingTable tbody.hasRoomList:hover {
+    border: 1px solid #aaa;
+}
+
+.dataCaptionFormat {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+}
+
+.titleCellTD {
+   vertical-align: top;
+   text-align: right;
+   padding-right: 15px;
+   width: 15%;
+}
+
+.titleCellFormat {
+    font-size: 13px;
+    font-family: Verdana, Arial;
+    color: #523D04;
+}
+
+.dialog-content {
+    font-size: 1.1em;
+    margin: 17px;
+    max-width: 600px;
+}
+
+.successfulAction {
+    background-color: #DDFFDD;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}

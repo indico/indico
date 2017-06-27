@@ -17,7 +17,7 @@ else:
             <div class="confTitle">
                 <h1>
                     <a href="${ displayURL }">
-                        <span class="conferencetitlelink" ${textColorStyle}>
+                        <span class="conference-title-link" ${textColorStyle}>
                             % if logo :
                                 <div class="confLogoBox">
                                    ${ logo }

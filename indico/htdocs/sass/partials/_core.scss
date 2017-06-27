@@ -121,3 +121,20 @@
 .truncate-text {
     @include ellipsis;
 }
+
+@media print {
+    .noprint {
+        visibility: hidden;
+    }
+    .print {
+        visibility: visible;
+    }
+}
+
+img {
+    border: 0;
+}
+
+label, .label {
+    font-weight: bold;
+}
