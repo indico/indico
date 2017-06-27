@@ -351,22 +351,6 @@ span.mandatoryField
     color: #FF0000;
 }
 
-
-/* New CSS */
-
-div.pageOverHeader
-{
-    background-color: #F6E8C3;
-    border-bottom: 1px solid #A2905A;
-    padding: 7px 10px;
-    color: #2f2506;
-    font-family: Verdana;
-    font-size: 12px;
-    font-weight: bold;
-    display: none;
-}
-
-
 /* Breadcrumb styles */
 
 .path img {

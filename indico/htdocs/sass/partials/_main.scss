@@ -85,13 +85,21 @@ div.page-header-dark {
 }
 
 /* Announcements */
+div.announcement-bar {
+    display: flex;
+    align-items: center;
+    padding: 0.5em 1em;
+    background-color: $light-yellow;
+    color: $dark-black;
+    font-size: 0.9em;
+    font-weight: bold;
 
-.icon-announcement {
-  float: right;
-  color: $dark-yellow;
-  font-size: 1.5em;
-  line-height: 1em;
-  cursor:pointer;
+    .icon-announcement {
+        display: flex;
+        color: $dark-yellow;
+        font-size: 1.5em;
+        cursor:pointer;
+    }
 }
 
 /* Breadcrumbs */
