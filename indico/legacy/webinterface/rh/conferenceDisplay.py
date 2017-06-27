@@ -21,8 +21,7 @@ from cStringIO import StringIO
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.pages.conferences import WPMyStuff
-from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected, RHProtected
+from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
@@ -54,14 +53,6 @@ class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):
 
     def _checkProtection(self):
         RHDisplayBaseProtected._checkProtection(self)
-
-
-class RHMyStuff(RHConferenceBaseDisplay, RHProtected):
-    def _checkProtection(self):
-        RHProtected._checkProtection(self)
-
-    def _process(self):
-        return WPMyStuff(self, self._target).display()
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):

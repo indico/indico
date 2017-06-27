@@ -306,12 +306,6 @@ class WPrintPageFrame(wcomponents.WTemplated):
     pass
 
 
-class WConfDisplayBodyBase(wcomponents.WTemplated):
-    def _getTitle(self):
-        entry = get_menu_entry_by_name(self._linkname, self._conf.as_event)
-        return entry.localized_title
-
-
 class WPConferenceModifBase(WPEventManagement):
     """Base class for event management pages without Jinja inheritance.
 
@@ -336,22 +330,3 @@ class WPConferenceModifBase(WPEventManagement):
 
     def _getPageContent(self, params):
         raise NotImplementedError
-
-
-class WConfMyStuff(WConfDisplayBodyBase):
-    _linkname = 'my_conference'
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        wvars = wcomponents.WTemplated.getVars(self)
-        wvars["body_title"] = self._getTitle()
-        return wvars
-
-
-class WPMyStuff(WPConferenceDefaultDisplayBase):
-    menu_entry_name = 'my_conference'
-
-    def _getBody(self,params):
-        return WConfMyStuff(self._conf).getHTML()

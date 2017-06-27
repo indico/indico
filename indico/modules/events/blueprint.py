@@ -61,3 +61,5 @@ _compat_bp.add_url_rule('/conferenceOtherViews.py', 'display_other_modpython',
                         make_compat_redirect_func(_bp, 'display_other'))
 _compat_bp.add_url_rule('/conferenceDisplay.py/overview', 'display_overview_modpython',
                         make_compat_redirect_func(_bp, 'display_overview'))
+_compat_bp.add_url_rule('/event/<confId>/my-conference/', 'display_mystuff', make_compat_redirect_func(_bp, 'display'))
+_compat_bp.add_url_rule('/myconference.py', 'display_mystuff_modpython', make_compat_redirect_func(_bp, 'display'))
