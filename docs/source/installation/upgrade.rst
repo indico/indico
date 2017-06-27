@@ -152,7 +152,7 @@ a list of values that should work in most standard Indico installations. However
 `documentation of the indico-migrate command <https://github.com/indico/indico-migrate>`_, to make
 sure there are no option conflicts with your setup.
 
-Most frequenty, ``indico-migrate postgresql:///indico fs:///opt/indico-legacy/db/Data.fs`` will work, followed by the following
+Most frequenty, ``indico-migrate postgresql:///indico file:///opt/indico-legacy/db/Data.fs`` will work, followed by the following
 parameters:
 
  * ``--archive-dir /opt/indico-legacy/archive``
@@ -168,7 +168,7 @@ An example:
 
 .. code-block:: shell
 
-    indico-migrate postgresql:///indico fs:///opt/indico-legacy/db/Data.fs --archive-dir /opt/indico/archive --storage-backend legacy --default-email default@acme.example.com --default-currency EUR --symlink-target ~/archive/legacy_symlinks/ --symlink-backend legacy-symlinks
+    indico-migrate postgresql:///indico file:///opt/indico-legacy/db/Data.fs --archive-dir /opt/indico/archive --storage-backend legacy --default-email default@acme.example.com --default-currency EUR --symlink-target ~/archive/legacy_symlinks/ --symlink-backend legacy-symlinks
 
 
 .. note::
