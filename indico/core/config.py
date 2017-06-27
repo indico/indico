@@ -217,7 +217,7 @@ class Config:
         'SQLAlchemyPoolTimeout'     : 10,
         'SQLAlchemyPoolRecycle'     : 120,
         'SQLAlchemyMaxOverflow'     : 3,
-        'SanitizationLevel'         : 1,
+        'SanitizationLevel'         : 2,
         'BaseURL'                   : 'http://localhost',
         'LogDir'                    : "/opt/indico/log" ,
         'TempDir'                   : "/opt/indico/tmp",
