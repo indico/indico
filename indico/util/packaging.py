@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import os
+import pkgutil
 import sys
 
 import pkg_resources
@@ -31,3 +32,16 @@ def package_is_editable(package):
         if os.path.isfile(egg_link):
             return True
     return False
+
+
+def get_package_root_path(import_name):
+    """Get the root path of a package
+
+    Returns ``None`` if the specified import name is invalid or
+    points to a module instead of a package.
+    """
+    loader = pkgutil.get_loader(import_name)
+    if loader is None or not loader.is_package(import_name):
+        return None
+    filepath = loader.get_filename(import_name)
+    return os.path.dirname(os.path.abspath(filepath))

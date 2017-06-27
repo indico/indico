@@ -21,7 +21,6 @@ from copy import copy
 from importlib import import_module
 
 from flask import g
-from flask.helpers import get_root_path
 from flask_sqlalchemy import BaseQuery, Model, Pagination
 from sqlalchemy import inspect, orm
 from sqlalchemy.event import listen, listens_for
@@ -31,6 +30,7 @@ from sqlalchemy.orm.attributes import get_history, set_committed_value
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core import signals
+from indico.util.packaging import get_package_root_path
 
 
 class IndicoBaseQuery(BaseQuery):
@@ -260,7 +260,9 @@ def import_all_models(package_name='indico'):
                          the top-level package containing this file
                          is used.
     """
-    package_root = get_root_path(package_name)
+    package_root = get_package_root_path(package_name)
+    if not package_root:
+        return
     modules = []
     for root, dirs, files in os.walk(package_root):
         if os.path.basename(root) == 'models':
