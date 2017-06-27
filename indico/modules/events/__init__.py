@@ -16,22 +16,23 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, flash, session, render_template
+from flask import flash, redirect, render_template, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.logger import Logger
-from indico.core.roles import check_roles, ManagementRole, get_available_roles
+from indico.core.roles import ManagementRole, check_roles, get_available_roles
 from indico.modules.events.cloning import get_event_cloners
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.legacy_mapping import LegacyEventMapping
 from indico.util.i18n import _, ngettext, orig_string
 from indico.util.string import is_legacy_id
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
-from indico.web.menu import SideMenuItem, TopMenuSection, TopMenuItem
+from indico.web.menu import SideMenuItem, TopMenuItem, TopMenuSection
+
 
 __all__ = ('Event', 'logger', 'event_management_object_url_prefixes', 'event_object_url_prefixes')
 logger = Logger.get('events')
@@ -207,6 +208,19 @@ def _topmenu_items(sender, **kwargs):
     yield TopMenuItem('create-lecture', _('Create lecture'), 'lecture', 30, section='create-event')
     yield TopMenuItem('create-meeting', _('Create meeting'), 'meeting', 20, section='create-event')
     yield TopMenuItem('create-conference', _('Create conference'), 'conference', 10, section='create-event')
+
+
+@signals.event.sidemenu.connect
+def _extend_event_menu(sender, **kwargs):
+    from indico.modules.events.layout.util import MenuEntryData, get_menu_entry_by_name
+
+    def _my_conference_visible(event):
+        return session.user and (get_menu_entry_by_name('my_contributions', event).is_visible or
+                                 get_menu_entry_by_name('my_sessions', event).is_visible)
+
+    yield MenuEntryData(_("Overview"), 'overview', 'events.display_overview', position=0, static_site=True)
+    yield MenuEntryData(_("My Conference"), 'my_conference', 'event.myconference', position=7,
+                        visible=_my_conference_visible)
 
 
 @signals.app_created.connect

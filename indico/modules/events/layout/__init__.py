@@ -78,13 +78,6 @@ def _extend_event_management_menu_layout(sender, event, **kwargs):
         yield SideMenuItem('images', _('Images'), url_for('event_layout.images', event), section='customization')
 
 
-@signals.event.sidemenu.connect
-def _get_default_menu_entries(sender, **kwargs):
-    from indico.modules.events.layout.default import get_default_menu_entries
-    for entry in get_default_menu_entries():
-        yield entry
-
-
 @signals.event.cloned.connect
 def _event_cloned(old_event, new_event, **kwargs):
     if old_event.type_ == EventType.conference:
