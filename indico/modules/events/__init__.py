@@ -219,8 +219,7 @@ def _extend_event_menu(sender, **kwargs):
                                  get_menu_entry_by_name('my_sessions', event).is_visible)
 
     yield MenuEntryData(_("Overview"), 'overview', 'events.display_overview', position=0, static_site=True)
-    yield MenuEntryData(_("My Conference"), 'my_conference', 'event.myconference', position=7,
-                        visible=_my_conference_visible)
+    yield MenuEntryData(_("My Conference"), 'my_conference', position=7, visible=_my_conference_visible)
 
 
 @signals.app_created.connect

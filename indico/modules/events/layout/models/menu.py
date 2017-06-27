@@ -23,7 +23,7 @@ from werkzeug.utils import cached_property
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import _
-from indico.util.string import return_ascii, slugify, text_to_repr, format_repr
+from indico.util.string import format_repr, return_ascii, slugify, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -72,6 +72,8 @@ class MenuEntryMixin(object):
         # the generated urls into something suitable as filenames
         if self.is_user_link:
             return self.link_url
+        elif (self.is_internal_link or self.is_plugin_link) and not self.default_data.endpoint:
+            return None
         elif self.is_internal_link:
             data = self.default_data
             if data.static_site and isinstance(data.static_site, basestring) and g.get('static_site'):

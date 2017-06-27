@@ -81,7 +81,10 @@
             {%- if entry.id == active_entry_id %} selected menuConfSelected
                     {%- if not root_entry %} sublink{% endif -%}
             {%- endif %}">
-            <a href="{{ entry.url }}" {%- if entry.new_tab %} target="_blank"{% endif %}>{{ entry.localized_title }}</a>
+            <a {% if entry.url %}href="{{ entry.url }}"{% else %}class="no-link"{% endif %}
+               {% if entry.new_tab %}target="_blank"{% endif %}>
+                {{- entry.localized_title -}}
+            </a>
             {%- if root_entry and entry.children -%}
                 <ul class="inner">
                     {%- for child in entry.children if child.is_visible -%}

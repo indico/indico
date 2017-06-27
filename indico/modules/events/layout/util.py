@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict, OrderedDict
-from itertools import count, chain
+from collections import OrderedDict, defaultdict
+from itertools import chain, count
 
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import joinedload, load_only
@@ -27,6 +27,7 @@ import indico
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.legacy.common.cache import GenericCache
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
@@ -34,7 +35,6 @@ from indico.util.signals import named_objects_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
 
-from indico.legacy.common.cache import GenericCache
 
 _cache = GenericCache('updated-menus')
 
@@ -105,7 +105,7 @@ class MenuEntryData(object):
     """
     plugin = None
 
-    def __init__(self, title, name, endpoint, position=-1, is_enabled=True, visible=None, parent=None,
+    def __init__(self, title, name, endpoint=None, position=-1, is_enabled=True, visible=None, parent=None,
                  static_site=False):
         self.title = title
         self._name = name

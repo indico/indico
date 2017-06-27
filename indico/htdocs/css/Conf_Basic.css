@@ -137,7 +137,12 @@ div.datePlace > div.timezone {
     /*background: #fff;  IE6 Bug */
 }
 
-#outer li a:hover {
+#outer li a.no-link, #outer li a.no-link:hover {
+    color: #555;
+    cursor: default
+}
+
+#outer li a:not(.no-link):hover {
     background: #e0e0e0;
 }
 
@@ -157,7 +162,7 @@ div.datePlace > div.timezone {
     padding: 7px 12px;
 }
 
-    /* sub menu item */
+/* sub menu item */
 
 li.menuConfMiddleCell {
     font-weight: normal;
