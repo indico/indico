@@ -46,7 +46,7 @@ def underline(s, sep='-'):
 
 
 def markdown(value):
-    return Markup(EnsureUnicodeExtension.ensure_unicode(render_markdown(value, extensions=('nl2br',))))
+    return Markup(EnsureUnicodeExtension.ensure_unicode(render_markdown(value, extensions=('nl2br', 'tables'))))
 
 
 def dedent(value):
