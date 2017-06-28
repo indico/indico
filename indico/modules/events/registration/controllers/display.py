@@ -80,8 +80,8 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
         user_registrations = [regform[0].id for regform in all_regforms if regform[1]]
         if len(scheduled_and_registered_regforms) == 1:
             return redirect(url_for('.display_regform', scheduled_and_registered_regforms[0]))
-        return self.view_class.render_template('display/regform_list.html', self._conf,
-                                               event=self.event_new, regforms=scheduled_and_registered_regforms,
+        return self.view_class.render_template('display/regform_list.html', self.event_new,
+                                               regforms=scheduled_and_registered_regforms,
                                                user_registrations=user_registrations)
 
 
@@ -191,7 +191,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         return self.view_class.render_template(
             'display/participant_list.html',
-            self._conf,
+            self.event_new,
             regforms=regforms,
             tables=tables,
             published=published,
@@ -268,7 +268,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
-        return self.view_class.render_template('display/regform_display.html', self._conf, event=self.event_new,
+        return self.view_class.render_template('display/regform_display.html', self.event_new,
                                                regform=self.regform,
                                                sections=get_event_section_data(self.regform),
                                                payment_conditions=payment_event_settings.get(self.event_new,

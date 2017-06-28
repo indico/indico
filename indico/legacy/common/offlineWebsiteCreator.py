@@ -26,18 +26,17 @@ from bs4 import BeautifulSoup
 from flask import current_app, request
 from werkzeug.utils import secure_filename
 
-from indico.legacy.common.contribPacker import ZIPFileHandler
+from indico.core.config import Config
 from indico.legacy.common import timezoneUtils
-from indico.legacy.pdfinterface.conference import ProgrammeToPDF, AbstractBook, ContribToPDF, ContribsToPDF
+from indico.legacy.common.contribPacker import ZIPFileHandler
+from indico.legacy.pdfinterface.conference import AbstractBook, ContribsToPDF, ContribToPDF, ProgrammeToPDF
 from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
                                                      WPStaticConferenceProgram, WPStaticContributionDisplay,
                                                      WPStaticContributionList, WPStaticCustomPage,
                                                      WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
-                                                     WPStaticSpeakerList, WPStaticSubcontributionDisplay,
-                                                     WPStaticTimetable, WPStaticSimpleEventDisplay)
+                                                     WPStaticSimpleEventDisplay, WPStaticSpeakerList,
+                                                     WPStaticSubcontributionDisplay, WPStaticTimetable)
 from indico.legacy.webinterface.rh.base import RH
-
-from indico.core.config import Config
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHContributionAuthor,
@@ -47,11 +46,11 @@ from indico.modules.events.contributions.util import get_contribution_ical_file
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
 from indico.modules.events.registration.controllers.display import RHParticipantList
-from indico.modules.events.sessions.util import get_session_timetable_pdf, get_session_ical_file
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
+from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf
 from indico.modules.events.timetable.controllers.display import RHTimetable
-from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
+from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.util.string import remove_tags
 from indico.web.assets.util import get_asset_path
 from indico.web.flask.util import url_for
@@ -264,7 +263,7 @@ class OfflineEventCreator(object):
             self._fileHandler.addNewFile(dst_path, css)
 
     def _create_home(self):
-        self._html = WPStaticSimpleEventDisplay(self._rh, self._conf, self.event.theme).display()
+        self._html = WPStaticSimpleEventDisplay(self._rh, self.event, self.event.theme).display()
 
     def _create_other_pages(self):
         pass

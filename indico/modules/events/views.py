@@ -39,10 +39,10 @@ class WPReferenceTypes(WPAdmin):
 class WPSimpleEventDisplayBase(MathjaxMixin, WPConferenceBase):
     """Base class for displaying something on a lecture/meeting page"""
 
-    @unify_event_args(legacy=True)
-    def __init__(self, rh, conf, **kwargs):
-        WPConferenceBase.__init__(self, rh, conf, **kwargs)
-        self.event = conf.as_event
+    @unify_event_args
+    def __init__(self, rh, event_, **kwargs):
+        self.event = event_
+        WPConferenceBase.__init__(self, rh, event_, **kwargs)
 
     def _getHeader(self):
         return render_event_header(self.event).encode('utf-8')

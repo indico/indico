@@ -24,7 +24,7 @@ from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
-from indico.modules.events.util import serialize_event_for_ical, get_theme
+from indico.modules.events.util import get_theme, serialize_event_for_ical
 from indico.modules.events.views import WPSimpleEventDisplay
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata import Serializer
@@ -64,12 +64,12 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
 
     def _display_conference_page(self):
         """Display the custom conference home page"""
-        return WPPage.render_template('page.html', self._conf, page=self.event_new.default_page)
+        return WPPage.render_template('page.html', self.event_new, page=self.event_new.default_page)
 
     def _display_conference(self):
         """Display the conference overview page"""
-        return WPConferenceDisplay(self, self._conf).display()
+        return WPConferenceDisplay(self, self.event_new).display()
 
     def _display_simple(self):
         """Display a simple single-page event (meeting/lecture)"""
-        return WPSimpleEventDisplay(self, self._conf, self.theme_id, self.theme_override).display()
+        return WPSimpleEventDisplay(self, self.event_new, self.theme_id, self.theme_override).display()

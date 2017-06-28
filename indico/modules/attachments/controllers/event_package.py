@@ -20,17 +20,12 @@ import os
 from collections import OrderedDict
 from datetime import timedelta
 
-from flask import session, flash
+from flask import flash, session
 from markupsafe import escape
-from sqlalchemy import cast, Date
+from sqlalchemy import Date, cast
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
-from indico.util.date_time import format_date, format_time
-from indico.util.i18n import _
-from indico.util.fs import secure_filename
-from indico.util.string import natural_sort_key, to_unicode
-from indico.web.forms.base import FormDefaults
 from indico.modules.attachments.forms import AttachmentPackageForm
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -38,6 +33,11 @@ from indico.modules.events.contributions.models.contributions import Contributio
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.util import ZipGeneratorMixin
+from indico.util.date_time import format_date, format_time
+from indico.util.fs import secure_filename
+from indico.util.i18n import _
+from indico.util.string import natural_sort_key, to_unicode
+from indico.web.forms.base import FormDefaults
 
 
 def _get_start_dt(obj):
@@ -195,8 +195,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             else:
                 flash(_('There are no materials matching your criteria.'), 'warning')
 
-        return self.wp.render_template('generate_package.html', self._conf, form=form, event=self.event_new,
-                                       management=self.management)
+        return self.wp.render_template('generate_package.html', self.event_new, form=form, management=self.management)
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))

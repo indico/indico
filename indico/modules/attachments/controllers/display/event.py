@@ -49,7 +49,7 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
         if request.args.get('redirect_if_single') == '1' and len(self.folder.attachments) == 1:
             return redirect(self.folder.attachments[0].download_url)
 
-        return WPEventFolderDisplay.render_template('folder.html', self._conf, folder=self.folder, event=self.event_new)
+        return WPEventFolderDisplay.render_template('folder.html', self.event_new, folder=self.folder)
 
 
 class RHPackageEventAttachmentsDisplay(AttachmentPackageMixin, RHConferenceBaseDisplay):

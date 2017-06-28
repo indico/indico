@@ -47,11 +47,11 @@ class RHTimetable(RHConferenceBaseDisplay):
         if self.theme is None:
             event_info = serialize_event_info(self.event_new)
             timetable_data = TimetableSerializer().serialize_timetable(self.event_new, strip_empty_days=True)
-            return self.view_class.render_template('display.html', self._conf, event_info=event_info,
+            return self.view_class.render_template('display.html', self.event_new, event_info=event_info,
                                                    timetable_data=timetable_data,
                                                    timetable_layout=self.timetable_layout)
         else:
-            return self.view_class_simple(self, self._conf, self.theme, self.theme_override).display()
+            return self.view_class_simple(self, self.event_new, self.theme, self.theme_override).display()
 
 
 class RHTimetableEntryInfo(RHConferenceBaseDisplay):
