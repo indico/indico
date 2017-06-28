@@ -54,8 +54,15 @@ type("TimezoneSelector", ["RemoteWidget"], {
         // Add header
         this.div.append(Html.div({className: 'tzHeader'}, $T('Change timezone')));
 
-        this.form = Html.form({method: "post", action: this.formTarget, style: {margin: 0}});
-        this.form.append(Html.input('hidden', {name: 'csrf_token'}, $('meta[name=csrf-token]').attr('content')));
+        this.form = Html.form({method: "post", 
+            action: this.formTarget, 
+            style: {margin: 0}
+        });
+        this.form.append(Html.input(
+            'hidden', 
+            {name: 'csrf_token'}, 
+            $('meta[name=csrf-token]').attr('content')
+        ));
         this.div.append(this.form);
 
         var container = Html.div({className: 'tzContainer'});
@@ -65,14 +72,31 @@ type("TimezoneSelector", ["RemoteWidget"], {
         this.localTZRadio = Html.input('radio', {name: 'activeTimezone'}, 'LOCAL');
         this.userTZRadio = Html.input('radio', {name: 'activeTimezone'}, 'My');
         this.selectTZradio = Html.input('radio', {name: 'activeTimezone'}, 'LOCAL');
-        container.append(Html.div({style: {marginBottom: pixels(5)}}, this.localTZRadio, $T(" Use the events' local timezone ")));
-        if (this.userTZ) {
-            container.append(Html.div({style: {marginBottom: pixels(5)}}, this.userTZRadio, $T(" Your saved timezone"), Html.em({}, ' (' + this.userTZ + ')')));
+        container.append(Html.div(
+            {style: {marginBottom: pixels(5)}}, 
+            this.localTZRadio, 
+            $T(" Use local timezone of event")
+        ));
+        if (this.userTZ) { 
+            container.append(Html.div(
+                {style: {marginBottom: pixels(5)}}, 
+                this.userTZRadio, 
+                $T(" Your saved timezone"), 
+                Html.em({}, 
+                ' (' + this.userTZ + ')')
+            ));
         }
-        container.append(Html.div({style: {marginBottom: pixels(5)}}, this.selectTZradio, $T(" Specify a timezone")));
+        container.append(Html.div(
+            {style: {marginBottom: pixels(5)}}, 
+            this.selectTZradio, 
+            $T(" Specify a timezone")
+            ));
 
         var select = Html.select({size: 12});
-        this.loadingOption = Html.option({style: {color: "#444", fontStyle:'italic'}}, $T('Loading list of timezones...'));
+        this.loadingOption = Html.option(
+            {style: {color: "#444", fontStyle:'italic'}}, 
+            $T('Loading list of timezones...')
+            );
         select.append(this.loadingOption);
         container.append(select);
 
@@ -110,7 +134,8 @@ type("TimezoneSelector", ["RemoteWidget"], {
         // If user is logged in add save to profile div
         if (this.userTZ) {
             container.append(Html.div({style: {fontStyle: 'italic', margin: '10px 0'}},
-                    Html.input('checkbox', {name: 'saveToProfile'}), $T(' Remember these settings next time I log in')
+                    Html.input('checkbox', {name: 'saveToProfile'}), 
+                    $T(' Remember these settings next time I log in')
             ));
         }
 
@@ -120,12 +145,17 @@ type("TimezoneSelector", ["RemoteWidget"], {
         cancelButton.observeClick(function() {
             $("#timezone-selector-link").qtip('hide');
         });
-        container.append(Html.div({style:{textAlign: 'center', marginTop: '15px'}}, applyButton, " ", cancelButton));
+        container.append(Html.div(
+            {style:{textAlign: 'center', marginTop: '15px'}}, 
+            applyButton, " ", 
+            cancelButton
+        ));
         if (this.activeTZ == 'LOCAL') {
             this.localTZRadio.set(true);
         }
-        else if (this.userTZ && this.userDisplayTZMode && this.userTZ == this.activeTZ &&
-                 this.userDisplayTZMode == 'MyTimezone') {
+        else if (this.userTZ && this.userDisplayTZMode && 
+                this.userTZ == this.activeTZ &&
+                this.userDisplayTZMode == 'MyTimezone') {
             this.userTZRadio.set(true);
         }
         else {
