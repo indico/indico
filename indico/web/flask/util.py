@@ -482,7 +482,7 @@ class XAccelMiddleware(object):
 
     def make_x_accel_header(self, path):
         for base, uri in self.mapping:
-            if path.startswith(base + '/'):
+            if path.startswith(str(base + '/')):
                 return uri + path[len(base):]
 
 
