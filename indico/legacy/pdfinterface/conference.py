@@ -22,10 +22,10 @@ from operator import attrgetter
 from pytz import timezone
 from qrcode import QRCode, constants
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT
-from reportlab.lib.pagesizes import landscape, A4
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.lib.units import inch, cm
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
+from reportlab.lib.pagesizes import A4, landscape
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
+from reportlab.lib.units import cm, inch
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table, TableStyle
 from reportlab.rl_config import defaultPageSize
@@ -33,22 +33,23 @@ from speaklater import is_lazy_string
 
 from indico.core.config import Config
 from indico.core.db import db
-from indico.modules.events.abstracts.models.abstracts import AbstractState, AbstractReviewingState
+from indico.legacy.common import utils
+from indico.legacy.common.timezoneUtils import DisplayTZ, nowutc
+from indico.legacy.pdfinterface.base import (PageBreak, Paragraph, PDFBase, PDFLaTeXBase, PDFWithTOC, Spacer, escape,
+                                             modifiedFontSize)
+from indico.legacy.webinterface.common.tools import strip_ml_tags
+from indico.modules.events.abstracts.models.abstracts import AbstractReviewingState, AbstractState
 from indico.modules.events.abstracts.models.reviews import AbstractAction
-from indico.modules.events.abstracts.settings import boa_settings, BOASortField, BOACorrespondingAuthorType
+from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
-from indico.util.date_time import format_date, format_datetime, format_time, format_human_timedelta
-from indico.util.i18n import ngettext, _
+from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time
+from indico.util.i18n import _, ngettext
 from indico.util.string import html_color_to_rgb, to_unicode, truncate
-from indico.legacy.pdfinterface.base import (escape, PDFLaTeXBase, PDFBase, PDFWithTOC, Paragraph, Spacer, PageBreak,
-                                             modifiedFontSize)
-from indico.legacy.common import utils
-from indico.legacy.common.timezoneUtils import DisplayTZ, nowutc
-from indico.legacy.webinterface.common.tools import strip_ml_tags
+
 
 styles = getSampleStyleSheet()
 
@@ -873,9 +874,9 @@ class TimeTablePlain(PDFWithTOC):
                             caption = obj.title.encode('utf-8')
 
                             if self._ttPDFFormat.showLengthContribs():
-                                caption = '{} ({})'.format(caption, format_human_timedelta(s_entry.duration))
+                                caption = u'{} ({})'.format(caption, format_human_timedelta(s_entry.duration))
 
-                            lt.append([self._fontify(caption, 10)])
+                            lt.append([self._fontify(caption.encode('utf-8'), 10)])
                             caption = Table(lt, colWidths=None, style=self._tsSpk)
 
                             if self._ttPDFFormat.showContribAbstract():
@@ -1073,12 +1074,10 @@ class SimplifiedTimeTablePlain(PDFBase):
                     lastSessions.append(sess)
                     e = sess
                 title = e.title
-                res.append(Paragraph('<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_("Session"), escape(title.encode('utf-8'))),
+                res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
+                                     .format(_(u"Session"), escape(title)).encode('utf-8'),
                                      self._styles["normal"]))
-                room_time = u""
-                if session_slot.room_name:
-                    room_time = to_unicode(escape(session_slot.room_name.encode('utf-8')))
+                room_time = escape(session_slot.room_name) if session_slot.room_name else u''
                 room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
                              .format(_(u"Time and Place"), room_time,
                                      to_unicode(format_time(entry.start_dt, timezone=self._tz)),
@@ -1096,13 +1095,10 @@ class SimplifiedTimeTablePlain(PDFBase):
                 if not contrib.can_access(self._aw):
                     continue
 
-                title = contrib.title
                 res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_(u"Contribution"), escape(title.encode('utf-8'))), self._styles["normal"]))
-                room_time = ""
-                if contrib.room_name:
-                    room_time = escape(contrib.room_name.encode('utf-8'))
+                                     .format(_(u"Contribution"), escape(contrib.title)), self._styles["normal"]))
 
+                room_time = escape(contrib.room_name) if contrib.room_name else u''
                 room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
                              .format(_(u"Time and Place"), room_time,
                                      to_unicode(format_date(entry.start_dt, timezone=self._tz)),
@@ -1118,13 +1114,12 @@ class SimplifiedTimeTablePlain(PDFBase):
                 break_ = entry.object
                 title = break_.title
                 res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
-                                     .format(_(u"Break"), escape(title.encode('utf-8'))), self._styles["normal"]))
-                room_time = ""
-                if break_.room_name:
-                    room_time = escape(break_.room_name.encode('utf-8'))
+                                     .format(_(u"Break"), escape(title)), self._styles["normal"]))
+                room_time = escape(break_.room_name) if break_.room_name else u''
                 room_time = (u'<font face="Times-Bold"><b> {}:</b></font> {}({}-{})'
-                             .format(_(u"Time and Place"), room_time, format_date(entry.start_dt, timezone=self._tz),
-                                     format_date(entry.end_dt, timezone=self._tz)))
+                             .format(_(u"Time and Place"), room_time,
+                                     to_unicode(format_date(entry.start_dt, timezone=self._tz)),
+                                     to_unicode(format_date(entry.end_dt, timezone=self._tz))))
                 res.append(Paragraph(room_time, self._styles["normal"]))
                 res.append(Spacer(1, 0.2 * inch))
         res.append(PageBreak())
