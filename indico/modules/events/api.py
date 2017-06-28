@@ -16,11 +16,11 @@
 
 import fnmatch
 import re
-import pytz
 from datetime import datetime
 from hashlib import md5
 from operator import attrgetter
 
+import pytz
 from flask import request
 from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload, undefer
@@ -30,23 +30,23 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.modules.attachments.api.util import build_folders_api_data, build_material_legacy_api_data
-from indico.modules.categories import LegacyCategoryMapping, Category
+from indico.modules.categories import Category, LegacyCategoryMapping
 from indico.modules.categories.serialize import serialize_categories_ical
 from indico.modules.events import Event
 from indico.modules.events.models.persons import PersonLinkBase
 from indico.modules.events.notes.util import build_note_api_data, build_note_legacy_api_data
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.date_time import iterdays
 from indico.util.fossilize import fossilize
 from indico.util.fossilize.conversion import Conversion
 from indico.util.string import to_unicode
-from indico.web.flask.util import url_for, send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.fossils import IPeriodFossil
+from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from indico.web.http_api.hooks.base import HTTPAPIHook, IteratedDataFetcher
 
 
 utc = pytz.timezone('UTC')
@@ -180,7 +180,7 @@ class SerializerBase(object):
                 'fullName': person.get_full_name(last_name_upper=False, abbrev_first_name=False),
                 'id': unicode(person.id),
                 'affiliation': person.affiliation,
-                'emailHash': md5(person.email).hexdigest() if person.email else None
+                'emailHash': md5(person.email.encode('utf-8')).hexdigest() if person.email else None
             }
             if isinstance(person, PersonLinkBase):
                 data['db_id'] = person.id
@@ -211,7 +211,7 @@ class SerializerBase(object):
             'id': convener.person_id,
             'db_id': convener.id,
             'person_id': convener.person_id,
-            'emailHash': md5(convener.person.email).hexdigest() if convener.person.email else None
+            'emailHash': md5(convener.person.email.encode('utf-8')).hexdigest() if convener.person.email else None
         }
         if can_manage:
             data['address'] = convener.address,
