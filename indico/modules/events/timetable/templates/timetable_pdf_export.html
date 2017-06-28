@@ -11,12 +11,16 @@
 <script>
     (function() {
         'use strict';
+
         var $form = $('#timetable-pdf-export-form');
         $form.find('[name=document_settings][value=showCoverPage], [name=document_settings][value=showTableContents], ' +
                    '[name=document_settings][value=showSessionTOC]').prop('checked', true);
         $form.find('[name=contribution_info][value=showContribId], [name=contribution_info][value=showSpeakerTitle]')
              .prop('checked', true);
         $form.find('[name=session_info][value=useSessionColorCodes], [name=session_info][value=showSessionDescription]')
+             .prop('checked', true);
+        $form.find('[name=visible_entries][value=showContribsAtConfLevel], ' +
+                   '[name=visible_entries][value=showBreaksAtConfLevel]')
              .prop('checked', true);
         $form.find('[name=document_settings][value=showTableContents]').on('change', function() {
             var $showSessionToc = $form.find('[name=document_settings][value=showSessionTOC]');
