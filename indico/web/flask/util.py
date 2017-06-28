@@ -172,7 +172,7 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
                     view_args[newkey] = value
         try:
             target = _url_for('%s.%s' % (getattr(blueprint, 'name', blueprint), endpoint), **view_args)
-        except BuildError:
+        except (BuildError, ValueError):
             raise NotFound
         return redirect(target, 302 if current_app.debug else 301)
     return _redirect
