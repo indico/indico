@@ -21,12 +21,13 @@ import posixpath
 from flask import render_template, request
 from sqlalchemy.orm import load_only
 
-from indico.legacy.webinterface.pages.conferences import (render_event_header, render_event_footer,
-                                                          WPConferenceBase, WConfMetadata, WPrintPageFrame)
+from indico.legacy.webinterface.pages.conferences import (WConfMetadata, WPConferenceBase, WPrintPageFrame,
+                                                          render_event_footer, render_event_header)
 from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import get_css_url
+from indico.util.event import unify_event_args
 from indico.util.mathjax import MathjaxMixin
 from indico.util.string import to_unicode
 
@@ -38,6 +39,7 @@ class WPReferenceTypes(WPAdmin):
 class WPSimpleEventDisplayBase(MathjaxMixin, WPConferenceBase):
     """Base class for displaying something on a lecture/meeting page"""
 
+    @unify_event_args(legacy=True)
     def __init__(self, rh, conf, **kwargs):
         WPConferenceBase.__init__(self, rh, conf, **kwargs)
         self.event = conf.as_event
