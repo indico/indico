@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
+from operator import attrgetter
 
 from flask import request
 from sqlalchemy.orm import joinedload
@@ -111,20 +112,26 @@ class RegistrationListGenerator(ListGeneratorBase):
                 result.append(item_id)
         return result
 
-    def _get_sorted_regform_items(self, item_ids):
+    def _get_sorted_regform_items(self, item_ids, with_sections=False):
         """Return the form items ordered by their position in the registration form."""
 
         if not item_ids:
             return []
-        return (RegistrationFormItem
-                .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
-                .with_parent(self.regform)
-                .join(RegistrationFormItem.parent, aliased=True)
-                .filter(~RegistrationFormItem.is_deleted)  # parent deleted
-                .order_by(RegistrationFormItem.position)  # parent position
-                .reset_joinpoint()
-                .order_by(RegistrationFormItem.position)  # item position
-                .all())
+        if with_sections:
+            return (RegistrationFormItem
+                    .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
+                    .order_by(RegistrationFormItem.position)
+                    .all())
+        else:
+            return (RegistrationFormItem
+                    .find(~RegistrationFormItem.is_deleted, RegistrationFormItem.id.in_(item_ids))
+                    .with_parent(self.regform)
+                    .join(RegistrationFormItem.parent, aliased=True)
+                    .filter(~RegistrationFormItem.is_deleted)  # parent deleted
+                    .order_by(RegistrationFormItem.position)  # parent position
+                    .reset_joinpoint()
+                    .order_by(RegistrationFormItem.position)  # item position
+                    .all())
 
     def _get_filters_from_request(self):
         filters = super(RegistrationListGenerator, self)._get_filters_from_request()
@@ -193,13 +200,24 @@ class RegistrationListGenerator(ListGeneratorBase):
             'filtering_enabled': total_entries != len(registrations)
         }
 
-    def get_list_export_config(self):
+    def get_list_export_config(self, with_sections=False):
         reg_list_config = self._get_config()
         static_item_ids, item_ids = self._split_item_ids(reg_list_config['items'], 'static')
+        if with_sections:
+            item_ids.extend([section.id for section in self.regform.sections if section.active_fields])
         item_ids = self._column_ids_to_db(item_ids)
+        all_items = self._get_sorted_regform_items(item_ids, with_sections=with_sections)
+        if with_sections:
+            sections = sorted([item for item in all_items if item.is_section], key=attrgetter('position'))
+            all_items = []
+            for section in sections:
+                displayed_fields = [field for field in section.active_fields if field.id in item_ids]
+                if displayed_fields:
+                    all_items.append(section)
+                    all_items.extend(sorted(displayed_fields, key=attrgetter('position')))
         return {
             'static_item_ids': static_item_ids,
-            'regform_items': self._get_sorted_regform_items(item_ids)
+            'regform_items': all_items
         }
 
     def render_list(self):
