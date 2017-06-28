@@ -14,21 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date
+from __future__ import unicode_literals
+
+from datetime import date, datetime
 
 from flask import session
-from wtforms.ext.dateutil.fields import DateTimeField, DateField
-from wtforms.fields.core import SelectMultipleField, StringField, BooleanField, RadioField, IntegerField
+from wtforms.ext.dateutil.fields import DateField, DateTimeField
+from wtforms.fields.core import BooleanField, IntegerField, RadioField, SelectMultipleField, StringField
+from wtforms.fields.simple import SubmitField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
-from wtforms_components import TimeField
 from wtforms.widgets.core import HiddenInput
-from wtforms.fields.simple import TextAreaField, SubmitField, HiddenField
+from wtforms_components import TimeField
 
+from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
+from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
-from indico.web.forms.validators import UsedIf, HiddenUnless
-from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
-from indico.util.i18n import _
+from indico.web.forms.validators import HiddenUnless, UsedIf
 
 
 class BookingSearchForm(IndicoForm):
@@ -70,7 +72,7 @@ class NewBookingFormBase(IndicoForm):
     end_dt = DateTimeField('End date', validators=[InputRequired()], parse_kwargs={'dayfirst': True},
                            display_format='%d/%m/%Y %H:%M')
     repeat_frequency = RadioField('Repeat frequency', coerce=int, default=0, validators=[InputRequired()],
-                                  choices=[(0, _(u'Once')), (1, _(u'Daily')), (2, _(u'Weekly')), (3, _(u'Monthly'))])
+                                  choices=[(0, _('Once')), (1, _('Daily')), (2, _('Weekly')), (3, _('Monthly'))])
     repeat_interval = IntegerField('Repeat interval', validators=[NumberRange(0, 3)], default=0)
 
     def validate_repeat_interval(self, field):
@@ -79,7 +81,7 @@ class NewBookingFormBase(IndicoForm):
 
     def validate_start_dt(self, field):
         if field.data != field.object_data and field.data.date() < date.today() and not session.user.is_admin:
-            raise ValidationError(_(u'The start time cannot be in the past.'))
+            raise ValidationError(_('The start time cannot be in the past.'))
 
     def validate_end_dt(self, field):
         start_dt = self.start_dt.data
@@ -95,10 +97,10 @@ class NewBookingFormBase(IndicoForm):
 class NewBookingCriteriaForm(NewBookingFormBase):
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
     flexible_dates_range = RadioField('Flexible days', coerce=int, default=0,
-                                      choices=[(0, _(u'Exact')),
-                                               (1, u'&plusmn;{}'.format(_(u'1 day'))),
-                                               (2, u'&plusmn;{}'.format(_(u'2 days'))),
-                                               (3, u'&plusmn;{}'.format(_(u'3 days')))])
+                                      choices=[(0, _('Exact')),
+                                               (1, '&plusmn;{}'.format(_('1 day'))),
+                                               (2, '&plusmn;{}'.format(_('2 days'))),
+                                               (3, '&plusmn;{}'.format(_('3 days')))])
 
     def validate_flexible_dates_range(self, field):
         if self.repeat_frequency.data == RepeatFrequency.DAY:
@@ -112,42 +114,42 @@ class NewBookingPeriodForm(NewBookingFormBase):
 class NewBookingConfirmForm(NewBookingPeriodForm):
     room_usage = RadioField([DataRequired()], choices=[('current_user', _("I'll be using the room myself")),
                                                        ('other_user', _("I'm booking the room for someone else"))])
-    booked_for_user = PrincipalField(_(u'User'), [HiddenUnless('room_usage', 'other_user'),
-                                                  DataRequired()], allow_external=True)
-    booking_reason = TextAreaField(_(u'Reason'), [DataRequired()])
-    uses_vc = BooleanField(_(u'I will use videoconference equipment'))
-    used_equipment = IndicoQuerySelectMultipleCheckboxField(_(u'VC equipment'), get_label=lambda x: x.name)
-    needs_vc_assistance = BooleanField(_(u'Request assistance for the startup of the videoconference session. '
-                                         u'This support is usually performed remotely.'))
-    needs_assistance = BooleanField(_(u'Request personal assistance for meeting startup'))
-    submit_book = SubmitField(_(u'Create booking'))
-    submit_prebook = SubmitField(_(u'Create pre-booking'))
+    booked_for_user = PrincipalField(_('User'), [HiddenUnless('room_usage', 'other_user'),
+                                                 DataRequired()], allow_external=True)
+    booking_reason = TextAreaField(_('Reason'), [DataRequired()])
+    uses_vc = BooleanField(_('I will use videoconference equipment'))
+    used_equipment = IndicoQuerySelectMultipleCheckboxField(_('VC equipment'), get_label=lambda x: x.name)
+    needs_vc_assistance = BooleanField(_('Request assistance for the startup of the videoconference session. '
+                                         'This support is usually performed remotely.'))
+    needs_assistance = BooleanField(_('Request personal assistance for meeting startup'))
+    submit_book = SubmitField(_('Create booking'))
+    submit_prebook = SubmitField(_('Create pre-booking'))
 
     def validate_used_equipment(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError(_(u'Videoconference equipment is not used.'))
+            raise ValidationError(_('Videoconference equipment is not used.'))
         elif not field.data and self.uses_vc.data:
-            raise ValidationError(_(u'Please select the type of videoconference that you will use.'))
+            raise ValidationError(_('Please select the type of videoconference that you will use.'))
 
     def validate_needs_vc_assistance(self, field):
         if field.data and not self.uses_vc.data:
-            raise ValidationError(_(u'Videoconference equipment is not used.'))
+            raise ValidationError(_('Videoconference equipment is not used.'))
 
 
 class NewBookingSimpleForm(NewBookingConfirmForm):
-    submit_check = SubmitField(_(u'Check conflicts'))
-    booking_reason = TextAreaField(_(u'Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
-                                                  DataRequired()])
+    submit_check = SubmitField(_('Check conflicts'))
+    booking_reason = TextAreaField(_('Reason'), [UsedIf(lambda form, field: not form.submit_check.data),
+                                                 DataRequired()])
     room_usage = RadioField(validators=[UsedIf(lambda form, field: not form.submit_check.data), DataRequired()],
                             choices=[('current_user', _("I'll be using the room myself")),
                                      ('other_user', _("I'm booking the room for someone else"))])
-    booked_for_user = PrincipalField(_(u'User'), [UsedIf(lambda form, field: not form.submit_check.data),
-                                                  HiddenUnless('room_usage', 'other_user'),
-                                                  DataRequired()], allow_external=True)
+    booked_for_user = PrincipalField(_('User'), [UsedIf(lambda form, field: not form.submit_check.data),
+                                                 HiddenUnless('room_usage', 'other_user'),
+                                                 DataRequired()], allow_external=True)
 
 
 class ModifyBookingForm(NewBookingSimpleForm):
-    submit_update = SubmitField(_(u'Update booking'))
+    submit_update = SubmitField(_('Update booking'))
 
     def __init__(self, *args, **kwargs):
         self._old_start_dt = kwargs.pop('old_start_dt')
@@ -165,9 +167,9 @@ class ModifyBookingForm(NewBookingSimpleForm):
         now = datetime.now()
 
         if self._old_start_dt < now and new_start_dt != self._old_start_dt and not session.user.is_admin:
-            raise ValidationError(_(u"The start time is in the past and cannot be modified."))
+            raise ValidationError(_("The start time is in the past and cannot be modified."))
         if self._old_start_dt >= now and new_start_dt < now and not session.user.is_admin:
-            raise ValidationError(_(u'The start time cannot be moved into the past.'))
+            raise ValidationError(_('The start time cannot be moved into the past.'))
 
     def validate_end_dt(self, field):
         super(NewBookingSimpleForm, self).validate_end_dt(field)
@@ -175,6 +177,6 @@ class ModifyBookingForm(NewBookingSimpleForm):
         now = datetime.now()
 
         if self._old_end_dt < now and new_end_dt != self._old_end_dt and not session.user.is_admin:
-            raise ValidationError(_(u"The end time is in the past and cannot be modified."))
+            raise ValidationError(_("The end time is in the past and cannot be modified."))
         if self._old_end_dt >= now and new_end_dt < now and not session.user.is_admin:
-            raise ValidationError(_(u'The end time cannot be moved into the past.'))
+            raise ValidationError(_('The end time cannot be moved into the past.'))
