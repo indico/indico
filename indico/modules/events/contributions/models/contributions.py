@@ -33,11 +33,10 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.management.util import get_non_inheriting_objects
-from indico.modules.events.models.persons import PersonLinkDataMixin, AuthorsSpeakersMixin
+from indico.modules.events.models.persons import AuthorsSpeakersMixin, PersonLinkDataMixin
 from indico.modules.events.papers.models.papers import Paper
-from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
+from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.sessions.util import session_coordinator_priv_enabled
-from indico.util.caching import memoize_request
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 

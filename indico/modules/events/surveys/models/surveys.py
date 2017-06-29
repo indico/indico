@@ -50,7 +50,7 @@ class Survey(db.Model):
     __table_args__ = (db.CheckConstraint("anonymous OR require_user", 'valid_anonymous_user'),
                       {'schema': 'event_surveys'})
 
-    #: The ID of the submission
+    #: The ID of the survey
     id = db.Column(
         db.Integer,
         primary_key=True
@@ -154,6 +154,13 @@ class Survey(db.Model):
         nullable=False,
         default=False
     )
+    #: The last user-friendly submission ID
+    _last_friendly_submission_id = db.deferred(db.Column(
+        'last_friendly_submission_id',
+        db.Integer,
+        nullable=False,
+        default=0
+    ))
 
     #: The list of submissions
     submissions = db.relationship(

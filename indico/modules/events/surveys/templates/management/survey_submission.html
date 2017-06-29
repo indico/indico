@@ -1,7 +1,7 @@
 {% extends 'events/surveys/management/_survey_base.html' %}
 
 {% block subtitle %}
-    {% trans %}Submission{% endtrans %}
+    {% trans id=submission.friendly_id %}Submission #{{ id }}{% endtrans %}
 {% endblock %}
 
 {% block description %}

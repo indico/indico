@@ -20,7 +20,16 @@ from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
+from indico.core.db.sqlalchemy.util.queries import increment_and_get
 from indico.util.string import return_ascii
+
+
+def _get_next_friendly_id(context):
+    """Get the next friendly id for a survey submission."""
+    from indico.modules.events.surveys.models.surveys import Survey
+    survey_id = context.current_parameters['survey_id']
+    assert survey_id is not None
+    return increment_and_get(Survey._last_friendly_submission_id, Survey.id == survey_id)
 
 
 class SurveySubmission(db.Model):
@@ -36,6 +45,12 @@ class SurveySubmission(db.Model):
     id = db.Column(
         db.Integer,
         primary_key=True
+    )
+    #: The human-friendly ID of the submission
+    friendly_id = db.Column(
+        db.Integer,
+        nullable=False,
+        default=_get_next_friendly_id
     )
     #: The ID of the survey
     survey_id = db.Column(
