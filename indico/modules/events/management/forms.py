@@ -17,16 +17,16 @@
 from __future__ import unicode_literals
 
 import re
-from datetime import timedelta, datetime
-from operator import itemgetter, attrgetter
+from datetime import datetime, timedelta
+from operator import attrgetter, itemgetter
 
 from flask import request, session
 from markupsafe import escape
 from pytz import timezone
 from werkzeug.datastructures import ImmutableMultiDict
-from wtforms import BooleanField, StringField, FloatField, SelectField, TextAreaField
+from wtforms import BooleanField, FloatField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField
-from wtforms.validators import InputRequired, DataRequired, ValidationError, Optional, NumberRange
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
 from indico.core.config import Config
 from indico.core.db import db
@@ -40,20 +40,20 @@ from indico.modules.events.cloning import EventCloner
 from indico.modules.events.fields import EventPersonLinkListField, ReferencesField
 from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import EventReference
-from indico.modules.events.sessions import COORDINATOR_PRIV_TITLES, COORDINATOR_PRIV_DESCS
+from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.timetable.util import get_top_level_entries
-from indico.util.date_time import format_human_timedelta, now_utc, relativedelta
+from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
 from indico.util.i18n import _
-from indico.util.string import is_valid_mail
+from indico.util.string import is_valid_mail, to_unicode
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (AccessControlListField, IndicoProtectionField, PrincipalListField,
-                                     IndicoEnumSelectField, IndicoPasswordField, IndicoDateTimeField,
-                                     IndicoTimezoneSelectField, IndicoLocationField, MultiStringField,
-                                     IndicoTagListField, IndicoRadioField, RelativeDeltaField, IndicoDateField,
-                                     IndicoSelectMultipleCheckboxField, IndicoWeekDayRepetitionField)
-from indico.web.forms.validators import LinkedDateTime, HiddenUnless
-from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
+from indico.web.forms.fields import (AccessControlListField, IndicoDateField, IndicoDateTimeField,
+                                     IndicoEnumSelectField, IndicoLocationField, IndicoPasswordField,
+                                     IndicoProtectionField, IndicoRadioField, IndicoSelectMultipleCheckboxField,
+                                     IndicoTagListField, IndicoTimezoneSelectField, IndicoWeekDayRepetitionField,
+                                     MultiStringField, PrincipalListField, RelativeDeltaField)
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 CLONE_REPEAT_CHOICES = (
@@ -149,13 +149,25 @@ class EventDatesForm(IndicoForm):
     def validate_end_dt(self, field):
         if not self.check_timetable_boundaries:
             return
-        start_dt_offset = self.start_dt.data - self.start_dt.object_data
-        end_buffer = field.data - max(self.toplevel_timetable_entries, key=attrgetter('end_dt')).end_dt
-        delta = max(timedelta(), start_dt_offset - end_buffer)
-        if delta:
-            delta_str = format_human_timedelta(delta, 'minutes', True)
-            raise ValidationError(_("The event is too short to fit all timetable entries. "
-                                    "It must be at least {} longer.").format(delta_str))
+        if self.update_timetable.data:
+            # if we move timetable entries according to the start date
+            # change, check that there's enough time at the end.
+            start_dt_offset = self.start_dt.data - self.start_dt.object_data
+            end_buffer = field.data - max(self.toplevel_timetable_entries, key=attrgetter('end_dt')).end_dt
+            delta = max(timedelta(), start_dt_offset - end_buffer)
+            if delta:
+                delta_str = format_human_timedelta(delta, 'minutes', True)
+                raise ValidationError(_("The event is too short to fit all timetable entries. "
+                                        "It must be at least {} longer.").format(delta_str))
+        else:
+            # if we do not update timetable entries, only check that
+            # the event does not end before its last timetable entry;
+            # a similar check for the start time is done above in that
+            # field's validation method.
+            max_end_dt = max(self.toplevel_timetable_entries, key=attrgetter('end_dt')).end_dt
+            if field.data < max_end_dt:
+                raise ValidationError(_("The event cannot end before its last timetable entry, which is at {}.")
+                                      .format(to_unicode(format_datetime(max_end_dt, timezone=self.event.tzinfo))))
 
 
 class EventLocationForm(IndicoForm):
