@@ -18,29 +18,22 @@
 fabfile for Indico development operations
 """
 
+import glob
+import json
 import os
 import re
-import sys
-import glob
 import shutil
-import requests
-import json
-import getpass
+import sys
 from contextlib import contextmanager
-import operator
 
-from fabric.api import local, lcd, task, env
+from fabric.api import env, lcd, local, task
+from fabric.colors import cyan, green, red, yellow
 from fabric.context_managers import prefix, settings
-from fabric.colors import red, green, yellow, cyan
 from fabric.contrib import console
-from fabric.operations import put, run
 
 
 ASSET_TYPES = ['js', 'sass', 'css']
-DOC_DIRS = ['guides']
 RECIPES = {}
-DEFAULT_REQUEST_ERROR_MSG = 'UNDEFINED ERROR (no error description from server)'
-CONF_FILE_NAME = 'fabfile.conf'
 SOURCE_DIR = os.path.dirname(__file__)
 
 CKBUILDER_CONFIG = {
@@ -61,14 +54,13 @@ CKBUILDER_CONFIG = {
     ],
 }
 
-execfile(CONF_FILE_NAME, {}, env)
-
 env.update({
-    'conf': CONF_FILE_NAME,
     'src_dir': SOURCE_DIR,
-    'ext_dir': os.path.join(SOURCE_DIR, env.ext_dirname),
-    'target_dir': os.path.join(SOURCE_DIR, env.target_dirname),
-    'node_env_path': os.path.join(SOURCE_DIR, env.node_env_dirname)
+    'ext_dir': os.path.join(SOURCE_DIR, 'ext_modules'),
+    'target_dir': os.path.join(SOURCE_DIR, 'indico', 'htdocs'),
+    'node_env_path': os.path.join(SOURCE_DIR, 'ext_modules', 'node_env'),
+    'node_version': '4.2.2',
+    'system_node': False,
 })
 
 
@@ -89,48 +81,12 @@ def node_env():
             yield
 
 
-@contextmanager
-def pyenv_env(version):
-    cmd_dir = os.path.join(env.pyenv_dir, 'versions', 'indico-build-{0}'.format(version), 'bin')
-    with prefix('PATH={0}:$PATH'.format(cmd_dir)):
-        yield
-
-
-def pyenv_cmd(cmd, **kwargs):
-    cmd_dir = os.path.join(env.pyenv_dir, 'bin')
-    return local('{0}/pyenv {1}'.format(cmd_dir, cmd), **kwargs)
-
-
 def grunt(args):
     cmd = os.path.join(env.src_dir, 'node_modules/.bin/grunt')
     local('{} {}'.format(cmd, args))
 
 
 # Util functions
-
-def _yes_no_input(message, default):
-    c = '? '
-    if default.lower() == 'y':
-        c = ' [Y/n]? '
-    elif default.lower() == 'n':
-        c = ' [y/N]? '
-    s = raw_input(message+c) or default
-    if s.lower() == 'y':
-        return True
-    else:
-        return False
-
-
-def _putl(source_file, dest_dir):
-    """
-    To be used instead of put, since it doesn't support symbolic links
-    """
-
-    put(source_file, '/')
-    run("mkdir -p {0}".format(dest_dir))
-    run("mv -f /{0} {1}".format(os.path.basename(source_file), dest_dir))
-
-
 def create_node_env():
     with settings(warn_only=True):
         local('nodeenv -c -n {0} {1}'.format(env.node_version, env.node_env_path))
@@ -139,35 +95,6 @@ def create_node_env():
 def lib_dir(src_dir, dtype):
     target_dir = os.path.join(src_dir, 'indico', 'htdocs')
     return os.path.join(target_dir, dtype, 'lib')
-
-
-def _check_pyenv(py_versions):
-    """
-    Check that pyenv and pyenv-virtualenv are installed and set up the
-    compilers/virtual envs in case they do not exist
-    """
-
-    if os.system('which pyenv'):
-        print red("Can't find pyenv!")
-        print yellow("Are you sure you have installed it?")
-        sys.exit(-2)
-    elif os.system('which pyenv-virtualenv'):
-        print red("Can't find pyenv-virtualenv!")
-        print yellow("Are you sure you have installed it?")
-        sys.exit(-2)
-
-    # list available pyenv versions
-    av_versions = os.listdir(os.path.join(env.pyenv_dir, 'versions'))
-
-    for py_version in py_versions:
-        if py_version not in av_versions:
-            print green('Installing Python {0}'.format(py_version))
-            pyenv_cmd('install {0}'.format(py_version), capture=True)
-
-        local("echo \'y\' | pyenv virtualenv {0} indico-build-{0}".format(py_version))
-
-        with pyenv_env(py_version):
-            local("pip install -r requirements.dev.txt")
 
 
 def _check_present(executable, message="Please install it first."):
@@ -210,24 +137,6 @@ def _cp_tree(dfrom, dto, exclude=[]):
     shutil.copytree(dfrom, dto, ignore=shutil.ignore_patterns(*exclude))
 
 
-def _find_most_recent(path, cmp=operator.gt, maxt=0):
-    for dirpath, __, fnames in os.walk(path):
-        for fname in fnames:
-
-            # ignore hidden files and ODTs
-            if fname.startswith(".") or fname.endswith(".odt"):
-                continue
-
-            mtime = os.stat(os.path.join(dirpath, fname)).st_mtime
-            if cmp(mtime, maxt):
-                maxt = mtime
-    return maxt
-
-
-def _find_least_recent(path):
-    return _find_most_recent(path, cmp=operator.lt, maxt=sys.maxint)
-
-
 def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
     l_dir = lib_dir(env.src_dir, dtype)
     dest_dir = os.path.join(l_dir, dest_subpath) if dest_subpath else l_dir
@@ -238,7 +147,6 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
 
 
 # Recipes
-
 @recipe('angular')
 def install_angular():
     with node_env():
@@ -579,298 +487,3 @@ def clean_deps(src_dir=None):
 
     for dtype in ASSET_TYPES:
         _safe_rm('{0}/*'.format(lib_dir(src_dir or env.src_dir, dtype)), recursive=True)
-
-
-@task
-def cleanup(build_dir=None, force=False):
-    """
-    Clean up build environment
-    """
-    _safe_rm('{0}'.format(build_dir or env.build_dir), recursive=True, ask=(not force))
-
-
-@task
-def tarball(src_dir=None):
-    """
-    Create a source Indico distribution (tarball)
-    """
-
-    src_dir = src_dir or env.src_dir
-
-    make_docs(src_dir)
-
-    setup_deps(n_env=os.path.join(src_dir, 'ext_modules', 'node_env'),
-               src_dir=src_dir)
-    local('python setup.py -q sdist')
-
-
-@task
-def egg(py_versions=None):
-    """
-    Create a binary Indico distribution (egg)
-    """
-
-    for py_version in py_versions:
-        cmd_dir = os.path.join(env.pyenv_dir, 'versions', 'indico-build-{0}'.format(py_version), 'bin')
-        local('{0} setup.py -q bdist_egg'.format(os.path.join(cmd_dir, 'python')))
-    print green(local('ls -lah dist/', capture=True))
-
-
-@task
-def make_docs(src_dir=None, build_dir=None, force=False):
-    """
-    Generate Indico docs
-    """
-
-    src_dir = src_dir or env.src_dir
-    doc_src_dir = os.path.join(src_dir, 'doc')
-
-    if build_dir is None:
-        target_dir = os.path.join(src_dir, 'indico', 'htdocs', 'ihelp')
-    else:
-        target_dir = os.path.join(build_dir or env.build_dir, 'indico', 'htdocs', 'ihelp')
-
-    if not force:
-        print yellow("Checking if docs need to be generated... "),
-        if _find_most_recent(target_dir) > _find_most_recent(doc_src_dir):
-            print green("Nope.")
-            return
-
-    print red("Yes :(")
-    _check_present('pdflatex')
-
-    print green('Generating documentation')
-    with lcd(doc_src_dir):
-        for d in DOC_DIRS:
-            with lcd(d):
-                local('make html')
-                local('make latex')
-                local('rm -rf {0}/*'.format(os.path.join(target_dir, 'html')))
-                local('mv build/html/* {0}'.format(os.path.join(target_dir, 'html')))
-
-        with lcd(os.path.join('guides', 'build', 'latex')):
-            local('make all-pdf')
-            local('mv *.pdf {0}'.format(os.path.join(target_dir, 'pdf')))
-
-        print green('Cleaning up')
-        for d in DOC_DIRS:
-            with lcd(d):
-                local('make clean')
-
-
-def _check_request_error(r):
-    if r.status_code >= 400:
-        j = r.json()
-        msg = j.get('message', DEFAULT_REQUEST_ERROR_MSG)
-        print red("ERROR: {0} ({1})".format(msg, r.status_code))
-        sys.exit(-2)
-
-
-def _valid_github_credentials(auth):
-    url = "https://api.github.com/repos/{0}/{1}".format(env.github['org'], env.github['repo'])
-    r = requests.get(url, auth=(env.github['user'], auth))
-    if (r.status_code == 401) and (r.json().get('message') == 'Bad credentials'):
-        print red('Invalid Github credentials for user \'{0}\''.format(env.github['user']))
-        return False
-
-    return True
-
-
-def _release_exists(tag_name, auth):
-    url = "https://api.github.com/repos/{0}/{1}/releases".format(env.github['org'], env.github['repo'])
-    r = requests.get(url, auth=(env.github['user'], auth))
-    _check_request_error(r)
-    parsed = r.json()
-    for release in parsed:
-        if release.get('tag_name') == tag_name:
-            rel_id = release.get('id')
-            return (True, rel_id, release)
-
-    return (False, 0, None)
-
-
-def _asset_exists(rel_id, name, auth):
-    url = "https://api.github.com/repos/{0}/{1}/releases/{2}/assets" \
-          .format(env.github['org'], env.github['repo'], rel_id)
-    r = requests.get(url, auth=(env.github['user'], auth))
-    _check_request_error(r)
-    parsed = r.json()
-    for j in parsed:
-        if j.get('name') == name:
-            asset_id = j.get('id')
-            return (True, asset_id)
-
-    return (False, 0)
-
-
-@task
-def upload_github(build_dir=None, tag_name=None, auth_token=None,
-                  overwrite=None, indico_version='master'):
-
-    build_dir = build_dir or env.build_dir
-    auth_token = auth_token or env.github['auth_token']
-
-    while (auth_token is None) or (not _valid_github_credentials(auth_token)):
-        auth_token = getpass.getpass(
-            'Insert the Github password/OAuth token for user \'{0}\': '.format(env.github['user']))
-
-    auth_creds = (env.github['user'], auth_token)
-
-    overwrite = overwrite or env.github['overwrite']
-
-    # Create a new release
-    tag_name = tag_name or indico_version
-    url = "https://api.github.com/repos/{0}/{1}/releases".format(env.github['org'], env.github['repo'])
-    payload = {
-        'tag_name': tag_name,
-        'target_commitish': indico_version,
-        'name': 'Indico {0}'.format(tag_name),
-        'draft': True
-    }
-
-    (exists, rel_id, release_data) = _release_exists(tag_name, auth_token)
-
-    if exists:
-        if overwrite is None:
-            overwrite = _yes_no_input('Release already exists, do you want to overwrite', 'n')
-        if overwrite:
-            release_id = rel_id
-        else:
-            return
-    else:
-        # We will need to get a new release id from github
-        r = requests.post(url, auth=auth_creds, data=json.dumps(payload))
-        _check_request_error(r)
-        release_data = r.json()
-        release_id = release_data.get('id')
-
-    # Upload binaries to the new release
-    binaries_dir = os.path.join(build_dir, 'indico', 'dist')
-
-    # awful way to handle this, but a regex seems like too much
-    url = release_data['upload_url'][:-7]
-
-    for f in os.listdir(binaries_dir):
-
-        # jump over hidden/system files
-        if f.startswith('.'):
-            continue
-
-        if os.path.isfile(os.path.join(binaries_dir, f)):
-            (exists, asset_id) = _asset_exists(release_id, f, auth_token)
-
-            if exists:
-                # delete previous version
-                del_url = "https://api.github.com/repos/{0}/{1}/releases/assets/{2}" \
-                          .format(env.github['org'], env.github['repo'], asset_id)
-                r = requests.delete(del_url, auth=auth_creds)
-                _check_request_error(r)
-
-            with open(os.path.join(binaries_dir, f), 'rb') as ff:
-                data = ff.read()
-                extension = os.path.splitext(f)[1]
-
-                # upload eggs using zip mime type
-                if extension == '.gz':
-                    headers = {'Content-Type': 'application/x-gzip'}
-                elif extension == '.egg':
-                    headers = {'Content-Type': 'application/zip'}
-
-                headers['Accept'] = 'application/vnd.github.v3+json'
-                headers['Content-Length'] = len(data)
-                params = {'name': f}
-
-                print green("Uploading \'{0}\' to Github".format(f))
-                r = requests.post(url, auth=auth_creds, headers=headers, data=data, params=params, verify=False)
-                _check_request_error(r)
-
-
-@task
-def upload_ssh(build_dir=None, server_host=None, server_port=None,
-               ssh_user=None, ssh_key=None, dest_dir=None):
-
-    build_dir = build_dir or env.build_dir
-    server_host = server_host or env.ssh['host']
-    server_port = server_port or env.ssh['port']
-    ssh_user = ssh_user or env.ssh['user']
-    ssh_key = ssh_key or env.ssh['key']
-    dest_dir = dest_dir or env.ssh['dest_dir']
-
-    env.host_string = server_host + ':' + server_port
-    env.user = ssh_user
-    env.key_filename = ssh_key
-
-    binaries_dir = os.path.join(build_dir, 'indico', 'dist')
-    for f in os.listdir(binaries_dir):
-        if os.path.isfile(os.path.join(binaries_dir, f)):
-            _putl(os.path.join(binaries_dir, f), dest_dir)
-
-
-@task
-def _package_release(build_dir, py_versions, system_node):
-    # Build source tarball
-    with settings(system_node=system_node):
-        print green('Generating '), cyan('tarball')
-        tarball(build_dir)
-
-    # Build binaries (EGG)
-    print green('Generating '), cyan('eggs')
-    egg(py_versions)
-
-
-@task
-def package_release(py_versions=None, build_dir=None, system_node=False,
-                    indico_version=None, upstream=None, tag_name=None,
-                    github_auth=None, overwrite=None, ssh_server_host=None,
-                    ssh_server_port=None, ssh_user=None, ssh_key=None,
-                    ssh_dest_dir=None, no_clean=False, force_clean=False,
-                    upload_to=None, build_here=False):
-    """
-    Create an Indico release - source and binary distributions
-    """
-
-    py_versions = py_versions.split('/') if py_versions else env.py_versions
-    upload_to = upload_to.split('/') if upload_to else []
-
-    build_dir = build_dir or env.build_dir
-    upstream = upstream or env.github['upstream']
-
-    ssh_server_host = ssh_server_host or env.ssh['host']
-    ssh_server_port = ssh_server_port or env.ssh['port']
-    ssh_user = ssh_user or env.ssh['user']
-    ssh_key = ssh_key or env.ssh['key']
-    ssh_dest_dir = ssh_dest_dir or env.ssh['dest_dir']
-
-    indico_version = indico_version or 'master'
-
-    local('mkdir -p {0}'.format(build_dir))
-
-    _check_pyenv(py_versions)
-
-    if build_here:
-        _package_release(os.path.dirname(__file__), py_versions, system_node)
-    else:
-        with lcd(build_dir):
-            if os.path.exists(os.path.join(build_dir, 'indico')):
-                print yellow("Repository seems to already exist.")
-                with lcd('indico'):
-                    local('git fetch {0}'.format(upstream))
-                    local('git reset --hard FETCH_HEAD')
-                    if not no_clean:
-                        local('git clean -df')
-            else:
-                local('git clone {0}'.format(upstream))
-            with lcd('indico'):
-                print green("Checking out branch \'{0}\'".format(indico_version))
-                local('git checkout {0}'.format(indico_version))
-
-                _package_release(os.path.join(build_dir, 'indico'), py_versions, system_node)
-
-    for u in upload_to:
-        if u == 'github':
-            upload_github(build_dir, tag_name, github_auth, overwrite, indico_version)
-        elif u == 'ssh':
-            upload_ssh(build_dir, ssh_server_host, ssh_server_port, ssh_user, ssh_key, ssh_dest_dir)
-
-    if not build_here and force_clean:
-        cleanup(build_dir, force=True)
