@@ -8,52 +8,54 @@
 {% endblock %}
 
 {% block content %}
-    <div class="toolbar space-after">
-        <div class="group">
-            <a href="{{ url_for('.export_questionnaire', survey) }}"
-               class="i-button"
-               title="{% trans %}Download a file containing all the questions of this survey. The file can later be imported into another survey.{% endtrans %}">
-                {% trans %}Export{% endtrans %}
-            </a>
-            {% if not survey.event_new.is_locked %}
-                <a href="#" data-href="{{ url_for('.import_questionnaire', survey) }}"
-                   class="i-button js-survey-item-dialog"
-                   data-title="{% trans %}Import questions{% endtrans %}">
-                    {% trans %}Import{% endtrans %}
+    <div class="manage-questionnaire">
+        <div class="toolbar space-after">
+            <div class="group">
+                <a href="{{ url_for('.export_questionnaire', survey) }}"
+                   class="i-button"
+                   title="{% trans %}Download a file containing all the questions of this survey. The file can later be imported into another survey.{% endtrans %}">
+                    {% trans %}Export{% endtrans %}
                 </a>
-            {% endif %}
+                {% if not survey.event_new.is_locked %}
+                    <a href="#" data-href="{{ url_for('.import_questionnaire', survey) }}"
+                       class="i-button js-survey-item-dialog"
+                       data-title="{% trans %}Import questions{% endtrans %}">
+                        {% trans %}Import{% endtrans %}
+                    </a>
+                {% endif %}
+            </div>
         </div>
-    </div>
 
-    <div class="flashed-messages"></div>
+        <div class="flashed-messages"></div>
 
-    <div class="action-box hide-if-locked">
-        <div class="section">
-            <div class="icon icon-list"></div>
-            <div class="text">
-                <div class="label">
-                    {% trans %}Sections{% endtrans %}
+        <div class="action-box hide-if-locked">
+            <div class="section">
+                <div class="icon icon-list"></div>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Sections{% endtrans %}
+                    </div>
+                    {% trans %}The questionnaire consists of one or more sections.{% endtrans %}
                 </div>
-                {% trans %}The questionnaire consists of one or more sections.{% endtrans %}
-            </div>
-            <div class="toolbar">
-                <a href="#" data-href="{{ url_for('.add_section', survey) }}"
-                   class="i-button js-survey-item-dialog icon-plus"
-                   data-title="{% trans %}Add section{% endtrans %}">
-                    {% trans %}Add section{% endtrans %}
-                </a>
+                <div class="toolbar">
+                    <a href="#" data-href="{{ url_for('.add_section', survey) }}"
+                       class="i-button js-survey-item-dialog icon-plus"
+                       data-title="{% trans %}Add section{% endtrans %}">
+                        {% trans %}Add section{% endtrans %}
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
 
-    <div id="survey-questionnaire-preview" class="i-box-group vert" data-sort-url="{{ url_for('.sort_items', survey) }}">
-        {{ render_questionnaire_preview(survey, preview_form, field_types) }}
-    </div>
+        <div id="survey-questionnaire-preview" class="i-box-group vert" data-sort-url="{{ url_for('.sort_items', survey) }}">
+            {{ render_questionnaire_preview(survey, preview_form, field_types) }}
+        </div>
 
-    <div class="toolbar right">
-        <a href="{{ url_for('.manage_survey', survey) }}" class="i-button big">
-            {% trans %}Back{% endtrans %}
-        </a>
+        <div class="toolbar right">
+            <a href="{{ url_for('.manage_survey', survey) }}" class="i-button big">
+                {% trans %}Back{% endtrans %}
+            </a>
+        </div>
     </div>
 
     <script>
