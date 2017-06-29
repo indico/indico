@@ -81,7 +81,7 @@
     }
 
     global.setupQuestionnaireWindows = function setupQuestionnaireWindows() {
-        $('.page-content').on('click', '.js-survey-item-dialog', function(evt) {
+        $('.manage-questionnaire').on('click', '.js-survey-item-dialog', function(evt) {
             evt.preventDefault();
             ajaxDialog({
                 trigger: this,
