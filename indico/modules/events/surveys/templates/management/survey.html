@@ -122,8 +122,9 @@
                         </a>
                     </li>
                 </ul>
-                <button id="delete-submissions" data-href="{{ url_for('.delete_submissions', survey) }}"
-                        class="hide-if-locked"
+                <button id="delete-submissions"
+                        class="i-button icon-remove text-color color-on-hover danger hide-if-locked"
+                        data-href="{{ url_for('.delete_submissions', survey) }}"
                         data-title="{% trans %}Remove all selected submissions?{% endtrans %}"
                         data-confirm="{% trans %}Are you sure you want to remove all selected submissions?{% endtrans %}"
                         data-method="DELETE" class="i-button icon-remove" disabled>
