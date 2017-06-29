@@ -17,16 +17,17 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase, WPConferenceDefaultDisplayBase
+from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
+from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.views import WPSimpleEventDisplayBase
 
 
-class WPManageSurvey(WPJinjaMixin, WPConferenceModifBase):
+class WPManageSurvey(WPEventManagement):
     template_prefix = 'events/surveys/'
     sidemenu_option = 'surveys'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
+        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
 
 
 class WPSurveyResults(WPManageSurvey):

@@ -16,17 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import request, flash, redirect, jsonify
-from sqlalchemy.orm import joinedload, defaultload
+from flask import flash, jsonify, redirect, request
+from sqlalchemy.orm import defaultload, joinedload
 
-from indico.modules.events.logs import EventLogRealm, EventLogKind
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
 from indico.modules.events.surveys.models.items import SurveySection
 from indico.modules.events.surveys.models.submissions import SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey
 from indico.modules.events.surveys.util import generate_spreadsheet_from_survey
-from indico.modules.events.surveys.views import WPSurveyResults, WPManageSurvey
+from indico.modules.events.surveys.views import WPManageSurvey, WPSurveyResults
 from indico.util.i18n import _
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import url_for
@@ -44,7 +44,7 @@ class RHSurveyResults(RHManageSurveyBase):
                        .one())
 
     def _process(self):
-        return WPSurveyResults.render_template('management/survey_results.html', self._conf, survey=self.survey)
+        return WPSurveyResults.render_template('management/survey_results.html', self.event_new, survey=self.survey)
 
 
 class RHExportSubmissionsBase(RHManageSurveyBase):
@@ -120,6 +120,6 @@ class RHDisplaySubmission(RHSurveySubmissionBase):
 
     def _process(self):
         answers = {answer.question_id: answer for answer in self.submission.answers}
-        return WPManageSurvey.render_template('management/survey_submission.html', self._conf,
+        return WPManageSurvey.render_template('management/survey_submission.html', self.event_new,
                                               survey=self.submission.survey, submission=self.submission,
                                               answers=answers)

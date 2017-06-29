@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import json
 
-from flask import request, flash, session, jsonify
+from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.datastructures import MultiDict
@@ -28,14 +28,14 @@ from indico.core.db import db
 from indico.modules.events.surveys import logger
 from indico.modules.events.surveys.controllers.management import RHManageSurveyBase, RHManageSurveysBase
 from indico.modules.events.surveys.fields import get_field_types
-from indico.modules.events.surveys.forms import TextForm, SectionForm, ImportQuestionnaireForm
-from indico.modules.events.surveys.models.items import (SurveyItem, SurveyItemType, SurveySection, SurveyText,
-                                                        SurveyQuestion)
+from indico.modules.events.surveys.forms import ImportQuestionnaireForm, SectionForm, TextForm
+from indico.modules.events.surveys.models.items import (SurveyItem, SurveyItemType, SurveyQuestion, SurveySection,
+                                                        SurveyText)
 from indico.modules.events.surveys.models.surveys import Survey
-from indico.modules.events.surveys.operations import add_survey_section, add_survey_question, add_survey_text
+from indico.modules.events.surveys.operations import add_survey_question, add_survey_section, add_survey_text
 from indico.modules.events.surveys.util import make_survey_form
 from indico.modules.events.surveys.views import WPManageSurvey
-from indico.util.i18n import _, ngettext
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
@@ -47,8 +47,8 @@ class RHManageSurveyQuestionnaire(RHManageSurveyBase):
     def _process(self):
         field_types = get_field_types()
         preview_form = make_survey_form(self.survey)()
-        return WPManageSurvey.render_template('management/survey_questionnaire.html', self._conf, survey=self.survey,
-                                              field_types=field_types, preview_form=preview_form)
+        return WPManageSurvey.render_template('management/survey_questionnaire.html', self.event_new,
+                                              survey=self.survey, field_types=field_types, preview_form=preview_form)
 
 
 class RHExportSurveyQuestionnaire(RHManageSurveyBase):

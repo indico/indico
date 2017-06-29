@@ -42,8 +42,7 @@ class RHManageSurveys(RHManageSurveysBase):
                    .filter(~Survey.is_deleted)
                    .order_by(db.func.lower(Survey.title))
                    .all())
-        return WPManageSurvey.render_template('management/survey_list.html',
-                                              self._conf, event=self.event_new, surveys=surveys)
+        return WPManageSurvey.render_template('management/survey_list.html', self.event_new, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
@@ -51,8 +50,8 @@ class RHManageSurvey(RHManageSurveyBase):
 
     def _process(self):
         submitted_surveys = [s for s in self.survey.submissions if s.is_submitted]
-        return WPManageSurvey.render_template('management/survey.html', self._conf, survey=self.survey,
-                                              submitted_surveys=submitted_surveys)
+        return WPManageSurvey.render_template('management/survey.html', self.event_new,
+                                              survey=self.survey, submitted_surveys=submitted_surveys)
 
 
 class RHEditSurvey(RHManageSurveyBase):
