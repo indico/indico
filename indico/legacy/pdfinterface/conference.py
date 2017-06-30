@@ -871,10 +871,11 @@ class TimeTablePlain(PDFWithTOC):
                         elif s_entry.type == TimetableEntryType.BREAK:
                             lt = []
                             date = self._fontify('{}'.format(format_time(s_entry.start_dt, timezone=self._tz)))
-                            caption = obj.title.encode('utf-8')
 
                             if self._ttPDFFormat.showLengthContribs():
-                                caption = u'{} ({})'.format(caption, format_human_timedelta(s_entry.duration))
+                                caption = u'{} ({})'.format(obj.title, format_human_timedelta(s_entry.duration))
+                            else:
+                                caption = obj.title
 
                             lt.append([self._fontify(caption.encode('utf-8'), 10)])
                             caption = Table(lt, colWidths=None, style=self._tsSpk)
