@@ -2740,7 +2740,7 @@ msgstr "N'inclure que les salles actives. <b>Ceci devrait être coché.</b> Veui
 
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRoomsResults.tpl:10
 msgid " Found {} rooms "
-msgstr "{0} salles trouvées"
+msgstr "{} salles trouvées"
 
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRoomsResults.tpl:22
 msgid "Room name"
@@ -16836,7 +16836,7 @@ msgstr "Oui/Non"
 
 #: indico/web/flask/app.py:141
 msgid "Login failed: {error}"
-msgstr "Echec de la connection: {erro}"
+msgstr "Echec de la connection: {error}"
 
 #: indico/web/flask/app.py:345
 msgid "An unexpected error occurred."
