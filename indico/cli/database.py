@@ -26,9 +26,11 @@ from flask import current_app
 from flask.cli import with_appcontext
 from flask_migrate.cli import db as flask_migrate_cli
 
+import indico
 from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.core.db.sqlalchemy.migration import PluginScriptDirectory, migrate, prepare_db
+from indico.core.db.sqlalchemy.util.management import get_all_tables
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 
@@ -54,6 +56,59 @@ def cli(ctx, plugin=None, all_plugins=False):
 def prepare():
     """Initializes a new database (creates tables, sets alembic rev to HEAD)"""
     return prepare_db()
+
+
+def _stamp(plugin=None, revision=None):
+    table = 'alembic_version' if not plugin else 'alembic_version_plugin_{}'.format(plugin)
+    db.session.execute('DELETE FROM {}'.format(table))
+    if revision:
+        db.session.execute('INSERT INTO {} VALUES (:revision)'.format(table), {'revision': revision})
+
+
+@cli.command()
+def reset_alembic():
+    """Resets the alembic state carried over from 1.9.x
+
+    Only run this command right after upgrading from a 1.9.x version
+    so the references to old alembic revisions (which were removed in
+    2.0) are reset.
+    """
+    tables = get_all_tables(db)['public']
+    if 'alembic_version' not in tables:
+        print 'No alembic_version table found'
+        sys.exit(1)
+    current_revs = [rev for rev, in db.session.execute('SELECT version_num FROM alembic_version').fetchall()]
+    if current_revs != ['563fa8622042']:
+        print ('Your database is not at the latest 1.9.11 revision (got [{}], expected [563fa8622042]).'
+               .format(', '.join(current_revs)))
+        print 'This can have multiple reasons:'
+        print '1) You did not upgrade from 1.9.x, so you do not need this command'
+        print '2) You have already executed the script'
+        print '3) You did not fully upgrade to the latest 1.9.11 revision before upgrading to 2.x'
+        print ('In case of (3), you need to install v1.9.11 and then upgrade the database before updating Indico back '
+               'to {}'.format(indico.__version__))
+        sys.exit(1)
+    plugins = sorted(x[23:] for x in tables if x.startswith('alembic_version_plugin_'))
+    print 'Resetting core alembic state...'
+    _stamp()
+    print 'Plugins found: {}'.format(', '.join(plugins))
+    no_revision_plugins = {'audiovisual', 'payment_cern'}
+    for plugin in no_revision_plugins:
+        # All revisions were just data migrations -> get rid of them
+        if plugin not in plugins:
+            continue
+        print '[{}] Deleting revision table'.format(plugin)
+        db.session.execute('DROP TABLE alembic_version_plugin_{}'.format(plugin))
+    plugin_revisions = {'chat': '3888761f35f7',
+                        'livesync': 'aa0dbc6c14aa',
+                        'outlook': '6093a83228a7',
+                        'vc_vidyo': '6019621fea50'}
+    for plugin, revision in plugin_revisions.iteritems():
+        if plugin not in plugins:
+            continue
+        print '[{}] Stamping to new revision'.format(plugin)
+        _stamp(plugin, revision)
+    db.session.commit()
 
 
 def _safe_downgrade(*args, **kwargs):
