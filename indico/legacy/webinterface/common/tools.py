@@ -13,11 +13,15 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
-from indico.core.logger import Logger
-from HTMLParser import HTMLParser, HTMLParseError
-from xml.sax.saxutils import  unescape
 
 import re
+from HTMLParser import HTMLParseError, HTMLParser
+from xml.sax.saxutils import unescape
+
+from indico.core.logger import Logger
+from indico.util.i18n import _
+from indico.util.string import to_unicode
+
 
 allowedTags = ["a","abbr","acronym","address","area",
                "b","bdo","big","blockquote","br",
@@ -115,9 +119,8 @@ locatestartendtag = re.compile(r"""
 
 
 class HarmfulHTMLException(Exception):
-
-    def __init__(self, msg, pos = 0):
-        self.msg = _("""Using forbidden HTML: "%s" found at %s""") % (msg, pos)
+    def __init__(self, msg, pos=0):
+        self.msg = _(u'Using forbidden HTML: "%s" found at %s') % (msg, pos)
 
     def __str__(self):
         return self.msg
@@ -213,10 +216,10 @@ class RestrictedHTMLParser( HTMLParser ):
 def restrictedHTML(txt, sanitizationLevel):
     try:
         parser = RestrictedHTMLParser(sanitizationLevel)
-        parser.feed(txt + '>')
+        parser.feed(to_unicode(txt) + u'>')
         parser.close()
-    except (HarmfulHTMLException, HTMLParseError),e :
-        return e.msg
+    except (HarmfulHTMLException, HTMLParseError) as exc:
+        return exc.msg
     return None
 
 
