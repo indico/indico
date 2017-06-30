@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import json
 import os
 import re
@@ -48,12 +50,12 @@ from indico.web.menu import SideMenuItem
 
 
 class PluginCategory(unicode, IndicoEnum):
-    search = _(u'Search')
-    synchronization = _(u'Synchronization')
-    payment = _(u'Payment')
-    importers = _(u'Importers')
-    videoconference = _(u'Videoconference')
-    other = _(u'Other')
+    search = _('Search')
+    synchronization = _('Synchronization')
+    payment = _('Payment')
+    importers = _('Importers')
+    videoconference = _('Videoconference')
+    other = _('Other')
 
 
 class IndicoPlugin(Plugin):
@@ -99,8 +101,10 @@ class IndicoPlugin(Plugin):
     category = None
     #: If `settings`, `event_settings` and `user_settings` should use strict
     #: mode, i.e. only allow keys in `default_settings`, `default_event_settings`
-    #: or `default_user_settings` (or the related `acl_settings` sets)
-    strict_settings = False
+    #: or `default_user_settings` (or the related `acl_settings` sets).
+    #: This should not be disabled in most cases; if you need to store arbitrary
+    #: keys, consider storing a dict inside a single top-level setting.
+    strict_settings = True
 
     def init(self):
         """Called when the plugin is being loaded/initialized.
@@ -364,7 +368,7 @@ class WPJinjaMixinPlugin(WPJinjaMixin):
 @signals.menu.items.connect_via('admin-sidemenu')
 def _extend_admin_menu(sender, **kwargs):
     if session.user.is_admin:
-        return SideMenuItem(u'plugins', _(u"Plugins"), url_for(u'plugins.index'), 80, icon=u'puzzle')
+        return SideMenuItem('plugins', _('Plugins'), url_for('plugins.index'), 80, icon='puzzle')
 
 
 plugin_engine = IndicoPluginEngine()

@@ -15,17 +15,18 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
 import re
 
 from flask import render_template
 from flask_pluginengine import render_plugin_template
 
 from indico.core import signals
-from indico.util.decorators import classproperty
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
+from indico.util.decorators import classproperty
 from indico.util.string import remove_accents
 from indico.util.user import retrieve_principal
 from indico.web.flask.templating import get_overridable_template_name
@@ -37,7 +38,6 @@ PREFIX_RE = re.compile('^vc_')
 
 class VCPluginMixin(object):
     settings_form = VCPluginSettingsFormBase
-    strict_settings = True
     default_settings = {'notification_emails': []}
     acl_settings = {'acl', 'managers'}
     #: the :class:`IndicoForm` to use for the videoconference room form

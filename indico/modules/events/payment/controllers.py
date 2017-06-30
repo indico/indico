@@ -117,7 +117,9 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
     def _process(self):
         can_modify = bool(session.user) and self.plugin.can_be_modified(session.user, self.event_new)
         plugin_settings = self.plugin.settings.get_all()
-        defaults = FormDefaults(self.plugin.event_settings.get_all(self.event_new), **plugin_settings)
+        plugin_event_settings = self.plugin.event_settings.get_all(self.event_new)
+        defaults = FormDefaults({k: v for k, v in plugin_event_settings.iteritems() if v is not None},
+                                **plugin_settings)
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         if can_modify and form.validate_on_submit():
             self.plugin.event_settings.set_multi(self.event_new, form.data)
