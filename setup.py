@@ -14,68 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
 
 import ast
 import os
 import re
 from distutils.command.build import build
-from setuptools import setup, find_packages
 
-
-ENTRY_POINTS = {
-    'console_scripts': [
-        'indico = indico.cli.core:cli',
-        'indico-zodbimport = indico_zodbimport.cli:main',
-    ],
-    'pytest11': [
-        'indico = indico.testing.pytest_plugin',
-    ],
-    'indico.zodb_importers': [
-        'roombooking = indico_zodbimport.modules.roombooking:RoomBookingImporter',
-        'payment = indico_zodbimport.modules.payment:PaymentImporter',
-        'api = indico_zodbimport.modules.api:APIImporter',
-        'users = indico_zodbimport.modules.users:UserImporter',
-        'groups = indico_zodbimport.modules.groups:GroupImporter',
-        'static_sites = indico_zodbimport.modules.static_sites:StaticSitesImporter',
-        'event_alarms = indico_zodbimport.modules.event_alarms:EventAlarmImporter',
-        'legacy_events = indico_zodbimport.modules.legacy_events:LegacyEventImporter',
-        'legacy_categories = indico_zodbimport.modules.legacy_categories:LegacyCategoryImporter',
-        'event_logs = indico_zodbimport.modules.event_logs:EventLogImporter',
-        'event_notes = indico_zodbimport.modules.event_notes:EventNoteImporter',
-        'attachments = indico_zodbimport.modules.attachments:AttachmentImporter',
-        'event_images = indico_zodbimport.modules.event_images:EventImageImporter',
-        'event_stubs = indico_zodbimport.modules.event_stubs:EventStubImporter',
-        'event_menus = indico_zodbimport.modules.event_menus:EventMenuImporter',
-        'event_layout = indico_zodbimport.modules.event_layout:EventLayoutImporter',
-        'event_surveys = indico_zodbimport.modules.event_surveys:SurveyImporter',
-        'event_managers = indico_zodbimport.modules.event_managers:EventManagerImporter',
-        'event_regforms = indico_zodbimport.modules.event_regforms:EventRegformImporter',
-        'event_participants = indico_zodbimport.modules.event_participants:EventParticipantsImporter',
-        'event_timetable = indico_zodbimport.modules.event_timetable:EventTimetableImporter',
-        'event_locations = indico_zodbimport.modules.event_locations:EventLocationsImporter',
-        'event_categories = indico_zodbimport.modules.event_categories:EventCategoriesImporter',
-        'event_dates_titles = indico_zodbimport.modules.event_dates_titles:EventDatesTitlesImporter',
-        'event_abstracts_zodb = indico_zodbimport.modules.event_abstracts_zodb:EventAbstractZODBPatcher',
-        'event_paper_reviewing_legacy = indico_zodbimport.modules.event_paper_reviewing_legacy:LegacyEventPaperReviewingImporter',
-        'legal = indico_zodbimport.modules.legal:LegalImporter',
-        'networks = indico_zodbimport.modules.networks:NetworkImporter',
-        'categories = indico_zodbimport.modules.categories:CategoryImporter',
-        'event_acls = indico_zodbimport.modules.event_acls:EventACLImporter',
-        'upcoming_events = indico_zodbimport.modules.upcoming_events:UpcomingEventsImporter',
-        'news = indico_zodbimport.modules.news:NewsImporter',
-        'event_types = indico_zodbimport.modules.event_types:EventTypeImporter',
-        'user_management = indico_zodbimport.modules.user_management:UserManagementImporter',
-        'event_series = indico_zodbimport.modules.event_series:EventSeriesImporter',
-        'event_keywords_ctimes_visibility = indico_zodbimport.modules.event_keywords_ctimes_visibility:EventKeywordsCreationTimesVisibilityImporter',
-        'event_abstracts = indico_zodbimport.modules.event_abstracts:EventAbstractsImporter',
-        'event_papers = indico_zodbimport.modules.event_papers:EventPapersImporter',
-        'event_shorturls = indico_zodbimport.modules.event_shorturls:EventShorturlsImporter',
-        'global_ip_acl = indico_zodbimport.modules.global_ip_acl:GlobalIPACLImporter',
-        'global_settings = indico_zodbimport.modules.global_settings:GlobalSettingsImporter',
-        'badges_posters = indico_zodbimport.modules.badges_posters:BadgePosterImporter',
-        'event_data = indico_zodbimport.modules.event_data:EventDataImporter',
-    ]
-}
+from setuptools import find_packages, setup
 
 
 def read_requirements_file(fname):
@@ -124,4 +70,7 @@ if __name__ == '__main__':
         packages=find_packages(),
         include_package_data=True,
         install_requires=get_requirements(),
-        entry_points=ENTRY_POINTS)
+        entry_points={
+            'console_scripts': {'indico = indico.cli.core:cli'},
+            'pytest11': {'indico = indico.testing.pytest_plugin'},
+        })
