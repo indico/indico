@@ -18,15 +18,19 @@ from __future__ import unicode_literals
 
 import os
 import re
+import sys
+from distutils.dist import Distribution
 from functools import wraps
+from pkgutil import walk_packages
 
 import click
 from babel.messages import frontend
-from distutils.dist import Distribution
+from babel.messages.pofile import read_po
+from flask import current_app
 from flask.helpers import get_root_path
-from pkgutil import walk_packages
 
 from indico.cli.core import cli_group
+from indico.util.console import cformat
 
 
 @cli_group()
@@ -131,3 +135,57 @@ for cmd_name in cmd_list:
         cmd = click.option(*(opts + [var_name]), is_flag=is_flag, default=default, help=description)(cmd)
 
     cli.add_command(cmd)
+
+
+@cli.command()
+def check_format_strings():
+    """Check whether format strings match.
+
+    This helps finding cases where e.g. the original string uses
+    ``{error}`` but the translation uses ``{erro}``, resulting
+    in errors when using the translated string.
+    """
+    root_path = os.path.join(current_app.root_path, 'translations')
+    paths = set()
+    for root, dirs, files in os.walk(root_path):
+        for file in files:
+            if file.endswith('.po'):
+                paths.add(os.path.join(root, file))
+    all_valid = True
+    for path in paths:
+        invalid = _get_invalid_po_format_strings(path)
+        if invalid:
+            all_valid = False
+            click.echo('Found invalid format strings in {}'.format(os.path.relpath(path, root_path)))
+            for item in invalid:
+                click.echo(cformat('%{yellow}{}%{reset} | %{yellow!}{}%{reset}\n%{red}{}%{reset} != %{red!}{}%{reset}')
+                           .format(item['orig'], item['trans'],
+                                   list(item['orig_placeholders']), list(item['trans_placeholders'])))
+            click.echo()
+    sys.exit(0 if all_valid else 1)
+
+
+def _get_invalid_po_format_strings(path):
+    with open(path, 'rb') as f:
+        po_data = read_po(f)
+    invalid = []
+    for msg in po_data:
+        all_orig = msg.id if isinstance(msg.id, tuple) else (msg.id,)
+        all_trans = msg.string if isinstance(msg.string, tuple) else (msg.string,)
+        if not any(all_trans):  # not translated
+            continue
+        for orig, trans in zip(all_orig, all_trans):
+            # brace format only; python-format (%s etc) is too vague
+            # since there are many strings containing e.g. just `%`
+            # which are never used for formatting, and babel's
+            # `_validate_format` checker fails on those too
+            orig_placeholders = set(re.findall(r'(\{[^}]+\})', orig))
+            trans_placeholders = set(re.findall(r'(\{[^}]+\})', trans))
+            if orig_placeholders != trans_placeholders:
+                invalid.append({
+                    'orig': orig,
+                    'trans': trans,
+                    'orig_placeholders': orig_placeholders,
+                    'trans_placeholders': trans_placeholders
+                })
+    return invalid
