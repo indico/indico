@@ -19,11 +19,16 @@
 .i-plugins-list {
     & > h2 { margin-top: 2em; }
 
-    & > .i-badges-list.left {
+    & > .i-badges-list {
+        display: flex;
+        justify-content: flex-start;
+
         & > .i-badge {
             @include transition(background-color $default-transition-duration $default-transition-function);
 
             width: 10em;
+            margin-left: 0;
+            margin-right: 1.6em;
 
             &.i-badge-disabled {
                 background-color: lighten($dark-blue, $light-color-variation);
