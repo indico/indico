@@ -51,11 +51,9 @@ def cli(ctx, plugin=None, all_plugins=False):
 
 
 @cli.command()
-@click.option('--empty', is_flag=True, help='Do not create the root category or system user. Use this only if you '
-                                            'intend to import data from ZODB.')
-def prepare(empty):
-    """Initializes an empty database (creates tables, sets alembic rev to HEAD)"""
-    return prepare_db(empty=empty)
+def prepare():
+    """Initializes a new database (creates tables, sets alembic rev to HEAD)"""
+    return prepare_db()
 
 
 def _safe_downgrade(*args, **kwargs):
