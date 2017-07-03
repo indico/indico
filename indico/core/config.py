@@ -78,6 +78,11 @@ FILE_TYPES = {"DOC": ["Ms Word", "application/msword", "word_big.png"],
 
 
 def get_config_path():
+    # In certain environments (debian+uwsgi+no-systemd) Indico may run
+    # with an incorrect $HOME (such as /root), resulting in the config
+    # files being searched in the wrong place. By clearing $HOME, Python
+    # will get the home dir from passwd which has the correct path.
+    old_home = os.environ.pop('HOME', None)
     # env var has priority
     try:
         return os.path.expanduser(os.environ['INDICO_CONFIG'])
@@ -85,6 +90,9 @@ def get_config_path():
         pass
     # try finding the config in various common paths
     paths = [os.path.expanduser('~/.indico.conf'), '/etc/indico.conf']
+    # Keeping HOME unset wouldn't be too bad but let's not have weird side-effects
+    if old_home is not None:
+        os.environ['HOME'] = old_home
     # If it's an editable setup (ie usually a dev instance) allow having
     # the config in the package's root path
     if package_is_editable('indico'):
