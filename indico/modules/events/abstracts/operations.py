@@ -175,12 +175,12 @@ def update_abstract(abstract, abstract_data, custom_fields_data=None):
                            data={'Changes': make_diff_log(changes, log_fields)})
 
 
-def withdraw_abstract(abstract, delete_contrib=False):
+def withdraw_abstract(abstract):
     abstract.reset_state()
     abstract.state = AbstractState.withdrawn
     contrib = abstract.contribution
     abstract.contribution = None
-    if delete_contrib and contrib:
+    if contrib:
         delete_contribution(contrib)
     db.session.flush()
     signals.event.abstract_state_changed.send(abstract)
