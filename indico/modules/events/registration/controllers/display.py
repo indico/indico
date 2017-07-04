@@ -132,7 +132,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             def _content(column_id):
                 if column_id in data_by_field:
                     return data_by_field[column_id].get_friendly_data(for_humans=True)
-                elif column_id in active_fields and active_fields[column_id].personal_data_type is not None:
+                elif (column_id in active_fields and active_fields[column_id].personal_data_type is not None and
+                        active_fields[column_id].personal_data_type.column is not None):
                     # some legacy registrations have no data in the firstname/lastname/email field
                     # so we need to get it from the registration object itself
                     return getattr(reg, active_fields[column_id].personal_data_type.column)
