@@ -23,7 +23,7 @@ from indico.modules.events.layout.controllers.images import RHImageDelete, RHIma
 from indico.modules.events.layout.controllers.layout import (RHLayoutEdit, RHLayoutCSSUpload, RHLayoutCSSDelete,
                                                              RHLayoutLogoUpload, RHLayoutLogoDelete, RHLogoDisplay,
                                                              RHLayoutCSSSaveTheme, RHLayoutCSSDisplay,
-                                                             RHLayoutCSSPreview)
+                                                             RHLayoutCSSPreview, RHLayoutTimetableThemeForm)
 from indico.modules.events.layout.controllers.menu import (RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
                                                            RHMenuToggleCustom, RHMenuEntryToggleEnabled,
                                                            RHMenuEntryToggleDefault, RHMenuEntryEdit,
@@ -33,6 +33,7 @@ _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')
 
 _bp.add_url_rule('/', 'index', RHLayoutEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/timetable-theme-form', 'timetable_theme_form', RHLayoutTimetableThemeForm)
 _bp.add_url_rule('/menu/', 'menu', RHMenuEdit)
 _bp.add_url_rule('/menu/toggle-customize', 'menu_toggle_custom', RHMenuToggleCustom, methods=('POST',))
 _bp.add_url_rule('/menu/<int:menu_entry_id>/', 'menu_entry_edit', RHMenuEntryEdit, methods=('GET', 'POST',))

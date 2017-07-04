@@ -47,3 +47,33 @@ definitions:
     template: weeks.html
     title: Indico Weeks View
     user_visible: true
+    user_settings:
+      colors:
+        caption: Contribution Colours
+        description: 'Colours used for different types of timetable entries'
+        type: MultipleItemsField
+        required: false
+        kwargs:
+          fields:
+            - id: entry
+              caption: Keyword
+            - id: color
+              caption: Colour
+          unique_field: entry
+        defaults:
+          - entry: foo
+            color: '#ff0000'
+          - entry: bar
+            color: '#00ffff'
+      start_day:
+        caption: Week start day
+        description: 'First day of weeks view'
+        type: SelectField
+        required: true
+        kwargs:
+          choices:
+            - [event, Event start day]
+            - [monday, Monday]
+            - [sunday, Sunday]
+        defaults:
+            monday

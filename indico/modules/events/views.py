@@ -25,7 +25,7 @@ from indico.legacy.webinterface.pages.conferences import (WConfMetadata, WPConfe
                                                           render_event_footer, render_event_header)
 from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
-from indico.modules.events.layout import theme_settings
+from indico.modules.events.layout import theme_settings, layout_settings
 from indico.modules.events.layout.util import get_css_url
 from indico.util.event import unify_event_args
 from indico.util.mathjax import MathjaxMixin
@@ -113,6 +113,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                              category=self.event.category.title,
                              timezone=self.event.display_tzinfo,
                              theme_settings=self.theme.get('settings', {}),
+                             theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
                              files=files,
                              folders=folders,
                              lectures=lectures)

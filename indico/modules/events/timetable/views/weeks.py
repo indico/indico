@@ -23,25 +23,21 @@ from itertools import takewhile
 from flask import render_template, request
 from pytz import timezone
 
-from indico.modules.events.timetable.models.entries import TimetableEntryType
+from indico.modules.events.layout import layout_settings
 from indico.util.date_time import iterdays
 
 
 def _flatten_timetable(entries):
     for entry in entries:
-        if entry.type == TimetableEntryType.SESSION_BLOCK:
-            for sub_entry in entry.children:
-                yield sub_entry
-        else:
-            yield entry
+        yield entry
 
 
 def _localized_time(dt, tz):
     return dt.astimezone(tz).time()
 
 
-def inject_week_timetable(event, days, tz_name):
-    first_week_day = request.args.get('first_week_day', 'monday')  # monday/sunday/event
+def inject_week_timetable(event, days, tz_name, tpl='events/timetable/display/_weeks.html'):
+    first_week_day = layout_settings.get(event, 'timetable_theme_settings').get('start_day')
     sunday_first = (first_week_day == 'sunday')
     show_end_times = request.args.get('showEndTimes') == '1'
 
@@ -57,7 +53,6 @@ def inject_week_timetable(event, days, tz_name):
         week_start = 6 if sunday_first else 0
         if first_day.weekday() != week_start:
             first_day -= timedelta(days=first_day.weekday()) + timedelta(days=int(has_weekends and sunday_first))
-
     week_table_shallow = []
     skipped_days = 0
     for i, dt in enumerate(iterdays(first_day, last_day)):
@@ -105,5 +100,6 @@ def inject_week_timetable(event, days, tz_name):
             tmp.append((day, day_entries))
         week_table.append(tmp)
 
-    return render_template('events/timetable/display/_weeks.html', event=event, week_table=week_table,
+    timetable_settings = layout_settings.get(event, 'timetable_theme_settings')
+    return render_template(tpl, event=event, week_table=week_table, timetable_settings=timetable_settings,
                            has_weekends=has_weekends, timezone=tz_name, tz_object=tz, show_end_times=show_end_times)
