@@ -195,7 +195,9 @@
                     <li class="spacer"></li>
                 {% endif %}
                 <li>
-                    <div class="row day-header">
+                    <div id="{{ day.strftime('%Y%m%d') }}" class="row day-header"
+                         data-anchor="{{ day.strftime('%Y%m%d') }}"
+                         data-anchor-text="{% trans %}Direct link to this day{% endtrans %}">
                         {{ day | format_date(format='full', timezone=timezone) }}
                     </div>
                     {% set hidden_count = [] %}

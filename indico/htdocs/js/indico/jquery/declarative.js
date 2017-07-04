@@ -317,7 +317,7 @@
             $('<a>', {
                 class: 'anchor-link',
                 href: '#' + fragment,
-                title: $T.gettext('Direct link to this item')
+                title: $elem.data('anchor-text') || $T.gettext('Direct link to this item')
             }).html('&para;').appendTo($elem);
         });
     }
