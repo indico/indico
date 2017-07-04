@@ -91,6 +91,7 @@
 .week-timetable .row {
     height: 18px;
     position: relative;
+    border-top: solid 1px #f9f9f9;
 }
 
 .week-timetable .row .title {
@@ -119,7 +120,6 @@
 
 .week-timetable .row.break {
     background-color: #ddd;
-    border-top: 1px solid #f9f9f9;
 }
 
 .week-timetable .row.break:hover {
@@ -128,7 +128,6 @@
 
 .week-timetable .row.contrib {
     background-color: #EDF3FD;
-    border-top: solid 1px #f9f9f9;
 }
 
 .week-timetable .row.contrib:hover {

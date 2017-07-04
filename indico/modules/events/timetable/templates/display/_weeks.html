@@ -98,7 +98,25 @@
     </div>
 {% endmacro %}
 
-{% macro _render_time_slots(start_time, slot_entries, prev_end, hidden_count, short_contrib_count)%}
+
+{% macro render_placeholder(duration) %}
+    {% set height = ((duration / 5) * px_per_5_minutes) - 1 %}
+    {% if to_subtract[-1] %}
+        {% set subtract = to_subtract.pop() %}
+        {% if subtract <= height %}
+            {% set height = height - subtract  %}
+        {% else %}
+            {% set __ = to_subtract.append(subtract - height) %}
+            {% set height = 0 %}
+        {% endif %}
+    {% endif %}
+    {% if height > 0 %}
+        <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ height }}px;">
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% macro _render_time_slots(start_time, slot_entries, prev_end, hidden_count) %}
     {% for entry, count in slot_entries %}
         {% set __ = prev_end.append(entry.end_dt.astimezone(tz_object)) %}
         {% set session = entry.object.session %}
@@ -114,14 +132,19 @@
         {% if loop.first %}
             {% set time_parts = (entry.duration.seconds/60) /5 %}
             {% set height = (time_parts * px_per_5_minutes) %}
-            {% set min_height = 17 %}
-            {% if short_contrib_count[-1] %}
-                {% set height = height - (min_height - px_per_5_minutes) * short_contrib_count| length %}
-                {% set __ = short_contrib_count.pop() %}
+            {% if to_subtract[-1] %}
+                {% if height - to_subtract[-1] >= min_height %}
+                    {% set height = height - to_subtract[-1] %}
+                    {% set subtract = to_subtract.pop() %}
+                {% endif %}
             {% endif %}
             {% if height < min_height %}
+                {% set subtract = 0 %}
+                {% if to_subtract[-1] %}
+                    {% set subtract = to_subtract.pop() %}
+                {% endif %}
+                {% set __ = to_subtract.append(subtract + (min_height - height)) %}
                 {% set height = min_height %}
-                {% set __ = short_contrib_count.append(1) %}
             {% endif %}
             {% set extra_styles = ['height: %dpx'|format(height)] %}
             {% if slot_entries|length > 1 %}
@@ -161,6 +184,8 @@
 {% endmacro %}
 
 {% set px_per_5_minutes = 5 %}
+{% set min_height = 17 %}
+{% set to_subtract = [] %}
 {% for week in week_table %}
     <div class="clearfix week-timetable {{ 'no-weekends' if not has_weekends else '' }}">
         <ul>
@@ -174,7 +199,6 @@
                         {{ day | format_date(format='full', timezone=timezone) }}
                     </div>
                     {% set hidden_count = [] %}
-                    {% set short_contrib_count = [] %}
                     {% for start_time, slot_entries in day_entries.viewitems() %}
                         {% set start_time_minutes = (start_time.strftime('%-H')|int*60 + start_time.strftime('%-M')|int) %}
                         {% set next_entry = day_entries.keys()[loop.index] %}
@@ -188,19 +212,17 @@
                             {% set end_time = prev_end.pop().time() %}
                             {% set new_dur = start_time_minutes - (end_time.strftime('%-H')|int*60 + end_time.strftime('%-M')|int) %}
                             {% if end_time < start_time and end_time.strftime('%-H')!= '0' %}
-                                <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ ((new_dur / 5) * px_per_5_minutes) - 1 }}px;">
-                                </div>
+                                {{ render_placeholder(new_dur) }}
                             {% endif %}
                         {% endif %}
                         {% if not slot_entries %}
                             {% if hidden_count[-1] %}
                                 {% set __ = hidden_count.append(hidden_count[-1] - 1) %}
                             {% else %}
-                                <div class="row placeholder" data-slot="{{ start_time }}" style="height: {{ ((duration / 5) * px_per_5_minutes) - 1 }}px;">
-                                </div>
+                                {{ render_placeholder(duration) }}
                             {% endif %}
                         {% else %}
-                            {{ _render_time_slots(start_time, slot_entries, prev_end, hidden_count, short_contrib_count) }}
+                            {{ _render_time_slots(start_time, slot_entries, prev_end, hidden_count) }}
                         {% endif %}
                     {% endfor %}
                 </li>

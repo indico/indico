@@ -113,7 +113,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                              category=self.event.category.title,
                              timezone=self.event.display_tzinfo,
                              theme_settings=self.theme.get('settings', {}),
-                             theme_user_settings=layout_settings.get(self.event, 'timetable_theme'),
+                             theme_user_settings=layout_settings.get(self.event, 'timetable_theme_settings'),
                              files=files,
                              folders=folders,
                              lectures=lectures)
