@@ -71,7 +71,6 @@ div.page-header {
     position: relative;
     border-top: 1px solid lighten($dark-blue, 10%);
     background-color: $dark-blue;
-    position: relative;
     width: 100%;
 
     img.header-logo {
@@ -79,7 +78,6 @@ div.page-header {
         border: none;
         height: 60px;
     }
-
 }
 
 div.page-header-dark {
