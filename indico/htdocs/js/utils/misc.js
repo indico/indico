@@ -147,7 +147,7 @@
                     text.remove();
 
                     promise.then(function() {
-                        box.text(options.feedbackMessage);
+                        box.find('.corner-message-text').text(options.feedbackMessage);
                         box.removeClass(options.class).addClass('success').removeClass('progress');
                     }, function() {
                         box.text($T.gettext('Operation failed!'));
