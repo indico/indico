@@ -45,14 +45,14 @@ class EventDataImporter(Importer):
         self.print_step("Migrating event data")
         for conf in committing_iterator(self._iter_events()):
             event_id = int(conf.id)
-            if conf._screenStartDate:
+            if getattr(conf, '_screenStartDate', None):
                 event_core_settings.set(event_id, 'start_dt_override', conf._screenStartDate)
-            if conf._screenEndDate:
+            if getattr(conf, '_screenEndDate', None):
                 event_core_settings.set(event_id, 'end_dt_override', conf._screenEndDate)
-            organizer_info = convert_to_unicode(conf._orgText)
+            organizer_info = convert_to_unicode(getattr(conf, '_orgText', ''))
             if organizer_info:
                 event_core_settings.set(event_id, 'organizer_info', organizer_info)
-            additional_info = convert_to_unicode(conf.contactInfo)
+            additional_info = convert_to_unicode(getattr(conf, 'contactInfo', ''))
             if additional_info:
                 event_core_settings.set(event_id, 'additional_info', additional_info)
             si = conf._supportInfo
