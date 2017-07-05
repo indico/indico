@@ -35,6 +35,6 @@ class GlobalSettingsImporter(Importer):
         })
         social_settings.set_multi({
             'enabled': bool(minfo._socialAppConfig['active']),
-            'facebook_app_id': convert_to_unicode(minfo._socialAppConfig['facebook']['appId'])
+            'facebook_app_id': convert_to_unicode(minfo._socialAppConfig['facebook'].get('appId'))
         })
         db.session.commit()
