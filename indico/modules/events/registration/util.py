@@ -28,6 +28,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
+from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.fields.choices import (ChoiceBaseField, AccommodationField,
                                                                get_field_merged_options)
@@ -291,7 +292,9 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         ('state', ('Registration state', lambda x: x.state.title)),
         ('price', ('Price', lambda x: x.render_price())),
         ('checked_in', ('Checked in', lambda x: x.checked_in)),
-        ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else ''))
+        ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else '')),
+        ('payment_date', ('Payment date', lambda x: x.transaction.timestamp if x.transaction is not None and
+                                                       x.transaction.status == TransactionStatus.successful else ''))
     ])
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))

@@ -64,6 +64,9 @@ class RegistrationListGenerator(ListGeneratorBase):
             }),
             ('checked_in_date', {
                 'title': _('Check-in date'),
+            }),
+            ('payment_date', {
+                'title': _('Payment date'),
             })
         ])
         self.personal_items = ('title', 'first_name', 'last_name', 'email', 'position', 'affiliation', 'address',
