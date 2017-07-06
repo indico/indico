@@ -104,7 +104,7 @@
     {% if to_subtract[-1] %}
         {% set subtract = to_subtract.pop() %}
         {% if subtract <= height %}
-            {% set height = height - subtract  %}
+            {% set height = height - subtract %}
         {% else %}
             {% set __ = to_subtract.append(subtract - height) %}
             {% set height = 0 %}
@@ -156,17 +156,19 @@
                 {% if entry.type.name == 'CONTRIBUTION' %}
                     {% for keyword in entry.contribution.keywords %}
                         {% for entry_color in entry_colors %}
-                            {% if keyword in entry_color['entry'] %}
-                                {% set __ = extra_styles.append('background-color: %s'|format(entry_color['color']))  %}
+                            {% if keyword in entry_color.entry %}
+                                {% set __ = extra_styles.append('background-color: %s'|format(entry_color.color)) %}
                             {% endif %}
                         {% endfor %}
                     {% endfor %}
+                {% elif entry.type.name == 'BREAK' %}
+                    {% set __ = extra_styles.append('background-color: #%s'|format(entry.break_.background_color)) %}
                 {% elif session %}
-                    {% set __ = extra_styles.append('background-color: #%s'|format(session.background_color))  %}
+                    {% set __ = extra_styles.append('background-color: #%s'|format(session.background_color)) %}
                 {% endif %}
             {% endif %}
         {% else %}
-            {% set same_time = True %}
+            {% set same_time = true %}
         {% endif %}
         {% if entry.type.name == 'CONTRIBUTION' or session %}
             {% if entry.type.name == 'CONTRIBUTION' %}
