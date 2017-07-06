@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import timedelta
 from itertools import takewhile
 
@@ -25,11 +25,6 @@ from pytz import timezone
 
 from indico.modules.events.layout import layout_settings
 from indico.util.date_time import iterdays
-
-
-def _flatten_timetable(entries):
-    for entry in entries:
-        yield entry
 
 
 def _localized_time(dt, tz):
@@ -65,7 +60,7 @@ def inject_week_timetable(event, days, tz_name, tpl='events/timetable/display/_w
             skipped_days += 2
         if i % (7 if has_weekends else 5) == 0:
             week_table_shallow.append([])
-        week_table_shallow[-1].append((day, list(_flatten_timetable(day_dict[day]))))
+        week_table_shallow[-1].append((day, day_dict[day]))
 
     # build a new week table that contains placeholders
     week_table = []
