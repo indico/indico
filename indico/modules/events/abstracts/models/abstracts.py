@@ -161,7 +161,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     )
     submitted_contrib_type_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.contribution_types.id'),
+        db.ForeignKey('events.contribution_types.id', ondelete='SET NULL'),
         nullable=True,
         index=True
     )
@@ -209,13 +209,13 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     )
     accepted_track_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.tracks.id'),
+        db.ForeignKey('events.tracks.id', ondelete='SET NULL'),
         nullable=True,
         index=True
     )
     accepted_contrib_type_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.contribution_types.id'),
+        db.ForeignKey('events.contribution_types.id', ondelete='SET NULL'),
         nullable=True,
         index=True
     )
@@ -274,7 +274,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         backref=db.backref(
             'proposed_abstracts',
             primaryjoin='(Abstract.submitted_contrib_type_id == ContributionType.id) & ~Abstract.is_deleted',
-            lazy=True
+            lazy=True,
+            passive_deletes=True
         )
     )
     submitted_for_tracks = db.relationship(
@@ -286,7 +287,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             primaryjoin='event_abstracts.submitted_for_tracks.c.track_id == Track.id',
             secondaryjoin='(event_abstracts.submitted_for_tracks.c.abstract_id == Abstract.id) & ~Abstract.is_deleted',
             collection_class=set,
-            lazy=True
+            lazy=True,
+            passive_deletes=True
         )
     )
     reviewed_for_tracks = db.relationship(
@@ -298,7 +300,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             primaryjoin='event_abstracts.reviewed_for_tracks.c.track_id == Track.id',
             secondaryjoin='(event_abstracts.reviewed_for_tracks.c.abstract_id == Abstract.id) & ~Abstract.is_deleted',
             collection_class=set,
-            lazy=True
+            lazy=True,
+            passive_deletes=True
         )
     )
     #: User who judged the abstract
@@ -318,7 +321,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         backref=db.backref(
             'abstracts_accepted',
             primaryjoin='(Abstract.accepted_track_id == Track.id) & ~Abstract.is_deleted',
-            lazy=True
+            lazy=True,
+            passive_deletes=True
         )
     )
     accepted_contrib_type = db.relationship(
@@ -328,7 +332,8 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         backref=db.backref(
             'abstracts_accepted',
             primaryjoin='(Abstract.accepted_contrib_type_id == ContributionType.id) & ~Abstract.is_deleted',
-            lazy=True
+            lazy=True,
+            passive_deletes=True
         )
     )
     merged_into = db.relationship(
