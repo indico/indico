@@ -22,6 +22,7 @@ from flask import jsonify, request, session
 
 from indico.legacy.pdfinterface.conference import SimplifiedTimeTablePlain, TimetablePDFFormat, TimeTablePlain
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.layout import layout_settings
 from indico.modules.events.timetable.forms import TimetablePDFExportForm
 from indico.modules.events.timetable.legacy import TimetableSerializer
 from indico.modules.events.timetable.util import (get_timetable_offline_pdf_generator, render_entry_info_balloon,
@@ -47,8 +48,9 @@ class RHTimetable(RHConferenceBaseDisplay):
         if self.theme is None:
             event_info = serialize_event_info(self.event_new)
             timetable_data = TimetableSerializer().serialize_timetable(self.event_new, strip_empty_days=True)
-            return self.view_class.render_template('display.html', self.event_new, event_info=event_info,
-                                                   timetable_data=timetable_data,
+            timetable_settings = layout_settings.get(self.event_new, 'timetable_theme_settings')
+            return self.view_class.render_template('display.html', self._conf, event_info=event_info,
+                                                   timetable_data=timetable_data, timetable_settings=timetable_settings,
                                                    timetable_layout=self.timetable_layout)
         else:
             return self.view_class_simple(self, self.event_new, self.theme, self.theme_override).display()

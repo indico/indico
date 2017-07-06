@@ -68,6 +68,14 @@
                                                 {{- registration.checked_in_dt | format_datetime(timezone=registration.event_new.tzinfo) -}}
                                             {%- endif %}
                                         </td>
+                                    {% elif item.id == 'payment_date' %}
+                                        <td class="i-table" data-text="{{ registration.transaction.timestamp }}">
+                                            {%- if registration.transaction and registration.transaction.status.name == 'successful' %}
+                                                {{ registration.transaction.timestamp | format_datetime(timezone=registration.event_new.tzinfo) }}
+                                            {%- else %}
+                                                -
+                                            {% endif %}
+                                        </td>
                                     {% else %}
                                         <td class="i-table">{{ data.get(item.id).friendly_data }}</td>
                                     {% endif %}

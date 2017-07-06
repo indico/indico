@@ -17,7 +17,7 @@
                     {% if abstract.can_withdraw(session.user, check_state=true) %}
                         {% set message %}
                             {% trans %}Do you really want to withdraw this abstract?{% endtrans %}
-                            {% if abstract.state.name == 'accepted' and abstract.contribution %}
+                            {% if abstract.contribution %}
                                 <br>
                                 {%- trans -%}
                                     Withdrawing this abstract will permanently delete its corresponding contribution.

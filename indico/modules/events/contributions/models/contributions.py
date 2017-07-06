@@ -128,7 +128,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     )
     track_id = db.Column(
         db.Integer,
-        db.ForeignKey('events.tracks.id'),
+        db.ForeignKey('events.tracks.id', ondelete='SET NULL'),
         index=True,
         nullable=True
     )
@@ -247,7 +247,8 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         backref=db.backref(
             'contributions',
             primaryjoin='(Contribution.track_id == Track.id) & ~Contribution.is_deleted',
-            lazy=True
+            lazy=True,
+            passive_deletes=True
         )
     )
     #: External references associated with this contribution

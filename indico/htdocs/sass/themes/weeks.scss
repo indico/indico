@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@import "base/palette";
+@import "base/defaults";
+@import "base/borders";
 @import "compass";
 
 .event-info-header {
@@ -86,10 +89,9 @@
 }
 
 .week-timetable .row {
-    @include ellipsis;
-
     height: 18px;
     position: relative;
+    border-top: solid 1px #f9f9f9;
 }
 
 .week-timetable .row .title {
@@ -118,7 +120,6 @@
 
 .week-timetable .row.break {
     background-color: #ddd;
-    border-top: 1px solid #f9f9f9;
 }
 
 .week-timetable .row.break:hover {
@@ -127,7 +128,6 @@
 
 .week-timetable .row.contrib {
     background-color: #EDF3FD;
-    border-top: solid 1px #f9f9f9;
 }
 
 .week-timetable .row.contrib:hover {
@@ -136,7 +136,7 @@
 
 .week-timetable .row .time {
     position: absolute;
-    background: #ddd;
+    background: rgba(0, 0, 0, 0.3);
     color: #000;
     width: 35px;
     height: 100%;
@@ -155,8 +155,6 @@
 }
 
 .week-timetable .row .main {
-    @include ellipsis;
-
     position: absolute;
     padding-left: 40px;
     width: 100%;
@@ -173,14 +171,7 @@
     padding-right: 29px;
 }
 
-.week-timetable .row.contrib .time {
-    background: #5D95EA;
-    color: white;
-    font-weight: bold;
-}
-
-.week-timetable .row.break .time {
-    background: #999;
+.week-timetable .row .time {
     color: white;
     font-weight: bold;
 }
@@ -190,7 +181,7 @@
     position: absolute;
     right: 0;
     display: inline-block;
-    margin: 1px 5px 0 0;
+    padding: 1px 5px 0 5px;
 }
 
 .week-timetable .row .session-mark + .more-contribs {
@@ -208,4 +199,58 @@
 
 .week-anchor {
     color: black !important;
+}
+
+.qtip-content {
+    display: inline-block;
+    padding: 10px;
+    box-sizing: border-box;
+
+    span {
+        line-height: 1.1em;
+    }
+
+    .title {
+        width: 100%;
+        font-weight: bold;
+        display: inline-block;
+    }
+
+    .entry-time {
+        margin: 0.5em 0 0.5em 0;
+    }
+
+    .description {
+        font-size: 0.8em;
+    }
+
+    .contrib-list {
+        width: 100%;
+        text-align: left;
+
+        ul {
+            padding-left: 0 !important;
+        }
+
+        strong {
+            @include border-bottom($dark-gray);
+            width: 100%;
+            display: block;
+            margin-top: 0.5em
+        }
+
+        .tooltip-contrib {
+            display: inline-flex;
+            justify-content: space-between;
+            
+            .time {
+                height: 100%;
+                margin-right: 5px;
+            }
+
+            .title {
+                width: auto;
+            }
+        }
+    }
 }

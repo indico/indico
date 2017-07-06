@@ -15,7 +15,7 @@
         {% set timeline = revision.get_timeline(session.user) %}
         {% if not loop.first %}
             <div class="i-timeline">
-                <div class="i-timeline">
+                <div class="i-timeline to-separator-wrapper">
                     <div class="i-timeline-connect-down to-separator"></div>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 </div>
             {% endif %}
             {% if loop.last %}
-                <div class="i-timeline">
+                <div class="i-timeline to-separator-wrapper">
                     {# XXX: We need to nest the connector into another .i-timeline to keep the same nesting #}
                     <div class="i-timeline-connect-down to-separator"></div>
                 </div>

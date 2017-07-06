@@ -152,7 +152,8 @@ class AbstractReview(ProposalReviewMixin, RenderModeMixin, db.Model):
         collection_class=set,
         backref=db.backref(
             'proposed_abstract_reviews',
-            lazy='dynamic'
+            lazy='dynamic',
+            passive_deletes=True
         )
     )
     proposed_contribution_type = db.relationship(

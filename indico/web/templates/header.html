@@ -4,9 +4,11 @@
 
 <div class="page-header clearfix">
     <div class="flexrow f-j-space-between f-a-start">
-        <a style="min-height: 60px;" href="{{ url_for_index() }}">
-            <img class="header-logo" src="{{ indico_config.LogoURL or system_icon('logo_indico_bw.png') }}">
-        </a>
+        {% block logo %}
+            <a style="min-height: 60px;" href="{{ url_for_index() }}">
+                <img class="header-logo" src="{{ indico_config.LogoURL or system_icon('logo_indico_bw.png') }}">
+            </a>
+        {% endblock %}
 
         <div class="flexcol">
             {{ render_session_bar(protected_object=protected_object, local_tz=local_tz, force_local_tz=force_local_tz) }}

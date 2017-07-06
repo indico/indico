@@ -105,6 +105,9 @@ def get_theme(event, override_theme_id=None):
     """
     if not override_theme_id:
         return event.theme, False
+    elif override_theme_id == 'default':
+        theme = theme_settings.defaults[event.type]
+        return theme, theme != event.theme
     elif override_theme_id in theme_settings.get_themes_for(event.type_.name):
         return override_theme_id, override_theme_id != event.theme
     else:

@@ -67,7 +67,9 @@ class RHAgreementForm(RHConferenceBaseDisplay):
                             .format(name=self.agreement.user.full_name))
 
     def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+        # XXX: Not checking event protection here - if you get the agreement link
+        # you need to be able to sign it no matter if you have access to the event
+        # or not.  Speakers might not even have an Indico account...
         if self.agreement.uuid != request.view_args['uuid']:
             raise Forbidden(_("The URL for this agreement is invalid."))
         if self.agreement.user:

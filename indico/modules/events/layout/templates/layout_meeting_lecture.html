@@ -1,10 +1,22 @@
 {% extends 'layout/base.html' %}
-{% from 'forms/_form.html' import simple_form %}
+{% from 'forms/_form.html' import simple_form, form_rows %}
 
 {% block title %}
     {%- trans %}Layout{% endtrans -%}
 {% endblock %}
 
 {%- block content %}
-    {{ simple_form(form, save_reminder=true, back_button=false) }}
+    {% call simple_form(form, save_reminder=true, back_button=false) %}
+        {{ form_rows(form) }}
+        {% if timetable_theme_settings_form %}
+            {{ form_rows(timetable_theme_settings_form) }}
+        {% endif %}
+    {% endcall %}
+    <script>
+        showThemeSettingsForm({
+            formUrl: {{ url_for('.timetable_theme_form', event) | tojson }},
+            themeFieldId: '{{ form.timetable_theme.id }}',
+            lastFieldId: 'form-group-timetable_theme'
+        });
+    </script>
 {%- endblock %}
