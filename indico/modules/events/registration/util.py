@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 from collections import OrderedDict
 
-from flask import current_app, session, json
+from flask import current_app, json, session
 from qrcode import QRCode, constants
-from sqlalchemy.orm import load_only, joinedload, undefer
+from sqlalchemy.orm import joinedload, load_only, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
@@ -30,19 +30,19 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.fields.choices import (ChoiceBaseField, AccommodationField,
+from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
-from indico.modules.events.registration.models.form_fields import (RegistrationFormPersonalDataField,
-                                                                   RegistrationFormFieldData)
+from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
+                                                                   RegistrationFormPersonalDataField)
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.modules.events.registration.models.invitations import RegistrationInvitation, InvitationState
-from indico.modules.events.registration.models.items import (RegistrationFormPersonalDataSection,
-                                                             RegistrationFormItemType, PersonalDataType)
+from indico.modules.events.registration.models.invitations import InvitationState, RegistrationInvitation
+from indico.modules.events.registration.models.items import (PersonalDataType, RegistrationFormItemType,
+                                                             RegistrationFormPersonalDataSection)
 from indico.modules.events.registration.models.registrations import Registration, RegistrationData, RegistrationState
 from indico.modules.events.registration.notifications import (notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.users.util import get_user_by_email
-from indico.util.date_time import format_datetime, format_date
+from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
 from indico.util.string import to_unicode
@@ -293,8 +293,10 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
         ('price', ('Price', lambda x: x.render_price())),
         ('checked_in', ('Checked in', lambda x: x.checked_in)),
         ('checked_in_date', ('Check-in date', lambda x: x.checked_in_dt if x.checked_in else '')),
-        ('payment_date', ('Payment date', lambda x: x.transaction.timestamp if x.transaction is not None and
-                                                       x.transaction.status == TransactionStatus.successful else ''))
+        ('payment_date', ('Payment date', lambda x: (x.transaction.timestamp
+                                                     if (x.transaction is not None and
+                                                         x.transaction.status == TransactionStatus.successful)
+                                                     else '')))
     ])
     for item in regform_items:
         field_names.append(unique_col(item.title, item.id))
