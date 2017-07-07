@@ -37,6 +37,7 @@ from indico.modules.events.timetable.legacy import serialize_event_info
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_time, get_day_end, iterdays
 from indico.util.i18n import _
+from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.colors import get_colors
 
@@ -342,7 +343,7 @@ def get_time_changes_notifications(changes, tzinfo, entry=None):
             else:
                 raise ValueError("Invalid change in session block.")
         if msg:
-            notifications.append(msg.format(format_time(new_time, timezone=tzinfo)))
+            notifications.append(msg.format(to_unicode(format_time(new_time, timezone=tzinfo))))
     return notifications
 
 
