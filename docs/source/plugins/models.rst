@@ -5,7 +5,7 @@ Plugins must describe its database model the in the *models* folder if needed::
 
     class Foo(db.Model):
         __tablename__ = 'foo'
-        __table_args__ = ({'schema': 'plugin_example'})
+        __table_args__ = {'schema': 'plugin_example'}
 
         id = db.Column(
             db.Integer,
@@ -13,6 +13,7 @@ Plugins must describe its database model the in the *models* folder if needed::
         )
         bar = db.Column(
             db.String,
+            nullable=False,
             default=''
         )
         location_id = db.Column(
@@ -30,9 +31,9 @@ Plugins must describe its database model the in the *models* folder if needed::
             return u'<Foo({}, {}, {})>'.format(self.id, self.bar, self.location)
 
 
-Thanks to **Alembic**, the migration needed to create the tables into the Indico can also be included in the plugin.
+Thanks to **Alembic**, the migration needed to create the tables in the database can also be included in the plugin.
 The steps to do so are:
 
-1. Create a revision for the changes your plugin will add with `indico plugindb migrate --plugin example`
-2. Fine tune the revision file generated under *migrations*.
-3. Run `indico plugindb upgrade --plugin example` to have Alembic upgrade your DB with the changes.
+1. Create a revision for the changes your plugin will add with ``indico db --plugin example migrate -m 'short description'``
+2. Fine-tune the revision file generated under *migrations*.
+3. Run ``indico db --plugin example upgrade`` to have Alembic upgrade your DB with the changes.
