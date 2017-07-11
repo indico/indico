@@ -114,7 +114,7 @@ if __name__ == '__main__':
         description='Indico is a full-featured conference lifecycle management and meeting/lecture scheduling tool',
         author='Indico Team',
         author_email='indico-team@cern.ch',
-        url='http://indico-software.org',
+        url='https://getindico.io',
         download_url='https://github.com/indico/indico/releases',
         long_description="Indico allows you to schedule conferences, from single talks to complex meetings with "
                          "sessions and contributions. It also includes an advanced user delegation mechanism, "
