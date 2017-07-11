@@ -212,7 +212,7 @@ def test_sanitize_email(input, output):
     ("Escaping works just fine! $ *a* $", "<p>Escaping works just fine! $ *a* $</p>"),
     ('![Just a cat](http://myserver.example.com/cat.png)', '<p><img alt="Just a cat" '
      'src="http://myserver.example.com/cat.png"></p>'),
-    ("<https://indico.github.io>", '<p><a href="https://indico.github.io">https://indico.github.io</a></p>')
+    ("<https://getindico.io>", '<p><a href="https://getindico.io">https://getindico.io</a></p>')
 ))
 def test_markdown(input, output):
     assert render_markdown(input,  extensions=('tables',)) == output
