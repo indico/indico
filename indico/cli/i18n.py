@@ -70,7 +70,7 @@ DEFAULT_OPTIONS = {
         'domain': 'messages-js'
     },
     'extract_messages_js': {
-        'keywords': '$T',
+        'keywords': ['$T', 'gettext', 'ngettext:1,2'],
         'width': '120',
         'output_file': MESSAGES_JS_POT,
         'mapping_file': 'babel-js.cfg',
