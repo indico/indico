@@ -90,8 +90,15 @@
         {% endif %}
         {{ _render_tooltip(entry, timezone) }}
         {% if has_multi and entry.type.name == 'CONTRIBUTION' %}
+            {% set multi_title -%}
+                {%- trans count=(slot_entries|length - 1) -%}
+                    There is one more contribution at this time. Click this icon to show it.
+                {%- pluralize -%}
+                    There are {{ count }} more contributions at this time. Click this icon to show them.
+                {%- endtrans -%}
+            {%- endset %}
             <i class="icon-expand more-contribs"
-               title="{{ _('There are {0} more contributions at this time. Click this icon to show them.'.format(slot_entries|length - 1)) }}"
+               title="{{ multi_title }}"
                data-qtip-opts='{"show":{"solo":true}, "style":{"classes":"informational"}}'>
            </i>
         {% endif %}
