@@ -233,7 +233,9 @@ class ConfManagerAbstractToPDF(AbstractToPDF):
             track_reviews = abstract.get_reviews(group=track)
             review_details = [(_format_review_action(review),
                                review.user.get_full_name(abbrev_first_name=False),
-                               review.comment)
+                               review.comment,
+                               review.score,
+                               [(rating.question.text, rating.value) for rating in review.ratings])
                               for review in track_reviews]
             if track_review_state in {AbstractReviewingState.positive, AbstractReviewingState.conflicting}:
                 proposed_contrib_types = {r.proposed_contribution_type.name for r in track_reviews
