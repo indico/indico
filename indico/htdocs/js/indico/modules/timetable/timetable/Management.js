@@ -692,14 +692,11 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
      * Builds the content for the ConfirmPopup
      */
     __getContent: function() {
-        var type;
-
+        var msg = $T.gettext("This will change the starting and ending times of the Session {0} so that it encompasses all entries defined in its timetable.");
         return Html.div("fitInnerTimetableDialog",
-                $T("This will change the starting and ending times of the Session "),
-                this.__getSessionTitle(),
-                $T(" so that it encompasses all entries defined in its timetable."),
+                msg.format(this.__getSessionTitle()),
                 Html.br(),
-                $T("Are you sure you want to proceed?"));
+                $T.gettext("Are you sure you want to proceed?"));
     },
 
     /**
