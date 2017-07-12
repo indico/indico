@@ -474,7 +474,7 @@ def setup_deps(n_env=None, n_version=None, src_dir=None, system_node=None):
             create_node_env()
 
         with node_env():
-            local('npm install grunt-cli')
+            local('npm install grunt-cli --prefix $(pwd)')
 
         _install_deps()
 
