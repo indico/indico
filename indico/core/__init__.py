@@ -36,4 +36,4 @@ def _topmenu_items(sender, **kwargs):
     yield TopMenuItem('help', _('Indico help'), None, 30, section='help')
     if Config.getInstance().getPublicSupportEmail():
         yield TopMenuItem('contact', _('Contact'), url_for('misc.contact'), 20, section='help')
-    yield TopMenuItem('about', _('More about Indico'), 'http://indico-software.org', 10, section='help')
+    yield TopMenuItem('about', _('More about Indico'), 'https://getindico.io', 10, section='help')

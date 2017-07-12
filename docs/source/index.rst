@@ -14,7 +14,7 @@ Welcome to Indico's documentation!
 |build-status| |license| |pypi-ver|
 
 Welcome to Indico's documentation. This documentation is split into several parts, from `installing Indico <installation/>`_ to developing `Indico plugins <plugins>`_.
-To dive into the internals of Indico, check out the `API documentation <api>`_. Read more about Indico in our `official website <https://indico.github.io>`_.
+To dive into the internals of Indico, check out the `API documentation <api>`_. Read more about Indico in our `official website <https://getindico.io>`_.
 
 
 Installation / Configuration

@@ -6,7 +6,7 @@ Indico
 
 Indico is a general-purpose event management web-based solution. It includes a full-blown conference organization workflow as well as tools for meeting management and room booking. It provides as well integration with video-conferencing solutions.
 
-A list of features `can be found here <https://indico.github.io/features/>`_. There is also a `video <https://www.youtube.com/watch?v=yo8rgg9dOcc>`_!
+A list of features `can be found here <https://getindico.io/features/>`_. There is also a `video <https://www.youtube.com/watch?v=yo8rgg9dOcc>`_!
 
 Indico is free software, licensed under terms of the GNU General Public License (GPL) v3. It is currently in production `at CERN <http://indico.cern.ch>`_, as well as in many other scientific institutions around the world.
 
@@ -16,14 +16,14 @@ Getting Indico
 
 |pypi-ver|
 
-Information on how to get the latest release can be found `at the project web site <http://indico.github.io/getting-started/>`_.
-If you are interested in contributing to Indico, you can consult the `project documentation <http://indico.readthedocs.org/>`_.
+Information on how to get the latest release can be found `at the project web site <https://getindico.io/getting-started/>`_.
+If you are interested in contributing to Indico, you can consult the `project documentation <https://docs.getindico.io>`_.
 
 
 Community
 ---------
 
-The project web site is http://indico.github.io and the developers can be
+The project web site is https://getindico.io and the developers can be
 reached via IRC (`#indico on Freenode <https://webchat.freenode.net/?channels=indico>`_).
 
 History

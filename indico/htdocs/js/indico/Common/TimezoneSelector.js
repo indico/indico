@@ -65,11 +65,11 @@ type("TimezoneSelector", ["RemoteWidget"], {
         this.localTZRadio = Html.input('radio', {name: 'activeTimezone'}, 'LOCAL');
         this.userTZRadio = Html.input('radio', {name: 'activeTimezone'}, 'My');
         this.selectTZradio = Html.input('radio', {name: 'activeTimezone'}, 'LOCAL');
-        container.append(Html.div({style: {marginBottom: pixels(5)}}, this.localTZRadio, $T(" Use the events' local timezone ")));
+        container.append(Html.div({style: {marginBottom: pixels(5)}}, this.localTZRadio, ' ', $T("Use the event/category timezone")));
         if (this.userTZ) {
-            container.append(Html.div({style: {marginBottom: pixels(5)}}, this.userTZRadio, $T(" Your saved timezone"), Html.em({}, ' (' + this.userTZ + ')')));
+            container.append(Html.div({style: {marginBottom: pixels(5)}}, this.userTZRadio, ' ', $T("Your saved timezone"), Html.em({}, ' (' + this.userTZ + ')')));
         }
-        container.append(Html.div({style: {marginBottom: pixels(5)}}, this.selectTZradio, $T(" Specify a timezone")));
+        container.append(Html.div({style: {marginBottom: pixels(5)}}, this.selectTZradio, ' ', $T("Specify a timezone")));
 
         var select = Html.select({size: 12});
         this.loadingOption = Html.option({style: {color: "#444", fontStyle:'italic'}}, $T('Loading list of timezones...'));

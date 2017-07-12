@@ -257,7 +257,7 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
 
     def _process(self):
         form = make_registration_form(self.regform)()
-        if form.validate_on_submit():
+        if form.validate_on_submit() and not self.regform.limit_reached:
             registration = create_registration(self.regform, form.data, self.invitation)
             return redirect(url_for('.display_regform', registration.locator.registrant))
         elif form.is_submitted():
