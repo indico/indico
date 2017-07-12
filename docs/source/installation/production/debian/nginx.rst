@@ -18,7 +18,7 @@ much more recent versions.
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
     wget --quiet -O - https://nginx.org/keys/nginx_signing.key | apt-key add -
     apt update
-    apt install -y postgresql-9.6 libpq-dev nginx python-dev python-virtualenv libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev build-essential redis-server uwsgi uwsgi-plugin-python
+    apt install -y --install-recommends postgresql-9.6 libpq-dev nginx python-dev python-virtualenv libxslt1-dev libxml2-dev libffi-dev libpcre3-dev libyaml-dev build-essential redis-server uwsgi uwsgi-plugin-python
 
 
 If you use Debian, run this command:
