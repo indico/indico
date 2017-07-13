@@ -89,12 +89,7 @@ class IndicoSession(BaseSession):
 
     @property
     def lang(self):
-        if '_lang' in self:
-            # explicit language set in the session
-            return self['_lang']
-        else:
-            # guess language based on accept-languages or use default
-            return set_best_lang(check_session=False)
+        return self.get('_lang') or set_best_lang(check_session=False)
 
     @lang.setter
     def lang(self, lang):
