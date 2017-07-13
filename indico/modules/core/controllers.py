@@ -16,11 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect
+from flask import flash, redirect, request, session
+from pytz import common_timezones_set
 from werkzeug.urls import url_join
 
 from indico.core.config import Config
 from indico.core.settings.proxy import PrefixSettingsProxy
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import SettingsForm
@@ -61,3 +63,37 @@ class RHSettings(RHAdminBase):
                                           social_settings=social_settings.get_all(),
                                           cephalopod_url=cephalopod_url,
                                           cephalopod_data=cephalopod_data)
+
+
+class RHChangeTimezone(RH):
+    """Update the session/user timezone"""
+
+    def _process(self):
+        mode = request.form['tz_mode']
+        tz = request.form.get('tz')
+        update_user = request.form.get('update_user') == '1'
+
+        if mode == 'local':
+            session.timezone = 'LOCAL'
+        elif mode == 'user' and session.user:
+            session.timezone = session.user.settings.get('timezone', Config.getInstance().getDefaultTimezone())
+        elif mode == 'custom' and tz in common_timezones_set:
+            session.timezone = tz
+
+        if update_user:
+            session.user.settings.set('force_timezone', mode != 'local')
+            if tz:
+                session.user.settings.set('timezone', tz)
+
+        return '', 204
+
+
+class RHChangeLanguage(RH):
+    """Update the session/user language"""
+
+    def _process(self):
+        language = request.form['lang']
+        session.lang = language
+        if session.user:
+            session.user.settings.set('lang', language)
+        return '', 204

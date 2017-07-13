@@ -16,13 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.rh import contact, errors, lang, resetTimezone
+from indico.legacy.webinterface.rh import contact, errors
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 misc = IndicoBlueprint('misc', __name__)
 
-misc.add_url_rule('/change-language', 'change_lang', lang.RHChangeLang, methods=('POST',))
-misc.add_url_rule('/change-timezone', 'change_tz', resetTimezone.RHResetTZ, methods=('POST',))
 misc.add_url_rule('/contact', 'contact', contact.RHContact)
 misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('GET', 'POST'))

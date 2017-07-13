@@ -91,7 +91,7 @@
             <div style="text-align: center; margin-top: 15px;">
                 <div class="group">
                     <button class="i-button highlight" type="button"
-                            data-href="{{ url_for('misc.change_tz') }}"
+                            data-href="{{ url_for('core.change_tz') }}"
                             data-method="POST"
                             data-params-selector="#tz-selector-widget input[name=tz_mode]:checked,
                                                   #tz-selector-widget select[name=tz]:not(:disabled),
@@ -177,7 +177,7 @@
                         {{- title -}}
                     </a>
                 {% else %}
-                    <a data-href="{{ url_for('misc.change_lang') }}"
+                    <a data-href="{{ url_for('core.change_lang') }}"
                        data-method="POST"
                        data-params='{{ {'lang': name}|tojson|forceescape }}'
                        data-reload-after
