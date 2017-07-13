@@ -18,21 +18,22 @@ from __future__ import unicode_literals
 
 from blinker import Namespace
 
+
 _signals = Namespace()
 
-registration_modified = _signals.signal('registration_modified', """
-Called when the registration is modified.  The `sender` is the
-registration; the change is passed in the `change` kwarg.
+registration_personal_data_modified = _signals.signal('registration-personal-data-modified', """
+Called when the registration personal data is modified. The `sender` is the
+`Registration` object; the change is passed in the `change` kwarg.
 """)
 
 registration_state_updated = _signals.signal('registration-state-updated', """
 Called when the state of registration changes.  The `sender` is the
-registration; the previous state is passed in the `previous_state`
+`Registration` object; the previous state is passed in the `previous_state`
 kwarg.
 """)
 
 registration_deleted = _signals.signal('registration-deleted', """
-Called when a registration is removed.  The `sender` is the registration.
+Called when a registration is removed.  The `sender` is the `Registration` object.
 """)
 
 registration_form_created = _signals.signal('registration-form-created', """
