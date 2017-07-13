@@ -138,7 +138,6 @@ type("PopupMenu", ["ChainedPopupWidget"],
                                           }
                                       });
 
-                                      IndicoUtil.onclickHandlerRemove(self.handler);
                                       var target = pair.get().action;
                                       target.open(pos.x + (target.alignRight ? 0 : link.dom.offsetWidth), pos.y - 1);
 

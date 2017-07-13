@@ -1,7 +1,7 @@
 <%page args=""/>
 <script type="text/javascript">
 
-    IndicoUI.executeOnLoad(function()
+    $(document).ready(function()
     {
         var startDate = IndicoUI.Widgets.Generic.dateField_sdate(false,null,['sDay', 'sMonth', 'sYear']);
         $E('sDatePlace').set(startDate);

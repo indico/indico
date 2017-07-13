@@ -78,43 +78,6 @@ var IndicoUI = {
             return;
         }
         this.__globalLayerLevels[parseInt(level) - 3000] = false;
-    },
-    __loadCount : 0,
-    loadTimeFuncs : {},
-
-    executeOnLoad : function(func) {
-        IndicoUI.loadTimeFuncs[IndicoUI.__loadCount] = (func);
-        IndicoUI.__loadCount++;
     }
 };
 
-$(function() {
-    for (var f in IndicoUI.loadTimeFuncs) {
-        IndicoUI.loadTimeFuncs[f]();
-    }
-
-    $E(document.body).observeClick(function(e) {
-        each(IndicoUtil.onclickFunctions, function(func) {
-            if (exists(func)) {
-                func(e);
-            }
-        });
-
-        //two-phase delete, due to loop/delete interactions
-        var idxs = [];
-        var count = 0;
-
-        each(IndicoUtil.onclickFunctions, function(func) {
-            if (func === null) {
-                idxs.push(count);
-            }
-            count++;
-        });
-
-        idxs.reverse();
-
-        each(idxs, function(idx) {
-            IndicoUtil.onclickFunctions.removeAt(idx);
-        });
-    });
-});

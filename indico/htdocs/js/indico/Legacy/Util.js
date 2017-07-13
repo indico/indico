@@ -508,21 +508,6 @@ var IndicoUtil = {
 
     },
 
-    /**
-     * Adds new function that is to be called when the document.onclick
-     * event is triggered.
-     * @param {function} f
-     */
-    onclickHandlerAdd : function(f) {
-        IndicoUtil.onclickFunctions.append(f);
-    },
-
-    onclickHandlerRemove : function(f) {
-        var idx = this.onclickFunctions.indexOf(f);
-        this.onclickFunctions.replaceAt(idx, null);
-    },
-
-    onclickFunctions : new WatchList(),
 
     // DEPRECATED, in favor of IndicoUI.Dialogs.Util.error
     errorReport: IndicoUI.Dialogs.Util.error,

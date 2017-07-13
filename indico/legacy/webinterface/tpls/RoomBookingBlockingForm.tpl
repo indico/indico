@@ -102,9 +102,7 @@
             startDate: '${ start_date.day }/${ start_date.month }/${ start_date.year }',
             endDate: '${ end_date.day }/${ end_date.month }/${ end_date.year }'
         });
-    });
 
-    IndicoUI.executeOnLoad(function() {
         var pm = new IndicoUtil.parameterManager();
         var hasRooms = false;
 

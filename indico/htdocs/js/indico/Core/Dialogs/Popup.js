@@ -15,53 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-type("PopupDialog", ["PopupWidget"], {
-    draw: function(content, x, y) {
-        return this.PopupWidget.prototype.draw.call(this, content, x, y, null, true);
-    },
-
-    clickTriggersClosing: function(target) {
-        // Check if one of the elements that should not trigger
-        // close is clicked
-        var nonCloseTriggeringClick = false;
-        each(this.nonCloseTriggeringElements, function(e) {
-            if (e.ancestorOf(target)) {
-                nonCloseTriggeringClick = true;
-            }
-        });
-        return (!this.canvas.ancestorOf(target) &&
-                !this.triggerElement.ancestorOf(target) &&
-                !nonCloseTriggeringClick);
-    },
-
-    open: function(x, y) {
-        var self = this;
-        this.PopupWidget.prototype.open.call(this, x, y);
-
-        self.clickHandler = function(event) {
-            if (self.clickTriggersClosing($E(eventTarget(event)))) {
-                self.close();
-            }
-        };
-        IndicoUtil.onclickHandlerAdd(self.clickHandler);
-    },
-
-    close: function() {
-        if (this.closeHandler() && this.isopen) {
-            IndicoUtil.onclickHandlerRemove(this.clickHandler);
-            this.PopupWidget.prototype.close.call(this);
-        }
-    }
-    },
-     function(content, triggerElement, closeHandler, nonCloseTriggeringElements) {
-         this.content = content;
-         this.PopupWidget();
-         this.triggerElement = triggerElement;
-         this.closeHandler = any(closeHandler, function() {return true; });
-         this.nonCloseTriggeringElements = any(nonCloseTriggeringElements, []);
-     }
-    );
-
 
 type("ExclusivePopup", ["Printable"], {
     open: function() {
