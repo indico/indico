@@ -162,7 +162,21 @@ div.session-bar {
         padding: 0 0 5px 5px;
         z-index:999;
     }
+}
 
+div.tz-selector-widget {
+    .tz-mode-container > div {
+        margin-bottom: 0.5em;
+    }
+
+    .tz-update-user-container {
+        margin: 1em 0;
+    }
+
+    .tz-save-container {
+        text-align: center;
+        margin-top: 1em;
+    }
 }
 
 .loginHighlighted {
