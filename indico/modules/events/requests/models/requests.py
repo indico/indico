@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.modules.events.requests import get_request_definitions
 from indico.util.date_time import now_utc
@@ -143,8 +143,6 @@ class Request(db.Model):
     @property
     def can_be_modified(self):
         """Determines if the request can be modified or if a new one must be sent"""
-        if (self.definition.modifiable is False):
-            return False
         return self.state in {RequestState.pending, RequestState.accepted}
 
     @property
