@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session, redirect, request
 from flask_multipass import MultipassException
 
-from indico.core import signals
+from indico.core import signals, Config
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.logger import Logger
@@ -30,7 +30,6 @@ from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
-from indico.legacy.common.timezoneUtils import SessionTZ
 
 
 logger = Logger.get('auth')
@@ -96,8 +95,10 @@ def login_user(user, identity=None, admin_impersonation=False):
                                 impersonating the user and thus should not
                                 be considered a login by the user.
     """
-    avatar = user.as_avatar
-    session.timezone = SessionTZ(avatar).getSessionTZ()
+    if user.settings.get('force_timezone'):
+        session.timezone = user.settings.get('timezone', Config.getInstance().getDefaultTimezone())
+    else:
+        session.timezone = 'LOCAL'
     session.user = user
     session.lang = user.settings.get('lang')
     if not admin_impersonation:

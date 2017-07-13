@@ -56,22 +56,3 @@ class DisplayTZ:
 
     def getDisplayTZ(self, as_timezone=False):
         return timezone(self._displayTZ) if as_timezone else self._displayTZ
-
-
-class SessionTZ:
-    def __init__(self, user):
-        try:
-            displayMode = user.getDisplayTZMode()
-        except:
-            displayMode = 'MyTimezone'
-        if displayMode == 'MyTimezone':
-            try:
-                tz = user.getTimezone()
-            except:
-                tz = "LOCAL"
-        else:
-            tz = "LOCAL"
-        self._displayTZ = tz
-
-    def getSessionTZ(self):
-        return self._displayTZ

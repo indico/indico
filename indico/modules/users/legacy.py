@@ -16,7 +16,6 @@
 
 from flask_multipass import IdentityInfo
 
-from indico.core.config import Config
 from indico.modules.users import User, logger
 from indico.modules.auth import Identity
 from indico.util.caching import memoize_request
@@ -167,17 +166,6 @@ class AvatarUserWrapper(Fossilizable):
 
     def setTimezone(self, tz):
         self.user.settings.set('timezone', to_unicode(tz))
-
-    @encode_utf8
-    def getTimezone(self):
-        default = Config.getInstance().getDefaultTimezone()
-        return self.user.settings.get('timezone', default) if self.user else default
-
-    def getDisplayTZMode(self):
-        return 'MyTimezone' if self.user and self.user.settings.get('force_timezone') else 'Event Timezone'
-
-    def setDisplayTZMode(self, display_tz='Event Timezone'):
-        self.user.settings.set('force_timezone', display_tz == 'MyTimezone')
 
     @encode_utf8
     def getAddress(self):

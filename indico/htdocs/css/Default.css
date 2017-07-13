@@ -1038,28 +1038,6 @@ div.timetableLoading {
     background-position: 0 -16px;
 }
 
-.timezonePopup {
-    min-width: 320px;
-    padding: 10px 5px 0;
-}
-
-.timezonePopup .tzHeader {
-    font-size: 20px;
-    color: #444;
-    margin-bottom: 15px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #AAA;
-}
-
-.timezonePopup select {
-    min-width: 260px;
-    margin: 5px 5px 5px 20px;
-    border: 1px solid #AAA;
-}
-.timezonePopup .tzContainer {
-    padding: 0px 5px;
-}
-
 ul.popupList {
     background: #FFFFFF;
     padding: 0px;

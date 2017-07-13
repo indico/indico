@@ -205,8 +205,7 @@ indico_legacy = rjs_bundle(
 indico_common = rjs_bundle(
     'indico_common',
     *namespace('js/indico/Common',
-               'Export.js',
-               'TimezoneSelector.js'))
+               'Export.js'))
 
 indico_jquery = rjs_bundle(
     'indico_jquery',
