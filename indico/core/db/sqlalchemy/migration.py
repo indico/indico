@@ -90,6 +90,12 @@ def _require_encoding(encoding):
 
 def prepare_db(empty=False, root_path=None, verbose=True):
     """Initialize an empty database (create tables, set alembic rev to HEAD)."""
+    if not _require_pg_version('9.4'):
+        return
+    if not _require_encoding('UTF8'):
+        return
+    if not _require_extensions('unaccent', 'pg_trgm'):
+        return
     root_path = root_path or current_app.root_path
     tables = get_all_tables(db)
     if 'alembic_version' not in tables['public']:
@@ -107,7 +113,7 @@ def prepare_db(empty=False, root_path=None, verbose=True):
                 print plugin_msg.format(plugin.name)
             with plugin.plugin_context():
                 stamp(revision='heads')
-        # Retrieve the table list again, just in case we created unexpected hables
+        # Retrieve the table list again, just in case we created unexpected tables
         tables = get_all_tables(db)
 
     tables['public'] = [t for t in tables['public'] if not t.startswith('alembic_version')]
@@ -120,11 +126,5 @@ def prepare_db(empty=False, root_path=None, verbose=True):
             for schema, schema_tables in sorted(tables.items()):
                 for t in schema_tables:
                     print cformat('  * %{cyan}{}%{reset}.%{cyan!}{}%{reset}').format(schema, t)
-        return
-    if not _require_pg_version('9.4'):
-        return
-    if not _require_encoding('UTF8'):
-        return
-    if not _require_extensions('unaccent', 'pg_trgm'):
         return
     create_all_tables(db, verbose=verbose, add_initial_data=(not empty))
