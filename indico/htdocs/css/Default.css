@@ -2274,7 +2274,6 @@ div#sdlw-actions {
 }
 
 .settingsWidget {
-    font-size: 14px;
     padding: 0 5px 5px;
     min-width: 250px;
 }
@@ -2290,6 +2289,7 @@ div#sdlw-actions {
 
 .settingsWidget .settingsWidgetHeader {
     font-weight: bold;
+    font-size: 14px;
 }
 
 .settingsWidget .settingsSeparator {

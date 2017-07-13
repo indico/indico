@@ -16,29 +16,29 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request, session
+from flask import request, session
+from pytz import common_timezones_set
 
 from indico.core.config import Config
 from indico.legacy.webinterface.rh.base import RH
-from indico.util.string import to_unicode
-from indico.web.util import url_for_index
 
 
 class RHResetTZ(RH):
     def _process(self):
-        if 'activeTimezone' not in request.values or request.values['activeTimezone'] == 'My':
-            tz = Config.getInstance().getDefaultTimezone()
-            if session.user:
-                tz = session.user.settings.get('timezone', tz)
-        else:
-            tz = request.values['activeTimezone']
+        mode = request.form['tz_mode']
+        tz = request.form.get('tz')
+        update_user = request.form.get('update_user') == '1'
 
-        if request.values.get('saveToProfile') == 'on' and session.user:
-            if tz == 'LOCAL':
-                session.user.settings.set('force_timezone', False)
-            else:
-                session.user.settings.set('force_timezone', True)
-                session.user.settings.set('timezone', to_unicode(tz))
+        if mode == 'local':
+            session.timezone = 'LOCAL'
+        elif mode == 'user' and session.user:
+            session.timezone = session.user.settings.get('timezone', Config.getInstance().getDefaultTimezone())
+        elif mode == 'custom' and tz in common_timezones_set:
+            session.timezone = tz
 
-        session.timezone = tz
-        return redirect(request.referrer or url_for_index())
+        if update_user:
+            session.user.settings.set('force_timezone', mode != 'local')
+            if tz:
+                session.user.settings.set('timezone', tz)
+
+        return '', 204

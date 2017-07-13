@@ -18,9 +18,8 @@ from __future__ import unicode_literals
 
 from operator import itemgetter
 
-
-from pytz import all_timezones
-from wtforms.fields.core import SelectField, BooleanField, StringField
+from pytz import common_timezones, common_timezones_set
+from wtforms.fields.core import BooleanField, SelectField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
@@ -28,7 +27,7 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.users import UserTitle, NameFormat
+from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
 from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, PrincipalListField
@@ -70,7 +69,9 @@ class UserPreferencesForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         super(UserPreferencesForm, self).__init__(*args, **kwargs)
         self.lang.choices = sorted(get_all_locales().items(), key=itemgetter(1))
-        self.timezone.choices = zip(all_timezones, all_timezones)
+        self.timezone.choices = zip(common_timezones, common_timezones)
+        if self.timezone.object_data and self.timezone.object_data not in common_timezones_set:
+            self.timezone.choices.append((self.timezone.object_data, self.timezone.object_data))
 
 
 class UserEmailsForm(IndicoForm):

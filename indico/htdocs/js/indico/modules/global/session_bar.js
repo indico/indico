@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global TimezoneSelector, $E */
-
 (function() {
     'use strict';
 
@@ -53,18 +51,18 @@
     }
 
     function setupTimezone() {
-        var link = $('#timezone-selector-link');
+        var widget = $('#tz-selector-widget');
+        widget.on('change', 'input[name=tz_mode]', function() {
+            var customTZ = this.value === 'custom';
+            var customTZSelect = widget.find('select[name=tz]');
+            customTZSelect.prop('disabled', !customTZ);
+            if (customTZ) {
+                customTZSelect.focus();
+                scrollToCurrentTZ();
+            }
+        });
 
-        var tzSelector = new TimezoneSelector(
-            $E('timezone-selector-link'),
-            link.data('active-timezone'),
-            link.data('active-timezone-display'),
-            link.data('user-timezone'),
-            link.data('user-timezone-display-mode'),
-            link.data('href')
-        );
-
-        link.qtip({
+        $('#tz-selector-link').qtip({
             style: {
                 width: '300px',
                 classes: 'qtip-rounded qtip-shadow qtip-popup qtip-timezone',
@@ -78,9 +76,7 @@
                 my: 'top center',
                 at: 'bottom center'
             },
-            content: function() {
-                return $(tzSelector.getContent().dom);
-            },
+            content: widget,
             show: {
                 event: 'click',
                 effect: function() {
@@ -93,8 +89,20 @@
                 effect: function() {
                     $(this).fadeOut(300);
                 }
+            },
+            events: {
+                show: function() {
+                    _.defer(scrollToCurrentTZ);
+                }
             }
         });
+
+        function scrollToCurrentTZ() {
+            var option = widget.find('select[name=tz] option:selected')[0];
+            if (option) {
+                option.scrollIntoView(false);
+            }
+        }
     }
 
     function setupUserSettings() {

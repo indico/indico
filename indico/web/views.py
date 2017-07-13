@@ -18,6 +18,7 @@ from __future__ import absolute_import, unicode_literals
 
 from flask import session
 from markupsafe import Markup
+from pytz import common_timezones, common_timezones_set
 
 from indico.core.config import Config
 from indico.modules.legal import legal_settings
@@ -39,12 +40,28 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
         'network': legal_settings.get('network_protected_disclaimer'),
         'restricted': legal_settings.get('restricted_disclaimer')
     }
+    default_tz = Config.getInstance().getDefaultTimezone()
+    if session.user:
+        user_tz = session.user.settings.get('timezone', default_tz)
+        if session.timezone == 'LOCAL':
+            tz_mode = 'local'
+        elif session.timezone == user_tz:
+            tz_mode = 'user'
+        else:
+            tz_mode = 'custom'
+    else:
+        user_tz = None
+        tz_mode = 'local' if session.timezone == 'LOCAL' else 'custom'
+    active_tz = _get_timezone_display(local_tz, session.timezone, force_local_tz)
+    timezones = common_timezones
+    if active_tz not in common_timezones_set:
+        timezones = list(common_timezones) + [active_tz]
     timezone_data = {
-        'active_tz': session.timezone,
-        'active_tz_display': _get_timezone_display(local_tz, session.timezone, force_local_tz),
-        'user_tz': session.avatar.getTimezone() if session.user else None,
-        'user_tz_display_mode': session.avatar.getDisplayTZMode() if session.user else None,
-        'disabled': force_local_tz
+        'disabled': force_local_tz,
+        'user_tz': user_tz,
+        'active_tz': active_tz,
+        'tz_mode': tz_mode,
+        'timezones': timezones,
     }
     tpl = get_template_module('_session_bar.html')
     rv = tpl.render_session_bar(protected_object=protected_object,

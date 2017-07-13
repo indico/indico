@@ -27,7 +27,7 @@
                                 {{- title -}}
                             </a>
                         {% else %}
-                            <a data-href="{{ url_for('misc.changeLang') }}"
+                            <a data-href="{{ url_for('misc.change_lang') }}"
                                data-method="POST"
                                data-params='{{ {'lang': name}|tojson|forceescape }}'
                                data-reload-after
