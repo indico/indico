@@ -71,7 +71,7 @@
                         axes: {
                             xaxis: {
                                 min: 0,
-                                padMax: 0,
+                                padMax: 0
                             },
                             yaxis: {
                                 pad: 8,
@@ -81,7 +81,7 @@
                                     showLabel: true,
                                     tickSpacing: 24
                                 }
-                            },
+                            }
                         },
                         height: {{ height }},
                         highlighter: {
@@ -98,8 +98,8 @@
                                 shadowOffset: 1
                             },
                             pointLabels: { show: true }
-                        },
-                    }
+                        }
+                    };
                     var countriesPlot = $.jqplot('countriesPlot', [countries], processJqPlotOptions(jqPlotOptions));
                 });
             </script>

@@ -15,26 +15,6 @@ function curry(method) {
 	};
 }
 
-function wrap(method, instance) {
-	return function() {
-		return method.apply(instance, $A(arguments));
-	}
-}
-
-/**
- * Returns a function that calls the method on the given instance.
- * @param {Function} method
- * @param {Object} instance
- * @param {Object} ... args
- * @return {Function}
- */
-function apply(method, instance) {
-	var args = $A(arguments, 2);
-	return function() {
-		return method.apply(instance, concat(args, arguments));
-	};
-}
-
 /**
  * Returns a template that invokes an input value on the object with the arguments.
  * @param {Object} self

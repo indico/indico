@@ -34,15 +34,6 @@ function set_repeatition_comment() {
     $('#repComment').html(s);
 }
 
-//Refresh datapicker's dates
-function refreshDates(){
-    var startDate = $("#sDatePlace").datepicker('getDate');
-    var endDate = $("#eDatePlace").datepicker('getDate');
-    if (startDate > endDate) {
-        $("#eDatePlace").datepicker('setDate', startDate);
-    }
-}
-
 // Store all fields in local storage
 function saveFormData() {
     var selectedRooms = $("#roomselector").roomselector("selection");

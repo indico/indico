@@ -133,40 +133,6 @@ function mapper(template) {
         return iterator;
 }
 
-function writer(template) {
-        var iterator;
-        if (exists(template)) {
-                iterator = function(value, key) {
-                        iterator.result += template(value, key);
-                };
-        } else {
-                iterator = function(value, key) {
-                        iterator.result += value;
-                };
-        }
-        iterator.result = "";
-        return iterator;
-}
-
-/**
- * Returns an iterator
- * that invokes the action also for items of nested arrays
- * and sets a result from the action as the result of the iterator
- * @param {Function} action
- * @return {Function}
- */
-function linearizing(action) {
-        function iterator(item) {
-                if (isArray(item)) {
-                        iterate(item, iterator);
-                } else {
-                        action(item);
-                }
-        }
-        iterator.result = action.result;
-        return iterator;
-}
-
 function where(match, action) {
 	function iterator(item, key) {
 		if (match(item, key)) {
@@ -186,22 +152,6 @@ function where(match, action) {
  */
 function existing(action) {
    return where(exists, action);
-}
-
-/**
- * Returns an iterator that applies the template on each item
- * and invokes the action on outputs from the template.
- * It sets a result from the action as the result of the iterator
- * @param {Function} action
- * @param {Function} template
- * @return {Function}
- */
-function processing(action, template) {
-        function iterator(value, key) {
-                action(template(value, key));
-        }
-        iterator.result = action.result;
-        return iterator;
 }
 
 function keyGetter(value, key) {
@@ -249,24 +199,6 @@ function search(items, match) {
                 each(items, function(value, key) {
                         if (match(value, key)) {
                                 result = [value, key];
-                                throw $found;
-                        }
-                });
-                return null;
-        } catch (e) {
-                if (e === $found) {
-                        return result;
-                }
-                throw e;
-        }
-}
-
-function lookup(items, match) {
-        var result;
-        try {
-                each(items, function(value, key) {
-                        result = match(value, key);
-                        if (exists(result)) {
                                 throw $found;
                         }
                 });

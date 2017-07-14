@@ -78,7 +78,7 @@
             indicoRequest('roombooking.blocking.' + action, args, function(result, error) {
                 killProgress();
                 if (exists(error)) {
-                    IndicoUtil.errorReport(error);
+                    IndicoUI.Dialogs.Util.error(error);
                 }
                 else {
                     rbRow.find('.js-process').remove();

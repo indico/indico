@@ -167,10 +167,6 @@ ul.mapAspectsList li {
     border-right: 1px solid #AAAAAA;
 }
 
-ul.mapAspectsList li.browserIE7 {
-    display: inline;
-}
-
 ul.mapAspectsList li.browserDefault {
     display: inline-table;
 }

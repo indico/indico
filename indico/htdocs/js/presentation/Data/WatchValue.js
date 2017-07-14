@@ -13,19 +13,10 @@ function $V(source, template) {
 }
 
 /**
- * Creates two-way convertor from the source.
- * @param {Accessor} source
- * @param {Object} template
- */
-function $C(source, template) {
-	return bind.accessor(new WatchValue(), source, template);
-}
-
-/**
  * Observable value.
  */
 type("WatchValue", ["WatchAccessor"], {
-}, 
+},
 	/**
 	 * Initializes a new watch value with the given value.
 	 * @param {Object} value
@@ -58,4 +49,3 @@ type("WatchPair", ["WatchValue"], {
 		this.WatchValue(value);
 	}
 );
-

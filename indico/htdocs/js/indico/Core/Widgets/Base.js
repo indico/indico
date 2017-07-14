@@ -571,35 +571,6 @@ type("JTabWidget", ["IWidget"], {
         }
         self._updateScrollButtons();
     },
-    showNotification: function(index, text) {
-        var label = this.getLabel(index);
-        label.qtip({
-            content: text,
-            position: {
-                my: 'bottom middle',
-                at: 'top middle',
-                viewport: $(window)
-            },
-            show: {
-                event: false
-            },
-            hide: {
-                event: 'unfocus'
-            },
-            style: {
-                classes: 'qtip-rounded qtip-balloon',
-                tip: {
-                    corner: true,
-                    width: 20,
-                    height: 15
-                }
-            }
-        }).qtip('show');
-    },
-    hideNotification: function(index) {
-        var label = this.getLabel(index);
-        label.qtip('destroy');
-    },
     _drawExtraButtons: function() {
         // Add any extra buttons displayed under the tabs
         var container = $('<div class="tabExtraButtons"/>');
@@ -1166,7 +1137,6 @@ type("PopupWidget", [], {
      * @param {Integer} y The vertical position of the top left corner.
      */
     open: function(x, y) {
-        //$E(document.body).append(this.draw(x,y));
         var stuff = this.draw(x, y).dom;
         $('body').append(stuff);
         this.isopen = true;

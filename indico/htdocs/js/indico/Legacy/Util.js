@@ -53,7 +53,7 @@ var IndicoUtil = {
                 table.append($("<tr style='margin-top:10px;'><td></td></tr>").append($("<td " + fieldStyle + "></td>").append(item[0])));
             }
         });
-        return table
+        return table;
 
     },
 
@@ -83,15 +83,6 @@ var IndicoUtil = {
         default:
             return dateText;
         }
-    },
-
-    /**
-    * Formats a JS Date, returning a string (DD/MM/YY)
-    * @param {Date} date A JS Date
-    * @return A string representation of the Date object
-    */
-    formatDate: function(date) {
-        return zeropad(date.getDate())+'/'+ zeropad(date.getMonth()+1) +'/'+date.getFullYear();
     },
 
     /**
@@ -508,9 +499,6 @@ var IndicoUtil = {
 
     },
 
-
-    // DEPRECATED, in favor of IndicoUI.Dialogs.Util.error
-    errorReport: IndicoUI.Dialogs.Util.error,
 
     /**
      * Simple function used in sorting

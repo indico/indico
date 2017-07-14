@@ -86,11 +86,6 @@ type("Html", ["XElement", "WatchAccessor", "CanGet"], {
         invokeObserver: function(observer) {
                 return observer(this.get());
         },
-        notifyObservers: function() {
-                if (this.observers) {
-                        this.invokeObserver(this.observers);
-                }
-        },
 
         // CanGet
         canGet: function() {
@@ -390,10 +385,6 @@ Html.addScript = function(path) {
         script.src = path;
         script.type = "text/javascript";
         document.getElementsByTagName("head")[0].appendChild(script);
-};
-
-Html.Target = {
-        New: "_blank"
 };
 
 Html.$ = function() {

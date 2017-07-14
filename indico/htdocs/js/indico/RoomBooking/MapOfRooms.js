@@ -145,10 +145,6 @@ type ("RoomMap", ["IWidget"],
             }, this);
         },
 
-        constructBrowserSpecificCss: function() {
-            return this.isBrowserIE7() ? 'browserIE7' : 'browserDefault';
-        },
-
         constructAspectCss: function(selected) {
             var selectionClass = selected ? 'mapAspectSelected' : 'mapAspectUnselected';
             return 'mapAspectsItem ' + selectionClass;
@@ -160,7 +156,7 @@ type ("RoomMap", ["IWidget"],
                 // construct a link that changes the map aspect if clicked
                 var link = Html.a({'href': '#', className: this.constructAspectCss(false)}, aspect.name);
                 var itemClassName = i == 0 ? 'first ' : (i == this.aspects.length - 1 ? 'last ' : '');
-                var item = Html.li({className: itemClassName + this.constructBrowserSpecificCss()}, link.dom);
+                var item = Html.li({className: itemClassName + 'browserDefault'}, link.dom);
                 aspect.applyAspect = this.createAspectChangeFunction(aspect, link);
 
                 // store the link for the aspect
@@ -800,11 +796,6 @@ type ("RoomMap", ["IWidget"],
             _.each(_.zip(this.aspects, this.boundCounters), function(pair) {
                 format.apply(this, pair);
             }, this);
-        },
-
-        isBrowserIE7: function() {
-            var agent = navigator.userAgent.toLowerCase();
-            return window.ActiveXObject && (/msie 7/.test(agent) || document.documentMode == 7);
         },
 
         embedWidgets: function() {

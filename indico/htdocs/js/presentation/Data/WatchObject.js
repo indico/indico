@@ -160,7 +160,7 @@ function watchType(name, properties, mixins) {
 }
 
 /**
- * 
+ *
  * @param {WatchType} target
  * @param {Array} values
  */
@@ -175,7 +175,7 @@ watchType.init = function(target, values) {
 };
 
 /**
- * 
+ *
  * @param {WatchType} target
  * @param {Object} object
  */
@@ -232,27 +232,3 @@ function mixWatchAccessors(target, properties, object) {
 	});
 	return object;
 }
-
-/**
- * Attaches the accessors and the getters from the object to the target and returns the object.
- * @param {Object} target
- * @param {Array} accessors
- * @param {Array} getters
- * @param {WatchObject} [object]
- * @return {WatchObject}
- */
-function mixWatchObject(target, accessors, getters, object) {
-	if (!exists(object)) {
-		object = new WatchObject();
-	}
-	iterate(properties, function(property) {
-		target[property] = object.accessor(property);
-	});
-	iterate(getters, function(property) {
-		target[property] = object.getter(property);
-	});
-	return object;	
-}
-
-newWatchObject = construct(WatchObject);
-getWatchObject = provide(WatchObject);

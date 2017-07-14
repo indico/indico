@@ -337,7 +337,6 @@ presentation = rjs_bundle(
                'Core/Commands.js',
                'Core/MathEx.js',
                'Data/Bag.js',
-               'Data/Watch.js',
                'Data/WatchValue.js',
                'Data/WatchList.js',
                'Data/WatchObject.js',
@@ -351,7 +350,6 @@ presentation = rjs_bundle(
                'Ui/Dom.js',
                'Ui/Extensions/Layout.js',
                'Ui/Text.js',
-               'Ui/Styles/SimpleStyles.js',
                'Ui/Widgets/WidgetBase.js',
                'Ui/Widgets/WidgetComponents.js',
                'Ui/Widgets/WidgetControl.js'))

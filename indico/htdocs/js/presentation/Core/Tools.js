@@ -48,10 +48,6 @@ function compact(list, offset, template) {
 	return iterate(list, existing(stacker(template)), offset);
 }
 
-function filter(list, match, offset, template) {
-  return iterate(list, where(match, stacker(template)), offset)
-}
-
 /**
  * Returns true if the collection contains an item that matches.
  * @param {Object} collection
@@ -97,7 +93,6 @@ function merge() {
 function keys(source) {
 	return translate(source, keyGetter);
 }
-var values = translate;
 
 /**
  * Adds the value as a new property to the object,

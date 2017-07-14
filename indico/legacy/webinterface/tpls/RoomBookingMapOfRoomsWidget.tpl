@@ -294,7 +294,7 @@ function availabilityFilterFunction(filtersCallback) {
                 }
                 filtersCallback([], [roomIdFilter]);
             } else {
-                IndicoUtil.errorReport(error);
+                IndicoUI.Dialogs.Util.error(error);
                 filtersCallback([], []);
             }
         });

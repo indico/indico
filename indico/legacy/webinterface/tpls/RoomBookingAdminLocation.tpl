@@ -281,7 +281,7 @@ var newAspectsHandler = function(newAspect, setResult) {
             if (!error) {
                 setResult({ok: true, id: result});
             } else {
-                IndicoUtil.errorReport(error);
+                IndicoUI.Dialogs.Util.error(error);
                 setResult(false);
             }
         }
@@ -301,7 +301,7 @@ var editAspectHandler = function(oldAspect, setResult, newAspect) {
             if (!error) {
                 setResult(true);
             } else {
-                IndicoUtil.errorReport(error);
+                IndicoUI.Dialogs.Util.error(error);
                 setResult(false);
             }
         }
@@ -321,7 +321,7 @@ var removeAspectHandler = function(aspect, setResult) {
             if (!error) {
                 setResult(true);
             } else {
-                IndicoUtil.errorReport(error);
+                IndicoUI.Dialogs.Util.error(error);
                 setResult(false);
             }
         }
@@ -348,7 +348,7 @@ indicoRequest(
             // TODO: remove logs
             console.log(result);
             console.log(error);
-            IndicoUtil.errorReport(error);
+            IndicoUI.Dialogs.Util.error(error);
         }
     }
 );

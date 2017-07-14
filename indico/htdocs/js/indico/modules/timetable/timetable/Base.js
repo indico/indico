@@ -875,15 +875,11 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     },
 
     _openSessionMenu: function(triggerElement, parent) {
-
         if (exists(this.addMenu) && this.addMenu.isOpen()) {
             return;
         }
 
         var self = this;
-
-        var menuItems = {};
-
         var sessions = {};
         each(this.eventInfo.sessions, function(session, key) {
             sessions[session.id] = {};
@@ -908,8 +904,6 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     },
 
     _createAddMenu: function(elem) {
-        var self = this;
-        var menuItems = {};
         var ul = $('<ul class="dropdown"/>');
 
         if (this._allowCreateHere('Session')) {

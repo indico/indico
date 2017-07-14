@@ -175,18 +175,6 @@ function parseDate(text) {
         return [day, month, year];
 }
 
-// d.m.yyyy
-/**
- * Formats date.
- * @param {Date} date
- * @return {String}
- */
-function formatDate(date) {
-        return date.getDate().toString() + "."
-                + (date.getMonth() + 1).toString() + "."
-                + date.getFullYear().toPaddedString(3);
-}
-
 // tuple is [day, month, year]
 /**
  * Sets the date from the tuple.
@@ -224,80 +212,4 @@ function getDate(date) {
                 date.getMonth() + 1,
                 date.getFullYear()
         ];
-}
-
-function __test__parseTime() {
-        var results = [];
-        iterate([
-    ["1", 1, 0],
-    ["12", 12, 0],
-    ["27", 27, 0],
-    ["123", 1, 23],
-    ["023", 0, 23],
-    ["1234", 12, 34],
-    ["0034", 0, 34],
-    ["1:", 1, 0],
-    ["12:", 12, 0],
-    ["3:4", 3, 4],
-    ["12:3", 12, 3],
-    ["02:3", 2, 3],
-    ["12:34", 12, 34],
-    ["00:34", 0, 34]
-        ], function(item) {
-                var result = parseTime(item[0]);
-                if (result == null) {
-                        if (item[1] != null) {
-                                results.push(format("{0}> {1}:{2} != null", [item[0], item[1], item[2]]));
-                        }
-                } else {
-                        if (result[0] != item[1] || result[1] != item[2]) {
-                                results.push(format("{0}> {1}:{2} != {3}:{4}", [item[0], item[1], item[2], result[0], result[1]]));
-                        }
-                }
-        });
-        return results;
-}
-
-function __test__parseDate() {
-        var results = [];
-        iterate([
-                ["2", 2, null, null],
-                ["23", 2, 3, null],
-                ["231", 23, 1, null],
-                ["2310", 23, 10, null],
-                ["23104", 23, 10, [4]],
-                ["231045", 23, 10, [45]],
-                ["2310456", 23, 10, 456],
-                ["23104567", 23, 10, 4567],
-                ["23107", 23, 10, [7]],
-                ["231007", 23, 10, [7]],
-                ["2310007", 23, 10, 7],
-                ["23100007", 23, 10, 7],
-                ["30.", 30, null, null],
-                ["2.10", 2, 10, null],
-                ["23.1", 23, 1, null],
-                ["23.10", 23, 10, null],
-                ["30.12.", 30, 12, null],
-                ["2.10.4", 2, 10, [4]],
-                ["23.1.4", 23, 1, [4]],
-                ["2.10.45", 2, 10, [45]],
-                ["23.1.45", 23, 1, [45]],
-                ["23.10.45", 23, 10, [45]],
-                ["2.10.4567", 2, 10, 4567],
-                ["23.1.4567", 23, 1, 4567],
-                ["23.10.4567", 23, 10, 4567]
-        ], function(item) {
-                var result = parseDate(item[0]);
-                if (result == null) {
-                        if (item[1] != null) {
-                                results.push(format("{0}> {1}.{2}.{3} != null", [item[0], item[1], item[2], item[3]]));
-                        }
-                } else {
-                        if (result[0] != item[1] || result[1] != item[2] || (result[2] != item[3]
-                                        && (result[2] != null && item[3] != null && result[2][0] != item[3][0]))) {
-                                results.push(format("{0}> {1}.{2}.{3} != {4}.{5}.{6}", [item[0], item[1], item[2], item[3], result[0], result[1], result[2]]));
-                        }
-                }
-        });
-        return results;
 }

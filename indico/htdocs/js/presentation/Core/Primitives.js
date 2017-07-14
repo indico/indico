@@ -10,12 +10,6 @@ if (typeof(global.include) !== "function") {
     }
 }
 
-function load(code) {
-    if (window.execScript) {
-        return window.execScript(code);
-    }
-    global.eval(code);
-}
 
 function extract(text, start, stop) {
     var startIndex;
@@ -45,13 +39,6 @@ function equals(a, b) {
     return a == b;
 }
 
-/**
- * Makes declarations internal
- * @param {Function} block
- */
-function internal(block) {
-    block();
-}
 
 /**
  * Two-way template that returns the input value.

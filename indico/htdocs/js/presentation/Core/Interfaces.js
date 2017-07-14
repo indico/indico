@@ -261,21 +261,6 @@ type("List", ["Enumerable"], {
 	 */
 	append: function(item) {},
 
-	appendExisting: function(item) {
-		if (exists(item)) {
-			return this.append(item);
-		} else {
-			return this.length;
-		}
-	},
-
-	appendMany: function(items) {
-		var self = this;
-		each(items, function(item) {
-			self.append(item);
-		});
-	},
-
 	/**
 	 * Inserts the new item at the index if available,
 	 * otherwise inserts the item at the beginning.
@@ -293,26 +278,12 @@ type("List", ["Enumerable"], {
 	 */
 	remove: function(item) {},
 
-	removeMany: function(items) {
-		var self = this;
-		each(items, function(item) {
-			self.remove(item);
-		});
-	},
-
 	/**
 	 * Removes an item at the given index and returns the item.
 	 * @param {Object} index
 	 * @return {Object} item
 	 */
 	removeAt: function(index) {},
-
-	removeManyAt: function(indexes) {
-		var self = this;
-		each(indexes, function(index) {
-			self.removeAt(index);
-		});
-	},
 
 	/**
 	 * Replaces item at index and returns previous item

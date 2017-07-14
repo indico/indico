@@ -148,10 +148,6 @@ type("ExportIcalInterface", [], {
         }
     },
 
-    showPopup: function(){
-        $('#icalExportPopup'+this.id).show();
-    },
-
     showContent: function(){
         var self = this;
         self.setURLsFunction(self.requestURLs);
@@ -211,7 +207,7 @@ type("ExportIcalInterface", [], {
                 }
             }
             break;
-        };
+        }
     }
 
 }, function(apiMode, persistentUserEnabled, persistentAllowed, apiActive, userLogged, setURLsFunction, getURLsMethod,

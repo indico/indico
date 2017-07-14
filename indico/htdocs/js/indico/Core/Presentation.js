@@ -35,37 +35,6 @@ extend(Html.prototype,
                    return this.ancestorOf(child.getParent());
                }
            },
-           getElementsByClassName: function(name){
-               if(document.getElementsByClassName) {
-                   return translate(this.dom.getElementsByClassName(name),
-                             $E);
-               } else {
-                   // check for XPath
-                   if (!!document.evaluate) {
-                       /* from Prototype */
-
-                       var expression = ".//*[contains(concat(' ', @class, ' '), ' " + name + " ')]";
-                       var results = [];
-                       var query = document.evaluate(expression, this.dom, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null);
-                       for (var i = 0, length = query.snapshotLength; i < length; i++) {
-                           results.push(query.snapshotItem(i));
-                       }
-                       return translate(results,
-                                        $E);
-                   } else {
-                       var children = this.dom.getElementsByTagName('*');
-                       var elements = [], child;
-                       for (var j = 0, length2 = children.length; j < length2; j++) {
-                           child = children[j];
-                           if (child.className == name) {
-                               elements.push(child);
-                           }
-                       }
-                       return translate(elements, $E);
-                   }
-               }
-           },
-
            replaceWith: function(element) {
                this.getParent().dom.replaceChild(element.dom, this.dom);
            }
@@ -83,14 +52,6 @@ function eventTarget(event) {
     return any(event.srcElement, event.target);
 }
 
-function stopPropagation(event) {
-    if (event.stopProgagation) {
-        event.stopPropagation();
-    } else {
-        event.cancelBubble = true;
-    }
-}
-
 function $N(name) {
     return translate(document.getElementsByName(name), $E);
 }
@@ -98,13 +59,6 @@ function $N(name) {
 // Function that always returns true
 function positive() {return true;}
 
-//Function that always returns false
-function negative() {return false;}
-
-//Function to sort arrays of integers
-var numberSorter = function(a, b) {
-    return a - b;
-};
 
 function createObject(clazz, args) {
     function Dummy(){}
@@ -115,25 +69,6 @@ function createObject(clazz, args) {
     clazz.apply(x, args);
 
     return x;
-}
-
-function filter(array, func)
-{
-    var len = array.length;
-
-    var res = [];
-    for (var i = 0; i < len; i++)
-    {
-        if (i in array)
-        {
-            var val = array[i];
-            if (func(val))
-            {
-                res.push(val);
-            }
-        }
-    }
-    return res;
 }
 
 function escapeHTML(html) {
@@ -195,55 +130,6 @@ extend(WatchList.prototype,
            }
 
        });
-
-type("WatchOrderedDict", ["WatchObject"],
-     {
-
-         // ATTENTION: Implementation not complete!
-         // remove() functions missing!
-
-         sort: function(compare) {
-             this.order.sort(compare);
-         }
-     },
-     function() {
-         this.order = $L();
-         this.WatchObject();
-
-         var self = this;
-
-         this.each = function(iterator) {
-             self.order.each(function(val, i) {
-                 return iterator(self.get(val), val);
-             });
-             return iterator.result;
-         };
-
-         this.set = function(key, value) {
-             this.order.add(key);
-             this.WatchObject.prototype.set.call(key, value);
-         };
-
-         var oldUpdate = this.update;
-         var oldClear = this.clear;
-
-         this.update = function(values) {
-
-             var self = this;
-
-             each(values, function(value, key) {
-                 self.order.append(key);
-             });
-
-             oldUpdate.call(this, values);
-         };
-
-         this.clear = function() {
-             this.order.clear();
-             return oldClear();
-         };
-
-     });
 
 Html.unescaped = map({'div': null, 'span': null}, function(value, elemType) {
     return function() {

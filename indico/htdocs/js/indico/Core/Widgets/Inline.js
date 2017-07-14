@@ -201,10 +201,6 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
              this._stopErrorList = this._setElementErrorState(this.input, text);
          },
 
-         _checkErrorState: function() {
-             return null;
-         },
-
          draw: function() {
              this.enableEvent();
              return this.IWidget.prototype.draw.call(this, this.input);
@@ -228,10 +224,6 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
          observeOtherKeys: function(observer) {
              this.otherKeyObservers.push(observer);
          },
-         stopObserving: function() {
-             this.observers = [];
-             this.otherKeyObservers = [];
-         },
          unbind: function() {
              bind.detach(this.input);
          },
@@ -244,9 +236,6 @@ type("RealtimeTextBox", ["IWidget", "WatchAccessor", "ErrorAware"],
          },
          setStyle: function(prop, value) {
              this.input.setStyle(prop, value);
-         },
-         setFocus: function() {
-             this.input.dom.focus();
          },
          notifyChange: function(keyCode, event) {
              var value = true;
@@ -321,9 +310,6 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
             },
             observe: function(observer) {
                 this.input.observe(observer);
-            },
-            getInput: function() {
-                return this.input;
             }
         },
         function(id, args, keyPressAction) {
@@ -338,6 +324,3 @@ type("EnterObserverTextBox", ["IWidget", "WatchAccessor"],
                 Dom.Event.dispatch(self.input.dom, 'change');
             });
         });
-
-
-;
