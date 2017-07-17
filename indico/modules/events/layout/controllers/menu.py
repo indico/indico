@@ -232,6 +232,7 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
                        .filter(MenuEntry.parent_id == self.entry.parent_id,
                                MenuEntry.position >= self.entry.position,
                                MenuEntry.id != self.entry.id)
+                       .order_by(MenuEntry.position)
                        .all())
         for entry in entries:
             entry.position = next(position_gen)
