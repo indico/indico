@@ -16,16 +16,17 @@
 
 from __future__ import unicode_literals
 
-import pkg_resources
 import platform
-from urlparse import urljoin
 
+import pkg_resources
 from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, RequestException, Timeout
+from werkzeug.urls import url_join
 
 import indico
 from indico.core.config import Config
 from indico.core.db import db
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.cephalopod.forms import CephalopodForm
@@ -35,8 +36,6 @@ from indico.modules.core.settings import core_settings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-
-from indico.legacy.webinterface.rh.base import RH
 
 
 def get_postgres_version():
@@ -58,26 +57,21 @@ class RHCephalopodBase(RHAdminBase):
 
 class RHCephalopod(RHCephalopodBase):
     def _process_GET(self):
-        cephalopod_settings.set('show_migration_message', False)
-        defaults = FormDefaults(**cephalopod_settings.get_all())
-        form = CephalopodForm(request.form, obj=defaults)
-
-        enabled = cephalopod_settings.get('joined')
+        form = CephalopodForm(request.form, obj=FormDefaults(**cephalopod_settings.get_all()))
         config = Config.getInstance()
-        instance_url = config.getBaseURL()
-        language = config.getDefaultLocale()
-        tracker_url = urljoin(config.getCommunityHubURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        hub_url = url_join(config.getCommunityHubURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        cephalopod_settings.set('show_migration_message', False)
         return WPCephalopod.render_template('cephalopod.html', 'cephalopod',
                                             affiliation=core_settings.get('site_organization'),
-                                            enabled=enabled,
+                                            enabled=cephalopod_settings.get('joined'),
                                             form=form,
                                             indico_version=indico.__version__,
-                                            instance_url=instance_url,
-                                            language=language,
+                                            instance_url=config.getBaseURL(),
+                                            language=config.getDefaultLocale(),
                                             operating_system=get_os(),
                                             postgres_version=get_postgres_version(),
                                             python_version=platform.python_version(),
-                                            tracker_url=tracker_url)
+                                            hub_url=hub_url)
 
     def _process_POST(self):
         name = request.form.get('contact_name', cephalopod_settings.get('contact_name'))

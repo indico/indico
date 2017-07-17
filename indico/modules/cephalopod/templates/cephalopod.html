@@ -24,7 +24,6 @@
             <li>{% trans %}Basic statistics (number of events, contributions and users){% endtrans %}</li>
         </ul>
     {% endcall %}
-    <span id="cephalopod-data" class="hidden" data-tracker-url="{{ tracker_url }}"></span>
 
     <div id="tracking-status" class="action-box">
         <div class="section">
@@ -61,6 +60,6 @@
     </div>
 
     <script>
-        setupCephalopodSettings({{ tracker_url|tojson }});
+        setupCephalopodSettings({{ hub_url|tojson }});
     </script>
 {% endblock %}
