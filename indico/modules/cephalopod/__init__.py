@@ -31,6 +31,7 @@ __all__ = ('logger', 'cephalopod_settings')
 logger = Logger.get('cephalopod')
 
 cephalopod_settings = SettingsProxy('cephalopod', {
+    'show_migration_message': False,
     'joined': False,
     'contact_email': None,
     'contact_name': None,

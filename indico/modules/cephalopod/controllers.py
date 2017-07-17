@@ -58,6 +58,7 @@ class RHCephalopodBase(RHAdminBase):
 
 class RHCephalopod(RHCephalopodBase):
     def _process_GET(self):
+        cephalopod_settings.set('show_migration_message', False)
         defaults = FormDefaults(**cephalopod_settings.get_all())
         form = CephalopodForm(request.form, obj=defaults)
 

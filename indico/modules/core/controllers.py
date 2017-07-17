@@ -56,9 +56,11 @@ class RHSettings(RHAdminBase):
             return redirect(url_for('.settings'))
 
         cephalopod_url, cephalopod_data = self._get_cephalopod_data()
+        show_migration_message = cephalopod_settings.get('show_migration_message')
         return WPSettings.render_template('settings.html', 'settings',
                                           form=form,
                                           core_settings=core_settings.get_all(),
                                           social_settings=social_settings.get_all(),
                                           cephalopod_url=cephalopod_url,
-                                          cephalopod_data=cephalopod_data)
+                                          cephalopod_data=cephalopod_data,
+                                          show_migration_message=show_migration_message)
