@@ -38,7 +38,8 @@ class RHSettings(RHAdminBase):
         if not cephalopod_settings.get('joined'):
             return None, {'enabled': False}
 
-        url = url_join(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        url = url_join(Config.getInstance().getCommunityHubURL(),
+                       'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         data = {'enabled': cephalopod_settings.get('joined'),
                 'contact': cephalopod_settings.get('contact_name'),
                 'email': cephalopod_settings.get('contact_email'),

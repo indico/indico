@@ -32,7 +32,7 @@ TIMEOUT = 10
 
 
 def _get_url():
-    return url_join(Config.getInstance().getTrackerURL(), 'api/instance/')
+    return url_join(Config.getInstance().getCommunityHubURL(), 'api/instance/')
 
 
 def register_instance(contact, email):
