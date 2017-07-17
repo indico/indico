@@ -275,7 +275,7 @@ class Config:
         'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
         'AttachmentStorage'         : 'default',
         'StaticSiteStorage'         : None,
-        'TrackerURL'                : 'http://localhost:5000/api',
+        'TrackerURL'                : 'https://hub.getindico.io',
         'ConfigFilePath'            : None,
         'LoggingConfigFile'         : 'logging.conf',
         'CustomizationDir'          : None,
