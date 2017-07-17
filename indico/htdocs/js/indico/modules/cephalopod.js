@@ -60,7 +60,7 @@
             if (!quiet) {
                 $('<div>', {class: 'message-text', html: errMsg})
                     .appendTo(
-                        $('<div>', {class: 'error-message-box'})
+                        $('<div>', {class: 'error-message-box fixed-width'})
                             .appendTo($('#flashed-messages'))
                 );
             }
@@ -142,7 +142,7 @@
                     html: $T.gettext('Your Indico server is not synchronized with the Community Hub! You can solve this <a href="{0}">here</a>.')
                               .format(settingsUrl)
                 }).appendTo(
-                    $('<div>', {class: 'warning-message-box'})
+                    $('<div>', {class: 'warning-message-box fixed-width'})
                         .appendTo($('#flashed-messages'))
                 );
             }
