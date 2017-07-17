@@ -112,9 +112,12 @@
                                 <li>{% trans %}Server URL{% endtrans %}</li>
                                 <li>{% trans %}Indico version installed{% endtrans %} ({{ indico_version }})</li>
                                 <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
+                                <li>{% trans %}Postgres version used{% endtrans %} ({{ postgres_version }})</li>
+                                <li>{% trans %}Operating system used{% endtrans %} ({{ operating_system }})</li>
+                                <li>{% trans %}Debug mode{% endtrans %} ({{ _('enabled') if config.DEBUG else _('disabled') }})</li>
                                 <li>
                                     {%- trans -%}
-                                        Statistical public data (number of events, contributions, etc...)
+                                        Basic statistics (number of events, contributions and users)
                                     {%- endtrans -%}
                                 </li>
                                 <li>{% trans %}Server default language{% endtrans %}</li>

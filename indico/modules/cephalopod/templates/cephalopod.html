@@ -21,6 +21,7 @@
             <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
             <li>{% trans %}Postgres version used{% endtrans %} ({{ postgres_version }})</li>
             <li>{% trans %}Operating system used{% endtrans %} ({{ operating_system }})</li>
+            <li>{% trans %}Debug mode{% endtrans %} ({{ _('enabled') if config.DEBUG else _('disabled') }})</li>
             <li>{% trans %}Basic statistics (number of events, contributions and users){% endtrans %}</li>
         </ul>
     {% endcall %}

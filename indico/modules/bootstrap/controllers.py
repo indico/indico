@@ -25,6 +25,7 @@ from requests.exceptions import HTTPError, RequestException, Timeout
 import indico
 from indico.core.config import Config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.util.queries import get_postgres_version
 from indico.legacy.webinterface.rh.base import RH
 from indico.modules.auth import Identity, login_user
 from indico.modules.bootstrap.forms import BootstrapForm
@@ -33,6 +34,7 @@ from indico.modules.core.settings import core_settings
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales
 from indico.util.string import to_unicode
+from indico.util.system import get_os
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.util import url_for_index
@@ -46,6 +48,8 @@ class RHBootstrap(RH):
                                form=BootstrapForm(),
                                timezone=Config.getInstance().getDefaultTimezone(),
                                languages=get_all_locales(),
+                               operating_system=get_os(),
+                               postgres_version=get_postgres_version(),
                                indico_version=indico.__version__,
                                python_version=python_version())
 

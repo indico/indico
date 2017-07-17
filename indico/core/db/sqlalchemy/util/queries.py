@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 import re
 
-from sqlalchemy import over, func, inspect
+from sqlalchemy import func, inspect, over
 from sqlalchemy.sql import update
+
 
 TS_REGEX = re.compile(r'([@<>!()&|:\'])')
 
@@ -75,6 +76,12 @@ def preprocess_ts_string(text, prefix=True):
 def has_extension(conn, name):
     """Checks if the postgres database has a certain extension installed"""
     return conn.execute("SELECT EXISTS(SELECT TRUE FROM pg_extension WHERE extname = %s)", (name,)).scalar()
+
+
+def get_postgres_version():
+    from indico.core.db import db
+    version = db.engine.execute("SELECT current_setting('server_version_num')::int").scalar()
+    return '{}.{}.{}'.format(version // 10000, version % 10000 // 100, version % 100)
 
 
 def increment_and_get(col, filter_):
