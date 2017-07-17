@@ -47,7 +47,7 @@
     {# TODO: move this to some kind of admin dashboard once we have one #}
     {% if cephalopod_data.enabled %}
         <script>
-            initCephalopodOnAdminPage(
+            checkCephalopodSynced(
                 {{ cephalopod_url | tojson }},
                 {{ cephalopod_data | tojson }},
                 {{ url_for('cephalopod.index') | tojson }}
