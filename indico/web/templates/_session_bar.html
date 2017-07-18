@@ -47,7 +47,7 @@
 {% macro _render_timezone_selector(timezone_data) %}
     {% if timezone_data.disabled %}
         <a class="i-button icon-time disabled">
-            {{- timezone_data.active_tz_display -}}
+            {{- timezone_data.active_tz -}}
         </a>
     {% else %}
         <div id="tz-selector-widget" style="display: none;" class="tz-selector-widget settingsWidget">
