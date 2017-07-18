@@ -40,7 +40,8 @@ class RHSettings(RHAdminBase):
         if not cephalopod_settings.get('joined'):
             return None, {'enabled': False}
 
-        url = url_join(Config.getInstance().getTrackerURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        url = url_join(Config.getInstance().getCommunityHubURL(),
+                       'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         data = {'enabled': cephalopod_settings.get('joined'),
                 'contact': cephalopod_settings.get('contact_name'),
                 'email': cephalopod_settings.get('contact_email'),
@@ -57,12 +58,14 @@ class RHSettings(RHAdminBase):
             return redirect(url_for('.settings'))
 
         cephalopod_url, cephalopod_data = self._get_cephalopod_data()
+        show_migration_message = cephalopod_settings.get('show_migration_message')
         return WPSettings.render_template('settings.html', 'settings',
                                           form=form,
                                           core_settings=core_settings.get_all(),
                                           social_settings=social_settings.get_all(),
                                           cephalopod_url=cephalopod_url,
-                                          cephalopod_data=cephalopod_data)
+                                          cephalopod_data=cephalopod_data,
+                                          show_migration_message=show_migration_message)
 
 
 class RHChangeTimezone(RH):

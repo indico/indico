@@ -7,6 +7,27 @@
 {% endblock %}
 
 {% block content %}
+    {% if show_migration_message and not cephalopod_data.enabled %}
+        <div class="action-box highlight">
+            <div class="section">
+                <span class="icon icon-lamp"></span>
+                <div class="text">
+                    <div class="label">
+                        {% trans %}Upgrade to Indico v2 successful!{% endtrans %}
+                    </div>
+                    <div>
+                        {% trans %}Please consider registering your server with the Community Hub.{% endtrans %}
+                    </div>
+                </div>
+                <div class="toolbar">
+                    <a href="{{ url_for('cephalopod.index') }}" class="i-button highlight">
+                        {% trans %}Details{% endtrans %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
     {% if config.DEBUG %}
         {% call message_box('warning') -%}
             {% trans %}Debug mode is enabled.{% endtrans %}
@@ -47,7 +68,7 @@
     {# TODO: move this to some kind of admin dashboard once we have one #}
     {% if cephalopod_data.enabled %}
         <script>
-            initCephalopodOnAdminPage(
+            checkCephalopodSynced(
                 {{ cephalopod_url | tojson }},
                 {{ cephalopod_data | tojson }},
                 {{ url_for('cephalopod.index') | tojson }}

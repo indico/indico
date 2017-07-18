@@ -24,7 +24,7 @@
                         % if details:
                             \vspace{0.5em}
                             \textbf{${_("Reviews:")}}
-                            % for proposed_action, reviewer, comment in details:
+                            % for proposed_action, reviewer, comment, score, ratings in details:
                                 \vspace{0.5em}
                                 \begin{addmargin}[1em]{1em}
                                     \rmfamily {
@@ -33,9 +33,21 @@
                                         \subsectionfont{\small\rmfamily}
                                         \small
                                         ${ reviewer | latex_escape }:
-                                        \textbf{ ${proposed_action | latex_escape} }
+                                        \textbf{ ${proposed_action | latex_escape}
+                                            % if score:
+                                                \textbullet\ ${ score }
+                                            % endif
+                                        }
                                         % if comment:
                                             (${ md_convert(comment)})
+                                        % endif
+                                        % if ratings:
+                                            % for question, rating in ratings:
+                                                \vspace{0.5em}
+                                                \begin{addmargin}[1em]{1em}
+                                                \textit{${question | latex_escape}} ${rating}
+                                                \end{addmargin}
+                                            % endfor
                                         % endif
                                     }
                                 \end{addmargin}

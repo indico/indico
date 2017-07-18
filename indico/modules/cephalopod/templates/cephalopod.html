@@ -21,10 +21,10 @@
             <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
             <li>{% trans %}Postgres version used{% endtrans %} ({{ postgres_version }})</li>
             <li>{% trans %}Operating system used{% endtrans %} ({{ operating_system }})</li>
+            <li>{% trans %}Debug mode{% endtrans %} ({{ _('enabled') if config.DEBUG else _('disabled') }})</li>
             <li>{% trans %}Basic statistics (number of events, contributions and users){% endtrans %}</li>
         </ul>
     {% endcall %}
-    <span id="cephalopod-data" class="hidden" data-tracker-url="{{ tracker_url }}"></span>
 
     <div id="tracking-status" class="action-box">
         <div class="section">
@@ -56,13 +56,11 @@
                 </p>
             {% endcall %}
             {% call form_footer(form) %}
-                    <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
+                <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
             {% endcall %}
     </div>
 
     <script>
-        $(function initCephalopod() {
-            initCephalopdOnSettingsPage({{ tracker_url|tojson }});
-        });
+        setupCephalopodSettings({{ hub_url|tojson }});
     </script>
 {% endblock %}
