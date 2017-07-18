@@ -1,7 +1,7 @@
 """Add backside_template column
 
 Revision ID: 3ca338ed5192
-Revises: 35d76c40ca48
+Revises: be7bdea6dd4d
 Create Date: 2017-05-17 11:33:30.295538
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '3ca338ed5192'
-down_revision = '35d76c40ca48'
+down_revision = 'be7bdea6dd4d'
 branch_labels = None
 depends_on = None
 
