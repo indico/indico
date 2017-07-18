@@ -67,3 +67,11 @@ get_event_themes_files = _signals.signal('get-event-themes-files', """
 Expected to return the path of a themes yaml containing event theme
 definitions.
 """)
+
+get_conference_themes = _signals.signal('get-conference-themes', """
+Expected to return ``(name, css, title)`` tuples for conference stylesheets.
+``name`` is the internal name used for the stylesheet which will be
+stored when the theme is selected in an event.  ``css`` is the location
+of the CSS file, relative to the plugin's ``static`` folder.  ``title``
+is the title displayed to the user when selecting the theme.
+""")

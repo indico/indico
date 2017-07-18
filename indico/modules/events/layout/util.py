@@ -27,11 +27,12 @@ import indico
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.core.plugins import url_for_plugin
 from indico.legacy.common.cache import GenericCache
 from indico.modules.events.layout import layout_settings
 from indico.modules.events.layout.models.menu import MenuEntry, MenuEntryType, TransientMenuEntry
 from indico.util.caching import memoize_request
-from indico.util.signals import named_objects_from_signal
+from indico.util.signals import named_objects_from_signal, values_from_signal
 from indico.util.string import crc32, return_ascii
 from indico.web.flask.util import url_for
 
@@ -313,6 +314,24 @@ def is_menu_entry_enabled(entry_name, event):
     return get_menu_entry_by_name(entry_name, event).is_enabled
 
 
+def get_plugin_conference_themes():
+    data = values_from_signal(signals.plugin.get_conference_themes.send(), return_plugins=True)
+    return {':'.join((plugin.name, name)): (path, title) for plugin, (name, path, title) in data}
+
+
+def _build_css_url(theme):
+    if ':' in theme:
+        try:
+            path = get_plugin_conference_themes()[theme][0]
+        except KeyError:
+            return None
+        plugin = theme.split(':', 1)[0]
+        return url_for_plugin(plugin + '.static', filename=path)
+    else:
+        css_base = url_parse(Config.getInstance().getCssConfTemplateBaseURL()).path
+        return '{}/{}'.format(css_base, theme)
+
+
 def get_css_url(event, force_theme=None, for_preview=False):
     """Builds the URL of a CSS resource.
 
@@ -324,9 +343,8 @@ def get_css_url(event, force_theme=None, for_preview=False):
     """
     from indico.modules.events.layout import layout_settings
 
-    css_base = url_parse(Config.getInstance().getCssConfTemplateBaseURL()).path
     if force_theme and force_theme != '_custom':
-        return '{}/{}'.format(css_base, force_theme)
+        return _build_css_url(force_theme)
     elif for_preview and force_theme is None:
         return None
     elif force_theme == '_custom' or layout_settings.get(event, 'use_custom_css'):
@@ -334,7 +352,7 @@ def get_css_url(event, force_theme=None, for_preview=False):
             return None
         return url_for('event_layout.css_display', event, slug=event.stylesheet_metadata['hash'])
     elif layout_settings.get(event, 'theme'):
-        return '{}/{}'.format(css_base, layout_settings.get(event, 'theme'))
+        return _build_css_url(layout_settings.get(event, 'theme'))
 
 
 def get_logo_data(event):
