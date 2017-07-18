@@ -132,10 +132,11 @@ When the wizard asks you about the **"Old archvive dir"**, make sure to set it t
 Running ``indico-migrate``
 ++++++++++++++++++++++++++
 
-First of all, make sure that you are using the **user** and **virtualenv** created using the step **"Install Indico"**:
+First of all, make sure that you are using the **user** and **virtualenv** created using the step **"Install Indico"** and that the legacy dir is owned by this **user**:
 
 .. code-block:: shell
 
+    chown -R indico /opt/indico-legacy
     su - indico
     source ~/.venv/bin/activate
 
