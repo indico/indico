@@ -8,7 +8,7 @@
                         <div class="i-box-title">
                             {{ section.title }}
                         </div>
-                        <div ng-if="section.description" class="i-box-description">
+                        <div ng-if="section.description" class="i-box-description pre-line">
                             {{ section.description }}
                         </div>
                     </div>
@@ -23,7 +23,7 @@
                     </div>
                     <div contenteditable
                         ng-if="section.description !== undefined"
-                        class="i-box-description"
+                        class="i-box-description pre-line"
                         ng-model="section.description"
                         placeholder="Fill the description"
                         nd-multiline="true">
