@@ -60,7 +60,7 @@
         {% endcall %}
     </div>
     <div class="front-warning-qtip-content hidden">
-        <div class="js-front-affected qbubble-item-list">
+        <div class="js-front-affected-title qbubble-item-list">
             {{ backside_template_data.title }}
         </div>
     </div>
@@ -341,7 +341,7 @@
                                             <div class="placeholder-text">{% trans %}The back side is empty.{% endtrans %}</div>
                                             <div class="placeholder-link">
                                                 {% set link_start %}
-                                                    <a href="#" class="js-backside-list-dialog"
+                                                    <a class="js-backside-list-dialog"
                                                        data-href="{{ url_for('.backside_template_list', template) }}"
                                                        data-title="{% trans %}Select a template for the back side{% endtrans %}">
                                                 {% endset %}
