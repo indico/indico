@@ -16,6 +16,7 @@
  */
 
 /* global AlertPopup: true */
+/* eslint-disable max-len */
 
 (function(global) {
     'use strict';
@@ -261,7 +262,7 @@
 
         // Handle the individual cases as required.
         if (item.type === "fixed") {
-            var text = prompt("Enter fixed-text value", item.text);
+            var text = prompt("Enter fixed-text value", item.text);  // eslint-disable-line no-alert
 
             if (text) {
                 var div = $item.parent('.ui-draggable');
@@ -859,7 +860,7 @@
                 if (removeBackSide) {
                     removeWarning();
                 }
-                $('.backside-template-title').text(data.template.title);
+                $('.backside-template-title, .js-front-affected-title').text(data.template.title);
             });
 
             $('.js-remove-backside').on('click', function() {
@@ -928,7 +929,9 @@
                     target: $('.js-front-affected')
                 },
                 content: {
-                    text: $('.front-warning-qtip-content').html()
+                    text: function() {
+                        return $('.front-warning-qtip-content').html();
+                    }
                 },
                 hide: {
                     event: 'unfocus click'
@@ -974,13 +977,13 @@
 
         function toggleFoldableOption(template, pageSize, pageOrientation) {
             var foldablePairs = {
-                'A0': 'A2',
-                'A1': 'A3',
-                'A2': 'A4',
-                'A3': 'A5',
-                'A4': 'A6',
-                'A5': 'A7',
-                'A6': 'A8'
+                A0: 'A2',
+                A1: 'A3',
+                A2: 'A4',
+                A3: 'A5',
+                A4: 'A6',
+                A5: 'A7',
+                A6: 'A8'
             };
             if (foldablePairs[pageSize] === template.format && pageOrientation === template.orientation) {
                 $("#page_layout option[value='foldable']").prop('disabled', false);
