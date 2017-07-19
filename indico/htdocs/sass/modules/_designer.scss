@@ -111,16 +111,13 @@
             transform-style: preserve-3d;
             transition: transform 1s;
 
-            * {
-                transform-style: preserve-3d;
-            }
-
             .template-side {
                 margin: 0;
                 position: absolute;
                 width: 100%;
                 height: 100%;
                 backface-visibility: hidden;
+                transform-style: preserve-3d;
 
                 &.back {
                     transform: rotateY(180deg);
