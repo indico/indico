@@ -46,7 +46,7 @@ from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_filename, chmod_umask
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
@@ -606,6 +606,7 @@ class ZipGeneratorMixin:
 
         temp_file.delete = False
         zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
+        chmod_umask(temp_file.name)
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):
