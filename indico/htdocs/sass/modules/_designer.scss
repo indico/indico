@@ -220,6 +220,7 @@
         display: flex;
         align-items: center;
         margin: 1em 0;
+        min-height: 37px;
 
         &:not(:last-child) {
             padding-right: 1em;

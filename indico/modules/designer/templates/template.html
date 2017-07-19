@@ -70,7 +70,7 @@
                 <label>{% trans %}Name{% endtrans %}</label>
                 <input class="js-template-name" size="20" type="text">
             </div>
-            <div class="tool">
+            <div class="tool js-hide-on-flip">
                 <i class="icon-rulers" title="{% trans %}Template dimensions{% endtrans %}"></i>
                 <div class="subtool">
                     <label>{% trans %}Width:{% endtrans %}</label>
@@ -107,7 +107,7 @@
                     </select>
                 </div>
             </div>
-            <div class="tool">
+            <div class="tool js-hide-on-flip">
                 <label for="grid-snap">{% trans %}Snap to grid{% endtrans %}</label>
                 <input id="grid-snap" type="checkbox">
             </div>
@@ -142,27 +142,25 @@
                     </div>
                 </form>
             </div>
-        </div>
-        <div class="designer-tools-row second-row disappear">
             {% if template.type.name == 'badge' %}
-                <div class="backside-tools hidden">
-                    <div class="tool">
-                        <span>{% trans %}Back side template:{% endtrans %}</span>
-                        <span class="backside-template-title">
-                            {{- template.backside_template.title -}}
-                        </span>
-                        <button class="js-remove-backside i-button icon-remove icon-only text-color subtle"
-                        title="{% trans %}Remove back side{% endtrans %}"></button>
-                    </div>
-                    <div class="tool">
-                        <button class="js-backside-list-dialog i-button icon-transmission"
-                                data-href="{{ url_for('.backside_template_list', template) }}"
-                                data-title="{% trans %}Select a template for the back side{% endtrans %}">
-                            {%- trans %}Change back side{% endtrans -%}
-                        </button>
-                    </div>
+                <div class="tool backside-tools">
+                    <span>{% trans %}Back side template:{% endtrans %}</span>
+                    <span class="backside-template-title">
+                        {{- template.backside_template.title -}}
+                    </span>
+                    <button class="js-remove-backside i-button icon-remove icon-only text-color subtle"
+                            title="{% trans %}Remove back side{% endtrans %}"></button>
+                </div>
+                <div class="tool backside-tools">
+                    <button class="js-backside-list-dialog i-button icon-transmission"
+                            data-href="{{ url_for('.backside_template_list', template) }}"
+                            data-title="{% trans %}Select a template for the back side{% endtrans %}">
+                        {%- trans %}Change back side{% endtrans -%}
+                    </button>
                 </div>
             {% endif %}
+        </div>
+        <div class="designer-tools-row second-row disappear">
             <div class="element-tools">
                 <div class="tool">
                     <span class="selection-text f-self-stretch"></span>

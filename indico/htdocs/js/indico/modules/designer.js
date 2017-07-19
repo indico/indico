@@ -822,10 +822,9 @@
                 $('.template-side.back').toggleClass('active', newFaceUp === 'back');
                 $('.template-side.front').toggleClass('active', newFaceUp === 'front');
                 $('.backside-tools').toggleClass('hidden', newFaceUp === 'front' || !hasBackside);
-                $('.second-row').toggleClass('disappear', newFaceUp === 'front');
                 $('.js-toggle-side').removeClass('highlight');
                 $('.element-tools').addClass('hidden');
-                $('.js-hide-on-flip').toggleClass('disappear', newFaceUp === 'back');
+                $('.js-hide-on-flip').toggle(newFaceUp !== 'back');
                 $this.toggleClass('highlight');
                 if ($selectedItem && $selectedItem[0]) {
                     deselectItem($selectedItem);
