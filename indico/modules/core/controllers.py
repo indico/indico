@@ -16,9 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect
+import requests
+from flask import flash, jsonify, redirect
+from packaging.version import Version
 from werkzeug.urls import url_join
 
+import indico
 from indico.core.config import Config
 from indico.core.settings.proxy import PrefixSettingsProxy
 from indico.modules.admin import RHAdminBase
@@ -64,3 +67,14 @@ class RHSettings(RHAdminBase):
                                           cephalopod_url=cephalopod_url,
                                           cephalopod_data=cephalopod_data,
                                           show_migration_message=show_migration_message)
+
+
+class RHVersionCheck(RHAdminBase):
+    """Check the installed indico version against pypi"""
+
+    def _process(self):
+        data = requests.get('https://pypi.python.org/pypi/indico/json').json()
+        current_version = Version(indico.__version__)
+        latest_version = Version(data['info']['version'])
+        return jsonify(current_version=unicode(current_version), latest_version=unicode(latest_version),
+                       outdated=(current_version < latest_version))

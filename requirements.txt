@@ -73,3 +73,4 @@ marshmallow-enum==1.2
 flask-marshmallow==0.8.0
 ipython<6,>=5.4.1
 prompt-toolkit<2.0.0,>=1.0.14
+packaging>=16.8,<17
