@@ -32,8 +32,8 @@ def update_template(template, title, data, backside_template_id=None, clear_back
     :param clear_background: Whether to remove the background image of the
                              template
     """
-    query = DesignerTemplate.query.filter(DesignerTemplate.backside_template == template)
-    if any(query) and (template.data['width'] != data['width'] or template.data['height'] != data['height']):
+    if template.data['width'] != data['width'] or template.data['height'] != data['height']:
+        query = DesignerTemplate.query.filter(DesignerTemplate.backside_template == template)
         for tpl in query:
             tpl.backside_template = None
             if tpl.event_new:
