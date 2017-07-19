@@ -31,9 +31,9 @@ from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
+from indico.modules.designer.operations import update_template
 from indico.modules.designer.util import get_inherited_templates, get_placeholder_options
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
-from indico.modules.designer.operations import update_template
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
@@ -255,7 +255,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
 
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
-        self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, self.template.data)
+        self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
                         clear_background=request.json['clear_background'])
