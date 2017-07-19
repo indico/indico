@@ -11,8 +11,7 @@
                                 class="not-selectable-backside"
                                 title="{% trans %}This template has different dimension than your template{% endtrans %}"
                             {% endif %}>
-                            <a href="#" class="backside-template"
-                               data-href="{{ url_for('.get_template_data', tpl) }}">
+                            <a class="backside-template" data-href="{{ url_for('.get_template_data', tpl) }}">
                                 <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
                                    title="{{ tpl.type.title }}"></i>
                                 <span>{{ tpl.title }}</span>
