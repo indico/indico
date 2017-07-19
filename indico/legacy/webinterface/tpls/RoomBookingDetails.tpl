@@ -275,8 +275,9 @@
                           ${ _('E-mail') }&nbsp;&nbsp;
                         </td>
                         <td align="left" class="blacktext">
-                          <a style="font-weight: normal" href="mailto:${ verbose(reservation.contact_email) }">${ reservation.contact_email.replace(',',', ') }
-                          </a>
+                          % if reservation.contact_email:
+                            <a style="font-weight: normal" href="mailto:${ reservation.contact_email }">${ reservation.contact_email }</a>
+                          % endif
                         </td>
                       </tr>
                       <tr>
