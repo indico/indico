@@ -236,7 +236,7 @@ class PrincipalMixin(object):
             lazy=False,
             backref=db.backref(
                 cls.principal_backref_name,
-                cascade='all, delete-orphan',
+                cascade='all, delete',
                 lazy='dynamic'
             )
         )
@@ -249,7 +249,7 @@ class PrincipalMixin(object):
             lazy=False,
             backref=db.backref(
                 cls.principal_backref_name,
-                cascade='all, delete-orphan',
+                cascade='all, delete',
                 lazy='dynamic'
             )
         )
@@ -264,7 +264,7 @@ class PrincipalMixin(object):
             lazy=False,
             backref=db.backref(
                 cls.principal_backref_name,
-                cascade='all, delete-orphan',
+                cascade='all, delete',
                 lazy='dynamic'
             )
         )
