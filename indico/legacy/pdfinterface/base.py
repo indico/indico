@@ -666,7 +666,7 @@ class PDFLaTeXBase(object):
         # Markdown -> LaTeX renderer
         # safe_mode - strip out all HTML
         md = markdown.Markdown(safe_mode='remove')
-        latex_mdx = mdx_latex.LaTeXExtension()
+        latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br'})
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         def _escape_latex_math(string):

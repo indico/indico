@@ -297,6 +297,7 @@ def makeExtension(configs=None):
 
 class LaTeXExtension(markdown.Extension):
     def __init__(self, configs=None):
+        self.configs = configs
         self.reset()
 
     def extendMarkdown(self, md, md_globals):
@@ -309,7 +310,7 @@ class LaTeXExtension(markdown.Extension):
                 self.md.inlinePatterns.pop(key)
                 break
 
-        latex_tp = LaTeXTreeProcessor()
+        latex_tp = LaTeXTreeProcessor(self.configs)
         math_pp = MathTextPostProcessor()
         table_pp = TableTextPostProcessor()
         link_pp = LinkTextPostProcessor()
@@ -345,6 +346,9 @@ class NonEncodedAutoMailPattern(markdown.inlinepatterns.Pattern):
 
 
 class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
+    def __init__(self, configs):
+        self.configs = configs
+
     def run(self, doc):
         """Walk the dom converting relevant nodes to text nodes with relevant
         content."""
@@ -407,6 +411,8 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
         elif ournode.tag == 'q':
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
+            if 'apply_br' in self.configs:
+                subcontent = subcontent.replace('\n', '\\\\\n')
             buffer += '\n%s\n' % subcontent.strip()
         elif ournode.tag == 'strong':
             buffer += '\\textbf{%s}' % subcontent.strip()
