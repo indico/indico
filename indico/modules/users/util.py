@@ -132,8 +132,8 @@ def get_linked_events(user, dt, limit=None):
         links.setdefault(event_id, set()).update(principal_roles)
     for event_id, principal_roles in get_events_with_linked_contributions(user, dt).iteritems():
         links.setdefault(event_id, set()).update(principal_roles)
-    for event_id in get_events_with_linked_event_persons(user, dt):
-        links.setdefault(event_id, set()).add('conference_chair')
+    for event_id, role in get_events_with_linked_event_persons(user, dt).iteritems():
+        links.setdefault(event_id, set()).add(role)
     for event_id, roles in get_events_with_abstract_reviewer_convener(user, dt).iteritems():
         links.setdefault(event_id, set()).update(roles)
     for event_id, roles in get_events_with_abstract_persons(user, dt).iteritems():
