@@ -1,0 +1,63 @@
+{% extends 'layout/dialog_base.html' %}
+
+{% macro _render_template_list(templates) %}
+    {% if templates %}
+        <div class="i-box just-group-list">
+            <div class="i-box-content">
+                <ul class="group-list no-content-before badge-backside-list">
+                    {% for tpl in templates | sort(attribute='title') %}
+                        {% set different_size = tpl.data.width != width or tpl.data.height != height %}
+                        <li {% if different_size %}
+                                class="not-selectable-backside"
+                                title="{% trans %}This template has different dimension than your template{% endtrans %}"
+                            {% endif %}>
+                            <a class="backside-template" data-href="{{ url_for('.get_template_data', tpl) }}">
+                                <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
+                                   title="{{ tpl.type.title }}"></i>
+                                <span>{{ tpl.title }}</span>
+                            </a>
+                       </li>
+                   {% endfor %}
+                </ul>
+            </div>
+        </div>
+    {% else %}
+        <div class="italic text-not-important">
+            {%- trans %}No templates{% endtrans -%}
+        </div>
+    {% endif %}
+{% endmacro %}
+
+{% block description %}
+    {%- trans -%}
+        The following badge templates can be used as the back side for your template. Note that only single-sided
+        templates with the same dimensions can be used as the back side of a template.
+    {%- endtrans -%}
+{%- endblock %}
+
+{% block content %}
+    <section>
+        <h3>{% trans %}Inherited templates{% endtrans %}</h3>
+        {{ _render_template_list(inherited_templates) }}
+    </section>
+    <section class="custom-template-list">
+        <h3>{% trans %}Custom templates{% endtrans %}</h3>
+        {{ _render_template_list(custom_templates) }}
+    </section>
+
+    <script>
+        $('li:not(.not-selectable-backside) .backside-template').on('click', function() {
+            var $this = $(this);
+            $.ajax({
+                url: $this.data('href'),
+                type: 'GET',
+                dataType: 'json',
+                error: handleAjaxError,
+                success: function(data) {
+                    $('.template-side.back').trigger('indico:backsideUpdated', data);
+                    $this.trigger('ajaxDialog:close');
+                }
+            });
+        });
+    </script>
+{% endblock %}

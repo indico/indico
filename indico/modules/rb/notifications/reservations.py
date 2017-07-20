@@ -28,7 +28,9 @@ class ReservationNotification(object):
 
     def compose_email_to_user(self, **mail_params):
         creator = self.reservation.created_by_user
-        to_list = {creator.email} | self.reservation.contact_emails
+        to_list = {creator.email}
+        if self.reservation.contact_email:
+            to_list.add(self.reservation.contact_email)
         subject = self._get_email_subject(**mail_params)
         body = self._make_body(mail_params, reservation=self.reservation)
         return make_email(to_list=to_list, subject=subject, body=body)

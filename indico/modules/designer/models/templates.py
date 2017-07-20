@@ -21,6 +21,7 @@ from sqlalchemy.dialects.postgresql import JSON
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import TemplateType, DEFAULT_CONFIG
+from indico.modules.designer.models.images import DesignerImageFile
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -69,8 +70,17 @@ class DesignerTemplate(db.Model):
         db.ForeignKey('indico.designer_image_files.id'),
         index=False,
         nullable=True
+      )
+    backside_template_id = db.Column(
+        db.ForeignKey('indico.designer_templates.id'),
+        index=True,
+        nullable=True
     )
-
+    is_clonable = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     category = db.relationship(
         'Category',
         lazy=True,
@@ -94,6 +104,11 @@ class DesignerTemplate(db.Model):
         lazy=True,
         foreign_keys=background_image_id,
         post_update=True
+    )
+    backside_template = db.relationship(
+        'DesignerTemplate',
+        lazy=True,
+        remote_side=id
     )
 
     # relationship backrefs:

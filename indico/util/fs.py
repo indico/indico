@@ -119,3 +119,12 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
         if not dry_run and not has_files and not dirs and relroot:
             removedirs(path, relroot)
     return deleted
+
+
+def chmod_umask(path):
+    """Change the permissions of a file to the umask-based default."""
+    # XXX: umask cannot be read except when changing it,
+    # so we change it and immediately restore it...
+    umask = os.umask(0)
+    os.umask(umask)
+    os.chmod(path, 0o666 & ~umask)

@@ -15,76 +15,29 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-#designer-control-tabs {
-    .designer-tab {
-        overflow: auto;
-        min-height: 170px;
-    }
 
-    .designer-tab > .left:not(:first-of-type) {
-        margin-left: 10px;
-    }
+.designer-canvas-wrapper {
+    margin-top: 2em;
 
-    .designer-tab > .panel {
-        min-height: 11em;
-        padding-right: 2em;
-
-        div {
+    .controls {
+        .template-side-controls,
+        .insert-element-controls {
             margin-bottom: 1em;
         }
-    }
 
-    .designer-tab > .panel:not(:last-of-type) {
-        border-right: 1px solid #ddd;
-    }
+        .insert-element-controls {
+            @include transition(opacity .2s);
 
-    .panel > i[class*='icon-'] {
-        margin-left: 0 !important;
-    }
+            label {
+                font-weight: normal;
+                margin-right: 0.5em;
+                color: $light-black;
+            }
 
-    .panel > i[class*='icon-']::before {
-        color: #ddd;
-        font-size: 2.5em;
-        margin-right: 0.2em;
-    }
+        }
 
-    .panel .content {
-        margin-left: 4em;
-    }
-
-    .panel .content h4:first-child {
-        margin-top: 0;
-    }
-
-    label[for="snap_checkbox"] {
-        font-weight: normal;
-        margin-left: 0.5em;
-    }
-
-    #font-selector, #color-selector, #style-selector, #size-selector, #alignment-selector {
-        display: block;
-        width: 10em;
-    }
-
-    #bgForm input[type="file"] {
-        max-width: 250px;
-    }
-
-    .move-button[data-direction='center'] {
-        margin: 0.3rem 0 0.3rem 0.3rem;
-    }
-}
-
-.designer-table {
-    #controls {
-        vertical-align: top;
-        width: 230px;
-        padding-right: 2em;
-
-        #selection-text {
-            margin: 0.2em 0.5em 0.2em 0.2em;
-            font-size: 1.2em;
-            color: #888;
+        .insert-element-btn {
+            margin-left: 1em;
         }
     }
 
@@ -93,8 +46,8 @@
     }
 
     .ruler#horizontal-ruler {
-        height: 10px;
-        top: -6px;
+        top: -16px;
+        left: 16px;
     }
 
     .ruler#vertical-ruler {
@@ -141,7 +94,7 @@
         }
     }
 
-    #template-div {
+    .template-container {
         border: 1px solid $gray;
         user-select: none;
         width: 425px;
@@ -149,7 +102,37 @@
         position: relative;
         left: 0;
         top: 0;
+        perspective: 1000px;
+
+        .template-content {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            transform-style: preserve-3d;
+            transition: transform 1s;
+
+            .template-side {
+                margin: 0;
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                backface-visibility: hidden;
+                transform-style: preserve-3d;
+
+                &.back {
+                    transform: rotateY(180deg);
+                }
+            }
+
+            &.flipped {
+                transform: rotateY(180deg);
+            }
+        }
     }
+}
+
+.disappear {
+    visibility: hidden;
 }
 
 #badge-settings-form .form-group-footer {
@@ -199,4 +182,173 @@
 
 .custom-template-list {
     margin-top: 20px;
+}
+
+.designer-tools {
+    min-height: 120px;
+
+    .designer-tools-row {
+        display: flex;
+        flex-wrap: wrap;
+        background-color: $light-gray;
+        color: $light-black;
+
+        &:not(:first-child) {
+            @include transition(opacity .2s);
+            border-top: 1px dashed $pastel-gray;
+        }
+    }
+
+    input[type=text],
+    input[type=number] {
+        @extend %text-input;
+    }
+
+    input[type=number] {
+        width: 5em;
+    }
+
+    input[type=file] {
+        display: none;
+    }
+
+    label {
+        font-weight: normal;
+    }
+
+    .tool {
+        display: flex;
+        align-items: center;
+        margin: 1em 0;
+        min-height: 37px;
+
+        &:not(:last-child) {
+            padding-right: 1em;
+            border-right: 1px solid $gray;
+        }
+
+        &:first-child {
+            margin-left: 1em;
+        }
+
+        &:not(:first-child) {
+            padding-left: 1em;
+        }
+
+        &:last-child {
+            margin-right: 1em;
+        }
+
+        i {
+            margin-right: 0.5em;
+            font-size: 1.5em;
+            color: $gray;
+        }
+
+        label {
+            margin-right: 0.3em;
+        }
+
+        .scale {
+            margin-left: 0.2em;
+            color: $dark-gray;
+        }
+
+        .background-label {
+            max-width: 10em;
+        }
+
+        &.font-tools .subtool {
+            margin-right: 0.5em;
+        }
+
+        .selection-text {
+            margin-right: 1em;
+            font-weight: bold;
+        }
+    }
+
+    .subtool {
+        display: flex;
+        align-items: center;
+
+        &:not(:last-child) {
+            margin-right: 1em;
+        }
+
+        &.background-position {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+    }
+
+    .backside-tools,
+    .element-tools {
+        display: flex;
+    }
+}
+
+.backside-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $light-gray;
+    width: 100%;
+    height: 100%;
+
+    .placeholder-content {
+        padding: 40px;
+        display: flex;
+        flex-direction: column;
+        text-align: center;
+
+        > div {
+            color: $gray;
+
+            &:first-child {
+                font-size: 2em;
+            }
+        }
+    }
+}
+
+.to-be-removed {
+    position: absolute;
+    z-index: 1000;
+    opacity: 0.9;
+}
+
+.backside-template-title {
+    font-weight: bold;
+    margin-left: 0.5em;
+    margin-right: 1em;
+}
+
+.badge-backside-list {
+    li {
+        padding: 0 !important;
+
+        a {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+        }
+
+        .template-icon-badge {
+            margin-right: 1em;
+        }
+
+        &.not-selectable-backside {
+            background-color: $light-gray;
+
+            * {
+                cursor: not-allowed;
+                color: $dark-gray;
+            }
+        }
+    }
+}
+
+.template-side.back:not(.empty) {
+    pointer-events: none;
 }

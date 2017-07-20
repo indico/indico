@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import shutil
+from collections import defaultdict
 from io import BytesIO
 
 from flask import flash, jsonify, request, session
@@ -26,10 +27,11 @@ from werkzeug.exceptions import Forbidden
 from indico.core.db import db
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.modules.categories.controllers.management import RHManageCategoryBase
-from indico.modules.designer import DEFAULT_CONFIG
+from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
+from indico.modules.designer.operations import update_template
 from indico.modules.designer.util import get_inherited_templates, get_placeholder_options
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
@@ -37,7 +39,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 TEMPLATE_DATA_JSON_SCHEMA = {
@@ -172,14 +174,20 @@ class CloneTemplateMixin(TargetFromURLMixin):
 
 
 class AddTemplateMixin(TargetFromURLMixin):
+    always_clonable = False
+
     def _checkProtection(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
 
     def _process(self):
         form = AddTemplateForm()
+        if self.always_clonable:
+            del form.is_clonable
         if form.validate_on_submit():
-            new_template = DesignerTemplate(title=form.title.data, type=form.type.data, **self.target_dict)
+            is_clonable = form.is_clonable.data if form.is_clonable else True
+            new_template = DesignerTemplate(title=form.title.data, type=form.type.data, is_clonable=is_clonable,
+                                            **self.target_dict)
             flash(_("Added new template '{}'").format(new_template.title), 'success')
             return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
         return jsonify_form(form, disabled_until_change=False)
@@ -194,11 +202,11 @@ class RHListCategoryTemplates(TemplateListMixin, RHManageCategoryBase):
 
 
 class RHAddEventTemplate(AddTemplateMixin, RHManageEventBase):
-    pass
+    always_clonable = True
 
 
 class RHAddCategoryTemplate(AddTemplateMixin, RHManageCategoryBase):
-    pass
+    always_clonable = False
 
 
 class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
@@ -221,17 +229,36 @@ class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProt
 
 class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_GET(self):
+        bs_template = self.template.backside_template
+        template_data = {
+            'title': self.template.title,
+            'data': self.template.data,
+            'background_url': self.template.background_image.download_url if self.template.background_image else None
+        }
+        backside_template_data = {
+            'id': bs_template.id if bs_template else None,
+            'title': bs_template.title if bs_template else None,
+            'data': bs_template.data if bs_template else None,
+            'background_url': (bs_template.background_image.download_url
+                               if bs_template and bs_template.background_image else None)
+        }
+        backside_templates = (DesignerTemplate.query
+                              .filter(DesignerTemplate.backside_template_id == self.template.id)
+                              .all())
+        related_tpls_per_owner = defaultdict(list)
+        for bs_tpl in backside_templates:
+            related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
         return self._render_template('template.html', template=self.template, placeholders=get_placeholder_options(),
-                                     config=DEFAULT_CONFIG[self.template.type], owner=self.target)
+                                     config=DEFAULT_CONFIG[self.template.type], owner=self.target,
+                                     template_data=template_data, backside_template_data=backside_template_data,
+                                     related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
 
     def _process_POST(self):
-        self.template.data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
-        self.template.title = request.json['title']
-        self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, self.template.data)
-
-        if request.json.pop('clear_background'):
-            self.template.background_image = None
-
+        data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
+        self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
+        update_template(self.template, title=request.json['title'], data=data,
+                        backside_template_id=request.json['backside_template_id'],
+                        clear_background=request.json['clear_background'])
         flash(_("Template successfully saved."), 'success')
         return jsonify_data()
 
@@ -279,3 +306,24 @@ class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
         db.session.delete(self.template)
         flash(_('The template has been removed'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
+
+
+class RHListBacksideTemplates(RHModifyDesignerTemplateBase, RHListEventTemplates):
+    def _process(self):
+        inherited_templates = [tpl for tpl in get_inherited_templates(self.target)
+                               if not tpl.backside_template and tpl.type == TemplateType.badge]
+        custom_templates = [tpl for tpl in self.target.designer_templates
+                            if not tpl.backside_template and tpl != self.template]
+        return jsonify_template('designer/backside_list.html', target=self.target, custom_templates=custom_templates,
+                                inherited_templates=inherited_templates, current_template=self.template,
+                                width=int(request.args['width']), height=int(request.args['height']))
+
+
+class RHGetTemplateData(RHModifyDesignerTemplateBase):
+    def _process(self):
+        template_data = {
+            'title': self.template.title,
+            'data': self.template.data,
+            'background_url': self.template.background_image.download_url if self.template.background_image else None
+        }
+        return jsonify(template=template_data, backside_template_id=self.template.id)

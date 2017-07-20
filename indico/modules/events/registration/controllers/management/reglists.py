@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 import os
 import uuid
 from io import BytesIO
-from operator import attrgetter
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload
@@ -32,13 +31,15 @@ from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
+from indico.modules.designer import PageLayout
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.designer.util import get_all_templates
+from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF
+from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable,
+                                                       RegistrantsListToBadgesPDFDoubleSided)
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
@@ -377,9 +378,14 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         config_params = badge_cache.get(request.view_args['uuid'])
         if not config_params:
             raise NotFound
-
+        if config_params['page_layout'] == PageLayout.foldable:
+            pdf_class = RegistrantsListToBadgesPDFFoldable
+        elif config_params['page_layout'] == PageLayout.double_sided:
+            pdf_class = RegistrantsListToBadgesPDFDoubleSided
+        else:
+            pdf_class = RegistrantsListToBadgesPDF
         registration_ids = config_params.pop('registration_ids')
-        pdf = RegistrantsListToBadgesPDF(self.template, config_params, self.event_new, registration_ids)
+        pdf = pdf_class(self.template, config_params, self.event_new, registration_ids)
         return send_file('Badges-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'PDF')
 
 
@@ -387,6 +393,20 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations"""
 
     ALLOW_LOCKED = True
+
+    format_map_portrait = {
+        'A0': (84.1, 118.9),
+        'A1': (59.4, 84.1),
+        'A2': (42.0, 59.4),
+        'A3': (29.7, 42.0),
+        'A4': (21.0, 29.7),
+        'A5': (14.8, 21.0),
+        'A6': (10.5, 14.8),
+        'A7': (7.4, 10.5),
+        'A8': (5.2, 7.4),
+    }
+
+    format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.iteritems()}
 
     def _checkParams(self, params):
         RHManageRegFormBase._checkParams(self, params)
@@ -398,9 +418,21 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                               .all()) if ids else []
         self.template_id = request.args.get('template_id')
 
+    def _get_format(self, tpl):
+        from indico.modules.designer.pdf import PIXELS_CM
+        format_map = self.format_map_landscape if tpl.data['width'] > tpl.data['height'] else self.format_map_portrait
+        return next((frm for frm, frm_size in format_map.iteritems()
+                     if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM) and
+                         frm_size[1] == float(tpl.data['height']) / PIXELS_CM), 'custom')
+
     def _process(self):
-        badge_templates = sorted((tpl for tpl in get_all_templates(self.event_new) if tpl.type.name == 'badge'),
-                                 key=attrgetter('title'))
+        all_templates = set(self.event_new.designer_templates) | get_inherited_templates(self.event_new)
+        badge_templates = {tpl.id: {
+            'data': tpl.data,
+            'backside_tpl_id': tpl.backside_template_id,
+            'orientation': 'landscape' if tpl.data['width'] > tpl.data['height'] else 'portrait',
+            'format': self._get_format(tpl)
+        } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = event_badge_settings.get_all(self.event_new.id)
         form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
@@ -409,6 +441,14 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
         if form.validate_on_submit():
             data = form.data
+            if data['page_layout'] == PageLayout.foldable:
+                data['top_margin'] = 0
+                data['bottom_margin'] = 0
+                data['left_margin'] = 0
+                data['right_margin'] = 0
+                data['margin_columns'] = 0
+                data['margin_rows'] = 0
+                data['dashed_border'] = False
             data.pop('submitted', None)
             template_id = data.pop('template')
             if data.pop('save_values', False):

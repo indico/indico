@@ -20,18 +20,18 @@ from datetime import time
 
 from flask import request
 from markupsafe import escape
-from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, HiddenField
+from wtforms.fields import BooleanField, HiddenField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField
-from wtforms.validators import DataRequired, Optional, NumberRange
+from wtforms.validators import DataRequired, NumberRange, Optional
 
 from indico.core.db import db
 from indico.modules.events.surveys.models.surveys import Survey
-from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
-from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoDateTimeField, EmailListField, FileField
-from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
-from indico.web.forms.validators import HiddenUnless, ValidationError, DateTimeRange, LinkedDateTime, UsedIf
 from indico.util.i18n import _
+from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
+from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField
+from indico.web.forms.validators import DateTimeRange, HiddenUnless, LinkedDateTime, UsedIf, ValidationError
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 class SurveyForm(IndicoForm):
@@ -84,8 +84,7 @@ class SurveyForm(IndicoForm):
 
 
 class ScheduleSurveyForm(IndicoForm):
-    start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), Optional(),
-                                                DateTimeRange(earliest='now')],
+    start_dt = IndicoDateTimeField(_("Start"), [UsedIf(lambda form, field: form.allow_reschedule_start), Optional()],
                                    default_time=time(0, 0),
                                    description=_("Moment when the survey will open for submissions"))
     end_dt = IndicoDateTimeField(_("End"), [Optional(), LinkedDateTime('start_dt')],

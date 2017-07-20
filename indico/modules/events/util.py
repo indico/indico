@@ -40,13 +40,14 @@ from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.layout import theme_settings
+from indico.modules.events.models.events import EventType
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.fs import secure_filename
+from indico.util.fs import secure_filename, chmod_umask
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for, send_file
@@ -147,18 +148,20 @@ def get_events_created_by(user, dt=None):
 
 
 def get_events_with_linked_event_persons(user, dt=None):
-    """Returns a list of all events for which the user is an EventPerson
+    """
+    Returns a dict containing the event ids and role for all events
+    where the user is a chairperson or (in case of a lecture) speaker.
 
     :param user: A `User`
     :param dt: Only include events taking place on/after that date
     """
     query = (user.event_persons
-             .options(load_only('event_id'))
-             .options(noload('*'))
+             .with_entities(EventPerson.event_id, Event._type)
              .join(Event, Event.id == EventPerson.event_id)
              .filter(EventPerson.event_links.any())
              .filter(~Event.is_deleted, Event.ends_after(dt)))
-    return {ep.event_id for ep in query}
+    return {event_id: ('lecture_speaker' if event_type == EventType.lecture else 'conference_chair')
+            for event_id, event_type in query}
 
 
 def get_random_color(event):
@@ -606,6 +609,7 @@ class ZipGeneratorMixin:
 
         temp_file.delete = False
         zip_file_name = '{}-{}.zip'.format(name_prefix, name_suffix) if name_suffix else '{}.zip'.format(name_prefix)
+        chmod_umask(temp_file.name)
         return send_file(zip_file_name, temp_file.name, 'application/zip', inline=False)
 
     def _prepare_folder_structure(self, item):

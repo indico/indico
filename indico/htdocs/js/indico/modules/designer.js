@@ -16,21 +16,28 @@
  */
 
 /* global AlertPopup: true */
+/* eslint-disable max-len */
 
 (function(global) {
     'use strict';
 
-    var lastSelectedDiv = null;
     var snapToGrid = false;
     // Dimensions of the template space, in pixels, and previous dimensions (cm)
     var templateDimensions, previousTemplateDimensions, pixelsPerCm, initialOffset, zoomFactor;
     // Id of the next element to be inserted
     var itemIdCounter = -1;
     // Pointer for the jQuery-UI tabs controller
-    var controlTabs = null;
     var editing = false;
     var items = {};
+    var backsideItems = {};
+    var backsideTemplateID = null;
     var itemTitles = {};
+    var initialWidth = null;
+    var initialHeight = null;
+    var showConfirmationDialog = false;
+    var confirmMessage = $T.gettext("The back side of the templates that use this one as the back side will be removed.");
+    var confirmTitle = $T.gettext("Disassociate back sides");
+    var removeBackSide = false;
 
     var DEFAULT_PIXEL_CM = 50;
 
@@ -104,13 +111,19 @@
             return html;
         }).bind(item);
 
-        items[item.id] = item;
         return item;
     }
 
-    function createItemFromObject(obj) {
+    function createItemFromObject(obj, isBackside) {
         delete obj.id;
-        return _.extend(createItem(), obj);
+        var newItem = _.extend(createItem(), obj);
+        if (!isBackside) {
+            items[newItem.id] = newItem;
+        } else {
+            backsideItems[newItem.id] = newItem;
+        }
+
+        return newItem;
     }
 
     // Dimensions class
@@ -122,22 +135,27 @@
     }
 
     // This function creates a new draggable div
-    function createDiv(item) {
+    function createDiv(item, isBackside) {
         // Each div has:
         // -a unique id, which is a natural number (0, 1, 2, ...)
         // -a type (stored in the name attribute)
         // -absolute x,y position
         // -an inner HTML with its content
+        var templateSide = isBackside ? '.template-side.back' : '.template-side.front';
         var newDiv = $('<div/>').css({
             position: 'absolute',
             left: item.x + 'px',
             top: item.y + 'px',
             zIndex: itemIdCounter + 10
-        }).data('id', item.id).appendTo('#template-div');
+        }).data('id', item.id).appendTo(templateSide);
+
+        if (isBackside) {
+            return newDiv;
+        }
 
         newDiv.draggable({
-            containment: '#template-div',
-            stack: '#template-div > div',
+            containment: templateSide,
+            stack: templateSide + ' > div',
             opacity: 0.5,
             drag: function(e, ui) {
                 if (snapToGrid) {
@@ -157,55 +175,60 @@
 
     // This function inserts the selected element in the blank space where template designing takes place
     function insertElement() {
-        var selectedType = $('#elementList').val();
+        var selectedType = $('#element-list').val();
         var newItem = createItem(selectedType);
         var newDiv = createDiv(newItem);
         var itemHtml = newItem.toHTML().appendTo(newDiv);
 
-        if (!lastSelectedDiv) {
-            markSelected(itemHtml);
-        }
-
+        items[newItem.id] = newItem;
+        selectItem(itemHtml);
         initialOffset += pixelsPerCm;
         initialOffset %= (templateDimensions.height - 20);
     }
 
-    function removeElement() {
-        if (lastSelectedDiv) {
-            delete items[lastSelectedDiv.data('id')];
-            lastSelectedDiv.remove();
-            $('#selection-text').html('');
-            lastSelectedDiv = null;
-            $('#modify-panel').hide();
-            $('#tab-format').hide();
-            controlTabs.tabs('option', 'active', 0);
+    function removeSelectedElement() {
+        var $selectedItem = $('.designer-item.selected');
+        var selectedItem = getSelectedItemData();
+
+        if (selectedItem) {
+            delete items[selectedItem.id];
+            $selectedItem.remove();
+            $('.element-tools').addClass('hidden');
         }
     }
 
-    function markSelected(selection) {
-        // Change the text that says which item is selected
-        var id = selection.parent('.ui-draggable').data('id');
-        var item = items[id];
-        $('#selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
-
-        // Bring highlight to the element modification tab.
-        if (controlTabs) {
-            controlTabs.tabs('option', 'active', 1);
+    function getItemData($item, isBackside) {
+        if ($item.length) {
+            var id = $item.closest('.ui-draggable').data('id');
+            return isBackside ? backsideItems[id] : items[id];
         }
+        return;
+    }
 
-        // Change the background color of the old selected item and the new selected item
-        if (lastSelectedDiv) {
-            var lastId = lastSelectedDiv.data('id');
-            items[lastId].selected = false;
-            lastSelectedDiv.find('.designer-item').removeClass('selected');
+    function getSelectedItemData() {
+        var $selectedItem = $('.designer-item.selected');
+        return getItemData($selectedItem);
+    }
+
+    function deselectItem($item) {
+        var item = getItemData($item);
+        if (item) {
+            item.selected = false;
+            $item.removeClass('selected');
         }
+    }
 
+    function selectItem($item) {
+        var item = getItemData($item);
+
+        $('.element-tools').removeClass('hidden');
+        $('.second-row').removeClass('disappear');
+
+        $('.selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
+
+        deselectItem($('.designer-item.selected'));
         item.selected = true;
-        selection.addClass('selected');
-        lastSelectedDiv = selection.parent('.ui-draggable');
-
-        $('#modify-panel').show();
-        $('#tab-format').show();
+        $item.addClass('selected');
 
         var itemStyles = _.filter([item.bold ? 'bold' : null, item.italic ? 'italic' : null]);
 
@@ -215,34 +238,36 @@
         $('#size-selector').val(item.font_size);
         $('#style-selector').val(itemStyles.length ? itemStyles.join('_') : 'normal');
         $('#color-selector').val(item.color);
-        $('#width_field').val(item.width / pixelsPerCm);
+        $('.js-element-width').val(item.width / pixelsPerCm);
+
+        var $fixedTextField = $('#fixed-text-field');
+        var $fontTools = $('.font-tools');
 
         if (item.type === 'fixed') {
-            $('#fixed-text-container').fadeIn();
-            $('#text-formatting-container').fadeIn();
-            $('#fixed-text-field').val(item.text);
+            $fontTools.fadeIn();
+            $fixedTextField.closest('.tool').fadeIn();
+            $fixedTextField.val(item.text);
         } else if (item.type === 'ticket_qr_code') {
-            $('#text-formatting-container').fadeOut();
-            $('#fixed-text-container').fadeOut();
+            $fontTools.fadeOut();
+            $fixedTextField.closest('.tool').fadeOut();
         } else {
-            $('#text-formatting-container').fadeIn();
-            $('#fixed-text-container').fadeOut();
-            $('#fixed-text-field').val("");
+            $fontTools.fadeIn();
+            $fixedTextField.closest('.tool').fadeOut();
+            $fixedTextField.val('');
         }
     }
 
-    function inlineEdit(itemHTML) {
-        var id = itemHTML.parent('.ui-draggable').data('id');
-        var selectedItem = items[id];
+    function inlineEditItem($item) {
+        var item = getItemData($item);
 
         // Handle the individual cases as required.
-        if (selectedItem.type === "fixed") {
-            var text = prompt("Enter fixed-text value", selectedItem.text);
+        if (item.type === "fixed") {
+            var text = prompt("Enter fixed-text value", item.text);  // eslint-disable-line no-alert
 
             if (text) {
-                var div = itemHTML.parent('.ui-draggable');
-                selectedItem.text = text;
-                div.html(selectedItem.toHTML());
+                var div = $item.parent('.ui-draggable');
+                item.text = text;
+                div.html(item.toHTML());
             }
         }
     }
@@ -288,76 +313,96 @@
 
     // This function displays all the items in the 'items' array on the screen
     // If there are already some items being displayed, it does not erase them
-    function displayItems() {
-        $.each(items, function(i, item) {
-            var newDiv = createDiv(item);
+    function displayItems(isBackside) {
+        var itemsList = isBackside ? backsideItems : items;
+        $.each(itemsList, function(i, item) {
+            var newDiv = createDiv(item, isBackside);
             newDiv.css({
                 left: zoom(item.x) + 'px',
                 top: zoom(item.y) + 'px'
             });
             newDiv.append(item.toHTML());
-            if (item.selected) {
-                markSelected(newDiv.find('.designer-item'));
+            if (item.selected && !isBackside) {
+                selectItem(newDiv.find('.designer-item'));
             }
         });
     }
 
+    function updatePreset(templateWidth, templateHeight) {
+        $('.js-preset-tool option').each(function() {
+            var $this = $(this);
 
-    function changeTemplateSize(template) {
-        var tpl = $('#template-div');
-        tpl.width($('#badge_width').val() * pixelsPerCm);
-        tpl.height($('#badge_height').val() * pixelsPerCm);
-        previousTemplateDimensions.width = templateDimensions.width;
-        previousTemplateDimensions.height = templateDimensions.height;
-        templateDimensions = new Dimensions($('#badge_width').val() * DEFAULT_PIXEL_CM,
-                                            $('#badge_height').val() * DEFAULT_PIXEL_CM);
-        updateRulers();
-        displayBackground(template);
+            if ($this.val() === 'custom') {
+                return;
+            }
+
+            var width = $this.data('width');
+            var height = $this.data('height');
+
+            if (width === templateWidth && height === templateHeight) {
+                $this.prop('selected', true);
+                $('.js-template-dimension').prop('disabled', true);
+            }
+        });
     }
 
-    function moveItem(direction) {
-        var lastSelectedItem = items[lastSelectedDiv.data('id')];
-        var div = lastSelectedDiv;
+    function changeTemplateSize(template, backsideTemplate) {
+        var tpl = $('.template-container');
+        var templateWidth = parseFloat($('.template-width').val());
+        var templateHeight = parseFloat($('.template-height').val());
+
+        tpl.width(templateWidth * pixelsPerCm);
+        tpl.height(templateHeight * pixelsPerCm);
+        previousTemplateDimensions.width = templateDimensions.width;
+        previousTemplateDimensions.height = templateDimensions.height;
+        templateDimensions = new Dimensions(templateWidth * DEFAULT_PIXEL_CM, templateHeight * DEFAULT_PIXEL_CM);
+        updateRulers();
+        displayAllBackgrounds(template, backsideTemplate);
+        updatePreset(templateWidth, templateHeight);
+    }
+
+    function moveSelectedItem(direction) {
+        var selectedItem = getSelectedItemData();
+        var div = $('.designer-item.selected').parent();
         ({
             left: function() {
                 if (div) {
                     div.css('left', 0);
-                    lastSelectedItem.x = 0;
+                    selectedItem.x = 0;
                 }
             },
             right: function() {
                 if (div) {
                     div.css('left', (templateDimensions.width - div.width()) + "px");
-                    lastSelectedItem.x = unzoom(templateDimensions.width - div.width());
+                    selectedItem.x = unzoom(templateDimensions.width - div.width());
                 }
             },
             center: function() {
                 if (div) {
                     div.css('left', ((templateDimensions.width - div.width()) / 2) + "px");
                     div.css('top', ((templateDimensions.height - div.height()) / 2) + "px");
-                    lastSelectedItem.x = unzoom((templateDimensions.width - div.width()) / 2);
-                    lastSelectedItem.y = unzoom((templateDimensions.height - div.height()) / 2);
+                    selectedItem.x = unzoom((templateDimensions.width - div.width()) / 2);
+                    selectedItem.y = unzoom((templateDimensions.height - div.height()) / 2);
                 }
             },
             top: function() {
                 if (div) {
                     div.css('top', 0);
-                    lastSelectedItem.y = 0;
+                    selectedItem.y = 0;
                 }
             },
             bottom: function() {
                 if (div) {
                     div.css('top', (templateDimensions.height - div.height()) + "px");
-                    lastSelectedItem.y = unzoom(templateDimensions.height - div.height());
+                    selectedItem.y = unzoom(templateDimensions.height - div.height());
                 }
             }
         })[direction]();
     }
 
-
-    function setAttribute(attribute) {
-        var item = items[lastSelectedDiv.data('id')];
-        var div = lastSelectedDiv;
+    function setSelectedItemAttribute(attribute) {
+        var selectedItem = getSelectedItemData();
+        var div = $('.designer-item.selected');
 
         if (!div) {
             return;
@@ -365,90 +410,108 @@
 
         ({
             font: function() {
-                item.font_family = $('#font-selector').val();
+                selectedItem.font_family = $('#font-selector').val();
             },
             color: function() {
-                item.color = $('#color-selector').val();
+                selectedItem.color = $('#color-selector').val();
             },
             alignment: function() {
-                item.text_align = $('#alignment-selector').val();
+                selectedItem.text_align = $('#alignment-selector').val();
             },
             size: function() {
-                item.font_size = $('#size-selector').val();
+                selectedItem.font_size = $('#size-selector').val();
             },
             style: function() {
                 switch ($('#style-selector').val()) {
                     case "normal":
-                        item.bold = false;
-                        item.italic = false;
+                        selectedItem.bold = false;
+                        selectedItem.italic = false;
                         break;
                     case "bold":
-                        item.bold = true;
-                        item.italic = false;
+                        selectedItem.bold = true;
+                        selectedItem.italic = false;
                         break;
                     case "italic":
-                        item.bold = false;
-                        item.italic = true;
+                        selectedItem.bold = false;
+                        selectedItem.italic = true;
                         break;
                     case "bold_italic":
-                        item.bold = true;
-                        item.italic = true;
+                        selectedItem.bold = true;
+                        selectedItem.italic = true;
                         break;
                 }
             },
             text: function() {
-                item.text = unescapeHTML($('#fixed-text-field').val());
-                $('#fixed-text-field').val(item.text);
+                var $fixedTextField = $('#fixed-text-field');
+                selectedItem.text = unescapeHTML($fixedTextField.val());
+                $fixedTextField.val(selectedItem.text);
             },
             width: function() {
-                item.width = $('#width_field').val() * pixelsPerCm;
-                if (item.type === 'ticket_qr_code') {
-                    item.height = item.width;
+                selectedItem.width = $('.js-element-width').val() * pixelsPerCm;
+                if (selectedItem.type === 'ticket_qr_code') {
+                    selectedItem.height = selectedItem.width;
                 }
             }
         })[attribute]();
 
-        div.html(item.toHTML());
-        lastSelectedDiv = div;
+        div.replaceWith(selectedItem.toHTML());
     }
 
     function save(template) {
-        if ($('#template-name').val() === '') {
-            new AlertPopup($T("Warning"), $T("Please choose a name for the template")).open();
+        if ($('.js-template-name').val() === '') {
+            new AlertPopup($T("Warning"), $T.gettext("Please choose a name for the template")).open();
             return;
+        }
+        if (removeBackSide) {
+            backsideTemplateID = null;
         }
         var templateData = {
             template: {
                 width: templateDimensions.realWidth,
                 height: templateDimensions.realHeight,
-                background_position: $('input[name=bg_position]:checked').val(),
+                background_position: $('input[name=bg-position]:checked').val(),
                 items: _.values(items).map(function(item) {
                     var itemCopy = $.extend(true, {}, item);
                     itemCopy.font_size = unzoomFont(item.font_size);
                     return item;
                 })
             },
-            clear_background: !template.background,
-            title: $('#template-name').val(),
+            clear_background: !template.background_url,
+            title: $('.js-template-name').val(),
+            backside_template_id: backsideTemplateID
         };
 
-        $.ajax({
-            url: location.pathname,
-            data: JSON.stringify(templateData),
-            contentType: 'application/json',
-            method: 'POST',
-            complete: IndicoUI.Dialogs.Util.progress(),
-            error: handleAjaxError,
-            success: function(data) {
-                handleFlashes(data, true);
-            }
+        var confirmed = showConfirmationDialog ? confirmPrompt(
+            $T.gettext("Are you sure you want to change the dimensions of this template?") +
+            confirmMessage,
+            confirmTitle
+        ) : $.Deferred().resolve();
+
+        confirmed.then(function() {
+            $.ajax({
+                url: location.pathname,
+                data: JSON.stringify(templateData),
+                contentType: 'application/json',
+                method: 'POST',
+                complete: IndicoUI.Dialogs.Util.progress(),
+                error: handleAjaxError,
+                success: function(data) {
+                    initialWidth = templateDimensions.width;
+                    initialHeight = templateDimensions.height;
+                    if (removeBackSide) {
+                        $('.affected-targets-warning').hide('fast');
+                        togglePlaceholderToBeRemoved(false);
+                        $('.js-remove-backside').click();
+                        removeBackSide = false;
+                        showConfirmationDialog = false;
+                    }
+                    handleFlashes(data, true);
+                }
+            });
         });
     }
 
     function setBackgroundPos($background, mode) {
-        var bgPosStretch = $('#bgPosStretch');
-        var bgPosCenter = $('#bgPosCenter');
-
         if (mode === 'stretch') {
             $background.css({
                 left: 0,
@@ -456,8 +519,6 @@
             });
             $background.height(templateDimensions.height);
             $background.width(templateDimensions.width);
-            bgPosStretch.prop('checked', true);
-            bgPosCenter.prop('checked', false);
         } else if (mode === 'center') {
             var imgDimensions = getImageRealDimensions($background);
             var ratio;
@@ -493,15 +554,16 @@
                     top: ((templateDimensions.height / 2) - (imgDimensions.height / 2)) + 'px'
                 });
             }
-
-            bgPosStretch.prop('checked', false);
-            bgPosCenter.prop('checked', true);
         }
     }
 
-    function displayBackground(template) {
-        $('#background').attr({
-            src: template.background
+    function displayBackground(template, isBackside) {
+        var templateSideClass = isBackside ? '.template-side.back' : '.template-side.front';
+        var $backgroundElement = $(templateSideClass).find('.background-image');
+        var backgroundPos = template.data.background_position;
+
+        $backgroundElement.attr({
+            src: template.background_url
         }).css({
             position: 'absolute',
             left: 0,
@@ -511,16 +573,21 @@
             zIndex: 5
         }).on('load', function() {
             $('#loadingIcon').hide();
-            $('#remove-background').removeClass('hidden');
-            setBackgroundPos($(this), template.data.background_position);
-        }).appendTo('#template-div');
+            setBackgroundPos($(this), backgroundPos);
+        }).appendTo(templateSideClass);
+    }
+
+    function displayAllBackgrounds(template, backsideTemplate) {
+        displayBackground(template);
+        if (backsideTemplate.background_url) {
+            displayBackground(backsideTemplate, true);
+        }
     }
 
     function removeBackground(template) {
-        if (template.background) {
-            template.background = null;
-            $('#background').remove();
-            $('#remove-background').addClass('hidden');
+        if (template.background_url) {
+            template.background_url = null;
+            $('.template-side.front').trigger('indico:backgroundChanged');
         }
     }
 
@@ -530,8 +597,98 @@
                   .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&');
     }
 
+    function displayTemplate(template, isBackside) {
+        if (template.data) {
+            template.data.items.forEach(function(item) {
+                createItemFromObject(item, isBackside);
+            });
+            displayItems(isBackside);
+        }
 
-    global.setupDesigner = function setupDesigner(template, config, placeholders) {
+        var hasBackside = isBackside && template.data && (template.data.items.length || template.background_url);
+        toggleBacksidePlaceholder(!hasBackside);
+
+        if (template.background_url) {
+            displayBackground(template, isBackside);
+        }
+    }
+
+    function clearBacksideTemplate(template) {
+        var $templateSide = $('.template-side.back');
+        if (template.background_url) {
+            template.background_url = null;
+            $templateSide.find('.background-image').remove();
+            $templateSide.append($('<img>', {class: 'background-image'}));
+        }
+        $templateSide.find('.designer-item').remove();
+        template.title = null;
+        template.data = null;
+        backsideItems = {};
+    }
+
+    function toggleBacksidePlaceholder(showPlaceholder) {
+        var $placeholder = $('.backside-placeholder');
+
+        $placeholder.parent().toggleClass('empty', showPlaceholder);
+        $placeholder.toggle(showPlaceholder);
+        $('.backside-tools').toggleClass('hidden', showPlaceholder);
+    }
+
+    function togglePlaceholderToBeRemoved(showPlaceholder) {
+        toggleBacksidePlaceholder(showPlaceholder);
+        $('.backside-tools').toggleClass('hidden', !showPlaceholder);
+        if (showPlaceholder) {
+            $('.backside-placeholder').addClass('to-be-removed');
+            $('.placeholder-text').html($T.gettext('This back side template will be removed'));
+            $('.placeholder-link').hide();
+            confirmMessage = $T.gettext('The back side of this template will be removed');
+            confirmTitle = $T.gettext('Disassociate back side');
+            removeBackSide = true;
+        } else {
+            $('.backside-placeholder').removeClass('to-be-removed');
+            $('.placeholder-text').html($T.gettext('The back side is empty.'));
+            $('.placeholder-link').show();
+            confirmMessage = $T.gettext("The back side of the templates that use this one as the back side will be removed.");
+            confirmTitle = $T.gettext("Disassociate back sides");
+            removeBackSide = false;
+        }
+    }
+
+    function toggleWarningOnDimensionChange(xDimension, yDimension, initialXDimension, initialYDimension) {
+        if (!$('#backside-warning').length && backsideTemplateID === null) {
+            return;
+        }
+        var $backsideTplsWarning = null;
+        if ($('#backside-warning').length && backsideTemplateID !== null) {
+            $backsideTplsWarning = $('.affected-targets-warning');
+        } else if ($('#backside-warning').length) {
+            $backsideTplsWarning = $('#backside-warning');
+        } else if (backsideTemplateID !== null) {
+            $backsideTplsWarning = $('#frontside-warning');
+        }
+        if (xDimension.val() * DEFAULT_PIXEL_CM !== initialXDimension) {
+            if (backsideTemplateID !== null) {
+                togglePlaceholderToBeRemoved(true);
+            }
+            $backsideTplsWarning.show('fast');
+            showConfirmationDialog = true;
+        } else if (yDimension.val() * DEFAULT_PIXEL_CM === initialYDimension) {
+            $backsideTplsWarning.hide('fast');
+            if (backsideTemplateID !== null) {
+                togglePlaceholderToBeRemoved(false);
+            }
+            showConfirmationDialog = false;
+        }
+    }
+
+    function removeWarning() {
+        $('#frontside-warning').hide('fast');
+        togglePlaceholderToBeRemoved(false);
+        removeBackSide = false;
+        showConfirmationDialog = false;
+    }
+
+    global.setupDesigner = function setupDesigner(template, backsideTemplate, config, placeholders) {
         editing = !!template;
         itemTitles = _.partial(_.extend, {}).apply(null, _.map(_.values(placeholders), _.property('options')));
 
@@ -543,35 +700,35 @@
         // and the position where items are inserted
         initialOffset = pixelsPerCm;
 
+        backsideTemplateID = backsideTemplate.id;
+
         // Item class
         $(document).ready(function() {
+            var removeBackgroundQtip = $('.js-remove-bg').qtip();
+
             $('#bg-form input[type="file"]').on('change', function() {
                 var $this = $(this);
-                if ($this.val()) {
-                    $('#upload-background').removeClass('hidden');
-                } else {
-                    $('#upload-background').addClass('hidden');
+                if (this.files) {
+                    $this.next('label').removeClass('i-button').text(this.files[0].name);
                 }
+                $('.js-upload-bg').attr('disabled', !$this.val()).toggleClass('highlight', !!$this.val());
             });
-
-            if (template.backgroundId) {
-                $('#remove-background').removeClass('hidden');
-            }
 
             // select and inline edit
-            $('#template-div').on('mousedown', '.designer-item', function() {
-                markSelected($(this));
+            $('.template-content').on('mousedown', '.designer-item', function() {
+                selectItem($(this));
             }).on('dblclick', '.designer-item', function() {
-                inlineEdit($(this));
+                inlineEditItem($(this));
             });
 
-            $('#upload-background').click(function() {
+            $('.js-upload-bg').click(function() {
+                $('.js-toggle-side.front').click();
                 $('#bg-form').submit();
                 return false;
             });
 
             // toggle grid/snap mode
-            $('#snap_checkbox').change(function() {
+            $('#grid-snap').change(function() {
                 snapToGrid = this.checked;
             }).change();
 
@@ -583,76 +740,214 @@
                         new AlertPopup($T("Error"), data.error).open();
                         return;
                     }
-                    if (template.background) {
-                        $('#background').attr('src', '');
-                    }
-                    template.background = data.image_url;
+                    template.background_url = data.image_url;
                     displayBackground(template);
+                    $('.template-side.front').trigger('indico:backgroundChanged');
                 }
             });
 
-            $('input[name=bg_position]').change(function(e) {
+            $('input[name=bg-position]').change(function(e) {
                 e.preventDefault();
-                setBackgroundPos($('#background'), $(this).val());
+                var newPosition = $(this).val();
+                var $backgroundElement = $('.template-side.front .background-image');
+
+                setBackgroundPos($backgroundElement, newPosition);
+                template.data.background_position = newPosition;
             });
 
-            $('#remove-background').click(function(e) {
+            $('.js-remove-bg').click(function(e) {
                 e.preventDefault();
+                removeBackgroundQtip.qtip('api').toggle();
                 removeBackground(template);
             });
 
             $('.move-button').click(function(e) {
                 e.preventDefault();
-                var dir = $(this).data('direction');
-                moveItem(dir);
+                var direction = $(this).data('direction');
+                moveSelectedItem(direction);
             });
 
-            $('.attrSelect').change(function() {
+            $('.js-font-tool').change(function() {
                 var attr = $(this).data('attr');
-                setAttribute(attr, config);
+                setSelectedItemAttribute(attr, config);
             });
 
-            $('#changeTemplateSize').click(function(e) {
+            $('.insert-element-btn').click(function(e) {
                 e.preventDefault();
-                changeTemplateSize(template);
-            });
-
-            $('#insert-button').click(function(e) {
-                e.preventDefault();
+                $('.js-toggle-side.front').click();
                 insertElement();
             });
 
-            $('#remove-button').click(function(e) {
+            $('.js-remove-element').click(function(e) {
                 e.preventDefault();
-                removeElement();
+                removeSelectedElement();
             });
 
-            $('#save-button').click(function(e) {
+            $('.js-save-template').click(function(e) {
                 e.preventDefault();
                 save(template);
             });
 
-            $('#badge_width, #badge_height').on('keyup', function() {
-                changeTemplateSize(template);
+            $('.template-width, .template-height').on('input', function() {
+                changeTemplateSize(template, backsideTemplate);
             });
 
-            $('#width_field').on('keyup', function() {
-                setAttribute('width', config);
+            $('.js-element-width').on('keyup click', function() {
+                setSelectedItemAttribute('width', config);
             });
 
             $('#fixed-text-field').on('keyup', function() {
-                setAttribute('text', config);
+                setSelectedItemAttribute('text', config);
             });
 
-            controlTabs = $('#designer-control-tabs').tabs();
+            $('.js-preset-tool').on('change', function() {
+                var $selectedOption = $(this).find('option:selected');
+
+                if ($selectedOption.val() !== 'custom') {
+                    $('.template-width').val($selectedOption.data('width')).change();
+                    $('.template-height').val($selectedOption.data('height')).change();
+                    changeTemplateSize(template, backsideTemplate);
+                }
+                $('.js-template-dimension').prop('disabled', $selectedOption.val() !== 'custom');
+            });
+
+            $('.js-toggle-side').on('click', function() {
+                var $this = $(this);
+                var newFaceUp = $this.hasClass('front') ? 'front' : 'back';
+                var $selectedItem = $('.designer-item.selected');
+                var hasBackside = (backsideTemplate.data &&
+                                   (backsideTemplate.data.items.length || backsideTemplate.background_url));
+
+                $('.template-content').toggleClass('flipped', newFaceUp === 'back');
+                $('.template-side.back').toggleClass('active', newFaceUp === 'back');
+                $('.template-side.front').toggleClass('active', newFaceUp === 'front');
+                $('.backside-tools').toggleClass('hidden', newFaceUp === 'front' || !hasBackside);
+                $('.js-toggle-side').removeClass('highlight');
+                $('.element-tools').addClass('hidden');
+                $('.js-hide-on-flip').toggle(newFaceUp !== 'back');
+                $('.js-invisible-on-flip').toggleClass('disappear', newFaceUp === 'back');
+                $this.toggleClass('highlight');
+                if ($selectedItem && $selectedItem[0]) {
+                    deselectItem($selectedItem);
+                }
+                $('.template-side.active').trigger('indico:backgroundChanged');
+            });
+
+            $('.template-side').on('indico:backgroundChanged', function() {
+                var $backgroundFile = $('#backgroundFile');
+                var $templateSide = $('.template-side.front');
+                var $templateSideBackground = $templateSide.find('.background-image');
+
+                if (!template.background_url && $templateSideBackground.attr('src')) {
+                    $templateSideBackground.remove();
+                    $templateSide.append($('<img>', {class: 'background'}));
+                    $backgroundFile.val('');
+                    $backgroundFile.next('label').addClass('i-button').text($T.gettext('Choose a file'));
+                }
+                $('.js-upload-bg').attr('disabled', !$backgroundFile.val());
+                $('.js-remove-bg').attr('disabled', !template.background_url);
+                $('#bg-position-stretch').prop('checked', template.data.background_position === 'stretch');
+                $('#bg-position-center').prop('checked', template.data.background_position === 'center');
+            });
+
+            $('.template-side.front').trigger('indico:backgroundChanged');
+
+            $('.template-side.back').on('indico:backsideUpdated', function(evt, data) {
+                backsideTemplateID = data.backside_template_id;
+                clearBacksideTemplate(backsideTemplate);
+                displayTemplate(data.template, true);
+                backsideTemplate = data.template;
+                if (removeBackSide) {
+                    removeWarning();
+                }
+                $('.backside-template-title, .js-front-affected-title').text(data.template.title);
+            });
+
+            $('.js-remove-backside').on('click', function() {
+                backsideTemplateID = null;
+                clearBacksideTemplate(backsideTemplate);
+                if (removeBackSide) {
+                    removeWarning();
+                }
+                toggleBacksidePlaceholder(true);
+            });
+
+            $('.js-change-orientation').on('click', function() {
+                var $width = $('.template-width');
+                var $height = $('.template-height');
+                var widthValue = $width.val();
+
+                $width.val($height.val()).change();
+                $height.val(widthValue).change();
+                changeTemplateSize(template, backsideTemplate);
+            });
+
+            $('.js-backside-list-dialog').on('click', function() {
+                var $this = $(this);
+
+                ajaxDialog({
+                    trigger: $this,
+                    url: $this.data('href'),
+                    data: {
+                        width: templateDimensions.realWidth,
+                        height: templateDimensions.realHeight
+                    },
+                    title: $this.data('title'),
+                });
+            });
+
+            $('.backside-tools').addClass('hidden');
+
+            var $templateWidth = $('.template-width');
+            var $templateHeight = $('.template-height');
+            $templateWidth.on('change input', function() {
+                toggleWarningOnDimensionChange($(this), $templateHeight, initialWidth, initialHeight);
+            });
+            $templateHeight.on('change input', function() {
+                toggleWarningOnDimensionChange($(this), $templateWidth, initialHeight, initialWidth);
+            });
+
+            $('.js-back-affected').qbubble({
+                overwrite: true,
+                position: {
+                    target: $('.js-back-affected')
+                },
+                content: {
+                    text: $('.back-warning-qtip-content').html()
+                },
+                hide: {
+                    event: 'unfocus click'
+                },
+                show: {
+                    event: 'click'
+                }
+            });
+
+            $('.js-front-affected').qbubble({
+                overwrite: true,
+                position: {
+                    target: $('.js-front-affected')
+                },
+                content: {
+                    text: function() {
+                        return $('.front-warning-qtip-content').html();
+                    }
+                },
+                hide: {
+                    event: 'unfocus click'
+                },
+                show: {
+                    event: 'click'
+                }
+            });
         });
 
         // We load the template if we are editing a template
         if (editing) {
             // We give the toHTML() method to each of the items
             templateDimensions = new Dimensions(template.data.width, template.data.height);
-            $('#template-name').val(template.title);
-            $('#template-div').width(templateDimensions.width)
+            $('.js-template-name').val(template.title);
+            $('.template-container').width(templateDimensions.width)
                               .height(templateDimensions.height);
         } else {
             templateDimensions = new Dimensions(config.tpl_size[0], config.tpl_size[1]);
@@ -660,17 +955,62 @@
 
         previousTemplateDimensions = new Dimensions(0, 0);
 
-        $('#badge_width').val(templateDimensions.width / pixelsPerCm);
-        $('#badge_height').val(templateDimensions.height / pixelsPerCm);
+        $('.template-width').val(templateDimensions.width / pixelsPerCm);
+        $('.template-height').val(templateDimensions.height / pixelsPerCm);
+
+        initialWidth = templateDimensions.width;
+        initialHeight = templateDimensions.height;
 
         updateRulers(); // creates the initial rulers
-        changeTemplateSize(template);
+        changeTemplateSize(template, backsideTemplate);
+        displayTemplate(template);
+        displayTemplate(backsideTemplate, true);
+    };
+    global.setupBadgePrinting = function setupBadgePrinting(templates) {
+        var $template = $('#template');
+        var $pageLayout = $('#page_layout');
+        var $dashedBorder = $('#dashed_border');
+        var $pageSize = $('#page_size');
+        var $pageOrientation = $('#page_orientation');
+        var $marginEditor = $('.margin-editor');
+        var $infoMessage = $('.info');
 
-        template.data.items.forEach(function(item) {
-            createItemFromObject(item);
-        });
+        function toggleFoldableOption(template, pageSize, pageOrientation) {
+            var foldablePairs = {
+                A0: 'A2',
+                A1: 'A3',
+                A2: 'A4',
+                A3: 'A5',
+                A4: 'A6',
+                A5: 'A7',
+                A6: 'A8'
+            };
+            if (foldablePairs[pageSize] === template.format && pageOrientation === template.orientation) {
+                $("#page_layout option[value='foldable']").prop('disabled', false);
+            } else {
+                $("#page_layout option[value='foldable']").prop('disabled', true);
+                if ($('#page_layout :selected').val() === 'foldable') {
+                    $('#page_layout :selected').next().prop('selected', true);
+                }
+            }
+        }
 
-        // This function displays the items, if any have been loaded, on the screen
-        displayItems();
+        $template.on('change', function() {
+            var $this = $(this);
+            var template = templates[parseInt($this.val(), 10)];
+
+            $pageLayout.closest('.form-group').toggle(!!template.backside_tpl_id);
+            $pageLayout.val('front_only');
+            toggleFoldableOption(template, $pageSize.val(), $pageOrientation.val());
+        }).change();
+
+        $pageLayout.on('change', function() {
+            $marginEditor.add($infoMessage).toggle($(this).val() !== 'foldable');
+            $dashedBorder.closest('.form-group').toggle($(this).val() !== 'foldable');
+        }).change();
+        $pageSize.add($pageOrientation).on('change', function() {
+            toggleFoldableOption(templates[parseInt($template.val(), 10)], $pageSize.val(), $pageOrientation.val());
+            $pageLayout.change();
+        }).change();
     };
 })(window);

@@ -105,7 +105,7 @@ class RHUserDashboard(RHUserBase):
                       'contribution_referee', 'contribution_editor', 'contribution_reviewer', 'abstract_reviewer',
                       'track_convener'}
     attendance_roles = {'contributor', 'contribution_submission', 'abstract_submitter', 'abstract_person',
-                        'registration_registrant', 'survey_submitter'}
+                        'registration_registrant', 'survey_submitter', 'lecture_speaker'}
 
     def _process(self):
         self.user.settings.set('suggest_categories', True)

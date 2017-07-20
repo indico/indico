@@ -31,7 +31,8 @@ DEFAULT_BADGE_SETTINGS = {
     'margin_rows': 0.0,
     'page_size': PageSize.A4,
     'page_orientation': PageOrientation.portrait,
-    'dashed_border': True
+    'dashed_border': True,
+    'page_layout': None
 }
 
 BADGE_SETTING_CONVERTERS = {

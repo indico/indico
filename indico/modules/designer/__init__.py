@@ -46,7 +46,14 @@ class PageSize(RichIntEnum):
     A3 = 4
     A4 = 5
     A5 = 6
-    Letter = 7
+    letter = 7
+
+
+class PageLayout(RichIntEnum):
+    __titles__ = [None, _("Single sided (foldable)"), _("Double sided"), _("Only front side")]
+    foldable = 1
+    double_sided = 2
+    front_only = 3
 
 
 DEFAULT_CONFIG = {

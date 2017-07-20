@@ -28,7 +28,7 @@ from wtforms.validators import DataRequired, NumberRange, Optional, ValidationEr
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import Config
-from indico.modules.designer import PageOrientation, PageSize
+from indico.modules.designer import PageOrientation, PageSize, PageLayout
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
@@ -355,6 +355,10 @@ class BadgeSettingsForm(IndicoForm):
                                  description=_("Display a dashed border around each badge"))
     page_size = IndicoEnumSelectField(_('Page size'), enum=PageSize)
     page_orientation = IndicoEnumSelectField(_('Page orientation'), enum=PageOrientation)
+    page_layout = IndicoEnumSelectField(_('Page layout'), enum=PageLayout,
+                                        description=_('The single sided (foldable) option is only available if the '
+                                                      'template orientation is the same as the page orientation and '
+                                                      'its width is exactly half of the page width'))
 
     top_margin = FloatField(_('Top margin'), [InputRequired()])
     left_margin = FloatField(_('Left margin'), [InputRequired()])

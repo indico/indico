@@ -169,18 +169,6 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         index=True
     )
-    _legacy_contact_email = db.Column(
-        'contact_email',
-        db.String,
-        nullable=False,
-        default=''
-    )
-    _legacy_contact_phone = db.Column(
-        'contact_phone',
-        db.String,
-        nullable=False,
-        default=''
-    )
     is_accepted = db.Column(
         db.Boolean,
         nullable=False
@@ -307,10 +295,6 @@ class Reservation(Serializer, db.Model):
     @property
     def contact_phone(self):
         return self.booked_for_user.phone if self.booked_for_user else None
-
-    @property
-    def contact_emails(self):
-        return set(filter(None, map(unicode.strip, self.contact_email.split(u',')))) if self.contact_email else set()
 
     @property
     def details_url(self):
@@ -615,9 +599,7 @@ class Reservation(Serializer, db.Model):
         return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     def is_booked_for(self, user):
-        if user is None:
-            return False
-        return self.booked_for_user == user or bool(self.contact_emails & set(user.all_emails))
+        return user is not None and self.booked_for_user == user
 
     @unify_user_args
     def is_owned_by(self, user):

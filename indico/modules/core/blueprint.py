@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.core.controllers import RHChangeLanguage, RHChangeTimezone, RHSettings
+from indico.modules.core.controllers import RHChangeLanguage, RHChangeTimezone, RHSettings, RHVersionCheck
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -24,6 +24,7 @@ from indico.web.flask.wrappers import IndicoBlueprint
 _bp = IndicoBlueprint('core', __name__, template_folder='templates', virtual_template_folder='core')
 
 _bp.add_url_rule('/admin/settings/', 'settings', RHSettings, methods=('GET', 'POST'))
+_bp.add_url_rule('/admin/version-check', 'version_check', RHVersionCheck)
 
 # TODO: replace with an actual admin dashboard at some point
 _bp.add_url_rule('/admin/', 'admin_dashboard', view_func=redirect_view('.settings'))

@@ -51,7 +51,27 @@ from indico.util.i18n import _, ngettext
 from indico.util.string import html_color_to_rgb, to_unicode, truncate
 
 
-styles = getSampleStyleSheet()
+# Change reportlab default pdf font Helvetica to indico ttf font,
+# because of better support for international characters.
+# Default font can't be easily changed by setting new value to
+# reportlab.rl_config.canvas_basefontname, because this variable
+# is used directly to initialize state of several reportlab modules
+# during their (first) import.
+def _get_sans_style_sheet():
+    _font_map = {
+        'Helvetica': 'Sans',
+        'Helvetica-Bold': 'Sans-Bold',
+        'Helvetica-Oblique': 'Sans-Italic',
+        'Helvetica-BoldOblique': 'Sans-Bold-Italic',
+    }
+
+    styles = getSampleStyleSheet()
+    for name, style in styles.byName.iteritems():
+        if hasattr(style, 'fontName'):
+            style.fontName = _font_map.get(style.fontName, style.fontName)
+        if hasattr(style, 'bulletFontName'):
+            style.bulletFontName = _font_map.get(style.bulletFontName, style.bulletFontName)
+    return styles
 
 
 def extract_affiliations(contrib):
@@ -120,6 +140,7 @@ class ProgrammeToPDF(PDFBase):
     def getBody(self, story=None):
         if not story:
             story = self._story
+        styles = _get_sans_style_sheet()
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
         p = Paragraph(escape(track_settings.get(self._event, 'program').encode('utf-8')), style)
@@ -513,6 +534,7 @@ class TimeTablePlain(PDFWithTOC):
             self._story.append(Spacer(inch, 1 * cm))
             if self._showSessions:
                 style2 = ParagraphStyle({})
+                style2.fontName = "Sans"
                 style2.fontSize = modifiedFontSize(14, self._fontsize)
                 style2.leading = modifiedFontSize(10, self._fontsize)
                 style2.alignment = TA_CENTER
@@ -567,7 +589,7 @@ class TimeTablePlain(PDFWithTOC):
     def _defineStyles(self):
         self._styles = {}
 
-        stylesheet = getSampleStyleSheet()
+        stylesheet = _get_sans_style_sheet()
         dayStyle = stylesheet["Heading1"]
         dayStyle.fontSize = modifiedFontSize(dayStyle.fontSize, self._fontsize)
         self._styles["day"] = dayStyle
@@ -755,7 +777,7 @@ class TimeTablePlain(PDFWithTOC):
         return self._ttPDFFormat.showUseSessionColorCodes()
 
     def _fontify(self, text, fSize=10, fName=""):
-        style = getSampleStyleSheet()["Normal"]
+        style = _get_sans_style_sheet()["Normal"]
         style.fontSize = modifiedFontSize(fSize, self._fontsize)
         style.leading = modifiedFontSize(fSize + 3, self._fontsize)
         return Paragraph(text, style)
@@ -765,15 +787,18 @@ class TimeTablePlain(PDFWithTOC):
 
     def _processDayEntries(self, day, story):
         res = []
-        originalts = TableStyle([('VALIGN', (0, 0), (-1, -1), "TOP"),
+        originalts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "Sans"),
+                                 ('VALIGN', (0, 0), (-1, -1), "TOP"),
                                  ('LEFTPADDING', (0, 0), (-1, -1), 1),
                                  ('RIGHTPADDING', (0, 0), (-1, -1), 1),
                                  ('GRID', (0, 1), (-1, -1), 1, colors.lightgrey)])
-        self._tsSpk = TableStyle([("LEFTPADDING", (0, 0), (0, -1), 0),
+        self._tsSpk = TableStyle([('FONTNAME', (0, 0), (-1, -1), "Sans"),
+                                  ("LEFTPADDING", (0, 0), (0, -1), 0),
                                   ("RIGHTPADDING", (0, 0), (0, -1), 0),
                                   ("TOPPADDING", (0, 0), (0, -1), 1),
                                   ("BOTTOMPADDING", (0, 0), (0, -1), 0)])
-        colorts = TableStyle([("LEFTPADDING", (0, 0), (-1, -1), 3),
+        colorts = TableStyle([('FONTNAME', (0, 0), (-1, -1), "Sans"),
+                              ("LEFTPADDING", (0, 0), (-1, -1), 3),
                               ("RIGHTPADDING", (0, 0), (-1, -1), 0),
                               ("TOPPADDING", (0, 0), (-1, -1), 0),
                               ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
@@ -1023,7 +1048,7 @@ class SimplifiedTimeTablePlain(PDFBase):
 
     def _defineStyles(self):
         self._styles = {}
-        stylesheets = getSampleStyleSheet()
+        stylesheets = _get_sans_style_sheet()
 
         normalStl = stylesheets["Normal"]
         normalStl.fontName = "Courier"
@@ -1196,6 +1221,7 @@ class RegistrantToPDF(PDFBase):
         if not story:
             story = self._story
         style = ParagraphStyle({})
+        style.fontName = 'Sans'
         style.fontSize = 12
 
         registration = self._reg
@@ -1223,10 +1249,12 @@ class RegistrantToPDF(PDFBase):
 
         style = ParagraphStyle({})
         style.alignment = TA_CENTER
+        style.fontName = 'Sans'
         style.fontSize = 25
         style.leading = 30
         _append_text_to_story(full_name, space=1.0, indexed_flowable=True)
         style = ParagraphStyle({})
+        style.fontName = 'Sans'
         style.alignment = TA_JUSTIFY
 
         for item in self._display:
@@ -1336,6 +1364,7 @@ class RegistrantsListToPDF(PDFBase):
             story = self._story
 
         style = ParagraphStyle({})
+        style.fontName = "Sans"
         style.fontSize = 12
         style.alignment = TA_CENTER
         text = u'<b>{}</b>'.format(_(u"List of registrants"))
@@ -1353,10 +1382,11 @@ class RegistrantsListToPDF(PDFBase):
         text_format.leftIndent=10
         text_format.firstLineIndent=0
 
-        tsRegs=TableStyle([('VALIGN',(0,0),(-1,-1),"MIDDLE"),
-                        ('LINEBELOW',(0,0),(-1,0), 1, colors.black),
-                        ('ALIGN',(0,0),(-1,0),"CENTER"),
-                        ('ALIGN',(0,1),(-1,-1),"LEFT") ] )
+        tsRegs = TableStyle([('FONTNAME', (0, 0), (-1, -1), "Sans"),
+                             ('VALIGN', (0, 0), (-1, -1), "MIDDLE"),
+                             ('LINEBELOW', (0, 0), (-1, 0), 1, colors.black),
+                             ('ALIGN', (0, 0), (-1, 0), "CENTER"),
+                             ('ALIGN', (0, 1), (-1, -1), "LEFT")])
         l = []
         lp = []
         lp.append(Paragraph('<b>{}</b>'.format(_('ID')), text_format))

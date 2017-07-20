@@ -6,7 +6,8 @@
         {{ form_row(settings_form.template) }}
 
         {% call form_fieldset(_('Page configuration')) %}
-            {{ form_rows(settings_form, fields=('save_values', 'dashed_border', 'page_size', 'page_orientation')) }}
+            {{ form_rows(settings_form,
+                         fields=('save_values', 'dashed_border', 'page_size', 'page_orientation', 'page_layout')) }}
         {% endcall %}
 
         <div class="flexrow margin-editor f-j-center">
@@ -42,4 +43,12 @@
             <input type="hidden" name="registration_id" value="{{ registration.id }}">
         {% endfor %}
     {% endcall %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            setupBadgePrinting({{ templates | tojson }});
+        })();
+    </script>
 {% endblock %}

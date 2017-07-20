@@ -69,6 +69,7 @@ most cases.
     [uwsgi]
     uid = indico
     gid = apache
+    umask = 027
     pidfile = /run/uwsgi/uwsgi.pid
 
     processes = 4
@@ -255,6 +256,7 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     SyslogIdentifier=indico-celery
     User=indico
     Group=apache
+    UMask=0027
     Type=simple
 
     [Install]

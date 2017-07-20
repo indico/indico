@@ -16,10 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, redirect, request, session
+import requests
+from flask import flash, jsonify, redirect, request, session
+from packaging.version import Version
 from pytz import common_timezones_set
 from werkzeug.urls import url_join
 
+import indico
 from indico.core.config import Config
 from indico.core.settings.proxy import PrefixSettingsProxy
 from indico.legacy.webinterface.rh.base import RH
@@ -100,3 +103,14 @@ class RHChangeLanguage(RH):
         if session.user:
             session.user.settings.set('lang', language)
         return '', 204
+
+
+class RHVersionCheck(RHAdminBase):
+    """Check the installed indico version against pypi"""
+
+    def _process(self):
+        data = requests.get('https://pypi.python.org/pypi/indico/json').json()
+        current_version = Version(indico.__version__)
+        latest_version = Version(data['info']['version'])
+        return jsonify(current_version=unicode(current_version), latest_version=unicode(latest_version),
+                       outdated=(current_version < latest_version))

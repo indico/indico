@@ -34,6 +34,14 @@
         {%- endcall %}
     {% endif %}
 
+
+    {% call message_box('highlight', classes='js-indico-version-message', style='display: none;') -%}
+        {% trans -%}
+            A new Indico version (<strong id="new-indico-version"></strong>) is available!
+            Your current version is <strong id="cur-indico-version"></strong>.
+        {%- endtrans %}
+    {%- endcall %}
+
     {% call simple_form(form, back_button=false) %}
         {% set legend %}
             {% trans %}System{% endtrans %}
@@ -75,4 +83,22 @@
             );
         </script>
     {% endif %}
+
+    <script>
+        (function() {
+            'use strict';
+
+            $.ajax({
+                url: {{ url_for('.version_check')|tojson }},
+                cache: false,
+                success: function(data) {
+                    if (data.outdated) {
+                        $('#cur-indico-version').text(data.current_version);
+                        $('#new-indico-version').text(data.latest_version);
+                        $('.js-indico-version-message').show();
+                    }
+                }
+            });
+        })();
+    </script>
 {% endblock %}

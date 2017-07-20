@@ -50,16 +50,13 @@ ratio = math.sqrt(math.sqrt(2.0))
 
 class PDFSizes:
     def __init__(self):
-        self.PDFpagesizes = {'Letter' : LETTER,
-                    'A0' : A3,
-                    'A1' : A3,
-                    'A2' : A3,
-                    'A3' : A3,
-                    'A4' : A4,
-                    'A5' : A5
-                   }
-
-        self.PDFfontsizes = [_("xxx-small"), _("xx-small"), _("x-small"), _("smaller"), _("small"), _("normal"), _("large"), _("larger")]
+        self.PDFpagesizes = {'Letter': LETTER,
+                             'A0': A3,
+                             'A1': A3,
+                             'A2': A3,
+                             'A3': A3,
+                             'A4': A4,
+                             'A5': A5}
 
 
 def escape(text):
@@ -79,22 +76,21 @@ def escape(text):
 
 
 def modifiedFontSize(fontsize, lowerNormalHigher):
-
-    if lowerNormalHigher == _("normal"):
+    if lowerNormalHigher == "normal":
         return fontsize
-    elif lowerNormalHigher == _("small"):
+    elif lowerNormalHigher == "small":
         return fontsize / ratio
-    elif lowerNormalHigher == _("large"):
+    elif lowerNormalHigher == "large":
         return fontsize * ratio
-    elif lowerNormalHigher == _("smaller"):
+    elif lowerNormalHigher == "smaller":
         return (fontsize / ratio) / ratio
-    elif lowerNormalHigher == _("x-small"):
+    elif lowerNormalHigher == "x-small":
         return ((fontsize / ratio) / ratio) / ratio
-    elif lowerNormalHigher == _("xx-small"):
+    elif lowerNormalHigher == "xx-small":
         return (((fontsize / ratio) / ratio) / ratio) / ratio
-    elif lowerNormalHigher == _("xxx-small"):
+    elif lowerNormalHigher == "xxx-small":
         return ((((fontsize / ratio) / ratio) / ratio) / ratio) / ratio
-    elif lowerNormalHigher == _("larger"):
+    elif lowerNormalHigher == "larger":
         return fontsize * ratio * ratio
     else:
         return fontsize
@@ -670,7 +666,7 @@ class PDFLaTeXBase(object):
         # Markdown -> LaTeX renderer
         # safe_mode - strip out all HTML
         md = markdown.Markdown(safe_mode='remove')
-        latex_mdx = mdx_latex.LaTeXExtension()
+        latex_mdx = mdx_latex.LaTeXExtension(configs={'apply_br'})
         latex_mdx.extendMarkdown(md, markdown.__dict__)
 
         def _escape_latex_math(string):
