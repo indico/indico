@@ -309,10 +309,6 @@ class Reservation(Serializer, db.Model):
         return self.booked_for_user.phone if self.booked_for_user else None
 
     @property
-    def contact_emails(self):
-        return set(filter(None, map(unicode.strip, self.contact_email.split(u',')))) if self.contact_email else set()
-
-    @property
     def details_url(self):
         return url_for('rooms.roomBooking-bookingDetails', self, _external=True)
 
@@ -615,9 +611,7 @@ class Reservation(Serializer, db.Model):
         return self.used_equipment.filter(EquipmentType.parent_id == vc_equipment)
 
     def is_booked_for(self, user):
-        if user is None:
-            return False
-        return self.booked_for_user == user or bool(self.contact_emails & set(user.all_emails))
+        return user is not None and self.booked_for_user == user
 
     @unify_user_args
     def is_owned_by(self, user):
