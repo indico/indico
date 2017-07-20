@@ -154,6 +154,7 @@ $display-preview-bg-color: white;
     background-color: $light-gray;
     display: flex;
     align-items: center;
+    justify-content: flex-end;
 }
 
 .wmd-spacer {
@@ -273,8 +274,7 @@ $display-preview-bg-color: white;
 .wmd-help-button {
     @include icon-before('icon-info');
 
-    position: absolute;
-    margin-right: 1em;
+    margin-left: auto;
 }
 
 .wmd-prompt-background {
