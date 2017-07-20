@@ -78,8 +78,8 @@ def reset_alembic():
         print 'No alembic_version table found'
         sys.exit(1)
     current_revs = [rev for rev, in db.session.execute('SELECT version_num FROM alembic_version').fetchall()]
-    if current_revs != ['be7bdea6dd4d']:
-        print ('Your database is not at the latest 1.9.11 revision (got [{}], expected [be7bdea6dd4d]).'
+    if current_revs != ['ebca3e91b139']:
+        print ('Your database is not at the latest 1.9.11 revision (got [{}], expected [ebca3e91b139]).'
                .format(', '.join(current_revs)))
         print 'This can have multiple reasons:'
         print '1) You did not upgrade from 1.9.x, so you do not need this command'
