@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, render_template
+from flask import render_template, session
 
 from indico.core import signals
 from indico.core.db import db
@@ -54,8 +54,7 @@ def _extend_event_menu(sender, **kwargs):
     from indico.modules.events.surveys.models.surveys import Survey
 
     def _visible(event):
-        return (event.has_feature('surveys') and
-                Survey.query.with_parent(event).filter(Survey.is_visible).has_rows())
+        return event.has_feature('surveys') and query_active_surveys(event).has_rows()
 
     return MenuEntryData(_('Surveys'), 'surveys', 'surveys.display_survey_list', position=12, visible=_visible)
 
