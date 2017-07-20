@@ -169,18 +169,6 @@ class Reservation(Serializer, db.Model):
         nullable=False,
         index=True
     )
-    _legacy_contact_email = db.Column(
-        'contact_email',
-        db.String,
-        nullable=False,
-        default=''
-    )
-    _legacy_contact_phone = db.Column(
-        'contact_phone',
-        db.String,
-        nullable=False,
-        default=''
-    )
     is_accepted = db.Column(
         db.Boolean,
         nullable=False
