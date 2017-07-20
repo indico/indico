@@ -102,6 +102,10 @@ $display-preview-bg-color: white;
 
     .wmd-preview {
         padding: 10px;
+
+        p {
+            white-space: pre-line;
+        }
     }
 }
 
