@@ -904,6 +904,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
     },
 
     _createAddMenu: function(elem) {
+        var self = this;
         var ul = $('<ul class="dropdown"/>');
 
         if (this._allowCreateHere('Session')) {
