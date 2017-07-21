@@ -1,0 +1,17 @@
+{% extends 'rb/admin.html' %}
+{% from 'message_box.html' import message_box %}
+{% from 'forms/_form.html' import simple_form %}
+
+{% block subtitle %}
+    {% trans %}Settings{% endtrans %}
+{% endblock %}
+
+{% block content %}
+    {% if not rb_active %}
+        {% call message_box('warning') %}
+            {% trans %}The Room Booking system is currently <strong>disabled</strong> in indico.conf{% endtrans %}
+        {% endcall %}
+    {% endif %}
+
+    {{ simple_form(form) }}
+{% endblock %}
