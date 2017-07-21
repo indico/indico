@@ -8,4 +8,4 @@ Installation guides
 
     Production <production/index.rst>
     Development <development.rst>
-    Upgrade <upgrade.rst>
+    Upgrade from 1.2 <upgrade_legacy.rst>

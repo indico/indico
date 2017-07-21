@@ -1,8 +1,5 @@
-Upgrade Indico from an older version
-====================================
-
-Upgrading from versions < 2.0
------------------------------
+Upgrade Indico from 1.2
+=======================
 
 .. warning::
     **ATTENTION: This process is not yet fully tested, use it at your own risk!**
@@ -15,7 +12,7 @@ If you're running a version that is lower than 2.0, you will have to run a speci
 
 
 Prerequisites
-+++++++++++++
+-------------
 
 In order to migrate to version 2.0 of Indico you will first of all need to make sure you have **at least version 1.2**
 of Indico installed. Migration of databases using earlier versions will either **fail** or very likely result in
@@ -29,7 +26,7 @@ of Indico installed. Migration of databases using earlier versions will either *
 
 
 Backing up ZODB
-+++++++++++++++
+---------------
 
 The migration script doesn't write to the ZODB, but we still recommend that you **make a backup** just in case:
 
@@ -58,7 +55,7 @@ Double check that the daemon is not running:
 
 
 Moving legacy data
-++++++++++++++++++
+------------------
 
 Indico 2.0 will use a directory structure that is similar to Indico 1.x, so first of all you will need to rename the old
 tree:
@@ -76,7 +73,7 @@ tree:
 
 
 Installing Indico 2.0
-+++++++++++++++++++++
+---------------------
 
 The first step should be to have a working Indico 2.0 setup. In order to do that, you should follow the regular Indico
 2.x installation instructions up to the "Configure Indico" step.  We provide below direct links to the relevant sections
@@ -112,7 +109,7 @@ nginx                         Apache
 
 
 Configuration Wizard
-++++++++++++++++++++
+--------------------
 
 You will then need to run the Configuration Wizard, following the normal installation guide (Debian/Ubuntu or CentOS).
 When the wizard asks you about the **"Old archvive dir"**, make sure to set it to the archive dir in the
@@ -130,7 +127,7 @@ When the wizard asks you about the **"Old archvive dir"**, make sure to set it t
 
 
 Running ``indico-migrate``
-++++++++++++++++++++++++++
+--------------------------
 
 First of all, make sure that you are using the **user** and **virtualenv** created using the step **"Install Indico"** and that the legacy dir is owned by this **user**:
 
@@ -185,7 +182,7 @@ An example:
 
 
 Post-migration work
-+++++++++++++++++++
+-------------------
 
 After the migration is done you may need to apply some adjustments in your ``indico.conf``. You may want to read our
 guide on how to configure an Identity/Authentication provider.
@@ -210,7 +207,7 @@ reflect the new path:
 
 
 Finishing up
-++++++++++++
+------------
 
 You can now proceed with the remaining installation steps:
 
@@ -238,7 +235,7 @@ nginx                             Apache
 
 
 Sanitizing HTML
-+++++++++++++++
+---------------
 
 Indico 2.0 uses `Markdown <https://en.wikipedia.org/wiki/Markdown>`_ for the descriptions of contributions and
 categories. Contribution descriptions that previously contained HTML will still work, but new ones will only support
@@ -262,7 +259,7 @@ If you're happy with the changes, you can just choose to save them:
 
 
 Removing old data
-+++++++++++++++++
+-----------------
 
 Even if you're sure the migration succeeded and all data was kept, please keep around the backup of your ZODB you
 made at the beginning of this guide. **After** and **only after** having **moved the legacy archive** to the new Indico
