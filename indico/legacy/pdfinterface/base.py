@@ -39,6 +39,7 @@ from reportlab.platypus.frames import Frame
 from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.util import mdx_latex
+from indico.util.fs import chmod_umask
 from indico.util.i18n import _
 from indico.util.string import render_markdown, sanitize_for_platypus, to_unicode
 from indico.legacy.common.TemplateExec import render as tpl_render
@@ -729,6 +730,7 @@ class LatexRunner(object):
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
         self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=Config.getInstance().getTempDir())
+        chmod_umask(self._dir, execute=True)
         source_filename = os.path.join(self._dir, template_name + '.tex')
         target_filename = os.path.join(self._dir, template_name + '.pdf')
         log_filename = os.path.join(self._dir, 'output.log')
