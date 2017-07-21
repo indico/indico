@@ -8,13 +8,8 @@ user-facing downtime.
 .. warning::
 
     When upgrading a production system it is highly recommended to
-    create a database backup beforehand.
+    create a database backup before starting.
 
-
-.. _upgrading-after-20:
-
-Upgrading after 2.0 and between 1.9.11 versions
------------------------------------------------
 
 First of all, stop the Celery worker.  To do so, run this as *root*:
 
@@ -75,7 +70,7 @@ Upgrading from 1.9.11 to 2.0
 Make sure that you have the latest 1.9.11 version installed and that you used
 ``indico db upgrade`` to have the most recent database structure.
 
-To upgrade to 2.0, follow the upgrade instructions in :ref:`upgrading-after-20`.
+To upgrade to 2.0, follow the upgrade instructions above.
 After successfully running the upgrade, use ``indico db reset_alembic`` to clear
 pre-2.0 database migration information, since all the old migration steps from
 the 1.9.x version line have been removed in 2.0.
