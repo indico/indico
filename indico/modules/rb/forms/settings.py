@@ -24,6 +24,11 @@ from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EmailListField, PrincipalListField
 
 
+GOOGLE_API_KEY_DOCS = 'https://developers.google.com/maps/documentation/javascript/get-api-key'
+GOOGLE_API_KEY_DESC = _('When using the "map of rooms" widget, you need to register a '
+                        '<a href="{link}">Google Maps API key</a>.').format(link=GOOGLE_API_KEY_DOCS)
+
+
 class SettingsForm(IndicoForm):
     admin_principals = PrincipalListField(_('Administrators'), groups=True)
     authorized_principals = PrincipalListField(_('Authorized users/groups'), groups=True)
@@ -37,3 +42,4 @@ class SettingsForm(IndicoForm):
     notifications_enabled = BooleanField(_('Reminders enabled'))
     vc_support_emails = EmailListField(_('Videoconference support email addresses (one per line)'))
     booking_limit = IntegerField(_('Maximum length of booking (days)'), [InputRequired(), NumberRange(min=1)])
+    google_maps_api_key = StringField(_('Google Maps API key'), description=GOOGLE_API_KEY_DESC)

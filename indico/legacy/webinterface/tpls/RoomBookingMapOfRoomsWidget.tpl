@@ -315,28 +315,33 @@ function setDefaultAvailabilityValues() {
         .trigger('change');
 }
 
-$(function() {
-    initializeAvailabilityFields();
+// called by google maps js callback
+function initMap() {
+    $(document).ready(function() {
+        initializeAvailabilityFields();
 
-    var mapCanvas = $E('map_canvas').dom;
-    var aspectsCanvas = $E('aspects_canvas').dom;
-    var filtersCanvas = $E('filters_canvas').dom;
-    var customWidgets = [{
-        widget: $E('mapOfRoomAvailabilityForm').dom,
-        getFilters: availabilityFilterFunction,
-        resetFields: setDefaultAvailabilityValues
-    }];
+        var mapCanvas = $('#map_canvas')[0];
+        var aspectsCanvas = $('#aspects_canvas')[0];
+        var filtersCanvas = $('#filters_canvas')[0];
+        var customWidgets = [{
+            widget: $('#mapOfRoomAvailabilityForm')[0],
+            getFilters: availabilityFilterFunction,
+            resetFields: setDefaultAvailabilityValues
+        }];
 
-    var roomMap = new RoomMap(
-        mapCanvas,
-        aspectsCanvas,
-        filtersCanvas,
-        aspects,
-        buildings,
-        filters,
-        customWidgets,
-        startupRoomFilters,
-        startupBuildingFilters
-    );
-});
+        new RoomMap(
+            mapCanvas,
+            aspectsCanvas,
+            filtersCanvas,
+            aspects,
+            buildings,
+            filters,
+            customWidgets,
+            startupRoomFilters,
+            startupBuildingFilters
+        );
+    });
+}
 </script>
+
+<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap${ ('&key=' + api_key) if api_key else '' }"></script>
