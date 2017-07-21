@@ -162,6 +162,9 @@ parameters:
  * ``--default-currency EUR``
  * ``--symlink-target ~/archive/legacy_symlinks/``
  * ``--symlink-backend legacy-symlinks``
+ * ``--migrate-broken-events`` (optional - use it if you want to migrate events that don't
+   belong to any category in v1.2.  If any such events exist, the will be added to a new category
+   named *Lost & Found*.
 
 (don't forget to replace ``<organization-hostname>`` with the e-mail hostname of your organization)
 
@@ -169,7 +172,7 @@ An example:
 
 .. code-block:: shell
 
-    indico-migrate postgresql:///indico file:///opt/indico-legacy/db/Data.fs --archive-dir /opt/indico-legacy/archive --storage-backend legacy --default-email default@acme.example.com --default-currency EUR --symlink-target ~/archive/legacy_symlinks/ --symlink-backend legacy-symlinks
+    indico-migrate postgresql:///indico file:///opt/indico-legacy/db/Data.fs --archive-dir /opt/indico-legacy/archive --storage-backend legacy --default-email default@acme.example.com --default-currency EUR --symlink-target ~/archive/legacy_symlinks/ --symlink-backend legacy-symlinks --migrate-broken-events
 
 
 .. note::
