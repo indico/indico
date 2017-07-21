@@ -7,5 +7,6 @@ Installation guides
     :maxdepth: 1
 
     Production <production/index.rst>
+    Upgrade <upgrade.rst>
+    Migration from 1.2 <upgrade_legacy.rst>
     Development <development.rst>
-    Upgrade from 1.2 <upgrade_legacy.rst>
