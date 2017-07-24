@@ -22,13 +22,16 @@ from operator import itemgetter
 
 import jsonschema
 from flask import request
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField, FloatField, HiddenField
 from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError, InputRequired
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import Config
-from indico.modules.designer import PageOrientation, PageSize, PageLayout
+from indico.core.db import db
+from indico.modules.designer import PageOrientation, PageSize, PageLayout, TemplateType
+from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
@@ -272,6 +275,17 @@ class TicketsForm(IndicoForm):
                                           widget=SwitchWidget(),
                                           description=_('Allow users to download their ticket from the registration '
                                                         'summary page.'))
+
+    ticket_template = QuerySelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
+                                                              Optional()], get_label='title', allow_blank=False)
+
+    def __init__(self, *args, **kwargs):
+        event = kwargs.pop('event')
+        super(TicketsForm, self).__init__(*args, **kwargs)
+        self.ticket_template.query = (DesignerTemplate.query
+                                      .filter(DesignerTemplate.type == TemplateType.badge,
+                                              db.or_(DesignerTemplate.category_id.in_(event.category_chain),
+                                                     DesignerTemplate.event_new == event)))
 
 
 class ParticipantsDisplayForm(IndicoForm):
