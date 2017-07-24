@@ -113,6 +113,7 @@ class DesignerTemplate(db.Model):
 
     # relationship backrefs:
     # - images (DesignerImageFile.template)
+    # - ticket_for_regforms (RegistrationForm.ticket_template)
 
     def __init__(self, **kwargs):
         data = kwargs.pop('data', None)

@@ -56,7 +56,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
         return True
 
     def _process(self):
-        form = TicketsForm(obj=self.regform)
+        form = TicketsForm(obj=self.regform, event=self.event_new)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
