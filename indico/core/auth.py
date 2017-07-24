@@ -18,13 +18,14 @@ from __future__ import unicode_literals
 
 from warnings import warn
 
-from flask import current_app
-from flask_multipass import Multipass
+from flask import current_app, request
+from flask_multipass import InvalidCredentials, Multipass, NoSuchUser
+from flask_multipass.providers.oauth import OAuthInvalidSessionState
 
 from indico.core.logger import Logger
 
 
-logger = Logger.get('multipass')
+logger = Logger.get('auth')
 
 
 class IndicoMultipass(Multipass):
@@ -102,7 +103,12 @@ class IndicoMultipass(Multipass):
                 raise ValueError('There is no default auth provider')
 
     def handle_auth_error(self, exc, redirect_to_login=False):
-        logger.error('Authentication failed: %s (%r)', exc, exc.details)
+        if isinstance(exc, (NoSuchUser, InvalidCredentials)):
+            logger.warning('Invalid credentials (ip=%s, provider=%s): %s',
+                           request.remote_addr, exc.provider.name if exc.provider else None, exc)
+        else:
+            fn = logger.debug if isinstance(exc, OAuthInvalidSessionState) else logger.error
+            fn('Authentication via %s failed: %s (%r)', exc.provider.name if exc.provider else None, exc, exc.details)
         return super(IndicoMultipass, self).handle_auth_error(exc, redirect_to_login=redirect_to_login)
 
 

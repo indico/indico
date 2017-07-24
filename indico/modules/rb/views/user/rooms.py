@@ -22,12 +22,14 @@ from flask import request, session
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.webinterface.pages.base import WPNotDecorated
 from indico.legacy.webinterface.wcomponents import WTemplated
+from indico.modules.rb import rb_settings
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
+from indico.util.string import crc32
 from indico.web.flask.util import url_for
 
 
@@ -81,10 +83,12 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
                 'repeat_mapping': RepeatMapping.mapping}
 
     def _getBody(self, params):
-        cache_key = str(sorted(dict(request.args, lang=session.lang).items()))
+        api_key = rb_settings.get('google_maps_api_key')
+        cache_key = str(sorted(dict(request.args, lang=session.lang).items())) + str(crc32(api_key))
         html = self.cache.get(cache_key)
         if html is None:
             params.update(self._get_widget_params())
+            params['api_key'] = api_key
             html = WTemplated('RoomBookingMapOfRoomsWidget').getHTML(params)
             self.cache.set(cache_key, html, 3600)
         return html

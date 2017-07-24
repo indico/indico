@@ -20,9 +20,9 @@ from flask import flash, redirect
 
 from indico.core.config import Config
 from indico.modules.admin import RHAdminBase
+from indico.modules.admin.views import WPAdmin
 from indico.modules.rb import rb_settings
 from indico.modules.rb.forms.settings import SettingsForm
-from indico.modules.rb.views.admin.settings import WPRoomBookingSettings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -38,4 +38,4 @@ class RHRoomBookingSettings(RHAdminBase):
             return redirect(url_for('.settings'))
 
         rb_active = Config.getInstance().getIsRoomBookingActive()
-        return WPRoomBookingSettings(self, 'rb-settings', rb_active=rb_active, form=form).display()
+        return WPAdmin.render_template('rb/settings.html', 'rb-settings', rb_active=rb_active, form=form)

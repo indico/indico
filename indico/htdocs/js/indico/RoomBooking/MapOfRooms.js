@@ -15,15 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// firefox/gecko has an issue with the canvas used by 3.4+
-// http://stackoverflow.com/q/982000/298479
-include(
-    location.protocol + '//maps' +
-    (location.protocol == 'https:' ? '-api-ssl' : '') +
-    ".google.com/maps/api/js?sensor=false" +
-    (Browser.Gecko ? '&v=3.3' : '')
-);
-
 /**
  * A Google Map of rooms.
  */

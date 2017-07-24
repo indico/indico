@@ -121,10 +121,15 @@ def cleanup_dir(path, min_age, dry_run=False, exclude=None):
     return deleted
 
 
-def chmod_umask(path):
-    """Change the permissions of a file to the umask-based default."""
+def chmod_umask(path, execute=False):
+    """Change the permissions of a file to the umask-based default.
+
+    :param path: The path to the file/directory
+    :param execute: Whether the x-bit may be set
+    """
     # XXX: umask cannot be read except when changing it,
     # so we change it and immediately restore it...
     umask = os.umask(0)
     os.umask(umask)
-    os.chmod(path, 0o666 & ~umask)
+    default = 0o777 if execute else 0o666
+    os.chmod(path, default & ~umask)

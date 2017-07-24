@@ -55,7 +55,7 @@ from indico.modules.events.legacy import LegacyConference
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.locators import get_locator
-from indico.util.string import truncate
+from indico.util.string import truncate, to_unicode
 from indico.web.flask.util import ResponseUtil, url_for
 
 
@@ -377,7 +377,7 @@ class RH(RequestHandlerBase):
     @jsonify_error(status=400)
     def _processBadRequestKeyError(self, e):
         """Request lacks a necessary key for processing"""
-        msg = _('Required argument missing: %s') % e.message
+        msg = _(u'Required argument missing: {}').format(to_unicode(e.message))
         return WPFormValuesError(self, msg).display()
 
     @jsonify_error

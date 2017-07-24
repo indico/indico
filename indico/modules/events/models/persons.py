@@ -217,7 +217,6 @@ class EventPerson(PersonMixin, db.Model):
         for event_person in source.event_persons:
             existing = existing_persons.get(event_person.event_id)
             if existing is None:
-                assert event_person.email in target.all_emails
                 event_person.user = target
             else:
                 existing.merge_person_info(event_person)
