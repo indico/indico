@@ -28,8 +28,8 @@ from indico.web.forms.widgets import SwitchWidget
 
 class CephalopodForm(IndicoForm):
     joined = BooleanField('Join the community', widget=SwitchWidget())
-    contact_name = StringField('Contact Name', [UsedIfChecked('enable_tracking'), DataRequired()],
+    contact_name = StringField('Contact Name', [UsedIfChecked('joined'), DataRequired()],
                                description=_('Name of the person responsible for your Indico server.'))
     contact_email = EmailField('Contact Email',
-                               [UsedIfChecked('enable_tracking'), DataRequired(), Email()],
+                               [UsedIfChecked('joined'), DataRequired(), Email()],
                                description=_('Email address of the person responsible for your Indico server.'))
