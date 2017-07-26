@@ -84,6 +84,7 @@ class DesignerTemplate(db.Model):
     category = db.relationship(
         'Category',
         lazy=True,
+        foreign_keys=category_id,
         backref=db.backref(
             'designer_templates',
             cascade='all, delete-orphan',

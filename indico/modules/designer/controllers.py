@@ -75,8 +75,10 @@ TEMPLATE_DATA_JSON_SCHEMA = {
 
 
 def _render_template_list(target, event):
+    from indico.modules.designer.util import get_default_template_on_category
     tpl = get_template_module('designer/_list.html')
-    return tpl.render_template_list(target.designer_templates, target, event=event,
+    default_template = get_default_template_on_category(target)
+    return tpl.render_template_list(target.designer_templates, target, event=event, default_template=default_template,
                                     inherited_templates=get_inherited_templates(target))
 
 
@@ -142,7 +144,10 @@ class TargetFromURLMixin(TemplateDesignerMixin):
 
 class TemplateListMixin(TargetFromURLMixin):
     def _process(self):
-        return self._render_template('list.html', inherited_templates=get_inherited_templates(self.target))
+        from indico.modules.designer.util import get_default_template_on_category
+        default_template = get_default_template_on_category(self.target)
+        return self._render_template('list.html', default_template=default_template,
+                                     inherited_templates=get_inherited_templates(self.target))
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
@@ -327,3 +332,20 @@ class RHGetTemplateData(RHModifyDesignerTemplateBase):
             'background_url': self.template.background_image.download_url if self.template.background_image else None
         }
         return jsonify(template=template_data, backside_template_id=self.template.id)
+
+
+class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
+
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+        category_id = request.view_args['category_id']
+        self.category = self._get_category(category_id)
+
+    def _process(self):
+        if self.category.default_ticket_template == self.template:
+            self.category.default_ticket_template = None
+        else:
+            self.category.default_ticket_template = self.template
+        db.session.commit()
+        return jsonify_data(html=_render_template_list(self.category, event=None))
