@@ -369,7 +369,7 @@ class RHRemoveAccount(RHUserBase):
             raise NotFound()
 
     def _process(self):
-        if session['login_identity'] == self.identity.id:
+        if session.get('login_identity') == self.identity.id:
             raise BadRequest("The identity used to log in can't be removed")
         if self.user.local_identity == self.identity:
             raise BadRequest("The main local identity can't be removed")
