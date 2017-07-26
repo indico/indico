@@ -286,6 +286,19 @@ class TicketsForm(IndicoForm):
                                       .filter(DesignerTemplate.type == TemplateType.badge,
                                               db.or_(DesignerTemplate.category_id.in_(event.category_chain),
                                                      DesignerTemplate.event_new == event)))
+        # print 'choiced'
+        # from indico.modules.designer.util import get_default_template_on_category
+        # default_tpl = get_default_template_on_category(event.category)
+        #
+        # # for tpl in self.ticket_template.iter_choices():
+        # #     print tpl[0]
+        # #     print default_tpl.id
+        # #
+        # #     if str(tpl[0]) == str(default_tpl.id):
+        # #         print 'tak tak'
+        # #         # tpl[1] = tpl[1] + _('Default template')
+        # #         tpl[1] = 'chuju'
+        # # print self.ticket_template.iter_choices
 
 
 class ParticipantsDisplayForm(IndicoForm):

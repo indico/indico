@@ -352,3 +352,11 @@
 .template-side.back:not(.empty) {
     pointer-events: none;
 }
+
+.toggle-default {
+    opacity: 0.3;
+
+    &.default-on-category {
+        opacity: 1;
+    }
+}

@@ -37,7 +37,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_template(tpl, target, inherited=false, event=none) -%}
+{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none) -%}
     <tr>
         <td class="i-table id-column">
             <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
@@ -60,6 +60,21 @@
         <td>
             <div class="thin toolbar right">
                 <div class="group">
+                    {% if not event and tpl.type.name == 'badge' %}
+                        {% set inherited_default = default_template == tpl and tpl.category != target %}
+                        <a class="i-button icon-layout icon-only borderless hide-if-locked toggle-default
+                            {{ 'default-on-category' if default_template == tpl }}
+                            {{ 'inherited-default' if inherited_default }}"
+                            {% if inherited_default %}
+                                title="{% trans %}This is the default template inherited from parent category{% endtrans %}"
+                            {% else %}
+                                title="{% trans %}Toggle default template for this category{% endtrans %}"
+                                data-href="{{ url_for('.toggle_category_default', target, template_id=tpl.id) }}"
+                                data-method="POST"
+                                data-update="#template-list"
+                            {% endif %}>
+                        </a>
+                    {% endif %}
                     {% if tpl.is_clonable %}
                         <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
                                 title="{% trans %}Clone this template{% endtrans %}"
@@ -122,13 +137,13 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none) -%}
+{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=None) -%}
     <section>
         <h3>{% trans %}Inherited templates{% endtrans %}</h3>
         <table class="i-table-widget" id="template-list">
             <tbody>
                 {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
-                    {{ _render_template(tpl, target, inherited=true, event=event) }}
+                    {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template) }}
                 {% endfor %}
             </tbody>
         </table>
@@ -149,7 +164,7 @@
             <table class="i-table-widget" id="template-list">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, event=event) }}
+                        {{ _render_template(tpl, target, event=event, default_template=default_template) }}
                     {% endfor %}
                 </tbody>
             </table>

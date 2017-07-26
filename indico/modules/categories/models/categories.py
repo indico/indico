@@ -175,6 +175,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=False
     )
+    default_ticket_template_id = db.Column(
+        db.ForeignKey('indico.designer_templates.id'),
+        nullable=True,
+        index=True
+    )
 
     children = db.relationship(
         'Category',
@@ -192,6 +197,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         backref='category',
         cascade='all, delete-orphan',
         collection_class=set
+    )
+    default_ticket_template = db.relationship(
+        'DesignerTemplate',
+        lazy=True,
+        foreign_keys=default_ticket_template_id,
     )
 
     # column properties:
