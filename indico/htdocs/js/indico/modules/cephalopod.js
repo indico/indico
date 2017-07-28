@@ -69,9 +69,8 @@
         return defer.promise();
     }
 
-    global.setupCephalopodSettings = function setupCephalopodSettings(cephalopodUrl) {
+    global.setupCephalopodSettings = function setupCephalopodSettings(cephalopodUrl, enabled) {
         var $joined = $('#joined');
-        var enabled = $joined.prop('checked');
 
         $joined.on('change', function() {
             $('#sync-button').prop('disabled', !this.checked);

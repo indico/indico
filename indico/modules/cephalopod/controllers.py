@@ -43,8 +43,10 @@ class RHCephalopodBase(RHAdminBase):
 
 
 class RHCephalopod(RHCephalopodBase):
-    def _process_GET(self):
-        form = CephalopodForm(request.form, obj=FormDefaults(**cephalopod_settings.get_all()))
+    def _process(self):
+        form = CephalopodForm(obj=FormDefaults(**cephalopod_settings.get_all()))
+        if form.validate_on_submit():
+            return self._process_form(form)
         config = Config.getInstance()
         hub_url = url_join(config.getCommunityHubURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         cephalopod_settings.set('show_migration_message', False)
@@ -60,10 +62,10 @@ class RHCephalopod(RHCephalopodBase):
                                             python_version=platform.python_version(),
                                             hub_url=hub_url)
 
-    def _process_POST(self):
-        name = request.form.get('contact_name', cephalopod_settings.get('contact_name'))
-        email = request.form.get('contact_email', cephalopod_settings.get('contact_email'))
-        enabled = request.form.get('joined', False)
+    def _process_form(self, form):
+        name = form.contact_name.data
+        email = form.contact_email.data
+        enabled = form.joined.data
         uuid = cephalopod_settings.get('uuid')
         try:
             if not enabled:

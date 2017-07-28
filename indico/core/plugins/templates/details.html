@@ -1,4 +1,5 @@
-{% extends 'layout/admin_page.html' %}
+{% extends 'layout/dialog_base.html' if request.is_xhr else 'layout/admin_page.html' %}
+
 {% from 'forms/_form.html' import form_header, form_rows, form_footer, form_fieldset %}
 
 {% block title %}{{ plugin.title }}{% endblock %}
