@@ -231,7 +231,7 @@ div.event-header {
     &.subcontrib-description {
         font-size: 0.9em;
         padding: 0.5em 0;
-    }
+		}
     .event-description {
         color: $black;
     }
@@ -560,7 +560,7 @@ div.event-details {
 
     .event-details-row {
         display: flex;
-        align-items: baseline;
+        /*align-items: baseline;*/
         margin-bottom: 0.5em;
     }
 
@@ -577,6 +577,7 @@ div.event-details {
 
     .event-details-content {
         flex: 1;
+		padding-right:20%;
     }
 }
 
