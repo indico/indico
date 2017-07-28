@@ -560,7 +560,6 @@ div.event-details {
 
     .event-details-row {
         display: flex;
-        align-items: baseline;
         margin-bottom: 0.5em;
     }
 
@@ -577,6 +576,7 @@ div.event-details {
 
     .event-details-content {
         flex: 1;
+        padding-right:20%;
     }
 }
 
