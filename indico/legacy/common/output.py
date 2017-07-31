@@ -223,7 +223,7 @@ class outputGenerator(object):
             self.materialToXMLMarc21(event, out=out)
         #out.closeTag("datafield")
 
-        if event.note:
+        if event.note and not event.note.is_deleted:
             self.noteToXMLMarc21(event.note, out=out)
 
         #if respEmail != "":
@@ -325,7 +325,7 @@ class outputGenerator(object):
         if include_material:
             self.materialToXMLMarc21(contrib, out=out)
 
-        if contrib.note:
+        if contrib.note and not contrib.note.is_deleted:
             self.noteToXMLMarc21(contrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
@@ -447,7 +447,7 @@ class outputGenerator(object):
         if includeMaterial:
             self.materialToXMLMarc21(subcontrib, out=out)
 
-        if subcontrib.note:
+        if subcontrib.note and not subcontrib.note.is_deleted:
             self.noteToXMLMarc21(subcontrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
@@ -543,7 +543,3 @@ class outputGenerator(object):
         out.writeTag('subfield', 'INDICO.{}'.format(uniqueId(note)), [['code', '3']])
         out.writeTag('subfield', 'resource', [['code', 'x']])
         out.closeTag('datafield')
-
-
-
-
