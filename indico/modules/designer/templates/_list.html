@@ -92,14 +92,19 @@
                            title="{% trans %}Edit template{% endtrans %}"></a>
                     {% endif %}
                     {% if not inherited %}
-                        <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked"
-                                title="{% trans %}Delete tempalte{% endtrans %}"
-                                data-href="{{ url_for('.delete_template', tpl) }}"
-                                data-method="DELETE"
-                                data-update="#template-list"
-                                data-confirm="{% trans title=tpl.title -%}
-                                                  Are you sure you want to delete template '{{ title }}'?
-                                              {%- endtrans %}">
+                        <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked
+                                {{ 'not-deletable' if tpl.not_deletable }}"
+                                {% if tpl.not_deletable %}
+                                    title="{% trans %}This template cannot be deleted because it's used by another registration form{% endtrans %}"
+                                {% else %}
+                                    title="{% trans %}Delete tempalte{% endtrans %}"
+                                    data-href="{{ url_for('.delete_template', tpl) }}"
+                                    data-method="DELETE"
+                                    data-update="#template-list"
+                                    data-confirm="{% trans title=tpl.title -%}
+                                                      Are you sure you want to delete template '{{ title }}'?
+                                                  {%- endtrans %}">
+                                {% endif %}
                         </button>
                     {%- endif %}
                 </div>
