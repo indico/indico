@@ -81,6 +81,11 @@ class DesignerTemplate(db.Model):
         nullable=False,
         default=True
     )
+    not_deletable = db.Column(
+        db.Boolean,
+        nullable=True,
+        default=False
+    )
     category = db.relationship(
         'Category',
         lazy=True,
