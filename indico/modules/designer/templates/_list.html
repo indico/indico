@@ -48,9 +48,7 @@
         </td>
         <td class="text-superfluous">
             {% if inherited %}
-                {% if tpl.category.is_root %}
-                    {% trans %}Default template{% endtrans %}
-                {% else %}
+                {% if not tpl.category.is_root %}
                     {% trans title=tpl.category.title -%}
                         from category "{{ title }}"
                     {% endtrans %}
@@ -61,14 +59,14 @@
             <div class="thin toolbar right">
                 <div class="group">
                     {% if not event and tpl.type.name == 'badge' %}
-                        {% set inherited_default = default_template == tpl and tpl.category != target %}
-                        <a class="i-button icon-layout icon-only borderless hide-if-locked toggle-default
+                        {% set inherited_from_root = default_template == tpl and tpl.category.get_root().default_ticket_template == tpl %}
+                        <a class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
                             {{ 'default-on-category' if default_template == tpl }}
-                            {{ 'inherited-default' if inherited_default }}"
-                            {% if inherited_default %}
-                                title="{% trans %}This is the default template inherited from parent category{% endtrans %}"
+                            {{ 'inherited-from-root' if inherited_from_root }}"
+                            {% if inherited_from_root %}
+                                title="{% trans %}This is the default ticket template from Home category{% endtrans %}"
                             {% else %}
-                                title="{% trans %}Toggle default template for this category{% endtrans %}"
+                                title="{% trans %}Toggle ticket template for this category{% endtrans %}"
                                 data-href="{{ url_for('.toggle_category_default', target, template_id=tpl.id) }}"
                                 data-method="POST"
                                 data-update="#template-list"

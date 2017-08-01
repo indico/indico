@@ -358,6 +358,15 @@
 
     &.default-on-category {
         opacity: 1;
+        color: $blue;
+
+        &.inherited-from-root {
+            opacity: 0.6;
+
+            &:hover {
+                color: $blue;
+            }
+        }
     }
 }
 
