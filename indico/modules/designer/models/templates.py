@@ -22,6 +22,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import TemplateType, DEFAULT_CONFIG
 from indico.modules.designer.models.images import DesignerImageFile
+from indico.modules.events import Event
+from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -136,6 +138,15 @@ class DesignerTemplate(db.Model):
     @property
     def owner(self):
         return self.event_new if self.event_new else self.category
+
+    @property
+    def is_not_deletable(self):
+        from indico.modules.events.registration.models.forms import RegistrationForm
+        active_regforms = RegistrationForm.find_all(RegistrationForm.ticket_template == self,
+                                                    Event.ends_after(now_utc()), _join=Event)
+        if active_regforms:
+            return True
+        return self.not_deletable
 
     @locator_property
     def locator(self):

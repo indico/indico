@@ -24,8 +24,10 @@ from flask import flash, jsonify, request, session
 from PIL import Image
 from werkzeug.exceptions import Forbidden
 
+from indico.core import signals
 from indico.core.db import db
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
+from indico.modules.categories import Category
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.modules.designer.forms import AddTemplateForm
@@ -36,6 +38,7 @@ from indico.modules.designer.util import get_inherited_templates, get_placeholde
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -308,6 +311,12 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
 
 class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
+        affected_regforms = RegistrationForm.find_all(RegistrationForm.ticket_template_id == self.template.id)
+        for regform in affected_regforms:
+            regform.ticket_template = None
+        affected_categories = Category.find_all(Category.default_ticket_template_id == self.template.id)
+        for category in affected_categories:
+            category.default_ticket_template = None
         db.session.delete(self.template)
         flash(_('The template has been removed'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
