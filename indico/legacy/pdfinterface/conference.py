@@ -20,18 +20,15 @@ from itertools import takewhile
 from operator import attrgetter
 
 from pytz import timezone
-from qrcode import QRCode, constants
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm, inch
-from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table, TableStyle
 from reportlab.rl_config import defaultPageSize
 from speaklater import is_lazy_string
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.legacy.common import utils
 from indico.legacy.common.timezoneUtils import DisplayTZ, nowutc
@@ -45,7 +42,6 @@ from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
-from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time
 from indico.util.i18n import _, ngettext
 from indico.util.string import html_color_to_rgb, to_unicode, truncate
@@ -1459,94 +1455,3 @@ class RegistrantsListToPDF(PDFBase):
         t = Table(l, colWidths=noneList, style=tsRegs)
         self._story.append(t)
         return story
-
-
-class TicketToPDF(PDFBase):
-    def __init__(self, event, registration, doc=None, story=None):
-        self._event = event
-        self._conf = event.as_legacy
-        self._registration = registration
-        PDFBase.__init__(self, doc, story)
-
-    def firstPage(self, c, doc):
-        c.saveState()
-        height = self._PAGE_HEIGHT - 1*cm
-        width = 1*cm
-
-        # Conference title
-        height -= 1*cm
-        startHeight = self._drawWrappedString(c, escape(self._event.title.encode('utf-8')),
-                                              height=height, width=width, size=20,
-                                              align="left", font='Times-Bold')
-
-        # Conference start and end date
-        height = startHeight - 1*cm
-        self._drawWrappedString(c, "%s - %s" % (
-            format_date(self._event.start_dt_local, format='full'),
-            format_date(self._event.end_dt_local, format='full')),
-            height=height, width=width, align="left", font="Times-Italic",
-            size=15)
-
-        # Conference location
-        if self._event.venue_name:
-            height -= 0.7*cm
-            self._drawWrappedString(
-                c,
-                escape(self._event.venue_name),
-                height=height, width=width, size=15, align="left",
-                font="Times-Italic")
-
-        # e-Ticket
-        c.setFont('Times-Bold', 30)
-        height -= 2*cm
-        c.drawCentredString(self._PAGE_WIDTH/2.0, height, _("e-ticket"))
-
-        # QRCode (Version 6 with error correction L can contain up to 106 bytes)
-        height -= 6*cm
-        qr = QRCode(
-            version=6,
-            error_correction=constants.ERROR_CORRECT_M,
-            box_size=4,
-            border=1
-        )
-        config = Config.getInstance()
-        qr_data = {"registrant_id": self._registration.id,
-                   "checkin_secret": self._registration.ticket_uuid,
-                   "event_id": self._event.id,
-                   "server_url": config.getBaseURL()}
-        json_qr_data = json.dumps(qr_data)
-        qr.add_data(json_qr_data)
-        qr.make(fit=True)
-        qr_img = qr.make_image()
-
-        c.drawImage(ImageReader(qr_img._img), width, height, height=4*cm,
-                    width=4*cm)
-
-        # QRCode and registrant info separating line
-        width += 4.5*cm
-        c.setStrokeColorRGB(0, 0, 0)
-        c.line(width, height, width, height + 4*cm)
-
-        # Registrant info
-        width += 0.5*cm
-        height += 3*cm
-        self._drawWrappedString(c, escape("ID: {0}".format(self._registration.friendly_id)),
-                                height=height, width=width, size=15,
-                                align="left", font='Times-Roman')
-        height -= 0.5*cm
-        self._drawWrappedString(c, escape(self._registration.full_name),
-                                height=height, width=width, size=15,
-                                align="left", font='Times-Roman')
-        personal_data = self._registration.get_personal_data()
-        if personal_data.get('affiliation'):
-            height -= 0.5*cm
-            self._drawWrappedString(c,
-                                    escape(personal_data['affiliation']),
-                                    height=height, width=width, size=15,
-                                    align="left", font='Times-Roman')
-        if personal_data.get('address'):
-            height -= 0.5*cm
-            self._drawWrappedString(c, escape(personal_data['address']),
-                                    height=height, width=width, size=15,
-                                    align="left", font='Times-Roman')
-        c.restoreState()
