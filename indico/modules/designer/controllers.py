@@ -24,7 +24,6 @@ from flask import flash, jsonify, request, session
 from PIL import Image
 from werkzeug.exceptions import Forbidden
 
-from indico.core import signals
 from indico.core.db import db
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.modules.categories import Category

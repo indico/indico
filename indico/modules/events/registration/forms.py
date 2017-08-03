@@ -276,29 +276,20 @@ class TicketsForm(IndicoForm):
                                           description=_('Allow users to download their ticket from the registration '
                                                         'summary page.'))
 
-    ticket_template = QuerySelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
-                                                              Optional()], get_label='title', allow_blank=False)
+    ticket_template_id = SelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
+                                                            Optional()], coerce=lambda x: int(x))
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
+        from indico.modules.designer.util import get_default_template_on_category
+        default_tpl = get_default_template_on_category(event.category)
+        all_templates = set(event.designer_templates) | get_inherited_templates(event)
+        badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
+                           if tpl.type == TemplateType.badge and tpl != default_tpl]
+        # Making the default category template the first option in the list of choices
+        badge_templates.insert(0, (default_tpl.id, default_tpl.title + ' ' + _('(Default category template)')))
         super(TicketsForm, self).__init__(*args, **kwargs)
-        self.ticket_template.query = (DesignerTemplate.query
-                                      .filter(DesignerTemplate.type == TemplateType.badge,
-                                              db.or_(DesignerTemplate.category_id.in_(event.category_chain),
-                                                     DesignerTemplate.event_new == event)))
-        # print 'choiced'
-        # from indico.modules.designer.util import get_default_template_on_category
-        # default_tpl = get_default_template_on_category(event.category)
-        #
-        # # for tpl in self.ticket_template.iter_choices():
-        # #     print tpl[0]
-        # #     print default_tpl.id
-        # #
-        # #     if str(tpl[0]) == str(default_tpl.id):
-        # #         print 'tak tak'
-        # #         # tpl[1] = tpl[1] + _('Default template')
-        # #         tpl[1] = 'chuju'
-        # # print self.ticket_template.iter_choices
+        self.ticket_template_id.choices = badge_templates
 
 
 class ParticipantsDisplayForm(IndicoForm):
