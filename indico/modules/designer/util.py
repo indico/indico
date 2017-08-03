@@ -45,6 +45,10 @@ def get_default_template_on_category(obj):
         return None
     if obj.default_ticket_template:
         return obj.default_ticket_template
-    parent_chain = list(reversed(obj.parent_chain_query.all()))
+    if obj.is_root:
+        default_root_tpl = DesignerTemplate.find_first(DesignerTemplate.not_deletable)
+        obj.default_ticket_template = default_root_tpl
+        return obj.default_ticket_template
+    parent_chain = reversed(obj.parent_chain_query.options(joinedload('default_ticket_template')).all())
     return next((category.default_ticket_template for
                  category in parent_chain if category.default_ticket_template), None)
