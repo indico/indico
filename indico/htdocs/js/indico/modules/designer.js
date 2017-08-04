@@ -466,6 +466,10 @@
             new AlertPopup($T("Warning"), $T.gettext("Please choose a name for the template")).open();
             return;
         }
+        if (!Object.keys(items).length && !template.background_url) {
+            new AlertPopup($T("Warning"), $T.gettext("The template cannot be empty. Add some elements or a background image.")).open();
+            return;
+        }
         if (removeBackSide) {
             backsideTemplateID = null;
         }
