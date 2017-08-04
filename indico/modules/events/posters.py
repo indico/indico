@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import division, unicode_literals
 
 from collections import namedtuple
 
@@ -44,8 +44,8 @@ class PosterPDF(DesignerPDFBase):
 
         if self.template.background_image:
             with self.template.background_image.open() as f:
-                self._draw_background(canvas, ImageReader(f), config.margin_horizontal, config.margin_vertical,
-                                      tpl_data.width_cm * cm, tpl_data.height_cm * cm)
+                self._draw_background(canvas, ImageReader(f), tpl_data, config.margin_horizontal,
+                                      config.margin_vertical, tpl_data.width_cm * cm, tpl_data.height_cm * cm)
 
         placeholders = get_placeholders('designer-fields')
 
@@ -60,7 +60,7 @@ class PosterPDF(DesignerPDFBase):
             elif item.get('text') is not None:
                 text = item['text']
 
-            self._draw_item(canvas, item, text, config.margin_horizontal, config.margin_vertical)
+            self._draw_item(canvas, item, tpl_data, text, config.margin_horizontal, config.margin_vertical)
 
     def _draw_poster(self, canvas, registration, pos_x, pos_y):
         """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner).
