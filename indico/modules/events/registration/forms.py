@@ -22,17 +22,14 @@ from operator import itemgetter
 
 import jsonschema
 from flask import request
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField, FloatField, HiddenField
 from wtforms.fields.html5 import EmailField, DecimalField
 from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError, InputRequired
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import Config
-from indico.core.db import db
 from indico.modules.designer import PageOrientation, PageSize, PageLayout, TemplateType
-from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.designer.util import get_inherited_templates
+from indico.modules.designer.util import get_inherited_templates, get_default_template_on_category
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
@@ -281,7 +278,6 @@ class TicketsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
-        from indico.modules.designer.util import get_default_template_on_category
         default_tpl = get_default_template_on_category(event.category)
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates

@@ -54,8 +54,8 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditDesignerTemplate,
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))
-    _bp.add_url_rule(prefix + '/<int:template_id>/toggle_default/', 'toggle_category_default',
-                     RHToggleTemplateDefaultOnCategory, methods=('GET', 'POST'))
+    _bp.add_url_rule(prefix + '/<int:template_id>/toggle-default/', 'toggle_category_default',
+                     RHToggleTemplateDefaultOnCategory, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'delete_template', RHDeleteDesignerTemplate,
                      defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template',
