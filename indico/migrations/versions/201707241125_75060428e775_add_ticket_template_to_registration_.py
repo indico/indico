@@ -17,8 +17,8 @@ depends_on = None
 
 
 def upgrade():
-    op.add_column('forms', sa.Column('ticket_template_id', sa.Integer(), nullable=True), schema='event_registration')
-    op.create_index(None, 'forms', ['ticket_template_id'], unique=False, schema='event_registration')
+    op.add_column('forms', sa.Column('ticket_template_id', sa.Integer(), nullable=True, index=True),
+                  schema='event_registration')
     op.create_foreign_key(None, 'forms', 'designer_templates',
                           ['ticket_template_id'], ['id'], source_schema='event_registration', referent_schema='indico')
 

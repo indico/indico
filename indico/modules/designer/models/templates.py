@@ -85,7 +85,7 @@ class DesignerTemplate(db.Model):
     )
     not_deletable = db.Column(
         db.Boolean,
-        nullable=True,
+        nullable=False,
         default=False
     )
     category = db.relationship(
@@ -140,13 +140,13 @@ class DesignerTemplate(db.Model):
         return self.event_new if self.event_new else self.category
 
     @property
-    def is_not_deletable(self):
+    def can_be_deleted(self):
         from indico.modules.events.registration.models.forms import RegistrationForm
         active_regforms = RegistrationForm.find_all(RegistrationForm.ticket_template == self,
                                                     Event.ends_after(now_utc()), _join=Event)
         if active_regforms:
-            return True
-        return self.not_deletable
+            return False
+        return not self.not_deletable
 
     @locator_property
     def locator(self):

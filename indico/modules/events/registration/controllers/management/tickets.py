@@ -27,6 +27,7 @@ from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.designer import PageOrientation
 from indico.modules.designer import PageSize
+from indico.modules.designer.util import get_default_template_on_category
 from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
@@ -103,13 +104,9 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         filename = secure_filename('{}-Ticket.pdf'.format(self.event_new.title), 'ticket.pdf')
         template = self.regform.ticket_template
         if template is None:
-            from indico.modules.designer.util import get_default_template_on_category
             template = get_default_template_on_category(self.event_new.category)
         signals.event.designer.print_badge_template.send(template, regform=self.regform)
-        if template.backside_template:
-            pdf_class = RegistrantsListToBadgesPDFFoldable
-        else:
-            pdf_class = RegistrantsListToBadgesPDF
+        pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
         config_params = DEFAULT_TICKET_PRINTING_SETTINGS
         pdf = pdf_class(template, config_params, self.event_new, [self.registration.id])
         return send_file(filename, pdf.get_pdf(), 'application/pdf')
