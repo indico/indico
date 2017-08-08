@@ -73,8 +73,12 @@
                             {% endif %}>
                         </a>
                     {% endif %}
-                    {% if tpl.is_clonable %}
-                        <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
+                        {% set clonable = tpl.is_clonable or target == tpl.category.get_root() %}
+                        <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
+                            {{ 'not-clonable' if not clonable }}"
+                            {% if not clonable %}
+                                title="{% trans %}This template cannot be cloned{% endtrans %}"
+                            {% else %}
                                 title="{% trans %}Clone this template{% endtrans %}"
                                 data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
                                 data-method="POST"
@@ -82,8 +86,8 @@
                                 data-confirm="{% trans title=tpl.title -%}
                                                   Are you sure you want to clone template '{{ title }}''?
                                               {%- endtrans %}">
+                            {% endif %}
                         </button>
-                    {% endif %}
                     {% if not inherited %}
                         <a class="i-button icon-edit icon-only text-color borderless hide-if-locked"
                            href="{{ url_for('.edit_template', tpl) }}"
