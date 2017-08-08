@@ -351,11 +351,11 @@
         var templateWidth = parseFloat($('.template-width').val());
         var templateHeight = parseFloat($('.template-height').val());
 
-        tpl.width(templateWidth * pixelsPerCm);
-        tpl.height(templateHeight * pixelsPerCm);
+        tpl.width(Math.round(templateWidth * pixelsPerCm));
+        tpl.height(Math.round(templateHeight * pixelsPerCm));
         previousTemplateDimensions.width = templateDimensions.width;
         previousTemplateDimensions.height = templateDimensions.height;
-        templateDimensions = new Dimensions(templateWidth * DEFAULT_PIXEL_CM, templateHeight * DEFAULT_PIXEL_CM);
+        templateDimensions = new Dimensions(Math.round(templateWidth * DEFAULT_PIXEL_CM), Math.round(templateHeight * DEFAULT_PIXEL_CM));
         updateRulers();
         displayAllBackgrounds(template, backsideTemplate);
         updatePreset(templateWidth, templateHeight);
@@ -373,16 +373,19 @@
             },
             right: function() {
                 if (div) {
-                    div.css('left', (templateDimensions.width - div.width()) + "px");
-                    selectedItem.x = unzoom(templateDimensions.width - div.width());
+                    var x = templateDimensions.width - div.width();
+                    div.css('left', (x > 0) ? x + "px" : 0);
+                    selectedItem.x = unzoom((x > 0) ? x : 0);
                 }
             },
             center: function() {
                 if (div) {
-                    div.css('left', ((templateDimensions.width - div.width()) / 2) + "px");
-                    div.css('top', ((templateDimensions.height - div.height()) / 2) + "px");
-                    selectedItem.x = unzoom((templateDimensions.width - div.width()) / 2);
-                    selectedItem.y = unzoom((templateDimensions.height - div.height()) / 2);
+                    var x = (templateDimensions.width - div.width()) / 2;
+                    var y = (templateDimensions.height - div.height()) / 2;
+                    div.css('left', (x > 0) ? x + "px" : 0);
+                    div.css('top', (y > 0) ? y + "px" : 0);
+                    selectedItem.x = unzoom((x > 0) ? x : 0);
+                    selectedItem.y = unzoom((y > 0) ? y : 0);
                 }
             },
             top: function() {
@@ -393,8 +396,9 @@
             },
             bottom: function() {
                 if (div) {
-                    div.css('top', (templateDimensions.height - div.height()) + "px");
-                    selectedItem.y = unzoom(templateDimensions.height - div.height());
+                    var y = templateDimensions.height - div.height();
+                    div.css('top', (y > 0) ? y + "px" : 0);
+                    selectedItem.y = unzoom((y > 0) ? y : 0);
                 }
             }
         })[direction]();
@@ -447,7 +451,7 @@
                 $fixedTextField.val(selectedItem.text);
             },
             width: function() {
-                selectedItem.width = $('.js-element-width').val() * pixelsPerCm;
+                selectedItem.width = Math.round($('.js-element-width').val() * pixelsPerCm);
                 if (selectedItem.type === 'ticket_qr_code') {
                     selectedItem.height = selectedItem.width;
                 }

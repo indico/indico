@@ -1,7 +1,7 @@
 {% extends 'events/registration/emails/base_registration_details.html' %}
 
 {% block subject_message -%}
-    New {% if registration.state.name == 'pending' %}pending{% endif %} registration
+    New {%- if registration.state.name == 'pending' %} pending{% endif %} registration
 {%- endblock %}
 
 {% block registration_header -%}
