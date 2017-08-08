@@ -83,7 +83,7 @@ class DesignerTemplate(db.Model):
         nullable=False,
         default=True
     )
-    not_deletable = db.Column(
+    system_template = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -146,7 +146,7 @@ class DesignerTemplate(db.Model):
                                                     Event.ends_after(now_utc()), _join=Event)
         if active_regforms:
             return False
-        return not self.not_deletable
+        return not self.system_template
 
     @locator_property
     def locator(self):

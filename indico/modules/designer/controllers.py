@@ -316,7 +316,7 @@ class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
         for category in affected_categories:
             category.default_ticket_template = None
             if category.is_root:
-                category.default_ticket_template = DesignerTemplate.find_first(DesignerTemplate.not_deletable)
+                category.default_ticket_template = DesignerTemplate.find_first(DesignerTemplate.system_template)
         db.session.delete(self.template)
         flash(_('The template has been removed'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
