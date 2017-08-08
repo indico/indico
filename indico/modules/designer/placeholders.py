@@ -79,7 +79,7 @@ class EventDatesPlaceholder(Placeholder):
         interval = _("{} to {}").format(to_unicode(format_date(start_dt, format='long')),
                                         to_unicode(format_date(end_dt, format='long')))
         if start_dt.date() == end_dt.date():
-            interval = format_datetime(start_dt)
+            interval = to_unicode(format_datetime(start_dt))
         elif start_dt.date().replace(day=1) == end_dt.date().replace(day=1):
             interval = "{} - {} {}".format(start_dt.day, end_dt.day,
                                            to_unicode(format_date(start_dt, format='MMMM yyyy')))
