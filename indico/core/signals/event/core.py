@@ -74,15 +74,6 @@ Expected to return a list of tuples ('button_name', 'js-call-class').
 Called when building the timetable view.
 """)
 
-has_read_access = _signals.signal('has-read-access', """
-Called when resolving the read access permissions for an event. The `sender` is the event,
-and the following parameters are available:
-
-* `user` - the user that is trying to access the event (:class:`.User` or ``None``)
-
-Should return ``True`` or ``False``.
-""")
-
 get_log_renderers = _signals.signal('get-log-renderers', """
 Expected to return `EventLogRenderer` classes.
 """)
