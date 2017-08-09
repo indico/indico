@@ -437,7 +437,8 @@ def generate_ticket_qr_code(registration):
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
         "event_id": unicode(registration.event_new.id),
-        "server_url": Config.getInstance().getBaseURL()
+        "server_url": Config.getInstance().getBaseURL(),
+        "version": 1
     }
     signals.event.registration.generate_ticket_qr_code.send(registration, ticket_data=qr_data)
     json_qr_data = json.dumps(qr_data)
