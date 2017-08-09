@@ -20,5 +20,4 @@ _signals = Namespace()
 
 print_badge_template = _signals.signal('print-badge-template', """
 Called when printing a badge template. Registration form is passed in the 'regform' kwarg.
-kwarg.
 """)

@@ -24,6 +24,7 @@ from sqlalchemy.orm import joinedload, load_only, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
@@ -427,9 +428,9 @@ def generate_ticket_qr_code(registration):
     :param registration: corresponding `Registration` object
     """
     qr = QRCode(
-        version=6,
-        error_correction=constants.ERROR_CORRECT_M,
-        box_size=4,
+        version=17,
+        error_correction=constants.ERROR_CORRECT_Q,
+        box_size=3,
         border=1
     )
     qr_data = {
@@ -438,6 +439,7 @@ def generate_ticket_qr_code(registration):
         "event_id": unicode(registration.event_new.id),
         "server_url": Config.getInstance().getBaseURL()
     }
+    signals.event.registration.generate_ticket_qr_code.send(registration, ticket_data=qr_data)
     json_qr_data = json.dumps(qr_data)
     qr.add_data(json_qr_data)
     qr.make(fit=True)

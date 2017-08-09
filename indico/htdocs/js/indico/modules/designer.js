@@ -84,8 +84,8 @@
             text_align: "center",
             color: "black",
             font_size: "15pt",
-            width: (type === 'ticket_qr_code') ? 100 : 400,
-            height: (type === 'ticket_qr_code') ? 100 : null,
+            width: (type === 'ticket_qr_code') ? 150 : 400,
+            height: (type === 'ticket_qr_code') ? 150 : null,
             text: $T("Fixed text"),
 
             // The following attributes have no meaning to the server
