@@ -1,6 +1,9 @@
 <div class="announcement-bar weak-hidden" id="announcement-bar">
-    <div class="f-self-stretch">{{ message | safe }}</div>
-    <span class="icon-close icon-announcement js-close"></span>
+    <div class="flexrow f-self-stretch f-j-center f-a-center">
+        <i class="icon icon-warning"></i>
+        <div>{{- message | safe -}}</div>
+    </div>
+    <span class="icon-close close-button"></span>
 </div>
 <script>
     (function() {
@@ -8,12 +11,12 @@
 
         var hash = {{ message | crc32 | string | tojson }};
 
-        $('#announcement-bar .js-close').on('click', function() {
+        $('#announcement-bar .close-button').on('click', function() {
             $.jStorage.set('hideAnnouncement', hash);
             $('#announcement-bar').slideUp('fast');
         });
 
-        if ($.jStorage.get('hideAnnouncement') != hash){
+        if ($.jStorage.get('hideAnnouncement') !== hash) {
             $("#announcement-bar").show();
         }
     })();

@@ -85,19 +85,28 @@ div.page-header-dark {
 
 /* Announcements */
 div.announcement-bar {
+    @extend %font-family-title;
+
     display: flex;
     align-items: center;
-    padding: 0.5em 1em;
-    background-color: $light-yellow;
+    padding: 0.75em;
+    background-color: lighten($light-yellow, 5%);
     color: $dark-black;
-    font-size: 0.9em;
-    font-weight: bold;
+    border-bottom: 2px solid $dark-yellow;
+    font-size: 1.1em;
+    text-align: center;
 
-    .icon-announcement {
+    .icon {
+        margin-right: 0.25em;
+        font-size: 1.1em;
+        color: $yellow;
+    }
+
+    .close-button {
         display: flex;
         color: $dark-yellow;
         font-size: 1.5em;
-        cursor:pointer;
+        cursor: pointer;
     }
 }
 
