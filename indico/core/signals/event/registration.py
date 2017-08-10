@@ -38,5 +38,5 @@ Called when a new registration form is created.  The `sender` is the
 
 generate_ticket_qr_code = _signals.signal('generate-ticket-qr-code', """
 Called when generating the QR code for a ticket. The data included in the QR code is passed
-in the ticket_data kwarg and may be modified.
+in the `ticket_data` kwarg and may be modified.
 """)

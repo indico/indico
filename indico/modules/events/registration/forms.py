@@ -274,7 +274,7 @@ class TicketsForm(IndicoForm):
                                                         'summary page.'))
 
     ticket_template_id = SelectField(_('Ticket template'), [HiddenUnless('tickets_enabled', preserve_data=True),
-                                                            Optional()], coerce=lambda x: int(x))
+                                                            Optional()], coerce=int)
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
@@ -283,7 +283,7 @@ class TicketsForm(IndicoForm):
         badge_templates = [(tpl.id, tpl.title) for tpl in all_templates
                            if tpl.type == TemplateType.badge and tpl != default_tpl]
         # Making the default category template the first option in the list of choices
-        badge_templates.insert(0, (default_tpl.id, default_tpl.title + ' ' + _('(Default category template)')))
+        badge_templates.insert(0, (default_tpl.id, '{} {}'.format(default_tpl.title, _('(Default category template)'))))
         super(TicketsForm, self).__init__(*args, **kwargs)
         self.ticket_template_id.choices = badge_templates
 

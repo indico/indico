@@ -73,21 +73,21 @@
                             {% endif %}>
                         </a>
                     {% endif %}
-                        {% set clonable = tpl.is_clonable or target == tpl.category.get_root() %}
-                        <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
-                            {{ 'not-clonable' if not clonable }}"
-                            {% if not clonable %}
-                                title="{% trans %}This template cannot be cloned{% endtrans %}"
-                            {% else %}
-                                title="{% trans %}Clone this template{% endtrans %}"
-                                data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
-                                data-method="POST"
-                                data-update="#template-list"
-                                data-confirm="{% trans title=tpl.title -%}
-                                                  Are you sure you want to clone template '{{ title }}''?
-                                              {%- endtrans %}">
-                            {% endif %}
-                        </button>
+                    {% set clonable = tpl.is_clonable or (not event and tpl.owner == target) %}
+                    <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
+                        {{ 'not-clonable' if not clonable }}"
+                        {% if not clonable %}
+                            title="{% trans %}This template cannot be cloned{% endtrans %}"
+                        {% else %}
+                            title="{% trans %}Clone this template{% endtrans %}"
+                            data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
+                            data-method="POST"
+                            data-update="#template-list"
+                            data-confirm="{% trans title=tpl.title -%}
+                                              Are you sure you want to clone template '{{ title }}''?
+                                          {%- endtrans %}">
+                        {% endif %}
+                    </button>
                     {% if not inherited %}
                         <a class="i-button icon-edit icon-only text-color borderless hide-if-locked"
                            href="{{ url_for('.edit_template', tpl) }}"
@@ -97,14 +97,14 @@
                         <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked
                                 {{ 'not-deletable' if not tpl.can_be_deleted }}"
                                 {% if not tpl.can_be_deleted %}
-                                    title="{% trans %}This template cannot be deleted because it's used by another registration form{% endtrans %}"
+                                    title="{% trans %}This template cannot be deleted because it is used by another registration form{% endtrans %}"
                                 {% else %}
-                                    title="{% trans %}Delete tempalte{% endtrans %}"
+                                    title="{% trans %}Delete template{% endtrans %}"
                                     data-href="{{ url_for('.delete_template', tpl) }}"
                                     data-method="DELETE"
                                     data-update="#template-list"
                                     data-confirm="{% trans title=tpl.title -%}
-                                                      Are you sure you want to delete template '{{ title }}'?
+                                                      Are you sure you want to delete the template '{{ title }}'?
                                                   {%- endtrans %}">
                                 {% endif %}
                         </button>
@@ -144,7 +144,7 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=None) -%}
+{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none) -%}
     <section>
         <h3>{% trans %}Inherited templates{% endtrans %}</h3>
         <table class="i-table-widget" id="template-list">

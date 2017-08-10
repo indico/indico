@@ -83,7 +83,7 @@ class DesignerTemplate(db.Model):
         nullable=False,
         default=True
     )
-    system_template = db.Column(
+    is_system_template = db.Column(
         db.Boolean,
         nullable=False,
         default=False
@@ -142,11 +142,13 @@ class DesignerTemplate(db.Model):
     @property
     def can_be_deleted(self):
         from indico.modules.events.registration.models.forms import RegistrationForm
-        active_regforms = RegistrationForm.find_all(RegistrationForm.ticket_template == self,
-                                                    Event.ends_after(now_utc()), _join=Event)
+        active_regforms = (RegistrationForm.query
+                           .filter(RegistrationForm.ticket_template == self,
+                                   RegistrationForm.event_new.has(Event.ends_after(now_utc())))
+                           .all())
         if active_regforms:
             return False
-        return not self.system_template
+        return not self.is_system_template
 
     @locator_property
     def locator(self):
