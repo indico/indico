@@ -239,6 +239,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         template_data = {
             'title': self.template.title,
             'data': self.template.data,
+            'is_clonable': self.template.is_clonable,
             'background_url': self.template.background_image.download_url if self.template.background_image else None
         }
         backside_template_data = {
@@ -264,6 +265,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
+                        is_clonable=request.json['is_clonable'],
                         clear_background=request.json['clear_background'])
         flash(_("Template successfully saved."), 'success')
         return jsonify_data()
