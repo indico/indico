@@ -77,7 +77,7 @@
                     <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
                         {{ 'not-clonable' if not clonable }}"
                         {% if not clonable %}
-                            title="{% trans %}This template cannot be cloned{% endtrans %}"
+                            title="{% trans %}This template cannot be cloned{% endtrans %}">
                         {% else %}
                             title="{% trans %}Clone this template{% endtrans %}"
                             data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"

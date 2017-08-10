@@ -467,7 +467,7 @@
             return;
         }
         if (!Object.keys(items).length && !template.background_url) {
-            new alertPopup($T.gettext("The template cannot be empty. Add some elements or a background image."), $T.gettext("Warning")).open();
+            alertPopup($T.gettext("The template cannot be empty. Add some elements or a background image."), $T.gettext("Warning"));
             return;
         }
         if (removeBackSide) {
@@ -486,6 +486,7 @@
             },
             clear_background: !template.background_url,
             title: $('.js-template-name').val(),
+            is_clonable: $('input[name="is-clonable"]:checked').length > 0,
             backside_template_id: backsideTemplateID
         };
 
@@ -955,6 +956,7 @@
             // We give the toHTML() method to each of the items
             templateDimensions = new Dimensions(template.data.width, template.data.height);
             $('.js-template-name').val(template.title);
+            $('.js-is-clonable').prop('checked', template.is_clonable);
             $('.template-container').width(templateDimensions.width)
                               .height(templateDimensions.height);
         } else {
