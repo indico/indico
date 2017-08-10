@@ -97,7 +97,7 @@
                         <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked
                                 {{ 'not-deletable' if not tpl.can_be_deleted }}"
                                 {% if not tpl.can_be_deleted %}
-                                    title="{% trans %}This template cannot be deleted because it is used by another registration form{% endtrans %}"
+                                    title="{% trans %}This template cannot be deleted because it is used by another registration form or as a backside for another template{% endtrans %}"
                                 {% else %}
                                     title="{% trans %}Delete template{% endtrans %}"
                                     data-href="{{ url_for('.delete_template', tpl) }}"

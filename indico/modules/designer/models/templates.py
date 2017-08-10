@@ -146,7 +146,8 @@ class DesignerTemplate(db.Model):
                            .filter(RegistrationForm.ticket_template == self,
                                    RegistrationForm.event_new.has(Event.ends_after(now_utc())))
                            .all())
-        if active_regforms:
+        used_as_backside = (DesignerTemplate.query.filter(DesignerTemplate.backside_template == self).all())
+        if active_regforms or used_as_backside:
             return False
         return not self.is_system_template
 
