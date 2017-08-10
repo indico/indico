@@ -45,6 +45,6 @@ def get_inherited_templates(obj):
 def get_default_template_on_category(category):
     if category.default_ticket_template:
         return category.default_ticket_template
-    parent_chain = reversed(category.parent_chain_query.options(joinedload('default_ticket_template')).all())
+    parent_chain = category.parent_chain_query.options(joinedload('default_ticket_template')).all()
     return next((category.default_ticket_template for
-                 category in parent_chain if category.default_ticket_template), None)
+                 category in reversed(parent_chain) if category.default_ticket_template), None)

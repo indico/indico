@@ -467,7 +467,7 @@
             return;
         }
         if (!Object.keys(items).length && !template.background_url) {
-            new AlertPopup($T("Warning"), $T.gettext("The template cannot be empty. Add some elements or a background image.")).open();
+            new alertPopup($T.gettext("The template cannot be empty. Add some elements or a background image."), $T.gettext("Warning")).open();
             return;
         }
         if (removeBackSide) {
