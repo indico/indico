@@ -27,17 +27,17 @@ Called when the registration personal data is modified. The `sender` is the
 """)
 
 registration_state_updated = _signals.signal('registration-state-updated', """
-Called when the state of registration changes.  The `sender` is the
+Called when the state of registration changes. The `sender` is the
 `Registration` object; the previous state is passed in the `previous_state`
 kwarg.
 """)
 
 registration_deleted = _signals.signal('registration-deleted', """
-Called when a registration is removed.  The `sender` is the `Registration` object.
+Called when a registration is removed. The `sender` is the `Registration` object.
 """)
 
 registration_form_created = _signals.signal('registration-form-created', """
-Called when a new registration form is created.  The `sender` is the
+Called when a new registration form is created. The `sender` is the
 `RegistrationForm` object.
 """)
 
@@ -47,6 +47,14 @@ in the `ticket_data` kwarg and may be modified.
 """)
 
 registration_form_deleted = _signals.signal('registration-form-deleted', """
-Called when a registration form is removed.  The `sender` is the
+Called when a registration form is removed. The `sender` is the
 `RegistrationForm` object.
+""")
+
+is_ticketing_handled = _signals.signal('is-ticketing-handled', """
+Called when resolving whether Indico should send tickets with e-mails
+or it will be handled by other module. The `sender` is the
+`RegistrationForm` object.
+
+Should return ``True`` or ``False``.
 """)

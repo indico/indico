@@ -22,27 +22,27 @@ from operator import itemgetter
 
 import jsonschema
 from flask import request
-from wtforms.fields import StringField, TextAreaField, BooleanField, IntegerField, SelectField, FloatField, HiddenField
-from wtforms.fields.html5 import EmailField, DecimalField
-from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError, InputRequired
+from wtforms.fields import BooleanField, FloatField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms.fields.html5 import DecimalField, EmailField
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.html5 import NumberInput
 
 from indico.core.config import Config
 from indico.modules.designer import PageOrientation, PageSize, PageLayout, TemplateType
 from indico.modules.designer.util import get_inherited_templates, get_default_template_on_category
 from indico.modules.events.features.util import is_feature_enabled
+from indico.modules.events.payment import payment_settings
 from indico.modules.events.registration.models.forms import ModificationMode
 from indico.modules.events.registration.models.invitations import RegistrationInvitation
 from indico.modules.events.registration.models.registrations import Registration
-from indico.modules.events.payment import payment_settings
 from indico.util.i18n import _
-from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
+from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (IndicoDateTimeField, EmailListField, PrincipalListField, IndicoEnumSelectField,
-                                     JSONField)
-from indico.web.forms.fields.simple import IndicoEmailRecipientsField, HiddenFieldList
-from indico.web.forms.validators import HiddenUnless, LinkedDateTime, IndicoEmail
-from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
+from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoEnumSelectField, JSONField,
+                                     PrincipalListField)
+from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
+from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 def _check_if_payment_required(form, field):
@@ -257,8 +257,8 @@ class EmailRegistrantsForm(IndicoForm):
 class TicketsForm(IndicoForm):
     tickets_enabled = BooleanField(_('Enable Tickets'), widget=SwitchWidget(),
                                    description=_('Create tickets for registrations using this registration form.'))
-    ticket_on_email = BooleanField(_('Attach to registration e-mail'), [HiddenUnless('tickets_enabled',
-                                                                                     preserve_data=True)],
+    ticket_on_email = BooleanField(_('Send with an e-mail'), [HiddenUnless('tickets_enabled',
+                                                                           preserve_data=True)],
                                    widget=SwitchWidget(),
                                    description=_('Attach PDF ticket to the email sent to a user after completing '
                                                  'their registration.'))
