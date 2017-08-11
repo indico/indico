@@ -17,13 +17,14 @@
 from __future__ import unicode_literals
 
 import click
-from flask.cli import pass_script_info, AppGroup
+from flask.cli import AppGroup, pass_script_info
 
 # XXX: Do not import any other indico modules here!
 # If any import from this module triggers an exception the dev server
 # will die while an exception only happening during app creation will
 # be handled gracefully.
 from indico.cli.util import IndicoFlaskGroup, LazyGroup
+
 
 click.disable_unicode_literals_warning = True
 __all__ = ('cli_command', 'cli_group')
@@ -61,6 +62,11 @@ def setup():
 @cli.group(cls=LazyGroup, import_name='indico.cli.user:cli')
 def user():
     """Manage Indico users."""
+
+
+@cli.group(cls=LazyGroup, import_name='indico.cli.event:cli')
+def event():
+    """Manage Indico events."""
 
 
 @cli.group(cls=LazyGroup, import_name='indico.cli.i18n:cli')
