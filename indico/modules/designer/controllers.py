@@ -34,11 +34,12 @@ from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
 from indico.modules.designer.util import (get_inherited_templates, get_placeholder_options,
-                                          get_default_template_on_category)
+                                          get_default_template_on_category, get_not_deletable_templates)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -80,8 +81,10 @@ TEMPLATE_DATA_JSON_SCHEMA = {
 def _render_template_list(target, event):
     tpl = get_template_module('designer/_list.html')
     default_template = get_default_template_on_category(target) if isinstance(target, Category) else None
+    not_deletable = get_not_deletable_templates(target)
     return tpl.render_template_list(target.designer_templates, target, event=event, default_template=default_template,
-                                    inherited_templates=get_inherited_templates(target))
+                                    inherited_templates=get_inherited_templates(target),
+                                    not_deletable_templates=not_deletable)
 
 
 class TemplateDesignerMixin:
@@ -146,9 +149,11 @@ class TargetFromURLMixin(TemplateDesignerMixin):
 
 class TemplateListMixin(TargetFromURLMixin):
     def _process(self):
+        templates = get_inherited_templates(self.target)
+        not_deletable = get_not_deletable_templates(self.target)
         default_template = get_default_template_on_category(self.target) if isinstance(self.target, Category) else None
-        return self._render_template('list.html', default_template=default_template,
-                                     inherited_templates=get_inherited_templates(self.target))
+        return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
+                                     default_template=default_template,)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):

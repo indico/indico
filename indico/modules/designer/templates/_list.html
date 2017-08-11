@@ -37,7 +37,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none) -%}
+{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none, not_deletable_templates=[]) -%}
     <tr>
         <td class="i-table id-column">
             <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
@@ -95,8 +95,8 @@
                     {% endif %}
                     {% if not inherited %}
                         <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked
-                                {{ 'not-deletable' if not tpl.can_be_deleted }}"
-                                {% if not tpl.can_be_deleted %}
+                                {{ 'not-deletable' if tpl in not_deletable_templates }}"
+                                {% if tpl in not_deletable_templates %}
                                     title="{% trans %}This template cannot be deleted because it is used by another registration form or as a backside for another template{% endtrans %}"
                                 {% else %}
                                     title="{% trans %}Delete template{% endtrans %}"
@@ -144,13 +144,13 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none) -%}
+{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none, not_deletable_templates=[]) -%}
     <section>
         <h3>{% trans %}Inherited templates{% endtrans %}</h3>
         <table class="i-table-widget" id="template-list">
             <tbody>
                 {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
-                    {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template) }}
+                    {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
                 {% endfor %}
             </tbody>
         </table>
@@ -171,7 +171,7 @@
             <table class="i-table-widget" id="template-list">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, event=event, default_template=default_template) }}
+                        {{ _render_template(tpl, target, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
                 </tbody>
             </table>

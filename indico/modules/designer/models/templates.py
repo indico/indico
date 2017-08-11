@@ -116,10 +116,12 @@ class DesignerTemplate(db.Model):
     backside_template = db.relationship(
         'DesignerTemplate',
         lazy=True,
-        remote_side=id
+        remote_side=id,
+        backref='backside_template_of'
     )
 
     # relationship backrefs:
+    # - backside_template_of (DesignerTemplate.backside_template)
     # - images (DesignerImageFile.template)
     # - ticket_for_regforms (RegistrationForm.ticket_template)
 
@@ -138,18 +140,6 @@ class DesignerTemplate(db.Model):
     @property
     def owner(self):
         return self.event_new if self.event_new else self.category
-
-    @property
-    def can_be_deleted(self):
-        from indico.modules.events.registration.models.forms import RegistrationForm
-        active_regforms = (RegistrationForm.query
-                           .filter(RegistrationForm.ticket_template == self,
-                                   RegistrationForm.event_new.has(Event.ends_after(now_utc())))
-                           .all())
-        used_as_backside = (DesignerTemplate.query.filter(DesignerTemplate.backside_template == self).all())
-        if active_regforms or used_as_backside:
-            return False
-        return not self.is_system_template
 
     @locator_property
     def locator(self):
