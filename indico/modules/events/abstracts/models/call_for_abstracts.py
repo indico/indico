@@ -98,4 +98,4 @@ class CallForAbstracts(object):
         now = now_utc(False)
         abstracts_settings.set(self.event, 'end_dt', now)
         if not self.has_started:
-            abstracts_settings.set(self.event_new, 'start_dt', now)
+            abstracts_settings.set(self.event, 'start_dt', now)
