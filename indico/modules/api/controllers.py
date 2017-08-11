@@ -177,10 +177,10 @@ class RHAPIBuildURLs(RH):
         api_key = session.user.api_key if session.user else None
         url_format = '/export/event/{0}/{1}/{2}.ics'
         if isinstance(self.object, Contribution):
-            event = self.object.event_new
+            event = self.object.event
             urls = generate_public_auth_request(api_key, url_format.format(event.id, 'contribution', self.object.id))
         elif isinstance(self.object, Session):
-            event = self.object.event_new
+            event = self.object.event
             urls = generate_public_auth_request(api_key, url_format.format(event.id, 'session', self.object.id))
         elif isinstance(self.object, Category):
             urls = generate_public_auth_request(api_key, '/export/categ/{0}.ics'.format(self.object.id),

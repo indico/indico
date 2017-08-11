@@ -131,7 +131,7 @@ class RegistrationFormScheduleForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         regform = kwargs.pop('regform')
-        self.timezone = regform.event_new.timezone
+        self.timezone = regform.event.timezone
         super(IndicoForm, self).__init__(*args, **kwargs)
 
 
@@ -161,7 +161,7 @@ class InvitationFormBase(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
-        event = self.regform.event_new
+        event = self.regform.event
         super(InvitationFormBase, self).__init__(*args, **kwargs)
         if not self.regform.moderation_enabled:
             del self.skip_moderation
@@ -240,7 +240,7 @@ class EmailRegistrantsForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.regform = kwargs.pop('regform')
-        event = self.regform.event_new
+        event = self.regform.event
         super(EmailRegistrantsForm, self).__init__(*args, **kwargs)
         self.from_address.choices = event.get_allowed_sender_emails().items()
         self.body.description = render_placeholder_info('registration-email', regform=self.regform, registration=None)

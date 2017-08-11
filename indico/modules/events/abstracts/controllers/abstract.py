@@ -49,10 +49,10 @@ class RHEditAbstract(RHAbstractBase):
         return self.abstract.can_edit(session.user)
 
     def _process(self):
-        abstract_form_class = make_abstract_form(self.event_new, management=self.management)
+        abstract_form_class = make_abstract_form(self.event, management=self.management)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.abstract.field_values}
         defaults = FormDefaults(self.abstract, attachments=self.abstract.files, **custom_field_values)
-        form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event_new)
+        form = abstract_form_class(obj=defaults, abstract=self.abstract, event=self.event)
         if form.validate_on_submit():
             update_abstract(self.abstract, *get_field_values(form.data))
             flash(_("Abstract modified successfully"), 'success')

@@ -131,7 +131,7 @@ class ProposalMixin(object):
 
     @property
     def cfp(self):
-        return getattr(self.event_new, self.call_for_proposals_attr)
+        return getattr(self.event, self.call_for_proposals_attr)
 
     @property
     def is_in_final_state(self):

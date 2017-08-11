@@ -34,11 +34,11 @@ def create_person():
 
 
 @pytest.fixture
-def create_agreement(db, dummy_event_new, dummy_person):
+def create_agreement(db, dummy_event, dummy_person):
     """Returns a a callable which lets you create agreements"""
 
     def _create_agreement(state):
-        agreement = Agreement(uuid=str(uuid4()), event_new=dummy_event_new, type='dummy',
+        agreement = Agreement(uuid=str(uuid4()), event=dummy_event, type='dummy',
                               person_email=dummy_person.email, person_name=dummy_person.name, state=state,
                               identifier=dummy_person.identifier)
         db.session.add(agreement)

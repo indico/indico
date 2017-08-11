@@ -88,7 +88,7 @@ def render_abstract_page(abstract, view_class=None, management=False):
     if len(reviewed_for_tracks) == 1:
         review_form = build_review_form(abstract, reviewed_for_tracks[0])
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
-    review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event_new, obj=abstract, formdata=None)
+    review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event, obj=abstract, formdata=None)
     params = {'abstract': abstract,
               'comment_form': comment_form,
               'review_form': review_form,
@@ -97,6 +97,6 @@ def render_abstract_page(abstract, view_class=None, management=False):
               'visible_tracks': get_visible_reviewed_for_tracks(abstract, session.user),
               'management': management}
     if view_class:
-        return view_class.render_template('abstract.html', abstract.event_new, **params)
+        return view_class.render_template('abstract.html', abstract.event, **params)
     else:
         return render_template('events/abstracts/abstract.html', no_javascript=True, standalone=True, **params)

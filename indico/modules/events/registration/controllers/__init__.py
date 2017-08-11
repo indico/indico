@@ -66,7 +66,7 @@ class RegistrationEditMixin:
             'manager': self.management
         }
 
-        return self.view_class.render_template(self.template_file, self.event_new,
+        return self.view_class.render_template(self.template_file, self.event,
                                                sections=section_data, regform=self.regform,
                                                registration_data=registration_data,
                                                registration_metadata=registration_metadata,

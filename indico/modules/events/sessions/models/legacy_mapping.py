@@ -48,7 +48,7 @@ class LegacySessionMapping(db.Model):
         index=True
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -103,7 +103,7 @@ class LegacySessionBlockMapping(db.Model):
         index=True
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(

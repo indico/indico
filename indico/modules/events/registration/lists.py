@@ -38,7 +38,7 @@ class RegistrationListGenerator(ListGeneratorBase):
     list_link_type = 'registration'
 
     def __init__(self, regform):
-        super(RegistrationListGenerator, self).__init__(regform.event_new, entry_parent=regform)
+        super(RegistrationListGenerator, self).__init__(regform.event, entry_parent=regform)
         self.regform = regform
         self.default_list_config = {
             'items': ('title', 'email', 'affiliation', 'reg_date', 'state'),

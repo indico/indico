@@ -1,7 +1,7 @@
 {% from 'message_box.html' import message_box %}
 {% from 'forms/_form.html' import form_header, form_footer %}
 
-{% set tzinfo = agreement.event_new.display_tzinfo %}
+{% set tzinfo = agreement.event.display_tzinfo %}
 
 <h2 class="page-title">
     {{ agreement.definition.title }}
@@ -43,16 +43,16 @@
             </div>
             <div class="info-section info-event">
                 <div class="info-event-title">
-                    {{ agreement.event_new.title }}
+                    {{ agreement.event.title }}
                 </div>
                 <div class="info-event-details">
                     <i class="icon-time"></i>
-                    {{ agreement.event_new.start_dt | format_datetime(timezone=tzinfo) }}
+                    {{ agreement.event.start_dt | format_datetime(timezone=tzinfo) }}
                 </div>
-                {% if agreement.event_new.venue_name %}
+                {% if agreement.event.venue_name %}
                     <div class="info-event-details">
                         <i class="icon-location"></i>
-                        {{ agreement.event_new.venue_name }}
+                        {{ agreement.event.venue_name }}
                     </div>
                 {% endif %}
             </div>

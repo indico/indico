@@ -143,7 +143,7 @@ class VCPluginMixin(object):
         """
         name = get_overridable_template_name('event_buttons.html', self, core_prefix='vc/')
         return render_template(name, plugin=self, vc_room=vc_room, event_vc_room=event_vc_room,
-                               event=event_vc_room.event_new, **kwargs)
+                               event=event_vc_room.event, **kwargs)
 
     def create_form(self, event, existing_vc_room=None, existing_event_vc_room=None):
         """Creates the videoconference room form
@@ -213,7 +213,7 @@ class VCPluginMixin(object):
         """Checks if a user can manage a vc room"""
         return (user.is_admin or
                 self.can_manage_vc(user) or
-                any(evt_assoc.event_new.can_manage(user) for evt_assoc in room.events))
+                any(evt_assoc.event.can_manage(user) for evt_assoc in room.events))
 
     def can_manage_vc(self, user):
         """Checks if a user has management rights on this VC system"""

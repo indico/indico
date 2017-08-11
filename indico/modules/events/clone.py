@@ -61,7 +61,7 @@ class EventPersonCloner(EventCloner):
     def _clone_persons(self, new_event):
         attrs = get_simple_column_attrs(EventPerson) | {'user'}
         for old_person in self.old_event.persons:
-            person = EventPerson(event_new=new_event)
+            person = EventPerson(event=new_event)
             person.populate_from_attrs(old_person, attrs)
             assert person not in db.session
             self._person_map[old_person] = person

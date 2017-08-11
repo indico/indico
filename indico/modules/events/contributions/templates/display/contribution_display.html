@@ -53,7 +53,7 @@
                 <i class="icon-calendar header-data"></i>
                 <span class="time-info">
                     {%- if contribution.timetable_entry %}
-                        {{- contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event_new.display_tzinfo) -}}
+                        {{- contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event.display_tzinfo) -}}
                     {% else %}
                         {%- trans %}Not scheduled{% endtrans -%}
                     {% endif -%}
@@ -238,7 +238,7 @@
             </div>
         </section>
     {%- endif %}
-    {% if contribution.event_new.has_feature('papers') %}
+    {% if contribution.event.has_feature('papers') %}
         {{ render_paper_section(contribution) }}
     {% endif %}
     <script>

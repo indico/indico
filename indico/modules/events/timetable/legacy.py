@@ -72,7 +72,7 @@ class TimetableSerializer(object):
         return timetable
 
     def serialize_session_timetable(self, session_, without_blocks=False, strip_empty_days=False):
-        event = session_.event_new
+        event = session_.event
         event_tz = event.tzinfo
         timetable = {}
         if session_.blocks:
@@ -228,9 +228,9 @@ class TimetableSerializer(object):
 
     def _get_date_data(self, entry):
         if self.management:
-            tzinfo = entry.event_new.tzinfo
+            tzinfo = entry.event.tzinfo
         else:
-            tzinfo = entry.event_new.display_tzinfo
+            tzinfo = entry.event.display_tzinfo
         return {'startDate': self._get_entry_date_dt(entry.start_dt, tzinfo),
                 'endDate': self._get_entry_date_dt(entry.end_dt, tzinfo)}
 
@@ -302,8 +302,8 @@ def serialize_day_update(event, day, block=None, session_=None):
 
 def serialize_entry_update(entry, with_timetable=False, session_=None):
     serializer = TimetableSerializer(management=True)
-    day = entry.start_dt.astimezone(entry.event_new.tzinfo)
-    day_update = serialize_day_update(entry.event_new, day, block=entry.parent, session_=session_)
+    day = entry.start_dt.astimezone(entry.event.tzinfo)
+    day_update = serialize_day_update(entry.event, day, block=entry.parent, session_=session_)
     return dict({'id': serializer._get_entry_key(entry),
                  'entry': serializer.serialize_timetable_entry(entry),
                  'autoOps': None},

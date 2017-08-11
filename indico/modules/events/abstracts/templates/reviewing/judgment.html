@@ -51,7 +51,7 @@
 {% endmacro %}
 
 {% macro render_review_summary_box(abstract, user, visible_tracks) %}
-    {% set event = abstract.event_new %}
+    {% set event = abstract.event %}
     {% set can_judge = abstract.can_judge(user, check_state=true) %}
     <div class="i-timeline-item-label action icon-file-check"></div>
     <div class="i-timeline-item-box content-indicator-left">
@@ -114,7 +114,7 @@
                                                 <span class="question-index">{{ loop.index }}</span>
                                             </div>
                                             <div class="question-text f-self-stretch">{{ question.text }}</div>
-                                            {{ render_score(score, abstract.event_new.cfa.rating_range) }}
+                                            {{ render_score(score, abstract.event.cfa.rating_range) }}
                                         </div>
                                     {% endfor %}
                                 </div>
@@ -133,7 +133,7 @@
                                                 {%- trans %}See review{% endtrans -%}
                                             </a>
                                             {% if review.score is not none %}
-                                                {{ render_score(review.score, abstract.event_new.cfa.rating_range) }}
+                                                {{ render_score(review.score, abstract.event.cfa.rating_range) }}
                                             {% endif %}
                                         </div>
                                     {% endfor %}

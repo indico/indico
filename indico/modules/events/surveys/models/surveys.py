@@ -197,7 +197,7 @@ class Survey(db.Model):
         viewonly=True
     )
     #: The Event containing this survey
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -254,7 +254,7 @@ class Survey(db.Model):
         """
         recipients = set(self.start_notification_emails)
         if self.notify_participants:
-            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event_new))
+            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event))
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
@@ -293,11 +293,11 @@ class Survey(db.Model):
         self.end_dt = now_utc()
 
     def send_start_notification(self):
-        if not self.notifications_enabled or self.start_notification_sent or not self.event_new.has_feature('surveys'):
+        if not self.notifications_enabled or self.start_notification_sent or not self.event.has_feature('surveys'):
             return
         template_module = get_template_module('events/surveys/emails/start_notification_email.txt', survey=self)
         email = make_email(bcc_list=self.start_notification_recipients, template=template_module)
-        send_email(email, event=self.event_new, module='Surveys')
+        send_email(email, event=self.event, module='Surveys')
         logger.info('Sending start notification for survey %s', self)
         self.start_notification_sent = True
 
@@ -306,7 +306,7 @@ class Survey(db.Model):
             return
         template_module = get_template_module('events/surveys/emails/new_submission_email.txt', submission=submission)
         email = make_email(bcc_list=self.new_submission_emails, template=template_module)
-        send_email(email, event=self.event_new, module='Surveys')
+        send_email(email, event=self.event, module='Surveys')
         logger.info('Sending submission notification for survey %s', self)
 
 

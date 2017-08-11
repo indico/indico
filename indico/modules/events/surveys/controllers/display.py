@@ -43,19 +43,19 @@ def _can_redirect_to_single_survey(surveys):
 class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
     @property
     def view_class(self):
-        return WPDisplaySurveyConference if self.event_new.type_ == EventType.conference else WPDisplaySurveySimpleEvent
+        return WPDisplaySurveyConference if self.event.type_ == EventType.conference else WPDisplaySurveySimpleEvent
 
 
 class RHSurveyList(RHSurveyBaseDisplay):
     def _process(self):
-        surveys = (query_active_surveys(self.event_new)
+        surveys = (query_active_surveys(self.event)
                    .options(joinedload('questions'),
                             joinedload('submissions'))
                    .all())
         if _can_redirect_to_single_survey(surveys):
             return redirect(url_for('.display_survey_form', surveys[0]))
 
-        return self.view_class.render_template('display/survey_list.html', self.event_new,
+        return self.view_class.render_template('display/survey_list.html', self.event,
                                                surveys=surveys, states=SurveyState,
                                                is_submission_in_progress=is_submission_in_progress,
                                                was_survey_submitted=was_survey_submitted)
@@ -88,10 +88,10 @@ class RHSubmitSurveyBase(RHSurveyBaseDisplay):
                            if session.user else None)
         if not self.survey.is_active:
             flash(_('This survey is not active'), 'error')
-            return redirect(url_for('.display_survey_list', self.event_new))
+            return redirect(url_for('.display_survey_list', self.event))
         elif was_survey_submitted(self.survey):
             flash(_('You have already answered this survey'), 'error')
-            return redirect(url_for('.display_survey_list', self.event_new))
+            return redirect(url_for('.display_survey_list', self.event))
 
 
 class RHSubmitSurvey(RHSubmitSurveyBase):
@@ -108,16 +108,16 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
             save_submitted_survey_to_session(submission)
             self.survey.send_submission_notification(submission)
             flash(_('The survey has been submitted'), 'success')
-            return redirect(url_for('.display_survey_list', self.event_new))
+            return redirect(url_for('.display_survey_list', self.event))
 
-        surveys = Survey.query.with_parent(self.event_new).filter(Survey.is_visible).all()
+        surveys = Survey.query.with_parent(self.event).filter(Survey.is_visible).all()
         if not _can_redirect_to_single_survey(surveys):
             back_button_endpoint = '.display_survey_list'
-        elif self.event_new.type_ != EventType.conference:
+        elif self.event.type_ != EventType.conference:
             back_button_endpoint = 'events.display'
         else:
             back_button_endpoint = None
-        return self.view_class.render_template('display/survey_questionnaire.html', self.event_new,
+        return self.view_class.render_template('display/survey_questionnaire.html', self.event,
                                                form=form, survey=self.survey,
                                                back_button_endpoint=back_button_endpoint,
                                                partial_completion=self.survey.partial_completion)

@@ -61,7 +61,7 @@ def save_submitted_survey_to_session(submission):
 def was_survey_submitted(survey):
     """Check whether the current user has submitted a survey"""
     from indico.modules.events.surveys.models.surveys import Survey
-    query = (Survey.query.with_parent(survey.event_new)
+    query = (Survey.query.with_parent(survey.event)
              .filter(Survey.submissions.any(db.and_(SurveySubmission.is_submitted,
                                                     SurveySubmission.user == session.user))))
     user_submitted_surveys = set(query)
@@ -77,7 +77,7 @@ def is_submission_in_progress(survey):
     """Check whether the current user has a survey submission in progress"""
     from indico.modules.events.surveys.models.surveys import Survey
     if session.user:
-        query = (Survey.query.with_parent(survey.event_new)
+        query = (Survey.query.with_parent(survey.event)
                  .filter(Survey.submissions.any(db.and_(~SurveySubmission.is_submitted,
                                                         SurveySubmission.user == session.user))))
         user_incomplete_surveys = set(query)

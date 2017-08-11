@@ -75,9 +75,9 @@ class RHPaymentSettings(RHPaymentManagementBase):
     def _process(self):
         methods = get_payment_plugins()
         enabled_methods = [method for method in methods.itervalues()
-                           if method.event_settings.get(self.event_new, 'enabled')]
-        return WPPaymentEventManagement.render_template('management/payments.html', self._conf, event=self.event_new,
-                                                        settings=payment_event_settings.get_all(self.event_new),
+                           if method.event_settings.get(self.event, 'enabled')]
+        return WPPaymentEventManagement.render_template('management/payments.html', self._conf, event=self.event,
+                                                        settings=payment_event_settings.get_all(self.event),
                                                         methods=methods.items(), enabled_methods=enabled_methods)
 
 
@@ -85,11 +85,11 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
     """Edit payment settings"""
 
     def _process(self):
-        current_event_settings = payment_event_settings.get_all(self.event_new)
+        current_event_settings = payment_event_settings.get_all(self.event)
         defaults = FormDefaults(current_event_settings, **payment_settings.get_all())
         form = EventSettingsForm(prefix='payment-', obj=defaults)
         if form.validate_on_submit():
-            payment_event_settings.set_multi(self.event_new, form.data)
+            payment_event_settings.set_multi(self.event, form.data)
             flash(_('Settings saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
@@ -107,22 +107,22 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
 
     def _checkProtection(self):
         self.protection_overridden = False
-        can_modify_plugin = session.user and self.plugin.can_be_modified(session.user, self.event_new)
-        can_modify_event = self.event_new.can_manage(session.user)
+        can_modify_plugin = session.user and self.plugin.can_be_modified(session.user, self.event)
+        can_modify_event = self.event.can_manage(session.user)
         self.protection_overridden = can_modify_plugin and not can_modify_event
         if not can_modify_plugin and not can_modify_event:
             RHPaymentManagementBase._checkProtection(self)
         return True
 
     def _process(self):
-        can_modify = bool(session.user) and self.plugin.can_be_modified(session.user, self.event_new)
+        can_modify = bool(session.user) and self.plugin.can_be_modified(session.user, self.event)
         plugin_settings = self.plugin.settings.get_all()
-        plugin_event_settings = self.plugin.event_settings.get_all(self.event_new)
+        plugin_event_settings = self.plugin.event_settings.get_all(self.event)
         defaults = FormDefaults({k: v for k, v in plugin_event_settings.iteritems() if v is not None},
                                 **plugin_settings)
         form = self.plugin.event_settings_form(prefix='payment-', obj=defaults, plugin_settings=plugin_settings)
         if can_modify and form.validate_on_submit():
-            self.plugin.event_settings.set_multi(self.event_new, form.data)
+            self.plugin.event_settings.set_multi(self.event, form.data)
             flash(_('Settings for {} saved').format(self.plugin.title), 'success')
             if self.protection_overridden:
                 return jsonify_data()
@@ -131,8 +131,8 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
         widget_attrs = {}
         if not can_modify:
             widget_attrs = {field.short_name: {'disabled': True} for field in form}
-        invalid_regforms = self.plugin.get_invalid_regforms(self.event_new)
-        return jsonify_template('events/payment/event_plugin_edit.html', event=self.event_new, form=form,
+        invalid_regforms = self.plugin.get_invalid_regforms(self.event)
+        return jsonify_template('events/payment/event_plugin_edit.html', event=self.event, form=form,
                                 plugin=self.plugin, can_modify=can_modify, widget_attrs=widget_attrs,
                                 invalid_regforms=invalid_regforms)
 
@@ -144,10 +144,10 @@ class RHPaymentCheckout(RHPaymentBase):
         if self.registration.state != RegistrationState.unpaid:
             flash(_("The registration doesn't need to be paid"), 'error')
             return redirect(url_for('event_registration.display_regform', self.registration.locator.registrant))
-        plugins = get_active_payment_plugins(self.event_new)
+        plugins = get_active_payment_plugins(self.event)
         valid_plugins = {k: v for k, v in plugins.iteritems() if v.supports_currency(self.registration.currency)}
         force_plugin = valid_plugins.items()[0] if len(valid_plugins) == 1 else None  # only one plugin available
-        return WPPaymentEvent.render_template('event_checkout.html', self._conf, event=self.event_new,
+        return WPPaymentEvent.render_template('event_checkout.html', self._conf, event=self.event,
                                               registration=self.registration,
                                               regform=self.registration.registration_form,
                                               plugins=valid_plugins.items(), force_plugin=force_plugin)
@@ -159,7 +159,7 @@ class RHPaymentForm(RHPaymentBase):
     def _checkParams(self, params):
         RHPaymentBase._checkParams(self, params)
         try:
-            self.plugin = get_active_payment_plugins(self.event_new)[request.args['method']]
+            self.plugin = get_active_payment_plugins(self.event)[request.args['method']]
         except KeyError:
             raise NotFound
         if not self.plugin.supports_currency(self.registration.currency):
@@ -176,5 +176,5 @@ class RHPaymentConditions(RHConferenceBaseDisplay):
     EVENT_FEATURE = 'payment'
 
     def _process(self):
-        conditions = payment_event_settings.get(self.event_new, 'conditions')
+        conditions = payment_event_settings.get(self.event, 'conditions')
         return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)

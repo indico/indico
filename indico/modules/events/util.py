@@ -83,7 +83,7 @@ def get_object_from_args(args=None):
         obj = Contribution.query.with_parent(event).filter_by(id=args['contrib_id']).first()
     elif object_type == 'subcontribution':
         obj = SubContribution.find(SubContribution.id == args['subcontrib_id'], ~SubContribution.is_deleted,
-                                   SubContribution.contribution.has(event_new=event, id=args['contrib_id'],
+                                   SubContribution.contribution.has(event=event, id=args['contrib_id'],
                                                                     is_deleted=False)).first()
     else:
         raise ValueError('Unexpected object type: {}'.format(object_type))
@@ -165,7 +165,7 @@ def get_events_with_linked_event_persons(user, dt=None):
 
 
 def get_random_color(event):
-    breaks = Break.query.filter(Break.timetable_entry.has(event_new=event))
+    breaks = Break.query.filter(Break.timetable_entry.has(event=event))
     used_colors = {s.colors for s in event.sessions} | {b.colors for b in breaks}
     unused_colors = set(get_colors()) - used_colors
     return random.choice(tuple(unused_colors) or get_colors())

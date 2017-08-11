@@ -20,7 +20,7 @@
         <i class="icon-time header-data"></i>
         <span class="time-info">
             {% if subcontrib.timetable_entry -%}
-                {{ subcontrib.timetable_entry.start_dt|format_datetime(timezone=subcontrib.event_new.display_tzinfo) }}
+                {{ subcontrib.timetable_entry.start_dt|format_datetime(timezone=subcontrib.event.display_tzinfo) }}
             {%- else -%}
                 {% trans %}Not scheduled{% endtrans %}
             {%- endif %}

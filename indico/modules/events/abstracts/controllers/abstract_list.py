@@ -45,7 +45,7 @@ class RHAbstractListBase(RHManageAbstractsBase):
 
     def _checkParams(self, params):
         RHManageAbstractsBase._checkParams(self, params)
-        self.list_generator = AbstractListGeneratorManagement(event=self.event_new)
+        self.list_generator = AbstractListGeneratorManagement(event=self.event)
 
 
 class RHManageAbstractsActionsBase(RHAbstractListBase):
@@ -55,7 +55,7 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
 
     @property
     def _abstract_query(self):
-        query = Abstract.query.with_parent(self.event_new)
+        query = Abstract.query.with_parent(self.event)
         if self._abstract_query_options:
             query = query.options(*self._abstract_query_options)
         return query
@@ -70,7 +70,7 @@ class RHBulkAbstractJudgment(RHManageAbstractsActionsBase):
     """Perform bulk judgment operations on selected abstracts"""
 
     def _process(self):
-        form = BulkAbstractJudgmentForm(event=self.event_new, abstract_id=[a.id for a in self.abstracts],
+        form = BulkAbstractJudgmentForm(event=self.event, abstract_id=[a.id for a in self.abstracts],
                                         judgment=request.form.get('judgment'))
         if form.validate_on_submit():
             judgment_data, abstract_data = form.split_data
@@ -112,12 +112,12 @@ class RHAbstractListStaticURL(RHAbstractListBase):
 
 class RHCreateAbstract(RHAbstractListBase):
     def _process(self):
-        abstract_form_class = make_abstract_form(self.event_new, notification_option=True, management=self.management)
-        form = abstract_form_class(event=self.event_new)
+        abstract_form_class = make_abstract_form(self.event, notification_option=True, management=self.management)
+        form = abstract_form_class(event=self.event)
         if form.validate_on_submit():
             data = form.data
             send_notifications = data.pop('send_notifications')
-            abstract = create_abstract(self.event_new, *get_field_values(data), send_notifications=send_notifications)
+            abstract = create_abstract(self.event, *get_field_values(data), send_notifications=send_notifications)
             flash(_("Abstract '{}' created successfully").format(abstract.title), 'success')
             tpl_components = self.list_generator.render_list(abstract)
             if tpl_components.get('hide_abstract'):
@@ -169,7 +169,7 @@ class RHAbstractPersonList(RHManageAbstractsActionsBase):
         for submitter in submitters:
             abstract_persons_dict[submitter]['submitter'] |= True
         return jsonify_template('events/abstracts/management/abstract_person_list.html',
-                                event_persons=abstract_persons_dict, event=self.event_new)
+                                event_persons=abstract_persons_dict, event=self.event)
 
 
 class RHManageAbstractsExportActionsBase(RHManageAbstractsActionsBase):
@@ -206,7 +206,7 @@ class RHAbstractsExportJSON(RHManageAbstractsExportActionsBase):
 
     def _process(self):
         abstracts = abstracts_schema.dump(sorted(self.abstracts, key=attrgetter('friendly_id'))).data
-        questions = abstract_review_questions_schema.dump(self.event_new.abstract_review_questions).data
+        questions = abstract_review_questions_schema.dump(self.event.abstract_review_questions).data
         response = jsonify(version=1, abstracts=abstracts, questions=questions)
         response.headers['Content-Disposition'] = 'attachment; filename="abstracts.json"'
         return response

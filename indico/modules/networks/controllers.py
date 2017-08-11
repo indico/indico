@@ -82,9 +82,9 @@ class RHDeleteNetworkGroup(RHAdminNetworkGroupBase):
     def _process_GET(self):
         query = (self.network_group.in_event_acls
                  .join(Event)
-                 .options(contains_eager('event_new'))
+                 .options(contains_eager('event'))
                  .order_by(Event.title))
-        events = [principal.event_new for principal in query]
+        events = [principal.event for principal in query]
         query = (self.network_group.in_category_acls
                  .join(Category)
                  .order_by(Category.title)

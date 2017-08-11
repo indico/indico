@@ -27,7 +27,7 @@ from indico.web.flask.templating import get_template_module
 def make_email_template(template, agreement, email_body=None):
     func = get_template_module if not current_plugin else get_plugin_template_module
     if not email_body:
-        email_body = agreement.definition.get_email_body_template(agreement.event_new).get_body()
+        email_body = agreement.definition.get_email_body_template(agreement.event).get_body()
     email_body = replace_placeholders('agreement-email', email_body, definition=agreement.definition,
                                       agreement=agreement)
     return func(template, email_body=email_body)
@@ -50,4 +50,4 @@ def notify_agreement_reminder(agreement, email_body=None, cc_addresses=None, fro
 @email_sender
 def notify_new_signature_to_manager(agreement):
     template = get_template_module('events/agreements/emails/new_signature_email_to_manager.txt', agreement=agreement)
-    return make_email(agreement.event_new.all_manager_emails, template=template)
+    return make_email(agreement.event.all_manager_emails, template=template)

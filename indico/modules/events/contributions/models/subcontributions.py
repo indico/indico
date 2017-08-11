@@ -121,8 +121,8 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
         super(SubContribution, self).__init__(**kwargs)
 
     @property
-    def event_new(self):
-        return self.contribution.event_new
+    def event(self):
+        return self.contribution.event
 
     @locator_property
     def locator(self):

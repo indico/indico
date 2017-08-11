@@ -26,7 +26,7 @@ from indico.modules.events.tracks.settings import track_settings
 
 
 def create_track(event, data):
-    track = Track(event_new=event)
+    track = Track(event=event)
     track.populate_from_dict(data)
     db.session.flush()
     logger.info('Track %r created by %r', track, session.user)
@@ -39,7 +39,7 @@ def update_track(track, data):
     track.populate_from_dict(data)
     db.session.flush()
     logger.info('Track %r modified by %r', track, session.user)
-    track.event_new.log(EventLogRealm.management, EventLogKind.change, 'Tracks',
+    track.event.log(EventLogRealm.management, EventLogKind.change, 'Tracks',
                         'Track "{}" has been modified.'.format(track.title), session.user)
 
 

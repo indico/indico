@@ -44,7 +44,7 @@ def build_static_site(static_site):
         session.lang = static_site.creator.settings.get('lang')
         rh = RH()
         rh._aw = AccessWrapper()
-        rh._conf = rh._target = static_site.event_new.as_legacy
+        rh._conf = rh._target = static_site.event.as_legacy
 
         g.rh = rh
         g.static_site = True
@@ -52,7 +52,7 @@ def build_static_site(static_site):
         zip_file_path = OfflineEvent(rh, rh._conf).create()
         static_site.state = StaticSiteState.success
         static_site.content_type = 'application/zip'
-        static_site.filename = 'offline_site_{}.zip'.format(static_site.event_new.id)
+        static_site.filename = 'offline_site_{}.zip'.format(static_site.event.id)
         with open(zip_file_path, 'rb') as f:
             static_site.save(f)
         db.session.commit()
@@ -74,7 +74,7 @@ def build_static_site(static_site):
 @email_sender
 def notify_static_site_success(static_site):
     template = get_template_module('events/static/emails/download_notification_email.txt',
-                                   user=static_site.creator, event=static_site.event_new,
+                                   user=static_site.creator, event=static_site.event,
                                    link=url_for('static_site.download', static_site, _external=True))
     return make_email({static_site.creator.email}, template=template, html=False)
 

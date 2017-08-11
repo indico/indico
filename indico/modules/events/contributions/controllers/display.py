@@ -66,7 +66,7 @@ class RHContributionDisplayBase(RHConferenceBaseDisplay):
 class RHDisplayProtectionBase(RHConferenceBaseDisplay):
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
-        if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event_new):
+        if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
             self._forbidden_if_not_admin()
 
 
@@ -81,9 +81,9 @@ class RHMyContributions(RHDisplayProtectionBase):
             raise Forbidden
 
     def _process(self):
-        contributions = get_contributions_with_user_as_submitter(self.event_new, session.user)
+        contributions = get_contributions_with_user_as_submitter(self.event, session.user)
         return WPMyContributions.render_template('display/user_contribution_list.html', self._conf,
-                                                 event=self.event_new, contributions=contributions)
+                                                 event=self.event, contributions=contributions)
 
 
 class RHContributionList(RHDisplayProtectionBase):
@@ -94,12 +94,12 @@ class RHContributionList(RHDisplayProtectionBase):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self.contribs = self.event_new.contributions
-        self.list_generator = ContributionDisplayListGenerator(event=self.event_new)
+        self.contribs = self.event.contributions
+        self.list_generator = ContributionDisplayListGenerator(event=self.event)
 
     def _process(self):
-        return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event_new,
-                                               timezone=self.event_new.display_tzinfo,
+        return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event,
+                                               timezone=self.event.display_tzinfo,
                                                **self.list_generator.get_list_kwargs())
 
 
@@ -110,7 +110,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
 
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, 'contributions',
-                                               '/export/event/{0}.ics'.format(self.event_new.id))
+                                               '/export/event/{0}.ics'.format(self.event.id))
         contrib = (Contribution.query
                    .filter_by(id=self.contrib.id)
                    .options(joinedload('type'),
@@ -128,9 +128,9 @@ class RHAuthorList(RHDisplayProtectionBase):
     view_class = WPAuthorList
 
     def _process(self):
-        authors = _get_persons(self.event_new, ContributionPersonLink.author_type != AuthorType.none)
+        authors = _get_persons(self.event, ContributionPersonLink.author_type != AuthorType.none)
         return self.view_class.render_template('display/author_list.html', self._conf, authors=authors,
-                                               event=self.event_new)
+                                               event=self.event)
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
@@ -139,9 +139,9 @@ class RHSpeakerList(RHDisplayProtectionBase):
     view_class = WPSpeakerList
 
     def _process(self):
-        speakers = _get_persons(self.event_new, ContributionPersonLink.is_speaker)
+        speakers = _get_persons(self.event, ContributionPersonLink.is_speaker)
         return self.view_class.render_template('display/speaker_list.html', self._conf, speakers=speakers,
-                                               event=self.event_new)
+                                               event=self.event)
 
 
 class RHContributionAuthor(RHContributionDisplayBase):
@@ -155,8 +155,8 @@ class RHContributionAuthor(RHContributionDisplayBase):
 
     def _checkProtection(self):
         RHContributionDisplayBase._checkProtection(self)
-        if (not is_menu_entry_enabled('author_index', self.event_new) and
-                not is_menu_entry_enabled('contributions', self.event_new)):
+        if (not is_menu_entry_enabled('author_index', self.event) and
+                not is_menu_entry_enabled('contributions', self.event)):
             self._forbidden_if_not_admin()
 
     def _checkParams(self, params):
@@ -166,9 +166,9 @@ class RHContributionAuthor(RHContributionDisplayBase):
                                                        contribution=self.contrib))
 
     def _process(self):
-        author_contribs = (Contribution.query.with_parent(self.event_new)
+        author_contribs = (Contribution.query.with_parent(self.event)
                            .join(ContributionPersonLink)
-                           .options(joinedload('event_new'))
+                           .options(joinedload('event'))
                            .options(load_only('id', 'title'))
                            .filter(ContributionPersonLink.id == self.author.id,
                                    ContributionPersonLink.author_type != AuthorType.none)
@@ -206,7 +206,7 @@ class RHContributionListFilter(RHContributionList):
         return RH._process(self)
 
     def _process_GET(self):
-        return WPContributions.render_template('contrib_list_filter.html', self._conf, event=self.event_new,
+        return WPContributions.render_template('contrib_list_filter.html', self._conf, event=self.event,
                                                filters=self.list_generator.list_config['filters'],
                                                static_items=self.list_generator.static_items)
 
@@ -240,5 +240,5 @@ class RHSubcontributionDisplay(RHConferenceBaseDisplay):
         self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):
-        return self.view_class.render_template('display/subcontribution_display.html', self._conf, event=self.event_new,
+        return self.view_class.render_template('display/subcontribution_display.html', self._conf, event=self.event,
                                                subcontrib=self.subcontrib)

@@ -306,7 +306,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     #: The ACL entries for the event
     acl_entries = db.relationship(
         'EventPrincipal',
-        backref='event_new',
+        backref='event',
         cascade='all, delete-orphan',
         collection_class=set
     )
@@ -316,7 +316,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         lazy=True,
         cascade='all, delete-orphan',
         backref=db.backref(
-            'event_new',
+            'event',
             lazy=True
         )
     )
@@ -369,48 +369,48 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     )
 
     # relationship backrefs:
-    # - abstract_email_templates (AbstractEmailTemplate.event_new)
-    # - abstract_review_questions (AbstractReviewQuestion.event_new)
-    # - abstracts (Abstract.event_new)
-    # - agreements (Agreement.event_new)
-    # - all_attachment_folders (AttachmentFolder.event_new)
-    # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event_new)
-    # - all_legacy_attachment_mappings (LegacyAttachmentMapping.event_new)
-    # - all_notes (EventNote.event_new)
-    # - all_vc_room_associations (VCRoomEventAssociation.event_new)
+    # - abstract_email_templates (AbstractEmailTemplate.event)
+    # - abstract_review_questions (AbstractReviewQuestion.event)
+    # - abstracts (Abstract.event)
+    # - agreements (Agreement.event)
+    # - all_attachment_folders (AttachmentFolder.event)
+    # - all_legacy_attachment_folder_mappings (LegacyAttachmentFolderMapping.event)
+    # - all_legacy_attachment_mappings (LegacyAttachmentMapping.event)
+    # - all_notes (EventNote.event)
+    # - all_vc_room_associations (VCRoomEventAssociation.event)
     # - attachment_folders (AttachmentFolder.linked_event)
     # - clones (Event.cloned_from)
-    # - contribution_fields (ContributionField.event_new)
-    # - contribution_types (ContributionType.event_new)
-    # - contributions (Contribution.event_new)
-    # - custom_pages (EventPage.event_new)
-    # - designer_templates (DesignerTemplate.event_new)
-    # - layout_images (ImageFile.event_new)
-    # - legacy_contribution_mappings (LegacyContributionMapping.event_new)
-    # - legacy_mapping (LegacyEventMapping.event_new)
-    # - legacy_session_block_mappings (LegacySessionBlockMapping.event_new)
-    # - legacy_session_mappings (LegacySessionMapping.event_new)
-    # - legacy_subcontribution_mappings (LegacySubContributionMapping.event_new)
-    # - log_entries (EventLogEntry.event_new)
-    # - menu_entries (MenuEntry.event_new)
+    # - contribution_fields (ContributionField.event)
+    # - contribution_types (ContributionType.event)
+    # - contributions (Contribution.event)
+    # - custom_pages (EventPage.event)
+    # - designer_templates (DesignerTemplate.event)
+    # - layout_images (ImageFile.event)
+    # - legacy_contribution_mappings (LegacyContributionMapping.event)
+    # - legacy_mapping (LegacyEventMapping.event)
+    # - legacy_session_block_mappings (LegacySessionBlockMapping.event)
+    # - legacy_session_mappings (LegacySessionMapping.event)
+    # - legacy_subcontribution_mappings (LegacySubContributionMapping.event)
+    # - log_entries (EventLogEntry.event)
+    # - menu_entries (MenuEntry.event)
     # - note (EventNote.linked_event)
-    # - paper_competences (PaperCompetence.event_new)
-    # - paper_review_questions (PaperReviewQuestion.event_new)
-    # - paper_templates (PaperTemplate.event_new)
-    # - persons (EventPerson.event_new)
-    # - registration_forms (RegistrationForm.event_new)
-    # - registrations (Registration.event_new)
-    # - reminders (EventReminder.event_new)
-    # - requests (Request.event_new)
-    # - reservations (Reservation.event_new)
-    # - sessions (Session.event_new)
-    # - settings (EventSetting.event_new)
-    # - settings_principals (EventSettingPrincipal.event_new)
-    # - static_list_links (StaticListLink.event_new)
-    # - static_sites (StaticSite.event_new)
-    # - surveys (Survey.event_new)
-    # - timetable_entries (TimetableEntry.event_new)
-    # - tracks (Track.event_new)
+    # - paper_competences (PaperCompetence.event)
+    # - paper_review_questions (PaperReviewQuestion.event)
+    # - paper_templates (PaperTemplate.event)
+    # - persons (EventPerson.event)
+    # - registration_forms (RegistrationForm.event)
+    # - registrations (Registration.event)
+    # - reminders (EventReminder.event)
+    # - requests (Request.event)
+    # - reservations (Reservation.event)
+    # - sessions (Session.event)
+    # - settings (EventSetting.event)
+    # - settings_principals (EventSettingPrincipal.event)
+    # - static_list_links (StaticListLink.event)
+    # - static_sites (StaticSite.event)
+    # - surveys (Survey.event)
+    # - timetable_entries (TimetableEntry.event)
+    # - tracks (Track.event)
     # - vc_room_associations (VCRoomEventAssociation.linked_event)
 
     start_dt_override = _EventSettingProperty(event_core_settings, 'start_dt_override')
@@ -455,7 +455,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         return LegacyConference(self)
 
     @property
-    def event_new(self):
+    def event(self):
         """Convenience property so all event entities have it"""
         return self
 
@@ -723,7 +723,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         """Get a session block of the event"""
         from indico.modules.events.sessions.models.blocks import SessionBlock
         query = SessionBlock.query.filter(SessionBlock.id == id_,
-                                          SessionBlock.session.has(event_new=self, is_deleted=False))
+                                          SessionBlock.session.has(event=self, is_deleted=False))
         if scheduled_only:
             query.filter(SessionBlock.timetable_entry != None)  # noqa
         return query.first()

@@ -49,7 +49,7 @@ def _clear_boa_cache(sender, obj=None, **kwargs):
     if isinstance(obj, Break):
         # breaks do not show up in the BoA
         return
-    event = (obj or sender).event_new
+    event = (obj or sender).event
     clear_boa_cache(event)
 
 

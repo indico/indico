@@ -2,14 +2,14 @@
 {% set survey = submission.survey %}
 
 {% block subject -%}
-    New survey submission for "{{ survey.title }}" on the event "{{ survey.event_new.title }}"
+    New survey submission for "{{ survey.title }}" on the event "{{ survey.event.title }}"
 {%- endblock %}
 
 {% block header -%}{%- endblock %}
 
 {% block body -%}
     {%- filter dedent -%}
-        A new submission has been made for the survey "{{ survey.title }}" on the event "{{ survey.event_new.title }}"
+        A new submission has been made for the survey "{{ survey.title }}" on the event "{{ survey.event.title }}"
         {%- if not submission.is_anonymous %} by {{ submission.user.full_name }}{% endif -%}.
 
         You can access the new submission here:
@@ -25,5 +25,5 @@
 {%- endblock %}
 
 {% block footer_url -%}
-    {{ survey.event_new.external_url }}
+    {{ survey.event.external_url }}
 {%- endblock %}

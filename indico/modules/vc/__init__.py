@@ -74,7 +74,7 @@ def _extend_event_menu(sender, **kwargs):
 @signals.event.session_block_deleted.connect
 def _link_object_deleted(obj, **kwargs):
     for event_vc_room in obj.vc_room_associations:
-        event_vc_room.link_object = obj.event_new
+        event_vc_room.link_object = obj.event
 
 
 @signals.event.session_deleted.connect

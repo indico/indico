@@ -47,8 +47,8 @@ class RHManageImagesBase(RHManageEventBase):
 class RHImages(RHManageImagesBase):
     def _process(self):
         form = AddImagesForm()
-        images = ImageFile.query.with_parent(self.event_new).all()
-        return WPImages.render_template('images.html', self._conf, images=images, event=self.event_new, form=form)
+        images = ImageFile.query.with_parent(self.event).all()
+        return WPImages.render_template('images.html', self._conf, images=images, event=self.event, form=form)
 
 
 class RHImageUpload(RHManageImagesBase):
@@ -74,7 +74,7 @@ class RHImageUpload(RHManageImagesBase):
                       .format(name=f.filename, type=image_type), 'error')
                 continue
             content_type = 'image/' + image_type
-            image = ImageFile(event_new=self.event_new, filename=filename, content_type=content_type)
+            image = ImageFile(event=self.event, filename=filename, content_type=content_type)
             image.save(data)
             num += 1
             db.session.flush()
@@ -82,13 +82,13 @@ class RHImageUpload(RHManageImagesBase):
             signals.event_management.image_created.send(image, user=session.user)
         flash(ngettext("The image has been uploaded", "{count} images have been uploaded", num)
               .format(count=len(files)), 'success')
-        return jsonify_data(image_list=_render_image_list(self.event_new))
+        return jsonify_data(image_list=_render_image_list(self.event))
 
 
 class RHImageDelete(RHManageImagesBase):
     def _checkParams(self, params):
         RHManageImagesBase._checkParams(self, params)
-        self.image = (ImageFile.query.with_parent(self.event_new)
+        self.image = (ImageFile.query.with_parent(self.event)
                       .filter_by(id=request.view_args['image_id'])
                       .first_or_404())
 
@@ -96,7 +96,7 @@ class RHImageDelete(RHManageImagesBase):
         signals.event_management.image_deleted.send(self.image, user=session.user)
         db.session.delete(self.image)
         flash(_("The image '{}' has been deleted").format(self.image.filename), 'success')
-        return jsonify_data(image_list=_render_image_list(self.event_new))
+        return jsonify_data(image_list=_render_image_list(self.event))
 
 
 class RHImageDisplay(RHConferenceBaseDisplay):

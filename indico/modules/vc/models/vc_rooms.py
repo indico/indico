@@ -208,7 +208,7 @@ class VCRoomEventAssociation(db.Model):
         backref=db.backref('events', cascade='all, delete-orphan')
     )
     #: The associated Event
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         foreign_keys=event_id,
         lazy=True,
@@ -248,8 +248,8 @@ class VCRoomEventAssociation(db.Model):
 
     @classmethod
     def register_link_events(cls):
-        event_mapping = {cls.linked_block: lambda x: x.event_new,
-                         cls.linked_contrib: lambda x: x.event_new,
+        event_mapping = {cls.linked_block: lambda x: x.event,
+                         cls.linked_contrib: lambda x: x.event,
                          cls.linked_event: lambda x: x}
 
         type_mapping = {cls.linked_event: VCRoomLinkType.event,
@@ -264,7 +264,7 @@ class VCRoomEventAssociation(db.Model):
             if value is not None:
                 event = fn(value)
                 assert event is not None
-                target.event_new = event
+                target.event = event
 
         for rel, fn in event_mapping.iteritems():
             if rel is not None:
@@ -276,7 +276,7 @@ class VCRoomEventAssociation(db.Model):
 
     @property
     def locator(self):
-        return dict(self.event_new.locator, service=self.vc_room.type, event_vc_room_id=self.id)
+        return dict(self.event.locator, service=self.vc_room.type, event_vc_room_id=self.id)
 
     @hybrid_property
     def link_object(self):
@@ -346,20 +346,20 @@ class VCRoomEventAssociation(db.Model):
         if delete_all:
             for assoc in vc_room.events[:]:
                 Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-                    vc_room, assoc.event_new, assoc.link_object)
+                    vc_room, assoc.event, assoc.link_object)
                 )
                 vc_room.events.remove(assoc)
         else:
             Logger.get('modules.vc').info("Detaching VC room {} from event {} ({})".format(
-                vc_room, self.event_new, self.link_object)
+                vc_room, self.event, self.link_object)
             )
             vc_room.events.remove(self)
         db.session.flush()
         if not vc_room.events:
             Logger.get('modules.vc').info("Deleting VC room {}".format(vc_room))
             if vc_room.status != VCRoomStatus.deleted:
-                vc_room.plugin.delete_room(vc_room, self.event_new)
-                notify_deleted(vc_room.plugin, vc_room, self, self.event_new, user)
+                vc_room.plugin.delete_room(vc_room, self.event)
+                notify_deleted(vc_room.plugin, vc_room, self, self.event, user)
             db.session.delete(vc_room)
 
 

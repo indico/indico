@@ -32,10 +32,10 @@ class RHManageBOA(RHManageAbstractsBase):
     """Configure book of abstracts"""
 
     def _process(self):
-        form = BOASettingsForm(obj=FormDefaults(**boa_settings.get_all(self.event_new)))
+        form = BOASettingsForm(obj=FormDefaults(**boa_settings.get_all(self.event)))
         if form.validate_on_submit():
-            boa_settings.set_multi(self.event_new, form.data)
-            clear_boa_cache(self.event_new)
+            boa_settings.set_multi(self.event, form.data)
+            clear_boa_cache(self.event)
             flash(_('Book of Abstract settings have been saved'), 'success')
             return jsonify_data()
         return jsonify_form(form)
@@ -45,4 +45,4 @@ class RHExportBOA(RHAbstractsBase):
     """Export the book of abstracts"""
 
     def _process(self):
-        return send_file('book-of-abstracts.pdf', create_boa(self.event_new), 'application/pdf')
+        return send_file('book-of-abstracts.pdf', create_boa(self.event), 'application/pdf')

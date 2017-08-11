@@ -61,4 +61,4 @@ class RHContributionPersonListMixin:
             person_roles['speaker'] |= contrib_person.is_speaker
             person_roles['primary_author'] |= contrib_person.author_type == AuthorType.primary
             person_roles['secondary_author'] |= contrib_person.author_type == AuthorType.secondary
-        return jsonify_template(self.template, event_persons=contribution_persons_dict, event=self.event_new)
+        return jsonify_template(self.template, event_persons=contribution_persons_dict, event=self.event)

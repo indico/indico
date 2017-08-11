@@ -118,7 +118,7 @@ class EventReminder(db.Model):
         )
     )
     #: The Event this reminder is associated with
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -129,7 +129,7 @@ class EventReminder(db.Model):
 
     @property
     def locator(self):
-        return dict(self.event_new.locator, reminder_id=self.id)
+        return dict(self.event.locator, reminder_id=self.id)
 
     @property
     def all_recipients(self):
@@ -140,7 +140,7 @@ class EventReminder(db.Model):
         """
         recipients = set(self.recipients)
         if self.send_to_participants:
-            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event_new))
+            recipients.update(reg.email for reg in Registration.get_all_for_event(self.event))
         recipients.discard('')  # just in case there was an empty email address somewhere
         return recipients
 
@@ -164,9 +164,9 @@ class EventReminder(db.Model):
         if not recipients:
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
-        email_tpl = make_reminder_email(self.event_new, self.include_summary, self.message)
+        email_tpl = make_reminder_email(self.event, self.include_summary, self.message)
         email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
-        send_email(email, self.event_new, 'Reminder', self.creator)
+        send_email(email, self.event, 'Reminder', self.creator)
 
     @return_ascii
     def __repr__(self):

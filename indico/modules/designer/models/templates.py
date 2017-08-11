@@ -90,7 +90,7 @@ class DesignerTemplate(db.Model):
             lazy=True
         )
     )
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -128,7 +128,7 @@ class DesignerTemplate(db.Model):
 
     @property
     def owner(self):
-        return self.event_new if self.event_new else self.category
+        return self.event if self.event else self.category
 
     @locator_property
     def locator(self):

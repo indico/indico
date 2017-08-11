@@ -50,7 +50,7 @@ class EventPrincipal(PrincipalRolesMixin, db.Model):
     )
 
     # relationship backrefs:
-    # - event_new (Event.acl_entries)
+    # - event (Event.acl_entries)
 
     @return_ascii
     def __repr__(self):

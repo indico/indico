@@ -50,7 +50,7 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
         RHProtected._checkProtection(self)
         if not can_manage_attachments(self.object, session.user):
             raise Forbidden
-        check_event_locked(self, self.event_new)
+        check_event_locked(self, self.event)
 
 
 class RHManageEventAttachments(ManageAttachmentsMixin, RHEventAttachmentManagementBase):

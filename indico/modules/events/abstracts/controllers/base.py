@@ -61,9 +61,9 @@ class RHAbstractsBase(RHConferenceBaseDisplay):
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
         # Only let event managers access the management versions.
-        if self.management and not self.event_new.can_manage(session.user):
+        if self.management and not self.event.can_manage(session.user):
             raise Forbidden
-        check_event_locked(self, self.event_new)
+        check_event_locked(self, self.event)
 
     @property
     def management(self):

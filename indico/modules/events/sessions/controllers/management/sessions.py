@@ -64,26 +64,26 @@ class RHSessionsList(RHManageSessionsBase):
     def _process(self):
         selected_entry = request.args.get('selected')
         selected_entry = int(selected_entry) if selected_entry else None
-        return WPManageSessions.render_template('management/session_list.html', self.event_new,
+        return WPManageSessions.render_template('management/session_list.html', self.event,
                                                 selected_entry=selected_entry,
-                                                **_get_session_list_args(self.event_new))
+                                                **_get_session_list_args(self.event))
 
 
 class RHCreateSession(RHManageSessionsBase):
     """Create a session in the event"""
 
     def _get_response(self, new_session):
-        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event_new.sessions]
+        sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
         return jsonify_data(sessions=sessions, new_session_id=new_session.id,
-                            html=_render_session_list(self.event_new))
+                            html=_render_session_list(self.event))
 
     def _process(self):
-        inherited_location = self.event_new.location_data
+        inherited_location = self.event.location_data
         inherited_location['inheriting'] = True
-        form = SessionForm(obj=FormDefaults(colors=get_random_color(self.event_new), location_data=inherited_location),
-                           event=self.event_new)
+        form = SessionForm(obj=FormDefaults(colors=get_random_color(self.event), location_data=inherited_location),
+                           event=self.event)
         if form.validate_on_submit():
-            new_session = create_session(self.event_new, form.data)
+            new_session = create_session(self.event, form.data)
             return self._get_response(new_session)
         return jsonify_form(form)
 
@@ -92,10 +92,10 @@ class RHModifySession(RHManageSessionBase):
     """Modify a session"""
 
     def _process(self):
-        form = SessionForm(obj=self.session, event=self.event_new)
+        form = SessionForm(obj=self.session, event=self.event)
         if form.validate_on_submit():
             update_session(self.session, form.data)
-            return jsonify_data(html=_render_session_list(self.event_new))
+            return jsonify_data(html=_render_session_list(self.event))
         return jsonify_form(form)
 
 
@@ -105,7 +105,7 @@ class RHDeleteSessions(RHManageSessionsActionsBase):
     def _process(self):
         for sess in self.sessions:
             delete_session(sess)
-        return jsonify_data(html=_render_session_list(self.event_new))
+        return jsonify_data(html=_render_session_list(self.event))
 
 
 class RHManageSessionsExportBase(RHManageSessionsActionsBase):
@@ -132,7 +132,7 @@ class RHExportSessionsPDF(RHManageSessionsExportBase):
     """Export list of sessions to a PDF"""
 
     def _process(self):
-        pdf_file = generate_pdf_from_sessions(self.event_new, self.sessions)
+        pdf_file = generate_pdf_from_sessions(self.event, self.sessions)
         return send_file('sessions.pdf', pdf_file, 'application/pdf')
 
 
@@ -141,7 +141,7 @@ class RHSessionREST(RHManageSessionBase):
 
     def _process_DELETE(self):
         delete_session(self.session)
-        return jsonify_data(html=_render_session_list(self.event_new))
+        return jsonify_data(html=_render_session_list(self.event))
 
     def _process_PATCH(self):
         data = request.json
@@ -181,7 +181,7 @@ class RHSessionProtection(RHManageSessionBase):
                 update_object_principals(self.session, form.acl.data, read_access=True)
             update_object_principals(self.session, form.managers.data, full_access=True)
             update_object_principals(self.session, form.coordinators.data, role='coordinate')
-            return jsonify_data(flash=False, html=_render_session_list(self.event_new))
+            return jsonify_data(flash=False, html=_render_session_list(self.event))
         return jsonify_form(form)
 
     def _get_defaults(self):
@@ -223,7 +223,7 @@ class RHManageSessionBlock(RHManageSessionBase):
         self.session_block = SessionBlock.get_one(request.view_args['block_id'])
 
     def _process(self):
-        form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event_new,
+        form = MeetingSessionBlockForm(obj=FormDefaults(**self._get_form_defaults()), event=self.event,
                                        session_block=self.session_block)
         if form.validate_on_submit():
             session_data = {k[8:]: v for k, v in form.data.iteritems() if k in form.session_fields}

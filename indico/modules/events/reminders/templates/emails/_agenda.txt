@@ -31,5 +31,5 @@
 {%- endmacro -%}
 
 {%- macro render_times(entry) -%}
-    [{{ entry.start_dt | format_time(timezone=entry.event_new.tzinfo) }} - {{ entry.end_dt | format_time(timezone=entry.event_new.tzinfo) }}]
+    [{{ entry.start_dt | format_time(timezone=entry.event.tzinfo) }} - {{ entry.end_dt | format_time(timezone=entry.event.tzinfo) }}]
 {%- endmacro -%}

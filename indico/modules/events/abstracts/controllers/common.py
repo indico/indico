@@ -42,7 +42,7 @@ class DisplayAbstractListMixin:
         return self._render_template(**self.list_generator.get_list_kwargs())
 
     def _render_template(self, **kwargs):
-        return self.view_class.render_template(self.template, self.event_new, **kwargs)
+        return self.view_class.render_template(self.template, self.event, **kwargs)
 
 
 class CustomizeAbstractListMixin:
@@ -52,7 +52,7 @@ class CustomizeAbstractListMixin:
 
     def _process_GET(self):
         list_config = self.list_generator._get_config()
-        return self.view_class.render_template('management/abstract_list_filter.html', self.event_new,
+        return self.view_class.render_template('management/abstract_list_filter.html', self.event,
                                                visible_items=list_config['items'],
                                                static_items=self.list_generator.static_items,
                                                extra_filters=self.list_generator.extra_filters,
@@ -70,7 +70,7 @@ class AbstractsExportPDFMixin:
     def _process(self):
         sorted_abstracts = sorted(self.abstracts, key=attrgetter('friendly_id'))
         cls = ConfManagerAbstractsToPDF if self.management else AbstractsToPDF
-        pdf = cls(self.event_new, sorted_abstracts)
+        pdf = cls(self.event, sorted_abstracts)
         return send_file('abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
@@ -94,7 +94,7 @@ class AbstractsExportExcel(_AbstractsExportBaseMixin):
     """Export list of abstracts to XLSX"""
 
     def _process(self):
-        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet(), tz=self.event_new.tzinfo)
+        return send_xlsx('abstracts.xlsx', *self._generate_spreadsheet(), tz=self.event.tzinfo)
 
 
 class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):
@@ -112,4 +112,4 @@ class AbstractsDownloadAttachmentsMixin(ZipGeneratorMixin):
 
     def _process(self):
         return self._generate_zip_file(self.abstracts, name_prefix='abstract-attachments',
-                                       name_suffix=self.event_new.id)
+                                       name_suffix=self.event.id)

@@ -97,7 +97,7 @@ class VCRoomLinkFormBase(IndicoForm):
         super(VCRoomLinkFormBase, self).__init__(*args, **kwargs)
         contrib_choices = [(contrib.id, contrib.title) for contrib in
                            sorted(self.event.contributions, key=attrgetter('title'))]
-        blocks = SessionBlock.find(SessionBlock.session.has((Session.event_new == self.event) & ~Session.is_deleted))
+        blocks = SessionBlock.find(SessionBlock.session.has((Session.event == self.event) & ~Session.is_deleted))
         block_choices = [(block.id, block.full_title) for block in sorted(blocks, key=attrgetter('full_title'))]
         self.contribution.choices = [('', _("Please select a contribution"))] + contrib_choices
         self.block.choices = [('', _("Please select a session block"))] + block_choices

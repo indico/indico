@@ -57,9 +57,9 @@ class RHPapersListBase(RHJudgingAreaBase):
     @cached_property
     def list_generator(self):
         if self.management:
-            return PaperAssignmentListGenerator(event=self.event_new)
+            return PaperAssignmentListGenerator(event=self.event)
         else:
-            return PaperJudgingAreaListGeneratorDisplay(event=self.event_new, user=session.user)
+            return PaperJudgingAreaListGeneratorDisplay(event=self.event, user=session.user)
 
 
 class RHPapersList(RHPapersListBase):
@@ -70,7 +70,7 @@ class RHPapersList(RHPapersListBase):
         return WPManagePapers if self.management else WPDisplayJudgingArea
 
     def _process(self):
-        return self.view_class.render_template(self.template, self.event_new, **self.list_generator.get_list_kwargs())
+        return self.view_class.render_template(self.template, self.event, **self.list_generator.get_list_kwargs())
 
     @cached_property
     def template(self):
@@ -85,7 +85,7 @@ class RHCustomizePapersList(RHPapersListBase):
     def _process_GET(self):
         list_config = self.list_generator.list_config
         return jsonify_template('events/papers/paper_list_filter.html',
-                                event=self.event_new,
+                                event=self.event,
                                 static_items=self.list_generator.static_items,
                                 filters=list_config['filters'],
                                 visible_items=list_config['items'])
@@ -124,14 +124,14 @@ class RHDownloadPapers(ZipGeneratorMixin, RHPapersActionBase):
                 yield f
 
     def _process(self):
-        return self._generate_zip_file(self.contributions, name_prefix='paper-files', name_suffix=self.event_new.id)
+        return self._generate_zip_file(self.contributions, name_prefix='paper-files', name_suffix=self.event.id)
 
 
 class RHJudgePapers(RHPapersActionBase):
     """Bulk judgment of papers"""
 
     def _process(self):
-        form = BulkPaperJudgmentForm(event=self.event_new, judgment=request.form.get('judgment'),
+        form = BulkPaperJudgmentForm(event=self.event, judgment=request.form.get('judgment'),
                                      contribution_id=[c.id for c in self.contributions])
         if form.validate_on_submit():
             submitted_papers = [c.paper for c in self.contributions if
@@ -161,7 +161,7 @@ class RHAssignPapersBase(RHPapersActionBase):
         RHPapersActionBase._checkParams(self, params)
         self.role = PaperReviewingRole[request.view_args['role']]
         user_ids = map(int, request.form.getlist('user_id'))
-        self.users = {u for u in CFP_ROLE_MAP[self.role](self.event_new.cfp) if u.id in user_ids}
+        self.users = {u for u in CFP_ROLE_MAP[self.role](self.event.cfp) if u.id in user_ids}
 
     def _checkProtection(self):
         RHPapersActionBase._checkProtection(self)
@@ -169,7 +169,7 @@ class RHAssignPapersBase(RHPapersActionBase):
             raise Forbidden
 
     def _process_assignment(self, assign):
-        update_reviewing_roles(self.event_new, self.users, self.contributions, self.role, assign)
+        update_reviewing_roles(self.event, self.users, self.contributions, self.role, assign)
         if assign:
             flash(_("Paper reviewing roles have been assigned."), 'success')
         else:
@@ -177,10 +177,10 @@ class RHAssignPapersBase(RHPapersActionBase):
         return jsonify_data(**self.list_generator.render_list())
 
     def _render_form(self, users, action):
-        user_competences = self.event_new.cfp.user_competences
+        user_competences = self.event.cfp.user_competences
         competences = {'competences_{}'.format(user_id): competences.competences
                        for user_id, competences in user_competences.iteritems()}
-        return jsonify_template('events/papers/assign_role.html', event=self.event_new, role=self.role.name,
+        return jsonify_template('events/papers/assign_role.html', event=self.event, role=self.role.name,
                                 action=action, users=users, competences=competences,
                                 contribs=self.contributions)
 
@@ -191,7 +191,7 @@ class RHAssignPapers(RHAssignPapersBase):
     def _process(self):
         if self.users:
             return self._process_assignment(True)
-        users = CFP_ROLE_MAP[self.role](self.event_new.cfp)
+        users = CFP_ROLE_MAP[self.role](self.event.cfp)
         return self._render_form(users, 'assign')
 
 

@@ -52,7 +52,7 @@ class ContributionType(db.Model):
         default=''
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -74,4 +74,4 @@ class ContributionType(db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, contrib_type_id=self.id)
+        return dict(self.event.locator, contrib_type_id=self.id)

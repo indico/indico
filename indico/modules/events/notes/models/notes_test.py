@@ -24,8 +24,8 @@ from indico.modules.events.notes.models.notes import EventNote, RenderMode, Even
 
 
 @pytest.fixture
-def note(db, dummy_event_new):
-    note = EventNote(object=dummy_event_new)
+def note(db, dummy_event):
+    note = EventNote(object=dummy_event)
     db.session.expunge(note)  # keep it out of the SA session (linking it to the event adds it)
     return note
 
@@ -148,20 +148,20 @@ def test_get_for_linked_object_deleted(note, dummy_user):
     assert EventNote.get_for_linked_object(note.object) is None
 
 
-def test_get_or_create(db, dummy_user, dummy_event_new, create_event):
-    note = EventNote.get_or_create(dummy_event_new)
+def test_get_or_create(db, dummy_user, dummy_event, create_event):
+    note = EventNote.get_or_create(dummy_event)
     assert note is not None
     assert not inspect(note).persistent  # new object
     note.create_revision(RenderMode.html, 'test', dummy_user)
     note.is_deleted = True
     db.session.flush()
     # get deleted one
-    assert EventNote.get_or_create(dummy_event_new) == note
+    assert EventNote.get_or_create(dummy_event) == note
     assert inspect(note).persistent
     note.is_deleted = False
     db.session.flush()
     # same if it's not deleted
-    assert EventNote.get_or_create(dummy_event_new) == note
+    assert EventNote.get_or_create(dummy_event) == note
     assert inspect(note).persistent
     # other event should create a new one
     other = EventNote.get_or_create(create_event(123))

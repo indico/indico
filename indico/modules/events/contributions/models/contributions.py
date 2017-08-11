@@ -63,7 +63,7 @@ class CustomFieldsMixin(object):
         fv = self.get_field_value(field_id, raw=True)
         if not fv:
             field_value_cls = type(self).field_values.prop.mapper.class_
-            fv = field_value_cls(contribution_field=self.event_new.get_contribution_field(field_id))
+            fv = field_value_cls(contribution_field=self.event.get_contribution_field(field_id))
             self.field_values.append(fv)
         old_value = fv.data
         fv.data = field_value
@@ -175,7 +175,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         default=0
     ))
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -400,11 +400,11 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         elif self.session_id is not None:
             return self.session
         else:
-            return self.event_new
+            return self.event
 
     @property
     def protection_parent(self):
-        return self.session if self.session_id is not None else self.event_new
+        return self.session if self.session_id is not None else self.event
 
     @property
     def start_dt(self):
@@ -420,7 +420,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, contrib_id=self.id)
+        return dict(self.event.locator, contrib_id=self.id)
 
     @property
     def verbose_title(self):
@@ -443,7 +443,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
             return True
         if (check_parent and self.session_id is not None and
                 self.session.can_manage(user, 'coordinate', allow_admin=allow_admin, explicit_role=explicit_role) and
-                session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
+                session_coordinator_priv_enabled(self.event, 'manage-contributions')):
             return True
         return False
 

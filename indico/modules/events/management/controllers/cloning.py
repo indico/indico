@@ -114,7 +114,7 @@ class RHClonePreview(RHManageEventBase):
 
     def _process(self):
         form = CloneRepeatabilityForm()
-        clone_calculator = get_clone_calculator(form.repeatability.data, self.event_new)
+        clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
         try:
             dates = clone_calculator.calculate(request.form)
             if len(dates) > 100:
@@ -133,13 +133,13 @@ class RHCloneEvent(RHManageEventBase):
         if step == 1:
             return CloneRepeatabilityForm()
         elif step == 2:
-            return CloneContentsForm(self.event_new, set_defaults=set_defaults)
+            return CloneContentsForm(self.event, set_defaults=set_defaults)
         elif step == 3:
-            default_category = (self.event_new.category if self.event_new.category.can_create_events(session.user)
+            default_category = (self.event.category if self.event.category.can_create_events(session.user)
                                 else None)
-            return CloneCategorySelectForm(self.event_new, category=default_category)
+            return CloneCategorySelectForm(self.event, category=default_category)
         elif step == 4:
-            return REPEAT_FORM_MAP[request.form['repeatability']](self.event_new, set_defaults=set_defaults)
+            return REPEAT_FORM_MAP[request.form['repeatability']](self.event, set_defaults=set_defaults)
         else:
             return None
 
@@ -159,15 +159,15 @@ class RHCloneEvent(RHManageEventBase):
             })
         elif step > 4:
             # last step - perform actual cloning
-            form = REPEAT_FORM_MAP[request.form['repeatability']](self.event_new)
+            form = REPEAT_FORM_MAP[request.form['repeatability']](self.event)
 
             if form.validate_on_submit():
                 if form.repeatability.data == 'once':
                     dates = [form.start_dt.data]
                 else:
-                    clone_calculator = get_clone_calculator(form.repeatability.data, self.event_new)
+                    clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
                     dates = clone_calculator.calculate(request.form)
-                clones = [clone_event(self.event_new, start_dt, set(form.selected_items.data), form.category.data)
+                clones = [clone_event(self.event, start_dt, set(form.selected_items.data), form.category.data)
                           for start_dt in dates]
                 if len(clones) == 1:
                     flash(_('Welcome to your cloned event!'), 'success')
@@ -179,6 +179,6 @@ class RHCloneEvent(RHManageEventBase):
                 # back to step 4, since there's been an error
                 step = 4
         dependencies = {c.name: {'requires': list(c.requires_deep), 'required_by': list(c.required_by_deep)}
-                        for c in EventCloner.get_cloners(self.event_new)}
-        return jsonify_template('events/management/clone_event.html', event=self.event_new, step=step, form=form,
+                        for c in EventCloner.get_cloners(self.event)}
+        return jsonify_template('events/management/clone_event.html', event=self.event, step=step, form=form,
                                 cloner_dependencies=dependencies, **tpl_args)

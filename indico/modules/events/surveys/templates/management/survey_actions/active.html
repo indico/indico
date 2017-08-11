@@ -12,7 +12,7 @@
     {% if not survey.end_dt %}
         {% trans %}Close now or schedule the deadline{% endtrans %}
     {% else %}
-        {% set tz = survey.event_new.tzinfo %}
+        {% set tz = survey.event.tzinfo %}
         {% trans date=survey.end_dt|format_date(timezone=tz), time=survey.end_dt|format_time(timezone=tz) -%}
             Scheduled to close on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }})
         {%- endtrans %}

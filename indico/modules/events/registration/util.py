@@ -228,7 +228,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     db.session.flush()
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, session.user)
-    regform.event_new.log(EventLogRealm.management if management else EventLogRealm.participants,
+    regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
                           EventLogKind.positive, 'Registration',
                           'New registration: {}'.format(registration.full_name),
                           session.user, data={'Email': registration.email})
@@ -273,7 +273,7 @@ def modify_registration(registration, data, management=False, notify_user=True):
                         old_price, registration.price)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
-    regform.event_new.log(EventLogRealm.management if management else EventLogRealm.participants,
+    regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
                           EventLogKind.change, 'Registration',
                           'Registration modified: {}'.format(registration.full_name),
                           session.user, data={'Email': registration.email})
@@ -373,7 +373,7 @@ def get_events_registered(user, dt=None):
              .options(load_only('event_id'))
              .options(joinedload(Registration.registration_form).load_only('event_id'))
              .join(Registration.registration_form)
-             .join(RegistrationForm.event_new)
+             .join(RegistrationForm.event)
              .filter(Registration.is_active, ~RegistrationForm.is_deleted, ~Event.is_deleted,
                      Event.ends_after(dt)))
     return {registration.event_id for registration in query}
@@ -435,7 +435,7 @@ def generate_ticket_qr_code(registration):
     qr_data = {
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
-        "event_id": unicode(registration.event_new.id),
+        "event_id": unicode(registration.event.id),
         "server_url": Config.getInstance().getBaseURL()
     }
     json_qr_data = json.dumps(qr_data)

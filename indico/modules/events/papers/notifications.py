@@ -24,7 +24,7 @@ from indico.web.flask.templating import get_template_module
 
 
 def notify_paper_revision_submission(revision):
-    event = revision.paper.event_new
+    event = revision.paper.event
     roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_paper_submission')
     if PaperReviewingRole.judge in roles_to_notify:
         for judge in revision.paper.contribution.paper_judges:
@@ -45,7 +45,7 @@ def notify_paper_revision_submission(revision):
 
 
 def notify_paper_review_submission(review):
-    event = review.revision.paper.event_new
+    event = review.revision.paper.event
     if not paper_reviewing_settings.get(event, 'notify_judge_on_review'):
         return
     for judge in review.revision.paper.contribution.paper_judges:
@@ -56,7 +56,7 @@ def notify_paper_review_submission(review):
 
 
 def notify_paper_judgment(paper, reset=False):
-    event = paper.event_new
+    event = paper.event
     authors = [x for x in paper.contribution.person_links if x.is_author]
     recipients = ([x for x in authors if x.email] if paper.last_revision.submitter.is_system
                   else [paper.last_revision.submitter])
@@ -99,7 +99,7 @@ def notify_paper_assignment(user, role, contributions, event, assign):
 
 
 def notify_comment(person, paper, comment, submitter):
-    event = paper.event_new
+    event = paper.event
     receiver_name = person.first_name or 'user'
     template = get_template_module('events/papers/emails/comment.html', event=event, receiver=receiver_name,
                                    contribution=paper.contribution, comment=comment, submitter=submitter)

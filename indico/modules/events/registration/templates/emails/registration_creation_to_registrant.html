@@ -6,7 +6,7 @@
 {%- endblock %}
 
 {% block registration_header -%}
-    {% set event = registration.registration_form.event_new %}
+    {% set event = registration.registration_form.event %}
     <p>Dear {{ registration.full_name }},</p>
     <p>
         {% block registration_header_text %}

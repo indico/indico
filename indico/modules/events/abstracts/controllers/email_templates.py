@@ -36,21 +36,21 @@ class RHEmailTemplateList(RHManageAbstractsBase):
     """Display list of e-mail templates."""
 
     def _process(self):
-        return jsonify_template('events/abstracts/management/notification_tpl_list.html', event=self.event_new,
-                                **_get_rules_fields(self.event_new))
+        return jsonify_template('events/abstracts/management/notification_tpl_list.html', event=self.event,
+                                **_get_rules_fields(self.event))
 
 
 class RHAddEmailTemplate(RHManageAbstractsBase):
     """Add a new e-mail template."""
 
     def _process(self):
-        form = CreateEmailTemplateForm(event=self.event_new)
+        form = CreateEmailTemplateForm(event=self.event)
         if form.validate_on_submit():
-            new_tpl = build_default_email_template(self.event_new, form.default_tpl.data)
+            new_tpl = build_default_email_template(self.event, form.default_tpl.data)
             form.populate_obj(new_tpl)
-            self.event_new.abstract_email_templates.append(new_tpl)
+            self.event.abstract_email_templates.append(new_tpl)
             db.session.flush()
-            return _render_notification_list(self.event_new)
+            return _render_notification_list(self.event)
         return jsonify_template('events/abstracts/management/notification_tpl_form.html', form=form)
 
 
@@ -59,7 +59,7 @@ class RHSortEmailTemplates(RHManageAbstractsBase):
 
     def _process(self):
         sort_order = request.json['sort_order']
-        tpls = {s.id: s for s in self.event_new.abstract_email_templates}
+        tpls = {s.id: s for s in self.event.abstract_email_templates}
         for position, tpl_id in enumerate(sort_order, 1):
             if tpl_id in tpls:
                 tpls[tpl_id].position = position
@@ -83,10 +83,10 @@ class RHEditEmailTemplateRules(RHEditEmailTemplateBase):
     """Edit the rules of a notification template."""
 
     def _process(self):
-        form = EditEmailTemplateRuleForm(obj=self.email_tpl, event=self.event_new)
+        form = EditEmailTemplateRuleForm(obj=self.email_tpl, event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.email_tpl)
-            return _render_notification_list(self.event_new)
+            return _render_notification_list(self.event)
         return jsonify_template('events/abstracts/management/notification_tpl_form.html', form=form, is_edit=True)
 
 
@@ -94,10 +94,10 @@ class RHEditEmailTemplateText(RHEditEmailTemplateBase):
     """Edit the e-mail text of a notification template."""
 
     def _process(self):
-        form = EditEmailTemplateTextForm(obj=self.email_tpl, event=self.event_new)
+        form = EditEmailTemplateTextForm(obj=self.email_tpl, event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.email_tpl)
-            return _render_notification_list(self.event_new)
+            return _render_notification_list(self.event)
         return jsonify_template('events/abstracts/management/notification_tpl_text_form.html', form=form, is_edit=True)
 
 
@@ -106,7 +106,7 @@ class RHDeleteEmailTemplate(RHEditEmailTemplateBase):
 
     def _process(self):
         db.session.delete(self.email_tpl)
-        return _render_notification_list(self.event_new, flash=False)
+        return _render_notification_list(self.event, flash=False)
 
 
 class RHEmailTemplateREST(RHEditEmailTemplateBase):
@@ -126,12 +126,12 @@ class RHEmailTemplateREST(RHEditEmailTemplateBase):
         return jsonify_data(flash=False)
 
 
-def _get_rules_fields(event_new):
-    abstract = create_mock_abstract(event_new)
+def _get_rules_fields(event):
+    abstract = create_mock_abstract(event)
     email_tpl_dict = {et.id: get_abstract_notification_tpl_module(et, abstract)
-                      for et in event_new.abstract_email_templates}
-    return {'tracks': {track.id: track for track in event_new.tracks},
-            'states': AbstractState.__titles__, 'contrib_types': {ct.id: ct for ct in event_new.contribution_types},
+                      for et in event.abstract_email_templates}
+    return {'tracks': {track.id: track for track in event.tracks},
+            'states': AbstractState.__titles__, 'contrib_types': {ct.id: ct for ct in event.contribution_types},
             'email_tpls': email_tpl_dict}
 
 

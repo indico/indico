@@ -259,19 +259,19 @@ def get_category_timetable(categ_ids, start_dt, end_dt, detail_level='event', tz
 def render_entry_info_balloon(entry, editable=False, sess=None):
     if entry.break_:
         return render_template('events/timetable/balloons/break.html', break_=entry.break_, editable=editable,
-                               can_manage_event=entry.event_new.can_manage(session.user), color_list=get_colors(),
-                               event_locked=entry.event_new.is_locked)
+                               can_manage_event=entry.event.can_manage(session.user), color_list=get_colors(),
+                               event_locked=entry.event.is_locked)
     elif entry.contribution:
         return render_template('events/timetable/balloons/contribution.html', contrib=entry.contribution,
                                editable=editable,
-                               can_manage_event=entry.event_new.can_manage(session.user),
+                               can_manage_event=entry.event.can_manage(session.user),
                                can_manage_contributions=sess.can_manage_contributions(session.user) if sess else True,
-                               event_locked=entry.event_new.is_locked)
+                               event_locked=entry.event.is_locked)
     elif entry.session_block:
         return render_template('events/timetable/balloons/block.html', block=entry.session_block, editable=editable,
                                can_manage_session=sess.can_manage(session.user) if sess else True,
                                can_manage_blocks=sess.can_manage_blocks(session.user) if sess else True,
-                               color_list=get_colors(), event_locked=entry.event_new.is_locked)
+                               color_list=get_colors(), event_locked=entry.event.is_locked)
     else:
         raise ValueError("Invalid entry")
 
@@ -282,7 +282,7 @@ def render_session_timetable(session, timetable_layout=None, management=False):
         return ''
     timetable_data = TimetableSerializer().serialize_session_timetable(session, without_blocks=True,
                                                                        strip_empty_days=True)
-    event_info = serialize_event_info(session.event_new)
+    event_info = serialize_event_info(session.event)
     tpl = get_template_module('events/timetable/_timetable.html')
     return tpl.render_timetable(timetable_data, event_info, timetable_layout=timetable_layout, management=management)
 

@@ -111,7 +111,7 @@ class TimetableEntry(db.Model):
         nullable=False
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -245,25 +245,25 @@ class TimetableEntry(db.Model):
     @property
     def siblings(self):
         from indico.modules.events.timetable.util import get_top_level_entries, get_nested_entries
-        tzinfo = self.event_new.tzinfo
+        tzinfo = self.event.tzinfo
         day = self.start_dt.astimezone(tzinfo).date()
-        siblings = (get_nested_entries(self.event_new)[self.parent_id]
+        siblings = (get_nested_entries(self.event)[self.parent_id]
                     if self.parent_id else
-                    get_top_level_entries(self.event_new))
+                    get_top_level_entries(self.event))
         return [x for x in siblings if x.start_dt.astimezone(tzinfo).date() == day and x.id != self.id]
 
     @property
     def siblings_query(self):
-        tzinfo = self.event_new.tzinfo
+        tzinfo = self.event.tzinfo
         day = self.start_dt.astimezone(tzinfo).date()
         criteria = (TimetableEntry.id != self.id,
                     TimetableEntry.parent == self.parent,
                     db.cast(TimetableEntry.start_dt.astimezone(tzinfo), db.Date) == day)
-        return TimetableEntry.query.with_parent(self.event_new).filter(*criteria)
+        return TimetableEntry.query.with_parent(self.event).filter(*criteria)
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, entry_id=self.id)
+        return dict(self.event.locator, entry_id=self.id)
 
     @return_ascii
     def __repr__(self):
@@ -299,14 +299,14 @@ class TimetableEntry(db.Model):
         :param by_start: Extend parent by start datetime.
         :param by_end: Extend parent by end datetime.
         """
-        tzinfo = self.event_new.tzinfo
+        tzinfo = self.event.tzinfo
         if self.start_dt.astimezone(tzinfo).date() != self.end_dt.astimezone(tzinfo).date():
             return
         if self.parent is None:
-            if by_start and self.start_dt < self.event_new.start_dt:
-                self.event_new.start_dt = self.start_dt
-            if by_end and self.end_dt > self.event_new.end_dt:
-                self.event_new.end_dt = self.end_dt
+            if by_start and self.start_dt < self.event.start_dt:
+                self.event.start_dt = self.start_dt
+            if by_end and self.end_dt > self.event.end_dt:
+                self.event.end_dt = self.end_dt
         else:
             extended = False
             if by_start and self.start_dt < self.parent.start_dt:

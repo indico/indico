@@ -37,7 +37,7 @@ class RHNoteBase(RHProtected):
     """Base handler for notes attached to an object inside an event"""
 
     def _checkParams(self):
-        self.object_type, self.event_new, self.object = get_object_from_args()
+        self.object_type, self.event, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound
 
@@ -49,7 +49,7 @@ class RHManageNoteBase(RHNoteBase):
         RHNoteBase._checkProtection(self)
         if not can_edit_note(self.object, session.user):
             raise Forbidden
-        check_event_locked(self, self.event_new)
+        check_event_locked(self, self.event)
 
 
 class RHEditNote(RHManageNoteBase):
@@ -83,13 +83,13 @@ class RHEditNote(RHManageNoteBase):
             if is_new:
                 signals.event.notes.note_added.send(note)
                 logger.info('Note %s created by %s', note, session.user)
-                self.event_new.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
-                                   session.user, data=note.link_event_log_data)
+                self.event.log(EventLogRealm.participants, EventLogKind.positive, 'Minutes', 'Added minutes',
+                               session.user, data=note.link_event_log_data)
             elif is_changed:
                 signals.event.notes.note_modified.send(note)
                 logger.info('Note %s modified by %s', note, session.user)
-                self.event_new.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
-                                   session.user, data=note.link_event_log_data)
+                self.event.log(EventLogRealm.participants, EventLogKind.change, 'Minutes', 'Updated minutes',
+                               session.user, data=note.link_event_log_data)
             saved = is_new or is_changed
         return jsonify_template('events/notes/edit_note.html', form=form, object_type=self.object_type,
                                 object=self.object, saved=saved, **kwargs)
@@ -103,7 +103,7 @@ class RHCompileNotes(RHEditNote):
     """Handle note edits a note attached to an object inside an event"""
 
     def _process(self):
-        source = render_template('events/notes/compiled_notes.html', notes=get_scheduled_notes(self.event_new))
+        source = render_template('events/notes/compiled_notes.html', notes=get_scheduled_notes(self.event))
         form = self._make_form(source=source)
         return self._process_form(form, is_compilation=True)
 
@@ -117,9 +117,9 @@ class RHDeleteNote(RHManageNoteBase):
             note.delete(session.user)
             signals.event.notes.note_deleted.send(note)
             logger.info('Note %s deleted by %s', note, session.user)
-            self.event_new.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
-                               session.user, data=note.link_event_log_data)
-        return redirect(self.event_new.url)
+            self.event.log(EventLogRealm.participants, EventLogKind.negative, 'Minutes', 'Removed minutes',
+                           session.user, data=note.link_event_log_data)
+        return redirect(self.event.url)
 
 
 class RHViewNote(RHNoteBase):

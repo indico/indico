@@ -33,7 +33,7 @@ from indico.web.http_api.metadata import Serializer
 class RHExportEventICAL(RHConferenceBaseDisplay):
     def _process(self):
         detail_level = request.args.get('detail', 'events')
-        data = {'results': serialize_event_for_ical(self.event_new, detail_level)}
+        data = {'results': serialize_event_for_ical(self.event, detail_level)}
         serializer = Serializer.create('ics')
         return send_file('event.ics', BytesIO(serializer(data)), 'text/calendar')
 
@@ -49,13 +49,13 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.force_overview = request.view_args.get('force_overview', False)
-        self.theme_id, self.theme_override = get_theme(self.event_new, request.args.get('view'))
+        self.theme_id, self.theme_override = get_theme(self.event, request.args.get('view'))
 
     def _process(self):
-        if self.event_new.type_ == EventType.conference:
+        if self.event.type_ == EventType.conference:
             if self.theme_override:
-                return redirect(url_for('timetable.timetable', self.event_new, view=self.theme_id))
-            elif self.event_new.default_page and not self.force_overview:
+                return redirect(url_for('timetable.timetable', self.event, view=self.theme_id))
+            elif self.event.default_page and not self.force_overview:
                 return self._display_conference_page()
             else:
                 return self._display_conference()
@@ -64,12 +64,12 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
 
     def _display_conference_page(self):
         """Display the custom conference home page"""
-        return WPPage.render_template('page.html', self.event_new, page=self.event_new.default_page)
+        return WPPage.render_template('page.html', self.event, page=self.event.default_page)
 
     def _display_conference(self):
         """Display the conference overview page"""
-        return WPConferenceDisplay(self, self.event_new).display()
+        return WPConferenceDisplay(self, self.event).display()
 
     def _display_simple(self):
         """Display a simple single-page event (meeting/lecture)"""
-        return WPSimpleEventDisplay(self, self.event_new, self.theme_id, self.theme_override).display()
+        return WPSimpleEventDisplay(self, self.event, self.theme_id, self.theme_override).display()

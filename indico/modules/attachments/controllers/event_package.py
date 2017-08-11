@@ -55,8 +55,8 @@ def _get_obj_parent(obj):
     if isinstance(obj, SubContribution):
         return obj.contribution
     elif isinstance(obj, Contribution):
-        return obj.session or obj.event_new
-    return obj.event_new
+        return obj.session or obj.event
+    return obj.event
 
 
 class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
@@ -89,7 +89,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
 
     def _build_base_query(self, added_since=None):
         query = Attachment.find(Attachment.type == AttachmentType.file, ~AttachmentFolder.is_deleted,
-                                ~Attachment.is_deleted, AttachmentFolder.event_new == self.event_new,
+                                ~Attachment.is_deleted, AttachmentFolder.event == self.event,
                                 _join=AttachmentFolder)
         if added_since is not None:
             query = query.join(Attachment.file).filter(cast(AttachmentFile.created_dt, Date) >= added_since)
@@ -141,7 +141,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
 
     def _prepare_folder_structure(self, item):
         attachment = item.attachment
-        event_dir = secure_filename(self.event_new.title, None)
+        event_dir = secure_filename(self.event.title, None)
         segments = [event_dir] if event_dir else []
         if _get_start_dt(attachment.folder.object) is None:
             segments.append('Unscheduled')
@@ -160,13 +160,13 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
         # TODO: adapt to new models (needs extra properties to use event TZ)
         obj = linked_object = attachment.folder.object
         paths = []
-        while obj != self.event_new:
+        while obj != self.event:
             start_date = _get_start_dt(obj)
             if start_date is not None:
                 if isinstance(obj, SubContribution):
                     paths.append(secure_filename('{}_{}'.format(obj.position, obj.title), ''))
                 else:
-                    time = format_time(start_date, format='HHmm', timezone=self.event_new.timezone)
+                    time = format_time(start_date, format='HHmm', timezone=self.event.timezone)
                     paths.append(secure_filename('{}_{}'.format(to_unicode(time), obj.title), ''))
             else:
                 if isinstance(obj, SubContribution):
@@ -176,7 +176,7 @@ class AttachmentPackageGeneratorMixin(ZipGeneratorMixin):
             obj = _get_obj_parent(obj)
 
         linked_obj_start_date = _get_start_dt(linked_object)
-        if attachment.folder.object != self.event_new and linked_obj_start_date is not None:
+        if attachment.folder.object != self.event and linked_obj_start_date is not None:
             paths.append(secure_filename(linked_obj_start_date.strftime('%Y%m%d_%A'), ''))
 
         return reversed(paths)
@@ -195,7 +195,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
             else:
                 flash(_('There are no materials matching your criteria.'), 'warning')
 
-        return self.wp.render_template('generate_package.html', self.event_new, form=form, management=self.management)
+        return self.wp.render_template('generate_package.html', self.event, form=form, management=self.management)
 
     def _prepare_form(self):
         form = AttachmentPackageForm(obj=FormDefaults(filter_type='all'))
@@ -220,7 +220,7 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
         return form
 
     def _load_session_data(self):
-        return [(sess.id, escape(sess.title)) for sess in self.event_new.sessions]
+        return [(sess.id, escape(sess.title)) for sess in self.event.sessions]
 
     def _load_contribution_data(self):
         def _format_contrib(contrib):
@@ -232,10 +232,10 @@ class AttachmentPackageMixin(AttachmentPackageGeneratorMixin):
                     contrib=contrib.title
                 )
 
-        contribs = sorted([contrib for contrib in self.event_new.contributions if contrib.timetable_entry],
+        contribs = sorted([contrib for contrib in self.event.contributions if contrib.timetable_entry],
                           key=lambda c: natural_sort_key(c.title))
         return [(contrib.id, escape(_format_contrib(contrib))) for contrib in contribs]
 
     def _iter_event_days(self):
-        for day in self.event_new.iter_days():
+        for day in self.event.iter_days():
             yield day.isoformat(), format_date(day, 'short').decode('utf-8')

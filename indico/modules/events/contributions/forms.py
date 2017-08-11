@@ -142,12 +142,12 @@ class ContributionStartDateForm(IndicoForm):
 
     def __init__(self, *args, **kwargs):
         self.contrib = kwargs.pop('contrib')
-        self.event = self.contrib.event_new
+        self.event = self.contrib.event
         self.timezone = self.event.timezone
         super(ContributionStartDateForm, self).__init__(*args, **kwargs)
 
     def validate_start_dt(self, field):
-        event = self.contrib.event_new
+        event = self.contrib.event
         day = self.contrib.start_dt.astimezone(event.tzinfo).date()
         if day == event.end_dt_local.date():
             latest_dt = event.end_dt
@@ -171,7 +171,7 @@ class ContributionDurationForm(IndicoForm):
         if field.errors:
             return
         if self.contrib.is_scheduled:
-            event = self.contrib.event_new
+            event = self.contrib.event
             day = self.contrib.start_dt.astimezone(event.tzinfo).date()
             if day == event.end_dt_local.date():
                 latest_dt = event.end_dt

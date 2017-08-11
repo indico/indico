@@ -29,14 +29,14 @@ def uniqueId(obj):
         return '{}.{}'.format(obj.event_id, obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.id)
     elif isinstance(obj, db.m.SubContribution):
         return '{}.{}.{}'.format(
-            obj.event_new.id,
+            obj.event.id,
             obj.legacy_mapping.legacy_contribution_id if obj.legacy_mapping else obj.contribution.id,
             obj.legacy_mapping.legacy_subcontribution_id if obj.legacy_mapping else obj.id
         )
     elif isinstance(obj, db.m.Session):
         return '{}.s{}'.format(obj.event_id, obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.id)
     elif isinstance(obj, db.m.SessionBlock):
-        return '{}.s{}.{}'.format(obj.event_new.id,
+        return '{}.s{}.{}'.format(obj.event.id,
                                   obj.legacy_mapping.legacy_session_id if obj.legacy_mapping else obj.session.id,
                                   obj.legacy_mapping.legacy_session_block_id if obj.legacy_mapping else obj.id)
     elif isinstance(obj, db.m.EventNote):

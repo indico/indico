@@ -10,7 +10,7 @@
     {% if not regform.end_dt %}
         {% trans %}Close now or schedule the deadline.{% endtrans %}
     {% else %}
-        {% set tz = regform.event_new.tzinfo %}
+        {% set tz = regform.event.tzinfo %}
         {% trans date=regform.end_dt|format_date(timezone=tz), time=regform.end_dt|format_time(timezone=tz) -%}
             Scheduled to close on <strong>{{ date }}</strong> at <strong>{{ time }}</strong> ({{ tz }}).
         {%- endtrans %}

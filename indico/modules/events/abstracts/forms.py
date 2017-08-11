@@ -74,7 +74,7 @@ def build_review_form(abstract=None, track=None, review=None):
     if review:
         abstract = review.abstract
         track = review.track
-    review_form_class = make_review_form(abstract.event_new)
+    review_form_class = make_review_form(abstract.event)
     reviews_for_track = abstract.get_reviews(user=session.user, group=track)
     review_for_track = reviews_for_track[0] if reviews_for_track else None
 
@@ -268,7 +268,7 @@ class AbstractJudgmentForm(AbstractJudgmentFormBase):
 
     def __init__(self, *args, **kwargs):
         abstract = kwargs.pop('abstract')
-        self.event = abstract.event_new
+        self.event = abstract.event
         candidate_tracks = list(abstract.candidate_tracks)
         candidate_contrib_types = list(abstract.candidate_contrib_types)
         if len(candidate_tracks) == 1:
@@ -308,7 +308,7 @@ class AbstractReviewForm(IndicoForm):
     def __init__(self, edit=False, *args, **kwargs):
         abstract = kwargs.pop('abstract')
         super(AbstractReviewForm, self).__init__(*args, **kwargs)
-        self.event = abstract.event_new
+        self.event = abstract.event
         if not edit:
             self.proposed_action.none = _("Propose an action...")
         self.proposed_related_abstract.excluded_abstract_ids = {abstract.id}
@@ -578,7 +578,7 @@ class AbstractCommentForm(IndicoForm):
         user = comment.user if comment else kwargs.pop('user')
         abstract = kwargs.pop('abstract')
         super(IndicoForm, self).__init__(*args, **kwargs)
-        if not abstract.event_new.cfa.allow_contributors_in_comments:
+        if not abstract.event.cfa.allow_contributors_in_comments:
             self.visibility.skip.add(AbstractCommentVisibility.contributors)
         if not abstract.can_judge(user) and not abstract.can_convene(user):
             self.visibility.skip.add(AbstractCommentVisibility.judges)

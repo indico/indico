@@ -62,14 +62,14 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy = joinedload('event_links')
         event_strategy.joinedload('person').joinedload('user')
 
-        chairpersons = {link.person for link in self.event_new.person_links}
+        chairpersons = {link.person for link in self.event.person_links}
         persons = defaultdict(lambda: {'session_blocks': defaultdict(dict),
                                        'contributions': defaultdict(dict),
                                        'subcontributions': defaultdict(dict),
                                        'abstracts': defaultdict(dict),
                                        'roles': defaultdict(lambda: False)})
 
-        event_persons_query = (self.event_new.persons
+        event_persons_query = (self.event.persons
                                .options(abstract_strategy,
                                         event_strategy,
                                         contribution_strategy,
@@ -105,7 +105,7 @@ class RHPersonsBase(RHManageEventBase):
                 if contrib.is_deleted:
                     continue
 
-                url = url_for('contributions.manage_contributions', self.event_new, selected=contrib.friendly_id)
+                url = url_for('contributions.manage_contributions', self.event, selected=contrib.friendly_id)
                 data['contributions'][contrib.id] = {'title': contrib.title, 'url': url}
                 data['roles']['speaker'] = True
 
@@ -115,7 +115,7 @@ class RHPersonsBase(RHManageEventBase):
                 if subcontrib.is_deleted or contrib.is_deleted:
                     continue
 
-                url = url_for('contributions.manage_contributions', self.event_new, selected=contrib.friendly_id)
+                url = url_for('contributions.manage_contributions', self.event, selected=contrib.friendly_id)
                 data['subcontributions'][subcontrib.id] = {'title': '{} ({})'.format(contrib.title, subcontrib.title),
                                                            'url': url}
                 data['roles']['speaker'] = True
@@ -127,17 +127,17 @@ class RHPersonsBase(RHManageEventBase):
 
 class RHPersonsList(RHPersonsBase):
     def _process(self):
-        event_principal_query = (EventPrincipal.query.with_parent(self.event_new)
+        event_principal_query = (EventPrincipal.query.with_parent(self.event)
                                  .filter(EventPrincipal.type == PrincipalType.email,
                                          EventPrincipal.has_management_role('submit')))
 
-        contrib_principal_query = (ContributionPrincipal.find(Contribution.event_new == self.event_new,
+        contrib_principal_query = (ContributionPrincipal.find(Contribution.event == self.event,
                                                               ContributionPrincipal.type == PrincipalType.email,
                                                               ContributionPrincipal.has_management_role('submit'))
                                    .join(Contribution)
                                    .options(contains_eager('contribution')))
 
-        session_principal_query = (SessionPrincipal.find(Session.event_new == self.event_new,
+        session_principal_query = (SessionPrincipal.find(Session.event == self.event,
                                                          SessionPrincipal.type == PrincipalType.email,
                                                          SessionPrincipal.has_management_role())
                                    .join(Session).options(joinedload('session').joinedload('acl_entries')))
@@ -153,7 +153,7 @@ class RHPersonsList(RHPersonsBase):
                 persons[principal.email]['roles']['no_account'] = True
                 num_no_account += 1
 
-        return WPManagePersons.render_template('management/person_list.html', self.event_new,
+        return WPManagePersons.render_template('management/person_list.html', self.event,
                                                persons=person_list, num_no_account=num_no_account)
 
 
@@ -171,14 +171,14 @@ class RHEmailEventPersons(RHManageEventBase):
         recipients = set(self._find_event_persons(person_ids, request.args.get('not_invited_only') == '1'))
         recipients |= set(self._find_users(user_ids))
         if self.no_account:
-            tpl = get_template_module('events/persons/emails/invitation.html', event=self.event_new)
+            tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
             disabled_until_change = False
         else:
-            tpl = get_template_module('events/persons/emails/generic.html', event=self.event_new)
+            tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
             disabled_until_change = True
         form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
                                      recipients=[x.email for x in recipients], body=tpl.get_html_body(),
-                                     subject=tpl.get_subject(), register_link=self.no_account, event=self.event_new)
+                                     subject=tpl.get_subject(), register_link=self.no_account, event=self.event)
         if form.validate_on_submit():
             self._send_emails(form, recipients)
             num = len(recipients)
@@ -192,19 +192,19 @@ class RHEmailEventPersons(RHManageEventBase):
             if self.no_account and isinstance(recipient, EventPerson):
                 recipient.invited_dt = now_utc()
             email_body = replace_placeholders('event-persons-email', form.body.data, person=recipient,
-                                              event=self.event_new, register_link=self.no_account)
+                                              event=self.event, register_link=self.no_account)
             email_subject = replace_placeholders('event-persons-email', form.subject.data, person=recipient,
-                                                 event=self.event_new, register_link=self.no_account)
+                                                 event=self.event, register_link=self.no_account)
             tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
             bcc = [session.user.email] if form.copy_for_sender.data else []
             email = make_email(to_list=recipient.email, bcc_list=bcc, from_address=form.from_address.data,
                                template=tpl, html=True)
-            send_email(email, self.event_new, 'Event Persons')
+            send_email(email, self.event, 'Event Persons')
 
     def _find_event_persons(self, person_ids, not_invited_only):
         if not person_ids:
             return []
-        query = self.event_new.persons
+        query = self.event.persons
         query = query.filter(EventPerson.id.in_(person_ids), EventPerson.email != '')
         if not_invited_only:
             query = query.filter(EventPerson.invited_dt.is_(None))
@@ -221,7 +221,7 @@ class RHGrantSubmissionRights(RHManageEventBase):
 
     def _process(self):
         count = 0
-        for cont in self.event_new.contributions:
+        for cont in self.event.contributions:
             speakers = cont.speakers[:]
             for subcontrib in cont.subcontributions:
                 speakers += subcontrib.speakers
@@ -230,11 +230,11 @@ class RHGrantSubmissionRights(RHManageEventBase):
                 if principal:
                     cont.update_principal(principal, add_roles={'submit'})
                     count += 1
-        self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
-                           'Contribution speakers have been granted with submission rights', session.user)
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+                       'Contribution speakers have been granted with submission rights', session.user)
         flash(ngettext('Submission rights have been granted to one speaker',
                        'Submission rights have been granted to {} speakers', count).format(count))
-        return redirect(url_for('.person_list', self.event_new))
+        return redirect(url_for('.person_list', self.event))
 
 
 class RHGrantModificationRights(RHManageEventBase):
@@ -242,17 +242,17 @@ class RHGrantModificationRights(RHManageEventBase):
 
     def _process(self):
         count = 0
-        for sess in self.event_new.sessions:
+        for sess in self.event.sessions:
             for convener in sess.conveners:
                 principal = convener.person.principal
                 if principal:
                     sess.update_principal(principal, full_access=True)
                     count += 1
-        self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
-                           'Modification rights have been granted to all session conveners', session.user)
+        self.event.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
+                       'Modification rights have been granted to all session conveners', session.user)
         flash(ngettext('Session modification rights have been granted to one session convener',
                        'Session modification rights have been granted to {} session conveners', count).format(count))
-        return redirect(url_for('.person_list', self.event_new))
+        return redirect(url_for('.person_list', self.event))
 
 
 class RHRevokeSubmissionRights(RHManageEventBase):
@@ -260,24 +260,24 @@ class RHRevokeSubmissionRights(RHManageEventBase):
 
     def _process(self):
         count = 0
-        for cont in self.event_new.contributions:
+        for cont in self.event.contributions:
             for entry in set(cont.acl_entries):
                 cont.update_principal(entry.principal, del_roles={'submit'})
                 count += 1
-        for entry in set(self.event_new.acl_entries):
-            self.event_new.update_principal(entry.principal, del_roles={'submit'})
+        for entry in set(self.event.acl_entries):
+            self.event.update_principal(entry.principal, del_roles={'submit'})
             count += 1
-        self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
-                           'Submission privileges have been revoked from event submitters', session.user)
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
+                       'Submission privileges have been revoked from event submitters', session.user)
         flash(ngettext('Submission rights have been revoked from one user',
                        'Submission rights have been revoked from {} users', count).format(count))
-        return redirect(url_for('.person_list', self.event_new))
+        return redirect(url_for('.person_list', self.event))
 
 
 class RHEditEventPerson(RHPersonsBase):
     def _checkParams(self, params):
         RHPersonsBase._checkParams(self, params)
-        self.person = EventPerson.query.with_parent(self.event_new).filter_by(id=request.view_args['person_id']).one()
+        self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
 
     def _process(self):
         form = EventPersonForm(obj=FormDefaults(self.person, skip_attrs={'title'}, title=self.person._title))

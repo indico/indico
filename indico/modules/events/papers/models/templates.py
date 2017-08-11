@@ -52,7 +52,7 @@ class PaperTemplate(StoredFileMixin, db.Model):
         default=''
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -68,10 +68,10 @@ class PaperTemplate(StoredFileMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, template_id=self.id, filename=self.filename)
+        return dict(self.event.locator, template_id=self.id, filename=self.filename)
 
     def _build_storage_path(self):
         self.assign_id()
-        path_segments = ['event', strict_unicode(self.event_new.id), 'paper_templates']
+        path_segments = ['event', strict_unicode(self.event.id), 'paper_templates']
         path = posixpath.join(*(path_segments + ['{}_{}'.format(self.id, self.filename)]))
         return Config.getInstance().getAttachmentStorage(), path

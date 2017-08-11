@@ -24,7 +24,7 @@ from indico.modules.events.models.persons import EventPerson
 @pytest.fixture
 def create_event_person(db):
     def _create(event, user=None, first_name=None, last_name=None, email=None, affiliation=None, title=None):
-        person = EventPerson(event_new=event,
+        person = EventPerson(event=event,
                              user=user,
                              first_name=first_name or user.first_name,
                              last_name=last_name or user.last_name,

@@ -44,7 +44,7 @@ class LegacyEventMapping(db.Model):
         autoincrement=False
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(

@@ -35,8 +35,8 @@ class RHCallForAbstracts(RHAbstractsBase):
     """Show the main CFA page"""
 
     def _process(self):
-        abstracts = get_user_abstracts(self.event_new, session.user) if session.user else []
-        return WPDisplayCallForAbstracts.render_template('display/call_for_abstracts.html', self.event_new,
+        abstracts = get_user_abstracts(self.event, session.user) if session.user else []
+        return WPDisplayCallForAbstracts.render_template('display/call_for_abstracts.html', self.event,
                                                          abstracts=abstracts)
 
 
@@ -49,7 +49,7 @@ class RHMyAbstractsExportPDF(RHAbstractsBase):
         RHAbstractsBase._checkProtection(self)
 
     def _process(self):
-        pdf = AbstractsToPDF(self.event_new, get_user_abstracts(self.event_new, session.user))
+        pdf = AbstractsToPDF(self.event, get_user_abstracts(self.event, session.user))
         return send_file('my-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
@@ -59,7 +59,7 @@ class RHSubmitAbstract(RHAbstractsBase):
     ALLOW_LOCKED = True
 
     def _checkProtection(self):
-        cfa = self.event_new.cfa
+        cfa = self.event.cfa
         if session.user and not cfa.is_open and not cfa.can_submit_abstracts(session.user):
             raise NoReportError(_('The Call for Abstracts is closed. Please contact the event organizer for further '
                                   'assistance.'), http_status_code=403)
@@ -68,12 +68,12 @@ class RHSubmitAbstract(RHAbstractsBase):
         RHAbstractsBase._checkProtection(self)
 
     def _process(self):
-        abstract_form_class = make_abstract_form(self.event_new, management=self.management)
-        form = abstract_form_class(event=self.event_new)
+        abstract_form_class = make_abstract_form(self.event, management=self.management)
+        form = abstract_form_class(event=self.event)
         if form.validate_on_submit():
-            abstract = create_abstract(self.event_new, *get_field_values(form.data), send_notifications=True)
+            abstract = create_abstract(self.event, *get_field_values(form.data), send_notifications=True)
             flash(_("Your abstract '{}' has been successfully submitted. It is registered with the number "
                     "#{}. You will be notified by email with the submission details.")
                   .format(abstract.title, abstract.friendly_id), 'success')
-            return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event_new))
-        return jsonify_template('events/abstracts/display/submission.html', event=self.event_new, form=form)
+            return jsonify_data(flash=False, redirect=url_for('.call_for_abstracts', self.event))
+        return jsonify_template('events/abstracts/display/submission.html', event=self.event, form=form)

@@ -23,12 +23,12 @@ from indico.legacy.webinterface.rh.base import RH
 
 class RHConferenceSite(RH):
     def _checkParams(self, params):
-        self.event_new = Event.get(int(params['confId']))
-        if self.event_new is None:
+        self.event = Event.get(int(params['confId']))
+        if self.event is None:
             raise NotFound(_(u'An event with this ID does not exist.'))
-        elif self.event_new.is_deleted:
+        elif self.event.is_deleted:
             raise NotFound(_(u'This event has been deleted.'))
-        self._conf = self._target = self.event_new.as_legacy
+        self._conf = self._target = self.event.as_legacy
 
 
 class RHConferenceBase(RHConferenceSite):

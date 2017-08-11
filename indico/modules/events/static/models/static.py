@@ -89,7 +89,7 @@ class StaticSite(StoredFileMixin, db.Model):
         )
     )
     #: The Event this static site is associated with
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -103,7 +103,7 @@ class StaticSite(StoredFileMixin, db.Model):
         return {'confId': self.event_id, 'id': self.id}
 
     def _build_storage_path(self):
-        path_segments = ['event', strict_unicode(self.event_new.id), 'static']
+        path_segments = ['event', strict_unicode(self.event.id), 'static']
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))

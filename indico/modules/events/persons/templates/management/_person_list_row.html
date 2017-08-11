@@ -23,14 +23,14 @@
     </td>
     <td class="i-table">
         <span class="i-label {{ 'no-role' if not person_data.roles.chairperson }}">
-            {%- if person.event_new.type == 'lecture' -%}
+            {%- if person.event.type == 'lecture' -%}
                 {%- trans %}Speaker{% endtrans -%}
             {%- else -%}
                 {%- trans %}Chairperson{% endtrans -%}
             {%- endif -%}
         </span>
     </td>
-    {%- if person.event_new.type != 'lecture' -%}
+    {%- if person.event.type != 'lecture' -%}
         <td class="i-table">
             <span class="i-label js-count-label {{ 'no-role' if not person_data.contributions }}"
                   data-items="{{ person_data.contributions | tojson | forceescape }}">
@@ -58,7 +58,7 @@
                 </span>
             </span>
         </td>
-        {% if person.event_new.has_feature('abstracts') %}
+        {% if person.event.has_feature('abstracts') %}
             <td class="i-table">
                 <span class="i-label js-count-label {{ 'no-role' if not person_data.abstracts }}"
                       data-items="{{ person_data.abstracts | tojson | forceescape }}">
@@ -83,7 +83,7 @@
         {% if person.invited_dt %}
             <span class="i-label icon-mail"
                   title="This person has been invited to create an Indico account">
-                {{ person.invited_dt | format_date(timezone=person_data.person.event_new.tzinfo) }}
+                {{ person.invited_dt | format_date(timezone=person_data.person.event.tzinfo) }}
             </span>
         {% endif %}
     </td>

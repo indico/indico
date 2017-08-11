@@ -58,7 +58,7 @@ class RHListOtherAbstracts(RHAbstractsBase):
 
     def _process(self):
         query = (Abstract.query
-                 .with_parent(self.event_new)
+                 .with_parent(self.event)
                  .filter(Abstract.state.notin_({AbstractState.duplicate, AbstractState.merged}))
                  .options(joinedload('submitter').lazyload('*'),
                           subqueryload('reviewed_for_tracks'),
@@ -94,7 +94,7 @@ class RHResetAbstractState(RHAbstractBase):
         if self.abstract.state == AbstractState.submitted:
             return False
         # manages can always reset
-        if self.event_new.can_manage(session.user):
+        if self.event.can_manage(session.user):
             return True
         # judges can reset if the abstract has not been withdrawn
         return self.abstract.can_judge(session.user) and self.abstract.state != AbstractState.withdrawn
@@ -129,7 +129,7 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
     def _checkParams(self, params):
         RHAbstractsBase._checkParams(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
-        self.list_generator = AbstractListGeneratorDisplay(event=self.event_new, track=self.track)
+        self.list_generator = AbstractListGeneratorDisplay(event=self.event, track=self.track)
 
     def _checkProtection(self):
         if not self.track.can_review_abstracts(session.user) and not self.track.can_convene(session.user):
@@ -241,10 +241,10 @@ class RHDisplayReviewableTracks(RHAbstractsBase):
         RHAbstractsBase._checkProtection(self)
 
     def _process(self):
-        track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event_new, session.user)
-        return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self.event_new,
+        track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event, session.user)
+        return WPDisplayAbstractsReviewing.render_template('display/tracks.html', self.event,
                                                            abstract_count=track_reviewer_abstract_count,
-                                                           tracks=get_user_tracks(self.event_new, session.user))
+                                                           tracks=get_user_tracks(self.event, session.user))
 
 
 class RHDisplayReviewableTrackAbstracts(DisplayAbstractListMixin, RHDisplayAbstractListBase):
@@ -289,7 +289,7 @@ class RHEditReviewedForTrackList(RHAbstractBase):
         return self.abstract.can_judge(session.user, check_state=True)
 
     def _process(self):
-        form = AbstractReviewedForTracksForm(event=self.event_new, obj=self.abstract)
+        form = AbstractReviewedForTracksForm(event=self.event, obj=self.abstract)
         if form.validate_on_submit():
             update_reviewed_for_tracks(self.abstract, form.reviewed_for_tracks.data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))

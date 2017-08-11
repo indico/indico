@@ -36,8 +36,8 @@ def update_template(template, title, data, backside_template_id=None, clear_back
         query = DesignerTemplate.query.filter(DesignerTemplate.backside_template == template)
         for tpl in query:
             tpl.backside_template = None
-            if tpl.event_new:
-                tpl.event_new.log(EventLogRealm.event, EventLogKind.negative, 'Designer', 'Backside removed',
+            if tpl.event:
+                tpl.event.log(EventLogRealm.event, EventLogKind.negative, 'Designer', 'Backside removed',
                                   session.user, data={'Template': tpl.title,
                                                       'Reason': 'Dimensions of backside changed',
                                                       'Backside': template.title})
@@ -48,6 +48,6 @@ def update_template(template, title, data, backside_template_id=None, clear_back
     if clear_background:
         template.background_image = None
 
-    if template.event_new:
-        template.event_new.log(EventLogRealm.event, EventLogKind.positive, 'Designer', 'Badge template updated',
+    if template.event:
+        template.event.log(EventLogRealm.event, EventLogKind.positive, 'Designer', 'Badge template updated',
                                session.user, data={'Template': template.title})

@@ -71,7 +71,7 @@ def _render_subcontribution_list(contrib):
                    .options(undefer('attachment_count'))
                    .order_by(SubContribution.position)
                    .all())
-    return tpl.render_subcontribution_list(contrib.event_new, contrib, subcontribs)
+    return tpl.render_subcontribution_list(contrib.event, contrib, subcontribs)
 
 
 class RHManageContributionsBase(RHManageEventBase):
@@ -79,7 +79,7 @@ class RHManageContributionsBase(RHManageEventBase):
 
     def _checkParams(self, params):
         RHManageEventBase._checkParams(self, params)
-        self.list_generator = ContributionListGenerator(event=self.event_new)
+        self.list_generator = ContributionListGenerator(event=self.event)
 
 
 class RHManageContributionBase(RHManageContributionsBase):
@@ -98,7 +98,7 @@ class RHManageContributionBase(RHManageContributionsBase):
     def _checkProtection(self):
         if not self.contrib.can_manage(session.user):
             raise Forbidden
-        check_event_locked(self, self.event_new)
+        check_event_locked(self, self.event)
 
 
 class RHManageSubContributionBase(RHManageContributionBase):
@@ -121,7 +121,7 @@ class RHManageContributionsActionsBase(RHManageContributionsBase):
     def _checkParams(self, params):
         RHManageContributionsBase._checkParams(self, params)
         ids = {int(x) for x in request.form.getlist('contribution_id')}
-        self.contribs = Contribution.query.with_parent(self.event_new).filter(Contribution.id.in_(ids)).all()
+        self.contribs = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(ids)).all()
 
 
 class RHManageSubContributionsActionsBase(RHManageContributionBase):
@@ -149,7 +149,7 @@ class RHContributionListCustomize(RHManageContributionsBase):
     ALLOW_LOCKED = True
 
     def _process_GET(self):
-        return WPManageContributions.render_template('contrib_list_filter.html', self.event_new,
+        return WPManageContributions.render_template('contrib_list_filter.html', self.event,
                                                      filters=self.list_generator.list_config['filters'],
                                                      static_items=self.list_generator.static_items)
 
@@ -169,15 +169,15 @@ class RHContributionListStaticURL(RHManageContributionsBase):
 
 class RHCreateContribution(RHManageContributionsBase):
     def _process(self):
-        inherited_location = self.event_new.location_data
+        inherited_location = self.event.location_data
         inherited_location['inheriting'] = True
-        contrib_form_class = make_contribution_form(self.event_new)
-        form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event_new)
+        contrib_form_class = make_contribution_form(self.event)
+        form = contrib_form_class(obj=FormDefaults(location_data=inherited_location), event=self.event)
         if form.validate_on_submit():
             # Create empty contribution so it can be compared to the new one in flash_if_unregistered
             contrib = Contribution()
-            with flash_if_unregistered(self.event_new, lambda: contrib.person_links):
-                contrib = create_contribution(self.event_new, *get_field_values(form.data))
+            with flash_if_unregistered(self.event, lambda: contrib.person_links):
+                contrib = create_contribution(self.event, *get_field_values(form.data))
             flash(_("Contribution '{}' created successfully").format(contrib.title), 'success')
             tpl_components = self.list_generator.render_list(contrib)
             if tpl_components['hide_contrib']:
@@ -188,15 +188,15 @@ class RHCreateContribution(RHManageContributionsBase):
 
 class RHEditContribution(RHManageContributionBase):
     def _process(self):
-        contrib_form_class = make_contribution_form(self.event_new)
+        contrib_form_class = make_contribution_form(self.event)
         custom_field_values = {'custom_{}'.format(x.contribution_field_id): x.data for x in self.contrib.field_values}
         parent_session_block = (self.contrib.timetable_entry.parent.session_block
                                 if (self.contrib.timetable_entry and self.contrib.timetable_entry.parent) else None)
         form = contrib_form_class(obj=FormDefaults(self.contrib, start_date=self.contrib.start_dt,
                                                    **custom_field_values),
-                                  event=self.event_new, contrib=self.contrib, session_block=parent_session_block)
+                                  event=self.event, contrib=self.contrib, session_block=parent_session_block)
         if form.validate_on_submit():
-            with track_time_changes(), flash_if_unregistered(self.event_new, lambda: self.contrib.person_links):
+            with track_time_changes(), flash_if_unregistered(self.event, lambda: self.contrib.person_links):
                 update_contribution(self.contrib, *get_field_values(form.data))
             flash(_("Contribution '{}' successfully updated").format(self.contrib.title), 'success')
             tpl_components = self.list_generator.render_list(self.contrib)
@@ -261,7 +261,7 @@ class RHContributionREST(RHManageContributionBase):
         if session_id is None:
             updates['session'] = None
         else:
-            session = Session.query.with_parent(self.event_new).filter_by(id=session_id).first()
+            session = Session.query.with_parent(self.event).filter_by(id=session_id).first()
             if not session:
                 raise BadRequest('Invalid session id')
             if session != self.contrib.session:
@@ -327,7 +327,7 @@ class RHCreateSubContribution(RHManageContributionBase):
     """Create a subcontribution"""
 
     def _process(self):
-        form = SubContributionForm(event=self.event_new)
+        form = SubContributionForm(event=self.event)
         if form.validate_on_submit():
             subcontrib = create_subcontribution(self.contrib, form.data)
             flash(_("Subcontribution '{}' created successfully").format(subcontrib.title), 'success')
@@ -339,7 +339,7 @@ class RHEditSubContribution(RHManageSubContributionBase):
     """Edit the subcontribution"""
 
     def _process(self):
-        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event_new, subcontrib=self.subcontrib)
+        form = SubContributionForm(obj=FormDefaults(self.subcontrib), event=self.event, subcontrib=self.subcontrib)
         if form.validate_on_submit():
             update_subcontribution(self.subcontrib, form.data)
             flash(_("Subcontribution '{}' updated successfully").format(self.subcontrib.title), 'success')
@@ -363,10 +363,10 @@ class RHCreateSubContributionREST(RHManageContributionBase):
     """REST endpoint to create a subcontribution"""
 
     def _process_POST(self):
-        form = SubContributionForm(event=self.event_new)
+        form = SubContributionForm(event=self.event)
         if form.validate_on_submit():
             subcontrib = create_subcontribution(self.contrib, form.data)
-            return jsonify(id=subcontrib.id, contribution_id=subcontrib.contribution_id, event_id=self.event_new.id)
+            return jsonify(id=subcontrib.id, contribution_id=subcontrib.contribution_id, event_id=self.event.id)
         return jsonify_data(success=False, errors=form.errors), 400
 
 
@@ -430,8 +430,8 @@ class RHContributionsMaterialPackage(RHManageContributionsExportActionsBase, Att
         attachments = self._filter_by_contributions({c.id for c in self.contribs}, None)
         if not attachments:
             flash(_('The selected contributions do not have any materials.'), 'warning')
-            return redirect(url_for('.manage_contributions', self.event_new))
-        return self._generate_zip_file(attachments, name_suffix=self.event_new.id)
+            return redirect(url_for('.manage_contributions', self.event))
+        return self._generate_zip_file(attachments, name_suffix=self.event.id)
 
 
 class RHContributionsExportCSV(RHManageContributionsExportActionsBase):
@@ -447,7 +447,7 @@ class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
 
     def _process(self):
         headers, rows = generate_spreadsheet_from_contributions(self.contribs)
-        return send_xlsx('contributions.xlsx', headers, rows, tz=self.event_new.tzinfo)
+        return send_xlsx('contributions.xlsx', headers, rows, tz=self.event.tzinfo)
 
 
 class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
@@ -458,13 +458,13 @@ class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
 
 class RHContributionsExportPDFBook(RHManageContributionsExportActionsBase):
     def _process(self):
-        pdf = ContributionBook(self.event_new, session.user, self.contribs, tz=self.event_new.timezone)
+        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone)
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
 
 class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase):
     def _process(self):
-        pdf = ContributionBook(self.event_new, session.user, self.contribs, tz=self.event_new.timezone,
+        pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
                                sort_by='board_number')
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
 
@@ -473,8 +473,8 @@ class RHManageContributionTypes(RHManageContributionsBase):
     """Dialog to manage the ContributionTypes of an event"""
 
     def _process(self):
-        contrib_types = self.event_new.contribution_types.all()
-        return jsonify_template('events/contributions/management/types_dialog.html', event=self.event_new,
+        contrib_types = self.event.contribution_types.all()
+        return jsonify_template('events/contributions/management/types_dialog.html', event=self.event,
                                 contrib_types=contrib_types)
 
 
@@ -496,13 +496,13 @@ class RHEditContributionType(RHManageContributionTypeBase):
     """Dialog to edit a ContributionType"""
 
     def _process(self):
-        form = ContributionTypeForm(event=self.event_new, obj=self.contrib_type)
+        form = ContributionTypeForm(event=self.event, obj=self.contrib_type)
         if form.validate_on_submit():
             old_name = self.contrib_type.name
             form.populate_obj(self.contrib_type)
             db.session.flush()
-            self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                               'Updated type: {}'.format(old_name), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                           'Updated type: {}'.format(old_name), session.user)
             return contribution_type_row(self.contrib_type)
         return jsonify_form(form)
 
@@ -511,14 +511,14 @@ class RHCreateContributionType(RHManageContributionsBase):
     """Dialog to add a ContributionType"""
 
     def _process(self):
-        form = ContributionTypeForm(event=self.event_new)
+        form = ContributionTypeForm(event=self.event)
         if form.validate_on_submit():
             contrib_type = ContributionType()
             form.populate_obj(contrib_type)
-            self.event_new.contribution_types.append(contrib_type)
+            self.event.contribution_types.append(contrib_type)
             db.session.flush()
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                               'Added type: {}'.format(contrib_type.name), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+                           'Added type: {}'.format(contrib_type.name), session.user)
             return contribution_type_row(contrib_type)
         return jsonify_form(form)
 
@@ -529,8 +529,8 @@ class RHDeleteContributionType(RHManageContributionTypeBase):
     def _process(self):
         db.session.delete(self.contrib_type)
         db.session.flush()
-        self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
-                           'Deleted type: {}'.format(self.contrib_type.name), session.user)
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+                       'Deleted type: {}'.format(self.contrib_type.name), session.user)
         return jsonify_data(flash=False)
 
 
@@ -538,9 +538,9 @@ class RHManageContributionFields(RHManageContributionsBase):
     """Dialog to manage the custom contribution fields of an event"""
 
     def _process(self):
-        custom_fields = self.event_new.contribution_fields.order_by(ContributionField.position)
+        custom_fields = self.event.contribution_fields.order_by(ContributionField.position)
         custom_field_types = sorted(get_contrib_field_types().values(), key=attrgetter('friendly_name'))
-        return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event_new,
+        return jsonify_template('events/contributions/management/fields_dialog.html', event=self.event,
                                 custom_fields=custom_fields, custom_field_types=custom_field_types)
 
 
@@ -548,7 +548,7 @@ class RHSortContributionFields(RHManageContributionsBase):
     """Sort the custom contribution fields of an event"""
 
     def _process(self):
-        field_by_id = {field.id: field for field in self.event_new.contribution_fields}
+        field_by_id = {field.id: field for field in self.event.contribution_fields}
         field_ids = map(int, request.form.getlist('field_ids'))
         for index, field_id in enumerate(field_ids, 0):
             field_by_id[field_id].position = index
@@ -556,8 +556,8 @@ class RHSortContributionFields(RHManageContributionsBase):
         for index, field in enumerate(sorted(field_by_id.values(), key=attrgetter('position')), len(field_ids)):
             field.position = index
         db.session.flush()
-        self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                           'Custom fields reordered', session.user)
+        self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                       'Custom fields reordered', session.user)
         return jsonify_data(flash=False)
 
 
@@ -578,10 +578,10 @@ class RHCreateContributionField(RHManageContributionsBase):
             contrib_field = ContributionField()
             field = self.field_cls(contrib_field)
             field.update_object(form.data)
-            self.event_new.contribution_fields.append(contrib_field)
+            self.event.contribution_fields.append(contrib_field)
             db.session.flush()
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                               'Added field: {}'.format(contrib_field.title), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
+                           'Added field: {}'.format(contrib_field.title), session.user)
             return jsonify_data(flash=False)
         return jsonify_template('forms/form_common_fields_first.html', form=form)
 
@@ -610,8 +610,8 @@ class RHEditContributionField(RHManageContributionFieldBase):
             old_title = self.contrib_field.title
             self.contrib_field.mgmt_field.update_object(form.data)
             db.session.flush()
-            self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
-                               'Modified field: {}'.format(old_title), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
+                           'Modified field: {}'.format(old_title), session.user)
             return jsonify_data(flash=False)
         return jsonify_template('forms/form_common_fields_first.html', form=form)
 
@@ -622,18 +622,18 @@ class RHDeleteContributionField(RHManageContributionFieldBase):
     def _process(self):
         db.session.delete(self.contrib_field)
         db.session.flush()
-        self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
-                           'Deleted field: {}'.format(self.contrib_field.title), session.user)
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Contributions',
+                       'Deleted field: {}'.format(self.contrib_field.title), session.user)
 
 
 class RHManageDescriptionField(RHManageContributionsBase):
     """Manage the description field used by the abstracts"""
 
     def _process(self):
-        description_settings = abstracts_settings.get(self.event_new, 'description_settings')
+        description_settings = abstracts_settings.get(self.event, 'description_settings')
         form = AbstractContentSettingsForm(obj=FormDefaults(description_settings))
         if form.validate_on_submit():
-            abstracts_settings.set(self.event_new, 'description_settings', form.data)
+            abstracts_settings.set(self.event, 'description_settings', form.data)
             return jsonify_data(flash=False)
         return jsonify_form(form)
 

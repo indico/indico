@@ -37,8 +37,8 @@ class RHConferenceAccessKey(RHConferenceBase):
         # XXX: we don't check if it's valid or not -- WPKeyAccessError shows a message
         # for that if there's an access key for the event in the session.
         # this is pretty awful but eventually we'll do this properly :)
-        self.event_new.set_session_access_key(self._accesskey)
-        self._redirect(self.event_new.url)
+        self.event.set_session_access_key(self._accesskey)
+        self._redirect(self.event.url)
 
 
 class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):
@@ -69,4 +69,4 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
              b'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']])
         outgen.confToXMLMarc21(self._conf)
         xmlgen.closeTag(b'marc:record')
-        return send_file('event-{}.marc.xml'.format(self.event_new.id), StringIO(xmlgen.getXml()), 'XML')
+        return send_file('event-{}.marc.xml'.format(self.event.id), StringIO(xmlgen.getXml()), 'XML')

@@ -46,7 +46,7 @@ class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
     @property
     def view_class(self):
         return (WPDisplayRegistrationFormConference
-                if self.event_new.type_ == EventType.conference
+                if self.event.type_ == EventType.conference
                 else WPDisplayRegistrationFormSimpleEvent)
 
 
@@ -74,13 +74,13 @@ class RHRegistrationFormList(RHRegistrationFormDisplayBase):
     """List of all registration forms in the event"""
 
     def _process(self):
-        all_regforms = get_event_regforms(self.event_new, session.user)
+        all_regforms = get_event_regforms(self.event, session.user)
         scheduled_and_registered_regforms = [regform[0] for regform in all_regforms
                                              if regform[0].is_scheduled or regform[1]]
         user_registrations = [regform[0].id for regform in all_regforms if regform[1]]
         if len(scheduled_and_registered_regforms) == 1:
             return redirect(url_for('.display_regform', scheduled_and_registered_regforms[0]))
-        return self.view_class.render_template('display/regform_list.html', self.event_new,
+        return self.view_class.render_template('display/regform_list.html', self.event,
                                                regforms=scheduled_and_registered_regforms,
                                                user_registrations=user_registrations)
 
@@ -108,10 +108,10 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                     used.add(reg_data_hash)
                     yield reg_data
 
-        column_names = registration_settings.get(self.event_new, 'participant_list_columns')
+        column_names = registration_settings.get(self.event, 'participant_list_columns')
         headers = [PersonalDataType[column_name].get_title() for column_name in column_names]
 
-        query = (Registration.query.with_parent(self.event_new)
+        query = (Registration.query.with_parent(self.event)
                  .filter(Registration.state.in_([RegistrationState.complete, RegistrationState.unpaid]),
                          RegistrationForm.publish_registrations_enabled,
                          ~RegistrationForm.is_deleted,
@@ -153,7 +153,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
 
         active_fields = {field.id: field for field in regform.active_fields}
         column_ids = [column_id
-                      for column_id in registration_settings.get_participant_list_columns(self.event_new, regform)
+                      for column_id in registration_settings.get_participant_list_columns(self.event, regform)
                       if column_id in active_fields]
         headers = [active_fields[column_id].title.title() for column_id in column_ids]
         active_registrations = sorted(regform.active_registrations, key=attrgetter('last_name', 'first_name', 'id'))
@@ -164,17 +164,17 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'show_checkin': any(registration['checked_in'] for registration in registrations)}
 
     def _process(self):
-        regforms = (RegistrationForm.query.with_parent(self.event_new)
+        regforms = (RegistrationForm.query.with_parent(self.event)
                     .filter(RegistrationForm.publish_registrations_enabled,
                             ~RegistrationForm.is_deleted)
                     .options(subqueryload('registrations').subqueryload('data').joinedload('field_data'))
                     .all())
-        if registration_settings.get(self.event_new, 'merge_registration_forms'):
+        if registration_settings.get(self.event, 'merge_registration_forms'):
             tables = [self._merged_participant_list_table()]
         else:
             tables = []
             regforms_dict = {regform.id: regform for regform in regforms if regform.publish_registrations_enabled}
-            for form_id in registration_settings.get_participant_list_form_ids(self.event_new):
+            for form_id in registration_settings.get_participant_list_form_ids(self.event):
                 try:
                     regform = regforms_dict.pop(form_id)
                 except KeyError:
@@ -185,14 +185,14 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             # There might be forms that have not been sorted by the user yet
             tables += map(self._participant_list_table, regforms_dict.viewvalues())
 
-        published = (RegistrationForm.query.with_parent(self.event_new)
+        published = (RegistrationForm.query.with_parent(self.event)
                      .filter(RegistrationForm.publish_registrations_enabled)
                      .has_rows())
         num_participants = sum(len(table['rows']) for table in tables)
 
         return self.view_class.render_template(
             'display/participant_list.html',
-            self.event_new,
+            self.event,
             regforms=regforms,
             tables=tables,
             published=published,
@@ -269,12 +269,12 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         if self.invitation:
             user_data.update((attr, getattr(self.invitation, attr)) for attr in ('first_name', 'last_name', 'email'))
         user_data['title'] = get_title_uuid(self.regform, user_data['title'])
-        return self.view_class.render_template('display/regform_display.html', self.event_new,
+        return self.view_class.render_template('display/regform_display.html', self.event,
                                                regform=self.regform,
                                                sections=get_event_section_data(self.regform),
-                                               payment_conditions=payment_event_settings.get(self.event_new,
+                                               payment_conditions=payment_event_settings.get(self.event,
                                                                                              'conditions'),
-                                               payment_enabled=self.event_new.has_feature('payment'),
+                                               payment_enabled=self.event.has_feature('payment'),
                                                user_data=user_data,
                                                invitation=self.invitation,
                                                registration=self.registration,
@@ -316,4 +316,4 @@ class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBas
         if self.invitation.state == InvitationState.pending:
             self.invitation.state = InvitationState.declined
             flash(_("You declined the invitation to register."))
-        return redirect(self.event_new.url)
+        return redirect(self.event.url)

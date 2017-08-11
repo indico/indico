@@ -81,7 +81,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
             reason = form.reason.data if not form.agreed.data else None
             func = self.agreement.accept if form.agreed.data else self.agreement.reject
             func(from_ip=request.remote_addr, reason=reason)
-            if self.agreement.definition.event_settings.get(self.event_new, 'manager_notifications_enabled'):
+            if self.agreement.definition.event_settings.get(self.event, 'manager_notifications_enabled'):
                 notify_new_signature_to_manager(self.agreement)
             return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
         html = self.agreement.render(form)
@@ -94,7 +94,7 @@ class RHAgreementManager(RHAgreementManagerBase):
     def _process(self):
         definitions = get_agreement_definitions().values()
         return WPAgreementManager.render_template('agreement_types.html', self._conf,
-                                                  event=self.event_new, definitions=definitions)
+                                                  event=self.event, definitions=definitions)
 
 
 class RHAgreementManagerDetails(RHAgreementManagerBase):
@@ -106,17 +106,17 @@ class RHAgreementManagerDetails(RHAgreementManagerBase):
         self.definition = get_agreement_definitions().get(definition_name)
         if self.definition is None:
             raise NotFound("Agreement type '{}' does not exist".format(definition_name))
-        if not self.definition.is_active(self.event_new):
+        if not self.definition.is_active(self.event):
             flash(_("The '{}' agreement is not used in this event.").format(self.definition.title), 'error')
-            return redirect(url_for('.event_agreements', self.event_new))
+            return redirect(url_for('.event_agreements', self.event))
 
     def _process(self):
-        people = self.definition.get_people(self.event_new)
-        agreements = (self.event_new.agreements
+        people = self.definition.get_people(self.event)
+        agreements = (self.event.agreements
                       .filter(Agreement.type == self.definition.name,
                               Agreement.identifier.in_(people))
                       .all())
-        return WPAgreementManager.render_template('agreement_type_details.html', self._conf, event=self.event_new,
+        return WPAgreementManager.render_template('agreement_type_details.html', self._conf, event=self.event,
                                                   definition=self.definition, agreements=agreements)
 
 
@@ -125,7 +125,7 @@ class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
 
     def _process(self):
         enabled = request.form['enabled'] == '1'
-        self.definition.event_settings.set(self.event_new, 'manager_notifications_enabled', enabled)
+        self.definition.event_settings.set(self.event, 'manager_notifications_enabled', enabled)
         return jsonify(success=True, enabled=enabled)
 
 
@@ -140,16 +140,16 @@ class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
         raise NotImplementedError
 
     def _get_form(self):
-        template = self.definition.get_email_body_template(self.event_new)
+        template = self.definition.get_email_body_template(self.event)
         form_defaults = FormDefaults(body=template.get_html_body())
-        return AgreementEmailForm(obj=form_defaults, definition=self.definition, event=self.event_new)
+        return AgreementEmailForm(obj=form_defaults, definition=self.definition, event=self.event)
 
     def _process(self):
         form = self._get_form()
         if form.validate_on_submit():
             self._success_handler(form)
             return jsonify(success=True)
-        return WPJinjaMixin.render_template(self.dialog_template, event=self.event_new, form=form,
+        return WPJinjaMixin.render_template(self.dialog_template, event=self.event, form=form,
                                             definition=self.definition)
 
 
@@ -158,13 +158,13 @@ class RHAgreementManagerDetailsSend(RHAgreementManagerDetailsEmailBase):
 
     def _get_people(self):
         identifiers = set(request.form.getlist('references'))
-        return {k: v for k, v in self.definition.get_people_not_notified(self.event_new).iteritems()
+        return {k: v for k, v in self.definition.get_people_not_notified(self.event).iteritems()
                 if v.email and v.identifier in identifiers}
 
     def _success_handler(self, form):
         people = self._get_people()
         email_body = form.body.data
-        send_new_agreements(self.event_new, self.definition.name, people, email_body, form.cc_addresses.data,
+        send_new_agreements(self.event, self.definition.name, people, email_body, form.cc_addresses.data,
                             form.from_address.data)
 
 
@@ -173,7 +173,7 @@ class RHAgreementManagerDetailsRemind(RHAgreementManagerDetailsEmailBase):
 
     def _get_agreements(self):
         ids = set(request.form.getlist('references'))
-        return (self.event_new.agreements
+        return (self.event.agreements
                 .filter(Agreement.id.in_(ids),
                         Agreement.person_email != None)  # noqa
                 .all())
@@ -190,14 +190,14 @@ class RHAgreementManagerDetailsSendAll(RHAgreementManagerDetailsSend):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_send_all.html'
 
     def _get_people(self):
-        return {k: v for k, v in self.definition.get_people_not_notified(self.event_new).iteritems() if v.email}
+        return {k: v for k, v in self.definition.get_people_not_notified(self.event).iteritems() if v.email}
 
 
 class RHAgreementManagerDetailsRemindAll(RHAgreementManagerDetailsRemind):
     dialog_template = 'events/agreements/dialogs/agreement_email_form_remind_all.html'
 
     def _get_agreements(self):
-        agreements = self.event_new.agreements.filter(Agreement.pending,
+        agreements = self.event.agreements.filter(Agreement.pending,
                                                       Agreement.person_email != None,  # noqa
                                                       Agreement.type == self.definition.name).all()
         return [a for a in agreements if not a.is_orphan()]
@@ -226,7 +226,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
         RHAgreementManagerDetails._checkParams(self, params)
         if 'id' in request.view_args:
             self.agreement = Agreement.get_one(request.view_args['id'])
-            if self.event_new != self.agreement.event_new:
+            if self.event != self.agreement.event:
                 raise NotFound
             if not self.agreement.pending:
                 raise NoReportError(_("The agreement is already signed"))
@@ -234,7 +234,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
             self.agreement = None
             identifier = request.args['identifier']
             try:
-                self.person = self.definition.get_people(self.event_new)[identifier]
+                self.person = self.definition.get_people(self.event)[identifier]
             except KeyError:
                 raise NotFound
 
@@ -243,7 +243,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
         form = AgreementAnswerSubmissionForm()
         if form.validate_on_submit():
             if agreement is None:
-                agreement = Agreement.create_from_data(event=self.event_new, type_=self.definition.name,
+                agreement = Agreement.create_from_data(event=self.event, type_=self.definition.name,
                                                        person=self.person)
                 db.session.add(agreement)
                 db.session.flush()
@@ -256,7 +256,7 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
             flash(_("Agreement answered on behalf of {0}".format(agreement.person_name)), 'success')
             return jsonify(success=True)
         return WPJinjaMixin.render_template('events/agreements/dialogs/agreement_submit_answer_form.html', form=form,
-                                            event=self.event_new, agreement=agreement)
+                                            event=self.event, agreement=agreement)
 
 
 class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreementBase):

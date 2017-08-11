@@ -51,7 +51,7 @@ class Paper(ProposalMixin):
         return self.contribution.locator
 
     # Contribution-related
-    event_new = AttributeProxyProperty('event_new')
+    event = AttributeProxyProperty('event')
     title = AttributeProxyProperty('title')
     verbose_title = AttributeProxyProperty('verbose_title')
 

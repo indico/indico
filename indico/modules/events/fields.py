@@ -102,7 +102,7 @@ class EventPersonListField(PrincipalListField):
 
     def _create_event_person(self, data):
         title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-        person = EventPerson(event_new=self.event, email=data.get('email', '').lower(), _title=title,
+        person = EventPerson(event=self.event, email=data.get('email', '').lower(), _title=title,
                              first_name=data.get('firstName'), last_name=data['familyName'],
                              affiliation=data.get('affiliation'), address=data.get('address'),
                              phone=data.get('phone'), is_untrusted=self.create_untrusted_persons)

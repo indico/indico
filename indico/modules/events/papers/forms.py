@@ -65,7 +65,7 @@ def build_review_form(paper_revision=None, review_type=None, review=None):
     if review:
         paper_revision = review.revision
         review_type = PaperTypeProxy(review.type)
-    review_form_class = make_review_form(paper_revision.paper.event_new, review_type=review_type.instance)
+    review_form_class = make_review_form(paper_revision.paper.event, review_type=review_type.instance)
     reviews = paper_revision.get_reviews(user=session.user, group=review_type.instance)
     latest_user_review = reviews[0] if reviews else None
     if latest_user_review:
@@ -226,7 +226,7 @@ class PaperReviewForm(IndicoForm):
     def __init__(self, edit=False, *args, **kwargs):
         paper = kwargs.pop('paper')
         super(PaperReviewForm, self).__init__(*args, **kwargs)
-        self.event = paper.event_new
+        self.event = paper.event
         if not edit:
             self.proposed_action.none = _("Propose an action...")
 

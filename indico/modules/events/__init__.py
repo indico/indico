@@ -63,14 +63,14 @@ def _merge_users(target, source, **kwargs):
     from indico.modules.events.models.persons import EventPerson
     from indico.modules.events.models.principals import EventPrincipal
     EventPerson.merge_users(target, source)
-    EventPrincipal.merge_users(target, source, 'event_new')
+    EventPrincipal.merge_users(target, source, 'event')
 
 
 @signals.users.registered.connect
 @signals.users.email_added.connect
 def _convert_email_principals(user, **kwargs):
     from indico.modules.events.models.principals import EventPrincipal
-    events = EventPrincipal.replace_email_with_user(user, 'event_new')
+    events = EventPrincipal.replace_email_with_user(user, 'event')
     if events:
         num = len(events)
         flash(ngettext("You have been granted manager/submission privileges for an event.",

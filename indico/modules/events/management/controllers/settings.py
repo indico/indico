@@ -42,8 +42,8 @@ class RHEventSettings(RHManageEventBase):
             raise Forbidden
         # If the user cannot manage the whole event see if anything gives them
         # limited management access.
-        if not self.event_new.can_manage(session.user):
-            urls = sorted(values_from_signal(signals.event_management.management_url.send(self.event_new),
+        if not self.event.can_manage(session.user):
+            urls = sorted(values_from_signal(signals.event_management.management_url.send(self.event),
                                              single_value=True))
             response = redirect(urls[0]) if urls else None
             raise Forbidden(response=response)
@@ -51,7 +51,7 @@ class RHEventSettings(RHManageEventBase):
         RHManageEventBase._checkProtection(self)  # mainly to trigger the legacy "event locked" check
 
     def _process(self):
-        return WPEventSettings.render_template('settings.html', self.event_new, 'settings')
+        return WPEventSettings.render_template('settings.html', self.event, 'settings')
 
 
 class RHEditEventDataBase(RHManageEventBase):
@@ -64,17 +64,17 @@ class RHEditEventDataBase(RHManageEventBase):
     def render_settings_box(self):
         tpl = get_template_module('events/management/_settings.html')
         assert self.section_name
-        return tpl.render_event_settings(self.event_new, section=self.section_name, with_container=False)
+        return tpl.render_event_settings(self.event, section=self.section_name, with_container=False)
 
     def jsonify_success(self):
         return jsonify_data(settings_box=self.render_settings_box(),
-                            right_header=render_event_management_header_right(self.event_new))
+                            right_header=render_event_management_header_right(self.event))
 
     def _process(self):
-        form = self.form_class(obj=self.event_new, event=self.event_new)
+        form = self.form_class(obj=self.event, event=self.event)
         if form.validate_on_submit():
-            with flash_if_unregistered(self.event_new, lambda: self.event_new.person_links):
-                update_event(self.event_new, **form.data)
+            with flash_if_unregistered(self.event, lambda: self.event.person_links):
+                update_event(self.event, **form.data)
             return self.jsonify_success()
         self.commit = False
         return self.render_form(form)
@@ -112,11 +112,11 @@ class RHEditEventDates(RHEditEventDataBase):
     section_name = 'dates'
 
     def _process(self):
-        defaults = FormDefaults(self.event_new, update_timetable=True)
-        form = EventDatesForm(obj=defaults, event=self.event_new)
+        defaults = FormDefaults(self.event, update_timetable=True)
+        form = EventDatesForm(obj=defaults, event=self.event)
         if form.validate_on_submit():
             with track_time_changes():
-                update_event(self.event_new, **form.data)
+                update_event(self.event, **form.data)
             return self.jsonify_success()
         show_screen_dates = form.has_displayed_dates and (form.start_dt_override.data or form.end_dt_override.data)
         return jsonify_template('events/management/event_dates.html', form=form, show_screen_dates=show_screen_dates)

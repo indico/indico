@@ -236,7 +236,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
         nullable=False,
         default=False
     )
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -460,7 +460,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, abstract_id=self.id)
+        return dict(self.event.locator, abstract_id=self.id)
 
     @hybrid_property
     def judgment_comment(self):
@@ -491,7 +491,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         if self.submitter == user:
             return True
-        if self.event_new.can_manage(user):
+        if self.event.can_manage(user):
             return True
         if any(x.person.user == user for x in self.person_links):
             return True
@@ -502,18 +502,18 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         if check_state and self.is_in_final_state:
             return False
-        if not self.event_new.cfa.allow_comments:
+        if not self.event.cfa.allow_comments:
             return False
-        if self.user_owns(user) and self.event_new.cfa.allow_contributors_in_comments:
+        if self.user_owns(user) and self.event.cfa.allow_contributors_in_comments:
             return True
         return self.can_judge(user) or self.can_convene(user) or self.can_review(user)
 
     def can_convene(self, user):
         if not user:
             return False
-        elif not self.event_new.can_manage(user, role='track_convener', explicit_role=True):
+        elif not self.event.can_manage(user, role='track_convener', explicit_role=True):
             return False
-        elif self.event_new in user.global_convener_for_events:
+        elif self.event in user.global_convener_for_events:
             return True
         elif user.convener_for_tracks & self.reviewed_for_tracks:
             return True
@@ -529,9 +529,9 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
             return False
-        elif not self.event_new.can_manage(user, role='abstract_reviewer', explicit_role=True):
+        elif not self.event.can_manage(user, role='abstract_reviewer', explicit_role=True):
             return False
-        elif self.event_new in user.global_abstract_reviewer_for_events:
+        elif self.event in user.global_abstract_reviewer_for_events:
             return True
         elif user.abstract_reviewer_for_tracks & self.reviewed_for_tracks:
             return True
@@ -543,9 +543,9 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif check_state and self.state != AbstractState.submitted:
             return False
-        elif self.event_new.can_manage(user):
+        elif self.event.can_manage(user):
             return True
-        elif self.event_new.cfa.allow_convener_judgment and self.can_convene(user):
+        elif self.event.cfa.allow_convener_judgment and self.can_convene(user):
             return True
         else:
             return False
@@ -553,13 +553,13 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def can_edit(self, user):
         if not user:
             return False
-        is_manager = self.event_new.can_manage(user)
+        is_manager = self.event.can_manage(user)
         if not self.user_owns(user) and not is_manager:
             return False
         elif is_manager and self.public_state in (AbstractPublicState.under_review, AbstractPublicState.withdrawn):
             return True
         elif (self.public_state == AbstractPublicState.awaiting and
-                (is_manager or self.event_new.cfa.can_edit_abstracts(user))):
+                (is_manager or self.event.cfa.can_edit_abstracts(user))):
             return True
         else:
             return False
@@ -567,7 +567,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def can_withdraw(self, user, check_state=False):
         if not user:
             return False
-        elif self.event_new.can_manage(user) and (not check_state or self.state != AbstractState.withdrawn):
+        elif self.event.can_manage(user) and (not check_state or self.state != AbstractState.withdrawn):
             return True
         elif user == self.submitter and (not check_state or self.state == AbstractState.submitted):
             return True
@@ -619,7 +619,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
 
     def get_reviewed_for_groups(self, user, include_reviewed=False):
         already_reviewed = {each.track for each in self.get_reviews(user=user)} if include_reviewed else set()
-        if self.event_new in user.global_abstract_reviewer_for_events:
+        if self.event in user.global_abstract_reviewer_for_events:
             return self.reviewed_for_tracks | already_reviewed
         return (self.reviewed_for_tracks & user.abstract_reviewer_for_tracks) | already_reviewed
 

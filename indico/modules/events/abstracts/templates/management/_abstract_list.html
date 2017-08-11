@@ -183,10 +183,10 @@
                                             {{- abstract.score | round(1) if abstract.score is not none else '-' }}
                                         </td>
                                     {% elif item.id == 'submitted_dt' %}
-                                        {% set dt = abstract.submitted_dt | format_datetime('short', timezone=abstract.event_new.timezone) %}
+                                        {% set dt = abstract.submitted_dt | format_datetime('short', timezone=abstract.event.timezone) %}
                                         <td class="i-table" data-text="{{ dt }}">{{- dt -}}</td>
                                     {% elif item.id == 'modified_dt' %}
-                                        {% set dt = abstract.modified_dt | format_datetime('short', timezone=abstract.event_new.timezone) if abstract.modified_dt else '' %}
+                                        {% set dt = abstract.modified_dt | format_datetime('short', timezone=abstract.event.timezone) if abstract.modified_dt else '' %}
                                         <td class="i-table" data-text="{{ dt }}">{{ dt if dt else '-' }}</td>
                                     {% endif %}
                                 {% endfor %}

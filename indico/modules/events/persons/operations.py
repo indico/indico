@@ -29,5 +29,5 @@ def update_person(person, data):
     db.session.flush()
     signals.event.person_updated.send(person)
     logger.info('Person %s updated by %s', person, session.user)
-    person.event_new.log(EventLogRealm.management, EventLogKind.change, 'Persons',
+    person.event.log(EventLogRealm.management, EventLogKind.change, 'Persons',
                          "Person with email '{}' has been updated".format(person.email), session.user)

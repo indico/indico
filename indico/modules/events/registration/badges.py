@@ -45,7 +45,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         super(RegistrantsListToBadgesPDF, self).__init__(template, config)
         self.event = event
         self.registrations = (Registration.find(Registration.id.in_(registration_ids), Registration.is_active,
-                                                Registration.event_new == event)
+                                                Registration.event == event)
                                           .order_by(*Registration.order_by_name).all())
 
     def _build_config(self, config_data):
@@ -105,7 +105,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                 if placeholder.group == 'registrant':
                     text = placeholder.render(registration)
                 else:
-                    text = placeholder.render(registration.event_new)
+                    text = placeholder.render(registration.event)
             elif item['text']:
                 text = item['text']
 

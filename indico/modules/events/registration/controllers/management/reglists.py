@@ -67,7 +67,7 @@ badge_cache = GenericCache('badge-printing')
 
 
 def _render_registration_details(registration):
-    event = registration.registration_form.event_new
+    event = registration.registration_form.event
     tpl = get_template_module('events/registration/management/_registration_details.html')
     return tpl.render_registration_details(registration=registration, payment_enabled=event.has_feature('payment'))
 
@@ -79,7 +79,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        return WPManageRegistration.render_template('management/regform_reglist.html', self.event_new,
+        return WPManageRegistration.render_template('management/regform_reglist.html', self.event,
                                                     regform=self.regform, **reg_list_kwargs)
 
 
@@ -90,7 +90,7 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_GET(self):
         reg_list_config = self.list_generator._get_config()
-        return WPManageRegistration.render_template('management/reglist_filter.html', self.event_new,
+        return WPManageRegistration.render_template('management/reglist_filter.html', self.event,
                                                     regform=self.regform,
                                                     RegistrationFormItemType=RegistrationFormItemType,
                                                     visible_items=reg_list_config['items'],
@@ -116,7 +116,7 @@ class RHRegistrationDetails(RHManageRegistrationBase):
 
     def _process(self):
         registration_details_html = _render_registration_details(self.registration)
-        return WPManageRegistration.render_template('management/registration_details.html', self.event_new,
+        return WPManageRegistration.render_template('management/registration_details.html', self.event,
                                                     registration=self.registration,
                                                     registration_details_html=registration_details_html)
 
@@ -206,7 +206,7 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             bcc = [session.user.email] if form.copy_for_sender.data else []
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
                                from_address=form.from_address.data, template=template, html=True)
-            send_email(email, self.event_new, 'Registration')
+            send_email(email, self.event, 'Registration')
 
     def _process(self):
         tpl = get_template_module('events/registration/emails/custom_email_default.html')
@@ -231,9 +231,9 @@ class RHRegistrationDelete(RHRegistrationsActionBase):
             registration.is_deleted = True
             signals.event.registration_deleted.send(registration)
             logger.info('Registration %s deleted by %s', registration, session.user)
-            self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
-                               'Registration deleted: {}'.format(registration.full_name),
-                               session.user, data={'Email': registration.email})
+            self.event.log(EventLogRealm.management, EventLogKind.negative, 'Registration',
+                           'Registration deleted: {}'.format(registration.full_name),
+                           session.user, data={'Email': registration.email})
         num_reg_deleted = len(self.registrations)
         flash(ngettext("Registration was deleted.",
                        "{num} registrations were deleted.", num_reg_deleted).format(num=num_reg_deleted), 'success')
@@ -270,7 +270,7 @@ class RHRegistrationCreate(RHManageRegFormBase):
             # not very pretty but usually this never happens thanks to client-side validation
             for error in form.error_list:
                 flash(error, 'error')
-        return WPManageRegistration.render_template('display/regform_display.html', self.event_new,
+        return WPManageRegistration.render_template('display/regform_display.html', self.event,
                                                     sections=get_event_section_data(self.regform), regform=self.regform,
                                                     post_url=url_for('.create_registration', self.regform),
                                                     user_data=self._get_user_data(), management=True)
@@ -350,7 +350,7 @@ class RHRegistrationsExportExcel(RHRegistrationsExportBase):
     def _process(self):
         headers, rows = generate_spreadsheet_from_registrations(self.registrations, self.export_config['regform_items'],
                                                                 self.export_config['static_item_ids'])
-        return send_xlsx('registrations.xlsx', headers, rows, tz=self.event_new.tzinfo)
+        return send_xlsx('registrations.xlsx', headers, rows, tz=self.event.tzinfo)
 
 
 class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
@@ -371,7 +371,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
 
         # Check that template belongs to this event or a category that
         # is a parent
-        if self.template.owner != self.event_new and self.template.owner.id not in self.event_new.category_chain:
+        if self.template.owner != self.event and self.template.owner.id not in self.event.category_chain:
             raise Forbidden
 
     def _process(self):
@@ -385,8 +385,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         else:
             pdf_class = RegistrantsListToBadgesPDF
         registration_ids = config_params.pop('registration_ids')
-        pdf = pdf_class(self.template, config_params, self.event_new, registration_ids)
-        return send_file('Badges-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'PDF')
+        pdf = pdf_class(self.template, config_params, self.event, registration_ids)
+        return send_file('Badges-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'PDF')
 
 
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
@@ -426,17 +426,17 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                          frm_size[1] == float(tpl.data['height']) / PIXELS_CM), 'custom')
 
     def _process(self):
-        all_templates = set(self.event_new.designer_templates) | get_inherited_templates(self.event_new)
+        all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
         badge_templates = {tpl.id: {
             'data': tpl.data,
             'backside_tpl_id': tpl.backside_template_id,
             'orientation': 'landscape' if tpl.data['width'] > tpl.data['height'] else 'portrait',
             'format': self._get_format(tpl)
         } for tpl in all_templates if tpl.type.name == 'badge'}
-        settings = event_badge_settings.get_all(self.event_new.id)
-        form = BadgeSettingsForm(self.event_new, template=self.template_id, **settings)
+        settings = event_badge_settings.get_all(self.event.id)
+        form = BadgeSettingsForm(self.event, template=self.template_id, **settings)
         registrations = self.registrations or self.regform.registrations
-        if self.event_new.is_locked:
+        if self.event.is_locked:
             del form.save_values
 
         if form.validate_on_submit():
@@ -452,14 +452,14 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             data.pop('submitted', None)
             template_id = data.pop('template')
             if data.pop('save_values', False):
-                event_badge_settings.set_multi(self.event_new, data)
+                event_badge_settings.set_multi(self.event, data)
             data['registration_ids'] = [x.id for x in registrations]
 
             key = unicode(uuid.uuid4())
             badge_cache.set(key, data, time=1800)
             download_url = url_for('.registrations_print_badges', self.regform, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
-        return jsonify_template('events/registration/management/print_badges.html', event=self.event_new,
+        return jsonify_template('events/registration/management/print_badges.html', event=self.event,
                                 regform=self.regform, settings_form=form, templates=badge_templates,
                                 registrations=registrations)
 

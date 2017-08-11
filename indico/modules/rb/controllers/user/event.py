@@ -57,8 +57,8 @@ def _get_object_type(obj):
 
 
 def _get_defaults_from_object(obj):
-    defaults = {'start_dt': obj.start_dt.astimezone(obj.event_new.tzinfo).replace(tzinfo=None),
-                'end_dt': obj.end_dt.astimezone(obj.event_new.tzinfo).replace(tzinfo=None),
+    defaults = {'start_dt': obj.start_dt.astimezone(obj.event.tzinfo).replace(tzinfo=None),
+                'end_dt': obj.end_dt.astimezone(obj.event.tzinfo).replace(tzinfo=None),
                 'booking_reason': u"{} '{}'".format(_get_object_type(obj), obj.title)}
     if defaults['end_dt'].date() != defaults['start_dt'].date():
         defaults['repeat_frequency'] = RepeatFrequency.DAY
@@ -84,9 +84,9 @@ class RHRoomBookingEventBase(RHManageEventBase, RHRoomBookingBase):
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
     def _process(self):
-        reservations = self.event_new.reservations.all()
+        reservations = self.event.reservations.all()
         if not reservations:
-            self._redirect(url_for('event_mgmt.rooms_choose_event', self.event_new))
+            self._redirect(url_for('event_mgmt.rooms_choose_event', self.event))
             return
         return WPRoomBookingEventBookingList(self, self._conf, reservations=reservations).display()
 
@@ -94,11 +94,11 @@ class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
 class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
     def _process(self):
         contribs = (Contribution.query
-                    .with_parent(self.event_new)
+                    .with_parent(self.event)
                     .join(TimetableEntry)  # implies is_scheduled
                     .order_by(TimetableEntry.start_dt)
                     .all())
-        sessions = sorted([s for s in self.event_new.sessions if s.start_dt is not None], key=attrgetter('start_dt'))
+        sessions = sorted([s for s in self.event.sessions if s.start_dt is not None], key=attrgetter('start_dt'))
         return WPRoomBookingEventChooseEvent(self, self._conf).display(contribs=contribs, sessions=sessions)
 
 
@@ -147,7 +147,7 @@ class RHRoomBookingEventBookingModifyBooking(RHRoomBookingEventBase, RHRoomBooki
         return WPRoomBookingEventModifyBooking(self, self._conf, **kwargs)
 
     def _get_success_url(self):
-        return url_for('event_mgmt.rooms_booking_details', self.event_new, self._reservation)
+        return url_for('event_mgmt.rooms_booking_details', self.event, self._reservation)
 
     def _process(self):
         return RHRoomBookingModifyBooking._process(self)
@@ -166,11 +166,11 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
         return WPRoomBookingEventNewBookingSimple(self, self._conf, cloning=True, **kwargs)
 
     def _get_success_url(self, booking):
-        return url_for('event_mgmt.rooms_booking_details', self.event_new, booking)
+        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingCloneBooking._create_booking(self, form, room)
-        booking.event_new = self.event_new
+        booking.event = self.event
         return booking
 
     def _process(self):
@@ -179,7 +179,7 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
 
 class _SuccessUrlDetailsMixin:
     def _get_success_url(self):
-        return url_for('event_mgmt.rooms_booking_details', self.event_new, self._reservation)
+        return url_for('event_mgmt.rooms_booking_details', self.event, self._reservation)
 
 
 class RHRoomBookingEventAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingEventBase, RHRoomBookingAcceptBooking):
@@ -263,16 +263,16 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
 
     def _make_confirm_form(self, *args, **kwargs):
         defaults = kwargs['defaults']
-        for key, value in _get_defaults_from_object(self.event_new).iteritems():
+        for key, value in _get_defaults_from_object(self.event).iteritems():
             defaults[key] = value
         return RHRoomBookingNewBookingSimple._make_confirm_form(self, *args, **kwargs)
 
     def _get_success_url(self, booking):
-        return url_for('event_mgmt.rooms_booking_details', self.event_new, booking)
+        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingNewBookingSimple._create_booking(self, form, room)
-        booking.event_new = self.event_new
+        booking.event = self.event
         return booking
 
     def _process(self):
@@ -291,13 +291,13 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         if not assign or assign == 'nothing':
             self._assign_to = None
         elif assign == 'event':
-            self._assign_to = self.event_new
+            self._assign_to = self.event
         else:
             element, _, element_id = assign.partition('-')
             if element == 'session':
-                self._assign_to = self.event_new.get_session(element_id)
+                self._assign_to = self.event.get_session(element_id)
             elif element == 'contribution':
-                self._assign_to = self.event_new.get_contribution(element_id)
+                self._assign_to = self.event.get_contribution(element_id)
             else:
                 raise NoReportError('Invalid assignment')
             if not self._assign_to:
@@ -313,22 +313,22 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
 
     def _get_select_room_form_defaults(self):
         defaults, _ = RHRoomBookingNewBooking._get_select_room_form_defaults(self)
-        for key, value in _get_defaults_from_object(self._assign_to or self.event_new).iteritems():
+        for key, value in _get_defaults_from_object(self._assign_to or self.event).iteritems():
             defaults[key] = value
         return defaults, False
 
     def _make_confirm_form(self, *args, **kwargs):
         if 'defaults' in kwargs:
-            obj = self._assign_to or self.event_new
+            obj = self._assign_to or self.event
             kwargs['defaults'].booking_reason = _get_defaults_from_object(obj)['booking_reason']
         return RHRoomBookingNewBooking._make_confirm_form(self, *args, **kwargs)
 
     def _get_success_url(self, booking):
-        return url_for('event_mgmt.rooms_booking_details', self.event_new, booking)
+        return url_for('event_mgmt.rooms_booking_details', self.event, booking)
 
     def _create_booking(self, form, room):
         booking = RHRoomBookingNewBooking._create_booking(self, form, room)
-        booking.event_new = self.event_new
+        booking.event = self.event
         if self._assign_to:
             _assign_room(self._assign_to, room)
 

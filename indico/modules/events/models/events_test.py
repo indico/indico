@@ -27,14 +27,14 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.sessions import Session
 
 
-def test_deleted_relationships(db, dummy_event_new):
-    event = dummy_event_new
+def test_deleted_relationships(db, dummy_event):
+    event = dummy_event
     assert not event.contributions
     assert not event.sessions
-    s = Session(event_new=event, title='s')
-    sd = Session(event_new=event, title='sd', is_deleted=True)
-    c = Contribution(event_new=event, title='c', session=sd, duration=timedelta(minutes=30))
-    cd = Contribution(event_new=event, title='cd', session=sd, duration=timedelta(minutes=30), is_deleted=True)
+    s = Session(event=event, title='s')
+    sd = Session(event=event, title='sd', is_deleted=True)
+    c = Contribution(event=event, title='c', session=sd, duration=timedelta(minutes=30))
+    cd = Contribution(event=event, title='cd', session=sd, duration=timedelta(minutes=30), is_deleted=True)
     sc = SubContribution(contribution=c, title='sc', duration=timedelta(minutes=10))
     scd = SubContribution(contribution=c, title='scd', duration=timedelta(minutes=10), is_deleted=True)
     db.session.flush()
@@ -53,18 +53,18 @@ def test_deleted_relationships(db, dummy_event_new):
     assert sd.contributions == [c]
     assert c.subcontributions == [sc]
     # the other direction should work fine even in case of deletion
-    assert s.event_new == event
-    assert sd.event_new == event
-    assert c.event_new == event
-    assert cd.event_new == event
+    assert s.event == event
+    assert sd.event == event
+    assert c.event == event
+    assert cd.event == event
     assert sc.contribution == c
     assert scd.contribution == c
 
 
-def test_modify_relationship_with_deleted(db, dummy_event_new):
-    event = dummy_event_new
-    c = Contribution(event_new=event, title='c', duration=timedelta(minutes=30))
-    cd = Contribution(event_new=event, title='cd', duration=timedelta(minutes=30), is_deleted=True)
+def test_modify_relationship_with_deleted(db, dummy_event):
+    event = dummy_event
+    c = Contribution(event=event, title='c', duration=timedelta(minutes=30))
+    cd = Contribution(event=event, title='cd', duration=timedelta(minutes=30), is_deleted=True)
     db.session.flush()
     assert event.contributions == [c]
     c2 = Contribution(title='c2', duration=timedelta(minutes=30))
@@ -81,8 +81,8 @@ def test_modify_relationship_with_deleted(db, dummy_event_new):
     (ProtectionMode.protected, ProtectionMode.public, ProtectionMode.public),
     (ProtectionMode.public, ProtectionMode.protected, ProtectionMode.protected)
 ))
-def test_effective_protection_mode(db, dummy_category, dummy_event_new, category_pm, event_pm, effective_pm):
+def test_effective_protection_mode(db, dummy_category, dummy_event, category_pm, event_pm, effective_pm):
     dummy_category.protection_mode = category_pm
-    dummy_event_new.protection_mode = event_pm
+    dummy_event.protection_mode = event_pm
     db.session.flush()
-    assert dummy_event_new.effective_protection_mode == effective_pm
+    assert dummy_event.effective_protection_mode == effective_pm

@@ -23,7 +23,7 @@ from indico.core.notifications import email_sender, make_email
 
 @email_sender
 def notify_double_payment(registration):
-    event = registration.registration_form.event_new
+    event = registration.registration_form.event
     to = event.creator.email
     body = render_template('events/payment/emails/double_payment_email_to_manager.txt', event=event,
                            registration=registration)
@@ -32,7 +32,7 @@ def notify_double_payment(registration):
 
 @email_sender
 def notify_amount_inconsistency(registration, amount, currency):
-    event = registration.registration_form.event_new
+    event = registration.registration_form.event
     to = event.creator.email
     body = render_template('events/payment/emails/payment_inconsistency_email_to_manager.txt',
                            event=event, registration=registration, amount=amount, currency=currency)

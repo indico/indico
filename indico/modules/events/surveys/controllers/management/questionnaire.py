@@ -47,7 +47,7 @@ class RHManageSurveyQuestionnaire(RHManageSurveyBase):
     def _process(self):
         field_types = get_field_types()
         preview_form = make_survey_form(self.survey)()
-        return WPManageSurvey.render_template('management/survey_questionnaire.html', self.event_new,
+        return WPManageSurvey.render_template('management/survey_questionnaire.html', self.event,
                                               survey=self.survey, field_types=field_types, preview_form=preview_form)
 
 

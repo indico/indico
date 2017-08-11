@@ -30,7 +30,7 @@ from indico.modules.events.reminders.models.reminders import EventReminder
 def send_event_reminders():
     reminders = EventReminder.find_all(~EventReminder.is_sent, ~Event.is_deleted,
                                        EventReminder.scheduled_dt <= now_utc(),
-                                       _join=EventReminder.event_new)
+                                       _join=EventReminder.event)
     try:
         for reminder in reminders:
             logger.info('Sending event reminder: %s', reminder)

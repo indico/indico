@@ -42,9 +42,9 @@ class RHManageTimetable(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
 
     def _process(self):
-        event_info = serialize_event_info(self.event_new)
-        timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event_new)
-        return WPManageTimetable.render_template('management.html', self.event_new, event_info=event_info,
+        event_info = serialize_event_info(self.event)
+        timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event)
+        return WPManageTimetable.render_template('management.html', self.event, event_info=event_info,
                                                  timetable_data=timetable_data)
 
 
@@ -54,16 +54,16 @@ class RHManageSessionTimetable(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
 
     def _process(self):
-        event_info = serialize_event_info(self.event_new)
+        event_info = serialize_event_info(self.event)
         event_info['timetableSession'] = serialize_session(self.session)
         timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
         management_rights = {
-            'can_manage_event': self.event_new.can_manage(session.user),
+            'can_manage_event': self.event.can_manage(session.user),
             'can_manage_session': self.session.can_manage(session.user),
             'can_manage_blocks': self.session.can_manage_blocks(session.user),
             'can_manage_contributions': self.session.can_manage_contributions(session.user)
         }
-        return WPManageTimetable.render_template('session_management.html', self.event_new, event_info=event_info,
+        return WPManageTimetable.render_template('session_management.html', self.event, event_info=event_info,
                                                  timetable_data=timetable_data, session_=self.session,
                                                  **management_rights)
 
@@ -73,14 +73,14 @@ class RHTimetableREST(RHManageTimetableEntryBase):
 
     def _get_contribution_updates(self, data):
         updates = {'parent': None}
-        contribution = Contribution.query.with_parent(self.event_new).filter_by(id=data['contribution_id']).first()
+        contribution = Contribution.query.with_parent(self.event).filter_by(id=data['contribution_id']).first()
         if contribution is None:
             raise BadRequest('Invalid contribution id')
         elif contribution.timetable_entry is not None:
             raise BadRequest('The contribution is already scheduled')
         updates['object'] = contribution
         if data.get('session_block_id'):
-            session_block = self.event_new.get_session_block(data['session_block_id'])
+            session_block = self.event.get_session_block(data['session_block_id'])
             if session_block is None:
                 raise BadRequest('Invalid session block id')
             if session_block.timetable_entry is None:
@@ -109,7 +109,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         # TODO: breaks & session blocks
         else:
             raise BadRequest('No object specified')
-        entry = create_timetable_entry(self.event_new, updates)
+        entry = create_timetable_entry(self.event, updates)
         return jsonify(start_dt=entry.start_dt.isoformat(), id=entry.id)
 
     def _process_PATCH(self):
@@ -130,7 +130,7 @@ class RHTimetableREST(RHManageTimetableEntryBase):
         """Delete a timetable entry"""
         if self.entry.type == TimetableEntryType.SESSION_BLOCK:
             delete_session_block(self.entry.session_block)
-        elif self.event_new.type != 'conference' and self.entry.type == TimetableEntryType.CONTRIBUTION:
+        elif self.event.type != 'conference' and self.entry.type == TimetableEntryType.CONTRIBUTION:
             delete_contribution(self.entry.contribution)
         else:
             delete_timetable_entry(self.entry)
@@ -143,7 +143,7 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
 
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+        self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
         html = render_entry_info_balloon(self.entry, editable=True, sess=self.session)
@@ -155,7 +155,7 @@ class RHBreakREST(RHManageTimetableBase):
 
     def _checkParams(self, params):
         RHManageTimetableBase._checkParams(self, params)
-        self.entry = self.event_new.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
+        self.entry = self.event.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
         self.break_ = self.entry.break_
 
     def _process_PATCH(self):

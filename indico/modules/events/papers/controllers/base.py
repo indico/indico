@@ -32,7 +32,7 @@ class RHPapersBase(RHConferenceBaseDisplay):
     def _checkProtection(self):
         RHConferenceBaseDisplay._checkProtection(self)
         # Only let managers access the management versions.
-        if self.management and not self.event_new.cfp.is_manager(session.user):
+        if self.management and not self.event.cfp.is_manager(session.user):
             raise Forbidden
 
     @property
@@ -64,9 +64,9 @@ class RHJudgingAreaBase(RHPapersBase):
 
     def _checkProtection(self):
         RHPapersBase._checkProtection(self)
-        if not session.user or not self.event_new.cfp.can_access_judging_area(session.user):
+        if not session.user or not self.event.cfp.can_access_judging_area(session.user):
             raise Forbidden
-        check_event_locked(self, self.event_new)
+        check_event_locked(self, self.event)
 
 
 class RHPaperBase(RHPapersBase):
@@ -89,7 +89,7 @@ class RHPaperBase(RHPapersBase):
         RHPapersBase._checkProtection(self)
         if not self._check_paper_protection():
             raise Forbidden
-        check_event_locked(self, self.event_new)
+        check_event_locked(self, self.event)
 
     def _check_paper_protection(self):
         """Perform a permission check on the current paper.

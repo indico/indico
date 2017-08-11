@@ -151,7 +151,7 @@ class EventPerson(PersonMixin, db.Model):
         default=False
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -180,7 +180,7 @@ class EventPerson(PersonMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, person_id=self.id)
+        return dict(self.event.locator, person_id=self.id)
 
     @return_ascii
     def __repr__(self):
@@ -196,7 +196,7 @@ class EventPerson(PersonMixin, db.Model):
 
     @classmethod
     def create_from_user(cls, user, event=None, is_untrusted=False):
-        return EventPerson(user=user, event_new=event, first_name=user.first_name, last_name=user.last_name,
+        return EventPerson(user=user, event=event, first_name=user.first_name, last_name=user.last_name,
                            email=user.email, affiliation=user.affiliation, address=user.address, phone=user.phone,
                            is_untrusted=is_untrusted)
 
@@ -233,7 +233,7 @@ class EventPerson(PersonMixin, db.Model):
         """
         from indico.modules.events.models.events import Event
         query = (cls.query
-                 .join(EventPerson.event_new)
+                 .join(EventPerson.event)
                  .filter(~Event.is_deleted,
                          cls.email.in_(user.all_emails),
                          cls.user_id.is_(None)))
@@ -486,10 +486,10 @@ def _mapper_configured():
     def _associate_event_person(target, value, *unused):
         if value is None:
             return
-        if target.person.event_new is None:
-            target.person.event_new = value
+        if target.person.event is None:
+            target.person.event = value
         else:
-            assert target.person.event_new == value
+            assert target.person.event == value
 
     @listens_for(EventPerson.event_links, 'append')
     @listens_for(EventPerson.session_block_links, 'append')

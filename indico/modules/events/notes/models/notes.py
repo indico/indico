@@ -105,7 +105,7 @@ class EventNote(LinkMixin, db.Model):
                               be pre-loaded and cached in the app
                               context.
         """
-        event = linked_object.event_new
+        event = linked_object.event
         try:
             return g.event_notes[event].get(linked_object)
         except (AttributeError, KeyError):

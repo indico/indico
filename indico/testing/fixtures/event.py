@@ -45,6 +45,6 @@ def create_event(dummy_user, dummy_category, db):
 
 
 @pytest.fixture
-def dummy_event_new(create_event):
+def dummy_event(create_event):
     """Creates a mocked dummy event"""
     return create_event(0)

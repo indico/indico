@@ -137,4 +137,4 @@ def get_event(linked_object):
     if isinstance(linked_object, Category):
         return None
     else:
-        return linked_object.event_new
+        return linked_object.event

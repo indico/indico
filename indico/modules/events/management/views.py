@@ -32,7 +32,7 @@ class WPEventManagement(WPJinjaMixin, WPMainBase):
 
     When using the class directly, pass the menu item as a posarg::
 
-        return WPEventManagement.render_template('foobar.html', self.event_new, 'foobar',
+        return WPEventManagement.render_template('foobar.html', self.event, 'foobar',
                                                  foo='bar')
 
     When subclassing you can set `sidemenu_option` on the class,
@@ -41,7 +41,7 @@ class WPEventManagement(WPJinjaMixin, WPMainBase):
     for some other reason (e.g. to set a `template_prefix` or include
     additional JS/CSS bundles)::
 
-        return WPSomething.render_template('foobar.html', self.event_new,
+        return WPSomething.render_template('foobar.html', self.event,
                                            foo='bar')
     """
 

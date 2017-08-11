@@ -32,7 +32,7 @@ class RHManagePaperTemplates(RHManagePapersBase):
     """Manage the available paper templates"""
 
     def _process(self):
-        return jsonify_template('events/papers/management/templates.html', event=self.event_new)
+        return jsonify_template('events/papers/management/templates.html', event=self.event)
 
 
 class RHManagePaperTemplateBase(RHManagePapersBase):
@@ -60,9 +60,9 @@ class RHUploadPaperTemplate(RHManagePapersBase):
     def _process(self):
         form = PaperTemplateForm()
         if form.validate_on_submit():
-            template = create_paper_template(self.event_new, form.data)
+            template = create_paper_template(self.event, form.data)
             flash(_('Paper template "{}" added.').format(template.name), 'success')
-            return _render_teplate_list(self.event_new)
+            return _render_teplate_list(self.event)
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 
@@ -75,7 +75,7 @@ class RHEditPaperTemplate(RHManagePaperTemplateBase):
             old_name = self.template.name
             update_paper_template(self.template, form.data)
             flash(_('Paper template "{}" updated.').format(old_name), 'success')
-            return _render_teplate_list(self.event_new)
+            return _render_teplate_list(self.event)
         return jsonify_form(form, form_header_kwargs={'action': request.relative_url})
 
 
@@ -85,7 +85,7 @@ class RHDeletePaperTemplate(RHManagePaperTemplateBase):
     def _process(self):
         delete_paper_template(self.template)
         flash(_('Paper template "{}" deleted.').format(self.template.name), 'success')
-        return _render_teplate_list(self.event_new)
+        return _render_teplate_list(self.event)
 
 
 class RHDownloadPaperTemplate(RHPapersBase):

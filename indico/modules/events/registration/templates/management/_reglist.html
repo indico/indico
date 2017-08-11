@@ -49,7 +49,7 @@
                                 {% for item in static_columns %}
                                     {% if item.id == 'reg_date' %}
                                         <td class="i-table" data-text="{{ registration.submitted_dt }}">
-                                            {{- registration.submitted_dt | format_datetime(timezone=registration.event_new.tzinfo) -}}
+                                            {{- registration.submitted_dt | format_datetime(timezone=registration.event.tzinfo) -}}
                                         </td>
                                     {% elif item.id == 'state' %}
                                         <td class="i-table">{{ registration.state.title }}</td>
@@ -65,13 +65,13 @@
                                     {% elif item.id == 'checked_in_date' %}
                                         <td class="i-table" data-text="{{ registration.checked_in_dt }}">
                                             {%- if registration.checked_in_dt %}
-                                                {{- registration.checked_in_dt | format_datetime(timezone=registration.event_new.tzinfo) -}}
+                                                {{- registration.checked_in_dt | format_datetime(timezone=registration.event.tzinfo) -}}
                                             {%- endif %}
                                         </td>
                                     {% elif item.id == 'payment_date' %}
                                         <td class="i-table" data-text="{{ registration.transaction.timestamp }}">
                                             {%- if registration.transaction and registration.transaction.status.name == 'successful' %}
-                                                {{ registration.transaction.timestamp | format_datetime(timezone=registration.event_new.tzinfo) }}
+                                                {{ registration.transaction.timestamp | format_datetime(timezone=registration.event.tzinfo) }}
                                             {%- else %}
                                                 -
                                             {% endif %}

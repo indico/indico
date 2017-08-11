@@ -51,7 +51,7 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 
     def _process(self):
         invitations = _query_invitation_list(self.regform)
-        return WPManageRegistration.render_template('management/regform_invitations.html', self.event_new,
+        return WPManageRegistration.render_template('management/regform_invitations.html', self.event,
                                                     regform=self.regform, invitations=invitations)
 
 
@@ -75,7 +75,7 @@ class RHRegistrationFormInvite(RHManageRegFormBase):
         notify_invitation(invitation, email_subject, email_body, email_from)
 
     def _process(self):
-        tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event_new)
+        tpl = get_template_module('events/registration/emails/invitation_default.html', event=self.event)
         form_cls = InvitationFormExisting if request.args.get('existing') == '1' else InvitationFormNew
         defaults = FormDefaults(email_body=tpl.get_html_body(), email_subject=tpl.get_subject())
         form = form_cls(obj=defaults, regform=self.regform)

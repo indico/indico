@@ -116,7 +116,7 @@ class EventLogEntry(db.Model):
         )
     )
     #: The Event this log entry is associated with
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(

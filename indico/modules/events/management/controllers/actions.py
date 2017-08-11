@@ -34,12 +34,12 @@ class RHDeleteEvent(RHManageEventBase):
     """Delete an event."""
 
     def _process_GET(self):
-        return jsonify_template('events/management/delete_event.html', event=self.event_new)
+        return jsonify_template('events/management/delete_event.html', event=self.event)
 
     def _process_POST(self):
-        self.event_new.delete('Deleted by user', session.user)
-        flash(_('Event "{}" successfully deleted.').format(self.event_new.title), 'success')
-        category = self.event_new.category
+        self.event.delete('Deleted by user', session.user)
+        flash(_('Event "{}" successfully deleted.').format(self.event.title), 'success')
+        category = self.event.category
         if category.can_manage(session.user):
             redirect_url = url_for('categories.manage_content', category)
         elif category.can_access(session.user):
@@ -54,9 +54,9 @@ class RHChangeEventType(RHManageEventBase):
 
     def _process(self):
         type_ = EventType[request.form['type']]
-        update_event_type(self.event_new, type_)
+        update_event_type(self.event, type_)
         flash(_('The event type has been changed to {}.').format(type_.title), 'success')
-        return jsonify_data(flash=False, redirect=url_for('.settings', self.event_new))
+        return jsonify_data(flash=False, redirect=url_for('.settings', self.event))
 
 
 class RHLockEvent(RHManageEventBase):
@@ -64,14 +64,14 @@ class RHLockEvent(RHManageEventBase):
 
     def _checkProtection(self):
         RHManageEventBase._checkProtection(self)
-        if not self.event_new.can_lock(session.user):
+        if not self.event.can_lock(session.user):
             raise Forbidden
 
     def _process_GET(self):
         return jsonify_template('events/management/lock_event.html')
 
     def _process_POST(self):
-        lock_event(self.event_new)
+        lock_event(self.event)
         flash(_('The event is now locked.'), 'success')
         return jsonify_data(flash=False)
 
@@ -80,11 +80,11 @@ class RHUnlockEvent(RHManageEventBase):
     """Unlock an event."""
 
     def _checkProtection(self):
-        self.ALLOW_LOCKED = self.event_new.can_lock(session.user)
+        self.ALLOW_LOCKED = self.event.can_lock(session.user)
         RHManageEventBase._checkProtection(self)
 
     def _process(self):
-        unlock_event(self.event_new)
+        unlock_event(self.event)
         flash(_('The event is now unlocked.'), 'success')
         return jsonify_data(flash=False)
 
@@ -100,11 +100,11 @@ class RHMoveEvent(RHManageEventBase):
 
     def _process(self):
         sep = ' \N{RIGHT-POINTING DOUBLE ANGLE QUOTATION MARK} '
-        old_path = sep.join(self.event_new.category.chain_titles)
+        old_path = sep.join(self.event.category.chain_titles)
         new_path = sep.join(self.target_category.chain_titles)
-        self.event_new.move(self.target_category)
-        self.event_new.log(EventLogRealm.management, EventLogKind.change, 'Category', 'Event moved', session.user,
-                           data={'From': old_path, 'To': new_path})
-        flash(_('Event "{}" has been moved to category "{}"').format(self.event_new.title, self.target_category.title),
+        self.event.move(self.target_category)
+        self.event.log(EventLogRealm.management, EventLogKind.change, 'Category', 'Event moved', session.user,
+                       data={'From': old_path, 'To': new_path})
+        flash(_('Event "{}" has been moved to category "{}"').format(self.event.title, self.target_category.title),
               'success')
         return jsonify_data(flash=False)

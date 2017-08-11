@@ -103,7 +103,7 @@ def _get_feature_definitions(sender, **kwargs):
 
 @signals.event_management.image_created.connect
 def _log_image_created(image, user, **kwargs):
-    image.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Layout',
+    image.event.log(EventLogRealm.management, EventLogKind.positive, 'Layout',
                         'Added image "{}"'.format(image.filename), user, data={
                             'File name': image.filename,
                             'File type': image.content_type,
@@ -113,7 +113,7 @@ def _log_image_created(image, user, **kwargs):
 
 @signals.event_management.image_deleted.connect
 def _log_image_deleted(image, user, **kwargs):
-    image.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Layout',
+    image.event.log(EventLogRealm.management, EventLogKind.negative, 'Layout',
                         'Deleted image "{}"'.format(image.filename), user, data={
                             'File name': image.filename
                         })

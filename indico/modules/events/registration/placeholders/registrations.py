@@ -48,7 +48,7 @@ class EventTitlePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, regform, registration):
-        return registration.registration_form.event_new.title
+        return registration.registration_form.event.title
 
 
 class EventLinkPlaceholder(Placeholder):
@@ -58,8 +58,8 @@ class EventLinkPlaceholder(Placeholder):
     @classmethod
     def render(cls, regform, registration):
         regform = registration.registration_form
-        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=regform.event_new.short_external_url,
-                                                                         title=escape(regform.event_new.title)))
+        return Markup('<a href="{url}" title="{title}">{url}</a>'.format(url=regform.event.short_external_url,
+                                                                         title=escape(regform.event.title)))
 
 
 class IDPlaceholder(Placeholder):

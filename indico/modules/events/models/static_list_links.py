@@ -71,7 +71,7 @@ class StaticListLink(db.Model):
         nullable=False
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -114,7 +114,7 @@ class StaticListLink(db.Model):
         """
         static_list_link = event.static_list_links.filter_by(type=type_, data=data).first()
         if static_list_link is None:
-            static_list_link = cls(event_new=event, type=type_, data=data)
+            static_list_link = cls(event=event, type=type_, data=data)
         else:
             # bump timestamp in case we start expiring old links
             # in the future

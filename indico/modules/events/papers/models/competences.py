@@ -49,7 +49,7 @@ class PaperCompetence(db.Model):
         default=[]
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(

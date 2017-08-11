@@ -112,7 +112,7 @@ def create_mock_abstract(event):
     Session = namedtuple('Session', ['title'])
     ContributionType = namedtuple('ContributionType', ['name'])
     Contribution = namedtuple('Contribution', ['title', 'track', 'session', 'type', 'locator'])
-    Abstract = namedtuple('Abstract', ['friendly_id', 'title', 'event_new', 'submitter', 'contribution',
+    Abstract = namedtuple('Abstract', ['friendly_id', 'title', 'event', 'submitter', 'contribution',
                                        'primary_authors', 'secondary_authors', 'locator', 'judgment_comment',
                                        'accepted_track', 'accepted_contrib_type', 'state', 'merged_into'])
 
@@ -136,7 +136,7 @@ def create_mock_abstract(event):
                                title="Broken Symmetry",
                                accepted_track=track,
                                accepted_contrib_type=contribution_type,
-                               event_new=event,
+                               event=event,
                                submitter=brout,
                                state=AbstractState.accepted,
                                contribution=contribution,
@@ -150,7 +150,7 @@ def create_mock_abstract(event):
                         title="Broken Symmetry and the Mass of Gauge Vector Mesons",
                         accepted_track=track,
                         accepted_contrib_type=contribution_type,
-                        event_new=event,
+                        event=event,
                         submitter=brout,
                         state=AbstractState.accepted,
                         contribution=contribution,
@@ -229,7 +229,7 @@ def get_user_abstracts(event, user):
 
 
 def get_visible_reviewed_for_tracks(abstract, user):
-    event = abstract.event_new
+    event = abstract.event
     if abstract.can_judge(user, check_state=True) or user in event.global_conveners:
         return abstract.reviewed_for_tracks
     convener_tracks = {track for track in event.tracks if track.can_convene(user)}
@@ -340,7 +340,7 @@ def get_events_with_abstract_reviewer_convener(user, dt=None):
                'convener_for_tracks': 'track_convener'}
     for rel, role in mapping.iteritems():
         query = (Track.query.with_parent(user, rel)
-                 .join(Track.event_new)
+                 .join(Track.event)
                  .filter(Event.ends_after(dt), ~Event.is_deleted)
                  .options(load_only('event_id')))
         for track in query:
@@ -365,7 +365,7 @@ def get_events_with_abstract_persons(user, dt=None):
                      ~Abstract.state.in_(bad_states),
                      Event.ends_after(dt),
                      Abstract.submitter == user)
-             .join(Abstract.event_new)
+             .join(Abstract.event)
              .options(load_only('event_id')))
     for abstract in query:
         data[abstract.event_id].add('abstract_submitter')
@@ -375,7 +375,7 @@ def get_events_with_abstract_persons(user, dt=None):
              .filter(~Event.is_deleted,
                      Event.ends_after(dt),
                      EventPerson.abstract_links.any(AbstractPersonLink.abstract.has(abstract_criterion)))
-             .join(EventPerson.event_new)
+             .join(EventPerson.event)
              .options(load_only('event_id')))
     for person in query:
         data[person.event_id].add('abstract_person')

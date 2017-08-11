@@ -92,8 +92,8 @@ class SessionBlock(LocationMixin, db.Model):
         super(SessionBlock, self).__init__(**kwargs)
 
     @property
-    def event_new(self):
-        return self.session.event_new
+    def event(self):
+        return self.session.event
 
     @locator_property
     def locator(self):

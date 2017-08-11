@@ -102,9 +102,9 @@ class LinkMixin(object):
         Call this method after the definition of a model which uses
         this mixin class.
         """
-        event_mapping = {cls.session: lambda x: x.event_new,
-                         cls.contribution: lambda x: x.event_new,
-                         cls.subcontribution: lambda x: x.contribution.event_new,
+        event_mapping = {cls.session: lambda x: x.event,
+                         cls.contribution: lambda x: x.event,
+                         cls.subcontribution: lambda x: x.contribution.event,
                          cls.linked_event: lambda x: x}
 
         type_mapping = {cls.category: LinkType.category,
@@ -121,7 +121,7 @@ class LinkMixin(object):
             if value is not None:
                 event = fn(value)
                 assert event is not None
-                target.event_new = event
+                target.event = event
 
         for rel, fn in event_mapping.iteritems():
             if rel is not None:
@@ -212,7 +212,7 @@ class LinkMixin(object):
             )
 
     @declared_attr
-    def event_new(cls):
+    def event(cls):
         return db.relationship(
             'Event',
             foreign_keys=cls.event_id,
@@ -285,7 +285,7 @@ class LinkMixin(object):
         if self.link_type == LinkType.category:
             return self.category
         elif self.link_type == LinkType.event:
-            return self.event_new
+            return self.event
         elif self.link_type == LinkType.session:
             return self.session
         elif self.link_type == LinkType.contribution:
@@ -296,7 +296,7 @@ class LinkMixin(object):
     @object.setter
     def object(self, obj):
         self.category = None
-        self.linked_event = self.event_new = self.session = self.contribution = self.subcontribution = None
+        self.linked_event = self.event = self.session = self.contribution = self.subcontribution = None
         if isinstance(obj, db.m.Category):
             self.category = obj
         elif isinstance(obj, db.m.Event):

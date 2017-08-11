@@ -40,7 +40,7 @@ class RHManageTimetableBase(RHManageEventBase):
         RHManageEventBase._checkParams(self, params)
         self.session = None
         if 'session_id' in request.view_args:
-            self.session = self.event_new.get_session(request.view_args['session_id'])
+            self.session = self.event.get_session(request.view_args['session_id'])
             if self.session is None:
                 raise NotFound
 
@@ -72,7 +72,7 @@ class RHManageTimetableEntryBase(RHManageTimetableBase):
 
     def _get_locator(self):
         if not self.entry:
-            return self.event_new
+            return self.event
         locator = self.entry.locator
         if 'session_id' in request.view_args:
             locator['session_id'] = self.session.id
@@ -82,4 +82,4 @@ class RHManageTimetableEntryBase(RHManageTimetableBase):
         RHManageTimetableBase._checkParams(self, params)
         self.entry = None
         if 'entry_id' in request.view_args:
-            self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+            self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()

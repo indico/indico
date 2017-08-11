@@ -109,7 +109,7 @@ def update_team_members(event, managers, judges, content_reviewers=None, layout_
 
 
 def create_competences(event, user, competences):
-    PaperCompetence(event_new=event, user=user, competences=competences)
+    PaperCompetence(event=event, user=user, competences=competences)
     logger.info("Competences for user %r for event %r created by %r", user, event, session.user)
     event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
               "Added competences of {}".format(user.full_name), session.user,
@@ -117,7 +117,7 @@ def create_competences(event, user, competences):
 
 
 def update_competences(user_competences, competences):
-    event = user_competences.event_new
+    event = user_competences.event
     user_competences.competences = competences
     logger.info("Competences for user %r in event %r updated by %r", user_competences.user, event, session.user)
     event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
@@ -161,7 +161,7 @@ def create_paper_revision(paper, submitter, files):
     db.session.expire(revision._contribution, ['_paper_last_revision'])
     notify_paper_revision_submission(revision)
     logger.info('Paper revision %r submitted by %r', revision, session.user)
-    paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         "Paper revision {} submitted for contribution {} ({})"
                         .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
     return revision
@@ -182,7 +182,7 @@ def judge_paper(paper, judgment, comment, judge):
     log_data = {'New state': orig_string(judgment.title)}
     notify_paper_judgment(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
-    paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
                         data=log_data)
 
@@ -192,7 +192,7 @@ def reset_paper_state(paper):
     db.session.flush()
     notify_paper_judgment(paper, reset=True)
     logger.info('Paper %r state reset by %r', paper, session.user)
-    paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Judgment {} reset'.format(paper.verbose_title), session.user)
 
 
@@ -210,7 +210,7 @@ def _store_paper_template_file(template, file):
 
 def create_paper_template(event, data):
     file = data.pop('template')
-    template = PaperTemplate(event_new=event)
+    template = PaperTemplate(event=event)
     template.populate_from_dict(data)
     _store_paper_template_file(template, file)
     db.session.flush()
@@ -268,7 +268,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
     review = PaperReview(revision=paper.last_revision, type=review_type.instance, user=user)
     review.populate_from_dict(review_data)
     log_data = {}
-    for question in paper.event_new.cfp.get_questions_for_review_type(review_type.instance):
+    for question in paper.event.cfp.get_questions_for_review_type(review_type.instance):
         value = int(questions_data['question_{}'.format(question.id)])
         review.ratings.append(PaperReviewRating(question=question, value=value))
         log_data[question.text] = value
@@ -280,7 +280,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
         'Action': orig_string(review.proposed_action.title),
         'Comment': review.comment
     })
-    paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         'Paper for contribution {} reviewed'.format(paper.contribution.verbose_title),
                         user, data=log_data)
     return review
@@ -288,7 +288,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
 
 def update_review(review, review_data, questions_data):
     paper = review.revision.paper
-    event = paper.event_new
+    event = paper.event
     changes = review.populate_from_dict(review_data)
     review.modified_dt = now_utc()
     log_fields = {}
@@ -331,7 +331,7 @@ def create_comment(paper, text, visibility, user):
     for receiver in recipients:
         notify_comment(receiver, paper, text, user)
     logger.info("Paper %r received a comment from %r", paper, session.user)
-    paper.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
                         'Paper {} received a comment'.format(paper.verbose_title),
                         session.user)
 
@@ -343,7 +343,7 @@ def update_comment(comment, text, visibility):
     db.session.flush()
     logger.info("Paper comment %r modified by %r", comment, session.user)
     paper = comment.paper_revision.paper
-    paper.event_new.log(EventLogRealm.management, EventLogKind.change, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
                         'Comment on paper {} modified'.format(paper.verbose_title), session.user,
                         data={'Changes': make_diff_log(changes, {'text': 'Text', 'visibility': 'Visibility'})})
 
@@ -353,7 +353,7 @@ def delete_comment(comment):
     db.session.flush()
     logger.info("Paper comment %r deleted by %r", comment, session.user)
     paper = comment.paper_revision.paper
-    paper.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Papers',
+    paper.event.log(EventLogRealm.management, EventLogKind.negative, 'Papers',
                         'Comment on paper {} removed'.format(paper.verbose_title), session.user)
 
 

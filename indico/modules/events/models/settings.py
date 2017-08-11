@@ -45,7 +45,7 @@ class EventSettingsMixin(object):
         )
 
     @declared_attr
-    def event_new(cls):
+    def event(cls):
         return db.relationship(
             'Event',
             lazy=True,

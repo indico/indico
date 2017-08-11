@@ -34,7 +34,7 @@
     {% endcall %}
 
     {# TODO: render review-summary-box #}
-    {% if not paper.event_new.is_locked and paper.can_judge(session.user, check_state=true) %}
+    {% if not paper.event.is_locked and paper.can_judge(session.user, check_state=true) %}
         <div id="proposal-decision-box" class="i-timeline-item">
             {{ render_decision_box(paper, judgment_form, session.user) }}
         </div>

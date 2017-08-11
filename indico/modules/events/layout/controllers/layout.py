@@ -75,7 +75,7 @@ def _make_theme_settings_form(event, theme):
 
 class RHLayoutTimetableThemeForm(RHLayoutBase):
     def _process(self):
-        form = _make_theme_settings_form(self.event_new, request.args['theme'])
+        form = _make_theme_settings_form(self.event, request.args['theme'])
         if not form:
             return jsonify()
         tpl = get_template_module('forms/_form.html')
@@ -84,54 +84,54 @@ class RHLayoutTimetableThemeForm(RHLayoutBase):
 
 class RHLayoutEdit(RHLayoutBase):
     def _process(self):
-        if self.event_new.type_ == EventType.conference:
+        if self.event.type_ == EventType.conference:
             return self._process_conference()
         else:
             return self._process_lecture_meeting()
 
     def _get_form_defaults(self):
-        defaults = FormDefaults(**layout_settings.get_all(self.event_new))
-        defaults.timetable_theme = self.event_new.theme
+        defaults = FormDefaults(**layout_settings.get_all(self.event))
+        defaults.timetable_theme = self.event.theme
         return defaults
 
     def _process_lecture_meeting(self):
-        form = LectureMeetingLayoutForm(obj=self._get_form_defaults(), event=self.event_new)
-        tt_theme_settings_form = _make_theme_settings_form(self.event_new, form.timetable_theme.data)
+        form = LectureMeetingLayoutForm(obj=self._get_form_defaults(), event=self.event)
+        tt_theme_settings_form = _make_theme_settings_form(self.event, form.timetable_theme.data)
         tt_form_valid = tt_theme_settings_form.validate_on_submit() if tt_theme_settings_form else True
         if form.validate_on_submit() and tt_form_valid:
             if tt_theme_settings_form:
-                layout_settings.set(self.event_new, 'timetable_theme_settings', tt_theme_settings_form.data)
+                layout_settings.set(self.event, 'timetable_theme_settings', tt_theme_settings_form.data)
             else:
-                layout_settings.delete(self.event_new, 'timetable_theme_settings')
-            layout_settings.set_multi(self.event_new, form.data)
+                layout_settings.delete(self.event, 'timetable_theme_settings')
+            layout_settings.set_multi(self.event, form.data)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('.index', self.event_new))
-        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self._conf, form=form, event=self.event_new,
+            return redirect(url_for('.index', self.event))
+        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self._conf, form=form, event=self.event,
                                             timetable_theme_settings_form=tt_theme_settings_form)
 
     def _process_conference(self):
-        form = ConferenceLayoutForm(obj=self._get_form_defaults(), event=self.event_new)
+        form = ConferenceLayoutForm(obj=self._get_form_defaults(), event=self.event)
         css_form = CSSForm()
         logo_form = LogoForm()
-        tt_theme_settings_form = _make_theme_settings_form(self.event_new, form.timetable_theme.data)
+        tt_theme_settings_form = _make_theme_settings_form(self.event, form.timetable_theme.data)
         tt_form_valid = tt_theme_settings_form.validate_on_submit() if tt_theme_settings_form else True
         if form.validate_on_submit() and tt_form_valid:
             if tt_theme_settings_form:
-                layout_settings.set(self.event_new, 'timetable_theme_settings', tt_theme_settings_form.data)
+                layout_settings.set(self.event, 'timetable_theme_settings', tt_theme_settings_form.data)
             else:
-                layout_settings.delete(self.event_new, 'timetable_theme_settings')
+                layout_settings.delete(self.event, 'timetable_theme_settings')
             data = {unicode(key): value for key, value in form.data.iteritems() if key in layout_settings.defaults}
-            layout_settings.set_multi(self.event_new, data)
+            layout_settings.set_multi(self.event, data)
             if form.theme.data == '_custom':
-                layout_settings.set(self.event_new, 'use_custom_css', True)
+                layout_settings.set(self.event, 'use_custom_css', True)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('.index', self.event_new))
+            return redirect(url_for('.index', self.event))
         else:
-            if self.event_new.logo_metadata:
-                logo_form.logo.data = self.event_new
-            if self.event_new.has_stylesheet:
-                css_form.css_file.data = self.event_new
-        return WPLayoutEdit.render_template('layout_conference.html', self._conf, form=form, event=self.event_new,
+            if self.event.logo_metadata:
+                logo_form.logo.data = self.event
+            if self.event.has_stylesheet:
+                css_form.css_file.data = self.event
+        return WPLayoutEdit.render_template('layout_conference.html', self._conf, form=form, event=self.event,
                                             logo_form=logo_form, css_form=css_form,
                                             timetable_theme_settings_form=tt_theme_settings_form)
 
@@ -155,86 +155,86 @@ class RHLayoutLogoUpload(RHLayoutBase):
         img.save(image_bytes, 'PNG')
         image_bytes.seek(0)
         content = image_bytes.read()
-        self.event_new.logo = content
-        self.event_new.logo_metadata = {
+        self.event.logo = content
+        self.event.logo_metadata = {
             'hash': crc32(content),
             'size': len(content),
             'filename': os.path.splitext(secure_filename(f.filename, 'logo'))[0] + '.png',
             'content_type': 'image/png'
         }
         flash(_('New logo saved'), 'success')
-        logger.info("New logo '%s' uploaded by %s (%s)", f.filename, session.user, self.event_new)
-        return jsonify_data(content=get_logo_data(self.event_new))
+        logger.info("New logo '%s' uploaded by %s (%s)", f.filename, session.user, self.event)
+        return jsonify_data(content=get_logo_data(self.event))
 
 
 class RHLayoutLogoDelete(RHLayoutBase):
     def _process(self):
-        self.event_new.logo = None
-        self.event_new.logo_metadata = None
+        self.event.logo = None
+        self.event.logo_metadata = None
         flash(_('Logo deleted'), 'success')
-        logger.info("Logo of %s deleted by %s", self.event_new, session.user)
+        logger.info("Logo of %s deleted by %s", self.event, session.user)
         return jsonify_data(content=None)
 
 
 class RHLayoutCSSUpload(RHLayoutBase):
     def _process(self):
         f = request.files['css_file']
-        self.event_new.stylesheet = to_unicode(f.read()).strip()
-        self.event_new.stylesheet_metadata = {
-            'hash': crc32(self.event_new.stylesheet),
-            'size': len(self.event_new.stylesheet),
+        self.event.stylesheet = to_unicode(f.read()).strip()
+        self.event.stylesheet_metadata = {
+            'hash': crc32(self.event.stylesheet),
+            'size': len(self.event.stylesheet),
             'filename': secure_filename(f.filename, 'stylesheet.css')
         }
         db.session.flush()
         flash(_('New CSS file saved. Do not forget to enable it ("Use custom CSS") after verifying that it is correct '
                 'using the preview.'), 'success')
-        logger.info('CSS file for %s uploaded by %s', self.event_new, session.user)
-        return jsonify_data(content=get_css_file_data(self.event_new))
+        logger.info('CSS file for %s uploaded by %s', self.event, session.user)
+        return jsonify_data(content=get_css_file_data(self.event))
 
 
 class RHLayoutCSSDelete(RHLayoutBase):
 
     def _process(self):
-        self.event_new.stylesheet = None
-        self.event_new.stylesheet_metadata = None
-        layout_settings.set(self.event_new, 'use_custom_css', False)
+        self.event.stylesheet = None
+        self.event.stylesheet_metadata = None
+        layout_settings.set(self.event, 'use_custom_css', False)
         flash(_('CSS file deleted'), 'success')
-        logger.info("CSS file for %s deleted by %s", self.event_new, session.user)
+        logger.info("CSS file for %s deleted by %s", self.event, session.user)
         return jsonify_data(content=None)
 
 
 class RHLayoutCSSPreview(RHLayoutBase):
     def _process(self):
-        form = CSSSelectionForm(event=self.event_new, formdata=request.args, csrf_enabled=False)
+        form = CSSSelectionForm(event=self.event, formdata=request.args, csrf_enabled=False)
         css_url = None
         if form.validate():
-            css_url = get_css_url(self.event_new, force_theme=form.theme.data, for_preview=True)
+            css_url = get_css_url(self.event, force_theme=form.theme.data, for_preview=True)
         return WPConferenceDisplay(self, self._conf, css_override_form=form, css_url_override=css_url).display()
 
 
 class RHLayoutCSSSaveTheme(RHLayoutBase):
     def _process(self):
-        form = CSSSelectionForm(event=self.event_new)
+        form = CSSSelectionForm(event=self.event)
         if form.validate_on_submit():
-            layout_settings.set(self.event_new, 'use_custom_css', form.theme.data == '_custom')
+            layout_settings.set(self.event, 'use_custom_css', form.theme.data == '_custom')
             if form.theme.data != '_custom':
                 layout_settings.set(self._conf, 'theme', form.theme.data)
             flash(_('Settings saved'), 'success')
-            return redirect(url_for('.index', self.event_new))
+            return redirect(url_for('.index', self.event))
 
 
 class RHLogoDisplay(RHConferenceBaseDisplay):
     def _process(self):
-        if not self.event_new.has_logo:
+        if not self.event.has_logo:
             raise NotFound
-        metadata = self.event_new.logo_metadata
-        return send_file(metadata['filename'], BytesIO(self.event_new.logo), mimetype=metadata['content_type'],
+        metadata = self.event.logo_metadata
+        return send_file(metadata['filename'], BytesIO(self.event.logo), mimetype=metadata['content_type'],
                          conditional=True)
 
 
 class RHLayoutCSSDisplay(RHConferenceBaseDisplay):
     def _process(self):
-        if not self.event_new.has_stylesheet:
+        if not self.event.has_stylesheet:
             raise NotFound
-        data = BytesIO(self.event_new.stylesheet.encode('utf-8'))
-        return send_file(self.event_new.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True)
+        data = BytesIO(self.event.stylesheet.encode('utf-8'))
+        return send_file(self.event.stylesheet_metadata['filename'], data, mimetype='text/css', conditional=True)

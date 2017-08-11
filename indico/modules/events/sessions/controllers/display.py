@@ -38,9 +38,9 @@ class RHDisplaySessionList(RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkProtection(self)
 
     def _process(self):
-        sessions = get_sessions_for_user(self.event_new, session.user)
+        sessions = get_sessions_for_user(self.event, session.user)
         return WPDisplayMySessionsConference.render_template('display/session_list.html', self._conf,
-                                                             event=self.event_new, sessions=sessions)
+                                                             event=self.event, sessions=sessions)
 
 
 class RHDisplaySessionBase(RHConferenceBaseDisplay):
@@ -64,7 +64,7 @@ class RHDisplaySession(RHDisplaySessionBase):
 
     def _process(self):
         ical_params = get_base_ical_parameters(session.user, 'sessions',
-                                               '/export/event/{0}/session/{1}.ics'.format(self.event_new.id,
+                                               '/export/event/{0}/session/{1}.ics'.format(self.event.id,
                                                                                           self.session.id))
         contributions_strategy = subqueryload('contributions')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
@@ -80,7 +80,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                 .options(contributions_strategy, blocks_strategy)
                 .one())
         return self.view_class.render_template('display/session_display.html', self._conf, sess=sess,
-                                               event=self.event_new, **ical_params)
+                                               event=self.event, **ical_params)
 
 
 class RHExportSessionToICAL(RHDisplaySessionBase):

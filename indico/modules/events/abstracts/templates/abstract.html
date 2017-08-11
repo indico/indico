@@ -9,7 +9,7 @@
 
 {% block back_button_url -%}
     {% if management -%}
-        {{ url_for('.manage_abstract_list', abstract.event_new) }}
+        {{ url_for('.manage_abstract_list', abstract.event) }}
     {%- endif %}
 {%- endblock %}
 
@@ -32,7 +32,7 @@
     {% endcall %}
 
     <div class="i-timeline">
-        {% if abstract.can_judge(session.user, check_state=true) and abstract.event_new.tracks %}
+        {% if abstract.can_judge(session.user, check_state=true) and abstract.event.tracks %}
             {{ render_reviewed_for_tracks_box(abstract, review_track_list_form) }}
         {% endif %}
 
@@ -42,7 +42,7 @@
             </div>
         {% endif %}
 
-        {% if not abstract.event_new.is_locked and abstract.can_judge(session.user, check_state=true) %}
+        {% if not abstract.event.is_locked and abstract.can_judge(session.user, check_state=true) %}
             <div id="proposal-decision-box" class="i-timeline-item">
                 {{ render_decision_box(abstract, judgment_form, session.user) }}
             </div>

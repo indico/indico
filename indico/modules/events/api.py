@@ -307,7 +307,7 @@ class SerializerBase(object):
             '_type': 'SessionSlot',
             '_fossil': self.fossils_mapping['block'].get(self._detail_level),
             'id': block.id,  # TODO: Need to check if breaking the `session_id-block_id` format is OK
-            'conference': self._build_session_event_api_data(block.event_new),
+            'conference': self._build_session_event_api_data(block.event),
             'startDate': self._serialize_date(block.timetable_entry.start_dt) if block.timetable_entry else None,
             'endDate': self._serialize_date(block.timetable_entry.end_dt) if block.timetable_entry else None,
             'description': '',  # Session blocks don't have a description

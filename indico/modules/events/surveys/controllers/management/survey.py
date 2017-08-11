@@ -38,11 +38,11 @@ class RHManageSurveys(RHManageSurveysBase):
     """Survey management overview (list of surveys)"""
 
     def _process(self):
-        surveys = (Survey.query.with_parent(self.event_new)
+        surveys = (Survey.query.with_parent(self.event)
                    .filter(~Survey.is_deleted)
                    .order_by(db.func.lower(Survey.title))
                    .all())
-        return WPManageSurvey.render_template('management/survey_list.html', self.event_new, surveys=surveys)
+        return WPManageSurvey.render_template('management/survey_list.html', self.event, surveys=surveys)
 
 
 class RHManageSurvey(RHManageSurveyBase):
@@ -50,7 +50,7 @@ class RHManageSurvey(RHManageSurveyBase):
 
     def _process(self):
         submitted_surveys = [s for s in self.survey.submissions if s.is_submitted]
-        return WPManageSurvey.render_template('management/survey.html', self.event_new,
+        return WPManageSurvey.render_template('management/survey.html', self.event,
                                               survey=self.survey, submitted_surveys=submitted_surveys)
 
 
@@ -61,14 +61,14 @@ class RHEditSurvey(RHManageSurveyBase):
         return FormDefaults(self.survey, limit_submissions=self.survey.submission_limit is not None)
 
     def _process(self):
-        form = SurveyForm(event=self.event_new, obj=self._get_form_defaults())
+        form = SurveyForm(event=self.event, obj=self._get_form_defaults())
         if form.validate_on_submit():
             form.populate_obj(self.survey)
             db.session.flush()
             flash(_('Survey modified'), 'success')
             logger.info('Survey %s modified by %s', self.survey, session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event_new, form=form,
+        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event, form=form,
                                 survey=self.survey)
 
 
@@ -79,16 +79,16 @@ class RHDeleteSurvey(RHManageSurveyBase):
         self.survey.is_deleted = True
         flash(_('Survey deleted'), 'success')
         logger.info('Survey %s deleted by %s', self.survey, session.user)
-        return redirect(url_for('.manage_survey_list', self.event_new))
+        return redirect(url_for('.manage_survey_list', self.event))
 
 
 class RHCreateSurvey(RHManageSurveysBase):
     """Create a new survey"""
 
     def _process(self):
-        form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event_new)
+        form = SurveyForm(obj=FormDefaults(require_user=True), event=self.event)
         if form.validate_on_submit():
-            survey = Survey(event_new=self.event_new)
+            survey = Survey(event=self.event)
             # add a default section so people can start adding questions right away
             survey.items.append(SurveySection(display_as_section=False))
             form.populate_obj(survey)
@@ -97,7 +97,7 @@ class RHCreateSurvey(RHManageSurveysBase):
             flash(_('Survey created'), 'success')
             logger.info('Survey %s created by %s', survey, session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event_new, form=form,
+        return jsonify_template('events/surveys/management/edit_survey.html', event=self.event, form=form,
                                 survey=None)
 
 
@@ -158,8 +158,8 @@ class RHSendSurveyLinks(RHManageSurveyBase):
         RHManageSurveyBase._checkParams(self, params)
 
     def _process(self):
-        tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event_new)
-        form = InvitationForm(body=tpl.get_html_body(), subject=tpl.get_subject(), event=self.event_new)
+        tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)
+        form = InvitationForm(body=tpl.get_html_body(), subject=tpl.get_subject(), event=self.event)
         if form.validate_on_submit():
             self._send_emails(form, form.recipients.data)
             num = len(form.recipients.data)
@@ -169,12 +169,12 @@ class RHSendSurveyLinks(RHManageSurveyBase):
 
     def _send_emails(self, form, recipients):
         for recipient in recipients:
-            email_body = replace_placeholders('survey-link-email', form.body.data, event=self.event_new,
+            email_body = replace_placeholders('survey-link-email', form.body.data, event=self.event,
                                               survey=self.survey)
-            email_subject = replace_placeholders('survey-link-email', form.subject.data, event=self.event_new,
+            email_subject = replace_placeholders('survey-link-email', form.subject.data, event=self.event,
                                                  survey=self.survey)
             tpl = get_template_module('emails/custom.html', subject=email_subject, body=email_body)
             bcc = [session.user.email] if form.copy_for_sender.data else []
             email = make_email(to_list=recipient,  bcc_list=bcc, from_address=form.from_address.data,
                                template=tpl, html=True)
-            send_email(email, self.event_new, 'Surveys')
+            send_email(email, self.event, 'Surveys')

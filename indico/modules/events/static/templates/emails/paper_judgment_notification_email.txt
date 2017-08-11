@@ -23,11 +23,11 @@
 {% block body -%}
     {% filter dedent -%}
         {% if paper.state.name in ('accepted', 'rejected') %}
-            After the reviewing process your paper "{{ contribution.title }} (#{{ contribution.friendly_id }})", submitted for "{{ contribution.event_new.title }}" has been {{ paper.state.name }}.
+            After the reviewing process your paper "{{ contribution.title }} (#{{ contribution.friendly_id }})", submitted for "{{ contribution.event.title }}" has been {{ paper.state.name }}.
             {{ get_comments() }}
             You may proceed to your paper page:
         {% elif paper.state.name == 'to_be_corrected' %}
-            After the reviewing process your paper "{{ contribution.title }} (#{{ contribution.friendly_id }})", submitted for "{{ contribution.event_new.title }}" is required to be corrected.
+            After the reviewing process your paper "{{ contribution.title }} (#{{ contribution.friendly_id }})", submitted for "{{ contribution.event.title }}" is required to be corrected.
             {{ get_comments() }}
             You may then apply the requested modifications to your paper and submit the modified version for review.
             In order to do so, please proceed to your paper page:
@@ -37,4 +37,4 @@
     {%- endfilter %}
 {%- endblock %}
 
-{% block footer_url %}{{ contribution.event_new.external_url }}{% endblock %}
+{% block footer_url %}{{ contribution.event.external_url }}{% endblock %}

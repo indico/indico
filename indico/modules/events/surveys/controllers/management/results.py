@@ -44,7 +44,7 @@ class RHSurveyResults(RHManageSurveyBase):
                        .one())
 
     def _process(self):
-        return WPSurveyResults.render_template('management/survey_results.html', self.event_new, survey=self.survey)
+        return WPSurveyResults.render_template('management/survey_results.html', self.event, survey=self.survey)
 
 
 class RHExportSubmissionsBase(RHManageSurveyBase):
@@ -78,7 +78,7 @@ class RHExportSubmissionsExcel(RHExportSubmissionsBase):
     """Export submissions as XLSX"""
 
     def _export(self, filename, headers, rows):
-        return send_xlsx(filename + '.xlsx', headers, rows, tz=self.event_new.tzinfo)
+        return send_xlsx(filename + '.xlsx', headers, rows, tz=self.event.tzinfo)
 
 
 class RHSurveySubmissionBase(RHManageSurveysBase):
@@ -108,10 +108,10 @@ class RHDeleteSubmissions(RHManageSurveyBase):
             if submission.id in submission_ids:
                 self.survey.submissions.remove(submission)
                 logger.info('Submission %s deleted from survey %s', submission, self.survey)
-                self.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
-                                   'Submission removed from survey "{}"'.format(self.survey.title),
-                                   data={'Submitter': submission.user.full_name
-                                         if not submission.is_anonymous else 'Anonymous'})
+                self.event.log(EventLogRealm.management, EventLogKind.negative, 'Surveys',
+                               'Submission removed from survey "{}"'.format(self.survey.title),
+                               data={'Submitter': submission.user.full_name
+                                     if not submission.is_anonymous else 'Anonymous'})
         return jsonify(success=True)
 
 
@@ -120,6 +120,6 @@ class RHDisplaySubmission(RHSurveySubmissionBase):
 
     def _process(self):
         answers = {answer.question_id: answer for answer in self.submission.answers}
-        return WPManageSurvey.render_template('management/survey_submission.html', self.event_new,
+        return WPManageSurvey.render_template('management/survey_submission.html', self.event,
                                               survey=self.submission.survey, submission=self.submission,
                                               answers=answers)

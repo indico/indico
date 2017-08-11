@@ -11,7 +11,7 @@
                             {% trans %}From{% endtrans %}
                         </span>
                         <span class="datetime">
-                            {{ regform.start_dt|format_date(timezone=regform.event_new.tzinfo) }}
+                            {{ regform.start_dt|format_date(timezone=regform.event.tzinfo) }}
                         </span>
                     </div>
                     <div>
@@ -20,7 +20,7 @@
                         </span>
                         <span class="datetime">
                             {% if regform.end_dt %}
-                                {{ regform.end_dt|format_date(timezone=regform.event_new.tzinfo) }}
+                                {{ regform.end_dt|format_date(timezone=regform.event.tzinfo) }}
                             {% else %}
                                 <em>{% trans %}Not specified{% endtrans %}</em>
                             {% endif %}

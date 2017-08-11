@@ -151,7 +151,7 @@ def get_abstract_notification_tpl_module(email_tpl, abstract):
     body = replace_placeholders('abstract-notification-email', email_tpl.body,
                                 abstract=abstract, escape_html=False)
     return get_template_module('events/abstracts/emails/abstract_notification.txt',
-                               event=email_tpl.event_new, subject=subject, body=body)
+                               event=email_tpl.event, subject=subject, body=body)
 
 
 def send_abstract_notifications(abstract):
@@ -162,10 +162,10 @@ def send_abstract_notifications(abstract):
     :return: whether an email has been sent
     """
     sent = False
-    for email_tpl in abstract.event_new.abstract_email_templates:
+    for email_tpl in abstract.event.abstract_email_templates:
         matched = False
         for rule in email_tpl.rules:
-            if check_rule('abstract-notifications', rule, abstract=abstract, event=abstract.event_new):
+            if check_rule('abstract-notifications', rule, abstract=abstract, event=abstract.event):
                 matched = True
                 to_recipients = []
                 if email_tpl.include_submitter:
@@ -180,7 +180,7 @@ def send_abstract_notifications(abstract):
                 tpl = get_abstract_notification_tpl_module(email_tpl, abstract)
                 email = make_email(to_list=to_recipients, cc_list=cc_recipients,
                                    reply_address=email_tpl.reply_to_address, template=tpl)
-                send_email(email, event=abstract.event_new, user=session.user)
+                send_email(email, event=abstract.event, user=session.user)
                 abstract.email_logs.append(AbstractEmailLogEntry.create_from_email(email, email_tpl=email_tpl,
                                                                                    user=session.user))
                 sent = True

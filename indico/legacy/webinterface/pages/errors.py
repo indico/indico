@@ -198,7 +198,7 @@ class WPKeyAccessError( WPDecorated ):
         WPDecorated.__init__( self, rh )
 
     def _getBody(self, params):
-        event = self._rh.event_new
+        event = self._rh.event
         msg = ""
         has_key = session.get("access_keys", {}).get(event._access_key_session_key) is not None
         if has_key:

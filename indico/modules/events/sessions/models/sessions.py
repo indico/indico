@@ -107,7 +107,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         default=False
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -153,11 +153,11 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     @property
     def location_parent(self):
-        return self.event_new
+        return self.event
 
     @property
     def protection_parent(self):
-        return self.event_new
+        return self.event
 
     @property
     def session(self):
@@ -168,7 +168,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     @memoize_request
     def start_dt(self):
         from indico.modules.events.sessions.models.blocks import SessionBlock
-        start_dt = (self.event_new.timetable_entries
+        start_dt = (self.event.timetable_entries
                     .with_entities(TimetableEntry.start_dt)
                     .join('session_block')
                     .filter(TimetableEntry.type == TimetableEntryType.SESSION_BLOCK,
@@ -197,7 +197,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, session_id=self.id)
+        return dict(self.event.locator, session_id=self.id)
 
     def get_non_inheriting_objects(self):
         """Get a set of child objects that do not inherit protection"""
@@ -215,7 +215,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         elif self.session.can_manage(user, allow_admin=allow_admin):
             return True
         elif (self.session.can_manage(user, 'coordinate') and
-                session_coordinator_priv_enabled(self.event_new, 'manage-contributions')):
+                session_coordinator_priv_enabled(self.event, 'manage-contributions')):
             return True
         else:
             return False
@@ -233,7 +233,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
             return True
         # session coordiator if block management is allowed
         elif (self.session.can_manage(user, 'coordinate') and
-                session_coordinator_priv_enabled(self.event_new, 'manage-blocks')):
+                session_coordinator_priv_enabled(self.event, 'manage-blocks')):
             return True
         else:
             return False

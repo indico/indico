@@ -62,7 +62,7 @@ class RHPaperTimeline(RHPaperBase):
 
     def _check_paper_protection(self):
         return (self.contribution.is_user_associated(session.user, check_abstract=True) or
-                self.event_new.cfp.is_manager(session.user) or
+                self.event.cfp.is_manager(session.user) or
                 self.paper.can_review(session.user) or
                 self.paper.can_judge(session.user))
 
@@ -188,14 +188,14 @@ class RHReviewingArea(RHPapersBase):
     def _checkProtection(self):
         if not session.user:
             raise Forbidden
-        if not self.event_new.cfp.can_access_reviewing_area(session.user):
+        if not self.event.cfp.can_access_reviewing_area(session.user):
             raise Forbidden
         RHPapersBase._checkProtection(self)
 
     def _process(self):
-        contribs_to_review = get_user_contributions_to_review(self.event_new, session.user)
-        reviewed_contribs = get_user_reviewed_contributions(self.event_new, session.user)
-        return WPDisplayReviewingArea.render_template('display/reviewing_area.html', self._conf, event=self.event_new,
+        contribs_to_review = get_user_contributions_to_review(self.event, session.user)
+        reviewed_contribs = get_user_reviewed_contributions(self.event, session.user)
+        return WPDisplayReviewingArea.render_template('display/reviewing_area.html', self._conf, event=self.event,
                                                       contribs_to_review=contribs_to_review,
                                                       reviewed_contribs=reviewed_contribs)
 
@@ -216,7 +216,7 @@ class RHResetPaperState(RHPaperBase):
         if self.paper.state == PaperRevisionState.submitted:
             return False
         # managers and judges can always reset
-        if self.paper.event_new.can_manage(session.user) or self.paper.can_judge(session.user):
+        if self.paper.event.can_manage(session.user) or self.paper.can_judge(session.user):
             return True
 
     def _process(self):
@@ -239,13 +239,13 @@ class RHCallForPapers(RHPapersBase):
         if not session.user:
             # checkProtection aborts in this case, but the functions below fail with a None user
             return
-        self.papers = set(get_contributions_with_paper_submitted_by_user(self.event_new, session.user))
-        contribs = set(get_contributions_with_user_paper_submission_rights(self.event_new, session.user))
+        self.papers = set(get_contributions_with_paper_submitted_by_user(self.event, session.user))
+        contribs = set(get_contributions_with_user_paper_submission_rights(self.event, session.user))
         self.contribs = contribs - self.papers
 
     def _process(self):
         return WPDisplayCallForPapers.render_template('display/call_for_papers.html', self._conf,
-                                                      event=self.event_new, contributions=self.contribs,
+                                                      event=self.event, contributions=self.contribs,
                                                       papers=self.papers)
 
 

@@ -95,11 +95,11 @@ def test_locator():
 
 
 @pytest.mark.parametrize('person_with_user', (True, False))
-def test_create_from_data(dummy_event_new, dummy_person, dummy_user, person_with_user):
+def test_create_from_data(dummy_event, dummy_person, dummy_user, person_with_user):
     type_ = 'dummy'
     dummy_person.user = dummy_user if person_with_user else None
-    agreement = Agreement.create_from_data(event=dummy_event_new, type_=type_, person=dummy_person)
-    assert agreement.event_new == dummy_event_new
+    agreement = Agreement.create_from_data(event=dummy_event, type_=type_, person=dummy_person)
+    assert agreement.event == dummy_event
     assert agreement.type == type_
     assert agreement.state == AgreementState.pending
     assert agreement.uuid
@@ -180,7 +180,7 @@ def test_belongs_to():
 
 
 @pytest.mark.usefixtures('mock_agreement_definition')
-def test_is_orphan(dummy_event_new):
-    agreement = Agreement(event_new=dummy_event_new)
+def test_is_orphan(dummy_event):
+    agreement = Agreement(event=dummy_event)
     agreement.is_orphan()
-    agreement.definition.is_agreement_orphan(agreement.event_new, agreement)
+    agreement.definition.is_agreement_orphan(agreement.event, agreement)

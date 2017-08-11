@@ -76,7 +76,7 @@
 {% endmacro %}
 
 {% macro render_decision_box(proposal, form, user) %}
-    {% set event = proposal.event_new %}
+    {% set event = proposal.event %}
     {{ render_user_avatar(user) }}
     <div class="i-timeline-item-box footer-only header-indicator-left review-form">
         <div class="i-box-footer">

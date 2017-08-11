@@ -111,7 +111,7 @@ def _extend_event_menu(sender, **kwargs):
         return session.user and has_contributions_with_user_as_submitter(event, session.user)
 
     def _visible_list_of_contributions(event):
-        return Contribution.query.filter(Contribution.event_new == event).has_rows()
+        return Contribution.query.filter(Contribution.event == event).has_rows()
 
     yield MenuEntryData(title=_("My Contributions"), name='my_contributions', visible=_visible_my_contributions,
                         endpoint='contributions.my_contributions', position=2, parent='my_conference')

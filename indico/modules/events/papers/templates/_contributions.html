@@ -5,7 +5,7 @@
     {% set can_submit = contribution.is_user_associated(session.user, check_abstract=true) %}
     {% set show_paper = paper and paper.accepted_revision %}
     {% set show_paper_status = paper and can_submit %}
-    {% set show_paper_submission = contribution.event_new.cfp.is_open and can_submit %}
+    {% set show_paper_submission = contribution.event.cfp.is_open and can_submit %}
 
     {% if show_paper or show_paper_status or show_paper_submission %}
         <section>

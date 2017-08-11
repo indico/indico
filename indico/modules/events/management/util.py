@@ -89,7 +89,7 @@ def get_non_inheriting_objects(root):
     """
     def _query_folders(obj, crit):
         return (db.m.AttachmentFolder.query
-                .filter_by(event_new=obj.event_new, is_deleted=False)
+                .filter_by(event=obj.event, is_deleted=False)
                 .filter(crit)
                 .options(joinedload('attachments')))
 

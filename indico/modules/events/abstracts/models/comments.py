@@ -76,7 +76,7 @@ class AbstractComment(ProposalCommentMixin, ReviewCommentMixin, db.Model):
     def can_edit(self, user):
         if user is None:
             return False
-        return self.user == user or self.abstract.event_new.can_manage(user)
+        return self.user == user or self.abstract.event.can_manage(user)
 
     def can_view(self, user):
         if user is None:

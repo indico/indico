@@ -67,7 +67,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
 
 
 def generate_ticket(registration):
-    pdf = TicketToPDF(registration.registration_form.event_new, registration)
+    pdf = TicketToPDF(registration.registration_form.event, registration)
     return BytesIO(pdf.getPDFBin())
 
 
@@ -89,7 +89,7 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
             raise Forbidden
 
     def _process(self):
-        filename = secure_filename('{}-Ticket.pdf'.format(self.event_new.title), 'ticket.pdf')
+        filename = secure_filename('{}-Ticket.pdf'.format(self.event.title), 'ticket.pdf')
         return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
@@ -111,9 +111,9 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
         checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
 
         qr_data = {
-            "event_id": self.event_new.id,
-            "title": self.event_new.title,
-            "date": format_date(self.event_new.start_dt_local),  # XXX: switch to utc+isoformat?
+            "event_id": self.event.id,
+            "title": self.event.title,
+            "date": format_date(self.event.start_dt_local),  # XXX: switch to utc+isoformat?
             "server": {
                 "baseUrl": config.getBaseURL(),
                 "consumerKey": checkin_app.client_id,

@@ -96,7 +96,7 @@ class AttachmentFile(StoredFileMixin, db.Model):
             path_segments = ['category', strict_unicode(folder.category.id)]
         else:
             # event/<id>/event/...
-            path_segments = ['event', strict_unicode(folder.event_new.id), folder.link_type.name]
+            path_segments = ['event', strict_unicode(folder.event.id), folder.link_type.name]
             if folder.link_type == LinkType.session:
                 # event/<id>/session/<session_id>/...
                 path_segments.append(strict_unicode(folder.session.id))

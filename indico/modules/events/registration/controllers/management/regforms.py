@@ -51,32 +51,32 @@ class RHManageRegistrationForms(RHManageRegFormsBase):
 
     def _process(self):
         regforms = (RegistrationForm.query
-                    .with_parent(self.event_new)
+                    .with_parent(self.event)
                     .options(undefer('active_registration_count'))
                     .order_by(db.func.lower(RegistrationForm.title)).all())
-        return WPManageRegistration.render_template('management/regform_list.html', self.event_new, regforms=regforms)
+        return WPManageRegistration.render_template('management/regform_list.html', self.event, regforms=regforms)
 
 
 class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
     """Customize the display of registrations on the public page"""
 
     def _process(self):
-        regforms = sorted(self.event_new.registration_forms, key=lambda f: f.title.lower())
+        regforms = sorted(self.event.registration_forms, key=lambda f: f.title.lower())
         form = ParticipantsDisplayForm()
         if form.validate_on_submit():
             data = form.json.data
-            registration_settings.set(self.event_new, 'merge_registration_forms', data['merge_forms'])
-            registration_settings.set_participant_list_form_ids(self.event_new, data['participant_list_forms'])
-            registration_settings.set_participant_list_columns(self.event_new, data['participant_list_columns'])
+            registration_settings.set(self.event, 'merge_registration_forms', data['merge_forms'])
+            registration_settings.set_participant_list_form_ids(self.event, data['participant_list_forms'])
+            registration_settings.set_participant_list_columns(self.event, data['participant_list_columns'])
             for regform in regforms:
                 regform.publish_registrations_enabled = regform.id in data['participant_list_forms']
             flash(_("The participants display settings have been saved."), 'success')
-            return redirect(url_for('.manage_regforms_display', self.event_new))
+            return redirect(url_for('.manage_regforms_display', self.event))
 
         available_columns = {field[0].name: field[1]['title'] for field in PersonalDataType.FIELD_DATA}
         enabled_columns = []
         disabled_columns = []
-        for column_name in registration_settings.get_participant_list_columns(self.event_new):
+        for column_name in registration_settings.get_participant_list_columns(self.event):
             if column_name in available_columns:
                 enabled_columns.append({'id': column_name, 'title': available_columns[column_name]})
                 del available_columns[column_name]
@@ -88,7 +88,7 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
         enabled_forms = []
         disabled_forms = []
         # Handle forms that have already been sorted by the user.
-        for form_id in registration_settings.get_participant_list_form_ids(self.event_new):
+        for form_id in registration_settings.get_participant_list_form_ids(self.event):
             try:
                 regform = available_forms[form_id]
             except KeyError:
@@ -105,8 +105,8 @@ class RHManageRegistrationFormsDisplay(RHManageRegFormsBase):
                 disabled_forms.append(regform)
         disabled_forms.sort(key=attrgetter('title'))
 
-        merge_forms = registration_settings.get(self.event_new, 'merge_registration_forms')
-        return WPManageRegistration.render_template('management/regform_display.html', self.event_new,
+        merge_forms = registration_settings.get(self.event, 'merge_registration_forms')
+        return WPManageRegistration.render_template('management/regform_display.html', self.event,
                                                     regforms=regforms, enabled_columns=enabled_columns,
                                                     disabled_columns=disabled_columns, enabled_forms=enabled_forms,
                                                     disabled_forms=disabled_forms, merge_forms=merge_forms, form=form)
@@ -118,13 +118,13 @@ class RHManageRegistrationFormDisplay(RHManageRegFormBase):
     def _process(self):
         form = ParticipantsDisplayFormColumnsForm()
         if form.validate_on_submit():
-            registration_settings.set_participant_list_columns(self.event_new, form.json.data['columns'], self.regform)
+            registration_settings.set_participant_list_columns(self.event, form.json.data['columns'], self.regform)
             flash(_('The settings for "{}" have been saved.').format(self.regform.title), 'success')
             return jsonify_data()
 
         available_fields = {field.id: field for field in self.regform.active_fields}
         enabled_fields = []
-        for field_id in registration_settings.get_participant_list_columns(self.event_new, self.regform):
+        for field_id in registration_settings.get_participant_list_columns(self.event, self.regform):
             try:
                 field = available_fields[field_id]
             except KeyError:
@@ -141,24 +141,24 @@ class RHManageParticipants(RHManageRegFormsBase):
     """Show and enable the dummy registration form for participants"""
 
     def _process_POST(self):
-        regform = self.event_new.participation_regform
-        set_feature_enabled(self.event_new, 'registration', True)
+        regform = self.event.participation_regform
+        set_feature_enabled(self.event, 'registration', True)
         if not regform:
-            regform = RegistrationForm(event_new=self.event_new, title="Participants", is_participation=True,
+            regform = RegistrationForm(event=self.event, title="Participants", is_participation=True,
                                        currency=payment_settings.get('currency'))
             create_personal_data_fields(regform)
             db.session.add(regform)
             db.session.flush()
             signals.event.registration_form_created.send(regform)
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
-                               'Registration form "{}" has been created'.format(regform.title), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
+                           'Registration form "{}" has been created'.format(regform.title), session.user)
         return redirect(url_for('event_registration.manage_regform', regform))
 
     def _process_GET(self):
-        regform = self.event_new.participation_regform
-        registration_enabled = self.event_new.has_feature('registration')
+        regform = self.event.participation_regform
+        registration_enabled = self.event.has_feature('registration')
         if not regform or not registration_enabled:
-            return WPManageParticipants.render_template('management/participants.html', self.event_new,
+            return WPManageParticipants.render_template('management/participants.html', self.event,
                                                         regform=regform, registration_enabled=registration_enabled)
         return redirect(url_for('event_registration.manage_regform', regform))
 
@@ -167,20 +167,20 @@ class RHRegistrationFormCreate(RHManageRegFormsBase):
     """Creates a new registration form"""
 
     def _process(self):
-        form = RegistrationFormForm(event=self.event_new,
-                                    publish_registrations_enabled=(self.event_new.type_ != EventType.conference))
+        form = RegistrationFormForm(event=self.event,
+                                    publish_registrations_enabled=(self.event.type_ != EventType.conference))
         if form.validate_on_submit():
-            regform = RegistrationForm(event_new=self.event_new)
+            regform = RegistrationForm(event=self.event)
             create_personal_data_fields(regform)
             form.populate_obj(regform)
             db.session.add(regform)
             db.session.flush()
             signals.event.registration_form_created.send(regform)
             flash(_('Registration form has been successfully created'), 'success')
-            self.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
-                               'Registration form "{}" has been created'.format(regform.title), session.user)
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Registration',
+                           'Registration form "{}" has been created'.format(regform.title), session.user)
             return redirect(url_for('.manage_regform', regform))
-        return WPManageRegistration.render_template('management/regform_edit.html', self.event_new,
+        return WPManageRegistration.render_template('management/regform_edit.html', self.event,
                                                     form=form, regform=None)
 
 
@@ -188,7 +188,7 @@ class RHRegistrationFormManage(RHManageRegFormBase):
     """Specific registration form management"""
 
     def _process(self):
-        return WPManageRegistration.render_template('management/regform.html', self.event_new, regform=self.regform)
+        return WPManageRegistration.render_template('management/regform.html', self.event, regform=self.regform)
 
 
 class RHRegistrationFormEdit(RHManageRegFormBase):
@@ -198,13 +198,13 @@ class RHRegistrationFormEdit(RHManageRegFormBase):
         return FormDefaults(self.regform, limit_registrations=self.regform.registration_limit is not None)
 
     def _process(self):
-        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event_new)
+        form = RegistrationFormForm(obj=self._get_form_defaults(), event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
             flash(_('Registration form has been successfully modified'), 'success')
             return redirect(url_for('.manage_regform', self.regform))
-        return WPManageRegistration.render_template('management/regform_edit.html', self.event_new, form=form,
+        return WPManageRegistration.render_template('management/regform_edit.html', self.event, form=form,
                                                     regform=self.regform)
 
 
@@ -215,7 +215,7 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
         self.regform.is_deleted = True
         flash(_("Registration form deleted"), 'success')
         logger.info("Registration form %s deleted by %s", self.regform, session.user)
-        return redirect(url_for('.manage_regform_list', self.event_new))
+        return redirect(url_for('.manage_regform_list', self.event))
 
 
 class RHRegistrationFormOpen(RHManageRegFormBase):
@@ -262,7 +262,7 @@ class RHRegistrationFormModify(RHManageRegFormBase):
     """Modify the form of a registration form"""
 
     def _process(self):
-        return WPManageRegistration.render_template('management/regform_modify.html', self.event_new,
+        return WPManageRegistration.render_template('management/regform_modify.html', self.event,
                                                     sections=get_event_section_data(self.regform, management=True),
                                                     regform=self.regform)
 
@@ -273,7 +273,7 @@ class RHRegistrationFormStats(RHManageRegFormBase):
     def _process(self):
         regform_stats = [OverviewStats(self.regform)]
         regform_stats += [AccommodationStats(x) for x in self.regform.active_fields if x.input_type == 'accommodation']
-        return WPManageRegistrationStats.render_template('management/regform_stats.html', self.event_new,
+        return WPManageRegistrationStats.render_template('management/regform_stats.html', self.event,
                                                          regform=self.regform, regform_stats=regform_stats)
 
 
@@ -281,10 +281,10 @@ class RHManageRegistrationManagers(RHManageRegFormsBase):
     """Modify event managers with registration role"""
 
     def _process(self):
-        reg_managers = {p.principal for p in self.event_new.acl_entries
+        reg_managers = {p.principal for p in self.event.acl_entries
                         if p.has_management_role('registration', explicit=True)}
         form = RegistrationManagersForm(obj=FormDefaults(managers=reg_managers))
         if form.validate_on_submit():
-            update_object_principals(self.event_new, form.managers.data, role='registration')
+            update_object_principals(self.event, form.managers.data, role='registration')
             return jsonify_data(flash=False)
         return jsonify_form(form)

@@ -30,7 +30,7 @@ from indico.util.i18n import orig_string
 
 def create_session(event, data):
     """Create a new session with the information passed in the `data` argument"""
-    event_session = Session(event_new=event)
+    event_session = Session(event=event)
     event_session.populate_from_dict(data)
     db.session.flush()
     event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
@@ -43,7 +43,7 @@ def create_session_block(session_, data):
     block = SessionBlock(session=session_)
     block.populate_from_dict(data)
     db.session.flush()
-    session_.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+    session_.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
                            'Session block "{}" for session "{}" has been created'
                            .format(block.title, session_.title), session.user)
     logger.info("Session block %s created by %s", block, session.user)
@@ -55,7 +55,7 @@ def update_session(event_session, data):
     event_session.populate_from_dict(data)
     db.session.flush()
     signals.event.session_updated.send(event_session)
-    event_session.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+    event_session.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                                 'Session "{}" has been updated'.format(event_session.title), session.user)
     logger.info('Session %s modified by %s', event_session, session.user)
 
@@ -92,7 +92,7 @@ def update_session_block(session_block, data):
         update_timetable_entry(session_block.timetable_entry, {'start_dt': start_dt})
     session_block.populate_from_dict(data)
     db.session.flush()
-    session_block.event_new.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+    session_block.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                                 'Session block "{}" has been updated'.format(session_block.title), session.user)
     logger.info('Session block %s modified by %s', session_block, session.user)
 
@@ -109,7 +109,7 @@ def delete_session_block(session_block):
     signals.event.session_block_deleted.send(session_block)
     if session_block in session_.blocks:
         session_.blocks.remove(session_block)
-    if not session_.blocks and session_.event_new.type != 'conference':
+    if not session_.blocks and session_.event.type != 'conference':
         delete_session(session_)
     db.session.flush()
     logger.info('Session block %s deleted by %s', session_block, session.user)

@@ -33,20 +33,20 @@ class RHStaticSiteBase(RHManageEventBase):
 
 class RHStaticSiteList(RHStaticSiteBase):
     def _process(self):
-        static_sites = self.event_new.static_sites.order_by(StaticSite.requested_dt.desc()).all()
+        static_sites = self.event.static_sites.order_by(StaticSite.requested_dt.desc()).all()
         return WPStaticSites.render_template('static_sites.html', self._conf,
-                                             event=self.event_new, static_sites=static_sites)
+                                             event=self.event, static_sites=static_sites)
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):
     ALLOW_LOCKED = True
 
     def _process(self):
-        static_site = StaticSite(creator=session.user, event_new=self.event_new)
+        static_site = StaticSite(creator=session.user, event=self.event)
         db.session.add(static_site)
         db.session.commit()
         build_static_site.delay(static_site)
-        return redirect(url_for('.list', self.event_new))
+        return redirect(url_for('.list', self.event))
 
 
 class RHStaticSiteDownload(RHStaticSiteBase):

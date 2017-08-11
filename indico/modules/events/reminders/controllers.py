@@ -55,8 +55,8 @@ class RHListReminders(RHRemindersBase):
     """Shows the list of event reminders"""
 
     def _process(self):
-        reminders = EventReminder.query.with_parent(self.event_new).order_by(EventReminder.scheduled_dt.desc()).all()
-        return WPReminders.render_template('reminders.html', self._conf, event=self.event_new, reminders=reminders)
+        reminders = EventReminder.query.with_parent(self.event).order_by(EventReminder.scheduled_dt.desc()).all()
+        return WPReminders.render_template('reminders.html', self._conf, event=self.event, reminders=reminders)
 
 
 class RHDeleteReminder(RHSpecificReminderBase):
@@ -70,7 +70,7 @@ class RHDeleteReminder(RHSpecificReminderBase):
             logger.info('Reminder deleted by %s: %s', session.user, self.reminder)
             flash(_("The reminder at {} has been deleted.")
                   .format(to_unicode(format_datetime(self.reminder.scheduled_dt))), 'success')
-        return redirect(url_for('.list', self.event_new))
+        return redirect(url_for('.list', self.event))
 
 
 def _send_reminder(reminder):
@@ -90,7 +90,7 @@ class RHEditReminder(RHSpecificReminderBase):
                                'relative_delta': reminder.event_start_delta}
         else:
             # Use the user's preferred event timezone
-            dt = reminder.scheduled_dt.astimezone(self.event_new.tzinfo)
+            dt = reminder.scheduled_dt.astimezone(self.event.tzinfo)
             defaults_kwargs = {'schedule_type': 'absolute',
                                'absolute_date': dt.date(),
                                'absolute_time': dt.time()}
@@ -98,7 +98,7 @@ class RHEditReminder(RHSpecificReminderBase):
 
     def _process(self):
         reminder = self.reminder
-        form = ReminderForm(obj=self._get_defaults(), event=self.event_new)
+        form = ReminderForm(obj=self._get_defaults(), event=self.event)
         if form.validate_on_submit():
             if reminder.is_sent:
                 flash(_("This reminder has already been sent and cannot be modified anymore."), 'error')
@@ -112,7 +112,7 @@ class RHEditReminder(RHSpecificReminderBase):
                       .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
             return jsonify_data(flash=False)
 
-        return jsonify_template('events/reminders/edit_reminder.html', event=self.event_new, reminder=reminder,
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=reminder,
                                 form=form)
 
 
@@ -120,9 +120,9 @@ class RHAddReminder(RHRemindersBase):
     """Adds a new reminder"""
 
     def _process(self):
-        form = ReminderForm(event=self.event_new, schedule_type='relative')
+        form = ReminderForm(event=self.event, schedule_type='relative')
         if form.validate_on_submit():
-            reminder = EventReminder(creator=session.user, event_new=self.event_new)
+            reminder = EventReminder(creator=session.user, event=self.event)
             form.populate_obj(reminder, existing_only=True)
             db.session.add(reminder)
             db.session.flush()
@@ -134,7 +134,7 @@ class RHAddReminder(RHRemindersBase):
                       .format(to_unicode(format_datetime(reminder.scheduled_dt))), 'success')
             return jsonify_data(flash=False)
 
-        return jsonify_template('events/reminders/edit_reminder.html', event=self.event_new, reminder=None, form=form,
+        return jsonify_template('events/reminders/edit_reminder.html', event=self.event, reminder=None, form=form,
                                 widget_attrs=form.default_widget_attrs)
 
 
@@ -143,6 +143,6 @@ class RHPreviewReminder(RHRemindersBase):
 
     def _process(self):
         include_summary = request.form.get('include_summary') == '1'
-        tpl = make_reminder_email(self.event_new, include_summary, request.form.get('message'))
+        tpl = make_reminder_email(self.event, include_summary, request.form.get('message'))
         html = render_template('events/reminders/preview.html', subject=tpl.get_subject(), body=tpl.get_body())
         return jsonify(html=html)

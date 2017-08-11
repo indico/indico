@@ -170,10 +170,10 @@ def test_convert_email_principals(db, create_event, create_user, dummy_user):
     other_entry_data = other_entry.current_data
     entry_data = entry.current_data
     # different emails for now -> nothing updated
-    assert not EventPrincipal.replace_email_with_user(user, 'event_new')
+    assert not EventPrincipal.replace_email_with_user(user, 'event')
     assert set(event.acl_entries) == {entry, other_entry}
     user.secondary_emails.add(principal.email)
-    assert EventPrincipal.replace_email_with_user(user, 'event_new') == {event}
+    assert EventPrincipal.replace_email_with_user(user, 'event') == {event}
     assert set(event.acl_entries) == {entry, other_entry}
     assert all(x.type == PrincipalType.user for x in event.acl_entries)
     db.session.expire(other_entry)
@@ -190,10 +190,10 @@ def test_convert_email_principals_merge(db, create_event, create_user):
     entry1 = event.update_principal(user, full_access=True, roles={'foo', 'foobar'})
     entry2 = event.update_principal(principal, read_access=True, roles={'foo', 'bar'})
     # different emails for now -> nothing updated
-    assert not EventPrincipal.replace_email_with_user(user, 'event_new')
+    assert not EventPrincipal.replace_email_with_user(user, 'event')
     assert set(event.acl_entries) == {entry1, entry2}
     user.secondary_emails.add(principal.email)
-    assert EventPrincipal.replace_email_with_user(user, 'event_new') == {event}
+    assert EventPrincipal.replace_email_with_user(user, 'event') == {event}
     assert len(event.acl_entries) == 1
     entry = list(event.acl_entries)[0]
     assert entry.full_access
@@ -383,7 +383,7 @@ def test_has_management_role_full_access_db(create_event, dummy_user, create_use
     entry = event.update_principal(dummy_user, full_access=True)
 
     def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event_new == event, EventPrincipal.has_management_role(*args))
+        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_role(*args))
 
     assert _find().one() == entry
     assert _find('foo').one() == entry
@@ -403,7 +403,7 @@ def test_has_management_role_no_access_db(create_event, dummy_user):
     event.update_principal(dummy_user, read_access=True)
 
     def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event_new == event, EventPrincipal.has_management_role(*args))
+        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_role(*args))
 
     assert not _find().count()
     assert not _find('foo').count()
@@ -427,7 +427,7 @@ def test_has_management_role_explicit_db(create_event, dummy_user, create_user, 
     event.update_principal(dummy_user, full_access=True, roles={'foo'})
 
     def _find(role):
-        return EventPrincipal.find(EventPrincipal.event_new == event,
+        return EventPrincipal.find(EventPrincipal.event == event,
                                    EventPrincipal.has_management_role(role, explicit=explicit))
 
     assert _find('foo').count() == (1 if explicit else 2)
@@ -458,7 +458,7 @@ def test_has_management_role_db(create_event, create_user, dummy_user):
     entry = event.update_principal(dummy_user, roles={'foo'})
 
     def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event_new == event, EventPrincipal.has_management_role(*args))
+        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_role(*args))
 
     assert not _find().count()
     assert _find('foo').one() == entry

@@ -41,19 +41,19 @@ class RHTimetable(RHConferenceBaseDisplay):
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
         self.timetable_layout = request.args.get('layout') or request.args.get('ttLyt')
-        self.theme, self.theme_override = get_theme(self.event_new, request.args.get('view'))
+        self.theme, self.theme_override = get_theme(self.event, request.args.get('view'))
 
     def _process(self):
-        self.event_new.preload_all_acl_entries()
+        self.event.preload_all_acl_entries()
         if self.theme is None:
-            event_info = serialize_event_info(self.event_new)
-            timetable_data = TimetableSerializer().serialize_timetable(self.event_new, strip_empty_days=True)
-            timetable_settings = layout_settings.get(self.event_new, 'timetable_theme_settings')
+            event_info = serialize_event_info(self.event)
+            timetable_data = TimetableSerializer().serialize_timetable(self.event, strip_empty_days=True)
+            timetable_settings = layout_settings.get(self.event, 'timetable_theme_settings')
             return self.view_class.render_template('display.html', self._conf, event_info=event_info,
                                                    timetable_data=timetable_data, timetable_settings=timetable_settings,
                                                    timetable_layout=self.timetable_layout)
         else:
-            return self.view_class_simple(self, self.event_new, self.theme, self.theme_override).display()
+            return self.view_class_simple(self, self.event, self.theme, self.theme_override).display()
 
 
 class RHTimetableEntryInfo(RHConferenceBaseDisplay):
@@ -61,7 +61,7 @@ class RHTimetableEntryInfo(RHConferenceBaseDisplay):
 
     def _checkParams(self, params):
         RHConferenceBaseDisplay._checkParams(self, params)
-        self.entry = self.event_new.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
+        self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
         html = render_entry_info_balloon(self.entry)
@@ -85,17 +85,17 @@ class RHTimetableExportPDF(RHConferenceBaseDisplay):
                                      'showSpeakerAffiliation': form_data['showSpeakerAffiliation'],
                                      'showSessionDescription': form_data['showSessionDescription']}
             if request.args.get('download') == '1':
-                pdf = pdf_class(self.event_new, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
+                pdf = pdf_class(self.event, session.user, sortingCrit=None, ttPDFFormat=pdf_format,
                                 pagesize=form.pagesize.data, fontsize=form.fontsize.data, **additional_params)
                 return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
             else:
                 url = url_for(request.endpoint, **dict(request.view_args, download='1', **request.args.to_dict(False)))
                 return jsonify_data(flash=False, redirect=url, redirect_no_loading=True)
         return jsonify_template('events/timetable/timetable_pdf_export.html', form=form,
-                                back_url=url_for('.timetable', self.event_new))
+                                back_url=url_for('.timetable', self.event))
 
 
 class RHTimetableExportDefaultPDF(RHConferenceBaseDisplay):
     def _process(self):
-        pdf = get_timetable_offline_pdf_generator(self.event_new)
+        pdf = get_timetable_offline_pdf_generator(self.event)
         return send_file('timetable.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')

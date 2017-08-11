@@ -51,4 +51,4 @@ class RHManageSessionsActionsBase(RHManageSessionsBase):
     def _checkParams(self, params):
         RHManageSessionsBase._checkParams(self, params)
         session_ids = set(map(int, request.form.getlist('session_id')))
-        self.sessions = Session.query.with_parent(self.event_new).filter(Session.id.in_(session_ids)).all()
+        self.sessions = Session.query.with_parent(self.event).filter(Session.id.in_(session_ids)).all()

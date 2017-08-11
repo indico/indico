@@ -73,7 +73,7 @@ def render_paper_page(paper, view_class=None):
         'revision_form': revision_form
     }
     if view_class:
-        return view_class.render_template('paper.html', paper.event_new.as_legacy, **params)
+        return view_class.render_template('paper.html', paper.event.as_legacy, **params)
     else:
         return render_template('events/papers/paper.html', no_javascript=True, **params)
 

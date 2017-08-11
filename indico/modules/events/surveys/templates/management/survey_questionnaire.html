@@ -15,7 +15,7 @@
                title="{% trans %}Download a file containing all the questions of this survey. The file can later be imported into another survey.{% endtrans %}">
                 {% trans %}Export{% endtrans %}
             </a>
-            {% if not survey.event_new.is_locked %}
+            {% if not survey.event.is_locked %}
                 <a href="#" data-href="{{ url_for('.import_questionnaire', survey) }}"
                    class="i-button js-survey-item-dialog"
                    data-title="{% trans %}Import questions{% endtrans %}">

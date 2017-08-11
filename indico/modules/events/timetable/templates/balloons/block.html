@@ -38,7 +38,7 @@
         <div class="title-header">
             <div class="title-caption">{% trans %}Session{% endtrans %}</div>
             <div class="group right entry-action-buttons">
-                {% if editable and not block.event_new.is_locked %}
+                {% if editable and not block.event.is_locked %}
                     {% if can_manage_session %}
                         {{ render_palette_picker(block.session, 'timetable.session_rest', color_list) }}
                         <a class="i-link icon-edit js-dialog-action js-edit js-hide-balloon"

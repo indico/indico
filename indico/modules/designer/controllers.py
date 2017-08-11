@@ -133,11 +133,11 @@ class TargetFromURLMixin(TemplateDesignerMixin):
 
     @property
     def target_dict(self):
-        return {'event_new': self.event_new} if self.object_type == 'event' else {'category': self.category}
+        return {'event': self.event} if self.object_type == 'event' else {'category': self.category}
 
     @property
     def target(self):
-        return self.event_new if self.object_type == 'event' else self.category
+        return self.event if self.object_type == 'event' else self.category
 
 
 class TemplateListMixin(TargetFromURLMixin):

@@ -71,7 +71,7 @@ def get_contribs_by_year(category_id=None):
     query = (db.session
              .query(db.cast(db.extract('year', TimetableEntry.start_dt), db.Integer).label('year'),
                     db.func.count())
-             .join(TimetableEntry.event_new)
+             .join(TimetableEntry.event)
              .filter(TimetableEntry.type == TimetableEntryType.CONTRIBUTION,
                      ~Event.is_deleted,
                      category_filter)
@@ -93,7 +93,7 @@ def get_attachment_count(category_id=None):
     query = (db.session
              .query(db.func.count(Attachment.id))
              .join(Attachment.folder)
-             .join(AttachmentFolder.event_new)
+             .join(AttachmentFolder.event)
              .outerjoin(AttachmentFolder.session)
              .outerjoin(AttachmentFolder.contribution)
              .outerjoin(AttachmentFolder.subcontribution)

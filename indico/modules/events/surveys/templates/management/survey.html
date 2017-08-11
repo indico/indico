@@ -45,7 +45,7 @@
     {% endif %}
 
     <div class="action-box">
-        {% if not survey.event_new.is_locked %}
+        {% if not survey.event.is_locked %}
             <div class="section">
                 <div class="icon icon-settings"></div>
                 <div class="text">
@@ -166,7 +166,7 @@
         <td>
             <a href="{{ url_for('.display_submission', submission) }}">#{{ submission.friendly_id }}</a>
         </td>
-        <td>{{ submission.submitted_dt|format_datetime(timezone=submission.survey.event_new.tzinfo) }}</td>
+        <td>{{ submission.submitted_dt|format_datetime(timezone=submission.survey.event.tzinfo) }}</td>
         <td>
             {% if not submission.is_anonymous %}
                 {{ submission.user.full_name }}

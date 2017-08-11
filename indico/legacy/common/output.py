@@ -287,7 +287,7 @@ class outputGenerator(object):
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "111"], ["ind1", " "], ["ind2", " "]])
-        out.writeTag("subfield", uniqueId(contrib.event_new), [["code", "g"]])
+        out.writeTag("subfield", uniqueId(contrib.event), [["code", "g"]])
         out.closeTag("datafield")
 
         # TODO: Adapt modification date once in the model
@@ -295,7 +295,7 @@ class outputGenerator(object):
         out.writeTag("subfield", datetime.now().strftime('%Y-%m-%dT'), [["code", "c"]])
         out.closeTag("datafield")
 
-        self._generate_category_path(contrib.event_new, out)
+        self._generate_category_path(contrib.event, out)
 
         self._generate_contrib_location_and_time(contrib, out)
 
@@ -304,7 +304,7 @@ class outputGenerator(object):
         out.closeTag("datafield")
 
         out.openTag("datafield", [["tag", "611"], ["ind1", "2"], ["ind2", "4"]])
-        out.writeTag("subfield", contrib.event_new.title, [["code", "a"]])
+        out.writeTag("subfield", contrib.event.title, [["code", "a"]])
         out.closeTag("datafield")
 
         self._generate_references(contrib, out)
@@ -329,7 +329,7 @@ class outputGenerator(object):
             self.noteToXMLMarc21(contrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib.event_new)), [["code", "b"]])
+        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(contrib.event)), [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
@@ -343,7 +343,7 @@ class outputGenerator(object):
         self._generate_link_field(url_for('contributions.display_contribution', contrib, _external=True),
                                   'Contribution details', out)
 
-        self._generate_link_field(contrib.event_new.external_url, 'Event details', out)
+        self._generate_link_field(contrib.event.external_url, 'Event details', out)
 
         self._generateAccessList(contrib, out, objId=uniqueId(contrib))
     ####
@@ -421,11 +421,11 @@ class outputGenerator(object):
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","111"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", uniqueId(subcontrib.event_new), [["code", "g"]])
+        out.writeTag("subfield", uniqueId(subcontrib.event), [["code", "g"]])
         out.closeTag("datafield")
 
         self._generate_references(subcontrib, out)
-        self._generate_category_path(subcontrib.event_new, out)
+        self._generate_category_path(subcontrib.event, out)
         self._generate_contrib_location_and_time(subcontrib.contribution, out)
     #
         out.openTag("datafield",[["tag","520"],["ind1"," "],["ind2"," "]])
@@ -433,7 +433,7 @@ class outputGenerator(object):
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","611"],["ind1","2"],["ind2","4"]])
-        out.writeTag("subfield", subcontrib.event_new.title, [["code", "a"]])
+        out.writeTag("subfield", subcontrib.event.title, [["code", "a"]])
         out.closeTag("datafield")
     #
         out.openTag("datafield",[["tag","650"],["ind1","1"],["ind2","7"]])
@@ -451,7 +451,7 @@ class outputGenerator(object):
             self.noteToXMLMarc21(subcontrib.note, out=out)
 
         out.openTag("datafield",[["tag","962"],["ind1"," "],["ind2"," "]])
-        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(subcontrib.event_new)), [["code", "b"]])
+        out.writeTag("subfield", 'INDICO.{}'.format(uniqueId(subcontrib.event)), [["code", "b"]])
         out.closeTag("datafield")
 
         out.openTag("datafield",[["tag","970"],["ind1"," "],["ind2"," "]])
@@ -465,7 +465,7 @@ class outputGenerator(object):
 
         self._generate_link_field(url_for('contributions.display_contribution', subcontrib.contribution,
                                           _external=True), 'Contribution details', out)
-        self._generate_link_field(subcontrib.event_new.external_url, 'Event details', out)
+        self._generate_link_field(subcontrib.event.external_url, 'Event details', out)
         self._generateAccessList(subcontrib.contribution, out, objId=uniqueId(subcontrib))
 
     def materialToXMLMarc21(self, obj, out=None):

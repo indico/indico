@@ -43,13 +43,13 @@ class RHPosterPrintSettings(RHManageEventBase):
 
     def _process(self):
         self.commit = False
-        form = PosterPrintingForm(self.event_new, template=self.template_id)
+        form = PosterPrintingForm(self.event, template=self.template_id)
         if form.validate_on_submit():
             data = dict(form.data)
             template_id = data.pop('template')
             key = unicode(uuid.uuid4())
             poster_cache.set(key, data, time=1800)
-            download_url = url_for('.print_poster', self.event_new, template_id=template_id, uuid=key)
+            download_url = url_for('.print_poster', self.event, template_id=template_id, uuid=key)
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_form(form, disabled_until_change=False, submit=_('Download PDF'))
 
@@ -64,7 +64,7 @@ class RHPrintEventPoster(RHManageEventBase):
 
         # Check that template belongs to this event or a category that
         # is a parent
-        if self.template.owner != self.event_new and self.template.owner.id not in self.event_new.category_chain:
+        if self.template.owner != self.event and self.template.owner.id not in self.event.category_chain:
             raise Forbidden
 
     def _process(self):
@@ -73,5 +73,5 @@ class RHPrintEventPoster(RHManageEventBase):
         if not config_params:
             raise NotFound
 
-        pdf = PosterPDF(self.template, config_params, self.event_new)
-        return send_file('Poster-{}.pdf'.format(self.event_new.id), pdf.get_pdf(), 'application/pdf')
+        pdf = PosterPDF(self.template, config_params, self.event)
+        return send_file('Poster-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'application/pdf')

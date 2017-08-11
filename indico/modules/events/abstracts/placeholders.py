@@ -37,7 +37,7 @@ class EventTitlePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.event_new.title
+        return abstract.event.title
 
 
 class EventURLPlaceholder(Placeholder):
@@ -46,7 +46,7 @@ class EventURLPlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        return abstract.event_new.external_url
+        return abstract.event.external_url
 
 
 class AbstractIDPlaceholder(Placeholder):

@@ -252,7 +252,7 @@ class Reservation(Serializer, db.Model):
         )
     )
     #: The Event this reservation was made for
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(

@@ -1,5 +1,5 @@
 {% macro menu_entry(entry) -%}
-    {% set event_locked = entry.event_new.is_locked %}
+    {% set event_locked = entry.event.is_locked %}
     <div class="menu-entry {%- if entry.is_root and entry.children %} with-children{% endif %}"
          data-position="{{ entry.position }}"
          data-position-url="{{ url_for('.menu_entry_position', entry) }}"

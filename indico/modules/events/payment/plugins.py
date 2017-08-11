@@ -129,7 +129,7 @@ class PaymentPluginMixin(object):
 
         :param registration: a :class:`Registration` object
         """
-        event = registration.registration_form.event_new
+        event = registration.registration_form.event
         settings = self.settings.get_all()
         event_settings = self.event_settings.get_all(event)
         data = {'event': event,

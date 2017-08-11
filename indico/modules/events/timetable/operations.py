@@ -70,17 +70,17 @@ def create_session_block_entry(session_, data):
     start_dt = data.pop('start_dt')
     block = create_session_block(session_=session_, data=data)
     entry_data = {'object': block, 'start_dt': start_dt}
-    return create_timetable_entry(session_.event_new, entry_data, extend_parent=True)
+    return create_timetable_entry(session_.event, entry_data, extend_parent=True)
 
 
 def create_timetable_entry(event, data, parent=None, extend_parent=False):
-    entry = TimetableEntry(event_new=event, parent=parent)
+    entry = TimetableEntry(event=event, parent=parent)
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
     signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, session.user)
-    entry.event_new.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
+    entry.event.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
                         "Entry for {} '{}' created".format(object_type, object_title), session.user,
                         data={'Time': format_datetime(entry.start_dt)})
     if extend_parent:
@@ -95,7 +95,7 @@ def schedule_contribution(contribution, start_dt, session_block=None, extend_par
         contribution.session = session_block.session
         contribution.session_block = session_block
         parent = session_block.timetable_entry
-    entry = create_timetable_entry(contribution.event_new, data, parent=parent, extend_parent=extend_parent)
+    entry = create_timetable_entry(contribution.event, data, parent=parent, extend_parent=extend_parent)
     return entry
 
 
@@ -106,7 +106,7 @@ def update_timetable_entry(entry, data):
     if changes:
         signals.event.timetable_entry_updated.send(entry, changes=changes)
         logger.info('Timetable entry %s updated by %s', entry, session.user)
-        entry.event_new.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
+        entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
                             "Entry for {} '{}' modified".format(object_type, object_title), session.user,
                             data={'Time': format_datetime(entry.start_dt)})
 
@@ -118,7 +118,7 @@ def delete_timetable_entry(entry, log=True):
     db.session.flush()
     if log:
         logger.info('Timetable entry %s deleted by %s', entry, session.user)
-        entry.event_new.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
+        entry.event.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
                             "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
                             data={'Time': format_datetime(entry.start_dt)})
 
@@ -133,7 +133,7 @@ def fit_session_block_entry(entry, log=True):
     entry.session_block.duration = end_dt - entry.start_dt
     db.session.flush()
     if log:
-        entry.event_new.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
+        entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
                             "Session block fitted to contents", session.user,
                             data={'Session block': entry.session_block.full_title})
 
@@ -161,7 +161,7 @@ def move_timetable_entry(entry, parent=None, day=None):
         contrib_update_data = {'session_id': None, 'session_block_id': None}
     elif parent:
         new_start_dt = find_latest_entry_end_dt(parent.object) or parent.start_dt
-        tz = entry.event_new.tzinfo
+        tz = entry.event.tzinfo
         if (new_start_dt + entry.duration).astimezone(tz).date() != parent.start_dt.astimezone(tz).date():
             raise UserValueError(_('Session block cannot span more than one day'))
         updates['parent'] = parent

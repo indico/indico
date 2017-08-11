@@ -60,7 +60,7 @@ class Track(DescriptionMixin, db.Model):
         default=_get_next_position
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -111,21 +111,21 @@ class Track(DescriptionMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, track_id=self.id)
+        return dict(self.event.locator, track_id=self.id)
 
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', _text=text_to_repr(self.title))
 
     def can_delete(self, user):
-        return self.event_new.can_manage(user) and not self.abstracts_accepted
+        return self.event.can_manage(user) and not self.abstracts_accepted
 
     def can_review_abstracts(self, user):
         if not user:
             return False
-        elif not self.event_new.can_manage(user, role='abstract_reviewer', explicit_role=True):
+        elif not self.event.can_manage(user, role='abstract_reviewer', explicit_role=True):
             return False
-        elif user in self.event_new.global_abstract_reviewers:
+        elif user in self.event.global_abstract_reviewers:
             return True
         elif user in self.abstract_reviewers:
             return True
@@ -135,9 +135,9 @@ class Track(DescriptionMixin, db.Model):
     def can_convene(self, user):
         if not user:
             return False
-        elif not self.event_new.can_manage(user, role='track_convener', explicit_role=True):
+        elif not self.event.can_manage(user, role='track_convener', explicit_role=True):
             return False
-        elif user in self.event_new.global_conveners:
+        elif user in self.event.global_conveners:
             return True
         elif user in self.conveners:
             return True

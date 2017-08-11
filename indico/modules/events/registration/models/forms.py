@@ -229,7 +229,7 @@ class RegistrationForm(db.Model):
     )
 
     #: The Event containing this registration form
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -316,7 +316,7 @@ class RegistrationForm(db.Model):
 
     @property
     def locator(self):
-        return dict(self.event_new.locator, reg_form_id=self.id)
+        return dict(self.event.locator, reg_form_id=self.id)
 
     @property
     def active_fields(self):
@@ -352,7 +352,7 @@ class RegistrationForm(db.Model):
 
     @property
     def sender_address(self):
-        contact_email = self.event_new.contact_emails[0] if self.event_new.contact_emails else None
+        contact_email = self.event.contact_emails[0] if self.event.contact_emails else None
         return self.notification_sender_address or contact_email
 
     @return_ascii

@@ -164,7 +164,7 @@ class AbstractToPDF(PDFLaTeXBase):
         super(AbstractToPDF, self).__init__()
 
         self._abstract = abstract
-        event = abstract.event_new
+        event = abstract.event
 
         if tz is None:
             tz = event.timezone
@@ -301,7 +301,7 @@ class ContribToPDF(PDFLaTeXBase):
     def __init__(self, contrib, tz=None):
         super(ContribToPDF, self).__init__()
 
-        event = contrib.event_new
+        event = contrib.event
         affiliations, author_mapping, coauthor_mapping = extract_affiliations(contrib)
 
         self._args.update({

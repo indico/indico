@@ -65,16 +65,16 @@ class RHManageTrackBase(RHManageTracksBase):
 
 class RHManageTracks(RHManageTracksBase):
     def _process(self):
-        tracks = self.event_new.tracks
-        return WPManageTracks.render_template('management.html', self._conf, event=self.event_new, tracks=tracks)
+        tracks = self.event.tracks
+        return WPManageTracks.render_template('management.html', self._conf, event=self.event, tracks=tracks)
 
 
 class RHEditProgram(RHManageTracksBase):
     def _process(self):
-        settings = track_settings.get_all(self.event_new)
+        settings = track_settings.get_all(self.event)
         form = ProgramForm(obj=FormDefaults(**settings))
         if form.validate_on_submit():
-            update_program(self.event_new, form.data)
+            update_program(self.event, form.data)
             flash(_("The program has been updated."))
             return jsonify_data()
         elif not form.is_submitted():
@@ -87,10 +87,10 @@ class RHCreateTrack(RHManageTracksBase):
     def _process(self):
         form = TrackForm()
         if form.validate_on_submit():
-            track = create_track(self.event_new, form.data)
+            track = create_track(self.event, form.data)
             flash(_('Track "{}" has been created.').format(track.title), 'success')
-            return jsonify_data(html=_render_track_list(self.event_new), new_track_id=track.id,
-                                tracks=[{'id': t.id, 'title': t.title} for t in self.event_new.tracks])
+            return jsonify_data(html=_render_track_list(self.event), new_track_id=track.id,
+                                tracks=[{'id': t.id, 'title': t.title} for t in self.event.tracks])
         return jsonify_form(form)
 
 
@@ -100,14 +100,14 @@ class RHEditTrack(RHManageTrackBase):
         if form.validate_on_submit():
             update_track(self.track, form.data)
             flash(_('Track "{}" has been modified.').format(self.track.title), 'success')
-            return jsonify_data(html=_render_track_list(self.event_new))
+            return jsonify_data(html=_render_track_list(self.event))
         return jsonify_form(form)
 
 
 class RHSortTracks(RHManageTracksBase):
     def _process(self):
         sort_order = request.json['sort_order']
-        tracks = {t.id: t for t in self.event_new.tracks}
+        tracks = {t.id: t for t in self.event.tracks}
         for position, track_id in enumerate(sort_order, 1):
             if track_id in tracks:
                 tracks[track_id].position = position
@@ -117,25 +117,25 @@ class RHDeleteTrack(RHManageTrackBase):
     def _process(self):
         delete_track(self.track)
         flash(_('Track "{}" has been deleted.').format(self.track.title), 'success')
-        return jsonify_data(html=_render_track_list(self.event_new))
+        return jsonify_data(html=_render_track_list(self.event))
 
 
 class RHDisplayTracks(RHConferenceBaseDisplay):
     def _process(self):
-        page_title = get_menu_entry_by_name('program', self.event_new).localized_title
-        program = track_settings.get(self.event_new, 'program')
-        render_mode = track_settings.get(self.event_new, 'program_render_mode')
+        page_title = get_menu_entry_by_name('program', self.event).localized_title
+        program = track_settings.get(self.event, 'program')
+        render_mode = track_settings.get(self.event, 'program_render_mode')
         program = RENDER_MODE_WRAPPER_MAP[render_mode](program)
-        tracks = (Track.query.with_parent(self.event_new)
+        tracks = (Track.query.with_parent(self.event)
                   .options(subqueryload('conveners'),
                            subqueryload('abstract_reviewers'))
                   .order_by(Track.position)
                   .all())
-        return WPDisplayTracks.render_template('display.html', self._conf, event=self.event_new, page_title=page_title,
+        return WPDisplayTracks.render_template('display.html', self._conf, event=self.event, page_title=page_title,
                                                program=program, tracks=tracks)
 
 
 class RHTracksPDF(RHConferenceBaseDisplay):
     def _process(self):
-        pdf = ProgrammeToPDF(self.event_new)
+        pdf = ProgrammeToPDF(self.event)
         return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')

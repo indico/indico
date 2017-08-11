@@ -96,7 +96,7 @@ class ScheduleSurveyForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         survey = kwargs.pop('survey')
         self.allow_reschedule_start = kwargs.pop('allow_reschedule_start')
-        self.timezone = survey.event_new.timezone
+        self.timezone = survey.event.timezone
         super(IndicoForm, self).__init__(*args, **kwargs)
         if not survey.start_notification_sent or not self.allow_reschedule_start:
             del self.resend_start_notification

@@ -108,7 +108,7 @@ class AbstractEmailTemplate(db.Model):
         nullable=False
     )
 
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
@@ -122,7 +122,7 @@ class AbstractEmailTemplate(db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event_new.locator, email_tpl_id=self.id)
+        return dict(self.event.locator, email_tpl_id=self.id)
 
     @return_ascii
     def __repr__(self):

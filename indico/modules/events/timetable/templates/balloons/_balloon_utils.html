@@ -1,6 +1,6 @@
 {% macro render_time_and_location(obj, editable, use_event_tz) %}
     {% set tt_entry = obj.timetable_entry %}
-    {% set event = tt_entry.event_new %}
+    {% set event = tt_entry.event %}
     {% set tz = event.tzinfo if use_event_tz else event.display_tzinfo %}
     <dl class="i-data-list">
         {% if editable and not event.is_locked %}

@@ -140,7 +140,7 @@ class EventReference(ReferenceModelBase):
     )
 
     # relationship backrefs:
-    # - event_new (Event.references)
+    # - event (Event.references)
 
     @return_ascii
     def __repr__(self):

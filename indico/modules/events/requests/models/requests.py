@@ -122,7 +122,7 @@ class Request(db.Model):
         )
     )
     #: The Event this agreement is associated with
-    event_new = db.relationship(
+    event = db.relationship(
         'Event',
         lazy=True,
         backref=db.backref(
