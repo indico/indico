@@ -82,6 +82,15 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
                                 regform=self.regform, form=form, can_enable_tickets=self._check_ticket_app_enabled())
 
 
+def generate_ticket(registration):
+    template = (registration.registration_form.ticket_template or
+                get_default_template_on_category(registration.event_new.category))
+    signals.event.designer.print_badge_template.send(template, regform=registration.registration_form)
+    pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
+    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event_new, [registration.id])
+    return pdf.get_pdf()
+
+
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
     """Generate ticket for a given registration"""
 
@@ -101,11 +110,7 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
 
     def _process(self):
         filename = secure_filename('{}-Ticket.pdf'.format(self.event_new.title), 'ticket.pdf')
-        template = self.regform.ticket_template or get_default_template_on_category(self.event_new.category)
-        signals.event.designer.print_badge_template.send(template, regform=self.regform)
-        pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
-        pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, self.event_new, [self.registration.id])
-        return send_file(filename, pdf.get_pdf(), 'application/pdf')
+        return send_file(filename, generate_ticket(self.registration), 'application/pdf')
 
 
 class RHTicketConfigQRCodeImage(RHManageRegFormBase):
