@@ -23,6 +23,7 @@ import click
 from indico.cli.core import cli_group
 from indico.core.db import db
 from indico.modules.events import Event
+from indico.modules.events.export import export_event, import_event
 
 
 click.disable_unicode_literals_warning = True
@@ -47,3 +48,41 @@ def restore(event_id):
     event.is_deleted = False
     db.session.commit()
     click.secho('Event undeleted: "{}"'.format(event.title), fg='green')
+
+
+@cli.command()
+@click.argument('event_id', type=int)
+@click.argument('target_file', type=click.File('wb'))
+def export(event_id, target_file):
+    """Exports all data associated with an event.
+
+    This exports the whole event as an archive which can be imported
+    on another other Indico instance.  Importing an event is only
+    guaranteed to work if it was exported on the same Indico version.
+    """
+    event = Event.get(event_id)
+    if event is None:
+        click.secho('This event does not exist', fg='red')
+        sys.exit(1)
+    elif event.is_deleted:
+        click.secho('This event has been deleted', fg='yellow')
+        click.confirm('Export it anyway?', abort=True)
+    export_event(event, target_file)
+
+
+@cli.command('import')
+@click.argument('source_file', type=click.File('rb'))
+@click.option('--force', is_flag=True, help='Ignore Indico version mismatches (DANGER)')
+@click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
+              help='ID of the target category. Defaults to the root category.')
+def import_(source_file, force, category_id):
+    """Imports an event exported from another Indico instance."""
+    event = import_event(source_file, category_id, force=force)
+    if event is None:
+        click.secho('Import failed.', fg='red')
+        sys.exit(1)
+    if not click.confirm('Import finished. Commit the changes?', default=True):
+        db.session.rollback()
+        sys.exit(1)
+    db.session.commit()
+    click.secho('Event imported -> {}'.format(event.external_url), fg='green')
