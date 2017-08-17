@@ -133,10 +133,10 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
         qr_data = {
             "event_id": self.event_new.id,
             "title": self.event_new.title,
-            "date": format_date(self.event_new.start_dt_local),  # XXX: switch to utc+isoformat?
+            "date": self.event_new.start_dt.isoformat(),
             "server": {
-                "baseUrl": config.getBaseURL(),
-                "consumerKey": checkin_app.client_id,
+                "base_url": config.getBaseURL(),
+                "consumer_key": checkin_app.client_id,
                 "auth_url": url_for('oauth.oauth_authorize', _external=True),
                 "token_url": url_for('oauth.oauth_token', _external=True)
             }
