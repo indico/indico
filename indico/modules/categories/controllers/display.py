@@ -295,11 +295,11 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         future_threshold = self.now + relativedelta(months=1, day=1, hour=0, minute=0)
         next_event_start_dt = (db.session.query(Event.start_dt)
                                .filter(Event.start_dt >= self.now, Event.category_id == self.category.id)
-                               .order_by(Event.start_dt.asc())
+                               .order_by(Event.start_dt.asc(), Event.id.asc())
                                .first() or (None,))[0]
         previous_event_start_dt = (db.session.query(Event.start_dt)
                                    .filter(Event.start_dt < self.now, Event.category_id == self.category.id)
-                                   .order_by(Event.start_dt.desc())
+                                   .order_by(Event.start_dt.desc(), Event.id.desc())
                                    .first() or (None,))[0]
         if next_event_start_dt is not None and next_event_start_dt > future_threshold:
             future_threshold = next_event_start_dt + relativedelta(months=1, day=1, hour=0, minute=0)
@@ -307,7 +307,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
             past_threshold = previous_event_start_dt.replace(day=1, hour=0, minute=0)
         event_query = (Event.query.with_parent(self.category)
                        .options(*self._event_query_options)
-                       .order_by(Event.start_dt.desc()))
+                       .order_by(Event.start_dt.desc(), Event.id.desc()))
         past_event_query = event_query.filter(Event.start_dt < past_threshold)
         future_event_query = event_query.filter(Event.start_dt >= future_threshold)
         current_event_query = event_query.filter(Event.start_dt >= past_threshold,
@@ -367,7 +367,7 @@ class RHEventList(RHDisplayCategoryEventsBase):
             raise BadRequest('"before" or "after" parameter must be specified')
         event_query = (Event.query.with_parent(self.category)
                        .options(*self._event_query_options)
-                       .order_by(Event.start_dt.desc()))
+                       .order_by(Event.start_dt.desc(), Event.id.desc()))
         if before:
             event_query = event_query.filter(Event.start_dt < before)
         if after:
