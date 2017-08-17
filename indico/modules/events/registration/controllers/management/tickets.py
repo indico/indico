@@ -134,6 +134,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
             "event_id": self.event_new.id,
             "title": self.event_new.title,
             "date": self.event_new.start_dt.isoformat(),
+            "version": 1,
             "server": {
                 "base_url": config.getBaseURL(),
                 "consumer_key": checkin_app.client_id,
