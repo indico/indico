@@ -351,7 +351,6 @@ class RHGetTemplateData(RHModifyDesignerTemplateBase):
 
 
 class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
-
     def _checkParams(self):
         RHManageCategoryBase._checkParams(self)
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
