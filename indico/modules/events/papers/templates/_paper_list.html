@@ -137,7 +137,7 @@
                                 <td class="i-table person-row-cell"
                                     data-searchable="{{ contrib.paper_judges|join(', ', attribute='name')|lower }}">
                                     <span class="vertical-aligner">
-                                        {% for judge in contrib.paper_judges -%}
+                                        {% for judge in contrib.paper_judges|sort(attribute='display_full_name') -%}
                                             <div class="person-row icon-user">{{ judge.display_full_name }}</div>
                                         {%- endfor %}
                                     </span>
@@ -147,7 +147,7 @@
                                 <td class="i-table person-row-cell"
                                     data-searchable="{{ contrib.paper_content_reviewers|join(', ', attribute='name')|lower }}">
                                     <span class="vertical-aligner">
-                                        {% for reviewer in contrib.paper_content_reviewers -%}
+                                        {% for reviewer in contrib.paper_content_reviewers|sort(attribute='display_full_name') -%}
                                             <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
                                         {%- endfor %}
                                     </span>
@@ -157,7 +157,7 @@
                                 <td class="i-table person-row-cell"
                                     data-searchable="{{ contrib.paper_layout_reviewers|join(', ', attribute='name')|lower }}">
                                     <span class="vertical-aligner">
-                                        {% for reviewer in contrib.paper_layout_reviewers -%}
+                                        {% for reviewer in contrib.paper_layout_reviewers|sort(attribute='display_full_name') -%}
                                             <div class="person-row icon-user">{{ reviewer.display_full_name }}</div>
                                         {%- endfor %}
                                     </span>
