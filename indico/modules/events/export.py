@@ -70,18 +70,6 @@ def import_event(source_file, category_id, force=False):
     return importer.deserialize(force)
 
 
-def _ordered_yaml_load(stream):
-    class OrderedLoader(yaml.Loader):
-        pass
-
-    def construct_mapping(loader, node):
-        loader.flatten_mapping(node)
-        return OrderedDict(loader.construct_pairs(node))
-
-    OrderedLoader.add_constructor(yaml.resolver.BaseResolver.DEFAULT_MAPPING_TAG, construct_mapping)
-    return yaml.load(stream, OrderedLoader)
-
-
 def _model_to_table(name):
     return getattr(db.m, name).__table__.fullname if name[0].isupper() else name
 
@@ -106,6 +94,13 @@ def _resolve_col(col):
         return attr
     assert len(attr.prop.columns) == 1
     return attr.prop.columns[0]
+
+
+def _get_single_fk(col):
+    # find the column-specific FK, not some compound fk containing this column
+    fks = [x for x in col.foreign_keys if len(x.constraint.columns) == 1]
+    assert len(fks) == 1
+    return fks[0]
 
 
 def _get_pk(table):
@@ -153,23 +148,27 @@ class EventExporter(object):
         print highlight(yaml_data, YamlLexer(), Terminal256Formatter(style='native'))
 
     def _load_spec(self):
-        def _process_tablespec(tablespec):
+        def _process_tablespec(tablename, tablespec):
             tablespec.setdefault('cols', {})
             tablespec.setdefault('fks', {})
             tablespec.setdefault('fks_out', {})
             tablespec.setdefault('skipif', None)
             tablespec.setdefault('order', None)
             tablespec.setdefault('allow_duplicates', False)
-            tablespec['fks'] = OrderedDict((fk, map(_resolve_col, incoming))
-                                           for fk, incoming in tablespec['fks'].iteritems())
-            tablespec['fks_out'] = OrderedDict((fk, _resolve_col(target))
-                                               for fk, target in tablespec['fks_out'].iteritems())
+            fks = OrderedDict()
+            for fk_name in tablespec['fks']:
+                col = _resolve_col(fk_name)
+                fk = _get_single_fk(col)
+                fks.setdefault(fk.column.name, []).append(col)
+            tablespec['fks'] = fks
+            tablespec['fks_out'] = OrderedDict((fk, _get_single_fk(db.metadata.tables[tablename].c[fk]).column)
+                                               for fk in tablespec['fks_out'])
             return tablespec
 
         with open(os.path.join(current_app.root_path, 'modules', 'events', 'export.yaml')) as f:
-            spec = _ordered_yaml_load(f)
+            spec = yaml.safe_load(f)
 
-        return OrderedDict((_model_to_table(k), _process_tablespec(v)) for k, v in spec['export'].iteritems())
+        return {_model_to_table(k): _process_tablespec(_model_to_table(k), v) for k, v in spec['export'].iteritems()}
 
     def _get_reverse_fk_map(self):
         legacy_tables = {'events.legacy_contribution_id_map', 'events.legacy_subcontribution_id_map',
@@ -209,10 +208,7 @@ class EventExporter(object):
             if target_column is not None:
                 fullname = '{}.{}'.format(target_column.table.fullname, target_column.name)
             else:
-                # find the column-specific FK, not some compound fk containing this column
-                fks = [x for x in column.foreign_keys if len(x.constraint.columns) == 1]
-                assert len(fks) == 1
-                fk = fks[0]
+                fk = _get_single_fk(column)
                 fullname = fk.target_fullname
                 target_column = fk.column
             if target_column is User.__table__.c.id and value is not None:
@@ -353,7 +349,7 @@ class EventImporter(object):
             return '{}.{}'.format(colspec.table.fullname, colspec.name)
 
         with open(os.path.join(current_app.root_path, 'modules', 'events', 'export.yaml')) as f:
-            spec = _ordered_yaml_load(f)
+            spec = yaml.safe_load(f)
 
         spec = spec['import']
         spec['defaults'] = {_model_to_table(k): v for k, v in spec.get('defaults', {}).iteritems()}

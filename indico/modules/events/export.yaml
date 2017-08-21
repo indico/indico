@@ -8,36 +8,35 @@ export:
       category_id: ~
       url_shortcut: ~
     fks:
-      id:
-        - EventPerson.event_id
-        - EventPersonLink.event_id
-        - EventLogEntry.event_id
-        - EventReminder.event_id
-        - EventSetting.event_id
-        - EventSettingPrincipal.event_id
-        - PaperCompetence.event_id
-        - PaperReviewQuestion.event_id
-        - PaperTemplate.event_id
-        - ContributionType.event_id
-        - ContributionField.event_id
-        - Track.event_id
-        - Session.event_id
-        - Contribution.event_id
-        - TimetableEntry.event_id
-        - ImageFile.event_id
-        - AttachmentFolder.event_id
-        - EventPrincipal.event_id
-        - EventNote.event_id
-        - RegistrationForm.event_id
-        - Survey.event_id
-        - DesignerTemplate.event_id
-        - EventPage.event_id
-        - MenuEntry.event_id
-        - Event.global_abstract_reviewers.prop.secondary.c.event_id
-        - Event.global_conveners.prop.secondary.c.event_id
-        - AbstractEmailTemplate.event_id
-        - AbstractReviewQuestion.event_id
-        - Abstract.event_id
+      - EventPerson.event_id
+      - EventPersonLink.event_id
+      - EventLogEntry.event_id
+      - EventReminder.event_id
+      - EventSetting.event_id
+      - EventSettingPrincipal.event_id
+      - PaperCompetence.event_id
+      - PaperReviewQuestion.event_id
+      - PaperTemplate.event_id
+      - ContributionType.event_id
+      - ContributionField.event_id
+      - Track.event_id
+      - Session.event_id
+      - Contribution.event_id
+      - TimetableEntry.event_id
+      - ImageFile.event_id
+      - AttachmentFolder.event_id
+      - EventPrincipal.event_id
+      - EventNote.event_id
+      - RegistrationForm.event_id
+      - Survey.event_id
+      - DesignerTemplate.event_id
+      - EventPage.event_id
+      - MenuEntry.event_id
+      - Event.global_abstract_reviewers.prop.secondary.c.event_id
+      - Event.global_conveners.prop.secondary.c.event_id
+      - AbstractEmailTemplate.event_id
+      - AbstractReviewQuestion.event_id
+      - Abstract.event_id
 
   EventPerson: {}
   EventPersonLink: {}
@@ -50,22 +49,20 @@ export:
     # and merged_into_id_only_merged check constraints
     order: Abstract.state.in_([5, 6]), Abstract.id
     fks:
-      id:
-        - AbstractComment.abstract_id
-        - AbstractFieldValue.abstract_id
-        - AbstractPersonLink.abstract_id
-        - AbstractEmailLogEntry.abstract_id
-        - AbstractFile.abstract_id
-        - Abstract.reviewed_for_tracks.prop.secondary.c.abstract_id
-        - Abstract.submitted_for_tracks.prop.secondary.c.abstract_id
-        - AbstractReview.abstract_id
+      - AbstractComment.abstract_id
+      - AbstractFieldValue.abstract_id
+      - AbstractPersonLink.abstract_id
+      - AbstractEmailLogEntry.abstract_id
+      - AbstractFile.abstract_id
+      - Abstract.reviewed_for_tracks.prop.secondary.c.abstract_id
+      - Abstract.submitted_for_tracks.prop.secondary.c.abstract_id
+      - AbstractReview.abstract_id
 
   AbstractReview:
     order: AbstractReview.proposed_action.in_([4, 5])
     fks:
-      id:
-        - AbstractReviewRating.review_id
-        - AbstractReview.proposed_tracks.prop.secondary.c.review_id
+      - AbstractReviewRating.review_id
+      - AbstractReview.proposed_tracks.prop.secondary.c.review_id
 
   AbstractEmailTemplate:
     cols:
@@ -97,44 +94,39 @@ export:
       venue_id: venue_name = Location.get(VALUE).name
       room_id: room_name = Room.get(VALUE).full_name
     fks:
-      id:
-        - SessionBlock.session_id
-        - SessionPrincipal.session_id
+      - SessionBlock.session_id
+      - SessionPrincipal.session_id
 
   SessionBlock:
     cols:
       venue_id: venue_name = Location.get(VALUE).name
       room_id: room_name = Room.get(VALUE).full_name
     fks:
-      id:
-        - SessionBlockPersonLink.session_block_id
+      - SessionBlockPersonLink.session_block_id
 
   Contribution:
     cols:
       venue_id: venue_name = Location.get(VALUE).name
       room_id: room_name = Room.get(VALUE).full_name
     fks:
-      id:
-        - ContributionPersonLink.contribution_id
-        - SubContribution.contribution_id
-        - ContributionPrincipal.contribution_id
-        - ContributionFieldValue.contribution_id
-        - PaperFile._contribution_id
-        - PaperRevision._contribution_id
-        - Contribution.paper_content_reviewers.prop.secondary.c.contribution_id
-        - Contribution.paper_layout_reviewers.prop.secondary.c.contribution_id
-        - Contribution.paper_judges.prop.secondary.c.contribution_id
+      - ContributionPersonLink.contribution_id
+      - SubContribution.contribution_id
+      - ContributionPrincipal.contribution_id
+      - ContributionFieldValue.contribution_id
+      - PaperFile._contribution_id
+      - PaperRevision._contribution_id
+      - Contribution.paper_content_reviewers.prop.secondary.c.contribution_id
+      - Contribution.paper_layout_reviewers.prop.secondary.c.contribution_id
+      - Contribution.paper_judges.prop.secondary.c.contribution_id
 
   PaperRevision:
     fks:
-      id:
-        - PaperReviewComment.revision_id
-        - PaperReview.revision_id
+      - PaperReviewComment.revision_id
+      - PaperReview.revision_id
 
   PaperReview:
     fks:
-      id:
-        - PaperReviewRating.review_id
+      - PaperReviewRating.review_id
 
   PaperTemplate: {}
   PaperFile: {}
@@ -148,8 +140,7 @@ export:
 
   SubContribution:
     fks:
-      id:
-        - SubContributionPersonLink.subcontribution_id
+      - SubContributionPersonLink.subcontribution_id
 
   SessionBlockPersonLink: {}
   ContributionPersonLink: {}
@@ -162,7 +153,7 @@ export:
 
   TimetableEntry:
     fks_out:
-      break_id: Break.id
+      - break_id
 
   ContributionType: {}
   ContributionField: {}
@@ -171,28 +162,24 @@ export:
 
   Track:
     fks:
-      id:
-        - Track.abstract_reviewers.prop.secondary.c.track_id
-        - Track.conveners.prop.secondary.c.track_id
+      - Track.abstract_reviewers.prop.secondary.c.track_id
+      - Track.conveners.prop.secondary.c.track_id
 
   AttachmentFolder:
     fks:
-      id:
-        - Attachment.folder_id
-        - AttachmentFolderPrincipal.folder_id
+      - Attachment.folder_id
+      - AttachmentFolderPrincipal.folder_id
 
   Attachment:
     fks:
-      id:
-        - AttachmentFile.attachment_id
-        - AttachmentPrincipal.attachment_id
+      - AttachmentFile.attachment_id
+      - AttachmentPrincipal.attachment_id
 
   AttachmentFile: {}
 
   EventNote:
     fks:
-      id:
-        - EventNoteRevision.note_id
+      - EventNoteRevision.note_id
 
   EventNoteRevision: {}
 
@@ -216,26 +203,23 @@ export:
 
   RegistrationForm:
     fks:
-      id:
-        - RegistrationFormItem.registration_form_id
-        - Registration.registration_form_id
-        - RegistrationInvitation.registration_form_id
+      - RegistrationFormItem.registration_form_id
+      - Registration.registration_form_id
+      - RegistrationInvitation.registration_form_id
 
   Registration:
     cols:
       uuid: ~
       ticket_uuid: ~
     fks:
-      id:
-        - RegistrationData.registration_id
-        - PaymentTransaction.registration_id
+      - RegistrationData.registration_id
+      - PaymentTransaction.registration_id
 
   RegistrationFormItem:
     # top-level items first to satisfy top_level_sections check constraint
     order: RegistrationFormItem.parent_id.isnot(None)
     fks:
-      id:
-        - RegistrationFormFieldData.field_id
+      - RegistrationFormFieldData.field_id
 
   RegistrationData: {}
   RegistrationFormFieldData: {}
@@ -249,9 +233,8 @@ export:
     cols:
       uuid: ~
     fks:
-      id:
-        - SurveyItem.survey_id
-        - SurveySubmission.survey_id
+      - SurveyItem.survey_id
+      - SurveySubmission.survey_id
 
   SurveyItem:
     # top-level items first to satisfy valid_question check constraint
@@ -265,8 +248,7 @@ export:
     # event with a running survey to another instance anyway?
     skipif: not ROW.is_submitted
     fks:
-      id:
-        - SurveyAnswer.submission_id
+      - SurveyAnswer.submission_id
 
   DesignerTemplate:
     allow_duplicates: true
@@ -274,10 +256,9 @@ export:
       # if we have a category id, we associate that template with the event instead
       category_id: event_id = MAKE_EVENT_REF()
     fks:
-      id:
-        - DesignerImageFile.template_id
+      - DesignerImageFile.template_id
     fks_out:
-      backside_template_id: DesignerTemplate.id
+      - backside_template_id
 
   DesignerImageFile: {}
 
