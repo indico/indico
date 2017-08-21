@@ -142,10 +142,6 @@ class EventExporter(object):
         }
         yaml_data = yaml.dump(metadata, indent=2)
         self._add_file('data.yaml', len(yaml_data), yaml_data)
-        from pygments import highlight
-        from pygments.lexers.data import YamlLexer
-        from pygments.formatters.terminal256 import Terminal256Formatter
-        print highlight(yaml_data, YamlLexer(), Terminal256Formatter(style='native'))
 
     def _load_spec(self):
         def _process_tablespec(tablename, tablespec):
