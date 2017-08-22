@@ -105,12 +105,12 @@ export:
       rules: |
         rules = []
         for _rule in VALUE:
-          _rule = dict(_rule)
-          if 'contribution_type' in _rule:
-            _rule['contribution_type'] = [MAKE_ID_REF(ContributionType.id, _x) for _x in _rule['contribution_type']]
-          if 'track' in _rule:
-            _rule['track'] = [MAKE_ID_REF(Track.id, _x) for _x in _rule['track']]
-          rules.append(_rule)
+            _rule = dict(_rule)
+            if 'contribution_type' in _rule:
+                _rule['contribution_type'] = [MAKE_ID_REF(ContributionType.id, _x) for _x in _rule['contribution_type']]
+            if 'track' in _rule:
+                _rule['track'] = [MAKE_ID_REF(Track.id, _x) for _x in _rule['track']]
+            rules.append(_rule)
 
   AbstractReviewQuestion: {}
   AbstractReviewRating: {}
@@ -325,12 +325,12 @@ import:
       rules: |
         rules = []
         for _rule in VALUE:
-          _rule = dict(_rule)
-          if 'contribution_type' in _rule:
-            _rule['contribution_type'] = [RESOLVE_ID_REF(_x) for _x in _rule['contribution_type']]
-          if 'track' in _rule:
-            _rule['track'] = [RESOLVE_ID_REF(_x) for _x in _rule['track']]
-          rules.append(_rule)
+            _rule = dict(_rule)
+            if 'contribution_type' in _rule:
+                _rule['contribution_type'] = [RESOLVE_ID_REF(_x) for _x in _rule['contribution_type']]
+            if 'track' in _rule:
+                _rule['track'] = [RESOLVE_ID_REF(_x) for _x in _rule['track']]
+            rules.append(_rule)
 
   # How user references should be handled if the user does not exist.
   # The following values may be used:
