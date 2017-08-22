@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, print_function
+from __future__ import print_function, unicode_literals
 
 import click
 from flask_multipass import IdentityInfo
@@ -28,6 +28,7 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import search_users
 from indico.util.console import cformat, prompt_email, prompt_pass
 from indico.util.string import to_unicode
+
 
 click.disable_unicode_literals_warning = True
 
@@ -67,7 +68,7 @@ def _safe_lower(s):
 @click.option('--last-name', '-s', help='Last name of the user')
 @click.option('--email', '-e', help='Email address of the user')
 @click.option('--affiliation', '-a', help='Affiliation of the user')
-def user_search(substring, include_deleted, include_pending, include_external, include_system, **criteria):
+def search(substring, include_deleted, include_pending, include_external, include_system, **criteria):
     """Searches users matching some criteria"""
     assert set(criteria.viewkeys()) == {'first_name', 'last_name', 'email', 'affiliation'}
     criteria = {k: v for k, v in criteria.viewitems() if v is not None}
@@ -104,8 +105,8 @@ def user_search(substring, include_deleted, include_pending, include_external, i
 
 @cli.command()
 @click.option('--admin/--no-admin', '-a/', 'grant_admin', is_flag=True, help='Grant admin rights')
-def user_create(grant_admin):
-    """Creates new user"""
+def create(grant_admin):
+    """Creates a new user"""
     user_type = 'user' if not grant_admin else 'admin'
     while True:
         email = prompt_email()
@@ -142,7 +143,7 @@ def user_create(grant_admin):
 
 @cli.command()
 @click.argument('user_id', type=int)
-def user_grant(user_id):
+def grant_admin(user_id):
     """Grants administration rights to a given user"""
     user = User.get(user_id)
     if user is None:
@@ -160,7 +161,7 @@ def user_grant(user_id):
 
 @cli.command()
 @click.argument('user_id', type=int)
-def user_revoke(user_id):
+def revoke_admin(user_id):
     """Revokes administration rights from a given user"""
     user = User.get(user_id)
     if user is None:

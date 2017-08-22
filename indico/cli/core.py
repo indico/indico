@@ -58,8 +58,8 @@ def setup():
     """Setup Indico."""
 
 
-@cli.group(cls=LazyGroup, import_name='indico.cli.admin:cli')
-def admin():
+@cli.group(cls=LazyGroup, import_name='indico.cli.user:cli')
+def user():
     """Manage Indico users."""
 
 
