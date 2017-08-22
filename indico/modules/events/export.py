@@ -36,9 +36,18 @@ from terminaltables import AsciiTable
 import indico
 from indico.core import Config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.storage.backend import get_storage
 from indico.modules.events import Event, EventLogKind, EventLogRealm
+from indico.modules.events.contributions import Contribution
+from indico.modules.events.contributions.models.principals import ContributionPrincipal
+from indico.modules.events.models.persons import EventPerson
+from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.registration.models.registrations import Registration
+from indico.modules.events.sessions import Session
+from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.users import User
+from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import now_utc
 from indico.util.string import strict_unicode
 
@@ -413,7 +422,41 @@ class EventImporter(object):
             raise Exception('Not all deferred idrefs have been consumed')
         event = Event.get(self.event_id)
         event.log(EventLogRealm.event, EventLogKind.other, 'Event', 'Event imported from another Indico instance')
+        self._associate_users_by_email(event)
+        db.session.flush()
         return event
+
+    def _associate_users_by_email(self, event):
+        # link objects to users by email where possible
+        # event principals
+        emails = [p.email for p in EventPrincipal.query.with_parent(event).filter_by(type=PrincipalType.email)]
+        for user in User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(emails))):
+            EventPrincipal.replace_email_with_user(user, 'event')
+
+        # session principals
+        query = (SessionPrincipal.query
+                 .filter(SessionPrincipal.session.has(Session.event == event),
+                         SessionPrincipal.type == PrincipalType.email))
+        emails = [p.email for p in query]
+        for user in User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(emails))):
+            SessionPrincipal.replace_email_with_user(user, 'session')
+
+        # contribution principals
+        query = (ContributionPrincipal.query
+                 .filter(ContributionPrincipal.contribution.has(Contribution.event == event),
+                         ContributionPrincipal.type == PrincipalType.email))
+        emails = [p.email for p in query]
+        for user in User.query.filter(~User.is_deleted, User.all_emails.contains(db.func.any(emails))):
+            ContributionPrincipal.replace_email_with_user(user, 'contribution')
+
+        # event persons
+        query = EventPerson.query.with_parent(event).filter(EventPerson.user_id.is_(None), EventPerson.email != '')
+        for person in query:
+            person.user = get_user_by_email(person.email)
+
+        # registrations
+        for registration in Registration.query.with_parent(event).filter(Registration.user_id.is_(None)):
+            registration.user = get_user_by_email(registration.email)
 
     def _convert_value(self, colspec, value):
         if not isinstance(value, tuple):
