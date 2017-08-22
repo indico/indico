@@ -1,4 +1,40 @@
 export:
+  # Specify how data gets exported.
+  # Each key is either the name of a model or, in case there is no model, the full
+  # table name (`schema.tablename`).
+  # For each table, the following keys are used:
+  # - cols: A list of columns with custom behavior.
+  #         If set to None (`~`), the column will not be exported. Use this e.g. for
+  #         a column containing a UUID or an ID referencing something that is never
+  #         exported (such as a category).
+  #         If set to a string, that string is executed as a snipped of Python code.
+  #         It has access to `VALUE`, `MAKE_EVENT_REF()` and `MAKE_ID_REF(target, id)`.
+  #         The target of `MAKE_ID_REF` is usually specified as `Model.attr`, but can
+  #         also reference a column directly (e.g. using the `secondary` notation
+  #         described in the `fks` section below). Any value assigned to a variable
+  #         that does not start with an underscore is exported instead of the original
+  #         column name. This allows assigning the new value to a different column or
+  #         even splitting a value into column (not very likely to be useful though).
+  # - fks: A list of incoming foreign keys, referencing a column in the current table.
+  #        They are processed in the specified order and once all rows of the current
+  #        table have been exported, all the referenced elements will be exported.
+  #        For FKs that are part of a many-to-many mapping table with no Model, you
+  #        need to go through the `secondary` attribute of the relationship to reference
+  #        the column (see the existing code for an example)
+  # - fks_out: A list of outgoing foreign keys. The referenced rows are exported before
+  #            each row in the current table that has such a reference.
+  # - skipif: A python expression that will be evaluated for each row. If it returns
+  #           true, the row is skipped. The current row is available as `ROW`.
+  #           Note that no cascading happens, so rows that are referenced somewhere
+  #           else may not be skipped.
+  # - order: A python expression returning something that can be passed to `order_by()`
+  #          or a tuple of such objects.
+  # - allow_duplicates: By default a row may not be referenced more than once (e.g. from
+  #                     different locations / FKs).  If this is set to true, this check is
+  #                     disabled (but the row is obviously still exported only once).  Only
+  #                     use this if you need to reference a table from two places that may
+  #                     have overlaps - do not use this without having a case where you get
+  #                     an error due to duplicates!
   Event:
     cols:
       venue_id: venue_name = Location.get(VALUE).name
@@ -270,12 +306,13 @@ export:
 
 
 import:
+  # Static default values used when there is no value in the exported data.
   #defaults:
-  #  SomeTable:
+  #  SomeModel:
   #    some_column: some_value
 
   # Code executed to convert imported values.
-  # Each code snippet has access to VALUE and a function RESOLVE_ID_REF
+  # Each code snippet has access to `VALUE` and a function `RESOLVE_ID_REF`
   # which converts an ID reference back to the ID of the associated row.
   # Deferred references and user references are not supported, so make sure
   # to not use this on any column referencing a user or whose referenced
