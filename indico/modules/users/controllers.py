@@ -403,7 +403,12 @@ class RHUsersAdminCreate(RHAdminBase):
         form = AdminAccountRegistrationForm()
         if form.validate_on_submit():
             data = form.data
-            identity = Identity(provider='indico', identifier=data.pop('username'), password=data.pop('password'))
+            if data.pop('create_identity'):
+                identity = Identity(provider='indico', identifier=data.pop('username'), password=data.pop('password'))
+            else:
+                identity = None
+                del data['username']
+                del data['password']
             user = create_user(data.pop('email'), data, identity, from_moderation=True)
             msg = Markup('{} <a href="{}">{}</a>').format(
                 escape(_('The account has been created.')),

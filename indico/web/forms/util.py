@@ -40,7 +40,7 @@ def get_form_field_names(form_class):
     return field_names
 
 
-def inject_validators(form, field_name, validators):
+def inject_validators(form, field_name, validators, early=False):
     """Add extra validators to a form field.
 
     This function may be called from the ``__init__`` method of a
@@ -51,13 +51,24 @@ def inject_validators(form, field_name, validators):
     :param form: the `Form` instance or a `Form` subclass
     :param field_name: the name of the field to change
     :param validators: a list of validators to add
+    :param early: whether to inject the validator before any existing
+                  validators. this is needed if a field has a validator
+                  that stops validation such as DataRequired and the
+                  injected one is e.g. HiddenUnless which needs to run
+                  even if the field is invalid
     """
     unbound = deepcopy(getattr(form, field_name))
     assert isinstance(unbound, UnboundField)
     if 'validators' in unbound.kwargs:
-        unbound.kwargs['validators'] += validators
+        if early:
+            unbound.kwargs['validators'] = validators + unbound.kwargs['validators']
+        else:
+            unbound.kwargs['validators'] += validators
     elif len(unbound.args) > 1:
-        validators_arg = unbound.args[1] + validators
+        if early:
+            validators_arg = validators + unbound.args[1]
+        else:
+            validators_arg = unbound.args[1] + validators
         unbound.args = unbound.args[:1] + (validators_arg,) + unbound.args[2:]
     else:
         unbound.kwargs['validators'] = validators

@@ -31,7 +31,8 @@ from indico.modules.users.models.users import NameFormat, UserTitle
 from indico.util.i18n import _, get_all_locales
 from indico.web.forms.base import IndicoForm, SyncedInputsMixin
 from indico.web.forms.fields import IndicoEnumSelectField, PrincipalField, PrincipalListField
-from indico.web.forms.validators import used_if_not_synced
+from indico.web.forms.util import inject_validators
+from indico.web.forms.validators import HiddenUnless, used_if_not_synced
 from indico.web.forms.widgets import SwitchWidget, SyncedInputWidget
 
 
@@ -108,8 +109,11 @@ class AdminUserSettingsForm(IndicoForm):
 
 class AdminAccountRegistrationForm(LocalRegistrationForm):
     email = EmailField(_('Email address'), [DataRequired(), _check_existing_email])
+    create_identity = BooleanField(_("Set login details"), widget=SwitchWidget(), default=True)
 
     def __init__(self, *args, **kwargs):
+        for field in ('username', 'password', 'confirm_password'):
+            inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
         super(AdminAccountRegistrationForm, self).__init__(*args, **kwargs)
         del self.comment
 

@@ -113,7 +113,8 @@
     </form>
 {% endmacro %}
 
-{% macro form_fieldset(legend, description=none, disabled=false, render_as_fieldset=true, collapsible=false, initially_collapsed=true) %}
+{% macro form_fieldset(legend, description=none, disabled=false, render_as_fieldset=true, id=none,
+                       collapsible=false, initially_collapsed=true) %}
     {% if not render_as_fieldset %}
         {#
         This is sugar for cases where you sometimes want the fieldset
@@ -128,7 +129,7 @@
         #}
         {{ caller() }}
     {% else %}
-        <fieldset{% if disabled %} disabled{% endif %} {% if collapsible %}class="collapsible {% if initially_collapsed %}initially-collapsed{% endif %} "{% endif %}>
+        <fieldset {% if id %}id="{{ id }}"{% endif %} {% if disabled %}disabled{% endif %} {% if collapsible %}class="collapsible {% if initially_collapsed %}initially-collapsed{% endif %}"{% endif %}>
             <legend>
                 {{ legend }}
                 {% if collapsible -%}
