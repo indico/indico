@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, SelectField, PasswordField, TextAreaField
+from wtforms.fields import PasswordField, SelectField, StringField, TextAreaField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import DataRequired, Length, ValidationError, Optional
+from wtforms.validators import DataRequired, Length, Optional, ValidationError
 
 from indico.modules.auth import Identity
 from indico.modules.users import User
@@ -112,7 +112,7 @@ class LocalRegistrationForm(RegistrationForm):
     @property
     def data(self):
         data = super(LocalRegistrationForm, self).data
-        del data['confirm_password']
+        data.pop('confirm_password', None)
         return data
 
 

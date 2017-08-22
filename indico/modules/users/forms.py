@@ -24,6 +24,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
+from indico.core import Config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail
@@ -112,10 +113,17 @@ class AdminAccountRegistrationForm(LocalRegistrationForm):
     create_identity = BooleanField(_("Set login details"), widget=SwitchWidget(), default=True)
 
     def __init__(self, *args, **kwargs):
-        for field in ('username', 'password', 'confirm_password'):
-            inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
+        local_identities = Config.getInstance().getLocalIdentities()
+        if local_identities:
+            for field in ('username', 'password', 'confirm_password'):
+                inject_validators(self, field, [HiddenUnless('create_identity')], early=True)
         super(AdminAccountRegistrationForm, self).__init__(*args, **kwargs)
         del self.comment
+        if not local_identities:
+            del self.username
+            del self.password
+            del self.confirm_password
+            del self.create_identity
 
 
 class AdminsForm(IndicoForm):

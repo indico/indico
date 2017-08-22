@@ -1,12 +1,14 @@
 {% from 'forms/_form.html' import form_header, form_rows, form_footer, form_fieldset %}
 
 {{ form_header(form) }}
-{% call form_fieldset(_('User information')) %}
+{% call form_fieldset(_('User information'), render_as_fieldset=indico_config.LocalIdentities) %}
     {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'affiliation', 'create_identity')) }}
 {% endcall %}
-{% call form_fieldset(_('Login details'), id='create-account-login-details') %}
-    {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
-{% endcall %}
+{% if indico_config.LocalIdentities %}
+    {% call form_fieldset(_('Login details'), id='create-account-login-details') %}
+        {{ form_rows(form, fields=('username', 'password', 'confirm_password')) }}
+    {% endcall %}
+{% endif %}
 {% call form_footer(form) %}
     <input class="i-button big highlight" type="submit" value="{% trans %}Save{% endtrans %}">
     <button type="button" class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
