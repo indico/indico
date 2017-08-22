@@ -35,6 +35,7 @@ export:
   #                     use this if you need to reference a table from two places that may
   #                     have overlaps - do not use this without having a case where you get
   #                     an error due to duplicates!
+
   Event:
     cols:
       venue_id: venue_name = Location.get(VALUE).name
@@ -74,12 +75,120 @@ export:
       - AbstractReviewQuestion.event_id
       - Abstract.event_id
 
+
+  # core event objects (contributions etc.) & timetable
+  Session:
+    cols:
+      venue_id: venue_name = Location.get(VALUE).name
+      room_id: room_name = Room.get(VALUE).full_name
+    fks:
+      - SessionBlock.session_id
+      - SessionPrincipal.session_id
+
+  SessionBlock:
+    cols:
+      venue_id: venue_name = Location.get(VALUE).name
+      room_id: room_name = Room.get(VALUE).full_name
+    fks:
+      - SessionBlockPersonLink.session_block_id
+
+  Contribution:
+    cols:
+      venue_id: venue_name = Location.get(VALUE).name
+      room_id: room_name = Room.get(VALUE).full_name
+    fks:
+      - ContributionPersonLink.contribution_id
+      - SubContribution.contribution_id
+      - ContributionPrincipal.contribution_id
+      - ContributionFieldValue.contribution_id
+      - PaperFile._contribution_id
+      - PaperRevision._contribution_id
+      - Contribution.paper_content_reviewers.prop.secondary.c.contribution_id
+      - Contribution.paper_layout_reviewers.prop.secondary.c.contribution_id
+      - Contribution.paper_judges.prop.secondary.c.contribution_id
+
+  SubContribution:
+    fks:
+      - SubContributionPersonLink.subcontribution_id
+
+  Break:
+    cols:
+      venue_id: venue_name = Location.get(VALUE).name
+      room_id: room_name = Room.get(VALUE).full_name
+
+  TimetableEntry:
+    fks_out:
+      - break_id
+
+  ContributionType: {}
+  ContributionField: {}
+  ContributionFieldValue: {}
+
+
+  Track:
+    fks:
+      - Track.abstract_reviewers.prop.secondary.c.track_id
+      - Track.conveners.prop.secondary.c.track_id
+
+  # persons & person links
   EventPerson: {}
   EventPersonLink: {}
+  SessionBlockPersonLink: {}
+  ContributionPersonLink: {}
+  SubContributionPersonLink: {}
+  AbstractPersonLink: {}
+
+
+  # attachments
+  AttachmentFolder:
+    fks:
+      - Attachment.folder_id
+      - AttachmentFolderPrincipal.folder_id
+
+  Attachment:
+    fks:
+      - AttachmentFile.attachment_id
+      - AttachmentPrincipal.attachment_id
+
+  AttachmentFile: {}
+
+
+  # notes
+  EventNote:
+    fks:
+      - EventNoteRevision.note_id
+
+  EventNoteRevision: {}
+
+
+  # acls
+  EventPrincipal:
+    skipif: ROW.type.name not in ('user', 'email')
+
+  EventSettingPrincipal:
+    skipif: ROW.type.name != 'user'
+
+  ContributionPrincipal:
+    skipif: ROW.type.name not in ('user', 'email')
+
+  SessionPrincipal:
+    skipif: ROW.type.name not in ('user', 'email')
+
+  AttachmentPrincipal:
+    skipif: ROW.type.name != 'user'
+
+  AttachmentFolderPrincipal:
+    skipif: ROW.type.name != 'user'
+
+
+  # misc stuff
   EventLogEntry: {}
   EventReminder: {}
   EventSetting: {}
+  ImageFile: {}
 
+
+  # abstracts
   Abstract:
     # duplicate/merged abstracts come last to satisfy duplicate_of_id_only_duplicate
     # and merged_into_id_only_merged check constraints
@@ -116,7 +225,6 @@ export:
   AbstractReviewRating: {}
   AbstractComment: {}
   AbstractFieldValue: {}
-  AbstractPersonLink: {}
   AbstractEmailLogEntry: {}
   AbstractFile: {}
   event_abstracts.reviewed_for_tracks: {}
@@ -125,36 +233,7 @@ export:
   events.track_abstract_reviewers: {}
   events.track_conveners: {}
 
-  Session:
-    cols:
-      venue_id: venue_name = Location.get(VALUE).name
-      room_id: room_name = Room.get(VALUE).full_name
-    fks:
-      - SessionBlock.session_id
-      - SessionPrincipal.session_id
-
-  SessionBlock:
-    cols:
-      venue_id: venue_name = Location.get(VALUE).name
-      room_id: room_name = Room.get(VALUE).full_name
-    fks:
-      - SessionBlockPersonLink.session_block_id
-
-  Contribution:
-    cols:
-      venue_id: venue_name = Location.get(VALUE).name
-      room_id: room_name = Room.get(VALUE).full_name
-    fks:
-      - ContributionPersonLink.contribution_id
-      - SubContribution.contribution_id
-      - ContributionPrincipal.contribution_id
-      - ContributionFieldValue.contribution_id
-      - PaperFile._contribution_id
-      - PaperRevision._contribution_id
-      - Contribution.paper_content_reviewers.prop.secondary.c.contribution_id
-      - Contribution.paper_layout_reviewers.prop.secondary.c.contribution_id
-      - Contribution.paper_judges.prop.secondary.c.contribution_id
-
+  # papers
   PaperRevision:
     fks:
       - PaperReviewComment.revision_id
@@ -174,69 +253,8 @@ export:
   event_paper_reviewing.layout_reviewers: {}
   event_paper_reviewing.judges: {}
 
-  SubContribution:
-    fks:
-      - SubContributionPersonLink.subcontribution_id
 
-  SessionBlockPersonLink: {}
-  ContributionPersonLink: {}
-  SubContributionPersonLink: {}
-
-  Break:
-    cols:
-      venue_id: venue_name = Location.get(VALUE).name
-      room_id: room_name = Room.get(VALUE).full_name
-
-  TimetableEntry:
-    fks_out:
-      - break_id
-
-  ContributionType: {}
-  ContributionField: {}
-  ContributionFieldValue: {}
-  ImageFile: {}
-
-  Track:
-    fks:
-      - Track.abstract_reviewers.prop.secondary.c.track_id
-      - Track.conveners.prop.secondary.c.track_id
-
-  AttachmentFolder:
-    fks:
-      - Attachment.folder_id
-      - AttachmentFolderPrincipal.folder_id
-
-  Attachment:
-    fks:
-      - AttachmentFile.attachment_id
-      - AttachmentPrincipal.attachment_id
-
-  AttachmentFile: {}
-
-  EventNote:
-    fks:
-      - EventNoteRevision.note_id
-
-  EventNoteRevision: {}
-
-  EventPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
-
-  EventSettingPrincipal:
-    skipif: ROW.type.name != 'user'
-
-  ContributionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
-
-  SessionPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
-
-  AttachmentPrincipal:
-    skipif: ROW.type.name != 'user'
-
-  AttachmentFolderPrincipal:
-    skipif: ROW.type.name != 'user'
-
+  # registration & payment
   RegistrationForm:
     fks:
       - RegistrationFormItem.registration_form_id
@@ -265,6 +283,8 @@ export:
 
   PaymentTransaction: {}
 
+
+  # surveys
   Survey:
     cols:
       uuid: ~
@@ -276,8 +296,6 @@ export:
     # top-level items first to satisfy valid_question check constraint
     order: SurveyItem.parent_id.isnot(None)
 
-  SurveyAnswer: {}
-
   SurveySubmission:
     # pending submissions have references to field ids in json data which we
     # cannot map easily.  they are also kind of useless... who migrates an
@@ -286,6 +304,10 @@ export:
     fks:
       - SurveyAnswer.submission_id
 
+  SurveyAnswer: {}
+
+
+  # badge/poster designer
   DesignerTemplate:
     allow_duplicates: true
     cols:
@@ -298,10 +320,12 @@ export:
 
   DesignerImageFile: {}
 
-  EventPage: {}
 
+  # conference menu
   MenuEntry:
     skipif: ROW.type.name == 'plugin_link'
+
+  EventPage: {}
 
 
 
@@ -310,6 +334,7 @@ import:
   #defaults:
   #  SomeModel:
   #    some_column: some_value
+
 
   # Code executed to convert imported values.
   # Each code snippet has access to `VALUE` and a function `RESOLVE_ID_REF`
@@ -331,6 +356,7 @@ import:
             if 'track' in _rule:
                 _rule['track'] = [RESOLVE_ID_REF(_x) for _x in _rule['track']]
             rules.append(_rule)
+
 
   # How user references should be handled if the user does not exist.
   # The following values may be used:
