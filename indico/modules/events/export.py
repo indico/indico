@@ -432,7 +432,7 @@ class EventImporter(object):
                        'weird, the system user will be used.')
             click.echo('- In case neither is possible, e.g. in abstract reviews or ACLs, these objects will '
                        'be skipped altogether!')
-            if click.confirm('Create the missing users?', default=False):  # TODO default=True
+            if click.confirm('Create the missing users?', default=True):
                 for uuid, userdata in missing.iteritems():
                     user = User(first_name=userdata['first_name'],
                                 last_name=userdata['last_name'],
