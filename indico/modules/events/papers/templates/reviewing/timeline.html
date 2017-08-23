@@ -169,7 +169,7 @@
 
 {% macro _render_timeline_file_list(files) %}
     <ul class="file-list">
-        {% for file in files %}
+        {% for file in files|sort(attribute='filename') %}
             {% set icon = icon_from_mimetype(file.content_type, 'icon-file-filled') %}
             <li class="truncate-text">
                 <a class="attachment {{ icon }}" href="{{ url_for('papers.download_file', file) }}"

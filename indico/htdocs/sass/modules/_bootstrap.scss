@@ -149,7 +149,6 @@
 
         .step-wrapper {
             width: 100%;
-            height: 100%;
             padding-top: 75px;
 
             color: $black;
@@ -217,7 +216,7 @@
                     }
 
                     .additional-information {
-                        color: #d3d3d3;
+                        color: $gray;
                     }
                 }
 

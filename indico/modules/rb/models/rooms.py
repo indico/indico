@@ -373,6 +373,14 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
         return u', '.join(map(unicode, infos))
 
     @property
+    def manager_emails(self):
+        manager_group = self.get_attribute_value('manager-group')
+        if not manager_group:
+            return set()
+        group = GroupProxy.get_named_default_group(manager_group)
+        return {u.email for u in group.get_members()}
+
+    @property
     def notification_emails(self):
         return set(filter(None, map(unicode.strip, self.get_attribute_value(u'notification-email', u'').split(u','))))
 

@@ -22,12 +22,13 @@ from operator import attrgetter
 from pytz import timezone
 from qrcode import QRCode, constants
 from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm, inch
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table, TableStyle
+from reportlab.platypus.flowables import HRFlowable
 from reportlab.rl_config import defaultPageSize
 from speaklater import is_lazy_string
 
@@ -42,13 +43,14 @@ from indico.modules.events.abstracts.models.abstracts import AbstractReviewingSt
 from indico.modules.events.abstracts.models.reviews import AbstractAction
 from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, boa_settings
 from indico.modules.events.layout.util import get_menu_entry_by_name
+from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
 from indico.util import json
 from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time
 from indico.util.i18n import _, ngettext
-from indico.util.string import html_color_to_rgb, to_unicode, truncate
+from indico.util.string import format_full_name, html_color_to_rgb, to_unicode, truncate
 
 
 # Change reportlab default pdf font Helvetica to indico ttf font,
@@ -1208,13 +1210,9 @@ class RegistrantToPDF(PDFBase):
             self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
                                     height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 25)
-        #c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT - inch - 5*cm, self._abstract.getTitle())
         c.setLineWidth(3)
         c.setStrokeGray(0.7)
-        #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
-        #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
         c.setFont('Times-Roman', 10)
-        #c.drawString(0.5*inch, 0.5*inch, Config.getInstance().getBaseURL())
         c.restoreState()
 
     def getBody(self, story=None, indexedFlowable=None, level=1 ):
@@ -1226,15 +1224,11 @@ class RegistrantToPDF(PDFBase):
 
         registration = self._reg
         data = registration.data_by_field
-        full_name = "{first_name} {last_name}".format(first_name=registration.first_name.encode('utf-8'),
-                                                      last_name=registration.last_name.encode('utf-8'))
 
-        def _append_text_to_story(text, space=0.2, indexed_flowable=False):
-            p = Paragraph(text, style, full_name)
-            if indexed_flowable:
-                indexedFlowable[p] = {"text": full_name, "level": 1}
+        def _append_text_to_story(text, space=0.2, style=style):
+            p = Paragraph(text, style, registration.full_name)
             story.append(p)
-            story.append(Spacer(inch, space*cm, full_name))
+            story.append(Spacer(inch, space*cm, registration.full_name))
 
         def _print_row(caption, value):
             if isinstance(caption, unicode) or is_lazy_string(caption):
@@ -1244,56 +1238,85 @@ class RegistrantToPDF(PDFBase):
             text = '<b>{field_name}</b>: {field_value}'.format(field_name=caption, field_value=value)
             _append_text_to_story(text)
 
-        text = _('Registrant ID: {id}').format(id=registration.friendly_id)
-        _append_text_to_story(text, space=0.5)
+        def _print_section(caption):
+            story.append(Spacer(0, 20))
+            section_style = ParagraphStyle({})
+            section_style.fontSize = 13
+            section_style.textColor = (0.5, 0.5, 0.5)
+            _append_text_to_story(caption, style=section_style)
+            story.append(HRFlowable(width='100%', thickness=1, color=(0.8, 0.8, 0.8), lineCap='round',
+                                    spaceAfter=10, dash=None))
 
-        style = ParagraphStyle({})
-        style.alignment = TA_CENTER
-        style.fontName = 'Sans'
-        style.fontSize = 25
-        style.leading = 30
-        _append_text_to_story(full_name, space=1.0, indexed_flowable=True)
+        full_name_title = format_full_name(registration.first_name, registration.last_name,
+                                           registration.get_personal_data().get('title'),
+                                           last_name_first=False, last_name_upper=False,
+                                           abbrev_first_name=False, show_title=True)
+
+        header_style = ParagraphStyle({}, style, fontSize=16)
+        header_data = [
+            [Paragraph(full_name_title.encode('utf-8'), header_style),
+             Paragraph('#{}'.format(registration.friendly_id),
+                       ParagraphStyle({}, header_style, alignment=TA_RIGHT))],
+        ]
+        header_table_style = TableStyle([('LEFTPADDING', (0, 0), (-1, -1), 0),
+                                         ('RIGHTPADDING', (0, 0), (-1, -1), 0)])
+        tbl = Table(header_data, style=header_table_style, colWidths=[None, cm])
+        story.append(tbl)
+        indexedFlowable[tbl] = {'text': registration.full_name, 'level': 1}
+
         style = ParagraphStyle({})
         style.fontName = 'Sans'
         style.alignment = TA_JUSTIFY
 
+        if self.static_items:
+            _print_section(_('Registration details'))
+
+            if 'reg_date' in self.static_items:
+                _print_row(_('Registration date'), format_datetime(registration.submitted_dt))
+            if 'state' in self.static_items:
+                _print_row(_('Registration state'), registration.state.title)
+            if 'price' in self.static_items:
+                _print_row(_('Price'), registration.render_price())
+            if 'payment_date' in self.static_items:
+                payment_date = format_datetime(registration.payment_dt) if registration.payment_dt else ''
+                _print_row(_('Payment date'), payment_date)
+            if 'checked_in' in self.static_items:
+                checked_in = 'Yes' if registration.checked_in else 'No'
+                _print_row(_('Checked in'), checked_in)
+            if 'checked_in_date' in self.static_items:
+                check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
+                _print_row(_('Check-in date'), check_in_date)
+
         for item in self._display:
             if item.input_type == 'accommodation' and item.id in data:
-                _print_row(caption=item.title, value=data[item.id].friendly_data.get('choice'))
+                _print_row(item.title, data[item.id].friendly_data.get('choice'))
                 arrival_date = data[item.id].friendly_data.get('arrival_date')
-                _print_row(caption=_('Arrival date'), value=format_date(arrival_date) if arrival_date else '')
+                _print_row(_('Arrival date'), format_date(arrival_date) if arrival_date else '')
                 departure_date = data[item.id].friendly_data.get('departure_date')
-                _print_row(caption=_('Departure date'), value=format_date(departure_date) if departure_date else '')
+                _print_row(_('Departure date'), format_date(departure_date) if departure_date else '')
             elif item.input_type == 'multi_choice' and item.id in data:
                 multi_choice_data = ', '.join(data[item.id].friendly_data)
-                _print_row(caption=item.title, value=multi_choice_data)
+                _print_row(item.title, multi_choice_data)
+            elif item.is_section:
+                _print_section(item.title)
+            elif item.personal_data_type in (PersonalDataType.title, PersonalDataType.first_name,
+                                             PersonalDataType.last_name):
+                continue
             else:
                 value = data[item.id].friendly_data if item.id in data else ''
-                _print_row(caption=item.title, value=value)
-
-        if 'reg_date' in self.static_items:
-            _print_row(caption=_('Registration date'), value=format_datetime(registration.submitted_dt))
-        if 'state' in self.static_items:
-            _print_row(caption=_('Registration state'), value=registration.state.title)
-        if 'price' in self.static_items:
-            _print_row(caption=_('Price'), value=registration.render_price())
-        if 'checked_in' in self.static_items:
-            checked_in = 'Yes' if registration.checked_in else 'No'
-            _print_row(caption=_('Checked in'), value=checked_in)
-        if 'checked_in_date' in self.static_items:
-            check_in_date = format_datetime(registration.checked_in_dt) if registration.checked_in else ''
-            _print_row(caption=_('Check-in date'), value=check_in_date)
+                _print_row(item.title, value)
 
         return story
 
 
 class RegistrantsListToBookPDF(PDFWithTOC):
-    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], static_items=None):
+    def __init__(self, conf, regform, reglist, item_ids, static_item_ids):
         self._conf = conf
+        self._regform = regform
         self._regList = reglist
-        self._display = display
+        self._item_ids = set(item_ids)
         self._title = _("Registrants Book")
-        self.static_items = static_items
+        self._static_item_ids = static_item_ids
         PDFWithTOC.__init__(self)
 
     def firstPage(self, c, doc):
@@ -1327,8 +1350,17 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.restoreState()
 
     def getBody(self):
+        items = []
+        for section in self._regform.sections:
+            if not section.is_visible:
+                continue
+            fields = [field for field in section.fields if field.id in self._item_ids and field.is_visible]
+            if not fields:
+                continue
+            items.append(section)
+            items += fields
         for reg in self._regList:
-            temp = RegistrantToPDF(self._conf, reg, self._display, static_items=self.static_items)
+            temp = RegistrantToPDF(self._conf, reg, items, static_items=self._static_item_ids)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 

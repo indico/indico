@@ -19,14 +19,20 @@ from __future__ import unicode_literals
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from indico.modules.events.management.views import WPEventManagement
+from indico.util.mathjax import MathjaxMixin
 
 
-class WPManageContributions(WPEventManagement):
+class WPManageContributions(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/contributions/'
     sidemenu_option = 'contributions'
 
     def getJSFiles(self):
-        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_contributions_js'].urls()
+        return (WPEventManagement.getJSFiles(self) +
+                self._asset_env['modules_contributions_js'].urls() +
+                self._asset_env['markdown_js'].urls())
+
+    def _getHeadContent(self):
+        return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
@@ -49,10 +55,10 @@ class WPContributions(WPContributionsDisplayBase):
     menu_entry_name = 'contributions'
 
     def getJSFiles(self):
-        return (WPContributionsDisplayBase.getJSFiles(self) + self._asset_env['dropzone_js'].urls())
+        return WPContributionsDisplayBase.getJSFiles(self) + self._asset_env['dropzone_js'].urls()
 
     def getCSSFiles(self):
-        return (WPContributionsDisplayBase.getCSSFiles(self) + self._asset_env['dropzone_css'].urls())
+        return WPContributionsDisplayBase.getCSSFiles(self) + self._asset_env['dropzone_css'].urls()
 
 
 class WPAuthorList(WPContributionsDisplayBase):
