@@ -99,16 +99,13 @@ class RegistrationListGenerator(ListGeneratorBase):
     def _column_ids_to_db(self, ids):
         """Translate string-based ids to DB-based RegistrationFormItem ids."""
         result = []
+        personal_data_field_ids = {x.personal_data_type: x.id for x in self.regform.form_items if x.is_field}
         for item_id in ids:
             if isinstance(item_id, basestring):
-                personal_data = PersonalDataType.get(item_id)
-                if personal_data:
-                    result.append(RegistrationFormPersonalDataField.find_one(registration_form=self.regform,
-                                                                             personal_data_type=personal_data).id)
-                else:
-                    result.append(item_id)
-            else:
-                result.append(item_id)
+                personal_data_type = PersonalDataType.get(item_id)
+                if personal_data_type:
+                    item_id = personal_data_field_ids[personal_data_type]
+            result.append(item_id)
         return result
 
     def _get_sorted_regform_items(self, item_ids):
@@ -194,13 +191,16 @@ class RegistrationListGenerator(ListGeneratorBase):
         }
 
     def get_list_export_config(self):
-        reg_list_config = self._get_config()
-        static_item_ids, item_ids = self._split_item_ids(reg_list_config['items'], 'static')
-        item_ids = self._column_ids_to_db(item_ids)
+        static_item_ids, item_ids = self.get_item_ids()
         return {
             'static_item_ids': static_item_ids,
             'regform_items': self._get_sorted_regform_items(item_ids)
         }
+
+    def get_item_ids(self):
+        reg_list_config = self._get_config()
+        static_item_ids, item_ids = self._split_item_ids(reg_list_config['items'], 'static')
+        return static_item_ids, self._column_ids_to_db(item_ids)
 
     def render_list(self):
         reg_list_kwargs = self.get_list_kwargs()

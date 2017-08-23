@@ -21,7 +21,7 @@ import uuid
 from io import BytesIO
 
 from flask import flash, jsonify, redirect, render_template, request, session
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
@@ -164,6 +164,8 @@ class RHRegistrationEdit(RegistrationEditMixin, RHManageRegistrationBase):
 class RHRegistrationsActionBase(RHManageRegFormBase):
     """Base class for classes performing actions on registrations"""
 
+    registration_query_options = ()
+
     def _checkParams(self, params):
         RHManageRegFormBase._checkParams(self, params)
         ids = set(request.form.getlist('registration_id'))
@@ -171,6 +173,7 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
                               .filter(Registration.id.in_(ids),
                                       ~Registration.is_deleted)
                               .order_by(*Registration.order_by_name)
+                              .options(*self.registration_query_options)
                               .all())
 
 
@@ -303,6 +306,7 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
     """Base class for all registration list export RHs"""
 
     ALLOW_LOCKED = True
+    registration_query_options = (subqueryload('data'),)
 
     def _checkParams(self, params):
         RHRegistrationsActionBase._checkParams(self, params)
@@ -329,9 +333,8 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style"""
 
     def _process(self):
-        pdf = RegistrantsListToBookPDF(self._conf, reglist=self.registrations,
-                                       display=self.export_config['regform_items'],
-                                       static_items=self.export_config['static_item_ids'])
+        static_item_ids, item_ids = self.list_generator.get_item_ids()
+        pdf = RegistrantsListToBookPDF(self._conf, self.regform, self.registrations, item_ids, static_item_ids)
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
 
 

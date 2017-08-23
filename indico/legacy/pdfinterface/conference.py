@@ -28,6 +28,7 @@ from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import cm, inch
 from reportlab.lib.utils import ImageReader
 from reportlab.platypus import Table, TableStyle
+from reportlab.platypus.flowables import HRFlowable
 from reportlab.rl_config import defaultPageSize
 from speaklater import is_lazy_string
 
@@ -1229,7 +1230,7 @@ class RegistrantToPDF(PDFBase):
         full_name = "{first_name} {last_name}".format(first_name=registration.first_name.encode('utf-8'),
                                                       last_name=registration.last_name.encode('utf-8'))
 
-        def _append_text_to_story(text, space=0.2, indexed_flowable=False):
+        def _append_text_to_story(text, space=0.2, indexed_flowable=False, style=style):
             p = Paragraph(text, style, full_name)
             if indexed_flowable:
                 indexedFlowable[p] = {"text": full_name, "level": 1}
@@ -1267,9 +1268,19 @@ class RegistrantToPDF(PDFBase):
             elif item.input_type == 'multi_choice' and item.id in data:
                 multi_choice_data = ', '.join(data[item.id].friendly_data)
                 _print_row(caption=item.title, value=multi_choice_data)
+            elif item.is_section:
+                story.append(Spacer(0, 20))
+                section_style = ParagraphStyle({})
+                section_style.fontSize = 13
+                section_style.textColor = (0.5, 0.5, 0.5)
+                _append_text_to_story(item.title, style=section_style)
+                story.append(HRFlowable(width="100%", thickness=1, color=(0.8, 0.8, 0.8), lineCap='round',
+                                        spaceAfter=10, dash=None))
             else:
                 value = data[item.id].friendly_data if item.id in data else ''
                 _print_row(caption=item.title, value=value)
+
+        story.append(Spacer(0, 30))
 
         if 'reg_date' in self.static_items:
             _print_row(caption=_('Registration date'), value=format_datetime(registration.submitted_dt))
@@ -1288,12 +1299,13 @@ class RegistrantToPDF(PDFBase):
 
 
 class RegistrantsListToBookPDF(PDFWithTOC):
-    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], static_items=None):
+    def __init__(self, conf, regform, reglist, item_ids, static_item_ids):
         self._conf = conf
+        self._regform = regform
         self._regList = reglist
-        self._display = display
+        self._item_ids = set(item_ids)
         self._title = _("Registrants Book")
-        self.static_items = static_items
+        self._static_item_ids = static_item_ids
         PDFWithTOC.__init__(self)
 
     def firstPage(self, c, doc):
@@ -1327,8 +1339,17 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.restoreState()
 
     def getBody(self):
+        items = []
+        for section in self._regform.sections:
+            if not section.is_visible:
+                continue
+            fields = [field for field in section.fields if field.id in self._item_ids and field.is_visible]
+            if not fields:
+                continue
+            items.append(section)
+            items += fields
         for reg in self._regList:
-            temp = RegistrantToPDF(self._conf, reg, self._display, static_items=self.static_items)
+            temp = RegistrantToPDF(self._conf, reg, items, static_items=self._static_item_ids)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
