@@ -313,6 +313,11 @@ class Registration(db.Model):
         return self.transaction is not None and self.transaction.status in paid_states
 
     @property
+    def payment_dt(self):
+        """The date/time when the registration has been paid for"""
+        return self.transaction.timestamp if self.is_paid else None
+
+    @property
     def price(self):
         """The total price of the registration.
 
