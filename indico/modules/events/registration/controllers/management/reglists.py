@@ -328,6 +328,10 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
 class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     """Export registration list to a PDF in book style"""
 
+    def _checkParams(self, params):
+        RHRegistrationsActionBase._checkParams(self, params)
+        self.export_config = self.list_generator.get_list_export_config(with_sections=True)
+
     def _process(self):
         pdf = RegistrantsListToBookPDF(self._conf, reglist=self.registrations,
                                        display=self.export_config['regform_items'],
