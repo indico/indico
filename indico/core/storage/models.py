@@ -136,6 +136,18 @@ class StoredFileMixin(object):
         )
 
     @declared_attr
+    def md5(cls):
+        """
+        An MD5 hash of the file.
+
+        Automatically assigned when `save()` is called.
+        """
+        return db.Column(
+            db.String,
+            nullable=False
+        )
+
+    @declared_attr
     def storage_backend(cls):
         return db.Column(
             db.String,
@@ -192,7 +204,7 @@ class StoredFileMixin(object):
         if self.version_of:
             assert getattr(self, self.version_of) is not None
         self.storage_backend, path = self._build_storage_path()
-        self.storage_file_id = self.storage.save(path, self.content_type, self.filename, data)
+        self.storage_file_id, self.md5 = self.storage.save(path, self.content_type, self.filename, data)
         self.size = self.storage.getsize(self.storage_file_id)
 
     def open(self):
