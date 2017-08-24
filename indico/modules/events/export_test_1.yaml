@@ -1,0 +1,117 @@
+!!python/unicode 'indico_version': {version}
+!!python/unicode 'objects':
+- !!python/tuple
+  - !!python/unicode 'events.events'
+  - !!python/unicode 'access_key': !!python/unicode ''
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'created_dt': !!python/tuple [datetime, '2017-08-24T00:00:00+00:00']
+    !!python/unicode 'creator_id': !!python/tuple [!!python/unicode 'userref', !!python/unicode '00000000-0000-4000-8000-000000000001']
+    !!python/unicode 'default_page_id': null
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'end_dt': !!python/tuple [datetime, '2017-08-24T12:00:00+00:00']
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000000']
+    !!python/unicode 'is_deleted': false
+    !!python/unicode 'is_locked': false
+    !!python/unicode 'keywords': []
+    !!python/unicode 'last_friendly_contribution_id': 2
+    !!python/unicode 'last_friendly_registration_id': 0
+    !!python/unicode 'last_friendly_session_id': 1
+    !!python/unicode 'logo': null
+    !!python/unicode 'logo_metadata': null
+    !!python/unicode 'no_access_contact': !!python/unicode ''
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'start_dt': !!python/tuple [datetime, '2017-08-24T10:00:00+00:00']
+    !!python/unicode 'stylesheet': null
+    !!python/unicode 'stylesheet_metadata': null
+    !!python/unicode 'timezone': !!python/unicode 'UTC'
+    !!python/unicode 'title': !!python/unicode 'dummy#0'
+    !!python/unicode 'type': !!python/object/apply:indico.modules.events.models.events.EventType [
+      2]
+    !!python/unicode 'venue_name': !!python/unicode ''
+    !!python/unicode 'visibility': null
+- !!python/tuple
+  - !!python/unicode 'events.sessions'
+  - !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'background_color': !!python/unicode 'e3f2d3'
+    !!python/unicode 'code': !!python/unicode ''
+    !!python/unicode 'default_contribution_duration': !!python/object/apply:datetime.timedelta [
+      0, 1200, 0]
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000000']
+    !!python/unicode 'friendly_id': 1
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000003']
+    !!python/unicode 'inherit_location': true
+    !!python/unicode 'is_deleted': true
+    !!python/unicode 'is_poster': false
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'text_color': !!python/unicode '202020'
+    !!python/unicode 'title': !!python/unicode 'sd'
+    !!python/unicode 'venue_name': !!python/unicode ''
+- !!python/tuple
+  - !!python/unicode 'events.contributions'
+  - !!python/unicode 'abstract_id': null
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'board_number': !!python/unicode ''
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'duration': !!python/object/apply:datetime.timedelta [0, 1800,
+      0]
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000000']
+    !!python/unicode 'friendly_id': 1
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000004']
+    !!python/unicode 'inherit_location': true
+    !!python/unicode 'is_deleted': false
+    !!python/unicode 'keywords': []
+    !!python/unicode 'last_friendly_subcontribution_id': 0
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'render_mode': !!python/object/apply:indico.core.db.sqlalchemy.descriptions.RenderMode [
+      2]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'session_block_id': null
+    !!python/unicode 'session_id': null
+    !!python/unicode 'title': !!python/unicode 'c1'
+    !!python/unicode 'track_id': null
+    !!python/unicode 'type_id': null
+    !!python/unicode 'venue_name': !!python/unicode ''
+- !!python/tuple
+  - !!python/unicode 'events.contributions'
+  - !!python/unicode 'abstract_id': null
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'board_number': !!python/unicode ''
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'duration': !!python/object/apply:datetime.timedelta [0, 1800,
+      0]
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000000']
+    !!python/unicode 'friendly_id': 2
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000006']
+    !!python/unicode 'inherit_location': true
+    !!python/unicode 'is_deleted': true
+    !!python/unicode 'keywords': []
+    !!python/unicode 'last_friendly_subcontribution_id': 0
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'render_mode': !!python/object/apply:indico.core.db.sqlalchemy.descriptions.RenderMode [
+      2]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'session_block_id': null
+    !!python/unicode 'session_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000003']
+    !!python/unicode 'title': !!python/unicode 'c2'
+    !!python/unicode 'track_id': null
+    !!python/unicode 'type_id': null
+    !!python/unicode 'venue_name': !!python/unicode ''
+!!python/unicode 'timestamp': 2017-08-24 09:00:00+00:00
+!!python/unicode 'users':
+  !!python/unicode '00000000-0000-4000-8000-000000000001':
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'affiliation': null
+    !!python/unicode 'all_emails': [!!python/unicode '1337@example.com']
+    !!python/unicode 'email': !!python/unicode '1337@example.com'
+    !!python/unicode 'first_name': !!python/unicode 'Guinea'
+    !!python/unicode 'last_name': !!python/unicode 'Pig'
+    !!python/unicode 'phone': !!python/unicode ''
+    !!python/unicode 'title': !!python/object/apply:indico.modules.users.models.users.UserTitle [
+      0]

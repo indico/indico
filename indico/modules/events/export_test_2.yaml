@@ -1,0 +1,161 @@
+!!python/unicode 'indico_version': {version}
+!!python/unicode 'objects':
+- !!python/tuple
+  - !!python/unicode 'events.events'
+  - !!python/unicode 'access_key': !!python/unicode ''
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'created_dt': !!python/tuple [datetime, '2017-08-24T15:28:42.652626+00:00']
+    !!python/unicode 'creator_id': !!python/tuple [!!python/unicode 'userref', !!python/unicode '00000000-0000-4000-8000-00000000000a']
+    !!python/unicode 'default_page_id': null
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'end_dt': !!python/tuple [datetime, '2017-08-24T12:00:00+00:00']
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000009']
+    !!python/unicode 'is_deleted': false
+    !!python/unicode 'is_locked': false
+    !!python/unicode 'keywords': []
+    !!python/unicode 'last_friendly_contribution_id': 2
+    !!python/unicode 'last_friendly_registration_id': 0
+    !!python/unicode 'last_friendly_session_id': 1
+    !!python/unicode 'logo': null
+    !!python/unicode 'logo_metadata': null
+    !!python/unicode 'no_access_contact': !!python/unicode ''
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'start_dt': !!python/tuple [datetime, '2017-08-24T10:00:00+00:00']
+    !!python/unicode 'stylesheet': null
+    !!python/unicode 'stylesheet_metadata': null
+    !!python/unicode 'timezone': !!python/unicode 'UTC'
+    !!python/unicode 'title': !!python/unicode 'dummy#0'
+    !!python/unicode 'type': !!python/object/apply:indico.modules.events.models.events.EventType [
+      2]
+    !!python/unicode 'venue_name': !!python/unicode ''
+    !!python/unicode 'visibility': null
+- !!python/tuple
+  - !!python/unicode 'events.sessions'
+  - !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'background_color': !!python/unicode 'e3f2d3'
+    !!python/unicode 'code': !!python/unicode ''
+    !!python/unicode 'default_contribution_duration': !!python/object/apply:datetime.timedelta [
+      0, 1200, 0]
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000009']
+    !!python/unicode 'friendly_id': 1
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-00000000000c']
+    !!python/unicode 'inherit_location': true
+    !!python/unicode 'is_deleted': true
+    !!python/unicode 'is_poster': false
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'text_color': !!python/unicode '202020'
+    !!python/unicode 'title': !!python/unicode 'sd'
+    !!python/unicode 'venue_name': !!python/unicode ''
+- !!python/tuple
+  - !!python/unicode 'events.contributions'
+  - !!python/unicode 'abstract_id': null
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'board_number': !!python/unicode ''
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'duration': !!python/object/apply:datetime.timedelta [0, 1800,
+      0]
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000009']
+    !!python/unicode 'friendly_id': 2
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-00000000000d']
+    !!python/unicode 'inherit_location': true
+    !!python/unicode 'is_deleted': true
+    !!python/unicode 'keywords': []
+    !!python/unicode 'last_friendly_subcontribution_id': 0
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'render_mode': !!python/object/apply:indico.core.db.sqlalchemy.descriptions.RenderMode [
+      2]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'session_block_id': null
+    !!python/unicode 'session_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-00000000000c']
+    !!python/unicode 'title': !!python/unicode 'c2'
+    !!python/unicode 'track_id': null
+    !!python/unicode 'type_id': null
+    !!python/unicode 'venue_name': !!python/unicode ''
+- !!python/tuple
+  - !!python/unicode 'events.contributions'
+  - !!python/unicode 'abstract_id': null
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'board_number': !!python/unicode ''
+    !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'duration': !!python/object/apply:datetime.timedelta [0, 1800,
+      0]
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000009']
+    !!python/unicode 'friendly_id': 1
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000010']
+    !!python/unicode 'inherit_location': true
+    !!python/unicode 'is_deleted': false
+    !!python/unicode 'keywords': []
+    !!python/unicode 'last_friendly_subcontribution_id': 0
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'render_mode': !!python/object/apply:indico.core.db.sqlalchemy.descriptions.RenderMode [
+      2]
+    !!python/unicode 'room_name': !!python/unicode ''
+    !!python/unicode 'session_block_id': null
+    !!python/unicode 'session_id': null
+    !!python/unicode 'title': !!python/unicode 'c1'
+    !!python/unicode 'track_id': null
+    !!python/unicode 'type_id': null
+    !!python/unicode 'venue_name': !!python/unicode ''
+- !!python/tuple
+  - !!python/unicode 'attachments.folders'
+  - !!python/unicode 'category_id': null
+    !!python/unicode 'contribution_id': null
+    !!python/unicode 'description': !!python/unicode 'a dummy folder'
+    !!python/unicode 'event_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000009']
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000014']
+    !!python/unicode 'is_always_visible': true
+    !!python/unicode 'is_default': false
+    !!python/unicode 'is_deleted': false
+    !!python/unicode 'link_type': !!python/object/apply:indico.core.db.sqlalchemy.links.LinkType [
+      2]
+    !!python/unicode 'linked_event_id': !!python/tuple [!!python/unicode 'idref',
+      !!python/unicode '00000000-0000-4000-8000-000000000009']
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'session_id': null
+    !!python/unicode 'subcontribution_id': null
+    !!python/unicode 'title': !!python/unicode 'dummy_folder'
+- !!python/tuple
+  - !!python/unicode 'attachments.attachments'
+  - !!python/unicode 'description': !!python/unicode ''
+    !!python/unicode 'file_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000018']
+    !!python/unicode 'folder_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000014']
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000017']
+    !!python/unicode 'is_deleted': false
+    !!python/unicode 'link_url': null
+    !!python/unicode 'modified_dt': !!python/tuple [datetime, '2017-08-24T15:28:42.693225+00:00']
+    !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
+      1]
+    !!python/unicode 'title': !!python/unicode 'dummy_attachment'
+    !!python/unicode 'type': !!python/object/apply:indico.modules.attachments.models.attachments.AttachmentType [
+      1]
+    !!python/unicode 'user_id': !!python/tuple [!!python/unicode 'userref', !!python/unicode '00000000-0000-4000-8000-00000000000a']
+- !!python/tuple
+  - !!python/unicode 'attachments.files'
+  - !!python/unicode '__file__': !!python/tuple
+    - !!python/unicode 'file'
+    - {!!python/unicode 'content_type': !!python/unicode 'text/plain', !!python/unicode 'filename': !!python/unicode 'dummy_file.txt',
+      !!python/unicode 'size': !!python/long '11', !!python/unicode 'uuid': !!python/unicode '00000000-0000-4000-8000-00000000001c'}
+    !!python/unicode 'attachment_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000017']
+    !!python/unicode 'created_dt': !!python/tuple [datetime, '2017-08-24T15:28:42.691791+00:00']
+    !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000018']
+    !!python/unicode 'user_id': !!python/tuple [!!python/unicode 'userref', !!python/unicode '00000000-0000-4000-8000-00000000000a']
+!!python/unicode 'timestamp': 2017-08-24 15:28:43.011442+00:00
+!!python/unicode 'users':
+  !!python/unicode '00000000-0000-4000-8000-00000000000a':
+    !!python/unicode 'address': !!python/unicode ''
+    !!python/unicode 'affiliation': null
+    !!python/unicode 'all_emails': [!!python/unicode '1337@example.com']
+    !!python/unicode 'email': !!python/unicode '1337@example.com'
+    !!python/unicode 'first_name': !!python/unicode 'Guinea'
+    !!python/unicode 'last_name': !!python/unicode 'Pig'
+    !!python/unicode 'phone': !!python/unicode ''
+    !!python/unicode 'title': !!python/object/apply:indico.modules.users.models.users.UserTitle [
+      0]
