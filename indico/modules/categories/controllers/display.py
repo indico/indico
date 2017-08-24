@@ -155,7 +155,7 @@ class RHCategoryInfo(RHDisplayCategoryBase):
     @classmethod
     def _category_query_options(cls):
         children_strategy = subqueryload('children')
-        children_strategy.load_only('id', 'parent_id', 'title', 'protection_mode')
+        children_strategy.load_only('id', 'parent_id', 'title', 'protection_mode', 'event_creation_restricted')
         children_strategy.subqueryload('acl_entries')
         children_strategy.undefer('deep_children_count')
         children_strategy.undefer('deep_events_count')

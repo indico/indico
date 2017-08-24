@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global strnatcmp:false, paginatedSelectAll:false */
+
 (function(global) {
     'use strict';
 
@@ -25,7 +27,7 @@
         if (parentCategoryId) {
             _fetchSourceCategory(parentCategoryId);
         }
-        $('.js-move-category').on('click', function(evt) {
+        $('.js-move-category').on('click', function() {
             var $this = $(this);
             _moveCategories([$this.data('categoryId')], _categories[parentCategoryId], $this.data('href'));
         });
@@ -68,7 +70,7 @@
             _moveCategories(getSelectedCategories(), _categories[categoryId], $this.data('href'));
         });
 
-        $table.find('.js-move-category').on('click', function(evt) {
+        $table.find('.js-move-category').on('click', function() {
             var $this = $(this);
             _moveCategories([$this.data('categoryId')], _categories[categoryId], $this.data('href'));
         });
@@ -88,7 +90,7 @@
         });
 
         enableIfChecked($tbody, checkboxSelector, $bulkDeleteButton, function($checkboxes) {
-            return $checkboxes.filter(':not([data-is-empty=true])').length == 0;
+            return $checkboxes.filter(':not([data-is-empty=true])').length === 0;
         });
         $bulkDeleteButton.on('click', bulkDeleteCategories).qtip({
             suppress: false,
@@ -131,7 +133,8 @@
 
         function sortCategories(sortOrder) {
             $tbody.find(categoryRowSelector).sort(function(a, b) {
-                return sortOrder * strnatcmp($(a).data('category-title'), $(b).data('category-title'));
+                return sortOrder * strnatcmp($(a).data('category-title').toLowerCase(),
+                                             $(b).data('category-title').toLowerCase());
             }).detach().appendTo($tbody);
         }
 
@@ -318,7 +321,7 @@
                 $.ajax({
                     url: endpoint,
                     type: 'POST',
-                    data: $.extend({'target_category_id': category.id}, data),
+                    data: $.extend({target_category_id: category.id}, data),
                     error: handleAjaxError,
                     success: function(data) {
                         if (data.success) {
@@ -362,7 +365,7 @@
                 $.ajax({
                     url: endpoint,
                     type: 'POST',
-                    data: $.extend({'target_category_id': category.id}, data || {}),
+                    data: $.extend({target_category_id: category.id}, data || {}),
                     error: handleAjaxError,
                     success: function(data) {
                         if (data.success) {
