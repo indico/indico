@@ -403,3 +403,26 @@ import:
     Contribution.paper_judges.prop.secondary.c.user_id: skip
     # run custom code
     SurveySubmission.user_id: is_anonymous = True
+
+  # Specify the verbose import message for a table.
+  # The key is the model/table and the value is a Python format string.
+  # The name of the object (usually the name of the model) should be
+  # wrapped in `<...>` so it is highlighted differently in the output.
+  # Each column present in the row is also available in the format string.
+  verbose:
+    Event: <Event> '{title}'
+    Session: <Session> '{title}' (#{friendly_id})
+    Contribution: <Contribution> '{title}' (#{friendly_id})
+    SubContribution: <Subcontribution> '{title}' (#{friendly_id})
+    Break: <Break> '{title}'
+    ContributionType: <Contribution type> '{name}'
+    ContributionField: <Contribution field> '{title}'
+    EventPerson: <Person> '{first_name} {last_name}' ({email})
+    Attachment: <Attachment> '{title}'
+    ImageFile: <Image> '{filename}'
+    Abstract: <Abstract> '{title}' (#{friendly_id})
+    RegistrationForm: <Registration form> '{title}'
+    Registration: <Registration> '{first_name} {last_name}' ({email}) (#{friendly_id})
+    Survey: <Survey> '{title}'
+    SurveySubmission: <Survey submission> (#{friendly_id})
+    DesignerTemplate: <Designer template> '{title}' ({type.title})

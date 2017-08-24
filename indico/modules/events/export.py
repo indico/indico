@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 import os
 import posixpath
+import re
 import tarfile
 from collections import OrderedDict, defaultdict
 from datetime import date, datetime
@@ -48,6 +49,7 @@ from indico.modules.events.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.users import User
 from indico.modules.users.util import get_user_by_email
+from indico.util.console import cformat
 from indico.util.date_time import now_utc
 from indico.util.string import strict_unicode
 
@@ -65,17 +67,18 @@ def export_event(event, target_file):
     exporter.serialize()
 
 
-def import_event(source_file, category_id, force=False):
+def import_event(source_file, category_id, verbose=False, force=False):
     """Import a previously-exported event.
 
     It is up to the caller of this function to commit the transaction.
 
     :param source_file: An open file object containing the exported event.
     :param category_id: ID of the category in which to create the event.
+    :param verbose: Whether to enable verbose output.
     :param force: Whether to ignore version conflicts.
     :return: The imported event.
     """
-    importer = EventImporter(source_file, category_id)
+    importer = EventImporter(source_file, category_id, verbose)
     return importer.deserialize(force)
 
 
@@ -379,9 +382,10 @@ class EventExporter(object):
 
 
 class EventImporter(object):
-    def __init__(self, source_file, category_id):
+    def __init__(self, source_file, category_id, verbose):
         self.source_file = source_file
         self.category_id = category_id
+        self.verbose = verbose
         self.archive = tarfile.open(fileobj=source_file)
         self.data = yaml.load(self.archive.extractfile('data.yaml'))
         self.id_map = {}
@@ -396,6 +400,10 @@ class EventImporter(object):
             colspec = _resolve_col(col)
             return '{}.{}'.format(colspec.table.fullname, colspec.name)
 
+        def _process_format(fmt, _re=re.compile(r'<([^>]+)>')):
+            fmt = _re.sub(r'%{reset}%{cyan}\1%{reset}%{blue!}', fmt)
+            return cformat('- %{blue!}' + fmt)
+
         with open(os.path.join(current_app.root_path, 'modules', 'events', 'export.yaml')) as f:
             spec = yaml.safe_load(f)
 
@@ -403,6 +411,7 @@ class EventImporter(object):
         spec['defaults'] = {_model_to_table(k): v for k, v in spec.get('defaults', {}).iteritems()}
         spec['custom'] = {_model_to_table(k): v for k, v in spec.get('custom', {}).iteritems()}
         spec['missing_users'] = {_resolve_col_name(k): v for k, v in spec.get('missing_users', {}).iteritems()}
+        spec['verbose'] = {_model_to_table(k): _process_format(v) for k, v in spec.get('verbose', {}).iteritems()}
         return spec
 
     def _load_users(self, data):
@@ -634,6 +643,9 @@ class EventImporter(object):
             stmt = db.func.nextval(db.func.pg_get_serial_sequence(table.fullname, pk_name))
             insert_values[pk_name] = pk_value = db.session.query(stmt).scalar()
             insert_values.update(self._process_file(pk_value, file_data))
+        if self.verbose and table.fullname in self.spec['verbose']:
+            fmt = self.spec['verbose'][table.fullname]
+            click.echo(fmt.format(**insert_values))
         res = db.session.execute(table.insert(), insert_values)
         if set_idref is not None:
             # if a column was marked as having incoming FKs, store

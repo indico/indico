@@ -73,16 +73,18 @@ def export(event_id, target_file):
 @cli.command('import')
 @click.argument('source_file', type=click.File('rb'))
 @click.option('--force', is_flag=True, help='Ignore Indico version mismatches (DANGER)')
+@click.option('-v', '--verbose', is_flag=True, help='Show verbose information on what is being imported')
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
               help='ID of the target category. Defaults to the root category.')
-def import_(source_file, force, category_id):
+def import_(source_file, force, verbose, category_id):
     """Imports an event exported from another Indico instance."""
-    event = import_event(source_file, category_id, force=force)
+    click.echo('Importing event...')
+    event = import_event(source_file, category_id, verbose=verbose, force=force)
     if event is None:
         click.secho('Import failed.', fg='red')
         sys.exit(1)
-    if not click.confirm('Import finished. Commit the changes?', default=True):
+    if not click.confirm(click.style('Import finished. Commit the changes?', fg='green'), default=True):
         db.session.rollback()
         sys.exit(1)
     db.session.commit()
-    click.secho('Event imported -> {}'.format(event.external_url), fg='green')
+    click.secho(event.external_url, fg='green', bold=True)
