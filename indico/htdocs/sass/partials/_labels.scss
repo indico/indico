@@ -25,7 +25,7 @@ $i-label-color: $light-black;
     @include border-all($gray);
     @include box-sizing(border-box);
     display: inline-flex;
-    color: $i-label-color !important;
+    color: $i-label-color;
     outline: none;
     justify-content: center;
     align-items: center;
@@ -33,8 +33,38 @@ $i-label-color: $light-black;
     padding: $i-label-vertical-padding $i-label-horizontal-padding;
 }
 
+@mixin _i-label-borderless($color) {
+    &.borderless {
+        box-shadow: none !important;
+        background: none !important;
+        border-color: transparent !important;
+        color: $color;
+    }
+}
+
+@mixin _i-label-states($flavor-color, $border-color, $border-accent-color, $font-color, $font-accent-color, $with-modes: true) {
+    $no-modes: '';
+
+    @if $with-modes == true {
+        $no-modes: ':not(.borderless):not(.text-color):not(.striped)';
+    }
+
+    &:not(.label)#{$no-modes} {
+        background: $flavor-color;
+        border-color: $border-color;
+        color: $font-color;
+    }
+}
+
+@mixin i-label-flavor($flavor-color, $border-color) {
+    @include _i-label-states($flavor-color, $border-color, $border-color, $light-gray, white);
+    @include _i-label-borderless($flavor-color);
+}
+
+
 .i-label {
     @extend %label;
+    @include _i-label-borderless($light-black);
     background: white;
     margin: 0 5px;
 
@@ -55,23 +85,18 @@ $i-label-color: $light-black;
 
     // same as in _buttons.scss
     &.accept {
-        @include border-all(darken($green, $light-color-variation));
-        background: $green;
-        color: #fdfdfd !important;
+        @include i-label-flavor($green, $light-color-variation);
     }
 
     &.danger {
-        @include border-all(darken($red, $light-color-variation));
-        background: $red;
-        color: #fdfdfd !important;
+        @include i-label-flavor($red, $light-color-variation);
     }
 
     &.highlight {
-        @include border-all(darken($blue, $light-color-variation));
-        background: $blue;
-        color: #fdfdfd !important;
+        @include i-label-flavor($blue, $light-color-variation);
 
         &.striped {
+            color: white;
             background-color: lighten($blue, $light-color-variation);
             background: repeating-linear-gradient(
                 -40deg,
@@ -84,9 +109,7 @@ $i-label-color: $light-black;
     }
 
     &.warning {
-        @include border-all(darken($yellow, $light-color-variation));
-        background: lighten($yellow, 8 * $light-color-variation);
-        color: darken($yellow, $light-color-variation) !important;
+        @include i-label-flavor($yellow, $light-color-variation);
     }
 
     &.disabled {
