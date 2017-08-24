@@ -26,16 +26,20 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
 from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
+from indico.modules.categories import Category
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import get_inherited_templates, get_placeholder_options
+from indico.modules.designer.util import (get_inherited_templates, get_placeholder_options,
+                                          get_default_template_on_category, get_not_deletable_templates)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.registration.models.forms import RegistrationForm
+from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -76,8 +80,11 @@ TEMPLATE_DATA_JSON_SCHEMA = {
 
 def _render_template_list(target, event):
     tpl = get_template_module('designer/_list.html')
-    return tpl.render_template_list(target.designer_templates, target, event=event,
-                                    inherited_templates=get_inherited_templates(target))
+    default_template = get_default_template_on_category(target) if isinstance(target, Category) else None
+    not_deletable = get_not_deletable_templates(target)
+    return tpl.render_template_list(target.designer_templates, target, event=event, default_template=default_template,
+                                    inherited_templates=get_inherited_templates(target),
+                                    not_deletable_templates=not_deletable)
 
 
 class TemplateDesignerMixin:
@@ -142,7 +149,11 @@ class TargetFromURLMixin(TemplateDesignerMixin):
 
 class TemplateListMixin(TargetFromURLMixin):
     def _process(self):
-        return self._render_template('list.html', inherited_templates=get_inherited_templates(self.target))
+        templates = get_inherited_templates(self.target)
+        not_deletable = get_not_deletable_templates(self.target)
+        default_template = get_default_template_on_category(self.target) if isinstance(self.target, Category) else None
+        return self._render_template('list.html', inherited_templates=templates, not_deletable_templates=not_deletable,
+                                     default_template=default_template,)
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
@@ -233,6 +244,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         template_data = {
             'title': self.template.title,
             'data': self.template.data,
+            'is_clonable': self.template.is_clonable,
             'background_url': self.template.background_image.download_url if self.template.background_image else None
         }
         backside_template_data = {
@@ -258,6 +270,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
+                        is_clonable=request.json['is_clonable'],
                         clear_background=request.json['clear_background'])
         flash(_("Template successfully saved."), 'success')
         return jsonify_data()
@@ -303,6 +316,14 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
 
 class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
+        affected_regforms = RegistrationForm.find_all(ticket_template_id=self.template.id)
+        for regform in affected_regforms:
+            regform.ticket_template = None
+        affected_categories = Category.find_all(default_ticket_template_id=self.template.id)
+        for category in affected_categories:
+            category.default_ticket_template = None
+            if category.is_root:
+                category.default_ticket_template = DesignerTemplate.find_first(DesignerTemplate.system_template)
         db.session.delete(self.template)
         flash(_('The template has been removed'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
@@ -327,3 +348,17 @@ class RHGetTemplateData(RHModifyDesignerTemplateBase):
             'background_url': self.template.background_image.download_url if self.template.background_image else None
         }
         return jsonify(template=template_data, backside_template_id=self.template.id)
+
+
+class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
+    def _checkParams(self):
+        RHManageCategoryBase._checkParams(self)
+        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
+        category_id = request.view_args['category_id']
+        self.category = self._get_category(category_id)
+
+    def _process(self):
+        self.category.default_ticket_template = (self.template if self.category.default_ticket_template != self.template
+                                                 else None)
+        db.session.commit()
+        return jsonify_data(html=_render_template_list(self.category, event=None))

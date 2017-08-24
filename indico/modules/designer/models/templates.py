@@ -22,6 +22,8 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import TemplateType, DEFAULT_CONFIG
 from indico.modules.designer.models.images import DesignerImageFile
+from indico.modules.events import Event
+from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -81,9 +83,15 @@ class DesignerTemplate(db.Model):
         nullable=False,
         default=True
     )
+    is_system_template = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     category = db.relationship(
         'Category',
         lazy=True,
+        foreign_keys=category_id,
         backref=db.backref(
             'designer_templates',
             cascade='all, delete-orphan',
@@ -108,11 +116,14 @@ class DesignerTemplate(db.Model):
     backside_template = db.relationship(
         'DesignerTemplate',
         lazy=True,
-        remote_side=id
+        remote_side=id,
+        backref='backside_template_of'
     )
 
     # relationship backrefs:
+    # - backside_template_of (DesignerTemplate.backside_template)
     # - images (DesignerImageFile.template)
+    # - ticket_for_regforms (RegistrationForm.ticket_template)
 
     def __init__(self, **kwargs):
         data = kwargs.pop('data', None)

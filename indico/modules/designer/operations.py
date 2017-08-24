@@ -22,12 +22,13 @@ from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events import EventLogKind, EventLogRealm
 
 
-def update_template(template, title, data, backside_template_id=None, clear_background=False):
+def update_template(template, title, data, is_clonable, backside_template_id=None, clear_background=False):
     """Update an existing template.
 
     :param template: The template to be updated
     :param title: An `EventType` value
     :param data: A dict containing the template data (width, height, items, etc)
+    :param is_clonable: Whether it is possible to clone this template
     :param backside_template_id: The ID of the template used as a backside
     :param clear_background: Whether to remove the background image of the
                              template
@@ -44,6 +45,7 @@ def update_template(template, title, data, backside_template_id=None, clear_back
     template.title = title
     template.data = dict({'background_position': 'stretch', 'items': []}, **data)
     template.backside_template = DesignerTemplate.get(backside_template_id) if backside_template_id else None
+    template.is_clonable = is_clonable
 
     if clear_background:
         template.background_image = None

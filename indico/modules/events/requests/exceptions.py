@@ -14,15 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from blinker import Namespace
+from __future__ import unicode_literals
 
-_signals = Namespace()
 
-from indico.core.signals.event.abstracts import *
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.designer import *
-from indico.core.signals.event.notes import *
-from indico.core.signals.event.persons import *
-from indico.core.signals.event.registration import *
-from indico.core.signals.event.timetable import *
+class RequestModuleError(Exception):
+    def __init__(self, message=None):
+        super(RequestModuleError, self).__init__(message)
+        self.message = message

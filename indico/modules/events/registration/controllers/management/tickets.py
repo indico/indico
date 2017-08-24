@@ -22,8 +22,12 @@ import qrcode
 from flask import flash, json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.designer import PageOrientation, PageSize
+from indico.modules.designer.util import get_default_template_on_category
+from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
@@ -34,7 +38,19 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for, send_file, secure_filename
 from indico.web.util import jsonify_data, jsonify_template
 
-from indico.legacy.pdfinterface.conference import TicketToPDF
+
+DEFAULT_TICKET_PRINTING_SETTINGS = {
+    'top_margin': 0,
+    'bottom_margin': 0,
+    'left_margin': 0,
+    'right_margin': 0,
+    'margin_columns': 0,
+    'margin_rows': 0.0,
+    'page_size': PageSize.A4,
+    'page_orientation': PageOrientation.portrait,
+    'dashed_border': False,
+    'page_layout': None
+}
 
 
 class RHRegistrationFormTickets(RHManageRegFormBase):
@@ -56,7 +72,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
         return True
 
     def _process(self):
-        form = TicketsForm(obj=self.regform)
+        form = TicketsForm(obj=self.regform, event=self.event_new)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
@@ -67,8 +83,12 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
 
 
 def generate_ticket(registration):
-    pdf = TicketToPDF(registration.registration_form.event_new, registration)
-    return BytesIO(pdf.getPDFBin())
+    template = (registration.registration_form.ticket_template or
+                get_default_template_on_category(registration.event_new.category))
+    signals.event.designer.print_badge_template.send(template, regform=registration.registration_form)
+    pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
+    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event_new, [registration.id])
+    return pdf.get_pdf()
 
 
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
@@ -113,10 +133,11 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
         qr_data = {
             "event_id": self.event_new.id,
             "title": self.event_new.title,
-            "date": format_date(self.event_new.start_dt_local),  # XXX: switch to utc+isoformat?
+            "date": self.event_new.start_dt.isoformat(),
+            "version": 1,
             "server": {
-                "baseUrl": config.getBaseURL(),
-                "consumerKey": checkin_app.client_id,
+                "base_url": config.getBaseURL(),
+                "consumer_key": checkin_app.client_id,
                 "auth_url": url_for('oauth.oauth_authorize', _external=True),
                 "token_url": url_for('oauth.oauth_token', _external=True)
             }

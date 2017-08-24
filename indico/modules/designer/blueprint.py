@@ -20,7 +20,8 @@ from indico.modules.designer.controllers import (RHListEventTemplates, RHListCat
                                                  RHDownloadTemplateImage, RHUploadBackgroundImage,
                                                  RHDeleteDesignerTemplate, RHCloneEventTemplate, RHAddEventTemplate,
                                                  RHCloneCategoryTemplate, RHAddCategoryTemplate,
-                                                 RHListBacksideTemplates, RHGetTemplateData)
+                                                 RHListBacksideTemplates, RHGetTemplateData,
+                                                 RHToggleTemplateDefaultOnCategory)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -53,6 +54,8 @@ for object_type in ('event', 'category'):
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'edit_template', RHEditDesignerTemplate,
                      defaults={'object_type': object_type}, methods=('GET', 'POST'))
+    _bp.add_url_rule(prefix + '/<int:template_id>/toggle-default/', 'toggle_category_default',
+                     RHToggleTemplateDefaultOnCategory, methods=('POST',))
     _bp.add_url_rule(prefix + '/<int:template_id>/', 'delete_template', RHDeleteDesignerTemplate,
                      defaults={'object_type': object_type}, methods=('DELETE',))
     _bp.add_url_rule(prefix + '/<int:template_id>/clone', 'clone_template',
