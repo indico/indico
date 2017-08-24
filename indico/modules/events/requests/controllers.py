@@ -19,8 +19,10 @@ from __future__ import unicode_literals
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
+from indico.core.db import db
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.requests import get_request_definitions
+from indico.modules.events.requests.exceptions import RequestModuleError
 from indico.modules.events.requests.models.requests import Request, RequestState
 from indico.modules.events.requests.util import is_request_manager
 from indico.modules.events.requests.views import WPRequestsEventManagement
@@ -120,13 +122,18 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
         else:
             req = self.request
             new = False
-        self.definition.send(req, form.data)
-        if new:
-            flash_msg = _("Your request ({0}) has been sent. "
-                          "You will be notified by e-mail once it has been accepted or rejected.")
+        try:
+            self.definition.send(req, form.data)
+        except RequestModuleError:
+            db.session.delete(req)
+            message = 'There was a problem sending your request ({0}). Please contact support for further details.'
+            flash(_(message).format(self.definition.title), 'error')
         else:
-            flash_msg = _("Your request ({0}) has been modified.")
-        flash(flash_msg.format(self.definition.title), 'success')
+            if new:
+                flash_msg = _("Your request ({0}) has been sent.")
+            else:
+                flash_msg = _("Your request ({0}) has been modified.")
+            flash(flash_msg.format(self.definition.title), 'success')
         if self.is_manager:
             return redirect(url_for('.event_requests_details', self.event_new, type=self.definition.name))
         else:
@@ -182,6 +189,11 @@ class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEvent
     def _process(self):
         if self.request.state not in {RequestState.pending, RequestState.accepted}:
             raise BadRequest
-        self.definition.withdraw(self.request)
-        flash(_('You have withdrawn your request ({0})').format(self.definition.title))
+        try:
+            self.definition.withdraw(self.request)
+        except RequestModuleError:
+            message = 'There was a problem withdrawing your request ({0}). Please contact support for further details.'
+            flash(_(message).format(self.definition.title), 'error')
+        else:
+            flash(_('You have withdrawn your request ({0})').format(self.definition.title))
         return redirect(url_for('.event_requests', self.event_new))
