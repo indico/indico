@@ -11,6 +11,11 @@
 {% from 'message_box.html' import message_box %}
 
 
+{% set moderated = (regform.moderation_enabled and
+                    not management and
+                    (not invitation or not invitation.skip_moderation)) %}
+
+
 {% block subtitle %}
     {% if management %}
         {% trans title=regform.title %}Add registration to "{{ title }}"{% endtrans %}
@@ -60,14 +65,14 @@
                 <span class="icon icon-info"></span>
                 <div class="text">
                     <div class="label">
-                        {%- if regform.moderation_enabled %}
+                        {%- if moderated %}
                             {%- trans %}Account required to apply{% endtrans %}
                         {%- else %}
                             {%- trans %}Account required to register{% endtrans %}
                         {%- endif -%}
                     </div>
                     <div>
-                        {%- if regform.moderation_enabled %}
+                        {%- if moderated %}
                             {%- trans %}In order to apply for this event you have to be logged in.{% endtrans %}
                         {%- else %}
                             {%- trans %}In order to register for this event you have to be logged in.{% endtrans %}
@@ -82,7 +87,7 @@
             </div>
         </div>
     {% else %}
-        {% if regform.moderation_enabled and not management %}
+        {% if moderated %}
             {% call message_box('warning', fixed_width=true, large_icon=true) %}
                 <div class="label">
                     {% trans %}Participation in this event is moderated{% endtrans %}
@@ -102,7 +107,7 @@
                 post-url="{{ request.url | tojson | forceescape }}"
                 check-email-url="{{ url_for('.check_email', regform, management=management) | tojson | forceescape }}"
                 management="{{ management | tojson | forceescape }}"
-                is-moderated="{{ regform.moderation_enabled | tojson | forceescape }}"
+                is-moderated="{{ moderated | tojson | forceescape }}"
                 notify-default="{{ session.get('registration_notify_user_default', true) | tojson | forceescape }}">
             </div>
         </div>
