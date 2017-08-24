@@ -312,6 +312,7 @@ class EventExporter(object):
             if not isinstance(order, tuple):
                 order = (order,)
             query = query.order_by(*order)
+        query = query.order_by(*table.primary_key.columns)
         cascaded = []
         for row in query:
             if spec['skipif'] and eval(spec['skipif'], _make_globals(ROW=row)):
