@@ -1,22 +1,9 @@
 [run]
 branch = true
 source = indico
-include =
-    indico/core/db/sqlalchemy/*.py
-    indico/core/settings/*.py
-    indico/core/storage.py
-    indico/modules/events/agreements/*.py
-    indico/modules/events/models/*.py
-    indico/modules/events/notes/*.py
-    indico/modules/events/payment/*.py
-    indico/modules/events/registration/*.py
-    indico/modules/oauth/*.py
-    indico/modules/rb/*.py
-    indico/modules/users/*.py
-    indico/util/signals.py
-    indico/util/string.py
-    indico/web/flask/templating.py
-    indico/util/*.py
+omit =
+    indico/legacy/*
+    indico/migrations/*
 
 [report]
 exclude_lines =
