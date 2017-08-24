@@ -1,9 +1,3 @@
-include AUTHORS
-include COPYING
-include INSTALL
-include README.rst
-include THANKS.md
-
 include indico/*.sample indico/web/indico.wsgi
 recursive-include indico *.html *.tpl *.txt *.js *.yaml
 
