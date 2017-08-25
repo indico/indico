@@ -126,8 +126,8 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
             self.definition.send(req, form.data)
         except RequestModuleError:
             db.session.delete(req)
-            message = 'There was a problem sending your request ({0}). Please contact support for further details.'
-            flash(_(message).format(self.definition.title), 'error')
+            flash_msg = _('There was a problem sending your request ({0}). Please contact support.')
+            flash(flash_msg.format(self.definition.title), 'error')
         else:
             if new:
                 flash_msg = _("Your request ({0}) has been sent.")
@@ -192,8 +192,8 @@ class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEvent
         try:
             self.definition.withdraw(self.request)
         except RequestModuleError:
-            message = 'There was a problem withdrawing your request ({0}). Please contact support for further details.'
-            flash(_(message).format(self.definition.title), 'error')
+            flash_msg = _('There was a problem withdrawing your request ({0}). Please contact support.')
+            flash(flash_msg.format(self.definition.title), 'error')
         else:
             flash(_('You have withdrawn your request ({0})').format(self.definition.title))
         return redirect(url_for('.event_requests', self.event_new))

@@ -18,6 +18,4 @@ from __future__ import unicode_literals
 
 
 class RequestModuleError(Exception):
-    def __init__(self, message=None):
-        super(RequestModuleError, self).__init__(message)
-        self.message = message
+    pass
