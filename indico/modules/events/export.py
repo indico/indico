@@ -67,19 +67,22 @@ def export_event(event, target_file):
     exporter.serialize()
 
 
-def import_event(source_file, category_id, verbose=False, force=False):
+def import_event(source_file, category_id=0, create_users=None, verbose=False, force=False):
     """Import a previously-exported event.
 
     It is up to the caller of this function to commit the transaction.
 
     :param source_file: An open file object containing the exported event.
     :param category_id: ID of the category in which to create the event.
+    :param create_users: Whether to create missing users or skip them.
+                         If set to None, an interactive prompt is shown
+                         when such users are encountered.
     :param verbose: Whether to enable verbose output.
     :param force: Whether to ignore version conflicts.
     :return: The imported event.
     """
-    importer = EventImporter(source_file, category_id, verbose)
-    return importer.deserialize(force)
+    importer = EventImporter(source_file, category_id, create_users, verbose, force)
+    return importer.deserialize()
 
 
 def _model_to_table(name):
@@ -382,10 +385,12 @@ class EventExporter(object):
 
 
 class EventImporter(object):
-    def __init__(self, source_file, category_id, verbose):
+    def __init__(self, source_file, category_id=0, create_users=None, verbose=False, force=False):
         self.source_file = source_file
         self.category_id = category_id
+        self.create_users = create_users
         self.verbose = verbose
+        self.force = force
         self.archive = tarfile.open(fileobj=source_file)
         self.data = yaml.load(self.archive.extractfile('data.yaml'))
         self.id_map = {}
@@ -438,14 +443,19 @@ class EventImporter(object):
                                    userdata['affiliation']])
             table = AsciiTable(table_data)
             click.echo(table.table)
-            click.echo('Do you want to create these users now?')
-            click.echo('If you choose to not create them, the behavior depends on where the user would be used:')
-            click.echo('- If the user is not required, it will be omitted.')
-            click.echo('- If a user is required but using the system user will not cause any problems or look '
-                       'weird, the system user will be used.')
-            click.echo('- In case neither is possible, e.g. in abstract reviews or ACLs, these objects will '
-                       'be skipped altogether!')
-            if click.confirm('Create the missing users?', default=True):
+            if self.create_users is None:
+                click.echo('Do you want to create these users now?')
+                click.echo('If you choose to not create them, the behavior depends on where the user would be used:')
+                click.echo('- If the user is not required, it will be omitted.')
+                click.echo('- If a user is required but using the system user will not cause any problems or look '
+                           'weird, the system user will be used.')
+                click.echo('- In case neither is possible, e.g. in abstract reviews or ACLs, these objects will '
+                           'be skipped altogether!')
+                create_users = click.confirm('Create the missing users?', default=True)
+            else:
+                create_users = self.create_users
+            if create_users:
+                click.secho('Creating missing users', fg='magenta')
                 for uuid, userdata in missing.iteritems():
                     user = User(first_name=userdata['first_name'],
                                 last_name=userdata['last_name'],
@@ -459,9 +469,13 @@ class EventImporter(object):
                     db.session.add(user)
                     db.session.flush()
                     self.user_map[uuid] = user.id
+                    if self.verbose:
+                        click.echo(cformat("- %{cyan}User%{blue!} '{}' ({})").format(user.full_name, user.email))
+            else:
+                click.secho('Skipping missing users', fg='magenta')
 
-    def deserialize(self, force):
-        if not force and self.data['indico_version'] != indico.__version__:
+    def deserialize(self):
+        if not self.force and self.data['indico_version'] != indico.__version__:
             click.secho('Version mismatch: trying to import event exported with {} to version {}'
                         .format(self.data['indico_version'], indico.__version__), fg='red')
             return None
@@ -616,13 +630,13 @@ class EventImporter(object):
                 deferred_idrefs[col] = exc.uuid
             except MissingUser as exc:
                 if exc.skip:
-                    click.secho('Skipping row in {} due to missing user ({})'.format(table.fullname, exc.username),
+                    click.secho('! Skipping row in {} due to missing user ({})'.format(table.fullname, exc.username),
                                 fg='yellow')
                     missing_user_skip = True
                 else:
                     missing_user_exec.add(exc.run)
             except MissingUserCascaded:
-                click.secho('Skipping row in {} as parent row was skipped due to a missing user'
+                click.secho('! Skipping row in {} as parent row was skipped due to a missing user'
                             .format(table.fullname), fg='yellow')
                 missing_user_skip = True
         if missing_user_skip:

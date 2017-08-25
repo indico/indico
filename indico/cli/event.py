@@ -72,18 +72,22 @@ def export(event_id, target_file):
 
 @cli.command('import')
 @click.argument('source_file', type=click.File('rb'))
+@click.option('--create-users/--no-create-users', default=None,
+              help='Whether to create missing user or skip them.  By default a confirmation prompt is shown when '
+                   'the archive contains such users')
 @click.option('--force', is_flag=True, help='Ignore Indico version mismatches (DANGER)')
 @click.option('-v', '--verbose', is_flag=True, help='Show verbose information on what is being imported')
+@click.option('-y', '--yes', is_flag=True, help='Always commit the imported event without prompting')
 @click.option('-c', '--category', 'category_id', type=int, default=0, metavar='ID',
               help='ID of the target category. Defaults to the root category.')
-def import_(source_file, force, verbose, category_id):
+def import_(source_file, create_users, force, verbose, yes, category_id):
     """Imports an event exported from another Indico instance."""
     click.echo('Importing event...')
-    event = import_event(source_file, category_id, verbose=verbose, force=force)
+    event = import_event(source_file, category_id, create_users=create_users, verbose=verbose, force=force)
     if event is None:
         click.secho('Import failed.', fg='red')
         sys.exit(1)
-    if not click.confirm(click.style('Import finished. Commit the changes?', fg='green'), default=True):
+    if not yes and not click.confirm(click.style('Import finished. Commit the changes?', fg='green'), default=True):
         db.session.rollback()
         sys.exit(1)
     db.session.commit()
