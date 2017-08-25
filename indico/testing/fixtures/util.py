@@ -19,7 +19,7 @@ from datetime import datetime
 
 import freezegun
 import pytest
-from sqlalchemy import cast, DateTime
+from sqlalchemy import DateTime, cast
 from sqlalchemy.sql.functions import _FunctionGenerator
 
 
@@ -42,7 +42,7 @@ def monkeypatch_methods(monkeypatch):
     return _monkeypatch_methods
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def freeze_time(monkeypatch):
     """Returns a function that freezes the current time
 

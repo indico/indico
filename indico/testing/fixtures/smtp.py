@@ -19,7 +19,7 @@ import pytest
 from indico.core.config import Config
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def smtp(disallow_emails, smtpserver):
     """Wrapper for the `smtpserver` fixture which updates the Indico config
     and disables the SMTP autofail logic for that smtp server.

@@ -18,7 +18,7 @@ import pytest
 from indico.util.caching import memoize_request
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def not_testing(app_context):
     app_context.config['TESTING'] = False
     try:

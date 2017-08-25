@@ -23,16 +23,16 @@ import tempfile
 from contextlib import contextmanager
 
 import pytest
-from sqlalchemy.engine import Engine
 from sqlalchemy import event
+from sqlalchemy.engine import Engine
 
 from indico.core.db import db as db_
-from indico.core.db.sqlalchemy.util.management import delete_all_tables, create_all_tables
+from indico.core.db.sqlalchemy.util.management import create_all_tables, delete_all_tables
 from indico.util.process import silent_check_call
 from indico.web.flask.app import configure_db
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def postgresql():
     """Provides a clean temporary PostgreSQL server/database.
 
@@ -86,7 +86,7 @@ def postgresql():
         shutil.rmtree(temp_dir)
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def database(app, postgresql):
     """Creates a test database which is destroyed afterwards
 
@@ -106,7 +106,7 @@ def database(app, postgresql):
         delete_all_tables(db_)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def db(database, monkeypatch):
     """Provides database access and ensures changes do not persist"""
     # Prevent database/session modifications
@@ -124,7 +124,7 @@ def db(database, monkeypatch):
     database.session.remove()
 
 
-@pytest.yield_fixture
+@pytest.fixture
 @pytest.mark.usefixtures('db')
 def count_queries():
     """Provides a query counter.
