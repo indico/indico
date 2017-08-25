@@ -142,7 +142,7 @@ def test_event_import(db, dummy_user):
         tarf.addfile(tar_info, BytesIO(b'hello world'))
 
     tar_buffer.seek(0)
-    e = import_event(tar_buffer, 0)
+    e = import_event(tar_buffer, create_users=False)
     # Check that event metadata is fine
     assert e.title == 'dummy#0'
     assert e.creator == dummy_user
