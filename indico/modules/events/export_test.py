@@ -43,7 +43,7 @@ class _MockUUID(object):
         return u
 
 
-@pytest.fixture()
+@pytest.fixture
 def reproducible_uuids(monkeypatch):
     muid = _MockUUID()
     monkeypatch.setattr(uuid, 'uuid4', muid.uuid4)
@@ -61,9 +61,9 @@ def test_event_export(db, dummy_event, monkeypatch):
     dummy_event.start_dt = as_utc(datetime(2017, 8, 24, 10, 0, 0))
     dummy_event.end_dt = as_utc(datetime(2017, 8, 24, 12, 0, 0))
 
-    s1 = Session(event=dummy_event, title='sd', is_deleted=True)
-    c1 = Contribution(event=dummy_event, title='c1', duration=timedelta(minutes=30))
-    c2 = Contribution(event=dummy_event, title='c2', session=s1, duration=timedelta(minutes=30), is_deleted=True)
+    s = Session(event=dummy_event, title='sd', is_deleted=True)
+    Contribution(event=dummy_event, title='c1', duration=timedelta(minutes=30))
+    Contribution(event=dummy_event, title='c2', session=s, duration=timedelta(minutes=30), is_deleted=True)
     db.session.flush()
     export_event(dummy_event, f)
     f.seek(0)
@@ -80,9 +80,9 @@ def test_event_export(db, dummy_event, monkeypatch):
 def test_event_attachment_export(db, dummy_event, dummy_attachment):
     from indico.modules.events.export import export_event
 
-    s1 = Session(event=dummy_event, title='sd', is_deleted=True)
-    c1 = Contribution(event=dummy_event, title='c1', duration=timedelta(minutes=30))
-    c2 = Contribution(event=dummy_event, title='c2', session=s1, duration=timedelta(minutes=30), is_deleted=True)
+    s = Session(event=dummy_event, title='sd', is_deleted=True)
+    Contribution(event=dummy_event, title='c1', duration=timedelta(minutes=30))
+    Contribution(event=dummy_event, title='c2', session=s, duration=timedelta(minutes=30), is_deleted=True)
 
     dummy_attachment.folder.event = dummy_event
     dummy_attachment.folder.linked_event = dummy_event
