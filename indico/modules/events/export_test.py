@@ -77,7 +77,6 @@ def test_event_export(db, dummy_event, monkeypatch):
         assert tarf.extractfile('data.yaml').read() == data_yaml_content
 
 
-@pytest.mark.usefixtures('storage')
 def test_event_attachment_export(db, dummy_event, dummy_attachment):
     from indico.modules.events.export import export_event
 
@@ -120,7 +119,6 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         assert tarf.extractfile('00000000-0000-4000-8000-00000000001c').read() == 'hello world'
 
 
-@pytest.mark.usefixtures('storage')
 def test_event_import(db, dummy_user):
     from indico.modules.events.export import import_event
 

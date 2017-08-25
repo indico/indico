@@ -21,7 +21,6 @@ from io import BytesIO
 import pytest
 
 from indico.core import signals
-from indico.core.config import Config
 from indico.core.storage.backend import Storage
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -29,7 +28,7 @@ from indico.modules.attachments.models.folders import AttachmentFolder
 
 @signals.get_storage_backends.connect
 def _get_storage_backends(sender, **kwargs):
-    yield MemoryStorage
+    return MemoryStorage
 
 
 class MemoryStorage(Storage):
@@ -53,17 +52,7 @@ class MemoryStorage(Storage):
         return len(self._get_file_content(file_id))
 
 
-@pytest.yield_fixture
-def storage():
-    Config.getInstance().update(
-        StorageBackends={
-            'test': 'mem://test'
-        },
-        AttachmentStorage='test'
-    )
-
-
-@pytest.yield_fixture
+@pytest.fixture
 def dummy_attachment(dummy_user):
     folder = AttachmentFolder(title='dummy_folder', description='a dummy folder')
     file_ = AttachmentFile(user=dummy_user, filename='dummy_file.txt', content_type='text/plain')

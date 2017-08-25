@@ -50,7 +50,7 @@ def pytest_configure(config):
         'Loggers': [],
         'TempDir': config.indico_temp_dir.strpath,
         'CacheDir': config.indico_temp_dir.strpath,
-        'StorageBackends': {'default': config.indico_temp_dir},
+        'StorageBackends': {'default': 'mem:'},
         'AttachmentStorage': 'default',
         'Plugins': plugins,
         'SecretKey': os.urandom(16)
