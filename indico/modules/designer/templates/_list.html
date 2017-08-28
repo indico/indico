@@ -149,16 +149,18 @@
 {% endmacro -%}
 
 {% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none, not_deletable_templates=[]) -%}
-    <section>
-        <h3>{% trans %}Inherited templates{% endtrans %}</h3>
-        <table class="i-table-widget" id="template-list">
-            <tbody>
-                {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
-                    {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
+    {% if inherited_templates %}
+        <section>
+            <h3>{% trans %}Inherited templates{% endtrans %}</h3>
+            <table class="i-table-widget" id="template-list">
+                <tbody>
+                    {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
+                        {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
 
     <section class="custom-template-list {{ 'hide-if-locked' if not templates }}">
         <div class="flexrow f-a-center f-j-space-between">
