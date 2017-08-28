@@ -42,7 +42,7 @@ def _notify_registration(registration, template, to_managers=False):
     if (not to_managers and
             regform.tickets_enabled and
             regform.ticket_on_email and
-            not (tickets_handled and any(tickets_handled)) and
+            not any(tickets_handled) and
             registration.state == RegistrationState.complete):
         attachments = get_ticket_attachment(registration)
 
