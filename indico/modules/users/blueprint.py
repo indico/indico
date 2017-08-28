@@ -51,7 +51,7 @@ _bp.add_url_rule('!/admin/users/registration-requests/<int:request_id>/reject', 
 # User profile
 with _bp.add_prefixed_rules('/<int:user_id>'):
     _bp.add_url_rule('/dashboard/', 'user_dashboard', RHUserDashboard)
-    _bp.add_url_rule('/suggestions/categories/<category_id>', 'user_suggestions_remove', RHUserSuggestionsRemove,
+    _bp.add_url_rule('/suggestions/categories/<int:category_id>', 'user_suggestions_remove', RHUserSuggestionsRemove,
                      methods=('DELETE',))
     _bp.add_url_rule('/profile/', 'user_profile', RHPersonalData, methods=('GET', 'POST'))
     _bp.add_url_rule('/preferences/', 'user_preferences', RHUserPreferences, methods=('GET', 'POST'))
