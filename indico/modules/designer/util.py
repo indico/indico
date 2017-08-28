@@ -46,20 +46,14 @@ def get_inherited_templates(obj):
 
 
 def get_not_deletable_templates(obj):
-    """Get all non-deletable templates usable by an event/category"""
+    """Get all non-deletable templates for an event/category"""
 
     not_deletable_criteria = [
         DesignerTemplate.is_system_template,
-        DesignerTemplate.backside_template_of != None,
+        DesignerTemplate.backside_template_of != None,  # noqa
         DesignerTemplate.ticket_for_regforms.any(RegistrationForm.event_new.has(Event.ends_after(now_utc())))
     ]
-    obj_criterion = [
-        DesignerTemplate.event_new == obj if isinstance(obj, Event) else
-        DesignerTemplate.category_id.in_(categ['id'] for categ in obj.chain)
-    ]
-    return set(DesignerTemplate.query
-               .filter(*obj_criterion)
-               .filter(db.or_(*not_deletable_criteria)))
+    return set(DesignerTemplate.query.filter(DesignerTemplate.owner == obj, db.or_(*not_deletable_criteria)))
 
 
 def get_default_template_on_category(category):

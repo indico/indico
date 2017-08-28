@@ -370,6 +370,7 @@
     }
 }
 
-.not-deletable, .not-clonable{
+.not-deletable, .not-clonable {
     opacity: 0.2;
+    cursor: default;
 }

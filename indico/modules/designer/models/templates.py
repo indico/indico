@@ -17,13 +17,11 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.modules.designer import TemplateType, DEFAULT_CONFIG
-from indico.modules.designer.models.images import DesignerImageFile
-from indico.modules.events import Event
-from indico.util.date_time import now_utc
+from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -137,9 +135,13 @@ class DesignerTemplate(db.Model):
             data.update({'width': size[0], 'height': size[1]})
         super(DesignerTemplate, self).__init__(data=data, **kwargs)
 
-    @property
+    @hybrid_property
     def owner(self):
         return self.event_new if self.event_new else self.category
+
+    @owner.comparator
+    def owner(cls):
+        return _OwnerComparator(cls)
 
     @locator_property
     def locator(self):
@@ -148,3 +150,20 @@ class DesignerTemplate(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'category_id', _text=self.title)
+
+
+class _OwnerComparator(Comparator):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __clause_element__(self):
+        # just in case
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        if isinstance(other, db.m.Event):
+            return self.cls.event_new == other
+        elif isinstance(other, db.m.Category):
+            return self.cls.category == other
+        else:
+            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))
