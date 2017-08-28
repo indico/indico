@@ -16,12 +16,13 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy import MetaData, ForeignKeyConstraint, Table
+from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.sql.ddl import DropConstraint, DropTable, DropSchema
+from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.util.console import cformat
+
 
 DEFAULT_TEMPLATE_DATA = {
     'background_position': 'stretch', 'width': 1050, 'items': [
