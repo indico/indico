@@ -301,10 +301,12 @@ class EventExporter(object):
         filename = data.pop('filename')
         content_type = data.pop('content_type')
         size = data.pop('size')
+        md5 = data.pop('md5')
         uuid = self._get_uuid()
         with get_storage(storage_backend).open(storage_file_id) as f:
             self._add_file(uuid, size, f)
-        data['__file__'] = ('file', {'uuid': uuid, 'filename': filename, 'content_type': content_type, 'size': size})
+        data['__file__'] = ('file', {'uuid': uuid, 'filename': filename, 'content_type': content_type, 'size': size,
+                                     'md5': md5})
 
     def _serialize_objects(self, table, filter_):
         spec = self.spec[table.fullname]
@@ -580,14 +582,17 @@ class EventImporter(object):
         storage = get_storage(storage_backend)
         extracted = self.archive.extractfile(data['uuid'])
         path = self._get_file_storage_path(id_, data['filename'])
-        storage_file_id = storage.save(path, data['content_type'], data['filename'], extracted)
+        storage_file_id, md5 = storage.save(path, data['content_type'], data['filename'], extracted)
         assert data['size'] == storage.getsize(storage_file_id)
+        if data['md5']:
+            assert data['md5'] == md5
         return {
             'storage_backend': storage_backend,
             'storage_file_id': storage_file_id,
             'content_type': data['content_type'],
             'filename': data['filename'],
-            'size': data['size']
+            'size': data['size'],
+            'md5': md5
         }
 
     def _deserialize_object(self, table, data):

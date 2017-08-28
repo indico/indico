@@ -260,6 +260,8 @@ export:
       - RegistrationFormItem.registration_form_id
       - Registration.registration_form_id
       - RegistrationInvitation.registration_form_id
+    fks_out:
+      - ticket_template_id
 
   Registration:
     cols:
