@@ -2,8 +2,10 @@
 branch = true
 source = indico
 omit =
+    indico/core/fossils/*
     indico/legacy/*
     indico/migrations/*
+    indico/testing/*
 
 [report]
 exclude_lines =
