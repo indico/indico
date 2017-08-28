@@ -14,12 +14,40 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from sqlalchemy import MetaData, ForeignKeyConstraint, Table
+from __future__ import unicode_literals
+
+from sqlalchemy import ForeignKeyConstraint, MetaData, Table
 from sqlalchemy.engine.reflection import Inspector
-from sqlalchemy.sql.ddl import DropConstraint, DropTable, DropSchema
+from sqlalchemy.sql.ddl import DropConstraint, DropSchema, DropTable
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode
 from indico.util.console import cformat
+
+
+DEFAULT_TEMPLATE_DATA = {
+    'background_position': 'stretch', 'width': 1050, 'items': [
+        {'font_size': '24pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
+         'text_align': 'center', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 190, 'x': 330,
+         'height': None, 'type': 'event_title', 'id': 0},
+        {'font_size': '15pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
+         'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 50, 'x': 50,
+         'height': None, 'type': 'event_dates', 'id': 1},
+        {'font_size': '15pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
+         'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 350, 'x': 230,
+         'height': None, 'type': 'affiliation', 'id': 2},
+        {'font_size': '15pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
+         'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 310, 'x': 230,
+         'height': None, 'type': 'full_name_b', 'id': 3},
+        {'font_size': '13.5pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': True,
+         'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 130, 'x': 50,
+         'height': None, 'type': 'event_venue', 'id': 4},
+        {'font_size': '15pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
+         'text_align': 'center', 'font_family': 'sans-serif', 'width': 150, 'italic': False, 'y': 270, 'x': 50,
+         'height': 150, 'type': 'ticket_qr_code', 'id': 5},
+        {'font_size': '13.5pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
+         'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 90, 'x': 50,
+         'height': None, 'type': 'event_room', 'id': 6}], 'height': 1485
+}
 
 
 def get_all_tables(db):
@@ -67,6 +95,8 @@ def delete_all_tables(db):
 def create_all_tables(db, verbose=False, add_initial_data=True):
     """Create all tables and required initial objects"""
     from indico.modules.categories import Category
+    from indico.modules.designer import TemplateType
+    from indico.modules.designer.models.templates import DesignerTemplate
     from indico.modules.users import User
     if verbose:
         print cformat('%{green}Creating tables')
@@ -77,5 +107,13 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
         db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
         if verbose:
             print cformat('%{green}Creating root category')
-        db.session.add(Category(id=0, title='Home', protection_mode=ProtectionMode.public))
+        cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public)
+        db.session.add(cat)
+        db.session.flush()
+        if verbose:
+            print cformat('%{green}Creating default ticket template for root category ')
+        dt = DesignerTemplate(category_id=0, title='Default ticket', type=TemplateType.badge,
+                              data=DEFAULT_TEMPLATE_DATA, is_system_template=True)
+        cat.default_ticket_template = dt
+        db.session.add(dt)
         db.session.commit()

@@ -66,9 +66,9 @@ items = itertools.chain(event_management_object_url_prefixes.iteritems(), [('cat
 for object_type, prefixes in items:
     for prefix in prefixes:
         if object_type == 'category':
-            prefix = '/category/<category_id>' + prefix
+            prefix = '/category/<int:category_id>' + prefix
         else:
-            prefix = '/event/<confId>' + prefix
+            prefix = '/event/<int:confId>' + prefix
         _bp.add_url_rule(prefix + '/attachments/', 'management',
                          _dispatch(RHManageEventAttachments, RHManageCategoryAttachments),
                          defaults={'object_type': object_type})

@@ -16,14 +16,15 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.designer.controllers import (RHListEventTemplates, RHListCategoryTemplates, RHEditDesignerTemplate,
-                                                 RHDownloadTemplateImage, RHUploadBackgroundImage,
-                                                 RHDeleteDesignerTemplate, RHCloneEventTemplate, RHAddEventTemplate,
-                                                 RHCloneCategoryTemplate, RHAddCategoryTemplate,
-                                                 RHListBacksideTemplates, RHGetTemplateData)
+from indico.modules.designer.controllers import (RHAddCategoryTemplate, RHAddEventTemplate, RHCloneCategoryTemplate,
+                                                 RHCloneEventTemplate, RHDeleteDesignerTemplate,
+                                                 RHDownloadTemplateImage, RHEditDesignerTemplate, RHGetTemplateData,
+                                                 RHListBacksideTemplates, RHListCategoryTemplates, RHListEventTemplates,
+                                                 RHToggleTemplateDefaultOnCategory, RHUploadBackgroundImage)
 from indico.util.caching import memoize
 from indico.web.flask.util import make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('designer', __name__, template_folder='templates', virtual_template_folder='designer')
 
@@ -39,11 +40,15 @@ def _dispatch(event_rh, category_rh):
     return view_func
 
 
+_bp.add_url_rule('/category/<int:category_id>/manage/designer/<int:template_id>/toggle-default', 'toggle_category_default',
+                 RHToggleTemplateDefaultOnCategory, methods=('POST',))
+
+
 for object_type in ('event', 'category'):
     if object_type == 'category':
-        prefix = '/category/<category_id>'
+        prefix = '/category/<int:category_id>'
     else:
-        prefix = '/event/<confId>'
+        prefix = '/event/<int:confId>'
     prefix += '/manage/designer'
     _bp.add_url_rule(prefix + '/', 'template_list', _dispatch(RHListEventTemplates, RHListCategoryTemplates),
                      defaults={'object_type': object_type})

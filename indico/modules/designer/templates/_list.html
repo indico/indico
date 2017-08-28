@@ -37,7 +37,7 @@
     {% endif %}
 {% endmacro %}
 
-{% macro _render_template(tpl, target, inherited=false, event=none) -%}
+{% macro _render_template(tpl, target, inherited=false, event=none, default_template=none, not_deletable_templates=[]) -%}
     <tr>
         <td class="i-table id-column">
             <i class="designer-template-type-icon template-icon-{{ tpl.type.name }}"
@@ -48,9 +48,7 @@
         </td>
         <td class="text-superfluous">
             {% if inherited %}
-                {% if tpl.category.is_root %}
-                    {% trans %}Default template{% endtrans %}
-                {% else %}
+                {% if not tpl.category.is_root %}
                     {% trans title=tpl.category.title -%}
                         from category "{{ title }}"
                     {% endtrans %}
@@ -60,31 +58,64 @@
         <td>
             <div class="thin toolbar right">
                 <div class="group">
-                    {% if tpl.is_clonable %}
-                        <button class="i-button icon-copy icon-only text-color borderless hide-if-locked"
-                                title="{% trans %}Clone this template{% endtrans %}"
-                                data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
+                    {% if not event and tpl.type.name == 'badge' %}
+                        {% set inherited_default = default_template == tpl and tpl.category != target and
+                                not target.default_ticket_template %}
+                        {% set global_default = default_template == tpl and target.is_root %}
+                        <a class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
+                            {{ 'default-on-category' if default_template == tpl }}
+                            {{ 'inherited' if inherited_default }}
+                            {{ 'global-default' if global_default }}"
+                            {% if inherited_default %}
+                                title="{% trans %}This is the inherited default ticket template{% endtrans %}"
+                            {% elif global_default %}
+                                title="{% trans %}This is the global default ticket template{% endtrans %}"
+                            {% else %}
+                                title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
+                                data-href="{{ url_for('.toggle_category_default', target, template_id=tpl.id) }}"
                                 data-method="POST"
                                 data-update="#template-list"
-                                data-confirm="{% trans title=tpl.title -%}
-                                                  Are you sure you want to clone template '{{ title }}''?
-                                              {%- endtrans %}">
-                        </button>
+                            {% endif %}>
+                        </a>
                     {% endif %}
+                    {% set clonable = tpl.is_clonable or (not event and tpl.owner == target) %}
+                    <button class="i-button icon-copy icon-only text-color borderless hide-if-locked
+                        {{ 'not-clonable' if not clonable }}"
+                        {% if not clonable %}
+                            title="{% trans %}This template cannot be cloned{% endtrans %}">
+                        {% else %}
+                            title="{% trans %}Clone this template{% endtrans %}"
+                            data-href="{{ url_for('.clone_template', target, template_id=tpl.id) }}"
+                            data-method="POST"
+                            data-update="#template-list"
+                            data-confirm="{% trans title=tpl.title -%}
+                                              Are you sure you want to clone template '{{ title }}''?
+                                          {%- endtrans %}">
+                        {% endif %}
+                    </button>
                     {% if not inherited %}
                         <a class="i-button icon-edit icon-only text-color borderless hide-if-locked"
                            href="{{ url_for('.edit_template', tpl) }}"
                            title="{% trans %}Edit template{% endtrans %}"></a>
                     {% endif %}
                     {% if not inherited %}
-                        <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked"
-                                title="{% trans %}Delete tempalte{% endtrans %}"
-                                data-href="{{ url_for('.delete_template', tpl) }}"
-                                data-method="DELETE"
-                                data-update="#template-list"
-                                data-confirm="{% trans title=tpl.title -%}
-                                                  Are you sure you want to delete template '{{ title }}'?
-                                              {%- endtrans %}">
+                        <button class="i-button icon-remove icon-only text-color borderless danger hide-if-locked
+                                {{ 'not-deletable' if tpl in not_deletable_templates }}"
+                                {% if tpl in not_deletable_templates %}
+                                    {% if tpl.is_system_template %}
+                                        title="{% trans %}This template cannot be deleted.{% endtrans %}"
+                                    {% else %}
+                                        title="{% trans %}This template cannot be deleted because it is used in a registration form or as a backside for another template.{% endtrans %}"
+                                    {% endif %}
+                                {% else %}
+                                    title="{% trans %}Delete template{% endtrans %}"
+                                    data-href="{{ url_for('.delete_template', tpl) }}"
+                                    data-method="DELETE"
+                                    data-update="#template-list"
+                                    data-confirm="{% trans title=tpl.title -%}
+                                                      Are you sure you want to delete the template '{{ title }}'?
+                                                  {%- endtrans %}">
+                                {% endif %}
                         </button>
                     {%- endif %}
                 </div>
@@ -122,17 +153,19 @@
     </tr>
 {% endmacro -%}
 
-{% macro render_template_list(templates, target, inherited_templates=[], event=none) -%}
-    <section>
-        <h3>{% trans %}Inherited templates{% endtrans %}</h3>
-        <table class="i-table-widget" id="template-list">
-            <tbody>
-                {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
-                    {{ _render_template(tpl, target, inherited=true, event=event) }}
-                {% endfor %}
-            </tbody>
-        </table>
-    </section>
+{% macro render_template_list(templates, target, inherited_templates=[], event=none, default_template=none, not_deletable_templates=[]) -%}
+    {% if inherited_templates %}
+        <section>
+            <h3>{% trans %}Inherited templates{% endtrans %}</h3>
+            <table class="i-table-widget" id="template-list">
+                <tbody>
+                    {% for tpl in inherited_templates | sort(attribute='title') | sort(attribute='type') %}
+                        {{ _render_template(tpl, target, inherited=true, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    {% endif %}
 
     <section class="custom-template-list {{ 'hide-if-locked' if not templates }}">
         <div class="flexrow f-a-center f-j-space-between">
@@ -149,7 +182,7 @@
             <table class="i-table-widget" id="template-list">
                 <tbody>
                     {% for tpl in templates | sort(attribute='title') | sort(attribute='type') %}
-                        {{ _render_template(tpl, target, event=event) }}
+                        {{ _render_template(tpl, target, event=event, default_template=default_template, not_deletable_templates=not_deletable_templates) }}
                     {% endfor %}
                 </tbody>
             </table>

@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms import StringField, BooleanField
+from wtforms import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.modules.designer.models.templates import TemplateType
@@ -30,4 +30,4 @@ class AddTemplateForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()])
     type = IndicoEnumSelectField(_('Template'), enum=TemplateType, default=TemplateType.poster)
     is_clonable = BooleanField(_('Allow cloning'), widget=SwitchWidget(), default=True,
-                               description=_("Allow event managers to clone this template."))
+                               description=_("Allow cloning this template in subcategories and events"))

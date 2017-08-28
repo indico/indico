@@ -17,11 +17,11 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import JSON
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.modules.designer import TemplateType, DEFAULT_CONFIG
-from indico.modules.designer.models.images import DesignerImageFile
+from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
@@ -81,9 +81,15 @@ class DesignerTemplate(db.Model):
         nullable=False,
         default=True
     )
+    is_system_template = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     category = db.relationship(
         'Category',
         lazy=True,
+        foreign_keys=category_id,
         backref=db.backref(
             'designer_templates',
             cascade='all, delete-orphan',
@@ -108,11 +114,15 @@ class DesignerTemplate(db.Model):
     backside_template = db.relationship(
         'DesignerTemplate',
         lazy=True,
-        remote_side=id
+        remote_side=id,
+        backref='backside_template_of'
     )
 
     # relationship backrefs:
+    # - backside_template_of (DesignerTemplate.backside_template)
+    # - default_ticket_template_of (Category.default_ticket_template)
     # - images (DesignerImageFile.template)
+    # - ticket_for_regforms (RegistrationForm.ticket_template)
 
     def __init__(self, **kwargs):
         data = kwargs.pop('data', None)
@@ -126,9 +136,13 @@ class DesignerTemplate(db.Model):
             data.update({'width': size[0], 'height': size[1]})
         super(DesignerTemplate, self).__init__(data=data, **kwargs)
 
-    @property
+    @hybrid_property
     def owner(self):
         return self.event if self.event else self.category
+
+    @owner.comparator
+    def owner(cls):
+        return _OwnerComparator(cls)
 
     @locator_property
     def locator(self):
@@ -137,3 +151,20 @@ class DesignerTemplate(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'event_id', 'category_id', _text=self.title)
+
+
+class _OwnerComparator(Comparator):
+    def __init__(self, cls):
+        self.cls = cls
+
+    def __clause_element__(self):
+        # just in case
+        raise NotImplementedError
+
+    def __eq__(self, other):
+        if isinstance(other, db.m.Event):
+            return self.cls.event == other
+        elif isinstance(other, db.m.Category):
+            return self.cls.category == other
+        else:
+            raise ValueError('Unexpected object type {}: {}'.format(type(other), other))

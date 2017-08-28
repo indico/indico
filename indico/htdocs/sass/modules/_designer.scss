@@ -352,3 +352,34 @@
 .template-side.back:not(.empty) {
     pointer-events: none;
 }
+
+.toggle-default {
+    opacity: 0.3;
+
+    &.default-on-category {
+        opacity: 1;
+        color: $blue;
+
+        &.inherited {
+            opacity: 0.6;
+            cursor: default;
+
+            &:hover {
+                color: $blue;
+            }
+        }
+
+        &.global-default {
+            cursor: default;
+
+            &:hover {
+                color: $blue;
+            }
+        }
+    }
+}
+
+.not-deletable, .not-clonable {
+    opacity: 0.2;
+    cursor: default;
+}

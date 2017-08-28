@@ -5,10 +5,18 @@
 
 {% set has_req = req and not req.state.name == 'withdrawn' %}
 {% set show_management = is_manager and has_req %}
+{% set button_title -%}
+    {%- if not req -%}
+        {% trans %}Send request{% endtrans %}
+    {%- elif req.can_be_modified -%}
+        {% trans %}Modify request{% endtrans %}
+    {%- else -%}
+        {% trans %}Send new request{% endtrans %}
+    {%- endif -%}
+{%- endset %}
 
 {% block title %}{% trans %}Services{% endtrans %}{% endblock %}
 {% block subtitle %}{{ definition.title }}{% endblock %}
-
 {% block content %}
     {{ form_header(form, id='request-form') }}
 
@@ -76,15 +84,8 @@
     {% endif %}
 
     {% call form_footer(form) %}
-        <input class="i-button big highlight" type="submit" value="
-            {%- if not req -%}
-                {%- trans -%}Send request{%- endtrans -%}
-            {%- elif req.can_be_modified -%}
-                {%- trans -%}Modify request{%- endtrans -%}
-            {%- else -%}
-                {%- trans -%}Send new request{%- endtrans -%}
-            {%- endif -%}
-        ">
+        <input id="send-request" class="i-button big highlight" type="submit"
+               value="{{ button_title }}" data-disabled-until-change>
         {% if not protection_overridden and req and req.state.name in ('pending', 'accepted') %}
             <input type="button" class="i-button big warning" id="withdraw-request"
                data-href="{{ url_for('.event_requests_withdraw', req) }}"

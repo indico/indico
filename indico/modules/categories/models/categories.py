@@ -17,13 +17,13 @@
 from __future__ import unicode_literals
 
 import pytz
-from sqlalchemy import orm, DDL
-from sqlalchemy.dialects.postgresql import ARRAY, array, JSON
+from sqlalchemy import DDL, orm
+from sqlalchemy.dialects.postgresql import ARRAY, JSON, array
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import column_property
-from sqlalchemy.sql import select, literal, exists, func
+from sqlalchemy.sql import exists, func, literal, select
 
 from indico.core import signals
 from indico.core.config import Config
@@ -37,7 +37,7 @@ from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import MarkdownText, text_to_repr, format_repr, return_ascii
+from indico.util.string import MarkdownText, format_repr, return_ascii, text_to_repr
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 
@@ -175,6 +175,11 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         nullable=False,
         default=False
     )
+    default_ticket_template_id = db.Column(
+        db.ForeignKey('indico.designer_templates.id'),
+        nullable=True,
+        index=True
+    )
 
     children = db.relationship(
         'Category',
@@ -192,6 +197,12 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         backref='category',
         cascade='all, delete-orphan',
         collection_class=set
+    )
+    default_ticket_template = db.relationship(
+        'DesignerTemplate',
+        lazy=True,
+        foreign_keys=default_ticket_template_id,
+        backref='default_ticket_template_of'
     )
 
     # column properties:

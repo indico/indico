@@ -18,11 +18,6 @@ from blinker import Namespace
 
 _signals = Namespace()
 
-from indico.core.signals.event.abstracts import *
-from indico.core.signals.event.contributions import *
-from indico.core.signals.event.core import *
-from indico.core.signals.event.designer import *
-from indico.core.signals.event.notes import *
-from indico.core.signals.event.persons import *
-from indico.core.signals.event.registration import *
-from indico.core.signals.event.timetable import *
+print_badge_template = _signals.signal('print-badge-template', """
+Called when printing a badge template. The registration form is passed in the `regform` kwarg.
+""")

@@ -213,6 +213,7 @@ class RHRegistrationFormDelete(RHManageRegFormBase):
 
     def _process(self):
         self.regform.is_deleted = True
+        signals.event.registration_form_deleted.send(self.regform)
         flash(_("Registration form deleted"), 'success')
         logger.info("Registration form %s deleted by %s", self.regform, session.user)
         return redirect(url_for('.manage_regform_list', self.event))

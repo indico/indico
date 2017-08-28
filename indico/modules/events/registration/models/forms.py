@@ -30,6 +30,7 @@ from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
 from indico.util.caching import memoize_request
@@ -72,6 +73,7 @@ class RegistrationForm(db.Model):
         db.String,
         nullable=False
     )
+    #: Whether it's the 'Participants' form of a meeting/lecture
     is_participation = db.Column(
         db.Boolean,
         nullable=False,
@@ -227,6 +229,13 @@ class RegistrationForm(db.Model):
         nullable=False,
         default=True
     )
+    #: The ID of the template used to generate tickets
+    ticket_template_id = db.Column(
+        db.Integer,
+        db.ForeignKey(DesignerTemplate.id),
+        nullable=True,
+        index=True
+    )
 
     #: The Event containing this registration form
     event = db.relationship(
@@ -236,6 +245,16 @@ class RegistrationForm(db.Model):
             'registration_forms',
             primaryjoin='(RegistrationForm.event_id == Event.id) & ~RegistrationForm.is_deleted',
             cascade='all, delete-orphan',
+            lazy=True
+        )
+    )
+    #: The template used to generate tickets
+    ticket_template = db.relationship(
+        'DesignerTemplate',
+        lazy=True,
+        foreign_keys=ticket_template_id,
+        backref=db.backref(
+            'ticket_for_regforms',
             lazy=True
         )
     )

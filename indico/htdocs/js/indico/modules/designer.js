@@ -84,8 +84,8 @@
             text_align: "center",
             color: "black",
             font_size: "15pt",
-            width: (type === 'ticket_qr_code') ? 100 : 400,
-            height: (type === 'ticket_qr_code') ? 100 : null,
+            width: (type === 'ticket_qr_code') ? 150 : 400,
+            height: (type === 'ticket_qr_code') ? 150 : null,
             text: $T("Fixed text"),
 
             // The following attributes have no meaning to the server
@@ -466,6 +466,10 @@
             new AlertPopup($T("Warning"), $T.gettext("Please choose a name for the template")).open();
             return;
         }
+        if (!Object.keys(items).length && !template.background_url) {
+            alertPopup($T.gettext("The template cannot be empty. Add some elements or a background image."), $T.gettext("Warning"));
+            return;
+        }
         if (removeBackSide) {
             backsideTemplateID = null;
         }
@@ -482,6 +486,7 @@
             },
             clear_background: !template.background_url,
             title: $('.js-template-name').val(),
+            is_clonable: $('input[name="is-clonable"]:checked').length > 0,
             backside_template_id: backsideTemplateID
         };
 
@@ -951,6 +956,7 @@
             // We give the toHTML() method to each of the items
             templateDimensions = new Dimensions(template.data.width, template.data.height);
             $('.js-template-name').val(template.title);
+            $('.js-is-clonable').prop('checked', template.is_clonable);
             $('.template-container').width(templateDimensions.width)
                               .height(templateDimensions.height);
         } else {

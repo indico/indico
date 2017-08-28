@@ -1,6 +1,10 @@
 {% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row %}
 {% from 'message_box.html' import message_box %}
 
+{% if ticket_warning %}
+    {{ message_box('warning', ticket_warning) }}
+{% endif %}
+
 {{ form_header(form)}}
 {{ form_row(form.tickets_enabled, disabled=not can_enable_tickets) }}
 {{ form_rows(form, skip=('tickets_enabled',)) }}

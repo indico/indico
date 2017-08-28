@@ -21,8 +21,8 @@ from io import BytesIO
 
 import pytest
 
-from indico.core.storage import (Storage, FileSystemStorage, StorageError, StorageReadOnlyError,
-                                 ReadOnlyFileSystemStorage)
+from indico.core.storage import (FileSystemStorage, ReadOnlyFileSystemStorage, Storage, StorageError,
+                                 StorageReadOnlyError)
 
 
 @pytest.fixture
@@ -71,17 +71,17 @@ def test_fs_errors(fs_storage):
 
 
 def test_fs_save_bytes(fs_storage):
-    f = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello test')
+    f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello test')
     assert fs_storage.open(f).read() == b'hello test'
 
 
 def test_fs_save_fileobj(fs_storage):
-    f = fs_storage.save('test.txt', 'unused/unused', 'unused', BytesIO(b'hello test'))
+    f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', BytesIO(b'hello test'))
     assert fs_storage.open(f).read() == b'hello test'
 
 
 def test_fs_overwrite(fs_storage):
-    f = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello test')
+    f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello test')
     with pytest.raises(StorageError) as exc_info:
         fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello fail')
     assert 'already exists' in unicode(exc_info.value)
@@ -102,15 +102,21 @@ def test_fs_dir(fs_storage):
 
 
 def test_fs_operations(fs_storage):
-    f1 = fs_storage.save('foo/bar/test.txt', 'unused/unused', 'unused', b'hello world')
-    f2 = fs_storage.save('foo/bar/test2.txt', 'unused/unused', 'unused', b'hello there')
-    f3 = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello test')
+    f1, h1 = fs_storage.save('foo/bar/test.txt', 'unused/unused', 'unused', b'hello world')
+    f2, h2 = fs_storage.save('foo/bar/test2.txt', 'unused/unused', 'unused', b'hello there')
+    f3, h3 = fs_storage.save('test.txt', 'unused/unused', 'unused', b'very very long file' * 1024 * 1024)
+
+    # check md5 checksums
+    assert h1 == u'5eb63bbbe01eeed093cb22bb8f5acdc3'
+    assert h2 == u'161bc25962da8fed6d2f59922fb642aa'
+    assert h3 == u'd35ddfd803cbe8915f5c3ecd1d0523b4'
+
     with fs_storage.open(f1) as fd:
         assert fd.read() == b'hello world'
     with fs_storage.open(f2) as fd:
         assert fd.read() == b'hello there'
     with fs_storage.open(f3) as fd:
-        assert fd.read() == b'hello test'
+        assert len(fd.read()) == 19922944
     assert fs_storage.getsize(f1) == 11
     fs_storage.delete(f1)
     # only f1 should have been deleted
@@ -119,12 +125,12 @@ def test_fs_operations(fs_storage):
     with fs_storage.open(f2) as fd:
         assert fd.read() == b'hello there'
     with fs_storage.open(f3) as fd:
-        assert fd.read() == b'hello test'
+        assert len(fd.read()) == 19922944
 
 
 @pytest.mark.usefixtures('request_context')
 def test_fs_send_file(fs_storage):
-    f1 = fs_storage.save('foo/bar/test.txt', 'unused/unused', 'unused', b'hello world')
+    f1, __ = fs_storage.save('foo/bar/test.txt', 'unused/unused', 'unused', b'hello world')
     response = fs_storage.send_file(f1, 'text/plain', 'filename.txt')
     assert 'text/plain' in response.headers['Content-type']
     assert 'filename.txt' in response.headers['Content-disposition']
@@ -133,7 +139,7 @@ def test_fs_send_file(fs_storage):
 
 @pytest.mark.usefixtures('request_context')
 def test_fs_readonly(fs_storage):
-    f = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
+    f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
     readonly = ReadOnlyFileSystemStorage(fs_storage.path)
     assert readonly.open(f).read() == b'hello world'
     assert readonly.send_file(f, 'test/plain', 'test.txt')
@@ -147,7 +153,7 @@ def test_fs_readonly(fs_storage):
 
 
 def test_fs_get_local_path(fs_storage):
-    f = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
+    f, __ = fs_storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
     with fs_storage.get_local_path(f) as path:
         assert path == fs_storage._resolve_path(f)
         with open(path, 'rb') as fd:
@@ -162,7 +168,7 @@ def test_storage_get_local_path(fs_storage):
             return Storage.get_local_path(self, file_id)
 
     storage = CustomStorage(fs_storage.path)
-    f = storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
+    f, __ = storage.save('test.txt', 'unused/unused', 'unused', b'hello world')
     with storage.get_local_path(f) as path:
         with open(path, 'rb') as fd:
             assert fd.read() == b'hello world'

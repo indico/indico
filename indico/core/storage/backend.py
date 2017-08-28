@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 import os
 import sys
 from contextlib import contextmanager
+from hashlib import md5
 from io import BytesIO
-from shutil import copyfileobj
 from tempfile import NamedTemporaryFile
 
 from werkzeug.security import safe_join
@@ -106,6 +106,20 @@ class Storage(object):
         """Ensures that fileobj is a file-like object and not a string"""
         return BytesIO(fileobj) if not hasattr(fileobj, 'read') else fileobj
 
+    def _copy_file(self, source, target, chunk_size=1024*1024):
+        """Copy a file, in chunks, from ``source`` to ``target``.
+
+        The return value will be the MD5 checksum of the file (hex).
+        """
+        checksum = md5()
+        while True:
+            chunk = source.read(chunk_size)
+            if not chunk:
+                break
+            target.write(chunk)
+            checksum.update(chunk)
+        return checksum.hexdigest().decode('ascii')
+
     def open(self, file_id):  # pragma: no cover
         """Opens a file in the storage for reading.
 
@@ -129,7 +143,7 @@ class Storage(object):
         """
         with self.open(file_id) as fd:
             with NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir()) as tmpfile:
-                copyfileobj(fd, tmpfile, 1024 * 1024)
+                self._copy_file(fd, tmpfile)
                 tmpfile.flush()
                 yield tmpfile.name
 
@@ -157,7 +171,8 @@ class Storage(object):
                          not be used depending on the backend).
         :param fileobj: A file-like object containing the file data as
                         bytes or a bytestring.
-        :return: unicode -- A unique identifier for the file.
+        :return: (unicode, unicode) -- A tuple containing a unique
+                        identifier for the file and an MD5 checksum.
         """
         raise NotImplementedError
 
@@ -243,8 +258,8 @@ class FileSystemStorage(Storage):
             if not os.path.isdir(basedir):
                 os.makedirs(basedir)
             with open(filepath, 'wb') as f:
-                copyfileobj(fileobj, f, 1024 * 1024)
-            return name
+                checksum = self._copy_file(fileobj, f)
+            return name, checksum
         except Exception as e:
             raise StorageError('Could not save "{}": {}'.format(name, e)), None, sys.exc_info()[2]
 

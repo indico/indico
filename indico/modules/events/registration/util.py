@@ -24,6 +24,7 @@ from sqlalchemy.orm import joinedload, load_only, undefer
 from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
@@ -42,10 +43,9 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import (notify_registration_creation,
                                                               notify_registration_modification)
 from indico.modules.users.util import get_user_by_email
-from indico.util.date_time import format_date, format_datetime
+from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
-from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -237,6 +237,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
 
 def modify_registration(registration, data, management=False, notify_user=True):
     old_price = registration.price
+    personal_data_changes = {}
     with db.session.no_autoflush:
         regform = registration.registration_form
         data_by_field = registration.data_by_field
@@ -264,13 +265,18 @@ def modify_registration(registration, data, management=False, notify_user=True):
             for key, val in attrs.iteritems():
                 setattr(data_by_field[form_item.id], key, val)
             if form_item.type == RegistrationFormItemType.field_pd and form_item.personal_data_type.column:
-                setattr(registration, form_item.personal_data_type.column, value)
+                key = form_item.personal_data_type.column
+                if getattr(registration, key) != value:
+                    personal_data_changes[key] = value
+                setattr(registration, key, value)
         registration.sync_state()
     db.session.flush()
     # sanity check
     if billable_items_locked and old_price != registration.price:
         raise Exception("There was an error while modifying your registration (price mismatch: %s / %s)",
                         old_price, registration.price)
+    if personal_data_changes:
+        signals.event.registration_personal_data_modified.send(registration, change=personal_data_changes)
     notify_registration_modification(registration, notify_user)
     logger.info('Registration %s modified by %s', registration, session.user)
     regform.event.log(EventLogRealm.management if management else EventLogRealm.participants,
@@ -427,17 +433,19 @@ def generate_ticket_qr_code(registration):
     :param registration: corresponding `Registration` object
     """
     qr = QRCode(
-        version=6,
-        error_correction=constants.ERROR_CORRECT_M,
-        box_size=4,
+        version=17,
+        error_correction=constants.ERROR_CORRECT_Q,
+        box_size=3,
         border=1
     )
     qr_data = {
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
         "event_id": unicode(registration.event.id),
-        "server_url": Config.getInstance().getBaseURL()
+        "server_url": Config.getInstance().getBaseURL(),
+        "version": 1
     }
+    signals.event.registration.generate_ticket_qr_code.send(registration, ticket_data=qr_data)
     json_qr_data = json.dumps(qr_data)
     qr.add_data(json_qr_data)
     qr.make(fit=True)

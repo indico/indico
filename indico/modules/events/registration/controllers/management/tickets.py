@@ -19,56 +19,75 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 import qrcode
-from flask import flash, json, render_template
+from flask import json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
+from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
+from indico.modules.designer import PageOrientation, PageSize
+from indico.modules.designer.util import get_default_template_on_category
+from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.oauth.models.applications import OAuthApplication
-from indico.util.date_time import format_date
 from indico.util.i18n import _
-from indico.web.flask.util import url_for, send_file, secure_filename
+from indico.web.flask.util import secure_filename, send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
-from indico.legacy.pdfinterface.conference import TicketToPDF
+
+DEFAULT_TICKET_PRINTING_SETTINGS = {
+    'top_margin': 0,
+    'bottom_margin': 0,
+    'left_margin': 0,
+    'right_margin': 0,
+    'margin_columns': 0,
+    'margin_rows': 0.0,
+    'page_size': PageSize.A4,
+    'page_orientation': PageOrientation.portrait,
+    'dashed_border': False,
+    'page_layout': None
+}
 
 
 class RHRegistrationFormTickets(RHManageRegFormBase):
     """Display and modify ticket settings."""
 
     def _check_ticket_app_enabled(self):
-        config = Config.getInstance()
-        checkin_app_client_id = config.getCheckinAppClientId()
+        checkin_app_client_id = Config.getInstance().getCheckinAppClientId()
 
         if checkin_app_client_id is None:
-            flash(_("indico-checkin client_id is not defined in the Indico configuration"), 'warning')
-            return False
+            return False, _("indico-checkin client_id is not defined in the Indico configuration")
 
         checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
         if checkin_app is None:
-            flash(_("indico-checkin is not registered as an OAuth application with client_id {}")
-                  .format(checkin_app_client_id), 'warning')
-            return False
-        return True
+            msg = (_("indico-checkin is not registered as an OAuth application with client_id {}")
+                   .format(checkin_app_client_id))
+            return False, msg
+        return True, None
 
     def _process(self):
-        form = TicketsForm(obj=self.regform)
+        form = TicketsForm(obj=self.regform, event=self.event)
         if form.validate_on_submit():
             form.populate_obj(self.regform)
             db.session.flush()
             return jsonify_data(flash=False, tickets_enabled=self.regform.tickets_enabled)
 
+        can_enable_tickets, ticket_warning = self._check_ticket_app_enabled()
         return jsonify_template('events/registration/management/regform_tickets.html',
-                                regform=self.regform, form=form, can_enable_tickets=self._check_ticket_app_enabled())
+                                regform=self.regform, form=form, can_enable_tickets=can_enable_tickets,
+                                ticket_warning=ticket_warning)
 
 
 def generate_ticket(registration):
-    pdf = TicketToPDF(registration.registration_form.event, registration)
-    return BytesIO(pdf.getPDFBin())
+    template = (registration.registration_form.ticket_template or
+                get_default_template_on_category(registration.event.category))
+    signals.event.designer.print_badge_template.send(template, regform=registration.registration_form)
+    pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
+    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, [registration.id])
+    return pdf.get_pdf()
 
 
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
@@ -113,10 +132,11 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
         qr_data = {
             "event_id": self.event.id,
             "title": self.event.title,
-            "date": format_date(self.event.start_dt_local),  # XXX: switch to utc+isoformat?
+            "date": self.event.start_dt.isoformat(),
+            "version": 1,
             "server": {
-                "baseUrl": config.getBaseURL(),
-                "consumerKey": checkin_app.client_id,
+                "base_url": config.getBaseURL(),
+                "consumer_key": checkin_app.client_id,
                 "auth_url": url_for('oauth.oauth_authorize', _external=True),
                 "token_url": url_for('oauth.oauth_token', _external=True)
             }
