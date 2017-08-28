@@ -144,7 +144,7 @@ class StoredFileMixin(object):
         """
         return db.Column(
             db.String,
-            nullable=False
+            nullable=not cls.file_required
         )
 
     @declared_attr

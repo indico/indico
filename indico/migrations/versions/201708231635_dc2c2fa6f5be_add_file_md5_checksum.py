@@ -31,11 +31,11 @@ def upgrade():
     )
     op.add_column(
         'registration_data',
-        sa.Column('md5', sa.String, nullable=False, server_default=''),
+        sa.Column('md5', sa.String, nullable=True),
         schema='event_registration'
     )
     op.add_column('image_files', sa.Column('md5', sa.String, nullable=False, server_default=''), schema='events')
-    op.add_column('static_sites', sa.Column('md5', sa.String, nullable=False, server_default=''), schema='events')
+    op.add_column('static_sites', sa.Column('md5', sa.String, nullable=True), schema='events')
     op.add_column(
         'designer_image_files',
         sa.Column('md5', sa.String, nullable=False, server_default=''),
@@ -45,10 +45,10 @@ def upgrade():
     op.alter_column('files', 'md5', server_default=None, schema='event_abstracts')
     op.alter_column('files', 'md5', server_default=None, schema='event_paper_reviewing')
     op.alter_column('templates', 'md5', server_default=None, schema='event_paper_reviewing')
-    op.alter_column('registration_data', 'md5', server_default=None, schema='event_registration')
     op.alter_column('image_files', 'md5', server_default=None, schema='events')
-    op.alter_column('static_sites', 'md5', server_default=None, schema='events')
     op.alter_column('designer_image_files', 'md5', server_default=None, schema='indico')
+    for table in ('event_registration.registration_data', 'events.static_sites'):
+        op.execute("""UPDATE {} SET md5 = '' WHERE storage_file_id IS NOT NULL""".format(table))
 
 
 def downgrade():
