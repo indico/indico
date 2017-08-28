@@ -120,6 +120,7 @@ class DesignerTemplate(db.Model):
 
     # relationship backrefs:
     # - backside_template_of (DesignerTemplate.backside_template)
+    # - default_ticket_template_of (Category.default_ticket_template)
     # - images (DesignerImageFile.template)
     # - ticket_for_regforms (RegistrationForm.ticket_template)
 
