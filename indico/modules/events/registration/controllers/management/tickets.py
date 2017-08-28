@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from io import BytesIO
 
 import qrcode
-from flask import flash, json, render_template
+from flask import json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
@@ -33,9 +33,8 @@ from indico.modules.events.registration.controllers.management import RHManageRe
 from indico.modules.events.registration.forms import TicketsForm
 from indico.modules.events.registration.models.registrations import RegistrationState
 from indico.modules.oauth.models.applications import OAuthApplication
-from indico.util.date_time import format_date
 from indico.util.i18n import _
-from indico.web.flask.util import url_for, send_file, secure_filename
+from indico.web.flask.util import secure_filename, send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -57,19 +56,17 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
     """Display and modify ticket settings."""
 
     def _check_ticket_app_enabled(self):
-        config = Config.getInstance()
-        checkin_app_client_id = config.getCheckinAppClientId()
+        checkin_app_client_id = Config.getInstance().getCheckinAppClientId()
 
         if checkin_app_client_id is None:
-            flash(_("indico-checkin client_id is not defined in the Indico configuration"), 'warning')
-            return False
+            return False, _("indico-checkin client_id is not defined in the Indico configuration")
 
         checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
         if checkin_app is None:
-            flash(_("indico-checkin is not registered as an OAuth application with client_id {}")
-                  .format(checkin_app_client_id), 'warning')
-            return False
-        return True
+            msg = (_("indico-checkin is not registered as an OAuth application with client_id {}")
+                   .format(checkin_app_client_id))
+            return False, msg
+        return True, None
 
     def _process(self):
         form = TicketsForm(obj=self.regform, event=self.event_new)
@@ -78,8 +75,10 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
             db.session.flush()
             return jsonify_data(flash=False, tickets_enabled=self.regform.tickets_enabled)
 
+        can_enable_tickets, ticket_warning = self._check_ticket_app_enabled()
         return jsonify_template('events/registration/management/regform_tickets.html',
-                                regform=self.regform, form=form, can_enable_tickets=self._check_ticket_app_enabled())
+                                regform=self.regform, form=form, can_enable_tickets=can_enable_tickets,
+                                ticket_warning=ticket_warning)
 
 
 def generate_ticket(registration):
