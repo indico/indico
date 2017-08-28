@@ -360,8 +360,17 @@
         opacity: 1;
         color: $blue;
 
-        &.inherited-from-root {
+        &.inherited {
             opacity: 0.6;
+            cursor: default;
+
+            &:hover {
+                color: $blue;
+            }
+        }
+
+        &.global-default {
+            cursor: default;
 
             &:hover {
                 color: $blue;

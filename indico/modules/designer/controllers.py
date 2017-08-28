@@ -33,13 +33,12 @@ from indico.modules.designer.forms import AddTemplateForm
 from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
-from indico.modules.designer.util import (get_inherited_templates, get_placeholder_options,
-                                          get_default_template_on_category, get_not_deletable_templates)
+from indico.modules.designer.util import (get_all_templates, get_default_template_on_category, get_inherited_templates,
+                                          get_not_deletable_templates, get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.registration.models.forms import RegistrationForm
-from indico.util.date_time import now_utc
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -78,7 +77,7 @@ TEMPLATE_DATA_JSON_SCHEMA = {
 }
 
 
-def _render_template_list(target, event):
+def _render_template_list(target, event=None):
     tpl = get_template_module('designer/_list.html')
     default_template = get_default_template_on_category(target) if isinstance(target, Category) else None
     not_deletable = get_not_deletable_templates(target)
@@ -351,14 +350,18 @@ class RHGetTemplateData(RHModifyDesignerTemplateBase):
 
 
 class RHToggleTemplateDefaultOnCategory(RHManageCategoryBase):
-    def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
-        self.template = DesignerTemplate.get_one(request.view_args['template_id'])
-        category_id = request.view_args['category_id']
-        self.category = self._get_category(category_id)
-
     def _process(self):
-        self.category.default_ticket_template = (self.template if self.category.default_ticket_template != self.template
-                                                 else None)
-        db.session.commit()
-        return jsonify_data(html=_render_template_list(self.category, event=None))
+        template = DesignerTemplate.get_one(request.view_args['template_id'])
+        if template not in get_all_templates(self.category):
+            raise Exception('Invalid template')
+        if template == self.category.default_ticket_template:
+            # already the default -> clear it
+            self.category.default_ticket_template = None
+        elif template == get_default_template_on_category(self.category, only_inherited=True):
+            # already the inherited default -> clear it instead of setting it explicitly
+            self.category.default_ticket_template = None
+        else:
+            self.category.default_ticket_template = template
+        if self.category.is_root and not self.category.default_ticket_template:
+            raise Exception('Cannot clear default ticket template on root category')
+        return jsonify_data(html=_render_template_list(self.category))

@@ -56,8 +56,8 @@ def get_not_deletable_templates(obj):
     return set(DesignerTemplate.query.filter(DesignerTemplate.owner == obj, db.or_(*not_deletable_criteria)))
 
 
-def get_default_template_on_category(category):
-    if category.default_ticket_template:
+def get_default_template_on_category(category, only_inherited=False):
+    if not only_inherited and category.default_ticket_template:
         return category.default_ticket_template
     parent_chain = category.parent_chain_query.options(joinedload('default_ticket_template')).all()
     return next((category.default_ticket_template for

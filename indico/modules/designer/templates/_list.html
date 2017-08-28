@@ -59,11 +59,16 @@
             <div class="thin toolbar right">
                 <div class="group">
                     {% if not event and tpl.type.name == 'badge' %}
-                        {% set inherited_from_root = default_template == tpl and tpl.category.get_root().default_ticket_template == tpl %}
+                        {% set inherited_default = default_template == tpl and tpl.category != target and
+                                not target.default_ticket_template %}
+                        {% set global_default = default_template == tpl and target.is_root %}
                         <a class="i-button icon-ticket icon-only borderless hide-if-locked toggle-default
                             {{ 'default-on-category' if default_template == tpl }}
-                            {{ 'inherited-from-root' if inherited_from_root }}"
-                            {% if inherited_from_root %}
+                            {{ 'inherited' if inherited_default }}
+                            {{ 'global-default' if global_default }}"
+                            {% if inherited_default %}
+                                title="{% trans %}This is the inherited default ticket template{% endtrans %}"
+                            {% elif global_default %}
                                 title="{% trans %}This is the global default ticket template{% endtrans %}"
                             {% else %}
                                 title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
