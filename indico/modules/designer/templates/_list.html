@@ -64,9 +64,9 @@
                             {{ 'default-on-category' if default_template == tpl }}
                             {{ 'inherited-from-root' if inherited_from_root }}"
                             {% if inherited_from_root %}
-                                title="{% trans %}This is the default ticket template from Home category{% endtrans %}"
+                                title="{% trans %}This is the global default ticket template{% endtrans %}"
                             {% else %}
-                                title="{% trans %}Toggle ticket template for this category{% endtrans %}"
+                                title="{% trans %}Toggle default ticket template for this category{% endtrans %}"
                                 data-href="{{ url_for('.toggle_category_default', target, template_id=tpl.id) }}"
                                 data-method="POST"
                                 data-update="#template-list"

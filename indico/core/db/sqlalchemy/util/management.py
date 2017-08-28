@@ -107,10 +107,13 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
         db.session.add(User(id=0, is_system=True, first_name='Indico', last_name='System'))
         if verbose:
             print cformat('%{green}Creating root category')
-        db.session.add(Category(id=0, title='Home', protection_mode=ProtectionMode.public))
+        cat = Category(id=0, title='Home', protection_mode=ProtectionMode.public)
+        db.session.add(cat)
         db.session.flush()
         if verbose:
             print cformat('%{green}Creating default ticket template for root category ')
-        db.session.add(DesignerTemplate(category_id=0, title='Default ticket',
-                                        type=TemplateType.badge, data=DEFAULT_TEMPLATE_DATA, is_system_template=True))
+        dt = DesignerTemplate(category_id=0, title='Default ticket', type=TemplateType.badge,
+                              data=DEFAULT_TEMPLATE_DATA, is_system_template=True)
+        cat.default_ticket_template = dt
+        db.session.add(dt)
         db.session.commit()
