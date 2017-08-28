@@ -379,7 +379,8 @@ class SerializerBase(object):
             'keywords': contrib.keywords,
             'track': contrib.track.title if contrib.track else None,
             'session': contrib.session.title if contrib.session else None,
-            'references': map(self.serialize_reference, contrib.references)
+            'references': map(self.serialize_reference, contrib.references),
+            'board_number': contrib.board_number
         }
         if include_subcontribs:
             data['subContributions'] = map(self._serialize_subcontribution, contrib.subcontributions)
