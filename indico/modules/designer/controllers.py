@@ -38,7 +38,6 @@ from indico.modules.designer.util import (get_all_templates, get_default_templat
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.registration.models.forms import RegistrationForm
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -315,16 +314,16 @@ class RHUploadBackgroundImage(RHModifyDesignerTemplateBase):
 
 class RHDeleteDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process(self):
-        affected_regforms = RegistrationForm.find_all(ticket_template_id=self.template.id)
-        for regform in affected_regforms:
-            regform.ticket_template = None
-        affected_categories = Category.find_all(default_ticket_template_id=self.template.id)
-        for category in affected_categories:
-            category.default_ticket_template = None
-            if category.is_root:
-                category.default_ticket_template = DesignerTemplate.find_first(DesignerTemplate.system_template)
         db.session.delete(self.template)
-        flash(_('The template has been removed'), 'success')
+        root = Category.get_root()
+        if not root.default_ticket_template:
+            # if we deleted the root category's default template, pick
+            # a system template as the new default (this always exists)
+            system_template = DesignerTemplate.find_first(DesignerTemplate.is_system_template,
+                                                          DesignerTemplate.type == TemplateType.badge)
+            root.default_ticket_template = system_template
+        db.session.flush()
+        flash(_('The template has been deleted'), 'success')
         return jsonify_data(html=_render_template_list(self.target, event=self.event_or_none))
 
 
