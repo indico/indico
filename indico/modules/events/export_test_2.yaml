@@ -142,7 +142,8 @@
   - !!python/unicode '__file__': !!python/tuple
     - !!python/unicode 'file'
     - {!!python/unicode 'content_type': !!python/unicode 'text/plain', !!python/unicode 'filename': !!python/unicode 'dummy_file.txt',
-      !!python/unicode 'size': !!python/long '11', !!python/unicode 'uuid': !!python/unicode '00000000-0000-4000-8000-00000000001c'}
+      !!python/unicode 'md5': !!python/unicode '5eb63bbbe01eeed093cb22bb8f5acdc3', !!python/unicode 'size': !!python/long '11',
+      !!python/unicode 'uuid': !!python/unicode '00000000-0000-4000-8000-00000000001c'}
     !!python/unicode 'attachment_id': !!python/tuple [!!python/unicode 'idref', !!python/unicode '00000000-0000-4000-8000-000000000017']
     !!python/unicode 'created_dt': !!python/tuple [datetime, '2017-08-24T15:28:42.691791+00:00']
     !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000018']

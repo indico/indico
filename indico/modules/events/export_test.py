@@ -29,6 +29,7 @@ import indico
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.contributions import Contribution
+from indico.modules.events.export import export_event, import_event
 from indico.modules.events.sessions import Session
 from indico.util.date_time import as_utc
 
@@ -46,15 +47,12 @@ class _MockUUID(object):
 @pytest.fixture
 def reproducible_uuids(monkeypatch):
     muid = _MockUUID()
-    monkeypatch.setattr(uuid, 'uuid4', muid.uuid4)
+    monkeypatch.setattr('indico.modules.events.export.uuid4', muid.uuid4)
 
 
 @pytest.mark.usefixtures('reproducible_uuids')
 def test_event_export(db, dummy_event, monkeypatch):
-    import indico.modules.events.export
-    monkeypatch.setattr(indico.modules.events.export, 'now_utc', lambda: as_utc(datetime(2017, 8, 24, 9, 0, 0)))
-
-    from indico.modules.events.export import export_event
+    monkeypatch.setattr('indico.modules.events.export.now_utc', lambda: as_utc(datetime(2017, 8, 24, 9, 0, 0)))
 
     f = BytesIO()
     dummy_event.created_dt = as_utc(datetime(2017, 8, 24, 0, 0, 0))
@@ -77,9 +75,8 @@ def test_event_export(db, dummy_event, monkeypatch):
         assert tarf.extractfile('data.yaml').read() == data_yaml_content
 
 
+@pytest.mark.usefixtures('reproducible_uuids')
 def test_event_attachment_export(db, dummy_event, dummy_attachment):
-    from indico.modules.events.export import export_event
-
     s = Session(event=dummy_event, title='sd', is_deleted=True)
     Contribution(event=dummy_event, title='c1', duration=timedelta(minutes=30))
     Contribution(event=dummy_event, title='c2', session=s, duration=timedelta(minutes=30), is_deleted=True)
@@ -114,14 +111,13 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         assert file_['filename'] == 'dummy_file.txt'
         assert file_['content_type'] == 'text/plain'
         assert file_['size'] == 11
+        assert file_['md5'] == '5eb63bbbe01eeed093cb22bb8f5acdc3'
         # check that the file itself was included (and verify content)
-        assert tarf.getnames() == ['00000000-0000-4000-8000-00000000001c', 'data.yaml']
-        assert tarf.extractfile('00000000-0000-4000-8000-00000000001c').read() == 'hello world'
+        assert tarf.getnames() == ['00000000-0000-4000-8000-000000000013', 'data.yaml']
+        assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == 'hello world'
 
 
 def test_event_import(db, dummy_user):
-    from indico.modules.events.export import import_event
-
     with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml'), 'r') as ref_file:
         data_yaml_content = ref_file.read().replace('{version}', indico.__version__)
 

@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from hashlib import md5
 from io import BytesIO
 
 import pytest
@@ -42,8 +43,9 @@ class MemoryStorage(Storage):
         return BytesIO(self._get_file_content(file_id))
 
     def save(self, file_id, content_type, filename, fileobj):
-        self.files[file_id] = (content_type, filename, self._ensure_fileobj(fileobj).read())
-        return file_id
+        data = self._ensure_fileobj(fileobj).read()
+        self.files[file_id] = (content_type, filename, data)
+        return file_id, md5(data).hexdigest().decode('ascii')
 
     def delete(self, file_id):
         del self.files[file_id]
