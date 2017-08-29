@@ -19,6 +19,7 @@ from email import charset
 from email.mime.application import MIMEApplication
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.utils import formatdate
 
 from flask import g
 
@@ -28,6 +29,7 @@ from indico.legacy.errors import MaKaCError
 from indico.util.event import unify_event_args
 from indico.util.i18n import _
 from indico.util.string import to_unicode
+
 
 # Prevent base64 encoding of utf-8 e-mails
 charset.add_charset('utf-8', charset.SHORTEST)
@@ -78,6 +80,9 @@ class GenericMailer:
         else:
             bccList = set()
 
+        if not toList and not ccList and not bccList:
+            return
+
         msg = MIMEMultipart()
         msg["Subject"] = to_unicode(notification.getSubject()).strip()
         msg["From"] = fromAddr
@@ -86,9 +91,7 @@ class GenericMailer:
             msg["Cc"] = ', '.join(ccList)
         if replyAddr:
             msg['Reply-to'] = replyAddr
-
-        if not toList and not ccList and not bccList:
-            return
+        msg["Date"] = formatdate()
 
         try:
             ct = notification.getContentType()
