@@ -17156,7 +17156,7 @@ msgstr "Retour à la page d'accueil"
 #: indico/web/templates/footer.html:14
 #, python-format
 msgid "Powered by %(indico)s"
-msgstr "Fonctionne avec%(indico)s"
+msgstr "Fonctionne avec %(indico)s"
 
 #: indico/web/templates/header.html:22
 msgid "Create lecture"
