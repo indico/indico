@@ -16636,7 +16636,7 @@ msgstr "'Hier'"
 
 #: indico/util/date_time.py:282
 msgid "'Today'"
-msgstr "'Aujourd'hui'"
+msgstr "'Aujourd''hui'"
 
 #: indico/util/date_time.py:283
 msgid "'Tomorrow'"
@@ -16660,7 +16660,7 @@ msgstr "'Hier' 'à' {time_fmt}"
 
 #: indico/util/date_time.py:302
 msgid "'Today' 'at' {time_fmt}"
-msgstr "'Aujourd'hui' 'à' {time_fmt}"
+msgstr "'Aujourd''hui' 'à' {time_fmt}"
 
 #: indico/util/date_time.py:303
 msgid "'Tomorrow' 'at' {time_fmt}"
@@ -17156,7 +17156,7 @@ msgstr "Retour à la page d'accueil"
 #: indico/web/templates/footer.html:14
 #, python-format
 msgid "Powered by %(indico)s"
-msgstr "Fonctionne avec%(indico)s"
+msgstr "Fonctionne avec %(indico)s"
 
 #: indico/web/templates/header.html:22
 msgid "Create lecture"
