@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.0.dev0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-11 12:07+0200\n"
+"POT-Creation-Date: 2017-08-29 12:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -27,7 +27,7 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:128 indico/htdocs/js/indico/Core/Dialogs/Base.js:134
 #: indico/htdocs/js/indico/RoomBooking/validation.js:215 indico/htdocs/js/indico/RoomBooking/validation.js:234
-#: indico/htdocs/js/indico/modules/designer.js:744 indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:237
+#: indico/htdocs/js/indico/modules/designer.js:749 indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:237
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRooms.tpl:324
 msgid "Error"
 msgstr ""
@@ -67,7 +67,8 @@ msgid "Do not send report"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Base.js:185 indico/htdocs/js/indico/Core/Dialogs/Users.js:878
-#: indico/htdocs/js/indico/modules/designer.js:466 indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:114
+#: indico/htdocs/js/indico/modules/designer.js:466 indico/htdocs/js/indico/modules/designer.js:470
+#: indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:114
 msgid "Warning"
 msgstr ""
 
@@ -1062,11 +1063,11 @@ msgstr ""
 msgid "Your Indico server is not synchronized with the Community Hub! You can solve this <a href=\"{0}\">here</a>."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:38 indico/htdocs/js/indico/modules/designer.js:655
+#: indico/htdocs/js/indico/modules/designer.js:38 indico/htdocs/js/indico/modules/designer.js:660
 msgid "The back side of the templates that use this one as the back side will be removed."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:39 indico/htdocs/js/indico/modules/designer.js:656
+#: indico/htdocs/js/indico/modules/designer.js:39 indico/htdocs/js/indico/modules/designer.js:661
 msgid "Disassociate back sides"
 msgstr ""
 
@@ -1078,27 +1079,31 @@ msgstr ""
 msgid "Please choose a name for the template"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:489
+#: indico/htdocs/js/indico/modules/designer.js:470
+msgid "The template cannot be empty. Add some elements or a background image."
+msgstr ""
+
+#: indico/htdocs/js/indico/modules/designer.js:494
 msgid "Are you sure you want to change the dimensions of this template?"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:646
+#: indico/htdocs/js/indico/modules/designer.js:651
 msgid "This back side template will be removed"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:648
+#: indico/htdocs/js/indico/modules/designer.js:653
 msgid "The back side of this template will be removed"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:649
+#: indico/htdocs/js/indico/modules/designer.js:654
 msgid "Disassociate back side"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:653
+#: indico/htdocs/js/indico/modules/designer.js:658
 msgid "The back side is empty."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/designer.js:849
+#: indico/htdocs/js/indico/modules/designer.js:854
 msgid "Choose a file"
 msgstr ""
 
@@ -1110,7 +1115,7 @@ msgstr ""
 msgid "There are no entries that match your search criteria."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:253 indico/htdocs/js/indico/modules/vc.js:58
+#: indico/htdocs/js/indico/modules/categories/management.js:256 indico/htdocs/js/indico/modules/vc.js:58
 msgid "*"
 msgid_plural ""
 "This videoconference room is used in other Indico events.<br>Do you want to \n"
@@ -1163,102 +1168,102 @@ msgstr ""
 msgid "This will make events in this category visible on your <a href=\"{0}\">Dashboard</a>."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:54 indico/htdocs/js/indico/modules/events/management.js:184
+#: indico/htdocs/js/indico/modules/categories/management.js:56 indico/htdocs/js/indico/modules/events/management.js:184
 msgid "Undo"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:56
+#: indico/htdocs/js/indico/modules/categories/management.js:58
 msgid "The category order has been restored."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:58
+#: indico/htdocs/js/indico/modules/categories/management.js:60
 msgid "The category list has been sorted."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:154
+#: indico/htdocs/js/indico/modules/categories/management.js:157
 msgid "Delete category"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:157
+#: indico/htdocs/js/indico/modules/categories/management.js:160
 msgid "This category cannot be deleted because it is not empty."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:165
+#: indico/htdocs/js/indico/modules/categories/management.js:168
 msgid "At least one selected category cannot be deleted because it is not empty."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:167
+#: indico/htdocs/js/indico/modules/categories/management.js:170
 msgid "Delete the selected category"
 msgid_plural "Delete {0} selected categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:171
+#: indico/htdocs/js/indico/modules/categories/management.js:174
 msgid "Select the categories to delete first."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:180
+#: indico/htdocs/js/indico/modules/categories/management.js:183
 msgid "Delete categories"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:199
+#: indico/htdocs/js/indico/modules/categories/management.js:202
 msgid "Move the selected category"
 msgid_plural "Move the {0} selected categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:202
+#: indico/htdocs/js/indico/modules/categories/management.js:205
 msgid "Select the categories to move first."
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:256
+#: indico/htdocs/js/indico/modules/categories/management.js:259
 msgid "Only {0} out of {1} events is currently selected."
 msgid_plural "Only {0} out of {1} events are currently selected."
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:291
-#: indico/htdocs/js/indico/modules/categories/management.js:341
+#: indico/htdocs/js/indico/modules/categories/management.js:294
+#: indico/htdocs/js/indico/modules/categories/management.js:344
 msgid "Move here"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:292
+#: indico/htdocs/js/indico/modules/categories/management.js:295
 msgid "Move category"
 msgid_plural "Move categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:293
+#: indico/htdocs/js/indico/modules/categories/management.js:296
 msgid "Select new category parent for the category"
 msgid_plural "Select new category parent for {0} selected categories"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:306
+#: indico/htdocs/js/indico/modules/categories/management.js:309
 msgid "The category is already here"
 msgid_plural "The selected categories are already here"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:311
+#: indico/htdocs/js/indico/modules/categories/management.js:314
 msgid "This is the category you are trying to move"
 msgid_plural "This is one of the categories you are trying to move"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:342 indico/htdocs/js/indico/modules/events/management.js:44
+#: indico/htdocs/js/indico/modules/categories/management.js:345 indico/htdocs/js/indico/modules/events/management.js:44
 msgid "Move event"
 msgid_plural "Move events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:344
+#: indico/htdocs/js/indico/modules/categories/management.js:347
 msgid "Select category destination for the event"
 msgid_plural "Select category destination for {0} selected events"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/htdocs/js/indico/modules/categories/management.js:356
+#: indico/htdocs/js/indico/modules/categories/management.js:359
 msgid "The event is already here"
 msgid_plural "The selected events are already here"
 msgstr[0] ""
