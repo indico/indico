@@ -34,6 +34,8 @@ def _update_app(app_id, system_app_type):
 
 
 def upgrade():
+    if context.is_offline_mode():
+        raise Exception('This upgrade is only possible in online mode')
     xargs = context.get_x_argument(as_dictionary=True)
     checkin_app_id = xargs.get('checkin_app_id')
     flower_app_id = xargs.get('flower_app_id')
