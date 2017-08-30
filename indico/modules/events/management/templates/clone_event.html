@@ -87,7 +87,7 @@
                     {% endif %}
                     {{ invisible_fields(form, skip=visible_fields) }}
                     {% if form.repeatability.data != 'once' %}
-                        {% call message_box('info', fixed_width=True, id='event-count') -%}
+                        {% call message_box('info', fixed_width=true, id='event-count') -%}
                             {% set count %}
                                 <span class="count"></span>
                             {% endset %}
@@ -95,7 +95,7 @@
                                 {{ count }} new events will be created. {{ link }}When?{{ endlink}}
                             {%- endtrans %}
                         {%- endcall %}
-                        {{ message_box('error', '-', fixed_width=True, id='clone-errors') }}
+                        {{ message_box('error', '-', fixed_width=true, id='clone-errors') }}
                     {% endif %}
                 {% endcall %}
             {% endif %}

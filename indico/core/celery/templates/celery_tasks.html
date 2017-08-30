@@ -8,7 +8,7 @@
 {% block content %}
     <div class="tasks">
         {%- if flower_url -%}
-            {%- call message_box('info', fixed_width=True) -%}
+            {%- call message_box('info', fixed_width=true) -%}
                 {%- trans -%}
                     Monitor Indico's Celery tasks with Flower
                     <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
