@@ -25,7 +25,7 @@ from indico.util.caching import memoize
 
 @memoize
 def get_countries():
-    _countries = {country.alpha2: country.name for country in pycountry.countries}
+    _countries = {country.alpha_2: country.name for country in pycountry.countries}
     _countries.update(Config.getInstance().getCustomCountries())
     return ImmutableDict(_countries)
 
@@ -36,6 +36,6 @@ def get_country(code):
         return get_countries()[code]
     except KeyError:
         try:
-            return pycountry.historic_countries.get(alpha2=code).name
+            return pycountry.historic_countries.get(alpha_2=code).name
         except KeyError:
             return None
