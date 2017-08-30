@@ -23,15 +23,50 @@ from sqlalchemy.ext.declarative import declared_attr
 from werkzeug.urls import url_parse
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.oauth import logger
 from indico.util.i18n import _
 from indico.util.string import return_ascii
+from indico.util.struct.enum import IndicoEnum
 
 
 SCOPES = {'read:user': _("User information (read only)"),
           'read:legacy_api': _('Legacy API (read only)'),
           'write:legacy_api': _('Legacy API (write only)'),
           'registrants': _('Event registrants')}
+
+
+class SystemAppType(int, IndicoEnum):
+    none = 0
+    checkin = 1
+    flower = 2
+
+    __enforced_data__ = {
+        checkin: {'default_scopes': {'registrants'},
+                  'redirect_uris': ['http://localhost'],
+                  'is_enabled': True},
+        flower: {'default_scopes': {'read:user'},
+                 'is_enabled': True}
+    }
+
+    __default_data__ = {
+        checkin: {'is_trusted': True,
+                  'name': 'Checkin App',
+                  'description': 'The checkin app for mobile devices allows scanning ticket QR codes and '
+                                 'checking-in event participants.'},
+        flower: {'is_trusted': True,
+                 'name': 'Flower',
+                 'description': 'Flower allows monitoring Celery tasks. If flower is installed, this app is used to '
+                                'restrict access to Indico administrators.'}
+    }
+
+    @property
+    def enforced_data(self):
+        return self.__enforced_data__.get(self, {})
+
+    @property
+    def default_data(self):
+        return dict(self.__default_data__.get(self, {}), **self.enforced_data)
 
 
 class OAuthApplication(db.Model):
@@ -42,6 +77,8 @@ class OAuthApplication(db.Model):
     @declared_attr
     def __table_args__(cls):
         return (db.Index('ix_uq_applications_name_lower', db.func.lower(cls.name), unique=True),
+                db.Index(None, cls.system_app_type, unique=True,
+                         postgresql_where=db.text('system_app_type != {}'.format(SystemAppType.none.value))),
                 {'schema': 'oauth'})
 
     #: the unique id of the application
@@ -95,6 +132,12 @@ class OAuthApplication(db.Model):
         db.Boolean,
         nullable=False,
         default=False
+    )
+    #: the type of system app (if any). system apps cannot be deleted
+    system_app_type = db.Column(
+        PyIntEnum(SystemAppType),
+        nullable=False,
+        default=SystemAppType.none
     )
 
     # relationship backrefs:

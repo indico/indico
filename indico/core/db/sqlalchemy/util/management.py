@@ -97,6 +97,7 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
     from indico.modules.categories import Category
     from indico.modules.designer import TemplateType
     from indico.modules.designer.models.templates import DesignerTemplate
+    from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.users import User
     if verbose:
         print cformat('%{green}Creating tables')
@@ -116,4 +117,9 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
                               data=DEFAULT_TEMPLATE_DATA, is_system_template=True)
         cat.default_ticket_template = dt
         db.session.add(dt)
+        if verbose:
+            print cformat('%{green}Creating system oauth apps')
+        for sat in SystemAppType:
+            if sat != SystemAppType.none:
+                db.session.add(OAuthApplication(system_app_type=sat, **sat.default_data))
         db.session.commit()

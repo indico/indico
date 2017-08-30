@@ -269,8 +269,6 @@ class Config:
         'CeleryResultBackend'       : None,
         'CeleryConfig'              : {},
         'ScheduledTaskOverride'     : {},
-        'CheckinAppClientId'        : None,
-        'FlowerClientId'            : None,
         'FlowerURL'                 : None,
         'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
         'AttachmentStorage'         : 'default',
