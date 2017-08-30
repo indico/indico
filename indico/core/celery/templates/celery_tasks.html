@@ -7,18 +7,14 @@
 
 {% block content %}
     <div class="tasks">
-        {%- call message_box('info', fixed_width=True) -%}
-            {%- if flower_url -%}
+        {%- if flower_url -%}
+            {%- call message_box('info', fixed_width=True) -%}
                 {%- trans -%}
-                    Monitor Indico's Celery tasks with Flower <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
+                    Monitor Indico's Celery tasks with Flower
+                    <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
                 {%- endtrans -%}
-            {%- else -%}
-                {%- trans -%}
-                    Indico uses Celery to manage tasks, which can be monitored using Flower.<br>
-                    Configure the Flower URL in <span class="mono">indico.conf</span> to have a link displayed here.
-                {%- endtrans %}
-            {%- endif -%}
-        {%- endcall %}
+            {%- endcall %}
+        {%- endif -%}
         <h2>{% trans %}Periodic Tasks{% endtrans %}</h2>
         <table class="i-table-widget fixed-width">
             <thead>
