@@ -40,7 +40,6 @@ def _get_font_size(text):
 
 
 class RegistrantsListToBadgesPDF(DesignerPDFBase):
-
     def __init__(self, template, config, event, registration_ids):
         super(RegistrantsListToBadgesPDF, self).__init__(template, config)
         self.event = event
@@ -69,8 +68,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows) * cm
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
-        if not (n_horizontal and n_vertical):
-            raise BadRequest('The template dimensions are too large for the page size you selected')
+        if not n_horizontal or not n_vertical:
+            raise BadRequest(_('The template dimensions are too large for the page size you selected'))
 
         # Print a badge for each registration
         for registration, (x, y) in izip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
@@ -138,7 +137,7 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
         if not n_horizontal or not n_vertical:
-            raise ValueError(_("The template dimensions are too large for the page size you selected"))
+            raise BadRequest(_("The template dimensions are too large for the page size you selected"))
 
         per_page = n_horizontal * n_vertical
         # make batch of as many badges as we can fit into one page and add duplicates for printing back sides
