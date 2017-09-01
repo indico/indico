@@ -25,7 +25,7 @@ from indico.util.console import cformat
 
 
 DEFAULT_TEMPLATE_DATA = {
-    'background_position': 'stretch', 'width': 1050, 'items': [
+    'background_position': 'stretch', 'width': 850, 'height': 1350, 'items': [
         {'font_size': '24pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
          'text_align': 'center', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 190, 'x': 330,
          'height': None, 'type': 'event_title', 'id': 0},
@@ -46,7 +46,7 @@ DEFAULT_TEMPLATE_DATA = {
          'height': 150, 'type': 'ticket_qr_code', 'id': 5},
         {'font_size': '13.5pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
          'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 90, 'x': 50,
-         'height': None, 'type': 'event_room', 'id': 6}], 'height': 1485
+         'height': None, 'type': 'event_room', 'id': 6}]
 }
 
 
