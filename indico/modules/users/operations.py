@@ -45,6 +45,7 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
     cfg = Config.getInstance()
     settings.setdefault('timezone', cfg.getDefaultTimezone())
     settings.setdefault('lang', cfg.getDefaultLocale())
+    settings.setdefault('suggest_categories', False)
     # Get a pending user if there is one
     user = User.find_first(~User.is_deleted, User.is_pending,
                            User.all_emails.contains(db.func.any(list({email} | set(other_emails)))))
