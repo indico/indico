@@ -22,6 +22,7 @@ from itertools import izip, product
 
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.designer.pdf import DesignerPDFBase
@@ -42,10 +43,12 @@ def _get_font_size(text):
 class RegistrantsListToBadgesPDF(DesignerPDFBase):
     def __init__(self, template, config, event, registration_ids):
         super(RegistrantsListToBadgesPDF, self).__init__(template, config)
-        self.event = event
-        self.registrations = (Registration.find(Registration.id.in_(registration_ids), Registration.is_active,
-                                                Registration.event_new == event)
-                                          .order_by(*Registration.order_by_name).all())
+        self.registrations = (Registration.query.with_parent(event)
+                              .filter(Registration.id.in_(registration_ids),
+                                      Registration.is_active)
+                              .order_by(*Registration.order_by_name)
+                              .options(subqueryload('data').joinedload('field_data'))
+                              .all())
 
     def _build_config(self, config_data):
         return ConfigData(**config_data)
