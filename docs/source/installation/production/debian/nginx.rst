@@ -146,7 +146,7 @@ most cases.
         access_log off;
       }
 
-      location ~ ^/(ihelp|css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$ {
+      location ~ ^/(css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$ {
         alias /opt/indico/web/htdocs/$1$2;
         access_log off;
       }

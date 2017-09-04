@@ -132,7 +132,7 @@ most cases.
         ServerSignature Off
 
         AliasMatch "^/static/assets/(core|(?:plugin|theme)-[^/]+)/(.*)$" "/opt/indico/assets/$1/$2"
-        AliasMatch "^/(ihelp|css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$" "/opt/indico/web/htdocs/$1$2"
+        AliasMatch "^/(css|images|js|static(?!/plugins|/assets|/themes|/custom))(/.*)$" "/opt/indico/web/htdocs/$1$2"
         Alias /robots.txt /opt/indico/web/htdocs/robots.txt
 
         SetEnv UWSGI_SCHEME https
