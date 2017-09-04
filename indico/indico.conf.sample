@@ -360,27 +360,13 @@ MaxUploadFileSize = 0
 #
 # Your Celery workers can be monitored using Flower.  To use it, simply start it
 # using `indico celery flower`; by default it will listen on the same host as
-# specified in BaseURL (non-SSL) on port 5555.  However, having an open Flower
-# instance is a security issue as it will allow anyone to shut down your celery
-# workers.  To avoid this, you can use Indico's OAuth2 provider to restrict the
-# access to flower to Indico administrators.  To do so, register a new OAuth
-# application in the administration interface (`Server admin > Applications`)
-# and set the `FlowerClientId` option to its Client ID.
-#FlowerClientId = None
-#
+# specified in BaseURL (non-SSL) on port 5555.  Authentication is done using
+# OAuth so only indico administrators can access flower.  You need to configure
+# the allowed auth callback URLs in the Indico administration area; otherwise
+# authentication will fail with an OAuth error.
 # To get a link to Flower in the administration menu, set `FlowerURL` to the URL
 # under which your Flower instance is accessible:
 #FlowerURL = None
-
-
-# ------------------------------------------------------------------------------
-# Indico Checkin
-# ------------------------------------------------------------------------------
-
-# In order to use Indico check-in app, first register the application manually
-# within `Server admin > Applications` and then fill in here the client_id
-# assigned to it.
-#CheckinAppClientId = ''
 
 
 # ------------------------------------------------------------------------------

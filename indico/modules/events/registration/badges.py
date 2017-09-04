@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import division, unicode_literals
 
 import re
 from collections import namedtuple
@@ -22,6 +22,7 @@ from itertools import izip, product
 
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
+from sqlalchemy.orm import subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.designer.pdf import DesignerPDFBase
@@ -40,13 +41,14 @@ def _get_font_size(text):
 
 
 class RegistrantsListToBadgesPDF(DesignerPDFBase):
-
     def __init__(self, template, config, event, registration_ids):
         super(RegistrantsListToBadgesPDF, self).__init__(template, config)
-        self.event = event
-        self.registrations = (Registration.find(Registration.id.in_(registration_ids), Registration.is_active,
-                                                Registration.event == event)
-                                          .order_by(*Registration.order_by_name).all())
+        self.registrations = (Registration.query.with_parent(event)
+                              .filter(Registration.id.in_(registration_ids),
+                                      Registration.is_active)
+                              .order_by(*Registration.order_by_name)
+                              .options(subqueryload('data').joinedload('field_data'))
+                              .all())
 
     def _build_config(self, config_data):
         return ConfigData(**config_data)
@@ -69,8 +71,8 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
         available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows) * cm
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
-        if not (n_horizontal and n_vertical):
-            raise BadRequest('The template dimensions are too large for the page size you selected')
+        if not n_horizontal or not n_vertical:
+            raise BadRequest(_('The template dimensions are too large for the page size you selected'))
 
         # Print a badge for each registration
         for registration, (x, y) in izip(self.registrations, self._iter_position(canvas, n_horizontal, n_vertical)):
@@ -78,11 +80,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
     def _draw_badge(self, canvas, registration, template, tpl_data, pos_x, pos_y):
         """Draw a badge for a given registration, at position pos_x, pos_y (top-left corner)."""
-
-        if registration is None:
-            return
         config = self.config
-
         badge_rect = (pos_x, self.height - pos_y - tpl_data.height_cm * cm,
                       tpl_data.width_cm * cm, tpl_data.height_cm * cm)
 
@@ -141,39 +139,36 @@ class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
         available_height = self.height - (config.top_margin - config.bottom_margin + config.margin_rows) * cm
         n_vertical = int(available_height / ((self.tpl_data.height_cm + config.margin_rows) * cm))
 
-        if not (n_horizontal and n_vertical):
-            raise ValueError(_("The template dimensions are too large for the page size you selected"))
+        if not n_horizontal or not n_vertical:
+            raise BadRequest(_("The template dimensions are too large for the page size you selected"))
 
-        badges_mix = []
-        to_repeat = []
-        one_page = n_horizontal * n_vertical
+        per_page = n_horizontal * n_vertical
         # make batch of as many badges as we can fit into one page and add duplicates for printing back sides
+        page_used = 0
+        badges_mix = []
         for i, reg in enumerate(self.registrations, 1):
             badges_mix.append(reg)
-            to_repeat.append(reg)
-            if (i % one_page) == 0:
-                badges_mix += to_repeat
-                to_repeat = []
+            page_used += 1
+            # create another page with the same registrations for the back side
+            if (i % per_page) == 0:
+                page_used = 0
+                badges_mix += badges_mix[-per_page:]
 
-        on_last_page = len(to_repeat)
-        # if the last page is not full add empty placeholders to make it "full" for proper printing of back sides
-        for n in range(0, one_page - on_last_page):
-            badges_mix.append(None)
-        for rep in to_repeat:
-            badges_mix.append(rep)
+        # if the last page was not full, fill it with blanks and add the back side
+        if page_used:
+            badges_mix += ([None] * (per_page - page_used)) + badges_mix[-page_used:]
 
-        backsides_printing = False
-        counter = 0
-        for registration, (x, y) in izip(badges_mix, self._iter_position(canvas, n_horizontal, n_vertical)):
-            if backsides_printing:
+        positioned_badges = izip(badges_mix, self._iter_position(canvas, n_horizontal, n_vertical))
+        for i, (registration, (x, y)) in enumerate(positioned_badges):
+            if registration is None:
+                # blank item for an incomplete last page
+                continue
+            current_page = (i // per_page) + 1
+            # odd pages contain front sides, even pages back sides
+            if current_page % 2:
+                self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
+            else:
                 # mirror badge coordinates
-                x_cm = x * cm
-                x_cm = (self.width - x_cm - self.tpl_data.width_cm * cm)
+                x_cm = (self.width - x*cm - self.tpl_data.width_cm*cm)
                 self._draw_badge(canvas, registration, self.template.backside_template,
                                  self.backside_tpl_data, x_cm, y * cm)
-            else:
-                self._draw_badge(canvas, registration, self.template, self.tpl_data, x * cm, y * cm)
-            counter += 1
-            if counter == one_page:
-                counter = 0
-                backsides_printing = not backsides_printing

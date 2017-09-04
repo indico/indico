@@ -100,16 +100,23 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
 
     def _process(self):
         form = ApplicationForm(obj=self.application, application=self.application)
+        disabled_fields = set(self.application.system_app_type.enforced_data)
         if form.validate_on_submit():
             form.populate_obj(self.application)
             logger.info("Application %s updated by %s", self.application, session.user)
             flash(_("Application {} was modified").format(self.application.name), 'success')
             return redirect(url_for('.apps'))
-        return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form)
+        return WPOAuthAdmin.render_template('app_details.html', application=self.application, form=form,
+                                            disabled_fields=disabled_fields)
 
 
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
     """Handles OAuth application deletion"""
+
+    def _checkProtection(self):
+        RHOAuthAdminApplicationBase._checkProtection(self)
+        if self.application.system_app_type:
+            raise Forbidden('Cannot delete system app')
 
     def _process(self):
         db.session.delete(self.application)

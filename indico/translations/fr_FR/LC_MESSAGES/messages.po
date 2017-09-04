@@ -17406,6 +17406,14 @@ msgstr "Retour à la page d'accueil"
 msgid "Powered by %(indico)s"
 msgstr "Fonctionne avec %(indico)s"
 
+#: indico/web/templates/header.html:22
+msgid "Create lecture"
+msgstr "Créer une présentation"
+
+#: indico/web/templates/header.html:25
+msgid "Create meeting"
+msgstr "Créer une réunion"
+
 #: indico/web/templates/header.html:30
 msgid "We are working on updating the documentation. Stay tuned!"
 msgstr "Nous travaillons à la mise à jour de cette documentation. Restez à l'écoute!"

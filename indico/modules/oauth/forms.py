@@ -20,14 +20,14 @@ import re
 from operator import itemgetter
 
 from markupsafe import escape
-from wtforms.fields import StringField, TextAreaField, BooleanField
+from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
-from indico.modules.oauth.models.applications import OAuthApplication, SCOPES
+from indico.modules.oauth.models.applications import SCOPES, OAuthApplication
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import TextListField, IndicoSelectMultipleCheckboxField
+from indico.web.forms.fields import IndicoSelectMultipleCheckboxField, TextListField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -60,6 +60,9 @@ class ApplicationForm(IndicoForm):
     def __init__(self, *args, **kwargs):
         self.application = kwargs.pop('application', None)
         super(ApplicationForm, self).__init__(*args, **kwargs)
+        for field in self.application.system_app_type.enforced_data:
+            # preserve existing value for disabled fields
+            self[field].data = self[field].object_data
 
     def validate_name(self, field):
         query = OAuthApplication.find(name=field.data)

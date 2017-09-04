@@ -177,7 +177,8 @@ class TimetableSerializer(object):
                      'title': contribution.title,
                      'url': url_for('contributions.display_contribution', contribution),
                      'friendlyId': contribution.friendly_id,
-                     'references': map(SerializerBase.serialize_reference, contribution.references)})
+                     'references': map(SerializerBase.serialize_reference, contribution.references),
+                     'board_number': contribution.board_number})
         return data
 
     def serialize_break_entry(self, entry, management=False):

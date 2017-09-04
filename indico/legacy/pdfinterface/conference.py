@@ -442,7 +442,7 @@ class TimetablePDFFormat:
         self.contribId = params.get('showContribId', True)
         self.speakerTitle = params.get('showSpeakerTitle', True)
         self.contribAbstract = params.get('showAbstract', False)
-        self.contribPosterAbstract = params.get('dontShowPosterAbstract', True)
+        self.contribPosterAbstract = not params.get('dontShowPosterAbstract', True)
         self.newPagePerSession = params.get('newPagePerSession', False)
         self.useSessionColorCodes = params.get('useSessionColorCodes', False)
         self.showSessionTOC = params.get('showSessionTOC', False)

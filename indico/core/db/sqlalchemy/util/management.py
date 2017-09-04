@@ -25,7 +25,7 @@ from indico.util.console import cformat
 
 
 DEFAULT_TEMPLATE_DATA = {
-    'background_position': 'stretch', 'width': 1050, 'items': [
+    'background_position': 'stretch', 'width': 850, 'height': 1350, 'items': [
         {'font_size': '24pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
          'text_align': 'center', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 190, 'x': 330,
          'height': None, 'type': 'event_title', 'id': 0},
@@ -46,7 +46,7 @@ DEFAULT_TEMPLATE_DATA = {
          'height': 150, 'type': 'ticket_qr_code', 'id': 5},
         {'font_size': '13.5pt', 'bold': False, 'color': 'black', 'text': 'Fixed text', 'selected': False,
          'text_align': 'left', 'font_family': 'sans-serif', 'width': 400, 'italic': False, 'y': 90, 'x': 50,
-         'height': None, 'type': 'event_room', 'id': 6}], 'height': 1485
+         'height': None, 'type': 'event_room', 'id': 6}]
 }
 
 
@@ -97,6 +97,7 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
     from indico.modules.categories import Category
     from indico.modules.designer import TemplateType
     from indico.modules.designer.models.templates import DesignerTemplate
+    from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
     from indico.modules.users import User
     if verbose:
         print cformat('%{green}Creating tables')
@@ -116,4 +117,9 @@ def create_all_tables(db, verbose=False, add_initial_data=True):
                               data=DEFAULT_TEMPLATE_DATA, is_system_template=True)
         cat.default_ticket_template = dt
         db.session.add(dt)
+        if verbose:
+            print cformat('%{green}Creating system oauth apps')
+        for sat in SystemAppType:
+            if sat != SystemAppType.none:
+                db.session.add(OAuthApplication(system_app_type=sat, **sat.default_data))
         db.session.commit()

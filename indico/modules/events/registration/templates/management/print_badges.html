@@ -1,7 +1,7 @@
 {% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
 
 {% block content %}
-    {% call simple_form(settings_form, form_header_kwargs={'id': 'badge-settings-form'},
+    {% call simple_form(settings_form, form_header_kwargs={'id': 'badge-settings-form'}, back=_('Cancel'),
                         submit=_("Download PDF"), disabled_until_change=false, disable_if_locked=false) %}
         {{ form_row(settings_form.template) }}
 

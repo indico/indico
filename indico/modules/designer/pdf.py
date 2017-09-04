@@ -22,7 +22,7 @@ from io import BytesIO
 
 from PIL.Image import Image
 from reportlab.lib import colors, pagesizes
-from reportlab.lib.enums import TA_JUSTIFY, TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import cm
 from reportlab.lib.utils import ImageReader
@@ -64,7 +64,6 @@ def _extract_font_size(text):
 
 
 class DesignerPDFBase(object):
-
     def __init__(self, template, config):
         self.config = self._build_config(config)
         self.template = template

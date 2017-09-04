@@ -32,8 +32,7 @@ from indico.modules.events.registration.controllers.display import RHRegistratio
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
 from indico.modules.events.registration.models.registrations import RegistrationState
-from indico.modules.oauth.models.applications import OAuthApplication
-from indico.util.i18n import _
+from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.web.flask.util import secure_filename, send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
 
@@ -55,19 +54,6 @@ DEFAULT_TICKET_PRINTING_SETTINGS = {
 class RHRegistrationFormTickets(RHManageRegFormBase):
     """Display and modify ticket settings."""
 
-    def _check_ticket_app_enabled(self):
-        checkin_app_client_id = Config.getInstance().getCheckinAppClientId()
-
-        if checkin_app_client_id is None:
-            return False, _("indico-checkin client_id is not defined in the Indico configuration")
-
-        checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
-        if checkin_app is None:
-            msg = (_("indico-checkin is not registered as an OAuth application with client_id {}")
-                   .format(checkin_app_client_id))
-            return False, msg
-        return True, None
-
     def _process(self):
         form = TicketsForm(obj=self.regform, event=self.event)
         if form.validate_on_submit():
@@ -75,10 +61,7 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
             db.session.flush()
             return jsonify_data(flash=False, tickets_enabled=self.regform.tickets_enabled)
 
-        can_enable_tickets, ticket_warning = self._check_ticket_app_enabled()
-        return jsonify_template('events/registration/management/regform_tickets.html',
-                                regform=self.regform, form=form, can_enable_tickets=can_enable_tickets,
-                                ticket_warning=ticket_warning)
+        return jsonify_template('events/registration/management/regform_tickets.html', regform=self.regform, form=form)
 
 
 def generate_ticket(registration):
@@ -126,9 +109,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
             border=1
         )
 
-        checkin_app_client_id = config.getCheckinAppClientId()
-        checkin_app = OAuthApplication.find_first(client_id=checkin_app_client_id)
-
+        checkin_app = OAuthApplication.find_one(system_app_type=SystemAppType.checkin)
         qr_data = {
             "event_id": self.event.id,
             "title": self.event.title,

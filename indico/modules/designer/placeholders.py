@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from babel.numbers import format_currency
+
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
@@ -29,7 +31,8 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationFullNameNoTitlePlaceholderC', 'RegistrationFullNamePlaceholderD',
            'RegistrationFullNameNoTitlePlaceholderD', 'RegistrationTitlePlaceholder',
            'RegistrationFirstNamePlaceholder', 'RegistrationLastNamePlaceholder', 'RegistrationTicketQRPlaceholder',
-           'RegistrationEmailPlaceholder', 'RegistrationAmountPlaceholder', 'RegistrationAffiliationPlaceholder',
+           'RegistrationEmailPlaceholder', 'RegistrationAmountPlaceholder', 'RegistrationPricePlaceholder',
+           'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
            'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder')
@@ -238,8 +241,22 @@ class RegistrationEmailPlaceholder(RegistrationPlaceholder):
 
 class RegistrationAmountPlaceholder(RegistrationPlaceholder):
     name = 'amount'
-    description = _("Amount")
-    field = 'price'
+    description = _("Price (no currency)")
+
+    @classmethod
+    def render(cls, registration):
+        # XXX: Use event locale once we have such a setting
+        return format_currency(registration.price, '', locale='en_GB')
+
+
+class RegistrationPricePlaceholder(RegistrationPlaceholder):
+    name = 'price'
+    description = _("Price (with currency)")
+
+    @classmethod
+    def render(cls, registration):
+        # XXX: Use event locale once we have such a setting
+        return format_currency(registration.price, registration.currency, locale='en_GB')
 
 
 class RegistrationAffiliationPlaceholder(RegistrationPDPlaceholder):
