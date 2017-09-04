@@ -90,7 +90,7 @@ def _require_encoding(encoding):
 
 def prepare_db(empty=False, root_path=None, verbose=True):
     """Initialize an empty database (create tables, set alembic rev to HEAD)."""
-    if not _require_pg_version('9.4'):
+    if not _require_pg_version('9.6'):
         return
     if not _require_encoding('UTF8'):
         return
