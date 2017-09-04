@@ -77,13 +77,12 @@ def main():
                                show_percent=True, show_pos=True) as objects:
             for obj in objects:
                 try:
-                    f = obj.open()
+                    with obj.open() as f:
+                        checksum = get_file_md5(f)
                 except Exception as exc:
                     click.echo(cformat('\n%{red!}Could not open %{reset}%{yellow}{}%{red!}: %{reset}%{yellow!}{}')
                                .format(obj, exc))
-                    continue
-                with f:
-                    checksum = get_file_md5(f)
+                else:
                     obj.md5 = checksum
 
 
