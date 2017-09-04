@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from flask import session
 
-from indico.core import signals, Config
+from indico.core import signals
+from indico.core.config import Config
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.modules.rb.models.blocking_principals import BlockingPrincipal
@@ -27,9 +28,10 @@ from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.util import rb_is_admin
-from indico.web.flask.util import url_for
 from indico.util.i18n import _
-from indico.web.menu import SideMenuSection, SideMenuItem, TopMenuItem
+from indico.web.flask.util import url_for
+from indico.web.menu import SideMenuItem, SideMenuSection, TopMenuItem
+
 
 logger = Logger.get('rb')
 

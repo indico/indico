@@ -24,7 +24,7 @@ from wtforms.fields.html5 import EmailField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
-from indico.core import Config
+from indico.core.config import Config
 from indico.modules.auth.forms import LocalRegistrationForm, _check_existing_email
 from indico.modules.users import User
 from indico.modules.users.models.emails import UserEmail

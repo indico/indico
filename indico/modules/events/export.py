@@ -35,7 +35,7 @@ from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
 import indico
-from indico.core import Config
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.storage.backend import get_storage

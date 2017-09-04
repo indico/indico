@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import session, redirect, request
+from flask import redirect, request, session
 from flask_multipass import MultipassException
 
-from indico.core import signals, Config
+from indico.core import signals
 from indico.core.auth import multipass
+from indico.core.config import Config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
