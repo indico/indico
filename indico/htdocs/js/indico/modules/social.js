@@ -33,13 +33,13 @@
     }
 
     $(document).ready(function() {
-        var container = $('#social');
+        var container = $('.social-button-container');
         if (!container.length) {
             return;
         }
 
         var dark = container.data('dark-theme');
-        $('#social_button').qtip({
+        $('.social-button').qtip({
             style: {
                 width: '420px',
                 classes: 'qtip-rounded qtip-shadow social_share_tooltip ' + (dark ? 'qtip-dark' : 'qtip-blue')
@@ -48,13 +48,13 @@
                 my: 'bottom right',
                 at: 'top center'
             },
-            content: $('#social_share'),
+            content: $('.social-share'),
             show: {
                 event: 'click',
                 effect: function() {
                     $(this).show('slide', {direction: 'down'});
                 },
-                target: $('#social_button')
+                target: $('.social-button')
             },
             hide: {
                 event: 'unfocus click',
@@ -65,15 +65,15 @@
             },
             events: {
                 render: function() {
-                    injectFacebook($('#social').data('social-settings').facebook_app_id);
+                    injectFacebook($('.social-button-container').data('social-settings').facebook_app_id);
                     $.getScript('//apis.google.com/js/plusone.js');
                     $.getScript('//platform.twitter.com/widgets.js');
                 },
                 hide: function() {
-                    $('#social').css('opacity', '');
+                    $('.social-button-container').css('opacity', '');
                 },
                 show: function() {
-                    $('#social').css('opacity', 1.0);
+                    $('.social-button-container').css('opacity', 1.0);
                 }
             }
         });

@@ -59,6 +59,7 @@ DEFAULTS = {
     'ENABLE_ROOMBOOKING': False,
     'EXTERNAL_REGISTRATION_URL': '',
     'FLOWER_URL': None,
+    'HELP_URL': 'https://learn.getindico.io',
     'IDENTITY_PROVIDERS': {},
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,

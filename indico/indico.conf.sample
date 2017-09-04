@@ -408,3 +408,7 @@ MAX_UPLOAD_FILE_SIZE = 0
 # If you have a custom logo, specify the URL to it here.  If unset, the default
 # indico logo is used.
 #LOGO_URL = ''
+#
+# If you have your own custom Indico documentation site, you can use this
+# setting to override the "Help" link at the bottom of the page.
+#HELP_URL = ''

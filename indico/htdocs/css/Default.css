@@ -161,36 +161,6 @@ a.active {
     visibility: hidden;
 }
 
-/* Footer */
-
-.footer {
-    color: #555;
-    padding: 10px 5px 10px 10px;
-    font-size: 11px;
-}
-
-.footer.dark {
-    color: #999;
-}
-
-
-.footer div.text {
-    margin-top: 20px;
-    float: left;
-    vertical-align: middle;
-}
-
-.footer .shorturl {
-    margin-top: 25px;
-    color: #1A64A0;
-    float: right;
-}
-
-.footer img
-{
-    vertical-align: middle;
-}
-
 /* Tabs */
 
 div.tabListContainer {
@@ -1193,21 +1163,6 @@ table.infoQuestionsTable td.dataBold {
     padding: 4px;
     list-style-type: none;
     width: 100%;
-}
-
-div#social {
-    float: right;
-    display: none;
-    border-radius: 10px;
-    opacity: 0.5;
-}
-
-div#social_share {
-    display: none;
-}
-
-div#social img#social_button:hover{
-    cursor: pointer;
 }
 
 .social_share_tooltip {
