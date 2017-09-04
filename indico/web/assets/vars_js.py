@@ -37,11 +37,8 @@ def generate_global_file(config):
         'title': auth.title,
         'supports_groups': auth.supports_groups
     } for auth in multipass.identity_providers.itervalues() if auth.supports_search]
-    file_type_icons = dict((k.lower(), v[2]) for k, v in config.getFileTypes().iteritems())
 
     indico_vars = {
-        'FileTypeIcons': file_type_icons,
-
         'Urls': {
             'Base': config.getBaseURL(),
             'BasePath': url_parse(config.getBaseURL()).path.rstrip('/'),

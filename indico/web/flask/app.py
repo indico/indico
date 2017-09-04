@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import os
 import re
 import traceback
 import uuid
@@ -83,7 +84,7 @@ def configure_app(app, set_path=False):
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
     app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
-    app.config['INDICO_HTDOCS'] = cfg.getHtdocsDir()
+    app.config['INDICO_HTDOCS'] = os.path.join(app.root_path, 'htdocs')
     app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldURLs()
     configure_multipass(app)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'

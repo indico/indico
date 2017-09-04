@@ -24,6 +24,7 @@ from flask import current_app, session
 from speaklater import _LazyString
 from werkzeug.exceptions import Forbidden
 
+import indico
 from indico.web.util import get_request_info
 
 try:
@@ -84,7 +85,6 @@ def _is_no_report_error(exc):
 
 
 def create_json_error_answer(exception, status=200):
-    from indico.core.config import Config
     from indico.core.errors import IndicoError, get_error_description
     if isinstance(exception, IndicoError):
         details = exception.toDict()
@@ -106,7 +106,7 @@ def create_json_error_answer(exception, status=200):
         }
 
     return current_app.response_class(dumps({
-        'version': Config.getInstance().getVersion(),
+        'version': indico.__version__,
         'result': None,
         'error': details
     }), mimetype='application/json', status=status)

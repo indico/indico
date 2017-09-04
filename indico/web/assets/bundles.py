@@ -20,6 +20,7 @@ from glob import glob
 from urlparse import urlparse
 
 import csscompressor
+from flask.helpers import get_root_path
 from markupsafe import Markup
 from webassets import Bundle, Environment
 from webassets.filter import Filter, register_filter
@@ -62,6 +63,10 @@ register_filter(CSSCompressor)
 register_filter(IndicoCSSRewrite)
 
 
+def _get_htdocs_path():
+    return os.path.join(get_root_path('indico'), 'htdocs')
+
+
 def configure_pyscss(environment):
     config = Config.getInstance()
     base_url_path = urlparse(config.getBaseURL()).path
@@ -69,8 +74,8 @@ def configure_pyscss(environment):
     environment.config['PYSCSS_DEBUG_INFO'] = environment.debug and config.getSCSSDebugInfo()
     environment.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(base_url_path)
     environment.config['PYSCSS_LOAD_PATHS'] = [
-        os.path.join(config.getHtdocsDir(), 'sass', 'lib', 'compass'),
-        os.path.join(config.getHtdocsDir(), 'sass')
+        os.path.join(_get_htdocs_path(), 'sass', 'lib', 'compass'),
+        os.path.join(_get_htdocs_path(), 'sass')
     ]
 
 
@@ -107,9 +112,9 @@ class IndicoEnvironment(LazyCacheEnvironment):
         self.debug = config.getDebug()
         configure_pyscss(self)
 
-        self.append_path(config.getHtdocsDir(), '/')
-        self.append_path(os.path.join(config.getHtdocsDir(), 'css'), '{0}/css'.format(url_path))
-        self.append_path(os.path.join(config.getHtdocsDir(), 'js'), '{0}/js'.format(url_path))
+        self.append_path(_get_htdocs_path(), '/')
+        self.append_path(os.path.join(_get_htdocs_path(), 'css'), '{0}/css'.format(url_path))
+        self.append_path(os.path.join(_get_htdocs_path(), 'js'), '{0}/js'.format(url_path))
 
 
 class ThemeEnvironment(LazyCacheEnvironment):
@@ -119,14 +124,14 @@ class ThemeEnvironment(LazyCacheEnvironment):
         url_path = urlparse(config.getBaseURL()).path
         output_dir = os.path.join(config.getAssetsDir(), 'theme-{}'.format(theme_id))
         output_url = '{}/static/assets/theme-{}'.format(url_path, theme_id)
-        theme_root = plugin.root_path if plugin else os.path.join(config.getHtdocsDir(), 'sass')
+        theme_root = plugin.root_path if plugin else os.path.join(_get_htdocs_path(), 'sass')
         static_dir = os.path.join(theme_root, 'themes')
         static_url = '{}/static/themes/{}'.format(url_path, theme_id)
         cache_dir = get_webassets_cache_dir(plugin.name if plugin else None)
         super(ThemeEnvironment, self).__init__(output_dir, output_url, debug=config.getDebug(), cache=cache_dir)
         self.append_path(output_dir, output_url)
         self.append_path(static_dir, static_url)
-        self.append_path(config.getHtdocsDir(), '/')
+        self.append_path(_get_htdocs_path(), '/')
         configure_pyscss(self)
 
 

@@ -202,8 +202,6 @@ class Logger:
             logConfFilepath = config.getLoggingConfigFilePath()
             smtpServer = config.getSmtpServer()
             serverName = config.getWorkerName()
-            if not serverName:
-                serverName = config.getHostNameURL()
 
             # Default arguments for the handlers, taken mostly for the configuration
             defaultArgs = {

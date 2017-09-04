@@ -37,6 +37,46 @@ from indico.util.locators import get_locator
 from indico.web.util import jsonify_data
 
 
+LEGACY_MIME_MAP = {
+    'ATOM': 'application/atom+xml',
+    'CSV': 'text/csv',
+    'DOC': 'application/msword',
+    'DOCX': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'GIF': 'image/gif',
+    'GZ': 'application/zip',
+    'HTM': 'text/html',
+    'HTML': 'text/html',
+    'ICAL': 'text/calendar',
+    'JPG': 'image/jpeg',
+    'MHT': ' message/rfc822',
+    'MOV': 'video/quicktime',
+    'ODP': 'application/vnd.sun.xml.impress',
+    'ODS': 'application/vnd.sun.xml.calc',
+    'ODT': 'application/vnd.sun.xml.writer',
+    'OGG': 'application/ogg',
+    'OGV': 'application/ogg',
+    'PDF': 'application/pdf',
+    'PNG': 'image/png',
+    'PPT': 'application/vnd.ms-powerpoint',
+    'PPTX': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+    'PS': 'application/postscript',
+    'RM': 'application/vnd.rn-realmedia',
+    'RSS': 'application/xhtml+xml',
+    'RTF': 'application/rtf',
+    'SXC': 'application/vnd.sun.xml.calc',
+    'SXI': 'application/vnd.sun.xml.impress',
+    'SXW': 'application/vnd.sun.xml.writer',
+    'TAR': 'application/tar',
+    'TIFF': 'image/gif',
+    'TXT': 'text/plain',
+    'WAV': 'audio/x-pn-wav',
+    'XLS': 'application/vnd.ms-excel',
+    'XLSX': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'XML': 'text/xml',
+    'ZIP': 'application/zip'
+}
+
+
 def discover_blueprints():
     """Discovers all blueprints inside the indico package
 
@@ -328,15 +368,14 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
     """
 
     name = secure_filename(name, 'file')
+    if mimetype.isupper() and '/' not in mimetype:
+        # Indico file type such as "JPG" or "CSV"
+        mimetype = LEGACY_MIME_MAP.get(mimetype, 'application/octet-stream')
     if inline is None:
-        inline = mimetype not in ('XML', 'CSV')
+        inline = mimetype not in ('text/csv', 'text/xml')
     if request.user_agent.platform == 'android':
         # Android is just full of fail when it comes to inline content-disposition...
         inline = False
-    if mimetype.isupper() and '/' not in mimetype:
-        # Indico file type such as "JPG" or "CSV"
-        from indico.core.config import Config
-        mimetype = Config.getInstance().getFileTypeMimeType(mimetype)
     if _is_office_mimetype(mimetype):
         inline = False
     if safe and mimetype in ('text/html', 'image/svg+xml'):

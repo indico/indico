@@ -23,7 +23,6 @@ from flask import session, after_this_request, g
 from oauthlib.oauth2 import FatalClientError, InvalidClientIdError
 
 from indico.core.db import db
-from indico.core.config import Config
 from indico.modules.oauth import oauth, logger
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
@@ -53,8 +52,7 @@ def load_grant(client_id, code):  # pragma: no cover
 
 @oauth.grantsetter
 def save_grant(client_id, code, request, *args, **kwargs):
-    ttl = Config.getInstance().getOAuthGrantTokenTTL()
-    expires = datetime.utcnow() + timedelta(seconds=ttl)
+    expires = datetime.utcnow() + timedelta(seconds=120)
     grant = OAuthGrant(client_id=client_id, code=code['code'], redirect_uri=request.redirect_uri,
                        user=session.user, scopes=request.scopes, expires=expires)
     grant.save()

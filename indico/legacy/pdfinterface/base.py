@@ -23,6 +23,7 @@ import xml.sax.saxutils as saxutils
 
 import markdown
 import pkg_resources
+from flask.helpers import get_root_path
 from PIL import Image as PILImage
 from reportlab import platypus
 from reportlab.lib.enums import TA_CENTER
@@ -726,7 +727,7 @@ class LatexRunner(object):
                 raise
 
     def run(self, template_name, **kwargs):
-        template_dir = os.path.join(Config.getInstance().getTPLDir(), 'latex')
+        template_dir = os.path.join(get_root_path('indico'), 'legacy/webinterface/tpls/latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
         self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=Config.getInstance().getTempDir())

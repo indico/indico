@@ -21,6 +21,7 @@ import xml.sax.saxutils
 
 from flask import current_app as app
 from flask import g, render_template, request, session
+from flask.helpers import get_root_path
 from mako import exceptions
 from mako.lookup import TemplateLookup
 
@@ -29,7 +30,6 @@ from indico.legacy.common.utils import formatDate, formatDateTime, formatDuratio
 
 
 # The main template directory
-TEMPLATE_DIR = Config.getInstance().getTPLDir()
 FILTER_IMPORTS = [
     'from indico.util.json import dumps as j',
     'from indico.util.string import encode_if_unicode',
@@ -81,7 +81,8 @@ def _define_lookup():
     # since unicode is disabled, template waits for
     # byte strings provided by default_filters
     # i.e converting SQLAlchemy model unicode properties to byte strings
-    return IndicoTemplateLookup(directories=[TEMPLATE_DIR],
+    tpl_dir = os.path.join(get_root_path('indico'), 'legacy/webinterface/tpls')
+    return IndicoTemplateLookup(directories=[tpl_dir],
                                 module_directory=os.path.join(Config.getInstance().getTempDir(), "mako_modules"),
                                 disable_unicode=True,
                                 input_encoding='utf-8',
@@ -98,13 +99,6 @@ def render(tplPath, params={}, module=None):
     """Render the template."""
     template = mako.get_template(tplPath, module)
     registerHelpers(params)
-
-    # This parameter is needed when a template which is stored
-    # outside of the main tpls directory (e.g. plugins) wants
-    # to include another template from the main directory.
-    # Usage example: <%include file="${TPLS}/SomeTemplate.tpl"/>
-    params['TPLS'] = TEMPLATE_DIR
-
     return template.render(**params)
 
 
@@ -236,8 +230,6 @@ def deepstr(obj):
 def systemIcon(s):
     return Config.getInstance().getSystemIconURL(s)
 
-def iconFileName(s):
-    return Config.getInstance().getSystemIconFileName(s)
 
 def truncateTitle(title, maxSize=30):
     if len(title) > maxSize:
@@ -345,8 +337,6 @@ def registerHelpers(objDict):
         objDict['rh'] = objDict['__rh__']
     if not 'systemIcon' in objDict:
         objDict['systemIcon'] = systemIcon
-    if not 'iconFileName' in objDict:
-        objDict['iconFileName'] = iconFileName
     if not 'escapeHTMLForJS' in objDict:
         objDict['escapeHTMLForJS'] = escapeHTMLForJS
     if not 'deepstr' in objDict:

@@ -81,14 +81,7 @@ class WTemplated:
             their variables to the ones returned by this method.
         """
         self._rh = g.get('rh')
-
-        cfg = Config.getInstance()
-        vars = cfg.getTPLVars()
-
-        for paramName in self.__params:
-            vars[ paramName ] = self.__params[ paramName ]
-
-        return vars
+        return dict(self.__params)
 
     def getHTML( self, params=None ):
         """Returns the HTML resulting of formating the text contained in

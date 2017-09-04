@@ -106,10 +106,7 @@ CacheDir  = '/opt/indico/cache'
 SmtpServer           = ("localhost", 8025)
 SmtpLogin            = ""
 SmtpPassword         = ""
-
-# If your SMTP server is using TLS write "yes", otherwise write "no"
-
-SmtpUseTLS           = "no"
+SmtpUseTLS           = False
 
 #------------------------------------------------------------------------------
 # EMAIL ADDRESSES

@@ -23,7 +23,6 @@ from mock import MagicMock
 from oauthlib.oauth2 import InvalidClientIdError
 from sqlalchemy.orm.exc import NoResultFound
 
-from indico.core.config import Config
 from indico.modules.oauth.provider import load_client, load_token, save_grant, save_token, DisabledClientIdError
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant
@@ -79,8 +78,7 @@ def test_save_grant(mocker, freeze_time):
     request.redirect_uri = 'http://localhost:5000'
     client_id = unicode(uuid4())
     code = {'code': 'foobar'}
-    ttl = Config.getInstance().getOAuthGrantTokenTTL()
-    expires = datetime.utcnow() + timedelta(seconds=ttl)
+    expires = datetime.utcnow() + timedelta(seconds=120)
     grant = save_grant(client_id, code, request)
     assert grant.client_id == client_id
     assert grant.code == code['code']

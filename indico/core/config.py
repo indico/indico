@@ -20,8 +20,6 @@ import ast
 import copy
 import os
 import socket
-import sys
-import urlparse
 from datetime import timedelta
 
 import pytz
@@ -36,45 +34,6 @@ from indico.util.packaging import package_is_editable
 
 
 __all__ = ['Config']
-
-
-FILE_TYPES = {"DOC": ["Ms Word", "application/msword", "word_big.png"],
-              "DOCX": ["Ms Word", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "word.png"],
-              "WAV": ["Audio", "audio/x-pn-wav", ""],
-              "XLS": ["MS Excel", "application/vnd.ms-excel", "xls.png"],
-              "XLSX": ["MS Excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "xls.png"],
-              "PS":  ["PostScript", "application/postscript", "ps.png"],
-              "SXC": ["Open Office Calc", "application/vnd.sun.xml.calc", "calc.png"],
-              "TAR": ["Tar File", "application/tar", "zip.png"],
-              "ODP": ["Open Documents Presentation", "application/vnd.sun.xml.impress", "impress.png"],
-              "SXI": ["Open Office Impress", "application/vnd.sun.xml.impress", "impress.png"],
-              "ODS": ["Open Office Spreadsheet", "application/vnd.sun.xml.calc", "calc.png"],
-              "ODT": ["Open Document Text", "application/vnd.sun.xml.writer", "writer.png"],
-              "HTML": ["HTML", "text/html", ""],
-              "PPT": ["Ms Powerpoint", "application/vnd.ms-powerpoint", "powerpoint.png"],
-              "PPTX": ["Ms Powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "powerpoint.png"],
-              "RM": ["Real Video", "application/vnd.rn-realmedia", ""],
-              "TXT": ["Plain Text", "text/plain", "txt.png"],
-              "XML": ["XML", "text/xml", ""],
-              "ZIP": ["ZIP", "application/zip", ""],
-              "SXW": ["Open Office Writer", "application/vnd.sun.xml.writer", "writer.png"],
-              "GZ":  ["Zipped File", "application/zip", "zip.png"],
-              "ICAL": ["ICAL", "text/calendar", ""],
-              "PDF": ["Portable Document Format", "application/pdf", "pdf_small.png"],
-              "CSV": ["Ms Excel", "application/vnd.ms-excel", "excel.png"],
-              "HTM": ["HTML", "text/html", ""],
-              "OGV": ["Ogg/Theora Video", "application/ogg", ""],
-              "MOV": ["Quicktime Video", "video/quicktime", ""],
-              "RTF": ["RTF", "application/rtf", ""],
-              "OGG": ["Ogg/Theora Video", "application/ogg", ""],
-              "RSS": ["RSS", "application/xhtml+xml", ""],
-              "MHT": ["MHT", " message/rfc822", ""],
-              "JPG": ["JPEG Image", "image/jpeg", ""],
-              "PNG": ["PNG Image", "image/png", ""],
-              "GIF": ["GIF Image", "image/gif", ""],
-              "TIFF": ["TIFF Image", "image/gif", ""],
-              "ATOM": ['Atom', "application/atom+xml", ""]
-              }
 
 
 def get_config_path():
@@ -237,11 +196,11 @@ class Config:
         'SmtpServer'                : ('localhost', 25),
         'SmtpLogin'                 : '',
         'SmtpPassword'              : '',
-        'SmtpUseTLS'                : 'no',
+        'SmtpUseTLS'                : False,
         'SupportEmail'              : 'root@localhost',
         'PublicSupportEmail'        : 'root@localhost',
         'NoReplyEmail'              : 'noreply-root@localhost',
-        'Profile'                   : 'no',
+        'Profile'                   : False,
         'StaticFileMethod'          : None,
         'MaxUploadFilesTotalSize'   : 0,
         'MaxUploadFileSize'         : 0,
@@ -249,7 +208,6 @@ class Config:
         'Debug'                     : False,
         'DebugUnicode'              : 0,
         'EmbeddedWebserver'         : False,
-        'OAuthGrantTokenTTL'        : 120,
         'SCSSDebugInfo'             : True,
         'SessionLifetime'           : 86400 * 31,
         'UseProxy'                  : False,
@@ -289,17 +247,9 @@ class Config:
         'LogoURL'                   : None,
     }
 
-    if sys.platform == 'win32':
-        default_values.update({
-            "LogDir"               : "C:\\indico\\log",
-            "TempDir"              : "C:\\indico\\temp",
-            "CacheDir"             : "C:\\indico\\cache",
-        })
-
-    def __init__(self, filePath = None):
+    def __init__(self, filePath=None):
         self.filePath = filePath
         self.__readConfigFile()
-        self._shelf = None
 
     def reset(self, custom=None):
         """
@@ -333,23 +283,9 @@ class Config:
         # config.py will become fat again if you don't follow this advice.
         self._configVars.update({
             'BaseURL'                   : self._configVars['BaseURL'].rstrip('/'),
-            'TPLVars'                   : {},
-            'FileTypes'                 : FILE_TYPES,
-            'HelpDir'                   : os.path.join(self.getHtdocsDir(), 'ihelp'),
-            'ImagesDir'                 : os.path.join(self.getHtdocsDir(), 'images'),
-            'FontsDir'                  : os.path.join(self.getHtdocsDir(), 'fonts'),
-            'JSDir'                     : os.path.join(self.getHtdocsDir(), 'js'),
             'SystemIcons'               : self.__systemIcons,
-            'RoomPhotosDir'             : os.path.join(self.getHtdocsDir(), 'images', "rooms", "large_photos"),
-            'RoomSmallPhotosDir'        : os.path.join(self.getHtdocsDir(), 'images', "rooms", "small_photos"),
-            'CssDir'                    : "%s/css/" % (self.getHtdocsDir()),
-            'CssBaseURL'                : self.getCssBaseURL(),
             'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
-            'TPLDir'                    : os.path.abspath(os.path.join(webinterface_dir, 'tpls')),
-            'HostNameURL'               : urlparse.urlparse(self.getBaseURL())[1].partition(':')[0],
-            'PortURL'                   : urlparse.urlparse(self.getBaseURL())[1].partition(':')[2] or '80',
             'ImagesBaseURL'             : self.getImagesBaseURL(),
-            'Version'                   : indico.__version__,
             'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
         })
 
@@ -371,8 +307,6 @@ class Config:
 
         self._configVars = {}
 
-        from indico.legacy.errors import MaKaCError
-
         # When populating configuration variables indico.conf's values have priority
         config_path = get_config_path()
         config_vars = self.__load_config(config_path)
@@ -383,15 +317,11 @@ class Config:
         # options that are derived automatically
         self._deriveOptions()
 
-        if ('XMLCacheDir' in config_vars and ('CacheDir' not in config_vars or
-                                              config_vars['XMLCacheDir'] != config_vars['CacheDir'])):
-            raise ValueError('XMLCacheDir has been renamed to CacheDir. Please update the config.')
-
         if self.getSanitizationLevel() not in range(4):
-            raise MaKaCError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
+            raise ValueError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
 
         if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
-            raise MaKaCError('StaticFileMethod must be None, a string or a 2-tuple')
+            raise ValueError('StaticFileMethod must be None, a string or a 2-tuple')
 
         if self.getDefaultTimezone() not in pytz.all_timezones_set:
             raise ValueError('Invalid default timezone: {}'.format(self.getDefaultTimezone()))
@@ -422,18 +352,6 @@ class Config:
             return lambda: configFinder(attr[3:])
         else:
             raise AttributeError
-
-    def _yesOrNoVariable(self, varName):
-        if self._configVars[varName] in ('yes', True):
-            return True
-        else:
-            return False
-
-    def getSmtpUseTLS(self):
-        return self._yesOrNoVariable('SmtpUseTLS')
-
-    def getProfile(self):
-        return self._yesOrNoVariable('Profile')
 
     def getStaticFileMethod(self):
         val = self._configVars['StaticFileMethod']
@@ -468,55 +386,16 @@ class Config:
             cls.__instance = Config()
         return cls.__instance
 
-    @classmethod
-    def setInstance(cls, instance):
-        cls.__instance = instance
-
     def getCssConfTemplateBaseURL(self):
         return '{}/css/confTemplates'.format(self.getBaseURL())
-
-    def getTPLVars(self):
-        """gives back the user configured variables that must be available in
-           any template file.
-        """
-        vars = self._configVars['TPLVars'].copy()
-        vars["imagesDir"] = self.getImagesBaseURL()
-        return vars
-
-    def getFileTypeMimeType(self, fileType):
-        """returns the configured mime-type for the specified file type
-        """
-        if fileType in self.getFileTypes():
-            return self.getFileTypes()[fileType][1]
-        return "unknown"
 
     def getSystemIconURL( self, id ):
         if id not in self.__systemIcons:
             return "%s/%s"%(self.getImagesBaseURL(), id )
         return "%s/%s"%(self.getImagesBaseURL(), self.__systemIcons[ id ])
 
-    def getSystemIconFileName(self, id):
-        if id not in self.__systemIcons:
-            return id
-        return self.__systemIcons[id]
-
-    def getHtdocsDir(self):
-        return os.path.join(get_root_path('indico'), 'htdocs')
-
     def getImagesBaseURL(self):
         if has_app_context() and g.get('static_site'):
             return "static/images"
         else:
             return url_parse("%s/images" % self.getBaseURL()).path
-
-    def getCssBaseURL(self):
-        if has_app_context() and g.get('static_site'):
-            return "static/css"
-        else:
-            return url_parse("%s/css" % self.getBaseURL()).path
-
-    def getScriptBaseURL(self):
-        if g.get('static_site'):
-            return 'static/js'
-        else:
-            return url_parse('%s/js' % self.getBaseURL()).path

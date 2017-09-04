@@ -24,6 +24,7 @@ from contextlib import contextmanager
 import requests
 from bs4 import BeautifulSoup
 from flask import current_app, request
+from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename
 
 from indico.core.config import Config
@@ -124,9 +125,9 @@ class OfflineEventCreator(object):
         self._failed_paths = set()
         self._css_files = set()
         self._downloaded_files = {}
+        self._htdocs_dir = os.path.join(get_root_path('indico'), 'htdocs')
 
     def create(self):
-        config = Config.getInstance()
         self._fileHandler = ZIPFileHandler()
 
         # create the home page html
@@ -139,14 +140,14 @@ class OfflineEventCreator(object):
         self._fileHandler.addDir(self._staticPath)
         # Add i18n js
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'indico', 'i18n'),
-                               os.path.join(config.getHtdocsDir(), 'js', 'indico', 'i18n'))
+                               os.path.join(self._htdocs_dir, 'js', 'indico', 'i18n'))
         # Add system icons (not referenced in HTML/CSS)
         for icon in Config.getInstance().getSystemIcons().itervalues():
             self._addFileFromSrc(os.path.join(self._staticPath, 'images', icon),
-                                 os.path.join(config.getHtdocsDir(), 'images', icon))
+                                 os.path.join(self._htdocs_dir, 'images', icon))
         # Mathjax plugins can't be discovered by parsing the HTML
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'lib', 'mathjax'),
-                               os.path.join(config.getHtdocsDir(), 'js', 'lib', 'mathjax'))
+                               os.path.join(self._htdocs_dir, 'js', 'lib', 'mathjax'))
 
         # Getting all materials, static files (css, images, js and vars.js.tpl)
         self._getAllMaterial()
@@ -181,7 +182,7 @@ class OfflineEventCreator(object):
         if match is not None:
             path = os.path.join(Config.getInstance().getAssetsDir(), get_asset_path(**match.groupdict()))
         else:
-            path = os.path.join(Config.getInstance().getHtdocsDir(), url)
+            path = os.path.join(self._htdocs_dir, url)
         return re.sub(r'#.*$', '', path)
 
     def _get_static_files(self, html):
@@ -224,7 +225,6 @@ class OfflineEventCreator(object):
 
     def _get_css_refs(self):
         """Adds files referenced in stylesheets and rewrite the URLs inside those stylesheets"""
-        config = Config.getInstance()
         for path in self._css_files:
             src_path = self._static_url_to_path(path)
             dst_path = os.path.join(self._staticPath, path)
@@ -242,19 +242,19 @@ class OfflineEventCreator(object):
                     # make it relative and resolve '..' elements
                     url = os.path.normpath(url[1:])
                     # anything else is straightforward: the url is now relative to the htdocs folder
-                    ref_src_path = os.path.join(config.getHtdocsDir(), url)
+                    ref_src_path = os.path.join(self._htdocs_dir, url)
                     ref_dst_path = os.path.join(self._staticPath, url)
                     # the new url is relative to the css location
                     static_url = os.path.relpath(url, os.path.dirname(path))
                 else:
                     # make the relative path absolute (note: it's most likely NOT relative to htdocs!)
-                    css_abs_path = os.path.join(config.getHtdocsDir(), path)
+                    css_abs_path = os.path.join(self._htdocs_dir, path)
                     # now we can combine the relative url with that path to get the proper paths of the resource
                     ref_src_path = os.path.normpath(os.path.join(os.path.dirname(css_abs_path), url))
                     ref_dst_path = os.path.normpath(os.path.join(self._staticPath, os.path.dirname(path), url))
                     static_url = os.path.relpath(ref_src_path, os.path.dirname(css_abs_path))
                 if not os.path.isfile(ref_src_path):
-                    htdocs_relative_path = os.path.relpath(ref_src_path, config.getHtdocsDir())
+                    htdocs_relative_path = os.path.relpath(ref_src_path, self._htdocs_dir)
                     htdocs_relative_path = re.sub(r'#.*$', '', htdocs_relative_path)
                     self._failed_paths.add(htdocs_relative_path)
                 else:
