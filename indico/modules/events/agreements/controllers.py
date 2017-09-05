@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-import os
+import mimetypes
 from io import BytesIO
 
 from flask import flash, jsonify, redirect, request, session
@@ -267,5 +267,5 @@ class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreem
 
     def _process(self):
         io = BytesIO(self.agreement.attachment)
-        file_ext = os.path.splitext(self.agreement.attachment_filename)[1]
-        return send_file(self.agreement.attachment_filename, io, file_ext)
+        mimetype = mimetypes.guess_type(self.agreement.attachment_filename)[0] or 'application/octet-stream'
+        return send_file(self.agreement.attachment_filename, io, mimetype)

@@ -69,4 +69,4 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
              b'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']])
         outgen.confToXMLMarc21(self._conf)
         xmlgen.closeTag(b'marc:record')
-        return send_file('event-{}.marc.xml'.format(self.event.id), StringIO(xmlgen.getXml()), 'XML')
+        return send_file('event-{}.marc.xml'.format(self.event.id), StringIO(xmlgen.getXml()), 'application/xml')

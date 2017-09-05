@@ -16,7 +16,7 @@
 
 import os
 
-from flask import current_app, json, session, render_template, send_from_directory, Response, redirect
+from flask import Response, current_app, json, redirect, render_template, send_from_directory, session
 from werkzeug.exceptions import NotFound
 
 from indico.core.config import Config
@@ -53,8 +53,7 @@ def js_vars_global():
         with open(cache_file, 'wb') as f:
             f.write(data)
 
-    return send_file('global.js', cache_file,
-                     mimetype='application/x-javascript', no_cache=False, conditional=True)
+    return send_file('global.js', cache_file, mimetype='application/javascript', no_cache=False, conditional=True)
 
 
 @assets_blueprint.route('/js-vars/user.js')
@@ -74,7 +73,7 @@ def js_vars_user():
             'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users}
         }
     data = render_template('assets/vars_user.js', user_vars=user_vars, user=user)
-    return Response(data, mimetype='application/x-javascript')
+    return Response(data, mimetype='application/javascript')
 
 
 def locale_data(path, name, domain):
@@ -112,7 +111,7 @@ def i18n_locale(locale_name):
         with open(cache_file, 'wb') as f:
             f.write("window.TRANSLATIONS = {};".format(json.dumps(i18n_data)))
 
-    return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/x-javascript',
+    return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/javascript',
                      no_cache=False, conditional=True)
 
 

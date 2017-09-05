@@ -38,8 +38,9 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.payment.models.transactions import TransactionAction
 from indico.modules.events.payment.util import register_transaction
 from indico.modules.events.registration import logger
-from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable,
-                                                       RegistrantsListToBadgesPDFDoubleSided)
+from indico.modules.events.registration.badges import (RegistrantsListToBadgesPDF,
+                                                       RegistrantsListToBadgesPDFDoubleSided,
+                                                       RegistrantsListToBadgesPDFFoldable)
 from indico.modules.events.registration.controllers import RegistrationEditMixin
 from indico.modules.events.registration.controllers.management import (RHManageRegFormBase, RHManageRegFormsBase,
                                                                        RHManageRegistrationBase)
@@ -326,7 +327,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
                 raise
             raise FormValuesError(_("Text too large to generate a PDF with table style. "
                                     "Please try again generating with book style."))
-        return send_file('RegistrantsList.pdf', BytesIO(data), 'PDF')
+        return send_file('RegistrantsList.pdf', BytesIO(data), 'application/pdf')
 
 
 class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
@@ -335,7 +336,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
     def _process(self):
         static_item_ids, item_ids = self.list_generator.get_item_ids()
         pdf = RegistrantsListToBookPDF(self._conf, self.regform, self.registrations, item_ids, static_item_ids)
-        return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'PDF')
+        return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
 
 
 class RHRegistrationsExportCSV(RHRegistrationsExportBase):
@@ -390,7 +391,7 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         registration_ids = config_params.pop('registration_ids')
         signals.event.designer.print_badge_template.send(self.template, regform=self.regform)
         pdf = pdf_class(self.template, config_params, self.event, registration_ids)
-        return send_file('Badges-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'PDF')
+        return send_file('Badges-{}.pdf'.format(self.event.id), pdf.get_pdf(), 'application/pdf')
 
 
 class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
