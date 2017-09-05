@@ -31,6 +31,7 @@ class ContributionPrincipal(PrincipalRolesMixin, db.Model):
     unique_columns = ('contribution_id',)
     disallowed_protection_modes = frozenset()
     allow_emails = True
+    allow_event_groups = True
 
     @declared_attr
     def __table_args__(cls):

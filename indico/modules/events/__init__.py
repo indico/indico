@@ -64,6 +64,8 @@ def _merge_users(target, source, **kwargs):
     from indico.modules.events.models.principals import EventPrincipal
     EventPerson.merge_users(target, source)
     EventPrincipal.merge_users(target, source, 'event')
+    target.event_groups |= source.event_groups
+    source.event_groups.clear()
 
 
 @signals.users.registered.connect
@@ -108,19 +110,19 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
         data['Group'] = '{} ({})'.format(principal.name, principal.provider_title)
     elif principal.principal_type == PrincipalType.network:
         data['IP Network'] = principal.name
+    elif principal.principal_type == PrincipalType.event_group:
+        data['Event Role'] = principal.name
     if entry is None:
         data['Read Access'] = old_data['read_access']
         data['Manager'] = old_data['full_access']
         data['Roles'] = _format_roles(old_data['roles'])
-        obj.log(EventLogRealm.management, EventLogKind.negative, 'Protection', 'ACL entry removed', session.user,
-                data=data)
+        obj.log(EventLogRealm.management, EventLogKind.negative, 'Protection', 'ACL entry removed', user, data=data)
     elif is_new:
         data['Read Access'] = entry.read_access
         data['Manager'] = entry.full_access
         if entry.roles:
             data['Roles'] = _format_roles(entry.roles)
-        obj.log(EventLogRealm.management, EventLogKind.positive, 'Protection', 'ACL entry added', session.user,
-                data=data)
+        obj.log(EventLogRealm.management, EventLogKind.positive, 'Protection', 'ACL entry added', user, data=data)
     elif entry.current_data != old_data:
         data['Read Access'] = entry.read_access
         data['Manager'] = entry.full_access
@@ -133,8 +135,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
             data['Roles (removed)'] = _format_roles(removed_roles)
         if current_roles:
             data['Roles'] = _format_roles(current_roles)
-        obj.log(EventLogRealm.management, EventLogKind.change, 'Protection', 'ACL entry changed', session.user,
-                data=data)
+        obj.log(EventLogRealm.management, EventLogKind.change, 'Protection', 'ACL entry changed', user, data=data)
 
 
 @signals.app_created.connect

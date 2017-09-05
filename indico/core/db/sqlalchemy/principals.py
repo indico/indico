@@ -36,14 +36,17 @@ class PrincipalType(int, IndicoEnum):
     multipass_group = 3
     email = 4
     network = 5
+    event_group = 6
 
 
-def _make_check(type_, allow_emails, allow_networks, *cols):
+def _make_check(type_, allow_emails, allow_networks, allow_event_groups, *cols):
     all_cols = {'user_id', 'local_group_id', 'mp_group_provider', 'mp_group_name'}
     if allow_emails:
         all_cols.add('email')
     if allow_networks:
         all_cols.add('ip_network_group_id')
+    if allow_event_groups:
+        all_cols.add('event_group_id')
     required_cols = all_cols & set(cols)
     forbidden_cols = all_cols - required_cols
     criteria = ['{} IS NULL'.format(col) for col in sorted(forbidden_cols)]
@@ -76,6 +79,7 @@ class EmailPrincipal(Fossilizable):
     is_network = False
     is_group = False
     is_single_person = True
+    is_event_group = False
     principal_order = 0
     fossilizes(IEmailPrincipalFossil)
 
@@ -131,6 +135,8 @@ class PrincipalMixin(object):
     allow_emails = False
     #: Whether it should be allowed to add an IP network.
     allow_networks = False
+    #: Whether it should be allowed to add an event group.
+    allow_event_groups = False
 
     @strict_classproperty
     @classmethod
@@ -148,16 +154,22 @@ class PrincipalMixin(object):
                 uniques.append(db.Index('ix_uq_{}_email'.format(cls.__tablename__), 'email', *cls.unique_columns,
                                         unique=True, postgresql_where=db.text('type = {}'.format(PrincipalType.email))))
         indexes = [db.Index(None, 'mp_group_provider', 'mp_group_name')]
-        checks = [_make_check(PrincipalType.user, cls.allow_emails, cls.allow_networks, 'user_id'),
-                  _make_check(PrincipalType.local_group, cls.allow_emails, cls.allow_networks, 'local_group_id'),
+        checks = [_make_check(PrincipalType.user, cls.allow_emails, cls.allow_networks, cls.allow_event_groups,
+                              'user_id'),
+                  _make_check(PrincipalType.local_group, cls.allow_emails, cls.allow_networks, cls.allow_event_groups,
+                              'local_group_id'),
                   _make_check(PrincipalType.multipass_group, cls.allow_emails, cls.allow_networks,
-                              'mp_group_provider', 'mp_group_name')]
+                              cls.allow_event_groups, 'mp_group_provider', 'mp_group_name')]
         if cls.allow_emails:
-            checks.append(_make_check(PrincipalType.email, cls.allow_emails, cls.allow_networks, 'email'))
+            checks.append(_make_check(PrincipalType.email, cls.allow_emails, cls.allow_networks, cls.allow_event_groups,
+                                      'email'))
             checks.append(db.CheckConstraint('email IS NULL OR email = lower(email)', 'lowercase_email'))
         if cls.allow_networks:
             checks.append(_make_check(PrincipalType.network, cls.allow_emails, cls.allow_networks,
-                                      'ip_network_group_id'))
+                                      cls.allow_event_groups, 'ip_network_group_id'))
+        if cls.allow_event_groups:
+            checks.append(_make_check(PrincipalType.event_group, cls.allow_emails, cls.allow_networks,
+                                      cls.allow_event_groups, 'event_group_id'))
         return tuple(uniques + indexes + checks)
 
 
@@ -168,6 +180,8 @@ class PrincipalMixin(object):
             exclude_values.add(PrincipalType.email)
         if not cls.allow_networks:
             exclude_values.add(PrincipalType.network)
+        if not cls.allow_event_groups:
+            exclude_values.add(PrincipalType.event_group)
         return db.Column(
             PyIntEnum(PrincipalType, exclude_values=(exclude_values or None)),
             nullable=False
@@ -229,6 +243,17 @@ class PrincipalMixin(object):
         )
 
     @declared_attr
+    def event_group_id(cls):
+        if not cls.allow_event_groups:
+            return
+        return db.Column(
+            db.Integer,
+            db.ForeignKey('events.groups.id'),
+            nullable=True,
+            index=True
+        )
+
+    @declared_attr
     def user(cls):
         assert cls.principal_backref_name
         return db.relationship(
@@ -269,6 +294,21 @@ class PrincipalMixin(object):
             )
         )
 
+    @declared_attr
+    def event_group(cls):
+        if not cls.allow_event_groups:
+            return
+        assert cls.principal_backref_name
+        return db.relationship(
+            'EventGroup',
+            lazy=False,
+            backref=db.backref(
+                cls.principal_backref_name,
+                cascade='all, delete',
+                lazy='dynamic'
+            )
+        )
+
     @hybrid_property
     def principal(self):
         from indico.modules.groups import GroupProxy
@@ -282,6 +322,8 @@ class PrincipalMixin(object):
             return EmailPrincipal(self.email)
         elif self.type == PrincipalType.network:
             return self.ip_network_group
+        elif self.type == PrincipalType.event_group:
+            return self.event_group
 
     @principal.setter
     def principal(self, value):
@@ -291,12 +333,16 @@ class PrincipalMixin(object):
         self.local_group = None
         self.multipass_group_provider = self.multipass_group_name = None
         self.ip_network_group = None
+        self.event_group = None
         if self.type == PrincipalType.email:
             assert self.allow_emails
             self.email = value.email
         elif self.type == PrincipalType.network:
             assert self.allow_networks
             self.ip_network_group = value
+        elif self.type == PrincipalType.event_group:
+            assert self.allow_event_groups
+            self.event_group = value
         elif self.type == PrincipalType.local_group:
             self.local_group = value.group
         elif self.type == PrincipalType.multipass_group:
@@ -488,6 +534,8 @@ class PrincipalComparator(Comparator):
             criteria = [self.cls.email == other.email]
         elif other.principal_type == PrincipalType.network:
             criteria = [self.cls.ip_network_group_id == other.id]
+        elif other.principal_type == PrincipalType.event_group:
+            criteria = [self.cls.event_group_id == other.id]
         elif other.principal_type == PrincipalType.local_group:
             criteria = [self.cls.local_group_id == other.id]
         elif other.principal_type == PrincipalType.multipass_group:
@@ -509,7 +557,7 @@ def clone_principals(cls, principals):
     """
     rv = set()
     assert all(isinstance(x, cls) for x in principals)
-    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group'}
+    attrs = get_simple_column_attrs(cls) | {'user', 'local_group', 'ip_network_group', 'event_group'}
     for old_principal in principals:
         principal = cls()
         principal.populate_from_dict({attr: getattr(old_principal, attr) for attr in attrs})
