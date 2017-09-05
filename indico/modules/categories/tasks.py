@@ -21,7 +21,7 @@ from datetime import timedelta
 from celery.schedules import crontab
 
 from indico.core.celery import celery
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.categories import Category, logger
 from indico.modules.users import User, UserSetting
@@ -61,11 +61,10 @@ def category_suggestions():
 @celery.periodic_task(name='category_cleanup', run_every=crontab(minute='0', hour='5'))
 def category_cleanup():
     from indico.modules.events import Event
-    cfg = Config.getInstance()
     janitor_user = User.get_system_user()
 
     logger.debug("Checking whether any categories should be cleaned up")
-    for categ_id, days in cfg.getCategoryCleanup().iteritems():
+    for categ_id, days in config.CATEGORY_CLEANUP.iteritems():
         try:
             category = Category.get(int(categ_id), is_deleted=False)
         except KeyError:

@@ -26,7 +26,7 @@ from sqlalchemy.orm import column_property
 from sqlalchemy.sql import exists, func, literal, select
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
@@ -138,7 +138,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     timezone = db.Column(
         db.String,
         nullable=False,
-        default=lambda: Config.getInstance().getDefaultTimezone()
+        default=lambda: config.DEFAULT_TIMEZONE
     )
     default_event_themes = db.Column(
         JSON,

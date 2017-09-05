@@ -24,7 +24,7 @@ from itertools import izip
 import redis
 from flask import g
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.logger import Logger
 from indico.legacy.common.utils import OSSpecific
 from indico.util.fs import silentremove
@@ -277,13 +277,13 @@ class GenericCache(object):
             return
 
         # If not, create a new one
-        backend = Config.getInstance().getCacheBackend()
+        backend = config.CACHE_BACKEND
         if backend == 'memcached':
-            self._client = MemcachedCacheClient(Config.getInstance().getMemcachedServers())
+            self._client = MemcachedCacheClient(config.MEMCACHED_SERVERS)
         elif backend == 'redis':
-            self._client = RedisCacheClient(Config.getInstance().getRedisCacheURL())
+            self._client = RedisCacheClient(config.REDIS_CACHE_URL)
         elif backend == 'files':
-            self._client = FileCacheClient(Config.getInstance().getCacheDir())
+            self._client = FileCacheClient(config.CACHE_DIR)
         else:
             self._client = NullCacheClient()
 

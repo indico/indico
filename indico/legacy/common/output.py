@@ -20,7 +20,6 @@ from datetime import datetime
 
 from sqlalchemy.orm import joinedload, load_only
 
-from indico.core.config import Config
 from indico.legacy.common.xmlGen import XMLGen
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
@@ -43,7 +42,6 @@ class outputGenerator(object):
             self._XMLGen = XG
         else:
             self._XMLGen = XMLGen()
-        self._config = Config.getInstance()
         self.text = ""
         self.time_XML = 0
         self.time_HTML = 0

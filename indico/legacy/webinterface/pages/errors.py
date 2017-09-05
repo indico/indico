@@ -21,7 +21,7 @@ from xml.sax.saxutils import quoteattr
 
 from flask import request, session
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.webinterface.pages.base import WPDecorated
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WTemplated
@@ -71,7 +71,7 @@ class WGenericError( WTemplated ):
                 vars["userEmail"] = quoteattr(user_email.encode('utf-8'))
         vars["reportURL"] = quoteattr(url_for('misc.errors'))
         details = ""
-        if Config.getInstance().getDebug() or user_is_admin:
+        if config.DEBUG or user_is_admin:
             details = """
 <table class="errorDetailsBox">
     <tr>

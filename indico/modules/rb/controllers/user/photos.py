@@ -19,7 +19,7 @@ from io import BytesIO
 
 from flask import redirect
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.cache import GenericCache
 from indico.modules.rb.models.photos import Photo
 from indico.modules.rb.models.rooms import Room
@@ -30,7 +30,7 @@ _cache = GenericCache('Rooms')
 
 
 def _redirect_no_photo(size):
-    return redirect(posixpath.join(Config.getInstance().getImagesBaseURL(), 'rooms/{}_photos/NoPhoto.jpg'.format(size)))
+    return redirect(posixpath.join(config.IMAGES_BASE_URL, 'rooms/{}_photos/NoPhoto.jpg'.format(size)))
 
 
 def room_photo(roomID, size, **kw):

@@ -56,7 +56,7 @@
              data-url="{{ url }}"
              data-dark-theme="{{ dark|tojson|forceescape }}"
              data-social-settings="{{ social_settings|tojson|forceescape }}">
-            <img src="{{ system_icon('social.png') }}"
+            <img src="{{ indico_config.IMAGES_BASE_URL }}/social.png"
                  id="social_button"
                  alt="{% trans %}Social Networks{% endtrans %}"
                  title="{% trans %}Social Networks{% endtrans %}">

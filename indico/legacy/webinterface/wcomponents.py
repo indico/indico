@@ -16,11 +16,9 @@
 
 from xml.sax.saxutils import escape
 
-import pkg_resources
 from flask import g, render_template
 from speaklater import _LazyString
 
-from indico.core.config import Config
 from indico.legacy.common.TemplateExec import render as render_mako
 from indico.web.menu import build_menu_structure
 
@@ -49,29 +47,11 @@ class WTemplated:
     """
     tplId = None
 
-    @classmethod
-    def forModule(cls, module, *args):
-        tplobj = cls(*args)
-        tplobj._for_module = module
-        return tplobj
-
     def __init__(self, tpl_name=None):
         if tpl_name is not None:
             self.tplId = tpl_name
 
         self._rh = g.get('rh')
-
-    def _setTPLFile(self):
-        """Sets the TPL (template) file for the object. It will try to get
-            from the configuration if there's a special TPL file for it and
-            if not it will look for a file called as the class name+".tpl"
-            in the configured TPL directory.
-        """
-        # because MANY classes skip the constructor...
-        if hasattr(self, '_for_module') and self._for_module:
-            self.tplFile = pkg_resources.resource_filename(self._for_module.__name__, 'tpls/{}.tpl'.format(self.tplId))
-        else:
-            self.tplFile = '{}.tpl'.format(self.tplId)
 
     def getVars( self ):
         """Returns a dictionary containing the TPL variables that will
@@ -94,7 +74,7 @@ class WTemplated:
         self._rh = g.get('rh')
         if self.tplId == None:
             self.tplId = self.__class__.__name__[1:]
-        self._setTPLFile()
+        self.tplFile = '{}.tpl'.format(self.tplId)
         self.__params = {}
         if params != None:
             self.__params = params
@@ -102,7 +82,7 @@ class WTemplated:
         vars = self.getVars()
         vars['__rh__'] = self._rh
         vars['self_'] = self
-        return render_mako(self.tplFile, vars, self)
+        return render_mako(self.tplFile, vars)
 
     @staticmethod
     def htmlText(param):

@@ -26,7 +26,7 @@ from markupsafe import Markup
 from werkzeug.datastructures import CallbackDict
 from werkzeug.utils import cached_property
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.cache import GenericCache
 from indico.modules.users import User
 from indico.util.date_time import get_display_tz
@@ -114,7 +114,7 @@ class IndicoSession(BaseSession):
             return self['_timezone']
         if '_user_id' not in self:
             return 'LOCAL'
-        return Config.getInstance().getDefaultTimezone()
+        return config.DEFAULT_TIMEZONE
 
     @timezone.setter
     def timezone(self, tz):

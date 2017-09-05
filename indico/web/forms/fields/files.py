@@ -20,7 +20,7 @@ from flask import json
 from werkzeug.datastructures import FileStorage
 from wtforms import Field
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.widgets import JinjaWidget
 
@@ -41,11 +41,10 @@ class FileField(Field):
     def __init__(self, *args, **kwargs):
         self.lightweight = kwargs.pop('lightweight', self.default_options['lightweight'])
 
-        config = Config.getInstance()
         max_file_size = kwargs.pop('max_file_size', None)
         if max_file_size is None:
-            max_file_size = min(config.getMaxUploadFileSize() or 10240,
-                                config.getMaxUploadFilesTotalSize() or 10240)  # in MB
+            max_file_size = min(config.MAX_UPLOAD_FILE_SIZE or 10240,
+                                config.MAX_UPLOAD_FILES_TOTAL_SIZE or 10240)  # in MB
         self.allow_multiple_files = kwargs.pop('multiple_files', self.default_options['multiple_files'])
         self.widget_options = {
             'url': kwargs.pop('post_url', None),

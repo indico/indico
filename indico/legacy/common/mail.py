@@ -23,7 +23,7 @@ from email.utils import formatdate
 
 from flask import g
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.logger import Logger
 from indico.legacy.errors import MaKaCError
 from indico.util.event import unify_event_args
@@ -125,15 +125,15 @@ class GenericMailer:
 
     @staticmethod
     def _send(msgData):
-        server=smtplib.SMTP(*Config.getInstance().getSmtpServer())
-        if Config.getInstance().getSmtpUseTLS():
+        server = smtplib.SMTP(*config.SMTP_SERVER)
+        if config.SMTP_USE_TLS:
             server.ehlo()
             (code, errormsg) = server.starttls()
             if code != 220:
                 raise MaKaCError( _("Can't start secure connection to SMTP server: %d, %s")%(code, errormsg))
-        if Config.getInstance().getSmtpLogin():
-            login = Config.getInstance().getSmtpLogin()
-            password = Config.getInstance().getSmtpPassword()
+        if config.SMTP_LOGIN:
+            login = config.SMTP_LOGIN
+            password = config.SMTP_PASSWORD
             (code, errormsg) = server.login(login, password)
             if code != 235:
                 raise MaKaCError( _("Can't login on SMTP server: %d, %s")%(code, errormsg))

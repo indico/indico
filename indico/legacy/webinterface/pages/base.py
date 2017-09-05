@@ -20,7 +20,7 @@ from urlparse import urlparse
 from flask import g, render_template, request
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.webinterface.wcomponents import render_header
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -149,7 +149,7 @@ class WPBase:
         return ""
 
     def _fix_path(self, path):
-        url_path = urlparse(Config.getInstance().getBaseURL()).path or '/'
+        url_path = urlparse(config.BASE_URL).path or '/'
         if path[0] != '/':
             path = posixpath.join(url_path, path)
         return path

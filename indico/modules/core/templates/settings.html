@@ -53,15 +53,15 @@
         {% call form_fieldset(legend) %}
             <dl class="i-data-list">
                 <dt>{% trans %}Default language{% endtrans %}</dt>
-                <dd>{{ indico_config.DefaultLocale }}</dd>
+                <dd>{{ indico_config.DEFAULT_LOCALE }}</dd>
                 <dt>{% trans %}Default timezone{% endtrans %}</dt>
-                <dd>{{ indico_config.DefaultTimezone }}</dd>
+                <dd>{{ indico_config.DEFAULT_TIMEZONE }}</dd>
                 <dt>{% trans %}Admin email{% endtrans %}</dt>
-                <dd>{{ indico_config.SupportEmail }}</dd>
+                <dd>{{ indico_config.SUPPORT_EMAIL }}</dd>
                 <dt>{% trans %}Support email{% endtrans %}</dt>
-                <dd>{{ indico_config.PublicSupportEmail }}</dd>
+                <dd>{{ indico_config.PUBLIC_SUPPORT_EMAIL }}</dd>
                 <dt>{% trans %}No-reply email{% endtrans %}</dt>
-                <dd>{{ indico_config.NoReplyEmail }}</dd>
+                <dd>{{ indico_config.NO_REPLY_EMAIL }}</dd>
             </dl>
         {% endcall %}
 

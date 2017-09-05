@@ -20,7 +20,7 @@ from datetime import timedelta
 
 import click
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.fs import cleanup_dir
 
 
@@ -34,25 +34,22 @@ def _print_files(files):
 
 def cleanup_cmd(temp=False, cache=False, assets=False, min_age=1, dry_run=False, verbose=False):
     if cache:
-        cache_dir = Config.getInstance().getCacheDir()
         if verbose:
-            click.echo(click.style('cleaning cache ({})'.format(cache_dir), fg='white', bold=True))
-        deleted = cleanup_dir(cache_dir, timedelta(days=min_age), dry_run=dry_run,
+            click.echo(click.style('cleaning cache ({})'.format(config.CACHE_DIR), fg='white', bold=True))
+        deleted = cleanup_dir(config.CACHE_DIR, timedelta(days=min_age), dry_run=dry_run,
                               exclude=lambda x: x.startswith('webassets-'))
         if verbose:
             _print_files(deleted)
     if temp:
-        temp_dir = Config.getInstance().getTempDir()
         if verbose:
-            click.echo(click.style('cleaning temp ({})'.format(temp_dir), fg='white', bold=True))
-        deleted = cleanup_dir(temp_dir, timedelta(days=min_age), dry_run=dry_run)
+            click.echo(click.style('cleaning temp ({})'.format(config.TEMP_DIR), fg='white', bold=True))
+        deleted = cleanup_dir(config.TEMP_DIR, timedelta(days=min_age), dry_run=dry_run)
         if verbose:
             _print_files(deleted)
     if assets:
-        assets_dir = Config.getInstance().getAssetsDir()
         if verbose:
-            click.echo(click.style('cleaning assets ({})'.format(assets_dir), fg='white', bold=True))
-        deleted = cleanup_dir(assets_dir, timedelta(days=min_age), dry_run=dry_run)
+            click.echo(click.style('cleaning assets ({})'.format(config.ASSETS_DIR), fg='white', bold=True))
+        deleted = cleanup_dir(config.ASSETS_DIR, timedelta(days=min_age), dry_run=dry_run)
         if verbose:
             _print_files(deleted)
     if dry_run:

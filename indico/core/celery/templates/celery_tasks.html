@@ -7,9 +7,9 @@
 
 {% block content %}
     <div class="tasks">
-        {%- if flower_url -%}
+        {%- if indico_config.FLOWER_URL -%}
             {%- call message_box('info', fixed_width=true) -%}
-                {%- trans -%}
+                {%- trans flower_url=indico_config.FLOWER_URL -%}
                     Monitor Indico's Celery tasks with Flower
                     <a class="bold" href="{{ flower_url }}" target="_blank">here</a>.
                 {%- endtrans -%}

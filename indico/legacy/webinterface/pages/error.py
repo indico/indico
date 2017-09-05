@@ -17,15 +17,12 @@
 from flask import render_template
 from sqlalchemy.exc import OperationalError
 
-from indico.core.config import Config
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 
 
 def render_error(message, description, standalone=False):
     if standalone:
-        logo_url = Config.getInstance().getSystemIconURL("logoIndico")
-        return render_template('standalone_error.html', error_message=message, error_description=description,
-                               logo_url=logo_url)
+        return render_template('standalone_error.html', error_message=message, error_description=description)
     else:
         try:
             return WPErrorWSGI(message, description).getHTML()

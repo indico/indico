@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from flask_pluginengine import plugin_context
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.notifications import email_sender, make_email
 
 
@@ -47,7 +47,7 @@ def notify_request_managers(req, template, **context):
     :param context: data passed to the template
     """
     event = req.event
-    from_addr = Config.getInstance().getSupportEmail()
+    from_addr = config.SUPPORT_EMAIL
     request_manager_emails = _get_request_manager_emails(req)
     if not request_manager_emails:
         return
@@ -66,7 +66,7 @@ def notify_event_managers(req, template, **context):
     :param context: data passed to the template
     """
     event = req.event
-    from_addr = Config.getInstance().getSupportEmail()
+    from_addr = config.SUPPORT_EMAIL
     context['event'] = event
     context['req'] = req
     tpl_event_managers = _get_template_module(template, **context)

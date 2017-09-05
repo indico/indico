@@ -27,7 +27,7 @@ from wtforms.fields.html5 import DecimalField, EmailField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.html5 import NumberInput
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.designer import PageLayout, PageOrientation, PageSize, TemplateType
 from indico.modules.designer.util import get_default_template_on_category, get_inherited_templates
 from indico.modules.events.features.util import is_feature_enabled
@@ -109,10 +109,9 @@ class RegistrationFormForm(IndicoForm):
         self.event = kwargs.pop('event')
         super(IndicoForm, self).__init__(*args, **kwargs)
         self._set_currencies()
-        default_sender_address = Config.getInstance().getNoReplyEmail()
         self.notification_sender_address.description = _('Email address set as the sender of all '
                                                          'notifications sent to users. If empty, '
-                                                         'then {0} is used.'.format(default_sender_address))
+                                                         'then {0} is used.'.format(config.NO_REPLY_EMAIL))
 
     def _set_currencies(self):
         currencies = [(c['code'], '{0[code]} ({0[name]})'.format(c)) for c in payment_settings.get('currencies')]

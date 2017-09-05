@@ -18,7 +18,6 @@ from __future__ import unicode_literals
 
 from flask import flash, redirect
 
-from indico.core.config import Config
 from indico.modules.admin import RHAdminBase
 from indico.modules.admin.views import WPAdmin
 from indico.modules.rb import rb_settings
@@ -37,5 +36,4 @@ class RHRoomBookingSettings(RHAdminBase):
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.settings'))
 
-        rb_active = Config.getInstance().getIsRoomBookingActive()
-        return WPAdmin.render_template('rb/settings.html', 'rb-settings', rb_active=rb_active, form=form)
+        return WPAdmin.render_template('rb/settings.html', 'rb-settings', form=form)

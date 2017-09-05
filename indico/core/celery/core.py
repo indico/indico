@@ -30,7 +30,7 @@ from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
 from indico.core.celery.util import locked_task
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
@@ -59,16 +59,14 @@ class IndicoCelery(Celery):
         self._patch_task()
 
     def init_app(self, app):
-        cfg = Config.getInstance()
-        broker_url = cfg.getCeleryBroker()
-        if not broker_url and not app.config['TESTING']:
+        if not config.CELERY_BROKER and not app.config['TESTING']:
             raise ValueError('Celery broker URL is not set')
-        self.conf['BROKER_URL'] = broker_url
-        self.conf['CELERY_RESULT_BACKEND'] = cfg.getCeleryResultBackend() or broker_url
+        self.conf['BROKER_URL'] = config.CELERY_BROKER
+        self.conf['CELERY_RESULT_BACKEND'] = config.CELERY_RESULT_BACKEND or config.CELERY_BROKER
         self.conf['CELERYBEAT_SCHEDULER'] = IndicoPersistentScheduler
-        self.conf['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(cfg.getTempDir(), 'celerybeat-schedule')
+        self.conf['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(config.TEMP_DIR, 'celerybeat-schedule')
         self.conf['CELERYD_HIJACK_ROOT_LOGGER'] = False
-        self.conf['CELERY_TIMEZONE'] = cfg.getDefaultTimezone()
+        self.conf['CELERY_TIMEZONE'] = config.DEFAULT_TIMEZONE
         self.conf['CELERY_IGNORE_RESULT'] = True
         self.conf['CELERY_STORE_ERRORS_EVEN_IF_IGNORED'] = True
         self.conf['CELERY_REDIRECT_STDOUTS'] = not app.debug
@@ -78,15 +76,15 @@ class IndicoCelery(Celery):
         self.conf['CELERY_ACCEPT_CONTENT'] = ['json', 'yaml', 'pickle']
         # Send emails about failed tasks
         self.conf['CELERY_SEND_TASK_ERROR_EMAILS'] = True
-        self.conf['ADMINS'] = [('Admin', cfg.getSupportEmail())]
-        self.conf['SERVER_EMAIL'] = 'Celery <{}>'.format(cfg.getNoReplyEmail())
-        self.conf['EMAIL_HOST'] = cfg.getSmtpServer()[0]
-        self.conf['EMAIL_PORT'] = cfg.getSmtpServer()[1]
-        self.conf['EMAIL_USE_TLS'] = cfg.getSmtpUseTLS()
-        self.conf['EMAIL_HOST_USER'] = cfg.getSmtpLogin() or None
-        self.conf['EMAIL_HOST_PASWORD'] = cfg.getSmtpPassword() or None
+        self.conf['ADMINS'] = [('Admin', config.SUPPORT_EMAIL)]
+        self.conf['SERVER_EMAIL'] = 'Celery <{}>'.format(config.NO_REPLY_EMAIL)
+        self.conf['EMAIL_HOST'] = config.SMTP_SERVER[0]
+        self.conf['EMAIL_PORT'] = config.SMTP_SERVER[1]
+        self.conf['EMAIL_USE_TLS'] = config.SMTP_USE_TLS
+        self.conf['EMAIL_HOST_USER'] = config.SMTP_LOGIN or None
+        self.conf['EMAIL_HOST_PASWORD'] = config.SMTP_PASSWORD or None
         # Allow indico.conf to override settings
-        self.conf.update(cfg.getCeleryConfig())
+        self.conf.update(config.CELERY_CONFIG)
         assert self.flask_app is None or self.flask_app is app
         self.flask_app = app
 
@@ -128,7 +126,7 @@ class IndicoCelery(Celery):
                 stack = ExitStack()
                 stack.enter_context(self.flask_app.app_context())
                 if getattr(s, 'request_context', False):
-                    stack.enter_context(self.flask_app.test_request_context(base_url=Config.getInstance().getBaseURL()))
+                    stack.enter_context(self.flask_app.test_request_context(base_url=config.BASE_URL))
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
                 plugin = getattr(s, 'plugin', kwargs.pop('__current_plugin__', None))
@@ -160,7 +158,7 @@ class IndicoPersistentScheduler(PersistentScheduler):
 
     def setup_schedule(self):
         deleted = set()
-        for task_name, entry in Config.getInstance().getScheduledTaskOverride().iteritems():
+        for task_name, entry in config.SCHEDULED_TASK_OVERRIDE.iteritems():
             if task_name not in self.app.conf['CELERYBEAT_SCHEDULE']:
                 self.logger.error('Invalid entry in ScheduledTaskOverride: %s', task_name)
                 continue

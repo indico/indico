@@ -30,7 +30,7 @@ from webassets import Bundle
 from werkzeug.utils import cached_property
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
@@ -122,13 +122,12 @@ class IndicoPlugin(Plugin):
         self._import_models()
 
     def _setup_assets(self):
-        config = Config.getInstance()
-        url_base_path = urlparse(config.getBaseURL()).path
-        output_dir = os.path.join(config.getAssetsDir(), 'plugin-{}'.format(self.name))
+        url_base_path = urlparse(config.BASE_URL).path
+        output_dir = os.path.join(config.ASSETS_DIR, 'plugin-{}'.format(self.name))
         output_url = '{}/static/assets/plugin-{}'.format(url_base_path, self.name)
         static_dir = os.path.join(self.root_path, 'static')
         static_url = '{}/static/plugins/{}'.format(url_base_path, self.name)
-        self.assets = LazyCacheEnvironment(output_dir, output_url, debug=config.getDebug(),
+        self.assets = LazyCacheEnvironment(output_dir, output_url, debug=config.DEBUG,
                                            cache=get_webassets_cache_dir(self.name))
         self.assets.append_path(output_dir, output_url)
         self.assets.append_path(static_dir, static_url)

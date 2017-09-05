@@ -37,26 +37,13 @@ pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.catego
 
 
 def pytest_configure(config):
-    from indico.core.config import Config
     from indico.core.logger import Logger
     # Load all the plugins defined in pytest_plugins
     config.pluginmanager.consider_module(sys.modules[__name__])
     config.indico_temp_dir = py.path.local(tempfile.mkdtemp(prefix='indicotesttmp.'))
-    plugins = filter(None, [x.strip() for x in re.split(r'[\s,;]+', config.getini('indico_plugins'))])
-    # Throw away all indico.conf options early
-    Config.getInstance().reset({
-        'SmtpServer': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
-        'CacheBackend': 'null',
-        'Loggers': [],
-        'TempDir': config.indico_temp_dir.strpath,
-        'CacheDir': config.indico_temp_dir.strpath,
-        'StorageBackends': {'default': 'mem:'},
-        'AttachmentStorage': 'default',
-        'Plugins': plugins,
-        'SecretKey': os.urandom(16)
-    })
+    config.indico_plugins = filter(None, [x.strip() for x in re.split(r'[\s,;]+', config.getini('indico_plugins'))])
     # Make sure we don't write any log files (or worse: send emails)
-    Logger.reset()
+    Logger.reset(no_init=True)
     del logging.root.handlers[:]
     logging.root.addHandler(logging.NullHandler())
     # Silence the annoying pycountry logger

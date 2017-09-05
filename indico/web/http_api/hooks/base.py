@@ -26,7 +26,7 @@ from types import GeneratorType
 import pytz
 from flask import current_app, request
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.legacy.common.mail import GenericMailer
@@ -111,10 +111,8 @@ class HTTPAPIHook(object):
         self._detail = get_query_parameter(self._queryParams, ['d', 'detail'], self.DEFAULT_DETAIL)
         tzName = get_query_parameter(self._queryParams, ['tz'], None)
 
-        self._serverTZ = Config.getInstance().getDefaultTimezone()
-
         if tzName is None:
-            tzName = self._serverTZ
+            tzName = config.DEFAULT_TIMEZONE
         try:
             self._tz = pytz.timezone(tzName)
         except pytz.UnknownTimeZoneError, e:
@@ -282,7 +280,6 @@ class IteratedDataFetcher(DataFetcher):
     def __init__(self, user, hook):
         super(IteratedDataFetcher, self).__init__(user, hook)
         self._tz = hook._tz
-        self._serverTZ = hook._serverTZ
         self._offset = hook._offset
         self._limit = hook._limit
         self._detail = hook._detail

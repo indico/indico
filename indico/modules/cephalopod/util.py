@@ -22,7 +22,7 @@ import requests
 from requests.exceptions import HTTPError, RequestException, Timeout
 from werkzeug.urls import url_join
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.cephalopod import cephalopod_settings, logger
 from indico.modules.core.settings import core_settings
 
@@ -32,16 +32,16 @@ TIMEOUT = 10
 
 
 def _get_url():
-    return url_join(Config.getInstance().getCommunityHubURL(), 'api/instance/')
+    return url_join(config.COMMUNITY_HUB_URL, 'api/instance/')
 
 
 def register_instance(contact, email):
-    payload = {'url': Config.getInstance().getBaseURL(),
+    payload = {'url': config.BASE_URL,
                'contact': contact,
                'email': email,
                'organization': core_settings.get('site_organization')}
     response = requests.post(_get_url(), data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
-                             verify=(not Config.getInstance().getDebug()))
+                             verify=(not config.DEBUG))
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -75,7 +75,7 @@ def unregister_instance():
     payload = {'enabled': False}
     url = url_join(_get_url(), cephalopod_settings.get('uuid'))
     response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
-                              verify=(not Config.getInstance().getDebug()))
+                              verify=(not config.DEBUG))
     try:
         response.raise_for_status()
     except HTTPError as err:
@@ -102,13 +102,13 @@ def sync_instance(contact, email):
         return
 
     payload = {'enabled': True,
-               'url': Config.getInstance().getBaseURL(),
+               'url': config.BASE_URL,
                'contact': contact,
                'email': email,
                'organization': core_settings.get('site_organization')}
     url = url_join(_get_url(), cephalopod_settings.get('uuid'))
     response = requests.patch(url, data=json.dumps(payload), headers=HEADERS, timeout=TIMEOUT,
-                              verify=(not Config.getInstance().getDebug()))
+                              verify=(not config.DEBUG))
     try:
         response.raise_for_status()
     except HTTPError as err:

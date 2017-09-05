@@ -26,6 +26,7 @@ from sqlalchemy import Date, cast
 from sqlalchemy.orm import joinedload, subqueryload, undefer
 from werkzeug.exceptions import ServiceUnavailable
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -609,8 +610,8 @@ class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
                 data['sessions'].extend(self._build_session_api_data(session_))
         if self._occurrences:
             data['occurrences'] = fossilize(self._calculate_occurrences(event, self._fromDT, self._toDT,
-                                            pytz.timezone(self._serverTZ)),
-                                            {Period: IPeriodFossil}, tz=self._tz, naiveTZ=self._serverTZ)
+                                            pytz.timezone(config.DEFAULT_TIMEZONE)),
+                                            {Period: IPeriodFossil}, tz=self._tz, naiveTZ=config.DEFAULT_TIMEZONE)
         return data
 
 

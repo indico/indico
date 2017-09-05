@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import TopMenuItem, TopMenuSection
@@ -34,6 +34,6 @@ def _topmenu_sections(sender, **kwargs):
 def _topmenu_items(sender, **kwargs):
     yield TopMenuItem('home', _('Home'), url_for_index(), 100)
     yield TopMenuItem('help', _('Indico help'), None, 30, section='help')
-    if Config.getInstance().getPublicSupportEmail():
+    if config.PUBLIC_SUPPORT_EMAIL:
         yield TopMenuItem('contact', _('Contact'), url_for('misc.contact'), 20, section='help')
     yield TopMenuItem('about', _('More about Indico'), 'https://getindico.io', 10, section='help')

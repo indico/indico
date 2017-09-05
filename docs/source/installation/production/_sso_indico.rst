@@ -3,7 +3,7 @@ Add the following code to your ``/opt/indico/etc/indico.conf``:
 .. code-block:: python
 
     # SSO
-    AuthProviders = {
+    AUTH_PROVIDERS = {
         'shib-sso': {
             'type': 'shibboleth',
             'title': 'SSO',
@@ -12,7 +12,7 @@ Add the following code to your ``/opt/indico/etc/indico.conf``:
             # 'logout_uri': 'https://login.yourcompany.tld/logout'
         }
     }
-    IdentityProviders = {
+    IDENTITY_PROVIDERS = {
         'shib-sso': {
             'type': 'shibboleth',
             'title': 'SSO',
@@ -35,7 +35,7 @@ if your SSO infrastructure provides a logout URL (usually used to log
 you out from all applications).
 
 If you only want to use SSO, without allowing people to login locally
-using username/password, disable it by setting ``LocalIdentities = False``
+using username/password, disable it by setting ``LOCAL_IDENTITIES = False``
 in ``indico.conf``.
 
 

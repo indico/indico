@@ -20,7 +20,7 @@ from flask import render_template
 from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
-from indico.legacy.webinterface.common import tools as security_tools
+from indico.core.config import config
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
@@ -28,8 +28,8 @@ from indico.web.assets import core_env
 from indico.web.flask.util import url_for, url_rule_to_js
 
 
-def generate_global_file(config):
-    locations = Location.find_all() if config.getIsRoomBookingActive() else []
+def generate_global_file():
+    locations = Location.find_all() if config.ENABLE_ROOMBOOKING else []
     location_names = {loc.name: loc.name for loc in locations}
     default_location = next((loc.name for loc in locations if loc.is_default), None)
     ext_auths = [{
@@ -40,13 +40,13 @@ def generate_global_file(config):
 
     indico_vars = {
         'Urls': {
-            'Base': config.getBaseURL(),
-            'BasePath': url_parse(config.getBaseURL()).path.rstrip('/'),
+            'Base': config.BASE_URL,
+            'BasePath': url_parse(config.BASE_URL).path.rstrip('/'),
             'JsonRpcService': url_for('api.jsonrpc'),
             'ExportAPIBase': url_for('api.httpapi', prefix='export'),
             'APIBase': url_for('api.httpapi', prefix='api'),
 
-            'ImagesBase': config.getImagesBaseURL(),
+            'ImagesBase': config.IMAGES_BASE_URL,
 
             'Login': url_for_login(),
             'Favorites': url_for('users.user_favorites'),
@@ -145,23 +145,14 @@ def generate_global_file(config):
             'Locations': location_names
         },
 
-        'Security': {
-            'allowedTags': ','.join(security_tools.allowedTags),
-            'allowedAttributes': ','.join(security_tools.allowedAttrs),
-            'allowedCssProperties': ','.join(security_tools.allowedCssProperties),
-            'allowedProtocols': ','.join(security_tools.allowedProtocols),
-            'urlProperties': ','.join(security_tools.urlProperties),
-            'sanitizationLevel': config.getSanitizationLevel()
-        },
-
         'Settings': {
             'ExtAuthenticators': ext_auths,
-            'RoomBookingModuleActive': config.getIsRoomBookingActive()
+            'RoomBookingModuleActive': config.ENABLE_ROOMBOOKING
         },
 
         'FileRestrictions': {
-            'MaxUploadFilesTotalSize': config.getMaxUploadFilesTotalSize(),
-            'MaxUploadFileSize': config.getMaxUploadFileSize()
+            'MaxUploadFilesTotalSize': config.MAX_UPLOAD_FILES_TOTAL_SIZE,
+            'MaxUploadFileSize': config.MAX_UPLOAD_FILE_SIZE
         }
     }
 

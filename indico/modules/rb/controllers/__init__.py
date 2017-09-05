@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.i18n import _
@@ -27,7 +27,7 @@ from indico.util.i18n import _
 
 class RHRoomBookingProtected(RHProtected):
     def _checkSessionUser(self):
-        if not Config.getInstance().getIsRoomBookingActive():
+        if not config.ENABLE_ROOMBOOKING:
             raise NotFound(_('The room booking module is not enabled.'))
         RHProtected._checkSessionUser(self)
         if not rb_check_user_access(session.user):

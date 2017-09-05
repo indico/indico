@@ -21,7 +21,7 @@ import posixpath
 from flask import g
 from sqlalchemy.ext.associationproxy import association_proxy
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkType
@@ -110,7 +110,7 @@ class AttachmentFile(StoredFileMixin, db.Model):
         self.assign_id()
         filename = '{}-{}-{}'.format(self.attachment.id, self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))
-        return Config.getInstance().getAttachmentStorage(), path
+        return config.ATTACHMENT_STORAGE, path
 
     @return_ascii
     def __repr__(self):

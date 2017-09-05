@@ -19,14 +19,14 @@ from __future__ import unicode_literals
 import pycountry
 from werkzeug.datastructures import ImmutableDict
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.caching import memoize
 
 
 @memoize
 def get_countries():
     _countries = {country.alpha2: country.name for country in pycountry.countries}
-    _countries.update(Config.getInstance().getCustomCountries())
+    _countries.update(config.CUSTOM_COUNTRIES)
     return ImmutableDict(_countries)
 
 

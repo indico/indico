@@ -33,7 +33,7 @@ from sqlalchemy.orm import load_only, noload
 from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.errors import UserValueError
 from indico.modules.api import api_settings
 from indico.modules.events import Event
@@ -408,7 +408,7 @@ def create_event_logo_tmp_file(event):
     """Creates a temporary file with the event's logo"""
     logo_meta = event.logo_metadata
     logo_extension = guess_extension(logo_meta['content_type']) or os.path.splitext(logo_meta['filename'])[1]
-    temp_file = NamedTemporaryFile(delete=False, dir=Config.getInstance().getTempDir(), suffix=logo_extension)
+    temp_file = NamedTemporaryFile(delete=False, dir=config.TEMP_DIR, suffix=logo_extension)
     temp_file.write(event.logo)
     temp_file.flush()
     return temp_file
@@ -598,7 +598,7 @@ class ZipGeneratorMixin:
         :return: The generated zip file.
         """
 
-        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir())
+        temp_file = NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR)
         with ZipFile(temp_file.name, 'w', allowZip64=True) as zip_handler:
             self.used_filenames = set()
             for item in self._iter_items(files_holder):

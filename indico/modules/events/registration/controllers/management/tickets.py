@@ -23,7 +23,7 @@ from flask import json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageOrientation, PageSize
 from indico.modules.designer.util import get_default_template_on_category
@@ -99,8 +99,6 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
     """Display configuration QRCode."""
 
     def _process(self):
-        config = Config.getInstance()
-
         # QRCode (Version 6 with error correction L can contain up to 106 bytes)
         qr = qrcode.QRCode(
             version=6,
@@ -116,7 +114,7 @@ class RHTicketConfigQRCodeImage(RHManageRegFormBase):
             "date": self.event.start_dt.isoformat(),
             "version": 1,
             "server": {
-                "base_url": config.getBaseURL(),
+                "base_url": config.BASE_URL,
                 "consumer_key": checkin_app.client_id,
                 "auth_url": url_for('oauth.oauth_authorize', _external=True),
                 "token_url": url_for('oauth.oauth_token', _external=True)

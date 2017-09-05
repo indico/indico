@@ -23,7 +23,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.auth import multipass
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.notifications import make_email
 from indico.legacy.common.mail import GenericMailer
@@ -222,9 +222,9 @@ class RHRegister(RH):
                 # If we have a matching user id, we shouldn't be on the registration page
                 # If the provider doesn't match it would't be a big deal but the request doesn't make sense
                 raise BadRequest
-        elif not Config.getInstance().getLocalIdentities():
+        elif not config.LOCAL_IDENTITIES:
             raise Forbidden('Local identities are disabled')
-        elif not Config.getInstance().getLocalRegistration():
+        elif not config.LOCAL_REGISTRATION:
             raise Forbidden('Local registration is disabled')
 
     def _get_verified_email(self):
@@ -295,8 +295,8 @@ class RHRegister(RH):
         user_data.update(handler.get_extra_user_data(form))
         identity_data = handler.get_identity_data(form)
         settings = {
-            'timezone': Config.getInstance().getDefaultTimezone() if session.timezone == 'LOCAL' else session.timezone,
-            'lang': session.lang or Config.getInstance().getDefaultLocale()
+            'timezone': config.DEFAULT_TIMEZONE if session.timezone == 'LOCAL' else session.timezone,
+            'lang': session.lang or config.DEFAULT_LOCALE
         }
         return {'email': email, 'extra_emails': extra_emails, 'user_data': user_data, 'identity_data': identity_data,
                 'settings': settings}
@@ -512,7 +512,7 @@ class LocalRegistrationHandler(RegistrationHandler):
 
     @property
     def moderate_registrations(self):
-        return Config.getInstance().getLocalModeration()
+        return config.LOCAL_MODERATION
 
     def get_all_emails(self, form):
         emails = super(LocalRegistrationHandler, self).get_all_emails(form)
@@ -555,7 +555,7 @@ class RHResetPassword(RH):
     """Resets the password for a local identity."""
 
     def _checkParams(self):
-        if not Config.getInstance().getLocalIdentities():
+        if not config.LOCAL_IDENTITIES:
             raise Forbidden('Local identities are disabled')
 
     def _process(self):

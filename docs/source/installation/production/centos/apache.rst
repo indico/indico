@@ -309,7 +309,7 @@ Now finish setting up the directory structure and permissions:
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/apache
     restorecon -R ~/
-    echo -e "\nStaticFileMethod = 'xsendfile'" >> ~/etc/indico.conf
+    echo -e "\nSTATIC_FILE_METHOD = 'xsendfile'" >> ~/etc/indico.conf
 
 
 9. Create database schema

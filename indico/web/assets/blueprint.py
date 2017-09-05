@@ -19,11 +19,10 @@ import os
 from flask import Response, current_app, json, redirect, render_template, send_from_directory, session
 from werkzeug.exceptions import NotFound
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.events.layout import theme_settings
 from indico.modules.users.util import serialize_user
-from indico.util.caching import make_hashable
 from indico.util.i18n import po_to_json
 from indico.util.string import crc32
 from indico.web.assets.util import get_asset_path
@@ -44,12 +43,10 @@ def js_vars_global():
     Provides a JS file with global definitions (all users)
     Useful for server-wide config options, URLs, etc...
     """
-    config = Config.getInstance()
-    config_hash = crc32(repr(make_hashable(sorted(config._configVars.items()))))
-    cache_file = os.path.join(config.getCacheDir(), 'assets_global_{}.js'.format(config_hash))
+    cache_file = os.path.join(config.CACHE_DIR, 'assets_global_{}.js'.format(config.hash))
 
     if not os.path.exists(cache_file):
-        data = generate_global_file(config)
+        data = generate_global_file()
         with open(cache_file, 'wb') as f:
             f.write(data)
 
@@ -86,10 +83,9 @@ def i18n_locale(locale_name):
     """
     Retrieve a locale in a Jed-compatible format
     """
-    config = Config.getInstance()
     root_path = os.path.join(current_app.root_path, 'translations')
     plugin_key = ','.join(sorted(plugin_engine.get_active_plugins()))
-    cache_file = os.path.join(config.getCacheDir(), 'assets_i18n_{}_{}.js'.format(locale_name, crc32(plugin_key)))
+    cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}_{}.js'.format(locale_name, crc32(plugin_key)))
 
     if not os.path.exists(cache_file):
         i18n_data = locale_data(root_path, locale_name, 'indico')
@@ -124,12 +120,12 @@ def static_asset(path, plugin=None, theme=None):
         raise NotFound
     elif theme and theme not in theme_settings.themes:
         raise NotFound
-    return send_from_directory(Config.getInstance().getAssetsDir(), get_asset_path(path, plugin=plugin, theme=theme))
+    return send_from_directory(config.ASSETS_DIR, get_asset_path(path, plugin=plugin, theme=theme))
 
 
 @assets_blueprint.route('!/static/custom/<path:filename>', endpoint='custom')
 def static_custom(filename):
-    customization_dir = Config.getInstance().getCustomizationDir()
+    customization_dir = config.CUSTOMIZATION_DIR
     if not customization_dir:
         raise NotFound
     customization_dir = os.path.join(customization_dir, 'static')

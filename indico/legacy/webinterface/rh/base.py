@@ -35,7 +35,7 @@ from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import NoReportError, get_error_description
@@ -295,7 +295,7 @@ class RH(RequestHandlerBase):
     def _processGeneralError(self, e):
         """Treats general errors occured during the process of a RH."""
 
-        if Config.getInstance().getPropagateAllExceptions():
+        if config.PROPAGATE_ALL_EXCEPTIONS:
             raise
         return WPGenericError(self).display()
 
@@ -304,7 +304,7 @@ class RH(RequestHandlerBase):
         """Unexpected errors"""
 
         self._responseUtil.redirect = None
-        if Config.getInstance().getEmbeddedWebserver() or Config.getInstance().getPropagateAllExceptions():
+        if config.PROPAGATE_ALL_EXCEPTIONS:
             raise
         return WPUnexpectedError(self).display()
 
@@ -430,7 +430,7 @@ class RH(RequestHandlerBase):
 
         if self._doProcess:
             if profile:
-                profile_name = os.path.join(Config.getInstance().getTempDir(), 'stone{}.prof'.format(random.random()))
+                profile_name = os.path.join(config.TEMP_DIR, 'stone{}.prof'.format(random.random()))
                 result = [None]
                 cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_name)
                 res = result[0]
@@ -443,8 +443,7 @@ class RH(RequestHandlerBase):
             # Just to be sure that we don't get some crappy http verb we don't expect
             raise BadRequest
 
-        cfg = Config.getInstance()
-        profile = cfg.getProfile()
+        profile = config.PROFILE
         profile_name, res, textLog = '', '', []
 
         self._startTime = datetime.now()
@@ -492,7 +491,7 @@ class RH(RequestHandlerBase):
 
         # log request timing
         if profile and os.path.isfile(profile_name):
-            rep = Config.getInstance().getTempDir()
+            rep = config.TEMP_DIR
             stats = pstats.Stats(profile_name)
             stats.sort_stats('cumulative', 'time', 'calls')
             stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))

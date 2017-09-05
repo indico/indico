@@ -22,7 +22,7 @@ from wtforms.widgets import CheckboxInput, HiddenInput, TextArea, TextInput
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.util.string import natural_sort_key
 from indico.web.flask.templating import get_template_module
@@ -265,7 +265,7 @@ class LocationWidget(JinjaWidget):
         rooms = {'data': []}
         venues = {'data': []}
         venue_map = {}
-        if Config.getInstance().getIsRoomBookingActive():
+        if config.ENABLE_ROOMBOOKING:
             rooms = {loc.name: {'data': self.get_sorted_rooms(loc)} for loc in field.locations}
             venues = {'data': [{'id': loc.id, 'name': loc.name} for loc in field.locations]}
             venue_map = {loc['id']: loc['name'] for loc in venues['data']}

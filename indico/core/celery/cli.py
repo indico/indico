@@ -22,7 +22,7 @@ import sys
 from celery.bin.celery import CeleryCommand, command_classes
 
 from indico.core.celery import celery
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.util.console import cformat
 from indico.web.flask.util import url_for
@@ -57,7 +57,7 @@ def celery_cmd(args):
                     'INDICO_FLOWER_AUTHORIZE_URL': url_for('oauth.oauth_authorize', _external=True),
                     'INDICO_FLOWER_TOKEN_URL': url_for('oauth.oauth_token', _external=True),
                     'INDICO_FLOWER_USER_URL': url_for('users.authenticated_user', _external=True)}
-        args = ['celery', '-b', Config.getInstance().getCeleryBroker()] + args + auth_args
+        args = ['celery', '-b', config.CELERY_BROKER] + args + auth_args
         env = dict(os.environ, **auth_env)
         os.execvpe('celery', args, env)
     elif args and args[0] == 'shell':

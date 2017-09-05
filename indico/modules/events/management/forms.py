@@ -28,7 +28,7 @@ from wtforms import BooleanField, FloatField, SelectField, StringField, TextArea
 from wtforms.fields.html5 import IntegerField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
@@ -72,7 +72,7 @@ class EventDataForm(IndicoForm):
         self.event = kwargs.pop('event')
         super(EventDataForm, self).__init__(*args, **kwargs)
         # TODO: Add a custom widget showing the prefix right before the field
-        prefix = '{}/e/'.format(Config.getInstance().getBaseURL())
+        prefix = '{}/e/'.format(config.BASE_URL)
         self.url_shortcut.description = _('<strong>{}SHORTCUT</strong> - the URL shortcut must be unique within '
                                           'this Indico instance and is not case sensitive.').format(prefix)
 

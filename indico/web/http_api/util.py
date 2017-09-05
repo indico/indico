@@ -19,7 +19,7 @@ import hmac
 import time
 import urllib
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.api import APIMode, api_settings
 
 
@@ -63,7 +63,6 @@ def generate_public_auth_request(apiKey, path, params=None):
     else:
         key = secret_key = None
         persistent = False
-    baseURL = Config.getInstance().getBaseURL()
     publicRequestsURL = None
     authRequestURL = None
     if apiMode == APIMode.KEY:
@@ -83,4 +82,5 @@ def generate_public_auth_request(apiKey, path, params=None):
         authRequestURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
         params["onlypublic"] = "yes"
         publicRequestsURL = build_indico_request(path, params, key, secret_key, persistent)  if key else None
-    return {"publicRequestURL": (baseURL + publicRequestsURL) if publicRequestsURL else "", "authRequestURL": (baseURL + authRequestURL) if authRequestURL else ""}
+    return {'publicRequestURL': (config.BASE_URL + publicRequestsURL) if publicRequestsURL else '',
+            'authRequestURL': (config.BASE_URL + authRequestURL) if authRequestURL else ''}

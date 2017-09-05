@@ -21,7 +21,6 @@ from flask import request, session
 from sqlalchemy.exc import DatabaseError
 
 from indico.core import signals
-from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import ConstraintViolated, handle_sqlalchemy_database_error
 from indico.core.errors import NoReportError as NoReportIndicoError

@@ -35,7 +35,7 @@ from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
 import indico
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.storage.backend import get_storage
@@ -578,7 +578,7 @@ class EventImporter(object):
         return path
 
     def _process_file(self, id_, data):
-        storage_backend = Config.getInstance().getAttachmentStorage()
+        storage_backend = config.ATTACHMENT_STORAGE
         storage = get_storage(storage_backend)
         extracted = self.archive.extractfile(data['uuid'])
         path = self._get_file_storage_path(id_, data['filename'])

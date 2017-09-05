@@ -21,7 +21,7 @@
             {# Local groups usually don't have massive amounts of members so we load them immediately #}
             {{ group_members(group) }}
         {% else %}
-            <img src="{{ indico_config.ImagesBaseURL }}/loading.gif" title="{% trans %}Loading member list{% endtrans %}">
+            <img src="{{ indico_config.IMAGES_BASE_URL }}/loading.gif" title="{% trans %}Loading member list{% endtrans %}">
             <script>
                 $.ajax({
                     url: {{ url_for('.group_members', group) | tojson }},

@@ -17,7 +17,7 @@
 from functools import wraps
 from types import GeneratorType
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.mail import GenericMailer
 
 
@@ -90,13 +90,11 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     to_list = {to_list} if isinstance(to_list, basestring) else to_list
     cc_list = {cc_list} if isinstance(cc_list, basestring) else cc_list
     bcc_list = {bcc_list} if isinstance(bcc_list, basestring) else bcc_list
-    if not from_address:
-        from_address = Config.getInstance().getNoReplyEmail()
     return {
         'toList': set(to_list),
         'ccList': set(cc_list),
         'bccList': set(bcc_list),
-        'fromAddr': from_address,
+        'fromAddr': from_address or config.NO_REPLY_EMAIL,
         'replyAddr': reply_address,
         'attachments': attachments,
         'subject': subject,

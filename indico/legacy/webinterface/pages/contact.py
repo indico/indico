@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer, WTemplated
 from indico.util.i18n import _
@@ -32,5 +32,5 @@ class WPContact(WPMainBase):
 class WContact(WTemplated):
     def getVars(self):
         vars = WTemplated.getVars(self)
-        vars["supportEmail"] = Config.getInstance().getPublicSupportEmail()
+        vars["supportEmail"] = config.PUBLIC_SUPPORT_EMAIL
         return vars

@@ -55,8 +55,8 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
 
     os.environ.pop('FLASK_DEBUG', None)
     os.environ['INDICO_CONF_OVERRIDE'] = repr({
-        'EmbeddedWebserver': True,
-        'BaseURL': url,
+        'PROPAGATE_ALL_EXCEPTIONS': True,
+        'BASE_URL': url,
     })
 
     if os.environ.get('WERKZEUG_RUN_MAIN') != 'true':
@@ -94,9 +94,7 @@ def _reset_state():
     # The reason for this behavior is that a file that fails to import
     # is not added to `sys.modules` so the reloader won't monitor it for
     # changes.
-    from indico.core.config import Config
     from indico.core.celery import celery
-    Config._Config__instance = None
     celery.flask_app = None
 
 

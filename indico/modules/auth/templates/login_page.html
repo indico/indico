@@ -5,7 +5,7 @@
     <div class="centered-column">
         {% if active_provider %}
             <div class="login-container clearfix">
-                <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                <img class="header-logo" src="{{ indico_config.IMAGES_BASE_URL }}/logo_indico.png">
                 {% if login_reason %}
                     <div class="login-reason-box">
                         {{ login_reason }}
@@ -36,7 +36,7 @@
             {% endif %}
         {% else %}
             <div class="login-container clearfix">
-                <img class="header-logo" src="{{ indico_config.config.getSystemIconURL('logoIndico') }}">
+                <img class="header-logo" src="{{ indico_config.IMAGES_BASE_URL }}/logo_indico.png">
                 {% include 'flashed_messages.html' %}
             </div>
         {% endif %}
@@ -56,15 +56,15 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {% if indico_config.LocalIdentities and indico_config.LocalRegistration %}
+        {% if indico_config.LOCAL_IDENTITIES and indico_config.LOCAL_REGISTRATION %}
             <p class="register">
                 {% trans url=url_for('.register', next=request.args.get('next')) -%}
                     If you do not have an Indico account yet, you can <a href="{{ url }}">create one here</a>.
                 {%- endtrans %}
             </p>
-        {% elif indico_config.ExternalRegistrationURL %}
+        {% elif indico_config.EXTERNAL_REGISTRATION_URL %}
             <p class="register">
-                {% trans url=indico_config.ExternalRegistrationURL -%}
+                {% trans url=indico_config.EXTERNAL_REGISTRATION_URL -%}
                     If you do not have an account yet, you can <a href="{{ url }}" target="_blank">create one here</a>.
                 {%- endtrans %}
             </p>

@@ -24,7 +24,7 @@ from wtforms.fields.core import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -74,7 +74,7 @@ class PaymentPluginMixin(object):
 
     @property
     def logo_url(self):
-        return Config.getInstance().getImagesBaseURL() + '/payment_logo.png'
+        return config.IMAGES_BASE_URL + '/payment_logo.png'
 
     def can_be_modified(self, user, event):
         """Checks if the user is allowed to enable/disable/modify the payment method.

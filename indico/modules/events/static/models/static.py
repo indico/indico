@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import posixpath
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.storage import StoredFileMixin
@@ -107,7 +107,7 @@ class StaticSite(StoredFileMixin, db.Model):
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))
-        return Config.getInstance().getStaticSiteStorage(), path
+        return config.STATIC_SITE_STORAGE, path
 
     @return_ascii
     def __repr__(self):

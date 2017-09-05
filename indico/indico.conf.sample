@@ -12,21 +12,21 @@
 # SQLAlchemy DB
 #------------------------------------------------------------------------------
 
-SQLAlchemyDatabaseURI = 'postgresql:///indico'
+SQLALCHEMY_DATABASE_URI = 'postgresql:///indico'
 
 # Size of the connection pool (default = 5)
-# SQLAlchemyPoolSize = 5
+# SQLALCHEMY_POOL_SIZE = 5
 
 # Connection timeout
-# SQLAlchemyPoolTimeout = 10
+# SQLALCHEMY_POOL_TIMEOUT = 10
 
 # Number of seconds after which a connection is automatically
 # recycled (default = 120)
-# SQLAlchemyPoolRecycle = 120
+# SQLALCHEMY_POOL_RECYCLE = 120
 
 # Number of connections that can be breated after pool is at maximum
 # size (default = 3)
-# SQLAlchemyMaxOverflow = 3
+# SQLALCHEMY_MAX_OVERFLOW = 3
 
 #------------------------------------------------------------------------------
 # SECURITY
@@ -37,12 +37,12 @@ SQLAlchemyDatabaseURI = 'postgresql:///indico'
 #    2: Raise error if SCRIPT tag is used
 #    3: No input filtering is done (DANGEROUS!)
 
-SanitizationLevel    = 2
+SANITIZATION_LEVEL = 2
 
 # To sign data such as activation tokens used in emails, Indico needs a secret
 # key.  It should be a random string; the preferred way to generate it is using
 # `import os; os.urandom(32)` in a Python shell.
-SecretKey = ''
+SECRET_KEY = ''
 
 #------------------------------------------------------------------------------
 # Development
@@ -50,24 +50,13 @@ SecretKey = ''
 # Enable debug mode to get unminified assets, verbose error messages in the
 # browser and various other things that are useful when developing indico or
 # tracking down errors but should not be enabled for production systems.
-#Debug = False
-#
-# Enabling unicode debugging injects an invisible zero-width space at the
-# beginning and end of every translated string.  This will cause errors in case
-# of implicit conversions from bytes to unicode or vide versa instead of
-# silently succeeding for english (ascii) strings and then failing in languages
-# where the same string is not plain ascii.  This setting should be enabled only
-# during development and never in production.
-# Level 1 will inject it only in translated strings and is usually safe while
-# level 2 will inject it in formatted date/time values too which may result in
-# strange/broken behavior in certain form fields.
-#DebugUnicode = 0
+#DEBUG = False
 #
 # You can cause all error-like exceptions (i.e. not something like AccessError)
 # to be propagated outside the Indico WSGI app by enabling this option. This has
 # the advantage of triggering the Werkzeug debugger of the embedded server even
 # in case of e.g. a MaKaCError.
-#PropagateAllExceptions = False
+#PROPAGATE_ALL_EXCEPTIONS = False
 
 #------------------------------------------------------------------------------
 # URLs
@@ -75,38 +64,38 @@ SecretKey = ''
 # BaseURL is the url where Indico will be accessed.
 # Except for development systems this should be a https URL and your web server
 # should be configured to redirect all HTTP requests to HTTPS.
-BaseURL = 'https://indico.yourdomain.tld'
+BASE_URL = 'https://indico.yourdomain.tld'
 
 # If you upgraded from an older Indico version (pre-2.0) and want to preserve
 # older URLs you should enable this option to avoid breaking links in search
 # engines and other websites.
-#RouteOldURLs = False
+#ROUTE_OLD_URLS = False
 
 
 #------------------------------------------------------------------------------
 # DIRECTORIES
 #------------------------------------------------------------------------------
-LogDir    = '/opt/indico/log'
-TempDir   = '/opt/indico/tmp'
-AssetsDir = '/opt/indico/assets'
-CacheDir  = '/opt/indico/cache'
+LOG_DIR    = '/opt/indico/log'
+TEMP_DIR   = '/opt/indico/tmp'
+ASSETS_DIR = '/opt/indico/assets'
+CACHE_DIR  = '/opt/indico/cache'
 # You can use 'redis', 'memcached' or 'files'. The files backend caches objects in
 # CacheDir while the Memcached backend uses one or more memcached servers.
-#CacheBackend         = 'files'
+#CACHE_BACKEND         = 'files'
 # When using memcached, provide a tuple containing 'ip:port' entries for the
 # memcached servers. Do not forget to firewall those servers as memcached has no
 # authentication at all!
-#MemcachedServers     = ('127.0.0.1:11211',)
+#MEMCACHED_SERVERS     = ('127.0.0.1:11211',)
 # When using redis, provide a redis connection string for the Redis server.
-#RedisCacheURL = 'redis://unused:password@localhost:6379/1'
+#REDIS_CACHE_URL = 'redis://unused:password@localhost:6379/1'
 
 #------------------------------------------------------------------------------
 # SMTP
 #------------------------------------------------------------------------------
-SmtpServer           = ("localhost", 8025)
-SmtpLogin            = ""
-SmtpPassword         = ""
-SmtpUseTLS           = False
+SMTP_SERVER = ('localhost', 8025)
+SMTP_LOGIN = ''
+SMTP_PASSWORD = ''
+SMTP_USE_TLS = False
 
 #------------------------------------------------------------------------------
 # EMAIL ADDRESSES
@@ -114,18 +103,18 @@ SmtpUseTLS           = False
 # SupportEmail is the email address where all automatically generated
 # application errors will be sent to.
 
-SupportEmail         = "root@localhost"
+SUPPORT_EMAIL = "root@localhost"
 
 
 # PublicSupportEmail is an email address that will be shown in Indico and where
 # users are expected to find help when they have using the website.
 
-PublicSupportEmail   = "root@localhost"
+PUBLIC_SUPPORT_EMAIL = "root@localhost"
 
 # NoReplyEmail is the email address showed when we do not want the users to answer
 # an automatically generated email.
 
-NoReplyEmail	     = "noreply-root@localhost"
+NO_REPLY_EMAIL = "noreply-root@localhost"
 
 
 #------------------------------------------------------------------------------
@@ -135,14 +124,14 @@ NoReplyEmail	     = "noreply-root@localhost"
 # request. This is a hard limit that is enforced on the server side.
 # default: 0 (unlimited)
 
-MaxUploadFilesTotalSize = 0
+MAX_UPLOAD_FILES_TOTAL_SIZE = 0
 
 # Here you can limit the maximum size of an uploaded file (in MB)
 # default: 0 (unlimited)
 # Please note that this limit is only enforced on the client side!
 # For a hard limit see MaxUploadFilesTotalSize
 
-MaxUploadFileSize = 0
+MAX_UPLOAD_FILE_SIZE = 0
 
 
 #------------------------------------------------------------------------------
@@ -151,7 +140,7 @@ MaxUploadFileSize = 0
 # Indico can automatically delete events older than a specified number of days.
 # This is set on a per-category basis:
 #
-# CategoryCleanup = {
+# CATEGORY_CLEANUP = {
 #   '2': 30  # delete events in category '2' that have been created more than 30 days ago
 # }
 
@@ -167,10 +156,10 @@ MaxUploadFileSize = 0
 # you should enable it here
 #
 # X-Sendfile (apache with mod_xsendfile, lighttpd):
-# StaticFileMethod = 'xsendfile'
+# STATIC_FILE_METHOD = 'xsendfile'
 #
 # X-Accel-Redirect (nginx):
-# StaticFileMethod = ('xaccelredirect', {
+# STATIC_FILE_METHOD = ('xaccelredirect', {
 #     '/opt/indico/archive': '/.xsf/archive',
 #     '/opt/indico/cache': '/.xsf/cache',
 #     '/opt/indico/htdocs': '/.xsf/htdocs'
@@ -183,18 +172,18 @@ MaxUploadFileSize = 0
 # }
 # DO NOT forget the "internal;" statement - it prevents users from accessing those URLs directly.
 
-#StaticFileMethod = None
+#STATIC_FILE_METHOD = None
 
 
 # Sessions are only stored for a certain time. You can modify the duration here. By setting
 # the lifetime to 0 the cookie will expire when the browser is closed.
-#SessionLifetime = 86400 * 31
+#SESSION_LIFETIME = 86400 * 31
 
 # If indico is behind a proxy, the user's IP needs to be retrieved from the
 # HTTP_X_FORWARDED_FOR header. To enable this behavior, set UseProxy to True.
 # Note that this MUST NOT be enabled if the machine is accessible directly or
 # users will be able to spoof their IP address!
-#UseProxy = False
+#USE_PROXY = False
 
 
 #------------------------------------------------------------------------------
@@ -208,22 +197,22 @@ MaxUploadFileSize = 0
 # If the LoggingConfigFile is not an absolute path, it is relative to the
 # location of this file.
 #
-# LoggingConfigFile    = 'logging.conf'
-# Loggers              = ['sentry', 'files']
-# SentryDSN            = 'http://user:password@logger.example.com/n'
-# SentryLoggingLevel   = 'ERROR'  # default: 'WARNING'
+# LOGGING_CONFIG_FILE = 'logging.conf'
+# LOGGERS = ['sentry', 'files']
+# SENTRY_DSN = 'http://user:password@logger.example.com/n'
+# SENTRY_LOGGING_LEVEL = 'ERROR'  # default: 'WARNING'
 
 
 #------------------------------------------------------------------------------
 # LATEX/PDF GENERATION
 #------------------------------------------------------------------------------
-# Set the path to xelatex if it's not within PATH:
-# PDFLatexProgram = 'xelatex'
+# Set the full path to xelatex if it's not within PATH:
+# XELATEX_PATH = 'xelatex'
 #
 # In strict mode, a non-zero status code is considered failure. Disable this if
 # you have old contributions that contain invalid LaTeX and you prefer possibly
 # weird-looking PDFs over an error and no PDF at all.
-# StrictLatex = True
+# STRICT_LATEX = True
 
 #------------------------------------------------------------------------------
 # ACTIVE PLUGINS
@@ -231,7 +220,7 @@ MaxUploadFileSize = 0
 
 # List of plugins to be loaded on server start.
 #
-# Plugins = {'example'}
+# PLUGINS = {'example'}
 
 #------------------------------------------------------------------------------
 # AUTHENTICATION
@@ -239,19 +228,19 @@ MaxUploadFileSize = 0
 # If you do not need integration with an existing authentication infrastructure
 # such as LDAP, OAuth or a SSO system like Shibboleth, you do not have to set
 # anything here. Having local identities enabled is sufficient:
-# LocalIdentities = True
+# LOCAL_IDENTITIES = True
 
 # If you do not want people to register Indico accounts on their own you can
 # disable that here.  Administrators can still create new indico accounts.
-# LocalRegistration = True
+# LOCAL_REGISTRATION = True
 
 # If you want to allow people to register themselves, but approve them before
 # their account is actually created, you can enable moderation.
-# LocalModeration = False
+# LOCAL_MODERATION = False
 
-# When `LocalIdentities` is set to False, a link to an external registration
+# When `LOCAL_IDENTITIES` is set to False, a link to an external registration
 # page can be configured here:
-# ExternalRegistrationURL = ''
+# EXTERNAL_REGISTRATION_URL = ''
 
 # For advanced authentication and user information retrieval, Indico uses the
 # Flask-Multipass library, so you can use any registered multipass auth/identity
@@ -304,11 +293,11 @@ MaxUploadFileSize = 0
 # an external user with no email will not appear in search results.
 #
 # Auth and identity providers with the same name are linked automatically
-# unless ProviderMap is specified.  If specified it should be a dictionary
+# unless PROVIDER_MAP is specified.  If specified it should be a dictionary
 # suitable for the MULTIPASS_PROVIDER_MAP setting of multipass.
-#AuthProviders = {}
-#IdentityProviders = {}
-#ProviderMap = {}
+#AUTH_PROVIDERS = {}
+#IDENTITY_PROVIDERS = {}
+#PROVIDER_MAP = {}
 
 #------------------------------------------------------------------------------
 # GLOBAL DEFAULTS
@@ -316,10 +305,10 @@ MaxUploadFileSize = 0
 
 # The timezone that is used by default. This also affects the timezone used by
 # periodic tasks.
-#DefaultTimezone = 'UTC'
+#DEFAULT_TIMEZONE = 'UTC'
 #
 # The locale that is used by default for i18n.
-#DefaultLocale = 'en_GB'
+#DEFAULT_LOCALE = 'en_GB'
 
 
 #------------------------------------------------------------------------------
@@ -332,11 +321,11 @@ MaxUploadFileSize = 0
 # We recommend Redis as it is very easy to set up. For details, see the Celery
 # documentation:
 # http://celery.readthedocs.org/en/latest/getting-started/brokers/redis.html
-#CeleryBroker = 'redis://unused:password@localhost:6379/0'
+#CELERY_BROKER = 'redis://unused:password@localhost:6379/0'
 #
 # By default, task results are stored in the broker backend, but you can
 # override it.
-#CeleryResultBackend = None
+#CELERY_RESULT_BACKEND = None
 #
 # By default, all periodic tasks are enabled and use a schedule that is
 # considered appropriate by the Indico developers.  You can override this
@@ -348,12 +337,12 @@ MaxUploadFileSize = 0
 #   The `task` key is not necessary in this case, as it is set automatically.
 # - A `timedelta` or `crontab` object which will just override the schedule
 #   and not touch any other options of the task.
-#ScheduledTaskOverride = {}
+#SCHEDULED_TASK_OVERRIDE = {}
 #
 # You can use the `CeleryConfig` settings to specify/override any config option
 # supported by Celery. For the full list of options, see the Celery docs at
 # http://celery.readthedocs.org/en/latest/configuration.html
-#CeleryConfig = {}
+#CELERY_CONFIG = {}
 #
 # Your Celery workers can be monitored using Flower.  To use it, simply start it
 # using `indico celery flower`; by default it will listen on the same host as
@@ -363,7 +352,7 @@ MaxUploadFileSize = 0
 # authentication will fail with an OAuth error.
 # To get a link to Flower in the administration menu, set `FlowerURL` to the URL
 # under which your Flower instance is accessible:
-#FlowerURL = None
+#FLOWER_URL = None
 
 
 # ------------------------------------------------------------------------------
@@ -378,16 +367,16 @@ MaxUploadFileSize = 0
 # To define a filesystem-based backend, use the string `fs:/base/path`.
 # Other backends may accept different options - see the documentation of these
 # backends for details.
-#StorageBackends = {'default': 'fs:/opt/indico/archive'}
+#STORAGE_BACKENDS = {'default': 'fs:/opt/indico/archive'}
 #
 # You need to set the storage backend used for event attachments to backend that
 # has been defined in StorageBackends.  Note that this only affects new uploads.
 # Existing files are taken from whatever backend was used when they have been
 # uploaded.
-#AttachmentStorage = 'default'
+#ATTACHMENT_STORAGE = 'default'
 # Static sites can be stored in a different backend.  If not set, the attachment
 # storage backend will be used.
-#StaticSiteStorage = None
+#STATIC_SITE_STORAGE = None
 
 
 # ------------------------------------------------------------------------------
@@ -400,7 +389,7 @@ MaxUploadFileSize = 0
 # sure to test all your modifications whenever you update Indico!
 #
 # Set the base directory for customizations.
-#CustomizationDir = '/opt/indico/custom'
+#CUSTOMIZATION_DIR = '/opt/indico/custom'
 #
 # By enabling customization debugging indico will log all customizable
 # templates the first time they are accessed (note that you need to enable the
@@ -413,7 +402,7 @@ MaxUploadFileSize = 0
 # where possible. To make this easier the log entry will also contain a
 # "reference" path that can be used to reference the original template from the
 # customized one.
-#CustomizationDebug = False
+#CUSTOMIZATION_DEBUG = False
 #
 # To include custom CSS and JavaScript, simply put *.scss and *.js files into
 # `<CustomizationDir>/scss` / `<CustomizationDir>/js`.  If there are multiple
@@ -425,4 +414,4 @@ MaxUploadFileSize = 0
 #
 # If you have a custom logo, specify the URL to it here.  If unset, the default
 # indico logo is used.
-#LogoURL = ''
+#LOGO_URL = ''

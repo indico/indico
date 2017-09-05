@@ -20,7 +20,7 @@ from flask import session
 from pytz import utc
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features import features_event_settings
 from indico.modules.events.operations import create_event
@@ -32,7 +32,7 @@ def warn_on_access(fn):
 
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        if Config.getInstance().getDebug():
+        if config.DEBUG:
             warnings.warn('Called {}'.format(fn.__name__), stacklevel=2)
         return fn(*args, **kwargs)
 

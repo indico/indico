@@ -24,7 +24,7 @@ from pprint import pformat
 
 from flask import has_request_context, request
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.web.util import get_request_info
 
 
@@ -196,42 +196,36 @@ class Logger:
                    'celery': [CeleryFilter()],
                    'smtp': [AddIDFilter('indico')]}
 
-        config = Config.getInstance()
-
-        if 'files' in config.getLoggers():
-            logConfFilepath = config.getLoggingConfigFilePath()
-            smtpServer = config.getSmtpServer()
-            serverName = config.getWorkerName()
-
+        if 'files' in config.LOGGERS:
+            smtp_server = config.SMTP_SERVER
+            server_name = config.WORKER_NAME
             # Default arguments for the handlers, taken mostly for the configuration
-            defaultArgs = {
+            default_args = {
                 'indico': ("FileHandler", "('%s', 'a')" % cls._log_path('indico.log'), 'DEBUG'),
                 'other': ("FileHandler", "('%s', 'a')" % cls._log_path('other.log'), 'DEBUG'),
                 'celery': ("FileHandler", "('%s', 'a')" % cls._log_path('celery.log'), 'DEBUG'),
                 'stderr': ('StreamHandler', '()', 'DEBUG'),
                 'smtp': (
                     "handlers.SMTPHandler", "(%s, 'logger@%s', ['%s'], 'Unexpected Exception occurred at %s')"
-                    % (smtpServer, serverName, config.getSupportEmail(), serverName), "ERROR")
+                    % (smtp_server, server_name, config.SUPPORT_EMAIL, server_name), "ERROR")
             }
 
-            cls.handlers.update(LoggerUtils.configFromFile(logConfFilepath, defaultArgs, filters))
+            cls.handlers.update(LoggerUtils.configFromFile(config.LOGGING_CONFIG_PATH, default_args, filters))
 
     @classmethod
     def init_app(cls, app):
         """
         Initialize Flask app logging (add Sentry if needed)
         """
-        config = Config.getInstance()
-
-        if 'sentry' in config.getLoggers():
+        if 'sentry' in config.LOGGERS:
             from raven.contrib.flask import Sentry
-            app.config['SENTRY_DSN'] = config.getSentryDSN()
+            app.config['SENTRY_DSN'] = config.SENTRY_DSN
 
             # Plug into both Flask and `logging`
-            Sentry(app, logging=True, level=getattr(logging, config.getSentryLoggingLevel()))
+            Sentry(app, logging=True, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
 
     @classmethod
-    def reset(cls):
+    def reset(cls, no_init=False):
         """
         Reset the config, using new paths, etc (useful for testing)
         """
@@ -239,7 +233,8 @@ class Logger:
             for handler in copy.copy(cls.handlers):
                 cls.removeHandler(handler)
 
-        cls.initialize()
+        if not no_init:
+            cls.initialize()
 
     @classmethod
     def removeHandler(cls, handlerName):
@@ -256,18 +251,13 @@ class Logger:
 
     @classmethod
     def _log_path(cls, fname):
-        cfg = Config.getInstance()
-
         # If we have no config file we are most likely running tests.
         # Doesn't make sense to log anything in this case.
-        if cfg.getFinalConfigFilePath() is None:
+        if config.CONFIG_PATH_RESOLVED is None:
             return os.devnull
 
-        for fpath in (os.path.join(cfg.getLogDir(), fname), os.path.join(os.getcwd(), '.indico.log')):
+        for fpath in (os.path.join(config.LOG_DIR, fname), os.path.join(os.getcwd(), '.indico.log')):
             if os.access(os.path.dirname(fpath), os.W_OK):
                 return fpath.replace('\\', '\\\\')
         else:
             raise IOError("Log file can't be written")
-
-
-Logger.initialize()

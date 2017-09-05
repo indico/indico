@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, request, session
 from werkzeug.datastructures import MultiDict
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.auth import Identity
 from indico.modules.users.operations import create_user
 from indico.util.signing import secure_serializer
@@ -137,9 +137,9 @@ def url_for_register(next_url=None, email=None):
                   has already been validated using some other way.
 
     """
-    if Config.getInstance().getLocalIdentities():
+    if config.LOCAL_IDENTITIES:
         token = secure_serializer.dumps(email, salt='register-email-prevalidated') if email else None
         return url_for('auth.register', token=token, next=next_url, _external=True)
 
-    external_url = Config.getInstance().getExternalRegistrationURL()
+    external_url = config.EXTERNAL_REGISTRATION_URL
     return external_url or url_for_login()

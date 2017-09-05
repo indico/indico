@@ -29,7 +29,7 @@ from dateutil.relativedelta import relativedelta as _relativedelta
 from dateutil.rrule import DAILY, FR, MO, SA, SU, TH, TU, WE, rrule
 from flask import has_request_context, request, session
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
 
@@ -90,13 +90,13 @@ def server_to_utc(dt):
 
     The given datetime **MUST** be naive but already contain the correct time in the server's TZ.
     """
-    server_tz = get_timezone(Config.getInstance().getDefaultTimezone())
+    server_tz = get_timezone(config.DEFAULT_TIMEZONE)
     return server_tz.localize(dt).astimezone(pytz.utc)
 
 
 def utc_to_server(dt):
     """Converts the given UTC datetime to the server's TZ."""
-    server_tz = get_timezone(Config.getInstance().getDefaultTimezone())
+    server_tz = get_timezone(config.DEFAULT_TIMEZONE)
     return dt.astimezone(server_tz)
 
 
@@ -116,7 +116,8 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
     elif not timezone and dt.tzinfo:
         timezone = session.tzinfo
     elif server_tz:
-        timezone = Config.getInstance().getDefaultTimezone()
+        timezone = config.DEFAULT_TIMEZONE
+
     rv = _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
     return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
@@ -151,7 +152,7 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     if not timezone and t.tzinfo:
         timezone = session.tzinfo
     elif server_tz:
-        timezone = Config.getInstance().getDefaultTimezone()
+        timezone = config.DEFAULT_TIMEZONE
     if isinstance(timezone, basestring):
         timezone = get_timezone(timezone)
     rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
@@ -454,12 +455,12 @@ def get_display_tz(obj=None, as_timezone=False):
     display_tz = session.timezone if has_request_context() else 'LOCAL'
     if display_tz == 'LOCAL':
         if obj is None:
-            display_tz = Config.getInstance().getDefaultTimezone()
+            display_tz = config.DEFAULT_TIMEZONE
         else:
             # obj can be Event, LegacyConference or Category
             if isinstance(obj, LegacyConference):
                 obj = obj.as_event
             display_tz = getattr(obj, 'timezone', 'UTC')
     if not display_tz:
-        display_tz = Config.getInstance().getDefaultTimezone()
+        display_tz = config.DEFAULT_TIMEZONE
     return pytz.timezone(display_tz) if as_timezone else display_tz

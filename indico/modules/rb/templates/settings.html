@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-    {% if not rb_active %}
+    {% if not indico_config.ENABLE_ROOMBOOKING %}
         {% call message_box('warning') %}
             {% trans %}The Room Booking system is currently <strong>disabled</strong> in indico.conf{% endtrans %}
         {% endcall %}

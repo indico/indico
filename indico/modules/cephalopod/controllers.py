@@ -18,12 +18,12 @@ from __future__ import unicode_literals
 
 import platform
 
-from flask import flash, jsonify, redirect, request
+from flask import flash, jsonify, redirect
 from requests.exceptions import HTTPError, RequestException, Timeout
 from werkzeug.urls import url_join
 
 import indico
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db.sqlalchemy.util.queries import get_postgres_version
 from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
@@ -47,16 +47,15 @@ class RHCephalopod(RHCephalopodBase):
         form = CephalopodForm(obj=FormDefaults(**cephalopod_settings.get_all()))
         if form.validate_on_submit():
             return self._process_form(form)
-        config = Config.getInstance()
-        hub_url = url_join(config.getCommunityHubURL(), 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
+        hub_url = url_join(config.COMMUNITY_HUB_URL, 'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         cephalopod_settings.set('show_migration_message', False)
         return WPCephalopod.render_template('cephalopod.html', 'cephalopod',
                                             affiliation=core_settings.get('site_organization'),
                                             enabled=cephalopod_settings.get('joined'),
                                             form=form,
                                             indico_version=indico.__version__,
-                                            instance_url=config.getBaseURL(),
-                                            language=config.getDefaultLocale(),
+                                            instance_url=config.BASE_URL,
+                                            language=config.DEFAULT_LOCALE,
                                             operating_system=get_os(),
                                             postgres_version=get_postgres_version(),
                                             python_version=platform.python_version(),
@@ -107,11 +106,10 @@ class RHCephalopodSync(RHCephalopodBase):
 
 class RHSystemInfo(RH):
     def _process(self):
-        config = Config.getInstance()
         stats = {'python_version': platform.python_version(),
                  'indico_version': indico.__version__,
                  'operating_system': get_os(),
                  'postgres_version': get_postgres_version(),
-                 'language': config.getDefaultLocale(),
-                 'debug': config.getDebug()}
+                 'language': config.DEFAULT_LOCALE,
+                 'debug': config.DEBUG}
         return jsonify(stats)

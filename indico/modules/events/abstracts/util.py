@@ -23,7 +23,7 @@ from collections import OrderedDict, defaultdict, namedtuple
 
 from sqlalchemy.orm import joinedload, load_only
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.legacy.pdfinterface.conference import AbstractBook
@@ -36,10 +36,8 @@ from indico.modules.events.abstracts.settings import abstracts_settings, boa_set
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
-from indico.util.date_time import format_datetime
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
-from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 
 
@@ -291,7 +289,7 @@ def create_boa(event):
     """
     path = boa_settings.get(event, 'cache_path')
     if path:
-        path = os.path.join(Config.getInstance().getCacheDir(), path)
+        path = os.path.join(config.CACHE_DIR, path)
         if os.path.exists(path):
             # update file mtime so it's not deleted during cache cleanup
             os.utime(path, None)
@@ -299,7 +297,7 @@ def create_boa(event):
     pdf = AbstractBook(event)
     tmp_path = pdf.generate()
     filename = 'boa-{}.pdf'.format(event.id)
-    full_path = os.path.join(Config.getInstance().getCacheDir(), filename)
+    full_path = os.path.join(config.CACHE_DIR, filename)
     shutil.move(tmp_path, full_path)
     boa_settings.set(event, 'cache_path', filename)
     return full_path
@@ -310,7 +308,7 @@ def clear_boa_cache(event):
     path = boa_settings.get(event, 'cache_path')
     if path:
         try:
-            os.remove(os.path.join(Config.getInstance().getCacheDir(), path))
+            os.remove(os.path.join(config.CACHE_DIR, path))
         except OSError as e:
             if e.errno != errno.ENOENT:
                 raise

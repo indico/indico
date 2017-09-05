@@ -25,7 +25,7 @@ from werkzeug.urls import url_parse
 
 import indico
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import url_for_plugin
 from indico.legacy.common.cache import GenericCache
@@ -328,7 +328,7 @@ def _build_css_url(theme):
         plugin = theme.split(':', 1)[0]
         return url_for_plugin(plugin + '.static', filename=path)
     else:
-        css_base = url_parse(Config.getInstance().getCssConfTemplateBaseURL()).path
+        css_base = url_parse(config.CONFERENCE_CSS_TEMPLATES_BASE_URL).path
         return '{}/{}'.format(css_base, theme)
 
 

@@ -23,7 +23,7 @@ from pytz import common_timezones_set
 from werkzeug.urls import url_join
 
 import indico
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.settings import PrefixSettingsProxy
 from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
@@ -43,12 +43,12 @@ class RHSettings(RHAdminBase):
         if not cephalopod_settings.get('joined'):
             return None, {'enabled': False}
 
-        url = url_join(Config.getInstance().getCommunityHubURL(),
+        url = url_join(config.COMMUNITY_HUB_URL,
                        'api/instance/{}'.format(cephalopod_settings.get('uuid')))
         data = {'enabled': cephalopod_settings.get('joined'),
                 'contact': cephalopod_settings.get('contact_name'),
                 'email': cephalopod_settings.get('contact_email'),
-                'url': Config.getInstance().getBaseURL(),
+                'url': config.BASE_URL,
                 'organization': core_settings.get('site_organization')}
         return url, data
 
@@ -82,7 +82,7 @@ class RHChangeTimezone(RH):
         if mode == 'local':
             session.timezone = 'LOCAL'
         elif mode == 'user' and session.user:
-            session.timezone = session.user.settings.get('timezone', Config.getInstance().getDefaultTimezone())
+            session.timezone = session.user.settings.get('timezone', config.DEFAULT_TIMEZONE)
         elif mode == 'custom' and tz in common_timezones_set:
             session.timezone = tz
 

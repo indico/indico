@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.users import User
 
@@ -42,9 +42,8 @@ def create_user(email, data, identity=None, settings=None, other_emails=None, fr
         other_emails = set()
     if settings is None:
         settings = {}
-    cfg = Config.getInstance()
-    settings.setdefault('timezone', cfg.getDefaultTimezone())
-    settings.setdefault('lang', cfg.getDefaultLocale())
+    settings.setdefault('timezone', config.DEFAULT_TIMEZONE)
+    settings.setdefault('lang', config.DEFAULT_LOCALE)
     settings.setdefault('suggest_categories', False)
     # Get a pending user if there is one
     user = User.find_first(~User.is_deleted, User.is_pending,

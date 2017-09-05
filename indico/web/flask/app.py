@@ -36,7 +36,7 @@ from wtforms.widgets import html_params
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.celery import celery
-from indico.core.config import Config
+from indico.core.config import IndicoConfig, config, load_config
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
@@ -44,6 +44,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
+from indico.legacy.common.TemplateExec import mako
 from indico.legacy.webinterface.pages.error import render_error
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -58,8 +59,8 @@ from indico.web.assets import (core_env, include_css_assets, include_js_assets, 
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
                                          markdown, natsort, strip_tags, subclassof, underline)
-from indico.web.flask.util import (IndicoConfigWrapper, ListConverter, XAccelMiddleware, discover_blueprints,
-                                   make_compat_blueprint, url_for, url_rule_to_js)
+from indico.web.flask.util import (ListConverter, XAccelMiddleware, discover_blueprints, make_compat_blueprint, url_for,
+                                   url_rule_to_js)
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
 from indico.web.menu import render_sidemenu
@@ -72,53 +73,40 @@ AUTO_COMPAT_BLUEPRINTS = {'admin', 'event', 'event_creation', 'event_mgmt', 'mis
 
 
 def configure_app(app, set_path=False):
-    cfg = Config.getInstance()
-    app.config['DEBUG'] = cfg.getDebug()
-    app.config['SECRET_KEY'] = cfg.getSecretKey()
+    config = IndicoConfig(app.config['INDICO'])  # needed since we don't have an app ctx yet
+    app.config['DEBUG'] = config.DEBUG
+    app.config['SECRET_KEY'] = config.SECRET_KEY
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
-        raise ValueError('SecretKey must be set to a random secret of at least 16 characters. '
+        raise ValueError('SECRET_KEY must be set to a random secret of at least 16 characters. '
                          'You can generate one using os.urandom(32) in Python shell.')
-    if cfg.getMaxUploadFilesTotalSize() > 0:
-        app.config['MAX_CONTENT_LENGTH'] = cfg.getMaxUploadFilesTotalSize() * 1024 * 1024
+    if config.MAX_UPLOAD_FILES_TOTAL_SIZE > 0:
+        app.config['MAX_CONTENT_LENGTH'] = config.MAX_UPLOAD_FILES_TOTAL_SIZE * 1024 * 1024
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
-    app.config['PERMANENT_SESSION_LIFETIME'] = cfg.getSessionLifetime()
-    app.config['INDICO_SESSION_PERMANENT'] = cfg.getSessionLifetime() > 0
+    app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
+    app.config['INDICO_SESSION_PERMANENT'] = config.SESSION_LIFETIME > 0
     app.config['INDICO_HTDOCS'] = os.path.join(app.root_path, 'htdocs')
-    app.config['INDICO_COMPAT_ROUTES'] = cfg.getRouteOldURLs()
-    configure_multipass(app)
+    configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
-    app.config['PLUGINENGINE_PLUGINS'] = cfg.getPlugins()
+    app.config['PLUGINENGINE_PLUGINS'] = config.PLUGINS
     if set_path:
-        base = url_parse(cfg.getBaseURL())
+        base = url_parse(config.BASE_URL)
         app.config['PREFERRED_URL_SCHEME'] = base.scheme
         app.config['SERVER_NAME'] = base.netloc
         if base.path:
             app.config['APPLICATION_ROOT'] = base.path
-    static_file_method = cfg.getStaticFileMethod()
-    if static_file_method:
-        app.config['USE_X_SENDFILE'] = True
-        method, args = static_file_method
-        if method == 'xsendfile':  # apache mod_xsendfile, lighttpd
-            pass
-        elif method == 'xaccelredirect':  # nginx
-            if not args or not hasattr(args, 'items'):
-                raise ValueError('StaticFileMethod args must be a dict containing at least one mapping')
-            app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
-        else:
-            raise ValueError('Invalid static file method: %s' % method)
-    if cfg.getUseProxy():
+    configure_xsendfile(app, config.STATIC_FILE_METHOD)
+    if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app)
 
 
-def configure_multipass(app):
-    cfg = Config.getInstance()
-    app.config['MULTIPASS_AUTH_PROVIDERS'] = cfg.getAuthProviders()
-    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = cfg.getIdentityProviders()
-    app.config['MULTIPASS_PROVIDER_MAP'] = cfg.getProviderMap() or {x: x for x in cfg.getAuthProviders()}
+def configure_multipass(app, config):
+    app.config['MULTIPASS_AUTH_PROVIDERS'] = config.AUTH_PROVIDERS
+    app.config['MULTIPASS_IDENTITY_PROVIDERS'] = config.IDENTITY_PROVIDERS
+    app.config['MULTIPASS_PROVIDER_MAP'] = config.PROVIDER_MAP or {x: x for x in config.AUTH_PROVIDERS}
     if 'indico' in app.config['MULTIPASS_AUTH_PROVIDERS'] or 'indico' in app.config['MULTIPASS_IDENTITY_PROVIDERS']:
         raise ValueError('The name `indico` is reserved and cannot be used as an Auth/Identity provider name.')
-    if cfg.getLocalIdentities():
+    if config.LOCAL_IDENTITIES:
         configure_multipass_local(app)
     app.config['MULTIPASS_IDENTITY_INFO_KEYS'] = {'first_name', 'last_name', 'email', 'affiliation', 'phone',
                                                   'address'}
@@ -142,8 +130,31 @@ def configure_multipass_local(app):
     app.config['MULTIPASS_PROVIDER_MAP']['indico'] = 'indico'
 
 
+def configure_xsendfile(app, method):
+    if not method:
+        return
+    elif isinstance(method, basestring):
+        args = None
+    else:
+        method, args = method
+        if not method:
+            return
+    app.config['USE_X_SENDFILE'] = True
+    if method == 'xsendfile':  # apache mod_xsendfile, lighttpd
+        pass
+    elif method == 'xaccelredirect':  # nginx
+        if not args or not hasattr(args, 'items'):
+            raise ValueError('STATIC_FILE_METHOD args must be a dict containing at least one mapping')
+        app.wsgi_app = XAccelMiddleware(app.wsgi_app, args)
+    else:
+        raise ValueError('Invalid static file method: %s' % method)
+
+
+def setup_mako(app):
+    mako.template_args['module_directory'] = os.path.join(config.TEMP_DIR, 'mako_modules')
+
+
 def setup_jinja(app):
-    config = Config.getInstance()
     # Unicode hack
     app.jinja_env.add_extension(EnsureUnicodeExtension)
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
@@ -153,8 +164,7 @@ def setup_jinja(app):
     app.add_template_global(url_for)
     app.add_template_global(url_for_plugin)
     app.add_template_global(url_rule_to_js)
-    app.add_template_global(IndicoConfigWrapper(config), 'indico_config')
-    app.add_template_global(config.getSystemIconURL, 'system_icon')
+    app.add_template_global(IndicoConfig(exc=Exception), 'indico_config')
     app.add_template_global(include_css_assets)
     app.add_template_global(include_js_assets)
     app.add_template_global(include_plugin_css_assets)
@@ -231,18 +241,15 @@ def configure_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
     if not app.config['TESTING']:
-        cfg = Config.getInstance()
-        db_uri = cfg.getSQLAlchemyDatabaseURI()
-
-        if db_uri is None:
+        if config.SQLALCHEMY_DATABASE_URI is None:
             raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
 
-        app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
+        app.config['SQLALCHEMY_DATABASE_URI'] = config.SQLALCHEMY_DATABASE_URI
         app.config['SQLALCHEMY_RECORD_QUERIES'] = False
-        app.config['SQLALCHEMY_POOL_SIZE'] = cfg.getSQLAlchemyPoolSize()
-        app.config['SQLALCHEMY_POOL_TIMEOUT'] = cfg.getSQLAlchemyPoolTimeout()
-        app.config['SQLALCHEMY_POOL_RECYCLE'] = cfg.getSQLAlchemyPoolRecycle()
-        app.config['SQLALCHEMY_MAX_OVERFLOW'] = cfg.getSQLAlchemyMaxOverflow()
+        app.config['SQLALCHEMY_POOL_SIZE'] = config.SQLALCHEMY_POOL_SIZE
+        app.config['SQLALCHEMY_POOL_TIMEOUT'] = config.SQLALCHEMY_POOL_TIMEOUT
+        app.config['SQLALCHEMY_POOL_RECYCLE'] = config.SQLALCHEMY_POOL_RECYCLE
+        app.config['SQLALCHEMY_MAX_OVERFLOW'] = config.SQLALCHEMY_MAX_OVERFLOW
 
     import_all_models()
     db.init_app(app)
@@ -267,7 +274,7 @@ def add_blueprints(app):
     blueprints, compat_blueprints = discover_blueprints()
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
-    if app.config['INDICO_COMPAT_ROUTES']:
+    if config.ROUTE_OLD_URLS:
         compat_blueprints |= {make_compat_blueprint(bp) for bp in blueprints if bp.name in AUTO_COMPAT_BLUEPRINTS}
         for blueprint in compat_blueprints:
             app.register_blueprint(blueprint)
@@ -281,7 +288,7 @@ def add_plugin_blueprints(app):
             raise Exception("Blueprint '{}' does not match plugin name '{}'".format(blueprint.name, plugin.name))
         if blueprint.name in blueprint_names:
             raise Exception("Blueprint '{}' defined by multiple plugins".format(blueprint.name))
-        if not app.config['INDICO_COMPAT_ROUTES'] and blueprint.name.startswith('plugin_compat_'):
+        if not config.ROUTE_OLD_URLS and blueprint.name.startswith('plugin_compat_'):
             continue
         blueprint_names.add(blueprint.name)
         with plugin.plugin_context():
@@ -329,12 +336,12 @@ def handle_exception(exception):
     return render_error(_("An unexpected error occurred."), str(exception), standalone=True), 500
 
 
-def make_app(set_path=False, testing=False):
+def make_app(set_path=False, testing=False, config_override=None):
     # If you are reading this code and wonder how to access the app:
     # >>> from flask import current_app as app
     # This only works while inside an application context but you really shouldn't have any
     # reason to access it outside this method without being inside an application context.
-    # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BaseURL
+    # When set_path is enabled, SERVER_NAME and APPLICATION_ROOT are set according to BASE_URL
     # so URLs can be generated without an app context, e.g. in the indico shell
 
     if _app_ctx_stack.top:
@@ -343,31 +350,35 @@ def make_app(set_path=False, testing=False):
         return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
     app.config['TESTING'] = testing
+    app.config['INDICO'] = load_config(only_defaults=testing, override=config_override)
     configure_app(app, set_path)
-    celery.init_app(app)
-
-    babel.init_app(app)
-    multipass.init_app(app)
-    oauth.init_app(app)
-    setup_jinja(app)
 
     with app.app_context():
+        Logger.initialize()
+        Logger.init_app(app)
+
+        celery.init_app(app)
+        babel.init_app(app)
+        multipass.init_app(app)
+        oauth.init_app(app)
+        setup_mako(app)
+        setup_jinja(app)
+
+        core_env.init_app(app)
         setup_assets()
 
-    configure_db(app)
-    mm.init_app(app)
-    extend_url_map(app)
-    add_handlers(app)
-    setup_request_stats(app)
-    add_blueprints(app)
-    Logger.init_app(app)
-    plugin_engine.init_app(app, Logger.get('plugins'))
-    if not plugin_engine.load_plugins(app):
-        raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
-    # Below this points plugins are available, i.e. sending signals makes sense
-    add_plugin_blueprints(app)
-    # themes can be provided by plugins
-    with app.app_context():
+        configure_db(app)
+        mm.init_app(app)
+        extend_url_map(app)
+        add_handlers(app)
+        setup_request_stats(app)
+        add_blueprints(app)
+        plugin_engine.init_app(app, Logger.get('plugins'))
+        if not plugin_engine.load_plugins(app):
+            raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
+        # Below this points plugins are available, i.e. sending signals makes sense
+        add_plugin_blueprints(app)
+        # themes can be provided by plugins
         register_theme_sass()
-    signals.app_created.send(app)
+        signals.app_created.send(app)
     return app

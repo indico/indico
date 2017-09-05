@@ -23,7 +23,7 @@ from sqlalchemy import Date, Time, or_
 from sqlalchemy.sql import cast
 from werkzeug.datastructures import MultiDict, OrderedMultiDict
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.auth import Identity
@@ -49,7 +49,7 @@ class RoomBookingHookBase(HTTPAPIHook):
         self._occurrences = _yesno(get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no'))
 
     def _has_access(self, user):
-        return Config.getInstance().getIsRoomBookingActive() and rb_check_user_access(user)
+        return config.ENABLE_ROOMBOOKING and rb_check_user_access(user)
 
 
 @HTTPAPIHook.register
@@ -110,7 +110,7 @@ class RoomNameHook(RoomBookingHookBase):
 
     def _has_access(self, user):
         # Access to RB data (no reservations) is public
-        return Config.getInstance().getIsRoomBookingActive()
+        return config.ENABLE_ROOMBOOKING
 
     def export_roomName(self, user):
         loc = Location.find_first(name=self._location)
@@ -203,7 +203,7 @@ class BookRoomHook(HTTPAPIHook):
             raise HTTPAPIError('A room with this ID does not exist')
 
     def _has_access(self, user):
-        if not Config.getInstance().getIsRoomBookingActive() or not rb_check_user_access(user):
+        if not config.ENABLE_ROOMBOOKING or not rb_check_user_access(user):
             return False
         if self._room.can_be_booked(user):
             return True
@@ -355,7 +355,7 @@ def _ical_serialize_reservation(cal, data, now):
 
 def _add_server_tz(dt):
     if dt.tzinfo is None:
-        return dt.replace(tzinfo=get_timezone(Config.getInstance().getDefaultTimezone()))
+        return dt.replace(tzinfo=get_timezone(config.DEFAULT_TIMEZONE))
     return dt
 
 

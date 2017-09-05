@@ -25,7 +25,7 @@ from werkzeug.urls import url_parse
 from wtforms import BooleanField, ValidationError
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
@@ -194,7 +194,7 @@ def url_rule_to_angular(endpoint):
     assert not rule.defaults
     segments = [':' + mapping.get(data, data) if is_dynamic else data
                 for is_dynamic, data in rule._trace]
-    prefix = url_parse(Config.getInstance().getBaseURL()).path.rstrip('/')
+    prefix = url_parse(config.BASE_URL).path
     return prefix + ''.join(segments).split('|', 1)[-1]
 
 
@@ -442,7 +442,7 @@ def generate_ticket_qr_code(registration):
         "registrant_id": registration.id,
         "checkin_secret": registration.ticket_uuid,
         "event_id": unicode(registration.event.id),
-        "server_url": Config.getInstance().getBaseURL(),
+        "server_url": config.BASE_URL,
         "version": 1
     }
     signals.event.registration.generate_ticket_qr_code.send(registration, ticket_data=qr_data)

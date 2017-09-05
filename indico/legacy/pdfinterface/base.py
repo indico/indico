@@ -37,7 +37,7 @@ from reportlab.pdfgen.canvas import Canvas
 from reportlab.platypus import PageTemplate, SimpleDocTemplate
 from reportlab.platypus.frames import Frame
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.logger import Logger
 from indico.legacy.common.TemplateExec import render as tpl_render
 from indico.legacy.common.utils import isStringHTML
@@ -707,7 +707,7 @@ class LatexRunner(object):
         self.has_toc = has_toc
 
     def run_latex(self, source_file, log_file=None):
-        pdflatex_cmd = [Config.getInstance().getPDFLatexProgram(),
+        pdflatex_cmd = [config.XELATEX_PATH,
                         '-no-shell-escape',
                         '-interaction', 'nonstopmode',
                         '-output-directory', self._dir,
@@ -720,7 +720,7 @@ class LatexRunner(object):
         except subprocess.CalledProcessError:
             Logger.get('pdflatex').warning('PDF creation possibly failed (non-zero exit code)!')
             # Only fail if we are in strict mode
-            if Config.getInstance().getStrictLatex():
+            if config.STRICT_LATEX:
                 # flush log, go to beginning and read it
                 if log_file:
                     log_file.flush()
@@ -730,7 +730,7 @@ class LatexRunner(object):
         template_dir = os.path.join(get_root_path('indico'), 'legacy/webinterface/tpls/latex')
         template = tpl_render(os.path.join(template_dir, template_name), kwargs)
 
-        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=Config.getInstance().getTempDir())
+        self._dir = tempfile.mkdtemp(prefix="indico-texgen-", dir=config.TEMP_DIR)
         chmod_umask(self._dir, execute=True)
         source_filename = os.path.join(self._dir, template_name + '.tex')
         target_filename = os.path.join(self._dir, template_name + '.pdf')

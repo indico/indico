@@ -18,7 +18,7 @@ from pprint import pformat
 
 from werkzeug.urls import url_parse
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.logger import Logger
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.errors import MaKaCError
@@ -34,8 +34,6 @@ class SendErrorReport(ServiceBase):
     CHECK_HTML = False
 
     def _sendReport( self ):
-        cfg = Config.getInstance()
-
         # if no e-mail address was specified,
         # add a default one
         if self._userMail:
@@ -43,9 +41,9 @@ class SendErrorReport(ServiceBase):
         else:
             fromAddr = 'indico-reports@example.org'
 
-        toAddr = Config.getInstance().getSupportEmail()
+        toAddr = config.SUPPORT_EMAIL
         Logger.get('errorReport').debug('mailing %s' % toAddr)
-        subject = "[Indico@{}] Error report".format(url_parse(cfg.getBaseURL()).netloc)
+        subject = "[Indico@{}] Error report".format(url_parse(config.BASE_URL).netloc)
 
         request_info = self._requestInfo or ''
         if isinstance(request_info, (dict, list)):

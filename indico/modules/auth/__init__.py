@@ -21,7 +21,7 @@ from flask_multipass import MultipassException
 
 from indico.core import signals
 from indico.core.auth import multipass
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.modules.auth.models.identities import Identity
@@ -97,7 +97,7 @@ def login_user(user, identity=None, admin_impersonation=False):
                                 be considered a login by the user.
     """
     if user.settings.get('force_timezone'):
-        session.timezone = user.settings.get('timezone', Config.getInstance().getDefaultTimezone())
+        session.timezone = user.settings.get('timezone', config.DEFAULT_TIMEZONE)
     else:
         session.timezone = 'LOCAL'
     session.user = user

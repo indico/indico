@@ -20,7 +20,7 @@ from flask import session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.legal import legal_settings
 from indico.util.i18n import get_all_locales
 from indico.web.flask.templating import get_template_module
@@ -30,7 +30,7 @@ def _get_timezone_display(local_tz, timezone, force=False):
     if force and local_tz:
         return local_tz
     elif timezone == 'LOCAL':
-        return local_tz or Config.getInstance().getDefaultTimezone()
+        return local_tz or config.DEFAULT_TIMEZONE
     else:
         return timezone
 
@@ -40,7 +40,7 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
         'network': legal_settings.get('network_protected_disclaimer'),
         'restricted': legal_settings.get('restricted_disclaimer')
     }
-    default_tz = Config.getInstance().getDefaultTimezone()
+    default_tz = config.DEFAULT_TIMEZONE
     if session.user:
         user_tz = session.user.settings.get('timezone', default_tz)
         if session.timezone == 'LOCAL':

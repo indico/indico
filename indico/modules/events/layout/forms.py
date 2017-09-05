@@ -21,7 +21,7 @@ from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import StringField
 from wtforms.validators import DataRequired, Optional, ValidationError
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.layout.util import get_css_file_data, get_logo_data, get_plugin_conference_themes
 from indico.util.i18n import _
@@ -117,7 +117,7 @@ class CSSForm(IndicoForm):
         self.css_file.description = _("If you want to fully customize your conference page you can create your own "
                                       "stylesheet and upload it. An example stylesheet can be downloaded "
                                       "<a href='{base_url}/standard.css' target='_blank'>here</a>."
-                                      .format(base_url=Config.getInstance().getCssConfTemplateBaseURL()))
+                                      .format(base_url=config.CONFERENCE_CSS_TEMPLATES_BASE_URL))
 
 
 class MenuBuiltinEntryForm(IndicoForm):

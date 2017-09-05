@@ -197,14 +197,14 @@ class IndicoTranslations(Translations):
             raise RuntimeError(msg)
 
     def ugettext(self, message):
-        from indico.core.config import Config
-        if Config.getInstance().getDebug():
+        from indico.core.config import config
+        if config.DEBUG:
             self._check_stack()
         return gettext(message)
 
     def ungettext(self, msgid1, msgid2, n):
-        from indico.core.config import Config
-        if Config.getInstance().getDebug():
+        from indico.core.config import config
+        if config.DEBUG:
             self._check_stack()
         return ngettext(msgid1, msgid2, n)
 
@@ -220,10 +220,10 @@ def set_best_lang(check_session=True):
     language, we will try to guess it from the browser settings and only
     after that fall back to the server's default.
     """
-    from indico.core.config import Config
+    from indico.core.config import config
 
     if not has_request_context():
-        return 'en_GB' if current_app.config['TESTING'] else Config.getInstance().getDefaultLocale()
+        return 'en_GB' if current_app.config['TESTING'] else config.DEFAULT_LOCALE
     elif 'lang' in g:
         return g.lang
     elif check_session and session.lang is not None:
@@ -238,7 +238,7 @@ def set_best_lang(check_session=True):
             return 'en_GB'
 
         # fall back to server default
-        resolved_lang = Config.getInstance().getDefaultLocale()
+        resolved_lang = config.DEFAULT_LOCALE
 
     # As soon as we looked up a language, cache it during the request.
     # This will be returned when accessing `session.lang` since there's code

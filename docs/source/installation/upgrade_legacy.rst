@@ -194,12 +194,12 @@ Indico directory:
 
     mv /opt/indico-legacy/archive /opt/indico/legacy-archive
 
-The legacy archive will remain **read-only**. You should update your ``indico.conf`` (``StorageBackends`` option) to
+The legacy archive will remain **read-only**. You should update your ``indico.conf`` (``STORAGE_BACKENDS`` option) to
 reflect the new path:
 
 .. code-block:: python
 
-    StorageBackends = {
+    STORAGE_BACKENDS = {
         # ...
         'legacy': 'fs-readonly:/opt/indico/legacy-archive'
         # ...

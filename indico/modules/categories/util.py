@@ -23,7 +23,7 @@ from pytz import timezone
 from sqlalchemy.orm import load_only
 from sqlalchemy.orm.attributes import set_committed_value
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -134,7 +134,7 @@ def get_upcoming_events():
     data = upcoming_events_settings.get_all()
     if not data['max_entries'] or not data['entries']:
         return
-    tz = timezone(Config.getInstance().getDefaultTimezone())
+    tz = timezone(config.DEFAULT_TIMEZONE)
     now = now_utc(False).astimezone(tz)
     base_query = (Event.query
                   .filter(Event.effective_protection_mode == ProtectionMode.public,

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.utils import encodeUnicode
 from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.webinterface.common.tools import escape_html, restrictedHTML
@@ -92,7 +92,7 @@ class Sanitization(object):
         # then check the security level of data sent to the server
         # if no user logged in, then no html allowed
         if user:
-            level = Config.getInstance().getSanitizationLevel()
+            level = config.SANITIZATION_LEVEL
         else:
             level = 0
 

@@ -22,6 +22,7 @@ from __future__ import absolute_import
 
 import binascii
 import functools
+import os
 import re
 import string
 import unicodedata
@@ -605,12 +606,27 @@ def inject_unicode_debug(s, level=1):
     without touching it.
 
     :param s: a unicode string
-    :param level: the minimum level of the DebugUnicode mode needed
-                  to inject the spaces.  the more likely it is to
-                  break things the higher it should be.
+    :param level: the minimum unicode debug level needed to inject
+                  the spaces.  the more likely it is to break things
+                  the higher it should be.
     """
-    from indico.core.config import Config
-    if Config.getInstance().getDebugUnicode() < level:
+
+    # Enabling unicode debugging injects an invisible zero-width space at the
+    # beginning and end of every translated string.  This will cause errors in case
+    # of implicit conversions from bytes to unicode or vice versa instead of
+    # silently succeeding for english (ascii) strings and then failing in languages
+    # where the same string is not plain ascii.  This setting should be enabled only
+    # during development and never in production.
+    # Level 1 will inject it only in translated strings and is usually safe while
+    # level 2 will inject it in formatted date/time values too which may result in
+    # strange/broken behavior in certain form fields.
+
+    try:
+        unicode_debug_level = int(os.environ.get('INDICO_UNICODE_DEBUG', '0'))
+    except ValueError:
+        unicode_debug_level = 0
+
+    if unicode_debug_level < level:
         return s
     else:
         return u'\N{ZERO WIDTH SPACE}' + s + u'\N{ZERO WIDTH SPACE}'

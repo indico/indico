@@ -32,7 +32,7 @@ from flask import current_app
 import indico
 from indico.core import signals
 from indico.core.celery import celery
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.events import Event
@@ -40,7 +40,6 @@ from indico.util.console import cformat
 from indico.util.date_time import now_utc, server_to_utc
 from indico.util.fossilize import clearCache
 from indico.web.flask.stats import request_stats_request_started
-from indico.web.flask.util import IndicoConfigWrapper
 
 
 def _add_to_context(namespace, info, element, name=None, doc=None, color='green'):
@@ -116,7 +115,7 @@ def _make_shell_context():
     add_to_context(celery, 'celery', doc='celery app', color='blue!')
     add_to_context(db, 'db', doc='sqlalchemy db interface', color='cyan!')
     add_to_context(now_utc, 'now_utc', doc='get current utc time', color='cyan!')
-    add_to_context(IndicoConfigWrapper(Config.getInstance()), 'config', doc='indico config')
+    add_to_context(config, 'config', doc='indico config')
     add_to_context(current_app, 'app', doc='flask app')
     add_to_context(lambda *a, **kw: server_to_utc(datetime.datetime(*a, **kw)), 'dt',
                    doc='like datetime() but converted from localtime to utc')
@@ -144,7 +143,7 @@ def shell_cmd(verbose, with_req_context):
     clearCache()
     stack = ExitStack()
     if with_req_context:
-        stack.enter_context(current_app.test_request_context(base_url=Config.getInstance().getBaseURL()))
+        stack.enter_context(current_app.test_request_context(base_url=config.BASE_URL))
     with stack:
         ipython_app = TerminalIPythonApp.instance(user_ns=ctx, display_banner=False)
         ipython_app.initialize(argv=[])

@@ -14,15 +14,31 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+import os
+
 import pytest
 
 from indico.web.flask.app import make_app
 
 
 @pytest.fixture(scope='session')
-def app():
+def app(request):
     """Creates the flask app"""
-    return make_app(set_path=True, testing=True)
+    config_override = {
+        'BASE_URL': 'http://localhost',
+        'SMTP_SERVER': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
+        'CACHE_BACKEND': 'null',
+        'LOGGERS': [],
+        'TEMP_DIR': request.config.indico_temp_dir.strpath,
+        'CACHE_DIR': request.config.indico_temp_dir.strpath,
+        'STORAGE_BACKENDS': {'default': 'mem:'},
+        'PLUGINS': request.config.indico_plugins,
+        'ENABLE_ROOMBOOKING': True,
+        'SECRET_KEY': os.urandom(16)
+    }
+    return make_app(set_path=True, testing=True, config_override=config_override)
 
 
 @pytest.fixture(autouse=True)

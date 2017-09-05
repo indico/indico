@@ -16,7 +16,7 @@
 
 import time
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.fossilize import Fossilizable, fossilizes
 from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
 
@@ -52,7 +52,7 @@ class HTTPAPIResult(Fossilizable):
         return self._ts
 
     def getURL(self):
-        prefix = Config.getInstance().getBaseURL()
+        prefix = config.BASE_URL
         if self._query:
             return prefix + self._path + '?' + self._query
         return prefix + self._path

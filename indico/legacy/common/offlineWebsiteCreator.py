@@ -27,7 +27,7 @@ from flask import current_app, request
 from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.contribPacker import ZIPFileHandler
 from indico.legacy.pdfinterface.conference import AbstractBook, ContribsToPDF, ContribToPDF, ProgrammeToPDF
 from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
@@ -70,8 +70,8 @@ def _fix_url_path(path):
     if path.startswith('static/'):
         # It's a path that was prefixed with baseurl
         path = path[7:]
-    elif path.startswith(Config.getInstance().getBaseURL()):
-        path = path[len(Config.getInstance().getBaseURL()):]
+    elif path.startswith(config.BASE_URL):
+        path = path[len(config.BASE_URL):]
     path = path.lstrip('/')
     path = _remove_qs(path)
     return path
@@ -139,10 +139,6 @@ class OfflineEventCreator(object):
         # Add i18n js
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'indico', 'i18n'),
                                os.path.join(self._htdocs_dir, 'js', 'indico', 'i18n'))
-        # Add system icons (not referenced in HTML/CSS)
-        for icon in Config.getInstance().getSystemIcons().itervalues():
-            self._addFileFromSrc(os.path.join(self._staticPath, 'images', icon),
-                                 os.path.join(self._htdocs_dir, 'images', icon))
         # Mathjax plugins can't be discovered by parsing the HTML
         self._addFolderFromSrc(os.path.join(self._staticPath, 'js', 'lib', 'mathjax'),
                                os.path.join(self._htdocs_dir, 'js', 'lib', 'mathjax'))
@@ -178,7 +174,7 @@ class OfflineEventCreator(object):
     def _static_url_to_path(self, url):
         match = re.match(r'^static/assets/(core|plugin-(?P<plugin>[^/]+)|theme-(?P<theme>[^/]+))/(?P<path>.+)$', url)
         if match is not None:
-            path = os.path.join(Config.getInstance().getAssetsDir(), get_asset_path(**match.groupdict()))
+            path = os.path.join(config.ASSETS_DIR, get_asset_path(**match.groupdict()))
         else:
             path = os.path.join(self._htdocs_dir, url)
         return re.sub(r'#.*$', '', path)
@@ -186,6 +182,7 @@ class OfflineEventCreator(object):
     def _get_static_files(self, html):
         soup = BeautifulSoup(html, 'lxml')
         images = set(_fix_url_path(x['src']) for x in soup.select('img[src]'))
+        images |= set(_fix_url_path(x['href']) for x in soup.select('link[rel="shortcut icon"]'))
         scripts = set(_fix_url_path(x['src']) for x in soup.select('script[src]'))
         styles = set(_fix_url_path(x['href']) for x in soup.select('link[rel="stylesheet"]'))
         for path in itertools.chain(images, scripts, styles):
@@ -210,14 +207,10 @@ class OfflineEventCreator(object):
         This is the only clean way to deal with static files from plugins since otherwise
         we would have to emulate RHHtdocs.
         """
-        cfg = Config.getInstance()
-        # If we have the embedded webserver prefer its base url since the iptables hack does
-        # not work for connections from the same machine
-        base_url = cfg.getBaseURL()
         for path in self._failed_paths:
             dst_path = os.path.join(self._staticPath, path)
             if not self._fileHandler.hasFile(dst_path):
-                response = requests.get(os.path.join(base_url, path), verify=False)
+                response = requests.get(os.path.join(config.BASE_URL, path), verify=False)
                 self._downloaded_files[dst_path] = response.content
                 self._fileHandler.addNewFile(dst_path, response.content)
 

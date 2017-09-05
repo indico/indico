@@ -14,29 +14,111 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import ast
-import copy
+import codecs
 import os
+import re
 import socket
+import warnings
 from datetime import timedelta
 
 import pytz
 from celery.schedules import crontab
-from flask import g, has_app_context
+from flask import current_app, g
 from flask.helpers import get_root_path
+from werkzeug.datastructures import ImmutableDict
 from werkzeug.urls import url_parse
 
-import indico
+from indico.util.caching import make_hashable
 from indico.util.fs import resolve_link
 from indico.util.packaging import package_is_editable
+from indico.util.string import crc32, snakify
 
 
-__all__ = ['Config']
+DEFAULTS = {
+    'ASSETS_DIR': '/opt/indico/assets',
+    'ATTACHMENT_STORAGE': 'default',
+    'AUTH_PROVIDERS': {},
+    'BASE_URL': None,
+    'CACHE_BACKEND': 'files',
+    'CACHE_DIR': '/opt/indico/cache',
+    'CATEGORY_CLEANUP': {},
+    'CELERY_BROKER': None,
+    'CELERY_CONFIG': {},
+    'CELERY_RESULT_BACKEND': None,
+    'COMMUNITY_HUB_URL': 'https://hub.getindico.io',
+    'CUSTOMIZATION_DEBUG': False,
+    'CUSTOMIZATION_DIR': None,
+    'CUSTOM_COUNTRIES': {},
+    'DEBUG': False,
+    'DEFAULT_LOCALE': 'en_GB',
+    'DEFAULT_TIMEZONE': 'UTC',
+    'ENABLE_ROOMBOOKING': False,
+    'EXTERNAL_REGISTRATION_URL': '',
+    'FLOWER_URL': None,
+    'IDENTITY_PROVIDERS': {},
+    'LOCAL_IDENTITIES': True,
+    'LOCAL_MODERATION': False,
+    'LOCAL_REGISTRATION': True,
+    'LOGGERS': ['files'],
+    'LOGGING_CONFIG_FILE': 'logging.conf',
+    'LOGO_URL': None,
+    'LOG_DIR': '/opt/indico/log',
+    'MAX_UPLOAD_FILES_TOTAL_SIZE': 0,
+    'MAX_UPLOAD_FILE_SIZE': 0,
+    'MEMCACHED_SERVERS': [],
+    'NO_REPLY_EMAIL': None,
+    'PLUGINS': set(),
+    'PROFILE': False,
+    'PROPAGATE_ALL_EXCEPTIONS': False,
+    'PROVIDER_MAP': {},
+    'PUBLIC_SUPPORT_EMAIL': None,
+    'REDIS_CACHE_URL': None,
+    'ROUTE_OLD_URLS': False,
+    'SANITIZATION_LEVEL': 2,
+    'SCHEDULED_TASK_OVERRIDE': {},
+    'SCSS_DEBUG_INFO': True,
+    'SECRET_KEY': None,
+    'SENTRY_DSN': None,
+    'SENTRY_LOGGING_LEVEL': 'WARNING',
+    'SESSION_LIFETIME': 86400 * 31,
+    'SMTP_LOGIN': '',
+    'SMTP_PASSWORD': '',
+    'SMTP_SERVER': ('localhost', 25),
+    'SMTP_USE_TLS': False,
+    'SQLALCHEMY_DATABASE_URI': None,
+    'SQLALCHEMY_MAX_OVERFLOW': 3,
+    'SQLALCHEMY_POOL_RECYCLE': 120,
+    'SQLALCHEMY_POOL_SIZE': 5,
+    'SQLALCHEMY_POOL_TIMEOUT': 10,
+    'STATIC_FILE_METHOD': None,
+    'STATIC_SITE_STORAGE': None,
+    'STORAGE_BACKENDS': {'default': 'fs:/opt/indico/archive'},
+    'STRICT_LATEX': True,
+    'SUPPORT_EMAIL': None,
+    'TEMP_DIR': '/opt/indico/tmp',
+    'USE_PROXY': False,
+    'WORKER_NAME': socket.getfqdn(),
+    'XELATEX_PATH': 'xelatex',
+}
+
+# Default values for settings that cannot be set in the config file
+INTERNAL_DEFAULTS = {
+    'CONFIG_PATH': os.devnull,
+    'CONFIG_PATH_RESOLVED': None,
+    'LOGGING_CONFIG_PATH': os.path.join(get_root_path('indico'), 'logging.conf.sample'),
+    'TESTING': False
+}
 
 
 def get_config_path():
+    """Get the path of the indico config file.
+
+    This may return the location of a symlink.  Resolving a link is up
+    to the caller if needed.
+    """
     # In certain environments (debian+uwsgi+no-systemd) Indico may run
     # with an incorrect $HOME (such as /root), resulting in the config
     # files being searched in the wrong place. By clearing $HOME, Python
@@ -63,339 +145,136 @@ def get_config_path():
                     'move/symlink the config in one of the following locations: {}'.format(', '.join(paths)))
 
 
-class Config:
-    """This class provides a common way to access and modify the configuration
-       parameters of the application. This configuration information will be
-       stored in a text file and will contain the minimal information (example:
-       db connection parameters) for the system to be initialised.
-       It will implement the Singleton pattern so only once instance of the
-       Config class can exist at the same time.
+def _parse_config(path):
+    globals_ = {'timedelta': timedelta, 'crontab': crontab}
+    locals_ = {}
+    with codecs.open(path, encoding='utf-8') as config_file:
+        # XXX: unicode_literals is inherited from this file
+        exec(compile(config_file.read(), path, 'exec'), globals_, locals_)
+    return {unicode(k if k.isupper() else _convert_key(k)): v
+            for k, v in locals_.iteritems()
+            if k[0] != '_'}
+
+
+def _convert_key(name):
+    # camelCase to BIG_SNAKE while preserving acronyms, i.e.
+    # FooBARs -> FOO_BARS (and not FOO_BA_RS)
+    name = re.sub(r'([A-Z])([A-Z]+)', lambda m: m.group(1) + m.group(2).lower(), name)
+    name = snakify(name).upper()
+    special_cases = {'PDFLATEX_PROGRAM': 'XELATEX_PATH',
+                     'SCSSDEBUG_INFO': 'SCSS_DEBUG_INFO',
+                     'IS_ROOM_BOOKING_ACTIVE': 'ENABLE_ROOMBOOKING'}
+    return special_cases.get(name, name)
+
+
+def _postprocess_config(data):
+    if data['DEFAULT_TIMEZONE'] not in pytz.all_timezones_set:
+        raise ValueError('Invalid default timezone: {}'.format(data['DEFAULT_TIMEZONE']))
+    data['BASE_URL'] = data['BASE_URL'].rstrip('/')
+    data['STATIC_SITE_STORAGE'] = data['STATIC_SITE_STORAGE'] or data['ATTACHMENT_STORAGE']
+
+
+def _sanitize_data(data, allow_internal=False):
+    allowed = set(DEFAULTS)
+    if allow_internal:
+        allowed |= set(INTERNAL_DEFAULTS)
+    for key in set(data) - allowed:
+        warnings.warn('Ignoring unknown config key {}'.format(key))
+    return {k: v for k, v in data.iteritems() if k in allowed}
+
+
+def load_config(only_defaults=False, override=None):
+    """Load the configuration data.
+
+    :param only_defaults: Whether to load only the default options,
+                          ignoring any user-specified config file
+                          or environment-based overrides.
+    :param override: An optional dict with extra values to add to
+                     the configuration.  Any values provided here
+                     will override values from the config file.
     """
-    __instance = None
+    data = dict(DEFAULTS, **INTERNAL_DEFAULTS)
+    if not only_defaults:
+        path = get_config_path()
+        config = _sanitize_data(_parse_config(path))
+        data.update(config)
+        env_override = os.environ.get('INDICO_CONF_OVERRIDE')
+        if env_override:
+            data.update(_sanitize_data(ast.literal_eval(env_override)))
+        resolved_path = resolve_link(path) if os.path.islink(path) else path
+        resolved_path = None if resolved_path == os.devnull else resolved_path
+        data['CONFIG_PATH'] = path
+        data['CONFIG_PATH_RESOLVED'] = resolved_path
+        if resolved_path is not None:
+            data['LOGGING_CONFIG_PATH'] = os.path.join(os.path.dirname(resolved_path), data['LOGGING_CONFIG_FILE'])
 
-    __systemIcons = {"modify": "link_shadow.png",
-                     "submit": "file_shadow.png",
-                     "view": "view.png",
-                     "group": "group.png",
-                     "schedule": "schedule.png",
-                     "user": "user.png",
-                     "loggedIn": "userloggedin.png",
-                     "warning": "warning.png",
-                     "warning_yellow": "warning_yellow.png",
-                     "signin": "key.png",
-                     "paper": "paper.png",
-                     "slides": "slides.png",
-                     "category": "category.png",
-                     "admin": "admins.png",
-                     "protected": "protected.png",
-                     "clone": "clone.png",
-                     "delete": "delete.png",
-                     "write_minutes": "write_minutes.png",
-                     "move": "move.png",
-                     "logo": "logo.png",
-                     "upArrow": "upArrow.png",
-                     "downArrow": "downArrow.png",
-                     "download": "download.png",
-                     "print": "print.png",
-                     "printer": "printer.png",
-                     "mail": "mail.png",
-                     "mail_big": "mail_big.png",
-                     "mail_grey": "mail_grey.png",
-                     "comments": "comments.png",
-                     "day": "pict_day_orange.png",
-                     "year": "pict_year_orange.png",
-                     "document": "pict_doc_orange.png",
-                     "conference": "pict_conf_bleu.png",
-                     "lecture": "pict_event_bleu.png",
-                     "meeting": "pict_meet_bleu.png",
-                     "meetingIcon": "meeting.png",
-                     "bulletMenuConf": "bulletMenuConf.png",
-                     "logoIndico": "logo_indico.png",
-                     "login": "pict_login.png",
-                     "tt_time": "tt_time.png",
-                     "miniLogo": "mini_logo_indico.png",
-                     "conferenceRoom": "conference_logo.png",
-                     "xml": "xml_small.png",
-                     "ical": "ical_small.png",
-                     "ical_grey": "ical_grey.png",
-                     "ical_small": "ical_small.png",
-                     "material": "material.png",
-                     "calendar": "pict_year_orange.png",
-                     "pdf": "pdf_small.png",
-                     "smallzip": "smallzip.png",
-                     "left_arrow": "left_arrow.png",
-                     "right_arrow": "right_arrow.png",
-                     "first_arrow": "first_arrow.png",
-                     "last_arrow": "last_arrow.png",
-                     "info": "info.png",
-                     "video": "video.png",
-                     "poster": "poster.png",
-                     "closed": "closed.png",
-                     "closeIcon": "close.png",
-                     "badge": "badge.png",
-                     "badgeMargins": "badge_margins.png",
-                     "loading": "loading.gif",
-                     "tick": "tick.png",
-                     "cross": "cross.png",
-                     "file": "file.png",
-                     "clock": "clock.png",
-                     "addressBarIcon": "indico.ico",
-                     "excel": "excel.png",
-                     "checkAll": "checkAll.png",
-                     "uncheckAll": "uncheckAll.png",
-                     "listing": "listing.png",
-                     "add": "add.png",
-                     "add_faded": "add_faded.png",
-                     "remove": "remove.png",
-                     "remove_faded": "remove_faded.png",
-                     "edit": "edit.png",
-                     "edit_faded": "edit_faded.png",
-                     "help": "help.png",
-                     "search": "search.png",
-                     "search_small": "search_small.png",
-                     "stat": "stat.png",
-                     "timezone": "timezone.png",
-                     "home": "home.png",
-                     "upCategory": "up_arrow.png",
-                     "manage": "manage.png",
-                     "ui_loading": "load_big.gif",
-                     "style": "style.png",
-                     "filter": "filter.png",
-                     "filter_active": "filter_active.png",
-                     "reload": "reload.png",
-                     "reload_faded": "reload_faded.png",
-                     "room": "room.png",
-                     "defaultConferenceLogo": "lecture3.png",
-                     "breadcrumbArrow": "breadcrumb_arrow.png",
-                     "star": "star.png",
-                     "starGrey": "starGrey.png",
-                     "calendarWidget": "calendarWidget.png",
-                     "facebook": "facebook.png",
-                     "twitter": "twitter.png",
-                     "gplus": "gplus.png",
-                     "gcal": "gcal.png",
-                     "link": "link.png"
-                     }
+    if override:
+        data.update(_sanitize_data(override, allow_internal=True))
+    _postprocess_config(data)
+    return ImmutableDict(data)
 
-    default_values = {
-        'IsRoomBookingActive'       : True,
-        'SQLAlchemyDatabaseURI'     : None,
-        'SQLAlchemyPoolSize'        : 5,
-        'SQLAlchemyPoolTimeout'     : 10,
-        'SQLAlchemyPoolRecycle'     : 120,
-        'SQLAlchemyMaxOverflow'     : 3,
-        'SanitizationLevel'         : 2,
-        'BaseURL'                   : 'http://localhost',
-        'LogDir'                    : "/opt/indico/log" ,
-        'TempDir'                   : "/opt/indico/tmp",
-        'AssetsDir'                 : '/opt/indico/assets',
-        'CacheDir'                  : "/opt/indico/cache",
-        'CacheBackend'              : 'files',
-        'MemcachedServers'          : [],
-        'RedisCacheURL'             : None,
-        'SmtpServer'                : ('localhost', 25),
-        'SmtpLogin'                 : '',
-        'SmtpPassword'              : '',
-        'SmtpUseTLS'                : False,
-        'SupportEmail'              : 'root@localhost',
-        'PublicSupportEmail'        : 'root@localhost',
-        'NoReplyEmail'              : 'noreply-root@localhost',
-        'Profile'                   : False,
-        'StaticFileMethod'          : None,
-        'MaxUploadFilesTotalSize'   : 0,
-        'MaxUploadFileSize'         : 0,
-        'PropagateAllExceptions'    : False,
-        'Debug'                     : False,
-        'DebugUnicode'              : 0,
-        'EmbeddedWebserver'         : False,
-        'SCSSDebugInfo'             : True,
-        'SessionLifetime'           : 86400 * 31,
-        'UseProxy'                  : False,
-        'RouteOldURLs'              : False,
-        'CustomCountries'           : {},
-        'PDFLatexProgram'           : 'xelatex',
-        'StrictLatex'               : True,
-        'WorkerName'                : socket.getfqdn(),
-        'Loggers'                   : ['files'],
-        'SentryDSN'                 : None,
-        'SentryLoggingLevel'        : 'WARNING',
-        'CategoryCleanup'           : {},
-        'Plugins'                   : {},
-        'AuthProviders'             : {},
-        'IdentityProviders'         : {},
-        'ProviderMap'               : {},
-        'LocalIdentities'           : True,
-        'LocalRegistration'         : True,
-        'LocalModeration'           : False,
-        'ExternalRegistrationURL'   : '',
-        'SecretKey'                 : None,
-        'DefaultTimezone'           : 'UTC',
-        'DefaultLocale'             : 'en_GB',
-        'CeleryBroker'              : None,
-        'CeleryResultBackend'       : None,
-        'CeleryConfig'              : {},
-        'ScheduledTaskOverride'     : {},
-        'FlowerURL'                 : None,
-        'StorageBackends'           : {'default': 'fs:/opt/indico/archive'},
-        'AttachmentStorage'         : 'default',
-        'StaticSiteStorage'         : None,
-        'CommunityHubURL'           : 'https://hub.getindico.io',
-        'ConfigFilePath'            : None,
-        'LoggingConfigFile'         : 'logging.conf',
-        'CustomizationDir'          : None,
-        'CustomizationDebug'        : False,
-        'LogoURL'                   : None,
-    }
 
-    def __init__(self, filePath=None):
-        self.filePath = filePath
-        self.__readConfigFile()
+class IndicoConfig(object):
+    """Wrapper for the Indico configuration.
 
-    def reset(self, custom=None):
-        """
-        Resets the config to the default values (ignoring indico.conf) and
-        sets custom options if provided
-        """
-        self._configVars = copy.deepcopy(self.default_values)
-        if custom:
-            self._configVars.update(custom)
-        self._deriveOptions()
+    It exposes all config keys as read-only attributes.
 
-    def update(self, **options):
-        """Updates the config with new values"""
-        invalid = set(options) - self._configVars.viewkeys()
-        if invalid:
-            raise ValueError('Tried to add invalid config options: {}'.format(', '.join(invalid)))
-        self._configVars.update(options)
-        self._deriveOptions()
+    Dynamic configuration attributes whose value may change depending
+    on other factors may be added as properties, but this should be
+    kept to a minimum and is mostly there for legacy reasons.
 
-    def _deriveOptions(self):
-        webinterface_dir = os.path.join(os.path.dirname(indico.__file__), 'legacy/webinterface')
+    :param config: The dict containing the configuration data.
+                   If omitted, it is taken from the active flask
+                   application.  An explicit configuration dict should
+                   not be specified except in special cases such as
+                   the initial app configuration where no app context
+                   is available yet.
+    :param exc: The exception to raise when accessing an invalid
+                config key.  This allows using the expected kind of
+                exception in most cases but overriding it when
+                exposing settings to Jinja where the default
+                :exc:`AttributeError` would silently be turned into
+                an empty string.
+    """
 
-        override = os.environ.get('INDICO_CONF_OVERRIDE')
-        if override:
-            override = ast.literal_eval(override)
-            assert isinstance(override, dict)
-            self._configVars.update(override)
+    __slots__ = ('_config', '_exc')
 
-        # Variables whose value is derived automatically
-        # THIS IS THE PLACE TO ADD NEW SHORTHAND OPTIONS, DONT CREATE A FUNCTION IF THE VALUE NEVER CHANGES,
-        # config.py will become fat again if you don't follow this advice.
-        self._configVars.update({
-            'BaseURL'                   : self._configVars['BaseURL'].rstrip('/'),
-            'SystemIcons'               : self.__systemIcons,
-            'CssConfTemplateBaseURL'    : self.getCssConfTemplateBaseURL(),
-            'ImagesBaseURL'             : self.getImagesBaseURL(),
-            'StaticSiteStorage'         : self.getStaticSiteStorage() or self.getAttachmentStorage(),
-        })
+    def __init__(self, config=None, exc=AttributeError):
+        # yuck, but we don't allow writing to attributes directly
+        object.__setattr__(self, '_config', config)
+        object.__setattr__(self, '_exc', exc)
 
-    def __load_config(self, path):
-        gvalues = {'timedelta': timedelta, 'crontab': crontab}
-        values = {}
-        execfile(path, gvalues, values)
-        return values
+    @property
+    def data(self):
+        try:
+            return self._config or current_app.config['INDICO']
+        except KeyError:
+            raise RuntimeError('config not loaded')
 
-    def __readConfigFile(self):
-        """initializes configuration parameters (Search order: indico.conf, default_values)
+    @property
+    def hash(self):
+        return crc32(repr(make_hashable(sorted(self.data.items()))))
 
-        IF YOU WANT TO CREATE NEW USER CONFIGURABLE OPTIONS:
-        If you need to define a new configuration option you _need_ to specify it here with
-        its default value and then you can put it in indico.conf.
+    @property
+    def CONFERENCE_CSS_TEMPLATES_BASE_URL(self):
+        return self.BASE_URL + '/css/confTemplates'
 
-                #### Indico will not see options that don't appear here ####
-        """
+    @property
+    def IMAGES_BASE_URL(self):
+        return 'static/images' if g.get('static_site') else url_parse('{}/images'.format(self.BASE_URL)).path
 
-        self._configVars = {}
+    def __getattr__(self, name):
+        try:
+            return self.data[name]
+        except KeyError:
+            raise self._exc('no such setting: ' + name)
 
-        # When populating configuration variables indico.conf's values have priority
-        config_path = get_config_path()
-        config_vars = self.__load_config(config_path)
+    def __setattr__(self, key, value):
+        raise AttributeError('cannot change config at runtime')
 
-        self._configVars = {k: config_vars.get(k, default) for k, default in self.default_values.iteritems()}
-        self._configVars['ConfigFilePath'] = config_path
+    def __delattr__(self, key):
+        raise AttributeError('cannot change config at runtime')
 
-        # options that are derived automatically
-        self._deriveOptions()
 
-        if self.getSanitizationLevel() not in range(4):
-            raise ValueError("Invalid SanitizationLevel value (%s). Valid values: 0, 1, 2, 3" % (self._configVars['SanitizationLevel']))
-
-        if self.getStaticFileMethod() is not None and len(self.getStaticFileMethod()) != 2:
-            raise ValueError('StaticFileMethod must be None, a string or a 2-tuple')
-
-        if self.getDefaultTimezone() not in pytz.all_timezones_set:
-            raise ValueError('Invalid default timezone: {}'.format(self.getDefaultTimezone()))
-
-        if self.getAttachmentStorage() not in self.getStorageBackends():
-            raise ValueError('Attachment storage "{}" is not defined in storage backends'.format(
-                self.getAttachmentStorage()))
-
-    def __getattr__(self, attr):
-        """Dynamic finder for values defined in indico.conf
-
-            For example, if an indico.conf value is "username" this method will
-            return its value for a getUsername() call.
-
-            If you add a new pair option = value to indico.conf there is no need to
-            create anything here. It will be returned automatically.
-
-            This all means that changing the name of an indico.conf will force you
-            to change all references in code to getOldOptionName to getNewOptionName
-            including the reference in default_values in this file.
-        """
-        # The following code intercepts all method calls that start with get and are
-        # not already defined (so you can still override a get method if you want)
-        # and returns a closure that returns the value of the option being asked for
-        if attr[0:3] == 'get':
-            def configFinder(k):
-                return self._configVars[k]
-            return lambda: configFinder(attr[3:])
-        else:
-            raise AttributeError
-
-    def getStaticFileMethod(self):
-        val = self._configVars['StaticFileMethod']
-        if not val:
-            return None
-        elif isinstance(val, basestring):
-            return val, None
-        elif not val[0]:
-            return None
-        else:
-            return val
-
-    def getFinalConfigFilePath(self):
-        config_path = self.getConfigFilePath()
-        if os.path.islink(config_path):
-            config_path = resolve_link(config_path)
-        return None if config_path == os.devnull else config_path
-
-    def getLoggingConfigFilePath(self):
-        config_path = self.getFinalConfigFilePath()
-        if config_path is None:
-            return os.path.join(get_root_path('indico'), 'logging.conf.sample')
-        return os.path.join(os.path.dirname(config_path), self.getLoggingConfigFile())
-
-    @classmethod
-    def getInstance(cls):
-        """returns an instance of the Config class ensuring only a single
-           instance is created. All the clients should use this method for
-           setting a Config object instead of normal instantiation
-        """
-        if cls.__instance is None:
-            cls.__instance = Config()
-        return cls.__instance
-
-    def getCssConfTemplateBaseURL(self):
-        return '{}/css/confTemplates'.format(self.getBaseURL())
-
-    def getSystemIconURL( self, id ):
-        if id not in self.__systemIcons:
-            return "%s/%s"%(self.getImagesBaseURL(), id )
-        return "%s/%s"%(self.getImagesBaseURL(), self.__systemIcons[ id ])
-
-    def getImagesBaseURL(self):
-        if has_app_context() and g.get('static_site'):
-            return "static/images"
-        else:
-            return url_parse("%s/images" % self.getBaseURL()).path
+#: The global Indico configuration
+config = IndicoConfig()

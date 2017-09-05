@@ -25,7 +25,6 @@ while target_ != None:
     l.append((name, url))
 
 l.reverse()
-arrowImage = systemIcon( "breadcrumb_arrow.png" )
 %>
 
 <div class="main-breadcrumb" ${'style="background-color: '+ bgColor +';" ' if bgColor else ""}>

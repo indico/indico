@@ -23,7 +23,7 @@ from markupsafe import Markup
 from requests.exceptions import HTTPError, RequestException, Timeout
 
 import indico
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_postgres_version
 from indico.legacy.webinterface.rh.base import RH
@@ -46,7 +46,7 @@ class RHBootstrap(RH):
             return redirect(url_for_index())
         return render_template('bootstrap/bootstrap.html',
                                form=BootstrapForm(),
-                               timezone=Config.getInstance().getDefaultTimezone(),
+                               timezone=config.DEFAULT_TIMEZONE,
                                languages=get_all_locales(),
                                operating_system=get_os(),
                                postgres_version=get_postgres_version(),
@@ -75,8 +75,8 @@ class RHBootstrap(RH):
         db.session.add(user)
         db.session.flush()
 
-        user.settings.set('timezone', Config.getInstance().getDefaultTimezone())
-        user.settings.set('lang', session.lang or Config.getInstance().getDefaultLocale())
+        user.settings.set('timezone', config.DEFAULT_TIMEZONE)
+        user.settings.set('lang', session.lang or config.DEFAULT_LOCALE)
 
         login_user(user, identity)
         full_name = user.full_name  # needed after the session closes

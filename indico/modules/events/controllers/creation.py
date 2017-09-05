@@ -24,7 +24,7 @@ from markupsafe import Markup
 from pytz import timezone
 from werkzeug.utils import cached_property
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.categories import Category
@@ -58,7 +58,7 @@ class RHCreateEvent(RHProtected):
 
     def _get_form_defaults(self):
         category = self._default_category
-        tzinfo = timezone(Config.getInstance().getDefaultTimezone())
+        tzinfo = timezone(config.DEFAULT_TIMEZONE)
         if category is not None:
             tzinfo = timezone(category.timezone)
 

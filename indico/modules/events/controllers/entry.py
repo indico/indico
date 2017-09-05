@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app, redirect, request, url_for
+from flask import redirect, request, url_for
 from werkzeug.exceptions import NotFound
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.controllers.display import RHDisplayEvent
@@ -48,7 +49,7 @@ def event_or_shorturl(confId, shorturl_namespace=False, force_overview=False):
                           .filter(db.func.lower(Event.url_shortcut) == confId.lower(),
                                   ~Event.is_deleted)
                           .one_or_none())
-        if (shorturl_namespace or current_app.config['INDICO_COMPAT_ROUTES']) and shorturl_event:
+        if (shorturl_namespace or config.ROUTE_OLD_URLS) and shorturl_event:
             if shorturl_namespace:
                 # Correct namespace => redirect to the event
                 func = lambda: redirect(shorturl_event.url)

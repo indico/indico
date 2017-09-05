@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import has_request_context, render_template, session
 
 from indico.core import signals
-from indico.core.config import Config
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.users import User
 from indico.modules.vc.forms import VCPluginSettingsFormBase

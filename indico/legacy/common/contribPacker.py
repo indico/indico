@@ -19,17 +19,17 @@ import string
 import tempfile
 import zipfile
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.utils import utf8rep
 
 
 class ZIPFileHandler:
     def __init__(self):
-        (fh, name) = tempfile.mkstemp(prefix="Indico", dir=Config.getInstance().getTempDir())
+        fh, name = tempfile.mkstemp(prefix="Indico", dir=config.TEMP_DIR)
         os.fdopen(fh).close()
         try:
             self._file = zipfile.ZipFile(name, "w", zipfile.ZIP_DEFLATED, allowZip64=True)
-        except:
+        except RuntimeError:
             self._file = zipfile.ZipFile(name, "w", allowZip64=True)
         self._name = name
 

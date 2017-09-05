@@ -28,7 +28,7 @@ from wtforms import Field, SelectField
 from wtforms.ext.dateutil.fields import DateField, DateTimeField
 from wtforms.validators import StopValidation
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.date_time import localize_as_utc, relativedelta
 from indico.util.i18n import _, get_current_locale
 from indico.web.forms.fields import JSONField
@@ -332,9 +332,8 @@ class OccurrencesField(JSONField):
 class IndicoTimezoneSelectField(SelectField):
     def __init__(self, *args, **kwargs):
         super(IndicoTimezoneSelectField, self).__init__(*args, **kwargs)
-        config = Config.getInstance()
         self.choices = [(v, v) for v in pytz.common_timezones]
-        self.default = config.getDefaultTimezone()
+        self.default = config.DEFAULT_TIMEZONE
 
     def process_data(self, value):
         super(IndicoTimezoneSelectField, self).process_data(value)

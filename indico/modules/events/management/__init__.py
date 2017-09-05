@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, SideMenuSection
@@ -38,7 +38,7 @@ def _sidemenu_sections(sender, **kwargs):
 def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
         yield SideMenuItem('settings', _('Settings'), url_for('event_management.settings', event), 100, icon='settings')
-        if Config.getInstance().getIsRoomBookingActive():
+        if config.ENABLE_ROOMBOOKING:
             yield SideMenuItem('room_booking', _('Room Booking'),
                                url_for('event_mgmt.rooms_booking_list', event),
                                50,

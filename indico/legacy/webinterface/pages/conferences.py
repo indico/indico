@@ -20,7 +20,7 @@ import os
 
 from flask import render_template, render_template_string, request, session
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common.utils import isStringHTML
 from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.common.tools import escape_html, strip_ml_tags
@@ -170,7 +170,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         return frame.getHTML(body, frameParams)
 
     def _getHeadContent(self):
-        path = Config.getInstance().getBaseURL()
+        path = config.BASE_URL
         try:
             timestamp = os.stat(__file__).st_mtime
         except OSError:
@@ -206,7 +206,7 @@ class WConfMetadata(wcomponents.WTemplated):
         v['social'] = social_settings.get_all()
 
         event = self._conf.as_event
-        v['image'] = event.logo_url if event.has_logo else Config.getInstance().getSystemIconURL("logo_indico")
+        v['image'] = event.logo_url if event.has_logo else (config.IMAGES_BASE_URL + '/logo_indico.png')
         v['description'] = strip_ml_tags(self._conf.as_event.description[:500].encode('utf-8'))
         return v
 

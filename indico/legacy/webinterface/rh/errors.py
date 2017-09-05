@@ -19,7 +19,7 @@ from pprint import pformat
 
 from werkzeug.urls import url_parse
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.notifications import make_email, send_email
 from indico.legacy.webinterface.pages import errors
 from indico.legacy.webinterface.rh.base import RH
@@ -51,12 +51,11 @@ class RHErrorReporting(RH):
         self._msg = params.get("reportMsg", "{}")
 
     def _sendReport(self):
-        cfg = Config.getInstance()
         data = json.loads(self._msg)
         template = get_template_module('emails/error_report.txt', comment=self._comments, traceback=data['traceback'],
                                        request_info=pformat(data['request_info']),
-                                       server_name=url_parse(cfg.getBaseURL()).netloc)
-        send_email(make_email(cfg.getSupportEmail(), reply_address=self._userMail, template=template), skip_queue=True)
+                                       server_name=url_parse(config.BASE_URL).netloc)
+        send_email(make_email(config.SUPPORT_EMAIL, reply_address=self._userMail, template=template), skip_queue=True)
 
     def process(self, params):
         self._checkParams(params)

@@ -322,7 +322,7 @@ Now finish setting up the directory structure and permissions:
     chmod 750 ~/web ~/.venv
     chmod g+w ~/log/nginx
     restorecon -R ~/
-    echo -e "\nStaticFileMethod = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
+    echo -e "\nSTATIC_FILE_METHOD = ('xaccelredirect', {'/opt/indico': '/.xsf/indico'})" >> ~/etc/indico.conf
 
 
 9. Create database schema

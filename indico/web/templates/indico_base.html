@@ -8,7 +8,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ system_icon('addressBarIcon') }}">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ indico_config.IMAGES_BASE_URL }}/indico.ico">
 
     {% if social.facebook_app_id -%}
         <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
@@ -59,7 +59,7 @@ Queries:         {{ req_stats.query_count }}
 Duration (sql):  {{ '%.06fs'|format(req_stats.query_duration) }}
 Duration (req):  {{ '%.06fs'|format(req_stats.req_duration) }}
 {%- if session.user and session.user.is_admin %}
-Worker:          {{ indico_config.WorkerName }}
+Worker:          {{ indico_config.WORKER_NAME }}
 {%- endif %}
 Endpoint:        {{ request.endpoint }}
 {%- if g.rh %}

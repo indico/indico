@@ -25,7 +25,7 @@ from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.errors import FormValuesError, UserValueError
 from indico.core.notifications import make_email, send_email
@@ -323,7 +323,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
         try:
             data = pdf.getPDFBin()
         except Exception:
-            if Config.getInstance().getDebug():
+            if config.DEBUG:
                 raise
             raise FormValuesError(_("Text too large to generate a PDF with table style. "
                                     "Please try again generating with book style."))

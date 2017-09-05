@@ -20,7 +20,7 @@ import traceback
 
 from flask import g, session
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.common import security
 from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.services.interface.rpc.common import HTMLSecurityError, ServiceAccessError
@@ -90,16 +90,15 @@ class ServiceBase(RequestHandlerBase):
                 raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
 
         if self._doProcess:
-            if Config.getInstance().getProfile():
+            if config.PROFILE:
                 import profile, pstats, random
-                proffilename = os.path.join(Config.getInstance().getTempDir(), "service%s.prof" % random.random())
+                proffilename = os.path.join(config.TEMP_DIR, "service%s.prof" % random.random())
                 result = [None]
                 profile.runctx("result[0] = self._getAnswer()", globals(), locals(), proffilename)
                 answer = result[0]
-                rep = Config.getInstance().getTempDir()
                 stats = pstats.Stats(proffilename)
                 stats.sort_stats('cumulative', 'time', 'calls')
-                stats.dump_stats(os.path.join(rep, "IndicoServiceRequestProfile.log"))
+                stats.dump_stats(os.path.join(config.TEMP_DIR, "IndicoServiceRequestProfile.log"))
                 os.remove(proffilename)
             else:
                 answer = self._getAnswer()

@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import posixpath
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
 from indico.util.string import return_ascii, strict_unicode
@@ -69,7 +69,7 @@ class DesignerImageFile(StoredFileMixin, db.Model):
         self.assign_id()
         filename = '{}-{}'.format(self.id, self.filename)
         path = posixpath.join(*(path_segments + [filename]))
-        return Config.getInstance().getAttachmentStorage(), path
+        return config.ATTACHMENT_STORAGE, path
 
     @return_ascii
     def __repr__(self):

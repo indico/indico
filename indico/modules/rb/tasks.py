@@ -24,7 +24,7 @@ from celery.schedules import crontab
 from sqlalchemy.orm import contains_eager
 
 from indico.core.celery import celery
-from indico.core.config import Config
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
@@ -88,7 +88,7 @@ def _notify_occurrences(user, occurrences):
 
 @celery.periodic_task(name='roombooking_occurrences', run_every=crontab(minute='15', hour='8'))
 def roombooking_occurrences(debug=False):
-    if not Config.getInstance().getIsRoomBookingActive():
+    if not config.ENABLE_ROOMBOOKING:
         logger.info('Notifications not sent because room booking is disabled')
         return
     if not rb_settings.get('notifications_enabled'):

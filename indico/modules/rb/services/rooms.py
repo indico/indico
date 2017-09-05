@@ -18,7 +18,7 @@ from datetime import datetime
 
 from flask import session
 
-from indico.core.config import Config
+from indico.core.config import config
 from indico.legacy.services.implementation.base import LoggedOnlyService, ServiceBase
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.reservations import RepeatFrequency
@@ -48,7 +48,7 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
         self._isActive = self._params.get('isActive', None)
 
     def _getAnswer(self):
-        if not Config.getInstance().getIsRoomBookingActive():
+        if not config.ENABLE_ROOMBOOKING:
             return {}
         criteria = {'_eager': Room.location}
         if self._isActive is not None:

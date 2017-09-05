@@ -26,7 +26,7 @@ from tempfile import NamedTemporaryFile
 from werkzeug.security import safe_join
 
 from indico.core import signals
-from indico.core.config import Config
+from indico.core.config import config
 from indico.util.signals import named_objects_from_signal
 from indico.util.string import return_ascii
 from indico.web.flask.util import send_file
@@ -35,7 +35,7 @@ from indico.web.flask.util import send_file
 def get_storage(backend_name):
     """Returns an FS object for the given backend.
 
-    The backend must be defined in the StorageBackends dict in the
+    The backend must be defined in the STORAGE_BACKENDS dict in the
     indico config.  Once a backend has been used it is assumed to
     stay there forever or at least as long as it is referenced
     somewhere.
@@ -44,7 +44,7 @@ def get_storage(backend_name):
     ``fs:/some/folder/`` or ``foo:host=foo.host,token=secret``.
     """
     try:
-        definition = Config.getInstance().getStorageBackends()[backend_name]
+        definition = config.STORAGE_BACKENDS[backend_name]
     except KeyError:
         raise RuntimeError('Storage backend does not exist: {}'.format(backend_name))
     name, data = definition.split(':', 1)
@@ -142,7 +142,7 @@ class Storage(object):
         :param file_id: The ID of the file within the storage backend.
         """
         with self.open(file_id) as fd:
-            with NamedTemporaryFile(suffix='indico.tmp', dir=Config.getInstance().getTempDir()) as tmpfile:
+            with NamedTemporaryFile(suffix='indico.tmp', dir=config.TEMP_DIR) as tmpfile:
                 self._copy_file(fd, tmpfile)
                 tmpfile.flush()
                 yield tmpfile.name
