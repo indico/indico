@@ -42,7 +42,7 @@ class LocalGroup(db.Model):
         index=True
     )
 
-    #: the local groups this user belongs to
+    #: the users in the group
     members = db.relationship(
         'User',
         secondary='users.group_members',
