@@ -89,6 +89,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
     if quiet:
         return
 
+    user = session.user if session else None  # allow acl changes outside request context
     available_roles = get_available_roles(Event)
 
     def _format_roles(roles):
