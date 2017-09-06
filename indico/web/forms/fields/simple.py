@@ -14,18 +14,18 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import json
 
 from markupsafe import escape
-from wtforms.fields import SelectMultipleField, RadioField, HiddenField, TextAreaField, PasswordField, Field
+from wtforms.fields import Field, HiddenField, PasswordField, RadioField, SelectMultipleField, TextAreaField
 from wtforms.widgets import CheckboxInput
 
 from indico.util.i18n import _
-from indico.util.string import sanitize_email, is_valid_mail
+from indico.util.string import is_valid_mail, sanitize_email
 from indico.web.forms.fields.util import is_preprocessed_formdata
-from indico.web.forms.widgets import JinjaWidget, HiddenInputs, PasswordWidget
+from indico.web.forms.widgets import HiddenInputs, JinjaWidget, PasswordWidget
 
 
 class IndicoSelectMultipleCheckboxField(SelectMultipleField):

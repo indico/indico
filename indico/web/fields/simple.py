@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import division, unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.fields.html5 import IntegerField
-from wtforms.validators import NumberRange, Optional, ValidationError, Length, InputRequired
+from wtforms.validators import InputRequired, Length, NumberRange, Optional, ValidationError
 
 from indico.util.i18n import _
 from indico.web.forms.fields import IndicoRadioField

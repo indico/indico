@@ -20,25 +20,25 @@ Base export interface
 
 import re
 import urllib
-from datetime import datetime, timedelta, time
+from datetime import datetime, time, timedelta
 from types import GeneratorType
 
 import pytz
-from flask import request, current_app
+from flask import current_app, request
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.logger import Logger
+from indico.legacy.common.mail import GenericMailer
 from indico.util.date_time import now_utc
+from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
 from indico.web.http_api.metadata import Serializer
-from indico.web.http_api.metadata.html import HTML4Serializer
-from indico.web.http_api.metadata.jsonp import JSONPSerializer
-from indico.web.http_api.metadata.ical import ICalSerializer
 from indico.web.http_api.metadata.atom import AtomSerializer
+from indico.web.http_api.metadata.html import HTML4Serializer
+from indico.web.http_api.metadata.ical import ICalSerializer
+from indico.web.http_api.metadata.jsonp import JSONPSerializer
 from indico.web.http_api.responses import HTTPAPIError
 from indico.web.http_api.util import get_query_parameter
-from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
-from indico.legacy.common.mail import GenericMailer
 
 
 class HTTPAPIHook(object):

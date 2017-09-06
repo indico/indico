@@ -18,15 +18,16 @@ from __future__ import unicode_literals
 
 import re
 
-from wtforms.widgets import TextInput, TextArea, HiddenInput, CheckboxInput
+from wtforms.widgets import CheckboxInput, HiddenInput, TextArea, TextInput
 from wtforms.widgets.core import HTMLString
 
 from indico.core.auth import multipass
 from indico.core.config import Config
 from indico.core.db import db
 from indico.util.string import natural_sort_key
-from indico.web.util import inject_js
 from indico.web.flask.templating import get_template_module
+from indico.web.util import inject_js
+
 
 html_commment_re = re.compile(r'<!--.*?-->', re.MULTILINE)
 

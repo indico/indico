@@ -14,24 +14,29 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, absolute_import
+# isort:skip_file
+# skipping just a single import is not enough as it does not prevent
+# isort from moving imports before the skipped line
+
+from __future__ import absolute_import, unicode_literals
 
 # XXX: keep `simple` on top; other modules may need fields from there (especially JSONField)
-from .simple import (IndicoSelectMultipleCheckboxField, IndicoSelectMultipleCheckboxBooleanField, IndicoRadioField,
-                     JSONField, HiddenFieldList, TextListField, EmailListField, IndicoPasswordField,
-                     IndicoStaticTextField, IndicoTagListField, IndicoEmailRecipientsField)
+from .simple import (EmailListField, HiddenFieldList, IndicoEmailRecipientsField, IndicoPasswordField, IndicoRadioField,
+                     IndicoSelectMultipleCheckboxBooleanField, IndicoSelectMultipleCheckboxField, IndicoStaticTextField,
+                     IndicoTagListField, JSONField, TextListField)
 
 from .colors import IndicoPalettePickerField
-from .datetime import (TimeDeltaField, IndicoDateTimeField, OccurrencesField, IndicoTimezoneSelectField,
-                       RelativeDeltaField, IndicoDateField, IndicoWeekDayRepetitionField)
-from .enums import IndicoEnumSelectField, IndicoEnumRadioField, HiddenEnumField
-from .files import FileField, EditableFileField
-from .itemlists import MultiStringField, MultipleItemsField, OverrideMultipleItemsField
+from .datetime import (IndicoDateField, IndicoDateTimeField, IndicoTimezoneSelectField, IndicoWeekDayRepetitionField,
+                       OccurrencesField, RelativeDeltaField, TimeDeltaField)
+from .enums import HiddenEnumField, IndicoEnumRadioField, IndicoEnumSelectField
+from .files import EditableFileField, FileField
+from .itemlists import MultipleItemsField, MultiStringField, OverrideMultipleItemsField
 from .location import IndicoLocationField
 from .markdown import IndicoMarkdownField
-from .principals import PrincipalListField, PrincipalField, AccessControlListField
+from .principals import AccessControlListField, PrincipalField, PrincipalListField
 from .protection import IndicoProtectionField
-from .sqlalchemy import IndicoQuerySelectMultipleField, IndicoQuerySelectMultipleCheckboxField
+from .sqlalchemy import IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelectMultipleField
+
 
 __all__ = ('IndicoSelectMultipleCheckboxField', 'IndicoRadioField', 'JSONField', 'HiddenFieldList', 'TextListField',
            'EmailListField', 'IndicoPasswordField', 'IndicoStaticTextField', 'IndicoTagListField',

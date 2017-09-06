@@ -22,9 +22,9 @@ from lxml import html
 from lxml.etree import ParserError
 from pytz import timezone, utc
 
+from indico.legacy.common.timezoneUtils import nowutc
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.legacy.common.timezoneUtils import nowutc
 
 
 class vRecur(ical.vRecur):

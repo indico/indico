@@ -16,7 +16,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
-from flask import g, render_template, jsonify, request, session, has_request_context
+from flask import g, has_request_context, jsonify, render_template, request, session
 from markupsafe import Markup
 
 from indico.util.i18n import _

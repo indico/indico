@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from copy import deepcopy
 
-from wtforms.fields import StringField, TextAreaField, BooleanField
+from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
 from indico.util.i18n import _

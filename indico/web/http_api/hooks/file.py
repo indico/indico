@@ -14,12 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-# indico imports
-from indico.web.http_api.metadata.serializer import Serializer
-
 from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.events.api import EventBaseHook
 from indico.web.http_api.hooks.base import HTTPAPIHook
+from indico.web.http_api.metadata.serializer import Serializer
 from indico.web.http_api.responses import HTTPAPIError
 
 

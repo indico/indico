@@ -24,31 +24,29 @@ import posixpath
 import re
 import time
 import urllib
+from urlparse import parse_qs
 from uuid import UUID
 
-from flask import request, session, g, current_app
-from urlparse import parse_qs
-from werkzeug.exceptions import NotFound, BadRequest
+from flask import current_app, g, request, session
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.modules.api import APIMode
-from indico.modules.api import api_settings
+from indico.legacy.accessControl import AccessWrapper
+from indico.legacy.common.cache import GenericCache
+from indico.legacy.common.fossilize import clearCache, fossilize
+from indico.modules.api import APIMode, api_settings
 from indico.modules.api.models.keys import APIKey
 from indico.modules.oauth import oauth
 from indico.modules.oauth.provider import load_token
 from indico.util.string import to_unicode
+from indico.web.flask.util import ResponseUtil
 from indico.web.http_api import HTTPAPIHook
-from indico.web.http_api.responses import HTTPAPIResult, HTTPAPIError
-from indico.web.http_api.util import get_query_parameter
 from indico.web.http_api.fossils import IHTTPAPIExportResultFossil
 from indico.web.http_api.metadata.serializer import Serializer
-from indico.web.flask.util import ResponseUtil
-
-from indico.legacy.common.fossilize import fossilize, clearCache
-from indico.legacy.accessControl import AccessWrapper
-from indico.legacy.common.cache import GenericCache
+from indico.web.http_api.responses import HTTPAPIError, HTTPAPIResult
+from indico.web.http_api.util import get_query_parameter
 
 
 # Remove the extension at the end or before the querystring

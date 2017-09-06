@@ -20,12 +20,12 @@ from flask import render_template
 from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
+from indico.legacy.webinterface.common import tools as security_tools
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
 from indico.web.assets import core_env
-from indico.web.flask.util import url_rule_to_js, url_for
-from indico.legacy.webinterface.common import tools as security_tools
+from indico.web.flask.util import url_for, url_rule_to_js
 
 
 def generate_global_file(config):

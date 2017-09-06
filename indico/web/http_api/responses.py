@@ -17,7 +17,7 @@
 import time
 
 from indico.core.config import Config
-from indico.legacy.common.fossilize import fossilizes, Fossilizable
+from indico.legacy.common.fossilize import Fossilizable, fossilizes
 from indico.web.http_api.fossils import IHTTPAPIErrorFossil, IHTTPAPIResultFossil
 
 

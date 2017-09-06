@@ -14,12 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from operator import attrgetter
 
-from wtforms import SelectFieldBase, HiddenField
-from wtforms.widgets import Select, RadioInput
+from wtforms import HiddenField, SelectFieldBase
+from wtforms.widgets import RadioInput, Select
 
 from indico.web.forms.widgets import JinjaWidget
 

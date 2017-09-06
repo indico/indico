@@ -18,14 +18,14 @@ from __future__ import unicode_literals
 
 import json
 
-from wtforms.fields import RadioField, BooleanField
-from wtforms.widgets.core import Input, Select, TextArea, HiddenInput
+from wtforms.fields import BooleanField, RadioField
 from wtforms.validators import Length, NumberRange
+from wtforms.widgets.core import HiddenInput, Input, Select, TextArea
 
 from indico.util.struct.enum import RichEnum
-from indico.web.forms.fields import (IndicoSelectMultipleCheckboxField, IndicoQuerySelectMultipleCheckboxField,
-                                     IndicoEnumRadioField)
-from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, WordCount, SoftLength
+from indico.web.forms.fields import (IndicoEnumRadioField, IndicoQuerySelectMultipleCheckboxField,
+                                     IndicoSelectMultipleCheckboxField)
+from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, SoftLength, WordCount
 from indico.web.forms.widgets import SelectizeWidget
 
 

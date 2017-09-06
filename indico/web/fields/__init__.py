@@ -20,6 +20,7 @@ from indico.core import signals
 from indico.util.signals import named_objects_from_signal
 from indico.web.fields.base import BaseField
 
+
 __all__ = ('BaseField', 'get_field_definitions')
 
 

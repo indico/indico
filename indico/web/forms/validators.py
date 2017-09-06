@@ -20,9 +20,9 @@ import re
 from datetime import timedelta
 from types import NoneType
 
-from wtforms.validators import StopValidation, ValidationError, EqualTo, Regexp, Length
+from wtforms.validators import EqualTo, Length, Regexp, StopValidation, ValidationError
 
-from indico.util.date_time import as_utc, format_datetime, format_time, now_utc, format_human_timedelta
+from indico.util.date_time import as_utc, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import is_valid_mail
 

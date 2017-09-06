@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import weakref
 
-from flask import request, session, flash, g
+from flask import flash, g, request, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
@@ -30,7 +30,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
-from indico.util.string import strip_whitespace, return_ascii
+from indico.util.string import return_ascii, strip_whitespace
 from indico.web.flask.util import url_for
 
 

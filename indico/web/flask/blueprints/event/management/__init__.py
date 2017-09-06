@@ -14,8 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+# isort:skip_file
+
 from indico.web.flask.wrappers import IndicoBlueprint
 
 event_mgmt = IndicoBlueprint('event_mgmt', __name__, url_prefix='/event/<confId>/manage')
 
-import indico.web.flask.blueprints.event.management.rooms
+from . import rooms

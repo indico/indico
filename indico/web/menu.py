@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, absolute_import
+from __future__ import absolute_import, unicode_literals
 
 from flask import render_template
 from markupsafe import Markup
 
 from indico.core import signals
 from indico.util.signals import named_objects_from_signal
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 
 
 class _MenuSectionBase(object):

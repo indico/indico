@@ -14,15 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.controllers.user.event import (RHRoomBookingEventBookingList, RHRoomBookingEventBookingDetails,
-                                                      RHRoomBookingEventBookingModifyBooking,
+from indico.modules.rb.controllers.user.event import (RHRoomBookingEventAcceptBooking,
                                                       RHRoomBookingEventBookingCloneBooking,
-                                                      RHRoomBookingEventRoomDetails, RHRoomBookingEventNewBookingSimple,
-                                                      RHRoomBookingEventChooseEvent, RHRoomBookingEventNewBooking,
-                                                      RHRoomBookingEventAcceptBooking, RHRoomBookingEventRejectBooking,
+                                                      RHRoomBookingEventBookingDetails, RHRoomBookingEventBookingList,
+                                                      RHRoomBookingEventBookingModifyBooking,
                                                       RHRoomBookingEventCancelBooking,
                                                       RHRoomBookingEventCancelBookingOccurrence,
-                                                      RHRoomBookingEventRejectBookingOccurrence)
+                                                      RHRoomBookingEventChooseEvent, RHRoomBookingEventNewBooking,
+                                                      RHRoomBookingEventNewBookingSimple,
+                                                      RHRoomBookingEventRejectBooking,
+                                                      RHRoomBookingEventRejectBookingOccurrence,
+                                                      RHRoomBookingEventRoomDetails)
 from indico.web.flask.blueprints.event.management import event_mgmt
 
 

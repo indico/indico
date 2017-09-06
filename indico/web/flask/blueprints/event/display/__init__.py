@@ -14,8 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+# isort:skip_file
+
 from indico.web.flask.wrappers import IndicoBlueprint
 
 event = IndicoBlueprint('event', __name__, url_prefix='/event/<confId>')
 
-import indico.web.flask.blueprints.event.display.main
+from . import main

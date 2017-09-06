@@ -14,14 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import hmac
 import hashlib
+import hmac
 import time
 import urllib
 
 from indico.core.config import Config
-from indico.modules.api import APIMode
-from indico.modules.api import api_settings
+from indico.modules.api import APIMode, api_settings
 
 
 def get_query_parameter(queryParams, keys, default=None, integer=False):
