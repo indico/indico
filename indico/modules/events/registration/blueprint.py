@@ -16,70 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
+from indico.modules.events.registration import api
+from indico.modules.events.registration.controllers import display
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.display import (RHParticipantList, RHRegistrationDisplayEdit,
-                                                                    RHRegistrationForm, RHRegistrationFormCheckEmail,
-                                                                    RHRegistrationFormDeclineInvitation,
-                                                                    RHRegistrationFormList)
-from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormAddField,
-                                                                              RHRegistrationFormAddText,
-                                                                              RHRegistrationFormModifyField,
-                                                                              RHRegistrationFormModifyText,
-                                                                              RHRegistrationFormMoveField,
-                                                                              RHRegistrationFormMoveText,
-                                                                              RHRegistrationFormToggleFieldState,
-                                                                              RHRegistrationFormToggleTextState)
-from indico.modules.events.registration.controllers.management.invitations import (RHRegistrationFormDeleteInvitation,
-                                                                                   RHRegistrationFormInvitations,
-                                                                                   RHRegistrationFormInvite,
-                                                                                   RHRegistrationFormManagerDeclineInvitation)
-from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
-                                                                                RHManageRegistrationFormDisplay,
-                                                                                RHManageRegistrationForms,
-                                                                                RHManageRegistrationFormsDisplay,
-                                                                                RHManageRegistrationManagers,
-                                                                                RHRegistrationFormClose,
-                                                                                RHRegistrationFormCreate,
-                                                                                RHRegistrationFormDelete,
-                                                                                RHRegistrationFormEdit,
-                                                                                RHRegistrationFormManage,
-                                                                                RHRegistrationFormModify,
-                                                                                RHRegistrationFormOpen,
-                                                                                RHRegistrationFormSchedule,
-                                                                                RHRegistrationFormStats)
-from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationApprove,
-                                                                                RHRegistrationBulkCheckIn,
-                                                                                RHRegistrationCheckIn,
-                                                                                RHRegistrationCreate,
-                                                                                RHRegistrationCreateMultiple,
-                                                                                RHRegistrationDelete,
-                                                                                RHRegistrationDetails,
-                                                                                RHRegistrationDownloadAttachment,
-                                                                                RHRegistrationEdit,
-                                                                                RHRegistrationEmailRegistrants,
-                                                                                RHRegistrationEmailRegistrantsPreview,
-                                                                                RHRegistrationListStaticURL,
-                                                                                RHRegistrationReject,
-                                                                                RHRegistrationsConfigBadges,
-                                                                                RHRegistrationsExportAttachments,
-                                                                                RHRegistrationsExportCSV,
-                                                                                RHRegistrationsExportExcel,
-                                                                                RHRegistrationsExportPDFBook,
-                                                                                RHRegistrationsExportPDFTable,
-                                                                                RHRegistrationsListCustomize,
-                                                                                RHRegistrationsListManage,
-                                                                                RHRegistrationsModifyStatus,
-                                                                                RHRegistrationsPrintBadges,
-                                                                                RHRegistrationTogglePayment)
-from indico.modules.events.registration.controllers.management.sections import (RHRegistrationFormAddSection,
-                                                                                RHRegistrationFormModifySection,
-                                                                                RHRegistrationFormMoveSection,
-                                                                                RHRegistrationFormToggleSection)
-from indico.modules.events.registration.controllers.management.tickets import (RHRegistrationFormTickets,
-                                                                               RHTicketConfigQRCode,
-                                                                               RHTicketConfigQRCodeImage,
-                                                                               RHTicketDownload)
+from indico.modules.events.registration.controllers.management import (fields, invitations, regforms, reglists,
+                                                                       sections, tickets)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -88,153 +29,159 @@ _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId
                       virtual_template_folder='events/registration', event_feature='registration')
 
 # Management
-_bp.add_url_rule('/manage/registration/', 'manage_regform_list', RHManageRegistrationForms)
-_bp.add_url_rule('/manage/registration/create', 'create_regform', RHRegistrationFormCreate, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/display', 'manage_regforms_display', RHManageRegistrationFormsDisplay,
+_bp.add_url_rule('/manage/registration/', 'manage_regform_list', regforms.RHManageRegistrationForms)
+_bp.add_url_rule('/manage/registration/create', 'create_regform', regforms.RHRegistrationFormCreate,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers', RHManageRegistrationManagers,
+_bp.add_url_rule('/manage/registration/display', 'manage_regforms_display', regforms.RHManageRegistrationFormsDisplay,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/managers', 'manage_registration_managers', regforms.RHManageRegistrationManagers,
                  methods=('GET', 'POST'))
 
 # Single registration form management
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', RHRegistrationFormManage)
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit',
-                 'edit_regform', RHRegistrationFormEdit, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete',
-                 'delete_regform', RHRegistrationFormDelete, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/open',
-                 'open_regform', RHRegistrationFormOpen, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/close',
-                 'close_regform', RHRegistrationFormClose, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/schedule',
-                 'schedule_regform', RHRegistrationFormSchedule, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform', RHRegistrationFormModify)
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/stats/', 'regform_stats', RHRegistrationFormStats)
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/display',
-                 'manage_regform_display', RHManageRegistrationFormDisplay, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/', 'manage_regform', regforms.RHRegistrationFormManage)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/edit', 'edit_regform', regforms.RHRegistrationFormEdit,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/delete', 'delete_regform', regforms.RHRegistrationFormDelete,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/open', 'open_regform', regforms.RHRegistrationFormOpen,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/close', 'close_regform', regforms.RHRegistrationFormClose,
+                 methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/schedule', 'schedule_regform',
+                 regforms.RHRegistrationFormSchedule, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/', 'modify_regform', regforms.RHRegistrationFormModify)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/stats/', 'regform_stats', regforms.RHRegistrationFormStats)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/display', 'manage_regform_display',
+                 regforms.RHManageRegistrationFormDisplay, methods=('GET', 'POST'))
 
 # Registrations management
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/', 'manage_reglist', RHRegistrationsListManage)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/', 'manage_reglist',
+                 reglists.RHRegistrationsListManage)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/customize', 'customize_reglist',
-                 RHRegistrationsListCustomize, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-url',
-                 'generate_static_url', RHRegistrationListStaticURL, methods=('POST',))
+                 reglists.RHRegistrationsListCustomize, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/static-url', 'generate_static_url',
+                 reglists.RHRegistrationListStaticURL, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create', 'create_registration',
-                 RHRegistrationCreate, methods=('GET', 'POST'))
+                 reglists.RHRegistrationCreate, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/create-multiple',
-                 'create_multiple_registrations', RHRegistrationCreateMultiple, methods=('GET', 'POST'))
+                 'create_multiple_registrations', reglists.RHRegistrationCreateMultiple, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/delete', 'delete_registrations',
-                 RHRegistrationDelete, methods=('POST',))
+                 reglists.RHRegistrationDelete, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/', 'registration_details',
-                 RHRegistrationDetails)
+                 reglists.RHRegistrationDetails)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/edit', 'edit_registration',
-                 RHRegistrationEdit, methods=('GET', 'POST'))
+                 reglists.RHRegistrationEdit, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/toggle-payment',
-                 'toggle_registration_payment', RHRegistrationTogglePayment, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>'
-                 '/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>', 'registration_file',
-                 RHRegistrationDownloadAttachment)
+                 'toggle_registration_payment', reglists.RHRegistrationTogglePayment, methods=('POST',))
+_bp.add_url_rule(
+    '/manage/registration/<int:reg_form_id>' '/registrations/<int:registration_id>/file/<int:field_data_id>-<filename>',
+    'registration_file', reglists.RHRegistrationDownloadAttachment)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/approve',
-                 'approve_registration', RHRegistrationApprove, methods=('POST',))
+                 'approve_registration', reglists.RHRegistrationApprove, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/reject',
-                 'reject_registration', RHRegistrationReject, methods=('POST',))
+                 'reject_registration', reglists.RHRegistrationReject, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/<int:registration_id>/check-in',
-                 'registration_check_in', RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
+                 'registration_check_in', reglists.RHRegistrationCheckIn, methods=('PUT', 'DELETE'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', 'email_registrants',
-                 RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
+                 reglists.RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email-preview', 'email_registrants_preview',
-                 RHRegistrationEmailRegistrantsPreview, methods=('GET', 'POST'))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/table.pdf',
-                 'registrations_pdf_export_table', RHRegistrationsExportPDFTable, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/book.pdf',
-                 'registrations_pdf_export_book', RHRegistrationsExportPDFBook, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.csv',
-                 'registrations_csv_export', RHRegistrationsExportCSV, methods=('POST',))
+                 reglists.RHRegistrationEmailRegistrantsPreview, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/table.pdf', 'registrations_pdf_export_table',
+                 reglists.RHRegistrationsExportPDFTable, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/book.pdf', 'registrations_pdf_export_book',
+                 reglists.RHRegistrationsExportPDFBook, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.csv', 'registrations_csv_export',
+                 reglists.RHRegistrationsExportCSV, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/registrations.xlsx',
-                 'registrations_excel_export', RHRegistrationsExportExcel, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status',
-                 'registrations_modify_status', RHRegistrationsModifyStatus, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in',
-                 'registrations_check_in', RHRegistrationBulkCheckIn, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments',
-                 'registrations_attachments_export', RHRegistrationsExportAttachments, methods=('POST',))
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/config',
-                 'registrations_config_badges', RHRegistrationsConfigBadges, methods=('POST',))
+                 'registrations_excel_export', reglists.RHRegistrationsExportExcel, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/modify-status', 'registrations_modify_status',
+                 reglists.RHRegistrationsModifyStatus, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/check-in', 'registrations_check_in',
+                 reglists.RHRegistrationBulkCheckIn, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachments', 'registrations_attachments_export',
+                 reglists.RHRegistrationsExportAttachments, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/config', 'registrations_config_badges',
+                 reglists.RHRegistrationsConfigBadges, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/print/<int:template_id>/<uuid>',
-                 'registrations_print_badges', RHRegistrationsPrintBadges)
+                 'registrations_print_badges', reglists.RHRegistrationsPrintBadges)
 
 # Invitation management
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations', RHRegistrationFormInvitations)
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'invite', RHRegistrationFormInvite,
-                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/', 'invitations',
+                 invitations.RHRegistrationFormInvitations)
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/invite', 'invite',
+                 invitations.RHRegistrationFormInvite, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>', 'delete_invitation',
-                 RHRegistrationFormDeleteInvitation, methods=('DELETE',))
+                 invitations.RHRegistrationFormDeleteInvitation, methods=('DELETE',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/invitations/<int:invitation_id>/decline',
-                 'manager_decline_invitation', RHRegistrationFormManagerDeclineInvitation, methods=('POST',))
+                 'manager_decline_invitation', invitations.RHRegistrationFormManagerDeclineInvitation,
+                 methods=('POST',))
 
 # E-ticket management
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets', 'tickets', RHRegistrationFormTickets,
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets', 'tickets', tickets.RHRegistrationFormTickets,
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode', 'tickets_qrcode',
-                 RHTicketConfigQRCode)
+                 tickets.RHTicketConfigQRCode)
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/qrcode.png', 'tickets_qrcode_image',
-                 RHTicketConfigQRCodeImage)
+                 tickets.RHTicketConfigQRCodeImage)
 
 # Regform edition: sections
 # The trailing slashes should be added to the blueprints here when Angular is updated
 # Right now, Angular strips off trailing slashes, thus causing Flask to throw errors
-_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section', RHRegistrationFormAddSection,
-                 methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections', 'add_section',
+                 sections.RHRegistrationFormAddSection, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>', 'modify_section',
-                 RHRegistrationFormModifySection, methods=('PATCH', 'DELETE', 'POST'))
+                 sections.RHRegistrationFormModifySection, methods=('PATCH', 'DELETE', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/toggle', 'toggle_section',
-                 RHRegistrationFormToggleSection, methods=('POST',))
+                 sections.RHRegistrationFormToggleSection, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/move', 'move_section',
-                 RHRegistrationFormMoveSection, methods=('POST',))
+                 sections.RHRegistrationFormMoveSection, methods=('POST',))
 
 # Regform edition: Fields
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields', 'add_field',
-                 RHRegistrationFormAddField, methods=('POST',))
+                 fields.RHRegistrationFormAddField, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>',
-                 'modify_field', RHRegistrationFormModifyField, methods=('DELETE', 'PATCH'))
+                 'modify_field', fields.RHRegistrationFormModifyField, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/toggle',
-                 'toggle_field', RHRegistrationFormToggleFieldState, methods=('POST',))
+                 'toggle_field', fields.RHRegistrationFormToggleFieldState, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/fields/<field_id>/move',
-                 'move_field', RHRegistrationFormMoveField, methods=('POST',))
+                 'move_field', fields.RHRegistrationFormMoveField, methods=('POST',))
 
 # Regform edition: Static text
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text', 'add_text',
-                 RHRegistrationFormAddText, methods=('POST',))
+                 fields.RHRegistrationFormAddText, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>',
-                 'modify_text', RHRegistrationFormModifyText, methods=('DELETE', 'PATCH'))
+                 'modify_text', fields.RHRegistrationFormModifyText, methods=('DELETE', 'PATCH'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/toggle',
-                 'toggle_text', RHRegistrationFormToggleTextState, methods=('POST',))
+                 'toggle_text', fields.RHRegistrationFormToggleTextState, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/form/sections/<section_id>/text/<field_id>/move',
-                 'move_text', RHRegistrationFormMoveText, methods=('POST',))
+                 'move_text', fields.RHRegistrationFormMoveText, methods=('POST',))
 
 
 # Display
-_bp.add_url_rule('/registrations/', 'display_regform_list', RHRegistrationFormList)
-_bp.add_url_rule('/registrations/participants', 'participant_list', RHParticipantList)
-_bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform', RHRegistrationForm, methods=('GET', 'POST'))
-_bp.add_url_rule('/registrations/<int:reg_form_id>/edit', 'edit_registration_display', RHRegistrationDisplayEdit,
+_bp.add_url_rule('/registrations/', 'display_regform_list', display.RHRegistrationFormList)
+_bp.add_url_rule('/registrations/participants', 'participant_list', display.RHParticipantList)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/', 'display_regform', display.RHRegistrationForm,
                  methods=('GET', 'POST'))
-_bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', RHRegistrationFormCheckEmail)
+_bp.add_url_rule('/registrations/<int:reg_form_id>/edit', 'edit_registration_display',
+                 display.RHRegistrationDisplayEdit, methods=('GET', 'POST'))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/check-email', 'check_email', display.RHRegistrationFormCheckEmail)
 _bp.add_url_rule('/registrations/<int:reg_form_id>/decline-invitation', 'decline_invitation',
-                 RHRegistrationFormDeclineInvitation, methods=('POST',))
-_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', RHTicketDownload)
+                 display.RHRegistrationFormDeclineInvitation, methods=('POST',))
+_bp.add_url_rule('/registrations/<int:reg_form_id>/ticket.pdf', 'ticket_download', tickets.RHTicketDownload)
 
 
 # API
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants/<int:registrant_id>', 'api_registrant',
-                 RHAPIRegistrant, methods=('GET', 'PATCH'))
+                 api.RHAPIRegistrant, methods=('GET', 'PATCH'))
 _bp.add_url_rule('!/api/events/<int:event_id>/registrants', 'api_registrants',
-                 RHAPIRegistrants)
+                 api.RHAPIRegistrants)
 
 
 # Participants
 _bp_participation = IndicoBlueprint('event_participation', __name__, url_prefix='/event/<confId>',
                                     template_folder='templates', virtual_template_folder='events/registration')
-_bp_participation.add_url_rule('/manage/participants/', 'manage', RHManageParticipants, methods=('GET', 'POST'))
+_bp_participation.add_url_rule('/manage/participants/', 'manage', regforms.RHManageParticipants,
+                               methods=('GET', 'POST'))
 
 
 # Legacy URLs
