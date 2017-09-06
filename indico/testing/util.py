@@ -16,7 +16,7 @@
 
 import operator
 import re
-from itertools import product, imap
+from itertools import imap, product
 
 
 def bool_matrix(template, mask=None, expect=None):
