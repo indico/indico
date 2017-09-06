@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.core.plugins.controllers import RHPlugins, RHPluginDetails
+from indico.core.plugins.controllers import RHPluginDetails, RHPlugins
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('plugins', __name__, template_folder='templates', virtual_template_folder='plugins',
                       url_prefix='/admin/plugins')

@@ -7,11 +7,11 @@ StaticArray class and functions that SQLAlchemy can process instead of non hasha
 
 from cStringIO import StringIO
 
-from sqlalchemy import types, String
+from sqlalchemy import String, types
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql.base import PGDialect
-from sqlalchemy.sql import expression
 from sqlalchemy.ext.compiler import compiles
+from sqlalchemy.sql import expression
 
 
 class StaticArray(types.TypeDecorator):

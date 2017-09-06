@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from blinker import Namespace
 
+
 _signals = Namespace()
 
 

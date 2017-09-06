@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db import db
-from indico.util.string import return_ascii, format_repr
 from sqlalchemy.ext.declarative import declared_attr
+
+from indico.core.db import db
+from indico.util.string import format_repr, return_ascii
 
 
 class ReviewRatingMixin(object):

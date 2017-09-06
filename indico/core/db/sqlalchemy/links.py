@@ -21,7 +21,7 @@ from itertools import chain
 
 from sqlalchemy.event import listen
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_property, Comparator
+from sqlalchemy.ext.hybrid import Comparator, hybrid_property
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum

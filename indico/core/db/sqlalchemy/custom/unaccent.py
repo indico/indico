@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy import DDL, text, Index
+from sqlalchemy import DDL, Index, text
 from sqlalchemy.event import listens_for
 from sqlalchemy.sql import func
 from sqlalchemy.sql.elements import conv

@@ -20,7 +20,7 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
-from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
+from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.util.date_time import now_utc
 
 

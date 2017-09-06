@@ -18,15 +18,15 @@ from __future__ import unicode_literals
 
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.ext.declarative import declared_attr
-from sqlalchemy.ext.hybrid import hybrid_method, hybrid_property, Comparator
+from sqlalchemy.ext.hybrid import Comparator, hybrid_method, hybrid_property
 from sqlalchemy.orm import joinedload, noload
 
-from indico.core.db.sqlalchemy import db, PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.core.roles import get_available_roles
-from indico.util.decorators import strict_classproperty, classproperty
-from indico.util.fossilize import fossilizes, Fossilizable, IFossil
-from indico.util.string import return_ascii, format_repr
+from indico.util.decorators import classproperty, strict_classproperty
+from indico.util.fossilize import Fossilizable, IFossil, fossilizes
+from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 

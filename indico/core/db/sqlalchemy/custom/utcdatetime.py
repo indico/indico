@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import pytz
-from sqlalchemy import types, func
+from sqlalchemy import func, types
 from sqlalchemy.sql import operators
 from sqlalchemy.sql.sqltypes import Interval
 from sqlalchemy.util import memoized_property

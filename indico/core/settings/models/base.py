@@ -17,9 +17,9 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
-
 from enum import Enum
-from flask import has_request_context, g
+
+from flask import g, has_request_context
 from sqlalchemy.dialects.postgresql import JSON
 
 from indico.core.db import db

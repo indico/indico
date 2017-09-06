@@ -24,7 +24,7 @@ from werkzeug.urls import url_join
 
 import indico
 from indico.core.config import Config
-from indico.core.settings.proxy import PrefixSettingsProxy
+from indico.core.settings import PrefixSettingsProxy
 from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings

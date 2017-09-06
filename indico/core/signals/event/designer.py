@@ -16,6 +16,7 @@
 
 from blinker import Namespace
 
+
 _signals = Namespace()
 
 print_badge_template = _signals.signal('print-badge-template', """

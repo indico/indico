@@ -20,7 +20,7 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.menu import TopMenuSection, TopMenuItem
+from indico.web.menu import TopMenuItem, TopMenuSection
 from indico.web.util import url_for_index
 
 

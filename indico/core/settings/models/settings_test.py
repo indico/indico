@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import pytest
 from enum import Enum
+
+import pytest
 
 from indico.core.settings.models.settings import Setting
 

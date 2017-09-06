@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from __future__ import unicode_literals
+
 from sqlalchemy import type_coerce
 from sqlalchemy.event import listens_for
 from sqlalchemy.sql.schema import CheckConstraint

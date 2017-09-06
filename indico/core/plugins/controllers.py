@@ -16,18 +16,18 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from operator import attrgetter
 
-from flask import request, flash
+from flask import flash, request
 from werkzeug.exceptions import NotFound
 
-from indico.core.plugins import plugin_engine, PluginCategory
+from indico.core.plugins import PluginCategory, plugin_engine
 from indico.core.plugins.views import WPPlugins
 from indico.modules.admin import RHAdminBase
-from indico.web.forms.base import FormDefaults
-from indico.web.flask.util import url_for, redirect_or_jsonify
 from indico.util.i18n import _
+from indico.web.flask.util import redirect_or_jsonify, url_for
+from indico.web.forms.base import FormDefaults
 
 
 class RHPluginsBase(RHAdminBase):

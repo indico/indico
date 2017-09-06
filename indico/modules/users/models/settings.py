@@ -22,7 +22,6 @@ from indico.core.db import db
 from indico.core.settings.models.base import JSONSettingsBase
 from indico.core.settings import SettingsProxyBase
 from indico.core.settings.util import get_setting, get_all_settings
-from indico.modules.users import User
 from indico.util.string import return_ascii
 
 
@@ -37,7 +36,7 @@ class UserSetting(JSONSettingsBase, db.Model):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey(User.id),
+        db.ForeignKey('users.users.id'),
         nullable=False,
         index=True
     )
@@ -60,7 +59,7 @@ class UserSetting(JSONSettingsBase, db.Model):
 def user_or_id(f):
     @wraps(f)
     def wrapper(self, user, *args, **kwargs):
-        if isinstance(user, User):
+        if isinstance(user, db.m.User):
             user = {'user': user}
         else:
             user = {'user_id': user.id}

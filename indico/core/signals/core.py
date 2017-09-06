@@ -16,6 +16,7 @@
 
 from blinker import Namespace
 
+
 _signals = Namespace()
 
 

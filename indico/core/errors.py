@@ -21,7 +21,7 @@ Module containing the Indico exception class hierarchy
 import traceback
 
 from flask import session
-from werkzeug.exceptions import Forbidden, NotFound, BadRequest, HTTPException
+from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 from indico.util.i18n import _
 from indico.util.string import to_unicode

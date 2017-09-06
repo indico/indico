@@ -19,9 +19,8 @@ from datetime import datetime, timedelta
 import pytest
 import pytz
 
-from indico.core.settings import SettingsProxy
+from indico.core.settings import PrefixSettingsProxy, SettingsProxy
 from indico.core.settings.converters import DatetimeConverter, TimedeltaConverter
-from indico.core.settings.proxy import PrefixSettingsProxy
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import User
 
@@ -152,8 +151,8 @@ def test_acls(dummy_user, create_user):
 
 
 def test_delete_propagate(mocker):
-    Setting = mocker.patch('indico.core.settings.core.Setting')
-    SettingPrincipal = mocker.patch('indico.core.settings.core.SettingPrincipal')
+    Setting = mocker.patch('indico.core.settings.proxy.Setting')
+    SettingPrincipal = mocker.patch('indico.core.settings.proxy.SettingPrincipal')
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     proxy.delete('reg', 'acl')
     Setting.delete.assert_called_once_with('foo', 'reg')
@@ -161,8 +160,8 @@ def test_delete_propagate(mocker):
 
 
 def test_set_multi_propagate(mocker):
-    Setting = mocker.patch('indico.core.settings.core.Setting')
-    SettingPrincipal = mocker.patch('indico.core.settings.core.SettingPrincipal')
+    Setting = mocker.patch('indico.core.settings.proxy.Setting')
+    SettingPrincipal = mocker.patch('indico.core.settings.proxy.SettingPrincipal')
     proxy = SettingsProxy('foo', {'reg': None}, acls={'acl'})
     proxy.set_multi({
         'reg': 'bar',

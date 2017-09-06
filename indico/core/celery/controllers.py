@@ -19,11 +19,10 @@ from __future__ import unicode_literals
 from datetime import timedelta
 from operator import itemgetter
 
-from indico.core.celery.views import WPCelery
-from indico.modules.admin import RHAdminBase
-
 from indico.core.celery import celery
+from indico.core.celery.views import WPCelery
 from indico.core.config import Config
+from indico.modules.admin import RHAdminBase
 
 
 class RHCeleryTasks(RHAdminBase):

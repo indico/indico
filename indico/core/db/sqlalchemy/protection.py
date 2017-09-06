@@ -24,12 +24,12 @@ from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 
 from indico.core import signals
-from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.roles import get_available_roles
-from indico.util.i18n import _
 from indico.util.caching import memoize_request
+from indico.util.i18n import _
 from indico.util.signals import values_from_signal
 from indico.util.struct.enum import RichIntEnum
 from indico.util.user import iter_acl

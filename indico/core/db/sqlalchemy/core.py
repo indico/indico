@@ -16,17 +16,16 @@
 
 from __future__ import absolute_import
 
-from contextlib import contextmanager
-
 import logging
 import sys
+from contextlib import contextmanager
 from functools import partial
 
 import flask_sqlalchemy
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.event import listen
 from sqlalchemy.exc import DatabaseError
-from sqlalchemy.orm import mapper, CompositeProperty
+from sqlalchemy.orm import CompositeProperty, mapper
 from sqlalchemy.sql.ddl import CreateSchema
 from werkzeug.utils import cached_property
 
@@ -34,7 +33,8 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
 
 # Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
-from indico.core.db.sqlalchemy.util.models import IndicoModel, IndicoBaseQuery
+# isort:skip_file
+from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
 flask_sqlalchemy.Model = IndicoModel
 flask_sqlalchemy.BaseQuery = IndicoBaseQuery
 

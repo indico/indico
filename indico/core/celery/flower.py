@@ -21,13 +21,12 @@ import json
 import os
 from urllib import urlencode
 
-from tornado.auth import OAuth2Mixin, AuthError, _auth_return_future
+from flower.urls import settings
+from flower.views import BaseHandler
+from tornado.auth import AuthError, OAuth2Mixin, _auth_return_future
 from tornado.httpclient import AsyncHTTPClient, HTTPClient, HTTPRequest
 from tornado.options import options
-from tornado.web import asynchronous, HTTPError
-
-from flower.views import BaseHandler
-from flower.urls import settings
+from tornado.web import HTTPError, asynchronous
 
 
 class FlowerAuthHandler(BaseHandler, OAuth2Mixin):

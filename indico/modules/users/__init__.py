@@ -16,21 +16,21 @@
 
 from __future__ import unicode_literals
 
-from flask import session, render_template
+from flask import render_template, session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.notifications import send_email, make_email
+from indico.core.notifications import make_email, send_email
+from indico.core.settings import SettingsProxy
 from indico.core.settings.converters import EnumConverter
-from indico.core.settings.core import SettingsProxy
 from indico.modules.users.ext import ExtraUserPreferences
-from indico.modules.users.models.users import User, NameFormat
 from indico.modules.users.models.settings import UserSetting, UserSettingsProxy
+from indico.modules.users.models.users import NameFormat, User
 from indico.util.i18n import _
-from indico.web.flask.templating import template_hook
-from indico.web.flask.templating import get_template_module
+from indico.web.flask.templating import get_template_module, template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
+
 
 __all__ = ('ExtraUserPreferences', 'User', 'UserSetting', 'UserSettingsProxy', 'user_settings')
 

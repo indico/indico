@@ -14,7 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+# isort:skip_file
+
 from blinker import Namespace
+
 
 _signals = Namespace()
 

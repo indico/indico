@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 import ipaddress
+
 from sqlalchemy import TypeDecorator
 from sqlalchemy.dialects.postgresql import CIDR
 

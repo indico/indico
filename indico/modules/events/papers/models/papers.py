@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.settings.proxy import AttributeProxyProperty
+from indico.core.settings import AttributeProxyProperty
 from indico.modules.events.models.reviews import ProposalMixin
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.util.locators import locator_property

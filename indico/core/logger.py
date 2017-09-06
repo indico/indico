@@ -15,17 +15,17 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import copy
-import os
 import logging
-import logging.handlers
 import logging.config
-import ConfigParser
+import logging.handlers
+import os
+from ConfigParser import ConfigParser
 from pprint import pformat
 
-from flask import request, has_request_context
-from indico.web.util import get_request_info
+from flask import has_request_context, request
 
 from indico.core.config import Config
+from indico.web.util import get_request_info
 
 
 class AddIDFilter(logging.Filter):
@@ -88,7 +88,7 @@ class LoggerUtils:
         Read the logging configuration from the logging.conf file.
         Fetch default values if the logging.conf file is not set.
         """
-        cp = ConfigParser.ConfigParser()
+        cp = ConfigParser()
         parsed_files = cp.read(fname)
 
         if cp.has_section('formatters'):
