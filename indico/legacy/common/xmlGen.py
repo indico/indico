@@ -15,8 +15,8 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from xml.sax import saxutils
-from indico.legacy.common.utils import encodeUnicode
 
+from indico.legacy.common.utils import encodeUnicode
 from indico.util.string import encode_if_unicode
 
 

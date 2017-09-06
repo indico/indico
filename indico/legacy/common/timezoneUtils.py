@@ -16,7 +16,7 @@
 
 from datetime import datetime
 
-from flask import session, has_request_context
+from flask import has_request_context, session
 from pytz import timezone
 
 from indico.core.config import Config

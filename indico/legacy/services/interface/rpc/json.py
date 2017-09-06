@@ -14,23 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import request, current_app as app
+from flask import current_app as app
+from flask import request
 from flask.wrappers import BadRequest
 
-from indico.legacy.common.security import Sanitization
-from indico.legacy.common.fossilize import (
-    NonFossilizableException,
-    clearCache,
-    fossilize
-)
-from indico.legacy.services.interface.rpc.common import (
-    CausedError,
-    NoReportError,
-    RequestError
-)
-from indico.legacy.services.interface.rpc.process import ServiceRunner
-
 from indico.core.logger import Logger
+from indico.legacy.common.fossilize import NonFossilizableException, clearCache, fossilize
+from indico.legacy.common.security import Sanitization
+from indico.legacy.services.interface.rpc.common import CausedError, NoReportError, RequestError
+from indico.legacy.services.interface.rpc.process import ServiceRunner
 from indico.util.json import dumps, loads
 from indico.util.string import fix_broken_obj, unicode_struct_to_utf8
 

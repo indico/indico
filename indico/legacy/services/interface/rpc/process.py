@@ -20,19 +20,16 @@ import sys
 from flask import request, session
 from sqlalchemy.exc import DatabaseError
 
-from indico.legacy.errors import NoReportError
-from indico.legacy.common.mail import GenericMailer
-from indico.legacy.services.interface.rpc import handlers
-from indico.legacy.services.interface.rpc.common import (CausedError,
-                                                 CSRFError,
-                                                 NoReportError as ServiceNoReportError)
-from indico.legacy.services.interface.rpc.common import RequestError
-from indico.legacy.services.interface.rpc.common import ProcessError
 from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
-from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error, ConstraintViolated
+from indico.core.db.sqlalchemy.core import ConstraintViolated, handle_sqlalchemy_database_error
 from indico.core.errors import NoReportError as NoReportIndicoError
+from indico.legacy.common.mail import GenericMailer
+from indico.legacy.errors import NoReportError
+from indico.legacy.services.interface.rpc import handlers
+from indico.legacy.services.interface.rpc.common import NoReportError as ServiceNoReportError
+from indico.legacy.services.interface.rpc.common import CausedError, CSRFError, ProcessError, RequestError
 from indico.util import fossilize
 
 

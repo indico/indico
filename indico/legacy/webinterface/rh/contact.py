@@ -14,8 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.webinterface.rh import base
 from indico.legacy.webinterface.pages import contact as contactPages
+from indico.legacy.webinterface.rh import base
+
 
 class RHContact(base.RH):
 

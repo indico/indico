@@ -28,23 +28,23 @@ from PIL import Image as PILImage
 from reportlab import platypus
 from reportlab.lib.enums import TA_CENTER
 from reportlab.lib.fonts import addMapping
-from reportlab.lib.pagesizes import landscape, A4, LETTER, A0, A1, A2, A3, A5
+from reportlab.lib.pagesizes import A0, A1, A2, A3, A4, A5, LETTER, landscape
 from reportlab.lib.styles import ParagraphStyle
-from reportlab.lib.units import inch, cm
+from reportlab.lib.units import cm, inch
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen.canvas import Canvas
-from reportlab.platypus import SimpleDocTemplate, PageTemplate
+from reportlab.platypus import PageTemplate, SimpleDocTemplate
 from reportlab.platypus.frames import Frame
 
 from indico.core.config import Config
 from indico.core.logger import Logger
+from indico.legacy.common.TemplateExec import render as tpl_render
+from indico.legacy.common.utils import isStringHTML
 from indico.util import mdx_latex
 from indico.util.fs import chmod_umask
 from indico.util.i18n import _
 from indico.util.string import render_markdown, sanitize_for_platypus, to_unicode
-from indico.legacy.common.TemplateExec import render as tpl_render
-from indico.legacy.common.utils import isStringHTML
 
 
 ratio = math.sqrt(math.sqrt(2.0))

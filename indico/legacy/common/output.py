@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import StringIO
 import string
+import StringIO
 from collections import defaultdict
 from datetime import datetime
 
@@ -24,13 +24,13 @@ from sqlalchemy.orm import joinedload, load_only
 
 from indico.core.config import Config
 from indico.legacy.common.xmlGen import XMLGen
-from indico.modules.attachments.models.attachments import AttachmentType, Attachment
+from indico.modules.attachments.models.attachments import Attachment, AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.event import uniqueId, unify_event_args
+from indico.util.event import unify_event_args, uniqueId
 from indico.web.flask.util import url_for
 
 

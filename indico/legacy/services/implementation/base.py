@@ -23,8 +23,8 @@ from flask import g, session
 from indico.core.config import Config
 from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common import security
-from indico.legacy.errors import MaKaCError, HtmlForbiddenTag
-from indico.legacy.services.interface.rpc.common import ServiceAccessError, HTMLSecurityError
+from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
+from indico.legacy.services.interface.rpc.common import HTMLSecurityError, ServiceAccessError
 from indico.legacy.webinterface.rh.base import RequestHandlerBase
 from indico.util.string import unicode_struct_to_utf8
 

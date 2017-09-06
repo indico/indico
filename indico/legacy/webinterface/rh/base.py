@@ -14,23 +14,23 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import cProfile
 import copy
+import cProfile
 import inspect
 import itertools
 import os
 import pstats
 import random
 from datetime import datetime
-from functools import wraps, partial
+from functools import partial, wraps
 from xml.sax.saxutils import escape
 
 import jsonschema
-from flask import request, session, g, current_app, redirect
+from flask import current_app, g, redirect, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, MethodNotAllowed, NotFound, Forbidden, HTTPException
+from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, MethodNotAllowed, NotFound
 from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
 
@@ -38,24 +38,24 @@ from indico.core import signals
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.core.errors import get_error_description, NoReportError
+from indico.core.errors import NoReportError, get_error_description
 from indico.core.logger import Logger
 from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
-from indico.legacy.errors import (AccessError, KeyAccessError, MaKaCError, ModificationError, NotLoggedError,
-                                  NotFoundError)
+from indico.legacy.errors import (AccessError, KeyAccessError, MaKaCError, ModificationError, NotFoundError,
+                                  NotLoggedError)
 from indico.legacy.webinterface.pages.error import render_error
-from indico.legacy.webinterface.pages.errors import (WPGenericError, WPUnexpectedError, WPAccessError, WPKeyAccessError,
-                                                     WPModificationError, WPFormValuesError, WPNoReportError,
-                                                     WPRestrictedHTML)
-from indico.modules.auth.util import url_for_login, redirect_to_login
+from indico.legacy.webinterface.pages.errors import (WPAccessError, WPFormValuesError, WPGenericError, WPKeyAccessError,
+                                                     WPModificationError, WPNoReportError, WPRestrictedHTML,
+                                                     WPUnexpectedError)
+from indico.modules.auth.util import redirect_to_login, url_for_login
 from indico.modules.events.legacy import LegacyConference
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.locators import get_locator
-from indico.util.string import truncate, to_unicode
+from indico.util.string import to_unicode, truncate
 from indico.web.flask.util import ResponseUtil, url_for
 
 

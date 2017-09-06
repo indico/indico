@@ -19,11 +19,10 @@ from importlib import import_module
 from indico.legacy.services.implementation import error
 from indico.legacy.services.interface.rpc import description
 from indico.modules.rb import services as rb_services
-from indico.modules.rb.services import (
-    aspects as rb_aspect_services,
-    blockings as rb_blocking_services,
-    rooms as rb_room_services
-)
+from indico.modules.rb.services import aspects as rb_aspect_services
+from indico.modules.rb.services import blockings as rb_blocking_services
+from indico.modules.rb.services import rooms as rb_room_services
+
 
 methodMap = {
     # rb base

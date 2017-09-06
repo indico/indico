@@ -16,9 +16,9 @@
 
 from werkzeug.exceptions import NotFound
 
+from indico.legacy.webinterface.rh.base import RH
 from indico.modules.events import Event
 from indico.util.i18n import _
-from indico.legacy.webinterface.rh.base import RH
 
 
 class RHConferenceSite(RH):

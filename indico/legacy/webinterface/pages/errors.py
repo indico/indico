@@ -19,7 +19,7 @@ import sys
 import traceback
 from xml.sax.saxutils import quoteattr
 
-from flask import session, request
+from flask import request, session
 
 from indico.core.config import Config
 from indico.legacy.webinterface.pages.base import WPDecorated

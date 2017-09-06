@@ -16,9 +16,9 @@
 
 from indico.core.config import Config
 from indico.legacy.common.utils import encodeUnicode
-
-from indico.legacy.errors import MaKaCError, HtmlForbiddenTag
+from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.webinterface.common.tools import escape_html, restrictedHTML
+
 
 """
 base module for HTML security

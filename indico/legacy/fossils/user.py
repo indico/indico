@@ -16,6 +16,7 @@
 
 from indico.legacy.common.fossilize import IFossil
 
+
 class IGroupFossil(IFossil):
 
     def getId(self):

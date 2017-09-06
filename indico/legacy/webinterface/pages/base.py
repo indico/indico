@@ -17,7 +17,7 @@
 import posixpath
 from urlparse import urlparse
 
-from flask import request, render_template, g
+from flask import g, render_template, request
 
 from indico.core import signals
 from indico.core.config import Config

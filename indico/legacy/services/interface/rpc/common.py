@@ -16,6 +16,7 @@
 
 import sys
 import traceback
+
 from indico.legacy.common.fossilize import Fossilizable, fossilizes
 from indico.legacy.fossils.error import ICausedErrorFossil, INoReportErrorFossil
 
@@ -106,4 +107,3 @@ class HTMLSecurityError(CausedError):
 
 class ServiceAccessError(NoReportError):
     pass
-

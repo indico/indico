@@ -18,8 +18,8 @@
 Module containing the legacy indico exception class hierarchy
 """
 
-from indico.legacy.common.fossilize import fossilizes, Fossilizable
-from indico.core.fossils.errors import IErrorReportFossil, IErrorNoReportFossil
+from indico.core.fossils.errors import IErrorNoReportFossil, IErrorReportFossil
+from indico.legacy.common.fossilize import Fossilizable, fossilizes
 from indico.util.translations import ensure_str
 
 

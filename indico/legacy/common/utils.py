@@ -17,7 +17,7 @@
 import os
 import re
 
-from indico.util.date_time import format_datetime, format_date, format_time
+from indico.util.date_time import format_date, format_datetime, format_time
 
 
 # fcntl is only available for POSIX systems
@@ -212,12 +212,11 @@ class OSSpecific(object):
             'LOCK_EX': fcntl.LOCK_EX,
             'LOCK_UN': fcntl.LOCK_UN,
             'LOCK_SH': fcntl.LOCK_SH
-            }
+        }
     else:
         _lockFile = _lockFileOthers
         _lockTranslationTable = {
             'LOCK_EX': None,
             'LOCK_UN': None,
             'LOCK_SH': None
-            }
-
+        }

@@ -14,10 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from pytz import timezone
+
 import indico.legacy.webinterface.pages.base as base
 import indico.legacy.webinterface.wcomponents as wcomponents
 from indico.legacy.common import timezoneUtils
-from pytz import timezone
 
 
 class WPMainBase(base.WPDecorated):

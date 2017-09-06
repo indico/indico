@@ -20,7 +20,6 @@ from werkzeug.urls import url_parse
 
 from indico.core.config import Config
 from indico.core.logger import Logger
-
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.errors import MaKaCError
 from indico.legacy.services.implementation.base import ServiceBase
