@@ -15,24 +15,25 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import ast
-import traceback
 import re
 import textwrap
+import traceback
 import warnings
 from contextlib import contextmanager
 
 from babel import negotiate_locale
-from babel.core import Locale, LOCALE_ALIASES
+from babel.core import LOCALE_ALIASES, Locale
 from babel.messages.pofile import read_po
-from babel.support import Translations, NullTranslations
-from flask import session, request, has_request_context, current_app, has_app_context, g
-from flask_babelex import Babel, get_domain, Domain
+from babel.support import NullTranslations, Translations
+from flask import current_app, g, has_app_context, has_request_context, request, session
+from flask_babelex import Babel, Domain, get_domain
 from flask_pluginengine import current_plugin
 from speaklater import is_lazy_string, make_lazy_string
 from werkzeug.utils import cached_property
 
 from indico.util.caching import memoize_request
 from indico.util.string import trim_inner_whitespace
+
 
 LOCALE_ALIASES = dict(LOCALE_ALIASES, en='en_GB')
 RE_TR_FUNCTION = re.compile(r'''_\("([^"]*)"\)|_\('([^']*)'\)''', re.DOTALL | re.MULTILINE)

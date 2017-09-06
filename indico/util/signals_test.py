@@ -17,7 +17,7 @@
 import pytest
 from mock import MagicMock
 
-from indico.util.signals import values_from_signal, named_objects_from_signal
+from indico.util.signals import named_objects_from_signal, values_from_signal
 
 
 def _make_signal_response(objects):

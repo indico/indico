@@ -15,23 +15,23 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import OrderedDict
-from datetime import timedelta, datetime
 from datetime import time as dt_time
+from datetime import datetime, timedelta
 
 import pytz
-from flask import request
+from babel.dates import format_date as _format_date
 from babel.dates import format_datetime as _format_datetime
 from babel.dates import format_time as _format_time
-from babel.dates import format_date as _format_date
 from babel.dates import format_timedelta as _format_timedelta
 from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
-from dateutil.rrule import rrule, DAILY, MO, TU, WE, TH, FR, SA, SU
 from dateutil.relativedelta import relativedelta as _relativedelta
+from dateutil.rrule import DAILY, FR, MO, SA, SU, TH, TU, WE, rrule
+from flask import request
 
 from indico.core.config import Config
 from indico.legacy.common.timezoneUtils import DisplayTZ
-from indico.util.i18n import get_current_locale, _, ngettext, parse_locale
+from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
 
 

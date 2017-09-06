@@ -22,20 +22,19 @@ from __future__ import absolute_import
 
 import binascii
 import functools
-from operator import attrgetter
-
 import re
 import string
 import unicodedata
+from enum import Enum
 from itertools import chain
+from operator import attrgetter
 from uuid import uuid4
 
 import bleach
 import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
-from enum import Enum
 from html2text import HTML2Text
-from lxml import html, etree
+from lxml import etree, html
 from markupsafe import Markup, escape
 from speaklater import _LazyString, is_lazy_string
 from sqlalchemy import ForeignKeyConstraint, inspect

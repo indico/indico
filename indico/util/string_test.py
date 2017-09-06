@@ -14,14 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from enum import Enum
 from itertools import count
 
 import pytest
-from enum import Enum
 
-from indico.util.string import (seems_html, to_unicode, make_unique_token, slugify, text_to_repr, format_repr, snakify,
-                                camelize, camelize_keys, snakify_keys, crc32, normalize_phone_number, render_markdown,
-                                sanitize_email)
+from indico.util.string import (camelize, camelize_keys, crc32, format_repr, make_unique_token, normalize_phone_number,
+                                render_markdown, sanitize_email, seems_html, slugify, snakify, snakify_keys,
+                                text_to_repr, to_unicode)
 
 
 def test_seems_html():

@@ -14,9 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from functools import wraps
-from itertools import groupby, chain, combinations, izip_longest, islice
+from itertools import chain, combinations, groupby, islice, izip_longest
 
 from flask import render_template_string
 

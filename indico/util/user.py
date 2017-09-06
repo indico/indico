@@ -18,9 +18,8 @@ from functools import wraps
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
-from indico.util.decorators import smart_decorator
-
 from indico.legacy.common.cache import GenericCache
+from indico.util.decorators import smart_decorator
 
 
 def iter_acl(acl):

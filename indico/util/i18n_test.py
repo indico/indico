@@ -15,17 +15,18 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
+
 import pytest
 from babel.messages import Catalog
 from babel.messages.mofile import write_mo
 from babel.support import Translations
-from flask import session, request, has_request_context
+from flask import has_request_context, request, session
 from flask_babelex import get_domain
 from speaklater import _LazyString
 from werkzeug.http import LanguageAccept
 
-from indico.util.i18n import _, ngettext, ungettext, gettext_context, session_language, babel, make_bound_gettext
 from indico.core.plugins import IndicoPlugin, plugin_engine
+from indico.util.i18n import _, babel, gettext_context, make_bound_gettext, ngettext, session_language, ungettext
 
 
 DICTIONARIES = {

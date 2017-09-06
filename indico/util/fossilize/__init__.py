@@ -24,13 +24,15 @@ Some of the features are:
  * Built-in inheritance support;
 """
 
-import logging
 import inspect
+import logging
 import re
 import threading
-import zope.interface
-from types import NoneType
 from itertools import ifilter
+from types import NoneType
+
+import zope.interface
+
 
 _fossil_cache = threading.local()
 

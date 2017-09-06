@@ -18,7 +18,7 @@ from hashlib import md5 as _md5
 
 import pytest
 
-from indico.util.passwords import PasswordProperty, BCryptPassword
+from indico.util.passwords import BCryptPassword, PasswordProperty
 
 
 def md5(s):

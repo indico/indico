@@ -17,7 +17,7 @@
 from functools import wraps
 from inspect import getcallargs
 
-from flask import has_request_context, g, current_app
+from flask import current_app, g, has_request_context
 
 
 _notset = object()

@@ -17,7 +17,7 @@
 from __future__ import absolute_import
 
 import traceback
-from datetime import datetime, date
+from datetime import date, datetime
 from UserDict import UserDict
 
 from flask import current_app, session
@@ -26,6 +26,7 @@ from werkzeug.exceptions import Forbidden
 
 import indico
 from indico.web.util import get_request_info
+
 
 try:
     import simplejson as _json

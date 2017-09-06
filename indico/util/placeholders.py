@@ -20,7 +20,7 @@ import re
 from operator import attrgetter
 
 from flask import render_template
-from markupsafe import escape, Markup
+from markupsafe import Markup, escape
 
 from indico.core import signals
 from indico.util.decorators import classproperty

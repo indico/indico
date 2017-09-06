@@ -66,21 +66,22 @@ Version 2.1: (August 2013)
 
 from __future__ import absolute_import
 
-__version__ = '2.1'
-
 import re
-import requests
 import sys
 import textwrap
+import xml.dom.minidom
 from io import BytesIO
 from mimetypes import guess_extension
-from requests.exceptions import InvalidURL
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse
 
 import markdown
-import xml.dom.minidom
+import requests
 from PIL import Image
+from requests.exceptions import InvalidURL
+
+
+__version__ = '2.1'
 
 
 start_single_quote_re = re.compile("(^|\s|\")'")

@@ -23,7 +23,7 @@ from datetime import datetime
 
 from werkzeug.utils import secure_filename as _secure_filename
 
-from indico.util.string import unicode_to_ascii, to_unicode
+from indico.util.string import to_unicode, unicode_to_ascii
 
 
 def silentremove(filename):
