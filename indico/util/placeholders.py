@@ -122,7 +122,7 @@ class ParametrizedPlaceholder(Placeholder):
 
     @classmethod
     def get_regex(cls, **kwargs):
-        param_regex = ('|'.join(re.escape(x[0]) for x in cls.iter_param_info(**kwargs))
+        param_regex = ('|'.join(re.escape(x[0]) for x in cls.iter_param_info(**kwargs) if x[0] is not None)
                        if cls.param_restricted else '[^}]+')
         regex = r'\{%s:(%s)}' if cls.param_required else r'\{%s(?::(%s))?}'
         return re.compile(regex % (re.escape(cls.name), param_regex))
