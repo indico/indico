@@ -22,10 +22,11 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events.features.base import EventFeature
-from indico.modules.events.models.events import EventType, Event
+from indico.modules.events.models.events import Event, EventType
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
+
 
 logger = Logger.get('events.papers')
 

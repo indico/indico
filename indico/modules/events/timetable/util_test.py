@@ -14,12 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date
+from datetime import date, datetime
 
 import pytest
 from pytz import utc
 
 from indico.modules.events.timetable.util import find_latest_entry_end_dt
+
 
 pytest_plugins = ('indico.modules.events.timetable.testing.fixtures',)
 

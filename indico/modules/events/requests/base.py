@@ -20,7 +20,6 @@ from flask_pluginengine import plugin_context
 from wtforms.fields import SubmitField, TextAreaField
 
 from indico.core.db import db
-from indico.modules.events.requests.models.requests import RequestState
 from indico.modules.events.requests.notifications import (notify_accepted_request, notify_new_modified_request,
                                                           notify_rejected_request, notify_withdrawn_request)
 from indico.modules.events.requests.views import WPRequestsEventManagement
@@ -148,6 +147,7 @@ class RequestDefinitionBase(object):
         :param req: the :class:`Request` of the request
         :param notify_event_managers: if event managers should be notified
         """
+        from indico.modules.events.requests.models.requests import RequestState
         req.state = RequestState.withdrawn
         notify_withdrawn_request(req, notify_event_managers)
 
@@ -162,6 +162,7 @@ class RequestDefinitionBase(object):
         :param data: the form data from the management form
         :param user: the user processing the request
         """
+        from indico.modules.events.requests.models.requests import RequestState
         cls.manager_save(req, data)
         req.state = RequestState.accepted
         req.processed_by_user = user
@@ -179,6 +180,7 @@ class RequestDefinitionBase(object):
         :param data: the form data from the management form
         :param user: the user processing the request
         """
+        from indico.modules.events.requests.models.requests import RequestState
         cls.manager_save(req, data)
         req.state = RequestState.rejected
         req.processed_by_user = user

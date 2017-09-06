@@ -21,7 +21,7 @@ from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.features.util import is_feature_enabled
 from indico.modules.events.layout import layout_settings
-from indico.modules.events.layout.models.menu import MenuEntry, EventPage
+from indico.modules.events.layout.models.menu import EventPage, MenuEntry
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 

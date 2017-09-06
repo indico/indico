@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import request, jsonify, redirect, flash
+from flask import flash, jsonify, redirect, request
 from sqlalchemy.orm import joinedload
 from werkzeug.exceptions import NotFound
 
@@ -26,7 +26,7 @@ from indico.core.auth import multipass
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
 from indico.modules.groups import GroupProxy
-from indico.modules.groups.forms import SearchForm, EditGroupForm
+from indico.modules.groups.forms import EditGroupForm, SearchForm
 from indico.modules.groups.models.groups import LocalGroup
 from indico.modules.groups.views import WPGroupsAdmin
 from indico.modules.users import User

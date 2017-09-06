@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, FileField, TextAreaField, SelectField
+from wtforms.fields import BooleanField, FileField, SelectField, TextAreaField
 from wtforms.fields.html5 import EmailField
-from wtforms.validators import InputRequired, DataRequired, ValidationError
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from indico.util.i18n import _
-from indico.util.placeholders import render_placeholder_info, get_missing_placeholders
+from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import UsedIf

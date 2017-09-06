@@ -19,12 +19,12 @@ from __future__ import unicode_literals
 from flask import current_app, redirect, request
 from werkzeug.exceptions import NotFound
 
+from indico.legacy.webinterface.rh.base import RH, RHSimple
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin
 from indico.modules.attachments.models.legacy_mapping import LegacyAttachmentFolderMapping, LegacyAttachmentMapping
 from indico.modules.events import LegacyEventMapping
 from indico.util.string import is_legacy_id
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.rh.base import RHSimple, RH
 
 
 def _clean_args(kwargs):

@@ -22,6 +22,7 @@ from indico.core.errors import IndicoError
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.util.date_time import now_utc
 
+
 pytest_plugins = 'indico.modules.events.agreements.testing.fixtures'
 
 

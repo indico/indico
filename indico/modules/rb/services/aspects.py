@@ -15,10 +15,10 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.core.db import db
-from indico.modules.rb.models.aspects import Aspect
-from indico.modules.rb.models.locations import Location
 from indico.legacy.services.implementation.base import ServiceBase
 from indico.legacy.services.interface.rpc.common import ServiceError
+from indico.modules.rb.models.aspects import Aspect
+from indico.modules.rb.models.locations import Location
 
 
 class RoomBookingMapBase(ServiceBase):

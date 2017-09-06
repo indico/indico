@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from collections import Counter
 from copy import deepcopy
-from datetime import datetime, date
+from datetime import date, datetime
 from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import ARRAY
@@ -31,7 +31,7 @@ from indico.modules.events.registration.models.form_fields import RegistrationFo
 from indico.modules.events.registration.models.registrations import RegistrationData
 from indico.util.date_time import format_date, iterdays
 from indico.util.i18n import _
-from indico.util.string import snakify_keys, camelize_keys
+from indico.util.string import camelize_keys, snakify_keys
 from indico.web.forms.fields import JSONField
 
 

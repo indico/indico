@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, date
+from datetime import date, datetime
 from itertools import groupby
 from operator import attrgetter
 
@@ -26,9 +26,9 @@ from sqlalchemy.orm import contains_eager
 from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import db
-from indico.modules.rb import rb_settings, logger
+from indico.modules.rb import logger, rb_settings
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import Reservation, RepeatFrequency
+from indico.modules.rb.models.reservations import RepeatFrequency, Reservation
 from indico.modules.rb.models.rooms import Room
 from indico.modules.rb.notifications.reservation_occurrences import notify_upcoming_occurrences
 from indico.util.console import cformat

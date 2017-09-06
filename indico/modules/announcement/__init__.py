@@ -20,10 +20,11 @@ from flask import render_template, session
 
 from indico.core import signals
 from indico.core.settings import SettingsProxy
+from indico.util.i18n import _
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
-from indico.util.i18n import _
+
 
 announcement_settings = SettingsProxy('announcement', {
     'enabled': False,

@@ -20,7 +20,7 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSON
 
 from indico.core.db import db
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 
 
 def _get_next_position(context):

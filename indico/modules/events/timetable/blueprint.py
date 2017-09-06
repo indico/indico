@@ -17,25 +17,24 @@
 from __future__ import unicode_literals
 
 from indico.modules.events.timetable.controllers.display import (RHTimetable, RHTimetableEntryInfo,
-                                                                 RHTimetableExportPDF, RHTimetableExportDefaultPDF)
-from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddContribution,
-                                                                RHLegacyTimetableAddBreak,
+                                                                 RHTimetableExportDefaultPDF, RHTimetableExportPDF)
+from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetableAddBreak,
+                                                                RHLegacyTimetableAddContribution,
                                                                 RHLegacyTimetableAddSession,
                                                                 RHLegacyTimetableAddSessionBlock,
+                                                                RHLegacyTimetableBreakREST,
                                                                 RHLegacyTimetableDeleteEntry,
-                                                                RHLegacyTimetableGetUnscheduledContributions,
-                                                                RHLegacyTimetableScheduleContribution,
-                                                                RHLegacyTimetableReschedule,
-                                                                RHLegacyTimetableFitBlock, RHLegacyTimetableEditEntry,
-                                                                RHLegacyTimetableEditEntryTime,
-                                                                RHLegacyTimetableMoveEntry,
+                                                                RHLegacyTimetableEditEntry,
                                                                 RHLegacyTimetableEditEntryDateTime,
+                                                                RHLegacyTimetableEditEntryTime,
+                                                                RHLegacyTimetableEditSession, RHLegacyTimetableFitBlock,
+                                                                RHLegacyTimetableGetUnscheduledContributions,
+                                                                RHLegacyTimetableMoveEntry, RHLegacyTimetableReschedule,
+                                                                RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableShiftEntries,
-                                                                RHLegacyTimetableSwapEntries,
-                                                                RHLegacyTimetableEditSession,
-                                                                RHLegacyTimetableBreakREST)
-from indico.modules.events.timetable.controllers.manage import (RHManageTimetable, RHManageSessionTimetable,
-                                                                RHTimetableREST, RHManageTimetableEntryInfo)
+                                                                RHLegacyTimetableSwapEntries)
+from indico.modules.events.timetable.controllers.manage import (RHManageSessionTimetable, RHManageTimetable,
+                                                                RHManageTimetableEntryInfo, RHTimetableREST)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 

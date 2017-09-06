@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 
+
 favorite_user_table = db.Table(
     'favorite_users',
     db.metadata,

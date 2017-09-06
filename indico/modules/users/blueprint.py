@@ -19,15 +19,15 @@ from __future__ import unicode_literals
 from flask import request
 
 from indico.modules.users.api import fetch_authenticated_user
-from indico.modules.users.controllers import (RHUserDashboard, RHPersonalData, RHUserPreferences, RHUserFavorites,
-                                              RHUserEmails, RHUserEmailsVerify, RHUserEmailsDelete,
-                                              RHUserEmailsSetPrimary, RHUserFavoritesUsersAdd,
-                                              RHUserFavoritesUserRemove, RHUserFavoritesCategoryAPI,
-                                              RHUserSuggestionsRemove, RHUsersAdmin, RHUsersAdminSettings,
-                                              RHUsersAdminCreate, RHUsersAdminMerge, RHUsersAdminMergeCheck,
-                                              RHRegistrationRequestList, RHRejectRegistrationRequest,
-                                              RHAcceptRegistrationRequest, RHAdmins)
+from indico.modules.users.controllers import (RHAcceptRegistrationRequest, RHAdmins, RHPersonalData,
+                                              RHRegistrationRequestList, RHRejectRegistrationRequest, RHUserDashboard,
+                                              RHUserEmails, RHUserEmailsDelete, RHUserEmailsSetPrimary,
+                                              RHUserEmailsVerify, RHUserFavorites, RHUserFavoritesCategoryAPI,
+                                              RHUserFavoritesUserRemove, RHUserFavoritesUsersAdd, RHUserPreferences,
+                                              RHUsersAdmin, RHUsersAdminCreate, RHUsersAdminMerge,
+                                              RHUsersAdminMergeCheck, RHUsersAdminSettings, RHUserSuggestionsRemove)
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('users', __name__, template_folder='templates', virtual_template_folder='users',
                       url_prefix='/user')

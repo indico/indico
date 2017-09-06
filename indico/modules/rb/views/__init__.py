@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.legacy.webinterface.pages.main import WPMainBase
-
 from indico.util.i18n import _
 from indico.web.menu import render_sidemenu
 

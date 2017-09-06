@@ -29,7 +29,7 @@ from indico.core.errors import IndicoError
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.util import proxy_to_reservation_if_last_valid_occurrence
 from indico.util import date_time
-from indico.util.date_time import iterdays, format_date
+from indico.util.date_time import format_date, iterdays
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii
 from indico.util.user import unify_user_args

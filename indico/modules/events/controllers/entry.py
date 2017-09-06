@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, request, url_for, current_app
+from flask import current_app, redirect, request, url_for
 from werkzeug.exceptions import NotFound
 
 from indico.core.db import db

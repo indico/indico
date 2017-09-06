@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import re
-from datetime import date, datetime, timedelta, time
+from datetime import date, datetime, time, timedelta
 
 from dateutil.relativedelta import relativedelta
 from flask import request, session
@@ -27,15 +27,15 @@ from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.controllers.decorators import requires_location, requires_room
 from indico.modules.rb.forms.rooms import SearchRoomsForm
+from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.statistics import calculate_rooms_occupancy, compose_rooms_stats
-from indico.modules.rb.views.user.rooms import (WPRoomBookingSearchRooms, WPRoomBookingMapOfRooms,
-                                                WPRoomBookingMapOfRoomsWidget, WPRoomBookingRoomDetails,
-                                                WPRoomBookingRoomStats, WPRoomBookingSearchRoomsResults)
+from indico.modules.rb.views.user.rooms import (WPRoomBookingMapOfRooms, WPRoomBookingMapOfRoomsWidget,
+                                                WPRoomBookingRoomDetails, WPRoomBookingRoomStats,
+                                                WPRoomBookingSearchRooms, WPRoomBookingSearchRoomsResults)
 from indico.web.forms.base import FormDefaults
 
 

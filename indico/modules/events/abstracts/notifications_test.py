@@ -24,9 +24,9 @@ from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractS
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
 from indico.modules.events.abstracts.util import build_default_email_template
+from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.users.models.users import UserTitle
 from indico.util.date_time import now_utc
 

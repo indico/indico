@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.core.notifications import make_email, send_email
-from indico.web.flask.templating import get_template_module, get_overridable_template_name
 from indico.modules.vc.util import get_linked_to_description
+from indico.web.flask.templating import get_overridable_template_name, get_template_module
 
 
 def notify_created(plugin, room, room_assoc, event, user):

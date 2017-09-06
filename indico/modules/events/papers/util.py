@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.orm import noload, load_only
+from sqlalchemy.orm import load_only, noload
 
 from indico.core.db import db
 from indico.modules.events import Event

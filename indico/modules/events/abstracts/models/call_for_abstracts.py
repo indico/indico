@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
-from indico.modules.events.abstracts.settings import abstracts_settings, abstracts_reviewing_settings
+from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
 from indico.modules.events.settings import EventSettingProperty
 from indico.util.date_time import now_utc
 from indico.util.string import return_ascii

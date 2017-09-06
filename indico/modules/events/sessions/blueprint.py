@@ -19,15 +19,15 @@ from __future__ import unicode_literals
 from functools import partial
 
 from indico.modules.events.sessions.controllers.compat import compat_session
-from indico.modules.events.sessions.controllers.display import (RHDisplaySessionList, RHDisplaySession,
-                                                                RHExportSessionToICAL, RHExportSessionTimetableToPDF)
-from indico.modules.events.sessions.controllers.management.sessions import (RHSessionsList, RHCreateSession,
-                                                                            RHModifySession, RHDeleteSessions,
+from indico.modules.events.sessions.controllers.display import (RHDisplaySession, RHDisplaySessionList,
+                                                                RHExportSessionTimetableToPDF, RHExportSessionToICAL)
+from indico.modules.events.sessions.controllers.management.sessions import (RHCreateSession, RHDeleteSessions,
                                                                             RHExportSessionsCSV, RHExportSessionsExcel,
-                                                                            RHExportSessionsPDF, RHSessionREST,
+                                                                            RHExportSessionsPDF, RHManageSessionBlock,
+                                                                            RHModifySession, RHSessionACL,
+                                                                            RHSessionACLMessage, RHSessionBlocks,
                                                                             RHSessionPersonList, RHSessionProtection,
-                                                                            RHManageSessionBlock, RHSessionBlocks,
-                                                                            RHSessionACL, RHSessionACLMessage)
+                                                                            RHSessionREST, RHSessionsList)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 

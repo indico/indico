@@ -21,7 +21,7 @@ from datetime import timedelta
 from operator import attrgetter
 
 import dateutil.parser
-from flask import flash, request, jsonify, session
+from flask import flash, jsonify, request, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest, NotFound
 
@@ -32,27 +32,26 @@ from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.sessions.controllers.management.sessions import RHCreateSession, RHSessionREST
 from indico.modules.events.sessions.forms import SessionForm
 from indico.modules.events.sessions.models.blocks import SessionBlock
-from indico.modules.events.sessions.operations import delete_session_block, update_session_block, update_session
+from indico.modules.events.sessions.operations import delete_session_block, update_session, update_session_block
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
 from indico.modules.events.timetable.controllers.manage import RHBreakREST
-from indico.modules.events.timetable.forms import (BreakEntryForm, ContributionEntryForm, SessionBlockEntryForm,
-                                                   BaseEntryForm)
-from indico.modules.events.timetable.legacy import (serialize_contribution, serialize_entry_update, serialize_session,
-                                                    serialize_day_update, TimetableSerializer)
+from indico.modules.events.timetable.forms import (BaseEntryForm, BreakEntryForm, ContributionEntryForm,
+                                                   SessionBlockEntryForm)
+from indico.modules.events.timetable.legacy import (TimetableSerializer, serialize_contribution, serialize_day_update,
+                                                    serialize_entry_update, serialize_session)
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_break_entry, create_session_block_entry,
-                                                        schedule_contribution, fit_session_block_entry,
-                                                        update_break_entry, update_timetable_entry,
-                                                        move_timetable_entry, update_timetable_entry_object,
-                                                        delete_timetable_entry, swap_timetable_entry)
-from indico.modules.events.timetable.reschedule import Rescheduler, RescheduleMode
+                                                        delete_timetable_entry, fit_session_block_entry,
+                                                        move_timetable_entry, schedule_contribution,
+                                                        swap_timetable_entry, update_break_entry,
+                                                        update_timetable_entry, update_timetable_entry_object)
+from indico.modules.events.timetable.reschedule import RescheduleMode, Rescheduler
 from indico.modules.events.timetable.util import (find_next_start_dt, get_session_block_entries,
-                                                  get_time_changes_notifications,
-                                                  shift_following_entries)
-from indico.modules.events.util import get_random_color, track_time_changes, get_field_values
-from indico.util.date_time import iterdays, as_utc
+                                                  get_time_changes_notifications, shift_following_entries)
+from indico.modules.events.util import get_field_values, get_random_color, track_time_changes
+from indico.util.date_time import as_utc, iterdays
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.forms.base import FormDefaults

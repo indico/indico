@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict, OrderedDict
+from collections import OrderedDict, defaultdict
 from datetime import datetime
 
 from flask import session
@@ -27,22 +27,20 @@ from sqlalchemy.sql import cast
 from werkzeug.datastructures import OrderedMultiDict
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.custom import static_array, PyIntEnum
+from indico.core.db.sqlalchemy.custom import PyIntEnum, static_array
 from indico.core.db.sqlalchemy.custom.utcdatetime import UTCDateTime
 from indico.core.db.sqlalchemy.util.queries import limit_groups
 from indico.core.errors import NoReportError
-from indico.modules.rb.models.equipment import (ReservationEquipmentAssociation, EquipmentType,
-                                                RoomEquipmentAssociation)
+from indico.modules.rb.models.equipment import EquipmentType, ReservationEquipmentAssociation, RoomEquipmentAssociation
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.util import unimplemented
-from indico.modules.rb.notifications.reservations import (notify_confirmation, notify_cancellation,
-                                                          notify_creation, notify_modification,
-                                                          notify_rejection)
+from indico.modules.rb.notifications.reservations import (notify_cancellation, notify_confirmation, notify_creation,
+                                                          notify_modification, notify_rejection)
 from indico.modules.rb.util import rb_is_admin
-from indico.util.date_time import now_utc, format_date, format_time
-from indico.util.i18n import _, N_
+from indico.util.date_time import format_date, format_time, now_utc
+from indico.util.i18n import N_, _
 from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
 from indico.util.string import return_ascii, to_unicode

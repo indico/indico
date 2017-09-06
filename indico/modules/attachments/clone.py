@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.orm import subqueryload, joinedload
+from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.links import LinkType

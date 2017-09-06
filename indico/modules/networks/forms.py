@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import StringField, TextAreaField, BooleanField
+from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.core.db import db

@@ -22,7 +22,7 @@ from operator import attrgetter
 from flask import render_template, session
 from pytz import utc
 from sqlalchemy import Date, cast
-from sqlalchemy.orm import joinedload, subqueryload, undefer, contains_eager
+from sqlalchemy.orm import contains_eager, joinedload, subqueryload, undefer
 
 from indico.core.db import db
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -30,10 +30,9 @@ from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPersonLink
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.timetable.legacy import TimetableSerializer
+from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
-from indico.modules.events.timetable.legacy import serialize_event_info
 from indico.util.caching import memoize_request
 from indico.util.date_time import format_time, get_day_end, iterdays
 from indico.util.i18n import _

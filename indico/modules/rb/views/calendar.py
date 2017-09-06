@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from collections import defaultdict
-from datetime import timedelta, datetime, time
+from datetime import datetime, time, timedelta
 from itertools import groupby
 from operator import attrgetter
 
@@ -23,17 +23,17 @@ from flask import session
 from sqlalchemy.orm import defaultload
 from werkzeug.datastructures import MultiDict
 
+from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
-from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
-from indico.util.date_time import iterdays, overlaps, format_date
+from indico.util.date_time import format_date, iterdays, overlaps
 from indico.util.i18n import _
 from indico.util.serializer import Serializer
 from indico.util.string import natural_sort_key
 from indico.util.struct.iterables import group_list
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.wcomponents import WTemplated
 
 
 class RoomBookingCalendarWidget(object):

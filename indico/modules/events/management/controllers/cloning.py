@@ -20,20 +20,20 @@ from collections import OrderedDict
 from datetime import datetime
 
 from dateutil import rrule
-from flask import flash, jsonify, session, request
+from flask import flash, jsonify, request, session
 from pytz import utc
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.management.forms import (CloneRepeatabilityForm,
-                                                    CloneContentsForm, CloneCategorySelectForm, CloneRepeatOnceForm,
-                                                    CloneRepeatIntervalForm, CloneRepeatPatternForm,
-                                                    CLONE_REPEAT_CHOICES)
+from indico.modules.events.management.forms import (CLONE_REPEAT_CHOICES, CloneCategorySelectForm, CloneContentsForm,
+                                                    CloneRepeatabilityForm, CloneRepeatIntervalForm,
+                                                    CloneRepeatOnceForm, CloneRepeatPatternForm)
 from indico.modules.events.operations import clone_event
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.util import jsonify_template, jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
+
 
 REPEAT_FORM_MAP = {
     'once': CloneRepeatOnceForm,

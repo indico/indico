@@ -24,12 +24,12 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
-from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
-from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
-from indico.modules.events.timetable.operations import (schedule_contribution, update_timetable_entry,
-                                                        delete_timetable_entry)
+from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
+from indico.modules.events.timetable.operations import (delete_timetable_entry, schedule_contribution,
+                                                        update_timetable_entry)
 from indico.modules.events.util import set_custom_fields
 
 

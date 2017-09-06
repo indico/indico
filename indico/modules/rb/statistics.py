@@ -5,10 +5,10 @@ from datetime import date, datetime
 from dateutil.relativedelta import relativedelta
 
 from indico.core.db import db
-from indico.util.date_time import iterdays
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import Reservation
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import Reservation
+from indico.util.date_time import iterdays
 
 
 def calculate_rooms_bookable_time(rooms, start_date=None, end_date=None):

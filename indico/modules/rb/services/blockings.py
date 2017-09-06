@@ -16,11 +16,11 @@
 
 from flask import session
 
+from indico.legacy.services.implementation.base import ServiceBase
+from indico.legacy.services.interface.rpc.common import ServiceError
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.util import rb_is_admin
 from indico.util.i18n import _
-from indico.legacy.services.implementation.base import ServiceBase
-from indico.legacy.services.interface.rpc.common import ServiceError
 
 
 class RoomBookingBlockingProcessBase(ServiceBase):

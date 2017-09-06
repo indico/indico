@@ -18,8 +18,9 @@ from __future__ import unicode_literals
 
 from flask import current_app, g
 
-from indico.modules.events.papers.controllers import display, management, templates, paper
+from indico.modules.events.papers.controllers import display, management, paper, templates
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('papers', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/papers')

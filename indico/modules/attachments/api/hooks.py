@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events import Event
 from indico.modules.attachments.api.util import build_folders_api_data
+from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.sessions import Session

@@ -29,13 +29,13 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
-from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (TimeDeltaField, PrincipalListField, IndicoProtectionField, IndicoLocationField,
-                                     IndicoDateTimeField, IndicoTagListField, AccessControlListField)
-from indico.web.forms.validators import UsedIf, DateTimeRange, MaxDuration
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
+from indico.web.flask.util import url_for
+from indico.web.forms.base import IndicoForm, generated_data
+from indico.web.forms.fields import (AccessControlListField, IndicoDateTimeField, IndicoLocationField,
+                                     IndicoProtectionField, IndicoTagListField, PrincipalListField, TimeDeltaField)
+from indico.web.forms.validators import DateTimeRange, MaxDuration, UsedIf
 
 
 class ContributionForm(IndicoForm):

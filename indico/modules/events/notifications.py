@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from sqlalchemy.orm import joinedload
 
-from indico.core.notifications import send_email, make_email
+from indico.core.notifications import make_email, send_email
 from indico.modules.categories.models.categories import Category
 from indico.web.flask.templating import get_template_module
 

@@ -16,12 +16,12 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, current_app
+from flask import current_app, redirect
 
+from indico.legacy.webinterface.rh.base import RHSimple
 from indico.modules.events.contributions.models.legacy_mapping import (LegacyContributionMapping,
                                                                        LegacySubContributionMapping)
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function

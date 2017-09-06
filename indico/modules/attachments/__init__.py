@@ -20,13 +20,14 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.util.i18n import _
-from indico.web.flask.util import url_for
 from indico.modules.attachments.logging import connect_log_signals
 from indico.modules.attachments.models.attachments import Attachment
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.util import can_manage_attachments
+from indico.util.i18n import _
+from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
+
 
 logger = Logger.get('attachments')
 connect_log_signals()

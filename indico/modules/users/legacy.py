@@ -16,14 +16,14 @@
 
 from flask_multipass import IdentityInfo
 
-from indico.modules.users import User, logger
-from indico.modules.auth import Identity
-from indico.util.caching import memoize_request
-from indico.util.fossilize import fossilizes, Fossilizable
-from indico.util.locators import locator_property
-from indico.util.string import to_unicode, return_ascii, encode_utf8
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.fossils.user import IAvatarFossil, IAvatarMinimalFossil
+from indico.modules.auth import Identity
+from indico.modules.users import User, logger
+from indico.util.caching import memoize_request
+from indico.util.fossilize import Fossilizable, fossilizes
+from indico.util.locators import locator_property
+from indico.util.string import encode_utf8, return_ascii, to_unicode
 
 
 AVATAR_FIELD_MAP = {

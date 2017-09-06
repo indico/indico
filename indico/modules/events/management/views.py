@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
-from indico.legacy.webinterface.wcomponents import render_header, WNavigationDrawer
+from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
 from indico.modules.events.models.events import EventType
 from indico.web.flask.templating import get_template_module
 

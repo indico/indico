@@ -25,7 +25,7 @@ from indico.legacy.webinterface.pages.conferences import (WConfMetadata, WPConfe
                                                           render_event_footer, render_event_header)
 from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
-from indico.modules.events.layout import theme_settings, layout_settings
+from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import get_css_url
 from indico.util.event import unify_event_args
 from indico.util.mathjax import MathjaxMixin

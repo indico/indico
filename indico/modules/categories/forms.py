@@ -19,20 +19,20 @@ from __future__ import unicode_literals
 from functools import partial
 
 from flask import request
-from wtforms.fields import BooleanField, SelectField, StringField, HiddenField, IntegerField
-from wtforms.validators import DataRequired, Optional, InputRequired, NumberRange, ValidationError
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 
-from indico.modules.categories.models.categories import EventMessageMode, Category
-from indico.modules.categories.util import get_visibility_options, get_image_data
+from indico.modules.categories.models.categories import Category, EventMessageMode
+from indico.modules.categories.util import get_image_data, get_visibility_options
 from indico.modules.events import Event
 from indico.modules.events.fields import IndicoThemeSelectField
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (AccessControlListField, PrincipalListField, IndicoProtectionField,
-                                     IndicoEnumSelectField, IndicoTimezoneSelectField, EmailListField,
-                                     EditableFileField, HiddenFieldList, MultipleItemsField, IndicoMarkdownField)
-from indico.web.forms.widgets import SwitchWidget, HiddenCheckbox
+from indico.web.forms.fields import (AccessControlListField, EditableFileField, EmailListField, HiddenFieldList,
+                                     IndicoEnumSelectField, IndicoMarkdownField, IndicoProtectionField,
+                                     IndicoTimezoneSelectField, MultipleItemsField, PrincipalListField)
+from indico.web.forms.widgets import HiddenCheckbox, SwitchWidget
 
 
 class CategorySettingsForm(IndicoForm):

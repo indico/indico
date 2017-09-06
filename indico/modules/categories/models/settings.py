@@ -20,8 +20,8 @@ from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.decorators import strict_classproperty
 from indico.core.settings.models.base import JSONSettingsBase
+from indico.util.decorators import strict_classproperty
 from indico.util.string import return_ascii
 
 

@@ -16,14 +16,15 @@
 
 from __future__ import unicode_literals
 
-from uuid import uuid4, UUID
+from uuid import UUID, uuid4
 
-from sqlalchemy.dialects.postgresql import JSONB, UUID as pg_UUID
+from sqlalchemy.dialects.postgresql import UUID as pg_UUID
+from sqlalchemy.dialects.postgresql import JSONB
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime
 from indico.util.date_time import now_utc
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 
 
 class StaticListLink(db.Model):

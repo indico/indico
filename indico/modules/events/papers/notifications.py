@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core.notifications import make_email, send_email
-from indico.modules.events.papers.settings import paper_reviewing_settings, PaperReviewingRole
+from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.web.flask.templating import get_template_module
 
 

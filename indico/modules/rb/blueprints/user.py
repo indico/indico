@@ -15,13 +15,11 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.modules.rb.controllers.admin import reservations as reservation_admin_handlers
-from indico.modules.rb.controllers.user import (
-    blockings as blocking_handlers,
-    index as index_handler,
-    photos as photo_handlers,
-    reservations as reservation_handlers,
-    rooms as room_handlers
-)
+from indico.modules.rb.controllers.user import blockings as blocking_handlers
+from indico.modules.rb.controllers.user import index as index_handler
+from indico.modules.rb.controllers.user import photos as photo_handlers
+from indico.modules.rb.controllers.user import reservations as reservation_handlers
+from indico.modules.rb.controllers.user import rooms as room_handlers
 from indico.web.flask.wrappers import IndicoBlueprint
 
 

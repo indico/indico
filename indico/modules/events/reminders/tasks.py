@@ -18,12 +18,12 @@ from __future__ import unicode_literals
 
 from celery.schedules import crontab
 
-from indico.core.db import db
-from indico.util.date_time import now_utc
 from indico.core.celery import celery
+from indico.core.db import db
 from indico.modules.events import Event
 from indico.modules.events.reminders import logger
 from indico.modules.events.reminders.models.reminders import EventReminder
+from indico.util.date_time import now_utc
 
 
 @celery.periodic_task(name='event_reminders', run_every=crontab(minute='*/5'))

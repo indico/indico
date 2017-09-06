@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin, WPDecorated
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
 

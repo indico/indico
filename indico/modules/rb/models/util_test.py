@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date, time, timedelta
+from datetime import date, datetime, time, timedelta
 
 import pytest
 

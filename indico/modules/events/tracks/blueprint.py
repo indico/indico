@@ -16,10 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.tracks.controllers import (RHManageTracks, RHEditProgram, RHCreateTrack, RHEditTrack,
-                                                      RHSortTracks, RHDeleteTrack, RHDisplayTracks, RHTracksPDF)
+from indico.modules.events.tracks.controllers import (RHCreateTrack, RHDeleteTrack, RHDisplayTracks, RHEditProgram,
+                                                      RHEditTrack, RHManageTracks, RHSortTracks, RHTracksPDF)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('tracks', __name__, template_folder='templates', virtual_template_folder='events/tracks',
                       url_prefix='/event/<confId>')

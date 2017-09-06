@@ -20,8 +20,8 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
+from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.persons import logger
-from indico.modules.events.logs import EventLogRealm, EventLogKind
 
 
 def update_person(person, data):

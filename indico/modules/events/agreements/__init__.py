@@ -20,9 +20,9 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.modules.events.agreements.base import AgreementPersonInfo, AgreementDefinitionBase
+from indico.modules.events.agreements.base import AgreementDefinitionBase, AgreementPersonInfo
 from indico.modules.events.agreements.models.agreements import Agreement
-from indico.modules.events.agreements.placeholders import PersonNamePlaceholder, AgreementLinkPlaceholder
+from indico.modules.events.agreements.placeholders import AgreementLinkPlaceholder, PersonNamePlaceholder
 from indico.modules.events.agreements.util import get_agreement_definitions
 from indico.util.i18n import _
 from indico.web.flask.util import url_for

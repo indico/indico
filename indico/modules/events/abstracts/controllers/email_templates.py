@@ -16,14 +16,13 @@
 
 from __future__ import unicode_literals
 
-
 from flask import request
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
-from indico.modules.events.abstracts.forms import (EditEmailTemplateRuleForm, EditEmailTemplateTextForm,
-                                                   CreateEmailTemplateForm)
+from indico.modules.events.abstracts.forms import (CreateEmailTemplateForm, EditEmailTemplateRuleForm,
+                                                   EditEmailTemplateTextForm)
 from indico.modules.events.abstracts.models.abstracts import AbstractState
 from indico.modules.events.abstracts.models.email_templates import AbstractEmailTemplate
 from indico.modules.events.abstracts.notifications import get_abstract_notification_tpl_module

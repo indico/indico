@@ -19,10 +19,9 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import attrgetter
 
-from indico.util.decorators import cached_classproperty
-
 from indico.core import signals
 from indico.util.caching import memoize_request
+from indico.util.decorators import cached_classproperty
 from indico.util.signals import named_objects_from_signal
 
 

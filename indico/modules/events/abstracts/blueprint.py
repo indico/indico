@@ -26,6 +26,7 @@ from indico.modules.events.abstracts.controllers import (abstract, abstract_list
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
+
 _bp = IndicoBlueprint('abstracts', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/abstracts')
 

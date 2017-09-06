@@ -20,23 +20,23 @@ from datetime import datetime, timedelta
 
 from flask import request
 from pytz import utc
-from wtforms.fields import StringField, TextAreaField, BooleanField, SelectField, IntegerField, HiddenField
-from wtforms.validators import DataRequired, ValidationError, InputRequired, NumberRange
-from wtforms_components import TimeField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
+from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
 from wtforms.widgets.html5 import NumberInput
+from wtforms_components import TimeField
 
 from indico.modules.events.contributions.forms import ContributionForm
 from indico.modules.events.sessions.forms import SessionBlockForm
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.util import find_next_start_dt
+from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import (TimeDeltaField, IndicoPalettePickerField, IndicoLocationField,
-                                     IndicoSelectMultipleCheckboxBooleanField)
+from indico.web.forms.fields import (IndicoLocationField, IndicoPalettePickerField,
+                                     IndicoSelectMultipleCheckboxBooleanField, TimeDeltaField)
 from indico.web.forms.util import get_form_field_names
-from indico.web.forms.validators import MaxDuration, HiddenUnless
+from indico.web.forms.validators import HiddenUnless, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
-from indico.util.i18n import _
 
 
 class EntryFormMixin(object):

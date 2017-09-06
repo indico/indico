@@ -23,13 +23,13 @@ from operator import itemgetter
 
 import wtforms
 from werkzeug.datastructures import FileStorage
-from wtforms.validators import NumberRange, ValidationError, InputRequired
+from wtforms.validators import InputRequired, NumberRange, ValidationError
 
-from indico.modules.events.registration.fields.base import (RegistrationFormFieldBase, RegistrationFormBillableField)
+from indico.modules.events.registration.fields.base import RegistrationFormBillableField, RegistrationFormFieldBase
 from indico.util.countries import get_countries, get_country
 from indico.util.date_time import strftime_all_years
 from indico.util.fs import secure_filename
-from indico.util.i18n import _, L_
+from indico.util.i18n import L_, _
 from indico.util.string import normalize_phone_number
 from indico.web.forms.fields import IndicoRadioField
 from indico.web.forms.validators import IndicoEmail

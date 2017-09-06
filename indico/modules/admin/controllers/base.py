@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.util.i18n import _
 from indico.legacy.webinterface.rh.base import RHProtected
+from indico.util.i18n import _
 
 
 class RHAdminBase(RHProtected):

@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from celery.schedules import crontab
-from flask import session, g
+from flask import g, session
 
 from indico.core.celery import celery
 from indico.core.db import db
-from indico.core.notifications import make_email, email_sender
+from indico.core.notifications import email_sender, make_email
 from indico.core.storage import StorageReadOnlyError
 from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common.offlineWebsiteCreator import OfflineEvent

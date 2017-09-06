@@ -24,6 +24,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuSection, TopMenuItem
 
+
 __all__ = ('RHAdminBase',)
 
 

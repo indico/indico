@@ -20,14 +20,14 @@ from itertools import chain
 from operator import attrgetter
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy import UTCDateTime, PyIntEnum
-from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
 from indico.modules.events.models.reviews import ProposalRevisionMixin
-from indico.modules.events.papers.models.reviews import PaperReviewType, PaperJudgmentProxy
+from indico.modules.events.papers.models.reviews import PaperJudgmentProxy, PaperReviewType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
 
 

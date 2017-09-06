@@ -19,12 +19,12 @@ from datetime import datetime
 from flask import session
 
 from indico.core.config import Config
+from indico.legacy.services.implementation.base import LoggedOnlyService, ServiceBase
 from indico.modules.rb.models.blockings import Blocking
-from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.reservations import RepeatFrequency
+from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
 from indico.modules.rb.models.rooms import Room
 from indico.util.date_time import get_datetime_from_request
-from indico.legacy.services.implementation.base import LoggedOnlyService, ServiceBase
 
 
 class RoomBookingAvailabilitySearchRooms(ServiceBase):

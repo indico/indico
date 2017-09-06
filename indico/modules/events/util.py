@@ -27,7 +27,7 @@ from mimetypes import guess_extension
 from tempfile import NamedTemporaryFile
 from zipfile import ZipFile
 
-from flask import flash, redirect, session, request, g, current_app
+from flask import current_app, flash, g, redirect, request, session
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
 from werkzeug.exceptions import BadRequest
@@ -47,10 +47,10 @@ from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
-from indico.util.fs import secure_filename, chmod_umask
+from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.flask.util import url_for, send_file
+from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
 
 

@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
 
 
 class WPEventLogs(WPConferenceModifBase, WPJinjaMixin):

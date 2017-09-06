@@ -16,9 +16,8 @@
 
 from __future__ import unicode_literals
 
-from operator import itemgetter
-
 from ipaddress import ip_network
+from operator import itemgetter
 
 from indico.util.i18n import _
 from indico.web.forms.fields import MultiStringField

@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from flask import request, redirect, current_app
-from indico.modules.events.registration.models.legacy_mapping import LegacyRegistrationMapping
+from flask import current_app, redirect, request
 
-from indico.web.flask.util import url_for
 from indico.legacy.webinterface.rh.base import RHSimple
+from indico.modules.events.registration.models.legacy_mapping import LegacyRegistrationMapping
+from indico.web.flask.util import url_for
 
 
 @RHSimple.wrap_function

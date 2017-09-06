@@ -23,6 +23,7 @@ from indico.modules.rb import rb_settings
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.tasks import roombooking_occurrences
 
+
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 

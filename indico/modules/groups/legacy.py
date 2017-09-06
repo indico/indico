@@ -17,10 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.core.auth import multipass
+from indico.legacy.fossils.user import IGroupFossil
 from indico.modules.groups import GroupProxy
 from indico.util.fossilize import Fossilizable, fossilizes
-from indico.util.string import to_unicode, return_ascii, encode_utf8
-from indico.legacy.fossils.user import IGroupFossil
+from indico.util.string import encode_utf8, return_ascii, to_unicode
 
 
 class GroupWrapper(Fossilizable):

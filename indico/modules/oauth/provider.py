@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 from datetime import datetime, timedelta
 from uuid import UUID
 
-from flask import session, after_this_request, g
+from flask import after_this_request, g, session
 from oauthlib.oauth2 import FatalClientError, InvalidClientIdError
 
 from indico.core.db import db
-from indico.modules.oauth import oauth, logger
+from indico.modules.oauth import logger, oauth
 from indico.modules.oauth.models.applications import OAuthApplication
 from indico.modules.oauth.models.tokens import OAuthGrant, OAuthToken
 from indico.util.date_time import now_utc

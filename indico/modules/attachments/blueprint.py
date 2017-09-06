@@ -18,34 +18,31 @@ from __future__ import unicode_literals
 
 import itertools
 
-from indico.modules.attachments.controllers.compat import (compat_folder, compat_folder_old, compat_attachment,
-                                                           RHCompatAttachmentNew)
+from indico.modules.attachments.controllers.compat import (RHCompatAttachmentNew, compat_attachment, compat_folder,
+                                                           compat_folder_old)
 from indico.modules.attachments.controllers.display.category import RHDownloadCategoryAttachment
 from indico.modules.attachments.controllers.display.event import (RHDownloadEventAttachment,
                                                                   RHListEventAttachmentFolder,
                                                                   RHPackageEventAttachmentsDisplay)
-from indico.modules.attachments.controllers.management.category import (RHManageCategoryAttachments,
-                                                                        RHAddCategoryAttachmentFiles,
+from indico.modules.attachments.controllers.management.category import (RHAddCategoryAttachmentFiles,
                                                                         RHAddCategoryAttachmentLink,
-                                                                        RHEditCategoryAttachment,
                                                                         RHCreateCategoryFolder,
-                                                                        RHEditCategoryFolder,
+                                                                        RHDeleteCategoryAttachment,
                                                                         RHDeleteCategoryFolder,
-                                                                        RHDeleteCategoryAttachment)
-from indico.modules.attachments.controllers.management.event import (RHManageEventAttachments,
-                                                                     RHAddEventAttachmentFiles,
+                                                                        RHEditCategoryAttachment, RHEditCategoryFolder,
+                                                                        RHManageCategoryAttachments)
+from indico.modules.attachments.controllers.management.event import (RHAddEventAttachmentFiles,
                                                                      RHAddEventAttachmentLink,
-                                                                     RHEditEventAttachment,
-                                                                     RHCreateEventFolder,
-                                                                     RHEditEventFolder,
-                                                                     RHDeleteEventFolder,
-                                                                     RHDeleteEventAttachment,
-                                                                     RHPackageEventAttachmentsManagement,
-                                                                     RHAttachmentManagementInfoColumn)
+                                                                     RHAttachmentManagementInfoColumn,
+                                                                     RHCreateEventFolder, RHDeleteEventAttachment,
+                                                                     RHDeleteEventFolder, RHEditEventAttachment,
+                                                                     RHEditEventFolder, RHManageEventAttachments,
+                                                                     RHPackageEventAttachmentsManagement)
 from indico.modules.events import event_management_object_url_prefixes, event_object_url_prefixes
 from indico.util.caching import memoize
-from indico.web.flask.util import make_view_func, make_compat_redirect_func
+from indico.web.flask.util import make_compat_redirect_func, make_view_func
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('attachments', __name__, template_folder='templates', virtual_template_folder='attachments')
 

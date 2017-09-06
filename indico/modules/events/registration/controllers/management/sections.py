@@ -16,13 +16,13 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify, session
+from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
-from indico.modules.events.registration.models.items import RegistrationFormSection, RegistrationFormItemType
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormSection
 from indico.web.util import jsonify_data
 
 

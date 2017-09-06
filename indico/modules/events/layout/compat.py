@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 from flask import current_app, redirect
 
-from indico.modules.events.layout.models.legacy_mapping import LegacyPageMapping, LegacyImageMapping
-from indico.web.flask.util import url_for
 from indico.legacy.webinterface.rh.base import RHSimple
+from indico.modules.events.layout.models.legacy_mapping import LegacyImageMapping, LegacyPageMapping
+from indico.web.flask.util import url_for
 
 
 @RHSimple.wrap_function

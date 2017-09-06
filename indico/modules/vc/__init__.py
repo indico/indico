@@ -16,20 +16,20 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template, has_request_context, session
+from flask import has_request_context, render_template, session
 
 from indico.core import signals
 from indico.core.config import Config
 from indico.modules.events.layout.util import MenuEntryData
 from indico.modules.users import User
-from indico.modules.vc.models.vc_rooms import VCRoomEventAssociation, VCRoomLinkType, VCRoom
 from indico.modules.vc.forms import VCPluginSettingsFormBase
+from indico.modules.vc.models.vc_rooms import VCRoom, VCRoomEventAssociation, VCRoomLinkType
 from indico.modules.vc.plugins import VCPluginMixin
-from indico.modules.vc.util import get_vc_plugins, get_managed_vc_plugins
+from indico.modules.vc.util import get_managed_vc_plugins, get_vc_plugins
+from indico.util.i18n import _
 from indico.web.flask.templating import get_overridable_template_name, template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem, TopMenuItem
-from indico.util.i18n import _
 
 
 __all__ = ('VCPluginMixin', 'VCPluginSettingsFormBase')

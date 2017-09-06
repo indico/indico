@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from uuid import uuid4
 
-from sqlalchemy.dialects.postgresql import UUID, INET
+from sqlalchemy.dialects.postgresql import INET, UUID
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import UTCDateTime

@@ -23,7 +23,7 @@ from decimal import Decimal
 from uuid import uuid4
 
 from babel.numbers import format_currency
-from flask import has_request_context, session, request
+from flask import has_request_context, request, session
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
@@ -41,7 +41,7 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr, format_full_name, strict_unicode
+from indico.util.string import format_full_name, format_repr, return_ascii, strict_unicode
 from indico.util.struct.enum import RichIntEnum
 
 

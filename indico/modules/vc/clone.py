@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.modules.events.cloning import EventCloner
-from indico.modules.vc import VCRoomEventAssociation, get_vc_plugins, VCRoomLinkType
+from indico.modules.vc import VCRoomEventAssociation, VCRoomLinkType, get_vc_plugins
 from indico.util.i18n import _
 
 

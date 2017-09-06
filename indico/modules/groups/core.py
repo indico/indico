@@ -24,11 +24,11 @@ from werkzeug.utils import cached_property
 from indico.core.auth import multipass
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.legacy.common.cache import GenericCache
 from indico.modules.auth import Identity
 from indico.modules.groups.models.groups import LocalGroup
 from indico.util.caching import memoize_request
 from indico.util.string import return_ascii
-from indico.legacy.common.cache import GenericCache
 
 
 class GroupProxy(object):

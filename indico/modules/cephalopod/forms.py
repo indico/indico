@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from wtforms import StringField, BooleanField
+from wtforms import BooleanField, StringField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import DataRequired, Email
 

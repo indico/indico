@@ -16,8 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.news.controllers import RHNews, RHManageNews, RHNewsSettings, RHCreateNews, RHEditNews, RHDeleteNews
+from indico.modules.news.controllers import RHCreateNews, RHDeleteNews, RHEditNews, RHManageNews, RHNews, RHNewsSettings
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('news', __name__, template_folder='templates', virtual_template_folder='news')
 

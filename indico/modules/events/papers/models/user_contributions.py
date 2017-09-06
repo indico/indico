@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 
+
 _paper_judges = db.Table(
     'judges',
     db.metadata,

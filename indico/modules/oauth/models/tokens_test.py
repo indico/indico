@@ -21,6 +21,7 @@ import pytest
 
 from indico.modules.oauth.models.tokens import OAuthGrant
 
+
 pytest_plugins = 'indico.modules.oauth.testing.fixtures'
 
 

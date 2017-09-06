@@ -24,21 +24,22 @@ from flask import session
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.papers import logger
-from indico.modules.events.papers.models.files import PaperFile
-from indico.modules.events.papers.models.reviews import (PaperAction, PaperReview, PaperReviewType,
-                                                         PaperCommentVisibility)
-from indico.modules.events.papers.models.review_ratings import PaperReviewRating
-from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.competences import PaperCompetence
+from indico.modules.events.papers.models.files import PaperFile
+from indico.modules.events.papers.models.review_ratings import PaperReviewRating
+from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReview,
+                                                         PaperReviewType)
+from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.models.templates import PaperTemplate
-from indico.modules.events.papers.notifications import (notify_paper_revision_submission,
-                                                        notify_paper_review_submission, notify_paper_judgment,
-                                                        notify_added_to_reviewing_team, notify_comment,
-                                                        notify_removed_from_reviewing_team, notify_paper_assignment)
+from indico.modules.events.papers.notifications import (notify_added_to_reviewing_team, notify_comment,
+                                                        notify_paper_assignment, notify_paper_judgment,
+                                                        notify_paper_review_submission,
+                                                        notify_paper_revision_submission,
+                                                        notify_removed_from_reviewing_team)
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.util import update_object_principals
 from indico.modules.users import User

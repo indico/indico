@@ -20,19 +20,18 @@ from uuid import UUID
 
 from babel.numbers import format_currency
 from flask import session
-from sqlalchemy import orm
-from sqlalchemy import select
+from sqlalchemy import orm, select
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
-from sqlalchemy.orm import subqueryload, column_property
+from sqlalchemy.orm import column_property, subqueryload
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.modules.designer.models.templates import DesignerTemplate
-from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.models.form_fields import RegistrationFormPersonalDataField
+from indico.modules.events.registration.models.registrations import Registration
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
 from indico.util.i18n import L_

@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
-from indico.util.string import return_ascii, format_repr
 from indico.modules.events.models.persons import PersonLinkBase
+from indico.util.string import format_repr, return_ascii
 
 
 class SessionBlockPersonLink(PersonLinkBase):

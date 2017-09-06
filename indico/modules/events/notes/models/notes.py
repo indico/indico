@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from functools import partial
 
 from flask import g
-from sqlalchemy.event import listens_for, listen
+from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.orm import joinedload
 
@@ -30,7 +30,7 @@ from indico.core.db.sqlalchemy.links import LinkMixin, LinkType
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.date_time import now_utc
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, render_markdown, text_to_repr
+from indico.util.string import render_markdown, return_ascii, text_to_repr
 
 
 class EventNote(LinkMixin, db.Model):

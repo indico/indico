@@ -16,23 +16,23 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.surveys.controllers.display import RHSurveyList, RHSubmitSurvey, RHSaveSurveyAnswers
-from indico.modules.events.surveys.controllers.management.questionnaire import (RHManageSurveyQuestionnaire,
+from indico.modules.events.surveys.controllers.display import RHSaveSurveyAnswers, RHSubmitSurvey, RHSurveyList
+from indico.modules.events.surveys.controllers.management.questionnaire import (RHAddSurveyQuestion, RHAddSurveySection,
+                                                                                RHAddSurveyText, RHDeleteSurveyQuestion,
+                                                                                RHDeleteSurveySection,
+                                                                                RHDeleteSurveyText,
+                                                                                RHEditSurveyQuestion,
+                                                                                RHEditSurveySection, RHEditSurveyText,
                                                                                 RHExportSurveyQuestionnaire,
                                                                                 RHImportSurveyQuestionnaire,
-                                                                                RHAddSurveyText, RHEditSurveyText,
-                                                                                RHDeleteSurveyText, RHAddSurveyQuestion,
-                                                                                RHEditSurveyQuestion,
-                                                                                RHDeleteSurveyQuestion,
-                                                                                RHAddSurveySection, RHEditSurveySection,
-                                                                                RHDeleteSurveySection,
+                                                                                RHManageSurveyQuestionnaire,
                                                                                 RHSortSurveyItems)
-from indico.modules.events.surveys.controllers.management.results import (RHSurveyResults, RHExportSubmissionsCSV,
-                                                                          RHExportSubmissionsExcel, RHDeleteSubmissions,
-                                                                          RHDisplaySubmission)
-from indico.modules.events.surveys.controllers.management.survey import (RHManageSurveys, RHManageSurvey, RHEditSurvey,
-                                                                         RHDeleteSurvey, RHCreateSurvey,
-                                                                         RHScheduleSurvey, RHCloseSurvey, RHOpenSurvey,
+from indico.modules.events.surveys.controllers.management.results import (RHDeleteSubmissions, RHDisplaySubmission,
+                                                                          RHExportSubmissionsCSV,
+                                                                          RHExportSubmissionsExcel, RHSurveyResults)
+from indico.modules.events.surveys.controllers.management.survey import (RHCloseSurvey, RHCreateSurvey, RHDeleteSurvey,
+                                                                         RHEditSurvey, RHManageSurvey, RHManageSurveys,
+                                                                         RHOpenSurvey, RHScheduleSurvey,
                                                                          RHSendSurveyLinks)
 from indico.web.flask.wrappers import IndicoBlueprint
 

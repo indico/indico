@@ -29,4 +29,3 @@ class AbstractReviewRating(ReviewRatingMixin, db.Model):
 
     question_class = AbstractReviewQuestion
     review_class = AbstractReview
-

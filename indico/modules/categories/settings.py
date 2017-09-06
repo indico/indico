@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from functools import wraps
 
 from indico.core.settings import SettingsProxyBase
-from indico.core.settings.util import get_setting, get_all_settings
+from indico.core.settings.util import get_all_settings, get_setting
 from indico.modules.categories import Category
 from indico.modules.categories.models.settings import CategorySetting
 

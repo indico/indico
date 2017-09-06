@@ -20,12 +20,12 @@ from flask import redirect, request
 
 from indico.modules.categories.compat import compat_category
 from indico.modules.categories.controllers.admin import RHManageUpcomingEvents
-from indico.modules.categories.controllers.display import (RHCategoryStatistics, RHCategoryIcon, RHCategoryLogo,
-                                                           RHCategoryInfo, RHCategorySearch, RHCategoryOverview,
-                                                           RHDisplayCategory, RHEventList, RHExportCategoryAtom,
-                                                           RHExportCategoryICAL, RHReachableCategoriesInfo,
-                                                           RHShowPastEventsInCategory, RHSubcatInfo,
-                                                           RHXMLExportCategoryInfo, RHCategoryCalendarView)
+from indico.modules.categories.controllers.display import (RHCategoryCalendarView, RHCategoryIcon, RHCategoryInfo,
+                                                           RHCategoryLogo, RHCategoryOverview, RHCategorySearch,
+                                                           RHCategoryStatistics, RHDisplayCategory, RHEventList,
+                                                           RHExportCategoryAtom, RHExportCategoryICAL,
+                                                           RHReachableCategoriesInfo, RHShowPastEventsInCategory,
+                                                           RHSubcatInfo, RHXMLExportCategoryInfo)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,

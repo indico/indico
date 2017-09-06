@@ -14,15 +14,14 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb import Room
-from indico.modules.rb import rb_settings
+from indico.legacy.webinterface.wcomponents import WTemplated
+from indico.modules.rb import Room, rb_settings
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
 from indico.modules.rb.models.reservations import RepeatMapping
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.caching import memoize_redis
 from indico.util.i18n import _
-from indico.legacy.webinterface.wcomponents import WTemplated
 
 
 class WPRoomBookingBookingDetails(WPRoomBookingBase):

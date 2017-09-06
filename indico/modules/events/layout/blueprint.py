@@ -16,18 +16,19 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.layout.compat import compat_image, compat_page
+from indico.modules.events.layout.controllers.images import RHImageDelete, RHImageDisplay, RHImages, RHImageUpload
+from indico.modules.events.layout.controllers.layout import (RHLayoutCSSDelete, RHLayoutCSSDisplay, RHLayoutCSSPreview,
+                                                             RHLayoutCSSSaveTheme, RHLayoutCSSUpload, RHLayoutEdit,
+                                                             RHLayoutLogoDelete, RHLayoutLogoUpload,
+                                                             RHLayoutTimetableThemeForm, RHLogoDisplay)
+from indico.modules.events.layout.controllers.menu import (RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
+                                                           RHMenuEntryEdit, RHMenuEntryPosition,
+                                                           RHMenuEntryToggleDefault, RHMenuEntryToggleEnabled,
+                                                           RHMenuToggleCustom, RHPageDisplay)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
-from indico.modules.events.layout.compat import compat_page, compat_image
-from indico.modules.events.layout.controllers.images import RHImageDelete, RHImageDisplay, RHImageUpload, RHImages
-from indico.modules.events.layout.controllers.layout import (RHLayoutEdit, RHLayoutCSSUpload, RHLayoutCSSDelete,
-                                                             RHLayoutLogoUpload, RHLayoutLogoDelete, RHLogoDisplay,
-                                                             RHLayoutCSSSaveTheme, RHLayoutCSSDisplay,
-                                                             RHLayoutCSSPreview, RHLayoutTimetableThemeForm)
-from indico.modules.events.layout.controllers.menu import (RHMenuAddEntry, RHMenuDeleteEntry, RHMenuEdit,
-                                                           RHMenuToggleCustom, RHMenuEntryToggleEnabled,
-                                                           RHMenuEntryToggleDefault, RHMenuEntryEdit,
-                                                           RHMenuEntryPosition, RHPageDisplay)
+
 
 _bp = IndicoBlueprint('event_layout', __name__, template_folder='templates',
                       virtual_template_folder='events/layout', url_prefix='/event/<confId>/manage/layout')

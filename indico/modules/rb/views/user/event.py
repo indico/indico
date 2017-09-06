@@ -14,15 +14,15 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.models.reservations import Reservation
-from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
-                                                       WPRoomBookingNewBookingSimple, WPRoomBookingNewBookingSelectRoom,
-                                                       WPRoomBookingNewBookingSelectPeriod,
-                                                       WPRoomBookingNewBookingConfirm)
-from indico.modules.rb.views.user.rooms import WPRoomBookingRoomDetails
-from indico.web.flask.util import url_for
 from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
 from indico.legacy.webinterface.wcomponents import TabControl, WTabControl, WTemplated
+from indico.modules.rb.models.reservations import Reservation
+from indico.modules.rb.views.user.reservations import (WPRoomBookingBookingDetails, WPRoomBookingModifyBooking,
+                                                       WPRoomBookingNewBookingConfirm,
+                                                       WPRoomBookingNewBookingSelectPeriod,
+                                                       WPRoomBookingNewBookingSelectRoom, WPRoomBookingNewBookingSimple)
+from indico.modules.rb.views.user.rooms import WPRoomBookingRoomDetails
+from indico.web.flask.util import url_for
 
 
 class WPRoomBookingEventBase(WPConferenceModifBase):

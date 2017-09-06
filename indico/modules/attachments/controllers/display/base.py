@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import redirect, session, request
-from werkzeug.exceptions import Forbidden, BadRequest
+from flask import redirect, request, session
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
 from indico.core.errors import NoReportError

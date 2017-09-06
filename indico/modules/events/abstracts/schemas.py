@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from marshmallow.fields import Nested, Float
+from marshmallow.fields import Float, Nested
 
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.models.abstracts import Abstract
@@ -24,10 +24,11 @@ from indico.modules.events.abstracts.models.comments import AbstractComment
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
-from indico.modules.events.contributions.schemas import contribution_type_schema_basic, ContributionFieldValueSchema
+from indico.modules.events.contributions.schemas import ContributionFieldValueSchema, contribution_type_schema_basic
 from indico.modules.events.schemas import PersonLinkSchema
 from indico.modules.events.tracks.schemas import track_schema_basic
 from indico.modules.users.schemas import UserSchema
+
 
 _basic_abstract_fields = ('id', 'friendly_id', 'title')
 

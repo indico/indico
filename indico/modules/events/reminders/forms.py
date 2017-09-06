@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from datetime import datetime, date
+from datetime import date, datetime
 
 import pytz
 from wtforms.ext.dateutil.fields import DateField
-from wtforms.fields import BooleanField, TextAreaField, SelectField
+from wtforms.fields import BooleanField, SelectField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 from wtforms_components import TimeField
 

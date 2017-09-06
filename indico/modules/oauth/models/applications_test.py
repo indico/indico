@@ -16,6 +16,7 @@
 
 import pytest
 
+
 pytest_plugins = 'indico.modules.oauth.testing.fixtures'
 
 

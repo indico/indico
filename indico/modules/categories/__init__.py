@@ -20,7 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.roles import check_roles, ManagementRole
+from indico.core.roles import ManagementRole, check_roles
 from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping

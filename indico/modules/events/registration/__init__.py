@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, render_template, flash
+from flask import flash, render_template, session
 
 from indico.core import signals
 from indico.core.db import db
@@ -31,6 +31,7 @@ from indico.util.i18n import _, ngettext
 from indico.web.flask.templating import template_hook
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
+
 
 logger = Logger.get('events.registration')
 

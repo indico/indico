@@ -31,8 +31,8 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import ReferenceType
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (IndicoLocationField, IndicoDateTimeField, IndicoTimezoneSelectField,
-                                     IndicoEnumRadioField, OccurrencesField)
+from indico.web.forms.fields import (IndicoDateTimeField, IndicoEnumRadioField, IndicoLocationField,
+                                     IndicoTimezoneSelectField, OccurrencesField)
 from indico.web.forms.validators import LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget
 

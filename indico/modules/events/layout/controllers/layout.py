@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import os
 from io import BytesIO
 
-from flask import flash, redirect, request, session, jsonify
+from flask import flash, jsonify, redirect, request, session
 from PIL import Image
 from werkzeug.exceptions import NotFound
 from wtforms import fields as wtforms_fields
@@ -42,7 +42,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms import fields as indico_fields
 from indico.web.forms.base import FormDefaults, IndicoForm
-from indico.web.util import jsonify_data, _pop_injected_js
+from indico.web.util import _pop_injected_js, jsonify_data
 
 
 class RHLayoutBase(RHManageEventBase):

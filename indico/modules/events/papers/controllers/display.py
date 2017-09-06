@@ -16,27 +16,27 @@
 
 from __future__ import unicode_literals
 
-from flask import request, session, flash
+from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.events.papers.controllers.base import RHPaperBase, RHPapersBase
-from indico.modules.events.papers.forms import (PaperSubmissionForm, PaperCommentForm, build_review_form,
-                                                PaperJudgmentForm)
+from indico.modules.events.papers.forms import (PaperCommentForm, PaperJudgmentForm, PaperSubmissionForm,
+                                                build_review_form)
 from indico.modules.events.papers.models.comments import PaperReviewComment
 from indico.modules.events.papers.models.files import PaperFile
 from indico.modules.events.papers.models.papers import Paper
-from indico.modules.events.papers.models.reviews import PaperReviewType, PaperReview, PaperTypeProxy
+from indico.modules.events.papers.models.reviews import PaperReview, PaperReviewType, PaperTypeProxy
 from indico.modules.events.papers.models.revisions import PaperRevisionState
-from indico.modules.events.papers.operations import (create_paper_revision, create_review, create_comment,
-                                                     update_comment, delete_comment, update_review, judge_paper,
-                                                     reset_paper_state)
-from indico.modules.events.papers.util import (get_user_contributions_to_review, get_user_reviewed_contributions,
-                                               get_contributions_with_paper_submitted_by_user,
-                                               get_contributions_with_user_paper_submission_rights)
-from indico.modules.events.papers.views import render_paper_page, WPDisplayReviewingArea, WPDisplayCallForPapers
+from indico.modules.events.papers.operations import (create_comment, create_paper_revision, create_review,
+                                                     delete_comment, judge_paper, reset_paper_state, update_comment,
+                                                     update_review)
+from indico.modules.events.papers.util import (get_contributions_with_paper_submitted_by_user,
+                                               get_contributions_with_user_paper_submission_rights,
+                                               get_user_contributions_to_review, get_user_reviewed_contributions)
+from indico.modules.events.papers.views import WPDisplayCallForPapers, WPDisplayReviewingArea, render_paper_page
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_form, jsonify_data, jsonify, jsonify_template
+from indico.web.util import jsonify, jsonify_data, jsonify_form, jsonify_template
 
 
 class RHSubmitPaper(RHPaperBase):

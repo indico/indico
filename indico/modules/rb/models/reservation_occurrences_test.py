@@ -25,6 +25,7 @@ from indico.modules.rb.models.reservation_occurrences import ReservationOccurren
 from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.testing.util import bool_matrix, extract_emails
 
+
 pytest_plugins = 'indico.modules.rb.testing.fixtures'
 
 

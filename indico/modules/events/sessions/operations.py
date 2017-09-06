@@ -20,11 +20,11 @@ from flask import session
 
 from indico.core import signals
 from indico.core.db import db
-from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.logs.util import make_diff_log
-from indico.modules.events.sessions import logger, session_settings, COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES
-from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES, logger, session_settings
 from indico.modules.events.sessions.models.blocks import SessionBlock
+from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import orig_string
 
 

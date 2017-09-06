@@ -24,7 +24,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.storage import StoredFileMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
-from indico.util.string import return_ascii, format_repr, strict_unicode
+from indico.util.string import format_repr, return_ascii, strict_unicode
 from indico.util.struct.enum import RichIntEnum
 
 

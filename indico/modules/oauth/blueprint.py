@@ -18,10 +18,10 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.oauth.controllers import (RHOAuthAuthorize, RHOAuthErrors, RHOAuthToken, RHOAuthUserProfile,
-                                              RHOAuthAdmin, RHOAuthAdminApplication, RHOAuthAdminApplicationNew,
-                                              RHOAuthAdminApplicationDelete, RHOAuthAdminApplicationReset,
-                                              RHOAuthAdminApplicationRevoke, RHOAuthUserTokenRevoke)
+from indico.modules.oauth.controllers import (RHOAuthAdmin, RHOAuthAdminApplication, RHOAuthAdminApplicationDelete,
+                                              RHOAuthAdminApplicationNew, RHOAuthAdminApplicationReset,
+                                              RHOAuthAdminApplicationRevoke, RHOAuthAuthorize, RHOAuthErrors,
+                                              RHOAuthToken, RHOAuthUserProfile, RHOAuthUserTokenRevoke)
 from indico.web.flask.wrappers import IndicoBlueprint
 
 

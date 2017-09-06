@@ -19,13 +19,13 @@ from __future__ import unicode_literals
 from flask import flash, request
 
 from indico.modules.events.papers.controllers.base import RHManagePapersBase, RHPapersBase
-from indico.modules.events.papers.forms import (PaperTemplateForm)
+from indico.modules.events.papers.forms import PaperTemplateForm
 from indico.modules.events.papers.models.templates import PaperTemplate
-from indico.modules.events.papers.operations import delete_paper_template, create_paper_template, update_paper_template
+from indico.modules.events.papers.operations import create_paper_template, delete_paper_template, update_paper_template
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form, jsonify_template, jsonify_data
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHManagePaperTemplates(RHManagePapersBase):

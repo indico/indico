@@ -17,13 +17,13 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
-from wtforms.validators import Optional, DataRequired
+from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.contributions.models.fields import ContributionField
 from indico.util.i18n import _
 from indico.web.fields import BaseField, get_field_definitions
-from indico.web.fields.simple import TextField
 from indico.web.fields.choices import SingleChoiceField
+from indico.web.fields.simple import TextField
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 

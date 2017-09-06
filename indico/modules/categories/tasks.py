@@ -23,7 +23,7 @@ from celery.schedules import crontab
 from indico.core.celery import celery
 from indico.core.config import Config
 from indico.core.db import db
-from indico.modules.categories import logger, Category
+from indico.modules.categories import Category, logger
 from indico.modules.users import User, UserSetting
 from indico.modules.users.models.suggestions import SuggestedCategory
 from indico.modules.users.util import get_related_categories

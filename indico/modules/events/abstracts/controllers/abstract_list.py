@@ -23,15 +23,15 @@ from flask import flash, jsonify, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
-from indico.modules.events.abstracts.controllers.common import (DisplayAbstractListMixin, CustomizeAbstractListMixin,
-                                                                AbstractsExportPDFMixin, AbstractsExportCSV,
-                                                                AbstractsExportExcel, AbstractsDownloadAttachmentsMixin)
-from indico.modules.events.abstracts.forms import (BulkAbstractJudgmentForm)
+from indico.modules.events.abstracts.controllers.common import (AbstractsDownloadAttachmentsMixin, AbstractsExportCSV,
+                                                                AbstractsExportExcel, AbstractsExportPDFMixin,
+                                                                CustomizeAbstractListMixin, DisplayAbstractListMixin)
+from indico.modules.events.abstracts.forms import BulkAbstractJudgmentForm
 from indico.modules.events.abstracts.lists import AbstractListGeneratorManagement
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
-from indico.modules.events.abstracts.operations import (create_abstract, delete_abstract, judge_abstract)
-from indico.modules.events.abstracts.schemas import abstracts_schema, abstract_review_questions_schema
+from indico.modules.events.abstracts.operations import create_abstract, delete_abstract, judge_abstract
+from indico.modules.events.abstracts.schemas import abstract_review_questions_schema, abstracts_schema
 from indico.modules.events.abstracts.util import make_abstract_form
 from indico.modules.events.abstracts.views import WPManageAbstracts
 from indico.modules.events.contributions.models.persons import AuthorType

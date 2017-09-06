@@ -15,14 +15,15 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from functools import wraps
+
 from flask import request
 from sqlalchemy.orm.exc import NoResultFound
 
 from indico.core.errors import IndicoError, NotFoundError
-from indico.util.decorators import smart_decorator
-from indico.util.i18n import _
 from indico.modules.rb import Room
 from indico.modules.rb.models.locations import Location
+from indico.util.decorators import smart_decorator
+from indico.util.i18n import _
 
 
 @smart_decorator

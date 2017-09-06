@@ -22,18 +22,18 @@ from io import BytesIO
 from flask import session
 from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_LEFT
-from reportlab.lib.pagesizes import landscape, A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.styles import ParagraphStyle
 from reportlab.platypus import Table, TableStyle
-from sqlalchemy.orm import joinedload, load_only, contains_eager, noload
+from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.db import db
+from indico.legacy.pdfinterface.base import Paragraph, PDFBase
 from indico.modules.events import Event
-from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.models.principals import SessionPrincipal
+from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.legacy.pdfinterface.base import PDFBase, Paragraph
 
 
 def can_manage_sessions(user, event, role=None):

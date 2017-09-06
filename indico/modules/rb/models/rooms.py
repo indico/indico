@@ -18,13 +18,13 @@ import ast
 import json
 from datetime import date
 
-from sqlalchemy import and_, func, or_, cast
+from sqlalchemy import and_, cast, func, or_
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.custom import static_array
-from indico.core.db.sqlalchemy.util.cache import versioned_cache, cached
+from indico.core.db.sqlalchemy.util.cache import cached, versioned_cache
 from indico.core.db.sqlalchemy.util.queries import escape_like
 from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
@@ -33,7 +33,7 @@ from indico.modules.rb.models.blocked_rooms import BlockedRoom
 from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.equipment import EquipmentType, RoomEquipmentAssociation
 from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping
+from indico.modules.rb.models.reservations import RepeatMapping, Reservation
 from indico.modules.rb.models.room_attributes import RoomAttribute, RoomAttributeAssociation
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.room_nonbookable_periods import NonBookablePeriod
@@ -42,9 +42,10 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.serializer import Serializer
-from indico.util.string import return_ascii, natural_sort_key
+from indico.util.string import natural_sort_key, return_ascii
 from indico.util.user import unify_user_args
 from indico.web.flask.util import url_for
+
 
 _cache = GenericCache('Rooms')
 

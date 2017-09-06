@@ -22,9 +22,9 @@ from indico.core import signals
 from indico.core.logger import Logger
 from indico.core.roles import ManagementRole
 from indico.modules.events.abstracts.clone import AbstractSettingsCloner
-from indico.modules.events.abstracts.notifications import StateCondition, TrackCondition, ContributionTypeCondition
+from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
 from indico.modules.events.features.base import EventFeature
-from indico.modules.events.models.events import EventType, Event
+from indico.modules.events.models.events import Event, EventType
 from indico.modules.events.timetable.models.breaks import Break
 from indico.util.i18n import _
 from indico.util.placeholders import Placeholder

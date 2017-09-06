@@ -15,7 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
-from datetime import timedelta, datetime, date, time
+from datetime import date, datetime, time, timedelta
 from operator import itemgetter
 
 import pytest
@@ -28,7 +28,7 @@ from indico.modules.rb.models.reservations import RepeatFrequency
 from indico.modules.rb.models.room_bookable_hours import BookableHours
 from indico.modules.rb.models.rooms import Room
 from indico.testing.util import bool_matrix
-from indico.util.date_time import get_day_start, get_day_end
+from indico.util.date_time import get_day_end, get_day_start
 from indico.util.struct.iterables import powerset
 
 

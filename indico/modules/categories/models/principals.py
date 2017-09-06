@@ -21,7 +21,7 @@ from sqlalchemy.ext.declarative import declared_attr
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalRolesMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 
 
 class CategoryPrincipal(PrincipalRolesMixin, db.Model):

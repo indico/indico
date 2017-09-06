@@ -20,10 +20,10 @@ from flask import flash, request
 
 from indico.core.db import db
 from indico.modules.admin import RHAdminBase
-from indico.modules.events.views import WPReferenceTypes
 from indico.modules.events.forms import ReferenceTypeForm
 from indico.modules.events.models.references import ReferenceType
-from indico.modules.events.operations import create_reference_type, update_reference_type, delete_reference_type
+from indico.modules.events.operations import create_reference_type, delete_reference_type, update_reference_type
+from indico.modules.events.views import WPReferenceTypes
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults

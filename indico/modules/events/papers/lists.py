@@ -24,7 +24,7 @@ from sqlalchemy.orm import subqueryload, undefer
 
 from indico.core.db import db
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.papers.models.revisions import PaperRevisionState, PaperRevision
+from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.events.papers.settings import PaperReviewingRole
 from indico.modules.events.util import ListGeneratorBase
 from indico.modules.users import User

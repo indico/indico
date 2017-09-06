@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from flask import session, redirect, request
+from flask import redirect, request, session
 from werkzeug.datastructures import MultiDict
 
 from indico.core.config import Config

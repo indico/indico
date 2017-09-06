@@ -16,8 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.controllers.admin import (RHReferenceTypes, RHCreateReferenceType, RHEditReferenceType,
-                                                     RHDeleteReferenceType)
+from indico.modules.events.controllers.admin import (RHCreateReferenceType, RHDeleteReferenceType, RHEditReferenceType,
+                                                     RHReferenceTypes)
 from indico.modules.events.controllers.creation import RHCreateEvent
 from indico.modules.events.controllers.display import RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl

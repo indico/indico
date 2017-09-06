@@ -19,9 +19,8 @@ from __future__ import unicode_literals
 from flask import session
 
 from indico.core import signals
-from indico.modules.events.requests.util import get_request_definitions, is_request_manager
 from indico.modules.events.requests.base import RequestDefinitionBase, RequestFormBase
-from indico.modules.events.requests.models.requests import Request, RequestState
+from indico.modules.events.requests.util import get_request_definitions, is_request_manager
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -53,12 +52,14 @@ def _get_event_management_url(event, **kwargs):
 
 @signals.users.merged.connect
 def _merge_users(target, source, **kwargs):
+    from indico.modules.events.requests.models.requests import Request
     Request.find(created_by_id=source.id).update({Request.created_by_id: target.id})
     Request.find(processed_by_id=source.id).update({Request.processed_by_id: target.id})
 
 
 @signals.event.deleted.connect
 def _event_deleted(event, **kwargs):
+    from indico.modules.events.requests.models.requests import Request, RequestState
     query = (Request.query.with_parent(event)
              .filter(Request.state.in_((RequestState.accepted, RequestState.pending))))
     for req in query:

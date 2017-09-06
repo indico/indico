@@ -18,71 +18,71 @@ from __future__ import unicode_literals
 
 from indico.modules.events.registration.api import RHAPIRegistrant, RHAPIRegistrants
 from indico.modules.events.registration.controllers.compat import compat_registration
-from indico.modules.events.registration.controllers.display import (RHRegistrationDisplayEdit, RHRegistrationFormList,
-                                                                    RHRegistrationForm,
-                                                                    RHRegistrationFormCheckEmail,
+from indico.modules.events.registration.controllers.display import (RHParticipantList, RHRegistrationDisplayEdit,
+                                                                    RHRegistrationForm, RHRegistrationFormCheckEmail,
                                                                     RHRegistrationFormDeclineInvitation,
-                                                                    RHParticipantList)
-from indico.modules.events.registration.controllers.management.tickets import (RHRegistrationFormTickets,
-                                                                               RHTicketConfigQRCodeImage,
-                                                                               RHTicketConfigQRCode,
-                                                                               RHTicketDownload)
-from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormToggleFieldState,
-                                                                              RHRegistrationFormToggleTextState,
+                                                                    RHRegistrationFormList)
+from indico.modules.events.registration.controllers.management.fields import (RHRegistrationFormAddField,
+                                                                              RHRegistrationFormAddText,
                                                                               RHRegistrationFormModifyField,
                                                                               RHRegistrationFormModifyText,
                                                                               RHRegistrationFormMoveField,
                                                                               RHRegistrationFormMoveText,
-                                                                              RHRegistrationFormAddField,
-                                                                              RHRegistrationFormAddText)
-from indico.modules.events.registration.controllers.management.invitations import (
-    RHRegistrationFormInvitations, RHRegistrationFormInvite, RHRegistrationFormDeleteInvitation,
-    RHRegistrationFormManagerDeclineInvitation
-)
+                                                                              RHRegistrationFormToggleFieldState,
+                                                                              RHRegistrationFormToggleTextState)
+from indico.modules.events.registration.controllers.management.invitations import (RHRegistrationFormDeleteInvitation,
+                                                                                   RHRegistrationFormInvitations,
+                                                                                   RHRegistrationFormInvite,
+                                                                                   RHRegistrationFormManagerDeclineInvitation)
 from indico.modules.events.registration.controllers.management.regforms import (RHManageParticipants,
-                                                                                RHManageRegistrationForms,
-                                                                                RHRegistrationFormCreate,
-                                                                                RHManageRegistrationFormsDisplay,
-                                                                                RHRegistrationFormEdit,
-                                                                                RHRegistrationFormDelete,
-                                                                                RHRegistrationFormManage,
-                                                                                RHRegistrationFormOpen,
-                                                                                RHRegistrationFormClose,
-                                                                                RHRegistrationFormSchedule,
-                                                                                RHRegistrationFormModify,
-                                                                                RHRegistrationFormStats,
                                                                                 RHManageRegistrationFormDisplay,
-                                                                                RHManageRegistrationManagers)
-from indico.modules.events.registration.controllers.management.sections import (RHRegistrationFormAddSection,
-                                                                                RHRegistrationFormModifySection,
-                                                                                RHRegistrationFormToggleSection,
-                                                                                RHRegistrationFormMoveSection)
-from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationsListManage,
-                                                                                RHRegistrationsListCustomize,
+                                                                                RHManageRegistrationForms,
+                                                                                RHManageRegistrationFormsDisplay,
+                                                                                RHManageRegistrationManagers,
+                                                                                RHRegistrationFormClose,
+                                                                                RHRegistrationFormCreate,
+                                                                                RHRegistrationFormDelete,
+                                                                                RHRegistrationFormEdit,
+                                                                                RHRegistrationFormManage,
+                                                                                RHRegistrationFormModify,
+                                                                                RHRegistrationFormOpen,
+                                                                                RHRegistrationFormSchedule,
+                                                                                RHRegistrationFormStats)
+from indico.modules.events.registration.controllers.management.reglists import (RHRegistrationApprove,
+                                                                                RHRegistrationBulkCheckIn,
+                                                                                RHRegistrationCheckIn,
+                                                                                RHRegistrationCreate,
+                                                                                RHRegistrationCreateMultiple,
+                                                                                RHRegistrationDelete,
                                                                                 RHRegistrationDetails,
                                                                                 RHRegistrationDownloadAttachment,
                                                                                 RHRegistrationEdit,
-                                                                                RHRegistrationListStaticURL,
                                                                                 RHRegistrationEmailRegistrants,
                                                                                 RHRegistrationEmailRegistrantsPreview,
-                                                                                RHRegistrationDelete,
-                                                                                RHRegistrationCreate,
-                                                                                RHRegistrationCreateMultiple,
-                                                                                RHRegistrationsExportPDFTable,
-                                                                                RHRegistrationsExportPDFBook,
+                                                                                RHRegistrationListStaticURL,
+                                                                                RHRegistrationReject,
+                                                                                RHRegistrationsConfigBadges,
+                                                                                RHRegistrationsExportAttachments,
                                                                                 RHRegistrationsExportCSV,
                                                                                 RHRegistrationsExportExcel,
-                                                                                RHRegistrationTogglePayment,
-                                                                                RHRegistrationsPrintBadges,
-                                                                                RHRegistrationsConfigBadges,
-                                                                                RHRegistrationApprove,
-                                                                                RHRegistrationReject,
+                                                                                RHRegistrationsExportPDFBook,
+                                                                                RHRegistrationsExportPDFTable,
+                                                                                RHRegistrationsListCustomize,
+                                                                                RHRegistrationsListManage,
                                                                                 RHRegistrationsModifyStatus,
-                                                                                RHRegistrationsExportAttachments,
-                                                                                RHRegistrationCheckIn,
-                                                                                RHRegistrationBulkCheckIn)
+                                                                                RHRegistrationsPrintBadges,
+                                                                                RHRegistrationTogglePayment)
+from indico.modules.events.registration.controllers.management.sections import (RHRegistrationFormAddSection,
+                                                                                RHRegistrationFormModifySection,
+                                                                                RHRegistrationFormMoveSection,
+                                                                                RHRegistrationFormToggleSection)
+from indico.modules.events.registration.controllers.management.tickets import (RHRegistrationFormTickets,
+                                                                               RHTicketConfigQRCode,
+                                                                               RHTicketConfigQRCodeImage,
+                                                                               RHTicketDownload)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('event_registration', __name__, url_prefix='/event/<confId>', template_folder='templates',
                       virtual_template_folder='events/registration', event_feature='registration')

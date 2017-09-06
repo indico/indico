@@ -21,17 +21,16 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core import signals
 from indico.modules.events.management.controllers.base import RHManageEventBase
-from indico.modules.events.management.forms import (EventDataForm, EventDatesForm,
-                                                    EventLocationForm, EventPersonsForm, EventContactInfoForm,
-                                                    EventClassificationForm)
+from indico.modules.events.management.forms import (EventClassificationForm, EventContactInfoForm, EventDataForm,
+                                                    EventDatesForm, EventLocationForm, EventPersonsForm)
 from indico.modules.events.management.util import flash_if_unregistered
-from indico.modules.events.management.views import (WPEventSettings, render_event_management_header_right)
-from indico.modules.events.operations import (update_event)
+from indico.modules.events.management.views import WPEventSettings, render_event_management_header_right
+from indico.modules.events.operations import update_event
 from indico.modules.events.util import track_time_changes
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import get_template_module
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template, jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHEventSettings(RHManageEventBase):

@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from datetime import datetime, date
+from datetime import date, datetime
 
 from dateutil.relativedelta import relativedelta
 from flask import request, session
@@ -24,7 +24,7 @@ from indico.legacy.webinterface.pages.base import WPNotDecorated
 from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.locations import Location
-from indico.modules.rb.models.reservations import RepeatMapping, RepeatFrequency
+from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
 from indico.modules.rb.util import rb_is_admin
 from indico.modules.rb.views import WPRoomBookingBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget

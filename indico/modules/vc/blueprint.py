@@ -16,11 +16,12 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.vc.controllers import (RHVCManageEvent, RHVCManageEventSelectService, RHVCManageEventCreate,
+from indico.modules.vc.controllers import (RHVCEventPage, RHVCManageAttach, RHVCManageEvent, RHVCManageEventCreate,
                                            RHVCManageEventModify, RHVCManageEventRefresh, RHVCManageEventRemove,
-                                           RHVCEventPage, RHVCManageSearch, RHVCManageAttach, RHVCRoomList)
+                                           RHVCManageEventSelectService, RHVCManageSearch, RHVCRoomList)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('vc', __name__, template_folder='templates', virtual_template_folder='vc')
 

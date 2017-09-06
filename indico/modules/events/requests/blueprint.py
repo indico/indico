@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.requests.controllers import (RHRequestsEventRequests, RHRequestsEventRequestDetails,
-                                                        RHRequestsEventRequestWithdraw, RHRequestsEventRequestProcess)
+from indico.modules.events.requests.controllers import (RHRequestsEventRequestDetails, RHRequestsEventRequestProcess,
+                                                        RHRequestsEventRequests, RHRequestsEventRequestWithdraw)
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('requests', __name__, template_folder='templates', virtual_template_folder='events/requests',
                       url_prefix='/event/<confId>/manage/requests')

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from collections import OrderedDict
 from operator import attrgetter
 
-from flask import request, flash, session
+from flask import flash, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db

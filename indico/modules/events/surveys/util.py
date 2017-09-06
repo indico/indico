@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from operator import attrgetter
 
 from flask import session
-from sqlalchemy.orm import load_only, joinedload
+from sqlalchemy.orm import joinedload, load_only
 
 from indico.core.db import db
 from indico.modules.events import Event

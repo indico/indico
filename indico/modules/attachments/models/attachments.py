@@ -27,7 +27,7 @@ from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.core.db.sqlalchemy.protection import ProtectionMixin
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.core.storage import VersionedResourceMixin, StoredFileMixin
+from indico.core.storage import StoredFileMixin, VersionedResourceMixin
 from indico.modules.attachments.models.principals import AttachmentPrincipal
 from indico.modules.attachments.preview import get_file_previewer
 from indico.modules.attachments.util import can_manage_attachments

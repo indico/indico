@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.groups.controllers import (RHGroups, RHGroupDetails, RHGroupMembers, RHGroupEdit, RHGroupDelete,
-                                               RHGroupDeleteMember)
+from indico.modules.groups.controllers import (RHGroupDelete, RHGroupDeleteMember, RHGroupDetails, RHGroupEdit,
+                                               RHGroupMembers, RHGroups)
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('groups', __name__, template_folder='templates', virtual_template_folder='groups',
                       url_prefix='/admin/groups')

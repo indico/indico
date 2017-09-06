@@ -16,18 +16,17 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session, request
+from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.modules.categories.models.categories import Category
-from indico.modules.events import EventLogRealm, EventLogKind
+from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.models.events import EventType
-from indico.modules.events.operations import (update_event_type,
-                                              lock_event, unlock_event)
+from indico.modules.events.operations import lock_event, unlock_event, update_event_type
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.util import jsonify_template, jsonify_data, url_for_index
+from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
 
 class RHDeleteEvent(RHManageEventBase):

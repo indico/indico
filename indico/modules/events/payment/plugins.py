@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 import re
 
-from flask import session, render_template
+from flask import render_template, session
 from flask_pluginengine import render_plugin_template
-from wtforms.fields.core import StringField, BooleanField
+from wtforms.fields.core import BooleanField, StringField
 from wtforms.validators import DataRequired
 
 from indico.core import signals

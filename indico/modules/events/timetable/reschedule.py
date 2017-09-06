@@ -16,10 +16,9 @@
 
 from __future__ import unicode_literals
 
-from datetime import timedelta, datetime
+from datetime import datetime, timedelta
 
 from flask import session
-
 from pytz import utc
 from werkzeug.utils import cached_property
 

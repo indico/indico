@@ -17,10 +17,11 @@
 import pytest
 from mock import MagicMock
 
-from indico.modules.events.payment.models.transactions import (PaymentTransaction, TransactionAction, TransactionStatus,
-                                                               TransactionStatusTransition, IgnoredTransactionAction,
+from indico.modules.events.payment.models.transactions import (DoublePaymentTransaction, IgnoredTransactionAction,
                                                                InvalidManualTransactionAction, InvalidTransactionAction,
-                                                               DoublePaymentTransaction, InvalidTransactionStatus)
+                                                               InvalidTransactionStatus, PaymentTransaction,
+                                                               TransactionAction, TransactionStatus,
+                                                               TransactionStatusTransition)
 from indico.testing.util import extract_logs
 
 

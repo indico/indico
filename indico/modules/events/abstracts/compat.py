@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 from flask import redirect
 
+from indico.legacy.webinterface.rh.base import RHSimple
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.web.flask.util import url_for
-from indico.legacy.webinterface.rh.base import RHSimple
 
 
 @RHSimple.wrap_function

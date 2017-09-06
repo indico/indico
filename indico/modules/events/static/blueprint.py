@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.modules.events.static.controllers import RHStaticSiteBuild, RHStaticSiteDownload, RHStaticSiteList
 from indico.web.flask.wrappers import IndicoBlueprint
 
+
 _bp = IndicoBlueprint('static_site', __name__, template_folder='templates', virtual_template_folder='events/static',
                       url_prefix='/event/<confId>/manage/offline-copy')
 

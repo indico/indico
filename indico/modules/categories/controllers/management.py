@@ -21,7 +21,7 @@ from io import BytesIO
 
 from flask import flash, redirect, request, session
 from PIL import Image
-from sqlalchemy.orm import joinedload, undefer_group, load_only
+from sqlalchemy.orm import joinedload, load_only, undefer_group
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db

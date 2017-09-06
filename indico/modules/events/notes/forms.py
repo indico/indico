@@ -18,9 +18,9 @@ from __future__ import unicode_literals
 
 from wtforms.fields import TextAreaField
 
+from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import CKEditorWidget
-from indico.util.i18n import _
 
 
 class NoteForm(IndicoForm):

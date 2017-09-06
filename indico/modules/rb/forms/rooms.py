@@ -16,18 +16,18 @@
 
 import itertools
 from operator import itemgetter
-from wtforms import Form
 
-from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms import Form
 from wtforms.ext.dateutil.fields import DateTimeField
-from wtforms.fields.core import StringField, RadioField, IntegerField, BooleanField, FloatField, FieldList, FormField
-from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
+from wtforms.fields.core import BooleanField, FieldList, FloatField, FormField, IntegerField, RadioField, StringField
+from wtforms.fields.simple import FileField, TextAreaField
+from wtforms.validators import DataRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets.core import HiddenInput
-from wtforms.fields.simple import TextAreaField, FileField
 from wtforms_components import TimeField
 
-from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.equipment import EquipmentType
+from indico.modules.rb.models.locations import Location
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_nested
 from indico.web.forms.base import IndicoForm

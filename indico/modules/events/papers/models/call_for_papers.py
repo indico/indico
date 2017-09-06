@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 from indico.modules.events.papers.models.competences import PaperCompetence
 from indico.modules.events.papers.models.reviews import PaperReviewType
-from indico.modules.events.papers.settings import paper_reviewing_settings, PaperReviewingRole
+from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.settings import EventSettingProperty
-from indico.util.date_time import now_utc
 from indico.util.caching import memoize_request
-from indico.util.string import return_ascii, MarkdownText
+from indico.util.date_time import now_utc
+from indico.util.string import MarkdownText, return_ascii
 
 
 class CallForPapers(object):

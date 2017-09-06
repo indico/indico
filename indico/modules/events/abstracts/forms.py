@@ -20,32 +20,32 @@ from datetime import time
 
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, IntegerField, RadioField, SelectField, StringField, TextAreaField, HiddenField
-from wtforms.validators import NumberRange, Optional, DataRequired, ValidationError, InputRequired
+from wtforms.fields import BooleanField, HiddenField, IntegerField, RadioField, SelectField, StringField, TextAreaField
+from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets import Select
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.descriptions import RenderMode
-from indico.modules.events.abstracts.fields import (EmailRuleListField, AbstractPersonLinkListField, AbstractField,
+from indico.modules.events.abstracts.fields import (AbstractField, AbstractPersonLinkListField, EmailRuleListField,
                                                     TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
-from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
-from indico.modules.events.abstracts.settings import BOASortField, BOACorrespondingAuthorType, abstracts_settings
-from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
+from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, abstracts_settings
 from indico.modules.events.contributions.models.persons import AuthorType
+from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReviewQuestionsField
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.util.placeholders import render_placeholder_info
-from indico.web.forms.base import IndicoForm, FormDefaults, generated_data
-from indico.web.forms.fields import (PrincipalListField, IndicoEnumSelectField, IndicoMarkdownField,
-                                     IndicoQuerySelectMultipleCheckboxField, EmailListField, EditableFileField,
-                                     IndicoDateTimeField, HiddenFieldList, HiddenEnumField,
-                                     IndicoQuerySelectMultipleField)
+from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
+from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenEnumField, HiddenFieldList,
+                                     IndicoDateTimeField, IndicoEnumSelectField, IndicoMarkdownField,
+                                     IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelectMultipleField,
+                                     PrincipalListField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, UsedIf, LinkedDateTime, WordCount, SoftLength
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 

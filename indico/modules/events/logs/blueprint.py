@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.modules.events.logs.controllers import RHEventLogs
 from indico.web.flask.wrappers import IndicoBlueprint
 
+
 _bp = IndicoBlueprint('event_logs', __name__, template_folder='templates', virtual_template_folder='events/logs',
                       url_prefix='/event/<confId>/manage/logs')
 

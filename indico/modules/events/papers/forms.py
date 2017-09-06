@@ -19,23 +19,23 @@ from __future__ import unicode_literals
 from datetime import time
 
 from flask import request, session
-from wtforms.fields import TextAreaField, BooleanField, HiddenField, StringField, RadioField
-from wtforms.validators import Optional, DataRequired
+from wtforms.fields import BooleanField, HiddenField, RadioField, StringField, TextAreaField
+from wtforms.validators import DataRequired, Optional
 
 from indico.modules.events.fields import ReviewQuestionsField
 from indico.modules.events.papers.fields import PaperEmailSettingsField
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
-from indico.modules.events.papers.models.reviews import (PaperAction, PaperReviewType, PaperCommentVisibility,
+from indico.modules.events.papers.models.reviews import (PaperAction, PaperCommentVisibility, PaperReviewType,
                                                          PaperTypeProxy)
 from indico.modules.events.papers.models.revisions import PaperRevisionState
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
-from indico.web.forms.base import IndicoForm, FormDefaults
-from indico.web.forms.fields import (PrincipalListField, IndicoDateTimeField, IndicoTagListField, HiddenEnumField,
-                                     HiddenFieldList, IndicoMarkdownField, FileField, EditableFileField,
-                                     IndicoEnumSelectField)
+from indico.web.forms.base import FormDefaults, IndicoForm
+from indico.web.forms.fields import (EditableFileField, FileField, HiddenEnumField, HiddenFieldList,
+                                     IndicoDateTimeField, IndicoEnumSelectField, IndicoMarkdownField,
+                                     IndicoTagListField, PrincipalListField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import LinkedDateTime, HiddenUnless
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import JinjaWidget, SwitchWidget
 
 

@@ -21,9 +21,9 @@ from dateutil.relativedelta import relativedelta
 
 from indico.core.errors import IndicoError
 from indico.modules.rb import rb_settings
-from indico.modules.rb.models.reservations import Reservation, RepeatFrequency, RepeatMapping
-from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
 from indico.modules.rb.models.reservation_edit_logs import ReservationEditLog
+from indico.modules.rb.models.reservation_occurrences import ReservationOccurrence
+from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping, Reservation
 from indico.testing.util import bool_matrix
 
 

@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 import re
 from datetime import datetime
 from difflib import SequenceMatcher
-
 from enum import Enum
+
 from markupsafe import Markup
 
 from indico.core import signals

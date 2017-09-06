@@ -20,7 +20,7 @@ from flask import session
 
 from indico.core.db import db
 from indico.modules.events.surveys import logger
-from indico.modules.events.surveys.models.items import (SurveyQuestion, SurveySection, SurveyText)
+from indico.modules.events.surveys.models.items import SurveyQuestion, SurveySection, SurveyText
 
 
 def add_survey_question(section, field_cls, data):

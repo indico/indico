@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import mimetypes
 
-from flask import flash, request, session, render_template
+from flask import flash, render_template, request, session
 
 from indico.core import signals
 from indico.core.db import db
@@ -26,8 +26,8 @@ from indico.modules.attachments import logger
 from indico.modules.attachments.controllers.util import SpecificAttachmentMixin, SpecificFolderMixin
 from indico.modules.attachments.forms import (AddAttachmentFilesForm, AddAttachmentLinkForm, AttachmentFolderForm,
                                               EditAttachmentFileForm, EditAttachmentLinkForm)
-from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.models.attachments import Attachment, AttachmentFile, AttachmentType
+from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.attachments.operations import add_attachment_link
 from indico.modules.attachments.util import get_attached_items
 from indico.util.fs import secure_filename
@@ -36,7 +36,7 @@ from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_template, jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
 
 
 def _render_attachment_list(linked_object):

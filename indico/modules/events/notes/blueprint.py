@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from indico.modules.events import event_object_url_prefixes
-from indico.modules.events.notes.controllers import RHCompileNotes, RHEditNote, RHDeleteNote, RHViewNote
+from indico.modules.events.notes.controllers import RHCompileNotes, RHDeleteNote, RHEditNote, RHViewNote
 from indico.web.flask.wrappers import IndicoBlueprint
 
 

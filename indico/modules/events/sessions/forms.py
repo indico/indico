@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
-from wtforms.fields import StringField, BooleanField, TextAreaField
+from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
@@ -26,10 +26,10 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import (IndicoPalettePickerField, TimeDeltaField, IndicoLocationField, PrincipalListField,
-                                     IndicoProtectionField, AccessControlListField)
-from indico.web.forms.widgets import SwitchWidget
+from indico.web.forms.fields import (AccessControlListField, IndicoLocationField, IndicoPalettePickerField,
+                                     IndicoProtectionField, PrincipalListField, TimeDeltaField)
 from indico.web.forms.validators import UsedIf
+from indico.web.forms.widgets import SwitchWidget
 
 
 class SessionForm(IndicoForm):

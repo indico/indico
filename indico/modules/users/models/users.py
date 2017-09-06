@@ -34,10 +34,10 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.db.sqlalchemy.util.models import get_default_values
 from indico.modules.users.models.affiliations import UserAffiliation
 from indico.modules.users.models.emails import UserEmail
-from indico.modules.users.models.favorites import favorite_user_table, favorite_category_table
+from indico.modules.users.models.favorites import favorite_category_table, favorite_user_table
 from indico.util.i18n import _
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_full_name, format_repr
+from indico.util.string import format_full_name, format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
 
 

@@ -28,7 +28,7 @@ from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.users.models.users import UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import orig_string
-from indico.util.string import return_ascii, camelize_keys, format_repr
+from indico.util.string import camelize_keys, format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 

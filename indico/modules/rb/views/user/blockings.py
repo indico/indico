@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.views import WPRoomBookingBase
 from indico.legacy.webinterface.wcomponents import WTemplated
+from indico.modules.rb.views import WPRoomBookingBase
 
 
 class WPRoomBookingBlockingDetails(WPRoomBookingBase):

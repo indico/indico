@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
+from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.modules.events.sessions.models.persons import SessionBlockPersonLink
 from indico.modules.events.util import serialize_person_link
-from indico.modules.events.fields import PersonLinkListFieldBase
 from indico.web.forms.widgets import JinjaWidget
 
 

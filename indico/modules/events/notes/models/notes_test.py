@@ -20,7 +20,7 @@ import pytest
 from sqlalchemy import inspect
 from sqlalchemy.exc import IntegrityError
 
-from indico.modules.events.notes.models.notes import EventNote, RenderMode, EventNoteRevision
+from indico.modules.events.notes.models.notes import EventNote, EventNoteRevision, RenderMode
 
 
 @pytest.fixture

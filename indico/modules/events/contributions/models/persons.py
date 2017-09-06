@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db.sqlalchemy import db, PyIntEnum
-from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr
+from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.modules.events.models.persons import PersonLinkBase
+from indico.util.locators import locator_property
+from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import IndicoEnum
 
 

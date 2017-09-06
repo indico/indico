@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.core.db.sqlalchemy import db, PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
 from indico.modules.events.papers.models.reviews import PaperReviewType
 

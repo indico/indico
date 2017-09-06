@@ -23,14 +23,14 @@ from sqlalchemy.ext.declarative import declared_attr
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import mapper
 
-from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.core.db.sqlalchemy.util.models import auto_table_args, override_attr
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.modules.users.models.users import UserTitle, PersonMixin
+from indico.modules.users.models.users import PersonMixin, UserTitle
 from indico.util.decorators import strict_classproperty
 from indico.util.locators import locator_property
-from indico.util.string import return_ascii, format_repr
+from indico.util.string import format_repr, return_ascii
 
 
 class PersonLinkDataMixin(object):

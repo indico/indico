@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 import json
 
-from indico.modules.events.papers.settings import paper_reviewing_settings as settings, RoleConverter
+from indico.modules.events.papers.settings import paper_reviewing_settings as settings
+from indico.modules.events.papers.settings import RoleConverter
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
 

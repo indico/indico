@@ -22,7 +22,7 @@ from datetime import timedelta
 
 import pytz
 from flask import has_request_context, session
-from sqlalchemy import orm, DDL
+from sqlalchemy import DDL, orm
 from sqlalchemy.dialects.postgresql import ARRAY, JSON
 from sqlalchemy.event import listens_for
 from sqlalchemy.ext.declarative import declared_attr
@@ -32,7 +32,7 @@ from sqlalchemy.orm.base import NEVER_SET, NO_VALUE
 from sqlalchemy.sql import select
 
 from indico.core import signals
-from indico.core.db.sqlalchemy import db, UTCDateTime, PyIntEnum
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
 from indico.core.db.sqlalchemy.attachments import AttachedItemsMixin
 from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.locations import LocationMixin
@@ -46,13 +46,13 @@ from indico.modules.categories import Category
 from indico.modules.events.logs import EventLogEntry
 from indico.modules.events.management.util import get_non_inheriting_objects
 from indico.modules.events.models.persons import PersonLinkDataMixin
-from indico.modules.events.settings import EventSettingProperty, event_core_settings, event_contact_settings
+from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
-from indico.util.date_time import overlaps, now_utc
+from indico.util.date_time import now_utc, overlaps
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
-from indico.util.string import return_ascii, format_repr, text_to_repr, to_unicode
+from indico.util.string import format_repr, return_ascii, text_to_repr, to_unicode
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 

@@ -14,11 +14,11 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import division, unicode_literals
 
-from indico.core.db.sqlalchemy import db, PyIntEnum, UTCDateTime
-from indico.core.db.sqlalchemy.descriptions import RenderModeMixin, RenderMode
-from indico.modules.events.models.reviews import ProposalReviewMixin, ProposalGroupProxy
+from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime, db
+from indico.core.db.sqlalchemy.descriptions import RenderMode, RenderModeMixin
+from indico.modules.events.models.reviews import ProposalGroupProxy, ProposalReviewMixin
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.locators import locator_property

@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from enum import Enum
+
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 

@@ -19,11 +19,10 @@ from __future__ import unicode_literals
 from io import BytesIO
 from itertools import ifilter
 
-from lxml import html
-from lxml.etree import ParserError
-
 import icalendar as ical
 from flask import session
+from lxml import html
+from lxml.etree import ParserError
 from pyatom import AtomFeed
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 

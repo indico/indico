@@ -25,7 +25,7 @@ from indico.core import signals
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
-from indico.modules.events.models.persons import EventPersonLink, EventPerson, PersonLinkBase
+from indico.modules.events.models.persons import EventPerson, EventPersonLink, PersonLinkBase
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.util import serialize_person_link
 from indico.modules.users import User

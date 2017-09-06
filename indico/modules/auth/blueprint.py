@@ -18,10 +18,11 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.modules.auth.controllers import (RHLogin, RHLoginForm, RHLogout, RHRegister, RHLinkAccount,
-                                             RHResetPassword, RHAccounts, RHRemoveAccount, RHAdminImpersonate)
+from indico.modules.auth.controllers import (RHAccounts, RHAdminImpersonate, RHLinkAccount, RHLogin, RHLoginForm,
+                                             RHLogout, RHRegister, RHRemoveAccount, RHResetPassword)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
+
 
 _bp = IndicoBlueprint('auth', __name__, template_folder='templates', virtual_template_folder='auth')
 

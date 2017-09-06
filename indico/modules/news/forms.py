@@ -17,12 +17,12 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField, IntegerField, StringField, TextAreaField
-from wtforms.validators import DataRequired, NumberRange, InputRequired
+from wtforms.validators import DataRequired, InputRequired, NumberRange
 
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.validators import HiddenUnless
-from indico.web.forms.widgets import SwitchWidget, CKEditorWidget
+from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 
 class NewsSettingsForm(IndicoForm):

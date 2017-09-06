@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from sqlalchemy.orm import joinedload, defaultload
+from sqlalchemy.orm import defaultload, joinedload
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs

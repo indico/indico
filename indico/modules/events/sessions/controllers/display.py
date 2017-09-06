@@ -18,17 +18,16 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from flask import session, request
+from flask import request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
+from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.sessions.models.sessions import Session
-from indico.modules.events.sessions.util import (get_sessions_for_user, get_session_ical_file,
-                                                 get_session_timetable_pdf)
-from indico.modules.events.sessions.views import WPDisplaySession, WPDisplayMySessionsConference
+from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf, get_sessions_for_user
+from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 
 
 class RHDisplaySessionList(RHConferenceBaseDisplay):

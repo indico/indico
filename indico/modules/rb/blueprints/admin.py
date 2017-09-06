@@ -14,11 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.modules.rb.controllers.admin import (
-    index as index_handler,
-    locations as location_handlers,
-    rooms as room_handlers
-)
+from indico.modules.rb.controllers.admin import index as index_handler
+from indico.modules.rb.controllers.admin import locations as location_handlers
+from indico.modules.rb.controllers.admin import rooms as room_handlers
 from indico.web.flask.wrappers import IndicoBlueprint
 
 

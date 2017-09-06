@@ -16,15 +16,16 @@
 
 from __future__ import unicode_literals
 
-from flask import request, jsonify, session
+from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
-from indico.modules.events.registration.models.items import RegistrationFormText, RegistrationFormItemType
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
+from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
 from indico.util.string import snakify_keys
+
 
 FIRST_DISABLED_POSITION = 1000
 

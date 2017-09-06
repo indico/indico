@@ -19,19 +19,19 @@ from datetime import datetime
 import icalendar
 import pytz
 from babel.dates import get_timezone
-from sqlalchemy import Time, Date, or_
+from sqlalchemy import Date, Time, or_
 from sqlalchemy.sql import cast
-from werkzeug.datastructures import OrderedMultiDict, MultiDict
+from werkzeug.datastructures import MultiDict, OrderedMultiDict
 
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.errors import IndicoError
 from indico.modules.auth import Identity
-from indico.modules.users import User
-from indico.modules.rb.util import rb_check_user_access
-from indico.modules.rb.models.reservations import Reservation, RepeatMapping, RepeatFrequency, ConflictingOccurrences
 from indico.modules.rb.models.locations import Location
+from indico.modules.rb.models.reservations import ConflictingOccurrences, RepeatFrequency, RepeatMapping, Reservation
 from indico.modules.rb.models.rooms import Room
+from indico.modules.rb.util import rb_check_user_access
+from indico.modules.users import User
 from indico.util.date_time import utc_to_server
 from indico.web.http_api import HTTPAPIHook
 from indico.web.http_api.metadata import ical

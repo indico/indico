@@ -27,18 +27,18 @@ from indico.core.db import db
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.models.abstracts import Abstract, AbstractState, EditTrackMode
 from indico.modules.events.abstracts.models.comments import AbstractComment
-from indico.modules.events.abstracts.models.persons import AbstractPersonLink
-from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
-from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.files import AbstractFile
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
+from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
+from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractReview
 from indico.modules.events.abstracts.notifications import send_abstract_notifications
-from indico.modules.events.contributions.operations import delete_contribution, create_contribution_from_abstract
-from indico.modules.events.logs.models.entries import EventLogRealm, EventLogKind
+from indico.modules.events.contributions.operations import create_contribution_from_abstract, delete_contribution
+from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.logs.util import make_diff_log
 from indico.modules.events.util import set_custom_fields
 from indico.util.date_time import now_utc
-from indico.util.i18n import orig_string
 from indico.util.fs import secure_filename
+from indico.util.i18n import orig_string
 
 
 def _update_tracks(abstract, tracks, only_reviewed_for=False):

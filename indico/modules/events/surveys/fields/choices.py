@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals, division
+from __future__ import division, unicode_literals
 
 import uuid
 from collections import Counter, OrderedDict
@@ -23,7 +23,7 @@ from copy import deepcopy
 from indico.modules.events.surveys.fields.base import SurveyField
 from indico.util.i18n import _
 from indico.util.string import alpha_enum
-from indico.web.fields.choices import SingleChoiceField, MultiSelectField
+from indico.web.fields.choices import MultiSelectField, SingleChoiceField
 
 
 class _AddUUIDMixin(object):

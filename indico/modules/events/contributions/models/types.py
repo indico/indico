@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.util.string import format_repr, return_ascii
 from indico.util.locators import locator_property
+from indico.util.string import format_repr, return_ascii
 
 
 class ContributionType(db.Model):

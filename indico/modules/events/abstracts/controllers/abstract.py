@@ -16,9 +16,10 @@
 
 from __future__ import unicode_literals
 
-from flask import flash, session, request
-from sqlalchemy.orm import joinedload, defaultload
+from flask import flash, request, session
+from sqlalchemy.orm import defaultload, joinedload
 
+from indico.legacy.pdfinterface.conference import AbstractToPDF, ConfManagerAbstractToPDF
 from indico.modules.events.abstracts.controllers.base import RHAbstractBase
 from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.operations import update_abstract
@@ -29,7 +30,6 @@ from indico.util.i18n import _
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
-from indico.legacy.pdfinterface.conference import ConfManagerAbstractToPDF, AbstractToPDF
 
 
 class RHDisplayAbstract(RHAbstractBase):

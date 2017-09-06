@@ -17,7 +17,7 @@
 import pytest
 
 from indico.modules.rb import rb_settings
-from indico.modules.rb.util import rb_is_admin, rb_check_user_access
+from indico.modules.rb.util import rb_check_user_access, rb_is_admin
 from indico.testing.util import bool_matrix
 
 

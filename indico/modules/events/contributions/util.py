@@ -20,7 +20,7 @@ from collections import defaultdict
 from io import BytesIO
 from operator import attrgetter
 
-from sqlalchemy.orm import load_only, contains_eager, noload, joinedload
+from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.db import db
 from indico.modules.attachments.util import get_attached_items
@@ -31,7 +31,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import serialize_person_link
-from indico.util.date_time import format_human_timedelta, format_datetime
+from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.http_api.metadata.serializer import Serializer

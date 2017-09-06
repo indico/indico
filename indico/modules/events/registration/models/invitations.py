@@ -20,12 +20,12 @@ from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import UUID
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 from indico.util.struct.enum import RichIntEnum
-from indico.core.db import db
 
 
 class InvitationState(RichIntEnum):

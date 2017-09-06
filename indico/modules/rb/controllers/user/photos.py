@@ -16,13 +16,14 @@
 
 import posixpath
 from io import BytesIO
+
 from flask import redirect
 
 from indico.core.config import Config
-from indico.web.flask.util import send_file
-from indico.modules.rb.models.rooms import Room
-from indico.modules.rb.models.photos import Photo
 from indico.legacy.common.cache import GenericCache
+from indico.modules.rb.models.photos import Photo
+from indico.modules.rb.models.rooms import Room
+from indico.web.flask.util import send_file
 
 
 _cache = GenericCache('Rooms')

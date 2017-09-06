@@ -21,7 +21,7 @@ import posixpath
 from indico.core.config import Config
 from indico.core.db import db
 from indico.core.storage import StoredFileMixin
-from indico.util.string import format_repr, return_ascii, text_to_repr, strict_unicode
+from indico.util.string import format_repr, return_ascii, strict_unicode, text_to_repr
 
 
 class AbstractFile(StoredFileMixin, db.Model):
