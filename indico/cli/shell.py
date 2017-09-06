@@ -22,7 +22,7 @@ import os
 import re
 import sys
 from functools import partial
-from operator import itemgetter, attrgetter
+from operator import attrgetter, itemgetter
 
 import click
 import sqlalchemy.orm
