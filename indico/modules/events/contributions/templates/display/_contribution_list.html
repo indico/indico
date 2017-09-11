@@ -1,7 +1,7 @@
 {% from 'events/display/indico/_common.html' import render_location, render_users %}
 {% from 'message_box.html' import message_box %}
 
-{% macro render_contribution_list(event, timezone, contributions, total_entries, with_session_info=true) %}
+{% macro render_contribution_list(event, timezone, contributions, total_entries=none, with_session_info=true) %}
     {% if contributions %}
         {% for contrib in contributions | selectattr('start_dt_display') | sort(attribute='title') | sort(attribute='start_dt_display') %}
             {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
@@ -10,6 +10,7 @@
             {{- _render_contribution_row(timezone, contrib, with_session_info) -}}
         {% endfor %}
     {%- else %}
+        {% if total_entries is none %}{% set total_entries = contributions|length %}{% endif %}
         {%- call message_box('info') %}
             {%- if total_entries %}
                 {%- trans -%}
