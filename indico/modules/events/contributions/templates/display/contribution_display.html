@@ -20,7 +20,7 @@
     </tr>
 {%- endmacro %}
 
-{% macro render_author_list(authors) %}
+{% macro render_author_list(authors, show_author_link) %}
     <div class="speaker-list">
         {% call(user_data) render_users(authors|sort(attribute='display_order_key'), separator='') %}
             <span itemprop="performers" itemscope itemtype="http://schema.org/Person" class="speaker-item icon-user">
@@ -29,9 +29,13 @@
                         {{ user_data.title }}
                     </span>
                 {%- endif %}
-                <a href="{{ url_for('contributions.display_author', user_data) }}">
+                {% if show_author_link %}
+                    <a href="{{ url_for('contributions.display_author', user_data) }}">
+                        <span>{{ user_data.display_full_name }}</span>
+                    </a>
+                {% else %}
                     <span>{{ user_data.display_full_name }}</span>
-                </a>
+                {% endif %}
                 {% if user_data.affiliation -%}
                     <span class="affiliation">
                         (<span class="text">{{ user_data.affiliation }}</span>)
@@ -52,18 +56,18 @@
             <div class="time-data">
                 <i class="icon-calendar header-data"></i>
                 <span class="time-info">
-                    {%- if contribution.timetable_entry %}
-                        {{- contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event.display_tzinfo) -}}
-                    {% else %}
+                    {%- if contribution.start_dt_display %}
+                        {{- contribution.start_dt_display|format_datetime(timezone=contribution.event.display_tzinfo) -}}
+                    {%- else -%}
                         {%- trans %}Not scheduled{% endtrans -%}
-                    {% endif -%}
+                    {%- endif -%}
                 </span>
             </div>
-            {% if contribution.timetable_entry -%}
+            {% if contribution.duration_display -%}
                 <div class="time-data">
                     <i class="icon-time header-data"></i>
                     <span class="time-info" title="{% trans %}Duration{% endtrans %}">
-                        {{ contribution.timetable_entry.duration|format_human_timedelta(narrow=true) }}
+                        {{ contribution.duration_display|format_human_timedelta(narrow=true) }}
                     </span>
                 </div>
             {%- endif %}
@@ -181,7 +185,7 @@
                     </h3>
                 </div>
             </div>
-            {{ render_author_list(contribution.primary_authors) }}
+            {{ render_author_list(contribution.primary_authors, show_author_link) }}
         </section>
     {% endif %}
 
@@ -198,7 +202,7 @@
                     </h3>
                 </div>
             </div>
-            {{ render_author_list(contribution.secondary_authors) }}
+            {{ render_author_list(contribution.secondary_authors, show_author_link) }}
         </section>
     {% endif %}
 

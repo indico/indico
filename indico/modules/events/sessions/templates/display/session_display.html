@@ -142,7 +142,7 @@
     <div class="js-container">
         {% if sess.contributions %}
             <div id="session-contrib-list" class="contribution-list js-view">
-                {{ render_contribution_list(event, event.display_tzinfo, sess.contributions, false) }}
+                {{ render_contribution_list(event, event.display_tzinfo, sess.contributions, with_session_info=false) }}
             </div>
         {% endif %}
 

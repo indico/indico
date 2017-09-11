@@ -415,6 +415,48 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         return self.timetable_entry.start_dt + self.duration if self.timetable_entry else None
 
     @property
+    def start_dt_poster(self):
+        if self.session and self.session.is_poster and self.timetable_entry and self.timetable_entry.parent:
+            return self.timetable_entry.parent.start_dt
+
+    @property
+    def end_dt_poster(self):
+        if self.session and self.session.is_poster and self.timetable_entry and self.timetable_entry.parent:
+            return self.timetable_entry.parent.end_dt
+
+    @property
+    def duration_poster(self):
+        if self.session and self.session.is_poster and self.timetable_entry and self.timetable_entry.parent:
+            return self.timetable_entry.parent.duration
+
+    @property
+    def start_dt_display(self):
+        """The displayed start time of the contribution.
+
+        This is the start time of the poster session if applicable,
+        otherwise the start time of the contribution itself.
+        """
+        return self.start_dt_poster or self.start_dt
+
+    @property
+    def end_dt_display(self):
+        """The displayed end time of the contribution.
+
+        This is the end time of the poster session if applicable,
+        otherwise the end time of the contribution itself.
+        """
+        return self.end_dt_poster or self.end_dt
+
+    @property
+    def duration_display(self):
+        """The displayed duration of the contribution.
+
+        This is the duration of the poster session if applicable,
+        otherwise the duration of the contribution itself.
+        """
+        return self.duration_poster or self.duration
+
+    @property
     def submitters(self):
         return {person_link for person_link in self.person_links if person_link.is_submitter}
 

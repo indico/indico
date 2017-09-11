@@ -66,6 +66,7 @@ class RHDisplaySession(RHDisplaySessionBase):
                                                '/export/event/{0}/session/{1}.ics'.format(self.event.id,
                                                                                           self.session.id))
         contributions_strategy = subqueryload('contributions')
+        contributions_strategy.joinedload('track')
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
         _contrib_tte_strategy.lazyload('*')
         contributions_strategy.joinedload('person_links')
