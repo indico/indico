@@ -46,6 +46,10 @@ def _get_persons(event, condition):
             .order_by(db.func.lower(EventPerson.last_name)))
 
 
+def _author_page_active(event):
+    return is_menu_entry_enabled('author_index', event) or is_menu_entry_enabled('contributions', event)
+
+
 class RHContributionDisplayBase(RHConferenceBaseDisplay):
     normalize_url_spec = {
         'locators': {
@@ -119,11 +123,12 @@ class RHContributionDisplay(RHContributionDisplayBase):
                             joinedload('timetable_entry').lazyload('*'))
                    .one())
         return self.view_class.render_template('display/contribution_display.html', self._conf,
-                                               contribution=contrib, **ical_params)
+                                               contribution=contrib,
+                                               show_author_link=_author_page_active(self.event_new),
+                                               **ical_params)
 
 
 class RHAuthorList(RHDisplayProtectionBase):
-
     MENU_ENTRY_NAME = 'author_index'
     view_class = WPAuthorList
 
@@ -134,7 +139,6 @@ class RHAuthorList(RHDisplayProtectionBase):
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
-
     MENU_ENTRY_NAME = 'speaker_index'
     view_class = WPSpeakerList
 
@@ -155,8 +159,7 @@ class RHContributionAuthor(RHContributionDisplayBase):
 
     def _checkProtection(self):
         RHContributionDisplayBase._checkProtection(self)
-        if (not is_menu_entry_enabled('author_index', self.event_new) and
-                not is_menu_entry_enabled('contributions', self.event_new)):
+        if not _author_page_active(self.event_new):
             self._forbidden_if_not_admin()
 
     def _checkParams(self, params):
