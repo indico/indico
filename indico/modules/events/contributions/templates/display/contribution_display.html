@@ -52,18 +52,18 @@
             <div class="time-data">
                 <i class="icon-calendar header-data"></i>
                 <span class="time-info">
-                    {%- if contribution.timetable_entry %}
-                        {{- contribution.timetable_entry.start_dt|format_datetime(timezone=contribution.event_new.display_tzinfo) -}}
-                    {% else %}
+                    {%- if contribution.start_dt_display %}
+                        {{- contribution.start_dt_display|format_datetime(timezone=contribution.event_new.display_tzinfo) -}}
+                    {%- else -%}
                         {%- trans %}Not scheduled{% endtrans -%}
-                    {% endif -%}
+                    {%- endif -%}
                 </span>
             </div>
-            {% if contribution.timetable_entry -%}
+            {% if contribution.duration_display -%}
                 <div class="time-data">
                     <i class="icon-time header-data"></i>
                     <span class="time-info" title="{% trans %}Duration{% endtrans %}">
-                        {{ contribution.timetable_entry.duration|format_human_timedelta(narrow=true) }}
+                        {{ contribution.duration_display|format_human_timedelta(narrow=true) }}
                     </span>
                 </div>
             {%- endif %}
