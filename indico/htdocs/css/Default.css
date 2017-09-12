@@ -1071,62 +1071,6 @@ table.infoQuestionsTable td.dataBold {
     color: #045FB4;
 }
 
-.editLinkInLine {
-    float: left;
-}
-
-.shadowRectangle {
-    background: #ECECEC url('/images/grey_gradient2.png') scroll repeat-x bottom left;
-    color: #444;
-    border: 1px solid #AAA;
-    -moz-border-radius-bottomleft:10px;
-    -moz-border-radius-bottomright:10px;
-    -moz-border-radius-topleft:10px;
-    -moz-border-radius-topright:10px;
-    border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA;
-    border-radius: 15px;
-    padding-left:15px;
-    padding-top:10px;
-    padding-bottom: 5px;
-}
-
-.shadowRectangleSoft {
-    background: #ECECEC url('/images/grey_gradient2.png') scroll repeat-x bottom left;
-    color: #444;
-    border: 1px solid #AAA;
-    -moz-border-radius-bottomleft:10px;
-    -moz-border-radius-bottomright:10px;
-    -moz-border-radius-topleft:10px;
-    -moz-border-radius-topright:10px;
-    border-bottom:1px solid #AAAAAA;
-    border-right:1px solid #AAAAAA;
-    border-radius: 15px;
-    padding-left:15px;
-    padding-top:10px;
-    padding-bottom: 5px;
-    margin-left: 20px;
-}
-
-.subGroupTitle {
-    font-size: 13px;
-    font-family: Verdana, Arial;
-    color: #523D04;
-    padding: 3px;
-    padding-bottom: 10px;
-    border-bottom: 1px groove #A4A4A4;
-    font-weight: bold;
-}
-
-.subGroupTitleAssignContribution {
-    font-size: 13px;
-    font-family: Verdana, Arial;
-    color: #523D04;
-    padding: 3px;
-    padding-bottom: 5px;
-    font-weight: bold;
-}
-
 .deadLineCell {
     text-align:left;
     padding: 7px;
@@ -1249,23 +1193,6 @@ table.infoQuestionsTable td.dataBold {
     padding: 4px;
     list-style-type: none;
     width: 100%;
-}
-
-.absMaterialInput {
-    margin: 5px 5px 0px 5px;
-}
-
-.existingAttachment {
-    padding-left: 6px;
-    padding-bottom: 8px;
-}
-
-.subGroupTitleAbstract {
-   font-size: 13px;
-   font-family: Verdana, Arial;
-   color: #523D04;
-   padding: 3px 0px 8px 3px;
-   font-weight: bold;
 }
 
 div#social {
