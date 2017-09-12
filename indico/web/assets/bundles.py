@@ -249,8 +249,6 @@ def register_all_js(env):
                    'track_role_widget.js',
                    'paper_email_settings_widget.js'))
 
-    indico_jquery_authors = rjs_bundle('indico_jquery_authors', 'js/indico/jquery/authors.js')
-
     indico_regform = rjs_bundle(
         'indico_regform',
         *namespace('js/indico/modules/registration/form',
@@ -474,7 +472,6 @@ def register_all_js(env):
     env.register('indico_legacy', indico_legacy)
     env.register('indico_common', indico_common)
     env.register('indico_jquery', indico_jquery)
-    env.register('indico_authors', indico_jquery_authors)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     env.register('statistics_js', statistics_js)
