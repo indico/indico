@@ -457,7 +457,7 @@ class XAccelMiddleware(object):
 
     def __init__(self, app, mapping):
         self.app = app
-        self.mapping = mapping.items()
+        self.mapping = [(str(k), str(v)) for k, v in mapping.iteritems()]
 
     def __call__(self, environ, start_response):
         def _start_response(status, headers, exc_info=None):
