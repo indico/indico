@@ -15,7 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 
-from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields.simple import TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -24,7 +23,7 @@ from indico.modules.rb.models.blockings import Blocking
 from indico.modules.rb.models.rooms import Room
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import JSONField, PrincipalListField
+from indico.web.forms.fields import JSONField, PrincipalListField, IndicoDateField
 
 
 class BlockingForm(IndicoForm):
@@ -66,8 +65,8 @@ class BlockingForm(IndicoForm):
 
 
 class CreateBlockingForm(BlockingForm):
-    start_date = DateField(_(u'Start date'), [DataRequired()], parse_kwargs={'dayfirst': True})
-    end_date = DateField(_(u'End date'), [DataRequired()], parse_kwargs={'dayfirst': True})
+    start_date = IndicoDateField(_(u'Start date'), [DataRequired()])
+    end_date = IndicoDateField(_(u'End date'), [DataRequired()])
 
     def validate_start_date(self, field):
         if self.start_date.data > self.end_date.data:

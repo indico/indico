@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from datetime import datetime, date
 
 import pytz
-from wtforms.ext.dateutil.fields import DateField
 from wtforms.fields import BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, InputRequired, ValidationError
 from wtforms_components import TimeField
@@ -28,7 +27,7 @@ from indico.modules.events.models.events import EventType
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import EmailListField, IndicoRadioField, TimeDeltaField
+from indico.web.forms.fields import EmailListField, IndicoRadioField, TimeDeltaField, IndicoDateField
 from indico.web.forms.validators import HiddenUnless
 
 
@@ -44,8 +43,7 @@ class ReminderForm(IndicoForm):
                                               ('absolute', _("Fixed date/time")),
                                               ('now', _('Send immediately'))])
     relative_delta = TimeDeltaField(_('Offset'), [HiddenUnless('schedule_type', 'relative'), DataRequired()])
-    absolute_date = DateField(_('Date'), [HiddenUnless('schedule_type', 'absolute'), DataRequired()],
-                              parse_kwargs={'dayfirst': True})
+    absolute_date = IndicoDateField(_('Date'), [HiddenUnless('schedule_type', 'absolute'), DataRequired()])
     absolute_time = TimeField(_('Time'), [HiddenUnless('schedule_type', 'absolute'), InputRequired()])
     # Recipients
     recipients = EmailListField(_('Email addresses'), description=_('One email address per line.'))
