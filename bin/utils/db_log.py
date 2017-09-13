@@ -25,7 +25,6 @@ import re
 import signal
 import SocketServer
 import struct
-import sys
 import termios
 import textwrap
 from threading import Lock
@@ -41,29 +40,6 @@ from pygments.lexers.sql import SqlLexer
 click.disable_unicode_literals_warning = True
 ignored_line_re = re.compile(r'^(?:(?P<frame>\d+):)?(?P<file>.+?)(?::(?P<line>\d+))?$')
 output_lock = Lock()
-help_text = textwrap.dedent("""
-    To use this script, you need to add the following to your logging.conf:
-
-    [logger_db]
-    level=DEBUG
-    handlers=db
-    qualname=indico.db
-    propagate=0
-
-    [handler_db]
-    class=handlers.SocketHandler
-    level=DEBUG
-    args=('localhost', 9020)
-
-
-    Also add your new logger/handler to the loggers/handlers lists, e.g. like this:
-
-    [loggers]
-    keys=root,db
-
-    [handlers]
-    keys=indico,db,other,smtp
-    """).strip()
 
 
 class LogRecordStreamHandler(SocketServer.StreamRequestHandler):
@@ -249,11 +225,7 @@ def sigint(*unused):
 @click.option('-I', '--ignored-request-paths', multiple=True, metavar='PATH',
               help='Request paths to ignore. May be used multiple times.  Matched against request.path (e.g. '
                    '/assets/js-vars/user.js). Prefix with ~ to use a regex match instead of an exact string match.')
-@click.option('-H', '--setup-help', is_flag=True, help='Explain how to enable db logging for this script')
-def main(port, traceback_frames, ignore_selects, ignored_sources, ignored_request_paths, setup_help):
-    if setup_help:
-        print help_text
-        sys.exit(1)
+def main(port, traceback_frames, ignore_selects, ignored_sources, ignored_request_paths):
     signal.signal(signal.SIGINT, sigint)
     print 'Listening on 127.0.0.1:{}'.format(port)
     server = LogRecordSocketReceiver('localhost', port, traceback_frames=traceback_frames,

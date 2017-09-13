@@ -37,18 +37,15 @@ pytest_plugins = ('indico.testing.fixtures.app', 'indico.testing.fixtures.catego
 
 
 def pytest_configure(config):
-    from indico.core.logger import Logger
     # Load all the plugins defined in pytest_plugins
     config.pluginmanager.consider_module(sys.modules[__name__])
     config.indico_temp_dir = py.path.local(tempfile.mkdtemp(prefix='indicotesttmp.'))
     config.indico_plugins = filter(None, [x.strip() for x in re.split(r'[\s,;]+', config.getini('indico_plugins'))])
     # Make sure we don't write any log files (or worse: send emails)
-    Logger.reset(no_init=True)
-    del logging.root.handlers[:]
+    assert not logging.root.handlers
     logging.root.addHandler(logging.NullHandler())
     # Silence the annoying pycountry logger
-    import pycountry.db
-    pycountry.db.logger.addHandler(logging.NullHandler())
+    logging.getLogger('pycountry.db').addHandler(logging.NullHandler())
 
 
 def pytest_unconfigure(config):

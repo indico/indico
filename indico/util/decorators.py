@@ -20,6 +20,7 @@ from functools import wraps
 from flask import request
 from werkzeug.exceptions import NotFound, Unauthorized
 
+from indico.core.logger import sentry_log_exception
 from indico.util.json import create_json_error_answer
 
 
@@ -93,7 +94,8 @@ def cached_writable_property(cache_attr, cache_on_set=True):
     return _cached_writable_property
 
 
-def jsonify_error(function=None, logger_name='requestHandler', logger_message=None, logging_level='info', status=200):
+def jsonify_error(function=None, logger_name='requestHandler', logger_message=None, logging_level='info', status=200,
+                  log_sentry=False):
     """
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
@@ -126,6 +128,8 @@ def jsonify_error(function=None, logger_name='requestHandler', logger_message=No
             # new variable name since python2 doesn't have `nonlocal`...
             used_status = getattr(exception, 'http_status_code', status)
             if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
+                if log_sentry:
+                    sentry_log_exception()
                 return create_json_error_answer(exception, status=used_status)
             else:
                 args[0]._responseUtil.status = used_status

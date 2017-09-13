@@ -41,7 +41,7 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.logger import Logger
+from indico.core.logger import Logger, sentry_log_exception
 from indico.core.marshmallow import mm
 from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
 from indico.legacy.common.TemplateExec import mako
@@ -333,6 +333,7 @@ def handle_exception(exception):
     Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
     if current_app.debug:
         raise
+    sentry_log_exception()
     return render_error(_("An unexpected error occurred."), str(exception), standalone=True), 500
 
 
@@ -354,9 +355,8 @@ def make_app(set_path=False, testing=False, config_override=None):
     configure_app(app, set_path)
 
     with app.app_context():
-        Logger.initialize()
-        Logger.init_app(app)
-
+        if not testing:
+            Logger.init(app)
         celery.init_app(app)
         babel.init_app(app)
         multipass.init_app(app)

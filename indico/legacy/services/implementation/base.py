@@ -21,6 +21,7 @@ import traceback
 from flask import g, session
 
 from indico.core.config import config
+from indico.core.logger import sentry_set_tags
 from indico.legacy.common import security
 from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.services.interface.rpc.common import HTMLSecurityError, ServiceAccessError
@@ -79,6 +80,7 @@ class ServiceBase(RequestHandlerBase):
         """
 
         g.rh = self
+        sentry_set_tags({'rh': self.__class__.__name__})
 
         self._checkParams()
         self._checkProtection()

@@ -1,0 +1,64 @@
+# This is the default indico logging configuration.
+# It uses the standard Python dictConfig syntax, but provides a few enhancements:
+# - The `filename` of a `logging.FileHandler` is relative to the configured LOG_DIR
+# - The SMTP connection data of a `logging.handlers.SMTPHandler` is taken from the
+#   indico config (this is disabled if a custom `mailhost` is set).
+#   `fromaddr`, `toaddrs` and `subject` are also set to useful default values, but
+#   these values may be overridden.
+# - The `indico.core.logger.FormattedSubjectSMTPHandler` handler allows formatting
+#   the email subject using a standard python format string (e.g. `%(message)s`).
+#   Besides that it behaves exactly like the normal `SMTPHandler`, including the
+#   Indico-specific default values mentioned above.
+# - All log formaters may use `%(request_id)s` to get a random ID unique to each
+#   request which makes it easier to grep for all other log entries that belong to
+#   a specific request.
+# - Setting `append_request_info` to `true` in a formatter will append various
+#   information about the current request to the log message.  This will result in
+#   a multi-line message and is only recommended for errors; usually in a handler
+#   which sends emails.
+
+version: 1
+
+root:
+  level: WARNING
+  handlers: [other]
+
+loggers:
+  indico:
+    level: INFO
+    propagate: false
+    handlers: [indico, email]
+  celery:
+    level: INFO
+    propagate: false
+    handlers: [celery, stderr]
+
+handlers:
+  indico:
+    class: logging.FileHandler
+    filename: indico.log
+    formatter: default
+  celery:
+    class: logging.FileHandler
+    filename: celery.log
+    formatter: simple
+  other:
+    class: logging.FileHandler
+    filename: other.log
+    formatter: simple
+  stderr:
+    class: logging.StreamHandler
+    formatter: default
+  email:
+    class: indico.core.logger.FormattedSubjectSMTPHandler
+    formatter: email
+    level: ERROR
+
+formatters:
+  default:
+    format: '%(asctime)s  %(levelname)-7s  %(request_id)s  %(name)-25s %(message)s'
+  simple:
+    format: '%(asctime)s  %(levelname)-7s  %(name)-25s %(message)s'
+  email:
+    append_request_info: true
+    format: "%(asctime)s  %(request_id)s  %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s\n\n"

@@ -39,7 +39,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import NoReportError, get_error_description
-from indico.core.logger import Logger
+from indico.core.logger import Logger, sentry_log_exception, sentry_set_tags
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
@@ -299,13 +299,13 @@ class RH(RequestHandlerBase):
             raise
         return WPGenericError(self).display()
 
-    @jsonify_error(status=500, logging_level='exception')
+    @jsonify_error(status=500, logging_level='exception', log_sentry=True)
     def _processUnexpectedError(self, e):
         """Unexpected errors"""
-
         self._responseUtil.redirect = None
         if config.PROPAGATE_ALL_EXCEPTIONS:
             raise
+        sentry_log_exception()
         return WPUnexpectedError(self).display()
 
     @jsonify_error(status=403)
@@ -449,6 +449,7 @@ class RH(RequestHandlerBase):
         self._startTime = datetime.now()
 
         g.rh = self
+        sentry_set_tags({'rh': self.__class__.__name__})
 
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()

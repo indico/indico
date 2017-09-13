@@ -76,6 +76,7 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
     # doesn't initialize its logger
     import logging
     werkzeug_logger = logging.getLogger('werkzeug')
+    werkzeug_logger.propagate = False
     werkzeug_logger.setLevel(logging.INFO)
     werkzeug_logger.addHandler(logging.StreamHandler())
 

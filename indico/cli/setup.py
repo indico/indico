@@ -209,7 +209,7 @@ def create_configs(target_dir):
     """
     root_dir, target_dir = _get_dirs(target_dir)
     _copy(os.path.normpath(os.path.join(root_dir, 'indico.conf.sample')), os.path.join(target_dir, 'indico.conf'))
-    _copy(os.path.normpath(os.path.join(root_dir, 'logging.conf.sample')), os.path.join(target_dir, 'logging.conf'))
+    _copy(os.path.normpath(os.path.join(root_dir, 'logging.yaml.sample')), os.path.join(target_dir, 'logging.yaml'))
 
 
 @cli.command()
@@ -549,8 +549,8 @@ class SetupWizard(object):
             f.write(config + b'\n')
 
         package_root = get_root_path('indico')
-        _copy(os.path.normpath(os.path.join(package_root, 'logging.conf.sample')),
-              os.path.join(self.root_path, 'etc', 'logging.conf'))
+        _copy(os.path.normpath(os.path.join(package_root, 'logging.yaml.sample')),
+              os.path.join(self.root_path, 'etc', 'logging.yaml'))
         _link(os.path.join(package_root, 'htdocs'), os.path.join(self.root_path, 'web', 'htdocs'))
         _copy(os.path.join(package_root, 'web', 'indico.wsgi'), os.path.join(self.root_path, 'web', 'indico.wsgi'),
               force=True)

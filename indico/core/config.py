@@ -52,6 +52,7 @@ DEFAULTS = {
     'CUSTOMIZATION_DEBUG': False,
     'CUSTOMIZATION_DIR': None,
     'CUSTOM_COUNTRIES': {},
+    'DB_LOG': False,
     'DEBUG': False,
     'DEFAULT_LOCALE': 'en_GB',
     'DEFAULT_TIMEZONE': 'UTC',
@@ -62,8 +63,7 @@ DEFAULTS = {
     'LOCAL_IDENTITIES': True,
     'LOCAL_MODERATION': False,
     'LOCAL_REGISTRATION': True,
-    'LOGGERS': ['files'],
-    'LOGGING_CONFIG_FILE': 'logging.conf',
+    'LOGGING_CONFIG_FILE': 'logging.yaml',
     'LOGO_URL': None,
     'LOG_DIR': '/opt/indico/log',
     'MAX_UPLOAD_FILES_TOTAL_SIZE': 0,
@@ -108,7 +108,7 @@ DEFAULTS = {
 INTERNAL_DEFAULTS = {
     'CONFIG_PATH': os.devnull,
     'CONFIG_PATH_RESOLVED': None,
-    'LOGGING_CONFIG_PATH': os.path.join(get_root_path('indico'), 'logging.conf.sample'),
+    'LOGGING_CONFIG_PATH': None,
     'TESTING': False
 }
 

@@ -30,7 +30,6 @@ def app(request):
         'BASE_URL': 'http://localhost',
         'SMTP_SERVER': ('localhost', 0),  # invalid port - just in case so we NEVER send emails!
         'CACHE_BACKEND': 'null',
-        'LOGGERS': [],
         'TEMP_DIR': request.config.indico_temp_dir.strpath,
         'CACHE_DIR': request.config.indico_temp_dir.strpath,
         'STORAGE_BACKENDS': {'default': 'mem:'},

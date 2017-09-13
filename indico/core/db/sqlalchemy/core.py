@@ -16,7 +16,6 @@
 
 from __future__ import absolute_import
 
-import logging
 import sys
 from contextlib import contextmanager
 from functools import partial
@@ -27,7 +26,6 @@ from sqlalchemy.event import listen
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import CompositeProperty, mapper
 from sqlalchemy.sql.ddl import CreateSchema
-from werkzeug.utils import cached_property
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
@@ -97,14 +95,6 @@ class IndicoSQLAlchemy(SQLAlchemy):
             self.session.execute('SET CONSTRAINTS ALL IMMEDIATE')
         except DatabaseError:
             handle_sqlalchemy_database_error()
-
-    @cached_property
-    def logger(self):
-        from indico.core.logger import Logger
-
-        logger = Logger.get('db')
-        logger.setLevel(logging.DEBUG)
-        return logger
 
     @contextmanager
     def tmp_session(self):

@@ -52,6 +52,11 @@ SECRET_KEY = ''
 # tracking down errors but should not be enabled for production systems.
 #DEBUG = False
 #
+# If you want to see all queries sent to the database in real-time, enable
+# sqlalchemy logging and run the `bin/utils/db_log.py` script in a separate
+# terminal window.
+#DB_LOG = False
+#
 # You can cause all error-like exceptions (i.e. not something like AccessError)
 # to be propagated outside the Indico WSGI app by enabling this option. This has
 # the advantage of triggering the Werkzeug debugger of the embedded server even
@@ -197,8 +202,9 @@ MAX_UPLOAD_FILE_SIZE = 0
 # If the LoggingConfigFile is not an absolute path, it is relative to the
 # location of this file.
 #
-# LOGGING_CONFIG_FILE = 'logging.conf'
-# LOGGERS = ['sentry', 'files']
+# LOGGING_CONFIG_FILE = 'logging.yaml'
+#
+# To use Sentry, simply set the SENTRY_DSN:
 # SENTRY_DSN = 'http://user:password@logger.example.com/n'
 # SENTRY_LOGGING_LEVEL = 'ERROR'  # default: 'WARNING'
 
@@ -393,7 +399,7 @@ MAX_UPLOAD_FILE_SIZE = 0
 #
 # By enabling customization debugging indico will log all customizable
 # templates the first time they are accessed (note that you need to enable the
-# 'DEBUG' log level in your logging.conf for this).
+# 'DEBUG' log level in your logging.yaml for this).
 # The log message contains the path where you need to store the template. This
 # path is relative to `<CustomizationDir>/templates/`.
 # It will also log the full path of the original template in case you decide to

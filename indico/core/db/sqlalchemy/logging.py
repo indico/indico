@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 
 import logging
 import pprint
@@ -25,6 +25,7 @@ from flask import appcontext_tearing_down, current_app, g, has_request_context, 
 from sqlalchemy.engine import Engine
 from sqlalchemy.event import listens_for
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.web.flask.stats import get_request_stats
@@ -59,12 +60,12 @@ def _fix_param(param):
 
 
 def apply_db_loggers(app):
-    if not app.debug or getattr(db, '_loggers_applied', False):
+    if not config.DB_LOG or getattr(db, '_loggers_applied', False):
         return
     db._loggers_applied = True
     from indico.core.logger import Logger
 
-    logger = Logger.get('db')
+    logger = Logger.get('_db')
     logger.setLevel(logging.DEBUG)
 
     @listens_for(Engine, 'before_cursor_execute')
