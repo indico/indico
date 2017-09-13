@@ -74,7 +74,7 @@ most cases.
     pidfile = /run/uwsgi/uwsgi.pid
 
     processes = 4
-    enable-threads = false
+    enable-threads = true
     chmod-socket = 770
     socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock

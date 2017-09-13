@@ -73,7 +73,7 @@ most cases.
     umask = 027
 
     processes = 4
-    enable-threads = false
+    enable-threads = true
     chmod-socket = 770
     socket = /opt/indico/web/uwsgi.sock
     stats = /opt/indico/web/uwsgi-stats.sock

@@ -68,7 +68,7 @@ most cases.
     umask = 027
 
     processes = 4
-    enable-threads = false
+    enable-threads = true
     socket = 127.0.0.1:8008
     stats = /opt/indico/web/uwsgi-stats.sock
     protocol = uwsgi
