@@ -46,9 +46,9 @@ Called when `ProtectionMixin.can_manage` is used to determine if a
 user can manage something or not.
 
 The `sender` is the type of the object that's using the mixin.  The
-actual instance is passed as `obj`.  The `user`, `role`, `allow_admin`,
-`check_parent` and `explicit_role` arguments of `can_manage` are
-passed as kwargs with the same name.
+actual instance is passed as `obj`.  The `user`, `permission`,
+`allow_admin`, `check_parent` and `explicit_permission` arguments of
+`can_manage` are passed as kwargs with the same name.
 
 If the signal returns ``True`` or ``False``, the access check succeeds
 or fails without any further checks.  If multiple subscribers to the
@@ -69,8 +69,8 @@ the given principal was in the ACL before.  If `quiet` is ``True``,
 signal handlers should not perform noisy actions such as logging or
 sending emails related to the change.
 
-If the ACL uses roles, `old_data` will contain a dictionary of the
-previous roles/permissions (see `PrincipalRolesMixin.current_data`).
+If the ACL uses permissions, `old_data` will contain a dictionary of the
+previous permissions (see `PrincipalPermissionsMixin.current_data`).
 """)
 
 
@@ -83,9 +83,9 @@ as `old_mode`, the new mode as `mode`.
 """)
 
 
-get_management_roles = _signals.signal('get-management-roles', """
-Expected to return `ManagementRole` subclasses.  The `sender` is the
-type of the object the roles may be used for.  Functions subscribing
+get_management_permissions = _signals.signal('get-management-permissions', """
+Expected to return `ManagementPermission` subclasses.  The `sender` is the
+type of the object the permissions may be used for.  Functions subscribing
 to this signal **MUST** check the sender by specifying it using the
 first argument of `connect_via()` or by comparing it inside the
 function.

@@ -72,12 +72,12 @@ class RHEventProtection(RHManageEventBase):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         if form.validate_on_submit():
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
-                                                     'own_no_access_contact': form.own_no_access_contact.data,
-                                                     'access_key': form.access_key.data,
-                                                     'visibility': form.visibility.data})
+                                                 'own_no_access_contact': form.own_no_access_contact.data,
+                                                 'access_key': form.access_key.data,
+                                                 'visibility': form.visibility.data})
             update_object_principals(self.event, form.acl.data, read_access=True)
             update_object_principals(self.event, form.managers.data, full_access=True)
-            update_object_principals(self.event, form.submitters.data, role='submit')
+            update_object_principals(self.event, form.submitters.data, permission='submit')
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event))
@@ -85,10 +85,12 @@ class RHEventProtection(RHManageEventBase):
 
     def _get_defaults(self):
         acl = {p.principal for p in self.event.acl_entries if p.read_access}
-        submitters = {p.principal for p in self.event.acl_entries if p.has_management_role('submit', explicit=True)}
+        submitters = {p.principal
+                      for p in self.event.acl_entries
+                      if p.has_management_permission('submit', explicit=True)}
         managers = {p.principal for p in self.event.acl_entries if p.full_access}
         registration_managers = {p.principal for p in self.event.acl_entries
-                                 if p.has_management_role('registration', explicit=True)}
+                                 if p.has_management_permission('registration', explicit=True)}
         event_session_settings = session_settings.get_all(self.event)
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}

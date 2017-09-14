@@ -21,7 +21,7 @@ from flask import flash, render_template, session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole
+from indico.core.permissions import ManagementPermission
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
@@ -147,7 +147,7 @@ def _associate_registrations(user, **kwargs):
 
 @signals.event_management.management_url.connect
 def _get_event_management_url(event, **kwargs):
-    if event.can_manage(session.user, role='registration'):
+    if event.can_manage(session.user, permission='registration'):
         return url_for('event_registration.manage_regform_list', event)
 
 
@@ -180,9 +180,9 @@ def _get_feature_definitions(sender, **kwargs):
     return RegistrationFeature
 
 
-@signals.acl.get_management_roles.connect_via(Event)
-def _get_management_roles(sender, **kwargs):
-    return RegistrationRole
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_management_permissions(sender, **kwargs):
+    return RegistrationPermission
 
 
 @signals.event_management.get_cloners.connect
@@ -202,7 +202,7 @@ class RegistrationFeature(EventFeature):
         return event.type_ == EventType.conference
 
 
-class RegistrationRole(ManagementRole):
+class RegistrationPermission(ManagementPermission):
     name = 'registration'
     friendly_name = _('Registration')
     description = _('Grants management access to the registration form.')

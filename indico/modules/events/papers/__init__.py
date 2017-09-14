@@ -20,7 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole
+from indico.core.permissions import ManagementPermission
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.models.events import Event, EventType
 from indico.util.i18n import _
@@ -50,12 +50,12 @@ def _get_feature_definitions(sender, **kwargs):
     return PapersFeature
 
 
-@signals.acl.get_management_roles.connect_via(Event)
-def _get_management_roles(sender, **kwargs):
-    yield PaperManagerRole
-    yield PaperJudgeRole
-    yield PaperContentReviewerRole
-    yield PaperLayoutReviewerRole
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_management_permissions(sender, **kwargs):
+    yield PaperManagerPermission
+    yield PaperJudgePermission
+    yield PaperContentReviewerPermission
+    yield PaperLayoutReviewerPermission
 
 
 class PapersFeature(EventFeature):
@@ -69,25 +69,25 @@ class PapersFeature(EventFeature):
         return event.type_ == EventType.conference
 
 
-class PaperManagerRole(ManagementRole):
+class PaperManagerPermission(ManagementPermission):
     name = 'paper_manager'
     friendly_name = _('Paper Manager')
     description = _('Grants management rights for paper reviewing on an event.')
 
 
-class PaperJudgeRole(ManagementRole):
+class PaperJudgePermission(ManagementPermission):
     name = 'paper_judge'
     friendly_name = _('Judge')
     description = _('Grants paper judgment rights for assigned papers.')
 
 
-class PaperContentReviewerRole(ManagementRole):
+class PaperContentReviewerPermission(ManagementPermission):
     name = 'paper_content_reviewer'
     friendly_name = _('Content reviewer')
     description = _('Grants content reviewing rights for assigned papers.')
 
 
-class PaperLayoutReviewerRole(ManagementRole):
+class PaperLayoutReviewerPermission(ManagementPermission):
     name = 'paper_layout_reviewer'
     friendly_name = _('Layout reviewer')
     description = _('Grants layout reviewing rights for assigned papers.')

@@ -180,15 +180,15 @@ class RHSessionProtection(RHManageSessionBase):
             if self.session.is_protected:
                 update_object_principals(self.session, form.acl.data, read_access=True)
             update_object_principals(self.session, form.managers.data, full_access=True)
-            update_object_principals(self.session, form.coordinators.data, role='coordinate')
+            update_object_principals(self.session, form.coordinators.data, permission='coordinate')
             return jsonify_data(flash=False, html=_render_session_list(self.event))
         return jsonify_form(form)
 
     def _get_defaults(self):
         acl = {x.principal for x in self.session.acl_entries if x.read_access}
         managers = {x.principal for x in self.session.acl_entries if x.full_access}
-        coordinators = {x.principal for x in self.session.acl_entries if x.has_management_role('coordinate',
-                                                                                               explicit=True)}
+        coordinators = {x.principal for x in self.session.acl_entries if x.has_management_permission('coordinate',
+                                                                                                     explicit=True)}
         return {'managers': managers, 'protection_mode': self.session.protection_mode, 'coordinators': coordinators,
                 'acl': acl}
 

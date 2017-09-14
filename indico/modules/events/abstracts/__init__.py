@@ -20,7 +20,7 @@ from flask import render_template, session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole
+from indico.core.permissions import ManagementPermission
 from indico.modules.events.abstracts.clone import AbstractSettingsCloner
 from indico.modules.events.abstracts.notifications import ContributionTypeCondition, StateCondition, TrackCondition
 from indico.modules.events.features.base import EventFeature
@@ -104,12 +104,12 @@ class AbstractsFeature(EventFeature):
         return event.type_ == EventType.conference
 
 
-@signals.acl.get_management_roles.connect_via(Event)
-def _get_management_roles(sender, **kwargs):
-    return AbstractReviewerRole
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_management_permissions(sender, **kwargs):
+    return AbstractReviewerPermission
 
 
-class AbstractReviewerRole(ManagementRole):
+class AbstractReviewerPermission(ManagementPermission):
     name = 'abstract_reviewer'
     friendly_name = _('Reviewer')
     description = _('Grants abstract reviewing rights on an event.')

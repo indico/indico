@@ -283,9 +283,9 @@ class RHManageRegistrationManagers(RHManageRegFormsBase):
 
     def _process(self):
         reg_managers = {p.principal for p in self.event.acl_entries
-                        if p.has_management_role('registration', explicit=True)}
+                        if p.has_management_permission('registration', explicit=True)}
         form = RegistrationManagersForm(obj=FormDefaults(managers=reg_managers))
         if form.validate_on_submit():
-            update_object_principals(self.event, form.managers.data, role='registration')
+            update_object_principals(self.event, form.managers.data, permission='registration')
             return jsonify_data(flash=False)
         return jsonify_form(form)
