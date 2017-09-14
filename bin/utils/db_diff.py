@@ -25,6 +25,7 @@ import tempfile
 import click
 from click._compat import should_strip_ansi
 
+
 click.disable_unicode_literals_warning = True
 
 
@@ -158,7 +159,7 @@ def main(dbname, verbose, apgdiff):
     # create database and dump current/new structures
     _checked_call(verbose, ['createdb', '-T', 'indico_template', temp_dbname])
     try:
-        env_override = {'INDICO_CONF_OVERRIDE': repr({'SQLAlchemyDatabaseURI': _build_conn_string(temp_dbname)})}
+        env_override = {'INDICO_CONF_OVERRIDE': repr({'SQLALCHEMY_DATABASE_URI': _build_conn_string(temp_dbname)})}
         _checked_call(verbose, ['indico', 'db', 'prepare'], env=env_override)
         dump_current = tempfile.NamedTemporaryFile(suffix='.sql', prefix='dbdiff-current-')
         dump_fresh = tempfile.NamedTemporaryFile(suffix='.sql', prefix='dbdiff-fresh-')
