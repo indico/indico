@@ -167,5 +167,5 @@ class SubContribution(DescriptionMixin, AttachedItemsMixin, AttachedNotesMixin, 
     def can_access(self, user, **kwargs):
         return self.contribution.can_access(user, **kwargs)
 
-    def can_manage(self, user, role=None, **kwargs):
-        return self.contribution.can_manage(user, role, **kwargs)
+    def can_manage(self, user, permission=None, **kwargs):
+        return self.contribution.can_manage(user, permission=permission, **kwargs)

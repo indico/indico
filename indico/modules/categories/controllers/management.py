@@ -202,7 +202,7 @@ class RHManageCategoryProtection(RHManageCategoryBase):
                              'visibility': form.visibility.data})
             update_object_principals(self.category, form.acl.data, read_access=True)
             update_object_principals(self.category, form.managers.data, full_access=True)
-            update_object_principals(self.category, form.event_creators.data, role='create')
+            update_object_principals(self.category, form.event_creators.data, permission='create')
             flash(_('Protection settings of the category have been updated'), 'success')
             return redirect(url_for('.manage_protection', self.category))
         return WPCategoryManagement.render_template('management/category_protection.html', self.category, 'protection',
@@ -212,7 +212,7 @@ class RHManageCategoryProtection(RHManageCategoryBase):
         acl = {x.principal for x in self.category.acl_entries if x.read_access}
         managers = {x.principal for x in self.category.acl_entries if x.full_access}
         event_creators = {x.principal for x in self.category.acl_entries
-                          if x.has_management_role('create', explicit=True)}
+                          if x.has_management_permission('create', explicit=True)}
         return FormDefaults(self.category, acl=acl, managers=managers, event_creators=event_creators)
 
 

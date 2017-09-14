@@ -129,17 +129,17 @@ class RHPersonsList(RHPersonsBase):
     def _process(self):
         event_principal_query = (EventPrincipal.query.with_parent(self.event)
                                  .filter(EventPrincipal.type == PrincipalType.email,
-                                         EventPrincipal.has_management_role('submit')))
+                                         EventPrincipal.has_management_permission('submit')))
 
         contrib_principal_query = (ContributionPrincipal.find(Contribution.event == self.event,
                                                               ContributionPrincipal.type == PrincipalType.email,
-                                                              ContributionPrincipal.has_management_role('submit'))
+                                                              ContributionPrincipal.has_management_permission('submit'))
                                    .join(Contribution)
                                    .options(contains_eager('contribution')))
 
         session_principal_query = (SessionPrincipal.find(Session.event == self.event,
                                                          SessionPrincipal.type == PrincipalType.email,
-                                                         SessionPrincipal.has_management_role())
+                                                         SessionPrincipal.has_management_permission())
                                    .join(Session).options(joinedload('session').joinedload('acl_entries')))
 
         persons = self.get_persons()
@@ -229,7 +229,7 @@ class RHGrantSubmissionRights(RHManageEventBase):
             for speaker in speakers:
                 principal = speaker.person.principal
                 if principal:
-                    cont.update_principal(principal, add_roles={'submit'})
+                    cont.update_principal(principal, add_permissions={'submit'})
                     count += 1
         self.event.log(EventLogRealm.management, EventLogKind.positive, 'Protection',
                        'Contribution speakers have been granted with submission rights', session.user)
@@ -263,10 +263,10 @@ class RHRevokeSubmissionRights(RHManageEventBase):
         count = 0
         for cont in self.event.contributions:
             for entry in set(cont.acl_entries):
-                cont.update_principal(entry.principal, del_roles={'submit'})
+                cont.update_principal(entry.principal, del_permissions={'submit'})
                 count += 1
         for entry in set(self.event.acl_entries):
-            self.event.update_principal(entry.principal, del_roles={'submit'})
+            self.event.update_principal(entry.principal, del_permissions={'submit'})
             count += 1
         self.event.log(EventLogRealm.management, EventLogKind.negative, 'Protection',
                        'Submission privileges have been revoked from event submitters', session.user)

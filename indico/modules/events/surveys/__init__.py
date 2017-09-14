@@ -21,7 +21,7 @@ from flask import render_template, session
 from indico.core import signals
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole
+from indico.core.permissions import ManagementPermission
 from indico.modules.events import Event
 from indico.modules.events.features.base import EventFeature
 from indico.modules.events.layout.util import MenuEntryData
@@ -91,9 +91,9 @@ def _get_feature_definitions(sender, **kwargs):
     return SurveysFeature
 
 
-@signals.acl.get_management_roles.connect_via(Event)
-def _get_management_roles(sender, **kwargs):
-    return SurveysRole
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_management_permissions(sender, **kwargs):
+    return SurveysPermission
 
 
 @signals.import_tasks.connect
@@ -111,7 +111,7 @@ class SurveysFeature(EventFeature):
         return True
 
 
-class SurveysRole(ManagementRole):
+class SurveysPermission(ManagementPermission):
     name = 'surveys'
     friendly_name = _('Surveys')
     description = _('Grants management access to surveys.')

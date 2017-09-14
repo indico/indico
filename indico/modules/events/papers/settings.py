@@ -25,7 +25,7 @@ from indico.util.struct.enum import RichIntEnum
 
 class PaperReviewingRole(RichIntEnum):
     __titles__ = [None, _('Judge'), _('Layout Reviewer'), _('Content Reviewer')]
-    __acl_roles__ = [None, 'paper_judge', 'paper_layout_reviewer', 'paper_content_reviewer']
+    __acl_permissions__ = [None, 'paper_judge', 'paper_layout_reviewer', 'paper_content_reviewer']
     __review_types__ = [None, None, PaperReviewType.layout, PaperReviewType.content]
 
     judge = 1
@@ -33,8 +33,8 @@ class PaperReviewingRole(RichIntEnum):
     content_reviewer = 3
 
     @property
-    def acl_role(self):
-        return self.__acl_roles__[self]
+    def acl_permission(self):
+        return self.__acl_permissions__[self]
 
     @property
     def review_type(self):

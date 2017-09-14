@@ -29,7 +29,7 @@ from indico.modules.events.registration.models.registrations import Registration
 class RHManageRegFormsBase(RHManageEventBase):
     """Base class for all registration management RHs"""
 
-    ROLE = 'registration'
+    PERMISSION = 'registration'
 
 
 class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):

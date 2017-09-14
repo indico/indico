@@ -22,19 +22,19 @@ from mock import MagicMock
 from indico.core import signals
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
 from indico.core.db.sqlalchemy.protection import ProtectionMode
-from indico.core.roles import get_available_roles
+from indico.core.permissions import get_available_permissions
 from indico.modules.events import Event
 from indico.modules.events.models.principals import EventPrincipal
 from indico.testing.util import bool_matrix
 
 
 @pytest.fixture(autouse=True)
-def _mock_available_roles(mocker):
+def _mock_available_permissions(mocker):
     # The code we are testing only cares about the keys so we don't
-    # need to actually create roles for now.
-    roles = dict(get_available_roles(Event), foo=None, bar=None, foobar=None)
-    mocker.patch('indico.core.db.sqlalchemy.protection.get_available_roles', return_value=roles)
-    mocker.patch('indico.core.db.sqlalchemy.principals.get_available_roles', return_value=roles)
+    # need to actually create permissions for now.
+    permissions = dict(get_available_permissions(Event), foo=None, bar=None, foobar=None)
+    mocker.patch('indico.core.db.sqlalchemy.protection.get_available_permissions', return_value=permissions)
+    mocker.patch('indico.core.db.sqlalchemy.principals.get_available_permissions', return_value=permissions)
 
 
 @pytest.mark.usefixtures('request_context')
@@ -61,42 +61,42 @@ def test_update_principal(create_event, dummy_user):
     assert not event.acl_entries
     # adding user with read access -> new acl entry since the user isn't in there yet
     entry = initial_entry = event.update_principal(dummy_user, read_access=True)
-    assert not entry.roles
+    assert not entry.permissions
     assert not entry.full_access
     assert entry.read_access
     assert event.acl_entries == {entry}
-    # adding a role
-    entry = event.update_principal(dummy_user, add_roles={'foo'})
+    # adding a permission
+    entry = event.update_principal(dummy_user, add_permissions={'foo'})
     assert entry is initial_entry
-    assert set(entry.roles) == {'foo'}
+    assert set(entry.permissions) == {'foo'}
     assert not entry.full_access
     assert entry.read_access
-    # adding yet another role
-    entry = event.update_principal(dummy_user, add_roles={'foo', 'bar'})
+    # adding yet another permission
+    entry = event.update_principal(dummy_user, add_permissions={'foo', 'bar'})
     assert entry is initial_entry
-    assert set(entry.roles) == {'foo', 'bar'}
+    assert set(entry.permissions) == {'foo', 'bar'}
     assert not entry.full_access
     assert entry.read_access
-    # replacing the roles
-    entry = event.update_principal(dummy_user, roles={'bar', 'foobar'})
+    # replacing the permissions
+    entry = event.update_principal(dummy_user, permissions={'bar', 'foobar'})
     assert entry is initial_entry
-    assert set(entry.roles) == {'bar', 'foobar'}
+    assert set(entry.permissions) == {'bar', 'foobar'}
     assert not entry.full_access
     assert entry.read_access
     # removing explicit read access but adding full manager access instead
     entry = event.update_principal(dummy_user, read_access=False, full_access=True)
     assert entry is initial_entry
-    assert set(entry.roles) == {'bar', 'foobar'}
+    assert set(entry.permissions) == {'bar', 'foobar'}
     assert entry.full_access
     assert not entry.read_access
-    # removing a role
-    entry = event.update_principal(dummy_user, del_roles={'foobar', 'foo'})
+    # removing a permission
+    entry = event.update_principal(dummy_user, del_permissions={'foobar', 'foo'})
     assert entry is initial_entry
-    assert set(entry.roles) == {'bar'}
+    assert set(entry.permissions) == {'bar'}
     assert entry.full_access
     assert not entry.read_access
     # removing the remaining access
-    entry = event.update_principal(dummy_user, del_roles={'bar'}, full_access=False)
+    entry = event.update_principal(dummy_user, del_permissions={'bar'}, full_access=False)
     assert entry is None
     assert not event.acl_entries
 
@@ -118,31 +118,31 @@ def test_update_principal_signal(create_event, dummy_user):
         event.update_principal(dummy_user)
         assert not calls
         # adding new entry
-        entry = event.update_principal(dummy_user, full_access=True, roles={'foo'})
+        entry = event.update_principal(dummy_user, full_access=True, permissions={'foo'})
         call = calls.pop()
         assert call['is_new']
         assert call['obj'] is event
         assert call['principal'] == dummy_user
         assert call['entry'] == entry
-        assert call['old_data'] == {'read_access': False, 'full_access': False, 'roles': set()}
+        assert call['old_data'] == {'read_access': False, 'full_access': False, 'permissions': set()}
         assert not call['quiet']
         # updating entry
-        event.update_principal(dummy_user, add_roles={'bar'})
+        event.update_principal(dummy_user, add_permissions={'bar'})
         call = calls.pop()
         assert not call['is_new']
         assert call['obj'] is event
         assert call['principal'] == dummy_user
         assert call['entry'] == entry
-        assert call['old_data'] == {'read_access': False, 'full_access': True, 'roles': {'foo'}}
+        assert call['old_data'] == {'read_access': False, 'full_access': True, 'permissions': {'foo'}}
         assert not call['quiet']
         # removing entry + quiet
-        event.update_principal(dummy_user, full_access=False, roles=set(), quiet=True)
+        event.update_principal(dummy_user, full_access=False, permissions=set(), quiet=True)
         call = calls.pop()
         assert not call['is_new']
         assert call['obj'] is event
         assert call['principal'] == dummy_user
         assert call['entry'] is None
-        assert call['old_data'] == {'read_access': False, 'full_access': True, 'roles': {'foo', 'bar'}}
+        assert call['old_data'] == {'read_access': False, 'full_access': True, 'permissions': {'foo', 'bar'}}
         assert call['quiet']
 
 
@@ -165,8 +165,8 @@ def test_convert_email_principals(db, create_event, create_user, dummy_user):
     event = create_event()
     user = create_user(123, email='user@example.com')
     principal = EmailPrincipal('unknown@example.com')
-    other_entry = event.update_principal(dummy_user, full_access=True, roles={'foo', 'foobar'})
-    entry = event.update_principal(principal, read_access=True, roles={'foo', 'bar'})
+    other_entry = event.update_principal(dummy_user, full_access=True, permissions={'foo', 'foobar'})
+    entry = event.update_principal(principal, read_access=True, permissions={'foo', 'bar'})
     other_entry_data = other_entry.current_data
     entry_data = entry.current_data
     # different emails for now -> nothing updated
@@ -187,8 +187,8 @@ def test_convert_email_principals_merge(db, create_event, create_user):
     event = create_event()
     user = create_user(123, email='user@example.com')
     principal = EmailPrincipal('unknown@example.com')
-    entry1 = event.update_principal(user, full_access=True, roles={'foo', 'foobar'})
-    entry2 = event.update_principal(principal, read_access=True, roles={'foo', 'bar'})
+    entry1 = event.update_principal(user, full_access=True, permissions={'foo', 'foobar'})
+    entry2 = event.update_principal(principal, read_access=True, permissions={'foo', 'bar'})
     # different emails for now -> nothing updated
     assert not EventPrincipal.replace_email_with_user(user, 'event')
     assert set(event.acl_entries) == {entry1, entry2}
@@ -198,17 +198,17 @@ def test_convert_email_principals_merge(db, create_event, create_user):
     entry = list(event.acl_entries)[0]
     assert entry.full_access
     assert entry.read_access
-    assert set(entry.roles) == {'foo', 'bar', 'foobar'}
+    assert set(entry.permissions) == {'foo', 'bar', 'foobar'}
 
 
 def test_update_principal_errors(create_event, dummy_user):
     event = create_event()
     with pytest.raises(ValueError):
-        event.update_principal(dummy_user, roles={'foo'}, add_roles={'bar'})
+        event.update_principal(dummy_user, permissions={'foo'}, add_permissions={'bar'})
     with pytest.raises(ValueError):
-        event.update_principal(dummy_user, roles={'foo'}, del_roles={'bar'})
+        event.update_principal(dummy_user, permissions={'foo'}, del_permissions={'bar'})
     with pytest.raises(ValueError):
-        event.update_principal(dummy_user, roles={'invalid'})
+        event.update_principal(dummy_user, permissions={'invalid'})
 
 
 def test_can_access_key_outside_context(create_event):
@@ -237,14 +237,14 @@ def test_can_access_key(create_event):
 
 
 @pytest.mark.usefixtures('request_context')
-def test_can_manage_roles(create_event, dummy_user):
+def test_can_manage_permissions(create_event, dummy_user):
     event = create_event()
-    assert not event.can_manage(dummy_user, 'ANY')
-    event.update_principal(dummy_user, roles={'foo'})
+    assert not event.can_manage(dummy_user, permission='ANY')
+    event.update_principal(dummy_user, permissions={'foo'})
     assert not event.can_manage(dummy_user)
-    assert not event.can_manage(dummy_user, 'bar')
-    assert event.can_manage(dummy_user, 'foo')
-    assert event.can_manage(dummy_user, 'ANY')
+    assert not event.can_manage(dummy_user, permission='bar')
+    assert event.can_manage(dummy_user, permission='foo')
+    assert event.can_manage(dummy_user, permission='ANY')
 
 
 @pytest.mark.parametrize(('signal_rv_1', 'signal_rv_2', 'allowed'), (
@@ -327,7 +327,7 @@ def test_can_access_signal_override_calls(create_event, dummy_user):
 def test_can_manage_admin(create_event, create_user, is_admin, allow_admin, not_explicit, expected):
     event = create_event()
     user = create_user(123, admin=is_admin)
-    assert event.can_manage(user, allow_admin=allow_admin, explicit_role=not not_explicit) == expected
+    assert event.can_manage(user, allow_admin=allow_admin, explicit_permission=not not_explicit) == expected
 
 
 def test_can_manage_guest(create_event, dummy_category):
@@ -355,55 +355,55 @@ def test_can_manage_parent_invalid(create_event, dummy_user):
         event.can_manage(dummy_user)
 
 
-def test_can_manage_roles_invalid(create_event, dummy_user):
+def test_can_manage_permissions_invalid(create_event, dummy_user):
     event = create_event()
     with pytest.raises(ValueError):
-        event.can_manage(dummy_user, 'invalid')
+        event.can_manage(dummy_user, permission='invalid')
 
 
 def test_merge_privs():
-    p = EventPrincipal(read_access=True, roles={'foo', 'bar'})
-    p.merge_privs(EventPrincipal(roles={'bar', 'foobar'}, full_access=True))
+    p = EventPrincipal(read_access=True, permissions={'foo', 'bar'})
+    p.merge_privs(EventPrincipal(permissions={'bar', 'foobar'}, full_access=True))
     assert p.read_access
     assert p.full_access
-    assert set(p.roles) == {'foo', 'bar', 'foobar'}
+    assert set(p.permissions) == {'foo', 'bar', 'foobar'}
 
 
-def test_has_management_role_full_access():
-    p = EventPrincipal(full_access=True, roles=[])
-    assert p.has_management_role()
-    assert p.has_management_role('foo')
-    assert p.has_management_role('ANY')
+def test_has_management_permission_full_access():
+    p = EventPrincipal(full_access=True, permissions=[])
+    assert p.has_management_permission()
+    assert p.has_management_permission('foo')
+    assert p.has_management_permission('ANY')
 
 
 @pytest.mark.usefixtures('request_context')
-def test_has_management_role_full_access_db(create_event, dummy_user, create_user):
+def test_has_management_permission_full_access_db(create_event, dummy_user, create_user):
     event = create_event()
-    event.update_principal(create_user(123), roles={'bar'})
+    event.update_principal(create_user(123), permissions={'bar'})
     entry = event.update_principal(dummy_user, full_access=True)
 
     def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_role(*args))
+        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_permission(*args))
 
     assert _find().one() == entry
     assert _find('foo').one() == entry
     assert _find('ANY').count() == 2
 
 
-def test_has_management_role_no_access():
-    p = EventPrincipal(read_access=True, roles=[])
-    assert not p.has_management_role()
-    assert not p.has_management_role('foo')
-    assert not p.has_management_role('ANY')
+def test_has_management_permission_no_access():
+    p = EventPrincipal(read_access=True, permissions=[])
+    assert not p.has_management_permission()
+    assert not p.has_management_permission('foo')
+    assert not p.has_management_permission('ANY')
 
 
 @pytest.mark.usefixtures('request_context')
-def test_has_management_role_no_access_db(create_event, dummy_user):
+def test_has_management_permission_no_access_db(create_event, dummy_user):
     event = create_event()
     event.update_principal(dummy_user, read_access=True)
 
     def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_role(*args))
+        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_permission(*args))
 
     assert not _find().count()
     assert not _find('foo').count()
@@ -411,54 +411,55 @@ def test_has_management_role_no_access_db(create_event, dummy_user):
 
 
 @pytest.mark.parametrize('explicit', (True, False))
-def test_has_management_role_explicit(explicit):
-    p = EventPrincipal(full_access=True, roles=['foo'])
-    assert p.has_management_role('foo', explicit=explicit)
-    assert p.has_management_role('ANY', explicit=explicit)
-    assert p.has_management_role('bar', explicit=explicit) == (not explicit)
-    assert EventPrincipal(full_access=True, roles=[]).has_management_role('ANY', explicit=explicit) == (not explicit)
+def test_has_management_permission_explicit(explicit):
+    p = EventPrincipal(full_access=True, permissions=['foo'])
+    assert p.has_management_permission('foo', explicit=explicit)
+    assert p.has_management_permission('ANY', explicit=explicit)
+    assert p.has_management_permission('bar', explicit=explicit) == (not explicit)
+    assert (EventPrincipal(full_access=True, permissions=[]).has_management_permission('ANY', explicit=explicit) ==
+            (not explicit))
 
 
 @pytest.mark.parametrize('explicit', (True, False))
 @pytest.mark.usefixtures('request_context')
-def test_has_management_role_explicit_db(create_event, dummy_user, create_user, explicit):
+def test_has_management_permission_explicit_db(create_event, dummy_user, create_user, explicit):
     event = create_event()
     event.update_principal(create_user(123), full_access=True)
-    event.update_principal(dummy_user, full_access=True, roles={'foo'})
+    event.update_principal(dummy_user, full_access=True, permissions={'foo'})
 
-    def _find(role):
+    def _find(permission):
         return EventPrincipal.find(EventPrincipal.event == event,
-                                   EventPrincipal.has_management_role(role, explicit=explicit))
+                                   EventPrincipal.has_management_permission(permission, explicit=explicit))
 
     assert _find('foo').count() == (1 if explicit else 2)
     assert _find('bar').count() == (0 if explicit else 2)
     assert _find('ANY').count() == (1 if explicit else 2)
 
 
-def test_has_management_role_explicit_fail():
-    p = EventPrincipal(roles=['foo'])
-    # no role specified
+def test_has_management_permission_explicit_fail():
+    p = EventPrincipal(permissions=['foo'])
+    # no permission specified
     with pytest.raises(ValueError):
-        p.has_management_role(explicit=True)
+        p.has_management_permission(explicit=True)
     with pytest.raises(ValueError):
-        EventPrincipal.has_management_role(explicit=True)
+        EventPrincipal.has_management_permission(explicit=True)
 
 
-def test_has_management_role():
-    p = EventPrincipal(roles=['foo'])
-    assert p.has_management_role('ANY')
-    assert p.has_management_role('foo')
-    assert not p.has_management_role('bar')
+def test_has_management_permission():
+    p = EventPrincipal(permissions=['foo'])
+    assert p.has_management_permission('ANY')
+    assert p.has_management_permission('foo')
+    assert not p.has_management_permission('bar')
 
 
 @pytest.mark.usefixtures('request_context')
-def test_has_management_role_db(create_event, create_user, dummy_user):
+def test_has_management_permission_db(create_event, create_user, dummy_user):
     event = create_event()
-    event.update_principal(create_user(123), roles={'bar'})
-    entry = event.update_principal(dummy_user, roles={'foo'})
+    event.update_principal(create_user(123), permissions={'bar'})
+    entry = event.update_principal(dummy_user, permissions={'foo'})
 
     def _find(*args):
-        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_role(*args))
+        return EventPrincipal.find(EventPrincipal.event == event, EventPrincipal.has_management_permission(*args))
 
     assert not _find().count()
     assert _find('foo').one() == entry

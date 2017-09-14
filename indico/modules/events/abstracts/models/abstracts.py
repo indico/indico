@@ -511,7 +511,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def can_convene(self, user):
         if not user:
             return False
-        elif not self.event.can_manage(user, role='track_convener', explicit_role=True):
+        elif not self.event.can_manage(user, permission='track_convener', explicit_permission=True):
             return False
         elif self.event in user.global_convener_for_events:
             return True
@@ -529,7 +529,7 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
             return False
         elif check_state and self.public_state not in (AbstractPublicState.under_review, AbstractPublicState.awaiting):
             return False
-        elif not self.event.can_manage(user, role='abstract_reviewer', explicit_role=True):
+        elif not self.event.can_manage(user, permission='abstract_reviewer', explicit_permission=True):
             return False
         elif self.event in user.global_abstract_reviewer_for_events:
             return True

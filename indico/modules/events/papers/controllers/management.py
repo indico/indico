@@ -131,11 +131,11 @@ class RHContactStaff(RHManagePapersBase):
         paper_persons_dict = {}
         for p in self.event.acl_entries:
             user = p.principal
-            is_judge = p.has_management_role('paper_judge', explicit=True)
+            is_judge = p.has_management_permission('paper_judge', explicit=True)
             is_content_reviewer = (self.event.cfp.content_reviewing_enabled and
-                                   p.has_management_role('paper_content_reviewer', explicit=True))
+                                   p.has_management_permission('paper_content_reviewer', explicit=True))
             is_layout_reviewer = (self.event.cfp.layout_reviewing_enabled and
-                                  p.has_management_role('paper_layout_reviewer', explicit=True))
+                                  p.has_management_permission('paper_layout_reviewer', explicit=True))
             if is_judge or is_content_reviewer or is_layout_reviewer:
                 paper_persons_dict[user] = {'judge': is_judge, 'content_reviewer': is_content_reviewer,
                                             'layout_reviewer': is_layout_reviewer}

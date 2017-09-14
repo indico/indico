@@ -20,7 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole
+from indico.core.permissions import ManagementPermission
 from indico.modules.events import Event
 from indico.modules.events.models.events import EventType
 from indico.modules.events.tracks.clone import TrackCloner
@@ -64,12 +64,12 @@ def _get_cloners(sender, **kwargs):
     yield TrackCloner
 
 
-@signals.acl.get_management_roles.connect_via(Event)
-def _get_management_roles(sender, **kwargs):
-    return TrackConvenerRole
+@signals.acl.get_management_permissions.connect_via(Event)
+def _get_management_permissions(sender, **kwargs):
+    return TrackConvenerPermission
 
 
-class TrackConvenerRole(ManagementRole):
+class TrackConvenerPermission(ManagementPermission):
     name = 'track_convener'
     friendly_name = _('Track convener')
     description = _('Grants track convener rights in an event')

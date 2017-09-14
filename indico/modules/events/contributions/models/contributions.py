@@ -479,12 +479,13 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
     def __repr__(self):
         return format_repr(self, 'id', is_deleted=False, _text=self.title)
 
-    def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
-        if super(Contribution, self).can_manage(user, role, allow_admin=allow_admin, check_parent=check_parent,
-                                                explicit_role=explicit_role):
+    def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
+        if super(Contribution, self).can_manage(user, permission, allow_admin=allow_admin, check_parent=check_parent,
+                                                explicit_permission=explicit_permission):
             return True
         if (check_parent and self.session_id is not None and
-                self.session.can_manage(user, 'coordinate', allow_admin=allow_admin, explicit_role=explicit_role) and
+                self.session.can_manage(user, 'coordinate', allow_admin=allow_admin,
+                                        explicit_permission=explicit_permission) and
                 session_coordinator_priv_enabled(self.event, 'manage-contributions')):
             return True
         return False
@@ -499,6 +500,7 @@ class Contribution(DescriptionMixin, ProtectionManagersMixin, LocationMixin, Att
         if check_abstract and self.abstract and self.abstract.submitter == user:
             return True
         return any(pl.person.user == user for pl in self.person_links if pl.person.user)
+
 
 Contribution.register_protection_events()
 
