@@ -160,7 +160,7 @@ class User(PersonMixin, db.Model):
     # Useful when dealing with both users and groups in the same code
     is_group = False
     is_single_person = True
-    is_event_group = False
+    is_event_role = False
     is_network = False
     principal_order = 0
     principal_type = PrincipalType.user
@@ -363,11 +363,11 @@ class User(PersonMixin, db.Model):
     # - content_reviewer_for_contributions (Contribution.paper_content_reviewers)
     # - convener_for_tracks (Track.conveners)
     # - created_events (Event.creator)
-    # - event_groups (EventGroup.members)
     # - event_log_entries (EventLogEntry.user)
     # - event_notes_revisions (EventNoteRevision.user)
     # - event_persons (EventPerson.user)
     # - event_reminders (EventReminder.creator)
+    # - event_roles (EventRole.members)
     # - favorite_of (User.favorite_users)
     # - global_abstract_reviewer_for_events (Event.global_abstract_reviewers)
     # - global_convener_for_events (Event.global_conveners)

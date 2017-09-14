@@ -64,8 +64,8 @@ def _merge_users(target, source, **kwargs):
     from indico.modules.events.models.principals import EventPrincipal
     EventPerson.merge_users(target, source)
     EventPrincipal.merge_users(target, source, 'event')
-    target.event_groups |= source.event_groups
-    source.event_groups.clear()
+    target.event_roles |= source.event_roles
+    source.event_roles.clear()
 
 
 @signals.users.registered.connect
@@ -110,7 +110,7 @@ def _log_acl_changes(sender, obj, principal, entry, is_new, old_data, quiet, **k
         data['Group'] = '{} ({})'.format(principal.name, principal.provider_title)
     elif principal.principal_type == PrincipalType.network:
         data['IP Network'] = principal.name
-    elif principal.principal_type == PrincipalType.event_group:
+    elif principal.principal_type == PrincipalType.event_role:
         data['Event Role'] = principal.name
     if entry is None:
         data['Read Access'] = old_data['read_access']

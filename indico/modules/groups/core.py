@@ -47,7 +47,7 @@ class GroupProxy(object):
     is_group = True
     is_network = False
     is_single_person = False
-    is_event_group = False
+    is_event_role = False
     principal_order = 3
 
     def __new__(cls, name_or_id, provider=None, _group=None):

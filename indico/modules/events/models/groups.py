@@ -21,16 +21,16 @@ from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.util.string import format_repr, return_ascii
 
 
-class EventGroup(db.Model):
-    __tablename__ = 'groups'
+class EventRole(db.Model):
+    __tablename__ = 'roles'
     __table_args__ = {'schema': 'events'}
 
     is_group = False
-    is_event_group = True
+    is_event_role = True
     is_single_person = True
     is_network = False
     principal_order = 2
-    principal_type = PrincipalType.event_group
+    principal_type = PrincipalType.event_role
 
     id = db.Column(
         db.Integer,
@@ -59,42 +59,42 @@ class EventGroup(db.Model):
         'Event',
         lazy=True,
         backref=db.backref(
-            'groups',
+            'roles',
             cascade='all, delete-orphan',
             lazy=True
         )
     )
     members = db.relationship(
         'User',
-        secondary='events.group_members',
+        secondary='events.role_members',
         lazy=True,
         collection_class=set,
-        backref=db.backref('event_groups', lazy=True, collection_class=set),
+        backref=db.backref('event_roles', lazy=True, collection_class=set),
     )
 
     # relationship backrefs:
-    # - in_attachment_acls (AttachmentPrincipal.event_group)
-    # - in_attachment_folder_acls (AttachmentFolderPrincipal.event_group)
-    # - in_contribution_acls (ContributionPrincipal.event_group)
-    # - in_event_acls (EventPrincipal.event_group)
-    # - in_event_settings_acls (EventSettingPrincipal.event_group)
-    # - in_session_acls (SessionPrincipal.event_group)
+    # - in_attachment_acls (AttachmentPrincipal.event_role)
+    # - in_attachment_folder_acls (AttachmentFolderPrincipal.event_role)
+    # - in_contribution_acls (ContributionPrincipal.event_role)
+    # - in_event_acls (EventPrincipal.event_role)
+    # - in_event_settings_acls (EventSettingPrincipal.event_role)
+    # - in_session_acls (SessionPrincipal.event_role)
 
     def __contains__(self, user):
-        return user is not None and self in user.event_groups
+        return user is not None and self in user.event_roles
 
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'code', _text=self.name)
 
 
-group_members_table = db.Table(
-    'group_members',
+role_members_table = db.Table(
+    'role_members',
     db.metadata,
     db.Column(
-        'group_id',
+        'role_id',
         db.Integer,
-        db.ForeignKey('events.groups.id'),
+        db.ForeignKey('events.roles.id'),
         primary_key=True,
         nullable=False,
         index=True
