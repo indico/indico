@@ -1,4 +1,4 @@
-"""Add event groups table
+"""Add event roles table
 
 Revision ID: f1eee7b4880a
 Revises:
@@ -18,7 +18,7 @@ depends_on = None
 
 def upgrade():
     op.create_table(
-        'groups',
+        'roles',
         sa.Column('id', sa.Integer(), nullable=False),
         sa.Column('event_id', sa.Integer(), nullable=False, index=True),
         sa.Column('name', sa.String(), nullable=False),
@@ -29,16 +29,16 @@ def upgrade():
         schema='events'
     )
     op.create_table(
-        'group_members',
-        sa.Column('group_id', sa.Integer(), nullable=False, index=True),
+        'role_members',
+        sa.Column('role_id', sa.Integer(), nullable=False, index=True),
         sa.Column('user_id', sa.Integer(), nullable=False, index=True),
-        sa.ForeignKeyConstraint(['group_id'], ['events.groups.id']),
+        sa.ForeignKeyConstraint(['role_id'], ['events.roles.id']),
         sa.ForeignKeyConstraint(['user_id'], ['users.users.id']),
-        sa.PrimaryKeyConstraint('group_id', 'user_id'),
+        sa.PrimaryKeyConstraint('role_id', 'user_id'),
         schema='events'
     )
 
 
 def downgrade():
-    op.drop_table('group_members', schema='events')
-    op.drop_table('groups', schema='events')
+    op.drop_table('role_members', schema='events')
+    op.drop_table('roles', schema='events')

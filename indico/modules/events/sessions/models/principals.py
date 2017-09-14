@@ -31,7 +31,7 @@ class SessionPrincipal(PrincipalRolesMixin, db.Model):
     unique_columns = ('session_id',)
     disallowed_protection_modes = frozenset()
     allow_emails = True
-    allow_event_groups = True
+    allow_event_roles = True
 
     @declared_attr
     def __table_args__(cls):

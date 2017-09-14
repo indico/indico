@@ -31,7 +31,7 @@ class EventPrincipal(PrincipalRolesMixin, db.Model):
     unique_columns = ('event_id',)
     allow_emails = True
     allow_networks = True
-    allow_event_groups = True
+    allow_event_roles = True
 
     @declared_attr
     def __table_args__(cls):

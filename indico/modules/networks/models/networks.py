@@ -35,7 +35,7 @@ class IPNetworkGroup(db.Model):
     is_group = False
     is_network = True
     is_single_person = False
-    is_event_group = False
+    is_event_role = False
 
     @declared_attr
     def __table_args__(cls):
