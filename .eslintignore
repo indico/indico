@@ -4,10 +4,8 @@ indico/htdocs/js/presentation/
 indico/htdocs/js/jquery/
 indico/htdocs/js/indico/Common/
 indico/htdocs/js/indico/Core/
-indico/htdocs/js/indico/Display/
 indico/htdocs/js/indico/Legacy/
 indico/htdocs/js/indico/Management/
-indico/htdocs/js/indico/MaterialEditor/
 indico/htdocs/js/indico/RoomBooking/
 indico/htdocs/js/indico/angular/
 indico/htdocs/js/indico/modules/timetable/timetable/*.js
