@@ -77,7 +77,7 @@ class EventSettingPrincipal(PrincipalSettingsBase, EventSettingsMixin, db.Model)
     principal_backref_name = 'in_event_settings_acls'
     settings_backref_name = 'settings_principals'
     extra_key_cols = ('event_id',)
-    allow_event_groups = True
+    allow_event_roles = True
 
     @declared_attr
     def __table_args__(cls):
