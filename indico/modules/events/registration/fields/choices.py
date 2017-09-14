@@ -95,6 +95,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
         def _check_number_of_places(form, field):
             if not field.data:
                 return
+            old_data = None
             if form.modified_registration:
                 old_data = form.modified_registration.data_by_field.get(self.form_item.id)
                 if not old_data or not self.has_data_changed(field.data, old_data):
@@ -108,11 +109,10 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
                     places_limit = choice.get('places_limit')
                     places_used_dict = self.get_places_used()
                     places_used_dict.setdefault(k, 0)
-                    if form.modified_registration:
-                        places_used_dict[k] -= (form.modified_registration
-                                                    .data_by_field[self.form_item.id].data.get(k, 0))
+                    if old_data and old_data.data:
+                        places_used_dict[k] -= old_data.data.get(k, 0)
                     places_used_dict[k] += field.data[k]
-                    if places_limit and not (places_limit - places_used_dict.get(k, 0)) >= 0:
+                    if places_limit and (places_limit - places_used_dict.get(k, 0)) < 0:
                         raise ValidationError(_('No places left for the option: {0}').format(captions[k]))
         return [_check_number_of_places]
 
