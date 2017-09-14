@@ -14,18 +14,17 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from pytz import timezone
+from flask import session
 
-import indico.legacy.webinterface.pages.base as base
-import indico.legacy.webinterface.wcomponents as wcomponents
-from indico.legacy.common import timezoneUtils
+from indico.legacy.webinterface import wcomponents
+from indico.legacy.webinterface.pages import base
 
 
 class WPMainBase(base.WPDecorated):
     sidemenu_option = None
 
     def _display(self, params):
-        self._timezone = timezone(timezoneUtils.DisplayTZ().getDisplayTZ())
+        self._timezone = session.tzinfo
         params = dict(params, **self._kwargs)
         body = WMainBase(self._getBody(params), self._timezone, self._getNavigationDrawer(),
                          isFrontPage=self._isFrontPage(),

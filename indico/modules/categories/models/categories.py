@@ -34,6 +34,7 @@ from indico.core.db.sqlalchemy.descriptions import DescriptionMixin, RenderMode
 from indico.core.db.sqlalchemy.protection import ProtectionManagersMixin, ProtectionMode
 from indico.core.db.sqlalchemy.searchable_titles import SearchableTitleMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
+from indico.util.date_time import get_display_tz
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.locators import locator_property
@@ -286,8 +287,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
     @property
     def display_tzinfo(self):
         """The tzinfo of the category or the one specified by the user"""
-        from indico.legacy.common.timezoneUtils import DisplayTZ
-        return DisplayTZ(conf=self).getDisplayTZ(as_timezone=True)
+        return get_display_tz(self, as_timezone=True)
 
     def can_create_events(self, user):
         """Check whether the user can create events in the category."""

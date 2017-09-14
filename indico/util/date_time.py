@@ -27,10 +27,9 @@ from babel.dates import get_timezone
 from babel.numbers import format_number as _format_number
 from dateutil.relativedelta import relativedelta as _relativedelta
 from dateutil.rrule import DAILY, FR, MO, SA, SU, TH, TU, WE, rrule
-from flask import request
+from flask import has_request_context, request, session
 
 from indico.core.config import Config
-from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.util.i18n import _, get_current_locale, ngettext, parse_locale
 from indico.util.string import inject_unicode_debug
 
@@ -115,10 +114,9 @@ def format_datetime(dt, format='medium', locale=None, timezone=None, server_tz=F
         assert timezone is None
         timezone = dt.tzinfo
     elif not timezone and dt.tzinfo:
-        timezone = DisplayTZ().getDisplayTZ()
+        timezone = session.tzinfo
     elif server_tz:
         timezone = Config.getInstance().getDefaultTimezone()
-
     rv = _format_datetime(dt, format=format, locale=locale, tzinfo=timezone)
     return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
@@ -151,12 +149,11 @@ def format_time(t, format='short', locale=None, timezone=None, server_tz=False):
     if not locale:
         locale = get_current_locale()
     if not timezone and t.tzinfo:
-        timezone = DisplayTZ().getDisplayTZ()
+        timezone = session.tzinfo
     elif server_tz:
         timezone = Config.getInstance().getDefaultTimezone()
-    if timezone:
+    if isinstance(timezone, basestring):
         timezone = get_timezone(timezone)
-
     rv = _format_time(t, format=format, locale=locale, tzinfo=timezone)
     return inject_unicode_debug(rv, 2).encode('utf-8') if inject_unicode else rv.encode('utf-8')
 
@@ -450,3 +447,19 @@ def strftime_all_years(dt, fmt):
         return dt.strftime(fmt)
     else:
         return dt.replace(year=1900).strftime(fmt.replace('%Y', '%%Y')).replace('%Y', unicode(dt.year))
+
+
+def get_display_tz(obj=None, as_timezone=False):
+    from indico.modules.events.legacy import LegacyConference
+    display_tz = session.timezone if has_request_context() else 'LOCAL'
+    if display_tz == 'LOCAL':
+        if obj is None:
+            display_tz = Config.getInstance().getDefaultTimezone()
+        else:
+            # obj can be Event, LegacyConference or Category
+            if isinstance(obj, LegacyConference):
+                obj = obj.as_event
+            display_tz = getattr(obj, 'timezone', 'UTC')
+    if not display_tz:
+        display_tz = Config.getInstance().getDefaultTimezone()
+    return pytz.timezone(display_tz) if as_timezone else display_tz

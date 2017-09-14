@@ -49,7 +49,7 @@ from indico.modules.events.models.persons import PersonLinkDataMixin
 from indico.modules.events.settings import EventSettingProperty, event_contact_settings, event_core_settings
 from indico.modules.events.timetable.models.entries import TimetableEntry
 from indico.util.caching import memoize_request
-from indico.util.date_time import now_utc, overlaps
+from indico.util.date_time import get_display_tz, now_utc, overlaps
 from indico.util.decorators import strict_classproperty
 from indico.util.i18n import _
 from indico.util.string import format_repr, return_ascii, text_to_repr, to_unicode
@@ -571,8 +571,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     @property
     def display_tzinfo(self):
         """The tzinfo of the event as preferred by the current user"""
-        from indico.legacy.common.timezoneUtils import DisplayTZ
-        return DisplayTZ(conf=self).getDisplayTZ(as_timezone=True)
+        return get_display_tz(self, as_timezone=True)
 
     @property
     @contextmanager

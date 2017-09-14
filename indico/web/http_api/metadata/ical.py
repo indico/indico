@@ -22,7 +22,7 @@ from lxml import html
 from lxml.etree import ParserError
 from pytz import timezone, utc
 
-from indico.legacy.common.timezoneUtils import nowutc
+from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
 
@@ -145,7 +145,7 @@ class ICalSerializer(Serializer):
         cal = ical.Calendar()
         cal.add('version', '2.0')
         cal.add('prodid', '-//CERN//INDICO//EN')
-        now = nowutc()
+        now = now_utc()
         for fossil in results:
             if '_fossil' in fossil:
                 mapper = ICalSerializer._mappers.get(fossil['_fossil'])

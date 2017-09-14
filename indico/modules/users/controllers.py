@@ -23,7 +23,6 @@ from operator import attrgetter
 from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from markupsafe import Markup, escape
-from pytz import timezone
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
@@ -33,7 +32,6 @@ from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.common.mail import GenericMailer
-from indico.legacy.common.timezoneUtils import DisplayTZ
 from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity
@@ -49,7 +47,7 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
                                        search_users, serialize_user)
 from indico.modules.users.views import WPUser, WPUsersAdmin
-from indico.util.date_time import now_utc, timedelta_split
+from indico.util.date_time import get_display_tz, now_utc, timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -109,13 +107,13 @@ class RHUserDashboard(RHUserBase):
 
     def _process(self):
         self.user.settings.set('suggest_categories', True)
-        tz = timezone(DisplayTZ().getDisplayTZ())
+        tz = session.tzinfo
         hours, minutes = timedelta_split(tz.utcoffset(datetime.now()))[:2]
         categories = get_related_categories(self.user)
         categories_events = []
         if categories:
             category_ids = {c['categ'].id for c in categories.itervalues()}
-            today = now_utc(False).astimezone(session.tzinfo).date()
+            today = now_utc(False).astimezone(tz).date()
             query = (Event.query
                      .filter(~Event.is_deleted,
                              Event.category_chain_overlaps(category_ids),
@@ -133,7 +131,6 @@ class RHUserDashboard(RHUserBase):
                                   'attendance': bool(roles & self.attendance_roles)})
                          for event, roles in get_linked_events(self.user, from_dt, 10).iteritems()]
         return WPUser.render_template('dashboard.html', 'dashboard',
-                                      timezone=unicode(tz),
                                       offset='{:+03d}:{:02d}'.format(hours, minutes), user=self.user,
                                       categories=categories,
                                       categories_events=categories_events,
