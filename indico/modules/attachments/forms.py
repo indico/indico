@@ -16,7 +16,6 @@
 
 from __future__ import unicode_literals
 
-from wtforms.ext.dateutil.fields import DateField
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
@@ -30,8 +29,8 @@ from indico.modules.attachments.util import get_default_folder_names
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (AccessControlListField, EditableFileField, FileField, IndicoRadioField,
-                                     IndicoSelectMultipleCheckboxField)
+from indico.web.forms.fields import (AccessControlListField, EditableFileField, FileField, IndicoDateField,
+                                     IndicoRadioField, IndicoSelectMultipleCheckboxField)
 from indico.web.forms.validators import HiddenUnless, UsedIf
 from indico.web.forms.widgets import SwitchWidget, TypeaheadWidget
 
@@ -127,8 +126,8 @@ class AttachmentFolderForm(IndicoForm):
 
 
 class AttachmentPackageForm(IndicoForm):
-    added_since = DateField(_('Added Since'), [Optional()], parse_kwargs={'dayfirst': True},
-                            description=_('Include only attachments uploaded after this date'))
+    added_since = IndicoDateField(_('Added Since'), [Optional()],
+                                  description=_('Include only attachments uploaded after this date'))
 
     filter_type = IndicoRadioField(_('Include'), [DataRequired()])
 

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import date, datetime
 
 from flask import session
-from wtforms.ext.dateutil.fields import DateField, DateTimeField
+from wtforms.ext.dateutil.fields import DateTimeField
 from wtforms.fields.core import BooleanField, IntegerField, RadioField, SelectMultipleField, StringField
 from wtforms.fields.simple import SubmitField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, ValidationError
@@ -29,16 +29,16 @@ from wtforms_components import TimeField
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
+from indico.web.forms.fields import IndicoDateField, IndicoQuerySelectMultipleCheckboxField, PrincipalField
 from indico.web.forms.validators import HiddenUnless, UsedIf
 
 
 class BookingSearchForm(IndicoForm):
     room_ids = SelectMultipleField('Rooms', [DataRequired()], coerce=int)
 
-    start_date = DateField('Start Date', [InputRequired()], parse_kwargs={'dayfirst': True})
+    start_date = IndicoDateField('Start Date', [InputRequired()])
     start_time = TimeField('Start Time', [InputRequired()])
-    end_date = DateField('End Date', [InputRequired()], parse_kwargs={'dayfirst': True})
+    end_date = IndicoDateField('End Date', [InputRequired()])
     end_time = TimeField('End Time', [InputRequired()])
 
     booked_for_name = StringField('Booked For Name')
