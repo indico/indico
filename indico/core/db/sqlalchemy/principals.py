@@ -23,7 +23,7 @@ from sqlalchemy.orm import joinedload, noload
 
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.core.roles import get_available_roles
+from indico.core.permissions import get_available_permissions
 from indico.util.decorators import classproperty, strict_classproperty
 from indico.util.fossilize import Fossilizable, IFossil, fossilizes
 from indico.util.string import format_repr, return_ascii
@@ -426,7 +426,7 @@ class PrincipalMixin(object):
         return updated
 
 
-class PrincipalRolesMixin(PrincipalMixin):
+class PrincipalPermissionsMixin(PrincipalMixin):
     #: The model for which we are a principal.  May also be a string
     #: containing the model's class name.
     principal_for = None
@@ -434,11 +434,12 @@ class PrincipalRolesMixin(PrincipalMixin):
     @strict_classproperty
     @classmethod
     def __auto_table_args(cls):
-        checks = [db.CheckConstraint('read_access OR full_access OR array_length(roles, 1) IS NOT NULL', 'has_privs')]
+        checks = [db.CheckConstraint('read_access OR full_access OR array_length(permissions, 1) IS NOT NULL',
+                                     'has_privs')]
         if cls.allow_networks:
             # you can match a network acl entry without being logged in.
             # we never want that for anything but simple read access
-            checks.append(db.CheckConstraint('type != {} OR (NOT full_access AND array_length(roles, 1) IS NULL)'
+            checks.append(db.CheckConstraint('type != {} OR (NOT full_access AND array_length(permissions, 1) IS NULL)'
                                              .format(PrincipalType.network),
                                              'networks_read_only'))
         return tuple(checks)
@@ -453,7 +454,7 @@ class PrincipalRolesMixin(PrincipalMixin):
         nullable=False,
         default=False
     )
-    roles = db.Column(
+    permissions = db.Column(
         ARRAY(db.String),
         nullable=False,
         default=[]
@@ -468,42 +469,44 @@ class PrincipalRolesMixin(PrincipalMixin):
             return cls.principal_for
 
     @hybrid_method
-    def has_management_role(self, role=None, explicit=False):
-        """Checks whether a principal has a certain management role.
+    def has_management_permission(self, permission=None, explicit=False):
+        """Checks whether a principal has a certain management permission.
 
         The check always succeeds if the user is a full manager; in
-        that case the list of roles is ignored.
+        that case the list of permissions is ignored.
 
-        :param role: The role to check for or 'ANY' to check for any
-                     management role.
-        :param explicit: Whether to check for the role itself even if
+        :param permission: The permission to check for or 'ANY' to check for any
+                     management permission.
+        :param explicit: Whether to check for the permission itself even if
                          the user has full management privileges.
         """
-        if role is None:
+        if permission is None:
             if explicit:
-                raise ValueError('role must be specified if explicit=True')
+                raise ValueError('permission must be specified if explicit=True')
             return self.full_access
         elif not explicit and self.full_access:
             return True
-        valid_roles = get_available_roles(self.principal_for_obj).viewkeys()
-        current_roles = set(self.roles) & valid_roles
-        if role == 'ANY':
-            return bool(current_roles)
-        assert role in valid_roles, "invalid role '{}' for object '{}'".format(role, self.principal_for_obj)
-        return role in current_roles
+        valid_permissions = get_available_permissions(self.principal_for_obj).viewkeys()
+        current_permissions = set(self.permissions) & valid_permissions
+        if permission == 'ANY':
+            return bool(current_permissions)
+        assert permission in valid_permissions, "invalid permission '{}' for object '{}'".format(permission,
+                                                                                                 self.principal_for_obj)
+        return permission in current_permissions
 
-    @has_management_role.expression
-    def has_management_role(cls, role=None, explicit=False):
-        if role is None:
+    @has_management_permission.expression
+    def has_management_permission(cls, permission=None, explicit=False):
+        if permission is None:
             if explicit:
-                raise ValueError('role must be specified if explicit=True')
+                raise ValueError('permission must be specified if explicit=True')
             return cls.full_access
-        valid_roles = get_available_roles(cls.principal_for_obj).viewkeys()
-        if role == 'ANY':
-            crit = (cls.roles.op('&&')(db.func.cast(valid_roles, ARRAY(db.String))))
+        valid_permissions = get_available_permissions(cls.principal_for_obj).viewkeys()
+        if permission == 'ANY':
+            crit = (cls.permissions.op('&&')(db.func.cast(valid_permissions, ARRAY(db.String))))
         else:
-            assert role in valid_roles, "invalid role '{}' for object '{}'".format(role, cls.principal_for_obj)
-            crit = (cls.roles.op('&&')(db.func.cast([role], ARRAY(db.String))))
+            assert permission in valid_permissions, \
+                "invalid permission '{}' for object '{}'".format(permission, cls.principal_for_obj)
+            crit = (cls.permissions.op('&&')(db.func.cast([permission], ARRAY(db.String))))
         if explicit:
             return crit
         else:
@@ -512,11 +515,11 @@ class PrincipalRolesMixin(PrincipalMixin):
     def merge_privs(self, other):
         self.read_access = self.read_access or other.read_access
         self.full_access = self.full_access or other.full_access
-        self.roles = sorted(set(self.roles) | set(other.roles))
+        self.permissions = sorted(set(self.permissions) | set(other.permissions))
 
     @property
     def current_data(self):
-        return {'roles': set(self.roles),
+        return {'permissions': set(self.permissions),
                 'read_access': self.read_access,
                 'full_access': self.full_access}
 

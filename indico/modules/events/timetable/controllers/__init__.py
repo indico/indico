@@ -56,7 +56,7 @@ class RHManageTimetableBase(RHManageEventBase):
             elif self.session_management_level == SessionManagementLevel.coordinate_with_contribs:
                 func = lambda u: self.session.can_manage_contributions(u)
             elif self.session_management_level == SessionManagementLevel.coordinate:
-                func = lambda u: self.session.can_manage(u, role='coordinate')
+                func = lambda u: self.session.can_manage(u, permission='coordinate')
             else:
                 raise Exception("Invalid session management level")
             if not func(session.user):

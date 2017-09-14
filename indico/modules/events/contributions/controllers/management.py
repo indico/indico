@@ -304,13 +304,15 @@ class RHContributionProtection(RHManageContributionBase):
             update_object_principals(self.contrib, form.managers.data, full_access=True)
             if self.contrib.is_protected:
                 update_object_principals(self.contrib, form.acl.data, read_access=True)
-            update_object_principals(self.contrib, form.submitters.data, role='submit')
+            update_object_principals(self.contrib, form.submitters.data, permission='submit')
             return jsonify_data(flash=False, **self.list_generator.render_list(self.contrib))
         return jsonify_form(form)
 
     def _get_defaults(self):
         managers = {p.principal for p in self.contrib.acl_entries if p.full_access}
-        submitters = {p.principal for p in self.contrib.acl_entries if p.has_management_role('submit', explicit=True)}
+        submitters = {p.principal
+                      for p in self.contrib.acl_entries
+                      if p.has_management_permission('submit', explicit=True)}
         acl = {p.principal for p in self.contrib.acl_entries if p.read_access}
         return {'managers': managers, 'submitters': submitters, 'protection_mode': self.contrib.protection_mode,
                 'acl': acl}

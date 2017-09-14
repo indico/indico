@@ -19,12 +19,12 @@ from __future__ import unicode_literals
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
-from indico.core.db.sqlalchemy.principals import PrincipalRolesMixin
+from indico.core.db.sqlalchemy.principals import PrincipalPermissionsMixin
 from indico.core.db.sqlalchemy.util.models import auto_table_args
 from indico.util.string import format_repr, return_ascii
 
 
-class SessionPrincipal(PrincipalRolesMixin, db.Model):
+class SessionPrincipal(PrincipalPermissionsMixin, db.Model):
     __tablename__ = 'session_principals'
     principal_backref_name = 'in_session_acls'
     principal_for = 'Session'
@@ -55,4 +55,4 @@ class SessionPrincipal(PrincipalRolesMixin, db.Model):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'session_id', 'principal', read_access=False, full_access=False, roles=[])
+        return format_repr(self, 'id', 'session_id', 'principal', read_access=False, full_access=False, permissions=[])

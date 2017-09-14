@@ -33,7 +33,7 @@ class RHAPIRegistrant(RH):
 
     @oauth.require_oauth('registrants')
     def _checkProtection(self):
-        if not self.event.can_manage(request.oauth.user, role='registration'):
+        if not self.event.can_manage(request.oauth.user, permission='registration'):
             raise Forbidden()
 
     def _checkParams(self):
@@ -66,7 +66,7 @@ class RHAPIRegistrants(RH):
 
     @oauth.require_oauth('registrants')
     def _checkProtection(self):
-        if not self.event.can_manage(request.oauth.user, role='registration'):
+        if not self.event.can_manage(request.oauth.user, permission='registration'):
             raise Forbidden()
 
     def _checkParams(self):

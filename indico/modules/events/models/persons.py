@@ -45,7 +45,7 @@ class PersonLinkDataMixin(object):
         for person_link in set(self.person_links) - value.viewkeys():
             principal = person_link.person.principal
             if principal:
-                self.update_principal(principal, del_roles={'submit'})
+                self.update_principal(principal, del_permissions={'submit'})
         # Update person links
         self.person_links = value.keys()
         for person_link, is_submitter in value.iteritems():
@@ -53,7 +53,7 @@ class PersonLinkDataMixin(object):
             principal = person.principal
             if not principal:
                 continue
-            action = {'add_roles': {'submit'}} if is_submitter else {'del_roles': {'submit'}}
+            action = {'add_permissions': {'submit'}} if is_submitter else {'del_permissions': {'submit'}}
             self.update_principal(principal, **action)
 
 
@@ -309,7 +309,7 @@ class EventPerson(PersonMixin, db.Model):
 
     def has_role(self, role, obj):
         """Whether the person has a role in the ACL list of a given object"""
-        principals = [x for x in obj.acl_entries if x.has_management_role(role, explicit=True)]
+        principals = [x for x in obj.acl_entries if x.has_management_permission(role, explicit=True)]
         return any(x
                    for x in principals
                    if ((self.user_id is not None and self.user_id == x.user_id) or

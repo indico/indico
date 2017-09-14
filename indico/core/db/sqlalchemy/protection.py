@@ -27,7 +27,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.core.db.sqlalchemy.principals import EmailPrincipal, PrincipalType
-from indico.core.roles import get_available_roles
+from indico.core.permissions import get_available_permissions
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -312,39 +312,41 @@ class ProtectionManagersMixin(ProtectionMixin):
     def all_manager_emails(self):
         """Return the emails of all managers"""
         # We ignore email principals here. They never signed up in indico anyway...
-        return {p.principal.email for p in self.acl_entries if p.type == PrincipalType.user and p.has_management_role()}
+        return {p.principal.email
+                for p in self.acl_entries
+                if p.type == PrincipalType.user and p.has_management_permission()}
 
     @memoize_request
-    def can_manage(self, user, role=None, allow_admin=True, check_parent=True, explicit_role=False):
+    def can_manage(self, user, permission=None, allow_admin=True, check_parent=True, explicit_permission=False):
         """Checks if the user can manage the object.
 
         :param user: The :class:`.User` to check. May be None if the
                      user is not logged in.
-        :param: role: The management role that is needed for the
-                      check to succeed.  If not specified, full
-                      management privs are required.  May be set to
-                      the string ``'ANY'`` to check if the user has
-                      any management privileges.  If the user has
-                      `full_access` privileges, he's assumed to have
-                      all possible roles.
+        :param: permission: The management permission that is needed for
+                            the check to succeed.  If not specified, full
+                            management privs are required.  May be set to
+                            the string ``'ANY'`` to check if the user has
+                            any management privileges.  If the user has
+                            `full_access` privileges, he's assumed to have
+                            all possible permissions.
         :param allow_admin: If admin users should always have access
         :param check_parent: If the parent object should be checked.
-                             In this case the role is ignored; only
+                             In this case the permission is ignored; only
                              full management access is inherited to
                              children.
-        :param explicit_role: If the specified role should be checked
-                              explicitly instead of short-circuiting
-                              the check for Indico admins or managers.
-                              When this option is set to ``True``, the
-                              values of `allow_admin` and `check_parent`
-                              are ignored.  This also applies if `role`
-                              is None in which case this argument being
-                              set to ``True`` is equivalent to
-                              `allow_admin` and `check_parent` being set
-                              to ``False``.
+        :param explicit_permission: If the specified permission should be checked
+                                    explicitly instead of short-circuiting
+                                    the check for Indico admins or managers.
+                                    When this option is set to ``True``, the
+                                    values of `allow_admin` and `check_parent`
+                                    are ignored.  This also applies if `permission`
+                                    is None in which case this argument being
+                                    set to ``True`` is equivalent to
+                                    `allow_admin` and `check_parent` being set
+                                    to ``False``.
         """
-        if role is not None and role != 'ANY' and role not in get_available_roles(type(self)):
-            raise ValueError("role '{}' is not valid for '{}' objects".format(role, type(self).__name__))
+        if permission is not None and permission != 'ANY' and permission not in get_available_permissions(type(self)):
+            raise ValueError("permission '{}' is not valid for '{}' objects".format(permission, type(self).__name__))
 
         if user is None:
             # An unauthorized user is never allowed to perform management operations.
@@ -353,9 +355,9 @@ class ProtectionManagersMixin(ProtectionMixin):
             return False
 
         # Trigger signals for protection overrides
-        rv = values_from_signal(signals.acl.can_manage.send(type(self), obj=self, user=user, role=role,
+        rv = values_from_signal(signals.acl.can_manage.send(type(self), obj=self, user=user, permission=permission,
                                                             allow_admin=allow_admin, check_parent=check_parent,
-                                                            explicit_role=explicit_role),
+                                                            explicit_permission=explicit_permission),
                                 single_value=True)
         if rv:
             # in case of contradictory results (shouldn't happen at all)
@@ -363,15 +365,16 @@ class ProtectionManagersMixin(ProtectionMixin):
             return all(rv)
 
         # Usually admins can access everything, so no need for checks
-        if not explicit_role and allow_admin and user.is_admin:
+        if not explicit_permission and allow_admin and user.is_admin:
             return True
 
         if any(user in entry.principal
                for entry in iter_acl(self.acl_entries)
-               if entry.has_management_role(role, explicit=(explicit_role and role is not None))):
+               if entry.has_management_permission(permission,
+                                                  explicit=(explicit_permission and permission is not None))):
             return True
 
-        if not check_parent or explicit_role:
+        if not check_parent or explicit_permission:
             return False
 
         # the parent can be either an object inheriting from this
@@ -386,8 +389,8 @@ class ProtectionManagersMixin(ProtectionMixin):
         else:
             raise TypeError('protection_parent of {} is of invalid type {} ({})'.format(self, type(parent), parent))
 
-    def update_principal(self, principal, read_access=None, full_access=None, roles=None, add_roles=None,
-                         del_roles=None, quiet=False):
+    def update_principal(self, principal, read_access=None, full_access=None, permissions=None, add_permissions=None,
+                         del_permissions=None, quiet=False):
         """Updates access privileges for the given principal.
 
         If the principal is not in the ACL, it will be added if
@@ -402,10 +405,10 @@ class ProtectionManagersMixin(ProtectionMixin):
                             object.
         :param full_access: If the principal should have full management
                             access.
-        :param roles: set -- The management roles to grant.  Any
-                      existing roles will be replaced.
-        :param add_roles: set -- Management roles to add.
-        :param del_roles: set -- Management roles to remove.
+        :param permissions: set -- The management permissions to grant.
+                            Any existing permissions will be replaced.
+        :param add_permissions: set -- Management permissions to add.
+        :param del_permissions: set -- Management permissions to remove.
         :param quiet: Whether the ACL change should happen silently.
                       This indicates to acl change signal handlers
                       that the change should not be logged, trigger
@@ -413,32 +416,32 @@ class ProtectionManagersMixin(ProtectionMixin):
         :return: The ACL entry for the given principal or ``None`` if
                  he was removed (or not added).
         """
-        if roles is not None and (add_roles or del_roles):
-            raise ValueError('add_roles/del_roles and roles are mutually exclusive')
+        if permissions is not None and (add_permissions or del_permissions):
+            raise ValueError('add_permissions/del_permissions and permissions are mutually exclusive')
         principal = _resolve_principal(principal)
         principal_class, entry = _get_acl_data(self, principal)
         new_entry = False
         if entry is None:
-            if not roles and not add_roles and not full_access and not read_access:
+            if not permissions and not add_permissions and not full_access and not read_access:
                 # not in ACL and no permissions to add
                 return None
-            entry = principal_class(principal=principal, read_access=False, full_access=False, roles=[])
+            entry = principal_class(principal=principal, read_access=False, full_access=False, permissions=[])
             self.acl_entries.add(entry)
             new_entry = True
         old_data = entry.current_data
-        # update roles
-        new_roles = set(entry.roles)
-        if roles is not None:
-            new_roles = roles
+        # update permissions
+        new_permissions = set(entry.permissions)
+        if permissions is not None:
+            new_permissions = permissions
         else:
-            if add_roles:
-                new_roles |= add_roles
-            if del_roles:
-                new_roles -= del_roles
-        invalid_roles = new_roles - get_available_roles(type(self)).viewkeys()
-        if invalid_roles:
-            raise ValueError('Invalid roles: {}'.format(', '.join(invalid_roles)))
-        entry.roles = sorted(new_roles)
+            if add_permissions:
+                new_permissions |= add_permissions
+            if del_permissions:
+                new_permissions -= del_permissions
+        invalid_permissions = new_permissions - get_available_permissions(type(self)).viewkeys()
+        if invalid_permissions:
+            raise ValueError('Invalid permissions: {}'.format(', '.join(invalid_permissions)))
+        entry.permissions = sorted(new_permissions)
         # update read privs
         if read_access is not None:
             entry.read_access = read_access
@@ -446,7 +449,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         if full_access is not None:
             entry.full_access = full_access
         # remove entry from acl if no privileges
-        if not entry.read_access and not entry.full_access and not entry.roles:
+        if not entry.read_access and not entry.full_access and not entry.permissions:
             self.acl_entries.remove(entry)
             # Flush in case the same principal is added back afterwards.
             # Not flushing in other cases (adding/modifying) is intentional
@@ -461,7 +464,7 @@ class ProtectionManagersMixin(ProtectionMixin):
         return entry
 
     def get_manager_list(self, recursive=False):
-        managers = {x.principal for x in self.acl_entries if x.has_management_role()}
+        managers = {x.principal for x in self.acl_entries if x.has_management_permission()}
         if recursive and self.protection_parent:
             managers.update(self.protection_parent.get_manager_list(recursive=True))
         return managers

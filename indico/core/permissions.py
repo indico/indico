@@ -21,37 +21,37 @@ from indico.util.caching import memoize_request
 from indico.util.signals import named_objects_from_signal
 
 
-class ManagementRole(object):
-    """Base class for management roles.
+class ManagementPermission(object):
+    """Base class for management permissions.
 
-    To create a new role, subclass this class and register
-    it using the `acl.get_management_roles` signal.
-    ManagementRole classes are never instatiated.
+    To create a new permission, subclass this class and register
+    it using the `acl.get_management_permissions` signal.
+    ManagementPermission classes are never instatiated.
     """
 
-    #: unique name of the role - must be all-lowercase
+    #: unique name of the permission - must be all-lowercase
     name = None
-    #: displayed name of the role (shown to users)
+    #: displayed name of the permission (shown to users)
     friendly_name = None
-    #: description of the role (optional)
+    #: description of the permission (optional)
     description = None
 
 
 @memoize_request
-def get_available_roles(type_):
-    """Gets a dict containing all roles for a given object type"""
-    return named_objects_from_signal(signals.acl.get_management_roles.send(type_))
+def get_available_permissions(type_):
+    """Gets a dict containing all permissions for a given object type"""
+    return named_objects_from_signal(signals.acl.get_management_permissions.send(type_))
 
 
-def check_roles(type_):
+def check_permissions(type_):
     """
-    Retrieves the roles for an object type and ensures they are
+    Retrieves the permissions for an object type and ensures they are
     defined properly.
 
     This function should be executed from a function connected to the
-    `app_created` signal to avoid failures related to invalid role
+    `app_created` signal to avoid failures related to invalid permission
     definitions later at runtime.
     """
-    roles = get_available_roles(type_)
-    if not all(x.islower() for x in roles):
-        raise RuntimeError('Management roles must be all-lowercase')
+    permissions = get_available_permissions(type_)
+    if not all(x.islower() for x in permissions):
+        raise RuntimeError('Management permissions must be all-lowercase')

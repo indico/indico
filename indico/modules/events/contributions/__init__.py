@@ -20,7 +20,7 @@ from flask import flash, session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole, check_roles
+from indico.core.permissions import ManagementPermission, check_permissions
 from indico.modules.events.contributions.contrib_fields import get_contrib_field_types
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField
@@ -87,16 +87,16 @@ def _get_contribution_cloner(sender, **kwargs):
 
 
 @signals.app_created.connect
-def _check_roles(app, **kwargs):
-    check_roles(Contribution)
+def _check_permissions(app, **kwargs):
+    check_permissions(Contribution)
 
 
-@signals.acl.get_management_roles.connect_via(Contribution)
-def _get_management_roles(sender, **kwargs):
-    return SubmitterRole
+@signals.acl.get_management_permissions.connect_via(Contribution)
+def _get_management_permissions(sender, **kwargs):
+    return SubmitterPermission
 
 
-class SubmitterRole(ManagementRole):
+class SubmitterPermission(ManagementPermission):
     name = 'submit'
     friendly_name = _('Submission')
     description = _('Grants access to materials and minutes.')

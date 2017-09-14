@@ -295,7 +295,7 @@ class Category(SearchableTitleMixin, DescriptionMixin, ProtectionManagersMixin, 
         # can also create events in it, otherwise only people with the
         # creation role can
         return user and ((not self.event_creation_restricted and self.can_access(user)) or
-                         self.can_manage(user, role='create'))
+                         self.can_manage(user, permission='create'))
 
     def move(self, target):
         """Move the category into another category."""

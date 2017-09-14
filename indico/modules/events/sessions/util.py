@@ -36,11 +36,12 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
-def can_manage_sessions(user, event, role=None):
+def can_manage_sessions(user, event, permission=None):
     """Check whether a user can manage any sessions in an event"""
     if event.can_manage(user):
         return True
-    return any(s.can_manage(user, role) for s in Session.query.with_parent(event).options(joinedload('acl_entries')))
+    return any(s.can_manage(user, permission)
+               for s in Session.query.with_parent(event).options(joinedload('acl_entries')))
 
 
 def generate_spreadsheet_from_sessions(sessions):
@@ -127,7 +128,7 @@ def get_events_with_linked_sessions(user, dt=None):
     :param dt: Only include events taking place on/after that date
     """
     query = (user.in_session_acls
-             .options(load_only('session_id', 'roles', 'full_access', 'read_access'))
+             .options(load_only('session_id', 'permissions', 'full_access', 'read_access'))
              .options(noload('*'))
              .options(contains_eager(SessionPrincipal.session).load_only('event_id'))
              .join(Session)
@@ -136,9 +137,9 @@ def get_events_with_linked_sessions(user, dt=None):
     data = defaultdict(set)
     for principal in query:
         roles = data[principal.session.event_id]
-        if 'coordinate' in principal.roles:
+        if 'coordinate' in principal.permissions:
             roles.add('session_coordinator')
-        if 'submit' in principal.roles:
+        if 'submit' in principal.permissions:
             roles.add('session_submission')
         if principal.full_access:
             roles.add('session_manager')
@@ -149,7 +150,7 @@ def get_events_with_linked_sessions(user, dt=None):
 
 def _query_sessions_for_user(event, user):
     return (Session.query.with_parent(event)
-            .filter(Session.acl_entries.any(db.and_(SessionPrincipal.has_management_role('coordinate'),
+            .filter(Session.acl_entries.any(db.and_(SessionPrincipal.has_management_permission('coordinate'),
                                                     SessionPrincipal.user == user))))
 
 

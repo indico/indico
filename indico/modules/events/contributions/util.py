@@ -47,7 +47,7 @@ def get_events_with_linked_contributions(user, dt=None):
     """
     def add_acl_data():
         query = (user.in_contribution_acls
-                 .options(load_only('contribution_id', 'roles', 'full_access', 'read_access'))
+                 .options(load_only('contribution_id', 'permissions', 'full_access', 'read_access'))
                  .options(noload('*'))
                  .options(contains_eager(ContributionPrincipal.contribution).load_only('event_id'))
                  .join(Contribution)
@@ -55,7 +55,7 @@ def get_events_with_linked_contributions(user, dt=None):
                  .filter(~Contribution.is_deleted, ~Event.is_deleted, Event.ends_after(dt)))
         for principal in query:
             roles = data[principal.contribution.event_id]
-            if 'submit' in principal.roles:
+            if 'submit' in principal.permissions:
                 roles.add('contribution_submission')
             if principal.full_access:
                 roles.add('contribution_manager')
@@ -154,7 +154,7 @@ def contribution_type_row(contrib_type):
 
 def _query_contributions_with_user_as_submitter(event, user):
     return (Contribution.query.with_parent(event)
-            .filter(Contribution.acl_entries.any(db.and_(ContributionPrincipal.has_management_role('submit'),
+            .filter(Contribution.acl_entries.any(db.and_(ContributionPrincipal.has_management_permission('submit'),
                                                          ContributionPrincipal.user == user))))
 
 

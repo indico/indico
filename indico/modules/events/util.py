@@ -130,7 +130,7 @@ def get_events_managed_by(user, dt=None):
              .join(Event)
              .options(noload('user'), noload('local_group'), load_only('event_id'))
              .filter(~Event.is_deleted, Event.ends_after(dt))
-             .filter(EventPrincipal.has_management_role('ANY')))
+             .filter(EventPrincipal.has_management_permission('ANY')))
     return {principal.event_id for principal in query}
 
 
@@ -212,7 +212,7 @@ def serialize_person_link(person_link):
     return data
 
 
-def update_object_principals(obj, new_principals, read_access=False, full_access=False, role=None):
+def update_object_principals(obj, new_principals, read_access=False, full_access=False, permission=None):
     """Updates an object's ACL with a new list of principals
 
     Exactly one argument out of `read_access`, `full_access` and `role` must be specified.
@@ -221,9 +221,9 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
     :param new_principals: The set containing the new principals
     :param read_access: Whether the read access ACL should be updated
     :param full_access: Whether the full access ACL should be updated
-    :param role: The role ACL that should be updated
+    :param permission: The role ACL that should be updated
     """
-    if read_access + full_access + bool(role) != 1:
+    if read_access + full_access + bool(permission) != 1:
         raise ValueError('Only one ACL property can be specified')
     if full_access:
         existing = {acl.principal for acl in obj.acl_entries if acl.full_access}
@@ -233,10 +233,12 @@ def update_object_principals(obj, new_principals, read_access=False, full_access
         existing = {acl.principal for acl in obj.acl_entries if acl.read_access}
         grant = {'read_access': True}
         revoke = {'read_access': False}
-    elif role:
-        existing = {acl.principal for acl in obj.acl_entries if acl.has_management_role(role, explicit=True)}
-        grant = {'add_roles': {role}}
-        revoke = {'del_roles': {role}}
+    elif permission:
+        existing = {acl.principal
+                    for acl in obj.acl_entries
+                    if acl.has_management_permission(permission, explicit=True)}
+        grant = {'add_permissions': {permission}}
+        revoke = {'del_permissions': {permission}}
 
     new_principals = set(new_principals)
     added = new_principals - existing

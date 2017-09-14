@@ -88,21 +88,25 @@ class CallForPapers(object):
 
     @property
     def managers(self):
-        return {p.principal for p in self.event.acl_entries if p.has_management_role('paper_manager', explicit=True)}
+        return {p.principal
+                for p in self.event.acl_entries
+                if p.has_management_permission('paper_manager', explicit=True)}
 
     @property
     def judges(self):
-        return {p.principal for p in self.event.acl_entries if p.has_management_role('paper_judge', explicit=True)}
+        return {p.principal
+                for p in self.event.acl_entries
+                if p.has_management_permission('paper_judge', explicit=True)}
 
     @property
     def content_reviewers(self):
         return {p.principal for p in self.event.acl_entries
-                if p.has_management_role('paper_content_reviewer', explicit=True)}
+                if p.has_management_permission('paper_content_reviewer', explicit=True)}
 
     @property
     def layout_reviewers(self):
         return {p.principal for p in self.event.acl_entries
-                if p.has_management_role('paper_layout_reviewer', explicit=True)}
+                if p.has_management_permission('paper_layout_reviewer', explicit=True)}
 
     @property
     def content_review_questions(self):
@@ -147,10 +151,10 @@ class CallForPapers(object):
         return self.is_manager(user) or self.is_judge(user) or self.is_reviewer(user)
 
     def is_manager(self, user):
-        return self.event.can_manage(user, role='paper_manager')
+        return self.event.can_manage(user, permission='paper_manager')
 
     def is_judge(self, user):
-        return self.event.can_manage(user, role='paper_judge', explicit_role=True)
+        return self.event.can_manage(user, permission='paper_judge', explicit_permission=True)
 
     def is_reviewer(self, user, role=None):
         if role:
@@ -158,7 +162,8 @@ class CallForPapers(object):
                 PaperReviewingRole.content_reviewer: self.content_reviewing_enabled,
                 PaperReviewingRole.layout_reviewer: self.layout_reviewing_enabled,
             }
-            return enabled[role] and self.event.can_manage(user, role=role.acl_role, explicit_role=True)
+            return enabled[role] and self.event.can_manage(user, permission=role.acl_permission,
+                                                           explicit_permission=True)
         else:
             return (self.is_reviewer(user, PaperReviewingRole.content_reviewer) or
                     self.is_reviewer(user, PaperReviewingRole.layout_reviewer))
