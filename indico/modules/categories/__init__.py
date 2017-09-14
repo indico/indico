@@ -20,7 +20,7 @@ from flask import session
 
 from indico.core import signals
 from indico.core.logger import Logger
-from indico.core.roles import ManagementRole, check_roles
+from indico.core.permissions import ManagementPermission, check_permissions
 from indico.core.settings import SettingsProxy
 from indico.modules.categories.models.categories import Category
 from indico.modules.categories.models.legacy_mapping import LegacyCategoryMapping
@@ -66,16 +66,16 @@ def _sidemenu_items(sender, **kwargs):
 
 
 @signals.app_created.connect
-def _check_roles(app, **kwargs):
-    check_roles(Category)
+def _check_permissions(app, **kwargs):
+    check_permissions(Category)
 
 
-@signals.acl.get_management_roles.connect_via(Category)
-def _get_management_roles(sender, **kwargs):
-    return CreatorRole
+@signals.acl.get_management_permissions.connect_via(Category)
+def _get_management_permissions(sender, **kwargs):
+    return CreatorPermission
 
 
-class CreatorRole(ManagementRole):
+class CreatorPermission(ManagementPermission):
     name = 'create'
     friendly_name = _('Event creation')
     description = _('Allows creating events in the category')

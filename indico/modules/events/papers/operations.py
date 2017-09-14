@@ -80,14 +80,14 @@ def _unassign_removed(event, changes):
 
 def update_team_members(event, managers, judges, content_reviewers=None, layout_reviewers=None):
     updated = {}
-    update_object_principals(event, managers, role='paper_manager')
-    updated[PaperReviewingRole.judge] = update_object_principals(event, judges, role='paper_judge')
+    update_object_principals(event, managers, permission='paper_manager')
+    updated[PaperReviewingRole.judge] = update_object_principals(event, judges, permission='paper_judge')
     if content_reviewers is not None:
         updated[PaperReviewingRole.content_reviewer] = update_object_principals(event, content_reviewers,
-                                                                                role='paper_content_reviewer')
+                                                                                permission='paper_content_reviewer')
     if layout_reviewers is not None:
         updated[PaperReviewingRole.layout_reviewer] = update_object_principals(event, layout_reviewers,
-                                                                               role='paper_layout_reviewer')
+                                                                               permission='paper_layout_reviewer')
     unassigned_contribs = _unassign_removed(event, updated)
     roles_to_notify = paper_reviewing_settings.get(event, 'notify_on_added_to_event')
     if PaperReviewingRole.judge in roles_to_notify:

@@ -28,7 +28,7 @@ from indico.modules.categories import Category
     (ProtectionMode.protected, False, {'read_access': True}, True),
     # restricted - authorized
     (ProtectionMode.protected, True, {'full_access': True}, True),
-    (ProtectionMode.protected, True, {'roles': {'create'}}, True),
+    (ProtectionMode.protected, True, {'permissions': {'create'}}, True),
     # restricted - not authorized
     (ProtectionMode.public, True, None, False),
     (ProtectionMode.protected, True, None, False),

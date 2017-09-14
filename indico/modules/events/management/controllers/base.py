@@ -32,7 +32,7 @@ from indico.web.util import jsonify_template
 
 class ManageEventMixin(object):
     ALLOW_LOCKED = False
-    ROLE = None
+    PERMISSION = None
 
     def _require_user(self):
         if session.user is None:
@@ -40,7 +40,7 @@ class ManageEventMixin(object):
 
     def _check_access(self):
         self._require_user()
-        if not self.event.can_manage(session.user, role=self.ROLE):
+        if not self.event.can_manage(session.user, permission=self.PERMISSION):
             raise Forbidden(_('You are not authorized to manage this event.'))
         check_event_locked(self, self.event)
 

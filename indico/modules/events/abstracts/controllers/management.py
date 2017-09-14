@@ -151,8 +151,8 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
                 track.abstract_reviewers = set(user_roles['reviewer'])
 
             # Update actual ACLs
-            update_object_principals(self.event, role_data['all_conveners'], role='track_convener')
-            update_object_principals(self.event, role_data['all_reviewers'], role='abstract_reviewer')
+            update_object_principals(self.event, role_data['all_conveners'], permission='track_convener')
+            update_object_principals(self.event, role_data['all_reviewers'], permission='abstract_reviewer')
 
             flash(_("Abstract reviewing roles have been updated."), 'success')
             logger.info("Abstract reviewing roles of %s have been updated by %s", self.event, session.user)
