@@ -108,7 +108,7 @@ class ChoiceBaseField(RegistrationFormBillableItemsField):
                     places_limit = choice.get('places_limit')
                     places_used_dict = self.get_places_used()
                     places_used_dict.setdefault(k, 0)
-                    if form.modified_registration:
+                    if form.modified_registration and old_data.data:
                         places_used_dict[k] -= (form.modified_registration
                                                     .data_by_field[self.form_item.id].data.get(k, 0))
                     places_used_dict[k] += field.data[k]
