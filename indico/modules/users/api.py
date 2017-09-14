@@ -41,12 +41,12 @@ class UserInfoHook(HTTPAPIHook):
         super(UserInfoHook, self)._getParams()
         self._user_id = self._pathParams['user_id']
 
-    def export_user(self, aw):
-        if not aw.user:
+    def export_user(self, user):
+        if not user:
             raise HTTPAPIError('You need to be logged in', 403)
         user = User.get(self._user_id, is_deleted=False)
         if not user:
             raise HTTPAPIError('Requested user not found', 404)
-        if not user.can_be_modified(aw.user):
+        if not user.can_be_modified(user):
             raise HTTPAPIError('You do not have access to that info', 403)
         return [user.as_avatar.fossilize()]

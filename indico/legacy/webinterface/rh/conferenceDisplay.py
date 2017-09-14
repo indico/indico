@@ -61,7 +61,7 @@ class RHConferenceToMarcXML(RHConferenceBaseDisplay):
         from indico.legacy.common.output import outputGenerator
         xmlgen = XMLGen()
         xmlgen.initXml()
-        outgen = outputGenerator(self.getAW(), xmlgen)
+        outgen = outputGenerator(session.user, xmlgen)
         xmlgen.openTag(b'marc:record', [
             [b'xmlns:marc', b'http://www.loc.gov/MARC21/slim'],
             [b'xmlns:xsi', b'http://www.w3.org/2001/XMLSchema-instance'],

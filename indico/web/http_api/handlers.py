@@ -30,10 +30,8 @@ from uuid import UUID
 from flask import current_app, g, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
-from indico.core.config import Config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.common.fossilize import clearCache, fossilize
 from indico.modules.api import APIMode, api_settings
@@ -113,13 +111,6 @@ def checkAK(apiKey, signature, timestamp, path, query):
     return ak, onlyPublic
 
 
-def buildAW(ak, onlyPublic=False):
-    aw = AccessWrapper()
-    if ak and not onlyPublic:
-        aw.setUser(ak.user.as_avatar)
-    return aw
-
-
 def handler(prefix, path):
     path = posixpath.join('/', prefix, path)
     clearCache()  # init fossil cache
@@ -187,12 +178,12 @@ def handler(prefix, path):
                 if enforceOnlyPublic:
                     onlyPublic = True
                 # Create an access wrapper for the API key's user
-                aw = buildAW(ak, onlyPublic)
+                user = ak.user if ak and not onlyPublic else None
             else:  # Access Token (OAuth)
                 at = load_token(oauth_request.access_token.access_token)
-                aw = buildAW(at, onlyPublic)
+                user = at.user if at and not onlyPublic else None
             # Get rid of API key in cache key if we did not impersonate a user
-            if ak and aw.getUser() is None:
+            if ak and user is None:
                 cacheKey = normalizeQuery(path, query,
                                           remove=('_', 'ak', 'apiKey', 'signature', 'timestamp', 'nc', 'nocache',
                                                   'oa', 'onlyauthed'))
@@ -207,16 +198,14 @@ def handler(prefix, path):
             token = request.headers.get('X-CSRF-Token', get_query_parameter(queryParams, ['csrftoken']))
             if used_session.csrf_protected and used_session.csrf_token != token:
                 raise HTTPAPIError('Invalid CSRF token', 403)
-            aw = AccessWrapper()
-            if not onlyPublic:
-                aw.setUser(used_session.avatar)
+            user = used_session.user if not onlyPublic else None
             userPrefix = 'user-{}_'.format(used_session.user.id)
             cacheKey = userPrefix + normalizeQuery(path, query,
                                                    remove=('_', 'nc', 'nocache', 'ca', 'cookieauth', 'oa', 'onlyauthed',
                                                            'csrftoken'))
 
         # Bail out if the user requires authentication but is not authenticated
-        if onlyAuthed and not aw.getUser():
+        if onlyAuthed and not user:
             raise HTTPAPIError('Not authenticated', 403)
 
         addToCache = not hook.NO_CACHE
@@ -228,9 +217,9 @@ def handler(prefix, path):
                 result, extra, ts, complete, typeMap = obj
                 addToCache = False
         if result is None:
-            g.current_api_user = aw.user
+            g.current_api_user = user
             # Perform the actual exporting
-            res = hook(aw)
+            res = hook(user)
             if isinstance(res, current_app.response_class):
                 addToCache = False
                 is_response = True

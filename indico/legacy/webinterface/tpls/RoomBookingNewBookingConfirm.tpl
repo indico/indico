@@ -10,7 +10,7 @@
 </ul>
 
 <script>
-    var userId = "rb-user-${ user.getId() }";
+    var userId = "rb-user-${ _session.user.id }";
 </script>
 
 <%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors:")'/>

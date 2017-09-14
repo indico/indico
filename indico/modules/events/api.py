@@ -79,7 +79,7 @@ class EventTimeTableHook(HTTPAPIHook):
         super(EventTimeTableHook, self)._getParams()
         self._idList = self._pathParams['idlist'].split('-')
 
-    def export_timetable(self, aw):
+    def export_timetable(self, user):
         serializer = TimetableSerializer(management=False)
         events = Event.find_all(Event.id.in_(map(int, self._idList)), ~Event.is_deleted)
         return {event.id: serializer.serialize_timetable(event) for event in events}
@@ -96,8 +96,8 @@ class EventSearchHook(HTTPAPIHook):
         search = self._pathParams['search_term']
         self._query = search
 
-    def export_event(self, aw):
-        expInt = EventSearchFetcher(aw, self)
+    def export_event(self, user):
+        expInt = EventSearchFetcher(user, self)
         return expInt.event(self._query)
 
 
@@ -127,23 +127,23 @@ class CategoryEventHook(HTTPAPIHook):
         self._location = get_query_parameter(self._queryParams, ['l', 'location'])
         self._room = get_query_parameter(self._queryParams, ['r', 'room'])
 
-    def export_categ(self, aw):
-        expInt = CategoryEventFetcher(aw, self)
+    def export_categ(self, user):
+        expInt = CategoryEventFetcher(user, self)
         id_list = set(self._idList)
-        if self._wantFavorites and aw.getUser():
-            id_list.update(str(c.id) for c in aw.getUser().user.favorite_categories)
+        if self._wantFavorites and user:
+            id_list.update(str(c.id) for c in user.favorite_categories)
         legacy_id_map = {m.legacy_category_id: m.category_id
                          for m in LegacyCategoryMapping.find(LegacyCategoryMapping.legacy_category_id.in_(id_list))}
         id_list = {str(legacy_id_map.get(id_, id_)) for id_ in id_list}
         return expInt.category(id_list, self._format)
 
-    def export_categ_extra(self, aw, resultList):
-        expInt = CategoryEventFetcher(aw, self)
+    def export_categ_extra(self, user, resultList):
+        expInt = CategoryEventFetcher(user, self)
         ids = set((event['categoryId'] for event in resultList))
         return expInt.category_extra(ids)
 
-    def export_event(self, aw):
-        expInt = CategoryEventFetcher(aw, self)
+    def export_event(self, user):
+        expInt = CategoryEventFetcher(user, self)
         return expInt.event(self._idList)
 
 
@@ -410,13 +410,13 @@ class SerializerBase(object):
 
 
 class CategoryEventFetcher(IteratedDataFetcher, SerializerBase):
-    def __init__(self, aw, hook):
-        super(CategoryEventFetcher, self).__init__(aw, hook)
+    def __init__(self, user, hook):
+        super(CategoryEventFetcher, self).__init__(user, hook)
         self._eventType = hook._eventType
         self._occurrences = hook._occurrences
         self._location = hook._location
         self._room = hook._room
-        self.user = getattr(aw.getUser(), 'user', None)
+        self.user = user
         self._detail_level = get_query_parameter(request.args.to_dict(), ['d', 'detail'], 'events')
         if self._detail_level not in ('events', 'contributions', 'subcontributions', 'sessions'):
             raise HTTPAPIError('Invalid detail level: {}'.format(self._detail_level), 400)
@@ -634,18 +634,18 @@ class SessionContribHook(EventBaseHook):
         self._idList = self._pathParams['idlist'].split('-')
         self._eventId = self._pathParams['event']
 
-    def export_session(self, aw):
-        expInt = SessionFetcher(aw, self)
+    def export_session(self, user):
+        expInt = SessionFetcher(user, self)
         return expInt.session(self._idList)
 
-    def export_contribution(self, aw):
-        expInt = ContributionFetcher(aw, self)
+    def export_contribution(self, user):
+        expInt = ContributionFetcher(user, self)
         return expInt.contribution(self._idList)
 
 
 class SessionContribFetcher(IteratedDataFetcher):
-    def __init__(self, aw, hook):
-        super(SessionContribFetcher, self).__init__(aw, hook)
+    def __init__(self, user, hook):
+        super(SessionContribFetcher, self).__init__(user, hook)
         self._eventId = hook._eventId
 
 
@@ -656,9 +656,9 @@ class SessionHook(SessionContribHook):
 
 
 class SessionFetcher(SessionContribFetcher, SerializerBase):
-    def __init__(self, aw, hook):
-        super(SessionFetcher, self).__init__(aw, hook)
-        self.user = getattr(aw.getUser(), 'user', None)
+    def __init__(self, user, hook):
+        super(SessionFetcher, self).__init__(user, hook)
+        self.user = user
 
     def session(self, idlist):
         event = Event.get(self._eventId, is_deleted=False)
@@ -724,7 +724,7 @@ class EventSearchFetcher(IteratedDataFetcher):
             counter = 0
             # Query the DB in chunks of 1000 records per query until the limit is satisfied
             for event in query.yield_per(1000):
-                if event.can_access(self._aw.getUser().user if self._aw.getUser() else None):
+                if event.can_access(self._user):
                     counter += 1
                     # Start yielding only when the counter reaches the given offset
                     if (self._offset is None) or (counter > self._offset):

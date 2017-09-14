@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from flask import session
+
 from indico.legacy.services.implementation.base import LoggedOnlyService
 from indico.legacy.services.interface.rpc.common import ServiceError
 
@@ -21,11 +23,10 @@ from indico.legacy.services.interface.rpc.common import ServiceError
 class UserGetEmail(LoggedOnlyService):
     def _checkParams(self):
         LoggedOnlyService._checkParams(self)
-        self._target = self.getAW().getUser()
 
     def _getAnswer(self):
-        if self._target:
-            return self._target.getEmail()
+        if session.user:
+            return session.user.email
         else:
             raise ServiceError("ERR-U4", "User is not logged in")
 

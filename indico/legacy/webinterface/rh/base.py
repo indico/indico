@@ -40,7 +40,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.errors import NoReportError, get_error_description
 from indico.core.logger import Logger
-from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
@@ -74,26 +73,6 @@ class RequestHandlerBase(object):
         a method named e.g. _checkProtection_POST which will be executed AFTER this one.
         """
         pass
-
-    def getAW(self):
-        """
-        Returns the access wrapper related to this session/user
-        """
-        return self._aw
-
-    accessWrapper = property(getAW)
-
-    def _getUser(self):
-        """
-        Returns the current user
-        """
-        return self._aw.getUser()
-
-    def _setUser(self, new_user=None):
-        """
-        Sets the current user
-        """
-        self._aw.setUser(new_user)
 
     def getRequestParams(self):
         return self._params
@@ -150,7 +129,6 @@ class RH(RequestHandlerBase):
     def __init__(self):
         self.commit = True
         self._responseUtil = ResponseUtil()
-        self._aw = AccessWrapper()  # Fill in the aw instance with the current information
         self._target = None
         self._reqParams = {}
         self._startTime = None
@@ -172,9 +150,6 @@ class RH(RequestHandlerBase):
             jsonschema.validate(json, schema)
         except jsonschema.ValidationError as e:
             raise BadRequest('Invalid JSON payload: {}'.format(e.message))
-
-    def _setSessionUser(self):
-        self._aw.setUser(session.avatar)
 
     @property
     def csrf_token(self):
@@ -415,7 +390,6 @@ class RH(RequestHandlerBase):
         return WPRestrictedHTML(self, escape(str(e))).display()
 
     def _check_auth(self, params):
-        self._setSessionUser()
         if session.user:
             logger.info('Request authenticated: %r', session.user)
         self._checkCSRF()
@@ -452,7 +426,7 @@ class RH(RequestHandlerBase):
         if func:
             func()
 
-        Sanitization.sanitizationCheck(self._target, self._reqParams, self._aw, self._doNotSanitizeFields)
+        Sanitization.sanitizationCheck(self._target, self._reqParams, session.user, self._doNotSanitizeFields)
 
         if self._doProcess:
             if profile:
@@ -581,7 +555,7 @@ class RHSimple(RH):
 
 class RHProtected(RH):
     def _checkSessionUser(self):
-        if self._getUser() is None:
+        if session.user is None:
             if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
@@ -604,7 +578,7 @@ class RHDisplayBaseProtected(RHProtected):
             raise KeyAccessError()
         if can_access:
             return
-        elif self._getUser() is None:
+        elif session.user is None:
             self._checkSessionUser()
         else:
             raise AccessError()
@@ -619,7 +593,7 @@ class RHModificationBaseProtected(RHProtected):
             raise Exception('Unexpected object')
         event = self._target.as_event
         if not event.can_manage(session.user, role=self.ROLE):
-            if self._getUser() is None:
+            if session.user is None:
                 self._checkSessionUser()
             else:
                 raise ModificationError()

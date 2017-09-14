@@ -28,7 +28,6 @@ from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename
 
 from indico.core.config import Config
-from indico.legacy.common import timezoneUtils
 from indico.legacy.common.contribPacker import ZIPFileHandler
 from indico.legacy.pdfinterface.conference import AbstractBook, ContribsToPDF, ContribToPDF, ProgrammeToPDF
 from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
@@ -111,12 +110,11 @@ class OfflineEvent:
 
 
 class OfflineEventCreator(object):
-
     def __init__(self, rh, conf, event_type=""):
         self._rh = rh
         self._conf = conf
-        self._display_tz = timezoneUtils.DisplayTZ(self._rh._aw, self._conf).getDisplayTZ()
         self.event = conf.as_event
+        self._display_tz = self.event.display_tzinfo.zone
         self._html = ""
         self._fileHandler = None
         self._mainPath = ""

@@ -56,7 +56,7 @@
     \mainmatter
     <%block name="book_body">
         % for contrib in contribs:
-            % if contrib.can_access(aw):
+            % if contrib.can_access(user):
                 \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.as_event.title | latex_escape}}{300pt} / ${_("Report of Abstracts") | latex_escape}}
                 \phantomsection
                 \addcontentsline{toc}{chapter}{${contrib.title | latex_escape}}

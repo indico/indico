@@ -48,8 +48,8 @@ class RoomBookingHookBase(HTTPAPIHook):
         self._toDT = utc_to_server(self._toDT.astimezone(pytz.utc)).replace(tzinfo=None) if self._toDT else None
         self._occurrences = _yesno(get_query_parameter(self._queryParams, ['occ', 'occurrences'], 'no'))
 
-    def _hasAccess(self, aw):
-        return Config.getInstance().getIsRoomBookingActive() and rb_check_user_access(aw.getUser())
+    def _has_access(self, user):
+        return Config.getInstance().getIsRoomBookingActive() and rb_check_user_access(user)
 
 
 @HTTPAPIHook.register
@@ -71,7 +71,7 @@ class RoomHook(RoomBookingHookBase):
         if self._detail not in {'rooms', 'reservations'}:
             raise HTTPAPIError('Invalid detail level: %s' % self._detail, 400)
 
-    def export_room(self, aw):
+    def export_room(self, user):
         loc = Location.find_first(name=self._location)
         if loc is None:
             return
@@ -108,11 +108,11 @@ class RoomNameHook(RoomBookingHookBase):
         self._location = self._pathParams['location']
         self._room_name = self._pathParams['room_name']
 
-    def _hasAccess(self, aw):
+    def _has_access(self, user):
         # Access to RB data (no reservations) is public
         return Config.getInstance().getIsRoomBookingActive()
 
-    def export_roomName(self, aw):
+    def export_roomName(self, user):
         loc = Location.find_first(name=self._location)
         if loc is None:
             return
@@ -148,7 +148,7 @@ class ReservationHook(RoomBookingHookBase):
         super(ReservationHook, self)._getParams()
         self._locations = self._pathParams['loclist'].split('-')
 
-    def export_reservation(self, aw):
+    def export_reservation(self, user):
         locations = Location.find_all(Location.name.in_(self._locations))
         if not locations:
             return
@@ -202,16 +202,16 @@ class BookRoomHook(HTTPAPIHook):
         if not self._room:
             raise HTTPAPIError('A room with this ID does not exist')
 
-    def _hasAccess(self, aw):
-        if not Config.getInstance().getIsRoomBookingActive() or not rb_check_user_access(aw.getUser()):
+    def _has_access(self, user):
+        if not Config.getInstance().getIsRoomBookingActive() or not rb_check_user_access(user):
             return False
-        if self._room.can_be_booked(aw.getUser()):
+        if self._room.can_be_booked(user):
             return True
-        elif self._room.can_be_prebooked(aw.getUser()):
+        elif self._room.can_be_prebooked(user):
             raise HTTPAPIError('The API only supports direct bookings but this room only allows pre-bookings.')
         return False
 
-    def api_roomBooking(self, aw):
+    def api_roomBooking(self, user):
         data = MultiDict({
             'start_dt': self._params['from'],
             'end_dt': self._params['to'],
@@ -224,7 +224,7 @@ class BookRoomHook(HTTPAPIHook):
             'booking_reason': self._params['reason']
         })
         try:
-            reservation = Reservation.create_from_data(self._room, data, aw.getUser())
+            reservation = Reservation.create_from_data(self._room, data, user)
         except ConflictingOccurrences:
             raise HTTPAPIError('Failed to create the booking due to conflicts with other bookings')
         except IndicoError as e:

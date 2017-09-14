@@ -55,21 +55,23 @@ class WGenericError( WTemplated ):
             headers.append("""%s: %s""" % (self.htmlText(k), self.htmlText(v)))
         userHTML = """-- none --"""
         vars["userEmail"] = ""
-        av = self._rh.getAW().getUser()
-        if av:
-            userHTML = self.htmlText( "%s <%s>"%( av.getFullName(), av.getEmail() ) )
-            vars["userEmail"] = quoteattr( av.getEmail() )
+        try:
+            user = session.user
+            user_name = user and user.full_name
+            user_email = user and user.email
+            user_is_admin = user and user.is_admin
+        except Exception:
+            # Yuck! But we are handling an error and we don't know if we
+            # can access the user or its attributes...
+            user = user_name = user_email = None
+            user_is_admin = False
+        else:
+            if user:
+                userHTML = self.htmlText(u'{} <{}>'.format(user_name, user_email).encode('utf-8'))
+                vars["userEmail"] = quoteattr(user_email.encode('utf-8'))
         vars["reportURL"] = quoteattr(url_for('misc.errors'))
         details = ""
-        show_details = Config.getInstance().getDebug()
-        if not show_details:
-            try:
-                show_details = session.user and session.user.is_admin
-            except Exception:
-                # We are handling some error so we cannot know if accessing the session user works
-                # If it fails we simply don't show details...
-                pass
-        if show_details:
+        if Config.getInstance().getDebug() or user_is_admin:
             details = """
 <table class="errorDetailsBox">
     <tr>

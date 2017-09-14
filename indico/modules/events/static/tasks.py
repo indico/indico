@@ -25,7 +25,6 @@ from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.notifications import email_sender, make_email
 from indico.core.storage import StorageReadOnlyError
-from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common.offlineWebsiteCreator import OfflineEvent
 from indico.legacy.webinterface.rh.base import RH
 from indico.modules.events.static import logger
@@ -43,7 +42,6 @@ def build_static_site(static_site):
         logger.info('Building static site: %s', static_site)
         session.lang = static_site.creator.settings.get('lang')
         rh = RH()
-        rh._aw = AccessWrapper()
         rh._conf = rh._target = static_site.event.as_legacy
 
         g.rh = rh

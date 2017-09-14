@@ -328,11 +328,6 @@ def registerHelpers(objDict):
         objDict['jsonEncode'] = jsonEncode
     if not 'roomBookingActive' in objDict:
         objDict['roomBookingActive'] = Config.getInstance().getIsRoomBookingActive()
-    if not 'user' in objDict:
-        if not '__rh__' in objDict or not objDict['__rh__']:
-            objDict['user'] = None
-        else:
-            objDict['user'] = objDict['__rh__']._getUser()  # The '__rh__' is set by framework
     if 'rh' not in objDict and '__rh__' in objDict:
         objDict['rh'] = objDict['__rh__']
     if not 'systemIcon' in objDict:

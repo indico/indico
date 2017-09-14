@@ -21,7 +21,6 @@ import traceback
 from flask import g, session
 
 from indico.core.config import Config
-from indico.legacy.accessControl import AccessWrapper
 from indico.legacy.common import security
 from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.services.interface.rpc.common import HTMLSecurityError, ServiceAccessError
@@ -41,9 +40,6 @@ class ServiceBase(RequestHandlerBase):
         if not self.UNICODE_PARAMS:
             params = unicode_struct_to_utf8(params)
         self._reqParams = self._params = params
-        # Fill in the aw instance with the current information
-        self._aw = AccessWrapper()
-        self._aw.setUser(session.avatar)
         self._target = None
         self._startTime = None
         self._endTime = None
@@ -89,7 +85,7 @@ class ServiceBase(RequestHandlerBase):
 
         if self.CHECK_HTML:
             try:
-                security.Sanitization.sanitizationCheck(self._target, self._params, self._aw, ['requestInfo'])
+                security.Sanitization.sanitizationCheck(self._target, self._params, session.user, ['requestInfo'])
             except HtmlForbiddenTag as e:
                 raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
 
@@ -127,7 +123,7 @@ class ProtectedService(ServiceBase):
         Checks that the current user exists (is authenticated)
         """
 
-        if self._getUser() is None:
+        if session.user is None:
             self._doProcess = False
             raise ServiceAccessError("You are currently not authenticated. Please log in again.")
 

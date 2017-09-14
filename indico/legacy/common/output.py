@@ -15,11 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import string
-import StringIO
 from collections import defaultdict
 from datetime import datetime
 
-from lxml import etree
 from sqlalchemy.orm import joinedload, load_only
 
 from indico.core.config import Config
@@ -38,26 +36,10 @@ def get_map_url(item):
     return item.room.map_url if item.room else None
 
 
-class XSLTransformer:
-
-    def __init__(self, stylesheet):
-        # instanciate stylesheet object
-        styledoc = etree.parse(stylesheet)
-        self.__style = etree.XSLT(styledoc)
-
-    def process (self, xml):
-
-        doc = etree.parse(StringIO.StringIO(xml))
-        # compute the transformation
-        result = self.__style(doc)
-
-        return str(result)
-
-
 class outputGenerator(object):
-    def __init__(self, aw, XG = None):
-        self.__aw = aw
-        if XG != None:
+    def __init__(self, user, XG=None):
+        self.__user = user
+        if XG is not None:
             self._XMLGen = XG
         else:
             self._XMLGen = XMLGen()
@@ -474,7 +456,7 @@ class outputGenerator(object):
         for attachment in (Attachment.find(~AttachmentFolder.is_deleted, AttachmentFolder.object == obj,
                                            is_deleted=False, _join=AttachmentFolder)
                                      .options(joinedload(Attachment.legacy_mapping))):
-            if attachment.can_access(self.__aw.getUser().user):
+            if attachment.can_access(self.__user):
                 self.resourceToXMLMarc21(attachment, out)
                 self._generateAccessList(acl=self._attachment_access_list(attachment), out=out,
                                          objId=self._attachment_unique_id(attachment, add_prefix=False))

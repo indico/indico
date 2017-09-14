@@ -85,13 +85,13 @@ class Sanitization(object):
                 Sanitization._encodeUnicode(param)
 
     @staticmethod
-    def sanitizationCheck(target, params, accessWrapper, doNotSanitize=[]):
+    def sanitizationCheck(target, params, user, doNotSanitize=[]):
         # first make sure all params are utf-8
         Sanitization._encodeUnicode(params)
 
         # then check the security level of data sent to the server
         # if no user logged in, then no html allowed
-        if accessWrapper.getUser():
+        if user:
             level = Config.getInstance().getSanitizationLevel()
         else:
             level = 0

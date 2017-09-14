@@ -32,7 +32,6 @@ from speaklater import is_lazy_string
 
 from indico.core.db import db
 from indico.legacy.common import utils
-from indico.legacy.common.timezoneUtils import DisplayTZ, nowutc
 from indico.legacy.pdfinterface.base import (PageBreak, Paragraph, PDFBase, PDFLaTeXBase, PDFWithTOC, Spacer, escape,
                                              modifiedFontSize)
 from indico.legacy.webinterface.common.tools import strip_ml_tags
@@ -44,7 +43,7 @@ from indico.modules.events.registration.models.items import PersonalDataType
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
 from indico.modules.events.tracks.settings import track_settings
 from indico.modules.events.util import create_event_logo_tmp_file
-from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time
+from indico.util.date_time import format_date, format_datetime, format_human_timedelta, format_time, now_utc
 from indico.util.i18n import _, ngettext
 from indico.util.string import format_full_name, html_color_to_rgb, to_unicode, truncate
 
@@ -122,7 +121,7 @@ class ProgrammeToPDF(PDFBase):
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
         self._drawWrappedString(c, "%s / %s" % (strip_ml_tags(self._event.title.encode('utf-8')), self._title),
                                 width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
-        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
+        c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def laterPages(self, c, doc):
@@ -132,7 +131,7 @@ class ProgrammeToPDF(PDFBase):
                                 color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5*inch,
                                 measurement=inch, lineSpacing=0.15)
         c.drawCentredString(self._PAGE_WIDTH/2.0, 0.75 * inch, "Page %d "%doc.page)
-        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
+        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def getBody(self, story=None):
@@ -362,7 +361,7 @@ class ContributionBook(PDFLaTeXBase):
             key_func = attrgetter(mapping.get(sort_by) or 'title')
         return sorted(contribs, key=key_func)
 
-    def __init__(self, event, aw, contribs=None, tz=None, sort_by=""):
+    def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
         self._conf = event.as_legacy
 
@@ -394,7 +393,7 @@ class ContributionBook(PDFLaTeXBase):
             'url': event.url,
             'fields': [f for f in event.contribution_fields if f.is_active],
             'sorted_by': sort_by,
-            'aw': aw,
+            'user': user,
             'boa_text': boa_settings.get(event, 'extra_text')
         })
 
@@ -498,13 +497,13 @@ class TimetablePDFFormat:
 
 
 class TimeTablePlain(PDFWithTOC):
-    def __init__(self, event, aw, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
+    def __init__(self, event, user, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
                  pagesize='A4', fontsize='normal', firstPageNumber=1, showSpeakerAffiliation=False,
                  showSessionDescription=False, tz=None):
         self._conf = event.as_legacy
         self._event = event
-        self._aw = aw
-        self._tz = DisplayTZ(self._aw, self._conf).getDisplayTZ()
+        self._user = user
+        self._tz = event.display_tzinfo.zone
         self._showSessions = showSessions
         self._showDays = showDays
         self._ttPDFFormat = ttPDFFormat or TimetablePDFFormat()
@@ -566,7 +565,7 @@ class TimeTablePlain(PDFWithTOC):
                                     height=0.75 * inch, font='Times-Roman', size=modifiedFontSize(9, self._fontsize),
                                     color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5 * inch,
                                     measurement=inch, lineSpacing=0.15)
-            c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, nowutc().strftime("%A %d %B %Y"))
+            c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime("%A %d %B %Y"))
             c.restoreState()
 
     def laterPages(self, c, doc):
@@ -624,7 +623,7 @@ class TimeTablePlain(PDFWithTOC):
         return speaker_name
 
     def _processContribution(self, contrib, l):
-        if not contrib.can_access(self._aw):
+        if not contrib.can_access(self._user):
             return
 
         lt = []
@@ -671,7 +670,7 @@ class TimeTablePlain(PDFWithTOC):
                 l.append([date, caption, speakers])
 
         for subc in contrib.subcontributions:
-            if not subc.can_access(self._aw):
+            if not subc.can_access(self._user):
                 return
 
             lt = []
@@ -708,7 +707,7 @@ class TimeTablePlain(PDFWithTOC):
                     l.append(["", caption, speakers])
 
     def _processPosterContribution(self, contrib, l):
-        if not contrib.can_access(self._aw):
+        if not contrib.can_access(self._user):
             return
 
         lt = []
@@ -746,7 +745,7 @@ class TimeTablePlain(PDFWithTOC):
             else:
                 l.append([caption, speakers, board_number])
         for subc in contrib.subcontributions:
-            if not subc.can_access(self._aw):
+            if not subc.can_access(self._user):
                 return
 
             lt = []
@@ -811,7 +810,7 @@ class TimeTablePlain(PDFWithTOC):
                 sess_block = entry.object
                 if self._showSessions and sess_block.session.id not in self._showSessions:
                     continue
-                if not sess_block.can_access(self._aw):
+                if not sess_block.can_access(self._user):
                     continue
 
                 room = u''
@@ -938,7 +937,7 @@ class TimeTablePlain(PDFWithTOC):
             # contribution
             elif self._ttPDFFormat.showContribsAtConfLevel() and entry.type == TimetableEntryType.CONTRIBUTION:
                 contrib = entry.object
-                if not contrib.can_access(self._aw):
+                if not contrib.can_access(self._user):
                     continue
 
                 room = u''
@@ -1026,12 +1025,12 @@ class TimeTablePlain(PDFWithTOC):
 
 
 class SimplifiedTimeTablePlain(PDFBase):
-    def __init__(self, event, aw, showSessions=[], showDays=[], sortingCrit=None, ttPDFFormat=None, pagesize='A4',
+    def __init__(self, event, user, showSessions=[], showDays=[], sortingCrit=None, ttPDFFormat=None, pagesize='A4',
                  fontsize='normal', tz=None):
         self._conf = event.as_legacy
         self._event = event
         self._tz = tz or self._event.timezone
-        self._aw = aw
+        self._user = user
         self._showSessions = showSessions
         self._showDays = showDays
         PDFBase.__init__(self, story=[], pagesize=pagesize)
@@ -1090,7 +1089,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 sess = session_slot.session
                 if self._showSessions and sess.id not in self._showSessions:
                     continue
-                if not session_slot.can_access(self._aw):
+                if not session_slot.can_access(self._user):
                     continue
                 if sess in lastSessions:
                     continue
@@ -1118,7 +1117,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 res.append(Spacer(1, 0.2 * inch))
             elif self._ttPDFFormat.showContribsAtConfLevel() and entry.type == TimetableEntryType.CONTRIBUTION:
                 contrib = entry.object
-                if not contrib.can_access(self._aw):
+                if not contrib.can_access(self._user):
                     continue
 
                 res.append(Paragraph(u'<font face="Times-Bold"><b> {}:</b></font> {}'
@@ -1342,7 +1341,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
             title = utils.unicodeSlice(doc.getCurrentPart(), 0, 50) + "..."
         c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 0.75 * inch, "%s"%title)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, u" {} {} ".format(_(u"Page"), doc.page))
-        c.drawString(inch,  0.75 * inch, nowutc().strftime("%A %d %B %Y"))
+        c.drawString(inch,  0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def getBody(self):
@@ -1384,7 +1383,7 @@ class RegistrantsListToPDF(PDFBase):
         c.setLineWidth(3)
         c.setStrokeGray(0.7)
         c.setFont('Times-Roman', 10)
-        c.drawRightString(self._PAGE_WIDTH - inch,self._PAGE_HEIGHT-1*cm, "%s"%(nowutc().strftime("%d %B %Y, %H:%M")))
+        c.drawRightString(self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - 1*cm, now_utc().strftime("%d %B %Y, %H:%M"))
         c.restoreState()
 
     def getBody(self, story=None, indexedFlowable={}, level=1 ):

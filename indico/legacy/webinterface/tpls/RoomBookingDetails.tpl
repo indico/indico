@@ -1,6 +1,7 @@
 <% valid_occurrences = reservation.occurrences.filter_by(is_valid=True).all() %>
 <% import itertools %>
 <% from indico.modules.rb.util import rb_is_admin %>
+<% user = _session.user %>
 
 <script type="text/javascript">
     var occurrences = ${ [formatDate(occ.date) for occ in valid_occurrences] | n,j };
@@ -389,13 +390,13 @@
                       <input type="hidden" id="reason" name="reason">
                       <div style="float:left; padding-top: 15px;">
                         % if not reservation.is_cancelled and not reservation.is_rejected:
-                          % if reservation.can_be_cancelled(_session.user):
+                          % if reservation.can_be_cancelled(user):
                             <a class="i-button" href="#" onclick="submit_cancel(); return false;">${ _('Cancel') }</a>
                           % endif
-                          % if reservation.can_be_accepted(_session.user) and not reservation.is_accepted:
+                          % if reservation.can_be_accepted(user) and not reservation.is_accepted:
                             <a class="i-button" href="#" onclick="submit_accept(); return false;">${ _('Accept') }</a>
                           % endif
-                          % if reservation.can_be_rejected(_session.user):
+                          % if reservation.can_be_rejected(user):
                             <a class="i-button" href="#" onclick="submit_reject(); return false;">${ _('Reject') }</a>
                           % endif
                           % if reservation.can_be_modified(user):
@@ -504,12 +505,12 @@
                         <td align="left" class="blacktext">
                           % for occurrence in valid_occurrences:
                           ${ formatDate(occurrence.start_dt.date()) }
-                            % if reservation.can_be_rejected(_session.user):
+                            % if reservation.can_be_rejected(user):
                               <a class="roomBookingRejectOccurrence" href="#" onclick="submit_reject_occurrence('${ url_for(endpoints['booking_occurrence_reject'], event, reservation, date=formatDate(occurrence.start_dt.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start_dt.date()) }'); return false;">
                                 ${ _('Reject') }
                               </a>
                             % endif
-                            % if reservation.can_be_cancelled(_session.user):
+                            % if reservation.can_be_cancelled(user):
                               <a class="roomBookingCancelOccurrence" href="#" onclick="submit_cancel_occurrence('${ url_for(endpoints['booking_occurrence_cancel'], event, reservation, date=formatDate(occurrence.start_dt.date(), format='yyyy-MM-dd')) }', '${ formatDate(occurrence.start_dt.date()) }'); return false;">
                                 ${ _('Cancel') }
                               </a>

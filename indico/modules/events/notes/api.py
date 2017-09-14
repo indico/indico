@@ -62,9 +62,8 @@ class NoteExportHook(HTTPAPIHook):
         if self._note is None or self._note.is_deleted:
             raise HTTPAPIError("No such note", 404)
 
-    def _hasAccess(self, aw):
-        user = aw.getUser().user if aw.getUser() else None
+    def _has_access(self, user):
         return self._obj.can_access(user)
 
-    def export_note(self, aw):
+    def export_note(self, user):
         return build_note_api_data(self._note)

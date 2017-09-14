@@ -81,7 +81,7 @@
                             ${ room.number }
                           </td>
                         </tr>
-                        % if user.isAdmin():
+                        % if _session.user.is_admin:
                           <tr>
                             <td class="subFieldWidth" align="right" valign="top">
                               ${ _('Latitude') }&nbsp;&nbsp;
@@ -315,15 +315,15 @@
                         </td>
                         <td colspan="2">
                             <div style="float:left; padding-top: 15px;">
-                              % if room.can_be_booked(user):
+                              % if room.can_be_booked(_session.user):
                                 <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('Book') }</a>
-                              % elif room.can_be_prebooked(user):
+                              % elif room.can_be_prebooked(_session.user):
                                 <a class="i-button" href="${ url_for(endpoints['room_book'], event, room) }">${ _('PRE-Book') }</a>
                               % endif
-                              % if room.can_be_modified(user):
+                              % if room.can_be_modified(_session.user):
                                 <a class="i-button" href="${ modify_room_url }">${ _('Modify') }</a>
                               % endif
-                              % if room.can_be_deleted(user):
+                              % if room.can_be_deleted(_session.user):
                                 <button class="i-button" data-href="${ delete_room_url }" data-method="POST"
                                    data-title="${ _('Delete Room?') }"
                                    data-confirm="${ _('THIS ACTION IS IRREVERSIBLE. Please note that all archived BOOKINGS WILL BE DELETED with the room. Are you sure you want to DELETE the room?') }">

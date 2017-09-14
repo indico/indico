@@ -55,9 +55,8 @@ class AttachmentsExportHook(HTTPAPIHook):
                 if self._obj is None:
                     raise HTTPAPIError("No such subcontribution", 404)
 
-    def _hasAccess(self, aw):
-        user = aw.getUser().user if aw.getUser() else None
+    def _has_access(self, user):
         return self._obj.can_access(user)
 
-    def export_attachments(self, aw):
+    def export_attachments(self, user):
         return {'folders': build_folders_api_data(self._obj)}

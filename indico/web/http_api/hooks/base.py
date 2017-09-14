@@ -138,7 +138,7 @@ class HTTPAPIHook(object):
         self._fromDT = DataFetcher._getDateTime('from', fromDT, self._tz) if fromDT else None
         self._toDT = DataFetcher._getDateTime('to', toDT, self._tz, aux=self._fromDT) if toDT else None
 
-    def _hasAccess(self, aw):
+    def _has_access(self, user):
         return True
 
     @property
@@ -150,11 +150,11 @@ class HTTPAPIHook(object):
             return self.METHOD_NAME
         return self.PREFIX + '_' + self._type.replace('-', '_')
 
-    def _performCall(self, func, aw):
+    def _performCall(self, func, user):
         resultList = []
         complete = True
         try:
-            res = func(aw)
+            res = func(user)
             if isinstance(res, GeneratorType):
                 for obj in res:
                     resultList.append(obj)
@@ -164,21 +164,21 @@ class HTTPAPIHook(object):
             complete = (self._limit == self._userLimit)
         return resultList, complete
 
-    def _perform(self, aw, func, extra_func):
+    def _perform(self, user, func, extra_func):
         self._getParams()
-        if not self._hasAccess(aw):
+        if not self._has_access(user):
             raise HTTPAPIError('Access to this resource is restricted.', 403)
-        resultList, complete = self._performCall(func, aw)
+        resultList, complete = self._performCall(func, user)
         if isinstance(resultList, current_app.response_class):
             return True, resultList, None, None
-        extra = extra_func(aw, resultList) if extra_func else None
+        extra = extra_func(user, resultList) if extra_func else None
         return False, resultList, complete, extra
 
-    def __call__(self, aw):
+    def __call__(self, user):
         """Perform the actual exporting"""
         if self.HTTP_POST != (request.method == 'POST'):
             raise HTTPAPIError('This action requires %s' % ('POST' if self.HTTP_POST else 'GET'), 405)
-        if not self.GUEST_ALLOWED and not aw.getUser():
+        if not self.GUEST_ALLOWED and not user:
             raise HTTPAPIError('Guest access to this resource is forbidden.', 403)
 
         method_name = self._getMethodName()
@@ -188,12 +188,12 @@ class HTTPAPIHook(object):
             raise NotImplementedError(method_name)
 
         if not self.COMMIT:
-            is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
+            is_response, resultList, complete, extra = self._perform(user, func, extra_func)
             db.session.rollback()
         else:
             try:
                 GenericMailer.flushQueue(False)
-                is_response, resultList, complete, extra = self._perform(aw, func, extra_func)
+                is_response, resultList, complete, extra = self._perform(user, func, extra_func)
                 db.session.commit()
                 GenericMailer.flushQueue(True)
             except Exception:
@@ -208,8 +208,8 @@ class DataFetcher(object):
     _deltas = {'yesterday': timedelta(-1),
                'tomorrow': timedelta(1)}
 
-    def __init__(self, aw, hook):
-        self._aw = aw
+    def __init__(self, user, hook):
+        self._user = user
         self._hook = hook
 
     @classmethod
@@ -279,8 +279,8 @@ class DataFetcher(object):
 
 
 class IteratedDataFetcher(DataFetcher):
-    def __init__(self, aw, hook):
-        super(IteratedDataFetcher, self).__init__(aw, hook)
+    def __init__(self, user, hook):
+        super(IteratedDataFetcher, self).__init__(user, hook)
         self._tz = hook._tz
         self._serverTZ = hook._serverTZ
         self._offset = hook._offset
