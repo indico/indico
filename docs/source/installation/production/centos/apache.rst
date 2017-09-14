@@ -425,7 +425,7 @@ before the ``AliasMatch`` lines:
 
 .. code-block:: apache
 
-    <LocationMatch /Shibboleth\.sso/ADFS|/login/shib-sso/shibboleth>
+    <LocationMatch "^(/Shibboleth\.sso|/login/shib-sso/shibboleth)">
         AuthType shibboleth
         ShibRequestSetting requireSession 1
         ShibExportAssertion Off
