@@ -248,7 +248,8 @@ td, th {
         vertical-align: middle;
     }
 
-    tr:first-child td {
+    &.multi-tbody tbody:first-child tr:first-child td,
+    &:not(.multi-tbody) tr:first-child td {
         border-top: 0;
     }
 

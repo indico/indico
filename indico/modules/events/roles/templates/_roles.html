@@ -1,0 +1,84 @@
+{% macro render_roles(roles) -%}
+    {% for role in roles|sort(attribute='code') %}
+        <tbody id="event-role-{{ role.id }}">
+            {{ render_role(role) }}
+        </tbody>
+    {% else %}
+        <tr>
+            <td colspan="4">
+                {% trans %}There are no roles defined yet.{% endtrans %}
+            </td>
+        </tr>
+    {% endfor %}
+{%- endmacro %}
+
+
+{% macro render_role(role, collapsed=true) -%}
+    <tr>
+        <td class="badge-column {{ 'toggle-members' if role.members }}">
+            <span class="i-tag outline role-badge" style="{{ role.css }};">
+                {{- role.code -}}
+            </span>
+        </td>
+        <td class="role-title {{ 'toggle-members' if role.members }}">{{ role.name }}</td>
+        <td class="role-members-summary {{ 'toggle-members' if role.members }}">
+            {% if role.members %}
+                <span class="icon-users i-button text-color outline highlight">
+                    {%- trans count=role.members|length -%}
+                        1 person
+                    {%- pluralize -%}
+                        {{ count }} people
+                    {%- endtrans -%}
+                </span>
+            {% else %}
+                <span class="icon-users i-button text-color outline dashed">
+                    {% trans %}Unassigned{% endtrans %}
+                </span>
+            {% endif %}
+        </td>
+        <td class="action-column">
+            <div class="thin toolbar right entry-action-buttons">
+                <div class="group">
+                    <button class="icon-plus i-button text-color borderless highlight js-add-members"
+                            data-href="{{ url_for('.add_members', role) }}"
+                            data-method="POST"
+                            data-update="#event-role-{{ role.id }}"></button>
+                    <button class="icon-shield i-button text-color borderless"></button>
+                    <button class="icon-mail i-button text-color borderless"></button>
+                    <button class="icon-edit i-button text-color borderless"
+                            data-href="{{ url_for('.edit_role', role) }}"
+                            data-title="{% trans %}Edit role{% endtrans %}"
+                            data-update="#event-role-{{ role.id }}"
+                            data-ajax-dialog></button>
+                    <button class="icon-remove i-button text-color borderless danger"
+                            data-href="{{ url_for('.delete_role', role) }}"
+                            data-method="DELETE"
+                            data-title="{% trans name=role.name %}Delete role '{{ name }}'{% endtrans %}"
+                            data-confirm="{% trans %}Are you sure you want to permanently delete this role?{% endtrans %}"
+                            data-update="#event-roles"
+                            data-ajax></button>
+                </div>
+            </div>
+        </td>
+    </tr>
+    {% if role.members %}
+        <tr class="role-list-row" style="{{ 'display: none;' if collapsed }}">
+            <td colspan="4">
+                <div class="content-area">
+                    <ul class="role-list">
+                        {% for user in role.members|sort(attribute='display_full_name') %}
+                            <li class="i-tag outline highlight icon-user">
+                                {{ user.display_full_name }}
+                                <button class="icon-cross i-button borderless text-color danger"
+                                        data-href="{{ url_for('.remove_member', role, user) }}"
+                                        data-method="DELETE"
+                                        data-update="#event-role-{{ role.id }}"
+                                        data-ajax></button>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </td>
+        </tr>
+    {% endif %}
+{%- endmacro %}
