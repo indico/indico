@@ -82,13 +82,15 @@ def render_abstract_page(abstract, view_class=None, management=False):
         review_form = build_review_form(abstract, reviewed_for_tracks[0])
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
     review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event, obj=abstract, formdata=None)
+    track_session_map = {track.id: track.default_session_id for track in abstract.event.tracks}
     params = {'abstract': abstract,
               'comment_form': comment_form,
               'review_form': review_form,
               'review_track_list_form': review_track_list_form,
               'judgment_form': judgment_form,
               'visible_tracks': get_visible_reviewed_for_tracks(abstract, session.user),
-              'management': management}
+              'management': management,
+              'track_session_map': track_session_map}
     if view_class:
         return view_class.render_template('abstract.html', abstract.event, **params)
     else:

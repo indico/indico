@@ -70,6 +70,9 @@
     {% if not no_javascript %}
         <script>
             setupReviewingPage();
+            setupAbstractJudgment({
+                trackSessionMap: {{ track_session_map|tojson }}
+            });
         </script>
     {% endif %}
 {% endblock %}
