@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii
 
 
@@ -86,6 +87,14 @@ class EventRole(db.Model):
     @return_ascii
     def __repr__(self):
         return format_repr(self, 'id', 'code', _text=self.name)
+
+    @locator_property
+    def locator(self):
+        return dict(self.event.locator, role_id=self.id)
+
+    @property
+    def css(self):
+        return 'color: #{0} !important; border-color: #{0} !important'.format(self.color)
 
 
 role_members_table = db.Table(
