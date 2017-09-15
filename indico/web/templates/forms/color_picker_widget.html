@@ -1,10 +1,13 @@
 {% extends 'forms/base_widget.html' %}
 
+{% set value = field._value() %}
+{% if value and value[0] != '#' %}{% set value = '#' + value %}{% endif %}
+
 {% block html %}
     <div class="i-color-field clearfix">
         <div class="clickable-wrapper">
             <span class="color-preview"></span>
-            <input id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}" type="text" maxlength="7">
+            <input id="{{ field.id }}" name="{{ field.name }}" value="{{ value }}" type="text" maxlength="7">
         </div>
     </div>
 {% endblock %}
