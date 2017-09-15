@@ -20,11 +20,16 @@
 
     global.setupColorPickerWidget = function setupColorPickerWidget(options) {
         options = $.extend(true, {
-            fieldId: null
+            fieldId: null,
+            showField: true
         }, options);
 
         var field = $('#' + options.fieldId);
         field.closest('.i-color-field').colorpicker();
-        field.clearableinput();
+        if (options.showField) {
+            field.clearableinput();
+        } else {
+            field.hide();
+        }
     };
 })(window);
