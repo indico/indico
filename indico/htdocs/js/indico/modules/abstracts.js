@@ -135,4 +135,15 @@
             applySearchFilters();
         }
     };
+
+    global.setupAbstractJudgment = function setupAbstractJudgment(options) {
+        options = $.extend({
+            trackSessionMap: {}
+        }, options);
+
+        $('#accepted_track').on('change', function() {
+            var sessionId = options.trackSessionMap[$(this).val()];
+            $('#session').val(sessionId || "__None");
+        }).trigger('change');
+    };
 })(window);
