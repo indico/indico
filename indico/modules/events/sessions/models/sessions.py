@@ -137,6 +137,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
     # relationship backrefs:
     # - attachment_folders (AttachmentFolder.session)
     # - contributions (Contribution.session)
+    # - default_for_tracks (Track.default_session)
     # - legacy_mapping (LegacySessionMapping.session)
     # - note (EventNote.session)
 
