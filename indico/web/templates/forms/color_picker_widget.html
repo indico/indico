@@ -1,7 +1,7 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div class="i-color-field">
+    <div class="i-color-field clearfix">
         <div class="clickable-wrapper">
             <span class="color-preview"></span>
             <input id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}" type="text" maxlength="7">
@@ -12,7 +12,8 @@
 {% block javascript %}
     <script>
         setupColorPickerWidget({
-            fieldId: {{ field.id | tojson }}
+            fieldId: {{ field.id | tojson }},
+            showField: {{ show_field | tojson }}
         });
     </script>
 {% endblock %}
