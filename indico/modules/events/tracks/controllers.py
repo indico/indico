@@ -85,7 +85,7 @@ class RHEditProgram(RHManageTracksBase):
 
 class RHCreateTrack(RHManageTracksBase):
     def _process(self):
-        form = TrackForm()
+        form = TrackForm(event=self.event)
         if form.validate_on_submit():
             track = create_track(self.event, form.data)
             flash(_('Track "{}" has been created.').format(track.title), 'success')
@@ -96,7 +96,7 @@ class RHCreateTrack(RHManageTracksBase):
 
 class RHEditTrack(RHManageTrackBase):
     def _process(self):
-        form = TrackForm(obj=self.track)
+        form = TrackForm(event=self.event, obj=self.track)
         if form.validate_on_submit():
             update_track(self.track, form.data)
             flash(_('Track "{}" has been modified.').format(self.track.title), 'success')

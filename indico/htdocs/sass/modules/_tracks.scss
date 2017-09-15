@@ -32,8 +32,17 @@
 
         .i-box-content {
             word-wrap: break-word;
-            padding: 10px 0px;
+            padding: 10px 0;
         }
+
+        .default-session::before {
+            font-size: 0.9em;
+        }
+
+        .i-label.default-session {
+            border-color: transparent;
+        }
+
     }
 
     .track-content-collapsible {
@@ -66,7 +75,7 @@
 
     .label {
         background-color: $gray;
-        border: 0;
+        border: none;
         cursor: default;
         display: inline-block;
         margin: 10px 5px 10px 0;
