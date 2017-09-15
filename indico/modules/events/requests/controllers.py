@@ -125,7 +125,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
         try:
             self.definition.send(req, form.data)
         except RequestModuleError:
-            db.session.delete(req)
+            self.commit = False
             flash_msg = _('There was a problem sending your request ({0}). Please contact support.')
             flash(flash_msg.format(self.definition.title), 'error')
         else:
