@@ -59,6 +59,12 @@ class Track(DescriptionMixin, db.Model):
         nullable=False,
         default=_get_next_position
     )
+    default_session_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.sessions.id'),
+        index=True,
+        nullable=True
+    )
 
     event = db.relationship(
         'Event',
@@ -91,6 +97,11 @@ class Track(DescriptionMixin, db.Model):
             collection_class=set,
             lazy=True
         )
+    )
+    default_session = db.relationship(
+        'Session',
+        lazy=True,
+        backref='default_for_tracks'
     )
 
     # relationship backrefs:
