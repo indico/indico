@@ -42,6 +42,34 @@ $i-label-color: $light-black;
     }
 }
 
+@mixin _i-label-outlines($color, $dark-color) {
+    &.text-color {
+        &:not(.color-on-hover) {
+            color: $color;
+        }
+
+        &.color-on-hover:hover {
+            color: $color;
+        }
+
+        &.outline {
+            border-color: $color;
+            background: white;
+        }
+
+        &.dashed {
+            border-style: dashed;
+            background: white;
+        }
+
+        &.subtle:not(:hover) {
+            box-shadow: none;
+            background: transparent;
+            border-color: transparent;
+        }
+    }
+}
+
 @mixin _i-label-states($flavor-color, $border-color, $border-accent-color, $font-color, $font-accent-color, $with-modes: true) {
     $no-modes: '';
 
@@ -57,14 +85,16 @@ $i-label-color: $light-black;
 }
 
 @mixin i-label-flavor($flavor-color, $border-color) {
+    $flavor-darkened-color: darken($flavor-color, 5%);
     @include _i-label-states($flavor-color, $border-color, $border-color, $light-gray, white);
     @include _i-label-borderless($flavor-color);
+    @include _i-label-outlines($flavor-color, $flavor-darkened-color);
 }
-
 
 .i-label {
     @extend %label;
     @include _i-label-borderless($light-black);
+    @include _i-label-outlines($light-black, $black);
     background: white;
     margin: 0 5px;
 
@@ -85,15 +115,15 @@ $i-label-color: $light-black;
 
     // same as in _buttons.scss
     &.accept {
-        @include i-label-flavor($green, $light-color-variation);
+        @include i-label-flavor($green, $dark-green);
     }
 
     &.danger {
-        @include i-label-flavor($red, $light-color-variation);
+        @include i-label-flavor($red, $dark-red);
     }
 
     &.highlight {
-        @include i-label-flavor($blue, $light-color-variation);
+        @include i-label-flavor($blue, $dark-blue);
 
         &.striped {
             color: white;
@@ -109,7 +139,7 @@ $i-label-color: $light-black;
     }
 
     &.warning {
-        @include i-label-flavor($yellow, $light-color-variation);
+        @include i-label-flavor($yellow, $dark-yellow);
     }
 
     &.disabled {
