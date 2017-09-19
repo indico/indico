@@ -22,60 +22,32 @@
         {{ person.affiliation }}
     </td>
     <td class="i-table">
-        <span class="i-label {{ 'no-role' if not person_data.roles.chairperson }}">
-            {%- if person.event.type == 'lecture' -%}
-                {%- trans %}Speaker{% endtrans -%}
-            {%- else -%}
-                {%- trans %}Chairperson{% endtrans -%}
-            {%- endif -%}
-        </span>
-    </td>
-    {%- if person.event.type != 'lecture' -%}
-        <td class="i-table">
-            <span class="i-label js-count-label {{ 'no-role' if not person_data.contributions }}"
-                  data-items="{{ person_data.contributions | tojson | forceescape }}">
-                {% trans %}Speaker{% endtrans %}
-                <span class="badge">
-                    {{ person_data.contributions | length }}
-                </span>
-            </span>
-        </td>
-        <td class="i-table">
-            <span class="i-label js-count-label {{ 'no-role' if not person_data.subcontributions }}"
-                  data-items="{{ person_data.subcontributions | tojson | forceescape }}">
-                {% trans %}Sub-contrib. Speaker{% endtrans %}
-                <span class="badge">
-                    {{ person_data.subcontributions | length }}
-                </span>
-            </span>
-        </td>
-        <td class="i-table">
-            <span class="i-label js-count-label {{ 'no-role' if not person_data.session_blocks }}"
-                  data-items="{{ person_data.session_blocks | tojson | forceescape }}">
-                {% trans %}Convener{% endtrans %}
-                <span class="badge">
-                    {{ person_data.session_blocks | length }}
-                </span>
-            </span>
-        </td>
-        {% if person.event.has_feature('abstracts') %}
-            <td class="i-table">
-                <span class="i-label js-count-label {{ 'no-role' if not person_data.abstracts }}"
-                      data-items="{{ person_data.abstracts | tojson | forceescape }}">
-                    {% trans %}Abstract author{% endtrans %}
-                    <span class="badge">
-                        {{ person_data.abstracts | length }}
+        {% for role, role_data in person_data.roles.iteritems() %}
+            {% if role_data is mapping %}
+                {% if 'elements' in role_data %}
+                    <span class="i-label js-count-label"
+                          style="color: {{ role_data.color }}; border-color: {{ role_data.color }}"
+                          data-items="{{ role_data.elements | tojson | forceescape }}">
+                        {{ role_data.code }}
+                        <span class="badge">
+                            {{ role_data.elements | length }}
+                        </span>
                     </span>
-                </span>
-            </td>
-        {% endif %}
-    {% endif %}
+                {% else %}
+                    <span class="i-label"
+                          style="color: {{ role_data.color }}; border-color: {{ role_data.color }}">
+                        {{ role_data.code }}
+                    </span>
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    </td>
     <td class="i-table">
         {% if person_data.roles.no_account %}
             <span class="i-label warning icon-warning"
                   title="{% trans email=person.email %}This user seems to have no Indico
                   account. If they do have an account, they should add {{ email }} to their profile{%- endtrans %}">
-                {% trans %}No Indico account{% endtrans %}
+                {% trans %}No account{% endtrans %}
             </span>
         {% endif %}
     </td>

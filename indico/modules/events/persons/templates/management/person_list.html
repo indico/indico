@@ -4,7 +4,7 @@
 {% from 'message_box.html' import message_box %}
 
 {% block title %}
-    {% trans %}Event Roles{% endtrans %}
+    {% trans %}List of Participants{% endtrans %}
 {% endblock %}
 
 {% block content %}
@@ -170,14 +170,6 @@
                         <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
                         <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
                         <th class="i-table" data-sorter="false"></th>
-                        {%- if event.type != 'lecture' -%}
-                            <th class="i-table" data-sorter="false"></th>
-                            <th class="i-table" data-sorter="false"></th>
-                            <th class="i-table" data-sorter="false"></th>
-                            {% if event.has_feature('abstracts') %}
-                                <th class="i-table" data-sorter="false"></th>
-                            {% endif %}
-                        {% endif %}
                         <th class="i-table" data-sorter="false"></th>
                         <th class="i-table" data-sorter="false"></th>
                         <th class="i-table" data-sorter="false"></th>
@@ -193,7 +185,7 @@
                         </tr>
                     {%- else -%}
                         <tr class="i-table">
-                            <td colspan="{{ 8 if event.type == 'lecture' else (11 + event.has_feature('abstracts')) }}">
+                            <td colspan="8">
                                 {%- trans %}No persons{% endtrans -%}
                             </td>
                         </tr>

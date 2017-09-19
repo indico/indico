@@ -63,11 +63,7 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'session_blocks': defaultdict(dict),
-                                       'contributions': defaultdict(dict),
-                                       'subcontributions': defaultdict(dict),
-                                       'abstracts': defaultdict(dict),
-                                       'roles': defaultdict(lambda: False)})
+        persons = defaultdict(lambda: {'roles': {}})
 
         event_persons_query = (self.event.persons
                                .options(abstract_strategy,
@@ -81,44 +77,73 @@ class RHPersonsBase(RHManageEventBase):
             data = persons[event_person.email or event_person.id]
 
             data['person'] = event_person
-            data['roles']['chairperson'] = event_person in chairpersons
+            if event_person in chairpersons:
+                if self.event.type == 'lecture':
+                    data['roles']['event_speaker'] = {'name': 'Event Speaker', 'code': 'SPK', 'color': '#00ff44'}
+                else:
+                    data['roles']['chairperson'] = {'name': 'Chairperson', 'code': 'CHR', 'color': '#771100'}
 
-            for person_link in event_person.abstract_links:
-                if person_link.abstract.is_deleted:
-                    continue
+            if self.event.type == 'lecture':
+                continue
 
-                url = url_for('abstracts.display_abstract', person_link.abstract, management=True)
-                data['abstracts'][person_link.abstract_id] = {'title': person_link.abstract.verbose_title, 'url': url}
-                data['roles']['author'] = True
+            if self.event.has_feature('abstracts'):
+                abstracts = {
+                    person_link.abstract_id: {
+                        'title': person_link.abstract.verbose_title,
+                        'url': url_for('abstracts.display_abstract', person_link.abstract, management=True)
+                    }
+                    for person_link in event_person.abstract_links if not person_link.abstract.is_deleted
+                }
 
-            for person_link in event_person.session_block_links:
-                if person_link.session_block.session.is_deleted:
-                    continue
+                if abstracts:
+                    data['roles']['author'] = {'name': 'Author', 'code': 'AUT', 'color': '#0000ff',
+                                               'elements': abstracts}
 
-                data['session_blocks'][person_link.session_block_id] = {'title': person_link.session_block.full_title}
-                data['roles']['convener'] = True
+            session_blocks = {
+                person_link.session_block_id: {
+                    'title': person_link.session_block.full_title,
+                }
+                for person_link in event_person.session_block_links
+                if not person_link.session_block.session.is_deleted
+            }
 
-            for person_link in event_person.contribution_links:
-                if not person_link.is_speaker:
-                    continue
-                contrib = person_link.contribution
-                if contrib.is_deleted:
-                    continue
+            if session_blocks:
+                data['roles']['convener'] = {'name': 'Convener', 'code': 'CON', 'color': '#008800',
+                                             'elements': session_blocks}
 
-                url = url_for('contributions.manage_contributions', self.event, selected=contrib.friendly_id)
-                data['contributions'][contrib.id] = {'title': contrib.title, 'url': url}
-                data['roles']['speaker'] = True
+            contributions = {
+                person_link.contribution.id: {
+                    'title': person_link.contribution.title,
+                    'url': url_for('contributions.manage_contributions', self.event,
+                                   selected=person_link.contribution.friendly_id)
+                }
+                for person_link in event_person.contribution_links
+                if person_link.is_speaker and not person_link.contribution.is_deleted
+            }
 
-            for person_link in event_person.subcontribution_links:
-                subcontrib = person_link.subcontribution
-                contrib = subcontrib.contribution
-                if subcontrib.is_deleted or contrib.is_deleted:
-                    continue
+            if contributions:
+                data['roles']['subcontrib_speaker'] = {'name': 'Speaker', 'code': 'SPK', 'color': '#00aa99',
+                                                       'elements': contributions}
 
-                url = url_for('contributions.manage_contributions', self.event, selected=contrib.friendly_id)
-                data['subcontributions'][subcontrib.id] = {'title': '{} ({})'.format(contrib.title, subcontrib.title),
-                                                           'url': url}
-                data['roles']['speaker'] = True
+            subcontributions = {
+                person_link.subcontribution.id: {
+                    'title': '{} ({})'.format(person_link.subcontribution.contribution.title,
+                                              person_link.subcontribution.title),
+                    'url': url_for('contributions.manage_contributions', self.event,
+                                   selected=person_link.subcontribution.friendly_id)
+                }
+                for person_link in event_person.subcontribution_links
+                if not person_link.subcontribution.is_deleted and
+                not person_link.subcontribution.contribution.is_deleted
+            }
+
+            if subcontributions:
+                data['roles']['speaker'] = {'name': 'Speaker', 'code': 'SPK', 'color': '#00ff44',
+                                            'elements': subcontributions}
+
+            if event_person.user:
+                for role in event_person.user.event_roles:
+                    data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'color': role.color}
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}

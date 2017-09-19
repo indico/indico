@@ -126,7 +126,7 @@
             sortList: [[1, 0]]
         });
 
-        $('.js-event-person-list .js-count-label:not(.no-role)').qbubble({
+        $('.js-event-person-list .js-count-label').qbubble({
             show: {
                 event: 'mouseover'
             },

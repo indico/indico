@@ -31,7 +31,8 @@ logger = Logger.get('events.persons')
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
-        return SideMenuItem('persons', _('Roles'), url_for('persons.person_list', event), section='organization')
+        return SideMenuItem('persons', _('List of Participants'), url_for('persons.person_list', event),
+                            section='organization')
 
 
 @signals.get_placeholders.connect_via('event-persons-email')
