@@ -28,7 +28,6 @@ from indico.modules.vc.forms import VCPluginSettingsFormBase
 from indico.modules.vc.models.vc_rooms import VCRoomLinkType
 from indico.util.decorators import classproperty
 from indico.util.string import remove_accents
-from indico.util.user import retrieve_principal
 from indico.web.flask.templating import get_overridable_template_name
 from indico.web.forms.base import FormDefaults
 
@@ -109,8 +108,7 @@ class VCPluginMixin(object):
         :param kwargs: arguments passed to the template
         """
         return render_plugin_template('{}:info_box.html'.format(self.name), plugin=self, event_vc_room=event_vc_room,
-                                      event=event, vc_room=vc_room, retrieve_principal=retrieve_principal,
-                                      settings=self.settings, **kwargs)
+                                      event=event, vc_room=vc_room, settings=self.settings, **kwargs)
 
     def render_manage_event_info_box(self, vc_room, event_vc_room, event, **kwargs):
         """Renders the information shown in the expandable box on a VC room in the management area
@@ -122,7 +120,7 @@ class VCPluginMixin(object):
         """
         return render_plugin_template('{}:manage_event_info_box.html'.format(self.name), plugin=self,
                                       event_vc_room=event_vc_room, event=event, vc_room=vc_room,
-                                      retrieve_principal=retrieve_principal, settings=self.settings, **kwargs)
+                                      settings=self.settings, **kwargs)
 
     def render_buttons(self, vc_room, event_vc_room, **kwargs):
         """Renders a list of plugin specific buttons (eg: Join URL, etc) in the management area

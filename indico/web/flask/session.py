@@ -84,10 +84,6 @@ class IndicoSession(BaseSession):
         self._refresh_sid = True
 
     @property
-    def avatar(self):
-        return self.user.as_avatar if self.user else None
-
-    @property
     def lang(self):
         return self.get('_lang') or set_best_lang(check_session=False)
 

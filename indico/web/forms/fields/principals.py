@@ -59,7 +59,7 @@ class PrincipalListField(HiddenField):
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
-        return principal_from_fossil(principal, allow_pending=self.allow_external, legacy=False,
+        return principal_from_fossil(principal, allow_pending=self.allow_external,
                                      allow_emails=self.allow_emails, allow_networks=self.allow_networks,
                                      existing_data=self.object_data)
 
