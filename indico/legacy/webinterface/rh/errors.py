@@ -58,7 +58,7 @@ class RHErrorReporting(RH):
                                        server_name=url_parse(config.BASE_URL).netloc)
         send_email(make_email(config.SUPPORT_EMAIL, reply_address=self._userMail, template=template), skip_queue=True)
 
-    def process(self, params):
+    def process(self):
         self._process_args()
         if self._sendIt:
             self._sendReport()

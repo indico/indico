@@ -38,7 +38,7 @@ class ServiceBase(RequestHandlerBase):
     def __init__(self, params):
         if not self.UNICODE_PARAMS:
             params = unicode_struct_to_utf8(params)
-        self._reqParams = self._params = params
+        self._params = params
         self._target = None
         self._startTime = None
         self._endTime = None

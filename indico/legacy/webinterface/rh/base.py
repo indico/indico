@@ -14,7 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import copy
 import cProfile
 import inspect
 import itertools
@@ -54,8 +53,8 @@ from indico.modules.events.legacy import LegacyConference
 from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.locators import get_locator
-from indico.util.string import to_unicode, truncate
-from indico.web.flask.util import ResponseUtil, url_for
+from indico.util.string import to_unicode
+from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
@@ -76,9 +75,6 @@ class RequestHandlerBase(object):
         This method is called after _process_args and is a good place
         to check if the user is permitted to perform some actions.
         """
-
-    def getRequestParams(self):
-        return self._params
 
 
 class RH(RequestHandlerBase):
@@ -121,7 +117,6 @@ class RH(RequestHandlerBase):
         self.commit = True
         self._responseUtil = ResponseUtil()
         self._target = None
-        self._reqParams = {}
         self._startTime = None
         self._endTime = None
         self._doProcess = True
@@ -145,9 +140,6 @@ class RH(RequestHandlerBase):
     @property
     def csrf_token(self):
         return session.csrf_token if session.csrf_protected else ''
-
-    def getRequestParams(self):
-        return self._reqParams
 
     def _redirect(self, targetURL, status=303):
         if isinstance(targetURL, Response):
@@ -358,11 +350,10 @@ class RH(RequestHandlerBase):
     def _processHtmlForbiddenTag(self, e):
         return WPRestrictedHTML(self, escape(str(e))).display()
 
-    def _check_auth(self, params):
+    def _check_auth(self):
         if session.user:
             logger.info('Request authenticated: %r', session.user)
         self._check_csrf()
-        self._reqParams = copy.copy(params)
 
     def _do_process(self, profile):
         profile_name = res = ''
@@ -378,7 +369,7 @@ class RH(RequestHandlerBase):
             return '', rv
 
         self._check_access()
-        Sanitization.sanitizationCheck(self._reqParams, self._doNotSanitizeFields)
+        Sanitization.sanitizationCheck(create_flat_args(), self._doNotSanitizeFields)
 
         if self._doProcess:
             if profile:
@@ -390,7 +381,7 @@ class RH(RequestHandlerBase):
                 res = self._process()
         return profile_name, res
 
-    def process(self, params):
+    def process(self):
         if request.method not in HTTP_VERBS:
             # Just to be sure that we don't get some crappy http verb we don't expect
             raise BadRequest
@@ -415,7 +406,7 @@ class RH(RequestHandlerBase):
             try:
                 fossilize.clearCache()
                 GenericMailer.flushQueue(False)
-                self._check_auth(params)
+                self._check_auth()
                 profile_name, res = self._do_process(profile)
                 signals.after_process.send()
 
@@ -500,7 +491,7 @@ class RHSimple(RH):
         """Decorates a function to run within the RH's framework"""
         @wraps(func)
         def wrapper(*args, **kwargs):
-            return cls(partial(func, *args, **kwargs)).process({})
+            return cls(partial(func, *args, **kwargs)).process()
 
         return wrapper
 

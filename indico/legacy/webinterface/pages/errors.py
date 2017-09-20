@@ -30,14 +30,12 @@ from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
 
 
-class WGenericError( WTemplated ):
-
-    def __init__( self, rh, showDetails=False ):
+class WGenericError(WTemplated):
+    def __init__(self, rh, showDetails=False):
         self._rh = rh
         self._showDetails = showDetails
 
-
-    def getVars( self ):
+    def getVars(self):
         vars = WTemplated.getVars( self )
         ex = sys.exc_info()[1]
         vars["msg"] = self.htmlText( str( ex ) )
@@ -47,7 +45,7 @@ class WGenericError( WTemplated ):
         rh = self._rh.__class__
         url = request.url.encode('utf-8')
         params = []
-        for (k,v) in self._rh.getRequestParams().items():
+        for k, v in request.values.iteritems():
             if k.strip() != "password":
                 params.append("""%s = %s""" % (self.htmlText(k), self.htmlText(v)))
         headers = []
@@ -63,7 +61,6 @@ class WGenericError( WTemplated ):
         except Exception:
             # Yuck! But we are handling an error and we don't know if we
             # can access the user or its attributes...
-            user = user_name = user_email = None
             user_is_admin = False
         else:
             if user:

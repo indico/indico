@@ -40,10 +40,8 @@ def event_or_shorturl(confId, shorturl_namespace=False, force_overview=False):
         if shorturl_namespace:
             func = lambda: redirect(event_.url)
         else:
-            params = request.args.to_dict()
-            params['confId'] = confId
             request.view_args['confId'] = int(request.view_args['confId'])
-            func = lambda: RHDisplayEvent().process(params)
+            func = lambda: RHDisplayEvent().process()
     else:
         shorturl_event = (Event.query
                           .filter(db.func.lower(Event.url_shortcut) == confId.lower(),

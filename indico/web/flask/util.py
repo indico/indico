@@ -115,9 +115,7 @@ def make_view_func(obj):
         if hasattr(obj, 'process'):
             # Indico RH
             def wrapper(**kwargs):
-                params = create_flat_args()
-                params.update(kwargs)
-                return obj().process(params)
+                return obj().process()
         else:
             # Some class we didn't expect.
             raise ValueError('Unexpected view func class: %r' % obj)
