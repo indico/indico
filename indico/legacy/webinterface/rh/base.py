@@ -65,28 +65,13 @@ logger = Logger.get('requestHandler')
 
 class RequestHandlerBase(object):
     def _check_access(self):
-        """This method is called after _checkParams and is a good place
-        to check if the user is permitted to perform some actions.
-
-        If you only want to run some code for GET or POST requests, you can create
-        a method named e.g. _check_access_POST which will be executed AFTER this one.
         """
-        pass
+        This method is called after _checkParams and is a good place
+        to check if the user is permitted to perform some actions.
+        """
 
     def getRequestParams(self):
         return self._params
-
-    def _getTruncatedParams(self):
-        """Truncates params"""
-        params = {}
-        for key, value in self._reqParams.iteritems():
-            if key in {'password', 'confirm_password'}:
-                params[key] = '[password hidden, len=%d]' % len(value)
-            elif isinstance(value, basestring):
-                params[key] = truncate(value, 1024)
-            else:
-                params[key] = value
-        return params
 
 
 class RH(RequestHandlerBase):
@@ -252,10 +237,6 @@ class RH(RequestHandlerBase):
         request.args (GET params (from the query string))
         request.form (POST params)
         request.values (GET+POST params - use only if ABSOLUTELY NECESSARY)
-
-        If you only want to run some code for GET or POST requests, you can create
-        a method named e.g. _checkParams_POST which will be executed AFTER this one.
-        The method is called without any arguments (except self).
         """
         pass
 
@@ -403,12 +384,6 @@ class RH(RequestHandlerBase):
             if isinstance(cp_result, (current_app.response_class, Response)):
                 return '', cp_result
 
-            func = getattr(self, '_checkParams_' + request.method, None)
-            if func:
-                cp_result = func()
-                if isinstance(cp_result, (current_app.response_class, Response)):
-                    return '', cp_result
-
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
 
@@ -417,10 +392,6 @@ class RH(RequestHandlerBase):
             return '', rv
 
         self._check_access()
-        func = getattr(self, '_check_access_' + request.method, None)
-        if func:
-            func()
-
         Sanitization.sanitizationCheck(self._reqParams, self._doNotSanitizeFields)
 
         if self._doProcess:
