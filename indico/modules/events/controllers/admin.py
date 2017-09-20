@@ -42,8 +42,8 @@ def _render_reference_type_list():
 class RHManageReferenceTypeBase(RHAdminBase):
     """Base class for a specific reference type"""
 
-    def _process_args(self, params):
-        RHAdminBase._process_args(self, params)
+    def _process_args(self):
+        RHAdminBase._process_args(self)
         self.reference_type = ReferenceType.find_one(id=request.view_args['reference_type_id'])
 
 

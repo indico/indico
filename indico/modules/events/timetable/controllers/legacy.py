@@ -61,8 +61,8 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 class RHLegacyTimetableAddEntryBase(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.manage
 
-    def _process_args(self, params):
-        RHManageTimetableBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
         self.day = dateutil.parser.parse(request.args['day']).date()
         self.session_block = None
         if 'session_block_id' in request.args:
@@ -128,8 +128,8 @@ class RHLegacyTimetableAddContribution(RHLegacyTimetableAddEntryBase):
 class RHLegacyTimetableAddSessionBlock(RHLegacyTimetableAddEntryBase):
     session_management_level = SessionManagementLevel.coordinate_with_blocks
 
-    def _process_args(self, params):
-        RHLegacyTimetableAddEntryBase._process_args(self, params)
+    def _process_args(self):
+        RHLegacyTimetableAddEntryBase._process_args(self)
         self.parent_session = self.session or self.event.get_session(request.args['parent_session_id'])
         if not self.parent_session:
             raise NotFound
@@ -182,8 +182,8 @@ class RHLegacyTimetableEditEntry(RHManageTimetableEntryBase):
         else:
             return SessionManagementLevel.coordinate
 
-    def _process_args(self, params):
-        RHManageTimetableEntryBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableEntryBase._process_args(self)
         self.edit_session = request.args.get('edit_session') == '1'
 
     def _process(self):
@@ -286,8 +286,8 @@ class RHLegacyTimetableAddSession(RHCreateSession):
 class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process_args(self, params):
-        RHManageTimetableBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
         self.session_id = None
         if 'session_block_id' in request.args:
             self.session_id = SessionBlock.get_one(request.args['session_block_id']).session_id
@@ -303,8 +303,8 @@ class RHLegacyTimetableGetUnscheduledContributions(RHManageTimetableBase):
 class RHLegacyTimetableScheduleContribution(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate
 
-    def _process_args(self, params):
-        RHManageTimetableBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
         self.session_block = None
         if 'block_id' in request.view_args:
             self.session_block = self.event.get_session_block(request.view_args['block_id'])
@@ -364,8 +364,8 @@ class RHLegacyTimetableReschedule(RHManageTimetableBase):
         else:
             return SessionManagementLevel.none
 
-    def _process_args(self, params):
-        RHManageTimetableBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
         self.validate_json(self._json_schema)
         self.day = dateutil.parser.parse(request.json['day']).date()
         self.session_block = None
@@ -395,8 +395,8 @@ class RHLegacyTimetableReschedule(RHManageTimetableBase):
 class RHLegacyTimetableFitBlock(RHManageTimetableBase):
     session_management_level = SessionManagementLevel.coordinate_with_blocks
 
-    def _process_args(self, params):
-        RHManageTimetableBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
         self.session_block = self.event.get_session_block(request.view_args['block_id'], scheduled_only=True)
         if self.session_block is None:
             raise NotFound
@@ -475,8 +475,8 @@ class RHLegacyTimetableSwapEntries(RHManageTimetableEntryBase):
         else:
             return SessionManagementLevel.coordinate
 
-    def _process_args(self, params):
-        RHManageTimetableEntryBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableEntryBase._process_args(self)
         if self.entry.is_parallel(in_session=self.session is not None):
             raise BadRequest
 

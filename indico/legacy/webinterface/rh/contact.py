@@ -19,7 +19,6 @@ from indico.legacy.webinterface.rh import base
 
 
 class RHContact(base.RH):
-
-    def _process( self ):
+    def _process(self):
         p = contactPages.WPContact(self)
         return p.display()

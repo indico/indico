@@ -51,16 +51,16 @@ class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
 
 
 class RHRegistrationFormBase(RegistrationFormMixin, RHRegistrationFormDisplayBase):
-    def _process_args(self, params):
-        RHRegistrationFormDisplayBase._process_args(self, params)
+    def _process_args(self):
+        RHRegistrationFormDisplayBase._process_args(self)
         RegistrationFormMixin._process_args(self)
 
 
 class RHRegistrationFormRegistrationBase(RHRegistrationFormBase):
     """Base for RHs handling individual registrations"""
 
-    def _process_args(self, params):
-        RHRegistrationFormBase._process_args(self, params)
+    def _process_args(self):
+        RHRegistrationFormBase._process_args(self)
         self.token = request.args.get('token')
         if self.token:
             self.registration = self.regform.get_registration(uuid=self.token)
@@ -249,8 +249,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))
 
-    def _process_args(self, params):
-        RHRegistrationFormRegistrationBase._process_args(self, params)
+    def _process_args(self):
+        RHRegistrationFormRegistrationBase._process_args(self)
         InvitationMixin._process_args(self)
         if self.invitation and self.invitation.state == InvitationState.accepted and self.invitation.registration:
             return redirect(url_for('.display_regform', self.invitation.registration.locator.registrant))
@@ -288,8 +288,8 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
     template_file = 'display/registration_modify.html'
     management = False
 
-    def _process_args(self, params):
-        RHRegistrationFormRegistrationBase._process_args(self, params)
+    def _process_args(self):
+        RHRegistrationFormRegistrationBase._process_args(self)
         if self.registration is None:
             if session.user:
                 flash(_("We could not find a registration for you.  If have already registered, please use the "
@@ -308,8 +308,8 @@ class RHRegistrationDisplayEdit(RegistrationEditMixin, RHRegistrationFormRegistr
 class RHRegistrationFormDeclineInvitation(InvitationMixin, RHRegistrationFormBase):
     """Decline an invitation to register"""
 
-    def _process_args(self, params):
-        RHRegistrationFormBase._process_args(self, params)
+    def _process_args(self):
+        RHRegistrationFormBase._process_args(self)
         InvitationMixin._process_args(self)
 
     def _process(self):

@@ -61,8 +61,8 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManageRegFormSectionBase._process_args(self, params)
+    def _process_args(self):
+        RHManageRegFormSectionBase._process_args(self)
         self.field = self.field_class.get_one(request.view_args['field_id'])
 
 

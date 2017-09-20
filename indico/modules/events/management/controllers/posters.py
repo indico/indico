@@ -37,8 +37,8 @@ poster_cache = GenericCache('poster-printing')
 class RHPosterPrintSettings(RHManageEventBase):
     ALLOW_LOCKED = True
 
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
         self.template_id = request.args.get('template_id')
 
     def _process(self):
@@ -55,8 +55,8 @@ class RHPosterPrintSettings(RHManageEventBase):
 
 
 class RHPrintEventPoster(RHManageEventBase):
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
     def _check_access(self):

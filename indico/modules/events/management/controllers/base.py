@@ -31,8 +31,8 @@ class RHManageEventBase(RHConferenceBase, RHModificationBaseProtected):
 
     DENY_FRAMES = True
 
-    def _process_args(self, params):
-        RHConferenceBase._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBase._process_args(self)
 
     def _check_access(self):
         RHModificationBaseProtected._check_access(self)

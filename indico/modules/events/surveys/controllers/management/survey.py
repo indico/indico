@@ -153,9 +153,9 @@ class RHOpenSurvey(RHManageSurveyBase):
 class RHSendSurveyLinks(RHManageSurveyBase):
     """Send emails with URL of the survey"""
 
-    def _process_args(self, params):
+    def _process_args(self):
         self._doNotSanitizeFields.append('from_address')
-        RHManageSurveyBase._process_args(self, params)
+        RHManageSurveyBase._process_args(self)
 
     def _process(self):
         tpl = get_template_module('events/surveys/emails/survey_link_email.html', event=self.event)

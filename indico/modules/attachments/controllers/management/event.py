@@ -40,8 +40,8 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
         }
     }
 
-    def _process_args(self, params):
-        RHConferenceBase._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBase._process_args(self)
         self.object_type, self.base_object, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound
@@ -72,8 +72,8 @@ class RHAddEventAttachmentLink(AddAttachmentLinkMixin, RHEventAttachmentManageme
 
 
 class RHEditEventAttachment(EditAttachmentMixin, RHEventAttachmentManagementBase):
-    def _process_args(self, params):
-        RHEventAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHEventAttachmentManagementBase._process_args(self)
         EditAttachmentMixin._process_args(self)
 
 
@@ -82,20 +82,20 @@ class RHCreateEventFolder(CreateFolderMixin, RHEventAttachmentManagementBase):
 
 
 class RHEditEventFolder(EditFolderMixin, RHEventAttachmentManagementBase):
-    def _process_args(self, params):
-        RHEventAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHEventAttachmentManagementBase._process_args(self)
         EditFolderMixin._process_args(self)
 
 
 class RHDeleteEventFolder(DeleteFolderMixin, RHEventAttachmentManagementBase):
-    def _process_args(self, params):
-        RHEventAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHEventAttachmentManagementBase._process_args(self)
         DeleteFolderMixin._process_args(self)
 
 
 class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagementBase):
-    def _process_args(self, params):
-        RHEventAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHEventAttachmentManagementBase._process_args(self)
         DeleteAttachmentMixin._process_args(self)
 
 

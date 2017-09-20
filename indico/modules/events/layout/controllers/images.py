@@ -86,8 +86,8 @@ class RHImageUpload(RHManageImagesBase):
 
 
 class RHImageDelete(RHManageImagesBase):
-    def _process_args(self, params):
-        RHManageImagesBase._process_args(self, params)
+    def _process_args(self):
+        RHManageImagesBase._process_args(self)
         self.image = (ImageFile.query.with_parent(self.event)
                       .filter_by(id=request.view_args['image_id'])
                       .first_or_404())
@@ -107,8 +107,8 @@ class RHImageDisplay(RHConferenceBaseDisplay):
         }
     }
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         image_id = request.view_args['image_id']
         self.image = ImageFile.get_one(image_id)
 

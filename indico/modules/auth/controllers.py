@@ -599,8 +599,8 @@ class RHResetPassword(RH):
 
 
 class RHAdminImpersonate(RHAdminBase):
-    def _process_args(self, params):
-        RHAdminBase._process_args(self, params)
+    def _process_args(self):
+        RHAdminBase._process_args(self)
         if request.form.get('undo') == '1':
             self.user = None
         else:

@@ -46,8 +46,8 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
     For a meeting/lecture the timetable is shown.
     """
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         self.force_overview = request.view_args.get('force_overview', False)
         self.theme_id, self.theme_override = get_theme(self.event, request.args.get('view'))
 

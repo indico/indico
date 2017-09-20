@@ -35,8 +35,8 @@ from indico.web.flask.util import url_for
 class RHSurveyResults(RHManageSurveyBase):
     """Displays summarized results of the survey"""
 
-    def _process_args(self, params):
-        RHManageSurveysBase._process_args(self, params)
+    def _process_args(self):
+        RHManageSurveysBase._process_args(self)
         # include all the sections and children to avoid querying them in a loop
         self.survey = (Survey.query
                        .filter_by(id=request.view_args['survey_id'], is_deleted=False)
@@ -88,8 +88,8 @@ class RHSurveySubmissionBase(RHManageSurveysBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManageSurveysBase._process_args(self, params)
+    def _process_args(self):
+        RHManageSurveysBase._process_args(self)
         survey_strategy = joinedload('survey')
         answers_strategy = defaultload('answers').joinedload('question')
         sections_strategy = joinedload('survey').defaultload('sections').joinedload('children')

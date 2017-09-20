@@ -53,8 +53,8 @@ class RHDisplaySessionBase(RHConferenceBaseDisplay):
         if not self.session.can_access(session.user):
             raise Forbidden
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
 
 

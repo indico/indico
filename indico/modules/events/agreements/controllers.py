@@ -52,8 +52,8 @@ class RHAgreementForm(RHConferenceBaseDisplay):
         'preserved_args': {'uuid'}
     }
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         self.agreement = Agreement.get_one(request.view_args['id'])
         if self.agreement.is_orphan():
             raise NotFound('The agreement is not active anymore')
@@ -100,8 +100,8 @@ class RHAgreementManager(RHAgreementManagerBase):
 class RHAgreementManagerDetails(RHAgreementManagerBase):
     """Management page for all agreements of a certain type (admin)"""
 
-    def _process_args(self, params):
-        RHAgreementManagerBase._process_args(self, params)
+    def _process_args(self):
+        RHAgreementManagerBase._process_args(self)
         definition_name = request.view_args['definition']
         self.definition = get_agreement_definitions().get(definition_name)
         if self.definition is None:
@@ -132,9 +132,9 @@ class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
 class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
     dialog_template = None
 
-    def _process_args(self, params):
+    def _process_args(self):
         self._doNotSanitizeFields.append('from_address')
-        RHAgreementManagerDetails._process_args(self, params)
+        RHAgreementManagerDetails._process_args(self)
 
     def _success_handler(self, form):
         raise NotImplementedError
@@ -214,16 +214,16 @@ class RHAgreementManagerDetailsAgreementBase(RHAgreementManagerDetails):
         }
     }
 
-    def _process_args(self, params):
-        RHAgreementManagerDetails._process_args(self, params)
+    def _process_args(self):
+        RHAgreementManagerDetails._process_args(self)
         self.agreement = Agreement.get_one(request.view_args['id'])
 
 
 class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
     """Submits the answer of an agreement on behalf of the person"""
 
-    def _process_args(self, params):
-        RHAgreementManagerDetails._process_args(self, params)
+    def _process_args(self):
+        RHAgreementManagerDetails._process_args(self)
         if 'id' in request.view_args:
             self.agreement = Agreement.get_one(request.view_args['id'])
             if self.event != self.agreement.event:
@@ -260,8 +260,8 @@ class RHAgreementManagerDetailsSubmitAnswer(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsDownloadAgreement(RHAgreementManagerDetailsAgreementBase):
-    def _process_args(self, params):
-        RHAgreementManagerDetailsAgreementBase._process_args(self, params)
+    def _process_args(self):
+        RHAgreementManagerDetailsAgreementBase._process_args(self)
         if self.agreement.state != AgreementState.accepted_on_behalf:
             raise NoReportError("The agreement was not accepted manually by an admin")
 

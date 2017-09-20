@@ -484,8 +484,8 @@ class RHRegistrationRequestList(RHAdminBase):
 class RHRegistrationRequestBase(RHAdminBase):
     """Base class to process a registration request"""
 
-    def _process_args(self, params):
-        RHAdminBase._process_args(self, params)
+    def _process_args(self):
+        RHAdminBase._process_args(self)
         self.request = RegistrationRequest.get_one(request.view_args['request_id'])
 
 

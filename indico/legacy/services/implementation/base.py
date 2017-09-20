@@ -46,18 +46,6 @@ class ServiceBase(RequestHandlerBase):
 
     # Methods =============================================================
 
-    def _process_args(self):
-        """
-        Checks the request parameters (normally overloaded)
-        """
-        pass
-
-    def _check_access(self):
-        """
-        Checks protection when accessing resources (normally overloaded)
-        """
-        pass
-
     def process(self):
         """
         Processes the request, analyzing the parameters, and feeding them to the

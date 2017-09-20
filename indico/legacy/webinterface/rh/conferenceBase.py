@@ -14,6 +14,9 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from flask import request
 from werkzeug.exceptions import NotFound
 
 from indico.legacy.webinterface.rh.base import RH
@@ -21,15 +24,11 @@ from indico.modules.events import Event
 from indico.util.i18n import _
 
 
-class RHConferenceSite(RH):
-    def _process_args(self, params):
-        self.event = Event.get(int(params['confId']))
+class RHConferenceBase(RH):
+    def _process_args(self):
+        self.event = Event.get(int(request.view_args['confId']))
         if self.event is None:
-            raise NotFound(_(u'An event with this ID does not exist.'))
+            raise NotFound(_('An event with this ID does not exist.'))
         elif self.event.is_deleted:
-            raise NotFound(_(u'This event has been deleted.'))
+            raise NotFound(_('This event has been deleted.'))
         self._conf = self._target = self.event.as_legacy
-
-
-class RHConferenceBase(RHConferenceSite):
-    pass

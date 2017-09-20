@@ -29,7 +29,7 @@ from indico.modules.categories.views import WPCategoryManagement
 
 
 class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
-    def _process_args(self, params):
+    def _process_args(self):
         RHManageCategoryBase._process_args(self)
         self.object_type = 'category'
         self.object = self.base_object = self.category
@@ -55,8 +55,8 @@ class RHAddCategoryAttachmentLink(AddAttachmentLinkMixin, RHCategoryAttachmentMa
 
 
 class RHEditCategoryAttachment(EditAttachmentMixin, RHCategoryAttachmentManagementBase):
-    def _process_args(self, params):
-        RHCategoryAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHCategoryAttachmentManagementBase._process_args(self)
         EditAttachmentMixin._process_args(self)
 
 
@@ -65,18 +65,18 @@ class RHCreateCategoryFolder(CreateFolderMixin, RHCategoryAttachmentManagementBa
 
 
 class RHEditCategoryFolder(EditFolderMixin, RHCategoryAttachmentManagementBase):
-    def _process_args(self, params):
-        RHCategoryAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHCategoryAttachmentManagementBase._process_args(self)
         EditFolderMixin._process_args(self)
 
 
 class RHDeleteCategoryFolder(DeleteFolderMixin, RHCategoryAttachmentManagementBase):
-    def _process_args(self, params):
-        RHCategoryAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHCategoryAttachmentManagementBase._process_args(self)
         DeleteFolderMixin._process_args(self)
 
 
 class RHDeleteCategoryAttachment(DeleteAttachmentMixin, RHCategoryAttachmentManagementBase):
-    def _process_args(self, params):
-        RHCategoryAttachmentManagementBase._process_args(self, params)
+    def _process_args(self):
+        RHCategoryAttachmentManagementBase._process_args(self)
         DeleteAttachmentMixin._process_args(self)

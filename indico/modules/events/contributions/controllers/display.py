@@ -62,8 +62,8 @@ class RHContributionDisplayBase(RHConferenceBaseDisplay):
         if not self.contrib.can_access(session.user):
             raise Forbidden
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         self.contrib = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
 
 
@@ -96,8 +96,8 @@ class RHContributionList(RHDisplayProtectionBase):
     MENU_ENTRY_NAME = 'contributions'
     view_class = WPContributions
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         self.contribs = self.event.contributions
         self.list_generator = ContributionDisplayListGenerator(event=self.event)
 
@@ -162,8 +162,8 @@ class RHContributionAuthor(RHContributionDisplayBase):
         if not _author_page_active(self.event):
             self._forbidden_if_not_admin()
 
-    def _process_args(self, params):
-        RHContributionDisplayBase._process_args(self, params)
+    def _process_args(self):
+        RHContributionDisplayBase._process_args(self)
         self.author = (ContributionPersonLink.find_one(ContributionPersonLink.author_type != AuthorType.none,
                                                        id=request.view_args['person_id'],
                                                        contribution=self.contrib))
@@ -238,8 +238,8 @@ class RHSubcontributionDisplay(RHConferenceBaseDisplay):
         if not self.subcontrib.can_access(session.user):
             raise Forbidden
 
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):

@@ -116,8 +116,8 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
-    def _process_args(self, params):
-        RHVCManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHVCManageEventBase._process_args(self)
         try:
             self.plugin = get_vc_plugins()[request.view_args['service']]
         except KeyError:
@@ -173,8 +173,8 @@ class RHVCManageEventCreate(RHVCManageEventCreateBase):
 
 
 class RHVCSystemEventBase(RHEventVCRoomMixin, RHVCManageEventBase):
-    def _process_args(self, params):
-        RHVCManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHVCManageEventBase._process_args(self)
         RHEventVCRoomMixin._process_args(self)
         if self.vc_room.type != request.view_args['service']:
             raise NotFound
@@ -319,8 +319,8 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
 class RHVCManageSearch(RHVCManageEventCreateBase):
     """Searches for a room based on its name"""
 
-    def _process_args(self, params):
-        RHVCManageEventCreateBase._process_args(self, params)
+    def _process_args(self):
+        RHVCManageEventCreateBase._process_args(self)
 
         self.query = request.args.get('q', '')
         if len(self.query) < 3:

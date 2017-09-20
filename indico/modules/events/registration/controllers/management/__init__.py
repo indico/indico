@@ -35,8 +35,8 @@ class RHManageRegFormsBase(RHManageEventBase):
 class RHManageRegFormBase(RegistrationFormMixin, RHManageRegFormsBase):
     """Base class for a specific registration form"""
 
-    def _process_args(self, params):
-        RHManageRegFormsBase._process_args(self, params)
+    def _process_args(self):
+        RHManageRegFormsBase._process_args(self)
         RegistrationFormMixin._process_args(self)
         self.list_generator = RegistrationListGenerator(regform=self.regform)
 
@@ -50,8 +50,8 @@ class RHManageRegistrationBase(RHManageRegFormBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManageRegFormBase._process_args(self, params)
+    def _process_args(self):
+        RHManageRegFormBase._process_args(self)
         self.registration = (Registration
                              .find(Registration.id == request.view_args['registration_id'],
                                    ~Registration.is_deleted,

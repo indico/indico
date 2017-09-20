@@ -37,8 +37,8 @@ class RHManageTimetableBase(RHManageEventBase):
 
     session_management_level = SessionManagementLevel.none
 
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
         self.session = None
         if 'session_id' in request.view_args:
             self.session = self.event.get_session(request.view_args['session_id'])
@@ -79,8 +79,8 @@ class RHManageTimetableEntryBase(RHManageTimetableBase):
             locator['session_id'] = self.session.id
         return locator
 
-    def _process_args(self, params):
-        RHManageTimetableBase._process_args(self, params)
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
         self.entry = None
         if 'entry_id' in request.view_args:
             self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()

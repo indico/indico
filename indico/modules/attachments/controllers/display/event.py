@@ -30,14 +30,14 @@ from indico.modules.events.models.events import EventType
 
 
 class RHDownloadEventAttachment(DownloadAttachmentMixin, RHConferenceBase):
-    def _process_args(self, params):
-        RHConferenceBase._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBase._process_args(self)
         DownloadAttachmentMixin._process_args(self)
 
 
 class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
-    def _process_args(self, params):
-        RHConferenceBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBaseDisplay._process_args(self)
         SpecificFolderMixin._process_args(self)
 
     def _check_access(self):

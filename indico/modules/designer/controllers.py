@@ -219,20 +219,20 @@ class RHAddCategoryTemplate(AddTemplateMixin, RHManageCategoryBase):
 
 
 class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
         CloneTemplateMixin._process_args(self)
 
 
 class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
-    def _process_args(self, params):
+    def _process_args(self):
         RHManageCategoryBase._process_args(self)
         CloneTemplateMixin._process_args(self)
 
 
 class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProtected):
-    def _process_args(self, params):
-        RHModificationBaseProtected._process_args(self, params)
+    def _process_args(self):
+        RHModificationBaseProtected._process_args(self)
         SpecificTemplateMixin._process_args(self)
 
 
@@ -281,8 +281,8 @@ class RHDownloadTemplateImage(RHModifyDesignerTemplateBase):
         }
     }
 
-    def _process_args(self, params):
-        RHModifyDesignerTemplateBase._process_args(self, params)
+    def _process_args(self):
+        RHModifyDesignerTemplateBase._process_args(self)
         self.image = DesignerImageFile.find_one(id=request.view_args['image_id'], template=self.template)
 
     def _process(self):

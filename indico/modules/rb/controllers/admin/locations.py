@@ -157,8 +157,10 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
-    def _process_args(self, param):
-        self._eq = request.form.get(param)
+    PARAM = None
+
+    def _process_args(self):
+        self._eq = request.form.get(self.PARAM)
         name = request.view_args.get('locationId')
         self._location = Location.find_first(name=name)
         if not self._location:
@@ -166,9 +168,7 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
-
-    def _process_args(self):
-        RHRoomBookingEquipmentBase._process_args(self, 'removeEquipmentName')
+    PARAM = 'removeEquipmentName'
 
     def _process(self):
         eq = self._location.equipment_types.filter_by(name=self._eq).one()
@@ -178,9 +178,7 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
 
 
 class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
-
-    def _process_args(self):
-        RHRoomBookingEquipmentBase._process_args(self, 'newEquipmentName')
+    PARAM = 'newEquipmentName'
 
     def _process(self):
         if self._eq:

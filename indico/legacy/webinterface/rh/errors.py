@@ -17,6 +17,7 @@
 import json
 from pprint import pformat
 
+from flask import request
 from werkzeug.urls import url_parse
 
 from indico.core.config import config
@@ -42,13 +43,13 @@ class RHErrorReporting(RH):
     # store a CSRF token in the session.
     CSRF_ENABLED = False
 
-    def _process_args(self, params):
-        self._sendIt = "confirm" in params
-        self._comments = ""
+    def _process_args(self):
+        self._sendIt = 'confirm' in request.values
+        self._comments = ''
         if self._sendIt:
-            self._comments = params.get("comments", "").strip()
-        self._userMail = params.get("userEmail", "")
-        self._msg = params.get("reportMsg", "{}")
+            self._comments = request.values.get('comments', '').strip()
+        self._userMail = request.values.get('userEmail', '')
+        self._msg = request.values.get('reportMsg', '{}')
 
     def _sendReport(self):
         data = json.loads(self._msg)
@@ -58,7 +59,7 @@ class RHErrorReporting(RH):
         send_email(make_email(config.SUPPORT_EMAIL, reply_address=self._userMail, template=template), skip_queue=True)
 
     def process(self, params):
-        self._process_args(params)
+        self._process_args()
         if self._sendIt:
             self._sendReport()
             p = errors.WPReportErrorSummary(self)

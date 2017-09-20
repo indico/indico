@@ -107,8 +107,8 @@ class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDet
         RHRoomBookingRoomDetails.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingRoomDetails._process_args(self)
 
     def _get_view(self, **kwargs):
@@ -123,8 +123,8 @@ class RHRoomBookingEventBookingDetails(RHRoomBookingEventBase, RHRoomBookingBook
         RHRoomBookingBookingDetails.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingBookingDetails._process_args(self)
 
     def _get_view(self, **kwargs):
@@ -139,8 +139,8 @@ class RHRoomBookingEventBookingModifyBooking(RHRoomBookingEventBase, RHRoomBooki
         RHRoomBookingModifyBooking.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingModifyBooking._process_args(self)
 
     def _get_view(self, **kwargs):
@@ -158,8 +158,8 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
         RHRoomBookingCloneBooking.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingCloneBooking._process_args(self)
 
     def _get_view(self, **kwargs):
@@ -187,8 +187,8 @@ class RHRoomBookingEventAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingEven
         RHRoomBookingAcceptBooking.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingAcceptBooking._process_args(self)
 
     def _process(self):
@@ -200,8 +200,8 @@ class RHRoomBookingEventCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingEven
         RHRoomBookingCancelBooking.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingCancelBooking._process_args(self)
 
     def _process(self):
@@ -213,8 +213,8 @@ class RHRoomBookingEventRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingEven
         RHRoomBookingRejectBooking.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingRejectBooking._process_args(self)
 
     def _process(self):
@@ -227,8 +227,8 @@ class RHRoomBookingEventCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomB
         RHRoomBookingCancelBookingOccurrence.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingCancelBookingOccurrence._process_args(self)
 
     def _process(self):
@@ -241,8 +241,8 @@ class RHRoomBookingEventRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomB
         RHRoomBookingRejectBookingOccurrence.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingRejectBookingOccurrence._process_args(self)
 
     def _process(self):
@@ -254,8 +254,8 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
         RHRoomBookingNewBookingSimple.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingNewBookingSimple._process_args(self)
 
     def _get_view(self, **kwargs):
@@ -284,8 +284,8 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         RHRoomBookingNewBooking.__init__(self)
         RHRoomBookingEventBase.__init__(self)
 
-    def _process_args(self, params):
-        RHRoomBookingEventBase._process_args(self, params)
+    def _process_args(self):
+        RHRoomBookingEventBase._process_args(self)
         RHRoomBookingNewBooking._process_args(self)
         assign = request.args.get('assign')
         if not assign or assign == 'nothing':

@@ -94,8 +94,8 @@ class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
     to the associated abstract.
     """
 
-    def _process_args(self, params):
-        RHAbstractsBase._process_args(self, params)
+    def _process_args(self):
+        RHAbstractsBase._process_args(self)
         SpecificAbstractMixin._process_args(self)
 
     def _check_access(self):

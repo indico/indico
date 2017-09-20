@@ -56,8 +56,8 @@ class RHStaticSiteDownload(RHStaticSiteBase):
         }
     }
 
-    def _process_args(self, params):
-        RHStaticSiteBase._process_args(self, params)
+    def _process_args(self):
+        RHStaticSiteBase._process_args(self)
         self.static_site = StaticSite.get_one(request.view_args['id'])
 
     def _process(self):

@@ -360,8 +360,9 @@ class ConferenceOfflineCreator(OfflineEventCreator):
     def _get_builtin_page(self, entry):
         obj = self._menu_offline_items.get(entry.name)
         if isinstance(obj, RH):
-            obj._process_args({'confId': self._conf.id})
+            request.view_args = {'confId': self._conf.id}
             with _override_request_endpoint(obj.view_class.endpoint):
+                obj._process_args()
                 self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
         if entry.name == 'abstracts_book':
             self._addPdf(self._conf, 'abstracts.export_boa', AbstractBook, event=self.event)
@@ -389,7 +390,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         rh.view_class = view_class
         request.view_args = params
         with _override_request_endpoint(rh.view_class.endpoint):
-            rh._process_args(params)
+            rh._process_args()
             html = rh._process()
         self._addPage(html, rh.view_class.endpoint, url_for_target)
 
@@ -417,7 +418,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         params = {'confId': self._conf.id, 'contrib_id': contrib.id, 'person_id': author.id}
         request.view_args = params
         with _override_request_endpoint('contributions.display_author'):
-            rh._process_args(params)
+            rh._process_args()
             html = rh._process()
         self._addPage(html, 'contributions.display_author', self._conf, contrib_id=contrib.id, person_id=author.id)
 

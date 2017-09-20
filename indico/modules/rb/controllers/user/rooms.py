@@ -41,7 +41,7 @@ from indico.web.forms.base import FormDefaults
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
     def _process_args(self):
-        RHRoomBookingBase._process_args(self, request.args)
+        RHRoomBookingBase._process_args(self)
         self._room_id = request.args.get('roomID')
 
     def _process(self):
@@ -50,7 +50,7 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
     def _process_args(self):
-        RHRoomBookingBase._process_args(self, request.args)
+        RHRoomBookingBase._process_args(self)
         self._room_id = request.args.get('roomID')
 
     def _process(self):

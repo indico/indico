@@ -77,8 +77,8 @@ class RHSubmitSurveyBase(RHSurveyBaseDisplay):
             # We don't use forbidden since that would redirect to login - but logging in won't help here
             raise NotFound
 
-    def _process_args(self, params):
-        RHSurveyBaseDisplay._process_args(self, params)
+    def _process_args(self):
+        RHSurveyBaseDisplay._process_args(self)
         self.survey = (Survey.query
                        .filter(Survey.id == request.view_args['survey_id'], Survey.is_visible)
                        .options(joinedload('submissions'),

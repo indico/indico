@@ -91,8 +91,8 @@ class RHUnlockEvent(RHManageEventBase):
 class RHMoveEvent(RHManageEventBase):
     """Move event to a different category"""
 
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
         self.target_category = Category.get_one(int(request.form['target_category_id']), is_deleted=False)
         if not self.target_category.can_create_events(session.user):
             raise Forbidden(_("You may only move events to categories where you are allowed to create events."))

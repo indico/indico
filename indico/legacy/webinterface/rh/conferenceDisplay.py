@@ -28,10 +28,10 @@ from indico.web.flask.util import send_file
 
 
 class RHConferenceAccessKey(RHConferenceBase):
-    def _process_args(self, params):
-        RHConferenceBase._process_args(self, params)
-        self._accesskey = params.get("accessKey", "").strip()
-        self._doNotSanitizeFields.append("accessKey")
+    def _process_args(self):
+        RHConferenceBase._process_args(self)
+        self._accesskey = request.form.get('accessKey', '').strip()
+        self._doNotSanitizeFields.append('accessKey')
 
     def _process(self):
         # XXX: we don't check if it's valid or not -- WPKeyAccessError shows a message
@@ -48,8 +48,8 @@ class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):
         else:
             raise Forbidden
 
-    def _process_args(self, params):
-        RHConferenceBase._process_args(self, params)
+    def _process_args(self):
+        RHConferenceBase._process_args(self)
 
     def _check_access(self):
         RHDisplayBaseProtected._check_access(self)

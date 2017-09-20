@@ -44,8 +44,8 @@ class RHManagePaperTemplateBase(RHManagePapersBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManagePapersBase._process_args(self, params)
+    def _process_args(self):
+        RHManagePapersBase._process_args(self)
         self.template = PaperTemplate.get_one(request.view_args['template_id'])
 
 
@@ -97,8 +97,8 @@ class RHDownloadPaperTemplate(RHPapersBase):
         }
     }
 
-    def _process_args(self, params):
-        RHPapersBase._process_args(self, params)
+    def _process_args(self):
+        RHPapersBase._process_args(self)
         self.template = PaperTemplate.get_one(request.view_args['template_id'])
 
     def _process(self):

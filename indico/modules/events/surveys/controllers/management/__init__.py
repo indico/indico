@@ -37,6 +37,6 @@ class RHManageSurveyBase(RHManageSurveysBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManageSurveysBase._process_args(self, params)
+    def _process_args(self):
+        RHManageSurveysBase._process_args(self)
         self.survey = Survey.find_one(id=request.view_args['survey_id'], is_deleted=False)

@@ -64,6 +64,13 @@ logger = Logger.get('requestHandler')
 
 
 class RequestHandlerBase(object):
+    def _process_args(self):
+        """
+        This method is called before _check_access and url normalization
+        and is a good place to fetch objects from the database based on
+        variables from request params.
+        """
+
     def _check_access(self):
         """
         This method is called after _process_args and is a good place
@@ -226,20 +233,6 @@ class RH(RequestHandlerBase):
             else:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
-    def _process_args(self, params):
-        """This method is called before _check_access and is a good place
-        to assign variables from request params to member variables.
-
-        Note that in any new code the params argument SHOULD be IGNORED.
-        Use the following objects provided by Flask instead:
-        from flask import request
-        request.view_args (URL route params)
-        request.args (GET params (from the query string))
-        request.form (POST params)
-        request.values (GET+POST params - use only if ABSOLUTELY NECESSARY)
-        """
-        pass
-
     def _process(self):
         """The default process method dispatches to a method containing
         the HTTP verb used for the current request, e.g. _process_POST.
@@ -374,16 +367,9 @@ class RH(RequestHandlerBase):
     def _do_process(self, profile):
         profile_name = res = ''
         try:
-            # old code gets parameters from call
-            # new code utilizes of flask.request
-            if len(inspect.getargspec(self._process_args).args) < 2:
-                cp_result = self._process_args()
-            else:
-                cp_result = self._process_args(self._reqParams)
-
+            cp_result = self._process_args()
             if isinstance(cp_result, (current_app.response_class, Response)):
                 return '', cp_result
-
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
 

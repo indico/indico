@@ -136,8 +136,8 @@ class RHManageSurveySectionBase(RHManageSurveysBase):
         'preserved_args': {'type'}
     }
 
-    def _process_args(self, params):
-        RHManageSurveysBase._process_args(self, params)
+    def _process_args(self):
+        RHManageSurveysBase._process_args(self)
         self.section = SurveySection.find_one(SurveySection.id == request.view_args['section_id'], ~Survey.is_deleted,
                                               _join=SurveySection.survey, _eager=SurveySection.survey)
         self.survey = self.section.survey
@@ -152,8 +152,8 @@ class RHManageSurveyTextBase(RHManageSurveysBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManageSurveysBase._process_args(self, params)
+    def _process_args(self):
+        RHManageSurveysBase._process_args(self)
         self.text = SurveyText.find_one(SurveyText.id == request.view_args['text_id'], ~Survey.is_deleted,
                                         _join=SurveyText.survey, _eager=SurveyText.survey)
         self.survey = self.text.survey
@@ -168,8 +168,8 @@ class RHManageSurveyQuestionBase(RHManageSurveysBase):
         }
     }
 
-    def _process_args(self, params):
-        RHManageSurveysBase._process_args(self, params)
+    def _process_args(self):
+        RHManageSurveysBase._process_args(self)
         self.question = SurveyQuestion.find_one(SurveyQuestion.id == request.view_args['question_id'],
                                                 ~Survey.is_deleted,
                                                 _join=SurveyQuestion.survey, _eager=SurveyQuestion.survey)

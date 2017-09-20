@@ -98,8 +98,8 @@ class RHCustomizePapersList(RHPapersListBase):
 class RHPapersActionBase(RHPapersListBase):
     """Base class for actions on selected papers"""
 
-    def _process_args(self, params):
-        RHPapersListBase._process_args(self, params)
+    def _process_args(self):
+        RHPapersListBase._process_args(self)
         ids = map(int, request.form.getlist('contribution_id'))
         self.contributions = (self.list_generator._build_query()
                               .filter(Contribution.id.in_(ids))
@@ -157,8 +157,8 @@ class RHJudgePapers(RHPapersActionBase):
 class RHAssignPapersBase(RHPapersActionBase):
     """Base class for assigning/unassigning paper reviewing roles"""
 
-    def _process_args(self, params):
-        RHPapersActionBase._process_args(self, params)
+    def _process_args(self):
+        RHPapersActionBase._process_args(self)
         self.role = PaperReviewingRole[request.view_args['role']]
         user_ids = map(int, request.form.getlist('user_id'))
         self.users = {u for u in CFP_ROLE_MAP[self.role](self.event.cfp) if u.id in user_ids}

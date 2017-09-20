@@ -67,8 +67,8 @@ class RHRequestsEventRequestBase(RHManageEventBase):
     #: if a request must be present in the database
     _require_request = True
 
-    def _process_args(self, params):
-        RHManageEventBase._process_args(self, params)
+    def _process_args(self):
+        RHManageEventBase._process_args(self)
         try:
             self.definition = get_request_definitions()[request.view_args['type']]
         except KeyError:
