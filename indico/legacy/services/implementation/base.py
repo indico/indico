@@ -15,8 +15,6 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import os
-import sys
-import traceback
 
 from flask import g, session
 
@@ -59,17 +57,6 @@ class ServiceBase(RequestHandlerBase):
         Checks protection when accessing resources (normally overloaded)
         """
         pass
-
-    def _processError(self):
-        """
-        Treats errors occured during the process of a RH, returning an error string.
-        @param e: the exception
-        @type e: An Exception-derived type
-        """
-
-        trace = traceback.format_exception(*sys.exc_info())
-
-        return ''.join(trace)
 
     def process(self):
         """

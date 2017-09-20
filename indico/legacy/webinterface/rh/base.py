@@ -167,9 +167,6 @@ class RH(RequestHandlerBase):
             raise MaKaCError(_("http header CRLF injection detected"))
         self._responseUtil.redirect = (targetURL, status)
 
-    def _processError(self, e):
-        raise
-
     def normalize_url(self):
         """Performs URL normalization.
 
@@ -274,7 +271,7 @@ class RH(RequestHandlerBase):
             raise MethodNotAllowed(valid_methods)
         return method()
 
-    def _checkCSRF(self):
+    def _check_csrf(self):
         token = request.headers.get('X-CSRF-Token') or request.form.get('csrf_token')
         if token is None:
             # Might be a WTForm with a prefix. In that case the field name is '<prefix>-csrf_token'
@@ -391,7 +388,7 @@ class RH(RequestHandlerBase):
     def _check_auth(self, params):
         if session.user:
             logger.info('Request authenticated: %r', session.user)
-        self._checkCSRF()
+        self._check_csrf()
         self._reqParams = copy.copy(params)
 
     def _do_process(self, profile):
@@ -481,7 +478,7 @@ class RH(RequestHandlerBase):
             logger.info('Request successful')
         except Exception as e:
             db.session.rollback()
-            res = self._getMethodByExceptionName(e)(e)
+            res = self._get_error_handler(e)(e)
             if isinstance(e, HTTPException) and e.response is not None:
                 res = e.response
             is_error_response = True
@@ -512,7 +509,7 @@ class RH(RequestHandlerBase):
             response.headers['X-Frame-Options'] = 'DENY'
         return response
 
-    def _getMethodByExceptionName(self, e):
+    def _get_error_handler(self, e):
         exception_name = {
             'NotFound': 'NotFoundError',
             'MaKaCError': 'GeneralError',
