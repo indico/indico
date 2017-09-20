@@ -371,17 +371,16 @@ class RH(RequestHandlerBase):
             explanation = e.getExplanation()
         return render_error(message, explanation)
 
-    @jsonify_error
+    @jsonify_error(status=400)
     def _processFormValuesError(self, e):
         """Treats user input related errors occured during the process of a RH."""
-
         return WPFormValuesError(self, e).display()
 
-    @jsonify_error
+    @jsonify_error(status=400)
     def _processRestrictedHTML(self, e):
         return WPRestrictedHTML(self, escape(str(e))).display()
 
-    @jsonify_error
+    @jsonify_error(status=400)
     def _processHtmlForbiddenTag(self, e):
         return WPRestrictedHTML(self, escape(str(e))).display()
 
