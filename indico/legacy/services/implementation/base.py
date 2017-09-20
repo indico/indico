@@ -44,9 +44,7 @@ class ServiceBase(RequestHandlerBase):
         self._target = None
         self._startTime = None
         self._endTime = None
-        self._doProcess = True  #Flag which indicates whether the RH process
-                                #   must be carried out; this is useful for
-                                #   the checkProtection methods
+        self._doProcess = True
 
     # Methods =============================================================
 
@@ -56,7 +54,7 @@ class ServiceBase(RequestHandlerBase):
         """
         pass
 
-    def _checkProtection( self ):
+    def _check_access(self):
         """
         Checks protection when accessing resources (normally overloaded)
         """
@@ -83,7 +81,7 @@ class ServiceBase(RequestHandlerBase):
         sentry_set_tags({'rh': self.__class__.__name__})
 
         self._checkParams()
-        self._checkProtection()
+        self._check_access()
 
         if self.CHECK_HTML:
             try:
@@ -134,5 +132,5 @@ class LoggedOnlyService(ProtectedService):
     Only accessible to users who are logged in (access keys not allowed)
     """
 
-    def _checkProtection( self ):
+    def _check_access(self):
         self._checkSessionUser()

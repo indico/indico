@@ -243,8 +243,8 @@ class RHRegistrationForm(InvitationMixin, RHRegistrationFormRegistrationBase):
         }
     }
 
-    def _checkProtection(self):
-        RHRegistrationFormRegistrationBase._checkProtection(self)
+    def _check_access(self):
+        RHRegistrationFormRegistrationBase._check_access(self)
         if self.regform.require_login and not session.user and request.method != 'GET':
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to register with a form '
                                                                 'that requires you to be logged in')))

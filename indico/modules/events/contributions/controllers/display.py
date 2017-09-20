@@ -57,8 +57,8 @@ class RHContributionDisplayBase(RHConferenceBaseDisplay):
         }
     }
 
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHConferenceBaseDisplay._check_access(self)
         if not self.contrib.can_access(session.user):
             raise Forbidden
 
@@ -68,8 +68,8 @@ class RHContributionDisplayBase(RHConferenceBaseDisplay):
 
 
 class RHDisplayProtectionBase(RHConferenceBaseDisplay):
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHConferenceBaseDisplay._check_access(self)
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
             self._forbidden_if_not_admin()
 
@@ -79,8 +79,8 @@ class RHMyContributions(RHDisplayProtectionBase):
 
     MENU_ENTRY_NAME = 'my_contributions'
 
-    def _checkProtection(self):
-        RHDisplayProtectionBase._checkProtection(self)
+    def _check_access(self):
+        RHDisplayProtectionBase._check_access(self)
         if not session.user:
             raise Forbidden
 
@@ -157,8 +157,8 @@ class RHContributionAuthor(RHContributionDisplayBase):
         }
     }
 
-    def _checkProtection(self):
-        RHContributionDisplayBase._checkProtection(self)
+    def _check_access(self):
+        RHContributionDisplayBase._check_access(self)
         if not _author_page_active(self.event):
             self._forbidden_if_not_admin()
 
@@ -233,8 +233,8 @@ class RHSubcontributionDisplay(RHConferenceBaseDisplay):
     }
     view_class = WPContributions
 
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHConferenceBaseDisplay._check_access(self)
         if not self.subcontrib.can_access(session.user):
             raise Forbidden
 

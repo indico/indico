@@ -34,8 +34,8 @@ class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
         self.object_type = 'category'
         self.object = self.base_object = self.category
 
-    def _checkProtection(self):
-        RHManageCategoryBase._checkProtection(self)
+    def _check_access(self):
+        RHManageCategoryBase._check_access(self)
         # This is already covered by CategModifBase, but if we ever add more
         # checks to can_manage_attachments we are on the safe side...
         if not can_manage_attachments(self.object, session.user):

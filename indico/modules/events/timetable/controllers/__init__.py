@@ -45,9 +45,9 @@ class RHManageTimetableBase(RHManageEventBase):
             if self.session is None:
                 raise NotFound
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.session or self.session_management_level == SessionManagementLevel.none:
-            RHManageEventBase._checkProtection(self)
+            RHManageEventBase._check_access(self)
         else:
             if self.session_management_level == SessionManagementLevel.manage:
                 func = lambda u: self.session.can_manage(u)

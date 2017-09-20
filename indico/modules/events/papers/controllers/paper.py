@@ -163,8 +163,8 @@ class RHAssignPapersBase(RHPapersActionBase):
         user_ids = map(int, request.form.getlist('user_id'))
         self.users = {u for u in CFP_ROLE_MAP[self.role](self.event.cfp) if u.id in user_ids}
 
-    def _checkProtection(self):
-        RHPapersActionBase._checkProtection(self)
+    def _check_access(self):
+        RHPapersActionBase._check_access(self)
         if not self.management and self.role == PaperReviewingRole.judge:
             raise Forbidden
 

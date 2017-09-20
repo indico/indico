@@ -36,7 +36,7 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 class RHEventSettings(RHManageEventBase):
     """Event settings dashboard"""
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
         # If the user cannot manage the whole event see if anything gives them
@@ -47,7 +47,7 @@ class RHEventSettings(RHManageEventBase):
             response = redirect(urls[0]) if urls else None
             raise Forbidden(response=response)
 
-        RHManageEventBase._checkProtection(self)  # mainly to trigger the legacy "event locked" check
+        RHManageEventBase._check_access(self)  # mainly to trigger the legacy "event locked" check
 
     def _process(self):
         return WPEventSettings.render_template('settings.html', self.event, 'settings')

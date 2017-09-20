@@ -88,8 +88,8 @@ class RHUserBase(RHProtected):
         if not self.allow_system_user and self.user.is_system:
             return redirect(url_for('users.user_profile'))
 
-    def _checkProtection(self):
-        RHProtected._checkProtection(self)
+    def _check_access(self):
+        RHProtected._check_access(self)
         if not self._doProcess:  # not logged in
             return
         if not self.user.can_be_modified(session.user):

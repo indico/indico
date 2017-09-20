@@ -45,8 +45,8 @@ class RHNoteBase(RHProtected):
 class RHManageNoteBase(RHNoteBase):
     """Base handler for managing notes attached to an object inside an event"""
 
-    def _checkProtection(self):
-        RHNoteBase._checkProtection(self)
+    def _check_access(self):
+        RHNoteBase._check_access(self)
         if not can_edit_note(self.object, session.user):
             raise Forbidden
         check_event_locked(self, self.event)
@@ -125,8 +125,8 @@ class RHDeleteNote(RHManageNoteBase):
 class RHViewNote(RHNoteBase):
     """Handles display of a note attached to an object inside an event"""
 
-    def _checkProtection(self):
-        RHNoteBase._checkProtection(self)
+    def _check_access(self):
+        RHNoteBase._check_access(self)
         if not self.object.can_access(session.user):
             raise Forbidden
 

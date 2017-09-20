@@ -606,9 +606,9 @@ class RHAdminImpersonate(RHAdminBase):
         else:
             self.user = User.get_one(int(request.form['user_id']), is_deleted=False)
 
-    def _checkProtection(self):
+    def _check_access(self):
         if self.user:
-            RHAdminBase._checkProtection(self)
+            RHAdminBase._check_access(self)
 
     def _process(self):
         if self.user:

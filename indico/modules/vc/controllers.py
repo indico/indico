@@ -349,8 +349,8 @@ class RHVCManageSearch(RHVCManageEventCreateBase):
 class RHVCRoomList(RHProtected):
     """Provides a list of videoconference rooms"""
 
-    def _checkProtection(self):
-        RHProtected._checkProtection(self)
+    def _check_access(self):
+        RHProtected._check_access(self)
         if not get_managed_vc_plugins(session.user):
             raise Forbidden
 

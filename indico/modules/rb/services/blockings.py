@@ -29,7 +29,7 @@ class RoomBookingBlockingProcessBase(ServiceBase):
     def _checkParams(self):
         self.blocked_room = BlockedRoom.get(self._params['blocked_room_id'])
 
-    def _checkProtection(self):
+    def _check_access(self):
         user = session.user
         if not user or (not rb_is_admin(user) and not self.blocked_room.room.is_owned_by(user)):
             raise ServiceError(_('You are not permitted to modify this blocking'))

@@ -141,8 +141,8 @@ class RHAPITogglePersistent(RHUserAPIBase):
 class RHAPIBlockKey(RHUserAPIBase):
     """API key blocking/unblocking"""
 
-    def _checkProtection(self):
-        RHUserAPIBase._checkProtection(self)
+    def _check_access(self):
+        RHUserAPIBase._check_access(self)
         if self._doProcess and not session.user.is_admin:
             raise Forbidden
 

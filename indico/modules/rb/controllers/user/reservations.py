@@ -68,8 +68,8 @@ class _SuccessUrlDetailsMixin:
 
 
 class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
         if not self._reservation.can_be_accepted(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
@@ -83,8 +83,8 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
         if not self._reservation.can_be_cancelled(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
@@ -100,8 +100,8 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
         RHRoomBookingBookingMixin._checkParams(self)
         self._reason = request.form.get('reason', u'')
 
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
         if not self._reservation.can_be_rejected(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
@@ -118,8 +118,8 @@ class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
         self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == occ_date).one()
 
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
         if not self._reservation.can_be_cancelled(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
@@ -137,8 +137,8 @@ class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
         self._reason = request.form.get('reason', u'')
         self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == occ_date).one()
 
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
         if not self._reservation.can_be_rejected(session.user):
             raise IndicoError("You are not authorized to perform this action")
 
@@ -620,7 +620,7 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
 
 
 class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingBase):
-    def _checkProtection(self):
+    def _check_access(self):
         if not self._reservation.can_be_modified(session.user):
             raise Forbidden
 

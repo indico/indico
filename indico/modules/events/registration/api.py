@@ -32,7 +32,7 @@ class RHAPIRegistrant(RH):
     CSRF_ENABLED = False
 
     @oauth.require_oauth('registrants')
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.event.can_manage(request.oauth.user, role='registration'):
             raise Forbidden()
 
@@ -65,7 +65,7 @@ class RHAPIRegistrants(RH):
     """RESTful registrants API"""
 
     @oauth.require_oauth('registrants')
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.event.can_manage(request.oauth.user, role='registration'):
             raise Forbidden()
 

@@ -46,8 +46,8 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
         if self.object is None:
             raise NotFound
 
-    def _checkProtection(self):
-        RHProtected._checkProtection(self)
+    def _check_access(self):
+        RHProtected._check_access(self)
         if not can_manage_attachments(self.object, session.user):
             raise Forbidden
         check_event_locked(self, self.event)

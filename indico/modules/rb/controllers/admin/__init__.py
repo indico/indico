@@ -28,7 +28,7 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
     tasks should be derived from this class.
     """
 
-    def _checkProtection(self):
+    def _check_access(self):
         if session.user is None:
             self._checkSessionUser()
         elif not rb_is_admin(session.user):

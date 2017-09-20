@@ -105,13 +105,13 @@ class RHPaymentPluginEdit(RHPaymentManagementBase):
         except KeyError:
             raise NotFound
 
-    def _checkProtection(self):
+    def _check_access(self):
         self.protection_overridden = False
         can_modify_plugin = session.user and self.plugin.can_be_modified(session.user, self.event)
         can_modify_event = self.event.can_manage(session.user)
         self.protection_overridden = can_modify_plugin and not can_modify_event
         if not can_modify_plugin and not can_modify_event:
-            RHPaymentManagementBase._checkProtection(self)
+            RHPaymentManagementBase._check_access(self)
         return True
 
     def _process(self):

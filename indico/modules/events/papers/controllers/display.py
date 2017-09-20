@@ -160,8 +160,8 @@ class RHPaperCommentBase(RHPaperBase):
         RHPaperBase._checkParams(self, params)
         self.comment = PaperReviewComment.get_one(request.view_args['comment_id'], is_deleted=False)
 
-    def _checkProtection(self):
-        RHPaperBase._checkProtection(self)
+    def _check_access(self):
+        RHPaperBase._check_access(self)
         if not self.comment.can_edit(session.user):
             raise Forbidden
 
@@ -185,12 +185,12 @@ class RHDeletePaperComment(RHPaperCommentBase):
 
 
 class RHReviewingArea(RHPapersBase):
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
         if not self.event.cfp.can_access_reviewing_area(session.user):
             raise Forbidden
-        RHPapersBase._checkProtection(self)
+        RHPapersBase._check_access(self)
 
     def _process(self):
         contribs_to_review = get_user_contributions_to_review(self.event, session.user)
@@ -229,15 +229,15 @@ class RHResetPaperState(RHPaperBase):
 class RHCallForPapers(RHPapersBase):
     """Show the main CFP page"""
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
-        RHPapersBase._checkProtection(self)
+        RHPapersBase._check_access(self)
 
     def _checkParams(self, params):
         RHPapersBase._checkParams(self, params)
         if not session.user:
-            # checkProtection aborts in this case, but the functions below fail with a None user
+            # _check_access aborts in this case, but the functions below fail with a None user
             return
         self.papers = set(get_contributions_with_paper_submitted_by_user(self.event, session.user))
         contribs = set(get_contributions_with_user_paper_submission_rights(self.event, session.user))

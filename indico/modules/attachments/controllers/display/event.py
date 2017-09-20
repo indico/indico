@@ -40,8 +40,8 @@ class RHListEventAttachmentFolder(SpecificFolderMixin, RHConferenceBaseDisplay):
         RHConferenceBaseDisplay._checkParams(self, params)
         SpecificFolderMixin._checkParams(self)
 
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHConferenceBaseDisplay._check_access(self)
         if not self.folder.can_access(session.user):
             raise Forbidden
 

@@ -43,10 +43,10 @@ class RHCallForAbstracts(RHAbstractsBase):
 class RHMyAbstractsExportPDF(RHAbstractsBase):
     """Export the list of the user's abstracts as PDF"""
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
-        RHAbstractsBase._checkProtection(self)
+        RHAbstractsBase._check_access(self)
 
     def _process(self):
         pdf = AbstractsToPDF(self.event, get_user_abstracts(self.event, session.user))
@@ -58,14 +58,14 @@ class RHSubmitAbstract(RHAbstractsBase):
 
     ALLOW_LOCKED = True
 
-    def _checkProtection(self):
+    def _check_access(self):
         cfa = self.event.cfa
         if session.user and not cfa.is_open and not cfa.can_submit_abstracts(session.user):
             raise NoReportError(_('The Call for Abstracts is closed. Please contact the event organizer for further '
                                   'assistance.'), http_status_code=403)
         elif not session.user or not cfa.can_submit_abstracts(session.user):
             raise Forbidden
-        RHAbstractsBase._checkProtection(self)
+        RHAbstractsBase._check_access(self)
 
     def _process(self):
         abstract_form_class = make_abstract_form(self.event, management=self.management)

@@ -31,7 +31,7 @@ from indico.web.flask.util import url_for
 
 
 class EventOrRequestManagerMixin:
-    def _checkProtection(self):
+    def _check_access(self):
         self.protection_overridden = False
         if hasattr(self, 'definition'):
             # check if user can manage *that* request
@@ -42,7 +42,7 @@ class EventOrRequestManagerMixin:
         can_manage_event = self.event.can_manage(session.user)
         self.protection_overridden = can_manage_request and not can_manage_event
         if not can_manage_request and not can_manage_event:
-            RHManageEventBase._checkProtection(self)
+            RHManageEventBase._check_access(self)
 
 
 class RHRequestsEventRequests(EventOrRequestManagerMixin, RHManageEventBase):
@@ -143,7 +143,7 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
 class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
     """Accept/Reject a request"""
 
-    def _checkProtection(self):
+    def _check_access(self):
         self._checkSessionUser()
         if not self.definition.can_be_managed(session.user):
             raise Forbidden
@@ -181,8 +181,8 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
 class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEventRequestBase):
     """Withdraw a request"""
 
-    def _checkProtection(self):
-        EventOrRequestManagerMixin._checkProtection(self)
+    def _check_access(self):
+        EventOrRequestManagerMixin._check_access(self)
         if self.protection_overridden:
             raise Forbidden
 

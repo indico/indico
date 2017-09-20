@@ -73,8 +73,8 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         self._form = CreateBlockingForm(start_date=date.today(), end_date=date.today())
         self._blocking = None
 
-    def _checkProtection(self):
-        RHRoomBookingCreateModifyBlockingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingCreateModifyBlockingBase._check_access(self)
         if not self._doProcess:  # we are not logged in
             return
 
@@ -103,8 +103,8 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
         self._form = BlockingForm(obj=defaults)
         self._form._blocking = self._blocking
 
-    def _checkProtection(self):
-        RHRoomBookingCreateModifyBlockingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingCreateModifyBlockingBase._check_access(self)
         if not self._doProcess:  # we are not logged in
             return
         if not self._blocking.can_be_modified(session.user):
@@ -141,8 +141,8 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
         if not self._block:
             raise IndicoError('A blocking with this ID does not exist.')
 
-    def _checkProtection(self):
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHRoomBookingBase._check_access(self)
         if not self._block.can_be_deleted(session.user):
             raise IndicoError('You are not authorized to delete this blocking.')
 

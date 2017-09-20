@@ -34,8 +34,8 @@ class RHManageEventBase(RHConferenceBase, RHModificationBaseProtected):
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
 
-    def _checkProtection(self):
-        RHModificationBaseProtected._checkProtection(self)
+    def _check_access(self):
+        RHModificationBaseProtected._check_access(self)
 
 
 class RHContributionPersonListMixin:

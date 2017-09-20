@@ -29,8 +29,8 @@ class RHPapersBase(RHConferenceBaseDisplay):
 
     EVENT_FEATURE = 'papers'
 
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHConferenceBaseDisplay._check_access(self)
         # Only let managers access the management versions.
         if self.management and not self.event.cfp.is_manager(session.user):
             raise Forbidden
@@ -50,8 +50,8 @@ class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
     ROLE = 'paper_manager'
     DENY_FRAMES = True
 
-    def _checkProtection(self):
-        RHModificationBaseProtected._checkProtection(self)
+    def _check_access(self):
+        RHModificationBaseProtected._check_access(self)
 
     @property
     def management(self):
@@ -62,8 +62,8 @@ class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
 class RHJudgingAreaBase(RHPapersBase):
     """Base class for all paper-related RHs only available to judges/managers"""
 
-    def _checkProtection(self):
-        RHPapersBase._checkProtection(self)
+    def _check_access(self):
+        RHPapersBase._check_access(self)
         if not session.user or not self.event.cfp.can_access_judging_area(session.user):
             raise Forbidden
         check_event_locked(self, self.event)
@@ -85,8 +85,8 @@ class RHPaperBase(RHPapersBase):
         if self.paper is None and self.PAPER_REQUIRED:
             raise NotFound
 
-    def _checkProtection(self):
-        RHPapersBase._checkProtection(self)
+    def _check_access(self):
+        RHPapersBase._check_access(self)
         if not self._check_paper_protection():
             raise Forbidden
         check_event_locked(self, self.event)

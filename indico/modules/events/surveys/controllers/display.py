@@ -68,8 +68,8 @@ class RHSubmitSurveyBase(RHSurveyBaseDisplay):
         }
     }
 
-    def _checkProtection(self):
-        RHSurveyBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHSurveyBaseDisplay._check_access(self)
         if self.survey.require_user and not session.user:
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to answer a survey '
                                                                 'that requires you to be logged in')))
@@ -142,8 +142,8 @@ class RHSubmitSurvey(RHSubmitSurveyBase):
 
 
 class RHSaveSurveyAnswers(RHSubmitSurveyBase):
-    def _checkProtection(self):
-        RHSubmitSurveyBase._checkProtection(self)
+    def _check_access(self):
+        RHSubmitSurveyBase._check_access(self)
         if not self.survey.partial_completion:
             raise Forbidden
 

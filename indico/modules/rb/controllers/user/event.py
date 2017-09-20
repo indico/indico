@@ -77,9 +77,9 @@ def _assign_room(obj, room, flash_message=True):
 
 
 class RHRoomBookingEventBase(RHManageEventBase, RHRoomBookingBase):
-    def _checkProtection(self):
-        RHManageEventBase._checkProtection(self)
-        RHRoomBookingBase._checkProtection(self)
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
+        RHRoomBookingBase._check_access(self)
 
 
 class RHRoomBookingEventBookingList(RHRoomBookingEventBase):

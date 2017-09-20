@@ -45,7 +45,7 @@ class SpecificAbstractMixin:
     def _checkParams(self):
         self.abstract = self._abstract_query.filter_by(id=request.view_args['abstract_id'], is_deleted=False).one()
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self._check_abstract_protection():
             raise Forbidden
 
@@ -58,8 +58,8 @@ class RHAbstractsBase(RHConferenceBaseDisplay):
 
     EVENT_FEATURE = 'abstracts'
 
-    def _checkProtection(self):
-        RHConferenceBaseDisplay._checkProtection(self)
+    def _check_access(self):
+        RHConferenceBaseDisplay._check_access(self)
         # Only let event managers access the management versions.
         if self.management and not self.event.can_manage(session.user):
             raise Forbidden
@@ -84,8 +84,8 @@ class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
         """Whether the RH is currently used in the management area"""
         return request.view_args.get('management', True)
 
-    def _checkProtection(self):
-        RHModificationBaseProtected._checkProtection(self)
+    def _check_access(self):
+        RHModificationBaseProtected._check_access(self)
 
 
 class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
@@ -98,9 +98,9 @@ class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
         RHAbstractsBase._checkParams(self, params)
         SpecificAbstractMixin._checkParams(self)
 
-    def _checkProtection(self):
-        RHAbstractsBase._checkProtection(self)
-        SpecificAbstractMixin._checkProtection(self)
+    def _check_access(self):
+        RHAbstractsBase._check_access(self)
+        SpecificAbstractMixin._check_access(self)
 
     def _check_abstract_protection(self):
         """Perform a permission check on the current abstract.

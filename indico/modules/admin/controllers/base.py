@@ -28,7 +28,7 @@ class RHAdminBase(RHProtected):
 
     DENY_FRAMES = True
 
-    def _checkProtection(self):
-        RHProtected._checkProtection(self)
+    def _check_access(self):
+        RHProtected._check_access(self)
         if not session.user.is_admin:
             raise Forbidden(_("Only Indico administrators may access this page."))

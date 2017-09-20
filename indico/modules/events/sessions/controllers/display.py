@@ -31,10 +31,10 @@ from indico.web.flask.util import send_file
 
 
 class RHDisplaySessionList(RHConferenceBaseDisplay):
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
-        RHConferenceBaseDisplay._checkProtection(self)
+        RHConferenceBaseDisplay._check_access(self)
 
     def _process(self):
         sessions = get_sessions_for_user(self.event, session.user)
@@ -49,7 +49,7 @@ class RHDisplaySessionBase(RHConferenceBaseDisplay):
         }
     }
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.session.can_access(session.user):
             raise Forbidden
 

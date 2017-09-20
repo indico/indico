@@ -64,13 +64,12 @@ logger = Logger.get('requestHandler')
 
 
 class RequestHandlerBase(object):
-
-    def _checkProtection(self):
+    def _check_access(self):
         """This method is called after _checkParams and is a good place
         to check if the user is permitted to perform some actions.
 
         If you only want to run some code for GET or POST requests, you can create
-        a method named e.g. _checkProtection_POST which will be executed AFTER this one.
+        a method named e.g. _check_access_POST which will be executed AFTER this one.
         """
         pass
 
@@ -246,7 +245,7 @@ class RH(RequestHandlerBase):
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
     def _checkParams(self, params):
-        """This method is called before _checkProtection and is a good place
+        """This method is called before _check_access and is a good place
         to assign variables from request params to member variables.
 
         Note that in any new code the params argument SHOULD be IGNORED.
@@ -421,8 +420,8 @@ class RH(RequestHandlerBase):
         if rv is not None:
             return '', rv
 
-        self._checkProtection()
-        func = getattr(self, '_checkProtection_' + request.method, None)
+        self._check_access()
+        func = getattr(self, '_check_access_' + request.method, None)
         if func:
             func()
 
@@ -564,12 +563,12 @@ class RHProtected(RH):
                 self._redirect(url_for_login(request.relative_url))
                 raise Forbidden
 
-    def _checkProtection(self):
+    def _check_access(self):
         self._checkSessionUser()
 
 
 class RHDisplayBaseProtected(RHProtected):
-    def _checkProtection(self):
+    def _check_access(self):
         if not isinstance(self._target, LegacyConference):
             raise Exception('Unexpected object')
         event = self._target.as_event
@@ -588,7 +587,7 @@ class RHModificationBaseProtected(RHProtected):
     ALLOW_LOCKED = False
     ROLE = None
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not isinstance(self._target, LegacyConference):
             raise Exception('Unexpected object')
         event = self._target.as_event

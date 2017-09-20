@@ -47,10 +47,10 @@ class RHListOtherAbstracts(RHAbstractsBase):
 
     ALLOW_LOCKED = True
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
-        RHAbstractsBase._checkProtection(self)
+        RHAbstractsBase._check_access(self)
 
     def _checkParams(self, params):
         RHAbstractsBase._checkParams(self, params)
@@ -131,7 +131,7 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
         self.track = Track.get_one(request.view_args['track_id'])
         self.list_generator = AbstractListGeneratorDisplay(event=self.event, track=self.track)
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.track.can_review_abstracts(session.user) and not self.track.can_convene(session.user):
             raise Forbidden
 
@@ -211,8 +211,8 @@ class RHAbstractCommentBase(RHAbstractBase):
         RHAbstractBase._checkParams(self, params)
         self.comment = AbstractComment.get_one(request.view_args['comment_id'], is_deleted=False)
 
-    def _checkProtection(self):
-        RHAbstractBase._checkProtection(self)
+    def _check_access(self):
+        RHAbstractBase._check_access(self)
         if not self.comment.can_edit(session.user):
             raise Forbidden
 
@@ -235,10 +235,10 @@ class RHDeleteAbstractComment(RHAbstractCommentBase):
 
 
 class RHDisplayReviewableTracks(RHAbstractsBase):
-    def _checkProtection(self):
+    def _check_access(self):
         if not session.user:
             raise Forbidden
-        RHAbstractsBase._checkProtection(self)
+        RHAbstractsBase._check_access(self)
 
     def _process(self):
         track_reviewer_abstract_count = get_track_reviewer_abstract_counts(self.event, session.user)

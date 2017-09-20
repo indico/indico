@@ -370,8 +370,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         RHRegistrationsActionBase._checkParams(self, params)
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
-    def _checkProtection(self):
-        RHRegistrationsActionBase._checkProtection(self)
+    def _check_access(self):
+        RHRegistrationsActionBase._check_access(self)
 
         # Check that template belongs to this event or a category that
         # is a parent

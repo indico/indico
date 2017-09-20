@@ -113,8 +113,8 @@ class RHOAuthAdminApplication(RHOAuthAdminApplicationBase):
 class RHOAuthAdminApplicationDelete(RHOAuthAdminApplicationBase):
     """Handles OAuth application deletion"""
 
-    def _checkProtection(self):
-        RHOAuthAdminApplicationBase._checkProtection(self)
+    def _check_access(self):
+        RHOAuthAdminApplicationBase._check_access(self)
         if self.application.system_app_type:
             raise Forbidden('Cannot delete system app')
 

@@ -121,7 +121,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
     def target(self):
         return self.template.owner
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
         elif isinstance(self.target, Event):
@@ -155,7 +155,7 @@ class TemplateListMixin(TargetFromURLMixin):
 
 
 class CloneTemplateMixin(TargetFromURLMixin):
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
 
@@ -185,7 +185,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
 class AddTemplateMixin(TargetFromURLMixin):
     always_clonable = False
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.target.can_manage(session.user):
             raise Forbidden
 

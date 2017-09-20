@@ -31,7 +31,7 @@ from indico.web.util import jsonify_template
 class DownloadAttachmentMixin(SpecificAttachmentMixin):
     """Download an attachment"""
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.attachment.can_access(session.user):
             raise Forbidden
 

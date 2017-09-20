@@ -73,7 +73,7 @@ def _flat_map(func, list_):
 class RHCategoryIcon(RHDisplayCategoryBase):
     _category_query_options = undefer('icon'),
 
-    def _checkProtection(self):
+    def _check_access(self):
         # Category icons are always public
         pass
 

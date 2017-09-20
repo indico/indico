@@ -95,7 +95,7 @@ class RHManageContributionBase(RHManageContributionsBase):
         RHManageContributionsBase._checkParams(self, params)
         self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
 
-    def _checkProtection(self):
+    def _check_access(self):
         if not self.contrib.can_manage(session.user):
             raise Forbidden
         check_event_locked(self, self.event)

@@ -81,8 +81,8 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
         if not self.registration:
             raise NotFound
 
-    def _checkProtection(self):
-        RHRegistrationFormRegistrationBase._checkProtection(self)
+    def _check_access(self):
+        RHRegistrationFormRegistrationBase._check_access(self)
         if self.registration.state != RegistrationState.complete:
             raise Forbidden
         if not self.regform.tickets_enabled:

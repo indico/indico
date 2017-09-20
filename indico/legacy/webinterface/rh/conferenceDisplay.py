@@ -51,8 +51,8 @@ class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):
     def _checkParams(self, params):
         RHConferenceBase._checkParams(self, params)
 
-    def _checkProtection(self):
-        RHDisplayBaseProtected._checkProtection(self)
+    def _check_access(self):
+        RHDisplayBaseProtected._check_access(self)
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):

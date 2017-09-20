@@ -61,8 +61,8 @@ class RHChangeEventType(RHManageEventBase):
 class RHLockEvent(RHManageEventBase):
     """Lock an event."""
 
-    def _checkProtection(self):
-        RHManageEventBase._checkProtection(self)
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
         if not self.event.can_lock(session.user):
             raise Forbidden
 
@@ -78,9 +78,9 @@ class RHLockEvent(RHManageEventBase):
 class RHUnlockEvent(RHManageEventBase):
     """Unlock an event."""
 
-    def _checkProtection(self):
+    def _check_access(self):
         self.ALLOW_LOCKED = self.event.can_lock(session.user)
-        RHManageEventBase._checkProtection(self)
+        RHManageEventBase._check_access(self)
 
     def _process(self):
         unlock_event(self.event)

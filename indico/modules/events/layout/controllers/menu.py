@@ -48,8 +48,8 @@ def _render_menu_entries(event, connect_menu=False):
 
 
 class RHMenuBase(RHManageEventBase):
-    def _checkProtection(self):
-        RHManageEventBase._checkProtection(self)
+    def _check_access(self):
+        RHManageEventBase._check_access(self)
         if self.event.type_ != EventType.conference:
             raise NotFound('Only conferences have a menu')
 
@@ -89,8 +89,8 @@ class RHMenuEntryEditBase(RHMenuBase):
         }
     }
 
-    def _checkProtection(self):
-        RHMenuBase._checkProtection(self)
+    def _check_access(self):
+        RHMenuBase._check_access(self)
         self._require_custom_menu()
 
     def _checkParams(self, params):
@@ -180,8 +180,8 @@ class RHMenuEntryToggleDefault(RHMenuEntryEditBase):
 
 
 class RHMenuAddEntry(RHMenuBase):
-    def _checkProtection(self):
-        RHMenuBase._checkProtection(self)
+    def _check_access(self):
+        RHMenuBase._check_access(self)
         self._require_custom_menu()
 
     def _process(self):

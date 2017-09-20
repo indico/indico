@@ -66,7 +66,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
             raise Forbidden(_('Please log in as {name} to sign this agreement.')
                             .format(name=self.agreement.user.full_name))
 
-    def _checkProtection(self):
+    def _check_access(self):
         # XXX: Not checking event protection here - if you get the agreement link
         # you need to be able to sign it no matter if you have access to the event
         # or not.  Speakers might not even have an Indico account...
