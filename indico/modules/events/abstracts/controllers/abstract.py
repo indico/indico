@@ -71,8 +71,8 @@ class RHAbstractsDownloadAttachment(RHAbstractBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHAbstractBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractBase._process_args(self, params)
         self.abstract_file = AbstractFile.get_one(request.view_args['file_id'])
 
     def _process(self):

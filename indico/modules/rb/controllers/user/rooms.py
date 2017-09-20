@@ -40,8 +40,8 @@ from indico.web.forms.base import FormDefaults
 
 
 class RHRoomBookingMapOfRooms(RHRoomBookingBase):
-    def _checkParams(self):
-        RHRoomBookingBase._checkParams(self, request.args)
+    def _process_args(self):
+        RHRoomBookingBase._process_args(self, request.args)
         self._room_id = request.args.get('roomID')
 
     def _process(self):
@@ -49,8 +49,8 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
 
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):
-    def _checkParams(self):
-        RHRoomBookingBase._checkParams(self, request.args)
+    def _process_args(self):
+        RHRoomBookingBase._process_args(self, request.args)
         self._room_id = request.args.get('roomID')
 
     def _process(self):
@@ -64,7 +64,7 @@ class RHRoomBookingSearchRooms(RHRoomBookingBase):
     def _get_form_data(self):
         return request.form
 
-    def _checkParams(self):
+    def _process_args(self):
         defaults = FormDefaults(location=Location.default_location)
         self._form = SearchRoomsForm(self._get_form_data(), obj=defaults, csrf_enabled=False)
         if (not session.user or not Room.user_owns_rooms(session.user)) and not hasattr(self, 'search_criteria'):
@@ -106,7 +106,7 @@ class RHRoomBookingSearchMyRooms(RHRoomBookingSearchRoomsShortcutBase):
 class RHRoomBookingRoomDetails(RHRoomBookingBase):
     @requires_location
     @requires_room
-    def _checkParams(self):
+    def _process_args(self):
         self._calendar_start = datetime.combine(date.today(), time())
         self._calendar_end = datetime.combine(date.today(), time(23, 59))
         try:
@@ -133,7 +133,7 @@ class RHRoomBookingRoomDetails(RHRoomBookingBase):
 
 
 class RHRoomBookingRoomStats(RHRoomBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._room = Room.get(request.view_args['roomID'])
         self._occupancy_period = request.args.get('period', 'pastmonth')
         self._end = date.today()

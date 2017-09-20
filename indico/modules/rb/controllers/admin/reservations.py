@@ -24,7 +24,7 @@ from indico.util.i18n import _
 
 
 class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
-    def _checkParams(self):
+    def _process_args(self):
         resv_id = request.view_args.get('resvID')
         self._reservation = Reservation.get(request.view_args['resvID'])
         if not self._reservation:

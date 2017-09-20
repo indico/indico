@@ -58,7 +58,7 @@ class RHPlugins(RHPluginsBase):
 class RHPluginDetails(RHPluginsBase):
     back_button_endpoint = 'plugins.index'
 
-    def _checkParams(self):
+    def _process_args(self):
         self.plugin = plugin_engine.get_plugin(request.view_args['plugin'])
         if not self.plugin or not self.plugin.configurable:
             raise NotFound

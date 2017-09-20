@@ -38,8 +38,8 @@ class RHTimetable(RHConferenceBaseDisplay):
     view_class = WPDisplayTimetable
     view_class_simple = WPSimpleEventDisplay
 
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+    def _process_args(self, params):
+        RHConferenceBaseDisplay._process_args(self, params)
         self.timetable_layout = request.args.get('layout') or request.args.get('ttLyt')
         self.theme, self.theme_override = get_theme(self.event, request.args.get('view'))
 
@@ -59,8 +59,8 @@ class RHTimetable(RHConferenceBaseDisplay):
 class RHTimetableEntryInfo(RHConferenceBaseDisplay):
     """Display timetable entry info balloon."""
 
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+    def _process_args(self, params):
+        RHConferenceBaseDisplay._process_args(self, params)
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):

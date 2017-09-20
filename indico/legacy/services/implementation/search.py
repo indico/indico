@@ -31,13 +31,13 @@ from indico.util.string import sanitize_email, to_unicode
 class SearchBase(LoggedOnlyService):
     CHECK_HTML = False
 
-    def _checkParams(self):
+    def _process_args(self):
         self._searchExt = self._params.get('search-ext', False)
 
 
 class SearchUsers(SearchBase):
-    def _checkParams(self):
-        SearchBase._checkParams(self)
+    def _process_args(self):
+        SearchBase._process_args(self)
         self._surName = self._params.get("surName", "")
         self._name = self._params.get("name", "")
         self._organisation = self._params.get("organisation", "")
@@ -70,8 +70,8 @@ class SearchUsers(SearchBase):
 
 class SearchGroups(SearchBase):
 
-    def _checkParams(self):
-        SearchBase._checkParams(self)
+    def _process_args(self):
+        SearchBase._process_args(self)
         self._group = self._params.get("group", "").strip()
         self._exactMatch = self._params.get("exactMatch", False)
 

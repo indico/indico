@@ -58,8 +58,8 @@ class RHManageTrackBase(RHManageTracksBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageTracksBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageTracksBase._process_args(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
 
 

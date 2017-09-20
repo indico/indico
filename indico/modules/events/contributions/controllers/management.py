@@ -77,8 +77,8 @@ def _render_subcontribution_list(contrib):
 class RHManageContributionsBase(RHManageEventBase):
     """Base class for all contributions management RHs"""
 
-    def _checkParams(self, params):
-        RHManageEventBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageEventBase._process_args(self, params)
         self.list_generator = ContributionListGenerator(event=self.event)
 
 
@@ -91,8 +91,8 @@ class RHManageContributionBase(RHManageContributionsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageContributionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionsBase._process_args(self, params)
         self.contrib = Contribution.find_one(id=request.view_args['contrib_id'], is_deleted=False)
 
     def _check_access(self):
@@ -110,16 +110,16 @@ class RHManageSubContributionBase(RHManageContributionBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageContributionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionBase._process_args(self, params)
         self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
 
 
 class RHManageContributionsActionsBase(RHManageContributionsBase):
     """Base class for classes performing actions on event contributions"""
 
-    def _checkParams(self, params):
-        RHManageContributionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionsBase._process_args(self, params)
         ids = {int(x) for x in request.form.getlist('contribution_id')}
         self.contribs = Contribution.query.with_parent(self.event).filter(Contribution.id.in_(ids)).all()
 
@@ -127,8 +127,8 @@ class RHManageContributionsActionsBase(RHManageContributionsBase):
 class RHManageSubContributionsActionsBase(RHManageContributionBase):
     """Base class for RHs performing actions on subcontributions"""
 
-    def _checkParams(self, params):
-        RHManageContributionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionBase._process_args(self, params)
         ids = {int(x) for x in request.form.getlist('subcontribution_id')}
         self.subcontribs = (SubContribution.query
                             .with_parent(self.contrib)
@@ -387,8 +387,8 @@ class RHSortSubContributions(RHManageContributionBase):
 
 
 class RHContributionUpdateStartDate(RHManageContributionBase):
-    def _checkParams(self, params):
-        RHManageContributionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionBase._process_args(self, params)
         if self.contrib.session_block:
             raise BadRequest
 
@@ -402,8 +402,8 @@ class RHContributionUpdateStartDate(RHManageContributionBase):
 
 
 class RHContributionUpdateDuration(RHManageContributionBase):
-    def _checkParams(self, params):
-        RHManageContributionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionBase._process_args(self, params)
         if self.contrib.session_block:
             raise BadRequest
 
@@ -487,8 +487,8 @@ class RHManageContributionTypeBase(RHManageContributionsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageContributionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionsBase._process_args(self, params)
         self.contrib_type = ContributionType.get_one(request.view_args['contrib_type_id'])
 
 
@@ -564,8 +564,8 @@ class RHSortContributionFields(RHManageContributionsBase):
 class RHCreateContributionField(RHManageContributionsBase):
     """Dialog to create a new custom field"""
 
-    def _checkParams(self, params):
-        RHManageContributionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionsBase._process_args(self, params)
         field_types = get_contrib_field_types()
         try:
             self.field_cls = field_types[request.view_args['field_type']]
@@ -595,8 +595,8 @@ class RHManageContributionFieldBase(RHManageContributionsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageContributionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageContributionsBase._process_args(self, params)
         self.contrib_field = ContributionField.get_one(request.view_args['contrib_field_id'])
 
 
@@ -641,7 +641,7 @@ class RHManageDescriptionField(RHManageContributionsBase):
 class RHCreateReferenceMixin:
     """Common methods for RH class creating a ContibutionReference or SubContributionReference"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.reference_value = request.form['value']
         reference_type_name = request.form['type']
         self.reference_type = ReferenceType.find_one(db.func.lower(ReferenceType.name) == reference_type_name.lower())
@@ -654,9 +654,9 @@ class RHCreateReferenceMixin:
 class RHCreateContributionReferenceREST(RHCreateReferenceMixin, RHManageContributionBase):
     """REST endpoint to add a reference to a Contribution"""
 
-    def _checkParams(self, params):
-        RHManageContributionBase._checkParams(self, params)
-        RHCreateReferenceMixin._checkParams(self)
+    def _process_args(self, params):
+        RHManageContributionBase._process_args(self, params)
+        RHCreateReferenceMixin._process_args(self)
 
     def _process_POST(self):
         reference = ContributionReference(reference_type=self.reference_type, value=self.reference_value,
@@ -668,9 +668,9 @@ class RHCreateContributionReferenceREST(RHCreateReferenceMixin, RHManageContribu
 class RHCreateSubContributionReferenceREST(RHCreateReferenceMixin, RHManageSubContributionBase):
     """REST endpoint to add a reference to a SubContribution"""
 
-    def _checkParams(self, params):
-        RHManageSubContributionBase._checkParams(self, params)
-        RHCreateReferenceMixin._checkParams(self)
+    def _process_args(self, params):
+        RHManageSubContributionBase._process_args(self, params)
+        RHCreateReferenceMixin._process_args(self)
 
     def _process_POST(self):
         reference = SubContributionReference(reference_type=self.reference_type, value=self.reference_value)

@@ -32,7 +32,7 @@ class RoomBookingMapBase(ServiceBase):
 
 
 class RoomBookingMapCreateAspect(RoomBookingMapBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._location = Location.find_first(name=self._param('location'))
         aspect_data = self._param('aspect')
         try:
@@ -60,7 +60,7 @@ class RoomBookingMapCreateAspect(RoomBookingMapBase):
 
 
 class RoomBookingMapUpdateAspect(RoomBookingMapBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._location = Location.find_first(name=self._param('location'))
         self._aspect = self._param('aspect')
 
@@ -79,7 +79,7 @@ class RoomBookingMapUpdateAspect(RoomBookingMapBase):
 
 
 class RoomBookingMapRemoveAspect(RoomBookingMapBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._location = Location.find_first(name=self._param('location'))
         self._aspectId = self._param('aspectId')
 
@@ -89,7 +89,7 @@ class RoomBookingMapRemoveAspect(RoomBookingMapBase):
 
 
 class RoomBookingMapListAspects(RoomBookingMapBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._location = Location.find_first(name=self._param('location'))
 
     def _getAnswer(self):

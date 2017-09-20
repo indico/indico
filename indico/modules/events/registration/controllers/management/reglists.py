@@ -131,8 +131,8 @@ class RHRegistrationDownloadAttachment(RHManageRegFormsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageRegFormsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormsBase._process_args(self, params)
         self.field_data = (RegistrationData
                            .find(RegistrationData.registration_id == request.view_args['registration_id'],
                                  RegistrationData.field_data_id == request.view_args['field_data_id'],
@@ -167,8 +167,8 @@ class RHRegistrationsActionBase(RHManageRegFormBase):
 
     registration_query_options = ()
 
-    def _checkParams(self, params):
-        RHManageRegFormBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormBase._process_args(self, params)
         ids = set(request.form.getlist('registration_id'))
         self.registrations = (Registration.query.with_parent(self.regform)
                               .filter(Registration.id.in_(ids),
@@ -197,9 +197,9 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     """Send email to selected registrants"""
 
-    def _checkParams(self, params):
+    def _process_args(self, params):
         self._doNotSanitizeFields.append('from_address')
-        RHRegistrationsActionBase._checkParams(self, params)
+        RHRegistrationsActionBase._process_args(self, params)
 
     def _send_emails(self, form):
         for registration in self.registrations:
@@ -309,8 +309,8 @@ class RHRegistrationsExportBase(RHRegistrationsActionBase):
     ALLOW_LOCKED = True
     registration_query_options = (subqueryload('data'),)
 
-    def _checkParams(self, params):
-        RHRegistrationsActionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHRegistrationsActionBase._process_args(self, params)
         self.export_config = self.list_generator.get_list_export_config()
 
 
@@ -366,8 +366,8 @@ class RHRegistrationsPrintBadges(RHRegistrationsActionBase):
         'preserved_args': {'uuid', 'template_id'}
     }
 
-    def _checkParams(self, params):
-        RHRegistrationsActionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHRegistrationsActionBase._process_args(self, params)
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
     def _check_access(self):
@@ -413,8 +413,8 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
 
     format_map_landscape = {name: (h, w) for name, (w, h) in format_map_portrait.iteritems()}
 
-    def _checkParams(self, params):
-        RHManageRegFormBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormBase._process_args(self, params)
         ids = set(request.form.getlist('registration_id'))
         self.registrations = (Registration.query.with_parent(self.regform)
                               .filter(Registration.id.in_(ids),

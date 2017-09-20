@@ -85,8 +85,8 @@ class RHCreateNews(RHManageNewsBase):
 
 
 class RHManageNewsItemBase(RHManageNewsBase):
-    def _checkParams(self, params):
-        RHManageNewsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageNewsBase._process_args(self, params)
         self.item = NewsItem.get_one(request.view_args['news_id'])
 
 

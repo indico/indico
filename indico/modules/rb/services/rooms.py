@@ -30,7 +30,7 @@ from indico.util.date_time import get_datetime_from_request
 class RoomBookingAvailabilitySearchRooms(ServiceBase):
     UNICODE_PARAMS = True
 
-    def _checkParams(self):
+    def _process_args(self):
         self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
         self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
         repetition = map(int, self._params['repeatability'].split('|'))
@@ -44,7 +44,7 @@ class RoomBookingAvailabilitySearchRooms(ServiceBase):
 class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
     UNICODE_PARAMS = True
 
-    def _checkParams(self):
+    def _process_args(self):
         self._isActive = self._params.get('isActive', None)
 
     def _getAnswer(self):
@@ -60,7 +60,7 @@ class RoomBookingListLocationsAndRoomsWithGuids(ServiceBase):
 class BookingPermission(LoggedOnlyService):
     UNICODE_PARAMS = True
 
-    def _checkParams(self):
+    def _process_args(self):
         blocking_id = self._params.get('blocking_id')
         self._room = Room.get(self._params['room_id'])
         self._blocking = Blocking.get(blocking_id) if blocking_id else None

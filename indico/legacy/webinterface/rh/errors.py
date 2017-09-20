@@ -42,7 +42,7 @@ class RHErrorReporting(RH):
     # store a CSRF token in the session.
     CSRF_ENABLED = False
 
-    def _checkParams(self, params):
+    def _process_args(self, params):
         self._sendIt = "confirm" in params
         self._comments = ""
         if self._sendIt:
@@ -58,7 +58,7 @@ class RHErrorReporting(RH):
         send_email(make_email(config.SUPPORT_EMAIL, reply_address=self._userMail, template=template), skip_queue=True)
 
     def process(self, params):
-        self._checkParams(params)
+        self._process_args(params)
         if self._sendIt:
             self._sendReport()
             p = errors.WPReportErrorSummary(self)

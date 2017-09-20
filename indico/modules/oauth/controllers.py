@@ -40,7 +40,7 @@ from indico.web.forms.base import FormDefaults
 class RHOAuthAuthorize(RHProtected):
     CSRF_ENABLED = False
 
-    def _checkParams(self):
+    def _process_args(self):
         try:
             UUID(hex=request.args['client_id'])
         except ValueError:
@@ -91,7 +91,7 @@ class RHOAuthAdmin(RHAdminBase):
 
 class RHOAuthAdminApplicationBase(RHAdminBase):
     """Base class for single OAuth application RHs"""
-    def _checkParams(self):
+    def _process_args(self):
         self.application = OAuthApplication.get(request.view_args['id'])
 
 
@@ -172,8 +172,8 @@ class RHOAuthUserProfile(RHUserBase):
 class RHOAuthUserTokenRevoke(RHUserBase):
     """Revokes user token"""
 
-    def _checkParams(self):
-        RHUserBase._checkParams(self)
+    def _process_args(self):
+        RHUserBase._process_args(self)
         self.token = OAuthToken.get(request.view_args['id'])
         if self.user != self.token.user:
             raise Forbidden("You can only revoke tokens associated with your user")

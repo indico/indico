@@ -36,8 +36,8 @@ class RHManageSessionBase(RHManageSessionsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageSessionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageSessionsBase._process_args(self, params)
         self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
 
     def _check_access(self):
@@ -48,7 +48,7 @@ class RHManageSessionBase(RHManageSessionsBase):
 class RHManageSessionsActionsBase(RHManageSessionsBase):
     """Base class for classes performing actions on sessions"""
 
-    def _checkParams(self, params):
-        RHManageSessionsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageSessionsBase._process_args(self, params)
         session_ids = set(map(int, request.form.getlist('session_id')))
         self.sessions = Session.query.with_parent(self.event).filter(Session.id.in_(session_ids)).all()

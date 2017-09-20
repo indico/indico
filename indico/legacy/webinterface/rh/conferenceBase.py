@@ -22,7 +22,7 @@ from indico.util.i18n import _
 
 
 class RHConferenceSite(RH):
-    def _checkParams(self, params):
+    def _process_args(self, params):
         self.event = Event.get(int(params['confId']))
         if self.event is None:
             raise NotFound(_(u'An event with this ID does not exist.'))

@@ -36,7 +36,7 @@ class RHAPIRegistrant(RH):
         if not self.event.can_manage(request.oauth.user, role='registration'):
             raise Forbidden()
 
-    def _checkParams(self):
+    def _process_args(self):
         self.event = Event.find(id=request.view_args['event_id'], is_deleted=False).first_or_404()
         self._registration = (self.event.registrations
                               .filter_by(id=request.view_args['registrant_id'],
@@ -69,7 +69,7 @@ class RHAPIRegistrants(RH):
         if not self.event.can_manage(request.oauth.user, role='registration'):
             raise Forbidden()
 
-    def _checkParams(self):
+    def _process_args(self):
         self.event = Event.find(id=request.view_args['event_id'], is_deleted=False).first_or_404()
 
     def _process_GET(self):

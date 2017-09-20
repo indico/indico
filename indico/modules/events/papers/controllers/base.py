@@ -78,8 +78,8 @@ class RHPaperBase(RHPapersBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHPapersBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPapersBase._process_args(self, params)
         self.contribution = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
         self.paper = self.contribution.paper
         if self.paper is None and self.PAPER_REQUIRED:

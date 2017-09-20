@@ -28,8 +28,8 @@ from indico.web.flask.util import send_file
 
 
 class RHConferenceAccessKey(RHConferenceBase):
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHConferenceBase._process_args(self, params)
         self._accesskey = params.get("accessKey", "").strip()
         self._doNotSanitizeFields.append("accessKey")
 
@@ -48,8 +48,8 @@ class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):
         else:
             raise Forbidden
 
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHConferenceBase._process_args(self, params)
 
     def _check_access(self):
         RHDisplayBaseProtected._check_access(self)

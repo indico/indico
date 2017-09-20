@@ -76,8 +76,8 @@ class RHDownloadPaperFile(RHPaperBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHPaperBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPaperBase._process_args(self, params)
         self.file = PaperFile.get_one(request.view_args['file_id'])
 
     def _process(self):
@@ -99,8 +99,8 @@ class RHSubmitPaperReview(RHPaperBase):
             return False
         return self.paper.can_review(session.user, check_state=True)
 
-    def _checkParams(self, params):
-        RHPaperBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPaperBase._process_args(self, params)
         self.type = PaperTypeProxy(PaperReviewType[request.view_args['review_type']])
 
     def _process(self):
@@ -122,8 +122,8 @@ class RHEditPaperReview(RHPaperBase):
     def _check_paper_protection(self):
         return self.review.can_edit(session.user, check_state=True)
 
-    def _checkParams(self, params):
-        RHPaperBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPaperBase._process_args(self, params)
         self.review = PaperReview.get_one(request.view_args['review_id'])
 
     def _process(self):
@@ -156,8 +156,8 @@ class RHPaperCommentBase(RHPaperBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHPaperBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPaperBase._process_args(self, params)
         self.comment = PaperReviewComment.get_one(request.view_args['comment_id'], is_deleted=False)
 
     def _check_access(self):
@@ -234,8 +234,8 @@ class RHCallForPapers(RHPapersBase):
             raise Forbidden
         RHPapersBase._check_access(self)
 
-    def _checkParams(self, params):
-        RHPapersBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPapersBase._process_args(self, params)
         if not session.user:
             # _check_access aborts in this case, but the functions below fail with a None user
             return

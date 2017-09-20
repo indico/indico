@@ -58,8 +58,8 @@ class RHRegistrationFormInvitations(RHManageRegFormBase):
 class RHRegistrationFormInvite(RHManageRegFormBase):
     """Invite someone to register"""
 
-    def _checkParams(self, params):
-        RHManageRegFormBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormBase._process_args(self, params)
         self._doNotSanitizeFields.append('email_from')
 
     def _create_invitation(self, user, skip_moderation, email_from, email_subject, email_body):
@@ -101,8 +101,8 @@ class RHRegistrationFormInvitationBase(RHManageRegFormBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageRegFormBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormBase._process_args(self, params)
         self.invitation = RegistrationInvitation.get_one(request.view_args['invitation_id'])
 
 

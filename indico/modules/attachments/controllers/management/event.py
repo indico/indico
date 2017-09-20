@@ -40,8 +40,8 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
         }
     }
 
-    def _checkParams(self, params):
-        RHConferenceBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHConferenceBase._process_args(self, params)
         self.object_type, self.base_object, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound
@@ -72,9 +72,9 @@ class RHAddEventAttachmentLink(AddAttachmentLinkMixin, RHEventAttachmentManageme
 
 
 class RHEditEventAttachment(EditAttachmentMixin, RHEventAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
-        EditAttachmentMixin._checkParams(self)
+    def _process_args(self, params):
+        RHEventAttachmentManagementBase._process_args(self, params)
+        EditAttachmentMixin._process_args(self)
 
 
 class RHCreateEventFolder(CreateFolderMixin, RHEventAttachmentManagementBase):
@@ -82,21 +82,21 @@ class RHCreateEventFolder(CreateFolderMixin, RHEventAttachmentManagementBase):
 
 
 class RHEditEventFolder(EditFolderMixin, RHEventAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
-        EditFolderMixin._checkParams(self)
+    def _process_args(self, params):
+        RHEventAttachmentManagementBase._process_args(self, params)
+        EditFolderMixin._process_args(self)
 
 
 class RHDeleteEventFolder(DeleteFolderMixin, RHEventAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
-        DeleteFolderMixin._checkParams(self)
+    def _process_args(self, params):
+        RHEventAttachmentManagementBase._process_args(self, params)
+        DeleteFolderMixin._process_args(self)
 
 
 class RHDeleteEventAttachment(DeleteAttachmentMixin, RHEventAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHEventAttachmentManagementBase._checkParams(self, params)
-        DeleteAttachmentMixin._checkParams(self)
+    def _process_args(self, params):
+        RHEventAttachmentManagementBase._process_args(self, params)
+        DeleteAttachmentMixin._process_args(self)
 
 
 class RHPackageEventAttachmentsManagement(AttachmentPackageMixin, RHManageEventBase):

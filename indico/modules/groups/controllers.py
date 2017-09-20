@@ -61,7 +61,7 @@ class RHGroups(RHAdminBase):
 
 
 class RHGroupBase(RHAdminBase):
-    def _checkParams(self):
+    def _process_args(self):
         try:
             group = GroupProxy(request.view_args['group_id'], request.view_args['provider'])
         except ValueError:
@@ -92,7 +92,7 @@ class RHGroupMembers(RHGroupBase):
 class RHGroupEdit(RHAdminBase):
     """Admin group modification/creation"""
 
-    def _checkParams(self):
+    def _process_args(self):
         if 'group_id' in request.view_args:
             self.new_group = False
             self.group = LocalGroup.get(request.view_args['group_id'])
@@ -119,7 +119,7 @@ class RHGroupEdit(RHAdminBase):
 
 
 class RHLocalGroupBase(RHAdminBase):
-    def _checkParams(self):
+    def _process_args(self):
         self.group = LocalGroup.get(request.view_args['group_id'])
         if self.group is None:
             raise NotFound

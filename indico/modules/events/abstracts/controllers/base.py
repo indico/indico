@@ -42,7 +42,7 @@ class SpecificAbstractMixin:
             query = query.options(*self._abstract_query_options)
         return query
 
-    def _checkParams(self):
+    def _process_args(self):
         self.abstract = self._abstract_query.filter_by(id=request.view_args['abstract_id'], is_deleted=False).one()
 
     def _check_access(self):
@@ -94,9 +94,9 @@ class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):
     to the associated abstract.
     """
 
-    def _checkParams(self, params):
-        RHAbstractsBase._checkParams(self, params)
-        SpecificAbstractMixin._checkParams(self)
+    def _process_args(self, params):
+        RHAbstractsBase._process_args(self, params)
+        SpecificAbstractMixin._process_args(self)
 
     def _check_access(self):
         RHAbstractsBase._check_access(self)

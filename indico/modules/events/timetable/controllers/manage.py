@@ -141,8 +141,8 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
 
     session_management_level = SessionManagementLevel.coordinate
 
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageTimetableBase._process_args(self, params)
         self.entry = self.event.timetable_entries.filter_by(id=request.view_args['entry_id']).first_or_404()
 
     def _process(self):
@@ -153,8 +153,8 @@ class RHManageTimetableEntryInfo(RHManageTimetableBase):
 class RHBreakREST(RHManageTimetableBase):
     """RESTful operations for managing breaks."""
 
-    def _checkParams(self, params):
-        RHManageTimetableBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageTimetableBase._process_args(self, params)
         self.entry = self.event.timetable_entries.filter_by(break_id=request.view_args['break_id']).first_or_404()
         self.break_ = self.entry.break_
 

@@ -93,8 +93,8 @@ class RHMenuEntryEditBase(RHMenuBase):
         RHMenuBase._check_access(self)
         self._require_custom_menu()
 
-    def _checkParams(self, params):
-        RHMenuBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHMenuBase._process_args(self, params)
         self.entry = MenuEntry.get_one(request.view_args['menu_entry_id'])
 
 
@@ -250,8 +250,8 @@ class RHPageDisplay(RHConferenceBaseDisplay):
         }
     }
 
-    def _checkParams(self, params):
-        RHConferenceBaseDisplay._checkParams(self, params)
+    def _process_args(self, params):
+        RHConferenceBaseDisplay._process_args(self, params)
         self.page = EventPage.get_one(request.view_args['page_id'])
 
     def _process(self):

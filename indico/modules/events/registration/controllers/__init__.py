@@ -33,7 +33,7 @@ class RegistrationFormMixin:
         }
     }
 
-    def _checkParams(self):
+    def _process_args(self):
         self.regform = (RegistrationForm.query
                         .filter_by(id=request.view_args['reg_form_id'], is_deleted=False)
                         .options(defaultload('form_items').joinedload('children').joinedload('current_data'))

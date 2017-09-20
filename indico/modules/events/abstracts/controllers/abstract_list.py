@@ -43,8 +43,8 @@ from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 class RHAbstractListBase(RHManageAbstractsBase):
     """Base class for all RHs using the abstract list generator"""
 
-    def _checkParams(self, params):
-        RHManageAbstractsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageAbstractsBase._process_args(self, params)
         self.list_generator = AbstractListGeneratorManagement(event=self.event)
 
 
@@ -60,8 +60,8 @@ class RHManageAbstractsActionsBase(RHAbstractListBase):
             query = query.options(*self._abstract_query_options)
         return query
 
-    def _checkParams(self, params):
-        RHAbstractListBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractListBase._process_args(self, params)
         ids = map(int, request.form.getlist('abstract_id'))
         self.abstracts = self._abstract_query.filter(Abstract.id.in_(ids)).all()
 

@@ -52,8 +52,8 @@ class RHListOtherAbstracts(RHAbstractsBase):
             raise Forbidden
         RHAbstractsBase._check_access(self)
 
-    def _checkParams(self, params):
-        RHAbstractsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractsBase._process_args(self, params)
         self.excluded_ids = set(request.form.getlist('excluded_abstract_id'))
 
     def _process(self):
@@ -126,8 +126,8 @@ class RHDisplayAbstractListBase(RHAbstractsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHAbstractsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractsBase._process_args(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
         self.list_generator = AbstractListGeneratorDisplay(event=self.event, track=self.track)
 
@@ -151,8 +151,8 @@ class RHSubmitAbstractReview(RHAbstractBase):
             return False
         return self.abstract.can_review(session.user, check_state=True)
 
-    def _checkParams(self, params):
-        RHAbstractBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractBase._process_args(self, params)
         self.track = Track.get_one(request.view_args['track_id'])
 
     def _process(self):
@@ -174,8 +174,8 @@ class RHEditAbstractReview(RHAbstractBase):
     def _check_abstract_protection(self):
         return self.review.can_edit(session.user, check_state=True)
 
-    def _checkParams(self, params):
-        RHAbstractBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractBase._process_args(self, params)
         self.review = AbstractReview.get_one(request.view_args['review_id'])
 
     def _process(self):
@@ -207,8 +207,8 @@ class RHAbstractCommentBase(RHAbstractBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHAbstractBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAbstractBase._process_args(self, params)
         self.comment = AbstractComment.get_one(request.view_args['comment_id'], is_deleted=False)
 
     def _check_access(self):
@@ -262,8 +262,8 @@ class RHDisplayAbstractListCustomize(CustomizeAbstractListMixin, RHDisplayAbstra
 class RHDisplayAbstractsActionsBase(RHDisplayAbstractListBase):
     """Base class for classes performing actions on abstract"""
 
-    def _checkParams(self, params):
-        RHDisplayAbstractListBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHDisplayAbstractListBase._process_args(self, params)
         ids = map(int, request.form.getlist('abstract_id'))
         self.abstracts = Abstract.query.with_parent(self.track, 'abstracts_reviewed').filter(Abstract.id.in_(ids)).all()
 

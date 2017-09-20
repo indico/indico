@@ -157,7 +157,7 @@ class RHAPIBlockKey(RHUserAPIBase):
 
 
 class RHAPIBuildURLs(RH):
-    def _checkParams(self):
+    def _process_args(self):
         data = request.json
         self.object = None
         if 'categId' in data:

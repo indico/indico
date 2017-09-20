@@ -40,7 +40,7 @@ _cache = GenericCache('Rooms')
 
 
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._room = Room.get(request.view_args['roomID'])
         self._target = self._room
 
@@ -141,7 +141,7 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
 class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
     @requires_location(parameter_name='roomLocation')
     @requires_room
-    def _checkParams(self):
+    def _process_args(self):
         self._form = self._make_form()
 
     def _save(self):
@@ -151,7 +151,7 @@ class RHRoomBookingModifyRoom(RHRoomBookingCreateModifyRoomBase):
 
 class RHRoomBookingCreateRoom(RHRoomBookingCreateModifyRoomBase):
     @requires_location(parameter_name='roomLocation')
-    def _checkParams(self):
+    def _process_args(self):
         self._room = Room()
         self._form = self._make_form()
 

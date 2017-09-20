@@ -56,8 +56,8 @@ class RHStaticSiteDownload(RHStaticSiteBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHStaticSiteBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHStaticSiteBase._process_args(self, params)
         self.static_site = StaticSite.get_one(request.view_args['id'])
 
     def _process(self):

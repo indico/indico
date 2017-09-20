@@ -21,6 +21,6 @@ from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 
 
 class RHDownloadCategoryAttachment(DownloadAttachmentMixin, RHDisplayCategoryBase):
-    def _checkParams(self):
-        RHDisplayCategoryBase._checkParams(self)
-        DownloadAttachmentMixin._checkParams(self)
+    def _process_args(self):
+        RHDisplayCategoryBase._process_args(self)
+        DownloadAttachmentMixin._process_args(self)

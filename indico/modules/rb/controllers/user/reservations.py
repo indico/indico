@@ -47,7 +47,7 @@ from indico.web.forms.base import FormDefaults
 
 class RHRoomBookingBookingMixin:
     """Mixin that retrieves the booking or fails if there is none."""
-    def _checkParams(self):
+    def _process_args(self):
         resv_id = request.view_args['resvID']
         self._reservation = Reservation.get(resv_id)
         if not self._reservation:
@@ -96,8 +96,8 @@ class RHRoomBookingCancelBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _checkParams(self):
-        RHRoomBookingBookingMixin._checkParams(self)
+    def _process_args(self):
+        RHRoomBookingBookingMixin._process_args(self)
         self._reason = request.form.get('reason', u'')
 
     def _check_access(self):
@@ -113,8 +113,8 @@ class RHRoomBookingRejectBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
 
 class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _checkParams(self):
-        RHRoomBookingBookingMixin._checkParams(self)
+    def _process_args(self):
+        RHRoomBookingBookingMixin._process_args(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
         self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == occ_date).one()
 
@@ -131,8 +131,8 @@ class RHRoomBookingCancelBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookin
 
 
 class RHRoomBookingRejectBookingOccurrence(_SuccessUrlDetailsMixin, RHRoomBookingBookingMixin, RHRoomBookingBase):
-    def _checkParams(self):
-        RHRoomBookingBookingMixin._checkParams(self)
+    def _process_args(self):
+        RHRoomBookingBookingMixin._process_args(self)
         occ_date = dateutil.parser.parse(request.view_args['date'], yearfirst=True).date()
         self._reason = request.form.get('reason', u'')
         self._occurrence = self._reservation.occurrences.filter(ReservationOccurrence.date == occ_date).one()
@@ -160,7 +160,7 @@ class RHRoomBookingSearchBookings(RHRoomBookingBase):
     def _filter_displayed_rooms(self, rooms, occurrences):
         return rooms
 
-    def _checkParams(self):
+    def _process_args(self):
         self._rooms = sorted(Room.find_all(is_active=True), key=lambda r: natural_sort_key(r.full_name))
         self._form_data = self._get_form_data()
         self._form = BookingSearchForm(self._form_data, csrf_enabled=False)
@@ -358,7 +358,7 @@ class RHRoomBookingNewBookingBase(RHRoomBookingBase):
 
 
 class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._room = Room.get(int(request.view_args['roomID']))
         if self._room is None:
             raise NotFoundError('This room does not exist')
@@ -442,8 +442,8 @@ class RHRoomBookingNewBookingSimple(RHRoomBookingNewBookingBase):
 
 
 class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBookingSimple):
-    def _checkParams(self):
-        RHRoomBookingBookingMixin._checkParams(self)
+    def _process_args(self):
+        RHRoomBookingBookingMixin._process_args(self)
 
         # use 'room' if passed through GET
         room_id = request.args.get('room', None)
@@ -500,7 +500,7 @@ class RHRoomBookingCloneBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBooki
 
 
 class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         try:
             self._step = int(request.form.get('step', 1))
         except ValueError:
@@ -678,7 +678,7 @@ class RHRoomBookingModifyBooking(RHRoomBookingBookingMixin, RHRoomBookingNewBook
 class RHRoomBookingCalendar(RHRoomBookingBase):
     MAX_DAYS = 365 * 2
 
-    def _checkParams(self):
+    def _process_args(self):
         today = datetime.now().date()
         self.start_dt = get_datetime_from_request('start_', default=datetime.combine(today, time(0, 0)))
         self.end_dt = get_datetime_from_request('end_', default=datetime.combine(self.start_dt.date(), time(23, 59)))

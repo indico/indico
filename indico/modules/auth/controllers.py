@@ -143,7 +143,7 @@ class RHLinkAccount(RH):
     email address and an existing user was found.
     """
 
-    def _checkParams(self):
+    def _process_args(self):
         self.identity_info = load_identity_info()
         if not self.identity_info or self.identity_info['indico_user_id'] is None:
             # Just redirect to the front page or whereever we wanted to go.
@@ -211,7 +211,7 @@ class RHRegister(RH):
     - creation of a new user based on information from an identity provider
     """
 
-    def _checkParams(self):
+    def _process_args(self):
         self.identity_info = None
         self.provider_name = request.view_args['provider']
         if self.provider_name is not None:
@@ -362,8 +362,8 @@ class RHAccounts(RHUserBase):
 class RHRemoveAccount(RHUserBase):
     """Removes an identity linked to a user"""
 
-    def _checkParams(self):
-        RHUserBase._checkParams(self)
+    def _process_args(self):
+        RHUserBase._process_args(self)
         self.identity = Identity.get_one(request.view_args['identity'])
         if self.identity.user != self.user:
             raise NotFound()
@@ -554,7 +554,7 @@ class LocalRegistrationHandler(RegistrationHandler):
 class RHResetPassword(RH):
     """Resets the password for a local identity."""
 
-    def _checkParams(self):
+    def _process_args(self):
         if not config.LOCAL_IDENTITIES:
             raise Forbidden('Local identities are disabled')
 
@@ -599,8 +599,8 @@ class RHResetPassword(RH):
 
 
 class RHAdminImpersonate(RHAdminBase):
-    def _checkParams(self, params):
-        RHAdminBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAdminBase._process_args(self, params)
         if request.form.get('undo') == '1':
             self.user = None
         else:

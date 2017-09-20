@@ -46,7 +46,7 @@ class ServiceBase(RequestHandlerBase):
 
     # Methods =============================================================
 
-    def _checkParams(self):
+    def _process_args(self):
         """
         Checks the request parameters (normally overloaded)
         """
@@ -67,7 +67,7 @@ class ServiceBase(RequestHandlerBase):
         g.rh = self
         sentry_set_tags({'rh': self.__class__.__name__})
 
-        self._checkParams()
+        self._process_args()
         self._check_access()
 
         if self.CHECK_HTML:

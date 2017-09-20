@@ -38,7 +38,7 @@ class RHRoomBookingAdmin(RHRoomBookingAdminBase):
 
 class RHRoomBookingLocationMixin:
     """Mixin that retrieves the location  or fails if there is none."""
-    def _checkParams(self):
+    def _process_args(self):
         self._location = Location.get(int(request.form['location_id']))
         if not self._location:
             raise NoReportError(u'No such location')
@@ -54,7 +54,7 @@ class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdmin
 
 class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
 
-    def _checkParams(self):
+    def _process_args(self):
         self._locationName = request.form.get('newLocationName').strip()
         if not self._locationName:
             raise FormValuesError(_('Location name may not be empty'))
@@ -79,7 +79,7 @@ class RHRoomBookingSetDefaultLocation(RHRoomBookingLocationMixin, RHRoomBookingA
 
 
 class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._with_kpi = request.args.get('withKPI', type=bool)
         self._actionSucceeded = request.args.get('actionSucceeded', default=False, type=bool)
         location_name = request.view_args.get('locationId')
@@ -111,7 +111,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
-    def _checkParams(self):
+    def _process_args(self):
         name = request.view_args.get('locationId')
         self._location = Location.find_first(name=name)
         if not self._location:
@@ -127,7 +127,7 @@ class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
 
 class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
-    def _checkParams(self):
+    def _process_args(self):
         name = request.view_args.get('locationId')
         self._location = Location.find_first(name=name)
         if not self._location:
@@ -157,7 +157,7 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
-    def _checkParams(self, param):
+    def _process_args(self, param):
         self._eq = request.form.get(param)
         name = request.view_args.get('locationId')
         self._location = Location.find_first(name=name)
@@ -167,8 +167,8 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
 
 class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
 
-    def _checkParams(self):
-        RHRoomBookingEquipmentBase._checkParams(self, 'removeEquipmentName')
+    def _process_args(self):
+        RHRoomBookingEquipmentBase._process_args(self, 'removeEquipmentName')
 
     def _process(self):
         eq = self._location.equipment_types.filter_by(name=self._eq).one()
@@ -179,8 +179,8 @@ class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):
 
 class RHRoomBookingSaveEquipment(RHRoomBookingEquipmentBase):
 
-    def _checkParams(self):
-        RHRoomBookingEquipmentBase._checkParams(self, 'newEquipmentName')
+    def _process_args(self):
+        RHRoomBookingEquipmentBase._process_args(self, 'newEquipmentName')
 
     def _process(self):
         if self._eq:

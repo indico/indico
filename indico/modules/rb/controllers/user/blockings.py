@@ -36,7 +36,7 @@ from indico.web.forms.base import FormDefaults
 
 
 class RHRoomBookingBlockingDetails(RHRoomBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._blocking = Blocking.get(request.view_args['blocking_id'])
         if not self._blocking:
             raise IndicoError('A blocking with this ID does not exist.')
@@ -69,7 +69,7 @@ class RHRoomBookingCreateModifyBlockingBase(RHRoomBookingBase):
 
 
 class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._form = CreateBlockingForm(start_date=date.today(), end_date=date.today())
         self._blocking = None
 
@@ -93,7 +93,7 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
 
 
 class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._blocking = Blocking.get(request.view_args['blocking_id'])
         if self._blocking is None:
             raise IndicoError('A blocking with this ID does not exist.')
@@ -136,7 +136,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
 
 
 class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self._block = Blocking.get(request.view_args['blocking_id'])
         if not self._block:
             raise IndicoError('A blocking with this ID does not exist.')
@@ -153,7 +153,7 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
 
 
 class RHRoomBookingBlockingList(RHRoomBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self.only_mine = request.args.get('only_mine') == '1'
         self.timeframe = request.args.get('timeframe', 'recent')
         if self.timeframe not in {'all', 'year', 'recent'}:
@@ -178,7 +178,7 @@ class RHRoomBookingBlockingList(RHRoomBookingBase):
 
 
 class RHRoomBookingBlockingsForMyRooms(RHRoomBookingBase):
-    def _checkParams(self):
+    def _process_args(self):
         self.state = request.args.get('state')
 
     def _process(self):

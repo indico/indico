@@ -66,7 +66,7 @@ logger = Logger.get('requestHandler')
 class RequestHandlerBase(object):
     def _check_access(self):
         """
-        This method is called after _checkParams and is a good place
+        This method is called after _process_args and is a good place
         to check if the user is permitted to perform some actions.
         """
 
@@ -226,7 +226,7 @@ class RH(RequestHandlerBase):
             else:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
-    def _checkParams(self, params):
+    def _process_args(self, params):
         """This method is called before _check_access and is a good place
         to assign variables from request params to member variables.
 
@@ -376,10 +376,10 @@ class RH(RequestHandlerBase):
         try:
             # old code gets parameters from call
             # new code utilizes of flask.request
-            if len(inspect.getargspec(self._checkParams).args) < 2:
-                cp_result = self._checkParams()
+            if len(inspect.getargspec(self._process_args).args) < 2:
+                cp_result = self._process_args()
             else:
-                cp_result = self._checkParams(self._reqParams)
+                cp_result = self._process_args(self._reqParams)
 
             if isinstance(cp_result, (current_app.response_class, Response)):
                 return '', cp_result

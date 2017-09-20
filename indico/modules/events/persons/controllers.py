@@ -160,10 +160,10 @@ class RHPersonsList(RHPersonsBase):
 class RHEmailEventPersons(RHManageEventBase):
     """Send emails to selected EventPersons"""
 
-    def _checkParams(self, params):
+    def _process_args(self, params):
         self._doNotSanitizeFields.append('from_address')
         self.no_account = request.args.get('no_account') == '1'
-        RHManageEventBase._checkParams(self, params)
+        RHManageEventBase._process_args(self, params)
 
     def _process(self):
         person_ids = request.form.getlist('person_id')
@@ -275,8 +275,8 @@ class RHRevokeSubmissionRights(RHManageEventBase):
 
 
 class RHEditEventPerson(RHPersonsBase):
-    def _checkParams(self, params):
-        RHPersonsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPersonsBase._process_args(self, params)
         self.person = EventPerson.query.with_parent(self.event).filter_by(id=request.view_args['person_id']).one()
 
     def _process(self):

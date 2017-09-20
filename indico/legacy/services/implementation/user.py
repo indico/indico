@@ -21,8 +21,8 @@ from indico.legacy.services.interface.rpc.common import ServiceError
 
 
 class UserGetEmail(LoggedOnlyService):
-    def _checkParams(self):
-        LoggedOnlyService._checkParams(self)
+    def _process_args(self):
+        LoggedOnlyService._process_args(self)
 
     def _getAnswer(self):
         if session.user:

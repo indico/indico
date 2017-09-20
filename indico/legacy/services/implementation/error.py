@@ -62,7 +62,7 @@ class SendErrorReport(ServiceBase):
         maildata = {"fromAddr": fromAddr, "toList": [toAddr], "subject": subject, "body": "\n".join(body)}
         GenericMailer.send(GenericNotification(maildata))
 
-    def _checkParams(self):
+    def _process_args(self):
         params = self._params or {}  # if params is not specified it's an empty list
         self._userMail = params.get('userMail', '')
         self._code = params.get('code', '')

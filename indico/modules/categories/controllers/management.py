@@ -248,8 +248,8 @@ class RHDeleteCategory(RHManageCategoryBase):
 
 
 class RHMoveCategoryBase(RHManageCategoryBase):
-    def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHManageCategoryBase._process_args(self)
         target_category_id = request.form.get('target_category_id')
         if target_category_id is None:
             self.target_category = None
@@ -264,8 +264,8 @@ class RHMoveCategoryBase(RHManageCategoryBase):
 class RHMoveCategory(RHMoveCategoryBase):
     """Move a category."""
 
-    def _checkParams(self):
-        RHMoveCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHMoveCategoryBase._process_args(self)
         if self.category.is_root:
             raise BadRequest(_("Cannot move the root category."))
         if self.target_category is not None:
@@ -283,8 +283,8 @@ class RHMoveCategory(RHMoveCategoryBase):
 class RHDeleteSubcategories(RHManageCategoryBase):
     """Bulk-delete subcategories"""
 
-    def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHManageCategoryBase._process_args(self)
         self.subcategories = (Category.query
                               .with_parent(self.category)
                               .filter(Category.id.in_(map(int, request.form.getlist('category_id'))))
@@ -304,8 +304,8 @@ class RHDeleteSubcategories(RHManageCategoryBase):
 class RHMoveSubcategories(RHMoveCategoryBase):
     """Bulk-move subcategories"""
 
-    def _checkParams(self):
-        RHMoveCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHMoveCategoryBase._process_args(self)
         subcategory_ids = map(int, request.values.getlist('category_id'))
         self.subcategories = (Category.query.with_parent(self.category)
                               .filter(Category.id.in_(subcategory_ids))
@@ -335,8 +335,8 @@ class RHSortSubcategories(RHManageCategoryBase):
 class RHManageCategorySelectedEventsBase(RHManageCategoryBase):
     """Base RH to manage selected events in a category"""
 
-    def _checkParams(self):
-        RHManageCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHManageCategoryBase._process_args(self)
         query = (Event.query
                  .with_parent(self.category)
                  .order_by(Event.start_dt.desc()))
@@ -360,8 +360,8 @@ class RHDeleteEvents(RHManageCategorySelectedEventsBase):
 
 
 class RHSplitCategory(RHManageCategorySelectedEventsBase):
-    def _checkParams(self):
-        RHManageCategorySelectedEventsBase._checkParams(self)
+    def _process_args(self):
+        RHManageCategorySelectedEventsBase._process_args(self)
         self.cat_events = set(self.category.events)
         self.sel_events = set(self.events)
 
@@ -388,8 +388,8 @@ class RHSplitCategory(RHManageCategorySelectedEventsBase):
 
 
 class RHMoveEvents(RHManageCategorySelectedEventsBase):
-    def _checkParams(self):
-        RHManageCategorySelectedEventsBase._checkParams(self)
+    def _process_args(self):
+        RHManageCategorySelectedEventsBase._process_args(self)
         self.target_category = Category.get_one(int(request.form['target_category_id']), is_deleted=False)
         if not self.target_category.can_create_events(session.user):
             raise Forbidden(_("You may only move events to categories where you are allowed to create events."))

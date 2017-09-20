@@ -66,7 +66,7 @@ class RHUserBase(RHProtected):
     flash_user_status = True
     allow_system_user = False
 
-    def _checkParams(self):
+    def _process_args(self):
         if not session.user:
             return
         self.user = session.user
@@ -203,8 +203,8 @@ class RHUserFavoritesUserRemove(RHUserBase):
 
 
 class RHUserFavoritesCategoryAPI(RHUserBase):
-    def _checkParams(self):
-        RHUserBase._checkParams(self)
+    def _process_args(self):
+        RHUserBase._process_args(self)
         self.category = Category.get_one(request.view_args['category_id'])
         self.suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
 
@@ -484,8 +484,8 @@ class RHRegistrationRequestList(RHAdminBase):
 class RHRegistrationRequestBase(RHAdminBase):
     """Base class to process a registration request"""
 
-    def _checkParams(self, params):
-        RHAdminBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHAdminBase._process_args(self, params)
         self.request = RegistrationRequest.get_one(request.view_args['request_id'])
 
 

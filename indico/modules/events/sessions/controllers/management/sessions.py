@@ -218,8 +218,8 @@ class RHManageSessionBlock(RHManageSessionBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageSessionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageSessionBase._process_args(self, params)
         self.session_block = SessionBlock.get_one(request.view_args['block_id'])
 
     def _process(self):

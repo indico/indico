@@ -38,7 +38,7 @@ class SpecificAttachmentMixin:
         'preserved_args': {'attachment_id'}
     }
 
-    def _checkParams(self):
+    def _process_args(self):
         self.attachment = Attachment.find_one(id=request.view_args['attachment_id'], is_deleted=False)
         if self.attachment.folder.is_deleted:
             raise NotFound
@@ -54,5 +54,5 @@ class SpecificFolderMixin:
         'preserved_args': {'folder_id'}
     }
 
-    def _checkParams(self):
+    def _process_args(self):
         self.folder = AttachmentFolder.find_one(id=request.view_args['folder_id'], is_deleted=False)

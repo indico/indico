@@ -73,8 +73,8 @@ class RHEditEmailTemplateBase(RHManageAbstractsBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageAbstractsBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageAbstractsBase._process_args(self, params)
         self.email_tpl = AbstractEmailTemplate.get_one(request.view_args['email_tpl_id'])
 
 

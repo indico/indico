@@ -127,7 +127,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
         elif isinstance(self.target, Event):
             check_event_locked(self, self.target)
 
-    def _checkParams(self):
+    def _process_args(self):
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
 
@@ -159,7 +159,7 @@ class CloneTemplateMixin(TargetFromURLMixin):
         if not self.target.can_manage(session.user):
             raise Forbidden
 
-    def _checkParams(self):
+    def _process_args(self):
         self.template = DesignerTemplate.get_one(request.view_args['template_id'])
 
     def _process(self):
@@ -219,21 +219,21 @@ class RHAddCategoryTemplate(AddTemplateMixin, RHManageCategoryBase):
 
 
 class RHCloneEventTemplate(CloneTemplateMixin, RHManageEventBase):
-    def _checkParams(self, params):
-        RHManageEventBase._checkParams(self, params)
-        CloneTemplateMixin._checkParams(self)
+    def _process_args(self, params):
+        RHManageEventBase._process_args(self, params)
+        CloneTemplateMixin._process_args(self)
 
 
 class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
-    def _checkParams(self, params):
-        RHManageCategoryBase._checkParams(self)
-        CloneTemplateMixin._checkParams(self)
+    def _process_args(self, params):
+        RHManageCategoryBase._process_args(self)
+        CloneTemplateMixin._process_args(self)
 
 
 class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProtected):
-    def _checkParams(self, params):
-        RHModificationBaseProtected._checkParams(self, params)
-        SpecificTemplateMixin._checkParams(self)
+    def _process_args(self, params):
+        RHModificationBaseProtected._process_args(self, params)
+        SpecificTemplateMixin._process_args(self)
 
 
 class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
@@ -281,8 +281,8 @@ class RHDownloadTemplateImage(RHModifyDesignerTemplateBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHModifyDesignerTemplateBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHModifyDesignerTemplateBase._process_args(self, params)
         self.image = DesignerImageFile.find_one(id=request.view_args['image_id'], template=self.template)
 
     def _process(self):

@@ -76,8 +76,8 @@ def generate_ticket(registration):
 class RHTicketDownload(RHRegistrationFormRegistrationBase):
     """Generate ticket for a given registration"""
 
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrationBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHRegistrationFormRegistrationBase._process_args(self, params)
         if not self.registration:
             raise NotFound
 

@@ -29,8 +29,8 @@ from indico.modules.categories.views import WPCategoryManagement
 
 
 class RHCategoryAttachmentManagementBase(RHManageCategoryBase):
-    def _checkParams(self, params):
-        RHManageCategoryBase._checkParams(self)
+    def _process_args(self, params):
+        RHManageCategoryBase._process_args(self)
         self.object_type = 'category'
         self.object = self.base_object = self.category
 
@@ -55,9 +55,9 @@ class RHAddCategoryAttachmentLink(AddAttachmentLinkMixin, RHCategoryAttachmentMa
 
 
 class RHEditCategoryAttachment(EditAttachmentMixin, RHCategoryAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHCategoryAttachmentManagementBase._checkParams(self, params)
-        EditAttachmentMixin._checkParams(self)
+    def _process_args(self, params):
+        RHCategoryAttachmentManagementBase._process_args(self, params)
+        EditAttachmentMixin._process_args(self)
 
 
 class RHCreateCategoryFolder(CreateFolderMixin, RHCategoryAttachmentManagementBase):
@@ -65,18 +65,18 @@ class RHCreateCategoryFolder(CreateFolderMixin, RHCategoryAttachmentManagementBa
 
 
 class RHEditCategoryFolder(EditFolderMixin, RHCategoryAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHCategoryAttachmentManagementBase._checkParams(self, params)
-        EditFolderMixin._checkParams(self)
+    def _process_args(self, params):
+        RHCategoryAttachmentManagementBase._process_args(self, params)
+        EditFolderMixin._process_args(self)
 
 
 class RHDeleteCategoryFolder(DeleteFolderMixin, RHCategoryAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHCategoryAttachmentManagementBase._checkParams(self, params)
-        DeleteFolderMixin._checkParams(self)
+    def _process_args(self, params):
+        RHCategoryAttachmentManagementBase._process_args(self, params)
+        DeleteFolderMixin._process_args(self)
 
 
 class RHDeleteCategoryAttachment(DeleteAttachmentMixin, RHCategoryAttachmentManagementBase):
-    def _checkParams(self, params):
-        RHCategoryAttachmentManagementBase._checkParams(self, params)
-        DeleteAttachmentMixin._checkParams(self)
+    def _process_args(self, params):
+        RHCategoryAttachmentManagementBase._process_args(self, params)
+        DeleteAttachmentMixin._process_args(self)

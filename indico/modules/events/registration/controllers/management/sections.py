@@ -35,8 +35,8 @@ class RHManageRegFormSectionBase(RHManageRegFormBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageRegFormBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormBase._process_args(self, params)
         self.section = RegistrationFormSection.get_one(request.view_args['section_id'])
 
 

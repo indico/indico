@@ -61,8 +61,8 @@ class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
         }
     }
 
-    def _checkParams(self, params):
-        RHManageRegFormSectionBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageRegFormSectionBase._process_args(self, params)
         self.field = self.field_class.get_one(request.view_args['field_id'])
 
 

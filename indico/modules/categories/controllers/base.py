@@ -40,7 +40,7 @@ class RHCategoryBase(RH):
             category = Category.get_root()
         return category
 
-    def _checkParams(self):
+    def _process_args(self):
         category_id = request.view_args['category_id']
         self.category = self._get_category(category_id)
         if self.category is None:

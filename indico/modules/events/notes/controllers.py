@@ -36,7 +36,7 @@ from indico.web.util import jsonify_template
 class RHNoteBase(RHProtected):
     """Base handler for notes attached to an object inside an event"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.object_type, self.event, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound

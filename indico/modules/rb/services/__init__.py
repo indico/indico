@@ -23,7 +23,7 @@ from indico.util.i18n import _
 class GetDateWarning(ServiceBase):
     UNICODE_PARAMS = True
 
-    def _checkParams(self):
+    def _process_args(self):
         self._start_dt = get_datetime_from_request(prefix='start_', source=self._params)
         self._end_dt = get_datetime_from_request(prefix='end_', source=self._params)
 

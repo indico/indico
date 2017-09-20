@@ -36,8 +36,8 @@ from indico.web.util import jsonify_template
 class RHShowNonInheriting(RHManageEventBase):
     """Show a list of non-inheriting child objects"""
 
-    def _checkParams(self, params):
-        RHManageEventBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHManageEventBase._process_args(self, params)
         self.obj = get_object_from_args()[2]
         if self.obj is None:
             raise NotFound

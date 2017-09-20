@@ -26,7 +26,7 @@ from indico.util.i18n import _
 class RoomBookingBlockingProcessBase(ServiceBase):
     UNICODE_PARAMS = True
 
-    def _checkParams(self):
+    def _process_args(self):
         self.blocked_room = BlockedRoom.get(self._params['blocked_room_id'])
 
     def _check_access(self):
@@ -42,8 +42,8 @@ class RoomBookingBlockingApprove(RoomBookingBlockingProcessBase):
 
 
 class RoomBookingBlockingReject(RoomBookingBlockingProcessBase):
-    def _checkParams(self):
-        RoomBookingBlockingProcessBase._checkParams(self)
+    def _process_args(self):
+        RoomBookingBlockingProcessBase._process_args(self)
         self.reason = self._params.get('reason')
         if not self.reason:
             raise ServiceError(_('You have to specify a rejection reason'))

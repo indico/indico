@@ -63,8 +63,8 @@ class RHPaymentBase(RHRegistrationFormRegistrationBase):
     """Base RH for non-management payment pages"""
     EVENT_FEATURE = 'payment'
 
-    def _checkParams(self, params):
-        RHRegistrationFormRegistrationBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHRegistrationFormRegistrationBase._process_args(self, params)
         if self.registration is None:
             raise NotFound
 
@@ -98,8 +98,8 @@ class RHPaymentSettingsEdit(RHPaymentManagementBase):
 class RHPaymentPluginEdit(RHPaymentManagementBase):
     """Configure a payment plugin for an event"""
 
-    def _checkParams(self, params):
-        RHPaymentManagementBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPaymentManagementBase._process_args(self, params)
         try:
             self.plugin = get_payment_plugins()[request.view_args['method']]
         except KeyError:
@@ -156,8 +156,8 @@ class RHPaymentCheckout(RHPaymentBase):
 class RHPaymentForm(RHPaymentBase):
     """Load the form for the selected payment plugin"""
 
-    def _checkParams(self, params):
-        RHPaymentBase._checkParams(self, params)
+    def _process_args(self, params):
+        RHPaymentBase._process_args(self, params)
         try:
             self.plugin = get_active_payment_plugins(self.event)[request.args['method']]
         except KeyError:

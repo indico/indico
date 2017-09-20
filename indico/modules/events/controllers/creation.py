@@ -44,7 +44,7 @@ from indico.web.util import jsonify_data, jsonify_template, url_for_index
 class RHCreateEvent(RHProtected):
     """Create a new event"""
 
-    def _checkParams(self):
+    def _process_args(self):
         self.event_type = EventType[request.view_args['event_type']]
 
     @cached_property

@@ -246,8 +246,8 @@ class RHDisplayCategoryEventsBase(RHDisplayCategoryBase):
                             load_only('id', 'category_id', 'created_dt', 'end_dt', 'protection_mode', 'start_dt',
                                       'title', 'type_', 'series_pos', 'series_count'))
 
-    def _checkParams(self):
-        RHDisplayCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHDisplayCategoryBase._process_args(self)
         self.now = now_utc(exact=False).astimezone(self.category.display_tzinfo)
 
     def format_event_date(self, event):
@@ -359,8 +359,8 @@ class RHEventList(RHDisplayCategoryEventsBase):
             return None
         return self.category.display_tzinfo.localize(dt)
 
-    def _checkParams(self):
-        RHDisplayCategoryEventsBase._checkParams(self)
+    def _process_args(self):
+        RHDisplayCategoryEventsBase._process_args(self)
         before = self._parse_year_month(request.args.get('before'))
         after = self._parse_year_month(request.args.get('after'))
         if before is None and after is None:
@@ -419,7 +419,7 @@ class RHExportCategoryAtom(RHDisplayCategoryBase):
 
 
 class RHXMLExportCategoryInfo(RH):
-    def _checkParams(self):
+    def _process_args(self):
         try:
             id_ = int(request.args['id'])
         except ValueError:
@@ -434,8 +434,8 @@ class RHXMLExportCategoryInfo(RH):
 class RHCategoryOverview(RHDisplayCategoryBase):
     """Display the events for a particular day, week or month"""
 
-    def _checkParams(self):
-        RHDisplayCategoryBase._checkParams(self)
+    def _process_args(self):
+        RHDisplayCategoryBase._process_args(self)
         self.detail = request.args.get('detail', 'event')
         if self.detail not in ('event', 'session', 'contribution'):
             raise BadRequest('Invalid detail argument')
