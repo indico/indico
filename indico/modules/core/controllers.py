@@ -111,6 +111,12 @@ class RHVersionCheck(RHAdminBase):
     def _process(self):
         data = requests.get('https://pypi.python.org/pypi/indico/json').json()
         current_version = Version(indico.__version__)
-        latest_version = Version(data['info']['version'])
+        if current_version.is_prerelease:
+            # if we are on a prerelease, get the latest one even if it's also a prerelease
+            latest_version = Version(data['info']['version'])
+        else:
+            # if we are stable, get the latest stable version
+            versions = map(Version, data['releases'])
+            latest_version = max(v for v in versions if not v.is_prerelease)
         return jsonify(current_version=unicode(current_version), latest_version=unicode(latest_version),
                        outdated=(current_version < latest_version))
