@@ -422,7 +422,7 @@ class RH(RequestHandlerBase):
         if func:
             func()
 
-        Sanitization.sanitizationCheck(self._target, self._reqParams, session.user, self._doNotSanitizeFields)
+        Sanitization.sanitizationCheck(self._reqParams, self._doNotSanitizeFields)
 
         if self._doProcess:
             if profile:

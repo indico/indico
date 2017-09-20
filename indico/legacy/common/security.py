@@ -14,18 +14,12 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.config import config
 from indico.legacy.common.utils import encodeUnicode
 from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.webinterface.common.tools import escape_html, restrictedHTML
 
 
-"""
-base module for HTML security
-"""
-
 class Sanitization(object):
-
     @staticmethod
     def _sanitize(params, level, doNotSanitize=[]):
         for i in params:
@@ -85,29 +79,6 @@ class Sanitization(object):
                 Sanitization._encodeUnicode(param)
 
     @staticmethod
-    def sanitizationCheck(target, params, user, doNotSanitize=[]):
-        # first make sure all params are utf-8
+    def sanitizationCheck(params, doNotSanitize=[]):
         Sanitization._encodeUnicode(params)
-
-        # then check the security level of data sent to the server
-        # if no user logged in, then no html allowed
-        if user:
-            level = config.SANITIZATION_LEVEL
-        else:
-            level = 0
-
-        if level not in range(4):
-            level = 1
-
-        if level == 0:
-            #Escape all HTML tags
-            Sanitization._escapeHTML(params, doNotSanitize)
-
-        elif level in [1, 2]:
-            #level 1 or default: raise error if script or style detected
-            #level 2: raise error if script but style accepted
-            Sanitization._sanitize(params, level, doNotSanitize)
-
-        elif level == 3:
-            # Absolutely no checks
-            return
+        Sanitization._sanitize(params, 2, doNotSanitize)

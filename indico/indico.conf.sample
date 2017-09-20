@@ -31,14 +31,6 @@ SQLALCHEMY_DATABASE_URI = 'postgresql:///indico'
 #------------------------------------------------------------------------------
 # SECURITY
 #------------------------------------------------------------------------------
-# Possible values of SanitizationLevel:
-#    0: Escape all HTML tags
-#    1: Raise error if styles are used
-#    2: Raise error if SCRIPT tag is used
-#    3: No input filtering is done (DANGEROUS!)
-
-SANITIZATION_LEVEL = 2
-
 # To sign data such as activation tokens used in emails, Indico needs a secret
 # key.  It should be a random string; the preferred way to generate it is using
 # `import os; os.urandom(32)` in a Python shell.

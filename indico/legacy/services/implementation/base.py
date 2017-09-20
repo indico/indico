@@ -72,7 +72,7 @@ class ServiceBase(RequestHandlerBase):
 
         if self.CHECK_HTML:
             try:
-                security.Sanitization.sanitizationCheck(self._target, self._params, session.user, ['requestInfo'])
+                security.Sanitization.sanitizationCheck(self._params, ['requestInfo'])
             except HtmlForbiddenTag as e:
                 raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
 

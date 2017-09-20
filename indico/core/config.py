@@ -77,7 +77,6 @@ DEFAULTS = {
     'PUBLIC_SUPPORT_EMAIL': None,
     'REDIS_CACHE_URL': None,
     'ROUTE_OLD_URLS': False,
-    'SANITIZATION_LEVEL': 2,
     'SCHEDULED_TASK_OVERRIDE': {},
     'SCSS_DEBUG_INFO': True,
     'SECRET_KEY': None,
