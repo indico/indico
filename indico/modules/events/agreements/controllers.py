@@ -130,10 +130,10 @@ class RHAgreementManagerDetailsToggleNotifications(RHAgreementManagerDetails):
 
 
 class RHAgreementManagerDetailsEmailBase(RHAgreementManagerDetails):
+    NOT_SANITIZED_FIELDS = {'from_address'}
     dialog_template = None
 
     def _process_args(self):
-        self._doNotSanitizeFields.append('from_address')
         RHAgreementManagerDetails._process_args(self)
 
     def _success_handler(self, form):

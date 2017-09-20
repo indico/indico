@@ -78,7 +78,7 @@ class RequestHandlerBase(object):
 
 
 class RH(RequestHandlerBase):
-    _doNotSanitizeFields = []
+    NOT_SANITIZED_FIELDS = frozenset()
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
     DENY_FRAMES = False  # whether to send an X-Frame-Options:DENY header
@@ -369,7 +369,7 @@ class RH(RequestHandlerBase):
             return '', rv
 
         self._check_access()
-        Sanitization.sanitizationCheck(create_flat_args(), self._doNotSanitizeFields)
+        Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
 
         if self._doProcess:
             if profile:

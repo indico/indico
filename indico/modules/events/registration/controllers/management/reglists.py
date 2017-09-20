@@ -197,9 +197,7 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
     """Send email to selected registrants"""
 
-    def _process_args(self):
-        self._doNotSanitizeFields.append('from_address')
-        RHRegistrationsActionBase._process_args(self)
+    NOT_SANITIZED_FIELDS = {'from_address'}
 
     def _send_emails(self, form):
         for registration in self.registrations:

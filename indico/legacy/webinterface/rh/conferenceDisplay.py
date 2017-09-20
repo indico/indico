@@ -28,10 +28,11 @@ from indico.web.flask.util import send_file
 
 
 class RHConferenceAccessKey(RHConferenceBase):
+    NOT_SANITIZED_FIELDS = {'accessKey'}
+
     def _process_args(self):
         RHConferenceBase._process_args(self)
         self._accesskey = request.form.get('accessKey', '').strip()
-        self._doNotSanitizeFields.append('accessKey')
 
     def _process(self):
         # XXX: we don't check if it's valid or not -- WPKeyAccessError shows a message

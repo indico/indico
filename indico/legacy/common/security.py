@@ -21,7 +21,7 @@ from indico.legacy.webinterface.common.tools import escape_html, restrictedHTML
 
 class Sanitization(object):
     @staticmethod
-    def _sanitize(params, level, doNotSanitize=[]):
+    def _sanitize(params, level, doNotSanitize=frozenset()):
         for i in params:
             if i in doNotSanitize:
                 continue
