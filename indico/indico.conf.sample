@@ -1,12 +1,12 @@
-
 #--------------------------
 # Indico configuration file
 #--------------------------
 #
-# This file is read on Apache startup. If you change any value you will need to
-# restart Apache afterwards to have its changes take effect.
+# This file is only read when the application is initialized.
+# If you change any value you will need to restart your WSGI server for
+# the config file to be re-read.
 #
-# Lines starting with "#" are comments and they will be ignored by Indico.
+# The file is executed as Python code so you can use anything that's allowed in PYthon.
 
 #------------------------------------------------------------------------------
 # SQLAlchemy DB
@@ -194,17 +194,12 @@ MAX_UPLOAD_FILE_SIZE = 0
 #------------------------------------------------------------------------------
 # LOGGING
 #------------------------------------------------------------------------------
-# Indico lets you log error messages using two methods:
-#
-#  * Simple log files (default)
-#  * Sentry (https://github.com/getsentry/sentry)
-#
 # If the LoggingConfigFile is not an absolute path, it is relative to the
 # location of this file.
 #
 # LOGGING_CONFIG_FILE = 'logging.yaml'
 #
-# To use Sentry, simply set the SENTRY_DSN:
+# To use Sentry (https://sentry.io), simply set the SENTRY_DSN:
 # SENTRY_DSN = 'http://user:password@logger.example.com/n'
 # SENTRY_LOGGING_LEVEL = 'ERROR'  # default: 'WARNING'
 
