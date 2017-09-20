@@ -59,17 +59,12 @@ from indico.web.assets import (core_env, include_css_assets, include_js_assets, 
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
                                          markdown, natsort, strip_tags, subclassof, underline)
-from indico.web.flask.util import (ListConverter, XAccelMiddleware, discover_blueprints, make_compat_blueprint, url_for,
-                                   url_rule_to_js)
+from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
 from indico.web.menu import render_sidemenu
 from indico.web.util import url_for_index
 from indico.web.views import render_session_bar
-
-
-#: Blueprint names for which legacy rules are auto-generated based on the endpoint name
-AUTO_COMPAT_BLUEPRINTS = {'admin', 'event', 'event_creation', 'event_mgmt', 'misc', 'rooms', 'rooms_admin'}
 
 
 def configure_app(app, set_path=False):
@@ -275,7 +270,6 @@ def add_blueprints(app):
     for blueprint in blueprints:
         app.register_blueprint(blueprint)
     if config.ROUTE_OLD_URLS:
-        compat_blueprints |= {make_compat_blueprint(bp) for bp in blueprints if bp.name in AUTO_COMPAT_BLUEPRINTS}
         for blueprint in compat_blueprints:
             app.register_blueprint(blueprint)
 

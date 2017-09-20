@@ -20,6 +20,7 @@ from indico.modules.rb.controllers.user import index as index_handler
 from indico.modules.rb.controllers.user import photos as photo_handlers
 from indico.modules.rb.controllers.user import reservations as reservation_handlers
 from indico.modules.rb.controllers.user import rooms as room_handlers
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -157,3 +158,18 @@ _bp.add_url_rule('/blocking/list',
 _bp.add_url_rule('/blocking/list/my-rooms',
                  'blocking_my_rooms',
                  blocking_handlers.RHRoomBookingBlockingsForMyRooms)
+
+
+_compat_bp = IndicoBlueprint('compat_rooms', __name__)
+_compat_bp.add_url_rule('/roomBooking.py', 'roomBooking',
+                        make_compat_redirect_func(_bp, 'roomBooking'))
+_compat_bp.add_url_rule('/roomBooking.py/mapOfRooms', 'roomBooking-mapOfRooms',
+                        make_compat_redirect_func(_bp, 'roomBooking-mapOfRooms'))
+_compat_bp.add_url_rule('/roomBooking.py/search4Bookings', 'roomBooking-search4Bookings',
+                        make_compat_redirect_func(_bp, 'roomBooking-search4Bookings'))
+_compat_bp.add_url_rule('/roomBooking.py/bookingDetails', 'roomBooking-bookingDetails',
+                        make_compat_redirect_func(_bp, 'roomBooking-bookingDetails'))
+_compat_bp.add_url_rule('/roomBooking.py/roomDetails', 'roomBooking-roomDetails',
+                        make_compat_redirect_func(_bp, 'roomBooking-roomDetails'))
+_compat_bp.add_url_rule('/roomBooking.py/roomStats', 'roomBooking-roomStats',
+                        make_compat_redirect_func(_bp, 'roomBooking-roomStats'))

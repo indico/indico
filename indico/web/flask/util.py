@@ -141,19 +141,6 @@ def redirect_view(endpoint, code=302):
     return _redirect
 
 
-def iter_blueprint_rules(blueprint):
-    for func in blueprint.deferred_functions:
-        yield dict(zip(func.func_code.co_freevars, (c.cell_contents for c in func.func_closure)))
-
-
-def legacy_rule_from_endpoint(endpoint):
-    endpoint = re.sub(r':\d+$', '', endpoint)
-    if '-' in endpoint:
-        return '/' + endpoint.replace('-', '.py/')
-    else:
-        return '/' + endpoint + '.py'
-
-
 def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_conv=None):
     def _redirect(**view_args):
         # In case of POST we can't safely redirect since the method would switch to GET
@@ -174,31 +161,6 @@ def make_compat_redirect_func(blueprint, endpoint, view_func=None, view_args_con
             raise NotFound
         return redirect(target, 302 if current_app.debug else 301)
     return _redirect
-
-
-def make_compat_blueprint(blueprint):
-    from indico.web.flask.blueprints.legacy import legacy_endpoints
-
-    compat = Blueprint('compat_' + blueprint.name, __name__)
-    used_endpoints = set()
-    for rule in iter_blueprint_rules(blueprint):
-        # Rules without an endpoint are never legacy rules
-        if not rule.get('endpoint'):
-            continue
-        # Rules which do not have a matching .py file are also not legacy rules
-        if rule['endpoint'] not in legacy_endpoints:
-            continue
-
-        endpoint = rule['endpoint']
-        i = 0
-        while endpoint in used_endpoints:
-            i += 1
-            endpoint = '%s:%s' % (rule['endpoint'], i)
-        used_endpoints.add(endpoint)
-        compat.add_url_rule(legacy_rule_from_endpoint(endpoint), endpoint,
-                            make_compat_redirect_func(blueprint, rule['endpoint'], rule['view_func']),
-                            methods=rule['options'].get('methods'))
-    return compat
 
 
 def url_for(endpoint, *targets, **values):
