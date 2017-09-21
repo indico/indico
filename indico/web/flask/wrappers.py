@@ -48,12 +48,8 @@ class IndicoRequest(Request):
 
     @cached_property
     def relative_url(self):
-        """The request's path including its query string if applicable.
-
-        This basically `full_path` but without the ugly trailing
-        questionmark if there is no query string.
-        """
-        return self.full_path.rstrip('?')
+        """The request's path including its query string if applicable."""
+        return self.script_root + self.full_path.rstrip('?')
 
     @cached_property
     def remote_addr(self):
