@@ -66,6 +66,9 @@
     }
 
     .role-description {
+        margin: 1em 0 0.5em 0;
+        overflow: auto;
+
         .title {
             font-size: 1.2em;
         }
@@ -74,21 +77,32 @@
             padding: 0;
             height: 1.8em !important;
         }
-
-        margin: 1em 0 0.5em 0;
-        overflow: auto;
     }
 
     .reviewer-container {
-        &:not(:first-child) {
-            @include border-top();
-        }
         margin: 0 -10px;
         padding-left: 10px;
         padding-right: 10px;
 
+        &:not(:first-child) {
+            @include border-top();
+        }
+
         &:not(:last-child) {
             padding-bottom: 1em;
         }
+    }
+}
+
+#event-participants-list {
+    .registration-column {
+        .icon-ticket {
+            color: $pastel-gray;
+
+            &.exists {
+                color: $blue;
+            }
+        }
+
     }
 }

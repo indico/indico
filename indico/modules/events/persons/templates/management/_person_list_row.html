@@ -3,6 +3,23 @@
     <td class="i-table thin-column hide-if-locked">
         <input type="checkbox" value="{{ person.id }}" class="select-row" name="person_id" {{ 'disabled' if not person.email }}>
     </td>
+    <td class="i-table registration-column">
+        {% set tooltip %}
+            {% if person_data.registrations %}
+                {%- trans %}The person has registered in:{% endtrans -%}
+                {% for reg in person_data.registrations %}
+                    <div>
+                        <a href='{{ url_for('event_registration.registration_details', reg) }}'>
+                            {{ reg.registration_form.title }}
+                        </a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                {%- trans %}The person has not registered yet{% endtrans -%}
+            {% endif %}
+        {% endset %}
+        <i class="icon-ticket js-show-regforms {{ 'exists' if person_data.registrations}}" data-title="{{ tooltip }}"></i>
+    </td>
     <td class="i-table name-column">
         {{ person.display_full_name }}
         {% if person.is_untrusted %}

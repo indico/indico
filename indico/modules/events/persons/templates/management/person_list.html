@@ -19,12 +19,12 @@
                     <a class="icon-checkbox-checked i-button arrow js-dropdown" href="#" data-toggle="dropdown"></a>
                     <ul class="dropdown">
                         <li>
-                            <a href="#" data-select-all="#event-roles-list input.select-row:visible:not(:disabled)">
+                            <a href="#" data-select-all="#event-participants-list input.select-row:visible:not(:disabled)">
                                 {% trans %}All{% endtrans %}
                             </a>
                         </li>
                         <li>
-                            <a href="#" data-select-none="#event-roles-list input.select-row:visible">
+                            <a href="#" data-select-none="#event-participants-list input.select-row:visible">
                                 {% trans %}None{% endtrans %}
                             </a>
                         </li>
@@ -35,7 +35,7 @@
                        data-href="{{ url_for('persons.email_event_persons', event) }}"
                        data-title="{% trans %}Send email{% endtrans %}"
                        data-method="POST"
-                       data-params-selector="#event-roles-list input[name=person_id]:checkbox:checked:visible"
+                       data-params-selector="#event-participants-list input[name=person_id]:checkbox:checked:visible"
                        data-ajax-dialog
                        data-reload-after>
                         {%- trans %}Send emails{% endtrans -%}
@@ -90,7 +90,7 @@
                             <a href="#"
                                title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
                                data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
-                               data-params-selector="#event-roles-list [data-no-account] input[name=person_id]:checkbox"
+                               data-params-selector="#event-participants-list [data-no-account] input[name=person_id]:checkbox"
                                data-title="{% trans %}Send email{% endtrans %}"
                                data-method="POST"
                                data-ajax-dialog
@@ -105,7 +105,7 @@
                                          received an invitation email yet{% endtrans %}"
                                    data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
                                                           not_invited_only=true) }}"
-                                   data-params-selector="#event-roles-list [data-no-account] input[name=person_id]:checkbox"
+                                   data-params-selector="#event-participants-list [data-no-account] input[name=person_id]:checkbox"
                                    data-title="{% trans %}Send email{% endtrans %}"
                                    data-method="POST"
                                    data-ajax-dialog
@@ -146,7 +146,7 @@
                 </div>
             </div>
         </div>
-        <div id="event-roles-list">
+        <div id="event-participants-list">
             {% if num_no_account %}
                 {% call message_box('warning') %}
                     {% trans count = num_no_account -%}
@@ -162,6 +162,7 @@
                 <thead>
                     <tr class="i-table">
                         <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>
+                        <th class="i-table" data-sorter="false"></th>
                         <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
                         <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
                         <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
@@ -181,7 +182,7 @@
                         </tr>
                     {%- else -%}
                         <tr class="i-table">
-                            <td colspan="8">
+                            <td colspan="9">
                                 {%- trans %}No persons{% endtrans -%}
                             </td>
                         </tr>

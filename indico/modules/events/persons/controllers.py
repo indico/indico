@@ -22,6 +22,7 @@ from collections import defaultdict
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import PrincipalType
 from indico.core.notifications import make_email, send_email
 from indico.modules.events import EventLogKind, EventLogRealm
@@ -33,6 +34,7 @@ from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.views import WPManagePersons
+from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.users import User
@@ -63,9 +65,12 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'roles': {}})
+        persons = defaultdict(lambda: {'roles': {}, 'registrations': []})
 
-        event_persons_query = (self.event.persons
+        event_persons_query = (db.session.query(EventPerson, Registration)
+                               .filter(EventPerson.event_id == self.event.id)
+                               .outerjoin(Registration, (EventPerson.user_id == Registration.user_id) &
+                                                        (Registration.event_id == self.event.id))
                                .options(abstract_strategy,
                                         event_strategy,
                                         contribution_strategy,
@@ -73,9 +78,10 @@ class RHPersonsBase(RHManageEventBase):
                                         session_block_strategy)
                                .all())
 
-        for event_person in event_persons_query:
+        for event_person, registration in event_persons_query:
             data = persons[event_person.email or event_person.id]
-
+            if registration:
+                data['registrations'].append(registration)
             data['person'] = event_person
             if event_person in chairpersons:
                 if self.event.type == 'lecture':

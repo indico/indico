@@ -173,6 +173,18 @@
                 refreshPersonFilters();
             });
         }
+
+        $('.js-show-regforms').qtip({
+            content: {
+                text: function() {
+                    return $(this).data('title');
+                }
+            },
+            hide: {
+                delay: 100,
+                fixed: true
+            }
+        });
     };
 
 
