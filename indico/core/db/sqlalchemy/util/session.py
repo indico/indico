@@ -18,17 +18,7 @@ from __future__ import unicode_literals
 
 from functools import wraps
 
-from flask_sqlalchemy import connection_stack
-
 from indico.core.db import db
-
-
-def update_session_options(db, session_options=None):
-    """Replace the Flask-SQLAlchemy session with a new one using the given options."""
-    if session_options is None:
-        session_options = {}
-    session_options.setdefault('scopefunc', connection_stack.__ident_func__)
-    db.session = db.create_scoped_session(session_options)
 
 
 def no_autoflush(fn):

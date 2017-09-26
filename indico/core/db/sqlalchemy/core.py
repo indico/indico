@@ -20,8 +20,7 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 
-import flask_sqlalchemy
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import Model, SQLAlchemy, _BoundDeclarativeMeta
 from sqlalchemy.event import listen
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm import CompositeProperty, mapper
@@ -29,12 +28,7 @@ from sqlalchemy.sql.ddl import CreateSchema
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.custom.unaccent import create_unaccent_function
-
-# Monkeypatching this since Flask-SQLAlchemy doesn't let us override the model class
-# isort:skip_file
 from indico.core.db.sqlalchemy.util.models import IndicoBaseQuery, IndicoModel
-flask_sqlalchemy.Model = IndicoModel
-flask_sqlalchemy.BaseQuery = IndicoBaseQuery
 
 
 class ConstraintViolated(Exception):
@@ -104,7 +98,7 @@ class IndicoSQLAlchemy(SQLAlchemy):
         callback without having to worry about things like the ZODB extension,
         implicit commits, etc.
         """
-        session = db.create_session({'query_cls': IndicoBaseQuery})
+        session = db.create_session({'query_cls': IndicoBaseQuery})()
         try:
             yield session
         except:
@@ -170,7 +164,12 @@ naming_convention = {
     'unique_index': _unique_index
 }
 
-db = IndicoSQLAlchemy(session_options={'query_cls': IndicoBaseQuery})
+# XXX: remove these two `del` statements once Flask-SQLAlchemy 2.3 is out;
+# they disable the tablename generation logic (which we do not use) in a
+# not-so-pretty way
+del Model.__tablename__
+del _BoundDeclarativeMeta.__new__
+db = IndicoSQLAlchemy(query_class=IndicoBaseQuery, model_class=IndicoModel)
 db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
