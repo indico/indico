@@ -2,17 +2,18 @@ sudo: false
 language: python
 python:
   - 2.7
+git:
+  submodules: false
 addons:
   postgresql: 9.6
-env:
-  global:
-    - INDICO_CONFIG=/dev/null
 install:
   - pip install -U pip setuptools
+  - pip install isort
   - pip install -e .
 script:
-  - pytest -v
+  - isort -rc --diff --check-only indico/
   - python bin/maintenance/update_backrefs.py --ci
+  - pytest -v
 notifications:
   email: false
   irc:
