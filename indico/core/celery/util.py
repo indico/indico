@@ -31,7 +31,7 @@ def locked_task(f):
         cache = GenericCache('task-locks')
         name = current_task.name
         if cache.get(name):
-            Logger.get('celery').warning('Task {} is locked; not executing it'.format(name))
+            Logger.get('celery').warning('Task %s is locked; not executing it', name)
             return
         cache.set(name, True)
         try:

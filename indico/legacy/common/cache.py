@@ -118,19 +118,19 @@ class RedisCacheClient(CacheClient):
                 for key in mapping:
                     self._client.expire(key, ttl)
         except redis.RedisError:
-            Logger.get('redisCache').exception('set_multi failed')
+            Logger.get('cache.redis').exception('set_multi(%r, %r) failed', mapping, ttl)
 
     def get_multi(self, keys):
         try:
             return dict(zip(keys, map(self._unpickle, self._client.mget(keys))))
         except redis.RedisError:
-            Logger.get('redisCache').exception('get_multi failed')
+            Logger.get('cache.redis').exception('get_multi(%r) failed', keys)
 
     def delete_multi(self, keys):
         try:
             self._client.delete(*keys)
         except redis.RedisError:
-            Logger.get('redisCache').exception('delete_multi failed')
+            Logger.get('cache.redis').exception('delete_multi(%r) failed', keys)
 
     def set(self, key, val, ttl=0):
         try:
@@ -139,19 +139,19 @@ class RedisCacheClient(CacheClient):
             else:
                 self._client.set(key, pickle.dumps(val))
         except redis.RedisError:
-            Logger.get('redisCache').exception('set failed')
+            Logger.get('cache.redis').exception('set(%r, %r, %r) failed', key, val, ttl)
 
     def get(self, key):
         try:
             return self._unpickle(self._client.get(key))
         except redis.RedisError:
-            Logger.get('redisCache').exception('get failed')
+            Logger.get('cache.redis').exception('get(%r) failed', key)
 
     def delete(self, key):
         try:
             self._client.delete(key)
         except redis.RedisError:
-            Logger.get('redisCache').exception('delete failed')
+            Logger.get('cache.redis').exception('delete(%r) failed', key)
 
 
 class FileCacheClient(CacheClient):
@@ -192,7 +192,7 @@ class FileCacheClient(CacheClient):
                 OSSpecific.lockFile(f, 'LOCK_UN')
                 f.close()
         except (IOError, OSError):
-            Logger.get('FileCache').exception('Error setting value in cache')
+            Logger.get('cache.files').exception('Error setting value in cache')
             return 0
         return 1
 
@@ -213,10 +213,10 @@ class FileCacheClient(CacheClient):
             if expiry and time.time() > expiry:
                 return None
         except (IOError, OSError):
-            Logger.get('FileCache').exception('Error getting cached value')
+            Logger.get('cache.files').exception('Error getting cached value')
             return None
         except (EOFError, pickle.UnpicklingError):
-            Logger.get('FileCache').exception('Cached information seems corrupted. Overwriting it.')
+            Logger.get('cache.files').exception('Cached information seems corrupted. Overwriting it.')
             return None
 
         return val
@@ -316,7 +316,7 @@ class GenericCache(object):
         """
         self._connect()
         time = self._processTime(time)
-        Logger.get('GenericCache/%s' % self._namespace).debug('SET %r (%d)' % (key, time))
+        Logger.get('cache.generic').debug('SET %s %r (%d)', self._namespace, key, time)
         self._client.set(self._makeKey(key), _NoneValue.replace(val), time)
 
     def set_multi(self, mapping, time=0):
@@ -328,7 +328,7 @@ class GenericCache(object):
     def get(self, key, default=None):
         self._connect()
         res = self._client.get(self._makeKey(key))
-        Logger.get('GenericCache/%s' % self._namespace).debug('GET %r -> %r' % (key, res is not None))
+        Logger.get('cache.generic').debug('GET %s %r (%s)', self._namespace, key, 'HIT' if res is not None else 'MISS')
         if res is None:
             return default
         return _NoneValue.restore(res)
@@ -350,7 +350,7 @@ class GenericCache(object):
 
     def delete(self, key):
         self._connect()
-        Logger.get('GenericCache/%s' % self._namespace).debug('DEL {!r}'.format(key))
+        Logger.get('cache.generic').debug('DEL %s %r', self._namespace, key)
         self._client.delete(self._makeKey(key))
 
     def delete_multi(self, keys):

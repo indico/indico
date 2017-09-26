@@ -100,8 +100,7 @@ class XMLSerializer(Serializer):
                 try:
                     elem.text = txt
                 except Exception:
-                    Logger.get('xmlSerializer').exception('Setting XML text value failed (id: {}, value {!r})'
-                                                          .format(id, txt))
+                    Logger.get('xmlSerializer').exception('Setting XML text value failed (id: %s, value %r)', id, txt)
 
         return felement
 

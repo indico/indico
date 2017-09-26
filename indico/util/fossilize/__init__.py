@@ -314,8 +314,8 @@ class Fossilizable(object):
                         try:
                             methodResult = attr()
                         except:
-                            logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s'" %
-                                                                        (obj, interfaceArg))
+                            logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s'",
+                                                                        obj, interfaceArg)
                             raise
                     else:
                         methodResult = attr
@@ -356,8 +356,8 @@ class Fossilizable(object):
                 try:
                     methodResult = convertFunction(methodResult, **converterArgs)
                 except:
-                    logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s' (%s)" %
-                                                                (obj, interfaceArg, methodName))
+                    logging.getLogger('indico.fossilize').error("Problem fossilizing '%r' with '%s' (%s)",
+                                                                obj, interfaceArg, methodName)
                     raise
 
 

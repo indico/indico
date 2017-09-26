@@ -208,7 +208,7 @@ class RHVCManageEventModify(RHVCSystemEventBase):
             try:
                 self.plugin.update_room(self.vc_room, self.event)
             except VCRoomNotFoundError as err:
-                Logger.get('modules.vc').warning("VC room {} not found. Setting it as deleted.".format(self.vc_room))
+                Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
                 self.vc_room.status = VCRoomStatus.deleted
                 flash(err.message, 'error')
                 return redirect(url_for('.manage_vc_rooms', self.event))
@@ -242,13 +242,12 @@ class RHVCManageEventRefresh(RHVCSystemEventBase):
                 plugin_name=self.plugin.friendly_name), 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))
 
-        Logger.get('modules.vc').info("Refreshing VC room {} from event {}".format(
-            self.vc_room, self._conf))
+        Logger.get('modules.vc').info("Refreshing VC room %r from event %r", self.vc_room, self.event)
 
         try:
             self.plugin.refresh_room(self.vc_room, self.event)
         except VCRoomNotFoundError as err:
-            Logger.get('modules.vc').warning("VC room '{}' not found. Setting it as deleted.".format(self.vc_room))
+            Logger.get('modules.vc').warning("VC room %r not found. Setting it as deleted.", self.vc_room)
             self.vc_room.status = VCRoomStatus.deleted
             flash(err.message, 'error')
             return redirect(url_for('.manage_vc_rooms', self.event))

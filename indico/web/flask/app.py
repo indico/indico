@@ -18,7 +18,6 @@ from __future__ import absolute_import, unicode_literals
 
 import os
 import re
-import traceback
 import uuid
 
 from babel.numbers import format_currency, get_currency_name
@@ -340,8 +339,7 @@ def make_app(set_path=False, testing=False, config_override=None):
     # so URLs can be generated without an app context, e.g. in the indico shell
 
     if _app_ctx_stack.top:
-        Logger.get('flask').warn('make_app({}) called within app context, using existing app:\n{}'.format(
-            set_path, '\n'.join(traceback.format_stack())))
+        Logger.get('flask').warn('make_app called within app context, using existing app')
         return _app_ctx_stack.top.app
     app = IndicoFlask('indico', static_folder=None, template_folder='web/templates')
     app.config['TESTING'] = testing
