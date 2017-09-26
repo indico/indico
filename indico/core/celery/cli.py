@@ -19,9 +19,11 @@ from __future__ import unicode_literals
 import os
 import sys
 
+from celery.bin.base import Command
 from celery.bin.celery import CeleryCommand, command_classes
 
 from indico.core.celery import celery
+from indico.core.celery.util import unlock_task
 from indico.core.config import config
 from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.util.console import cformat
@@ -65,3 +67,21 @@ def celery_cmd(args):
         sys.exit(1)
     else:
         CeleryCommand(celery).execute_from_commandline(['indico celery'] + args)
+
+
+class UnlockCommand(Command):
+    """Unlock a locked task.
+
+    Use this if your celery worker was e.g. killed by your kernel's
+    oom-killer and thus a task never got unlocked.
+
+    Examples:
+
+        indico celery unlock event_reminders
+    """
+
+    def run(self, name, **kwargs):
+        if unlock_task(name):
+            print cformat('%{green!}Task {} unlocked').format(name)
+        else:
+            print cformat('%{yellow}Task {} is not locked').format(name)

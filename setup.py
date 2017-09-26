@@ -72,5 +72,6 @@ if __name__ == '__main__':
         install_requires=get_requirements(),
         entry_points={
             'console_scripts': {'indico = indico.cli.core:cli'},
+            'celery.commands': {'unlock = indico.core.celery.cli:UnlockCommand'},
             'pytest11': {'indico = indico.testing.pytest_plugin'},
         })
