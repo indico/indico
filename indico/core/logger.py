@@ -20,6 +20,7 @@ import logging
 import logging.config
 import logging.handlers
 import os
+import warnings
 from pprint import pformat
 
 import yaml
@@ -60,9 +61,16 @@ class FormattedSubjectSMTPHandler(logging.handlers.SMTPHandler):
 class Logger(object):
     @classmethod
     def init(cls, app):
-        if not config.LOGGING_CONFIG_PATH:
+        path = config.LOGGING_CONFIG_PATH
+        if not path:
             return
-        with open(config.LOGGING_CONFIG_PATH) as f:
+        if not os.path.exists(path):
+            default_path = os.path.join(app.root_path, 'logging.yaml.sample')
+            warnings.warn('Logging config file not found; using defaults. '
+                          'Copy {default_path} to {path} to get rid of this warning.'
+                          .format(path=path, default_path=default_path))
+            path = default_path
+        with open(path) as f:
             data = yaml.safe_load(f)
         data['disable_existing_loggers'] = False
         data['incremental'] = False
