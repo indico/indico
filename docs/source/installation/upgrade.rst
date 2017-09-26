@@ -74,3 +74,24 @@ To upgrade to 2.0, follow the upgrade instructions above.
 After successfully running the upgrade, use ``indico db reset_alembic`` to clear
 pre-2.0 database migration information, since all the old migration steps from
 the 1.9.x version line have been removed in 2.0.
+
+The names of all settings changed in 2.0; instead of using ``CamelCased`` names
+they now use ``UPPER_SNAKE_CASE``. The old names still work, but we recommend
+updating the config file anyway. You can find a list of all the new option names
+`in the code`_.  Most renames are pretty straightforward; only the following
+options have been changed in more than just capitalization:
+
+===================  ==================
+**Old**              **New**
+-------------------  ------------------
+PDFLatexProgram      XELATEX_PATH
+IsRoomBookingActive  ENABLE_ROOMBOOKING
+SanitizationLevel    *removed*
+===================  ==================
+
+The format of the logging config changed. The old file ``/opt/indico/etc/logging.conf``
+is not used anymore and can be deleted.
+Run ``indico setup create_configs /opt/indico/etc/``  to create the new ``logging.yaml``
+which can then be customized if needed.
+
+.. _in the code: https://github.com/indico/indico/blob/master/indico/core/config.py#L40
