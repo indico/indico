@@ -13,7 +13,7 @@ install:
 script:
   - isort -rc --diff --check-only indico/
   - python bin/maintenance/update_backrefs.py --ci
-  - pytest -v
+  - pytest
 notifications:
   email: false
   irc:
