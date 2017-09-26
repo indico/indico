@@ -53,7 +53,7 @@ def postgresql():
     except Exception as e:
         pytest.skip('Could not retrieve PostgreSQL version: {}'.format(e))
     pg_version = map(int, re.match(r'initdb \(PostgreSQL\) ((?:\d+\.?)+)', version_output).group(1).split('.'))
-    if pg_version[0] < 9 or (pg_version[0] == 9 and pg_version[1] < 2):
+    if pg_version[0] < 9 or (pg_version[0] == 9 and pg_version[1] < 6):
         pytest.skip('PostgreSQL version is too old: {}'.format(version_output))
 
     # Prepare server instance and a test database

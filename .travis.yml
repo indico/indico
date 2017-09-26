@@ -3,7 +3,7 @@ language: python
 python:
   - 2.7
 addons:
-  postgresql: 9.4
+  postgresql: 9.6
 env:
   global:
     - INDICO_CONFIG=/dev/null
