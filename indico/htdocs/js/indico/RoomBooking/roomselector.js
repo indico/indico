@@ -227,7 +227,7 @@
 
             // Enable the dropdown only if the user has some rooms
             if (myRooms.length > 0) {
-                filterButton.data('toggle', 'dropdown');
+                filterButton.attr('data-toggle', 'dropdown');
             } else {
                 filterButton.addClass('disabled');
             }
