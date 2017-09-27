@@ -83,9 +83,12 @@
     };
 
     function refreshPersonFilters() {
+        $('#person-filters ul > li').removeClass('enabled');
         var personRows = $('.js-event-person-list tr[data-person-roles]');
         var filters = $('.js-event-person-list [data-filter]:checked').map(function() {
-            return $(this).data('filter');
+            var $this = $(this);
+            $this.closest('li').addClass('enabled');
+            return $this.data('filter');
         }).get();
 
         var visibleEntries = personRows.filter(function() {
@@ -184,6 +187,32 @@
                 delay: 100,
                 fixed: true
             }
+        });
+
+        var $personFilters = $('#person-filters');
+        // Sets background color of role filter items based on their colored squared color
+        $personFilters.find('li .colored-square').each(function() {
+            var $this = $(this);
+            $this.closest('li').css('background-color', $.Color($this.css('color')).alpha(0.1));
+        });
+
+        // Reset role filters
+        $personFilters.find('.js-reset-role-filter').on('click', function() {
+            $('.js-event-person-list [data-filter]').each(function() {
+                var $this = $(this);
+                $this.prop('checked', !$this.is('#filter-no-account'));
+                $this.parent().toggleClass('enabled', !$this.is('#filter-no-account'));
+            });
+            refreshPersonFilters();
+        });
+
+        // Allows to click in the whole list item area to enable/disable role filters
+        $personFilters.find('li label').on('click', function(evt) {
+            evt.preventDefault();
+        });
+        $personFilters.find('li').on('click', function() {
+            var $checkbox = $(this).find('[data-filter]');
+            $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
         });
     };
 

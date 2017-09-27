@@ -118,31 +118,69 @@
                 </div>
             </div>
             <div class="toolbar">
-                <div id="person-filters" class="group i-selection">
-                    <span class="i-button label">{% trans %}Show{% endtrans %}</span>
-                    <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
-                    <label for="filter-chairpersons" class="i-button">
-                        {%- if event.type == 'lecture' -%}
-                            {%- trans %}Speakers{% endtrans -%}
-                        {%- else -%}
-                            {%- trans %}Chairpersons{% endtrans -%}
-                        {%- endif -%}
-                    </label>
-                    {% if event.type != 'lecture' %}
-                        <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
-                        <label for="filter-speakers" class="i-button">{% trans %}Speakers{% endtrans %}</label>
-                        <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
-                        <label for="filter-conveners" class="i-button">{% trans %}Conveners{% endtrans %}</label>
-                        {% if event.has_feature('abstracts') %}
-                            <input type="checkbox" id="filter-abstract-author" data-filter="author" checked>
-                            <label for="filter-abstract-author" class="i-button">
-                                {%- trans %}Abstract authors{% endtrans -%}
+                <div id="person-filters" class="group list-filter">
+                    <a class="i-button arrow highlight js-dropdown" data-toggle="dropdown">Filter role</a>
+                    <ul class="dropdown">
+                        <li class="enabled">
+                            <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
+                            <i class="icon-checkmark"></i>
+                            <i class="icon-stop colored-square" style="color: {{ builtin_roles.chairperson.color }};"></i>
+                            <label for="filter-chairpersons">
+                                {%- if event.type == 'lecture' -%}
+                                    {%- trans %}Speakers{% endtrans -%}
+                                {%- else -%}
+                                    {%- trans %}Chairpersons{% endtrans -%}
+                                {%- endif -%}
                             </label>
+                        </li>
+                        {% if event.type != 'lecture' %}
+                            <li class="enabled">
+                                <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
+                                <i class="icon-checkmark"></i>
+                                <i class="icon-stop colored-square" style="color: {{ builtin_roles.speaker.color }};"></i>
+                                <label for="filter-speakers">{% trans %}Speakers{% endtrans %}</label>
+                            </li>
+                            <li class="enabled">
+                                <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
+                                <i class="icon-checkmark"></i>
+                                <i class="icon-stop colored-square" style="color: {{ builtin_roles.convener.color }};"></i>
+                                <label for="filter-conveners">{% trans %}Conveners{% endtrans %}</label>
+                            </li>
+                            {% if event.has_feature('abstracts') %}
+                                <li class="enabled">
+                                    <input type="checkbox" id="filter-abstract-author" data-filter="author" checked>
+                                    <i class="icon-checkmark"></i>
+                                    <i class="icon-stop colored-square" style="color: {{ builtin_roles.author.color }};"></i>
+                                    <label for="filter-abstract-author">
+                                        {%- trans %}Abstract authors{% endtrans -%}
+                                    </label>
+                                </li>
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    <span class="i-button label">{% trans %}or{% endtrans %}</span>
-                    <input type="checkbox" id="filter-no-account" data-filter="no_account">
-                    <label for="filter-no-account" class="i-button">{% trans %}Users with no account{% endtrans %}</label>
+                        {% for role_id, role_data in custom_roles.iteritems() %}
+                            <li class="enabled">
+                                <input type="checkbox" id="filter-{{ role_id }}" data-filter="{{ role_id }}" checked>
+                                <i class="icon-checkmark"></i>
+                                <i class="icon-stop colored-square" style="color: {{ role_data.color }};"></i>
+                                <label for="filter-{{ role_id }}" title="{{ role_data.code }}">{{ role_data.name }}</label>
+                            </li>
+                        {% endfor %}
+                        <li class="separator">
+                            <span class="titled-rule">{% trans %}or{% endtrans %}</span>
+                        </li>
+                        <li for="filter-no-account">
+                            <input type="checkbox" id="filter-no-account" data-filter="no_account">
+                            <i class="icon-checkmark"></i>
+                            <i class="icon-stop colored-square no-account"></i>
+                            <label for="filter-no-account">{% trans %}Users with no account{% endtrans %}</label>
+                        </li>
+                    </ul>
+                    <a class="i-button highlight icon-close js-reset-role-filter"
+                       title="{% trans %}Reset role filters{% endtrans %}"></a>
+                </div>
+                <div class="group">
+                    <span class="i-button label icon-search"></span>
+                    <input type="text" id="search-input" placeholder="{% trans %}Search string{% endtrans %}">
                 </div>
             </div>
         </div>

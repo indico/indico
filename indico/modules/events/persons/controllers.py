@@ -29,6 +29,7 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.models.groups import EventRole
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
@@ -45,6 +46,13 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_template
+
+# TODO: Define codes and colors and use EventRole objects
+BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': '#771100'},
+                 'author': {'name': 'Author', 'code': 'AUT', 'color': '#0000ff'},
+                 'convener': {'name': 'Convener', 'code': 'CON', 'color': '#008800'},
+                 'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '#00aa99'}
+                 }
 
 
 class RHPersonsBase(RHManageEventBase):
@@ -84,10 +92,7 @@ class RHPersonsBase(RHManageEventBase):
                 data['registrations'].append(registration)
             data['person'] = event_person
             if event_person in chairpersons:
-                if self.event.type == 'lecture':
-                    data['roles']['event_speaker'] = {'name': 'Event Speaker', 'code': 'SPK', 'color': '#00ff44'}
-                else:
-                    data['roles']['chairperson'] = {'name': 'Chairperson', 'code': 'CHR', 'color': '#771100'}
+                data['roles']['chairperson'] = BUILTIN_ROLES['chairperson'].copy()
 
             if self.event.type == 'lecture':
                 continue
@@ -102,8 +107,8 @@ class RHPersonsBase(RHManageEventBase):
                 }
 
                 if abstracts:
-                    data['roles']['author'] = {'name': 'Author', 'code': 'AUT', 'color': '#0000ff',
-                                               'elements': abstracts}
+                    data['roles']['author'] = BUILTIN_ROLES['author'].copy()
+                    data['roles']['author']['elements'] = abstracts
 
             session_blocks = {
                 person_link.session_block_id: {
@@ -114,8 +119,8 @@ class RHPersonsBase(RHManageEventBase):
             }
 
             if session_blocks:
-                data['roles']['convener'] = {'name': 'Convener', 'code': 'CON', 'color': '#008800',
-                                             'elements': session_blocks}
+                data['roles']['convener'] = BUILTIN_ROLES['convener'].copy()
+                data['roles']['convener']['elements'] = session_blocks
 
             contributions = {
                 person_link.contribution.id: {
@@ -126,10 +131,6 @@ class RHPersonsBase(RHManageEventBase):
                 for person_link in event_person.contribution_links
                 if person_link.is_speaker and not person_link.contribution.is_deleted
             }
-
-            if contributions:
-                data['roles']['subcontrib_speaker'] = {'name': 'Speaker', 'code': 'SPK', 'color': '#00aa99',
-                                                       'elements': contributions}
 
             subcontributions = {
                 person_link.subcontribution.id: {
@@ -143,9 +144,9 @@ class RHPersonsBase(RHManageEventBase):
                 not person_link.subcontribution.contribution.is_deleted
             }
 
-            if subcontributions:
-                data['roles']['speaker'] = {'name': 'Speaker', 'code': 'SPK', 'color': '#00ff44',
-                                            'elements': subcontributions}
+            if contributions or subcontributions:
+                data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
+                data['roles']['speaker']['elements'] = dict(contributions, **subcontributions)
 
             if event_person.user:
                 for role in event_person.user.event_roles:
@@ -183,9 +184,11 @@ class RHPersonsList(RHPersonsBase):
             if not persons[principal.email].get('no_account'):
                 persons[principal.email]['roles']['no_account'] = True
                 num_no_account += 1
-
-        return WPManagePersons.render_template('management/person_list.html', self.event,
-                                               persons=person_list, num_no_account=num_no_account)
+        custom_roles = {'custom_{}'.format(r.id): {'name': r.name, 'code': r.code, 'color': r.color}
+                        for r in self.event.roles}
+        return WPManagePersons.render_template('management/person_list.html', self.event, persons=person_list,
+                                               num_no_account=num_no_account, builtin_roles=BUILTIN_ROLES,
+                                               custom_roles=custom_roles)
 
 
 class RHEmailEventPersons(RHManageEventBase):

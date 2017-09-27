@@ -94,15 +94,57 @@
     }
 }
 
-#event-participants-list {
-    .registration-column {
-        .icon-ticket {
-            color: $pastel-gray;
+.event-roles {
+    .list-filter {
+        padding: 0;
 
-            &.exists {
-                color: $blue;
+        li {
+            padding: 0.1em 0.7em !important;
+
+            & > ::before {
+                cursor: pointer;
+            }
+
+            &.separator {
+                cursor: default;
+            }
+
+            &:not(.enabled):not(.separator) {
+                background-color: inherit !important;
+            }
+
+            input[type='checkbox'] {
+                display: none;
+
+                &:not(:checked) + .icon-checkmark {
+                    visibility: hidden;
+                }
+            }
+
+            .icon-checkmark {
+                color: $black;
+                padding-right: 0.5em;
+            }
+
+            .icon-stop.no-account {
+                color: $yellow;
+            }
+
+            span.titled-rule {
+                width: 100%;
             }
         }
+    }
 
+    #event-participants-list {
+        .registration-column {
+            .icon-ticket {
+                color: $pastel-gray;
+
+                &.exists {
+                    color: $blue;
+                }
+            }
+        }
     }
 }
