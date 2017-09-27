@@ -13,11 +13,11 @@ pyatom==1.4
 pycountry==17.9.23
 mock==2.0.0
 freezegun==0.3.9
-pytest==3.1.2
+pytest==3.2.2
 pytest-catchlog==1.2.2
 pytest-cov==2.5.1
 pytest-localserver==0.3.7
-pytest-mock==1.6.0
+pytest-mock==1.6.3
 python-dateutil==2.6.0
 pytz
 reportlab==3.4.0

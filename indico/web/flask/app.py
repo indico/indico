@@ -234,7 +234,13 @@ def setup_assets():
 def configure_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
-    if not app.config['TESTING']:
+    if app.config['TESTING']:
+        # tests do not actually use sqlite but run a postgres instance and
+        # reconfigure flask-sqlalchemy to use that database.  by setting
+        # a dummy uri explicitly instead of letting flask-sqlalchemy do
+        # the exact same thing we avoid a warning when running tests.
+        app.config.setdefault('SQLALCHEMY_DATABASE_URI', 'sqlite:///:memory:')
+    else:
         if config.SQLALCHEMY_DATABASE_URI is None:
             raise Exception("No proper SQLAlchemy store has been configured. Please edit your indico.conf")
 
