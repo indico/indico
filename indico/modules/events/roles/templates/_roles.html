@@ -74,13 +74,13 @@
                         {% endfor %}
                     </ul>
                 {% else %}
-                    <div class="empty">There are no members yet.</div>
+                    <div class="empty">{% trans %}There are no members yet.{% endtrans %}</div>
                 {% endif %}
                     <div class="toolbar f-j-end">
                          <button class="i-button highlight text-color icon-plus js-add-members"
-                                data-href="{{ url_for('.add_members', role) }}"
-                                data-method="POST"
-                                data-update="#event-role-{{ role.id }}">{% trans %}Add user{% endtrans %}
+                                 data-href="{{ url_for('.add_members', role) }}"
+                                 data-method="POST"
+                                 data-update="#event-role-{{ role.id }}">{% trans %}Add user{% endtrans %}
                          </button>
                     </div>
             </div>

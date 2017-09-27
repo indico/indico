@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import errno
 import os
 from glob import glob
@@ -438,7 +440,7 @@ def register_all_js(env):
         'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
         'designer': rjs_bundle('modules_designer', 'js/indico/modules/designer.js'),
         'event_cloning': rjs_bundle('modules_event_cloning', 'js/indico/modules/events/cloning.js'),
-        'roles': rjs_bundle('modules_roles', 'js/indico/modules/roles.js')
+        'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
     widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',

@@ -24,4 +24,4 @@ class WPEventRoles(WPEventManagement):
     sidemenu_option = 'roles'
 
     def getJSFiles(self):
-        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_roles_js'].urls()
+        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_event_roles_js'].urls()

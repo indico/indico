@@ -15,55 +15,55 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
-.role-list-row .i-tag {
-    display: inline-flex;
-    justify-content: center;
-    align-items: baseline;
-}
-
-.i-tag:not(:first-child) {
-    margin-left: 0.2em;
-}
-
 .role-list-row {
+
     background: #eee;
-}
 
-.role-list-row td {
-    padding: 0 !important;
-}
+    td {
+        padding: 0 !important;
 
-.role-list-row td .content-area {
-    background: #fff;
-    margin: 0 0 0 58px !important;
-}
+        .content-area {
+            background: #fff;
+            margin: 0 0 0 58px !important;
 
-.role-list-row td .content-area .empty {
-    padding: 10px;
-    font-style: italic;
-    color: $dark-gray;
-}
+            .empty {
+                padding: 10px;
+                font-style: italic;
+                color: $dark-gray;
+            }
 
-.role-list-row td .content-area .toolbar {
-    padding: 10px;
+            .toolbar {
+                padding: 10px;
+            }
+        }
+    }
+
+    .i-tag {
+        display: inline-flex;
+        justify-content: center;
+        align-items: baseline;
+
+        :not(:first-child) {
+            margin-left: 0.2em;
+        }
+    }
 }
 
 .role-list {
     padding: 10px;
     box-sizing: border-box;
     list-style-type: none;
-}
 
-.role-list li {
-    font-size: 11px !important;
-    display: inline-block;
-    margin-right: 0.3em;
-    margin-bottom: 0.7em;
-}
+    li {
+        font-size: 11px !important;
+        display: inline-block;
+        margin-right: 0.3em;
+        margin-bottom: 0.7em;
 
-.role-list li::before {
-    margin-right: 0.3em;
+        &::before {
+            margin-right: 0.3em;
+        }
+    }
 }
 
 .badge-column {
