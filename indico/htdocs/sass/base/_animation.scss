@@ -50,7 +50,25 @@
     0% {
         background-color: $blue;
     }
+
     100% {
         background-color: inherit;
     }
+}
+
+.open {
+    overflow: hidden;
+    opacity: 1;
+    transition-property: all;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
+}
+
+.close {
+    overflow: hidden;
+    max-height: 0 !important;
+    opacity: 0;
+    transition-property: all;
+    transition-duration: 0.5s;
+    transition-timing-function: ease-out;
 }
