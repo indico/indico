@@ -23,7 +23,6 @@ from operator import itemgetter
 from celery import Celery
 from celery.app.log import Logging
 from celery.beat import PersistentScheduler
-from celery.signals import before_task_publish
 from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
 from sqlalchemy import inspect
@@ -61,28 +60,19 @@ class IndicoCelery(Celery):
     def init_app(self, app):
         if not config.CELERY_BROKER and not app.config['TESTING']:
             raise ValueError('Celery broker URL is not set')
-        self.conf['BROKER_URL'] = config.CELERY_BROKER
-        self.conf['CELERY_RESULT_BACKEND'] = config.CELERY_RESULT_BACKEND or config.CELERY_BROKER
-        self.conf['CELERYBEAT_SCHEDULER'] = IndicoPersistentScheduler
-        self.conf['CELERYBEAT_SCHEDULE_FILENAME'] = os.path.join(config.TEMP_DIR, 'celerybeat-schedule')
-        self.conf['CELERYD_HIJACK_ROOT_LOGGER'] = False
-        self.conf['CELERY_TIMEZONE'] = config.DEFAULT_TIMEZONE
-        self.conf['CELERY_IGNORE_RESULT'] = True
-        self.conf['CELERY_STORE_ERRORS_EVEN_IF_IGNORED'] = True
-        self.conf['CELERY_REDIRECT_STDOUTS'] = not app.debug
+        self.conf['broker_url'] = config.CELERY_BROKER
+        self.conf['result_backend'] = config.CELERY_RESULT_BACKEND or config.CELERY_BROKER
+        self.conf['beat_scheduler'] = IndicoPersistentScheduler
+        self.conf['beat_schedule_filename'] = os.path.join(config.TEMP_DIR, 'celerybeat-schedule')
+        self.conf['worker_hijack_root_logger'] = False
+        self.conf['timezone'] = config.DEFAULT_TIMEZONE
+        self.conf['task_ignore_result'] = True
+        self.conf['task_store_errors_even_if_ignored'] = True
+        self.conf['worker_redirect_stdouts'] = not app.debug
         # Pickle isn't pretty but that way we can pass along all types (tz-aware datetimes, sets, etc.)
-        self.conf['CELERY_RESULT_SERIALIZER'] = 'pickle'
-        self.conf['CELERY_TASK_SERIALIZER'] = 'pickle'
-        self.conf['CELERY_ACCEPT_CONTENT'] = ['json', 'yaml', 'pickle']
-        # Send emails about failed tasks
-        self.conf['CELERY_SEND_TASK_ERROR_EMAILS'] = True
-        self.conf['ADMINS'] = [('Admin', config.SUPPORT_EMAIL)]
-        self.conf['SERVER_EMAIL'] = 'Celery <{}>'.format(config.NO_REPLY_EMAIL)
-        self.conf['EMAIL_HOST'] = config.SMTP_SERVER[0]
-        self.conf['EMAIL_PORT'] = config.SMTP_SERVER[1]
-        self.conf['EMAIL_USE_TLS'] = config.SMTP_USE_TLS
-        self.conf['EMAIL_HOST_USER'] = config.SMTP_LOGIN or None
-        self.conf['EMAIL_HOST_PASWORD'] = config.SMTP_PASSWORD or None
+        self.conf['result_serializer'] = 'pickle'
+        self.conf['task_serializer'] = 'pickle'
+        self.conf['accept_content'] = ['json', 'yaml', 'pickle']
         # Allow indico.conf to override settings
         self.conf.update(config.CELERY_CONFIG)
         assert self.flask_app is None or self.flask_app is app
@@ -112,7 +102,7 @@ class IndicoCelery(Celery):
             kwargs.setdefault('ignore_result', True)
             task = self.task(f, *args, **kwargs)
             entry['task'] = task.name
-            self.conf['CELERYBEAT_SCHEDULE'][task.name] = entry
+            self.conf['beat_schedule'][task.name] = entry
             return task
 
         return decorator
@@ -121,6 +111,19 @@ class IndicoCelery(Celery):
         """Patches the `task` decorator to run tasks inside the indico environment"""
         class IndicoTask(self.Task):
             abstract = True
+
+            def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
+                            link=None, link_error=None, shadow=None, **options):
+                if args is not None:
+                    args = _CelerySAWrapper.wrap_args(args)
+                if kwargs is not None:
+                    kwargs = _CelerySAWrapper.wrap_kwargs(kwargs)
+                if current_plugin:
+                    if kwargs is None:
+                        kwargs = {}
+                    kwargs['__current_plugin__'] = current_plugin.name
+                return super(IndicoTask, self).apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
+                                                           link=link, link_error=link_error, shadow=shadow, **options)
 
             def __call__(s, *args, **kwargs):
                 stack = ExitStack()
@@ -159,23 +162,23 @@ class IndicoPersistentScheduler(PersistentScheduler):
     def setup_schedule(self):
         deleted = set()
         for task_name, entry in config.SCHEDULED_TASK_OVERRIDE.iteritems():
-            if task_name not in self.app.conf['CELERYBEAT_SCHEDULE']:
+            if task_name not in self.app.conf['beat_schedule']:
                 self.logger.error('Invalid entry in ScheduledTaskOverride: %s', task_name)
                 continue
             if not entry:
                 deleted.add(task_name)
-                del self.app.conf['CELERYBEAT_SCHEDULE'][task_name]
+                del self.app.conf['beat_schedule'][task_name]
             elif isinstance(entry, dict):
                 assert entry.get('task') in {None, task_name}  # make sure the task name is not changed
-                self.app.conf['CELERYBEAT_SCHEDULE'][task_name].update(entry)
+                self.app.conf['beat_schedule'][task_name].update(entry)
             else:
-                self.app.conf['CELERYBEAT_SCHEDULE'][task_name]['schedule'] = entry
+                self.app.conf['beat_schedule'][task_name]['schedule'] = entry
         super(IndicoPersistentScheduler, self).setup_schedule()
         self._print_schedule(deleted)
 
     def _print_schedule(self, deleted):
         table_data = [['Name', 'Schedule']]
-        for entry in sorted(self.app.conf['CELERYBEAT_SCHEDULE'].itervalues(), key=itemgetter('task')):
+        for entry in sorted(self.app.conf['beat_schedule'].itervalues(), key=itemgetter('task')):
             table_data.append([cformat('%{yellow!}{}%{reset}').format(entry['task']),
                                cformat('%{green}{!r}%{reset}').format(entry['schedule'])])
         for task_name in sorted(deleted):
@@ -225,12 +228,3 @@ class _CelerySAWrapper(object):
     @classmethod
     def unwrap_kwargs(cls, kwargs):
         return {k: v.object if isinstance(v, cls) else v for k, v in kwargs.iteritems()}
-
-
-@before_task_publish.connect
-def before_task_publish_signal(*args, **kwargs):
-    body = kwargs['body']
-    body['args'] = _CelerySAWrapper.wrap_args(body['args'])
-    body['kwargs'] = _CelerySAWrapper.wrap_kwargs(body['kwargs'])
-    if current_plugin:
-        body['kwargs']['__current_plugin__'] = current_plugin.name

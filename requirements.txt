@@ -54,7 +54,7 @@ Flask-Multipass>=0.0.dev6
 click==6.7
 colorclass==2.2.0
 itsdangerous==0.24
-celery==3.1.25
+celery==4.1.0
 PyYAML==3.12
 terminaltables==3.1.0
 contextlib2==0.5.5

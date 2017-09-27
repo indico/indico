@@ -29,7 +29,7 @@ class RHCeleryTasks(RHAdminBase):
     def _process(self):
         notset = object()
         tasks = []
-        for entry in celery.conf['CELERYBEAT_SCHEDULE'].values():
+        for entry in celery.conf['beat_schedule'].values():
             override = config.SCHEDULED_TASK_OVERRIDE.get(entry['task'], notset)
             custom_schedule = None
             disabled = False
