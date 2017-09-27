@@ -14,6 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import re
 from datetime import datetime
 
 import dateutil.parser
@@ -43,7 +44,7 @@ class XMLSerializer(Serializer):
         self._typeMap = kwargs.pop('typeMap', {})
         super(XMLSerializer, self).__init__(query_params, pretty, **kwargs)
 
-    def _convert(self, value):
+    def _convert(self, value, _control_char_re=re.compile(ur'[\x00-\x08\x0b\x0c\x0e-\x1f]')):
         if isinstance(value, datetime):
             return value.isoformat()
         elif isinstance(value, (int, long, float, bool)):
@@ -51,8 +52,8 @@ class XMLSerializer(Serializer):
         else:
             value = to_unicode(value) if isinstance(value, str) else value
             if isinstance(value, basestring):
-                # Get rid of vertical tabs, the most common control char breaking XML conversion
-                value = value.replace('\x0b', '')
+                # Get rid of control chars breaking XML conversion
+                value = _control_char_re.sub(u'', value)
             return value
 
     def _xmlForFossil(self, fossil, doc=None):
