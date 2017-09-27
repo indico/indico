@@ -80,8 +80,6 @@ def configure_app(app, set_path=False):
     app.config['PROPAGATE_EXCEPTIONS'] = True
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
-    app.config['INDICO_SESSION_PERMANENT'] = config.SESSION_LIFETIME > 0
-    app.config['INDICO_HTDOCS'] = os.path.join(app.root_path, 'htdocs')
     configure_multipass(app, config)
     app.config['PLUGINENGINE_NAMESPACE'] = 'indico.plugins'
     app.config['PLUGINENGINE_PLUGINS'] = config.PLUGINS
@@ -317,8 +315,9 @@ def handle_404(exception):
         if re.search(r'\.py(?:/\S+)?$', request.path):
             # While not dangerous per se, we never serve *.py files as static
             raise NotFound
+        htdocs = os.path.join(current_app.root_path, 'htdocs')
         try:
-            return send_from_directory(current_app.config['INDICO_HTDOCS'], request.path[1:], conditional=True)
+            return send_from_directory(htdocs, request.path[1:], conditional=True)
         except (UnicodeEncodeError, BadRequest):
             raise NotFound
     except NotFound:

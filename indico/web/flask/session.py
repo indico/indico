@@ -186,7 +186,7 @@ class IndicoSessionInterface(SessionInterface):
             # If the session has not been modified we only store if it needs to be refreshed
             return
 
-        if app.config['INDICO_SESSION_PERMANENT']:
+        if config.SESSION_LIFETIME > 0:
             # Setting session.permanent marks the session as modified so we only set it when we
             # are saving the session anyway!
             session.permanent = True
