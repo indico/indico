@@ -28,14 +28,13 @@
         var $roles = $('#event-roles');
         $roles.on('click', '.toggle-members', function() {
             var $row = $(this).closest('tr').next('tr').find('.slide');
-            $row[0].style.maxHeight = $row[0].scrollHeight + "px";
+            $row.css('max-height', $row[0].scrollHeight + "px");
             $row.toggleClass('open close');
         });
 
         $roles.on('indico:htmlUpdated', function() {
-            var $slide = $(this).find('.slide');
-            $slide.each(function() {
-                $(this)[0].style.maxHeight =  $(this)[0].scrollHeight + "px";
+            $(this).find('.slide').each(function() {
+                $(this).css('max-height', this.scrollHeight + "px");
             });
         });
     }
