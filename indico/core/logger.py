@@ -32,7 +32,9 @@ from indico.web.util import get_request_info
 
 
 try:
+    from raven.contrib.celery import register_logger_signal, register_signal
     from raven.contrib.flask import Sentry
+    from raven.handlers.logging import SentryHandler
 except ImportError:
     Sentry = object  # so we can subclass
     has_sentry = False
@@ -141,6 +143,9 @@ class IndicoSentry(Sentry):
 def init_sentry(app):
     sentry = IndicoSentry(dsn=config.SENTRY_DSN, logging=True, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
     sentry.init_app(app)
+    # connect to the celery logger
+    register_logger_signal(sentry.client)
+    register_signal(sentry.client)
 
 
 def sentry_log_exception():
