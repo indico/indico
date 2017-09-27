@@ -15,15 +15,15 @@
 
 {% macro render_role(role, collapsed=true) -%}
     <tr>
-        <td class="badge-column {{ 'toggle-members' if role.members }}">
+        <td class="badge-column toggle-members">
             <span class="i-tag outline role-badge" style="{{ role.css }};">
                 {{- role.code -}}
             </span>
         </td>
-        <td class="role-title {{ 'toggle-members' if role.members }}">{{ role.name }}</td>
-        <td class="role-members-summary {{ 'toggle-members' if role.members }}">
+        <td class="role-title toggle-members">{{ role.name }}</td>
+        <td class="role-members-summary toggle-members">
             {% if role.members %}
-                <span class="icon-users i-button text-color outline highlight">
+                <span class="icon-users i-label text-color outline highlight">
                     {%- trans count=role.members|length -%}
                         1 person
                     {%- pluralize -%}
@@ -31,7 +31,7 @@
                     {%- endtrans -%}
                 </span>
             {% else %}
-                <span class="icon-users i-button text-color outline dashed">
+                <span class="icon-users i-label text-color outline dashed">
                     {% trans %}Unassigned{% endtrans %}
                 </span>
             {% endif %}
@@ -39,10 +39,6 @@
         <td class="action-column">
             <div class="thin toolbar right entry-action-buttons">
                 <div class="group">
-                    <button class="icon-plus i-button text-color borderless highlight js-add-members"
-                            data-href="{{ url_for('.add_members', role) }}"
-                            data-method="POST"
-                            data-update="#event-role-{{ role.id }}"></button>
                     <button class="icon-shield i-button text-color borderless"></button>
                     <button class="icon-mail i-button text-color borderless"></button>
                     <button class="icon-edit i-button text-color borderless"
@@ -61,11 +57,11 @@
             </div>
         </td>
     </tr>
-    {% if role.members %}
-        <tr class="role-list-row" style="{{ 'display: none;' if collapsed }}">
-            <td colspan="4">
-                <div class="content-area">
-                    <ul class="role-list">
+    <tr class="role-list-row">
+        <td colspan="4">
+            <div class="content-area slide {{ 'close' if collapsed else 'open' }}">
+                {% if role.members %}
+                     <ul class="role-list">
                         {% for user in role.members|sort(attribute='display_full_name') %}
                             <li class="i-tag outline highlight icon-user">
                                 {{ user.display_full_name }}
@@ -77,8 +73,17 @@
                             </li>
                         {% endfor %}
                     </ul>
-                </div>
-            </td>
-        </tr>
-    {% endif %}
+                {% else %}
+                    <div class="empty">There are no members yet.</div>
+                {% endif %}
+                    <div class="toolbar f-j-end">
+                         <button class="i-button highlight text-color icon-plus js-add-members"
+                                data-href="{{ url_for('.add_members', role) }}"
+                                data-method="POST"
+                                data-update="#event-role-{{ role.id }}">{% trans %}Add user{% endtrans %}
+                         </button>
+                    </div>
+            </div>
+        </td>
+    </tr>
 {%- endmacro %}

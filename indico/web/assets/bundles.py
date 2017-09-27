@@ -437,7 +437,8 @@ def register_all_js(env):
         'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions.js'),
         'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
         'designer': rjs_bundle('modules_designer', 'js/indico/modules/designer.js'),
-        'event_cloning': rjs_bundle('modules_event_cloning', 'js/indico/modules/events/cloning.js')
+        'event_cloning': rjs_bundle('modules_event_cloning', 'js/indico/modules/events/cloning.js'),
+        'roles': rjs_bundle('modules_roles', 'js/indico/modules/roles.js')
     }
 
     widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',

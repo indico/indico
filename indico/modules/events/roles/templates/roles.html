@@ -4,49 +4,6 @@
 {% block title %}{% trans %}Roles{% endtrans %}{% endblock %}
 
 {% block content %}
-    {# TODO: move to scss file #}
-    <style>
-        .i-tag:not(:first-child) {
-            margin-left: 0.2em;
-        }
-        .role-list-row {
-            background: #eee;
-        }
-        .role-list-row td {
-            padding: 0 !important;
-        }
-        .role-list-row td .content-area {
-            background: #fff;
-            margin: 0 0 0 58px !important;
-        }
-        .role-list {
-            padding: 10px;
-            box-sizing: border-box;
-            list-style-type: none;
-        }
-        .role-list li {
-            display: inline-block;
-            margin-right: 0.3em;
-        }
-        .role-list li:before {
-            margin-right: 0.3em;
-        }
-        .badge-column {
-            width: 20px;
-        }
-        .role-badge {
-            display: inline-block;
-            width: 25px;
-            text-align: center;
-        }
-        .role-members-summary {
-            text-align: right;
-        }
-        .toggle-members {
-            cursor: pointer;
-        }
-    </style>
-
     <table class="i-table-widget multi-tbody" id="event-roles">
         {{ render_roles(roles) }}
     </table>
@@ -59,45 +16,4 @@
             {% trans %}Add Role{% endtrans %}
         </button>
     </div>
-
-    {# TODO: move to JS file #}
-    <script>
-        (function() {
-            'use strict';
-
-            $('#event-roles').on('click', '.js-add-members', function(evt) {
-                var $this = $(this);
-                evt.stopPropagation();
-
-                $('<div>').principalfield({
-                    multiChoice: true,
-                    onAdd: function(users) {
-                        $.ajax({
-                            url: $this.data('href'),
-                            method: $this.data('method'),
-                            data: JSON.stringify({'users': users}),
-                            dataType: 'json',
-                            contentType: 'application/json',
-                            error: handleAjaxError,
-                            complete: IndicoUI.Dialogs.Util.progress(),
-                            success: function(data) {
-                                updateHtml($this.data('update'), data);
-                            }
-                        });
-                    }
-                }).principalfield('choose');
-            });
-
-            $('#event-roles').on('click', '.toggle-members', function() {
-                var row = $(this).closest('tr').next('tr');
-                var visible = row.is(':visible');
-                if (!visible) {
-                    row.fadeIn().find('ul').hide().slideDown('medium');
-                } else {
-                    row.fadeOut({duration: 'medium', queue: false});
-                    row.find('ul').slideUp('medium');
-                }
-            });
-        })();
-    </script>
 {% endblock %}
