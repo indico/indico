@@ -140,9 +140,21 @@ class IndicoSentry(Sentry):
         self.client.tags_context({'locale': set_best_lang()})
 
 
+class RHFilter(logging.Filter):
+    def filter(self, record):
+        # we don't want to send RH log messages (especially exceptions)
+        # to sentry since they are already logged as exceptions
+        return record.name != 'indico.rh'
+
+
 def init_sentry(app):
     sentry = IndicoSentry(dsn=config.SENTRY_DSN, logging=True, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
     sentry.init_app(app)
+    # connect to the indico logger (sentry only registers itself on the
+    # root logger, and the indico logger does not propagate its messages)
+    handler = SentryHandler(sentry.client, level=sentry.level)
+    handler.addFilter(RHFilter())
+    Logger.get().addHandler(handler)
     # connect to the celery logger
     register_logger_signal(sentry.client)
     register_signal(sentry.client)

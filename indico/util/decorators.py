@@ -94,8 +94,7 @@ def cached_writable_property(cache_attr, cache_on_set=True):
     return _cached_writable_property
 
 
-def jsonify_error(function=None, logger_name='requestHandler', logger_message=None, logging_level='info', status=200,
-                  log_sentry=False):
+def jsonify_error(function=None, logging_level='info', status=200, log_sentry=False):
     """
     Returns response of error handlers in JSON if requested in JSON
     and logs the exception that ended the request.
@@ -114,14 +113,12 @@ def jsonify_error(function=None, logger_name='requestHandler', logger_message=No
             else:
                 raise IndicoError('Wrong usage of jsonify_error: No error found in params')
 
-            tb = ''
+            logger_fn = getattr(Logger.get('rh'), logging_level)
             if logging_level != 'exception' and not isinstance(exception, no_tb_exceptions):
                 tb = traceback.format_exc()
-            logger_fn = getattr(Logger.get(logger_name), logging_level)
-            logger_fn(
-                logger_message if logger_message else
-                'Request finished: {} ({})\n{}'.format(exception.__class__.__name__, exception, tb).rstrip()
-            )
+                logger_fn('Request finished: %s (%s)\n%s', exception.__class__.__name__, exception, tb)
+            else:
+                logger_fn('Request finished: %s (%s)', exception.__class__.__name__, exception)
 
             # allow e.g. NoReportError to specify a status code without possibly
             # breaking old code that expects it with a 200 code.

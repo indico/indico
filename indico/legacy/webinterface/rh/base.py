@@ -59,7 +59,7 @@ from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
 
-logger = Logger.get('requestHandler')
+logger = Logger.get('rh')
 
 
 class RequestHandlerBase(object):
