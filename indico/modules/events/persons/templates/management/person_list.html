@@ -1,5 +1,6 @@
 {% extends 'events/management/base.html' if event.type == 'lecture' else 'events/management/full_width_base.html' %}
 
+{% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 {% from 'events/persons/management/_person_list_row.html' import render_person_row %}
 {% from 'message_box.html' import message_box %}
 
@@ -118,6 +119,7 @@
                 </div>
             </div>
             <div class="toolbar">
+                {{ render_displayed_entries_fragment(persons|length, persons|length) }}
                 <div id="person-filters" class="group list-filter">
                     <a class="i-button arrow highlight js-dropdown" data-toggle="dropdown">Filter role</a>
                     <ul class="dropdown">

@@ -101,6 +101,7 @@
 
         personRows.addClass('hidden');
         visibleEntries.removeClass('hidden');
+        $('#filtering-state strong').text(visibleEntries.length);
         $('.js-event-person-list').trigger('indico:syncEnableIfChecked');
     }
 
