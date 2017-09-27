@@ -70,6 +70,8 @@ def configure_app(app, set_path=False):
     config = IndicoConfig(app.config['INDICO'])  # needed since we don't have an app ctx yet
     app.config['DEBUG'] = config.DEBUG
     app.config['SECRET_KEY'] = config.SECRET_KEY
+    app.config['LOGGER_NAME'] = 'flask.app'
+    app.config['LOGGER_HANDLER_POLICY'] = 'never'
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
         raise ValueError('SECRET_KEY must be set to a random secret of at least 16 characters. '
                          'You can generate one using os.urandom(32) in Python shell.')
