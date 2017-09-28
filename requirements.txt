@@ -35,7 +35,7 @@ Pillow==4.2.1
 qrcode==5.3
 Markdown==2.3.1
 bleach==2.0.0
-Flask-SQLAlchemy==2.2
+Flask-SQLAlchemy==2.3.0
 Flask-WTF==0.14.2
 Flask-BabelEx==0.9.3
 SQLAlchemy==1.1.14

@@ -20,9 +20,11 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 
-from flask_sqlalchemy import Model, SQLAlchemy, _BoundDeclarativeMeta
+from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.model import BindMetaMixin
 from sqlalchemy.event import listen
 from sqlalchemy.exc import DatabaseError
+from sqlalchemy.ext.declarative import DeclarativeMeta, declarative_base
 from sqlalchemy.orm import CompositeProperty, mapper
 from sqlalchemy.sql.ddl import CreateSchema
 
@@ -108,6 +110,13 @@ class IndicoSQLAlchemy(SQLAlchemy):
             session.close()
 
 
+class NoNameGenMeta(BindMetaMixin, DeclarativeMeta):
+    # This is like Flask-SQLAlchemy's default metaclass but without
+    # generating table names (i.e. a model without an explicit table
+    # name will fail instead of getting a name set implicitly)
+    pass
+
+
 def on_models_committed(sender, changes):
     for obj, change in changes:
         obj.__committed__(change)
@@ -164,12 +173,8 @@ naming_convention = {
     'unique_index': _unique_index
 }
 
-# XXX: remove these two `del` statements once Flask-SQLAlchemy 2.3 is out;
-# they disable the tablename generation logic (which we do not use) in a
-# not-so-pretty way
-del Model.__tablename__
-del _BoundDeclarativeMeta.__new__
-db = IndicoSQLAlchemy(query_class=IndicoBaseQuery, model_class=IndicoModel)
+db = IndicoSQLAlchemy(model_class=declarative_base(cls=IndicoModel, metaclass=NoNameGenMeta, name='Model'),
+                      query_class=IndicoBaseQuery)
 db.Model.metadata.naming_convention = naming_convention
 listen(db.Model.metadata, 'before_create', _before_create)
 listen(mapper, 'mapper_configured', _mapper_configured)
