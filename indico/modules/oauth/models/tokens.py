@@ -95,8 +95,7 @@ class OAuthToken(db.Model):
 
     @property
     def expires(self):
-        # work around to have a non-expiring token
-        return datetime.utcnow() + timedelta(days=3650)
+        return None
 
     @property
     def scopes(self):

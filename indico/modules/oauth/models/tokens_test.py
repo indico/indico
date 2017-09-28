@@ -50,9 +50,8 @@ def test_token_locator(dummy_token):
     assert dummy_token.locator == {'id': dummy_token.id}
 
 
-def test_token_expires(freeze_time, dummy_token):
-    freeze_time(datetime.utcnow())
-    assert dummy_token.expires == datetime.utcnow() + timedelta(days=3650)
+def test_token_expires(dummy_token):
+    assert dummy_token.expires is None
 
 
 def test_token_scopes(dummy_token):

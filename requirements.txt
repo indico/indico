@@ -58,7 +58,7 @@ celery==4.1.0
 PyYAML==3.12
 terminaltables==3.1.0
 contextlib2==0.5.5
-Flask-OAuthlib==0.9.1
+Flask-OAuthlib==0.9.4
 translitcodec
 certifi
 Jinja2==2.9.6
