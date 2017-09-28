@@ -32,7 +32,7 @@ from indico.web.util import get_request_info
 
 
 try:
-    from raven.contrib.celery import register_logger_signal, register_signal
+    from raven.contrib.celery import register_logger_signal, register_signal, CeleryFilter
     from raven.contrib.flask import Sentry
     from raven.handlers.logging import SentryHandler
 except ImportError:
@@ -156,8 +156,10 @@ def init_sentry(app):
     handler.addFilter(RHFilter())
     Logger.get().addHandler(handler)
     # connect to the celery logger
-    register_logger_signal(sentry.client)
     register_signal(sentry.client)
+    handler = SentryHandler(sentry.client, level=sentry.level)
+    handler.addFilter(CeleryFilter())
+    logging.getLogger('celery').addHandler(handler)
 
 
 def sentry_log_exception():
