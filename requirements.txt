@@ -36,7 +36,7 @@ qrcode==5.3
 Markdown==2.3.1
 bleach==1.4.3
 Flask-SQLAlchemy==2.2
-Flask-WTF==0.13
+Flask-WTF==0.14.2
 Flask-BabelEx==0.9.3
 SQLAlchemy==1.1.14
 WTForms==2.1

@@ -16,7 +16,7 @@
           {% if multipart %}enctype="multipart/form-data"{% endif %}
           {% if caller %}{{ caller() }}{% endif %}
           {% if no_ajax %}data-no-ajax{% endif %}>
-        {% if form.csrf_enabled -%}
+        {% if form.meta.csrf -%}
             {{ form.csrf_token() }}
         {% endif %}
         {% for field in _iter_form_fields(form, hidden_fields=true, skip=('csrf_token',)) %}

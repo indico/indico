@@ -30,7 +30,7 @@ from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import EmailListField, FileField, IndicoDateTimeField
-from indico.web.forms.validators import DateTimeRange, HiddenUnless, LinkedDateTime, UsedIf, ValidationError
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf, ValidationError
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
 

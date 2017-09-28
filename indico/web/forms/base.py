@@ -21,6 +21,7 @@ import weakref
 from flask import flash, g, request, session
 from flask_wtf import FlaskForm
 from wtforms import ValidationError
+from wtforms.csrf.core import CSRF
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields.core import FieldList
 from wtforms.form import FormMeta
@@ -73,15 +74,34 @@ class IndicoFormMeta(FormMeta):
         for name, field in extra_fields:
             name = 'ext__' + name
             if hasattr(ext_cls, name):
-                raise RuntimeError('Preference collision in {}: {}'.format(cls.__name__, name))
+                raise RuntimeError('Field name collision in {}: {}'.format(cls.__name__, name))
             setattr(ext_cls, name, field)
         return ext_cls(*args, **kwargs)
+
+
+class IndicoFormCSRF(CSRF):
+    def generate_csrf_token(self, csrf_token_field):
+        return session.csrf_token
+
+    def validate_csrf_token(self, form, field):
+        if field.current_token == field.data:
+            return
+        if not g.get('flashed_csrf_message'):
+            # Only flash the message once per request. We may end up in here
+            # multiple times if `validate()` is called more than once
+            flash(_('It looks like there was a problem with your current session. Please submit the form again.'),
+                  'error')
+            g.flashed_csrf_message = True
+        raise ValidationError(_('Invalid CSRF token'))
 
 
 class IndicoForm(FlaskForm):
     __metaclass__ = IndicoFormMeta
 
     class Meta:
+        csrf = True
+        csrf_class = IndicoFormCSRF
+
         def bind_field(self, form, unbound_field, options):
             # We don't set default filters for query-based fields as it breaks them if no query_factory is set
             # while the Form is instantiated. Also, it's quite pointless for those fields...
@@ -94,6 +114,15 @@ class IndicoForm(FlaskForm):
             return bound
 
     def __init__(self, *args, **kwargs):
+        csrf_enabled = kwargs.pop('csrf_enabled', None)
+        if csrf_enabled is not None:
+            # This is exactly what FlaskForm already does, but without
+            # a deprecation warning.
+            # Being able to set ``csrf_enabled=False`` is much nicer
+            # than ``meta={'csrf': False}`` and if we ever need to
+            # change it for some reason we can always replace it everywhere
+            kwargs['meta'] = kwargs.get('meta') or {}
+            kwargs['meta'].setdefault('csrf', csrf_enabled)
         super(IndicoForm, self).__init__(*args, **kwargs)
         self.ajax_response = None
 
@@ -116,21 +145,6 @@ class IndicoForm(FlaskForm):
         rv = field.process_ajax()
         self.ajax_response = rv
         return True
-
-    def generate_csrf_token(self, csrf_context=None):
-        if not self.csrf_enabled:
-            return None
-        return session.csrf_token
-
-    def validate_csrf_token(self, field):
-        if self.csrf_enabled and field.data != session.csrf_token:
-            if not g.get('flashed_csrf_message'):
-                # Only flash the message once per request. We may end up in here
-                # multiple times if `validate()` is called more than once
-                flash(_('It looks like there was a problem with your current session. Please submit the form again.'),
-                      'error')
-                g.flashed_csrf_message = True
-            raise ValidationError(_('CSRF token missing'))
 
     def validate(self):
         valid = super(IndicoForm, self).validate()
@@ -212,7 +226,9 @@ class IndicoForm(FlaskForm):
     @property
     def data(self):
         """Extends form.data with generated data from properties"""
-        data = {k: v for k, v in super(IndicoForm, self).data.iteritems() if not k.startswith('ext__')}
+        data = {k: v
+                for k, v in super(IndicoForm, self).data.iteritems()
+                if k != self.meta.csrf_field_name and not k.startswith('ext__')}
         data.update(self.generated_data)
         return data
 
