@@ -16,8 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.modules.admin.views import WPAdmin
+from indico.util.i18n import _
 
 
 class WPLegalMixin:
@@ -28,6 +31,9 @@ class WPManageLegalMessages(WPLegalMixin, WPAdmin):
     pass
 
 
-class WPDisplayLegalMessages(WPLegalMixin, WPJinjaMixin, WPDecorated):
+class WPDisplayLegalMessages(WPLegalMixin, WPJinjaMixin, WPMainBase):
+    def _getNavigationDrawer(self):
+        return WSimpleNavigationDrawer(_('Terms and Conditions'))
+
     def _getBody(self, params):
         return self._getPageContent(params)
