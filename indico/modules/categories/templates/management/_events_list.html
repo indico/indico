@@ -15,7 +15,7 @@
         </td>
         <td class="i-table">
             <a href="{{ url_for('event_management.settings', event) }}">
-                {{ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | strip_tags }}
+                {{ event.get_verbose_title(show_series_pos=(event.type == 'lecture')) | striptags }}
             </a>
         </td>
         <td class="i-table">{{ event.start_dt|format_datetime(timezone=event.category.tzinfo) }}</td>

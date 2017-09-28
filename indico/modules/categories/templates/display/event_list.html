@@ -94,7 +94,7 @@
                         </span>
                         <a href="{{ event.url }}" itemprop="url">
                             <span itemprop="summary">
-                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | strip_tags }}
+                                {{ event.get_verbose_title(show_speakers=is_lecture, show_series_pos=is_lecture) | striptags }}
                             </span>
                         </a>
                         <span class="protected">

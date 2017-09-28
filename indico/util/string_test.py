@@ -20,7 +20,7 @@ from itertools import count
 import pytest
 
 from indico.util.string import (camelize, camelize_keys, crc32, format_repr, make_unique_token, normalize_phone_number,
-                                render_markdown, sanitize_email, seems_html, slugify, snakify, snakify_keys,
+                                render_markdown, sanitize_email, seems_html, slugify, snakify, snakify_keys, strip_tags,
                                 text_to_repr, to_unicode)
 
 
@@ -84,6 +84,15 @@ def test_slugify_args():
 ))
 def test_slugify_lower(input, lower, output):
     assert slugify(input, lower=lower) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    (b'foo <strong>bar</strong>', b'foo bar'),
+    (u'foo <strong>bar</strong>', u'foo bar'),
+))
+def test_strip_tags(input, output):
+    assert strip_tags(input) == output
+    assert type(input) is type(output)
 
 
 @pytest.mark.parametrize(('input', 'html', 'max_length', 'output'), (

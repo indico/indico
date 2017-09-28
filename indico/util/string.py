@@ -35,6 +35,7 @@ import bleach
 import markdown
 import translitcodec  # this is NOT unused. it needs to be imported to register the codec.
 from html2text import HTML2Text
+from jinja2.filters import do_striptags
 from lxml import etree, html
 from markupsafe import Markup, escape
 from speaklater import _LazyString, is_lazy_string
@@ -248,13 +249,14 @@ def remove_extra_spaces(text):
     return pattern.sub(' ', text).strip()
 
 
-def remove_tags(text):
-    """
-    Removes html-like tags from given text. Tag names aren't checked,
-    <no-valid-tag></no-valid-tag> pair will be removed.
-    """
-    pattern = re.compile(r"<(\w|\/)[^<\s\"']*?>")
-    return remove_extra_spaces(pattern.sub(' ', text))
+def strip_tags(text):
+    """Strip HTML tags and replace adjacent whitespace by one space."""
+    encode = False
+    if isinstance(text, str):
+        encode = True
+        text = text.decode('utf-8')
+    text = do_striptags(text)
+    return text.encode('utf-8') if encode else text
 
 
 def render_markdown(text, escape_latex_math=True, md=None, **kwargs):

@@ -40,7 +40,7 @@
         {%- if event.description %}
 
             {% filter underline %}Description{% endfilter %}
-            {{ event.description | strip_tags }}
+            {{ event.description | striptags }}
         {%- endif %}
 
         {% if not occurrences -%}

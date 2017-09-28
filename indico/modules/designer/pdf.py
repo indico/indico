@@ -31,7 +31,7 @@ from reportlab.platypus import Paragraph
 
 from indico.legacy.pdfinterface.base import setTTFonts
 from indico.modules.designer import PageOrientation
-from indico.web.flask.templating import strip_tags
+from indico.util.string import strip_tags
 
 
 FONT_STYLES = {

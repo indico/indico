@@ -51,7 +51,7 @@ from indico.modules.events.sessions.util import get_session_ical_file, get_sessi
 from indico.modules.events.timetable.controllers.display import RHTimetable
 from indico.modules.events.timetable.util import get_timetable_offline_pdf_generator
 from indico.modules.events.tracks.controllers import RHDisplayTracks
-from indico.util.string import remove_tags
+from indico.util.string import strip_tags
 from indico.web.assets.util import get_asset_path
 from indico.web.flask.util import url_for
 
@@ -260,7 +260,7 @@ class OfflineEventCreator(object):
         pass
 
     def _normalize_path(self, path):
-        return secure_filename(remove_tags(path))
+        return secure_filename(strip_tags(path))
 
     def _getAllMaterial(self):
         self._addMaterialFrom(self.event, "events/conference")

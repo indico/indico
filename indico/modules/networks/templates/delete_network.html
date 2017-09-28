@@ -29,7 +29,7 @@
             {% for event in events %}
                 <li>
                     <a href="{{ url_for('event_management.protection', event) }}" target="_blank">
-                        {{ event.title|strip_tags }}
+                        {{ event.title|striptags }}
                     </a>
                 </li>
             {% endfor %}

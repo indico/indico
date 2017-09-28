@@ -57,7 +57,7 @@ from indico.web.assets import (core_env, include_css_assets, include_js_assets, 
                                register_theme_sass)
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
-                                         markdown, natsort, strip_tags, subclassof, underline)
+                                         markdown, natsort, subclassof, underline)
 from indico.web.flask.util import ListConverter, XAccelMiddleware, discover_blueprints, url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoFlask
 from indico.web.forms.jinja_helpers import is_single_line_field, iter_form_fields, render_field
@@ -203,7 +203,6 @@ def setup_jinja(app):
     app.add_template_filter(natsort)
     app.add_template_filter(groupby)
     app.add_template_filter(any)
-    app.add_template_filter(strip_tags)
     app.add_template_filter(alpha_enum)
     app.add_template_filter(crc32)
     app.add_template_filter(bool)

@@ -68,8 +68,8 @@
         <ul class="main-page-list">
             {% for event in upcoming_events %}
                 <li>
-                    <a href="{{ event.url }}" class="title" title="{{ event.title|strip_tags }}" >
-                        {{ event.title|strip_tags }}
+                    <a href="{{ event.url }}" class="title" title="{{ event.title|striptags }}" >
+                        {{ event.title|striptags }}
                     </a>
                     <span class="timing">
                         {% if happening_now(event) %}

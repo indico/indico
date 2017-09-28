@@ -22,7 +22,6 @@ import posixpath
 import re
 from heapq import heappush
 
-import bleach
 from flask import current_app
 from flask_pluginengine.util import get_state
 from jinja2 import environmentfilter
@@ -88,11 +87,6 @@ def groupby(environment, value, attribute, reverse=False):
     expr = make_attrgetter(environment, attribute)
     return [_GroupTuple(key, list(values))
             for key, values in itertools.groupby(sorted(value, key=expr, reverse=reverse), expr)]
-
-
-def strip_tags(value):
-    """Strips provided text of html tags"""
-    return bleach.clean(value, tags=[], strip=True).strip() if '<' in value else value
 
 
 def instanceof(value, type_):
