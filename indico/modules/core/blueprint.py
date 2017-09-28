@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.core.controllers import RHChangeLanguage, RHChangeTimezone, RHSettings, RHVersionCheck
+from indico.modules.core.controllers import RHChangeLanguage, RHChangeTimezone, RHContact, RHSettings, RHVersionCheck
 from indico.web.flask.util import redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -32,6 +32,9 @@ _bp.add_url_rule('/admin/', 'admin_dashboard', view_func=redirect_view('.setting
 # Global operations
 _bp.add_url_rule('/change-language', 'change_lang', RHChangeLanguage, methods=('POST',))
 _bp.add_url_rule('/change-timezone', 'change_tz', RHChangeTimezone, methods=('POST',))
+
+# Misc pages
+_bp.add_url_rule('/contact', 'contact', RHContact)
 
 # Allow loadbalancers etc to easily check whether the service is alive
 _bp.add_url_rule('/ping', 'ping', lambda: ('', 204))

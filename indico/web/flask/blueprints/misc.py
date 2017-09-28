@@ -16,11 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.rh import contact, errors
+from indico.legacy.webinterface.rh.errors import RHErrorReporting
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
 misc = IndicoBlueprint('misc', __name__)
 
-misc.add_url_rule('/contact', 'contact', contact.RHContact)
-misc.add_url_rule('/report-error', 'errors', errors.RHErrorReporting, methods=('GET', 'POST'))
+misc.add_url_rule('/report-error', 'errors', RHErrorReporting, methods=('GET', 'POST'))

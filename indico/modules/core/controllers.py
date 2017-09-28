@@ -20,6 +20,7 @@ import requests
 from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pytz import common_timezones_set
+from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_join
 
 import indico
@@ -30,10 +31,17 @@ from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
-from indico.modules.core.views import WPSettings
+from indico.modules.core.views import WPContact, WPSettings
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+
+
+class RHContact(RH):
+    def _process(self):
+        if not config.PUBLIC_SUPPORT_EMAIL:
+            raise NotFound
+        return WPContact.render_template('contact.html')
 
 
 class RHSettings(RHAdminBase):
@@ -62,7 +70,7 @@ class RHSettings(RHAdminBase):
 
         cephalopod_url, cephalopod_data = self._get_cephalopod_data()
         show_migration_message = cephalopod_settings.get('show_migration_message')
-        return WPSettings.render_template('settings.html', 'settings',
+        return WPSettings.render_template('admin/settings.html', 'settings',
                                           form=form,
                                           core_settings=core_settings.get_all(),
                                           social_settings=social_settings.get_all(),

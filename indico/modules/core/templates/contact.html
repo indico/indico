@@ -1,0 +1,12 @@
+{% extends 'layout/base.html' %}
+
+{% block page_class %}fixed-width-standalone-text-page{% endblock %}
+
+{% block title -%}
+    {% trans %}Contact{% endtrans %}
+{%- endblock %}
+
+{% block content -%}
+    {% trans %}If you need support, you can contact the following email address:{% endtrans %}<br>
+    <a href="mailto:{{ indico_config.PUBLIC_SUPPORT_EMAIL }}">{{ indico_config.PUBLIC_SUPPORT_EMAIL }}</a>
+{%- endblock %}
