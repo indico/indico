@@ -174,7 +174,11 @@ class IndicoPersistentScheduler(PersistentScheduler):
             else:
                 self.app.conf['beat_schedule'][task_name]['schedule'] = entry
         super(IndicoPersistentScheduler, self).setup_schedule()
-        self._print_schedule(deleted)
+        if not self.app.conf['worker_redirect_stdouts']:
+            # print the schedule unless we are in production where
+            # this output would get redirected to a logger which is
+            # not pretty, especially with the colors
+            self._print_schedule(deleted)
 
     def _print_schedule(self, deleted):
         table_data = [['Name', 'Schedule']]
