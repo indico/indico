@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global strnatcmp:false */
+/* global setupSearchBox:false, strnatcmp:false */
 
 (function(global) {
     'use strict';
@@ -101,7 +101,6 @@
 
         personRows.addClass('hidden');
         visibleEntries.removeClass('hidden');
-        $('#filtering-state strong').text(visibleEntries.length);
         $('.js-event-person-list').trigger('indico:syncEnableIfChecked');
     }
 
@@ -109,6 +108,15 @@
         options = $.extend({
             hasNoAccountFilter: false
         }, options);
+
+        var filterConfig = {
+            itemHandle: 'tr',
+            listItems: '#event-participants-list tbody tr:not(.hidden)',
+            term: '#search-input',
+            state: '#filtering-state',
+            placeholder: '#filter-placeholder'
+        };
+        var applySearchFilters = setupSearchBox(filterConfig);
 
         enableIfChecked('.js-event-person-list', '.select-row:visible', '.js-event-person-list .js-requires-selected-row');
         if ($('.js-event-person-list').closest('.ui-dialog').length) {
@@ -169,12 +177,14 @@
             $('.js-event-person-list [data-filter]:not(#filter-no-account)').on('change', function() {
                 $('#filter-no-account').prop('checked', false);
                 refreshPersonFilters();
+                applySearchFilters();
             });
             $('#filter-no-account').on('change', function() {
                 if (this.checked) {
                     $('.js-event-person-list [data-filter]:checked:not(#filter-no-account)').prop('checked', false);
                 }
                 refreshPersonFilters();
+                applySearchFilters();
             });
         }
 
@@ -205,6 +215,7 @@
                 $this.parent().toggleClass('enabled', !$this.is('#filter-no-account'));
             });
             refreshPersonFilters();
+            applySearchFilters();
         });
 
         // Allows to click in the whole list item area to enable/disable role filters

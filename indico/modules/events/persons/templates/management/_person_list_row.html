@@ -18,9 +18,9 @@
                 {%- trans %}The person has not registered yet{% endtrans -%}
             {% endif %}
         {% endset %}
-        <i class="icon-ticket js-show-regforms {{ 'exists' if person_data.registrations}}" data-title="{{ tooltip }}"></i>
+        <i class="icon-ticket js-show-regforms {{ 'exists' if person_data.registrations }}" data-title="{{ tooltip }}"></i>
     </td>
-    <td class="i-table name-column">
+    <td class="i-table name-column" data-searchable="{{ person.display_full_name|lower }}">
         {{ person.display_full_name }}
         {% if person.is_untrusted %}
             {% set untrusted_tooltip -%}
