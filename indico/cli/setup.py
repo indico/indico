@@ -25,7 +25,6 @@ from smtplib import SMTP
 
 import click
 from click import wrap_text
-from flask import Flask
 from flask.helpers import get_root_path
 from prompt_toolkit import prompt
 from prompt_toolkit.contrib.completers import PathCompleter, WordCompleter
@@ -40,7 +39,6 @@ from sqlalchemy.pool import NullPool
 from werkzeug.urls import url_parse
 
 from indico.util.console import cformat
-from indico.util.i18n import babel, get_all_locales
 from indico.util.string import is_valid_mail
 
 
@@ -213,15 +211,18 @@ def create_configs(target_dir):
 
 
 @cli.command()
-def wizard():
+@click.option('--dev', is_flag=True)
+def wizard(dev):
     """Runs a setup wizard to configure Indico from scratch."""
-    SetupWizard().run()
+    SetupWizard().run(dev=dev)
 
 
 class SetupWizard(object):
     def __init__(self):
         self._missing_dirs = set()
         self.root_path = None
+        self.data_root_path = None
+        self.config_dir_path = None
         self.config_path = None
         self.indico_url = None
         self.db_uri = None
@@ -239,22 +240,24 @@ class SetupWizard(object):
         self.rb_active = None
         self.old_archive_dir = None
 
-    def run(self):
+    def run(self, dev):
         self._check_root()
         self._check_venv()
-        self._prompt_root_path()
-        self.config_path = os.path.join(self.root_path, 'etc', 'indico.conf')
+        self._prompt_root_path(dev=dev)
+        self.config_dir_path = (get_root_path('indico') if dev else os.path.join(self.root_path, 'etc'))
+        self.config_path = os.path.join(self.config_dir_path, 'indico.conf')
         self._check_configured()
-        self._check_directories()
-        self._prompt_indico_url()
+        self._check_directories(dev=dev)
+        self._prompt_indico_url(dev=dev)
         self._prompt_db_uri()
         self._prompt_redis_uris()
         self._prompt_emails()
-        self._prompt_smtp_data()
+        self._prompt_smtp_data(dev=dev)
         self._prompt_defaults()
         self._prompt_misc()
-        self._prompt_migration()
-        self._setup()
+        if not dev:
+            self._prompt_migration()
+        self._setup(dev=dev)
 
     def _check_root(self):
         if os.getuid() == 0 or os.geteuid() == 0:
@@ -267,8 +270,9 @@ class SetupWizard(object):
             _warn('It looks like you are not using a virtualenv. This is unsupported and strongly discouraged.')
             _prompt_abort()
 
-    def _prompt_root_path(self):
-        self.root_path = _prompt('Indico root path', default='/opt/indico', path=True,
+    def _prompt_root_path(self, dev=False):
+        default_root = os.getcwd().decode(sys.getfilesystemencoding()) if dev else '/opt/indico'
+        self.root_path = _prompt('Indico root path', default=default_root, path=True,
                                  help='Enter the base directory where Indico will be installed.')
         # The root needs to exist (ideally created during `useradd`)
         if not os.path.isdir(self.root_path):
@@ -281,6 +285,7 @@ class SetupWizard(object):
                   .format(self.root_path))
             _warn('The virtualenv is currently located in {}'.format(sys.prefix))
             _prompt_abort()
+        self.data_root_path = os.path.join(self.root_path, 'data') if dev else self.root_path
 
     def _check_configured(self):
         # Bail out early if indico is already configured
@@ -289,12 +294,15 @@ class SetupWizard(object):
                 self.config_path))
             raise click.Abort
 
-    def _check_directories(self):
-        dirs = ['archive', 'assets', 'cache', 'etc', 'log', 'tmp', 'web']
+    def _check_directories(self, dev=False):
+        dirs = ['archive', 'assets', 'cache', 'log', 'tmp']
+        if not dev:
+            dirs += ['etc', 'web']
+
         _echo('Indico will use the following directories')
         has_existing = False
         for name in dirs:
-            path = os.path.join(self.root_path, name)
+            path = os.path.join(self.data_root_path, name)
             exists_suffix = ''
             if os.path.exists(path):
                 has_existing = True
@@ -308,7 +316,7 @@ class SetupWizard(object):
                   'please move its data to a different location.')
             _prompt_abort()
 
-    def _prompt_indico_url(self):
+    def _prompt_indico_url(self, dev=False):
         def _check_url(url):
             data = url_parse(url)
             if not data.scheme or not data.host:
@@ -317,7 +325,7 @@ class SetupWizard(object):
             elif data.fragment or data.query or data.auth:
                 _warn('Invalid URL: must not contain fragment, query string or username/password')
                 return False
-            elif data.scheme != 'https':
+            elif not dev and data.scheme != 'https':
                 _warn('Unless this is a test instance it is HIGHLY RECOMMENDED to use an https:// URL')
                 return False
             elif data.path not in ('', '/'):
@@ -325,8 +333,9 @@ class SetupWizard(object):
                 return False
             return True
 
+        default_url = ('http://127.0.0.1:8000' if dev else 'https://{}'.format(socket.getfqdn()))
         url = _prompt('Indico URL', validate=_check_url, allow_invalid=True,
-                      default='https://' + socket.getfqdn(),
+                      default=default_url,
                       help='Indico needs to know the URL through which it is accessible. '
                            'We strongly recommend using an https:// URL and a subdomain, e.g. '
                            'https://indico.yourdomain.com')
@@ -402,12 +411,14 @@ class SetupWizard(object):
                                      help='When Indico sends email notifications they are usually sent from the '
                                           'noreply email.')
 
-    def _prompt_smtp_data(self):
+    def _prompt_smtp_data(self, dev=False):
         def _get_default_smtp(custom_host=None):
             if custom_host:
-                candidates = ((custom_host, 25), (custom_host, 587))
+                candidates = [(custom_host, 25), (custom_host, 587)]
             else:
-                candidates = (('127.0.0.1', 25), ('127.0.0.1', 587))
+                candidates = [('127.0.0.1', 25), ('127.0.0.1', 587)]
+            if dev:
+                candidates.insert(0, (custom_host or '127.0.0.1', 1025))
             for host, port in candidates:
                 try:
                     SMTP(host, port, timeout=3).close()
@@ -452,9 +463,8 @@ class SetupWizard(object):
 
     def _prompt_defaults(self):
         def _get_all_locales():
-            # We need babel linked to a Flask app to get the list of locales
-            babel.init_app(Flask('indico'))
-            return get_all_locales()
+            # get all directories in indico/translations
+            return os.walk(os.path.join(get_root_path('indico'), 'translations')).next()[1]
 
         def _get_system_timezone():
             candidates = []
@@ -497,16 +507,19 @@ class SetupWizard(object):
                                             'ArchiveDir of the old indico version.  Leave this empty if you are not '
                                             'upgrading.')
 
-    def _setup(self):
-        storage_backends = {'default': 'fs:' + os.path.join(self.root_path, 'archive')}
+    def _setup(self, dev=False):
+        storage_backends = {'default': 'fs:' + os.path.join(self.data_root_path, 'archive')}
         if self.old_archive_dir:
             storage_backends['legacy'] = 'fs-readonly:' + self.old_archive_dir
 
         config_link_path = os.path.expanduser('~/.indico.conf')
-        create_config_link = _confirm('Create symlink?', default=True,
-                                      help='By creating a symlink to indico.conf in {}, you can run '
-                                           'indico without having to set the INDICO_CONFIG '
-                                           'environment variable'.format(config_link_path))
+        if not dev:
+            create_config_link = _confirm('Create symlink?', default=True,
+                                          help='By creating a symlink to indico.conf in {}, you can run '
+                                               'indico without having to set the INDICO_CONFIG '
+                                               'environment variable'.format(config_link_path))
+        else:
+            create_config_link = False
 
         config_data = [
             b'# General settings',
@@ -519,10 +532,10 @@ class SetupWizard(object):
             b'DEFAULT_TIMEZONE = {!r}'.format(self.default_timezone.encode('utf-8')),
             b'DEFAULT_LOCALE = {!r}'.format(self.default_locale.encode('utf-8')),
             b'ENABLE_ROOMBOOKING = {!r}'.format(self.rb_active),
-            b'CACHE_DIR = {!r}'.format(os.path.join(self.root_path, 'cache').encode('utf-8')),
-            b'TEMP_DIR = {!r}'.format(os.path.join(self.root_path, 'tmp').encode('utf-8')),
-            b'LOG_DIR = {!r}'.format(os.path.join(self.root_path, 'log').encode('utf-8')),
-            b'ASSETS_DIR = {!r}'.format(os.path.join(self.root_path, 'assets').encode('utf-8')),
+            b'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache').encode('utf-8')),
+            b'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp').encode('utf-8')),
+            b'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log').encode('utf-8')),
+            b'ASSETS_DIR = {!r}'.format(os.path.join(self.data_root_path, 'assets').encode('utf-8')),
             b'STORAGE_BACKENDS = {!r}'.format({k.encode('utf-8'): v.encode('utf-8')
                                               for k, v in storage_backends.iteritems()}),
             b"ATTACHMENT_STORAGE = 'default'",
@@ -537,7 +550,20 @@ class SetupWizard(object):
             b'PUBLIC_SUPPORT_EMAIL = {!r}'.format(self.contact_email.encode('utf-8')),
             b'NO_REPLY_EMAIL = {!r}'.format(self.noreply_email.encode('utf-8'))
         ]
+
+        if dev:
+            config_data += [
+                b'',
+                b'# Development options',
+                b'DB_LOG = True',
+                b'DEBUG = True'
+            ]
+
         config = b'\n'.join(x for x in config_data if x is not None)
+
+        if dev:
+            if not os.path.exists(self.data_root_path):
+                os.mkdir(self.data_root_path)
 
         _echo()
         for path in self._missing_dirs:
@@ -550,10 +576,13 @@ class SetupWizard(object):
 
         package_root = get_root_path('indico')
         _copy(os.path.normpath(os.path.join(package_root, 'logging.yaml.sample')),
-              os.path.join(self.root_path, 'etc', 'logging.yaml'))
-        _link(os.path.join(package_root, 'htdocs'), os.path.join(self.root_path, 'web', 'htdocs'))
-        _copy(os.path.join(package_root, 'web', 'indico.wsgi'), os.path.join(self.root_path, 'web', 'indico.wsgi'),
-              force=True)
+              os.path.join(self.config_dir_path, 'logging.yaml'))
+
+        if not dev:
+            _link(os.path.join(package_root, 'htdocs'), os.path.join(self.data_root_path, 'web', 'htdocs'))
+            _copy(os.path.join(package_root, 'web', 'indico.wsgi'),
+                  os.path.join(self.data_root_path, 'web', 'indico.wsgi'),
+                  force=True)
 
         if create_config_link:
             _link(self.config_path, config_link_path)
