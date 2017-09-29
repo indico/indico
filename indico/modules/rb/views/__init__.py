@@ -31,11 +31,14 @@ class WPRoomBookingBase(WPMainBase):
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
+    def _getNavigationDrawer(self):
+        return WSimpleNavigationDrawer(_('Room Booking'))
+
     def _display(self, params):
-        # TODO: refactor...
-        params = dict(params, **self._kwargs)
+        # TODO: when moving RB to jinja, refactor this to proper jinja inheritance
+        # and only use this hack for legacy parts still using WP/W mako stuff
         tpl = "{% extends 'rb/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
-        body = u'<div>{}</div>'.format(to_unicode(self._getBody(params)))
-        breadcrumbs = WSimpleNavigationDrawer(_('Room Booking')).getHTML()
-        body = render_template_string(tpl, _body=body, active_menu_item=self.sidemenu_option, breadcrumbs=breadcrumbs)
+        params = dict(params, **self._kwargs)
+        body = to_unicode(self._getBody(params))
+        body = render_template_string(tpl, _body=body, active_menu_item=self.sidemenu_option)
         return self._applyDecoration(body)

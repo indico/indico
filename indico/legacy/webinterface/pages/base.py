@@ -94,7 +94,7 @@ class WPJinjaMixin:
 
 
 class WPBase:
-    _title = "Indico"
+    _title = u'Indico'
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
@@ -199,8 +199,10 @@ class WPDecorated(WPBase):
         return render_template('footer.html').encode('utf-8')
 
     def _applyDecoration(self, body):
-        return u'<div class="header">{}</div>\n<div class="main">{}</div>\n{}'.format(
-            to_unicode(self._getHeader()), to_unicode(body), to_unicode(self._getFooter()))
+        nav = self._getNavigationDrawer()
+        breadcrumbs = nav.getHTML() if nav else ''
+        return u'<div class="header">{}</div>\n<div class="main">{}<div>{}</div></div>\n{}'.format(
+            to_unicode(self._getHeader()), to_unicode(breadcrumbs), to_unicode(body), to_unicode(self._getFooter()))
 
     def _display(self, params):
         params = dict(params, **self._kwargs)

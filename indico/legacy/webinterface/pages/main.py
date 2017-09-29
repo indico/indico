@@ -14,21 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from flask import session
-
-from indico.legacy.webinterface.pages import base
-from indico.util.string import to_unicode
+from indico.legacy.webinterface.pages.base import WPDecorated
 
 
-class WPMainBase(base.WPDecorated):
+class WPMainBase(WPDecorated):
     sidemenu_option = None
-
-    def _display(self, params):
-        self._timezone = session.tzinfo
-        params = dict(params, **self._kwargs)
-        body = u'<div>{}</div>'.format(to_unicode(self._getBody(params)))
-        nav = self._getNavigationDrawer()
-        return self._applyDecoration(to_unicode(nav.getHTML() if nav else '') + body)
-
-    def _getBody(self, params):
-        raise NotImplementedError('_getBody() needs to be overridden.')
