@@ -14,21 +14,28 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
+from flask import render_template_string
+
 from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
-from indico.web.menu import render_sidemenu
+from indico.util.string import to_unicode
 
 
 class WPRoomBookingBase(WPMainBase):
-
     def _getTitle(self):
         return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
-    def _getSideMenu(self):
-        return render_sidemenu('rb-sidemenu', active_item=self.sidemenu_option)
-
-    def _isRoomBooking(self):
-        return True
+    def _display(self, params):
+        # TODO: refactor...
+        params = dict(params, **self._kwargs)
+        tpl = "{% extends 'rb/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
+        body = u'<div>{}</div>'.format(to_unicode(self._getBody(params)))
+        breadcrumbs = WSimpleNavigationDrawer(_('Room Booking')).getHTML()
+        body = render_template_string(tpl, _body=body, active_menu_item=self.sidemenu_option, breadcrumbs=breadcrumbs)
+        return self._applyDecoration(body)

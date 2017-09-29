@@ -16,8 +16,8 @@
 
 from flask import session
 
-from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.pages import base
+from indico.util.string import to_unicode
 
 
 class WPMainBase(base.WPDecorated):
@@ -26,42 +26,9 @@ class WPMainBase(base.WPDecorated):
     def _display(self, params):
         self._timezone = session.tzinfo
         params = dict(params, **self._kwargs)
-        body = WMainBase(self._getBody(params), self._timezone, self._getNavigationDrawer(),
-                         isFrontPage=self._isFrontPage(),
-                         isRoomBooking=self._isRoomBooking(),
-                         sideMenu=self._getSideMenu()).getHTML()
-
-        return self._applyDecoration(body)
+        body = u'<div>{}</div>'.format(to_unicode(self._getBody(params)))
+        nav = self._getNavigationDrawer()
+        return self._applyDecoration(to_unicode(nav.getHTML() if nav else '') + body)
 
     def _getBody(self, params):
         raise NotImplementedError('_getBody() needs to be overridden.')
-
-    def _getSideMenu(self):
-        return ''
-
-
-class WMainBase(wcomponents.WTemplated):
-
-    def __init__(self, page, timezone, navigation=None, isFrontPage=False, isRoomBooking=False, sideMenu=None):
-        self._page = page
-        self._navigation = navigation
-        self._isFrontPage = isFrontPage
-        self._isRoomBooking = isRoomBooking
-        self._timezone = timezone
-        self._sideMenu = sideMenu
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars(self)
-
-        vars['body'] = self._page
-        vars["isFrontPage"] = self._isFrontPage
-        vars["isRoomBooking"] = self._isRoomBooking
-
-        vars["navigation"] = ""
-        if self._navigation:
-            vars["navigation"] = self._navigation.getHTML(vars)
-
-        vars["timezone"] = self._timezone
-        vars['sideMenu'] = self._sideMenu
-
-        return vars

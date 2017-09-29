@@ -1,0 +1,12 @@
+{% extends 'layout/management_page.html' %}
+
+{% block side_menu %}
+    {{ render_sidemenu('rb-sidemenu', active_item=active_menu_item) }}
+{% endblock %}
+
+{% block page %}
+    {{ breadcrumbs|safe }}
+    <div>
+        {{ super() }}
+    </div>
+{% endblock %}

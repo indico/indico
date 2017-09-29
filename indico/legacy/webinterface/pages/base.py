@@ -212,16 +212,6 @@ class WPDecorated(WPBase):
     def _getNavigationDrawer(self):
         return None
 
-    def _isFrontPage(self):
-        """
-            Welcome page class overloads this, so that additional info (news, policy)
-            is shown.
-        """
-        return False
-
-    def _isRoomBooking(self):
-        return False
-
 
 class WPNotDecorated(WPBase):
     def _display(self, params):
