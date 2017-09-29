@@ -5,7 +5,7 @@
 <%include file="ErrorList.tpl" args='errors=errors, msg=_("There are some errors in the search criteria")'/>
 
 <form method="post" action="" id="searchBookings">
-    ${ form.csrf_token() }
+    ${ form.csrf_token() if form.meta.csrf else '' }
     <h2 class="group-title">
         <i class="icon-location"></i>
         ${ _('Taking place in') }
