@@ -15,32 +15,32 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from indico.legacy.webinterface.wcomponents import WTemplated
-from indico.modules.rb.views import WPRoomBookingBase
+from indico.modules.rb.views import WPRoomBookingLegacyBase
 
 
-class WPRoomBookingBlockingDetails(WPRoomBookingBase):
+class WPRoomBookingBlockingDetails(WPRoomBookingLegacyBase):
     sidemenu_option = 'blocking_create'
 
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         return WTemplated('RoomBookingBlockingDetails').getHTML(params)
 
 
-class WPRoomBookingBlockingForm(WPRoomBookingBase):
+class WPRoomBookingBlockingForm(WPRoomBookingLegacyBase):
     sidemenu_option = 'blocking_create'
 
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         return WTemplated('RoomBookingBlockingForm').getHTML(params)
 
 
-class WPRoomBookingBlockingList(WPRoomBookingBase):
+class WPRoomBookingBlockingList(WPRoomBookingLegacyBase):
     sidemenu_option = 'my_blockings'
 
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         return WTemplated('RoomBookingBlockingList').getHTML(params)
 
 
-class WPRoomBookingBlockingsForMyRooms(WPRoomBookingBase):
+class WPRoomBookingBlockingsForMyRooms(WPRoomBookingLegacyBase):
     sidemenu_option = 'blockings_my_rooms'
 
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         return WTemplated('RoomBookingBlockingsForMyRooms').getHTML(params)

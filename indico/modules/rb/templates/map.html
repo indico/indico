@@ -1,0 +1,7 @@
+{% extends 'rb/full_width_base.html' %}
+
+{% block content %}
+    <iframe src="{{ url_for('rooms.roomBooking-mapOfRoomsWidget') }}"
+            frameborder="0" scrolling="no" style="margin-top: -10px; overflow: hidden; width: 100%; min-height: 710px;">
+    </iframe>
+{% endblock %}

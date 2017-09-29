@@ -45,7 +45,7 @@ class RHRoomBookingMapOfRooms(RHRoomBookingBase):
         self._room_id = request.args.get('roomID')
 
     def _process(self):
-        return WPRoomBookingMapOfRooms(self, roomID=self._room_id).display()
+        return WPRoomBookingMapOfRooms.render_template('map.html', room_id=self._room_id)
 
 
 class RHRoomBookingMapOfRoomsWidget(RHRoomBookingBase):

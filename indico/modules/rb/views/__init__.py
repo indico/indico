@@ -18,15 +18,19 @@ from __future__ import unicode_literals
 
 from flask import render_template_string
 
+from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 
 
-class WPRoomBookingBase(WPMainBase):
-    def _getTitle(self):
-        return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
+class WPRoomBookingBase(WPJinjaMixin, WPMainBase):
+    template_prefix = 'rb/'
+
+    def __init__(self, rh, **kwargs):
+        kwargs['active_menu_item'] = self.sidemenu_option
+        WPMainBase.__init__(self, rh, **kwargs)
 
     def getJSFiles(self):
         return WPMainBase.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
@@ -34,11 +38,19 @@ class WPRoomBookingBase(WPMainBase):
     def _getNavigationDrawer(self):
         return WSimpleNavigationDrawer(_('Room Booking'))
 
-    def _display(self, params):
-        # TODO: when moving RB to jinja, refactor this to proper jinja inheritance
-        # and only use this hack for legacy parts still using WP/W mako stuff
+    def _getBody(self, params):
+        return self._getPageContent(params)
+
+
+class WPRoomBookingLegacyBase(WPRoomBookingBase):
+    def _getTitle(self):
+        return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
+
+    def _getBody(self, params):
+        # Legacy handling for pages that do not use Jinja inheritance.
         tpl = "{% extends 'rb/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
-        params = dict(params, **self._kwargs)
-        body = to_unicode(self._getBody(params))
-        body = render_template_string(tpl, _body=body, active_menu_item=self.sidemenu_option)
-        return self._applyDecoration(body)
+        body = to_unicode(self._getPageContent(params))
+        return render_template_string(tpl, _body=body, **self._kwargs)
+
+    def _getPageContent(self, params):
+        raise NotImplementedError

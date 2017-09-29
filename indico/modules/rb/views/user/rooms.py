@@ -26,7 +26,7 @@ from indico.modules.rb import rb_settings
 from indico.modules.rb.models.locations import Location
 from indico.modules.rb.models.reservations import RepeatFrequency, RepeatMapping
 from indico.modules.rb.util import rb_is_admin
-from indico.modules.rb.views import WPRoomBookingBase
+from indico.modules.rb.views import WPRoomBookingBase, WPRoomBookingLegacyBase
 from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
 from indico.util.string import crc32
@@ -34,30 +34,7 @@ from indico.web.flask.util import url_for
 
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):
-
     sidemenu_option = 'map'
-
-    def __init__(self, rh, **params):
-        WPRoomBookingBase.__init__(self, rh)
-        self._rh = rh
-        self._params = params
-
-    def _getTitle(self):
-        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Map of rooms'))
-
-    def _getBody(self, params):
-        return WRoomBookingMapOfRooms(**self._params).getHTML(params)
-
-
-class WRoomBookingMapOfRooms(WTemplated):
-    def __init__(self, **params):
-        WTemplated.__init__(self)
-        self._params = params if params else {}
-
-    def getVars(self):
-        wvars = WTemplated.getVars(self)
-        wvars['mapOfRoomsWidgetURL'] = url_for('rooms.roomBooking-mapOfRoomsWidget', **self._params)
-        return wvars
 
 
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
@@ -69,9 +46,6 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
 
     def getJSFiles(self):
         return WPNotDecorated.getJSFiles(self) + self._includeJSPackage('RoomBooking')
-
-    def _getTitle(self):
-        return '{} - {}'.format(WPNotDecorated._getTitle(self), _('Map of rooms'))
 
     def _get_widget_params(self):
         default_location = Location.default_location
@@ -94,13 +68,10 @@ class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
         return html
 
 
-class WPRoomBookingSearchRooms(WPRoomBookingBase):
+class WPRoomBookingSearchRooms(WPRoomBookingLegacyBase):
     sidemenu_option = 'search_rooms'
 
-    def _getTitle(self):
-        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search for rooms'))
-
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         params['startDT'] = datetime.combine(date.today(), Location.working_time_start)
         params['endDT'] = datetime.combine(date.today(), Location.working_time_end)
         params['startT'] = params['startDT'].strftime('%H:%M')
@@ -108,27 +79,21 @@ class WPRoomBookingSearchRooms(WPRoomBookingBase):
         return WTemplated('RoomBookingSearchRooms').getHTML(params)
 
 
-class WPRoomBookingSearchRoomsResults(WPRoomBookingBase):
+class WPRoomBookingSearchRoomsResults(WPRoomBookingLegacyBase):
     def __init__(self, rh, menu_item, **kwargs):
         self.sidemenu_option = menu_item
-        WPRoomBookingBase.__init__(self, rh, **kwargs)
+        WPRoomBookingLegacyBase.__init__(self, rh, **kwargs)
 
-    def _getTitle(self):
-        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Search results'))
-
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         return WTemplated('RoomBookingSearchRoomsResults').getHTML(params)
 
 
-class WPRoomBookingRoomDetails(WPRoomBookingBase):
+class WPRoomBookingRoomDetails(WPRoomBookingLegacyBase):
     endpoints = {
         'room_book': 'rooms.room_book'
     }
 
-    def _getTitle(self):
-        return '{} - {}'.format(WPRoomBookingBase._getTitle(self), _('Room Details'))
-
-    def _getBody(self, params):
+    def _getPageContent(self, params):
         params['endpoints'] = self.endpoints
         calendar = RoomBookingCalendarWidget(params['occurrences'], params['start_dt'], params['end_dt'],
                                              specific_room=params['room'])
@@ -168,8 +133,8 @@ class WRoomBookingRoomDetails(WTemplated):
         return wvars
 
 
-class WPRoomBookingRoomStats(WPRoomBookingBase):
-    def _getBody(self, params):
+class WPRoomBookingRoomStats(WPRoomBookingLegacyBase):
+    def _getPageContent(self, params):
         params['period_options'] = [
             ('pastmonth', _('Last 30 days')),
             (params['last_month'], _('Previous month')),

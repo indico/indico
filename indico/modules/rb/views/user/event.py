@@ -59,7 +59,7 @@ class WPRoomBookingEventRoomDetails(WPRoomBookingEventBase, WPRoomBookingRoomDet
         self._tabNewBooking.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingRoomDetails._getBody(self, params)
+        return WPRoomBookingRoomDetails._getPageContent(self, params)
 
 
 class WPRoomBookingEventBookingList(WPRoomBookingEventBase):
@@ -94,7 +94,7 @@ class WPRoomBookingEventBookingDetails(WPRoomBookingEventBase, WPRoomBookingBook
         self._tabExistBookings.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingBookingDetails._getBody(self, params)
+        return WPRoomBookingBookingDetails._getPageContent(self, params)
 
 
 class WPRoomBookingEventModifyBooking(WPRoomBookingEventBase, WPRoomBookingModifyBooking):
@@ -106,7 +106,7 @@ class WPRoomBookingEventModifyBooking(WPRoomBookingEventBase, WPRoomBookingModif
         self._tabExistBookings.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingModifyBooking._getBody(self, params)
+        return WPRoomBookingModifyBooking._getPageContent(self, params)
 
 
 class WPRoomBookingEventNewBookingSimple(WPRoomBookingEventBase, WPRoomBookingNewBookingSimple):
@@ -118,7 +118,7 @@ class WPRoomBookingEventNewBookingSimple(WPRoomBookingEventBase, WPRoomBookingNe
         self._tabNewBooking.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingNewBookingSimple._getBody(self, params)
+        return WPRoomBookingNewBookingSimple._getPageContent(self, params)
 
 
 class WPRoomBookingEventNewBookingSelectRoom(WPRoomBookingEventBase, WPRoomBookingNewBookingSelectRoom):
@@ -126,7 +126,7 @@ class WPRoomBookingEventNewBookingSelectRoom(WPRoomBookingEventBase, WPRoomBooki
         self._tabNewBooking.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingNewBookingSelectRoom._getBody(self, params)
+        return WPRoomBookingNewBookingSelectRoom._getPageContent(self, params)
 
 
 class WPRoomBookingEventNewBookingSelectPeriod(WPRoomBookingEventBase, WPRoomBookingNewBookingSelectPeriod):
@@ -134,7 +134,7 @@ class WPRoomBookingEventNewBookingSelectPeriod(WPRoomBookingEventBase, WPRoomBoo
         self._tabNewBooking.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingNewBookingSelectPeriod._getBody(self, params)
+        return WPRoomBookingNewBookingSelectPeriod._getPageContent(self, params)
 
 
 class WPRoomBookingEventNewBookingConfirm(WPRoomBookingEventBase, WPRoomBookingNewBookingConfirm):
@@ -142,4 +142,4 @@ class WPRoomBookingEventNewBookingConfirm(WPRoomBookingEventBase, WPRoomBookingN
         self._tabNewBooking.setActive()
 
     def _getTabContent(self, params):
-        return WPRoomBookingNewBookingConfirm._getBody(self, params)
+        return WPRoomBookingNewBookingConfirm._getPageContent(self, params)
