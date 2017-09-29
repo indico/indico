@@ -16,19 +16,18 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
 from indico.web.menu import get_menu_item
 
 
-class WPAdmin(WPJinjaMixin, WPMainBase):
+class WPAdmin(WPJinjaMixin, WPDecorated):
     """Base class for admin pages."""
 
     def __init__(self, rh, active_menu_item=None, **kwargs):
         kwargs['active_menu_item'] = active_menu_item or self.sidemenu_option
-        WPMainBase.__init__(self, rh, **kwargs)
+        WPDecorated.__init__(self, rh, **kwargs)
 
     def _getNavigationDrawer(self):
         menu_item = get_menu_item('admin-sidemenu', self._kwargs['active_menu_item'])

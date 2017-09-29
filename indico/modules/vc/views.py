@@ -16,9 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
-from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 
 
@@ -56,7 +55,7 @@ class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
         return self._getPageContent(params)
 
 
-class WPVCService(WPVCJinjaMixin, WPMainBase):
+class WPVCService(WPVCJinjaMixin, WPDecorated):
     def _getNavigationDrawer(self):
         return WSimpleNavigationDrawer('Videoconference')
 

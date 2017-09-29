@@ -16,12 +16,11 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.modules.users.views import WPUser
 
 
-class WPAuth(WPJinjaMixin, WPMainBase):
+class WPAuth(WPJinjaMixin, WPDecorated):
     template_prefix = 'auth/'
 
     def _getBody(self, params):

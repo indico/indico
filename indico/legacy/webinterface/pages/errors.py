@@ -23,7 +23,6 @@ from flask import request, session
 
 from indico.core.config import config
 from indico.legacy.webinterface.pages.base import WPDecorated
-from indico.legacy.webinterface.pages.main import WPMainBase
 from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -304,6 +303,7 @@ class WFormValuesError( WTemplated ):
         vars["msg"] = self._msg
         return vars
 
+
 class WPFormValuesError( WPDecorated ):
 
     def __init__( self, rh, msg="" ):
@@ -325,6 +325,7 @@ class WPRestrictedHTML( WPDecorated ):
         wc = WRestrictedHTML( self._rh, self._msg )
         return wc.getHTML()
 
+
 class WRestrictedHTML( WGenericError ):
 
     def __init__( self, rh, msg="" ):
@@ -336,15 +337,17 @@ class WRestrictedHTML( WGenericError ):
         vars["msg"] = self._msg
         return vars
 
-class WPError404( WPMainBase ):
+
+class WPError404(WPDecorated):
 
     def __init__( self, rh, goBack="" ):
-        WPMainBase. __init__( self, rh)
+        WPDecorated.__init__(self, rh)
         self._goBack = goBack
 
     def _getBody( self, params ):
         wc = WError404( self._rh, self._goBack )
         return wc.getHTML()
+
 
 class WError404( WTemplated ):
 

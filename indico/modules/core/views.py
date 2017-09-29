@@ -16,8 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
@@ -30,7 +29,7 @@ class WPSettings(WPAdmin):
         return WPAdmin.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
 
 
-class WPContact(WPJinjaMixin, WPMainBase):
+class WPContact(WPJinjaMixin, WPDecorated):
     template_prefix = 'core/'
 
     def _getNavigationDrawer(self):

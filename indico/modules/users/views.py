@@ -18,15 +18,14 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.modules.admin.views import WPAdmin
 from indico.modules.users import User
 from indico.util.i18n import _
 
 
-class WPUser(WPJinjaMixin, WPMainBase):
+class WPUser(WPJinjaMixin, WPDecorated):
     """Base WP for user profile pages.
 
     Whenever you use this, you MUST include `user` in the params passed to
@@ -39,7 +38,7 @@ class WPUser(WPJinjaMixin, WPMainBase):
 
     def __init__(self, rh, active_menu_item, **kwargs):
         kwargs['active_menu_item'] = active_menu_item
-        WPMainBase.__init__(self, rh, **kwargs)
+        WPDecorated.__init__(self, rh, **kwargs)
 
     def _getNavigationDrawer(self):
         if 'user_id' in request.view_args:

@@ -16,14 +16,13 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
 from indico.modules.events.models.events import EventType
 from indico.web.flask.templating import get_template_module
 
 
-class WPEventManagement(WPJinjaMixin, WPMainBase):
+class WPEventManagement(WPJinjaMixin, WPDecorated):
     """Base class for event management pages.
 
     When using this class the template will always have `event`
@@ -52,10 +51,10 @@ class WPEventManagement(WPJinjaMixin, WPMainBase):
             'active_menu_item': active_menu_item or self.sidemenu_option,
             'event_types': [(et.name, et.title) for et in EventType]
         }
-        WPMainBase.__init__(self, rh, **kwargs)
+        WPDecorated.__init__(self, rh, **kwargs)
 
     def getJSFiles(self):
-        return (WPMainBase.getJSFiles(self) +
+        return (WPDecorated.getJSFiles(self) +
                 self._includeJSPackage('Management') +
                 self._asset_env['modules_event_cloning_js'].urls() +
                 self._asset_env['modules_event_management_js'].urls())

@@ -18,22 +18,21 @@ from __future__ import unicode_literals
 
 from flask import render_template_string
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.main import WPMainBase
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 
 
-class WPRoomBookingBase(WPJinjaMixin, WPMainBase):
+class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
     template_prefix = 'rb/'
 
     def __init__(self, rh, **kwargs):
         kwargs['active_menu_item'] = self.sidemenu_option
-        WPMainBase.__init__(self, rh, **kwargs)
+        WPDecorated.__init__(self, rh, **kwargs)
 
     def getJSFiles(self):
-        return WPMainBase.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
+        return WPDecorated.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
     def _getNavigationDrawer(self):
         return WSimpleNavigationDrawer(_('Room Booking'))
@@ -44,7 +43,7 @@ class WPRoomBookingBase(WPJinjaMixin, WPMainBase):
 
 class WPRoomBookingLegacyBase(WPRoomBookingBase):
     def _getTitle(self):
-        return '{} - {}'.format(WPMainBase._getTitle(self), _('Room Booking'))
+        return '{} - {}'.format(WPDecorated._getTitle(self), _('Room Booking'))
 
     def _getBody(self, params):
         # Legacy handling for pages that do not use Jinja inheritance.

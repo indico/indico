@@ -189,6 +189,8 @@ class WPBase:
 
 
 class WPDecorated(WPBase):
+    sidemenu_option = None
+
     def _getHeader(self):
         return render_header()
 
