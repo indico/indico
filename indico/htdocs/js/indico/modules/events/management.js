@@ -138,7 +138,7 @@
             sortList: [[1, 0]]
         });
 
-        $('.js-event-person-list .js-count-label').qbubble({
+        $('.js-event-person-list .roles-column > span').qbubble({
             show: {
                 event: 'mouseover'
             },
@@ -153,20 +153,27 @@
             },
             content: {
                 text: function() {
-                    var html = $('<ul class="qbubble-item-list">');
-                    var items = _.values($(this).data('items')).sort(function(a, b) {
-                        return strnatcmp(a.title.toLowerCase(), b.title.toLowerCase());
-                    });
+                    var $this = $(this);
+                    var html = $('<div>');
+                    var role = $('<strong>', {text: "{0}".format($(this).data('role-name'))});
+                    html.append(role);
+                    if ($this.is('.js-count-label')) {
+                        var list = $('<ul>', {class: 'qbubble-item-list'});
+                        var items = _.values($this.data('items')).sort(function(a, b) {
+                            return strnatcmp(a.title.toLowerCase(), b.title.toLowerCase());
+                        });
 
-                    $.each(items, function() {
-                        var item = $('<li>');
-                        if (this.url) {
-                            item.append($('<a>', {text: this.title, href: this.url}));
-                        } else {
-                            item.text(this.title);
-                        }
-                        html.append(item);
-                    });
+                        $.each(items, function() {
+                            var item = $('<li>');
+                            if (this.url) {
+                                item.append($('<a>', {text: this.title, href: this.url}));
+                            } else {
+                                item.text(this.title);
+                            }
+                            list.append(item);
+                        });
+                        html.append(list);
+                    }
 
                     return html;
                 }
