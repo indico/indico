@@ -40,7 +40,6 @@ class ServiceBase(RequestHandlerBase):
             params = unicode_struct_to_utf8(params)
         self._params = params
         self._target = None
-        self._startTime = None
         self._endTime = None
         self._doProcess = True
 

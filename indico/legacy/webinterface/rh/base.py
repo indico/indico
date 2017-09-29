@@ -20,7 +20,6 @@ import itertools
 import os
 import pstats
 import random
-from datetime import datetime
 from functools import partial, wraps
 from xml.sax.saxutils import escape
 
@@ -117,7 +116,6 @@ class RH(RequestHandlerBase):
         self.commit = True
         self._responseUtil = ResponseUtil()
         self._target = None
-        self._startTime = None
         self._endTime = None
         self._doProcess = True
 
@@ -387,9 +385,7 @@ class RH(RequestHandlerBase):
             raise BadRequest
 
         profile = config.PROFILE
-        profile_name, res, textLog = '', '', []
-
-        self._startTime = datetime.now()
+        profile_name, res = '', ''
 
         g.rh = self
         sentry_set_tags({'rh': self.__class__.__name__})
@@ -397,7 +393,6 @@ class RH(RequestHandlerBase):
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()
 
-        textLog.append("%s : Database request started" % (datetime.now() - self._startTime))
         logger.info(u'Request started: %s %s [IP=%s] [PID=%s]',
                     request.method, request.relative_url, request.remote_addr, os.getpid())
 
@@ -429,9 +424,6 @@ class RH(RequestHandlerBase):
             if isinstance(e, HTTPException) and e.response is not None:
                 res = e.response
             is_error_response = True
-
-        totalTime = (datetime.now() - self._startTime)
-        textLog.append('{} : Request ended'.format(totalTime))
 
         # log request timing
         if profile and os.path.isfile(profile_name):
