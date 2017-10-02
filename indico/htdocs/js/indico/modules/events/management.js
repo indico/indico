@@ -104,6 +104,12 @@
         $('.js-event-person-list').trigger('indico:syncEnableIfChecked');
     }
 
+    function toggleResetBtn() {
+        var isInitialState = $('#person-filters [data-filter]:checked').length ===
+                             $('#person-filters [data-filter]:not(#filter-no-account)').length;
+        $('.js-reset-role-filter').toggleClass('disabled', isInitialState);
+    }
+
     global.setupEventPersonsList = function setupEventPersonsList(options) {
         options = $.extend({
             hasNoAccountFilter: false
@@ -223,6 +229,7 @@
             });
             refreshPersonFilters();
             applySearchFilters();
+            toggleResetBtn();
         });
 
         // Allows to click in the whole list item area to enable/disable role filters
@@ -232,6 +239,7 @@
         $personFilters.find('li').on('click', function() {
             var $checkbox = $(this).find('[data-filter]');
             $checkbox.prop('checked', !$checkbox.prop('checked')).trigger('change');
+            toggleResetBtn();
         });
     };
 
