@@ -40,24 +40,22 @@
     </td>
     <td class="i-table roles-column">
         {% for role, role_data in person_data.roles.iteritems() %}
-            {% if role_data is mapping %}
-                {% if 'elements' in role_data %}
-                    <span class="i-label js-count-label"
-                          style="color: {{ role_data.color }}; border-color: {{ role_data.color }}"
+            {%- if role != 'no_account' %}
+                {%- if role_data.elements -%}
+                    <span class="i-tag outline contrast js-count-label" style="{{ role_data.css }};"
                           data-role-name="{{ role_data.name }}"
                           data-items="{{ role_data.elements | tojson | forceescape }}">
-                        {{ role_data.code }}
-                        <span class="badge">
-                            {{ role_data.elements | length }}
-                        </span>
+                        {{- role_data.code -}}
+                        <span class="badge">{{ role_data.elements | length }}</span>
                     </span>
                 {% else %}
-                    <span class="i-label" style="color: {{ role_data.color }}; border-color: {{ role_data.color }}"
+                    <span class="i-tag outline contrast {{ 'custom' if role.startswith('custom_') }}"
+                          style="{{ role_data.css }};"
                           data-role-name="{{ role_data.name }}">
-                        {{ role_data.code }}
+                        {{- role_data.code -}}
                     </span>
-                {% endif %}
-            {% endif %}
+                {%- endif %}
+            {%- endif -%}
         {% endfor %}
     </td>
     <td class="i-table">

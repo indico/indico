@@ -126,7 +126,7 @@
                         <li class="enabled">
                             <input type="checkbox" id="filter-chairpersons" data-filter="chairperson" checked>
                             <i class="icon-checkmark"></i>
-                            <i class="icon-stop colored-square" style="color: {{ builtin_roles.chairperson.color }};"></i>
+                            <i class="icon-stop colored-square" style="color: #{{ builtin_roles.chairperson.color }};"></i>
                             <label for="filter-chairpersons">
                                 {%- if event.type == 'lecture' -%}
                                     {%- trans %}Speakers{% endtrans -%}
@@ -139,20 +139,20 @@
                             <li class="enabled">
                                 <input type="checkbox" id="filter-speakers" data-filter="speaker" checked>
                                 <i class="icon-checkmark"></i>
-                                <i class="icon-stop colored-square" style="color: {{ builtin_roles.speaker.color }};"></i>
+                                <i class="icon-stop colored-square" style="color: #{{ builtin_roles.speaker.color }};"></i>
                                 <label for="filter-speakers">{% trans %}Speakers{% endtrans %}</label>
                             </li>
                             <li class="enabled">
                                 <input type="checkbox" id="filter-conveners" data-filter="convener" checked>
                                 <i class="icon-checkmark"></i>
-                                <i class="icon-stop colored-square" style="color: {{ builtin_roles.convener.color }};"></i>
+                                <i class="icon-stop colored-square" style="color: #{{ builtin_roles.convener.color }};"></i>
                                 <label for="filter-conveners">{% trans %}Conveners{% endtrans %}</label>
                             </li>
                             {% if event.has_feature('abstracts') %}
                                 <li class="enabled">
                                     <input type="checkbox" id="filter-abstract-author" data-filter="author" checked>
                                     <i class="icon-checkmark"></i>
-                                    <i class="icon-stop colored-square" style="color: {{ builtin_roles.author.color }};"></i>
+                                    <i class="icon-stop colored-square" style="color: #{{ builtin_roles.author.color }};"></i>
                                     <label for="filter-abstract-author">
                                         {%- trans %}Abstract authors{% endtrans -%}
                                     </label>
@@ -163,7 +163,7 @@
                             <li class="enabled">
                                 <input type="checkbox" id="filter-{{ role_id }}" data-filter="{{ role_id }}" checked>
                                 <i class="icon-checkmark"></i>
-                                <i class="icon-stop colored-square" style="color: {{ role_data.color }};"></i>
+                                <i class="icon-stop colored-square" style="color: #{{ role_data.color }};"></i>
                                 <label for="filter-{{ role_id }}" title="{{ role_data.code }}">{{ role_data.name }}</label>
                             </li>
                         {% endfor %}

@@ -148,5 +148,19 @@
                 }
             }
         }
+
+        .roles-column {
+            & > span {
+                margin: 0.4em;
+            }
+
+            & > span:not(.custom) {
+                border-color: $pastel-gray !important;
+            }
+
+            .badge {
+                background-color: $gray;
+            }
+        }
     }
 }

@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 import itertools
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import contains_eager, joinedload
@@ -47,11 +47,14 @@ from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_template
 
-# TODO: Define codes and colors and use EventRole objects
-BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': '#771100'},
-                 'author': {'name': 'Author', 'code': 'AUT', 'color': '#0000ff'},
-                 'convener': {'name': 'Convener', 'code': 'CON', 'color': '#008800'},
-                 'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '#00aa99'}
+BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 'f7b076',
+                                 'css': 'color: #f7b076 !important; border-color: #f7b076 !important'},
+                 'author': {'name': 'Author', 'code': 'AUT', 'color': '7994f7',
+                            'css': 'color: #7994f7 !important; border-color: #7994f7 !important'},
+                 'convener': {'name': 'Convener', 'code': 'CON', 'color': 'dcb1f9',
+                              'css': 'color: #dcb1f9 !important; border-color: #dcb1f9 !important'},
+                 'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '7fd1c8',
+                             'css': 'color: #7fd1c8 !important; border-color: #7fd1c8 !important'}
                  }
 
 
@@ -73,7 +76,7 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'roles': {}, 'registrations': []})
+        persons = defaultdict(lambda: {'roles': OrderedDict(), 'registrations': []})
 
         event_persons_query = (db.session.query(EventPerson, Registration)
                                .filter(EventPerson.event_id == self.event.id)
@@ -150,7 +153,7 @@ class RHPersonsBase(RHManageEventBase):
 
             if event_person.user:
                 for role in event_person.user.event_roles:
-                    data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'color': role.color}
+                    data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'css': role.css}
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
