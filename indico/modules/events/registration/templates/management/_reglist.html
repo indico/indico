@@ -21,12 +21,14 @@
                             <th class="i-table thin-column"></th>
                             <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
                             <th class="i-table">{% trans %}Full name{% endtrans %}</th>
+
                             {% for item in static_columns %}
                                 <th class="i-table" data-sorter="text">{{ item.caption }}</th>
                             {% endfor %}
                             {% for item in dynamic_columns %}
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
+                            <th> Access state</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -109,6 +111,7 @@
                                         </td>
                                     {% endif %}
                                 {% endfor %}
+                                {{ template_hook('registration_access_status', registration=registration) }}
                             </tr>
                         {% endfor %}
                     </tbody>
