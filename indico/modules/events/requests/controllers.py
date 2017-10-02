@@ -192,6 +192,7 @@ class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEvent
         try:
             self.definition.withdraw(self.request)
         except RequestModuleError:
+            self.commit = False
             flash_msg = _('There was a problem withdrawing your request ({0}). Please contact support.')
             flash(flash_msg.format(self.definition.title), 'error')
         else:
