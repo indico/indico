@@ -92,8 +92,10 @@ class Logger(object):
                         handler['credentials'] = (config.SMTP_LOGIN, config.SMTP_PASSWORD)
                 handler.setdefault('fromaddr', 'logger@{}'.format(config.WORKER_NAME))
                 handler.setdefault('toaddrs', [config.SUPPORT_EMAIL])
-                subject = 'Unexpected Exception occurred at {}: %(message)s'.format(config.WORKER_NAME)
-                handler.setdefault('subject', subject)
+                subject = ('Unexpected Exception occurred at {}: %(message)s'
+                           if handler['class'] == 'indico.core.logger.FormattedSubjectSMTPHandler' else
+                           'Unexpected Exception occurred at {}')
+                handler.setdefault('subject', subject.format(config.WORKER_NAME))
         for formatter in data['formatters'].itervalues():
             # Make adding request info to log entries less ugly
             if formatter.pop('append_request_info', False):
