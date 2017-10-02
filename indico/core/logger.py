@@ -32,9 +32,8 @@ from indico.web.util import get_request_info
 
 
 try:
-    from raven.contrib.celery import register_logger_signal, register_signal, CeleryFilter
+    from raven.contrib.celery import register_logger_signal, register_signal
     from raven.contrib.flask import Sentry
-    from raven.handlers.logging import SentryHandler
 except ImportError:
     Sentry = object  # so we can subclass
     has_sentry = False
@@ -52,12 +51,23 @@ class AddRequestIDFilter(object):
 class RequestInfoFormatter(logging.Formatter):
     def format(self, record):
         rv = super(RequestInfoFormatter, self).format(record)
-        return rv + '\n\n' + pformat(get_request_info())
+        info = get_request_info()
+        if info:
+            rv += '\n\n' + pformat(info)
+        return rv
 
 
 class FormattedSubjectSMTPHandler(logging.handlers.SMTPHandler):
     def getSubject(self, record):
         return self.subject % record.__dict__
+
+
+class BlacklistFilter(logging.Filter):
+    def __init__(self, names):
+        self.filters = [logging.Filter(name) for name in names]
+
+    def filter(self, record):
+        return not any(x.filter(record) for x in self.filters)
 
 
 class Logger(object):
@@ -79,7 +89,7 @@ class Logger(object):
         # Make the request ID available in all loggers
         data.setdefault('filters', {})['_add_request_id'] = {'()': AddRequestIDFilter}
         for handler in data['handlers'].itervalues():
-            handler.setdefault('filters', []).append('_add_request_id')
+            handler.setdefault('filters', []).insert(0, '_add_request_id')
             if handler['class'] == 'logging.FileHandler' and handler['filename'][0] != '/':
                 # Make relative paths relative to the log dir
                 handler['filename'] = os.path.join(config.LOG_DIR, handler['filename'])
@@ -152,16 +162,9 @@ class RHFilter(logging.Filter):
 def init_sentry(app):
     sentry = IndicoSentry(dsn=config.SENTRY_DSN, logging=True, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
     sentry.init_app(app)
-    # connect to the indico logger (sentry only registers itself on the
-    # root logger, and the indico logger does not propagate its messages)
-    handler = SentryHandler(sentry.client, level=sentry.level)
-    handler.addFilter(RHFilter())
-    Logger.get().addHandler(handler)
     # connect to the celery logger
+    register_logger_signal(sentry.client)
     register_signal(sentry.client)
-    handler = SentryHandler(sentry.client, level=sentry.level)
-    handler.addFilter(CeleryFilter())
-    logging.getLogger('celery').addHandler(handler)
 
 
 def sentry_log_exception():

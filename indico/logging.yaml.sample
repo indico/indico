@@ -20,32 +20,32 @@
 version: 1
 
 root:
-  level: WARNING
+  level: INFO
   handlers: [other]
 
 loggers:
   indico:
-    level: INFO
-    propagate: false
     handlers: [indico, email]
   celery:
-    level: INFO
-    propagate: false
-    handlers: [celery, stderr]
+    handlers: [celery, email, stderr]
 
 handlers:
   indico:
     class: logging.FileHandler
     filename: indico.log
+    filters: [indico]
     formatter: default
   celery:
     class: logging.FileHandler
     filename: celery.log
+    filters: [celery]
     formatter: simple
   other:
     class: logging.FileHandler
     filename: other.log
+    filters: [other]
     formatter: simple
+    level: WARNING
   stderr:
     class: logging.StreamHandler
     formatter: default
@@ -62,3 +62,12 @@ formatters:
   email:
     append_request_info: true
     format: "%(asctime)s  %(request_id)s  %(name)s - %(levelname)s %(filename)s:%(lineno)d -- %(message)s\n\n"
+
+filters:
+  indico:
+    name: indico
+  celery:
+    name: celery
+  other:
+    (): indico.core.logger.BlacklistFilter
+    names: [indico, celery]
