@@ -39,7 +39,6 @@ from indico.core.logger import Logger, sentry_set_tags
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
-from indico.legacy.webinterface.pages.errors import WPKeyAccessError
 from indico.modules.events.legacy import LegacyConference
 from indico.util.i18n import _
 from indico.util.locators import get_locator
@@ -247,10 +246,7 @@ class RH(RequestHandlerBase):
         if rv is not None:
             return '', rv
 
-        try:
-            self._check_access()
-        except AccessKeyRequired:
-            return '', WPKeyAccessError(self).display()
+        self._check_access()
         Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
 
         if profile:
@@ -349,30 +345,6 @@ class RHProtected(RH):
 
     def _check_access(self):
         self._checkSessionUser()
-
-
-class AccessKeyRequired(Forbidden):
-    pass
-
-
-class RHDisplayBaseProtected(RHProtected):
-    def _check_access(self):
-        if not isinstance(self._target, LegacyConference):
-            raise Exception('Unexpected object')
-        event = self._target.as_event
-        can_access = event.can_access(session.user)
-        if not can_access and event.access_key:
-            raise AccessKeyRequired
-        if can_access:
-            return
-        elif session.user is None:
-            self._checkSessionUser()
-        else:
-            msg = [_(u"You are not authorized to access this event.")]
-            if event.no_access_contact:
-                msg.append(_(u"If you believe you should have access, please contact {}")
-                           .format(event.no_access_contact))
-            raise Forbidden(u' '.join(msg))
 
 
 class RHModificationBaseProtected(RHProtected):
