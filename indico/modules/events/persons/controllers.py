@@ -155,8 +155,21 @@ class RHPersonsBase(RHManageEventBase):
                 for role in event_person.user.event_roles:
                     data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'css': role.css}
 
+        event_person_users = [person_data['person'].user for email, person_data in persons.iteritems()
+                              if person_data['person'].user]
+
+        event_roles_users = defaultdict(lambda: {'roles': OrderedDict(), 'person': [], 'is_event_role_user': True})
+        for role in self.event.roles:
+            for member in role.members:
+                if member not in event_person_users:
+                    event_roles_users[member.email]['roles']['custom_{}'.format(role.id)] = {'name': role.name,
+                                                                                             'code': role.code,
+                                                                                             'css': role.css}
+                    event_roles_users[member.email]['person'] = member
+
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
+        persons = dict(persons, **event_roles_users)
         return persons
 
 

@@ -162,5 +162,11 @@
                 background-color: $gray;
             }
         }
+
+        .edit-column {
+            .i-link.disabled {
+                color: $pastel-gray;
+            }
+        }
     }
 }
