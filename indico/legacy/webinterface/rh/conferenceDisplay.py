@@ -21,8 +21,9 @@ from cStringIO import StringIO
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected
+from indico.legacy.webinterface.pages.errors import WPKeyAccessError
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.modules.events.legacy import LegacyConference
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
 
@@ -42,18 +43,41 @@ class RHConferenceAccessKey(RHConferenceBase):
         return redirect(self.event.url)
 
 
-class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):
+class AccessKeyRequired(Forbidden):
+    pass
+
+
+class RHConferenceBaseDisplay(RHConferenceBase):
     def _forbidden_if_not_admin(self):
         if not request.is_xhr and session.user and session.user.is_admin:
             flash(_('This page is currently not visible by non-admin users (menu entry disabled)!'), 'warning')
         else:
             raise Forbidden
 
-    def _process_args(self):
-        RHConferenceBase._process_args(self)
-
     def _check_access(self):
-        RHDisplayBaseProtected._check_access(self)
+        if not isinstance(self._target, LegacyConference):
+            raise Exception('Unexpected object')
+        if self.event.can_access(session.user):
+            return
+        elif self.event.access_key:
+            raise AccessKeyRequired
+        elif session.user is None:
+            raise Forbidden
+        else:
+            msg = [_("You are not authorized to access this event.")]
+            if self.event.no_access_contact:
+                msg.append(_("If you believe you should have access, please contact {}")
+                           .format(self.event.no_access_contact))
+            raise Forbidden(' '.join(msg))
+
+    def _show_access_key_form(self):
+        return WPKeyAccessError(self).display()
+
+    def _do_process(self, profile):
+        try:
+            return RHConferenceBase._do_process(self, profile)
+        except AccessKeyRequired:
+            return b'', self._show_access_key_form()
 
 
 class RHConferenceToMarcXML(RHConferenceBaseDisplay):
