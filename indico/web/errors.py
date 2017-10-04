@@ -24,6 +24,7 @@ from itsdangerous import BadData
 from sqlalchemy.exc import OperationalError
 from werkzeug.exceptions import Forbidden, HTTPException
 
+from indico.core.errors import NoReportError
 from indico.legacy.common.cache import GenericCache
 from indico.web.flask.util import url_for
 from indico.web.util import get_request_info
@@ -77,16 +78,9 @@ def _need_json_response():
     return request.is_xhr or request.is_json
 
 
-def _is_no_report_error(exc):
-    from indico.core import errors as indico_errors
-    from indico.legacy import errors as makac_errors
-    return (isinstance(exc, (indico_errors.NoReportError, makac_errors.NoReportError)) or
-            getattr(exc, '_disallow_report', False))
-
-
 def _is_error_reportable(exc):
     # error marked as not reportable
-    if _is_no_report_error(exc):
+    if isinstance(exc, NoReportError) or getattr(exc, '_disallow_report', False):
         return False
     elif isinstance(exc, BadData):
         # itsdangerous stuff - should only fail if someone tampers with a link

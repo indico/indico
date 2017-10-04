@@ -14,8 +14,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from werkzeug.exceptions import BadRequest
+
+from indico.core.errors import NoReportError
 from indico.legacy.common.utils import encodeUnicode
-from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
 from indico.legacy.webinterface.common.tools import escape_html, restrictedHTML
 
 
@@ -32,7 +34,7 @@ class Sanitization(object):
             if isinstance(param, str):
                 res = restrictedHTML(param, level)
                 if res is not None:
-                    raise HtmlForbiddenTag(res)
+                    raise NoReportError(res)
             elif isinstance(param, list) or isinstance(param, dict):
                 Sanitization._sanitize(param, level)
 
@@ -74,7 +76,8 @@ class Sanitization(object):
             if isinstance(param, str) and param != "":
                 params[k] = encodeUnicode(param)
                 if params[k] == "":
-                    raise MaKaCError(_("Your browser is using an encoding which is not recognized by Indico... Please make sure you set your browser encoding to utf-8"))
+                    raise BadRequest("Your browser is using an encoding which is not recognized by Indico. "
+                                     "Please make sure you set your browser encoding to utf-8")
             elif isinstance(param, list) or isinstance(param, dict):
                 Sanitization._encodeUnicode(param)
 
