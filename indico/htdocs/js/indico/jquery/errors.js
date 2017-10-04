@@ -33,14 +33,10 @@
                 data = JSON.parse(data.responseText);
             } catch (e) {
                 IndicoUI.Dialogs.Util.error({
-                    code: data.status,
-                    type: 'unknown',
-                    message: data.statusText.toLowerCase(),
-                    data: {},
-                    inner: null,
-                    requestInfo: {
-                        url: data._requestURL  // set in beforeSend callback
-                    }
+                    title: $T.gettext('Something went wrong'),
+                    message: '{0} ({1})'.format(data.statusText.toLowerCase(), data.status),
+                    suggest_login: false,
+                    report_url: null
                 });
                 return true;
             }

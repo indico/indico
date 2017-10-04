@@ -345,9 +345,6 @@ indicoRequest(
             );
             $E('AspectsListHolder').set(aspectsListField.draw());
         } else {
-            // TODO: remove logs
-            console.log(result);
-            console.log(error);
             IndicoUI.Dialogs.Util.error(error);
         }
     }

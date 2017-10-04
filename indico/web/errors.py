@@ -106,11 +106,12 @@ def _is_error_reportable(exc):
 
 
 def _jsonify_error(exc, title, message, code):
-    report_url = url_for('core.report_error', error_id=g.saved_error_uuid) if 'saved_error_uuid' in g else None
+    report_url = None
+    if _is_error_reportable(exc) and 'saved_error_uuid' in g:
+        report_url = url_for('core.report_error', error_id=g.saved_error_uuid)
     error_data = {
         'title': title,
         'message': message,
-        'reportable': _is_error_reportable(exc),
         'suggest_login': isinstance(exc, Forbidden) and session.user is None,
         'report_url': report_url
     }
