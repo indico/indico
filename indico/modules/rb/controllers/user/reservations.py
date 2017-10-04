@@ -48,10 +48,7 @@ from indico.web.forms.base import FormDefaults
 class RHRoomBookingBookingMixin:
     """Mixin that retrieves the booking or fails if there is none."""
     def _process_args(self):
-        resv_id = request.view_args['resvID']
-        self._reservation = Reservation.get(resv_id)
-        if not self._reservation:
-            raise NoReportError('No booking with id: {}'.format(resv_id))
+        self._reservation = Reservation.get_one(request.view_args['resvID'])
 
 
 class RHRoomBookingBookingDetails(RHRoomBookingBookingMixin, RHRoomBookingBase):
@@ -75,7 +72,7 @@ class RHRoomBookingAcceptBooking(_SuccessUrlDetailsMixin, RHRoomBookingBookingMi
 
     def _process(self):
         if self._reservation.find_overlapping().filter(Reservation.is_accepted).count():
-            raise IndicoError("This reservation couldn't be accepted due to conflicts with other reservations")
+            raise IndicoError(_(u"This reservation couldn't be accepted due to conflicts with other reservations"))
         if self._reservation.is_pending:
             self._reservation.accept(session.user)
             flash(_(u'Booking accepted'), 'success')
@@ -589,10 +586,10 @@ class RHRoomBookingNewBooking(RHRoomBookingNewBookingBase):
             # Doing so would be very hard anyway as we don't keep all data necessary to show step 2
             # when it's not a step 1 form submission.
             if not form.validate():
-                raise IndicoError('<br>'.join(form.error_list))
+                raise IndicoError(u'<br>'.join(form.error_list))
             room = Room.get(form.room_id.data)
             if not room:
-                raise IndicoError('Invalid room')
+                raise IndicoError(u'Invalid room')
             # Show step 3 page
             confirm_form_defaults = FormDefaults(form.data)
             return self._show_confirm(room, form, self._step, confirm_form_defaults)
