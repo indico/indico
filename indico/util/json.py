@@ -16,16 +16,10 @@
 
 from __future__ import absolute_import
 
-import traceback
 from datetime import date, datetime
 from UserDict import UserDict
 
-from flask import current_app, session
 from speaklater import _LazyString
-from werkzeug.exceptions import Forbidden
-
-import indico
-from indico.web.util import get_request_info
 
 
 try:
@@ -76,38 +70,3 @@ def loads(string):
     Simple wrapper around json.decode()
     """
     return _json.loads(string)
-
-
-def _is_no_report_error(exc):
-    from indico.core import errors as indico_errors
-    from indico.legacy import errors as makac_errors
-    return (isinstance(exc, (indico_errors.NoReportError, makac_errors.NoReportError)) or
-            getattr(exc, '_disallow_report', False))
-
-
-def create_json_error_answer(exception, status=200):
-    from indico.core.errors import IndicoError, get_error_description
-    if isinstance(exception, IndicoError):
-        details = exception.toDict()
-    else:
-        exception_data = exception.__dict__
-        try:
-            _json.dumps(exception_data)
-        except Exception:
-            exception_data = {}
-        details = {
-            'code': type(exception).__name__,
-            'hasUser': bool(session.user),
-            'type': 'noReport' if ((not session.user and isinstance(exception, Forbidden)) or
-                                   _is_no_report_error(exception)) else 'unknown',
-            'message': unicode(get_error_description(exception)),
-            'data': exception_data,
-            'requestInfo': get_request_info(),
-            'inner': traceback.format_exc()
-        }
-
-    return current_app.response_class(dumps({
-        'version': indico.__version__,
-        'result': None,
-        'error': details
-    }), mimetype='application/json', status=status)

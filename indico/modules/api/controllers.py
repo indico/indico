@@ -143,7 +143,7 @@ class RHAPIBlockKey(RHUserAPIBase):
 
     def _check_access(self):
         RHUserAPIBase._check_access(self)
-        if self._doProcess and not session.user.is_admin:
+        if not session.user.is_admin:
             raise Forbidden
 
     def _process(self):

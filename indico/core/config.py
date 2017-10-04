@@ -73,7 +73,6 @@ DEFAULTS = {
     'NO_REPLY_EMAIL': None,
     'PLUGINS': set(),
     'PROFILE': False,
-    'PROPAGATE_ALL_EXCEPTIONS': False,
     'PROVIDER_MAP': {},
     'PUBLIC_SUPPORT_EMAIL': None,
     'REDIS_CACHE_URL': None,

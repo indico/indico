@@ -133,19 +133,6 @@ def to_unicode(text):
     return fix_broken_string(text, as_unicode=True) if isinstance(text, str) else unicode(text)
 
 
-def fix_broken_obj(obj):
-    if isinstance(obj, dict):
-        return dict((k, fix_broken_obj(v)) for k, v in obj.iteritems())
-    elif isinstance(obj, list):
-        return map(fix_broken_obj, obj)
-    elif isinstance(obj, str):
-        return fix_broken_string(obj)
-    elif isinstance(obj, unicode):
-        pass  # nothing to do
-    else:
-        raise ValueError('Invalid object type in fix_broken_obj: {0}'.format(type(obj)))
-
-
 def remove_non_alpha(text):
     return ''.join(c for c in text if c.isalnum())
 

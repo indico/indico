@@ -55,7 +55,6 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
 
     os.environ.pop('FLASK_DEBUG', None)
     os.environ['INDICO_CONF_OVERRIDE'] = repr({
-        'PROPAGATE_ALL_EXCEPTIONS': True,
         'BASE_URL': url,
     })
 

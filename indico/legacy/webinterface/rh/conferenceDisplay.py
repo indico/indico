@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from cStringIO import StringIO
 
-from flask import flash, request, session
+from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.legacy.webinterface.rh.base import RHDisplayBaseProtected
@@ -39,7 +39,7 @@ class RHConferenceAccessKey(RHConferenceBase):
         # for that if there's an access key for the event in the session.
         # this is pretty awful but eventually we'll do this properly :)
         self.event.set_session_access_key(self._accesskey)
-        self._redirect(self.event.url)
+        return redirect(self.event.url)
 
 
 class RHConferenceBaseDisplay(RHConferenceBase, RHDisplayBaseProtected):

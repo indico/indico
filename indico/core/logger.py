@@ -32,8 +32,10 @@ from indico.web.util import get_request_info
 
 
 try:
+    from raven import setup_logging
     from raven.contrib.celery import register_logger_signal, register_signal
     from raven.contrib.flask import Sentry
+    from raven.handlers.logging import SentryHandler
 except ImportError:
     Sentry = object  # so we can subclass
     has_sentry = False
@@ -152,16 +154,16 @@ class IndicoSentry(Sentry):
         self.client.tags_context({'locale': set_best_lang()})
 
 
-class RHFilter(logging.Filter):
-    def filter(self, record):
-        # we don't want to send RH log messages (especially exceptions)
-        # to sentry since they are already logged as exceptions
-        return record.name != 'indico.rh'
-
-
 def init_sentry(app):
-    sentry = IndicoSentry(dsn=config.SENTRY_DSN, logging=True, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
+    sentry = IndicoSentry(dsn=config.SENTRY_DSN, wrap_wsgi=False, register_signal=True, logging=False)
     sentry.init_app(app)
+    # setup logging manually and exclude uncaught indico exceptions.
+    # these are logged manually in the flask error handler logic so
+    # we get the X-Sentry-ID header which is not populated in the
+    # logging handlers
+    handler = SentryHandler(sentry.client, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
+    handler.addFilter(BlacklistFilter({'indico.flask'}))
+    setup_logging(handler)
     # connect to the celery logger
     register_logger_signal(sentry.client)
     register_signal(sentry.client)

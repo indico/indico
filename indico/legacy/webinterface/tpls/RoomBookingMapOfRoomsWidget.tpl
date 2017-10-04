@@ -150,9 +150,8 @@ var startupBuildingFilters = [];
     });
 % endif
 
-var aspects = ${ jsonEncode(aspects) };
-
-var buildings = ${ jsonEncode(buildings) };
+var aspects = ${ aspects | n,j };
+var buildings = ${ buildings | n,j };
 
 var filters = [
     {

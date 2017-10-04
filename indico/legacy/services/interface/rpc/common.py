@@ -17,16 +17,11 @@
 import sys
 import traceback
 
-from indico.legacy.common.fossilize import Fossilizable, fossilizes
-from indico.legacy.fossils.error import ICausedErrorFossil, INoReportErrorFossil
 
-
-class CausedError(Exception, Fossilizable):
+class CausedError(Exception):
     """
     A normal error, triggered on the server side
     """
-
-    fossilizes(ICausedErrorFossil)
 
     def __init__(self, code, message, inner=None, type=None):
         self.code = code
@@ -63,8 +58,6 @@ class NoReportError(CausedError):
     no error report form)
     """
 
-    fossilizes(INoReportErrorFossil)
-
     def __init__(self, message, inner=None, title=None, explanation=None):
         CausedError.__init__(self, "", message, inner, "noReport")
         self._title = title
@@ -82,7 +75,8 @@ class NoReportError(CausedError):
 
 class CSRFError(NoReportError):
     def __init__(self):
-        NoReportError.__init__(self, _('Oops, looks like there was a problem with your current session. Please refresh the page and try again.'))
+        NoReportError.__init__(self, _('Oops, looks like there was a problem with your current session. '
+                                       'Please refresh the page and try again.'))
         self.code = 'ERR-CSRF'
 
 
@@ -90,20 +84,5 @@ class RequestError(CausedError):
     pass
 
 
-class ProcessError(CausedError):
-
-    def __init__(self, code, message):
-        CausedError.__init__(self, code, message, inner = traceback.format_exception(*sys.exc_info()))
-
-
-class ServiceError(CausedError):
-    def __init__(self, code='', message='', inner = None):
-        CausedError.__init__(self, code, message, inner)
-
-
 class HTMLSecurityError(CausedError):
-    pass
-
-
-class ServiceAccessError(NoReportError):
     pass

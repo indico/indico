@@ -90,8 +90,6 @@ class RHUserBase(RHProtected):
 
     def _check_access(self):
         RHProtected._check_access(self)
-        if not self._doProcess:  # not logged in
-            return
         if not self.user.can_be_modified(session.user):
             raise Forbidden('You cannot modify this user.')
 

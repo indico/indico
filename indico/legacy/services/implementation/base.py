@@ -14,15 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import os
-
 from flask import g, session
+from werkzeug.exceptions import Forbidden
 
-from indico.core.config import config
 from indico.core.logger import sentry_set_tags
 from indico.legacy.common import security
-from indico.legacy.errors import HtmlForbiddenTag, MaKaCError
-from indico.legacy.services.interface.rpc.common import HTMLSecurityError, ServiceAccessError
+from indico.legacy.errors import HtmlForbiddenTag
+from indico.legacy.services.interface.rpc.common import HTMLSecurityError
 from indico.legacy.webinterface.rh.base import RequestHandlerBase
 from indico.util.string import unicode_struct_to_utf8
 
@@ -41,9 +39,6 @@ class ServiceBase(RequestHandlerBase):
         self._params = params
         self._target = None
         self._endTime = None
-        self._doProcess = True
-
-    # Methods =============================================================
 
     def process(self):
         """
@@ -62,22 +57,7 @@ class ServiceBase(RequestHandlerBase):
                 security.Sanitization.sanitizationCheck(self._params, ['requestInfo'])
             except HtmlForbiddenTag as e:
                 raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
-
-        if self._doProcess:
-            if config.PROFILE:
-                import profile, pstats, random
-                proffilename = os.path.join(config.TEMP_DIR, "service%s.prof" % random.random())
-                result = [None]
-                profile.runctx("result[0] = self._getAnswer()", globals(), locals(), proffilename)
-                answer = result[0]
-                stats = pstats.Stats(proffilename)
-                stats.sort_stats('cumulative', 'time', 'calls')
-                stats.dump_stats(os.path.join(config.TEMP_DIR, "IndicoServiceRequestProfile.log"))
-                os.remove(proffilename)
-            else:
-                answer = self._getAnswer()
-
-            return answer
+        return self._getAnswer()
 
     def _getAnswer(self):
         """
@@ -86,25 +66,10 @@ class ServiceBase(RequestHandlerBase):
         If this method is not overloaded, an exception will occur.
         If you don't want to return an answer, you should still implement this method with 'pass'.
         """
-        # This exception will happen if the _getAnswer method is not implemented in a derived class
-        raise MaKaCError("No answer was returned")
+        raise NotImplementedError
 
 
-class ProtectedService(ServiceBase):
-    def _checkSessionUser(self):
-        """
-        Checks that the current user exists (is authenticated)
-        """
-
-        if session.user is None:
-            self._doProcess = False
-            raise ServiceAccessError("You are currently not authenticated. Please log in again.")
-
-
-class LoggedOnlyService(ProtectedService):
-    """
-    Only accessible to users who are logged in (access keys not allowed)
-    """
-
+class LoggedOnlyService(ServiceBase):
     def _check_access(self):
-        self._checkSessionUser()
+        if session.user is None:
+            raise Forbidden("You are currently not authenticated. Please log in again.")

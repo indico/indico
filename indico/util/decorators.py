@@ -14,14 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-import traceback
 from functools import wraps
-
-from flask import request
-from werkzeug.exceptions import NotFound, Unauthorized
-
-from indico.core.logger import sentry_log_exception
-from indico.util.json import create_json_error_answer
 
 
 class classproperty(property):
@@ -92,49 +85,6 @@ def cached_writable_property(cache_attr, cache_on_set=True):
                 pass
 
     return _cached_writable_property
-
-
-def jsonify_error(function=None, logging_level='info', status=200, log_sentry=False):
-    """
-    Returns response of error handlers in JSON if requested in JSON
-    and logs the exception that ended the request.
-    """
-    from indico.core.errors import IndicoError, NotFoundError
-    from indico.core.logger import Logger
-    no_tb_exceptions = (NotFound, NotFoundError, Unauthorized)
-
-    def _jsonify_error(f):
-        @wraps(f)
-        def wrapper(*args, **kw):
-            for e in list(args) + kw.values():
-                if isinstance(e, Exception):
-                    exception = e
-                    break
-            else:
-                raise IndicoError('Wrong usage of jsonify_error: No error found in params')
-
-            logger_fn = getattr(Logger.get('rh'), logging_level)
-            if logging_level != 'exception' and not isinstance(exception, no_tb_exceptions):
-                tb = traceback.format_exc()
-                logger_fn('Request finished: %s (%s)\n%s', exception.__class__.__name__, exception, tb)
-            else:
-                logger_fn('Request finished: %s (%s)', exception.__class__.__name__, exception)
-
-            # allow e.g. NoReportError to specify a status code without possibly
-            # breaking old code that expects it with a 200 code.
-            # new variable name since python2 doesn't have `nonlocal`...
-            used_status = getattr(exception, 'http_status_code', status)
-            if request.is_xhr or request.headers.get('Content-Type') == 'application/json':
-                if log_sentry:
-                    sentry_log_exception()
-                return create_json_error_answer(exception, status=used_status)
-            else:
-                args[0]._responseUtil.status = used_status
-                return f(*args, **kw)
-        return wrapper
-    if function:
-        return _jsonify_error(function)
-    return _jsonify_error
 
 
 def smart_decorator(f):

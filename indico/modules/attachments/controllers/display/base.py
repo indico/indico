@@ -45,8 +45,8 @@ class DownloadAttachmentMixin(SpecificAttachmentMixin):
                 raise BadRequest
             previewer = get_file_previewer(self.attachment.file)
             if not previewer:
-                raise NoReportError(_('There is no preview available for this file type. Please refresh the page.'),
-                                    http_status_code=400)
+                raise NoReportError.wrap_exc(BadRequest(_('There is no preview available for this file type. '
+                                                          'Please refresh the page.')))
             preview_content = previewer.generate_content(self.attachment)
             return jsonify_template('attachments/preview.html', attachment=self.attachment,
                                     preview_content=preview_content)

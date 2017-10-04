@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from operator import attrgetter
 
-from flask import flash, request
+from flask import flash, redirect, request
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
@@ -86,8 +86,7 @@ class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
     def _process(self):
         reservations = self.event.reservations.all()
         if not reservations:
-            self._redirect(url_for('event_mgmt.rooms_choose_event', self.event))
-            return
+            return redirect(url_for('event_mgmt.rooms_choose_event', self.event))
         return WPRoomBookingEventBookingList(self, self._conf, reservations=reservations).display()
 
 

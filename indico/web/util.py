@@ -16,6 +16,8 @@
 
 from __future__ import absolute_import, unicode_literals
 
+from datetime import datetime
+
 from flask import g, has_request_context, jsonify, render_template, request, session
 from markupsafe import Markup
 
@@ -109,7 +111,7 @@ def jsonify_data(flash=True, **json_data):
     return jsonify(**json_data)
 
 
-def _format_request_data(data, hide_passwords):
+def _format_request_data(data, hide_passwords=False):
     if not hasattr(data, 'iterlists'):
         data = ((k, [v]) for k, v in data.iteritems())
     else:
@@ -136,20 +138,29 @@ def get_request_info(hide_passwords=True):
     """
     if not has_request_context():
         return None
+    try:
+        user_info = {
+            'id': session.user.id,
+            'name': session.user.full_name,
+            'email': session.user.email
+        } if session.user else None
+    except Exception as exc:
+        user_info = 'ERROR: {}'.format(exc)
     return {
         'id': request.id,
+        'time': datetime.now().isoformat(),
         'url': request.url,
         'endpoint': request.url_rule.endpoint if request.url_rule else None,
         'method': request.method,
         'rh': g.rh.__class__.__name__ if 'rh' in g else None,
-        'user': repr(session.user),
+        'user': user_info,
         'ip': request.remote_addr,
         'user_agent': unicode(request.user_agent),
         'referrer': request.referrer,
         'data': {
-            'url': _format_request_data(request.view_args, False),
-            'get': _format_request_data(request.args, False),
-            'post': _format_request_data(request.form, hide_passwords),
+            'url': _format_request_data(request.view_args) if request.view_args is not None else None,
+            'get': _format_request_data(request.args),
+            'post': _format_request_data(request.form, hide_passwords=hide_passwords),
             'json': request.get_json(silent=True),
             'headers': _format_request_data(request.headers, False),
         }
