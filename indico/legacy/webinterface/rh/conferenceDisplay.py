@@ -16,16 +16,13 @@
 
 from __future__ import unicode_literals
 
-from cStringIO import StringIO
-
-from flask import flash, redirect, request, session
+from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.modules.events.legacy import LegacyConference
 from indico.modules.events.views import WPAccessKey
 from indico.util.i18n import _
-from indico.web.flask.util import send_file
 
 
 class AccessKeyRequired(Forbidden):
@@ -63,20 +60,3 @@ class RHConferenceBaseDisplay(RHConferenceBase):
             return RHConferenceBase._do_process(self, profile)
         except AccessKeyRequired:
             return b'', self._show_access_key_form()
-
-
-class RHConferenceToMarcXML(RHConferenceBaseDisplay):
-    def _process(self):
-        from indico.legacy.common.xmlGen import XMLGen
-        from indico.legacy.common.output import outputGenerator
-        xmlgen = XMLGen()
-        xmlgen.initXml()
-        outgen = outputGenerator(session.user, xmlgen)
-        xmlgen.openTag(b'marc:record', [
-            [b'xmlns:marc', b'http://www.loc.gov/MARC21/slim'],
-            [b'xmlns:xsi', b'http://www.w3.org/2001/XMLSchema-instance'],
-            [b'xsi:schemaLocation',
-             b'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']])
-        outgen.confToXMLMarc21(self._conf)
-        xmlgen.closeTag(b'marc:record')
-        return send_file('event-{}.marc.xml'.format(self.event.id), StringIO(xmlgen.getXml()), 'application/xml')

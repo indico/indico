@@ -18,8 +18,10 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from flask import jsonify, redirect, request
+from flask import jsonify, redirect, request, session
 
+from indico.legacy.common.output import outputGenerator
+from indico.legacy.common.xmlGen import XMLGen
 from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
@@ -82,3 +84,18 @@ class RHEventAccessKey(RHConferenceBase):
     def _process(self):
         self.event.set_session_access_key(request.form['access_key'])
         return jsonify(valid=self.event.check_access_key())
+
+
+class RHEventMarcXML(RHConferenceBaseDisplay):
+    def _process(self):
+        xmlgen = XMLGen()
+        xmlgen.initXml()
+        outgen = outputGenerator(session.user, xmlgen)
+        xmlgen.openTag(b'marc:record', [
+            [b'xmlns:marc', b'http://www.loc.gov/MARC21/slim'],
+            [b'xmlns:xsi', b'http://www.w3.org/2001/XMLSchema-instance'],
+            [b'xsi:schemaLocation',
+             b'http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd']])
+        outgen.confToXMLMarc21(self._conf)
+        xmlgen.closeTag(b'marc:record')
+        return send_file('event-{}.marc.xml'.format(self.event.id), BytesIO(xmlgen.getXml()), 'application/xml')
