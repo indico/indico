@@ -18,10 +18,10 @@
 IndicoUI.Dialogs.Util = {
     error: function(err) {
         var dialog = null;
-        if (err.reportable === false) {
-            dialog = new NoReportErrorDialog(err);
-        } else {
+        if (err.report_url) {
             dialog = new ErrorReportDialog(err);
+        } else {
+            dialog = new NoReportErrorDialog(err);
         }
         dialog.open();
     },

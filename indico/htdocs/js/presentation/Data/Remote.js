@@ -109,13 +109,13 @@ function jsonRpc(url, method, params, handler) {
             // this function is already doing it
             var error;
             try {
-                error = JSON.parse(xhr.responseText);
+                error = JSON.parse(xhr.responseText).error;
             } catch (e) {
                 error = {
-                    title: data.status,
-                    message: data.statusText.toLowerCase(),
-                    reportable: true,
-                    suggest_login: false
+                    title: $T.gettext('Something went wrong'),
+                    message: '{0} ({1})'.format(data.statusText.toLowerCase(), data.status),
+                    suggest_login: false,
+                    report_url: null
                 };
             }
             handler(null, error);
