@@ -17,7 +17,6 @@
 from flask import flash, redirect, request, url_for
 
 from indico.core.db import db
-from indico.core.errors import IndicoError
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.models.reservations import Reservation
 from indico.util.i18n import _
@@ -25,10 +24,7 @@ from indico.util.i18n import _
 
 class RHRoomBookingDeleteBooking(RHRoomBookingAdminBase):
     def _process_args(self):
-        resv_id = request.view_args.get('resvID')
-        self._reservation = Reservation.get(request.view_args['resvID'])
-        if not self._reservation:
-            raise IndicoError('No booking with id: {}'.format(resv_id))
+        self._reservation = Reservation.get_one(request.view_args['resvID'])
 
     def _process(self):
         db.session.delete(self._reservation)

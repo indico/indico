@@ -15,9 +15,9 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 from flask import flash, redirect, request
+from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
-from indico.core.errors import FormValuesError, IndicoError, NoReportError
 from indico.modules.rb.controllers.admin import RHRoomBookingAdminBase
 from indico.modules.rb.models.equipment import EquipmentType
 from indico.modules.rb.models.locations import Location
@@ -41,7 +41,7 @@ class RHRoomBookingLocationMixin:
     def _process_args(self):
         self._location = Location.get(int(request.form['location_id']))
         if not self._location:
-            raise NoReportError(u'No such location')
+            raise NotFound(u'No such location')
 
 
 class RHRoomBookingDeleteLocation(RHRoomBookingLocationMixin, RHRoomBookingAdminBase):
@@ -57,11 +57,11 @@ class RHRoomBookingSaveLocation(RHRoomBookingAdminBase):
     def _process_args(self):
         self._locationName = request.form.get('newLocationName').strip()
         if not self._locationName:
-            raise FormValuesError(_('Location name may not be empty'))
+            raise BadRequest(_('Location name may not be empty'))
         if '/' in self._locationName:
-            raise FormValuesError(_('Location name may not contain slashes'))
+            raise BadRequest(_('Location name may not contain slashes'))
         if Location.find_first(name=self._locationName):
-            raise FormValuesError(_('Location "{0}" already exists').format(self._locationName))
+            raise BadRequest(_('Location "{0}" already exists').format(self._locationName))
 
     def _process(self):
         is_default = Location.find().count() == 0
@@ -83,9 +83,7 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
         self._with_kpi = request.args.get('withKPI', type=bool)
         self._actionSucceeded = request.args.get('actionSucceeded', default=False, type=bool)
         location_name = request.view_args.get('locationId')
-        self._location = Location.find_first(name=location_name)
-        if not self._location:
-            raise IndicoError('Unknown Location: {0}'.format(location_name))
+        self._location = Location.find_one(name=location_name)
 
     def _process(self):
         rooms = sorted(self._location.rooms, key=lambda r: natural_sort_key(r.full_name))
@@ -110,12 +108,9 @@ class RHRoomBookingAdminLocation(RHRoomBookingAdminBase):
 
 
 class RHRoomBookingDeleteCustomAttribute(RHRoomBookingAdminBase):
-
     def _process_args(self):
         name = request.view_args.get('locationId')
-        self._location = Location.find_first(name=name)
-        if not self._location:
-            raise IndicoError(_('Unknown Location: {0}').format(name))
+        self._location = Location.find_one(name=name)
         self._attr = request.args.get('removeCustomAttributeName', '')
 
     def _process(self):
@@ -129,16 +124,13 @@ class RHRoomBookingSaveCustomAttribute(RHRoomBookingAdminBase):
 
     def _process_args(self):
         name = request.view_args.get('locationId')
-        self._location = Location.find_first(name=name)
-        if not self._location:
-            raise IndicoError(_('Unknown Location: {0}').format(name))
-
+        self._location = Location.find_one(name=name)
         self._new_attr = None
         attr_title = request.form.get('newCustomAttributeName', default='').strip()
         if attr_title:
             attr_name = attr_title.replace(' ', '-').lower()
             if self._location.get_attribute_by_name(attr_name):
-                raise FormValuesError(_('There is already an attribute named: {0}').format(attr_name))
+                raise BadRequest(_('There is already an attribute named: {0}').format(attr_name))
 
             self._new_attr = RoomAttribute(name=attr_name, title=attr_title, type='str',
                                            is_required=request.form.get('newCustomAttributeIsRequired') == 'on',
@@ -162,9 +154,7 @@ class RHRoomBookingEquipmentBase(RHRoomBookingAdminBase):
     def _process_args(self):
         self._eq = request.form.get(self.PARAM)
         name = request.view_args.get('locationId')
-        self._location = Location.find_first(name=name)
-        if not self._location:
-            raise IndicoError(_('Unknown Location: {0}').format(name))
+        self._location = Location.find_one(name=name)
 
 
 class RHRoomBookingDeleteEquipment(RHRoomBookingEquipmentBase):

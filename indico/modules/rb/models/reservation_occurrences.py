@@ -141,13 +141,13 @@ class ReservationOccurrence(db.Model, Serializer):
             if repeat_interval == 1:
                 return rrule.rrule(rrule.DAILY, dtstart=start, until=end)
             else:
-                raise IndicoError('Unsupported interval')
+                raise IndicoError(u'Unsupported interval')
 
         elif repeat_frequency == RepeatFrequency.WEEK:
             if 0 < repeat_interval < 4:
                 return rrule.rrule(rrule.WEEKLY, dtstart=start, until=end, interval=repeat_interval)
             else:
-                raise IndicoError('Unsupported interval')
+                raise IndicoError(u'Unsupported interval')
 
         elif repeat_frequency == RepeatFrequency.MONTH:
 
@@ -159,9 +159,9 @@ class ReservationOccurrence(db.Model, Serializer):
                 return rrule.rrule(rrule.MONTHLY, dtstart=start, until=end, byweekday=start.weekday(),
                                    bysetpos=position)
             else:
-                raise IndicoError('Unsupported interval {}'.format(repeat_interval))
+                raise IndicoError(u'Unsupported interval {}'.format(repeat_interval))
 
-        raise IndicoError('Unexpected frequency {}'.format(repeat_frequency))
+        raise IndicoError(u'Unexpected frequency {}'.format(repeat_frequency))
 
     @staticmethod
     def filter_overlap(occurrences):

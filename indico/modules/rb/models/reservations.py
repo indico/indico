@@ -355,7 +355,7 @@ class Reservation(Serializer, db.Model):
         if prebook is None:
             prebook = not room.can_be_booked(user)
             if prebook and not room.can_be_prebooked(user):
-                raise NoReportError('You cannot book this room')
+                raise NoReportError(u'You cannot book this room')
 
         room.check_advance_days(data['end_dt'].date(), user)
         room.check_bookable_hours(data['start_dt'].time(), data['end_dt'].time(), user)

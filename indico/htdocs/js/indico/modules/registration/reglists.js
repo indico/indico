@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global setupListGenerator:false, getSelectedRows:false, handleRowSelection:false, setupTableSorter:false */
+
 (function(global) {
     'use strict';
 

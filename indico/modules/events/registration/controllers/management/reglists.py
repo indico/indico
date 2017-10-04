@@ -22,12 +22,12 @@ from io import BytesIO
 
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload, subqueryload
-from werkzeug.exceptions import Forbidden, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.errors import FormValuesError, UserValueError
+from indico.core.errors import NoReportError
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
@@ -183,7 +183,7 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
 
     def _process(self):
         if not self.registrations:
-            raise UserValueError(_("The selected registrants have been removed."))
+            raise NoReportError.wrap_exc(BadRequest(_("The selected registrants have been removed.")))
         registration = self.registrations[0]
         email_body = replace_placeholders('registration-email', request.form['body'], regform=self.regform,
                                           registration=registration)
@@ -323,8 +323,8 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
         except Exception:
             if config.DEBUG:
                 raise
-            raise FormValuesError(_("Text too large to generate a PDF with table style. "
-                                    "Please try again generating with book style."))
+            raise NoReportError(_("Text too large to generate a PDF with table style. "
+                                  "Please try again generating with book style."))
         return send_file('RegistrantsList.pdf', BytesIO(data), 'application/pdf')
 
 

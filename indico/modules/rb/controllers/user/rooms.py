@@ -148,21 +148,21 @@ class RHRoomBookingRoomStats(RHRoomBookingBase):
         else:
             match = re.match(r'(\d{4})(?:-(\d{2}))?', self._occupancy_period)
             if match is None:
-                raise IndicoError('Invalid period specified')
+                raise IndicoError(u'Invalid period specified')
             year = int(match.group(1))
             month = int(match.group(2)) if match.group(2) else None
             if month:
                 try:
                     self._start = date(year, month, 1)
                 except ValueError:
-                    raise IndicoError('Invalid year or month specified')
+                    raise IndicoError(u'Invalid year or month specified')
                 self._end = self._start + relativedelta(months=1)
                 self._occupancy_period = '{:d}-{:02d}'.format(year, month)
             else:
                 try:
                     self._start = date(year, 1, 1)
                 except ValueError:
-                    raise IndicoError('Invalid year specified')
+                    raise IndicoError(u'Invalid year specified')
                 self._end = self._start + relativedelta(years=1)
                 self._occupancy_period = str(year)
 

@@ -18,14 +18,10 @@
 Module containing the Indico exception class hierarchy
 """
 
-import traceback
-
-from flask import session
 from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, NotFound
 
 from indico.util.i18n import _
 from indico.util.string import to_unicode
-from indico.util.translations import ensure_str
 
 
 def get_error_description(exception):
@@ -49,38 +45,6 @@ def get_error_description(exception):
 
 
 class IndicoError(Exception):
-
-    code = -32000  # json-rpc server specific errors starting code
-
-    def __init__(self, message='', area='', explanation=''):
-        self.message = message
-        self._area = area
-        self._explanation = explanation
-
-    @ensure_str
-    def __str__(self):
-        if self._area:
-            return '{} - {}'.format(self._area, self.message)
-        else:
-            return self.message
-
-    def __unicode__(self):
-        return str(self).decode('utf-8')
-
-    def getMessage(self):
-        return self.message
-
-    def getArea(self):
-        return self._area
-
-    def getExplanation(self):
-        """
-        Some extra information, like actions that can be taken
-        """
-        return self._explanation
-
-
-class FormValuesError(IndicoError):
     pass
 
 

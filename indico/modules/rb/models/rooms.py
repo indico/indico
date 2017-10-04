@@ -740,4 +740,4 @@ class Room(versioned_cache(_cache, 'id'), db.Model, Serializer):
                 return True
         if quiet:
             return False
-        raise NoReportError('Room cannot be booked at this time')
+        raise NoReportError(u'Room cannot be booked at this time')
