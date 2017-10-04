@@ -25,7 +25,6 @@ from werkzeug.exceptions import BadRequest, BadRequestKeyError, Forbidden, HTTPE
 
 from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger, sentry_log_exception
-from indico.legacy.errors import MaKaCError
 from indico.modules.auth.util import redirect_to_login
 from indico.util.i18n import _
 from indico.util.string import to_unicode
@@ -87,7 +86,6 @@ def handle_baddata(exc):
 
 
 @errors_bp.app_errorhandler(IndicoError)
-@errors_bp.app_errorhandler(MaKaCError)
 def handle_indico_exception(exc):
     return render_error(exc, _('Something went wrong'), exc.message, getattr(exc, 'http_status_code', 500))
 

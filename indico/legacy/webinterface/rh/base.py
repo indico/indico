@@ -39,7 +39,6 @@ from indico.core.logger import Logger, sentry_set_tags
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
-from indico.legacy.errors import NotLoggedError
 from indico.legacy.webinterface.pages.errors import WPKeyAccessError
 from indico.modules.events.legacy import LegacyConference
 from indico.util.i18n import _
@@ -346,10 +345,7 @@ class RHSimple(RH):
 class RHProtected(RH):
     def _checkSessionUser(self):
         if session.user is None:
-            if 'application/json' in request.headers.get('Content-Type', 'text/html'):
-                raise NotLoggedError("You are currently not authenticated. Please log in again.")
-            else:
-                raise Forbidden
+            raise Forbidden
 
     def _check_access(self):
         self._checkSessionUser()

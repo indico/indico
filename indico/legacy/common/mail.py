@@ -25,9 +25,7 @@ from flask import g
 
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.legacy.errors import MaKaCError
 from indico.util.event import unify_event_args
-from indico.util.i18n import _
 from indico.util.string import to_unicode
 
 
@@ -36,7 +34,6 @@ charset.add_charset('utf-8', charset.SHORTEST)
 
 
 class GenericMailer:
-
     @classmethod
     def send(cls, notification, skipQueue=False):
         if isinstance(notification, dict):
@@ -104,7 +101,7 @@ class GenericMailer:
         elif ct == "text/html":
             part1 = MIMEText(body, "html", "utf-8")
         else:
-            raise MaKaCError(_("Unknown MIME type: %s") % (ct))
+            raise ValueError('Unknown MIME type: {}'.format(ct))
         msg.attach(part1)
 
         if hasattr(notification, 'getAttachments'):
@@ -130,13 +127,13 @@ class GenericMailer:
             server.ehlo()
             (code, errormsg) = server.starttls()
             if code != 220:
-                raise MaKaCError( _("Can't start secure connection to SMTP server: %d, %s")%(code, errormsg))
+                raise Exception('Cannot start secure connection to SMTP server: {}, {}'.format(code, errormsg))
         if config.SMTP_LOGIN:
             login = config.SMTP_LOGIN
             password = config.SMTP_PASSWORD
             (code, errormsg) = server.login(login, password)
             if code != 235:
-                raise MaKaCError( _("Can't login on SMTP server: %d, %s")%(code, errormsg))
+                raise Exception('Cannot login on SMTP server: {}, {}'.format(code, errormsg))
 
         to_addrs = msgData['toList'] | msgData['ccList'] | msgData['bccList']
         try:
@@ -146,7 +143,7 @@ class GenericMailer:
                 ', '.join(msgData['bccList']) or 'None'))
             server.sendmail(msgData['fromAddr'], to_addrs, msgData['msg'])
         except smtplib.SMTPRecipientsRefused as e:
-            raise MaKaCError('Email address is not valid: {}'.format(e.recipients))
+            raise ValueError('Email address is not valid: {}'.format(e.recipients))
         finally:
             server.quit()
         Logger.get('mail').info('Mail sent to {}'.format(', '.join(to_addrs)))
