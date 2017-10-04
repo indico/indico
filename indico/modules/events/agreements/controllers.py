@@ -58,7 +58,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
         if self.agreement.is_orphan():
             raise NotFound('The agreement is not active anymore')
 
-    def _checkSessionUser(self):
+    def _require_user(self):
         if session.user is None:
             raise Forbidden(response=redirect_to_login(reason=_('You are trying to sign an agreement that requires '
                                                                 'you to be logged in')))
@@ -73,7 +73,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
         if self.agreement.uuid != request.view_args['uuid']:
             raise Forbidden(_("The URL for this agreement is invalid."))
         if self.agreement.user:
-            self._checkSessionUser()
+            self._require_user()
 
     def _process(self):
         form = AgreementForm()
