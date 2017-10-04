@@ -18,20 +18,17 @@ import copy
 
 from flask import request, session
 from sqlalchemy.exc import DatabaseError
+from werkzeug.exceptions import BadRequest
 
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.core.errors import NoReportError as NoReportIndicoError
 from indico.legacy.common.mail import GenericMailer
-from indico.legacy.errors import NoReportError
 from indico.legacy.services.interface.rpc import handlers
-from indico.legacy.services.interface.rpc.common import NoReportError as ServiceNoReportError
-from indico.legacy.services.interface.rpc.common import CSRFError, RequestError
 from indico.util import fossilize
 
 
-def lookupHandler(method):
+def _lookup_handler(method):
     endpoint, functionName = handlers, method
     while True:
         handler = endpoint.methodMap.get(functionName, None)
@@ -40,22 +37,24 @@ def lookupHandler(method):
         try:
             endpointName, functionName = method.split('.', 1)
         except Exception:
-            raise RequestError('ERR-R1', 'Unsupported method.')
+            raise BadRequest('Unsupported method')
 
         if 'endpointMap' in dir(endpoint):
             endpoint = endpoint.endpointMap.get(endpointName, None)
             if not endpoint:
-                raise RequestError('ERR-R0', 'Unknown endpoint: {0}'.format(endpointName))
+                raise BadRequest('Unknown endpoint: {}'.format(endpointName))
         else:
-            raise RequestError('ERR-R1', 'Unsupported method')
+            raise BadRequest('Unsupported method')
     return handler
 
 
-def processRequest(method, params):
-    handler = lookupHandler(method)
+def _process_request(method, params):
+    handler = _lookup_handler(method)
 
     if session.csrf_protected and session.csrf_token != request.headers.get('X-CSRF-Token'):
-        raise CSRFError()
+        msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
+                u"button, reload the page and try again.")
+        raise BadRequest(msg)
 
     if hasattr(handler, 'process'):
         return handler(params).process()
@@ -63,21 +62,15 @@ def processRequest(method, params):
         return handler(params)
 
 
-class ServiceRunner(object):
-    def invokeMethod(self, method, params):
-        result = None
-        fossilize.clearCache()
-        GenericMailer.flushQueue(False)
-        try:
-            try:
-                result = processRequest(method, copy.deepcopy(params))
-                signals.after_process.send()
-            except NoReportError as e:
-                raise ServiceNoReportError(e.getMessage())
-            except NoReportIndicoError as e:
-                raise ServiceNoReportError(e.getMessage(), title=_("Error"))
-            db.session.commit()
-        except DatabaseError:
-            handle_sqlalchemy_database_error()
-        GenericMailer.flushQueue(True)
-        return result
+def invoke_method(method, params):
+    result = None
+    fossilize.clearCache()
+    GenericMailer.flushQueue(False)
+    try:
+        result = _process_request(method, copy.deepcopy(params))
+        signals.after_process.send()
+        db.session.commit()
+    except DatabaseError:
+        handle_sqlalchemy_database_error()
+    GenericMailer.flushQueue(True)
+    return result

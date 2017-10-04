@@ -18,7 +18,7 @@ from flask import jsonify, request
 
 from indico.core.logger import Logger
 from indico.legacy.common.fossilize import clearCache
-from indico.legacy.services.interface.rpc.process import ServiceRunner
+from indico.legacy.services.interface.rpc.process import invoke_method
 
 
 def process():
@@ -28,5 +28,5 @@ def process():
     rv = {}
     if 'id' in payload:
         rv['id'] = payload['id']
-    rv['result'] = ServiceRunner().invokeMethod(str(payload['method']), payload.get('params', []))
+    rv['result'] = invoke_method(str(payload['method']), payload.get('params', []))
     return jsonify(rv)

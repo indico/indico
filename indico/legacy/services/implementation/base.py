@@ -18,9 +18,7 @@ from flask import g, session
 from werkzeug.exceptions import Forbidden
 
 from indico.core.logger import sentry_set_tags
-from indico.legacy.common import security
-from indico.legacy.errors import HtmlForbiddenTag
-from indico.legacy.services.interface.rpc.common import HTMLSecurityError
+from indico.legacy.common.security import Sanitization
 from indico.legacy.webinterface.rh.base import RequestHandlerBase
 from indico.util.string import unicode_struct_to_utf8
 
@@ -53,10 +51,7 @@ class ServiceBase(RequestHandlerBase):
         self._check_access()
 
         if self.CHECK_HTML:
-            try:
-                security.Sanitization.sanitizationCheck(self._params, ['requestInfo'])
-            except HtmlForbiddenTag as e:
-                raise HTMLSecurityError('ERR-X0', 'HTML Security problem. {}'.format(e))
+            Sanitization.sanitizationCheck(self._params)
         return self._getAnswer()
 
     def _getAnswer(self):
