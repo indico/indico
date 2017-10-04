@@ -1,0 +1,55 @@
+<div class="error-box">
+    <h1>
+        {% trans %}Access Denied{% endtrans %}
+    </h1>
+    <p>
+        {% trans %}This event is protected with an access key.{% endtrans %}
+        <br>
+        {% if session.user %}
+            {% trans %}Please enter it below.{%- endtrans %}
+        {% else %}
+            {% set link_start -%}
+                <a href="{{ url_for_login(request.relative_url) }}"><strong>
+            {%- endset %}
+            {% set link_end %}</strong></a>{% endset %}
+            {% trans -%}
+                Please {{ link_start }}log in{{ link_end }} or enter the key below.
+            {%- endtrans %}
+        {% endif %}
+    </p>
+    <form action="{{ url_for('events.key_access', event) }}" method="post" class="i-has-action" id="access-key-form">
+        <input type="hidden" value="{{ session.csrf_token }}" name="csrf_token">
+        <input type="password" name="access_key">
+        <button class="i-button icon-key" type="submit"></button>
+    </form>
+    <div class="error-box-small">
+        <a href="{{ url_for_index() }}">{% trans %}Go to the main page{% endtrans %}</a>
+    </div>
+</div>
+
+<script>
+    (function() {
+        'use strict';
+
+        var $form = $('#access-key-form');
+        var $field = $form.find('input[name=access_key]');
+        var $button = $form.find('button[type=submit]');
+
+        $field.on('input', function() {
+            $field.removeClass('hasError');
+            $button.qtip('destroy');
+        });
+
+        $form.ajaxForm({
+            error: handleAjaxError,
+            success: function(data) {
+                if (data.valid) {
+                    location.reload();
+                } else {
+                    $field.val('').addClass('hasError');
+                    $button.stickyTooltip('danger', $T.gettext('Invalid access key'));
+                }
+            }
+        });
+    })();
+</script>

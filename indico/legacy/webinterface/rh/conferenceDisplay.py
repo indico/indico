@@ -21,26 +21,11 @@ from cStringIO import StringIO
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.pages.errors import WPKeyAccessError
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.modules.events.legacy import LegacyConference
+from indico.modules.events.views import WPAccessKey
 from indico.util.i18n import _
 from indico.web.flask.util import send_file
-
-
-class RHConferenceAccessKey(RHConferenceBase):
-    NOT_SANITIZED_FIELDS = {'accessKey'}
-
-    def _process_args(self):
-        RHConferenceBase._process_args(self)
-        self._accesskey = request.form.get('accessKey', '').strip()
-
-    def _process(self):
-        # XXX: we don't check if it's valid or not -- WPKeyAccessError shows a message
-        # for that if there's an access key for the event in the session.
-        # this is pretty awful but eventually we'll do this properly :)
-        self.event.set_session_access_key(self._accesskey)
-        return redirect(self.event.url)
 
 
 class AccessKeyRequired(Forbidden):
@@ -71,7 +56,7 @@ class RHConferenceBaseDisplay(RHConferenceBase):
             raise Forbidden(' '.join(msg))
 
     def _show_access_key_form(self):
-        return WPKeyAccessError(self).display()
+        return WPAccessKey.render_template('display/access_key.html', event=self.event)
 
     def _do_process(self, profile):
         try:
