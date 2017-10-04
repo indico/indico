@@ -144,7 +144,7 @@ class RHRequestsEventRequestProcess(RHRequestsEventRequestDetailsBase):
     """Accept/Reject a request"""
 
     def _check_access(self):
-        self._checkSessionUser()
+        self._require_user()
         if not self.definition.can_be_managed(session.user):
             raise Forbidden
 

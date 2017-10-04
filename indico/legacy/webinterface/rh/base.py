@@ -339,12 +339,12 @@ class RHSimple(RH):
 
 
 class RHProtected(RH):
-    def _checkSessionUser(self):
+    def _require_user(self):
         if session.user is None:
             raise Forbidden
 
     def _check_access(self):
-        self._checkSessionUser()
+        self._require_user()
 
 
 class RHModificationBaseProtected(RHProtected):
@@ -357,7 +357,7 @@ class RHModificationBaseProtected(RHProtected):
         event = self._target.as_event
         if not event.can_manage(session.user, role=self.ROLE):
             if session.user is None:
-                self._checkSessionUser()
+                self._require_user()
             else:
                 raise Forbidden(_(u'You are not authorized to manage this event.'))
         check_event_locked(self, event)

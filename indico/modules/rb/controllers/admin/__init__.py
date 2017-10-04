@@ -30,6 +30,6 @@ class RHRoomBookingAdminBase(RHRoomBookingBase):
 
     def _check_access(self):
         if session.user is None:
-            self._checkSessionUser()
+            self._require_user()
         elif not rb_is_admin(session.user):
             raise Forbidden(_('You are not authorized to take this action.'))
