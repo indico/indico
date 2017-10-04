@@ -25,7 +25,9 @@ from lxml import html
 from lxml.etree import ParserError
 from pyatom import AtomFeed
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from werkzeug.urls import url_parse
 
+from indico.core.config import config
 from indico.modules.categories import Category
 from indico.modules.events import Event
 from indico.util.date_time import now_utc
@@ -82,7 +84,7 @@ def serialize_categories_ical(category_ids, user, event_filter=True, event_filte
                     if event.venue_name and event.room_name
                     else (event.venue_name or event.room_name))
         cal_event = ical.Event()
-        cal_event.add('uid', u'indico-event-{}@cern.ch'.format(event.id))
+        cal_event.add('uid', u'indico-event-{}@{}'.format(event.id, url_parse(config.BASE_URL).host))
         cal_event.add('dtstamp', now)
         cal_event.add('dtstart', event.start_dt)
         cal_event.add('dtend', event.end_dt)

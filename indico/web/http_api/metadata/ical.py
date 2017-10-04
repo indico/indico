@@ -21,7 +21,9 @@ import icalendar as ical
 from lxml import html
 from lxml.etree import ParserError
 from pytz import timezone, utc
+from werkzeug.urls import url_parse
 
+from indico.core.config import config
 from indico.util.date_time import now_utc
 from indico.util.string import to_unicode
 from indico.web.http_api.metadata.serializer import Serializer
@@ -42,6 +44,7 @@ class vRecur(ical.vRecur):
             result.append('%s=%s' % (key, vals))
         return ';'.join(result)
 
+
 ical.cal.types_factory['recur'] = vRecur
 
 
@@ -55,7 +58,7 @@ def _deserialize_date(date_dict):
 
 def serialize_event(cal, fossil, now, id_prefix="indico-event"):
     event = ical.Event()
-    event.add('uid', '%s-%s@cern.ch' % (id_prefix, fossil['id']))
+    event.add('uid', '{}-{}@{}'.format(id_prefix, fossil['id'], url_parse(config.BASE_URL).host))
     event.add('dtstamp', now)
     event.add('dtstart', _deserialize_date(fossil['startDate']))
     event.add('dtend', _deserialize_date(fossil['endDate']))
