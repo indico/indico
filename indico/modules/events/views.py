@@ -21,6 +21,7 @@ import posixpath
 from flask import render_template, request
 from sqlalchemy.orm import load_only
 
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import (WConfMetadata, WPConferenceBase, WPrintPageFrame,
                                                           render_event_footer, render_event_header)
 from indico.modules.admin.views import WPAdmin
@@ -118,3 +119,10 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                              folders=folders,
                              lectures=lectures)
         return rv.encode('utf-8')
+
+
+class WPAccessKey(WPJinjaMixin, WPDecorated):
+    template_prefix = 'events/'
+
+    def _getBody(self, params):
+        return self._getPageContent(params)

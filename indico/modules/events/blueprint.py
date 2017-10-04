@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.modules.events.controllers.admin import (RHCreateReferenceType, RHDeleteReferenceType, RHEditReferenceType,
                                                      RHReferenceTypes)
 from indico.modules.events.controllers.creation import RHCreateEvent
-from indico.modules.events.controllers.display import RHExportEventICAL
+from indico.modules.events.controllers.display import RHEventAccessKey, RHExportEventICAL
 from indico.modules.events.controllers.entry import event_or_shorturl
 from indico.web.flask.util import make_compat_redirect_func, redirect_view
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -52,6 +52,9 @@ _bp.add_url_rule('/e/<path:confId>', 'shorturl', event_or_shorturl, strict_slash
 _bp.add_url_rule('/event/<confId>/', 'display', event_or_shorturl)
 _bp.add_url_rule('/event/<confId>/overview', 'display_overview', event_or_shorturl, defaults={'force_overview': True})
 _bp.add_url_rule('/event/<confId>/other-view', 'display_other', redirect_view('timetable.timetable'))
+
+# Access keys
+_bp.add_url_rule('/event/<confId>/key-access', 'key_access', RHEventAccessKey, methods=('POST',))
 
 
 # Legacy URLs

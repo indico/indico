@@ -18,9 +18,10 @@ from __future__ import unicode_literals
 
 from io import BytesIO
 
-from flask import redirect, request
+from flask import jsonify, redirect, request
 
 from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
+from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
@@ -73,3 +74,11 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
     def _display_simple(self):
         """Display a simple single-page event (meeting/lecture)"""
         return WPSimpleEventDisplay(self, self.event, self.theme_id, self.theme_override).display()
+
+
+class RHEventAccessKey(RHConferenceBase):
+    NOT_SANITIZED_FIELDS = {'access_key'}
+
+    def _process(self):
+        self.event.set_session_access_key(request.form['access_key'])
+        return jsonify(valid=self.event.check_access_key())

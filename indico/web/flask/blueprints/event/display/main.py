@@ -20,9 +20,5 @@ from indico.legacy.webinterface.rh import conferenceDisplay
 from indico.web.flask.blueprints.event.display import event
 
 
-# Event access
-event.add_url_rule('/accesskey', 'conferenceDisplay-accessKey', conferenceDisplay.RHConferenceAccessKey,
-                   methods=('GET', 'POST'))
-
 # Machine-readable formats
 event.add_url_rule('/event.marc.xml', 'conferenceDisplay-marcxml', conferenceDisplay.RHConferenceToMarcXML)
