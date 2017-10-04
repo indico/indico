@@ -24,7 +24,7 @@ from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.models.principals import EventPrincipal
-from indico.modules.events.papers.models.revisions import PaperRevision
+from indico.modules.events.papers.models.revisions import PaperRevision, PaperRevisionState
 from indico.modules.users import User
 
 
@@ -85,5 +85,9 @@ def has_contributions_with_user_paper_submission_rights(event, user):
     return _query_contributions_with_user_paper_submission_rights(event, user).has_rows()
 
 
-def get_contributions_with_user_paper_submission_rights(event, user):
-    return _query_contributions_with_user_paper_submission_rights(event, user).all()
+def get_user_submittable_contributions(event, user):
+    allowed_states = [PaperRevisionState.to_be_corrected]
+    return (_query_contributions_with_user_paper_submission_rights(event, user)
+            .filter(db.or_(Contribution._paper_last_revision == None,  # noqa
+                           Contribution._paper_last_revision.has(PaperRevision.state.in_(allowed_states))))
+            .all())
