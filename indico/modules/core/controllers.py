@@ -16,25 +16,32 @@
 
 from __future__ import unicode_literals
 
+import re
+
 import requests
 from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pytz import common_timezones_set
 from werkzeug.exceptions import NotFound
-from werkzeug.urls import url_join
+from werkzeug.urls import url_join, url_parse
 
 import indico
 from indico.core.config import config
+from indico.core.logger import Logger
+from indico.core.notifications import make_email, send_email
 from indico.core.settings import PrefixSettingsProxy
 from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
-from indico.modules.core.forms import SettingsForm
+from indico.modules.core.forms import ReportErrorForm, SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
 from indico.util.i18n import _
+from indico.web.errors import load_error_data
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.util import jsonify_data, jsonify_form
 
 
 class RHContact(RH):
@@ -42,6 +49,57 @@ class RHContact(RH):
         if not config.PUBLIC_SUPPORT_EMAIL:
             raise NotFound
         return WPContact.render_template('contact.html')
+
+
+class RHReportError(RH):
+    NOT_SANITIZED_FIELDS = {'comment'}
+
+    def _process_args(self):
+        self.error_data = load_error_data(request.view_args['error_id'])
+        if self.error_data is None:
+            raise NotFound('Error details not found. We might be having some technical issues; please try again later.')
+
+    def _process(self):
+        form = ReportErrorForm(email=(session.user.email if session.user else ''))
+        if form.validate_on_submit():
+            self._send_email(form.email.data, form.comment.data)
+            if config.SENTRY_DSN and self.error_data['sentry_event_id'] is not None:
+                self._send_sentry(form.email.data, form.comment.data)
+            return jsonify_data(flash=False)
+        return jsonify_form(form)
+
+    def _send_email(self, email, comment):
+        # using reply-to for the user email would be nicer, but email clients
+        # usually only show the from address and it's nice to immediately see
+        # whether an error report has an email address associated and if
+        # multiple reports came from the same person
+        template = get_template_module('core/emails/error_report.txt',
+                                       comment=comment,
+                                       error_data=self.error_data,
+                                       server_name=url_parse(config.BASE_URL).netloc)
+        send_email(make_email(config.SUPPORT_EMAIL, from_address=(email or config.NO_REPLY_EMAIL), template=template))
+
+    def _send_sentry(self, email, comment):
+        # strip password and query string from the DSN, and all auth data from the POST target
+        dsn = re.sub(r':[^@/]+(?=@)', '', config.SENTRY_DSN)
+        url = url_parse(dsn)
+        dsn = unicode(url.replace(query=None))
+        verify = url.decode_query().get('ca_certs', True)
+        url = unicode(url.replace(path='/api/embed/error-page/', netloc=url._split_netloc()[1], query=None))
+        user_data = self.error_data['request_info']['user'] or {'name': 'Anonymous', 'email': config.NO_REPLY_EMAIL}
+        try:
+            rv = requests.post(url,
+                               params={'dsn': dsn,
+                                       'eventId': self.error_data['sentry_event_id']},
+                               data={'name': user_data['name'],
+                                     'email': email or user_data['email'],
+                                     'comments': comment},
+                               headers={'Origin': config.BASE_URL},
+                               verify=verify)
+            rv.raise_for_status()
+        except Exception:
+            # don't bother users if this fails!
+            Logger.get('sentry').exception('Could not submit user feedback')
 
 
 class RHSettings(RHAdminBase):

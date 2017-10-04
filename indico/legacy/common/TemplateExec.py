@@ -214,9 +214,6 @@ def registerHelpers(objDict):
         objDict['linkify'] = linkify
     if not 'truncateTitle' in objDict:
         objDict['truncateTitle'] = truncateTitle
-    if not 'jsonEncode' in objDict:
-        from indico.legacy.services.interface.rpc.json import encode as jsonEncode
-        objDict['jsonEncode'] = jsonEncode
     if 'rh' not in objDict and '__rh__' in objDict:
         objDict['rh'] = objDict['__rh__']
     if not 'latex_escape' in objDict:

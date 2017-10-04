@@ -109,61 +109,36 @@ type("ServiceDialogWithButtons", ["ExclusivePopupWithButtons", "ServiceDialog"],
  */
 type("ErrorReportDialog", ["ServiceDialogWithButtons"],
      {
-         _sendReport: function(email) {
+         _sendReport: function() {
              var self = this;
-             this.error.userMail = email.get();
-
-             if (!$.isArray(this.error.inner)) {
-                 this.error.inner = this.error.inner ? [this.error.inner] : [];
-             }
-
-             // make sure the HTML sanitization filter won't ruin everything
-             _(this.error.inner).each(function(line, i) {
-                 self.error.inner[i] = Util.HTMLEscape(line);
+             ajaxDialog({
+                 title: $T.gettext('Report Error'),
+                 url: this.error.report_url,
+                 onClose: function(data) {
+                     if (data) {
+                         self.$content.append($('<strong>').text($T.gettext('Thanks for your error report!')));
+                         self.dialogElement.find('.ui-dialog-buttonset button:eq(1) .ui-button-text').text($T.gettext('Close'));
+                         self.dialogElement.find('.ui-dialog-buttonset button:eq(0)').remove();
+                     }
+                 }
              });
-             indicoRequest('system.error.report',
-                           this.error,
-                           function(result, error){
-                               if (error) {
-                                   new AlertPopup($T("Error"), $T("Unable to send your error report: ") + error.message).open();
-                               }
-                               else {
-                                   if (result) {
-                                       new AlertPopup($T("Success"), $T("Your report has been sent. Thank you!")).open();
-                                   } else {
-                                       new AlertPopup($T("Error"), $T("Your report could not be sent to the support address.")).open();
-                                   }
-                                   self.close();
-                               }
-                           }
-                          );
          },
 
          draw: function() {
-             this.email = new WatchObject();
-
-             // TODO: force unidirectional binding?
-             $B(this.email.accessor(), indicoSource('user.data.email.get', {}));
-
-             var content = $('<div/>').css({
+             this.$content = $('<div/>').css({
                  textAlign: 'center',
                  width: '300px'
              });
-             $('<p/>').text($T('An error has occurred while processing your request. We advise you to submit an error report, by clicking "Send report".')).appendTo(content);
-             $('<p/>').css('color', 'red').text(this.error.message).appendTo(content);
-             var emailBlock = $('<div/>').appendTo(content);
-             emailBlock.append($('<label/>').text($T('Your e-mail: ')));
-             var emailInput = $B(Html.input('text', {}), this.email.accessor());
-             emailBlock.append(emailInput.dom);
-
-             return this.ServiceDialogWithButtons.prototype.draw.call(this, content);
+             $('<p>').text($T('An error has occurred while processing your request.')).appendTo(this.$content);
+             $('<p>').css('color', 'red').text(this.error.message).appendTo(this.$content);
+             return this.ServiceDialogWithButtons.prototype.draw.call(this, this.$content);
          },
 
          _getButtons: function() {
              var self = this;
              return [
                  [$T('Send report'), function() {
-                     self._sendReport(self.email);
+                     self._sendReport();
                  }],
                  [$T('Do not send report'), function() {
                      self.close();
@@ -173,6 +148,7 @@ type("ErrorReportDialog", ["ServiceDialogWithButtons"],
      },
      function(error) {
          this.error = error;
+         this.title = error.title;
      }
 );
 
@@ -190,7 +166,7 @@ type("NoReportErrorDialog", ["AlertPopup"], {
         content.append(Html.div({}, this.error.message));
         content.append(Html.unescaped.div("warningExplanation", this.error.explanation));
 
-        if (this.error.code == 'ERR-P4' || (this.error.code == 'Forbidden' && !this.error.hasUser)) {
+        if (this.error.suggest_login) {
             content.append(Html.div({style:{marginTop:pixels(10)}},
                     Html.a({href: build_url(Indico.Urls.Login, {next: document.URL})}, $T("Go to login page"))));
         }

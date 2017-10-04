@@ -61,8 +61,8 @@ class RHSubmitAbstract(RHAbstractsBase):
     def _check_access(self):
         cfa = self.event.cfa
         if session.user and not cfa.is_open and not cfa.can_submit_abstracts(session.user):
-            raise NoReportError(_('The Call for Abstracts is closed. Please contact the event organizer for further '
-                                  'assistance.'), http_status_code=403)
+            raise NoReportError.wrap_exc(Forbidden(_('The Call for Abstracts is closed. '
+                                                     'Please contact the event organizer for further assistance.')))
         elif not session.user or not cfa.can_submit_abstracts(session.user):
             raise Forbidden
         RHAbstractsBase._check_access(self)

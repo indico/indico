@@ -18,7 +18,6 @@ from __future__ import absolute_import, unicode_literals
 
 import inspect
 import os
-import re
 import time
 from importlib import import_module
 
@@ -351,51 +350,23 @@ class ResponseUtil(object):
 
     def __init__(self):
         self.headers = Headers()
-        self._redirect = None
         self.status = 200
         self.content_type = None
-        self.call = None
 
     @property
     def modified(self):
-        return bool(self.headers) or self._redirect or self.status != 200 or self.content_type
-
-    @property
-    def redirect(self):
-        return self._redirect
-
-    @redirect.setter
-    def redirect(self, value):
-        if isinstance(value, tuple) and len(value) == 2:
-            if isinstance(value[0], str):
-                value = (value[0].decode('utf-8'), value[1])
-        elif value is not None:
-            raise ValueError('redirect must be None or a 2-tuple containing URL and status code')
-        self._redirect = value
+        return bool(self.headers) or self.status != 200 or self.content_type
 
     def make_empty(self):
         return self.make_response('')
 
-    def make_redirect(self):
-        if not self._redirect:
-            raise Exception('Cannot create a redirect response without a redirect')
-        if self.call:
-            raise Exception('Cannot use make_redirect when a callable is set')
-        return redirect(*self.redirect)
-
     def make_response(self, res):
-        if self.call:
-            raise Exception('Cannot use make_response when a callable is set')
-
         if isinstance(res, (current_app.response_class, WerkzeugResponse, tuple)):
             if self.modified:
                 # If we receive a response - most likely one created by send_file - we do not allow any
                 # external modifications.
                 raise Exception('Cannot combine response object with custom modifications')
             return res
-
-        if self._redirect:
-            return self.make_redirect()
 
         # Return a plain string if that's all we have
         if not res and not self.modified:

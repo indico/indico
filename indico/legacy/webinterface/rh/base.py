@@ -21,14 +21,12 @@ import os
 import pstats
 import random
 from functools import partial, wraps
-from xml.sax.saxutils import escape
 
 import jsonschema
 from flask import current_app, g, redirect, request, session
-from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.orm.exc import NoResultFound
-from werkzeug.exceptions import BadRequest, Forbidden, HTTPException, MethodNotAllowed, NotFound
+from werkzeug.exceptions import BadRequest, Forbidden, MethodNotAllowed, NotFound
 from werkzeug.routing import BuildError
 from werkzeug.wrappers import Response
 
@@ -36,23 +34,16 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.core.errors import NoReportError, get_error_description
-from indico.core.logger import Logger, sentry_log_exception, sentry_set_tags
+from indico.core.errors import NoReportError
+from indico.core.logger import Logger, sentry_set_tags
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
-from indico.legacy.errors import (AccessError, KeyAccessError, MaKaCError, ModificationError, NotFoundError,
-                                  NotLoggedError)
-from indico.legacy.webinterface.pages.error import render_error
-from indico.legacy.webinterface.pages.errors import (WPAccessError, WPFormValuesError, WPGenericError, WPKeyAccessError,
-                                                     WPModificationError, WPNoReportError, WPRestrictedHTML,
-                                                     WPUnexpectedError)
-from indico.modules.auth.util import redirect_to_login, url_for_login
+from indico.legacy.errors import NotLoggedError
+from indico.legacy.webinterface.pages.errors import WPKeyAccessError
 from indico.modules.events.legacy import LegacyConference
-from indico.util.decorators import jsonify_error
 from indico.util.i18n import _
 from indico.util.locators import get_locator
-from indico.util.string import to_unicode
 from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
 
 
@@ -117,7 +108,6 @@ class RH(RequestHandlerBase):
         self._responseUtil = ResponseUtil()
         self._target = None
         self._endTime = None
-        self._doProcess = True
 
     # Methods =============================================================
 
@@ -138,16 +128,6 @@ class RH(RequestHandlerBase):
     @property
     def csrf_token(self):
         return session.csrf_token if session.csrf_protected else ''
-
-    def _redirect(self, targetURL, status=303):
-        if isinstance(targetURL, Response):
-            status = targetURL.status_code
-            targetURL = targetURL.headers['Location']
-        else:
-            targetURL = str(targetURL)
-        if "\r" in targetURL or "\n" in targetURL:
-            raise MaKaCError(_("http header CRLF injection detected"))
-        self._responseUtil.redirect = (targetURL, status)
 
     def normalize_url(self):
         """Performs URL normalization.
@@ -251,102 +231,97 @@ class RH(RequestHandlerBase):
         if event_id is not None:
             require_feature(event_id, self.EVENT_FEATURE)
 
-    @jsonify_error
-    def _processGeneralError(self, e):
-        """Treats general errors occured during the process of a RH."""
+    # @jsonify_error
+    # def _processGeneralError(self, e):
+    #     """Treats general errors occured during the process of a RH."""
+    #     if config.PROPAGATE_ALL_EXCEPTIONS:
+    #         raise
+    #     return WPGenericError(self).display()
 
-        if config.PROPAGATE_ALL_EXCEPTIONS:
-            raise
-        return WPGenericError(self).display()
+    # @jsonify_error(status=500, logging_level='exception', log_sentry=True)
+    # def _processUnexpectedError(self, e):
+    #     """Unexpected errors"""
+    #     self._responseUtil.redirect = None
+    #     if config.PROPAGATE_ALL_EXCEPTIONS:
+    #         raise
+    #     sentry_log_exception()
+    #     return WPUnexpectedError(self).display()
 
-    @jsonify_error(status=500, logging_level='exception', log_sentry=True)
-    def _processUnexpectedError(self, e):
-        """Unexpected errors"""
-        self._responseUtil.redirect = None
-        if config.PROPAGATE_ALL_EXCEPTIONS:
-            raise
-        sentry_log_exception()
-        return WPUnexpectedError(self).display()
+    # @jsonify_error(status=403)
+    # def _processForbidden(self, e):
+    #     if session.user is None and not request.is_xhr and not e.response and request.blueprint != 'auth':
+    #         return redirect_to_login(reason=_("Please log in to access this page."))
+    #     message = _("Access Denied")
+    #     explanation = get_error_description(e)
+    #     return render_error(message, explanation)
 
-    @jsonify_error(status=403)
-    def _processForbidden(self, e):
-        if session.user is None and not request.is_xhr and not e.response and request.blueprint != 'auth':
-            return redirect_to_login(reason=_("Please log in to access this page."))
-        message = _("Access Denied")
-        explanation = get_error_description(e)
-        return render_error(message, explanation)
+    # @jsonify_error(status=400)
+    # def _processBadRequest(self, e):
+    #     message = _("Bad Request")
+    #     return render_error(message, e.description)
 
-    @jsonify_error(status=400)
-    def _processBadRequest(self, e):
-        message = _("Bad Request")
-        return render_error(message, e.description)
+    # @jsonify_error(status=401)
+    # def _processUnauthorized(self, e):
+    #     message = _("Unauthorized")
+    #     return render_error(message, e.description)
 
-    @jsonify_error(status=401)
-    def _processUnauthorized(self, e):
-        message = _("Unauthorized")
-        return render_error(message, e.description)
+    # @jsonify_error(status=400)
+    # def _processBadData(self, e):
+    #     message = _("Invalid or expired token")
+    #     return render_error(message, e.message)
 
-    @jsonify_error(status=400)
-    def _processBadData(self, e):
-        message = _("Invalid or expired token")
-        return render_error(message, e.message)
+    # @jsonify_error(status=403)
+    # def _processAccessError(self, e):
+    #     """Treats access errors occured during the process of a RH."""
+    #     return WPAccessError(self).display()
 
-    @jsonify_error(status=403)
-    def _processAccessError(self, e):
-        """Treats access errors occured during the process of a RH."""
-        return WPAccessError(self).display()
+    # @jsonify_error
+    # def _processKeyAccessError(self, e):
+    #     """Treats access errors occured during the process of a RH."""
+    #     return WPKeyAccessError(self).display()
 
-    @jsonify_error
-    def _processKeyAccessError(self, e):
-        """Treats access errors occured during the process of a RH."""
-        return WPKeyAccessError(self).display()
+    # @jsonify_error
+    # def _processModificationError(self, e):
+    #     """Handles modification errors occured during the process of a RH."""
+    #     if not session.user:
+    #         return redirect_to_login(reason=_("Please log in to access this page. If you have a modification key, "
+    #                                           "you may enter it afterwards."))
+    #     return WPModificationError(self).display()
 
-    @jsonify_error
-    def _processModificationError(self, e):
-        """Handles modification errors occured during the process of a RH."""
-        if not session.user:
-            return redirect_to_login(reason=_("Please log in to access this page. If you have a modification key, you "
-                                              "may enter it afterwards."))
-        return WPModificationError(self).display()
+    # @jsonify_error(status=400)
+    # def _processBadRequestKeyError(self, e):
+    #     """Request lacks a necessary key for processing"""
+    #     msg = _(u'Required argument missing: {}').format(to_unicode(e.message))
+    #     return WPFormValuesError(self, msg).display()
 
-    @jsonify_error(status=400)
-    def _processBadRequestKeyError(self, e):
-        """Request lacks a necessary key for processing"""
-        msg = _(u'Required argument missing: {}').format(to_unicode(e.message))
-        return WPFormValuesError(self, msg).display()
+    # @jsonify_error
+    # def _processNoReportError(self, e):
+    #     """Process errors without reporting"""
+    #     return WPNoReportError(self, e).display()
 
-    @jsonify_error
-    def _processNoReportError(self, e):
-        """Process errors without reporting"""
-        return WPNoReportError(self, e).display()
+    # @jsonify_error(status=400)
+    # def _processUserValueError(self, e):
+    #     """Process errors without reporting"""
+    #     return WPNoReportError(self, e).display()
 
-    @jsonify_error(status=400)
-    def _processUserValueError(self, e):
-        """Process errors without reporting"""
-        return WPNoReportError(self, e).display()
+    # @jsonify_error(status=404)
+    # def _processNotFoundError(self, e):
+    #     if isinstance(e, NotFound):
+    #         message = _("Page not found")  # that's a bit nicer than "404: Not Found"
+    #         explanation = get_error_description(e)
+    #     else:
+    #         message = e.getMessage()
+    #         explanation = e.getExplanation()
+    #     return render_error(message, explanation)
 
-    @jsonify_error(status=404)
-    def _processNotFoundError(self, e):
-        if isinstance(e, NotFound):
-            message = _("Page not found")  # that's a bit nicer than "404: Not Found"
-            explanation = get_error_description(e)
-        else:
-            message = e.getMessage()
-            explanation = e.getExplanation()
-        return render_error(message, explanation)
+    # @jsonify_error(status=400)
+    # def _processFormValuesError(self, e):
+    #     """Treats user input related errors occured during the process of a RH."""
+    #     return WPFormValuesError(self, e).display()
 
-    @jsonify_error(status=400)
-    def _processFormValuesError(self, e):
-        """Treats user input related errors occured during the process of a RH."""
-        return WPFormValuesError(self, e).display()
-
-    @jsonify_error(status=400)
-    def _processRestrictedHTML(self, e):
-        return WPRestrictedHTML(self, escape(str(e))).display()
-
-    @jsonify_error(status=400)
-    def _processHtmlForbiddenTag(self, e):
-        return WPRestrictedHTML(self, escape(str(e))).display()
+    # @jsonify_error(status=400)
+    # def _processHtmlForbiddenTag(self, e):
+    #     return WPRestrictedHTML(self, escape(str(e))).display()
 
     def _check_auth(self):
         if session.user:
@@ -354,30 +329,30 @@ class RH(RequestHandlerBase):
         self._check_csrf()
 
     def _do_process(self, profile):
-        profile_name = res = ''
         try:
-            cp_result = self._process_args()
-            if isinstance(cp_result, (current_app.response_class, Response)):
-                return '', cp_result
+            args_result = self._process_args()
+            if isinstance(args_result, (current_app.response_class, Response)):
+                return '', args_result
         except NoResultFound:  # sqlalchemy .one() not finding anything
-            raise NotFoundError(_('The specified item could not be found.'), title=_('Item not found'))
+            raise NotFound(_(u'The specified item could not be found.'))
 
         rv = self.normalize_url()
         if rv is not None:
             return '', rv
 
-        self._check_access()
+        try:
+            self._check_access()
+        except AccessKeyRequired:
+            return '', WPKeyAccessError(self).display()
         Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
 
-        if self._doProcess:
-            if profile:
-                profile_name = os.path.join(config.TEMP_DIR, 'stone{}.prof'.format(random.random()))
-                result = [None]
-                cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_name)
-                res = result[0]
-            else:
-                res = self._process()
-        return profile_name, res
+        if profile:
+            profile_name = os.path.join(config.TEMP_DIR, 'stone{}.prof'.format(random.random()))
+            result = [None]
+            cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_name)
+            return profile_name, result[0]
+        else:
+            return '', self._process()
 
     def process(self):
         if request.method not in HTTP_VERBS:
@@ -396,34 +371,26 @@ class RH(RequestHandlerBase):
         logger.info(u'Request started: %s %s [IP=%s] [PID=%s]',
                     request.method, request.relative_url, request.remote_addr, os.getpid())
 
-        is_error_response = False
         try:
-            try:
-                fossilize.clearCache()
-                GenericMailer.flushQueue(False)
-                self._check_auth()
-                profile_name, res = self._do_process(profile)
-                signals.after_process.send()
+            fossilize.clearCache()
+            GenericMailer.flushQueue(False)
+            self._check_auth()
+            profile_name, res = self._do_process(profile)
+            signals.after_process.send()
 
-                if self.commit:
-                    if GenericMailer.has_queue():
-                        # ensure we fail early (before sending out e-mails)
-                        # in case there are DB constraint violations, etc...
-                        db.enforce_constraints()
-                        GenericMailer.flushQueue(True)
+            if self.commit:
+                if GenericMailer.has_queue():
+                    # ensure we fail early (before sending out e-mails)
+                    # in case there are DB constraint violations, etc...
+                    db.enforce_constraints()
+                    GenericMailer.flushQueue(True)
 
-                    db.session.commit()
-                else:
-                    db.session.rollback()
-            except DatabaseError:
-                handle_sqlalchemy_database_error()  # this will re-raise an exception
-            logger.info('Request successful')
-        except Exception as e:
-            db.session.rollback()
-            res = self._get_error_handler(e)(e)
-            if isinstance(e, HTTPException) and e.response is not None:
-                res = e.response
-            is_error_response = True
+                db.session.commit()
+            else:
+                db.session.rollback()
+        except DatabaseError:
+            handle_sqlalchemy_database_error()  # this will re-raise an exception
+        logger.debug('Request successful')
 
         # log request timing
         if profile and os.path.isfile(profile_name):
@@ -433,33 +400,13 @@ class RH(RequestHandlerBase):
             stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))
             os.remove(profile_name)
 
-        if is_error_response and isinstance(res, (current_app.response_class, Response)):
-            # if we went through error handling code, responseUtil._status has been changed
-            # so make_response() would fail
-            return res
-
-        # In case of no process needed, we should return empty string to avoid erroneous output
-        # specially with getVars breaking the JS files.
-        if not self._doProcess or res is None:
+        if res is None:
             return self._responseUtil.make_empty()
 
         response = self._responseUtil.make_response(res)
         if self.DENY_FRAMES:
             response.headers['X-Frame-Options'] = 'DENY'
         return response
-
-    def _get_error_handler(self, e):
-        exception_name = {
-            'NotFound': 'NotFoundError',
-            'MaKaCError': 'GeneralError',
-            'IndicoError': 'GeneralError',
-            'ValueError': 'UnexpectedError',
-            'Exception': 'UnexpectedError',
-            'AccessControlError': 'AccessError'
-        }.get(type(e).__name__, type(e).__name__)
-        if isinstance(e, BadData):  # we also want its subclasses
-            exception_name = 'BadData'
-        return getattr(self, '_process{}'.format(exception_name), self._processUnexpectedError)
 
 
 class RHSimple(RH):
@@ -491,16 +438,17 @@ class RHSimple(RH):
 class RHProtected(RH):
     def _checkSessionUser(self):
         if session.user is None:
-            if request.headers.get("Content-Type", "text/html").find("application/json") != -1:
+            if 'application/json' in request.headers.get('Content-Type', 'text/html'):
                 raise NotLoggedError("You are currently not authenticated. Please log in again.")
             else:
-                # XXX: the next two lines are there in case something swallows our exception
-                self._doProcess = False
-                self._redirect(url_for_login(request.relative_url))
                 raise Forbidden
 
     def _check_access(self):
         self._checkSessionUser()
+
+
+class AccessKeyRequired(Forbidden):
+    pass
 
 
 class RHDisplayBaseProtected(RHProtected):
@@ -510,13 +458,17 @@ class RHDisplayBaseProtected(RHProtected):
         event = self._target.as_event
         can_access = event.can_access(session.user)
         if not can_access and event.access_key:
-            raise KeyAccessError()
+            raise AccessKeyRequired
         if can_access:
             return
         elif session.user is None:
             self._checkSessionUser()
         else:
-            raise AccessError()
+            msg = [_(u"You are not authorized to access this event.")]
+            if event.no_access_contact:
+                msg.append(_(u"If you believe you should have access, please contact {}")
+                           .format(event.no_access_contact))
+            raise Forbidden(u' '.join(msg))
 
 
 class RHModificationBaseProtected(RHProtected):
@@ -531,7 +483,7 @@ class RHModificationBaseProtected(RHProtected):
             if session.user is None:
                 self._checkSessionUser()
             else:
-                raise ModificationError()
+                raise Forbidden(_(u'You are not authorized to manage this event.'))
         check_event_locked(self, event)
 
 

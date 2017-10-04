@@ -22,4 +22,4 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 misc = IndicoBlueprint('misc', __name__)
 
-misc.add_url_rule('/report-error', 'errors', RHErrorReporting, methods=('GET', 'POST'))
+misc.add_url_rule('/report-error-old', 'errors', RHErrorReporting, methods=('GET', 'POST'))

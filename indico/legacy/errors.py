@@ -49,14 +49,10 @@ class MaKaCError(Exception, Fossilizable):
         """
         Some extra information, like actions that can be taken
         """
-
         return self._explanation
 
 
 class AccessControlError(MaKaCError):
-    """
-    """
-
     fossilizes(IErrorNoReportFossil)
 
     def __init__(self, objectType="object"):
@@ -71,50 +67,12 @@ class AccessControlError(MaKaCError):
         return str(self)
 
 
-class AccessError(AccessControlError):
-    """
-    """
-    pass
-
-
-class KeyAccessError(AccessControlError):
-    """
-    """
-    pass
-
-
-class ModificationError(AccessControlError):
-    """
-    """
-
-    @ensure_str
-    def __str__(self):
-        return _("you are not authorised to modify this %s") % self.objType
-
-
 class NotLoggedError(MaKaCError):
-    """
-    """
     fossilizes(IErrorNoReportFossil)
 
 
 class NoReportError(MaKaCError):
-    """
-    """
     fossilizes(IErrorNoReportFossil)
-
-
-class NotFoundError(MaKaCError):
-    """
-    Legacy indico's own NotFound version (just for legacy support)
-    """
-    fossilizes(IErrorNoReportFossil)
-
-    def __init__(self, message, title=""):
-        if not title:
-            title = message
-            message = ''
-        super(NotFoundError, self).__init__(title, explanation=message)
 
 
 class HtmlForbiddenTag(NoReportError):

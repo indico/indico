@@ -16,7 +16,6 @@
 
 from indico.core.db import db
 from indico.legacy.services.implementation.base import ServiceBase
-from indico.legacy.services.interface.rpc.common import ServiceError
 from indico.modules.rb.models.aspects import Aspect
 from indico.modules.rb.models.locations import Location
 
@@ -25,10 +24,7 @@ class RoomBookingMapBase(ServiceBase):
     UNICODE_PARAMS = True
 
     def _param(self, parameter_name):
-        try:
-            return self._params[parameter_name]
-        except:
-            raise ServiceError('ERR-RB0', 'Invalid parameter name: {0}.'.format(parameter_name))
+        return self._params[parameter_name]
 
 
 class RoomBookingMapCreateAspect(RoomBookingMapBase):

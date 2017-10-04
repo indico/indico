@@ -17,17 +17,15 @@
 from __future__ import absolute_import, unicode_literals
 
 import os
-import re
 import uuid
 
 from babel.numbers import format_currency, get_currency_name
-from flask import _app_ctx_stack, current_app, request, send_from_directory
+from flask import _app_ctx_stack, request
 from flask_pluginengine import plugins_loaded
 from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
-from werkzeug.exceptions import BadRequest, NotFound
 from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
@@ -40,11 +38,10 @@ from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.core import on_models_committed
 from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
-from indico.core.logger import Logger, sentry_log_exception
+from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
 from indico.legacy.common.TemplateExec import mako
-from indico.legacy.webinterface.pages.error import render_error
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
 from indico.modules.oauth import oauth
@@ -55,6 +52,7 @@ from indico.util.signals import values_from_signal
 from indico.util.string import alpha_enum, crc32, slugify
 from indico.web.assets import (core_env, include_css_assets, include_js_assets, register_all_css, register_all_js,
                                register_theme_sass)
+from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
                                          markdown, natsort, subclassof, underline)
@@ -78,6 +76,8 @@ def configure_app(app, set_path=False):
     if config.MAX_UPLOAD_FILES_TOTAL_SIZE > 0:
         app.config['MAX_CONTENT_LENGTH'] = config.MAX_UPLOAD_FILES_TOTAL_SIZE * 1024 * 1024
     app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.config['TRAP_HTTP_EXCEPTIONS'] = False
+    app.config['TRAP_BAD_REQUEST_ERRORS'] = config.DEBUG
     app.config['SESSION_COOKIE_NAME'] = 'indico_session'
     app.config['PERMANENT_SESSION_LIFETIME'] = config.SESSION_LIFETIME
     configure_multipass(app, config)
@@ -265,8 +265,7 @@ def extend_url_map(app):
 
 def add_handlers(app):
     app.after_request(inject_current_url)
-    app.register_error_handler(404, handle_404)
-    app.register_error_handler(Exception, handle_exception)
+    app.register_blueprint(errors_bp)
 
 
 def add_blueprints(app):
@@ -307,33 +306,6 @@ def inject_current_url(response):
         return response
     response.headers['X-Indico-URL'] = request.relative_url
     return response
-
-
-def handle_404(exception):
-    try:
-        if re.search(r'\.py(?:/\S+)?$', request.path):
-            # While not dangerous per se, we never serve *.py files as static
-            raise NotFound
-        htdocs = os.path.join(current_app.root_path, 'htdocs')
-        try:
-            return send_from_directory(htdocs, request.path[1:], conditional=True)
-        except (UnicodeEncodeError, BadRequest):
-            raise NotFound
-    except NotFound:
-        if exception.description == NotFound.description:
-            # The default reason is too long and not localized
-            description = _("The page you are looking for doesn't exist.")
-        else:
-            description = exception.description
-        return render_error(_("Page not found"), description), 404
-
-
-def handle_exception(exception):
-    Logger.get('wsgi').exception(exception.message or 'WSGI Exception')
-    if current_app.debug:
-        raise
-    sentry_log_exception()
-    return render_error(_("An unexpected error occurred."), str(exception), standalone=True), 500
 
 
 def make_app(set_path=False, testing=False, config_override=None):

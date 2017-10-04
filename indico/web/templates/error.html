@@ -1,6 +1,24 @@
 <div class="error-box">
     <h1>{{ error_message }}</h1>
     <p>{{ error_description }}</p>
+    {% if g.saved_error_uuid and not standalone %}
+        <button id="report-error" class="i-button big"
+                data-href="{{ url_for('core.report_error', error_id=g.saved_error_uuid) }}"
+                data-title="{% trans %}Report Error{% endtrans %}"
+                data-ajax-dialog>
+            {%- trans %}Report Error{% endtrans -%}
+        </button>
+        <script>
+            (function() {
+                'use strict';
+                $('#report-error').on('ajaxDialog:closed', function(evt, data) {
+                    if (data) {
+                        $(this).replaceWith($T.gettext('Thanks for your error report!'));
+                    }
+                });
+            })();
+        </script>
+    {% endif %}
     <div class="error-box-small">
         <a href="{{ url_for_index() }}">{% trans %}Back to the main page{% endtrans %}</a>
     </div>

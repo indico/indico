@@ -21,6 +21,7 @@ from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
 from indico.core.config import config
+from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.modules.legal import legal_settings
 from indico.util.i18n import get_all_locales
 from indico.web.flask.templating import get_template_module
@@ -69,3 +70,20 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
                                 timezone_data=timezone_data,
                                 languages=get_all_locales())
     return Markup(rv)
+
+
+class WPError(WPDecorated, WPJinjaMixin):
+    def __init__(self, message, description):
+        WPDecorated.__init__(self, None)
+        self._message = message
+        self._description = description
+
+    def _getBody(self, params):
+        return self._getPageContent({
+            '_jinja_template': 'error.html',
+            'error_message': self._message,
+            'error_description': self._description
+        })
+
+    def getHTML(self):
+        return self.display()

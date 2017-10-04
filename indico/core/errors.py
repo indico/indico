@@ -52,12 +52,10 @@ class IndicoError(Exception):
 
     code = -32000  # json-rpc server specific errors starting code
 
-    def __init__(self, message='', area='', explanation='', http_status_code=None):
+    def __init__(self, message='', area='', explanation=''):
         self.message = message
         self._area = area
         self._explanation = explanation
-        if http_status_code is not None:
-            self.http_status_code = http_status_code
 
     @ensure_str
     def __str__(self):
@@ -81,18 +79,6 @@ class IndicoError(Exception):
         """
         return self._explanation
 
-    def toDict(self):
-        reportable = not isinstance(self, NoReportError) and not getattr(self, '_disallow_report', False)
-        return {
-            'code': self.code,
-            'hasUser': bool(session.user),
-            'type': 'noReport' if not reportable else 'unknown',
-            'message': self.getMessage(),
-            'data': self.__dict__,
-            'requestInfo': {},
-            'inner': traceback.format_exc()
-        }
-
 
 class FormValuesError(IndicoError):
     pass
@@ -106,14 +92,10 @@ class NoReportError(IndicoError):
         return exc
 
 
-class NotFoundError(IndicoError):
-    pass
-
-
 class UserValueError(NoReportError):
     """Error to indicate that the user entered invalid data.
 
     This behaves basically like NoReportError but it comes with
-    a 400 status code so AJAX error handling properly goes into
-    the error callback instead of the success callback.
+    a 400 status code isntead of the usual 500 code.
     """
+    http_status_code = 400

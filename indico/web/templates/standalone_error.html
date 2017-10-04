@@ -59,5 +59,7 @@
             <img alt="logo" class="header-logo" src="{{ indico_config.IMAGES_BASE_URL }}/logo_indico.png">
         </a>
     </div>
-    {% include "error.html" %}
+    {% with standalone=true %}
+        {% include "error.html" %}
+    {% endwith %}
 </div>

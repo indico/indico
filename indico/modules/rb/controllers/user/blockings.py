@@ -19,9 +19,9 @@ from datetime import date
 
 from flask import flash, redirect, request, session
 from sqlalchemy.orm import joinedload
+from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
-from indico.core.errors import IndicoError
 from indico.modules.rb.controllers import RHRoomBookingBase
 from indico.modules.rb.forms.blockings import BlockingForm, CreateBlockingForm
 from indico.modules.rb.models.blocked_rooms import BlockedRoom
@@ -39,7 +39,7 @@ class RHRoomBookingBlockingDetails(RHRoomBookingBase):
     def _process_args(self):
         self._blocking = Blocking.get(request.view_args['blocking_id'])
         if not self._blocking:
-            raise IndicoError('A blocking with this ID does not exist.')
+            raise NotFound('A blocking with this ID does not exist.')
 
     def _process(self):
         return WPRoomBookingBlockingDetails(self, blocking=self._blocking).display()
@@ -73,11 +73,6 @@ class RHRoomBookingCreateBlocking(RHRoomBookingCreateModifyBlockingBase):
         self._form = CreateBlockingForm(start_date=date.today(), end_date=date.today())
         self._blocking = None
 
-    def _check_access(self):
-        RHRoomBookingCreateModifyBlockingBase._check_access(self)
-        if not self._doProcess:  # we are not logged in
-            return
-
     def _save(self):
         self._blocking = blocking = Blocking()
         blocking.start_date = self._form.start_date.data
@@ -96,7 +91,7 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
     def _process_args(self):
         self._blocking = Blocking.get(request.view_args['blocking_id'])
         if self._blocking is None:
-            raise IndicoError('A blocking with this ID does not exist.')
+            raise NotFound('A blocking with this ID does not exist.')
         defaults = FormDefaults(self._blocking, attrs={'reason'},
                                 principals=self._blocking.allowed,
                                 blocked_rooms=[br.room_id for br in self._blocking.blocked_rooms])
@@ -105,10 +100,8 @@ class RHRoomBookingModifyBlocking(RHRoomBookingCreateModifyBlockingBase):
 
     def _check_access(self):
         RHRoomBookingCreateModifyBlockingBase._check_access(self)
-        if not self._doProcess:  # we are not logged in
-            return
         if not self._blocking.can_be_modified(session.user):
-            raise IndicoError(_("You are not authorized to modify this blocking."))
+            raise Forbidden(_("You are not authorized to modify this blocking."))
 
     def _save(self):
         blocking = self._blocking
@@ -139,12 +132,12 @@ class RHRoomBookingDeleteBlocking(RHRoomBookingBase):
     def _process_args(self):
         self._block = Blocking.get(request.view_args['blocking_id'])
         if not self._block:
-            raise IndicoError('A blocking with this ID does not exist.')
+            raise NotFound('A blocking with this ID does not exist.')
 
     def _check_access(self):
         RHRoomBookingBase._check_access(self)
         if not self._block.can_be_deleted(session.user):
-            raise IndicoError('You are not authorized to delete this blocking.')
+            raise Forbidden('You are not authorized to delete this blocking.')
 
     def _process(self):
         db.session.delete(self._block)

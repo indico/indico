@@ -44,6 +44,5 @@ methodMap = {
 
 
 endpointMap = {
-    "user": import_module('indico.legacy.services.implementation.user'),
     "search": import_module('indico.legacy.services.implementation.search')
 }

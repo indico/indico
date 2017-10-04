@@ -1,0 +1,19 @@
+{% extends 'emails/base.txt' %}
+
+{% block header %}{% endblock %}
+{% block footer_title %}Error Report{% endblock %}
+{% block subject_prefix %}[Indico@{{ server_name }}]{% endblock %}
+{% block subject %}Error report: {{ error_data.message|truncate(50) }}{% endblock %}
+
+
+{% block body -%}
+{% filter underline %}Comment{% endfilter %}
+{{ comment }}
+
+
+{% filter underline %}Traceback{% endfilter %}
+{{ error_data.traceback }}
+
+{% filter underline %}Request Data{% endfilter %}
+{{ error_data.request_info|pprint }}
+{% endblock %}
