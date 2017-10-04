@@ -16,7 +16,6 @@
 
 from importlib import import_module
 
-from indico.legacy.services.implementation import error
 from indico.modules.rb import services as rb_services
 from indico.modules.rb.services import aspects as rb_aspect_services
 from indico.modules.rb.services import blockings as rb_blocking_services
@@ -38,8 +37,6 @@ methodMap = {
     # rb blockings
     'roombooking.blocking.approve': rb_blocking_services.RoomBookingBlockingApprove,
     'roombooking.blocking.reject': rb_blocking_services.RoomBookingBlockingReject,
-    # system
-    'system.error.report': error.SendErrorReport
 }
 
 
