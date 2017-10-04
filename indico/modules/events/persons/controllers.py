@@ -93,7 +93,7 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'roles': OrderedDict(), 'registrations': []})
+        persons = defaultdict(lambda: {'roles': OrderedDict(), 'registrations': [], 'has_event_person': True})
 
         event_persons_query = (db.session.query(EventPerson, Registration)
                                .filter(EventPerson.event_id == self.event.id)
@@ -106,6 +106,12 @@ class RHPersonsBase(RHManageEventBase):
                                         session_block_strategy)
                                .all())
 
+        event_user_roles = defaultdict(set)
+        for event_role in self.event.roles:
+            for user in event_role.members:
+                event_user_roles[user].add(event_role)
+
+        event_person_users = set()
         for event_person, registration in event_persons_query:
             data = persons[event_person.email or event_person.id]
             if registration:
@@ -146,25 +152,24 @@ class RHPersonsBase(RHManageEventBase):
                 data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
                 data['roles']['speaker']['elements'] = dict(contributions, **subcontributions)
 
-            if event_person.user:
-                for role in event_person.user.event_roles:
-                    data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'css': role.css}
+            for role in event_user_roles[event_person.user]:
+                data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'css': role.css}
 
-        event_person_users = [person_data['person'].user for email, person_data in persons.iteritems()
-                              if person_data['person'].user]
+            event_person_users.add(event_person.user)
 
-        event_roles_users = defaultdict(lambda: {'roles': OrderedDict(), 'person': [], 'is_event_role_user': True})
-        for role in self.event.roles:
-            for member in role.members:
-                if member not in event_person_users:
-                    event_roles_users[member.email]['roles']['custom_{}'.format(role.id)] = {'name': role.name,
-                                                                                             'code': role.code,
-                                                                                             'css': role.css}
-                    event_roles_users[member.email]['person'] = member
+        internal_role_users = defaultdict(lambda: {'roles': OrderedDict(), 'person': [], 'has_event_person': False})
+        for user, roles in event_user_roles.viewitems():
+            if user in event_person_users:
+                continue
+            for role in roles:
+                user_metadata = internal_role_users[user.email]
+                user_metadata['person'] = user
+                user_metadata['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
+                                                                       'css': role.css}
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
-        persons = dict(persons, **event_roles_users)
+        persons = dict(persons, **internal_role_users)
         return persons
 
 

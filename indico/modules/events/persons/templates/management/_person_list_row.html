@@ -76,10 +76,7 @@
         {% endif %}
     </td>
     <td class="i-table edit-column">
-        {% if person_data.is_event_role_user %}
-            <a class="i-link icon-edit disabled"
-               title="{%- trans %}This user does not belong to any built-in role{% endtrans -%}"></a>
-        {% else %}
+        {% if person_data.has_event_person %}
             <a class="i-link icon-edit"
                title="{%- trans %}Edit information{% endtrans -%}"
                data-href="{{ url_for('persons.edit_person', person) }}"
@@ -87,6 +84,9 @@
                data-update="#person-{{ person.id }}"
                data-highlight-update
                data-ajax-dialog></a>
+        {% else %}
+            <a class="i-link icon-edit disabled"
+               title="{%- trans %}This user does not play any public role{% endtrans -%}"></a>
         {% endif %}
     </td>
 {% endmacro %}
