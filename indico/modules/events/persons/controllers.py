@@ -54,11 +54,28 @@ BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 
                  'convener': {'name': 'Convener', 'code': 'CON', 'color': 'dcb1f9',
                               'css': 'color: #dcb1f9 !important; border-color: #dcb1f9 !important'},
                  'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '7fd1c8',
-                             'css': 'color: #7fd1c8 !important; border-color: #7fd1c8 !important'}
-                 }
+                             'css': 'color: #7fd1c8 !important; border-color: #7fd1c8 !important'}}
 
 
 class RHPersonsBase(RHManageEventBase):
+    def generate_abstracts_data(self, person_link):
+        return {'title': person_link.abstract.verbose_title,
+                'url': url_for('abstracts.display_abstract', person_link.abstract, management=True)}
+
+    def generate_sessions_data(self, person_link):
+        return {'title': person_link.session_block.full_title}
+
+    def generate_contributions_data(self, person_link):
+        return {'title': person_link.contribution.title,
+                'url': url_for('contributions.manage_contributions', self.event,
+                               selected=person_link.contribution.friendly_id)}
+
+    def generate_subcontributions_data(self, person_link):
+        return {'title': '{} ({})'.format(person_link.subcontribution.contribution.title,
+                                          person_link.subcontribution.title),
+                'url': url_for('contributions.manage_contributions', self.event,
+                               selected=person_link.subcontribution.friendly_id)}
+
     def get_persons(self):
         abstract_strategy = joinedload('abstract_links')
         abstract_strategy.joinedload('abstract')
@@ -101,51 +118,29 @@ class RHPersonsBase(RHManageEventBase):
                 continue
 
             if self.event.has_feature('abstracts'):
-                abstracts = {
-                    person_link.abstract_id: {
-                        'title': person_link.abstract.verbose_title,
-                        'url': url_for('abstracts.display_abstract', person_link.abstract, management=True)
-                    }
-                    for person_link in event_person.abstract_links if not person_link.abstract.is_deleted
-                }
+                abstracts = {person_link.abstract_id: self.generate_abstracts_data(person_link)
+                             for person_link in event_person.abstract_links if not person_link.abstract.is_deleted}
 
                 if abstracts:
                     data['roles']['author'] = BUILTIN_ROLES['author'].copy()
                     data['roles']['author']['elements'] = abstracts
 
-            session_blocks = {
-                person_link.session_block_id: {
-                    'title': person_link.session_block.full_title,
-                }
-                for person_link in event_person.session_block_links
-                if not person_link.session_block.session.is_deleted
-            }
+            session_blocks = {person_link.session_block_id: self.generate_sessions_data(person_link)
+                              for person_link in event_person.session_block_links
+                              if not person_link.session_block.session.is_deleted}
 
             if session_blocks:
                 data['roles']['convener'] = BUILTIN_ROLES['convener'].copy()
                 data['roles']['convener']['elements'] = session_blocks
 
-            contributions = {
-                person_link.contribution.id: {
-                    'title': person_link.contribution.title,
-                    'url': url_for('contributions.manage_contributions', self.event,
-                                   selected=person_link.contribution.friendly_id)
-                }
-                for person_link in event_person.contribution_links
-                if person_link.is_speaker and not person_link.contribution.is_deleted
-            }
+            contributions = {person_link.contribution.id: self.generate_contributions_data(person_link)
+                             for person_link in event_person.contribution_links
+                             if person_link.is_speaker and not person_link.contribution.is_deleted}
 
-            subcontributions = {
-                person_link.subcontribution.id: {
-                    'title': '{} ({})'.format(person_link.subcontribution.contribution.title,
-                                              person_link.subcontribution.title),
-                    'url': url_for('contributions.manage_contributions', self.event,
-                                   selected=person_link.subcontribution.friendly_id)
-                }
-                for person_link in event_person.subcontribution_links
-                if not person_link.subcontribution.is_deleted and
-                not person_link.subcontribution.contribution.is_deleted
-            }
+            subcontributions = {person_link.subcontribution.id: self.generate_subcontributions_data(person_link)
+                                for person_link in event_person.subcontribution_links
+                                if not person_link.subcontribution.is_deleted and
+                                not person_link.subcontribution.contribution.is_deleted}
 
             if contributions or subcontributions:
                 data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
