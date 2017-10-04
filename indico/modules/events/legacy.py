@@ -16,14 +16,7 @@
 
 import warnings
 
-from flask import session
-from pytz import utc
-
-from indico.core import signals
 from indico.core.config import config
-from indico.modules.events.cloning import EventCloner
-from indico.modules.events.features import features_event_settings
-from indico.modules.events.operations import create_event
 from indico.util.string import return_ascii
 
 
@@ -64,31 +57,3 @@ class LegacyConference(object):
     def locator(self):
         warnings.warn('Accessed Conference.locator', stacklevel=4)
         return self.event.locator
-
-    def clone(self, startDate):
-        # startDate is in the timezone of the event
-        old_event = self.as_event
-        start_dt = old_event.tzinfo.localize(startDate).astimezone(utc)
-        end_dt = start_dt + old_event.duration
-        data = {
-            'start_dt': start_dt,
-            'end_dt': end_dt,
-            'timezone': old_event.timezone,
-            'title': old_event.title,
-            'description': old_event.description,
-            'visibility': old_event.visibility
-        }
-        event = create_event(old_event.category, old_event.type_, data,
-                             features=features_event_settings.get(self, 'enabled'),
-                             add_creator_as_manager=False)
-
-        # Run the new modular cloning system
-        EventCloner.run_cloners(old_event, event)
-        signals.event.cloned.send(old_event, new_event=event)
-
-        # Grant access to the event creator -- must be done after modular cloners
-        # since cloning the event ACL would result in a duplicate entry
-        with event.logging_disabled:
-            event.update_principal(session.user, full_access=True)
-
-        return event.as_legacy
