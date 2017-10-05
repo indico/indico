@@ -14,6 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 import cProfile
 import inspect
 import itertools
@@ -217,8 +219,8 @@ class RH(RequestHandlerBase):
             # Might be a WTForm with a prefix. In that case the field name is '<prefix>-csrf_token'
             token = next((v for k, v in request.form.iteritems() if k.endswith('-csrf_token')), None)
         if self.CSRF_ENABLED and request.method != 'GET' and token != session.csrf_token:
-            msg = _(u"It looks like there was a problem with your current session. Please use your browser's back "
-                    u"button, reload the page and try again.")
+            msg = _("It looks like there was a problem with your current session. Please use your browser's back "
+                    "button, reload the page and try again.")
             raise BadRequest(msg)
 
     def _check_event_feature(self):
@@ -238,7 +240,7 @@ class RH(RequestHandlerBase):
             if isinstance(args_result, (current_app.response_class, Response)):
                 return args_result
         except NoResultFound:  # sqlalchemy .one() not finding anything
-            raise NotFound(_(u'The specified item could not be found.'))
+            raise NotFound(_('The specified item could not be found.'))
 
         rv = self.normalize_url()
         if rv is not None:
@@ -267,7 +269,7 @@ class RH(RequestHandlerBase):
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()
 
-        logger.info(u'Request started: %s %s [IP=%s] [PID=%s]',
+        logger.info('Request started: %s %s [IP=%s] [PID=%s]',
                     request.method, request.relative_url, request.remote_addr, os.getpid())
 
         try:
@@ -347,10 +349,10 @@ class RHModificationBaseProtected(RHProtected):
             if session.user is None:
                 self._require_user()
             else:
-                raise Forbidden(_(u'You are not authorized to manage this event.'))
+                raise Forbidden(_('You are not authorized to manage this event.'))
         check_event_locked(self, event)
 
 
 def check_event_locked(rh, event, force=False):
     if (not getattr(rh, 'ALLOW_LOCKED', False) or force) and event.is_locked and request.method not in ('GET', 'HEAD'):
-        raise NoReportError.wrap_exc(Forbidden(_(u'This event has been locked so no modifications are possible.')))
+        raise NoReportError.wrap_exc(Forbidden(_('This event has been locked so no modifications are possible.')))
