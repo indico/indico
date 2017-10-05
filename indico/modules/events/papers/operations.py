@@ -163,8 +163,8 @@ def create_paper_revision(paper, submitter, files):
     notify_paper_revision_submission(revision)
     logger.info('Paper revision %r submitted by %r', revision, session.user)
     paper.event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
-                        "Paper revision {} submitted for contribution {} ({})"
-                        .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
+                    "Paper revision {} submitted for contribution {} ({})"
+                    .format(revision.id, paper.contribution.title, paper.contribution.friendly_id), session.user)
     return revision
 
 
@@ -184,8 +184,8 @@ def judge_paper(paper, judgment, comment, judge):
     notify_paper_judgment(paper)
     logger.info('Paper %r was judged by %r to %s', paper, judge, orig_string(judgment.title))
     paper.event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
-                        'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
-                        data=log_data)
+                    'Paper "{}" was judged'.format(orig_string(paper.verbose_title)), judge,
+                    data=log_data)
 
 
 def reset_paper_state(paper):
@@ -194,7 +194,7 @@ def reset_paper_state(paper):
     notify_paper_judgment(paper, reset=True)
     logger.info('Paper %r state reset by %r', paper, session.user)
     paper.event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
-                        'Judgment {} reset'.format(paper.verbose_title), session.user)
+                    'Judgment {} reset'.format(paper.verbose_title), session.user)
 
 
 def _store_paper_template_file(template, file):
@@ -282,8 +282,8 @@ def create_review(paper, review_type, user, review_data, questions_data):
         'Comment': review.comment
     })
     paper.event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
-                        'Paper for contribution {} reviewed'.format(paper.contribution.verbose_title),
-                        user, data=log_data)
+                    'Paper for contribution {} reviewed'.format(paper.contribution.verbose_title),
+                    user, data=log_data)
     return review
 
 
@@ -333,8 +333,8 @@ def create_comment(paper, text, visibility, user):
         notify_comment(receiver, paper, text, user)
     logger.info("Paper %r received a comment from %r", paper, session.user)
     paper.event.log(EventLogRealm.management, EventLogKind.positive, 'Papers',
-                        'Paper {} received a comment'.format(paper.verbose_title),
-                        session.user)
+                    'Paper {} received a comment'.format(paper.verbose_title),
+                    session.user)
 
 
 def update_comment(comment, text, visibility):
@@ -345,8 +345,8 @@ def update_comment(comment, text, visibility):
     logger.info("Paper comment %r modified by %r", comment, session.user)
     paper = comment.paper_revision.paper
     paper.event.log(EventLogRealm.management, EventLogKind.change, 'Papers',
-                        'Comment on paper {} modified'.format(paper.verbose_title), session.user,
-                        data={'Changes': make_diff_log(changes, {'text': 'Text', 'visibility': 'Visibility'})})
+                    'Comment on paper {} modified'.format(paper.verbose_title), session.user,
+                    data={'Changes': make_diff_log(changes, {'text': 'Text', 'visibility': 'Visibility'})})
 
 
 def delete_comment(comment):
@@ -355,7 +355,7 @@ def delete_comment(comment):
     logger.info("Paper comment %r deleted by %r", comment, session.user)
     paper = comment.paper_revision.paper
     paper.event.log(EventLogRealm.management, EventLogKind.negative, 'Papers',
-                        'Comment on paper {} removed'.format(paper.verbose_title), session.user)
+                    'Comment on paper {} removed'.format(paper.verbose_title), session.user)
 
 
 def set_deadline(event, role, deadline, enforce=True):
