@@ -55,8 +55,8 @@ class RHConferenceBaseDisplay(RHConferenceBase):
     def _show_access_key_form(self):
         return WPAccessKey.render_template('display/access_key.html', event=self.event)
 
-    def _do_process(self, profile):
+    def _do_process(self):
         try:
-            return RHConferenceBase._do_process(self, profile)
+            return RHConferenceBase._do_process(self)
         except AccessKeyRequired:
-            return b'', self._show_access_key_form()
+            return self._show_access_key_form()

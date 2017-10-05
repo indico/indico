@@ -18,8 +18,7 @@ import cProfile
 import inspect
 import itertools
 import os
-import pstats
-import random
+import time
 from functools import partial, wraps
 
 import jsonschema
@@ -105,7 +104,6 @@ class RH(RequestHandlerBase):
         self.commit = True
         self._responseUtil = ResponseUtil()
         self._target = None
-        self._endTime = None
 
     # Methods =============================================================
 
@@ -234,37 +232,35 @@ class RH(RequestHandlerBase):
             logger.info('Request authenticated: %r', session.user)
         self._check_csrf()
 
-    def _do_process(self, profile):
+    def _do_process(self):
         try:
             args_result = self._process_args()
             if isinstance(args_result, (current_app.response_class, Response)):
-                return '', args_result
+                return args_result
         except NoResultFound:  # sqlalchemy .one() not finding anything
             raise NotFound(_(u'The specified item could not be found.'))
 
         rv = self.normalize_url()
         if rv is not None:
-            return '', rv
+            return rv
 
         self._check_access()
         Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
 
-        if profile:
-            profile_name = os.path.join(config.TEMP_DIR, 'stone{}.prof'.format(random.random()))
+        if config.PROFILE:
             result = [None]
-            cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_name)
-            return profile_name, result[0]
+            profile_path = os.path.join(config.TEMP_DIR, '{}-{}.prof'.format(type(self).__name__, time.time()))
+            cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_path)
+            return result[0]
         else:
-            return '', self._process()
+            return self._process()
 
     def process(self):
         if request.method not in HTTP_VERBS:
             # Just to be sure that we don't get some crappy http verb we don't expect
             raise BadRequest
 
-        profile = config.PROFILE
-        profile_name, res = '', ''
-
+        res = ''
         g.rh = self
         sentry_set_tags({'rh': self.__class__.__name__})
 
@@ -278,7 +274,7 @@ class RH(RequestHandlerBase):
             fossilize.clearCache()
             GenericMailer.flushQueue(False)
             self._check_auth()
-            profile_name, res = self._do_process(profile)
+            res = self._do_process()
             signals.after_process.send()
 
             if self.commit:
@@ -294,14 +290,6 @@ class RH(RequestHandlerBase):
         except DatabaseError:
             handle_sqlalchemy_database_error()  # this will re-raise an exception
         logger.debug('Request successful')
-
-        # log request timing
-        if profile and os.path.isfile(profile_name):
-            rep = config.TEMP_DIR
-            stats = pstats.Stats(profile_name)
-            stats.sort_stats('cumulative', 'time', 'calls')
-            stats.dump_stats(os.path.join(rep, 'IndicoRequestProfile.log'))
-            os.remove(profile_name)
 
         if res is None:
             return self._responseUtil.make_empty()
