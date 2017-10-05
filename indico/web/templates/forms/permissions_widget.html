@@ -1,0 +1,12 @@
+{% extends 'forms/base_widget.html' %}
+
+{% block html %}
+    <div id="permissions-widget" class="js-permissions-widget">
+    </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        $('#permissions-widget').permissionswidget({});
+    </script>
+{% endblock %}

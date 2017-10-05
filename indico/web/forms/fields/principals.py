@@ -27,6 +27,7 @@ from indico.modules.networks.models.networks import IPNetworkGroup
 from indico.modules.networks.util import serialize_ip_network_group
 from indico.modules.users.util import serialize_user
 from indico.util.user import principal_from_fossil
+from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
 
 
@@ -119,3 +120,10 @@ class PrincipalField(PrincipalListField):
         if valuelist:
             data = map(self._convert_principal, json.loads(valuelist[0]))
             self.data = None if not data else data[0]
+
+
+class PermissionsField(JSONField):
+    widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
+
+    def _value(self):
+        return super(PermissionsField, self)._value() if self.data else '[]'

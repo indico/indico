@@ -52,6 +52,7 @@ from indico.web.forms.fields import (AccessControlListField, IndicoDateField, In
                                      IndicoProtectionField, IndicoRadioField, IndicoSelectMultipleCheckboxField,
                                      IndicoTagListField, IndicoTimezoneSelectField, IndicoWeekDayRepetitionField,
                                      MultiStringField, PrincipalListField, RelativeDeltaField)
+from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
 
@@ -246,6 +247,7 @@ class EventProtectionForm(IndicoForm):
                              description=_("""From which point in the category tree this event will be visible from """
                                            """(number of categories upwards). Applies to "Today's events" and """
                                            """Calendar only. If the event is moved, this number will be preserved."""))
+    permissions = PermissionsField(_("Permissions"), [DataRequired()])
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):

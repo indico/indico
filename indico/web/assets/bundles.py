@@ -249,7 +249,8 @@ def register_all_js(env):
                    'sortablelist.js',
                    'categorynavigator.js',
                    'track_role_widget.js',
-                   'paper_email_settings_widget.js'))
+                   'paper_email_settings_widget.js',
+                   'permissions_widget.js'))
 
     indico_regform = rjs_bundle(
         'indico_regform',
