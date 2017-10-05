@@ -22,9 +22,12 @@
                 {% endtrans %}
             {% endif %}
         </div>
-        <div class="protectionWidgetSection">
-            {{ disclaimers[mode]|sanitize_html }}
-        </div>
+        {% set disclaimer = disclaimers[mode]|sanitize_html|trim %}
+        {% if disclaimer %}
+            <div class="protectionWidgetSection">
+                {{ disclaimer }}
+            </div>
+        {% endif %}
     </div>
 
     <a id="protection-details-link"
