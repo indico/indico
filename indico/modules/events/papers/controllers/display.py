@@ -32,7 +32,7 @@ from indico.modules.events.papers.operations import (create_paper_revision, crea
                                                      reset_paper_state)
 from indico.modules.events.papers.util import (get_user_contributions_to_review, get_user_reviewed_contributions,
                                                get_contributions_with_paper_submitted_by_user,
-                                               get_contributions_with_user_paper_submission_rights)
+                                               get_user_submittable_contributions)
 from indico.modules.events.papers.views import render_paper_page, WPDisplayReviewingArea, WPDisplayCallForPapers
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -42,6 +42,12 @@ from indico.web.util import jsonify_form, jsonify_data, jsonify, jsonify_templat
 class RHSubmitPaper(RHPaperBase):
     PAPER_REQUIRED = False
     ALLOW_LOCKED = True
+
+    def _check_paper_protection(self):
+        if not RHPaperBase._check_paper_protection(self):
+            return False
+        paper = self.contribution.paper
+        return paper is None or paper.state == PaperRevisionState.to_be_corrected
 
     def _process(self):
         form = PaperSubmissionForm()
@@ -240,7 +246,7 @@ class RHCallForPapers(RHPapersBase):
             # checkProtection aborts in this case, but the functions below fail with a None user
             return
         self.papers = set(get_contributions_with_paper_submitted_by_user(self.event_new, session.user))
-        contribs = set(get_contributions_with_user_paper_submission_rights(self.event_new, session.user))
+        contribs = set(get_user_submittable_contributions(self.event_new, session.user))
         self.contribs = contribs - self.papers
 
     def _process(self):
