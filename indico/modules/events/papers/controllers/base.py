@@ -19,9 +19,10 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.management.controllers.base import ManageEventMixin
+from indico.modules.events.util import check_event_locked
 
 
 class RHPapersBase(RHConferenceBaseDisplay):
@@ -41,7 +42,7 @@ class RHPapersBase(RHConferenceBaseDisplay):
         return request.view_args.get('management', False)
 
 
-class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
+class RHManagePapersBase(ManageEventMixin, RHPapersBase):
     """
     Base class for all paper-related RHs that require full event
     management permissions
@@ -49,9 +50,6 @@ class RHManagePapersBase(RHPapersBase, RHModificationBaseProtected):
 
     ROLE = 'paper_manager'
     DENY_FRAMES = True
-
-    def _check_access(self):
-        RHModificationBaseProtected._check_access(self)
 
     @property
     def management(self):

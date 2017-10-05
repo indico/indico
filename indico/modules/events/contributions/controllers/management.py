@@ -25,7 +25,6 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
 from indico.legacy.pdfinterface.conference import ContribsToPDF, ContributionBook
-from indico.legacy.webinterface.rh.base import check_event_locked
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
@@ -54,7 +53,8 @@ from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import get_field_values, track_time_changes, update_object_principals
+from indico.modules.events.util import (check_event_locked, get_field_values, track_time_changes,
+                                        update_object_principals)
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx

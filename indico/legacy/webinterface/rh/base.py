@@ -35,12 +35,10 @@ from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.core.errors import NoReportError
 from indico.core.logger import Logger, sentry_set_tags
 from indico.legacy.common import fossilize
 from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
-from indico.modules.events.legacy import LegacyConference
 from indico.util.i18n import _
 from indico.util.locators import get_locator
 from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
@@ -330,24 +328,3 @@ class RHProtected(RH):
 
     def _check_access(self):
         self._require_user()
-
-
-class RHModificationBaseProtected(RHProtected):
-    ALLOW_LOCKED = False
-    ROLE = None
-
-    def _check_access(self):
-        if not isinstance(self._target, LegacyConference):
-            raise Exception('Unexpected object')
-        event = self._target.as_event
-        if not event.can_manage(session.user, role=self.ROLE):
-            if session.user is None:
-                self._require_user()
-            else:
-                raise Forbidden(_('You are not authorized to manage this event.'))
-        check_event_locked(self, event)
-
-
-def check_event_locked(rh, event, force=False):
-    if (not getattr(rh, 'ALLOW_LOCKED', False) or force) and event.is_locked and request.method not in ('GET', 'HEAD'):
-        raise NoReportError.wrap_exc(Forbidden(_('This event has been locked so no modifications are possible.')))

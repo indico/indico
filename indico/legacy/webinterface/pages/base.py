@@ -158,12 +158,11 @@ class WPBase:
         raise NotImplementedError
 
     def display(self, **params):
-        from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
         from indico.modules.admin import RHAdminBase
         from indico.modules.core.settings import social_settings
 
         title_parts = [to_unicode(self._getTitle())]
-        if self.MANAGEMENT or isinstance(self._rh, RHModificationBaseProtected):
+        if self.MANAGEMENT:
             title_parts.append(_(u'Management area'))
         elif isinstance(self._rh, RHAdminBase):
             title_parts.append(_(u'Administrator area'))

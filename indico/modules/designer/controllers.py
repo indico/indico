@@ -25,7 +25,7 @@ from PIL import Image
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
+from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.categories import Category
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
@@ -38,6 +38,7 @@ from indico.modules.designer.util import (get_all_templates, get_default_templat
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.util import check_event_locked
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
@@ -122,6 +123,7 @@ class SpecificTemplateMixin(TemplateDesignerMixin):
         return self.template.owner
 
     def _check_access(self):
+        self._require_user()
         if not self.target.can_manage(session.user):
             raise Forbidden
         elif isinstance(self.target, Event):
@@ -230,10 +232,10 @@ class RHCloneCategoryTemplate(CloneTemplateMixin, RHManageCategoryBase):
         CloneTemplateMixin._process_args(self)
 
 
-class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHModificationBaseProtected):
-    def _process_args(self):
-        RHModificationBaseProtected._process_args(self)
-        SpecificTemplateMixin._process_args(self)
+class RHModifyDesignerTemplateBase(SpecificTemplateMixin, RHProtected):
+    def _check_access(self):
+        RHProtected._check_access(self)
+        SpecificTemplateMixin._check_access(self)
 
 
 class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
