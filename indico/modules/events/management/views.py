@@ -44,6 +44,8 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
                                            foo='bar')
     """
 
+    MANAGEMENT = True
+
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_

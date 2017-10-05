@@ -19,9 +19,10 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected, check_event_locked
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.management.controllers.base import ManageEventMixin
+from indico.modules.events.util import check_event_locked
 
 
 class SpecificAbstractMixin:
@@ -71,7 +72,7 @@ class RHAbstractsBase(RHConferenceBaseDisplay):
         return request.view_args.get('management', False)
 
 
-class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
+class RHManageAbstractsBase(ManageEventMixin, RHAbstractsBase):
     """
     Base class for all abstract-related RHs that require full event
     management permissions
@@ -83,9 +84,6 @@ class RHManageAbstractsBase(RHAbstractsBase, RHModificationBaseProtected):
     def management(self):
         """Whether the RH is currently used in the management area"""
         return request.view_args.get('management', True)
-
-    def _check_access(self):
-        RHModificationBaseProtected._check_access(self)
 
 
 class RHAbstractBase(SpecificAbstractMixin, RHAbstractsBase):

@@ -37,8 +37,7 @@ class RHConferenceBaseDisplay(RHConferenceBase):
             raise Forbidden
 
     def _check_access(self):
-        if not isinstance(self._target, LegacyConference):
-            raise Exception('Unexpected object')
+        assert isinstance(self._target, LegacyConference)
         if self.event.can_access(session.user):
             return
         elif self.event.access_key:

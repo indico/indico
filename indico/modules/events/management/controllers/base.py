@@ -18,24 +18,40 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from indico.legacy.webinterface.rh.base import RHModificationBaseProtected
+from flask import session
+from werkzeug.exceptions import Forbidden
+
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.util import check_event_locked
+from indico.util.i18n import _
 from indico.web.util import jsonify_template
 
 
-class RHManageEventBase(RHConferenceBase, RHModificationBaseProtected):
+class ManageEventMixin(object):
+    ALLOW_LOCKED = False
+    ROLE = None
+
+    def _require_user(self):
+        if session.user is None:
+            raise Forbidden
+
+    def _check_access(self):
+        self._require_user()
+        if not self.event.can_manage(session.user, role=self.ROLE):
+            raise Forbidden(_('You are not authorized to manage this event.'))
+        check_event_locked(self, self.event)
+
+
+class RHManageEventBase(RHConferenceBase, ManageEventMixin):
     """Base class for event management RHs"""
 
     DENY_FRAMES = True
 
-    def _process_args(self):
-        RHConferenceBase._process_args(self)
-
     def _check_access(self):
-        RHModificationBaseProtected._check_access(self)
+        ManageEventMixin._check_access(self)
 
 
 class RHContributionPersonListMixin:

@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import jsonify, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.base import RHProtected, check_event_locked
+from indico.legacy.webinterface.rh.base import RHProtected
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
@@ -29,7 +29,7 @@ from indico.modules.attachments.controllers.management.base import (AddAttachmen
 from indico.modules.attachments.util import can_manage_attachments
 from indico.modules.attachments.views import WPEventAttachments, WPPackageEventAttachmentsManagement
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.util import get_object_from_args
+from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.web.flask.templating import get_template_module
 
 

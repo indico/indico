@@ -30,11 +30,11 @@ from zipfile import ZipFile
 from flask import current_app, flash, g, redirect, request, session
 from sqlalchemy import inspect
 from sqlalchemy.orm import load_only, noload
-from werkzeug.exceptions import BadRequest
+from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core import signals
 from indico.core.config import config
-from indico.core.errors import UserValueError
+from indico.core.errors import NoReportError, UserValueError
 from indico.modules.api import api_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -52,6 +52,11 @@ from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
+
+
+def check_event_locked(rh, event, force=False):
+    if (not getattr(rh, 'ALLOW_LOCKED', False) or force) and event.is_locked and request.method not in ('GET', 'HEAD'):
+        raise NoReportError.wrap_exc(Forbidden(_('This event has been locked so no modifications are possible.')))
 
 
 def get_object_from_args(args=None):
