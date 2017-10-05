@@ -202,10 +202,10 @@ class RH(RequestHandlerBase):
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
 
     def _process(self):
-        """The default process method dispatches to a method containing
-        the HTTP verb used for the current request, e.g. _process_POST.
-        When implementing this please consider that you most likely want/need
-        only GET and POST - the other verbs are not supported everywhere!
+        """Dispatch to a method named ``_process_<verb>``.
+
+        Except for RESTful endpoints it is usually best to just
+        override this method, especially when using WTForms.
         """
         method = getattr(self, '_process_' + request.method, None)
         if method is None:
@@ -228,11 +228,6 @@ class RH(RequestHandlerBase):
         event_id = request.view_args.get('confId') or request.view_args.get('event_id')
         if event_id is not None:
             require_feature(event_id, self.EVENT_FEATURE)
-
-    def _check_auth(self):
-        if session.user:
-            logger.info('Request authenticated: %r', session.user)
-        self._check_csrf()
 
     def _do_process(self):
         try:
@@ -269,13 +264,13 @@ class RH(RequestHandlerBase):
         if self.EVENT_FEATURE is not None:
             self._check_event_feature()
 
-        logger.info('Request started: %s %s [IP=%s] [PID=%s]',
-                    request.method, request.relative_url, request.remote_addr, os.getpid())
+        logger.info('%s %s [IP=%s] [PID=%s] [UID=%r]',
+                    request.method, request.relative_url, request.remote_addr, os.getpid(), session.get('_user_id'))
 
         try:
             fossilize.clearCache()
             GenericMailer.flushQueue(False)
-            self._check_auth()
+            self._check_csrf()
             res = self._do_process()
             signals.after_process.send()
 
