@@ -508,7 +508,8 @@ class TimeTablePlain(PDFWithTOC):
         self._showDays = showDays
         self._ttPDFFormat = ttPDFFormat or TimetablePDFFormat()
         story = None if self._ttPDFFormat.showCoverPage() else []
-        PDFWithTOC.__init__(self, story=story, pagesize=pagesize, fontsize=fontsize, firstPageNumber=firstPageNumber)
+        PDFWithTOC.__init__(self, story=story, pagesize=pagesize, fontsize=fontsize, firstPageNumber=firstPageNumber,
+                            include_toc=self._ttPDFFormat.showTableContents())
         self._title = _("Programme")
         self._doc.leftMargin = 1 * cm
         self._doc.rightMargin = 1 * cm

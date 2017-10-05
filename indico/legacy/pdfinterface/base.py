@@ -384,9 +384,9 @@ class PDFBase:
             #to keep the PDF data not in a file, we use a dummy file object which save the data in a string
             self._fileDummy = FileDummy()
             if printLandscape:
-                self._doc = SimpleDocTemplate(self._fileDummy, pagesize = landscape(PDFSizes().PDFpagesizes[pagesize]))
+                self._doc = SimpleDocTemplate(self._fileDummy, pagesize=landscape(PDFSizes().PDFpagesizes[pagesize]))
             else:
-                self._doc = SimpleDocTemplate(self._fileDummy, pagesize = PDFSizes().PDFpagesizes[pagesize])
+                self._doc = SimpleDocTemplate(self._fileDummy, pagesize=PDFSizes().PDFpagesizes[pagesize])
 
         if title is not None:
             self._doc.title = title
@@ -432,8 +432,8 @@ class PDFBase:
         #return the data from the fileDummy
         return self._fileDummy.getData()
 
-    def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0,0,0), \
-                                align="center", width=None, height=None, measurement=cm, lineSpacing=1, maximumWidth=None  ):
+    def _drawWrappedString(self, c, text, font='Times-Bold', size=30, color=(0, 0, 0), align="center", width=None,
+                           height=None, measurement=cm, lineSpacing=1, maximumWidth=None):
         if maximumWidth is None:
             maximumWidth = self._PAGE_WIDTH-1*cm
         if width is None:
@@ -503,13 +503,14 @@ def _doNothing(canvas, doc):
 
 class DocTemplateWithTOC(SimpleDocTemplate):
 
-    def __init__(self, indexedFlowable, filename, firstPageNumber = 1, **kw ):
+    def __init__(self, indexedFlowable, filename, firstPageNumber=1, include_toc=False, **kw):
         """toc is the TableOfContents object
         indexedFlowale is a dictionnary with flowables as key and a dictionnary as value.
             the sub-dictionnary have two key:
                 text: the text which will br print in the table
                 level: the level of the entry( modifying the indentation and the police
         """
+        self.include_toc = include_toc
         self._toc = []
         self._tocStory = []
         self._indexedFlowable = indexedFlowable
@@ -544,15 +545,14 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         entryStyle.fontName = "LinuxLibertine"
         entryStyle.spaceBefore = 8
         self._tocStory.append(PageBreak())
-        self._tocStory.append(Spacer(inch, 1*cm))
-        self._tocStory.append(Paragraph( _("Table of contents"), headerStyle))
-        self._tocStory.append(Spacer(inch, 2*cm))
-        for entry in self._toc:
-            self._tocStory.append(TableOfContentsEntry("<para leftIndent=%s" % ((entry[0] - 1) * 50) + ">" + entry[1] + "</para>", str(entry[2]),entryStyle))
-            #self._tocStory.append(SimpleParagraph(entry[1]))
-        #self._tocStory.append(PageBreak())
+        if self.include_toc:
+            self._tocStory.append(Spacer(inch, 1*cm))
+            self._tocStory.append(Paragraph( _("Table of contents"), headerStyle))
+            self._tocStory.append(Spacer(inch, 2*cm))
+            for entry in self._toc:
+                self._tocStory.append(TableOfContentsEntry("<para leftIndent=%s" % ((entry[0] - 1) * 50) + ">" + entry[1] + "</para>", str(entry[2]),entryStyle))
 
-    def laterPages(self,c,doc):
+    def laterPages(self, c, doc):
         c.saveState()
         c.setFont('Times-Roman',9)
         c.setFillColorRGB(0.5,0.5,0.5)
@@ -608,8 +608,7 @@ class PDFWithTOC(PDFBase):
 
     """
 
-    def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1):
-
+    def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1, include_toc=False):
         self._fontsize = fontsize
         self._story = story
         if story is None:
@@ -621,7 +620,8 @@ class PDFWithTOC(PDFBase):
         self._fileDummy = FileDummy()
 
         self._doc = DocTemplateWithTOC(self._indexedFlowable, self._fileDummy, firstPageNumber=firstPageNumber,
-                                       pagesize=PDFSizes().PDFpagesizes[pagesize])
+                                       pagesize=PDFSizes().PDFpagesizes[pagesize],
+                                       include_toc=include_toc)
 
         self._PAGE_HEIGHT = PDFSizes().PDFpagesizes[pagesize][1]
         self._PAGE_WIDTH = PDFSizes().PDFpagesizes[pagesize][0]
