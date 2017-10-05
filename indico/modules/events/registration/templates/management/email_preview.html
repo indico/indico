@@ -9,7 +9,7 @@
 {% endcall %}
 
 <strong>{% trans %}Subject{% endtrans %}</strong>
-<pre class="mono">{{ subject }}</pre>
+<pre class="mono">{{ subject | forceescape }}</pre>
 <br>
 <strong>{% trans %}Body{% endtrans %}</strong>
 <div>{{ body }}</div>

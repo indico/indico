@@ -5,5 +5,5 @@
 {% endblock %}
 
 {% block content %}
-    {{ page.html|safe }}
+    {{ page.html|sanitize_html }}
 {% endblock %}

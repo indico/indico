@@ -29,6 +29,7 @@ from indico.modules.events.notes.forms import NoteForm
 from indico.modules.events.notes.models.notes import EventNote, RenderMode
 from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import check_event_locked, get_object_from_args
+from indico.util.string import sanitize_html
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_template
 
@@ -134,4 +135,4 @@ class RHViewNote(RHNoteBase):
         note = EventNote.get_for_linked_object(self.object, preload_event=False)
         if not note:
             raise NotFound
-        return note.html
+        return sanitize_html(note.html)
