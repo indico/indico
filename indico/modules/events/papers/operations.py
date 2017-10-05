@@ -157,7 +157,7 @@ def create_paper_revision(paper, submitter, files):
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         pf = PaperFile(filename=filename, content_type=content_type, paper_revision=revision,
                        _contribution=paper.contribution)
-        pf.save(f.file)
+        pf.save(f.stream)
     db.session.flush()
     db.session.expire(revision._contribution, ['_paper_last_revision'])
     notify_paper_revision_submission(revision)
@@ -206,7 +206,7 @@ def _store_paper_template_file(template, file):
     template.size = None
     template.content_type = content_type
     template.filename = filename
-    template.save(file.file)
+    template.save(file.stream)
 
 
 def create_paper_template(event, data):

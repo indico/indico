@@ -100,7 +100,7 @@ class AddAttachmentFilesMixin:
                     attachment.acl = form.acl.data
                 content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
                 attachment.file = AttachmentFile(user=session.user, filename=filename, content_type=content_type)
-                attachment.file.save(f.file)
+                attachment.file.save(f.stream)
                 db.session.add(attachment)
                 db.session.flush()
                 logger.info('Attachment %s uploaded by %s', attachment, session.user)
@@ -152,7 +152,7 @@ class EditAttachmentMixin(SpecificAttachmentMixin):
                 if file:
                     self.attachment.file = AttachmentFile(user=session.user, content_type=file.mimetype,
                                                           filename=secure_filename(file.filename, 'attachment'))
-                    self.attachment.file.save(file.file)
+                    self.attachment.file.save(file.stream)
 
             signals.attachments.attachment_updated.send(self.attachment, user=session.user)
             flash(_("The attachment \"{name}\" has been updated").format(name=self.attachment.title), 'success')
