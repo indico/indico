@@ -60,6 +60,6 @@ class UserValueError(NoReportError):
     """Error to indicate that the user entered invalid data.
 
     This behaves basically like NoReportError but it comes with
-    a 400 status code isntead of the usual 500 code.
+    a 400 status code instead of the usual 500 code.
     """
     http_status_code = 400
