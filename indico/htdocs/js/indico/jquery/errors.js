@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global showErrorDialog:false */
+
 (function(global) {
     'use strict';
 
@@ -32,7 +34,7 @@
             try {
                 data = JSON.parse(data.responseText);
             } catch (e) {
-                IndicoUI.Dialogs.Util.error({
+                showErrorDialog({
                     title: $T.gettext('Something went wrong'),
                     message: '{0} ({1})'.format(data.statusText.toLowerCase(), data.status),
                     suggest_login: false,
@@ -44,7 +46,7 @@
         // data.data.error is only needed for angular error handlers
         var error = data.error || (data.data && data.data.error);
         if (error) {
-            IndicoUI.Dialogs.Util.error(error);
+            showErrorDialog(error);
             return true;
         }
     };

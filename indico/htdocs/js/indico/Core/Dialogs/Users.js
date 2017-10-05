@@ -320,7 +320,7 @@ type ("UserSearchPanel", ["SimpleSearchPanel"], {
                     self.searchButton.dom.disabled = false;
                 } else {
                     self.foundPeopleList.clearList();
-                    IndicoUI.Dialogs.Util.error(error);
+                    showErrorDialog(error);
                 }
             }
         );
@@ -400,7 +400,7 @@ type ("GroupSearchPanel", ["SimpleSearchPanel"], {
                     self.searchButton.dom.disabled = false;
                 } else {
                     self.foundPeopleList.clearList();
-                    IndicoUI.Dialogs.Util.error(error);
+                    showErrorDialog(error);
                 }
             }
         );

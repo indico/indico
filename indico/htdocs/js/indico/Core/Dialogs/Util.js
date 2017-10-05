@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function() {
+(function(global) {
     'use strict';
 
     var ERROR_DIALOG_TEMPLATE = _.template(
@@ -37,7 +37,7 @@
         '</div>'
     );
 
-    function showErrorDialog(error) {
+    global.showErrorDialog = function showErrorDialog(error) {
         var $content = $(ERROR_DIALOG_TEMPLATE({
             errorText: error.message,
             infoText: $T.gettext('Please reload the page and report this error to us if it persists.'),
@@ -61,11 +61,9 @@
                 }
             }
         });
-    }
+    };
 
     IndicoUI.Dialogs.Util = {
-        error: showErrorDialog,
-
         progress: function(text) {
             var dialog = new ProgressDialog(text);
             dialog.open();
@@ -75,4 +73,4 @@
             };
         }
     };
-})();
+})(window);
