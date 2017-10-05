@@ -69,6 +69,7 @@ class RH(RequestHandlerBase):
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
     DENY_FRAMES = False  # whether to send an X-Frame-Options:DENY header
+    CHECK_HTML = False  # whether to run the legacy HTML sanitizer
 
     #: A dict specifying how the url should be normalized.
     #: `args` is a dictionary mapping view args keys to callables
@@ -240,7 +241,8 @@ class RH(RequestHandlerBase):
             return rv
 
         self._check_access()
-        Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
+        if self.CHECK_HTML:
+            Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
 
         if config.PROFILE:
             result = [None]
