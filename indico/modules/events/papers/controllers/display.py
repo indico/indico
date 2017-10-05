@@ -46,6 +46,8 @@ class RHSubmitPaper(RHPaperBase):
     def _check_paper_protection(self):
         if not RHPaperBase._check_paper_protection(self):
             return False
+        if not self.contribution.is_user_associated(session.user, check_abstract=True):
+            return False
         paper = self.contribution.paper
         return paper is None or paper.state == PaperRevisionState.to_be_corrected
 
