@@ -72,7 +72,7 @@ def add_abstract_files(abstract, files, log_action=True):
         filename = secure_filename(f.filename, 'attachment')
         content_type = mimetypes.guess_type(f.filename)[0] or f.mimetype or 'application/octet-stream'
         abstract_file = AbstractFile(filename=filename, content_type=content_type, abstract=abstract)
-        abstract_file.save(f.file)
+        abstract_file.save(f.stream)
         db.session.flush()
     if log_action:
         logger.info('%d abstract file(s) added to %s by %s', len(files), abstract, session.user)

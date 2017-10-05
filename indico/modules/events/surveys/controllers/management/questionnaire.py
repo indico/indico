@@ -114,7 +114,7 @@ class RHImportSurveyQuestionnaire(RHManageSurveyBase):
         form = ImportQuestionnaireForm()
         if form.validate_on_submit():
             try:
-                data = json.load(form.json_file.data.file)
+                data = json.load(form.json_file.data.stream)
                 self._import_data(data)
             except ValueError as exception:
                 logger.info('%s tried to import an invalid JSON file: %s', session.user, exception.message)

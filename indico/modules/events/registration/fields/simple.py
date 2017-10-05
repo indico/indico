@@ -254,7 +254,7 @@ class FileField(RegistrationFormFieldBase):
         if file_:
             # we have a file -> always save it
             data['file'] = {
-                'data': file_.file,
+                'data': file_.stream,
                 'name': secure_filename(file_.filename, 'attachment'),
                 'content_type': mimetypes.guess_type(file_.filename)[0] or file_.mimetype or 'application/octet-stream'
             }
