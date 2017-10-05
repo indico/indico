@@ -1,6 +1,6 @@
 {% macro render_note(note, last) %}
     <h1>● {{ note.object.title }}</h1>
-    {{ note.html|safe }}
+    {{ note.html|sanitize_html }}
     {% if not last %}
         <hr>
     {% endif %}

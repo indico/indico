@@ -19,19 +19,19 @@
     <div class="infoline location">
         <span title="${_("Location")}" class="icon icon-location" aria-hidden="true"></span>
         <div class="place text">
-          ${event.venue_name}
+          ${escape(event.venue_name)}
         </div>
       % if event.room and event.room.map_url:
         <div class="room text">
-          <a href="${event.room.map_url}">${event.room_name}</a>
+          <a href="${event.room.map_url}">${escape(event.room_name)}</a>
         </div>
       % elif event.room_name:
         <div class="room text">
-          ${event.room_name}
+          ${escape(event.room_name)}
         </div>
       % endif
       % if event.address:
-        <div class="address text nohtml">${event.address}</div>
+        <div class="address text nohtml">${escape(event.address)}</div>
       % endif
     </div>
   % endif
@@ -44,12 +44,12 @@
         <li>
           % if link.email:
             % if _session.user:
-              <a href="mailto:${link.email}">${link.full_name}</a>
+              <a href="mailto:${escape(link.email)}">${escape(link.full_name)}</a>
             % else:
-              <a href="#" class="nomail">${link.full_name}</a>
+              <a href="#" class="nomail">${escape(link.full_name)}</a>
             % endif
           % else:
-            ${link.full_name}
+            ${escape(link.full_name)}
           % endif
         </li>
         % endfor
@@ -65,7 +65,7 @@
   % if moreInfo:
   <div class="infoline info">
       <span  title="${_("Extra information")}" class="icon icon-info" aria-hidden="true"></span>
-      <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo }</div>
+      <div class="text ${'nohtml' if not moreInfo_html else ''}">${ moreInfo|sanitize_html }</div>
   </div>
   % endif
   </div>
@@ -78,8 +78,8 @@ ${ actions }
 <script type="text/javascript">
     $('.chair_list .nomail').qtip({
         content: {
-            text: $T("Login to see email address"),
-        },
+            text: $T("Login to see email address")
+        }
     });
     setupAttachmentTreeView();
 </script>

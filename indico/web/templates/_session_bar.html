@@ -23,7 +23,7 @@
             {% endif %}
         </div>
         <div class="protectionWidgetSection">
-            {{ disclaimers[mode]|safe }}
+            {{ disclaimers[mode]|sanitize_html }}
         </div>
     </div>
 

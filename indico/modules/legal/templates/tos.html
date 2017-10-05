@@ -6,5 +6,5 @@
 {% endblock %}
 
 {% block content %}
-    {{ tos|safe }}
+    {{ tos|sanitize_html }}
 {% endblock %}

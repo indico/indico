@@ -4,5 +4,5 @@
 {% block footer %}{% endblock %}
 
 {% block body %}
-    {{ email_body | safe }}
+    {{ email_body | sanitize_html }}
 {% endblock %}

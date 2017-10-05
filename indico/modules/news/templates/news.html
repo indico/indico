@@ -17,7 +17,7 @@
                 {% if _is_new(item) %}<i class="icon-new new-label"></i>{% endif %}
             </h2>
             <div class="content">
-                {{ item.content | safe }}
+                {{ item.content | sanitize_html }}
             </div>
         </div>
     {% endfor %}
