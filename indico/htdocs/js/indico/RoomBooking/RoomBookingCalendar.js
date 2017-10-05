@@ -407,7 +407,7 @@ type ("RoomBookingCalendarDrawer", [],
                             self._proceedToBooking(bar);
                         }
                     } else {
-                        IndicoUI.Dialogs.Util.error(error || result.error);
+                        showErrorDialog(error || result.error);
                     }
                 });
             },

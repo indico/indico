@@ -19,7 +19,7 @@
 type("InlineWidget", ["IWidget"],
      {
          _error: function(error) {
-             IndicoUI.Dialogs.Util.error(error);
+             showErrorDialog(error);
          }
      });
 

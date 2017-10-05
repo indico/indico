@@ -42,7 +42,7 @@ function go_to_room(roomLocation, roomId, clone_booking) {
                     popup.open();
                 }
             } else {
-                IndicoUI.Dialogs.Util.error(error);
+                showErrorDialog(error);
             }
         }
     );
