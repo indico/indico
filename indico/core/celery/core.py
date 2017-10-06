@@ -18,13 +18,16 @@ from __future__ import unicode_literals
 
 import logging
 import os
+from datetime import datetime
 from operator import itemgetter
 
 from celery import Celery
 from celery.app.log import Logging
 from celery.beat import PersistentScheduler
+from celery.schedules import BaseSchedule
 from contextlib2 import ExitStack
 from flask_pluginengine import current_plugin, plugin_context
+from pytz import timezone
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
 
@@ -56,6 +59,12 @@ class IndicoCelery(Celery):
         super(IndicoCelery, self).__init__(*args, **kwargs)
         self.flask_app = None
         self._patch_task()
+        # XXX: needed to keep using localtime-based crontab schedules
+        # without having the broken timezone handling in celery 4.1
+        # TODO: once a new celery version is out, revert the commit that
+        # adds this hack, sets `nowfun` and comments out the timezone
+        # config option.
+        BaseSchedule.now = lambda self: datetime.now(timezone(config.DEFAULT_TIMEZONE))
 
     def init_app(self, app):
         if not config.CELERY_BROKER and not app.config['TESTING']:
@@ -65,7 +74,7 @@ class IndicoCelery(Celery):
         self.conf['beat_scheduler'] = IndicoPersistentScheduler
         self.conf['beat_schedule_filename'] = os.path.join(config.TEMP_DIR, 'celerybeat-schedule')
         self.conf['worker_hijack_root_logger'] = False
-        self.conf['timezone'] = config.DEFAULT_TIMEZONE
+        # self.conf['timezone'] = config.DEFAULT_TIMEZONE  # XXX: broken in celery 4.1
         self.conf['task_ignore_result'] = True
         self.conf['task_store_errors_even_if_ignored'] = True
         self.conf['worker_redirect_stdouts'] = not app.debug
