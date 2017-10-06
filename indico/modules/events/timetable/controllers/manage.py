@@ -43,7 +43,7 @@ class RHManageTimetable(RHManageTimetableBase):
 
     def _process(self):
         event_info = serialize_event_info(self.event)
-        timetable_data = TimetableSerializer(management=True).serialize_timetable(self.event)
+        timetable_data = TimetableSerializer(self.event, management=True).serialize_timetable()
         return WPManageTimetable.render_template('management.html', self.event, event_info=event_info,
                                                  timetable_data=timetable_data)
 
@@ -56,7 +56,7 @@ class RHManageSessionTimetable(RHManageTimetableBase):
     def _process(self):
         event_info = serialize_event_info(self.event)
         event_info['timetableSession'] = serialize_session(self.session)
-        timetable_data = TimetableSerializer(management=True).serialize_session_timetable(self.session)
+        timetable_data = TimetableSerializer(self.event, management=True).serialize_session_timetable(self.session)
         management_rights = {
             'can_manage_event': self.event.can_manage(session.user),
             'can_manage_session': self.session.can_manage(session.user),

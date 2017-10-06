@@ -420,7 +420,7 @@ class RHLegacyTimetableMoveEntry(RHManageTimetableEntryBase):
                                 parent_entry=self.entry.parent)
 
     def _process_POST(self):
-        self.serializer = TimetableSerializer(True)
+        self.serializer = TimetableSerializer(self.event, management=True)
         with track_time_changes(auto_extend=True, user=session.user) as changes:
             entry_data = self._move_entry(request.json)
         rv = dict(serialize_entry_update(self.entry), **entry_data)
