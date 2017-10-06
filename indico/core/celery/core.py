@@ -121,18 +121,17 @@ class IndicoCelery(Celery):
         class IndicoTask(self.Task):
             abstract = True
 
-            def apply_async(self, args=None, kwargs=None, task_id=None, producer=None,
+            def apply_async(s, args=None, kwargs=None, task_id=None, producer=None,
                             link=None, link_error=None, shadow=None, **options):
                 if args is not None:
                     args = _CelerySAWrapper.wrap_args(args)
                 if kwargs is not None:
                     kwargs = _CelerySAWrapper.wrap_kwargs(kwargs)
                 if current_plugin:
-                    if kwargs is None:
-                        kwargs = {}
-                    kwargs['__current_plugin__'] = current_plugin.name
-                return super(IndicoTask, self).apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
-                                                           link=link, link_error=link_error, shadow=shadow, **options)
+                    options['headers'] = options.get('headers') or {}  # None in a retry
+                    options['headers']['indico_plugin'] = current_plugin.name
+                return super(IndicoTask, s).apply_async(args=args, kwargs=kwargs, task_id=task_id, producer=producer,
+                                                        link=link, link_error=link_error, shadow=shadow, **options)
 
             def __call__(s, *args, **kwargs):
                 stack = ExitStack()
@@ -141,7 +140,7 @@ class IndicoCelery(Celery):
                     stack.enter_context(self.flask_app.test_request_context(base_url=config.BASE_URL))
                 args = _CelerySAWrapper.unwrap_args(args)
                 kwargs = _CelerySAWrapper.unwrap_kwargs(kwargs)
-                plugin = getattr(s, 'plugin', kwargs.pop('__current_plugin__', None))
+                plugin = getattr(s, 'plugin', s.request.get('indico_plugin'))
                 if isinstance(plugin, basestring):
                     plugin_name = plugin
                     plugin = plugin_engine.get_plugin(plugin)
