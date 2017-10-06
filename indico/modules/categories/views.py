@@ -33,6 +33,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
     """WP for category display pages"""
 
     template_prefix = 'categories/'
+    ALLOW_JSON = False
 
     def __init__(self, rh, category, **kwargs):
         kwargs['category'] = category

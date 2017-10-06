@@ -43,6 +43,7 @@ class WPJinjaMixin:
     template namespace!
     """
 
+    ALLOW_JSON = True  # whether XHRs automatically get a jsonified version
     template_prefix = ''
     render_template_func = staticmethod(render_template)
 
@@ -59,7 +60,7 @@ class WPJinjaMixin:
                         the template
         """
         template = cls._prefix_template(template_name_or_list or cls._template)
-        if request.is_xhr:
+        if cls.ALLOW_JSON and request.is_xhr:
             return jsonify_template(template, _render_func=cls.render_template_func, **context)
         else:
             context['_jinja_template'] = template
