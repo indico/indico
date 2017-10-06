@@ -44,7 +44,8 @@ class Paper(ProposalMixin):
 
     @return_ascii
     def __repr__(self):
-        return '<Paper(contribution_id={}, state={})>'.format(self.contribution.id, self.state.name)
+        state = self.state.name if self.last_revision else None
+        return '<Paper(contribution_id={}, state={})>'.format(self.contribution.id, state)
 
     @locator_property
     def locator(self):
@@ -91,7 +92,7 @@ class Paper(ProposalMixin):
     def can_manage(self, user):
         if not user:
             return False
-        return self.contribution.can_manage(user)
+        return self.event.can_manage(user)
 
     def can_judge(self, user, check_state=False):
         if not user:

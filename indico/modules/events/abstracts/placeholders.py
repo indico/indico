@@ -105,9 +105,13 @@ class ContributionTypePlaceholder(Placeholder):
 
     @classmethod
     def render(cls, abstract):
-        if abstract.state == AbstractState.accepted:
-            return abstract.accepted_contrib_type.name if abstract.accepted_contrib_type else ''
-        return ''
+        if abstract.state == AbstractState.withdrawn:
+            ctype = abstract.accepted_contrib_type or abstract.submitted_contrib_type
+        elif abstract.state == AbstractState.accepted:
+            ctype = abstract.accepted_contrib_type
+        else:
+            ctype = abstract.submitted_contrib_type
+        return ctype.name if ctype else ''
 
 
 class PrimaryAuthorsPlaceholder(Placeholder):
