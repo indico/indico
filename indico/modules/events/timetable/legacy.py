@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import defaultdict
+from hashlib import md5
 from itertools import chain
 
 from flask import session
@@ -276,10 +277,11 @@ class TimetableSerializer(object):
         return data
 
     def _get_person_data(self, person_link):
+        person = person_link.person
         return {'firstName': person_link.first_name,
                 'familyName': person_link.last_name,
                 'affiliation': person_link.affiliation,
-                'email': person_link.person.email,
+                'emailHash': md5(person.email.encode('utf-8')).hexdigest() if person.email else None,
                 'name': person_link.get_full_name(last_name_first=False, last_name_upper=False,
                                                   abbrev_first_name=False, show_title=True),
                 'displayOrderKey': person_link.display_order_key}
