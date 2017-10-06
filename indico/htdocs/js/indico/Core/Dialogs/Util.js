@@ -21,7 +21,6 @@
     var ERROR_DIALOG_TEMPLATE = _.template(
         '<div class="error-dialog">' +
         '    <div class="error-message-box">' +
-        '        <span class="icon"></span>' +
         '        <div class="message-text"><%= errorText %></div>' +
         '    </div>' +
         '    <p class="js-info-text"><%= infoText %></p>' +
