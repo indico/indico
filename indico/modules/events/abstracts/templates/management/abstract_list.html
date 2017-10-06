@@ -147,12 +147,14 @@
                         {%- trans %}Author list{% endtrans -%}
                     </button>
                 </div>
-                <div class="group">
-                    <a href="#" class="i-button icon-attachment js-requires-selected-row js-submit-list-form disabled"
-                       data-href="{{ url_for('.download_attachments', event) }}">
-                        {%- trans %}Download attachments{%- endtrans %}
-                    </a>
-                </div>
+                {% if can_download_attachments %}
+                    <div class="group">
+                        <a href="#" class="i-button icon-attachment js-requires-selected-row js-submit-list-form disabled"
+                           data-href="{{ url_for('.download_attachments', event) }}">
+                            {%- trans %}Download attachments{%- endtrans %}
+                        </a>
+                    </div>
+                {% endif %}
                 <div class="group">
                     <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}

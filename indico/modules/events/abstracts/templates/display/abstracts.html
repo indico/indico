@@ -38,10 +38,12 @@
                             data-ajax-dialog>
                         {%- trans %}Customize list{% endtrans -%}
                     </button>
-                    <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
-                       data-href="{{ url_for('.display_download_attachments', track) }}">
-                        {%- trans %}Download attachments{%- endtrans %}
-                    </a>
+                    {% if can_download_attachments %}
+                        <a href="#" class="i-button icon-attachment js-requires-selected-row disabled js-submit-list-form"
+                           data-href="{{ url_for('.display_download_attachments', track) }}">
+                            {%- trans %}Download attachments{%- endtrans %}
+                        </a>
+                    {% endif %}
                     <a class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Export{% endtrans -%}
                     </a>

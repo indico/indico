@@ -22,6 +22,7 @@ from operator import attrgetter
 from flask import redirect
 
 from indico.legacy.pdfinterface.conference import AbstractsToPDF, ConfManagerAbstractsToPDF
+from indico.modules.events.abstracts.models.files import AbstractFile
 from indico.modules.events.abstracts.util import generate_spreadsheet_from_abstracts
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
@@ -42,7 +43,13 @@ class DisplayAbstractListMixin:
         return self._render_template(**self.list_generator.get_list_kwargs())
 
     def _render_template(self, **kwargs):
-        return self.view_class.render_template(self.template, self.event, **kwargs)
+        can_download_attachments = self.event.cfa.allow_attachments
+        if not can_download_attachments:
+            can_download_attachments = (AbstractFile.query
+                                        .filter(AbstractFile.abstract.has(event=self.event, is_deleted=False))
+                                        .has_rows())
+        return self.view_class.render_template(self.template, self.event,
+                                               can_download_attachments=can_download_attachments, **kwargs)
 
 
 class CustomizeAbstractListMixin:
