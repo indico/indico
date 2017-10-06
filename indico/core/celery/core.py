@@ -54,7 +54,7 @@ class IndicoCelery(Celery):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('log', IndicoCeleryLogging)
         super(IndicoCelery, self).__init__(*args, **kwargs)
-        self.flask_app = None  # set from configure_celery
+        self.flask_app = None
         self._patch_task()
 
     def init_app(self, app):
