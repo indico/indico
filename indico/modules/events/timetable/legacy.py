@@ -31,8 +31,9 @@ from indico.web.flask.util import url_for
 
 
 class TimetableSerializer(object):
-    def __init__(self, management=False):
+    def __init__(self, management=False, user=None):
         self.management = management
+        self.user = user or session.user
 
     def serialize_timetable(self, event, days=None, hide_weekends=False, strip_empty_days=False):
         tzinfo = event.tzinfo if self.management else event.display_tzinfo
@@ -55,7 +56,7 @@ class TimetableSerializer(object):
             date_str = day.strftime('%Y%m%d')
             if date_str not in timetable:
                 continue
-            if not entry.can_view(session.user):
+            if not entry.can_view(self.user):
                 continue
             data = self.serialize_timetable_entry(entry, load_children=False)
             key = self._get_entry_key(entry)
@@ -92,7 +93,7 @@ class TimetableSerializer(object):
             date_key = block_entry.start_dt.astimezone(event_tz).strftime('%Y%m%d')
             entries = block_entry.children if without_blocks else [block_entry]
             for entry in entries:
-                if not entry.can_view(session.user):
+                if not entry.can_view(self.user):
                     continue
                 entry_key = self._get_entry_key(entry)
                 timetable[date_key][entry_key] = self.serialize_timetable_entry(entry, load_children=True)
