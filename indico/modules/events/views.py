@@ -23,15 +23,14 @@ from sqlalchemy.orm import load_only
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.pages.conferences import (WConfMetadata, WPConferenceBase,
-                                                          WPConferenceDefaultDisplayBase, WPrintPageFrame,
-                                                          render_event_footer, render_event_header)
+                                                          WPConferenceDefaultDisplayBase, render_event_footer,
+                                                          render_event_header)
 from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings, theme_settings
 from indico.modules.events.layout.util import get_css_url
 from indico.util.event import unify_event_args
 from indico.util.mathjax import MathjaxMixin
-from indico.util.string import to_unicode
 
 
 class WPReferenceTypes(WPAdmin):
@@ -81,7 +80,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 
     def _applyDecoration(self, body):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':
-            return to_unicode(WPrintPageFrame().getHTML({'content': body}))
+            return render_template('events/display/print.html', content=body)
         else:
             return WPConferenceBase._applyDecoration(self, body)
 

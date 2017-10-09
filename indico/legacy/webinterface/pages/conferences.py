@@ -207,10 +207,6 @@ class WConfMetadata(wcomponents.WTemplated):
         return v
 
 
-class WPrintPageFrame(wcomponents.WTemplated):
-    pass
-
-
 class WPConferenceModifBase(WPEventManagement):
     """Base class for event management pages without Jinja inheritance.
 
