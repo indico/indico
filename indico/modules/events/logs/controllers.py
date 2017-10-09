@@ -27,4 +27,4 @@ class RHEventLogs(RHManageEventBase):
     def _process(self):
         entries = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
         realms = {e.realm for e in entries}
-        return WPEventLogs.render_template('logs.html', self._conf, entries=entries, realms=realms)
+        return WPEventLogs.render_template('logs.html', self.event, entries=entries, realms=realms)

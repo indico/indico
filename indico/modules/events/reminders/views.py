@@ -16,13 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPReminders(WPEventManagementLegacy, WPJinjaMixin):
+class WPReminders(WPEventManagement):
     template_prefix = 'events/reminders/'
     sidemenu_option = 'reminders'
-
-    def _getPageContent(self, params):
-        return WPJinjaMixin._getPageContent(self, params)

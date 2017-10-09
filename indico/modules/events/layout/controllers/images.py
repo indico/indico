@@ -48,7 +48,7 @@ class RHImages(RHManageImagesBase):
     def _process(self):
         form = AddImagesForm()
         images = ImageFile.query.with_parent(self.event).all()
-        return WPImages.render_template('images.html', self._conf, images=images, event=self.event, form=form)
+        return WPImages.render_template('images.html', self.event, images=images, form=form)
 
 
 class RHImageUpload(RHManageImagesBase):

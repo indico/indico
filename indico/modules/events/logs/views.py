@@ -16,13 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPEventLogs(WPEventManagementLegacy, WPJinjaMixin):
+class WPEventLogs(WPEventManagement):
     template_prefix = 'events/logs/'
     sidemenu_option = 'logs'
-
-    def _getPageContent(self, params):
-        return WPJinjaMixin._getPageContent(self, params)

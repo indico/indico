@@ -34,8 +34,7 @@ class RHStaticSiteBase(RHManageEventBase):
 class RHStaticSiteList(RHStaticSiteBase):
     def _process(self):
         static_sites = self.event.static_sites.order_by(StaticSite.requested_dt.desc()).all()
-        return WPStaticSites.render_template('static_sites.html', self._conf,
-                                             event=self.event, static_sites=static_sites)
+        return WPStaticSites.render_template('static_sites.html', self.event, static_sites=static_sites)
 
 
 class RHStaticSiteBuild(RHStaticSiteBase):

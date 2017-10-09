@@ -55,8 +55,7 @@ class RHFeatures(RHFeaturesBase):
     def _process(self):
         form = self._make_form()
         widget_attrs = {field.short_name: {'disabled': True} for field in form} if self.event.is_locked else {}
-        return WPFeatures.render_template('features.html', self._conf, event=self.event, form=form,
-                                          widget_attrs=widget_attrs)
+        return WPFeatures.render_template('features.html', self.event, form=form, widget_attrs=widget_attrs)
 
 
 class RHSwitchFeature(RHFeaturesBase):

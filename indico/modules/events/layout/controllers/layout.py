@@ -106,7 +106,7 @@ class RHLayoutEdit(RHLayoutBase):
             layout_settings.set_multi(self.event, form.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.index', self.event))
-        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self._conf, form=form, event=self.event,
+        return WPLayoutEdit.render_template('layout_meeting_lecture.html', self.event, form=form,
                                             timetable_theme_settings_form=tt_theme_settings_form)
 
     def _process_conference(self):
@@ -131,7 +131,7 @@ class RHLayoutEdit(RHLayoutBase):
                 logo_form.logo.data = self.event
             if self.event.has_stylesheet:
                 css_form.css_file.data = self.event
-        return WPLayoutEdit.render_template('layout_conference.html', self._conf, form=form, event=self.event,
+        return WPLayoutEdit.render_template('layout_conference.html', self.event, form=form,
                                             logo_form=logo_form, css_form=css_form,
                                             timetable_theme_settings_form=tt_theme_settings_form)
 

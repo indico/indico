@@ -62,7 +62,7 @@ class RHMenuEdit(RHMenuBase):
     def _process(self):
         custom_menu_enabled = layout_settings.get(self.event, 'use_custom_menu')
         menu = menu_entries_for_event(self.event) if custom_menu_enabled else None
-        return WPMenuEdit.render_template('menu_edit.html', self._conf, event=self.event, menu=menu,
+        return WPMenuEdit.render_template('menu_edit.html', self.event, menu=menu,
                                           custom_menu_enabled=custom_menu_enabled)
 
 

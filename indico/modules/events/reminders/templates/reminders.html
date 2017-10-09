@@ -1,4 +1,5 @@
-{% extends 'layout/base.html' %}
+{% extends 'events/management/base.html' %}
+
 {% set pending_reminders = reminders|rejectattr('is_sent')|list %}
 {% set sent_reminders = reminders|selectattr('is_sent')|list %}
 {% set tzinfo = event.tzinfo %}

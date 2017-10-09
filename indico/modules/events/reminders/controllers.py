@@ -56,7 +56,7 @@ class RHListReminders(RHRemindersBase):
 
     def _process(self):
         reminders = EventReminder.query.with_parent(self.event).order_by(EventReminder.scheduled_dt.desc()).all()
-        return WPReminders.render_template('reminders.html', self._conf, event=self.event, reminders=reminders)
+        return WPReminders.render_template('reminders.html', self.event, reminders=reminders)
 
 
 class RHDeleteReminder(RHSpecificReminderBase):

@@ -1,4 +1,4 @@
-{% extends 'layout/base.html' %}
+{% extends 'events/management/base.html' if linked_object_type == 'event' and not request.is_xhr else 'layout/base.html' %}
 {% from 'attachments/_attachments.html' import attachments_page %}
 
 {% block title %}{% trans %}Materials{% endtrans %}{% endblock %}

@@ -16,10 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.management.views import WPEventManagement
 
 
-class WPFeatures(WPJinjaMixin, WPEventManagementLegacy):
+class WPFeatures(WPEventManagement):
     template_prefix = 'events/features/'
     sidemenu_option = 'features'
