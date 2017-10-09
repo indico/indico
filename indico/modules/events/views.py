@@ -22,7 +22,7 @@ from flask import render_template, request
 from sqlalchemy.orm import load_only
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import (WPConferenceBase, WPConferenceDefaultDisplayBase,
+from indico.legacy.webinterface.pages.conferences import (WPConferenceDefaultDisplayBase, WPEventBase,
                                                           render_event_footer, render_event_header)
 from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
@@ -36,13 +36,13 @@ class WPReferenceTypes(WPAdmin):
     template_prefix = 'events/'
 
 
-class WPSimpleEventDisplayBase(MathjaxMixin, WPConferenceBase):
+class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
     """Base class for displaying something on a lecture/meeting page"""
 
     @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         self.event = event_
-        WPConferenceBase.__init__(self, rh, event_, **kwargs)
+        WPEventBase.__init__(self, rh, event_, **kwargs)
 
     def _getHeader(self):
         return render_event_header(self.event).encode('utf-8')
@@ -59,7 +59,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         self.theme_override = theme_override
 
     def _getHeadContent(self):
-        return MathjaxMixin._getHeadContent(self) + WPConferenceBase._getHeadContent(self)
+        return MathjaxMixin._getHeadContent(self) + WPEventBase._getHeadContent(self)
 
     def get_extra_css_files(self):
         theme_urls = self.theme['asset_env']['display_sass'].urls() if self.theme.get('asset_env') else []
@@ -70,7 +70,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         theme_print_sass = (self.theme['asset_env']['print_sass'].urls()
                             if 'print_sass' in self.theme.get('asset_env', [])
                             else [])
-        return WPConferenceBase.getPrintCSSFiles(self) + theme_print_sass
+        return WPEventBase.getPrintCSSFiles(self) + theme_print_sass
 
     def getJSFiles(self):
         return (WPSimpleEventDisplayBase.getJSFiles(self) +
@@ -81,7 +81,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':
             return render_template('events/display/print.html', content=body)
         else:
-            return WPConferenceBase._applyDecoration(self, body)
+            return WPEventBase._applyDecoration(self, body)
 
     def _getHeader(self):
         return render_event_header(self.event, theme=self.theme_id, theme_override=self.theme_override).encode('utf-8')

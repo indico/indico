@@ -91,7 +91,7 @@ def render_event_footer(event, dark=False):
                            google_calendar_params=google_calendar_params)
 
 
-class WPConferenceBase(WPDecorated):
+class WPEventBase(WPDecorated):
     @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -122,7 +122,7 @@ class WPConferenceBase(WPDecorated):
         return WPDecorated._getHeadContent(self) + meta
 
 
-class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
+class WPConferenceDefaultDisplayBase(MathjaxMixin, WPEventBase):
     menu_entry_plugin = None
     menu_entry_name = None
 
@@ -131,7 +131,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
         kwargs['conf_layout_params'] = self._get_layout_params()
-        WPConferenceBase.__init__(self, rh, event_, **kwargs)
+        WPEventBase.__init__(self, rh, event_, **kwargs)
 
     def _get_layout_params(self):
         bg_color = layout_settings.get(self.event, 'header_background_color').replace('#', '').lower()
@@ -178,7 +178,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         return '\n'.join([
             css,
             MathjaxMixin._getHeadContent(self),
-            WPConferenceBase._getHeadContent(self)
+            WPEventBase._getHeadContent(self)
         ])
 
     def _applyDecoration(self, body):
@@ -190,7 +190,7 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
                                             event=self.event, form=css_override_form,
                                             download_url=self._kwargs['css_url_override'])
             body = override_html + body
-        return WPConferenceBase._applyDecoration(self, to_unicode(body))
+        return WPEventBase._applyDecoration(self, to_unicode(body))
 
 
 class WPConferenceModifBase(WPEventManagement):
