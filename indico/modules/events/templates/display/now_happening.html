@@ -6,9 +6,9 @@
     <span id="now-happening-entries">
         {% for entry in entries %}
             {% set obj = entry.object %}
-            {% if entry.type == 'CONTRIBUTION' %}
+            {% if entry.type.name == 'CONTRIBUTION' %}
                 {% set url = url_for('contributions.display_contribution', obj) %}
-            {% elif entry.type == 'BREAK' %}
+            {% elif entry.type.name == 'BREAK' %}
                 {% if entry.parent %}
                     {% set url = url_for('sessions.display_session', entry.parent.object) %}
                 {% else %}
