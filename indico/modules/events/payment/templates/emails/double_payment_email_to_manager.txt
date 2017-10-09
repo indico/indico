@@ -1,6 +1,0 @@
-Dear manager of the event {{ event.title }},
-
-There has been a duplicated payment for the registrant with ID {{ registration.friendly_id }}.
-Please, check with the registrant to see if there was some misunderstanding or whatever.
-
-Regards.

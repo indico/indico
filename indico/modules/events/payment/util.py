@@ -21,7 +21,6 @@ import re
 from indico.core.db import db
 from indico.core.plugins import plugin_engine
 from indico.modules.events.payment import PaymentPluginMixin
-from indico.modules.events.payment.notifications import notify_double_payment
 from indico.modules.events.payment.models.transactions import PaymentTransaction, TransactionStatus
 from indico.modules.events.registration.notifications import notify_registration_state_update
 
@@ -52,13 +51,11 @@ def register_transaction(registration, amount, currency, action, provider=None, 
     :param data: arbitrary JSON-serializable data specific to the
                  transaction's provider
     """
-    new_transaction, double_payment = PaymentTransaction.create_next(registration=registration, action=action,
-                                                                     amount=amount, currency=currency,
-                                                                     provider=provider, data=data)
+    new_transaction = PaymentTransaction.create_next(registration=registration, action=action,
+                                                     amount=amount, currency=currency,
+                                                     provider=provider, data=data)
     if new_transaction:
         db.session.flush()
-        if double_payment:
-            notify_double_payment(registration)
         if new_transaction.status == TransactionStatus.successful:
             registration.update_state(paid=True)
         elif new_transaction.status == TransactionStatus.cancelled:
