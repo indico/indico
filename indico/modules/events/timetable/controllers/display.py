@@ -49,7 +49,7 @@ class RHTimetable(RHConferenceBaseDisplay):
             event_info = serialize_event_info(self.event)
             timetable_data = TimetableSerializer(self.event).serialize_timetable(strip_empty_days=True)
             timetable_settings = layout_settings.get(self.event, 'timetable_theme_settings')
-            return self.view_class.render_template('display.html', self._conf, event_info=event_info,
+            return self.view_class.render_template('display.html', self.event, event_info=event_info,
                                                    timetable_data=timetable_data, timetable_settings=timetable_settings,
                                                    timetable_layout=self.timetable_layout)
         else:

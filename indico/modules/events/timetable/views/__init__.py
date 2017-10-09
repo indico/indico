@@ -24,13 +24,12 @@ from flask import render_template, request, session
 from sqlalchemy.orm import joinedload
 
 from indico.core import signals
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.views.weeks import inject_week_timetable
 from indico.modules.events.util import get_theme
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.signals import values_from_signal
 from indico.web.flask.templating import register_template_hook, template_hook
 
@@ -51,15 +50,12 @@ class WPManageTimetable(WPEventManagement):
                 self._asset_env['modules_contributions_js'].urls())
 
 
-class WPDisplayTimetable(WPJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPDisplayTimetable(WPConferenceDisplayBase):
     template_prefix = 'events/timetable/'
     menu_entry_name = 'timetable'
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
-
     def getJSFiles(self):
-        return WPConferenceDisplayLegacyBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
+        return WPConferenceDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
 
 
 @template_hook('meeting-body')
