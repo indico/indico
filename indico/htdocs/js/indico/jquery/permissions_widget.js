@@ -18,14 +18,57 @@
 (function($) {
     'use strict';
 
+    var permissionClasses = {
+        access: 'accept',
+        timetable: 'highlight',
+        edit: 'danger',
+        submit: 'warning'
+    };
+
     $.widget('indico.permissionswidget', {
-        options: {
-            a: null,
-            b: {},
-            c: []
+        _update: function() {
+            this.$dataField.val(JSON.stringify(this.data));
+        },
+        _renderLabel: function(principal) {
+            var $labelBox = $('<div class="label-box">');
+            if (principal.type === 'role') {
+                var $code = $('<span class="role-code">').text(principal.code)
+                    .css({'border-color': '#' + principal.color, 'color': '#' + principal.color});
+                var $text = $('<span class="text-normal">').text(principal.name);
+                return $labelBox.append($('<span class="flexrow f-a-center">').append($code).append($text));
+            } else {
+                var iconClass = principal.type === 'user' ? 'icon-user' : 'icon-users';
+                var text = principal.type === 'user' ? principal.name : principal.id;
+                return $labelBox.append($('<span class="label-icon text-normal">').addClass(iconClass).text(text));
+            }
+        },
+        _renderPermissions: function(permissions) {
+            var $permissions = $('<div class="permissions-box flexrow f-a-center f-self-stretch">');
+            var $permissionsList = $('<ul>').appendTo($permissions);
+            permissions.forEach(function(item) {
+                $permissionsList.append($('<li class="i-label bold">').addClass(permissionClasses[item]).append(item));
+            });
+            var $editButton = $('<button class="i-button text-color borderless icon-only icon-edit">')
+                .appendTo($permissions);
+            return $permissions;
+        },
+        _renderItem: function(item) {
+            var $item = $('<li class="flexrow f-a-center">');
+            $item.append(this._renderLabel(item[0]));
+            $item.append(this._renderPermissions(item[1]));
+            return $item;
+        },
+        _render: function() {
+            var self = this;
+            this.data.forEach(function(item) {
+                self.$permissionsWidgetList.append(self._renderItem(item));
+            });
         },
         _create: function() {
-            this.element.text('Hello widget!');
+            this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
+            this.$dataField = this.element.find('input[type=hidden]');
+            this.data = JSON.parse(this.$dataField.val());
+            this._render();
         }
     });
 })(jQuery);

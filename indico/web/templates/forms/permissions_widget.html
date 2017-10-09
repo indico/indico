@@ -1,12 +1,32 @@
 {% extends 'forms/base_widget.html' %}
 
 {% block html %}
-    <div id="permissions-widget" class="js-permissions-widget">
+    <h3>Permissions</h3>
+    <div id="permissions-widget-{{ field.id }}" class="js-permissions-widget">
+        <input type="hidden" value="{{ field._value() }}">
+        <ul class="permissions-widget-list"></ul>
+        <div class="toolbars">
+            <div class="toolbar">
+                <button class="i-button icon-plus highlight js-dropdown arrow" data-toggle="dropdown">
+                    {%- trans %}Add entry{% endtrans -%}
+                </button>
+                <ul class="dropdown">
+                    <li><a href="#">{% trans %}User / Group{% endtrans %}</a></li>
+                    <li><a href="#">{% trans %}Role{% endtrans %}</a></li>
+                    <li><a href="#">{% trans %}IP Network{% endtrans %}</a></li>
+                </ul>
+            </div>
+            <div class="toolbar">
+                <button class="i-button icon-medal text-color borderless">
+                    {%- trans %}Manage roles{% endtrans -%}
+                </button>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
 {% block javascript %}
     <script>
-        $('#permissions-widget').permissionswidget({});
+        $('#permissions-widget-{{ field.id }}').permissionswidget({});
     </script>
 {% endblock %}

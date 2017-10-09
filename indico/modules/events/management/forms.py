@@ -247,7 +247,7 @@ class EventProtectionForm(IndicoForm):
                              description=_("""From which point in the category tree this event will be visible from """
                                            """(number of categories upwards). Applies to "Today's events" and """
                                            """Calendar only. If the event is moved, this number will be preserved."""))
-    permissions = PermissionsField(_("Permissions"), [DataRequired()])
+    permissions = PermissionsField(_("Permissions"))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):

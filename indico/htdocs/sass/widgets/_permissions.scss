@@ -1,0 +1,52 @@
+.permissions-widget-list {
+    @include border-left($width: 3px);
+    padding-left: 1em;
+
+    & > li {
+        padding: 0.25em 0;
+    }
+
+    ul {
+        padding: 0;
+        list-style-type: none;
+    }
+
+    .label-box {
+        flex-basis: 25%;
+        margin-right: 1em;
+
+        .label-icon::before,
+        .role-code {
+            margin-right: 0.5em;
+        }
+
+        .label-icon::before {
+            color: $light-black;
+            font-size: 1.1em;
+        }
+
+        .role-code {
+            @include border-all();
+            @include border-radius();
+            padding: 0.1em;
+        }
+    }
+
+    .permissions-box {
+        @include border-all($style: dashed);
+        padding: 0.3em 0.5em;
+        width: 100%;
+
+        ul {
+            li {
+                display: inline;
+                font-size: 0.8em;
+                text-transform: uppercase;
+            }
+        }
+
+        button {
+            margin-left: auto;
+        }
+    }
+}

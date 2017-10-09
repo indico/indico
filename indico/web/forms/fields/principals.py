@@ -125,5 +125,8 @@ class PrincipalField(PrincipalListField):
 class PermissionsField(JSONField):
     widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
 
+    def __init__(self, *args, **kwargs):
+        super(PermissionsField, self).__init__(*args, **kwargs)
+
     def _value(self):
         return super(PermissionsField, self)._value() if self.data else '[]'
