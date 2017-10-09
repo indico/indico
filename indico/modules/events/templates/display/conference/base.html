@@ -1,3 +1,5 @@
+{% extends 'layout/conference_page_base.html' %}
+
 {% from 'events/display/_event_header_message.html' import render_event_header_msg %}
 {% from 'events/layout/_menu.html' import menu_entry_display %}
 
@@ -16,87 +18,89 @@
 {%- endmacro -%}
 
 
-<div class="conf clearfix" itemscope itemtype="http://schema.org/Event">
-    <div class="confheader clearfix" style="{{ conf_layout_params.bg_color_css }}">
-        <div class="confTitleBox clearfix" style="{{ conf_layout_params.bg_color_css }}">
-            <div class="confTitle">
-                <h1>
-                    <a href="{{ event.url }}">
-                        <span class="conference-title-link" style="{{ conf_layout_params.text_color_css }}">
-                            {% if event.has_logo %}
-                                <div class="confLogoBox">
-                                   <img src="{{ event.logo_url }}" alt="{{ event.title }}" border="0" class="confLogo">
-                                </div>
-                            {% endif %}
-                            <span itemprop="title">{{ event.title }}</span>
-                        </span>
-                    </a>
-                </h1>
-           </div>
-        </div>
-        <div class="confSubTitleBox" style="{{ conf_layout_params.bg_color_css }}">
-            <div class="confSubTitleContent flexrow">
-                <div class="confSubTitle f-self-stretch" style="{{ conf_layout_params.text_color_css }}">
-                    {{ template_hook('conference-header', event=event) }}
-                    <div class="datePlace">
-                        <div class="date">{{ _format_event_date(event) }}</div>
-                        <div class="place">{{ event.venue_name }}</div>
-                        <div class="timezone">
-                            {%- trans tz=event.display_tzinfo.zone %}{{ tz }} timezone{% endtrans -%}
+{% block page %}
+    <div class="conf clearfix" itemscope itemtype="http://schema.org/Event">
+        <div class="confheader clearfix" style="{{ conf_layout_params.bg_color_css }}">
+            <div class="confTitleBox clearfix" style="{{ conf_layout_params.bg_color_css }}">
+                <div class="confTitle">
+                    <h1>
+                        <a href="{{ event.url }}">
+                            <span class="conference-title-link" style="{{ conf_layout_params.text_color_css }}">
+                                {% if event.has_logo %}
+                                    <div class="confLogoBox">
+                                       <img src="{{ event.logo_url }}" alt="{{ event.title }}" border="0" class="confLogo">
+                                    </div>
+                                {% endif %}
+                                <span itemprop="title">{{ event.title }}</span>
+                            </span>
+                        </a>
+                    </h1>
+               </div>
+            </div>
+            <div class="confSubTitleBox" style="{{ conf_layout_params.bg_color_css }}">
+                <div class="confSubTitleContent flexrow">
+                    <div class="confSubTitle f-self-stretch" style="{{ conf_layout_params.text_color_css }}">
+                        {{ template_hook('conference-header', event=event) }}
+                        <div class="datePlace">
+                            <div class="date">{{ _format_event_date(event) }}</div>
+                            <div class="place">{{ event.venue_name }}</div>
+                            <div class="timezone">
+                                {%- trans tz=event.display_tzinfo.zone %}{{ tz }} timezone{% endtrans -%}
+                            </div>
                         </div>
+                        {{ template_hook('now-happening', event=event, text_color_css=conf_layout_params.text_color_css) }}
+                        {{ template_hook('conference-header-subtitle', event=event) }}
                     </div>
-                    {{ template_hook('now-happening', event=event, text_color_css=conf_layout_params.text_color_css) }}
-                    {{ template_hook('conference-header-subtitle', event=event) }}
-                </div>
-                {{ template_hook('conference-header-right-column', event=event) }}
-            </div>
-        </div>
-        {% if conf_layout_params.announcement %}
-            <div class="simpleTextAnnouncement">{{ conf_layout_params.announcement }}</div>
-        {% endif %}
-    </div>
-    <div id="confSectionsBox" class="clearfix">
-        {% include 'flashed_messages.html' %}
-        {{ render_event_header_msg(event, meeting=false) }}
-        <div class="conf_leftMenu">
-            <ul id="outer">
-                {%- for entry in conf_layout_params.menu if entry.is_visible %}
-                    {{ menu_entry_display(entry, active_entry_id=conf_layout_params.active_menu_item) }}
-                {% endfor -%}
-            </ul>
-
-            {% if event.contact_emails or event.contact_phones -%}
-                <div class="support_box">
-                    <h3>{{ event.contact_title }}</h3>
-                    <ul>
-                        {% for email in event.contact_emails %}
-                            <li>
-                                <span class="icon icon-mail" aria-hidden="true"></span>
-                                <a href="mailto:{{ email }}?subject={{ event.title|urlencode }}">{{ email }}</a>
-                            </li>
-                        {% endfor %}
-
-                        {% for phone in event.contact_phones %}
-                            <li>
-                                <span class="icon icon-phone" aria-hidden="true"></span>
-                                <a href="tel:{{ phone|replace(' ', '') }}">{{ phone }}</a>
-                            </li>
-                        {% endfor %}
-                    </ul>
-                </div>
-            {%- endif %}
-        </div>
-        <div class="confBodyBox clearfix {{ 'event-locked' if event.is_locked }}">
-            <div class="mainContent">
-                <div class="col2">
-                    {% block content %}{% endblock %}
+                    {{ template_hook('conference-header-right-column', event=event) }}
                 </div>
             </div>
+            {% if conf_layout_params.announcement %}
+                <div class="simpleTextAnnouncement">{{ conf_layout_params.announcement }}</div>
+            {% endif %}
         </div>
+        <div id="confSectionsBox" class="clearfix">
+            {% include 'flashed_messages.html' %}
+            {{ render_event_header_msg(event, meeting=false) }}
+            <div class="conf_leftMenu">
+                <ul id="outer">
+                    {%- for entry in conf_layout_params.menu if entry.is_visible %}
+                        {{ menu_entry_display(entry, active_entry_id=conf_layout_params.active_menu_item) }}
+                    {% endfor -%}
+                </ul>
+
+                {% if event.contact_emails or event.contact_phones -%}
+                    <div class="support_box">
+                        <h3>{{ event.contact_title }}</h3>
+                        <ul>
+                            {% for email in event.contact_emails %}
+                                <li>
+                                    <span class="icon icon-mail" aria-hidden="true"></span>
+                                    <a href="mailto:{{ email }}?subject={{ event.title|urlencode }}">{{ email }}</a>
+                                </li>
+                            {% endfor %}
+
+                            {% for phone in event.contact_phones %}
+                                <li>
+                                    <span class="icon icon-phone" aria-hidden="true"></span>
+                                    <a href="tel:{{ phone|replace(' ', '') }}">{{ phone }}</a>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {%- endif %}
+            </div>
+            <div class="confBodyBox clearfix {{ 'event-locked' if event.is_locked }}">
+                <div class="mainContent">
+                    <div class="col2">
+                        {{ super() }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script>
+            $(document).ready(function() {
+                $('h1').mathJax();
+            });
+        </script>
     </div>
-    <script>
-        $(document).ready(function() {
-            $('h1').mathJax();
-        });
-    </script>
-</div>
+{% endblock %}

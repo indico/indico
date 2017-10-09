@@ -213,7 +213,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         return rv.encode('utf-8')
 
 
-class WPConferenceDisplayLegacyBase(MathjaxMixin, WPEventBase):
+class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     menu_entry_plugin = None
     menu_entry_name = None
 
@@ -254,10 +254,6 @@ class WPConferenceDisplayLegacyBase(MathjaxMixin, WPEventBase):
         if entry:
             return entry.id
 
-    def _apply_conference_layout(self, body):
-        tpl = "{% extends 'events/display/conference/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
-        return render_template_string(tpl, _body=body, **self._kwargs)
-
     def _getHeadContent(self):
         path = config.BASE_URL
         try:
@@ -272,9 +268,11 @@ class WPConferenceDisplayLegacyBase(MathjaxMixin, WPEventBase):
             WPEventBase._getHeadContent(self)
         ])
 
+    def _getBody(self, params):
+        return WPJinjaMixin._getPageContent(self, params)
+
     def _applyDecoration(self, body):
         self.logo_url = self.event.logo_url if self.event.has_logo else None
-        body = self._apply_conference_layout(body)
         css_override_form = self._kwargs.get('css_override_form')
         if css_override_form:
             override_html = render_template('events/layout/css_preview_header.html',
@@ -282,6 +280,13 @@ class WPConferenceDisplayLegacyBase(MathjaxMixin, WPEventBase):
                                             download_url=self._kwargs['css_url_override'])
             body = override_html + body
         return WPEventBase._applyDecoration(self, to_unicode(body))
+
+
+class WPConferenceDisplayLegacyBase(WPConferenceDisplayBase):
+    def _applyDecoration(self, body):
+        tpl = "{% extends 'events/display/conference/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
+        body = render_template_string(tpl, _body=body, **self._kwargs)
+        return WPConferenceDisplayBase._applyDecoration(self, body)
 
 
 class WPConferenceDisplay(WPConferenceDisplayLegacyBase):

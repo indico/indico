@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.management.views import WPEventManagementLegacy
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.views import WPConferenceDisplayBase
 
 
 class WPLayoutEdit(WPJinjaMixin, WPEventManagementLegacy):
@@ -34,15 +34,12 @@ class WPMenuEdit(WPJinjaMixin, WPEventManagementLegacy):
         return WPEventManagementLegacy.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
 
 
-class WPPage(WPJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPPage(WPConferenceDisplayBase):
     template_prefix = 'events/layout/'
 
     def __init__(self, rh, conference, **kwargs):
         self.page = kwargs['page']
-        WPConferenceDisplayLegacyBase.__init__(self, rh, conference, **kwargs)
-
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
+        WPConferenceDisplayBase.__init__(self, rh, conference, **kwargs)
 
     @property
     def sidemenu_option(self):
