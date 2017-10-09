@@ -16,9 +16,8 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.management.views import WPEventManagement
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.views import WPConferenceDisplayBase
 
 
 class WPManageSessions(WPEventManagement):
@@ -29,15 +28,12 @@ class WPManageSessions(WPEventManagement):
         return WPEventManagement.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls()
 
 
-class WPDisplaySession(WPJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPDisplaySession(WPConferenceDisplayBase):
     template_prefix = 'events/sessions/'
     menu_entry_name = 'timetable'
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
-
     def getJSFiles(self):
-        return WPConferenceDisplayLegacyBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
+        return WPConferenceDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
 
 
 class WPDisplayMySessionsConference(WPDisplaySession):

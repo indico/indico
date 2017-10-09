@@ -38,8 +38,7 @@ class RHDisplaySessionList(RHConferenceBaseDisplay):
 
     def _process(self):
         sessions = get_sessions_for_user(self.event, session.user)
-        return WPDisplayMySessionsConference.render_template('display/session_list.html', self._conf,
-                                                             event=self.event, sessions=sessions)
+        return WPDisplayMySessionsConference.render_template('display/session_list.html', self.event, sessions=sessions)
 
 
 class RHDisplaySessionBase(RHConferenceBaseDisplay):

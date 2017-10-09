@@ -1,107 +1,111 @@
+{% extends 'events/display/conference/base.html' %}
+
 {% from 'attachments/_attachments.html' import render_attachments %}
 
-<div class="conferenceDetails">
-    <div itemprop="description" class="description">
-        {{ event.description }}
-    </div>
-
-    <div class="infogrid">
-        <div class="infoline date">
-            <span title="{% trans %}Date/Time{% endtrans %}" class="icon icon-time" aria-hidden="true"></span>
-            <div class="text">
-                <div>
-                    <span class="label">{% trans %}Starts{% endtrans %}</span>
-                    <time datetime="{{ event.start_dt_display.isoformat() }}">
-                        {{ event.start_dt_display|format_datetime(timezone=event.display_tzinfo) }}
-                    </time>
-                </div>
-                <div>
-                    <span class="label">{% trans %}Ends{% endtrans %}</span>
-                    <time datetime="{{ event.end_dt_display.isoformat() }}">
-                        {{ event.end_dt_display|format_datetime(timezone=event.display_tzinfo) }}
-                    </time>
-                </div>
-                <div class="timezone">{{ event.display_tzinfo.zone }}</div>
-            </div>
+{% block content %}
+    <div class="conferenceDetails">
+        <div itemprop="description" class="description">
+            {{ event.description }}
         </div>
 
-        {% if event.has_location_info or event.address %}
-            <div class="infoline location">
-                <span title="{% trans %}Location{% endtrans %}" class="icon icon-location" aria-hidden="true"></span>
-                <div class="place text">
-                    {{ event.venue_name }}
-                </div>
-                {% if event.room and event.room.map_url %}
-                    <div class="room text">
-                        <a href="{{ event.room.map_url }}">{{ event.room_name }}</a>
-                    </div>
-                {% elif event.room_name %}
-                    <div class="room text">
-                        {{ event.room_name }}
-                    </div>
-                {% endif %}
-
-                {% if event.address %}
-                    <div class="address text nohtml">{{ event.address }}</div>
-                {% endif %}
-            </div>
-        {% endif %}
-
-        {% if event.person_links %}
-            <div class="infoline chairs clear">
-                <span title="{% trans %}Chairpersons{% endtrans %}" class="icon icon-user-chairperson"
-                      aria-hidden="true"></span>
-                <ul class="chair_list text">
-                    {% for link in event.person_links|sort(attribute='display_order_key') %}
-                        <li>
-                            {% if link.email %}
-                                {% if session.user %}
-                                    <a href="mailto:{{ link.email }}">{{ link.full_name }}</a>
-                                {% else %}
-                                    <a title="{% trans %}Log in to see their email address{% endtrans %}">
-                                        {{ link.full_name }}
-                                    </a>
-                                {% endif %}
-                            {% else %}
-                                {{ link.full_name }}
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
-            </div>
-        {% endif %}
-
-        {% set is_submitter = event.can_manage(session.user, 'submit') %}
-        {% if is_submitter or event.attached_items %}
-            <div class="infoline material material-list">
-                <div class="attachments-box {{ 'highlighted-area' if is_submitter }}">
-                    <div class="attachments-box-header">
-                        <h2 class="icon-attachment">{% trans %}Materials{% endtrans %}</h2>
-                        {% if is_submitter %}
-                            <a href="#" class="right i-button icon-edit hide-if-locked"
-                               data-locator="{{ event.locator|tojson|forceescape }}"
-                               data-reload-on-change
-                               data-attachment-editor></a>
-                        {% endif %}
-                    </div>
-                    {{ render_attachments(event.attached_items, management=false) }}
-                </div>
-            </div>
-        {% endif %}
-
-        {% if event.additional_info %}
-            <div class="infoline info">
-                <span title="{% trans %}Extra information{% endtrans %}" class="icon icon-info"
-                      aria-hidden="true"></span>
+        <div class="infogrid">
+            <div class="infoline date">
+                <span title="{% trans %}Date/Time{% endtrans %}" class="icon icon-time" aria-hidden="true"></span>
                 <div class="text">
-                    {{ event.additional_info|rich_markup }}
+                    <div>
+                        <span class="label">{% trans %}Starts{% endtrans %}</span>
+                        <time datetime="{{ event.start_dt_display.isoformat() }}">
+                            {{ event.start_dt_display|format_datetime(timezone=event.display_tzinfo) }}
+                        </time>
+                    </div>
+                    <div>
+                        <span class="label">{% trans %}Ends{% endtrans %}</span>
+                        <time datetime="{{ event.end_dt_display.isoformat() }}">
+                            {{ event.end_dt_display|format_datetime(timezone=event.display_tzinfo) }}
+                        </time>
+                    </div>
+                    <div class="timezone">{{ event.display_tzinfo.zone }}</div>
                 </div>
             </div>
-        {% endif %}
-    </div>
-    {{ template_hook('conference-home-info', event=event) }}
-</div>
 
-<script>
-    setupAttachmentTreeView();
-</script>
+            {% if event.has_location_info or event.address %}
+                <div class="infoline location">
+                    <span title="{% trans %}Location{% endtrans %}" class="icon icon-location" aria-hidden="true"></span>
+                    <div class="place text">
+                        {{ event.venue_name }}
+                    </div>
+                    {% if event.room and event.room.map_url %}
+                        <div class="room text">
+                            <a href="{{ event.room.map_url }}">{{ event.room_name }}</a>
+                        </div>
+                    {% elif event.room_name %}
+                        <div class="room text">
+                            {{ event.room_name }}
+                        </div>
+                    {% endif %}
+
+                    {% if event.address %}
+                        <div class="address text nohtml">{{ event.address }}</div>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+            {% if event.person_links %}
+                <div class="infoline chairs clear">
+                    <span title="{% trans %}Chairpersons{% endtrans %}" class="icon icon-user-chairperson"
+                          aria-hidden="true"></span>
+                    <ul class="chair_list text">
+                        {% for link in event.person_links|sort(attribute='display_order_key') %}
+                            <li>
+                                {% if link.email %}
+                                    {% if session.user %}
+                                        <a href="mailto:{{ link.email }}">{{ link.full_name }}</a>
+                                    {% else %}
+                                        <a title="{% trans %}Log in to see their email address{% endtrans %}">
+                                            {{ link.full_name }}
+                                        </a>
+                                    {% endif %}
+                                {% else %}
+                                    {{ link.full_name }}
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            {% set is_submitter = event.can_manage(session.user, 'submit') %}
+            {% if is_submitter or event.attached_items %}
+                <div class="infoline material material-list">
+                    <div class="attachments-box {{ 'highlighted-area' if is_submitter }}">
+                        <div class="attachments-box-header">
+                            <h2 class="icon-attachment">{% trans %}Materials{% endtrans %}</h2>
+                            {% if is_submitter %}
+                                <a href="#" class="right i-button icon-edit hide-if-locked"
+                                   data-locator="{{ event.locator|tojson|forceescape }}"
+                                   data-reload-on-change
+                                   data-attachment-editor></a>
+                            {% endif %}
+                        </div>
+                        {{ render_attachments(event.attached_items, management=false) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if event.additional_info %}
+                <div class="infoline info">
+                    <span title="{% trans %}Extra information{% endtrans %}" class="icon icon-info"
+                          aria-hidden="true"></span>
+                    <div class="text">
+                        {{ event.additional_info|rich_markup }}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {{ template_hook('conference-home-info', event=event) }}
+    </div>
+
+    <script>
+        setupAttachmentTreeView();
+    </script>
+{% endblock %}

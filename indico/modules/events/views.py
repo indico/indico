@@ -289,7 +289,7 @@ class WPConferenceDisplayLegacyBase(WPConferenceDisplayBase):
         return WPConferenceDisplayBase._applyDecoration(self, body)
 
 
-class WPConferenceDisplay(WPConferenceDisplayLegacyBase):
+class WPConferenceDisplay(WPConferenceDisplayBase):
     menu_entry_name = 'overview'
 
     def _getBody(self, params):
