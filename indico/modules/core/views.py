@@ -17,9 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
+from indico.web.breadcrumbs import render_breadcrumbs
 
 
 class WPSettings(WPAdmin):
@@ -32,8 +32,8 @@ class WPSettings(WPAdmin):
 class WPContact(WPJinjaMixin, WPDecorated):
     template_prefix = 'core/'
 
-    def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(_('Contact'))
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(_('Contact'))
 
     def _getBody(self, params):
         return self._getPageContent(params)

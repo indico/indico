@@ -202,10 +202,9 @@ class WPDecorated(WPBase):
         return render_template('footer.html').encode('utf-8')
 
     def _applyDecoration(self, body):
-        nav = self._getNavigationDrawer()
-        breadcrumbs = nav.getHTML() if nav else ''
+        breadcrumbs = self._get_breadcrumbs()
         return u'<div class="header">{}</div>\n<div class="main">{}<div>{}</div></div>\n{}'.format(
-            to_unicode(self._getHeader()), to_unicode(breadcrumbs), to_unicode(body), to_unicode(self._getFooter()))
+            to_unicode(self._getHeader()), breadcrumbs, to_unicode(body), to_unicode(self._getFooter()))
 
     def _display(self, params):
         params = dict(params, **self._kwargs)
@@ -214,8 +213,8 @@ class WPDecorated(WPBase):
     def _getBody(self, params):
         raise NotImplementedError
 
-    def _getNavigationDrawer(self):
-        return None
+    def _get_breadcrumbs(self):
+        return u''
 
 
 class WPNotDecorated(WPBase):
@@ -226,5 +225,5 @@ class WPNotDecorated(WPBase):
     def _getBody(self, params):
         pass
 
-    def _getNavigationDrawer(self):
-        return None
+    def _get_breadcrumbs(self):
+        return u''

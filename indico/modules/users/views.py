@@ -19,10 +19,10 @@ from __future__ import unicode_literals
 from flask import request
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.modules.admin.views import WPAdmin
 from indico.modules.users import User
 from indico.util.i18n import _
+from indico.web.breadcrumbs import render_breadcrumbs
 
 
 class WPUser(WPJinjaMixin, WPDecorated):
@@ -40,13 +40,13 @@ class WPUser(WPJinjaMixin, WPDecorated):
         kwargs['active_menu_item'] = active_menu_item
         WPDecorated.__init__(self, rh, **kwargs)
 
-    def _getNavigationDrawer(self):
+    def _get_breadcrumbs(self):
         if 'user_id' in request.view_args:
             user = User.get(request.view_args['user_id'])
             profile_breadcrumb = _('Profile of {name}').format(name=user.full_name)
         else:
             profile_breadcrumb = _('My Profile')
-        return WSimpleNavigationDrawer(profile_breadcrumb)
+        return render_breadcrumbs(profile_breadcrumb)
 
     def _getBody(self, params):
         return self._getPageContent(params)

@@ -104,38 +104,6 @@ class WTemplated:
         return "&nbsp;"
 
 
-class WNavigationDrawer(WTemplated):
-
-    def __init__( self, pars, bgColor = None, type = None):
-        self._target = pars["target"]
-        self._isModif = pars.get("isModif", False)
-        self._track = pars.get("track", None) #for abstracts viewed inside a track
-        self._bgColor = bgColor
-        self._actionType = type #type of action
-
-    def getVars( self ):
-        vars = WTemplated.getVars( self )
-        vars["target"] = self._target
-        vars["isModif"]= self._isModif
-        vars["track"]= self._track
-        vars["bgColor"] = self._bgColor
-        vars["actionType"] = self._actionType
-        return vars
-
-    def getHTML(self, params=None):
-        return WTemplated.getHTML(self, params)
-
-
-class WSimpleNavigationDrawer(WTemplated):
-    def __init__(self, *items):
-        self._items = items
-
-    def getVars(self):
-        params = WTemplated.getVars(self)
-        params['items'] = self._items
-        return params
-
-
 class TabControl:
 
     def __init__( self, parent=None, child=None ):

@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from flask import render_template_string
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
 from indico.util.string import to_unicode
+from indico.web.breadcrumbs import render_breadcrumbs
 
 
 class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
@@ -34,8 +34,8 @@ class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
     def getJSFiles(self):
         return WPDecorated.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
-    def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(_('Room Booking'))
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(_('Room Booking'))
 
     def _getTitle(self):
         return '{} - {}'.format(WPDecorated._getTitle(self), _('Room Booking'))

@@ -19,10 +19,11 @@ from __future__ import unicode_literals
 from flask import render_template_string
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
+from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.events.models.events import EventType
 from indico.util.event import unify_event_args
 from indico.util.string import to_unicode
+from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.flask.templating import get_template_module
 
 
@@ -72,9 +73,8 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
     def _getBody(self, params):
         return self._getPageContent(params)
 
-    def _getNavigationDrawer(self):
-        pars = {'target': self.event, 'isModif': True}
-        return WNavigationDrawer(pars, bgColor='white')
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(event=self.event, management=True)
 
 
 class WPEventManagementLegacy(WPEventManagement):

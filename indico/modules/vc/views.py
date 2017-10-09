@@ -17,10 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.i18n import _
+from indico.web.breadcrumbs import render_breadcrumbs
 
 
 class WPVCManageEvent(WPEventManagement):
@@ -47,8 +47,8 @@ class WPVCEventPage(WPConferenceDisplayBase):
 class WPVCService(WPJinjaMixin, WPDecorated):
     template_prefix = 'vc/'
 
-    def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer(_('Videoconference'))
+    def _get_breadcrumbs(self):
+        return render_breadcrumbs(_('Videoconference'))
 
     def _getBody(self, params):
         return self._getPageContent(params)

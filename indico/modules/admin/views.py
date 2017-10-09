@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
 from indico.util.i18n import _
+from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.menu import get_menu_item
 
 
@@ -29,12 +29,12 @@ class WPAdmin(WPJinjaMixin, WPDecorated):
         kwargs['active_menu_item'] = active_menu_item or self.sidemenu_option
         WPDecorated.__init__(self, rh, **kwargs)
 
-    def _getNavigationDrawer(self):
+    def _get_breadcrumbs(self):
         menu_item = get_menu_item('admin-sidemenu', self._kwargs['active_menu_item'])
         items = [_('Administration')]
         if menu_item:
             items.append(menu_item.title)
-        return WSimpleNavigationDrawer(*items)
+        return render_breadcrumbs(*items)
 
     def _getBody(self, params):
         return self._getPageContent(params)

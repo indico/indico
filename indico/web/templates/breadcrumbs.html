@@ -1,0 +1,16 @@
+<div class="main-breadcrumb {{ 'management' if management }}">
+    <span class="path">
+        {% for (title, url) in items %}
+            {% if not loop.first %}
+                <span class="sep">»</span>
+            {% endif %}
+            {% if url %}
+                <a href="{{ url }}" itemtype="http://data-vocabulary.org/Breadcrumb" itemprop="url" class="item" itemscope>
+                    <span itemprop="title">{{ title|truncate(40) }}</span>
+                </a>
+            {% else %}
+                <span class="item" itemprop="title">{{ title|truncate(40) }}</span>
+            {% endif %}
+        {% endfor %}
+    </span>
+</div>

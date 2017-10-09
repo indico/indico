@@ -19,10 +19,11 @@ from __future__ import unicode_literals
 from markupsafe import escape
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
+from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.admin.views import WPAdmin
 from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
+from indico.web.breadcrumbs import render_breadcrumbs
 
 
 class WPManageUpcomingEvents(WPAdmin):
@@ -65,9 +66,10 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
             head_content += MathjaxMixin._getHeadContent(self)
         return head_content
 
-    def _getNavigationDrawer(self):
-        if self.category and not self.category.is_root:
-            return WNavigationDrawer({'target': self.category})
+    def _get_breadcrumbs(self):
+        if not self.category or self.category.is_root:
+            return ''
+        return render_breadcrumbs(category=self.category)
 
 
 class WPCategoryManagement(WPCategory):
@@ -86,9 +88,10 @@ class WPCategoryManagement(WPCategory):
     def getJSFiles(self):
         return WPCategory.getJSFiles(self) + self._asset_env['modules_categories_management_js'].urls()
 
-    def _getNavigationDrawer(self):
-        if not self.category.is_root:
-            return WNavigationDrawer({'target': self.category, 'isModif': True}, bgColor="white")
+    def _get_breadcrumbs(self):
+        if self.category.is_root:
+            return ''
+        return render_breadcrumbs(category=self.category, management=True)
 
 
 class WPCategoryStatistics(WPCategory):
