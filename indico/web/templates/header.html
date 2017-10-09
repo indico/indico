@@ -26,11 +26,6 @@
                         {% if item.section == 'create-event' and item.url in ('lecture', 'meeting', 'conference') %}
                             {# special handling for event creation links #}
                             {{ create_event_link(category, item.url, item.title, id=item.name) }}
-                        {% elif item.section == 'help' and item.name == 'help' and item.url is none %}
-                            <a style="color: #777; cursor: initial;"
-                               title="{% trans %}We are working on updating the documentation. Stay tuned!{% endtrans %}">
-                                {{ item.title }}
-                            </a>
                         {% else %}
                             <a href="{{ item.url }}">{{ item.title }}</a>
                         {% endif %}
