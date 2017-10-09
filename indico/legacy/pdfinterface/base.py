@@ -611,7 +611,7 @@ class PDFWithTOC(PDFBase):
 
     """
 
-    def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1, include_toc=False):
+    def __init__(self, story=None, pagesize='A4', fontsize='normal', firstPageNumber=1, include_toc=True):
         self._fontsize = fontsize
         self._story = story
         if story is None:

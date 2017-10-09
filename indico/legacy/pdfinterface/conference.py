@@ -1258,7 +1258,7 @@ class RegistrantToPDF(PDFBase):
                                          ('RIGHTPADDING', (0, 0), (-1, -1), 0)])
         tbl = Table(header_data, style=header_table_style, colWidths=[None, cm])
         story.append(tbl)
-        indexedFlowable[tbl] = {'text': registration.full_name, 'level': 1}
+        indexedFlowable[tbl] = {'text': registration.full_name.encode('utf-8'), 'level': 1}
 
         style = ParagraphStyle({})
         style.fontName = 'Sans'
