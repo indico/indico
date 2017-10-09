@@ -18,47 +18,37 @@ from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
-from indico.modules.events.management.views import WPEventManagementLegacy
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.views import WPConferenceDisplayBase
+from indico.util.i18n import _
 
 
-class WPVCJinjaMixin(WPJinjaMixin):
+class WPVCManageEvent(WPEventManagement):
+    sidemenu_option = 'videoconference'
     template_prefix = 'vc/'
 
-
-class WPVCManageEvent(WPVCJinjaMixin, WPEventManagementLegacy):
-    sidemenu_option = 'videoconference'
-
     def getCSSFiles(self):
-        return WPEventManagementLegacy.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
+        return WPEventManagement.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def getJSFiles(self):
-        return (WPEventManagementLegacy.getJSFiles(self) +
+        return (WPEventManagement.getJSFiles(self) +
                 self._asset_env['modules_vc_js'].urls() +
                 self._asset_env['selectize_js'].urls())
 
-    def _getPageContent(self, params):
-        return WPVCJinjaMixin._getPageContent(self, params)
 
-
-class WPVCEventPage(WPVCJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPVCEventPage(WPConferenceDisplayBase):
     menu_entry_name = 'videoconference_rooms'
-
-    def __init__(self, rh, conf, **kwargs):
-        WPConferenceDisplayLegacyBase.__init__(self, rh, conf, **kwargs)
-        self._conf = conf
+    template_prefix = 'vc/'
 
     def getJSFiles(self):
-        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
-                self._asset_env['modules_vc_js'].urls())
-
-    def _getBody(self, params):
-        return self._getPageContent(params)
+        return WPConferenceDisplayBase.getJSFiles(self) + self._asset_env['modules_vc_js'].urls()
 
 
-class WPVCService(WPVCJinjaMixin, WPDecorated):
+class WPVCService(WPJinjaMixin, WPDecorated):
+    template_prefix = 'vc/'
+
     def _getNavigationDrawer(self):
-        return WSimpleNavigationDrawer('Videoconference')
+        return WSimpleNavigationDrawer(_('Videoconference'))
 
     def _getBody(self, params):
         return self._getPageContent(params)

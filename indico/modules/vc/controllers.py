@@ -38,9 +38,9 @@ from indico.modules.vc.views import WPVCEventPage, WPVCManageEvent, WPVCService
 from indico.util.date_time import as_utc, get_day_end, get_day_start, now_utc
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
-from indico.web.flask.util import redirect_or_jsonify, url_for
+from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import _pop_injected_js, jsonify_data
+from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
 def process_vc_room_association(plugin, event, vc_room, form, event_vc_room=None, allow_same_room=False):
@@ -101,7 +101,7 @@ class RHVCManageEvent(RHVCManageEventBase):
         room_event_assocs = VCRoomEventAssociation.find_for_event(self.event, include_hidden=True,
                                                                   include_deleted=True).all()
         event_vc_rooms = [event_vc_room for event_vc_room in room_event_assocs if event_vc_room.vc_room.plugin]
-        return WPVCManageEvent.render_template('manage_event.html', self._conf, event=self.event,
+        return WPVCManageEvent.render_template('manage_event.html', self.event,
                                                event_vc_rooms=event_vc_rooms, plugins=get_vc_plugins().values())
 
 
@@ -111,8 +111,8 @@ class RHVCManageEventSelectService(RHVCManageEventBase):
     def _process(self):
         action = request.args.get('vc_room_action', '.manage_vc_rooms_create')
         attach = request.args.get('attach', '')
-        return WPVCManageEvent.render_template('manage_event_select.html', self._conf, vc_room_action=action,
-                                               event=self.event, plugins=get_vc_plugins().values(), attach=attach)
+        return jsonify_template('vc/manage_event_select.html', event=self.event, vc_room_action=action,
+                                plugins=get_vc_plugins().values(), attach=attach)
 
 
 class RHVCManageEventCreateBase(RHVCManageEventBase):
@@ -283,7 +283,7 @@ class RHVCEventPage(RHConferenceBaseDisplay):
         for event_vc_room in event_vc_rooms:
             if event_vc_room.vc_room.plugin:
                 linked_to[event_vc_room.link_type.name][event_vc_room.link_object].append(event_vc_room)
-        return WPVCEventPage.render_template('event_vc.html', self._conf, event=self.event,
+        return WPVCEventPage.render_template('event_vc.html', self.event,
                                              event_vc_rooms=event_vc_rooms, linked_to=linked_to,
                                              vc_plugins_available=vc_plugins_available)
 
@@ -308,11 +308,11 @@ class RHVCManageAttach(RHVCManageEventCreateBase):
                 if event_vc_room:
                     flash(_("The room has been attached to the event."), 'success')
                     db.session.add(event_vc_room)
-            return redirect_or_jsonify(url_for('.manage_vc_rooms', self.event), flash=False)
+            return jsonify_data(flash=False)
 
-        return WPVCManageEvent.render_template('attach_room.html', self._conf, event=self.event, form=form,
-                                               skip_fields=form.conditional_fields | {'room'},
-                                               plugin=self.plugin)
+        return jsonify_template('vc/attach_room.html', event=self.event, form=form,
+                                skip_fields=form.conditional_fields | {'room'},
+                                plugin=self.plugin)
 
 
 class RHVCManageSearch(RHVCManageEventCreateBase):
