@@ -1,0 +1,8 @@
+{% if event.type == 'conference' %}
+    {% extends 'events/display/conference/base.html' %}
+{% else %}
+    {% extends 'layout/meeting_page_base.html' %}
+{% endif %}
+
+{% block title %}{{ agreement.definition.title }}{% endblock %}
+{% block content %}{{ html|safe }}{% endblock %}

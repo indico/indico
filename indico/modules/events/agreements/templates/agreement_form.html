@@ -3,10 +3,6 @@
 
 {% set tzinfo = agreement.event.display_tzinfo %}
 
-<h2 class="page-title">
-    {{ agreement.definition.title }}
-</h2>
-
 {% if agreement.accepted %}
     {% call message_box('success') %}
         {% trans dt=agreement.signed_dt|format_datetime(timezone=tzinfo) -%}

@@ -31,8 +31,10 @@ from indico.modules.events.agreements.forms import AgreementAnswerSubmissionForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.modules.events.agreements.notifications import notify_agreement_reminder, notify_new_signature_to_manager
 from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
-from indico.modules.events.agreements.views import WPAgreementForm, WPAgreementManager
+from indico.modules.events.agreements.views import (WPAgreementFormConference, WPAgreementFormSimpleEvent,
+                                                    WPAgreementManager)
 from indico.modules.events.management.controllers import RHManageEventBase
+from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
@@ -85,7 +87,10 @@ class RHAgreementForm(RHConferenceBaseDisplay):
                 notify_new_signature_to_manager(self.agreement)
             return redirect(url_for('.agreement_form', self.agreement, uuid=self.agreement.uuid))
         html = self.agreement.render(form)
-        return WPAgreementForm.render_string(html, self._conf)
+        view_class = (WPAgreementFormConference
+                      if self.event.type_ == EventType.conference else
+                      WPAgreementFormSimpleEvent)
+        return view_class.render_template('form_page.html', self.event, agreement=self.agreement, html=html)
 
 
 class RHAgreementManager(RHAgreementManagerBase):
@@ -93,8 +98,7 @@ class RHAgreementManager(RHAgreementManagerBase):
 
     def _process(self):
         definitions = get_agreement_definitions().values()
-        return WPAgreementManager.render_template('agreement_types.html', self._conf,
-                                                  event=self.event, definitions=definitions)
+        return WPAgreementManager.render_template('agreement_types.html', self.event, definitions=definitions)
 
 
 class RHAgreementManagerDetails(RHAgreementManagerBase):
@@ -116,7 +120,7 @@ class RHAgreementManagerDetails(RHAgreementManagerBase):
                       .filter(Agreement.type == self.definition.name,
                               Agreement.identifier.in_(people))
                       .all())
-        return WPAgreementManager.render_template('agreement_type_details.html', self._conf, event=self.event,
+        return WPAgreementManager.render_template('agreement_type_details.html', self.event,
                                                   definition=self.definition, agreements=agreements)
 
 

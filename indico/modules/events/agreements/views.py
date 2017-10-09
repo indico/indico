@@ -17,15 +17,21 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.modules.events.management.views import WPEventManagementLegacy
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDisplayBase
 
 
-class WPAgreementForm(WPConferenceDisplayLegacyBase, WPJinjaMixin):
+class WPAgreementFormSimpleEvent(WPJinjaMixin, WPSimpleEventDisplayBase):
+    template_prefix = 'events/agreements/'
+
     def _getBody(self, params):
         return self._getPageContent(params)
 
 
-class WPAgreementManager(WPJinjaMixin, WPEventManagementLegacy):
+class WPAgreementFormConference(WPConferenceDisplayBase):
+    template_prefix = 'events/agreements/'
+
+
+class WPAgreementManager(WPEventManagement):
     template_prefix = 'events/agreements/'
     sidemenu_option = 'agreements'
