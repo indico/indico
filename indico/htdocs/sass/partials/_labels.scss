@@ -42,7 +42,7 @@ $i-label-color: $light-black;
     }
 }
 
-@mixin _i-label-states($flavor-color, $border-color, $border-accent-color, $font-color, $font-accent-color, $with-modes: true) {
+@mixin _i-label-states($flavor-color, $color-variation, $font-color, $with-modes: true) {
     $no-modes: '';
 
     @if $with-modes == true {
@@ -50,14 +50,14 @@ $i-label-color: $light-black;
     }
 
     &:not(.label)#{$no-modes} {
+        @include border-all(darken($flavor-color, $color-variation));
         background: $flavor-color;
-        border-color: $border-color;
         color: $font-color;
     }
 }
 
-@mixin i-label-flavor($flavor-color, $border-color) {
-    @include _i-label-states($flavor-color, $border-color, $border-color, $light-gray, white);
+@mixin i-label-flavor($flavor-color, $color-variation) {
+    @include _i-label-states($flavor-color, $color-variation, $light-gray);
     @include _i-label-borderless($flavor-color);
 }
 
@@ -110,6 +110,8 @@ $i-label-color: $light-black;
 
     &.warning {
         @include i-label-flavor($yellow, $light-color-variation);
+        background: lighten($yellow, 8 * $light-color-variation) !important;
+        color: darken($yellow, $light-color-variation) !important;
     }
 
     &.disabled {
