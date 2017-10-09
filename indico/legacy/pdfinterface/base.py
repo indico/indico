@@ -501,8 +501,8 @@ def _doNothing(canvas, doc):
     "Dummy callback for onPage"
     pass
 
-class DocTemplateWithTOC(SimpleDocTemplate):
 
+class DocTemplateWithTOC(SimpleDocTemplate):
     def __init__(self, indexedFlowable, filename, firstPageNumber=1, include_toc=False, **kw):
         """toc is the TableOfContents object
         indexedFlowale is a dictionnary with flowables as key and a dictionnary as value.
@@ -547,10 +547,13 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         self._tocStory.append(PageBreak())
         if self.include_toc:
             self._tocStory.append(Spacer(inch, 1*cm))
-            self._tocStory.append(Paragraph( _("Table of contents"), headerStyle))
+            self._tocStory.append(Paragraph(_("Table of contents"), headerStyle))
             self._tocStory.append(Spacer(inch, 2*cm))
             for entry in self._toc:
-                self._tocStory.append(TableOfContentsEntry("<para leftIndent=%s" % ((entry[0] - 1) * 50) + ">" + entry[1] + "</para>", str(entry[2]),entryStyle))
+                indent = ((entry[0] - 1) * 50)
+                toc_entry = TableOfContentsEntry('<para leftIndent={}>{}</para>'.format(indent, entry[1]),
+                                                 str(entry[2]), entryStyle)
+                self._tocStory.append(toc_entry)
 
     def laterPages(self, c, doc):
         c.saveState()
