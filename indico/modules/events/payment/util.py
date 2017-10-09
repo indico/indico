@@ -53,13 +53,11 @@ def register_transaction(registration, amount, currency, action, provider=None, 
     :param data: arbitrary JSON-serializable data specific to the
                  transaction's provider
     """
-    new_transaction, double_payment = PaymentTransaction.create_next(registration=registration, action=action,
-                                                                     amount=amount, currency=currency,
-                                                                     provider=provider, data=data)
+    new_transaction = PaymentTransaction.create_next(registration=registration, action=action,
+                                                     amount=amount, currency=currency,
+                                                     provider=provider, data=data)
     if new_transaction:
         db.session.flush()
-        if double_payment:
-            notify_double_payment(registration)
         if new_transaction.status == TransactionStatus.successful:
             registration.update_state(paid=True)
         elif new_transaction.status == TransactionStatus.cancelled:

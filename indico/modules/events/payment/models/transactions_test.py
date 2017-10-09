@@ -165,9 +165,8 @@ def test_manual(dummy_transaction, provider, expected):
 
 
 def test_create_next(creation_params):
-    transaction, double_payment = PaymentTransaction.create_next(**creation_params)
+    transaction = PaymentTransaction.create_next(**creation_params)
     assert isinstance(transaction, PaymentTransaction)
-    assert not double_payment
 
 
 @pytest.mark.parametrize('exception', (
@@ -179,18 +178,9 @@ def test_create_next(creation_params):
 def test_create_next_with_exception(caplog, mocker, creation_params, exception):
     mocker.patch.object(TransactionStatusTransition, 'next')
     TransactionStatusTransition.next.side_effect = exception('TEST_EXCEPTION')
-    transaction, double_payment = PaymentTransaction.create_next(**creation_params)
+    transaction = PaymentTransaction.create_next(**creation_params)
     log = extract_logs(caplog, one=True, name='indico.payment')
     assert transaction is None
-    assert double_payment is None
     assert 'TEST_EXCEPTION' in log.message
     if log.exc_info:
         assert log.exc_info[0] == exception
-
-
-def test_create_next_double_payment(caplog, creation_params):
-    creation_params['registration'].transaction = MagicMock(status=TransactionStatus.successful)
-    _, double_payment = PaymentTransaction.create_next(**creation_params)
-    log = extract_logs(caplog, one=True, name='indico.payment').message
-    assert 'already paid' in log
-    assert double_payment

@@ -233,25 +233,23 @@ class PaymentTransaction(db.Model):
         new_transaction = PaymentTransaction(amount=amount, currency=currency,
                                              provider=provider, data=data)
         registration.transaction = new_transaction
-        double_payment = False
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
             Logger.get('payment').exception("%s (data received: %r)", e, data)
-            return None, None
+            return None
         except InvalidManualTransactionAction as e:
             Logger.get('payment').exception("Invalid manual action code '%s' on initial status (data received: %r)",
                                             e, data)
-            return None, None
+            return None
         except InvalidTransactionAction as e:
             Logger.get('payment').exception("Invalid action code '%s' on initial status (data received: %r)", e, data)
-            return None, None
+            return None
         except IgnoredTransactionAction as e:
             Logger.get('payment').warning("%s (data received: %r)", e, data)
-            return None, None
+            return None
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
-            double_payment = True
-            Logger.get('payment').warning("Received successful payment for an already paid registration")
+            Logger.get('payment').info("Received successful payment for an already paid registration")
         new_transaction.status = next_status
-        return new_transaction, double_payment
+        return new_transaction
