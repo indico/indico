@@ -1,33 +1,55 @@
-{% if management %}{% extends 'layout/base.html' %}{% endif %}
+{% if management %}
+    {% extends 'layout/base.html' %}
+{% elif event.type == 'conference' %}
+    {% extends 'events/display/conference/base.html' %}
+{% else %}
+    {% extends 'layout/meeting_page_base.html' %}
+{% endif %}
+
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
 
 
-{% if management %}
-    {% block title %}{% trans %}Materials{% endtrans %}{% endblock %}
-    {% block subtitle %}{% trans %}Package{% endtrans %}{% endblock %}
-{% endif %}
+
+{% block title %}
+    {% if management %}
+        {% trans %}Materials{% endtrans %}
+    {% else %}
+        {% trans %}Material Package{% endtrans %}
+    {% endif %}
+{% endblock %}
+
+
+{% macro wrap_in_ibox(use_ibox) %}
+    {% if not use_ibox %}
+        {{ caller() }}
+    {% else %}
+        <div class="i-box-group vert fixed-width attachments-package">
+            <div class="i-box">
+                <div class="i-box-header">
+                    <div class="i-box-title">{%- trans %}Material Package{% endtrans -%}</div>
+                    {% if management %}
+                        <div class="i-box-buttons toolbar">
+                            <div class="group">
+                                <a href="{{ url_for('.management', event) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="i-box-content">
+                    {{ caller() }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endmacro %}
 
 
 {% block content %}
-    <div class="i-box-group vert fixed-width attachments-package">
-        <div class="i-box">
-            <div class="i-box-header">
-                <div class="i-box-title">{%- trans %}Material Package{% endtrans -%}</div>
-                {% if management %}
-                    <div class="i-box-buttons toolbar">
-                        <div class="group">
-                            <a href="{{ url_for('.management', event) }}" class="i-button">{% trans %}Go back{% endtrans %}</a>
-                        </div>
-                    </div>
-                {% endif %}
-            </div>
-            <div class="i-box-content">
-                {{ form_header(form, disable_if_locked=false) }}
-                {{ form_rows(form) }}
-                {% call form_footer(form) %}
-                    <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
-                {% endcall %}
-            </div>
-        </div>
-    </div>
+    {% call wrap_in_ibox(management) %}
+        {{ form_header(form, disable_if_locked=false) }}
+        {{ form_rows(form) }}
+        {% call form_footer(form) %}
+            <input type="submit" class='i-button big highlight' value="{% trans %}Download package{% endtrans %}">
+        {% endcall %}
+    {% endcall %}
 {% endblock %}

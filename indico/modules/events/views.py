@@ -282,13 +282,6 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
         return WPEventBase._applyDecoration(self, to_unicode(body))
 
 
-class WPConferenceDisplayLegacyBase(WPConferenceDisplayBase):
-    def _applyDecoration(self, body):
-        tpl = "{% extends 'events/display/conference/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
-        body = render_template_string(tpl, _body=body, **self._kwargs)
-        return WPConferenceDisplayBase._applyDecoration(self, body)
-
-
 class WPConferenceDisplay(WPConferenceDisplayBase):
     menu_entry_name = 'overview'
 
