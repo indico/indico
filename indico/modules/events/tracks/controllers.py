@@ -66,7 +66,7 @@ class RHManageTrackBase(RHManageTracksBase):
 class RHManageTracks(RHManageTracksBase):
     def _process(self):
         tracks = self.event.tracks
-        return WPManageTracks.render_template('management.html', self._conf, event=self.event, tracks=tracks)
+        return WPManageTracks.render_template('management.html', self.event, tracks=tracks)
 
 
 class RHEditProgram(RHManageTracksBase):
@@ -131,8 +131,8 @@ class RHDisplayTracks(RHConferenceBaseDisplay):
                            subqueryload('abstract_reviewers'))
                   .order_by(Track.position)
                   .all())
-        return WPDisplayTracks.render_template('display.html', self._conf, event=self.event, page_title=page_title,
-                                               program=program, tracks=tracks)
+        return WPDisplayTracks.render_template('display.html', self.event,
+                                               page_title=page_title, program=program, tracks=tracks)
 
 
 class RHTracksPDF(RHConferenceBaseDisplay):

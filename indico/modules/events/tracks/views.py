@@ -16,36 +16,32 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.modules.events.management.views import WPEventManagementLegacy
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.mathjax import MathjaxMixin
 
 
-class WPManageTracks(MathjaxMixin, WPJinjaMixin, WPEventManagementLegacy):
+class WPManageTracks(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
 
     def getJSFiles(self):
-        return (WPEventManagementLegacy.getJSFiles(self) +
+        return (WPEventManagement.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
-        return WPEventManagementLegacy._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayTracks(MathjaxMixin, WPJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPDisplayTracks(MathjaxMixin, WPConferenceDisplayBase):
     template_prefix = 'events/tracks/'
     menu_entry_name = 'program'
 
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params)
-
     def getJSFiles(self):
-        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
+        return (WPConferenceDisplayBase.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
-        return WPConferenceDisplayLegacyBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPConferenceDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
