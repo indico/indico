@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
-from indico.modules.events.views import WPSimpleEventDisplayBase
+from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.views import WPConferenceDisplayLegacyBase, WPSimpleEventDisplayBase
 
 
 class AttachmentsMixin(WPJinjaMixin):
@@ -29,8 +29,8 @@ class AttachmentsMixin(WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPEventAttachments(AttachmentsMixin, WPConferenceModifBase):
-    base_wp = WPConferenceModifBase
+class WPEventAttachments(AttachmentsMixin, WPEventManagementLegacy):
+    base_wp = WPEventManagementLegacy
     sidemenu_option = 'attachments'
 
 
@@ -48,7 +48,7 @@ class WPPackageEventAttachmentsManagement(WPEventAttachments, WPJinjaMixin):
         return WPJinjaMixin._getPageContent(self, params)
 
 
-class WPPackageEventAttachmentsDisplayConference(WPConferenceDefaultDisplayBase, WPJinjaMixin):
+class WPPackageEventAttachmentsDisplayConference(WPConferenceDisplayLegacyBase, WPJinjaMixin):
     template_prefix = 'attachments/'
 
     def _getBody(self, params):

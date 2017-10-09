@@ -17,24 +17,25 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.views import WPConferenceDisplayLegacyBase
 from indico.util.mathjax import MathjaxMixin
 
 
-class WPManageTracks(MathjaxMixin, WPJinjaMixin, WPConferenceModifBase):
+class WPManageTracks(MathjaxMixin, WPJinjaMixin, WPEventManagementLegacy):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) +
+        return (WPEventManagementLegacy.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
-        return WPConferenceModifBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPEventManagementLegacy._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayTracks(MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPDisplayTracks(MathjaxMixin, WPJinjaMixin, WPConferenceDisplayLegacyBase):
     template_prefix = 'events/tracks/'
     menu_entry_name = 'program'
 
@@ -42,9 +43,9 @@ class WPDisplayTracks(MathjaxMixin, WPJinjaMixin, WPConferenceDefaultDisplayBase
         return WPJinjaMixin._getPageContent(self, params)
 
     def getJSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
+        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
-        return WPConferenceDefaultDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPConferenceDisplayLegacyBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)

@@ -17,9 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from indico.modules.events.management.views import WPEventManagement
-from indico.modules.events.views import WPSimpleEventDisplayBase
+from indico.modules.events.views import WPConferenceDisplayLegacyBase, WPSimpleEventDisplayBase
 
 
 class WPManageSurvey(WPEventManagement):
@@ -53,9 +52,9 @@ class DisplaySurveyMixin(WPJinjaMixin):
         return self.base_class.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
 
 
-class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDefaultDisplayBase):
+class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDisplayLegacyBase):
     template_prefix = 'events/surveys/'
-    base_class = WPConferenceDefaultDisplayBase
+    base_class = WPConferenceDisplayLegacyBase
     menu_entry_name = 'surveys'
 
 

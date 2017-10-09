@@ -17,27 +17,28 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.views import WPConferenceDisplayLegacyBase
 
 
-class WPLayoutEdit(WPJinjaMixin, WPConferenceModifBase):
+class WPLayoutEdit(WPJinjaMixin, WPEventManagementLegacy):
     template_prefix = 'events/layout/'
     sidemenu_option = 'layout'
 
 
-class WPMenuEdit(WPJinjaMixin, WPConferenceModifBase):
+class WPMenuEdit(WPJinjaMixin, WPEventManagementLegacy):
     template_prefix = 'events/layout/'
     sidemenu_option = 'menu'
 
     def getJSFiles(self):
-        return WPConferenceModifBase.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
+        return WPEventManagementLegacy.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
 
 
-class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPPage(WPJinjaMixin, WPConferenceDisplayLegacyBase):
     template_prefix = 'events/layout/'
 
     def __init__(self, rh, conference, **kwargs):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conference, **kwargs)
+        WPConferenceDisplayLegacyBase.__init__(self, rh, conference, **kwargs)
         self.page = kwargs['page']
 
     def _getBody(self, params):
@@ -48,6 +49,6 @@ class WPPage(WPJinjaMixin, WPConferenceDefaultDisplayBase):
         return self.page.menu_entry.id
 
 
-class WPImages(WPJinjaMixin, WPConferenceModifBase):
+class WPImages(WPJinjaMixin, WPEventManagementLegacy):
     template_prefix = 'events/layout/'
     sidemenu_option = 'images'

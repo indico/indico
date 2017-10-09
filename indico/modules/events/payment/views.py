@@ -17,8 +17,9 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 from indico.modules.admin.views import WPAdmin
+from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.views import WPConferenceDisplayLegacyBase
 
 
 class WPPaymentJinjaMixin(WPJinjaMixin):
@@ -29,7 +30,7 @@ class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdmin):
     pass
 
 
-class WPPaymentEventManagement(WPConferenceModifBase, WPPaymentJinjaMixin):
+class WPPaymentEventManagement(WPEventManagementLegacy, WPPaymentJinjaMixin):
     template_prefix = 'events/payment/'
     sidemenu_option = 'payment'
 
@@ -37,7 +38,7 @@ class WPPaymentEventManagement(WPConferenceModifBase, WPPaymentJinjaMixin):
         return WPPaymentJinjaMixin._getPageContent(self, params)
 
 
-class WPPaymentEvent(WPConferenceDefaultDisplayBase, WPPaymentJinjaMixin):
+class WPPaymentEvent(WPConferenceDisplayLegacyBase, WPPaymentJinjaMixin):
     menu_entry_name = 'registration'
 
     def _getBody(self, params):

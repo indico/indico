@@ -17,10 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagementLegacy
 
 
-class WPStaticSites(WPConferenceModifBase, WPJinjaMixin):
+class WPStaticSites(WPEventManagementLegacy, WPJinjaMixin):
     template_prefix = 'events/static/'
     sidemenu_option = 'static'
 

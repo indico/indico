@@ -16,9 +16,13 @@
 
 from __future__ import unicode_literals
 
+from flask import render_template_string
+
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import WNavigationDrawer, render_header
 from indico.modules.events.models.events import EventType
+from indico.util.event import unify_event_args
+from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 
 
@@ -71,6 +75,32 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
     def _getNavigationDrawer(self):
         pars = {'target': self.event, 'isModif': True}
         return WNavigationDrawer(pars, bgColor='white')
+
+
+class WPEventManagementLegacy(WPEventManagement):
+    """Base class for event management pages without Jinja inheritance.
+
+    Do not use this for anything new.  Instead, use `WPEventManagement`
+    directly (or inherit from it) and inherit the associated Jinja template
+    from ``events/management/base.html``.
+    """
+
+    @unify_event_args
+    def __init__(self, rh, event_, **kwargs):
+        WPEventManagement.__init__(self, rh, event_, **kwargs)
+        self._conf = self.event.as_legacy
+
+    def _getBody(self, params):
+        # Legacy handling for pages that do not use Jinja inheritance.
+        tpl = u"{% extends 'events/management/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
+        body = to_unicode(self._getPageContent(params))
+        return render_template_string(tpl, _body=body, **self._kwargs)
+
+    def _getTabContent(self, params):
+        raise NotImplementedError
+
+    def _getPageContent(self, params):
+        raise NotImplementedError
 
 
 class WPEventSettings(WPEventManagement):

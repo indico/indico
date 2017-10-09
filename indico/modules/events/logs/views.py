@@ -17,10 +17,10 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceModifBase
+from indico.modules.events.management.views import WPEventManagementLegacy
 
 
-class WPEventLogs(WPConferenceModifBase, WPJinjaMixin):
+class WPEventLogs(WPEventManagementLegacy, WPJinjaMixin):
     template_prefix = 'events/logs/'
     sidemenu_option = 'logs'
 

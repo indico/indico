@@ -17,22 +17,23 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase, WPConferenceModifBase
 from indico.legacy.webinterface.wcomponents import WSimpleNavigationDrawer
+from indico.modules.events.management.views import WPEventManagementLegacy
+from indico.modules.events.views import WPConferenceDisplayLegacyBase
 
 
 class WPVCJinjaMixin(WPJinjaMixin):
     template_prefix = 'vc/'
 
 
-class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
+class WPVCManageEvent(WPVCJinjaMixin, WPEventManagementLegacy):
     sidemenu_option = 'videoconference'
 
     def getCSSFiles(self):
-        return WPConferenceModifBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
+        return WPEventManagementLegacy.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def getJSFiles(self):
-        return (WPConferenceModifBase.getJSFiles(self) +
+        return (WPEventManagementLegacy.getJSFiles(self) +
                 self._asset_env['modules_vc_js'].urls() +
                 self._asset_env['selectize_js'].urls())
 
@@ -40,15 +41,15 @@ class WPVCManageEvent(WPVCJinjaMixin, WPConferenceModifBase):
         return WPVCJinjaMixin._getPageContent(self, params)
 
 
-class WPVCEventPage(WPVCJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPVCEventPage(WPVCJinjaMixin, WPConferenceDisplayLegacyBase):
     menu_entry_name = 'videoconference_rooms'
 
     def __init__(self, rh, conf, **kwargs):
-        WPConferenceDefaultDisplayBase.__init__(self, rh, conf, **kwargs)
+        WPConferenceDisplayLegacyBase.__init__(self, rh, conf, **kwargs)
         self._conf = conf
 
     def getJSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
+        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
                 self._asset_env['modules_vc_js'].urls())
 
     def _getBody(self, params):

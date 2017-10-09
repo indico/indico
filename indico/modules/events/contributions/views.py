@@ -17,8 +17,8 @@
 from __future__ import unicode_literals
 
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import WPConferenceDefaultDisplayBase
 from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.views import WPConferenceDisplayLegacyBase
 from indico.util.mathjax import MathjaxMixin
 
 
@@ -35,14 +35,14 @@ class WPManageContributions(MathjaxMixin, WPEventManagement):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDefaultDisplayBase):
+class WPContributionsDisplayBase(WPJinjaMixin, WPConferenceDisplayLegacyBase):
     template_prefix = 'events/contributions/'
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
 
     def getJSFiles(self):
-        return (WPConferenceDefaultDisplayBase.getJSFiles(self) +
+        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
                 self._asset_env['modules_contributions_js'].urls() +
                 self._asset_env['modules_event_display_js'].urls())
 
