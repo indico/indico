@@ -61,7 +61,7 @@ def _render_session_timetable(session, **kwargs):
 
 
 @template_hook('now-happening')
-def _render_now_happening_info(event, **kwargs):
+def _render_now_happening_info(event, text_color_css, **kwargs):
     from indico.modules.events.layout import layout_settings
     if layout_settings.get(event, 'show_banner'):
         current_dt = now_utc(exact=False)
@@ -71,4 +71,4 @@ def _render_now_happening_info(event, **kwargs):
         if not entries:
             return
         return render_template('events/display/now_happening.html', event=event, entries=entries,
-                               text_color=kwargs.get('text_color'))
+                               text_color_css=text_color_css)

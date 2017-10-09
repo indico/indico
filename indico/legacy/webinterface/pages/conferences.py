@@ -99,6 +99,7 @@ class WPConferenceBase(base.WPDecorated):
     @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
+        self.event = event_
         WPDecorated.__init__(self, rh, **kwargs)
         self._navigationTarget = self._conf = event_.as_legacy
         self._tz = event_.display_tzinfo.zone
@@ -124,6 +125,27 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
     menu_entry_plugin = None
     menu_entry_name = None
 
+    @unify_event_args
+    def __init__(self, rh, event_, **kwargs):
+        assert event_ == kwargs.setdefault('event', event_)
+        self.event = event_
+        kwargs['conf_layout_params'] = self._get_layout_params()
+        WPConferenceBase.__init__(self, rh, event_, **kwargs)
+
+    def _get_layout_params(self):
+        bg_color = layout_settings.get(self.event, 'header_background_color').replace('#', '').lower()
+        text_color = layout_settings.get(self.event, 'header_text_color').replace('#', '').lower()
+        announcement = ''
+        if layout_settings.get(self.event, 'show_announcement'):
+            announcement = layout_settings.get(self.event, 'announcement')
+        return {
+            'menu': menu_entries_for_event(self.event),
+            'active_menu_item': self.sidemenu_option,
+            'bg_color_css': 'background: #{0}; border-color: #{0};'.format(bg_color) if bg_color else '',
+            'text_color_css': 'color: #{};'.format(text_color) if text_color else '',
+            'announcement': announcement
+        }
+
     def get_extra_css_files(self):
         theme_url = self._kwargs.get('css_url_override', get_css_url(self._conf.as_event))
         return [theme_url] if theme_url else []
@@ -140,33 +162,9 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         if entry:
             return entry.id
 
-    def _applyConfDisplayDecoration( self, body ):
-        frame = WConfDisplayFrame(self._conf)
-        event = self._conf.as_event
-
-        announcement = ''
-        if layout_settings.get(event, 'show_announcement'):
-            announcement = layout_settings.get(event, 'announcement')
-
-        frameParams = {
-            "confModifURL": url_for('event_management.settings', event),
-            "logoURL": self.logo_url,
-            "currentURL": request.url,
-            "announcement": announcement,
-            'active_menu_entry_id': self.sidemenu_option
-        }
-        if self.event.has_logo:
-            frameParams["logoURL"] = self.logo_url
-        body = '''
-            <div class="confBodyBox clearfix {}">
-                <div class="mainContent">
-                    <div class="col2">
-                        {}
-                    </div>
-                </div>
-            </div>
-        '''.format('event-locked' if event.is_locked else '', encode_if_unicode(body))
-        return frame.getHTML(body, frameParams)
+    def _apply_conference_layout(self, body):
+        tpl = u"{% extends 'events/display/conference/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"
+        return render_template_string(tpl, _body=body, **self._kwargs)
 
     def _getHeadContent(self):
         path = config.BASE_URL
@@ -183,14 +181,13 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
         ])
 
     def _applyDecoration(self, body):
-        self.event = self._conf.as_event
         self.logo_url = self.event.logo_url if self.event.has_logo else None
-        body = self._applyConfDisplayDecoration(body)
+        body = self._apply_conference_layout(body)
         css_override_form = self._kwargs.get('css_override_form')
         if css_override_form:
             override_html = render_template('events/layout/css_preview_header.html',
                                             event=self.event, form=css_override_form,
-                                            download_url=self._kwargs['css_url_override']).encode('utf-8')
+                                            download_url=self._kwargs['css_url_override'])
             body = override_html + body
         return WPConferenceBase._applyDecoration(self, to_unicode(body))
 
@@ -208,47 +205,6 @@ class WConfMetadata(wcomponents.WTemplated):
         v['image'] = event.logo_url if event.has_logo else (config.IMAGES_BASE_URL + '/logo_indico.png')
         v['description'] = strip_ml_tags(self._conf.as_event.description[:500].encode('utf-8'))
         return v
-
-
-class WConfDisplayFrame(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-        self.event = self._conf.as_event
-
-    def getHTML(self, body, params):
-        self._body = body
-        return wcomponents.WTemplated.getHTML( self, params )
-
-    def getVars(self):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars["logo"] = ""
-        if self.event.has_logo:
-            vars["logoURL"] = self.event.logo_url
-            vars["logo"] = '<img src="{}" alt="{}" border="0" class="confLogo">'.format(
-                vars["logoURL"], escape_html(self.event.title.encode('utf-8'), escape_quotes=True))
-        vars["confTitle"] = self.event.title.encode('utf-8')
-        vars["displayURL"] = self.event.url
-        start_dt_local = self.event.start_dt_display.astimezone(self.event.display_tzinfo)
-        end_dt_local = self.event.end_dt_display.astimezone(self.event.display_tzinfo)
-        vars["timezone"] = self.event.display_tzinfo.zone
-        vars["confDateInterval"] = _("from {start} to {end}").format(start=format_date(start_dt_local, format='long'),
-                                                                     end=format_date(end_dt_local, format='long'))
-        if start_dt_local.strftime("%d%B%Y") == end_dt_local.strftime("%d%B%Y"):
-            vars["confDateInterval"] = format_date(start_dt_local, format='long')
-        elif start_dt_local.strftime("%B%Y") == end_dt_local.strftime("%B%Y"):
-            vars["confDateInterval"] = "%s-%s %s" % (start_dt_local.day, end_dt_local.day,
-                                                     format_date(start_dt_local, format='MMMM yyyy'))
-        vars["confLocation"] = self.event.venue_name
-        vars["body"] = self._body
-        vars['menu'] = menu_entries_for_event(self.event)
-
-        vars["bgColorCode"] = layout_settings.get(self._conf, 'header_background_color').replace("#", "")
-        vars["textColorCode"] = layout_settings.get(self._conf, 'header_text_color').replace("#", "")
-
-        vars["confId"] = self._conf.id
-        vars["conf"] = self._conf
-        return vars
 
 
 class WPrintPageFrame(wcomponents.WTemplated):
