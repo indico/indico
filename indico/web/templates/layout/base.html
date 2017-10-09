@@ -6,7 +6,7 @@
                 {% if self.back_button_url()|trim %}
                     <a href="{% filter trim %}{% block back_button_url %}{% endblock %}{% endfilter %}"
                        class="icon-prev back-button"
-                       title="{% if self.back_button_title() %}{% block back_button_title %}{% endblock %}{% else %}{% trans %}Back{% endtrans %}{% endif %}">
+                       title="{% if self.back_button_title()|trim %}{% block back_button_title %}{% endblock %}{% else %}{% trans %}Back{% endtrans %}{% endif %}">
                     </a>
                 {% endif %}
                 <div class="title">
@@ -15,28 +15,28 @@
                             <h2>
                                 {%- block title %}{% endblock -%}
                             </h2>
-                            {%- if self.title_actions -%}
+                            {%- if self.title_actions()|trim -%}
                                 <div class="actions">
                                     {% block title_actions %}{% endblock %}
                                 </div>
                             {%- endif -%}
                         </div>
-                        {% if self.subtitle() -%}
+                        {% if self.subtitle()|trim -%}
                             <h3>{% block subtitle %}{% endblock %}</h3>
                         {% endif %}
                     </div>
-                    {% if self.page_actions() %}
+                    {% if self.page_actions()|trim %}
                         <div class="actions">
                             {% block page_actions %}{% endblock %}
                         </div>
                     {% endif %}
                 </div>
-                {% if self.description() -%}
+                {% if self.description()|trim -%}
                     <div class="page-description">
                         {% block description %}{% endblock %}
                     </div>
                 {% endif %}
-                {% if self.info() %}
+                {% if self.info()|trim %}
                     <div class="page-info">
                         {% block info %}{% endblock %}
                     </div>
