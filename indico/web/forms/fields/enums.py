@@ -83,3 +83,6 @@ class HiddenEnumField(_EnumFieldMixin, HiddenField):
         if self.data is not None and (self.data in self.skip or (self.only is not None and self.data not in self.only)):
             self.data = old_data
             raise ValueError(self.gettext('Not a valid choice'))
+
+    def _value(self):
+        return getattr(self.data, 'name', self.data) if self.data is not None else ''
