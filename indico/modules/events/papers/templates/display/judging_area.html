@@ -1,4 +1,5 @@
-{% extends 'layout/conference_page_base.html' %}
+{% extends 'events/display/conference/base.html' %}
+
 {% from 'events/papers/_paper_list.html' import render_paper_assignment_content %}
 {% from 'message_box.html' import message_box %}
 
@@ -13,10 +14,12 @@
 {% block content %}
     {% if not event.cfp.is_judge(session.user) %}
         {% call message_box('info') %}
-            {% set link_start %}
+            {% set link_start -%}
                 <a href="{{ url_for('.papers_list', event, management=true) }}">
-            {% endset %}
-            {% set link_end='</a>'|safe %}
+            {%- endset %}
+            {% set link_end -%}
+                </a>
+            {%- endset %}
             {% trans -%}
                 Paper judges use this area to judge papers assigned to them.<br>
                 As a manager you can see all papers in the {{ link_start }}management area{{ link_end }}.

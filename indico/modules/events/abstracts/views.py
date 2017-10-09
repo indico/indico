@@ -18,14 +18,13 @@ from __future__ import unicode_literals
 
 from flask import render_template, session
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.abstracts.util import get_visible_reviewed_for_tracks
 from indico.modules.events.management.views import WPEventManagement
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.mathjax import MathjaxMixin
 
 
-class WPManageAbstracts(MathjaxMixin, WPJinjaMixin, WPEventManagement):
+class WPManageAbstracts(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/abstracts/'
     sidemenu_option = 'abstracts'
 
@@ -43,24 +42,21 @@ class WPManageAbstracts(MathjaxMixin, WPJinjaMixin, WPEventManagement):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayAbstractsBase(MathjaxMixin, WPJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPDisplayAbstractsBase(MathjaxMixin, WPConferenceDisplayBase):
     template_prefix = 'events/abstracts/'
 
     def getJSFiles(self):
-        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
+        return (WPConferenceDisplayBase.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['selectize_js'].urls() +
                 self._asset_env['modules_reviews_js'].urls() +
                 self._asset_env['modules_abstracts_js'].urls())
 
     def getCSSFiles(self):
-        return WPConferenceDisplayLegacyBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
-
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
+        return WPConferenceDisplayBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
 
     def _getHeadContent(self):
-        return WPConferenceDisplayLegacyBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
+        return WPConferenceDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPDisplayAbstracts(WPDisplayAbstractsBase):

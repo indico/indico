@@ -18,11 +18,10 @@ from __future__ import unicode_literals
 
 from flask import render_template, session
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.papers.forms import (PaperCommentForm, PaperJudgmentForm, PaperSubmissionForm,
                                                 build_review_form)
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.mathjax import MathjaxMixin
 
 
@@ -39,17 +38,14 @@ class WPManagePapers(MathjaxMixin, WPEventManagement):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayPapersBase(WPJinjaMixin, WPConferenceDisplayLegacyBase):
+class WPDisplayPapersBase(WPConferenceDisplayBase):
     template_prefix = 'events/papers/'
 
     def getJSFiles(self):
-        return (WPConferenceDisplayLegacyBase.getJSFiles(self) +
+        return (WPConferenceDisplayBase.getJSFiles(self) +
                 self._asset_env['modules_event_management_js'].urls() +
                 self._asset_env['modules_reviews_js'].urls() +
                 self._asset_env['modules_papers_js'].urls())
-
-    def _getBody(self, params):
-        return WPJinjaMixin._getPageContent(self, params).encode('utf-8')
 
 
 class WPDisplayJudgingArea(WPDisplayPapersBase):
@@ -75,7 +71,7 @@ def render_paper_page(paper, view_class=None):
     if view_class:
         return view_class.render_template('paper.html', paper.event.as_legacy, **params)
     else:
-        return render_template('events/papers/paper.html', no_javascript=True, **params)
+        return render_template('events/papers/paper.html', no_javascript=True, standalone=True, **params)
 
 
 class WPDisplayReviewingArea(WPDisplayPapersBase):
