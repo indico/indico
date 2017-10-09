@@ -38,8 +38,8 @@ class WPPage(WPJinjaMixin, WPConferenceDisplayLegacyBase):
     template_prefix = 'events/layout/'
 
     def __init__(self, rh, conference, **kwargs):
-        WPConferenceDisplayLegacyBase.__init__(self, rh, conference, **kwargs)
         self.page = kwargs['page']
+        WPConferenceDisplayLegacyBase.__init__(self, rh, conference, **kwargs)
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
