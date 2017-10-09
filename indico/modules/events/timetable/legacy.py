@@ -33,7 +33,7 @@ from indico.web.flask.util import url_for
 class TimetableSerializer(object):
     def __init__(self, event, management=False, user=None):
         self.management = management
-        self.user = user if user is not None and not has_request_context() else session.user
+        self.user = user if user is not None or not has_request_context() else session.user
         self.event = event
         self.can_manage_event = self.event.can_manage(self.user)
 
