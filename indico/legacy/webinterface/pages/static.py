@@ -14,14 +14,13 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPSpeakerList
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.registration.views import WPDisplayRegistrationParticipantList
 from indico.modules.events.sessions.views import WPDisplaySession
 from indico.modules.events.timetable.views import WPDisplayTimetable
 from indico.modules.events.tracks.views import WPDisplayTracks
-from indico.modules.events.views import WPSimpleEventDisplay
+from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 
 
 class WPStaticEventBase:

@@ -323,7 +323,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
             self._menu_offline_items[wp.menu_entry_name] = rh
 
     def _create_home(self):
-        p = WPStaticConferenceDisplay(self._rh, self._conf)
+        p = WPStaticConferenceDisplay(self._rh, self.event)
         self._html = p.display()
 
     def _create_other_pages(self):

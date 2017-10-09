@@ -22,13 +22,12 @@ from flask import jsonify, redirect, request, session
 
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.xmlGen import XMLGen
-from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import get_theme, serialize_event_for_ical
-from indico.modules.events.views import WPSimpleEventDisplay
+from indico.modules.events.views import WPConferenceDisplay, WPSimpleEventDisplay
 from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata import Serializer
 

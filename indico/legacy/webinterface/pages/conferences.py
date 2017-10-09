@@ -18,10 +18,9 @@ from __future__ import print_function
 
 import os
 
-from flask import render_template, render_template_string, request, session
+from flask import render_template, render_template_string, request
 
 from indico.core.config import config
-from indico.legacy.common.utils import isStringHTML
 from indico.legacy.webinterface import wcomponents
 from indico.legacy.webinterface.common.tools import escape_html, strip_ml_tags
 from indico.legacy.webinterface.pages import base
@@ -250,56 +249,6 @@ class WConfDisplayFrame(wcomponents.WTemplated):
         vars["confId"] = self._conf.id
         vars["conf"] = self._conf
         return vars
-
-
-class WConfDetailsFull(wcomponents.WTemplated):
-
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars( self ):
-        vars = wcomponents.WTemplated.getVars( self )
-        vars['timezone'] = self._conf.as_event.display_tzinfo.zone
-
-        description = self._conf.as_event.description.encode('utf-8')
-        vars["description_html"] = isStringHTML(description)
-        vars["description"] = description
-
-        event = self._conf.as_event
-        start_dt_local = event.start_dt_display.astimezone(event.display_tzinfo)
-        end_dt_local = event.end_dt_display.astimezone(event.display_tzinfo)
-
-        fsdate, fedate = format_date(start_dt_local, format='medium'), format_date(end_dt_local, format='medium')
-        fstime, fetime = start_dt_local.strftime("%H:%M"), end_dt_local.strftime("%H:%M")
-
-        vars["dateInterval"] = (fsdate, fstime, fedate, fetime)
-
-        vars["address"] = None
-        vars["room"] = None
-
-        vars["attachments"] = self._conf.as_event.attached_items
-        vars["conf"] = self._conf
-        vars["event"] = self._conf.as_event
-
-        info = self._conf.as_event.additional_info
-        vars["moreInfo_html"] = isStringHTML(info)
-        vars["moreInfo"] = info
-        vars["actions"] = ''
-        vars["isSubmitter"] = self._conf.as_event.can_manage(session.user, 'submit')
-        return vars
-
-
-#---------------------------------------------------------------------------
-
-
-class WPConferenceDisplay(WPConferenceDefaultDisplayBase):
-    menu_entry_name = 'overview'
-
-    def _getBody(self, params):
-        return WConfDetailsFull(self._conf).getHTML()
-
-    def _getFooter(self):
-        return render_event_footer(self.event).encode('utf-8')
 
 
 class WPrintPageFrame(wcomponents.WTemplated):

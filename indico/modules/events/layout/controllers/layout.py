@@ -26,7 +26,6 @@ from wtforms import fields as wtforms_fields
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
-from indico.legacy.webinterface.pages.conferences import WPConferenceDisplay
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
@@ -35,6 +34,7 @@ from indico.modules.events.layout.util import get_css_file_data, get_css_url, ge
 from indico.modules.events.layout.views import WPLayoutEdit
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
+from indico.modules.events.views import WPConferenceDisplay
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.util.string import crc32, to_unicode
@@ -209,7 +209,7 @@ class RHLayoutCSSPreview(RHLayoutBase):
         css_url = None
         if form.validate():
             css_url = get_css_url(self.event, force_theme=form.theme.data, for_preview=True)
-        return WPConferenceDisplay(self, self._conf, css_override_form=form, css_url_override=css_url).display()
+        return WPConferenceDisplay(self, self.event, css_override_form=form, css_url_override=css_url).display()
 
 
 class RHLayoutCSSSaveTheme(RHLayoutBase):
