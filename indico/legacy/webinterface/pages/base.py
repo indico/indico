@@ -160,7 +160,7 @@ class WPBase:
 
     def display(self, **params):
         from indico.modules.admin import RHAdminBase
-        from indico.modules.core.settings import social_settings
+        from indico.modules.core.settings import core_settings, social_settings
 
         title_parts = [to_unicode(self._getTitle())]
         if self.MANAGEMENT:
@@ -182,6 +182,7 @@ class WPBase:
 
         return render_template(u'indico_base.html',
                                css_files=css_files, print_css_files=print_css_files, js_files=js_files,
+                               site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=u' - '.join(title_parts),
                                head_content=to_unicode(self._getHeadContent()),

@@ -21,9 +21,6 @@ import os
 from flask import render_template, render_template_string, request
 
 from indico.core.config import config
-from indico.legacy.webinterface import wcomponents
-from indico.legacy.webinterface.common.tools import escape_html, strip_ml_tags
-from indico.legacy.webinterface.pages import base
 from indico.legacy.webinterface.pages.base import WPDecorated
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.events.layout import layout_settings, theme_settings
@@ -33,9 +30,8 @@ from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.models.events import EventType
 from indico.util.date_time import format_date
 from indico.util.event import unify_event_args
-from indico.util.i18n import _
 from indico.util.mathjax import MathjaxMixin
-from indico.util.string import encode_if_unicode, to_unicode, truncate
+from indico.util.string import strip_tags, to_unicode, truncate
 from indico.web.flask.util import url_for
 
 
@@ -95,7 +91,7 @@ def render_event_footer(event, dark=False):
                            google_calendar_params=google_calendar_params)
 
 
-class WPConferenceBase(base.WPDecorated):
+class WPConferenceBase(WPDecorated):
     @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -112,13 +108,18 @@ class WPConferenceBase(base.WPDecorated):
             else:
                 dates = " (%s - %s)" % (format_date(start_dt_local, format='long'),
                                         format_date(end_dt_local, format='long'))
-        self._setTitle("%s %s" % (strip_ml_tags(self._conf.as_event.title.encode('utf-8')), dates))
+        self._setTitle("%s %s" % (strip_tags(self.event.title.encode('utf-8')), dates))
 
     def _getHeader(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
 
     def getJSFiles(self):
-        return base.WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+        return WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+
+    def _getHeadContent(self):
+        site_name = core_settings.get('site_title')
+        meta = render_template('events/meta.html', event=self.event, site_name=site_name)
+        return WPDecorated._getHeadContent(self) + meta
 
 
 class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
@@ -176,8 +177,8 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
 
         return '\n'.join([
             css,
-            WConfMetadata(self._conf).getHTML(),
-            MathjaxMixin._getHeadContent(self)
+            MathjaxMixin._getHeadContent(self),
+            WPConferenceBase._getHeadContent(self)
         ])
 
     def _applyDecoration(self, body):
@@ -190,21 +191,6 @@ class WPConferenceDefaultDisplayBase(MathjaxMixin, WPConferenceBase):
                                             download_url=self._kwargs['css_url_override'])
             body = override_html + body
         return WPConferenceBase._applyDecoration(self, to_unicode(body))
-
-
-class WConfMetadata(wcomponents.WTemplated):
-    def __init__(self, conf):
-        self._conf = conf
-
-    def getVars(self):
-        v = wcomponents.WTemplated.getVars( self )
-        v['site_name'] = core_settings.get('site_title')
-        v['social'] = social_settings.get_all()
-
-        event = self._conf.as_event
-        v['image'] = event.logo_url if event.has_logo else (config.IMAGES_BASE_URL + '/logo_indico.png')
-        v['description'] = strip_ml_tags(self._conf.as_event.description[:500].encode('utf-8'))
-        return v
 
 
 class WPConferenceModifBase(WPEventManagement):

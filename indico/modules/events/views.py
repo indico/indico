@@ -22,9 +22,8 @@ from flask import render_template, request
 from sqlalchemy.orm import load_only
 
 from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
-from indico.legacy.webinterface.pages.conferences import (WConfMetadata, WPConferenceBase,
-                                                          WPConferenceDefaultDisplayBase, render_event_footer,
-                                                          render_event_header)
+from indico.legacy.webinterface.pages.conferences import (WPConferenceBase, WPConferenceDefaultDisplayBase,
+                                                          render_event_footer, render_event_header)
 from indico.modules.admin.views import WPAdmin
 from indico.modules.events import Event
 from indico.modules.events.layout import layout_settings, theme_settings
@@ -60,7 +59,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         self.theme_override = theme_override
 
     def _getHeadContent(self):
-        return WConfMetadata(self._conf).getHTML() + MathjaxMixin._getHeadContent(self)
+        return MathjaxMixin._getHeadContent(self) + WPConferenceBase._getHeadContent(self)
 
     def get_extra_css_files(self):
         theme_urls = self.theme['asset_env']['display_sass'].urls() if self.theme.get('asset_env') else []
