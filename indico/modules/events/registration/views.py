@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.models.events import EventType
-from indico.modules.events.views import WPConferenceDisplayLegacyBase, WPSimpleEventDisplayBase
+from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDisplayBase
 
 
 class WPManageRegistration(WPEventManagement):
@@ -67,9 +67,9 @@ class DisplayRegistrationFormMixin(WPJinjaMixin):
         return self.base_class.getJSFiles(self) + self._asset_env['modules_registration_js'].urls()
 
 
-class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDisplayLegacyBase):
+class WPDisplayRegistrationFormConference(DisplayRegistrationFormMixin, WPConferenceDisplayBase):
     template_prefix = 'events/registration/'
-    base_class = WPConferenceDisplayLegacyBase
+    base_class = WPConferenceDisplayBase
     menu_entry_name = 'registration'
 
 

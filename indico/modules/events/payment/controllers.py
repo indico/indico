@@ -76,7 +76,7 @@ class RHPaymentSettings(RHPaymentManagementBase):
         methods = get_payment_plugins()
         enabled_methods = [method for method in methods.itervalues()
                            if method.event_settings.get(self.event, 'enabled')]
-        return WPPaymentEventManagement.render_template('management/payments.html', self._conf, event=self.event,
+        return WPPaymentEventManagement.render_template('management/payments.html', self.event,
                                                         settings=payment_event_settings.get_all(self.event),
                                                         methods=methods.items(), enabled_methods=enabled_methods)
 

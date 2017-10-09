@@ -16,30 +16,20 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.admin.views import WPAdmin
-from indico.modules.events.management.views import WPEventManagementLegacy
-from indico.modules.events.views import WPConferenceDisplayLegacyBase
+from indico.modules.events.management.views import WPEventManagement
+from indico.modules.events.views import WPConferenceDisplayBase
 
 
-class WPPaymentJinjaMixin(WPJinjaMixin):
+class WPPaymentAdmin(WPAdmin):
     template_prefix = 'events/payment/'
 
 
-class WPPaymentAdmin(WPPaymentJinjaMixin, WPAdmin):
-    pass
-
-
-class WPPaymentEventManagement(WPEventManagementLegacy, WPPaymentJinjaMixin):
+class WPPaymentEventManagement(WPEventManagement):
     template_prefix = 'events/payment/'
     sidemenu_option = 'payment'
 
-    def _getPageContent(self, params):
-        return WPPaymentJinjaMixin._getPageContent(self, params)
 
-
-class WPPaymentEvent(WPConferenceDisplayLegacyBase, WPPaymentJinjaMixin):
+class WPPaymentEvent(WPConferenceDisplayBase):
+    template_prefix = 'events/payment/'
     menu_entry_name = 'registration'
-
-    def _getBody(self, params):
-        return WPPaymentJinjaMixin._getPageContent(self, params)
