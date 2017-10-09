@@ -37,14 +37,14 @@ class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
     def _getNavigationDrawer(self):
         return WSimpleNavigationDrawer(_('Room Booking'))
 
+    def _getTitle(self):
+        return '{} - {}'.format(WPDecorated._getTitle(self), _('Room Booking'))
+
     def _getBody(self, params):
         return self._getPageContent(params)
 
 
 class WPRoomBookingLegacyBase(WPRoomBookingBase):
-    def _getTitle(self):
-        return '{} - {}'.format(WPDecorated._getTitle(self), _('Room Booking'))
-
     def _getBody(self, params):
         # Legacy handling for pages that do not use Jinja inheritance.
         tpl = "{% extends 'rb/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"

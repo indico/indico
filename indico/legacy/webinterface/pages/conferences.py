@@ -101,14 +101,14 @@ class WPConferenceBase(WPDecorated):
         self._tz = event_.display_tzinfo.zone
         start_dt_local = event_.start_dt_display.astimezone(event_.display_tzinfo)
         end_dt_local = event_.end_dt_display.astimezone(event_.display_tzinfo)
-        dates = " (%s)" % format_date(start_dt_local, format='long')
-        if start_dt_local.strftime("%d%B%Y") != end_dt_local.strftime("%d%B%Y"):
-            if start_dt_local.strftime("%B%Y") == end_dt_local.strftime("%B%Y"):
-                dates = " (%s-%s)" % (start_dt_local.strftime("%d"), format_date(end_dt_local, format='long'))
+        dates = u' ({})'.format(to_unicode(format_date(start_dt_local, format='long')))
+        if start_dt_local.date() != end_dt_local.date():
+            if start_dt_local.year == end_dt_local.year and start_dt_local.month == end_dt_local.month:
+                dates = u' ({}-{})'.format(start_dt_local.day, format_date(end_dt_local, format='long'))
             else:
-                dates = " (%s - %s)" % (format_date(start_dt_local, format='long'),
-                                        format_date(end_dt_local, format='long'))
-        self._setTitle("%s %s" % (strip_tags(self.event.title.encode('utf-8')), dates))
+                dates = u' ({} - {})'.format(to_unicode(format_date(start_dt_local, format='long')),
+                                             to_unicode(format_date(end_dt_local, format='long')))
+        self._setTitle(u'{} {}'.format(strip_tags(self.event.title), dates))
 
     def _getHeader(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
