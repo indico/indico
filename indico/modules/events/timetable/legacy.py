@@ -309,7 +309,7 @@ def serialize_day_update(event, day, block=None, session_=None):
             'slotEntry': serializer.serialize_session_block_entry(block) if block else None}
 
 
-def serialize_entry_update(entry, with_timetable=False, session_=None):
+def serialize_entry_update(entry, session_=None):
     serializer = TimetableSerializer(entry.event, management=True)
     day = entry.start_dt.astimezone(entry.event.tzinfo)
     day_update = serialize_day_update(entry.event, day, block=entry.parent, session_=session_)
