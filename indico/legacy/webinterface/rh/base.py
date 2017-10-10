@@ -49,22 +49,7 @@ HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
 logger = Logger.get('rh')
 
 
-class RequestHandlerBase(object):
-    def _process_args(self):
-        """
-        This method is called before _check_access and url normalization
-        and is a good place to fetch objects from the database based on
-        variables from request params.
-        """
-
-    def _check_access(self):
-        """
-        This method is called after _process_args and is a good place
-        to check if the user is permitted to perform some actions.
-        """
-
-
-class RH(RequestHandlerBase):
+class RH(object):
     NOT_SANITIZED_FIELDS = frozenset()
     CSRF_ENABLED = True  # require a csrf_token when accessing the RH with anything but GET
     EVENT_FEATURE = None  # require a certain event feature when accessing the RH. See `EventFeature` for details
@@ -199,6 +184,19 @@ class RH(RequestHandlerBase):
                     raise NotFound
             else:
                 raise NotFound('The URL contains invalid data. Please go to the previous page and refresh it.')
+
+    def _process_args(self):
+        """
+        This method is called before _check_access and url normalization
+        and is a good place to fetch objects from the database based on
+        variables from request params.
+        """
+
+    def _check_access(self):
+        """
+        This method is called after _process_args and is a good place
+        to check if the user is permitted to perform some actions.
+        """
 
     def _process(self):
         """Dispatch to a method named ``_process_<verb>``.

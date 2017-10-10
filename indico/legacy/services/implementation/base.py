@@ -19,11 +19,10 @@ from werkzeug.exceptions import Forbidden
 
 from indico.core.logger import sentry_set_tags
 from indico.legacy.common.security import Sanitization
-from indico.legacy.webinterface.rh.base import RequestHandlerBase
 from indico.util.string import unicode_struct_to_utf8
 
 
-class ServiceBase(RequestHandlerBase):
+class ServiceBase(object):
     """
     The ServiceBase class is the basic class for services.
     """
@@ -36,6 +35,12 @@ class ServiceBase(RequestHandlerBase):
             params = unicode_struct_to_utf8(params)
         self._params = params
         self._target = None
+
+    def _process_args(self):
+        pass
+
+    def _check_access(self):
+        pass
 
     def process(self):
         """
