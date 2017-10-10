@@ -87,7 +87,7 @@ class RHRoomBookingEventBookingList(RHRoomBookingEventBase):
         reservations = self.event.reservations.all()
         if not reservations:
             return redirect(url_for('event_mgmt.rooms_choose_event', self.event))
-        return WPRoomBookingEventBookingList(self, self._conf, reservations=reservations).display()
+        return WPRoomBookingEventBookingList(self, self.event, reservations=reservations).display()
 
 
 class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
@@ -98,7 +98,7 @@ class RHRoomBookingEventChooseEvent(RHRoomBookingEventBase):
                     .order_by(TimetableEntry.start_dt)
                     .all())
         sessions = sorted([s for s in self.event.sessions if s.start_dt is not None], key=attrgetter('start_dt'))
-        return WPRoomBookingEventChooseEvent(self, self._conf).display(contribs=contribs, sessions=sessions)
+        return WPRoomBookingEventChooseEvent(self, self.event).display(contribs=contribs, sessions=sessions)
 
 
 class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDetails):
@@ -111,7 +111,7 @@ class RHRoomBookingEventRoomDetails(RHRoomBookingEventBase, RHRoomBookingRoomDet
         RHRoomBookingRoomDetails._process_args(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventRoomDetails(self, self._conf, **kwargs)
+        return WPRoomBookingEventRoomDetails(self, self.event, **kwargs)
 
     def _process(self):
         return RHRoomBookingRoomDetails._process(self)
@@ -127,7 +127,7 @@ class RHRoomBookingEventBookingDetails(RHRoomBookingEventBase, RHRoomBookingBook
         RHRoomBookingBookingDetails._process_args(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventBookingDetails(self, self._conf, **kwargs)
+        return WPRoomBookingEventBookingDetails(self, self.event, **kwargs)
 
     def _process(self):
         return RHRoomBookingBookingDetails._process(self)
@@ -143,7 +143,7 @@ class RHRoomBookingEventBookingModifyBooking(RHRoomBookingEventBase, RHRoomBooki
         RHRoomBookingModifyBooking._process_args(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventModifyBooking(self, self._conf, **kwargs)
+        return WPRoomBookingEventModifyBooking(self, self.event, **kwargs)
 
     def _get_success_url(self):
         return url_for('event_mgmt.rooms_booking_details', self.event, self._reservation)
@@ -162,7 +162,7 @@ class RHRoomBookingEventBookingCloneBooking(RHRoomBookingEventBase, RHRoomBookin
         RHRoomBookingCloneBooking._process_args(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventNewBookingSimple(self, self._conf, cloning=True, **kwargs)
+        return WPRoomBookingEventNewBookingSimple(self, self.event, cloning=True, **kwargs)
 
     def _get_success_url(self, booking):
         return url_for('event_mgmt.rooms_booking_details', self.event, booking)
@@ -258,7 +258,7 @@ class RHRoomBookingEventNewBookingSimple(RHRoomBookingEventBase, RHRoomBookingNe
         RHRoomBookingNewBookingSimple._process_args(self)
 
     def _get_view(self, **kwargs):
-        return WPRoomBookingEventNewBookingSimple(self, self._conf, **kwargs)
+        return WPRoomBookingEventNewBookingSimple(self, self.event, **kwargs)
 
     def _make_confirm_form(self, *args, **kwargs):
         defaults = kwargs['defaults']
@@ -308,7 +308,7 @@ class RHRoomBookingEventNewBooking(RHRoomBookingEventBase, RHRoomBookingNewBooki
         views = {'select_room': WPRoomBookingEventNewBookingSelectRoom,
                  'select_period': WPRoomBookingEventNewBookingSelectPeriod,
                  'confirm': WPRoomBookingEventNewBookingConfirm}
-        return views[view](self, self._conf, **kwargs)
+        return views[view](self, self.event, **kwargs)
 
     def _get_select_room_form_defaults(self):
         defaults, _ = RHRoomBookingNewBooking._get_select_room_form_defaults(self)

@@ -88,7 +88,6 @@ class RH(object):
     def __init__(self):
         self.commit = True
         self._responseUtil = ResponseUtil()
-        self._target = None
 
     # Methods =============================================================
 

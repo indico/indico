@@ -316,7 +316,7 @@ class RHRegistrationsExportPDFTable(RHRegistrationsExportBase):
     """Export registration list to a PDF in table style"""
 
     def _process(self):
-        pdf = RegistrantsListToPDF(self._conf, reglist=self.registrations, display=self.export_config['regform_items'],
+        pdf = RegistrantsListToPDF(self.event, reglist=self.registrations, display=self.export_config['regform_items'],
                                    static_items=self.export_config['static_item_ids'])
         try:
             data = pdf.getPDFBin()
@@ -333,7 +333,7 @@ class RHRegistrationsExportPDFBook(RHRegistrationsExportBase):
 
     def _process(self):
         static_item_ids, item_ids = self.list_generator.get_item_ids()
-        pdf = RegistrantsListToBookPDF(self._conf, self.regform, self.registrations, item_ids, static_item_ids)
+        pdf = RegistrantsListToBookPDF(self.event, self.regform, self.registrations, item_ids, static_item_ids)
         return send_file('RegistrantsBook.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
 
 

@@ -218,7 +218,7 @@ class RHLayoutCSSSaveTheme(RHLayoutBase):
         if form.validate_on_submit():
             layout_settings.set(self.event, 'use_custom_css', form.theme.data == '_custom')
             if form.theme.data != '_custom':
-                layout_settings.set(self._conf, 'theme', form.theme.data)
+                layout_settings.set(self.event, 'theme', form.theme.data)
             flash(_('Settings saved'), 'success')
             return redirect(url_for('.index', self.event))
 

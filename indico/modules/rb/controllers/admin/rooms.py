@@ -42,7 +42,6 @@ _cache = GenericCache('Rooms')
 class RHRoomBookingDeleteRoom(RHRoomBookingAdminBase):
     def _process_args(self):
         self._room = Room.get(request.view_args['roomID'])
-        self._target = self._room
 
     def _process(self):
         if self._room.has_live_reservations():

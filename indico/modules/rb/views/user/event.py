@@ -34,16 +34,16 @@ class WPRoomBookingEventBase(WPEventManagementLegacy):
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
         self._tabExistBookings = self._tabCtrl.newTab('existing', 'Existing Bookings',
-                                                      url_for('event_mgmt.rooms_booking_list', self._conf.as_event))
+                                                      url_for('event_mgmt.rooms_booking_list', self.event))
         self._tabNewBooking = self._tabCtrl.newTab('new', 'New Booking',
-                                                   url_for('event_mgmt.rooms_choose_event', self._conf.as_event))
-        if not Reservation.query.with_parent(self._conf.as_event).has_rows():
+                                                   url_for('event_mgmt.rooms_choose_event', self.event))
+        if not Reservation.query.with_parent(self.event).has_rows():
             self._tabExistBookings.setEnabled(False)
         self._setActiveTab()
 
     def _getPageContent(self, params):
         self._createTabCtrl()
-        params['event'] = self._conf
+        params['event'] = self.event
         return WTabControl(self._tabCtrl).getHTML(self._getTabContent(params))
 
     def _getTabContent(self, params):

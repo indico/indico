@@ -322,14 +322,13 @@ class ContribsToPDF(PDFLaTeXBase):
     _table_of_contents = True
     _tpl_filename = "report.tpl"
 
-    def __init__(self, conf, contribs, tz=None):
+    def __init__(self, event, contribs, tz=None):
         super(ContribsToPDF, self).__init__()
 
-        event = conf.as_event
         self._args.update({
             'doc_type': 'contribution',
             'title': _("Report of Contributions"),
-            'conf': conf,
+            'conf': event.as_legacy,
             'items': contribs,
             'fields': [f for f in event.contribution_fields if f.is_active],
             'url': event.short_external_url,
@@ -1306,8 +1305,8 @@ class RegistrantToPDF(PDFBase):
 
 
 class RegistrantsListToBookPDF(PDFWithTOC):
-    def __init__(self, conf, regform, reglist, item_ids, static_item_ids):
-        self._conf = conf
+    def __init__(self, event, regform, reglist, item_ids, static_item_ids):
+        self._conf = event.as_legacy
         self._regform = regform
         self._regList = reglist
         self._item_ids = set(item_ids)
@@ -1363,8 +1362,8 @@ class RegistrantsListToBookPDF(PDFWithTOC):
 
 class RegistrantsListToPDF(PDFBase):
 
-    def __init__(self, conf, doc=None, story=[], reglist=None, display=[], static_items=None):
-        self._conf = conf
+    def __init__(self, event, doc=None, story=[], reglist=None, display=[], static_items=None):
+        self._conf = event.as_legacy
         self._regList = reglist
         self._display = display
         PDFBase.__init__(self, doc, story, printLandscape=True)

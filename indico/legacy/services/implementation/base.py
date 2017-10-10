@@ -34,7 +34,6 @@ class ServiceBase(object):
         if not self.UNICODE_PARAMS:
             params = unicode_struct_to_utf8(params)
         self._params = params
-        self._target = None
 
     def _process_args(self):
         pass

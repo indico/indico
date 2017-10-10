@@ -104,7 +104,7 @@ class WPEventBase(WPDecorated):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
         WPDecorated.__init__(self, rh, **kwargs)
-        self._navigationTarget = self._conf = event_.as_legacy
+        self._conf = event_.as_legacy
         self._tz = event_.display_tzinfo.zone
         start_dt_local = event_.start_dt_display.astimezone(event_.display_tzinfo)
         end_dt_local = event_.end_dt_display.astimezone(event_.display_tzinfo)
@@ -202,7 +202,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
                else posixpath.join('events/display', tpl_name))
 
         rv = render_template(tpl,
-                             event=self.event, conf=self._conf,
+                             event=self.event,
                              category=self.event.category.title,
                              timezone=self.event.display_tzinfo,
                              theme_settings=self.theme.get('settings', {}),
@@ -239,7 +239,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
         }
 
     def get_extra_css_files(self):
-        theme_url = self._kwargs.get('css_url_override', get_css_url(self._conf.as_event))
+        theme_url = self._kwargs.get('css_url_override', get_css_url(self.event))
         return [theme_url] if theme_url else []
 
     def _getHeader(self):

@@ -452,7 +452,7 @@ class RHContributionsExportExcel(RHManageContributionsExportActionsBase):
 
 class RHContributionsExportPDF(RHManageContributionsExportActionsBase):
     def _process(self):
-        pdf = ContribsToPDF(self._conf, self.contribs)
+        pdf = ContribsToPDF(self.event, self.contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
 

@@ -20,7 +20,6 @@ from flask import flash, request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.events import Event
-from indico.modules.events.legacy import LegacyConference
 from indico.modules.events.views import WPAccessKey
 from indico.util.i18n import _
 from indico.web.rh import RH
@@ -33,7 +32,7 @@ class RHEventBase(RH):
             raise NotFound(_('An event with this ID does not exist.'))
         elif self.event.is_deleted:
             raise NotFound(_('This event has been deleted.'))
-        self._conf = self._target = self.event.as_legacy
+        self._conf = self.event.as_legacy
 
 
 class RHDisplayEventBase(RHEventBase):
@@ -44,7 +43,6 @@ class RHDisplayEventBase(RHEventBase):
             raise Forbidden
 
     def _check_access(self):
-        assert isinstance(self._target, LegacyConference)
         if self.event.can_access(session.user):
             return
         elif self.event.access_key:

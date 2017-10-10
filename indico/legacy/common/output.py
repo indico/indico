@@ -27,7 +27,7 @@ from indico.modules.groups import GroupProxy
 from indico.modules.groups.legacy import LDAPGroupWrapper
 from indico.modules.users import User
 from indico.modules.users.legacy import AvatarUserWrapper
-from indico.util.event import unify_event_args, uniqueId
+from indico.util.event import uniqueId
 from indico.web.flask.util import url_for
 
 
@@ -116,8 +116,7 @@ class outputGenerator(object):
             # public record
             self._generateACLDatafield(None, None, objId, out)
 
-    @unify_event_args
-    def confToXMLMarc21(self,event,includeSession=1,includeContribution=1,includeMaterial=1,out=None):
+    def confToXMLMarc21(self, event, includeSession=1, includeContribution=1, includeMaterial=1, out=None):
         if not out:
             out = self._XMLGen
         temp = XMLGen(init=False)

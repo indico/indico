@@ -147,7 +147,7 @@ class RHPaymentCheckout(RHPaymentBase):
         plugins = get_active_payment_plugins(self.event)
         valid_plugins = {k: v for k, v in plugins.iteritems() if v.supports_currency(self.registration.currency)}
         force_plugin = valid_plugins.items()[0] if len(valid_plugins) == 1 else None  # only one plugin available
-        return WPPaymentEvent.render_template('event_checkout.html', self._conf, event=self.event,
+        return WPPaymentEvent.render_template('event_checkout.html', self.event,
                                               registration=self.registration,
                                               regform=self.registration.registration_form,
                                               plugins=valid_plugins.items(), force_plugin=force_plugin)
@@ -177,4 +177,4 @@ class RHPaymentConditions(RHDisplayEventBase):
 
     def _process(self):
         conditions = payment_event_settings.get(self.event, 'conditions')
-        return WPPaymentEvent.render_template('terms_and_conditions.html', self._conf, conditions=conditions)
+        return jsonify_template('events/payment/terms_and_conditions.html', conditions=conditions)

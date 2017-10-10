@@ -42,7 +42,7 @@ def build_static_site(static_site):
         logger.info('Building static site: %s', static_site)
         session.lang = static_site.creator.settings.get('lang')
         rh = RH()
-        rh._conf = rh._target = static_site.event.as_legacy
+        rh._conf = static_site.event.as_legacy
 
         g.rh = rh
         g.static_site = True

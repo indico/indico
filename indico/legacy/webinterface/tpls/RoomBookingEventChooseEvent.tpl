@@ -18,7 +18,7 @@
         </li>
         <li>
             <input type="radio" name="assign" value="event" id="assign-event">
-            <label for="assign-event" style="font-weight: normal;">${ event.as_event.type_.title }: <strong>${escape( event.as_event.title )}</strong></label>
+            <label for="assign-event" style="font-weight: normal;">${ event.type_.title }: <strong>${escape( event.title )}</strong></label>
         </li>
         % for sess in sessions:
             <li>

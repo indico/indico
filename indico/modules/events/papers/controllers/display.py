@@ -203,7 +203,7 @@ class RHReviewingArea(RHPapersBase):
     def _process(self):
         contribs_to_review = get_user_contributions_to_review(self.event, session.user)
         reviewed_contribs = get_user_reviewed_contributions(self.event, session.user)
-        return WPDisplayReviewingArea.render_template('display/reviewing_area.html', self._conf, event=self.event,
+        return WPDisplayReviewingArea.render_template('display/reviewing_area.html', self.event,
                                                       contribs_to_review=contribs_to_review,
                                                       reviewed_contribs=reviewed_contribs)
 
@@ -252,9 +252,8 @@ class RHCallForPapers(RHPapersBase):
         self.contribs = contribs - self.papers
 
     def _process(self):
-        return WPDisplayCallForPapers.render_template('display/call_for_papers.html', self._conf,
-                                                      event=self.event, contributions=self.contribs,
-                                                      papers=self.papers)
+        return WPDisplayCallForPapers.render_template('display/call_for_papers.html', self.event,
+                                                      contributions=self.contribs, papers=self.papers)
 
 
 class RHSelectContribution(RHCallForPapers):

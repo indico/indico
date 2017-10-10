@@ -86,8 +86,8 @@ class RHMyContributions(RHDisplayProtectionBase):
 
     def _process(self):
         contributions = get_contributions_with_user_as_submitter(self.event, session.user)
-        return WPMyContributions.render_template('display/user_contribution_list.html', self._conf,
-                                                 event=self.event, contributions=contributions)
+        return WPMyContributions.render_template('display/user_contribution_list.html', self.event,
+                                                 contributions=contributions)
 
 
 class RHContributionList(RHDisplayProtectionBase):
@@ -102,7 +102,7 @@ class RHContributionList(RHDisplayProtectionBase):
         self.list_generator = ContributionDisplayListGenerator(event=self.event)
 
     def _process(self):
-        return self.view_class.render_template('display/contribution_list.html', self._conf, event=self.event,
+        return self.view_class.render_template('display/contribution_list.html', self.event,
                                                timezone=self.event.display_tzinfo,
                                                **self.list_generator.get_list_kwargs())
 
@@ -122,7 +122,7 @@ class RHContributionDisplay(RHContributionDisplayBase):
                             joinedload('subcontributions'),
                             joinedload('timetable_entry').lazyload('*'))
                    .one())
-        return self.view_class.render_template('display/contribution_display.html', self._conf,
+        return self.view_class.render_template('display/contribution_display.html', self.event,
                                                contribution=contrib,
                                                show_author_link=_author_page_active(self.event),
                                                **ical_params)
@@ -134,8 +134,7 @@ class RHAuthorList(RHDisplayProtectionBase):
 
     def _process(self):
         authors = _get_persons(self.event, ContributionPersonLink.author_type != AuthorType.none)
-        return self.view_class.render_template('display/author_list.html', self._conf, authors=authors,
-                                               event=self.event)
+        return self.view_class.render_template('display/author_list.html', self.event, authors=authors)
 
 
 class RHSpeakerList(RHDisplayProtectionBase):
@@ -144,8 +143,7 @@ class RHSpeakerList(RHDisplayProtectionBase):
 
     def _process(self):
         speakers = _get_persons(self.event, ContributionPersonLink.is_speaker)
-        return self.view_class.render_template('display/speaker_list.html', self._conf, speakers=speakers,
-                                               event=self.event)
+        return self.view_class.render_template('display/speaker_list.html', self.event, speakers=speakers)
 
 
 class RHContributionAuthor(RHContributionDisplayBase):
@@ -176,7 +174,7 @@ class RHContributionAuthor(RHContributionDisplayBase):
                            .filter(ContributionPersonLink.id == self.author.id,
                                    ContributionPersonLink.author_type != AuthorType.none)
                            .all())
-        return WPContributions.render_template('display/contribution_author.html', self._conf,
+        return WPContributions.render_template('display/contribution_author.html', self.event,
                                                author=self.author, contribs=author_contribs)
 
 
@@ -189,7 +187,7 @@ class RHContributionExportToPDF(RHContributionDisplayBase):
 class RHContributionsExportToPDF(RHContributionList):
     def _process(self):
         contribs = self.list_generator.get_list_kwargs()['contribs']
-        pdf = ContribsToPDF(self._conf, contribs)
+        pdf = ContribsToPDF(self.event, contribs)
         return send_file('contributions.pdf', pdf.generate(), 'application/pdf')
 
 
@@ -209,7 +207,7 @@ class RHContributionListFilter(RHContributionList):
         return RH._process(self)
 
     def _process_GET(self):
-        return WPContributions.render_template('contrib_list_filter.html', self._conf, event=self.event,
+        return WPContributions.render_template('contrib_list_filter.html', self.event,
                                                filters=self.list_generator.list_config['filters'],
                                                static_items=self.list_generator.static_items)
 
@@ -243,5 +241,5 @@ class RHSubcontributionDisplay(RHDisplayEventBase):
         self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):
-        return self.view_class.render_template('display/subcontribution_display.html', self._conf, event=self.event,
+        return self.view_class.render_template('display/subcontribution_display.html', self.event,
                                                subcontrib=self.subcontrib)

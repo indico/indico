@@ -333,7 +333,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         self._addPdf(self._conf, 'timetable.export_default_pdf',
                      get_timetable_offline_pdf_generator(self.event))
         # Generate contributions in PDF
-        self._addPdf(self._conf, 'contributions.contribution_list_pdf', ContribsToPDF, conf=self._conf,
+        self._addPdf(self._conf, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
                      contribs=self.event.contributions)
 
         # Getting specific pages for contributions
