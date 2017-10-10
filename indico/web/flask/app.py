@@ -30,6 +30,7 @@ from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
 
+import indico
 from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.celery import celery
@@ -70,6 +71,11 @@ def configure_app(app, set_path=False):
     app.config['SECRET_KEY'] = config.SECRET_KEY
     app.config['LOGGER_NAME'] = 'flask.app'
     app.config['LOGGER_HANDLER_POLICY'] = 'never'
+    if config.SENTRY_DSN:
+        app.config['SENTRY_CONFIG'] = {
+            'dsn': config.SENTRY_DSN,
+            'release': indico.__version__
+        }
     if not app.config['SECRET_KEY'] or len(app.config['SECRET_KEY']) < 16:
         raise ValueError('SECRET_KEY must be set to a random secret of at least 16 characters. '
                          'You can generate one using os.urandom(32) in Python shell.')

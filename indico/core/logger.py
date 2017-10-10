@@ -155,7 +155,7 @@ class IndicoSentry(Sentry):
 
 
 def init_sentry(app):
-    sentry = IndicoSentry(dsn=config.SENTRY_DSN, wrap_wsgi=False, register_signal=True, logging=False)
+    sentry = IndicoSentry(wrap_wsgi=False, register_signal=True, logging=False)
     sentry.init_app(app)
     # setup logging manually and exclude uncaught indico exceptions.
     # these are logged manually in the flask error handler logic so
