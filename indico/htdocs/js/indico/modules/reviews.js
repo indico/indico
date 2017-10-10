@@ -23,6 +23,8 @@
     global.setupReviewingPage = function setupReviewingPage() {
         $('body').on('declarative:success', '.js-delete-comment', function() {
             $(this).closest('.i-timeline-item').remove();
+        }).on('indico:htmlUpdated', function() {
+            $(this).find('.js-mathjax').mathJax();
         }).on('ajaxForm:show', '.js-edit-comment, .js-edit-review', function() {
             var $this = $(this);
             var $item = $this.closest('.i-timeline-item-box');
