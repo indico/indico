@@ -48,12 +48,6 @@ SECRET_KEY = ''
 # sqlalchemy logging and run the `bin/utils/db_log.py` script in a separate
 # terminal window.
 #DB_LOG = False
-#
-# You can cause all error-like exceptions (i.e. not something like AccessError)
-# to be propagated outside the Indico WSGI app by enabling this option. This has
-# the advantage of triggering the Werkzeug debugger of the embedded server even
-# in case of e.g. a MaKaCError.
-#PROPAGATE_ALL_EXCEPTIONS = False
 
 #------------------------------------------------------------------------------
 # URLs
