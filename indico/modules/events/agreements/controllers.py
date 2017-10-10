@@ -24,7 +24,6 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.errors import NoReportError
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.agreements.forms import AgreementAnswerSubmissionForm, AgreementEmailForm, AgreementForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
@@ -38,6 +37,7 @@ from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.views import WPJinjaMixin
 
 
 class RHAgreementManagerBase(RHManageEventBase):

@@ -18,11 +18,11 @@ from __future__ import unicode_literals
 
 from flask import request
 
-from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.modules.admin.views import WPAdmin
 from indico.modules.users import User
 from indico.util.i18n import _
 from indico.web.breadcrumbs import render_breadcrumbs
+from indico.web.views import WPDecorated, WPJinjaMixin
 
 
 class WPUser(WPJinjaMixin, WPDecorated):

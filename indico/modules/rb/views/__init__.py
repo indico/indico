@@ -18,10 +18,10 @@ from __future__ import unicode_literals
 
 from flask import render_template_string
 
-from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.breadcrumbs import render_breadcrumbs
+from indico.web.views import WPDecorated, WPJinjaMixin
 
 
 class WPRoomBookingBase(WPJinjaMixin, WPDecorated):

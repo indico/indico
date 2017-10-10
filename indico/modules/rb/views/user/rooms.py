@@ -20,7 +20,6 @@ from dateutil.relativedelta import relativedelta
 from flask import request, session
 
 from indico.legacy.common.cache import GenericCache
-from indico.legacy.webinterface.pages.base import WPNotDecorated
 from indico.legacy.webinterface.wcomponents import WTemplated
 from indico.modules.rb import rb_settings
 from indico.modules.rb.models.locations import Location
@@ -31,6 +30,7 @@ from indico.modules.rb.views.calendar import RoomBookingCalendarWidget
 from indico.util.i18n import _
 from indico.util.string import crc32
 from indico.web.flask.util import url_for
+from indico.web.views import WPNotDecorated
 
 
 class WPRoomBookingMapOfRooms(WPRoomBookingBase):

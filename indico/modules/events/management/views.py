@@ -18,13 +18,13 @@ from __future__ import unicode_literals
 
 from flask import render_template_string
 
-from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.events.models.events import EventType
 from indico.util.event import unify_event_args
 from indico.util.string import to_unicode
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.flask.templating import get_template_module
+from indico.web.views import WPDecorated, WPJinjaMixin
 
 
 class WPEventManagement(WPJinjaMixin, WPDecorated):

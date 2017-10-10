@@ -23,7 +23,6 @@ from flask import render_template, render_template_string, request
 from sqlalchemy.orm import load_only
 
 from indico.core.config import config
-from indico.legacy.webinterface.pages.base import WPDecorated, WPJinjaMixin
 from indico.modules.admin.views import WPAdmin
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.events import Event
@@ -36,6 +35,7 @@ from indico.util.event import unify_event_args
 from indico.util.mathjax import MathjaxMixin
 from indico.util.string import strip_tags, to_unicode, truncate
 from indico.web.flask.util import url_for
+from indico.web.views import WPDecorated, WPJinjaMixin
 
 
 def _get_print_url(event, theme=None, theme_override=False):

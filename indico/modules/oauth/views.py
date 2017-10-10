@@ -16,9 +16,9 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.admin.views import WPAdmin
 from indico.modules.users.views import WPUser
+from indico.web.views import WPJinjaMixin
 
 
 class WPOAuthJinjaMixin(WPJinjaMixin):

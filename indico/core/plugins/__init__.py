@@ -35,7 +35,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.settings import EventSettingsProxy
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
@@ -47,6 +46,7 @@ from indico.web.flask.templating import get_template_module, register_template_h
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
 from indico.web.menu import SideMenuItem
+from indico.web.views import WPJinjaMixin
 
 
 class PluginCategory(unicode, IndicoEnum):

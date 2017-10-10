@@ -16,10 +16,10 @@
 
 from __future__ import unicode_literals
 
-from indico.legacy.webinterface.pages.base import WPJinjaMixin
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.models.events import EventType
 from indico.modules.events.views import WPConferenceDisplayBase, WPSimpleEventDisplayBase
+from indico.web.views import WPJinjaMixin
 
 
 class WPManageRegistration(WPEventManagement):
