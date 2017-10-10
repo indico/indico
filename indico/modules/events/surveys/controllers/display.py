@@ -23,8 +23,8 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.surveys.models.submissions import SurveyAnswer, SurveySubmission
 from indico.modules.events.surveys.models.surveys import Survey, SurveyState
@@ -40,7 +40,7 @@ def _can_redirect_to_single_survey(surveys):
     return len(surveys) == 1 and surveys[0].is_active and not was_survey_submitted(surveys[0])
 
 
-class RHSurveyBaseDisplay(RHConferenceBaseDisplay):
+class RHSurveyBaseDisplay(RHDisplayEventBase):
     @property
     def view_class(self):
         return WPDisplaySurveyConference if self.event.type_ == EventType.conference else WPDisplaySurveySimpleEvent

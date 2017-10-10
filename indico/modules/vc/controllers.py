@@ -26,7 +26,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
 from indico.modules.vc.forms import VCRoomListFilterForm
@@ -273,7 +273,7 @@ class RHVCManageEventRemove(RHVCSystemEventBase):
         return redirect(url_for('.manage_vc_rooms', self.event))
 
 
-class RHVCEventPage(RHConferenceBaseDisplay):
+class RHVCEventPage(RHDisplayEventBase):
     """Lists the VC rooms in an event page"""
 
     def _process(self):

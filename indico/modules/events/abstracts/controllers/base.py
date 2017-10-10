@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers.base import ManageEventMixin
 from indico.modules.events.util import check_event_locked
 
@@ -54,13 +54,13 @@ class SpecificAbstractMixin:
         raise NotImplementedError
 
 
-class RHAbstractsBase(RHConferenceBaseDisplay):
+class RHAbstractsBase(RHDisplayEventBase):
     """Base class for all abstract-related RHs"""
 
     EVENT_FEATURE = 'abstracts'
 
     def _check_access(self):
-        RHConferenceBaseDisplay._check_access(self)
+        RHDisplayEventBase._check_access(self)
         # Only let event managers access the management versions.
         if self.management and not self.event.can_manage(session.user):
             raise Forbidden

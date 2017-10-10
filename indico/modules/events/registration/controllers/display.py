@@ -23,8 +23,8 @@ from flask import flash, jsonify, redirect, request, session
 from sqlalchemy.orm import contains_eager, subqueryload
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.auth.util import redirect_to_login
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
@@ -42,7 +42,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import url_for
 
 
-class RHRegistrationFormDisplayBase(RHConferenceBaseDisplay):
+class RHRegistrationFormDisplayBase(RHDisplayEventBase):
     @property
     def view_class(self):
         return (WPDisplayRegistrationFormConference

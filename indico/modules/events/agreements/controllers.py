@@ -25,7 +25,6 @@ from werkzeug.exceptions import Forbidden, NotFound
 from indico.core.db import db
 from indico.core.errors import NoReportError
 from indico.legacy.webinterface.pages.base import WPJinjaMixin
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.agreements.forms import AgreementAnswerSubmissionForm, AgreementEmailForm, AgreementForm
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
@@ -33,6 +32,7 @@ from indico.modules.events.agreements.notifications import notify_agreement_remi
 from indico.modules.events.agreements.util import get_agreement_definitions, send_new_agreements
 from indico.modules.events.agreements.views import (WPAgreementFormConference, WPAgreementFormSimpleEvent,
                                                     WPAgreementManager)
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.events import EventType
 from indico.util.i18n import _
@@ -44,7 +44,7 @@ class RHAgreementManagerBase(RHManageEventBase):
     """Base class for agreement management RHs"""
 
 
-class RHAgreementForm(RHConferenceBaseDisplay):
+class RHAgreementForm(RHDisplayEventBase):
     """Agreement form page"""
 
     normalize_url_spec = {
@@ -55,7 +55,7 @@ class RHAgreementForm(RHConferenceBaseDisplay):
     }
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.agreement = Agreement.get_one(request.view_args['id'])
         if self.agreement.is_orphan():
             raise NotFound('The agreement is not active anymore')

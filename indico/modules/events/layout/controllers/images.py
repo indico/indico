@@ -24,7 +24,7 @@ from PIL import Image
 
 from indico.core import signals
 from indico.core.db import db
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import logger
 from indico.modules.events.layout.forms import AddImagesForm
 from indico.modules.events.layout.models.images import ImageFile
@@ -99,7 +99,7 @@ class RHImageDelete(RHManageImagesBase):
         return jsonify_data(image_list=_render_image_list(self.event))
 
 
-class RHImageDisplay(RHConferenceBaseDisplay):
+class RHImageDisplay(RHDisplayEventBase):
     EVENT_FEATURE = 'images'
     normalize_url_spec = {
         'locators': {
@@ -108,7 +108,7 @@ class RHImageDisplay(RHConferenceBaseDisplay):
     }
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         image_id = request.view_args['image_id']
         self.image = ImageFile.get_one(image_id)
 

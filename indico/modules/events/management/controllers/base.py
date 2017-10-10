@@ -21,10 +21,10 @@ from collections import defaultdict
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.controllers.base import RHEventBase
 from indico.modules.events.util import check_event_locked
 from indico.util.i18n import _
 from indico.web.util import jsonify_template

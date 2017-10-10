@@ -26,7 +26,7 @@ from wtforms import fields as wtforms_fields
 from wtforms.validators import DataRequired
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger, theme_settings
 from indico.modules.events.layout.forms import (ConferenceLayoutForm, CSSForm, CSSSelectionForm,
                                                 LectureMeetingLayoutForm, LogoForm)
@@ -223,7 +223,7 @@ class RHLayoutCSSSaveTheme(RHLayoutBase):
             return redirect(url_for('.index', self.event))
 
 
-class RHLogoDisplay(RHConferenceBaseDisplay):
+class RHLogoDisplay(RHDisplayEventBase):
     def _process(self):
         if not self.event.has_logo:
             raise NotFound
@@ -232,7 +232,7 @@ class RHLogoDisplay(RHConferenceBaseDisplay):
                          conditional=True)
 
 
-class RHLayoutCSSDisplay(RHConferenceBaseDisplay):
+class RHLayoutCSSDisplay(RHDisplayEventBase):
     def _process(self):
         if not self.event.has_stylesheet:
             raise NotFound

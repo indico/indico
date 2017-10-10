@@ -22,7 +22,6 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.legacy.pdfinterface.conference import ContribsToPDF, ContribToPDF
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
@@ -30,6 +29,7 @@ from indico.modules.events.contributions.models.subcontributions import SubContr
 from indico.modules.events.contributions.util import (get_contribution_ical_file,
                                                       get_contributions_with_user_as_submitter)
 from indico.modules.events.contributions.views import WPAuthorList, WPContributions, WPMyContributions, WPSpeakerList
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
@@ -50,7 +50,7 @@ def _author_page_active(event):
     return is_menu_entry_enabled('author_index', event) or is_menu_entry_enabled('contributions', event)
 
 
-class RHContributionDisplayBase(RHConferenceBaseDisplay):
+class RHContributionDisplayBase(RHDisplayEventBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.contrib
@@ -58,18 +58,18 @@ class RHContributionDisplayBase(RHConferenceBaseDisplay):
     }
 
     def _check_access(self):
-        RHConferenceBaseDisplay._check_access(self)
+        RHDisplayEventBase._check_access(self)
         if not self.contrib.can_access(session.user):
             raise Forbidden
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.contrib = Contribution.get_one(request.view_args['contrib_id'], is_deleted=False)
 
 
-class RHDisplayProtectionBase(RHConferenceBaseDisplay):
+class RHDisplayProtectionBase(RHDisplayEventBase):
     def _check_access(self):
-        RHConferenceBaseDisplay._check_access(self)
+        RHDisplayEventBase._check_access(self)
         if not is_menu_entry_enabled(self.MENU_ENTRY_NAME, self.event):
             self._forbidden_if_not_admin()
 
@@ -97,7 +97,7 @@ class RHContributionList(RHDisplayProtectionBase):
     view_class = WPContributions
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.contribs = self.event.contributions
         self.list_generator = ContributionDisplayListGenerator(event=self.event)
 
@@ -225,7 +225,7 @@ class RHContributionListDisplayStaticURL(RHContributionList):
         return jsonify(url=self.list_generator.generate_static_url())
 
 
-class RHSubcontributionDisplay(RHConferenceBaseDisplay):
+class RHSubcontributionDisplay(RHDisplayEventBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.subcontrib
@@ -234,12 +234,12 @@ class RHSubcontributionDisplay(RHConferenceBaseDisplay):
     view_class = WPContributions
 
     def _check_access(self):
-        RHConferenceBaseDisplay._check_access(self)
+        RHDisplayEventBase._check_access(self)
         if not self.subcontrib.can_access(session.user):
             raise Forbidden
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.subcontrib = SubContribution.get_one(request.view_args['subcontrib_id'], is_deleted=False)
 
     def _process(self):

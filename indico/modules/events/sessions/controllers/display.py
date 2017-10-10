@@ -22,7 +22,7 @@ from flask import request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf, get_sessions_for_user
 from indico.modules.events.sessions.views import WPDisplayMySessionsConference, WPDisplaySession
@@ -30,18 +30,18 @@ from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import send_file
 
 
-class RHDisplaySessionList(RHConferenceBaseDisplay):
+class RHDisplaySessionList(RHDisplayEventBase):
     def _check_access(self):
         if not session.user:
             raise Forbidden
-        RHConferenceBaseDisplay._check_access(self)
+        RHDisplayEventBase._check_access(self)
 
     def _process(self):
         sessions = get_sessions_for_user(self.event, session.user)
         return WPDisplayMySessionsConference.render_template('display/session_list.html', self.event, sessions=sessions)
 
 
-class RHDisplaySessionBase(RHConferenceBaseDisplay):
+class RHDisplaySessionBase(RHDisplayEventBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.session
@@ -53,7 +53,7 @@ class RHDisplaySessionBase(RHConferenceBaseDisplay):
             raise Forbidden
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.session = Session.get_one(request.view_args['session_id'], is_deleted=False)
 
 

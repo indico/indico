@@ -20,8 +20,8 @@ from flask import flash, jsonify, redirect, request, session
 from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.plugins.controllers import RHPluginDetails
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.admin import RHAdminBase
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.payment import payment_event_settings, payment_settings
 from indico.modules.events.payment.forms import AdminSettingsForm, EventSettingsForm
@@ -172,7 +172,7 @@ class RHPaymentForm(RHPaymentBase):
         return jsonify(html=html)
 
 
-class RHPaymentConditions(RHConferenceBaseDisplay):
+class RHPaymentConditions(RHDisplayEventBase):
     EVENT_FEATURE = 'payment'
 
     def _process(self):

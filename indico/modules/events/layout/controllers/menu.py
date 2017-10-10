@@ -23,7 +23,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import get_default_values
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger
 from indico.modules.events.layout.forms import MenuBuiltinEntryForm, MenuLinkForm, MenuPageForm
 from indico.modules.events.layout.models.menu import EventPage, MenuEntry, MenuEntryType
@@ -243,7 +243,7 @@ class RHMenuDeleteEntry(RHMenuEntryEditBase):
         return jsonify_data(flash=False, menu=_render_menu_entries(self.event, connect_menu=True))
 
 
-class RHPageDisplay(RHConferenceBaseDisplay):
+class RHPageDisplay(RHDisplayEventBase):
     normalize_url_spec = {
         'locators': {
             lambda self: self.page
@@ -251,7 +251,7 @@ class RHPageDisplay(RHConferenceBaseDisplay):
     }
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.page = EventPage.get_one(request.view_args['page_id'])
 
     def _process(self):

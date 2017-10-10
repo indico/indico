@@ -22,8 +22,7 @@ from flask import jsonify, redirect, request, session
 
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.xmlGen import XMLGen
-from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase, RHEventBase
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
 from indico.modules.events.util import get_theme, serialize_event_for_ical
@@ -32,7 +31,7 @@ from indico.web.flask.util import send_file, url_for
 from indico.web.http_api.metadata import Serializer
 
 
-class RHExportEventICAL(RHConferenceBaseDisplay):
+class RHExportEventICAL(RHDisplayEventBase):
     def _process(self):
         detail_level = request.args.get('detail', 'events')
         data = {'results': serialize_event_for_ical(self.event, detail_level)}
@@ -40,7 +39,7 @@ class RHExportEventICAL(RHConferenceBaseDisplay):
         return send_file('event.ics', BytesIO(serializer(data)), 'text/calendar')
 
 
-class RHDisplayEvent(RHConferenceBaseDisplay):
+class RHDisplayEvent(RHDisplayEventBase):
     """Display the main page of an event.
 
     For a conference this is either the overview page or the custom
@@ -49,7 +48,7 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
     """
 
     def _process_args(self):
-        RHConferenceBaseDisplay._process_args(self)
+        RHDisplayEventBase._process_args(self)
         self.force_overview = request.view_args.get('force_overview', False)
         self.theme_id, self.theme_override = get_theme(self.event, request.args.get('view'))
 
@@ -85,7 +84,7 @@ class RHEventAccessKey(RHEventBase):
         return jsonify(valid=self.event.check_access_key())
 
 
-class RHEventMarcXML(RHConferenceBaseDisplay):
+class RHEventMarcXML(RHDisplayEventBase):
     def _process(self):
         xmlgen = XMLGen()
         xmlgen.initXml()

@@ -19,19 +19,19 @@ from __future__ import unicode_literals
 from flask import request, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.contributions.models.contributions import Contribution
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.management.controllers.base import ManageEventMixin
 from indico.modules.events.util import check_event_locked
 
 
-class RHPapersBase(RHConferenceBaseDisplay):
+class RHPapersBase(RHDisplayEventBase):
     """Base class for all paper-related RHs"""
 
     EVENT_FEATURE = 'papers'
 
     def _check_access(self):
-        RHConferenceBaseDisplay._check_access(self)
+        RHDisplayEventBase._check_access(self)
         # Only let managers access the management versions.
         if self.management and not self.event.cfp.is_manager(session.user):
             raise Forbidden

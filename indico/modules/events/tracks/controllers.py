@@ -24,7 +24,7 @@ from sqlalchemy.orm import subqueryload
 
 from indico.core.db.sqlalchemy.descriptions import RENDER_MODE_WRAPPER_MAP
 from indico.legacy.pdfinterface.conference import ProgrammeToPDF
-from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
+from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.tracks.forms import ProgramForm, TrackForm
@@ -120,7 +120,7 @@ class RHDeleteTrack(RHManageTrackBase):
         return jsonify_data(html=_render_track_list(self.event))
 
 
-class RHDisplayTracks(RHConferenceBaseDisplay):
+class RHDisplayTracks(RHDisplayEventBase):
     def _process(self):
         page_title = get_menu_entry_by_name('program', self.event).localized_title
         program = track_settings.get(self.event, 'program')
@@ -135,7 +135,7 @@ class RHDisplayTracks(RHConferenceBaseDisplay):
                                                page_title=page_title, program=program, tracks=tracks)
 
 
-class RHTracksPDF(RHConferenceBaseDisplay):
+class RHTracksPDF(RHDisplayEventBase):
     def _process(self):
         pdf = ProgrammeToPDF(self.event)
         return send_file('program.pdf', BytesIO(pdf.getPDFBin()), 'application/pdf')
