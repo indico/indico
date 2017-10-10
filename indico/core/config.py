@@ -95,7 +95,7 @@ DEFAULTS = {
     'STATIC_FILE_METHOD': None,
     'STATIC_SITE_STORAGE': None,
     'STORAGE_BACKENDS': {'default': 'fs:/opt/indico/archive'},
-    'STRICT_LATEX': True,
+    'STRICT_LATEX': False,
     'SUPPORT_EMAIL': None,
     'TEMP_DIR': '/opt/indico/tmp',
     'USE_PROXY': False,

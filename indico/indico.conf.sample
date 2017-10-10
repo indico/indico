@@ -196,10 +196,11 @@ MAX_UPLOAD_FILE_SIZE = 0
 # Set the full path to xelatex if it's not within PATH:
 # XELATEX_PATH = 'xelatex'
 #
-# In strict mode, a non-zero status code is considered failure. Disable this if
-# you have old contributions that contain invalid LaTeX and you prefer possibly
-# weird-looking PDFs over an error and no PDF at all.
-# STRICT_LATEX = True
+# In strict mode, a non-zero status code is considered failure. This is
+# disabled by default since LaTeX is rather generous when it comes to using
+# a non-zero exit code. For example, having an oversized image in an abstract
+# is enough to cause one.  It is generally not advised to enable strict mode.
+# STRICT_LATEX = False
 
 #------------------------------------------------------------------------------
 # ACTIVE PLUGINS
