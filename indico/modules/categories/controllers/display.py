@@ -33,7 +33,6 @@ from werkzeug.exceptions import BadRequest, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.categories.controllers.base import RHDisplayCategoryBase
 from indico.modules.categories.legacy import XMLCategorySerializer
 from indico.modules.categories.models.categories import Category
@@ -54,6 +53,7 @@ from indico.util.i18n import _
 from indico.util.string import to_unicode
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
+from indico.web.rh import RH
 from indico.web.util import jsonify_data
 
 

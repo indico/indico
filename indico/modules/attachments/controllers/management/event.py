@@ -19,7 +19,6 @@ from __future__ import unicode_literals
 from flask import jsonify, session
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
@@ -31,6 +30,7 @@ from indico.modules.attachments.views import WPEventAttachments, WPPackageEventA
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.web.flask.templating import get_template_module
+from indico.web.rh import RHProtected
 
 
 class RHEventAttachmentManagementBase(RHEventBase, RHProtected):

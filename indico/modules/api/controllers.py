@@ -20,7 +20,6 @@ from flask import flash, redirect, request, session
 from werkzeug.exceptions import BadRequest, Forbidden
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.api import APIMode, api_settings
 from indico.modules.api.forms import AdminSettingsForm
@@ -35,6 +34,7 @@ from indico.util.i18n import _
 from indico.web.flask.util import redirect_or_jsonify, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.http_api.util import generate_public_auth_request
+from indico.web.rh import RH
 from indico.web.util import jsonify_data
 
 

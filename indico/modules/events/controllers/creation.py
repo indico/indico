@@ -26,7 +26,6 @@ from werkzeug.utils import cached_property
 
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.categories import Category
 from indico.modules.events.forms import EventCreationForm, LectureCreationForm
 from indico.modules.events.models.events import EventType
@@ -38,6 +37,7 @@ from indico.util.date_time import now_utc
 from indico.util.struct.iterables import materialize_iterable
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_template, url_for_index
 
 

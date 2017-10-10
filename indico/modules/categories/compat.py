@@ -21,9 +21,9 @@ import re
 from flask import abort, redirect, request
 from werkzeug.exceptions import NotFound
 
-from indico.legacy.webinterface.rh.base import RHSimple
 from indico.modules.categories import LegacyCategoryMapping
 from indico.web.flask.util import url_for
+from indico.web.rh import RHSimple
 
 
 @RHSimple.wrap_function

@@ -25,7 +25,6 @@ from werkzeug.urls import url_join
 import indico
 from indico.core.config import config
 from indico.core.db.sqlalchemy.util.queries import get_postgres_version
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.cephalopod.forms import CephalopodForm
@@ -36,6 +35,7 @@ from indico.util.i18n import _
 from indico.util.system import get_os
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RH
 
 
 class RHCephalopodBase(RHAdminBase):

@@ -23,7 +23,6 @@ from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.base import RH, RHProtected
 from indico.modules.admin import RHAdminBase
 from indico.modules.oauth import logger
 from indico.modules.oauth.forms import ApplicationForm
@@ -35,6 +34,7 @@ from indico.modules.users.controllers import RHUserBase
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RH, RHProtected
 
 
 class RHOAuthAuthorize(RHProtected):

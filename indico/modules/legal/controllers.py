@@ -18,12 +18,12 @@ from __future__ import unicode_literals
 
 from flask import redirect
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.legal import legal_settings
 from indico.modules.legal.forms import LegalMessagesForm
 from indico.modules.legal.views import WPDisplayLegalMessages, WPManageLegalMessages
 from indico.web.flask.util import url_for
+from indico.web.rh import RH
 
 
 class RHManageLegalMessages(RHAdminBase):

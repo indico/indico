@@ -19,9 +19,9 @@ from __future__ import unicode_literals
 from flask import request
 from werkzeug.exceptions import NotFound
 
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.events import Event
 from indico.util.i18n import _
+from indico.web.rh import RH
 
 
 class RHEventBase(RH):

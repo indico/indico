@@ -20,9 +20,9 @@ from flask import session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.config import config
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.rb.util import rb_check_user_access
 from indico.util.i18n import _
+from indico.web.rh import RHProtected
 
 
 class RHRoomBookingProtected(RHProtected):

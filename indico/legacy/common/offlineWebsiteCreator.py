@@ -36,7 +36,6 @@ from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStati
                                                      WPStaticDisplayRegistrationParticipantList, WPStaticSessionDisplay,
                                                      WPStaticSimpleEventDisplay, WPStaticSpeakerList,
                                                      WPStaticSubcontributionDisplay, WPStaticTimetable)
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.attachments.models.attachments import AttachmentType
 from indico.modules.attachments.models.folders import AttachmentFolder
 from indico.modules.events.contributions.controllers.display import (RHAuthorList, RHContributionAuthor,
@@ -54,6 +53,7 @@ from indico.modules.events.tracks.controllers import RHDisplayTracks
 from indico.util.string import strip_tags
 from indico.web.assets.util import get_asset_path
 from indico.web.flask.util import url_for
+from indico.web.rh import RH
 
 
 RE_CSS_URL = re.compile(r'url\(\s*(?P<quote>["\']?)(?!data:)(?P<url>[^\\\')]+)(?P=quote)\s*\)')

@@ -92,7 +92,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
                                    config.CUSTOMIZATION_DEBUG)
 
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
-        from indico.legacy.webinterface.rh.base import RHSimple
+        from indico.web.rh import RHSimple
         # Endpoints from Flask-Multipass need to be wrapped in the RH
         # logic to get the autocommit logic and error handling for code
         # running inside the identity handler.

@@ -21,7 +21,6 @@ from datetime import timedelta
 from flask import flash, redirect, request, session
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.news import logger, news_settings
 from indico.modules.news.forms import NewsForm, NewsSettingsForm
@@ -32,6 +31,7 @@ from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RH
 from indico.web.util import jsonify_data, jsonify_form
 
 

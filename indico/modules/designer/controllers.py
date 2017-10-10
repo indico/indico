@@ -25,7 +25,6 @@ from PIL import Image
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.categories import Category
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
@@ -42,6 +41,7 @@ from indico.modules.events.util import check_event_locked
 from indico.util.fs import secure_filename
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
+from indico.web.rh import RHProtected
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 

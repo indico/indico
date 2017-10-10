@@ -22,7 +22,6 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.core.db import db
 from indico.legacy.pdfinterface.conference import ContribsToPDF, ContribToPDF
-from indico.legacy.webinterface.rh.base import RH
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -35,6 +34,7 @@ from indico.modules.events.layout.util import is_menu_entry_enabled
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import jsonify_data, send_file
+from indico.web.rh import RH
 
 
 def _get_persons(event, condition):

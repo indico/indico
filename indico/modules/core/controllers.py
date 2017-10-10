@@ -30,7 +30,6 @@ from indico.core.config import config
 from indico.core.logger import Logger
 from indico.core.notifications import make_email, send_email
 from indico.core.settings import PrefixSettingsProxy
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import ReportErrorForm, SettingsForm
@@ -41,6 +40,7 @@ from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RH
 from indico.web.util import jsonify_data, jsonify_form
 
 

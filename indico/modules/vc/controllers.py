@@ -26,7 +26,6 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.vc.exceptions import VCRoomError, VCRoomNotFoundError
@@ -40,6 +39,7 @@ from indico.util.i18n import _
 from indico.util.struct.iterables import group_list
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RHProtected
 from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 

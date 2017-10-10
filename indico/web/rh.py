@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+from __future__ import absolute_import, unicode_literals
 
 import cProfile
 import inspect
@@ -45,7 +45,6 @@ from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
 
 
 HTTP_VERBS = {'GET', 'PATCH', 'POST', 'PUT', 'DELETE'}
-
 logger = Logger.get('rh')
 
 

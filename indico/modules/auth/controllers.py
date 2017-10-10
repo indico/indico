@@ -27,7 +27,6 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.notifications import make_email
 from indico.legacy.common.mail import GenericMailer
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity, logger, login_user
 from indico.modules.auth.forms import (AddLocalIdentityForm, EditLocalIdentityForm, LocalRegistrationForm,
@@ -43,6 +42,7 @@ from indico.util.signing import secure_serializer
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults, IndicoForm
+from indico.web.rh import RH
 from indico.web.util import url_for_index
 
 

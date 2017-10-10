@@ -26,12 +26,12 @@ from indico.core.db import db
 from indico.core.notifications import email_sender, make_email
 from indico.core.storage import StorageReadOnlyError
 from indico.legacy.common.offlineWebsiteCreator import OfflineEvent
-from indico.legacy.webinterface.rh.base import RH
 from indico.modules.events.static import logger
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.date_time import now_utc
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.rh import RH
 
 
 @celery.task(request_context=True)

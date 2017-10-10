@@ -22,7 +22,6 @@ from werkzeug.exceptions import Forbidden, NotFound
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import attrs_changed
-from indico.legacy.webinterface.rh.base import RHProtected
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.notes import logger
 from indico.modules.events.notes.forms import NoteForm
@@ -31,6 +30,7 @@ from indico.modules.events.notes.util import can_edit_note, get_scheduled_notes
 from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.util.string import sanitize_html
 from indico.web.forms.base import FormDefaults
+from indico.web.rh import RHProtected
 from indico.web.util import jsonify_template
 
 
