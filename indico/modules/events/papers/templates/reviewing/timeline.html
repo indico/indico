@@ -4,7 +4,7 @@
 
 {% macro render_paper_info(paper) %}
     <div class="submission-title flexrow">
-        <h3 class="f-self-stretch">
+        <h3 class="f-self-stretch js-mathjax">
             {% trans contribution_title=paper.contribution.title%}Paper for {{ contribution_title }}{% endtrans %}
             <span class="submission-id">
                 #{{ paper.contribution.friendly_id }}
