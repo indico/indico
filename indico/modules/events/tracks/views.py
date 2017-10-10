@@ -34,7 +34,7 @@ class WPManageTracks(MathjaxMixin, WPEventManagement):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayTracks(MathjaxMixin, WPConferenceDisplayBase):
+class WPDisplayTracks(WPConferenceDisplayBase):
     template_prefix = 'events/tracks/'
     menu_entry_name = 'program'
 
@@ -42,6 +42,3 @@ class WPDisplayTracks(MathjaxMixin, WPConferenceDisplayBase):
         return (WPConferenceDisplayBase.getJSFiles(self) +
                 self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
-
-    def _getHeadContent(self):
-        return WPConferenceDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)

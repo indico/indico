@@ -42,7 +42,7 @@ class WPManageAbstracts(MathjaxMixin, WPEventManagement):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
-class WPDisplayAbstractsBase(MathjaxMixin, WPConferenceDisplayBase):
+class WPDisplayAbstractsBase(WPConferenceDisplayBase):
     template_prefix = 'events/abstracts/'
 
     def getJSFiles(self):
@@ -54,9 +54,6 @@ class WPDisplayAbstractsBase(MathjaxMixin, WPConferenceDisplayBase):
 
     def getCSSFiles(self):
         return WPConferenceDisplayBase.getCSSFiles(self) + self._asset_env['selectize_css'].urls()
-
-    def _getHeadContent(self):
-        return WPConferenceDisplayBase._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
 
 
 class WPDisplayAbstracts(WPDisplayAbstractsBase):

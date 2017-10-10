@@ -79,7 +79,7 @@ def render_session_bar(protected_object=None, local_tz=None, force_local_tz=Fals
     return Markup(rv)
 
 
-class WPJinjaMixin:
+class WPJinjaMixin(object):
     """Mixin for WPs backed by Jinja templates.
 
     This allows you to use a single WP class and its layout, CSS,
@@ -145,7 +145,7 @@ class WPJinjaMixin:
         return self.render_template_func(template, **params)
 
 
-class WPBase:
+class WPBase(object):
     _title = 'Indico'
 
     #: Whether the WP is used for management (adds suffix to page title)
