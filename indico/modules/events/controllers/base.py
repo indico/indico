@@ -32,7 +32,6 @@ class RHEventBase(RH):
             raise NotFound(_('An event with this ID does not exist.'))
         elif self.event.is_deleted:
             raise NotFound(_('This event has been deleted.'))
-        self._conf = self.event.as_legacy
 
 
 class RHDisplayEventBase(RHEventBase):

@@ -142,25 +142,19 @@ def setTTFonts():
         alreadyRegistered = True
 
 
-class Int2Romans:
+def int_to_roman(value):
+    """Convert an integer to Roman numerals."""
+    if not 0 < value < 4000:
+        raise ValueError( _("Int to Roman Error: Argument must be between 1 and 3999"))
+    ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
+    nums = ('m',  'cm', 'd', 'cd','c', 'xc','l','xl','x','ix','v','iv','i')
+    result = ""
+    for i in range(len(ints)):
+        count = int(value / ints[i])
+        result += nums[i] * count
+        value -= ints[i] * count
+    return result
 
-    def int_to_roman(input):
-        """
-        Convert an integer to Roman numerals.
-        """
-        if type(input) != type(1):
-            raise TypeError, _("expected integer, got %s") % type(input)
-        if not 0 < input < 4000:
-            raise MaKaCError( _("Int to Roman Error: Argument must be between 1 and 3999"))
-        ints = (1000, 900,  500, 400, 100,  90, 50,  40, 10,  9,   5,  4,   1)
-        nums = ('m',  'cm', 'd', 'cd','c', 'xc','l','xl','x','ix','v','iv','i')
-        result = ""
-        for i in range(len(ints)):
-            count = int(input / ints[i])
-            result += nums[i] * count
-            input -= ints[i] * count
-        return result
-    int_to_roman = staticmethod(int_to_roman)
 
 class Paragraph(platypus.Paragraph):
     """
@@ -464,10 +458,10 @@ class PDFBase:
 
     def _drawLogo(self, c, drawTitle = True):
         from indico.modules.events.util import create_event_logo_tmp_file
-        logo = self._conf.as_event.logo
+        logo = self.event.logo
         imagePath = ""
         if logo:
-            imagePath = create_event_logo_tmp_file(self._conf.as_event).name
+            imagePath = create_event_logo_tmp_file(self.event).name
         if imagePath:
             try:
                 img = PILImage.open(imagePath)
@@ -481,7 +475,7 @@ class PDFBase:
                 startHeight = self._PAGE_HEIGHT
 
                 if drawTitle:
-                    startHeight = self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                    startHeight = self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                                           height=self._PAGE_HEIGHT - inch)
 
                 # lower edge of the image
@@ -492,7 +486,7 @@ class PDFBase:
                 return startHeight
             except IOError:
                 if drawTitle:
-                    self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+                    self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                             height=self._PAGE_HEIGHT - inch)
         return 0
 
@@ -559,7 +553,7 @@ class DocTemplateWithTOC(SimpleDocTemplate):
         c.saveState()
         c.setFont('Times-Roman',9)
         c.setFillColorRGB(0.5,0.5,0.5)
-        c.drawCentredString(self._PAGE_WIDTH/2.0,0.5*cm,"%s "%Int2Romans.int_to_roman(doc.page-1))
+        c.drawCentredString(self._PAGE_WIDTH / 2.0, 0.5 * cm, '%s ' % int_to_roman(doc.page - 1))
         c.restoreState()
 
     def multiBuild(self, story, filename=None, canvasMaker=Canvas, maxPasses=10, onFirstPage=_doNothing, onLaterPages=_doNothing):

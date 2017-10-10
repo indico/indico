@@ -92,9 +92,8 @@ def extract_affiliations(contrib):
 class ProgrammeToPDF(PDFBase):
 
     def __init__(self, event, tz=None):
-        self._event = event
-        self._conf = event.as_legacy
-        self._tz = self._event.tzinfo
+        self.event = event
+        self._tz = self.event.tzinfo
         self._title = get_menu_entry_by_name('program', event).localized_title.encode('utf-8')
         PDFBase.__init__(self, title='program.pdf')
 
@@ -104,7 +103,7 @@ class ProgrammeToPDF(PDFBase):
         height = self._drawLogo(c)
 
         if not height:
-            height = self._drawWrappedString(c, escape(self._event.title.encode('utf-8')),
+            height = self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                              height=self._PAGE_HEIGHT - 2*inch)
 
         c.setFont('Times-Bold', 15)
@@ -112,21 +111,21 @@ class ProgrammeToPDF(PDFBase):
         height -= 2 * cm
 
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, "{} - {}".format(
-            self._event.start_dt_local.strftime("%A %d %B %Y"), self._event.end_dt_local.strftime("%A %d %B %Y")))
-        if self._event.venue_name:
+            self.event.start_dt_local.strftime("%A %d %B %Y"), self.event.end_dt_local.strftime("%A %d %B %Y")))
+        if self.event.venue_name:
             height-=1*cm
-            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self._event.venue_name.encode('utf-8')))
+            c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self.event.venue_name.encode('utf-8')))
         c.setFont('Times-Bold', 30)
         height-=6*cm
         c.drawCentredString(self._PAGE_WIDTH/2.0, height, self._title)
-        self._drawWrappedString(c, "%s / %s" % (strip_ml_tags(self._event.title.encode('utf-8')), self._title),
+        self._drawWrappedString(c, "%s / %s" % (strip_ml_tags(self.event.title.encode('utf-8')), self._title),
                                 width=inch, height=0.75*inch, font='Times-Roman', size=9, color=(0.5,0.5,0.5), align="left", maximumWidth=self._PAGE_WIDTH-3.5*inch, measurement=inch, lineSpacing=0.15)
         c.drawRightString(self._PAGE_WIDTH - inch, 0.75 * inch, now_utc().strftime("%A %d %B %Y"))
         c.restoreState()
 
     def laterPages(self, c, doc):
         c.saveState()
-        self._drawWrappedString(c, "%s / %s" % (escape(strip_ml_tags(self._event.title.encode('utf-8'))), self._title),
+        self._drawWrappedString(c, "%s / %s" % (escape(strip_ml_tags(self.event.title.encode('utf-8'))), self._title),
                                 width=inch, height=self._PAGE_HEIGHT-0.75*inch, font='Times-Roman', size=9,
                                 color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5*inch,
                                 measurement=inch, lineSpacing=0.15)
@@ -140,10 +139,10 @@ class ProgrammeToPDF(PDFBase):
         styles = _get_sans_style_sheet()
         style = styles["Normal"]
         style.alignment = TA_JUSTIFY
-        p = Paragraph(escape(track_settings.get(self._event, 'program').encode('utf-8')), style)
+        p = Paragraph(escape(track_settings.get(self.event, 'program').encode('utf-8')), style)
         story.append(p)
         story.append(Spacer(1, 0.4*inch))
-        for track in self._event.tracks:
+        for track in self.event.tracks:
             bogustext = track.title.encode('utf-8')
             p = Paragraph(escape(bogustext), styles["Heading1"])
             self._story.append(p)
@@ -362,7 +361,6 @@ class ContributionBook(PDFLaTeXBase):
 
     def __init__(self, event, user, contribs=None, tz=None, sort_by=""):
         super(ContributionBook, self).__init__()
-        self._conf = event.as_legacy
 
         tz = tz or event.timezone
         contribs = self._sort_contribs(contribs or event.contributions, sort_by)
@@ -499,8 +497,7 @@ class TimeTablePlain(PDFWithTOC):
     def __init__(self, event, user, showSessions=None, showDays=None, sortingCrit=None, ttPDFFormat=None,
                  pagesize='A4', fontsize='normal', firstPageNumber=1, showSpeakerAffiliation=False,
                  showSessionDescription=False, tz=None):
-        self._conf = event.as_legacy
-        self._event = event
+        self.event = event
         self._user = user
         self._tz = event.display_tzinfo.zone
         self._showSessions = showSessions
@@ -535,7 +532,7 @@ class TimeTablePlain(PDFWithTOC):
                 style2.fontSize = modifiedFontSize(14, self._fontsize)
                 style2.leading = modifiedFontSize(10, self._fontsize)
                 style2.alignment = TA_CENTER
-                sess_captions = [sess.title for sess in self._event.sessions if sess.id in self._showSessions]
+                sess_captions = [sess.title for sess in self.event.sessions if sess.id in self._showSessions]
                 p = Paragraph("\n".join(sess_captions), style2)
                 self._story.append(p)
             self._story.append(Spacer(inch, 2 * cm))
@@ -548,19 +545,19 @@ class TimeTablePlain(PDFWithTOC):
             if self._ttPDFFormat.showLogo():
                 self._drawLogo(c, False)
 
-            height = self._drawWrappedString(c, self._event.title.encode('utf-8'))
+            height = self._drawWrappedString(c, self.event.title.encode('utf-8'))
             c.setFont('Times-Bold', modifiedFontSize(15, self._fontsize))
             height -= 2 * cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height,
-                                "{} - {}".format(format_date(self._event.start_dt, format='full', timezone=self._tz),
-                                                 format_date(self._event.end_dt, format='full', timezone=self._tz)))
-            if self._event.venue_name:
+                                "{} - {}".format(format_date(self.event.start_dt, format='full', timezone=self._tz),
+                                                 format_date(self.event.end_dt, format='full', timezone=self._tz)))
+            if self.event.venue_name:
                 height -= 2 * cm
-                c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self._event.venue_name))
+                c.drawCentredString(self._PAGE_WIDTH / 2.0, height, escape(self.event.venue_name))
             c.setFont('Times-Bold', modifiedFontSize(30, self._fontsize))
             height -= 1 * cm
             c.drawCentredString(self._PAGE_WIDTH / 2.0, height, self._title)
-            self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title),
+            self._drawWrappedString(c, "{} / {}".format(self.event.title.encode('utf-8'), self._title),
                                     width=inch,
                                     height=0.75 * inch, font='Times-Roman', size=modifiedFontSize(9, self._fontsize),
                                     color=(0.5, 0.5, 0.5), align="left", maximumWidth=self._PAGE_WIDTH - 3.5 * inch,
@@ -573,7 +570,7 @@ class TimeTablePlain(PDFWithTOC):
         maxi = self._PAGE_WIDTH - 2 * cm
         if doc.getCurrentPart().strip():
             maxi = self._PAGE_WIDTH - 6 * cm
-        self._drawWrappedString(c, "{} / {}".format(self._event.title.encode('utf-8'), self._title),
+        self._drawWrappedString(c, "{} / {}".format(self.event.title.encode('utf-8'), self._title),
                                 width=1 * cm,
                                 height=self._PAGE_HEIGHT - 1 * cm, font='Times-Roman',
                                 size=modifiedFontSize(9, self._fontsize), color=(0.5, 0.5, 0.5), align="left",
@@ -800,8 +797,8 @@ class TimeTablePlain(PDFWithTOC):
                               ("TOPPADDING", (0, 0), (-1, -1), 0),
                               ("BOTTOMPADDING", (0, 0), (-1, -1), 0),
                               ('GRID', (0, 0), (0, -1), 1, colors.lightgrey)])
-        entries = (self._event.timetable_entries
-                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day,
+        entries = (self.event.timetable_entries
+                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
                    .order_by(TimetableEntry.start_dt))
         for entry in entries:
@@ -997,12 +994,12 @@ class TimeTablePlain(PDFWithTOC):
             s.fontSize = 18
             s.leading = 22
             s.alignment = TA_CENTER
-            p = Paragraph(escape(self._event.title.encode('utf-8')), s)
+            p = Paragraph(escape(self.event.title.encode('utf-8')), s)
             story.append(p)
             story.append(Spacer(1, 0.4 * inch))
 
-        current_day = self._event.start_dt.date()
-        end_day = self._event.end_dt.date()
+        current_day = self.event.start_dt.date()
+        end_day = self.event.end_dt.date()
         while current_day <= end_day:
             if self._showDays and current_day.strftime("%d-%B-%Y") not in self._showDays:
                 current_day += timedelta(days=1)
@@ -1027,9 +1024,8 @@ class TimeTablePlain(PDFWithTOC):
 class SimplifiedTimeTablePlain(PDFBase):
     def __init__(self, event, user, showSessions=[], showDays=[], sortingCrit=None, ttPDFFormat=None, pagesize='A4',
                  fontsize='normal', tz=None):
-        self._conf = event.as_legacy
-        self._event = event
-        self._tz = tz or self._event.timezone
+        self.event = event
+        self._tz = tz or self.event.timezone
         self._user = user
         self._showSessions = showSessions
         self._showDays = showDays
@@ -1079,8 +1075,8 @@ class SimplifiedTimeTablePlain(PDFBase):
     def _processDayEntries(self, day, story):
         lastSessions = []  # this is to avoid checking if the slots have titles for all the slots
         res = []
-        entries = (self._event.timetable_entries
-                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self._event.tzinfo), db.Date) == day,
+        entries = (self.event.timetable_entries
+                   .filter(db.cast(TimetableEntry.start_dt.astimezone(self.event.tzinfo), db.Date) == day,
                            TimetableEntry.parent_id.is_(None))
                    .order_by(TimetableEntry.start_dt))
         for entry in entries:
@@ -1155,8 +1151,8 @@ class SimplifiedTimeTablePlain(PDFBase):
         if not story:
             story = self._story
 
-        current_day = self._event.start_dt.date()
-        end_day = self._event.end_dt.date()
+        current_day = self.event.start_dt.date()
+        end_day = self.event.end_dt.date()
         while current_day <= end_day:
             if len(self._showDays) > 0 and current_day.strftime("%d-%B-%Y") not in self._showDays:
                 current_day += timedelta(days=1)
@@ -1167,12 +1163,12 @@ class SimplifiedTimeTablePlain(PDFBase):
                 current_day += timedelta(days=1)
                 continue
             text = u'{} - {}-{}'.format(
-                escape(self._event.title),
-                escape(to_unicode(format_date(self._event.start_dt, timezone=self._tz))),
-                escape(to_unicode(format_date(self._event.end_dt, timezone=self._tz)))
+                escape(self.event.title),
+                escape(to_unicode(format_date(self.event.start_dt, timezone=self._tz))),
+                escape(to_unicode(format_date(self.event.end_dt, timezone=self._tz)))
             )
-            if self._event.venue_name:
-                text = u'%s, %s.' % (text, self._event.venue_name)
+            if self.event.venue_name:
+                text = u'%s, %s.' % (text, self.event.venue_name)
             p = Paragraph(text.encode('utf-8'), self._styles["title"])
             story.append(p)
             text2 = u'{}: {}'.format(_(u'Daily Programme'), escape(current_day.strftime("%A %d %B %Y")))
@@ -1185,10 +1181,9 @@ class SimplifiedTimeTablePlain(PDFBase):
 
 
 class RegistrantToPDF(PDFBase):
-
-    def __init__(self, conf, reg, display, doc=None, story=None, static_items=None):
+    def __init__(self, event, reg, display, doc=None, story=None, static_items=None):
+        self.event = event
         self._reg = reg
-        self._conf = conf
         self._display = display
         self.static_items = static_items
         if not story:
@@ -1202,7 +1197,7 @@ class RegistrantToPDF(PDFBase):
         c.saveState()
         c.setFont('Times-Bold', 30)
         if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+            self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                     height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 25)
         c.setLineWidth(3)
@@ -1306,7 +1301,7 @@ class RegistrantToPDF(PDFBase):
 
 class RegistrantsListToBookPDF(PDFWithTOC):
     def __init__(self, event, regform, reglist, item_ids, static_item_ids):
-        self._conf = event.as_legacy
+        self.event = event
         self._regform = regform
         self._regList = reglist
         self._item_ids = set(item_ids)
@@ -1318,7 +1313,7 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         c.saveState()
         c.setFont('Times-Bold', 30)
         if not self._drawLogo(c):
-            self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+            self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                     height=self._PAGE_HEIGHT - 2*inch)
         c.setFont('Times-Bold', 35)
         c.drawCentredString(self._PAGE_WIDTH/2, self._PAGE_HEIGHT/2, self._title)
@@ -1327,14 +1322,14 @@ class RegistrantsListToBookPDF(PDFWithTOC):
         #c.line(inch, self._PAGE_HEIGHT - inch - 6*cm, self._PAGE_WIDTH - inch, self._PAGE_HEIGHT - inch - 6*cm)
         #c.line(inch, inch , self._PAGE_WIDTH - inch, inch)
         c.setFont('Times-Roman', 10)
-        c.drawString(0.5*inch, 0.5*inch, self._conf.as_event.short_external_url)
+        c.drawString(0.5*inch, 0.5*inch, self.event.short_external_url)
         c.restoreState()
 
     def laterPages(self, c, doc):
         c.saveState()
         c.setFont('Times-Roman', 9)
         c.setFillColorRGB(0.5, 0.5, 0.5)
-        confTitle = escape(truncate(self._conf.as_event.title, 30).encode('utf-8'))
+        confTitle = escape(truncate(self.event.title, 30).encode('utf-8'))
         c.drawString(inch, self._PAGE_HEIGHT - 0.75 * inch, "%s / %s"%(confTitle, self._title))
         title = doc.getCurrentPart()
         if len(doc.getCurrentPart())>50:
@@ -1355,15 +1350,14 @@ class RegistrantsListToBookPDF(PDFWithTOC):
             items.append(section)
             items += fields
         for reg in self._regList:
-            temp = RegistrantToPDF(self._conf, reg, items, static_items=self._static_item_ids)
+            temp = RegistrantToPDF(self.event, reg, items, static_items=self._static_item_ids)
             temp.getBody(self._story, indexedFlowable=self._indexedFlowable, level=1)
             self._story.append(PageBreak())
 
 
 class RegistrantsListToPDF(PDFBase):
-
     def __init__(self, event, doc=None, story=[], reglist=None, display=[], static_items=None):
-        self._conf = event.as_legacy
+        self.event = event
         self._regList = reglist
         self._display = display
         PDFBase.__init__(self, doc, story, printLandscape=True)
@@ -1377,7 +1371,7 @@ class RegistrantsListToPDF(PDFBase):
         showLogo = False
         c.setFont('Times-Bold', 30)
         if not showLogo:
-            self._drawWrappedString(c, escape(self._conf.as_event.title.encode('utf-8')),
+            self._drawWrappedString(c, escape(self.event.title.encode('utf-8')),
                                     height=self._PAGE_HEIGHT - 0.75*inch)
         c.setFont('Times-Bold', 25)
         c.setLineWidth(3)
@@ -1395,7 +1389,7 @@ class RegistrantsListToPDF(PDFBase):
         style.fontSize = 12
         style.alignment = TA_CENTER
         text = u'<b>{}</b>'.format(_(u"List of registrants"))
-        p = Paragraph(text, style, part=escape(self._conf.as_event.title.encode('utf-8')))
+        p = Paragraph(text, style, part=escape(self.event.title.encode('utf-8')))
         p.spaceAfter = 30
         story.append(p)
 

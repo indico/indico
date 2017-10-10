@@ -104,7 +104,6 @@ class WPEventBase(WPDecorated):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
         WPDecorated.__init__(self, rh, **kwargs)
-        self._conf = event_.as_legacy
         self._tz = event_.display_tzinfo.zone
         start_dt_local = event_.start_dt_display.astimezone(event_.display_tzinfo)
         end_dt_local = event_.end_dt_display.astimezone(event_.display_tzinfo)

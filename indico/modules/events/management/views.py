@@ -85,11 +85,6 @@ class WPEventManagementLegacy(WPEventManagement):
     from ``events/management/base.html``.
     """
 
-    @unify_event_args
-    def __init__(self, rh, event_, **kwargs):
-        WPEventManagement.__init__(self, rh, event_, **kwargs)
-        self._conf = self.event.as_legacy
-
     def _getBody(self, params):
         # Legacy handling for pages that do not use Jinja inheritance.
         tpl = u"{% extends 'events/management/base.html' %}{% block content %}{{ _body | safe }}{% endblock %}"

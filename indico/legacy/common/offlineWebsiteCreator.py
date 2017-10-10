@@ -44,6 +44,7 @@ from indico.modules.events.contributions.controllers.display import (RHAuthorLis
 from indico.modules.events.contributions.util import get_contribution_ical_file
 from indico.modules.events.layout.models.menu import MenuEntryType
 from indico.modules.events.layout.util import menu_entries_for_event
+from indico.modules.events.models.events import EventType
 from indico.modules.events.registration.controllers.display import RHParticipantList
 from indico.modules.events.sessions.controllers.display import RHDisplaySession
 from indico.modules.events.sessions.util import get_session_ical_file, get_session_timetable_pdf
@@ -93,33 +94,20 @@ def _override_request_endpoint(endpoint):
         request.url_rule = old_rule
 
 
-class OfflineEvent:
-
-    def __init__(self, rh, conf):
-        self._rh = rh
-        self._conf = conf
-        self._eventType = conf.as_event.type_.name
-
-    def create(self):
-        websiteCreator = None
-        if self._eventType in ('lecture', 'meeting'):
-            websiteCreator = OfflineEventCreator(self._rh, self._conf, self._eventType)
-        elif self._eventType == "conference":
-            websiteCreator = ConferenceOfflineCreator(self._rh, self._conf)
-        return websiteCreator.create()
+def create_static_site(rh, event):
+    cls = OfflineEventCreator if event.type_ in (EventType.lecture, EventType.meeting) else ConferenceOfflineCreator
+    return cls(rh, event).create()
 
 
 class OfflineEventCreator(object):
-    def __init__(self, rh, conf, event_type=""):
+    def __init__(self, rh, event):
         self._rh = rh
-        self._conf = conf
-        self.event = conf.as_event
+        self.event = event
         self._display_tz = self.event.display_tzinfo.zone
         self._html = ""
         self._fileHandler = None
         self._mainPath = ""
         self._staticPath = ""
-        self._eventType = event_type
         self._failed_paths = set()
         self._css_files = set()
         self._downloaded_files = {}
@@ -302,9 +290,8 @@ class OfflineEventCreator(object):
 
 
 class ConferenceOfflineCreator(OfflineEventCreator):
-
-    def __init__(self, rh, conf, event_type=""):
-        super(ConferenceOfflineCreator, self).__init__(rh, conf, event_type)
+    def __init__(self, rh, event):
+        super(ConferenceOfflineCreator, self).__init__(rh, event)
         # Menu entries we want to include in the offline version.
         # Those which are backed by a WP class get their name from that class;
         # the others are simply hardcoded.
@@ -330,10 +317,10 @@ class ConferenceOfflineCreator(OfflineEventCreator):
         # Getting all menu items
         self._get_menu_items()
         # Getting conference timetable in PDF
-        self._addPdf(self._conf, 'timetable.export_default_pdf',
+        self._addPdf(self.event, 'timetable.export_default_pdf',
                      get_timetable_offline_pdf_generator(self.event))
         # Generate contributions in PDF
-        self._addPdf(self._conf, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
+        self._addPdf(self.event, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
                      contribs=self.event.contributions)
 
         # Getting specific pages for contributions
@@ -360,17 +347,17 @@ class ConferenceOfflineCreator(OfflineEventCreator):
     def _get_builtin_page(self, entry):
         obj = self._menu_offline_items.get(entry.name)
         if isinstance(obj, RH):
-            request.view_args = {'confId': self._conf.id}
+            request.view_args = {'confId': self.event.id}
             with _override_request_endpoint(obj.view_class.endpoint):
                 obj._process_args()
-                self._addPage(obj._process(), obj.view_class.endpoint, self._conf)
+                self._addPage(obj._process(), obj.view_class.endpoint, self.event)
         if entry.name == 'abstracts_book':
-            self._addPdf(self._conf, 'abstracts.export_boa', AbstractBook, event=self.event)
+            self._addPdf(self.event, 'abstracts.export_boa', AbstractBook, event=self.event)
         if entry.name == 'program':
-            self._addPdf(self._conf, 'tracks.program_pdf', ProgrammeToPDF, event=self.event)
+            self._addPdf(self.event, 'tracks.program_pdf', ProgrammeToPDF, event=self.event)
 
     def _get_custom_page(self, page):
-        html = WPStaticCustomPage.render_template('page.html', self._conf, page=page)
+        html = WPStaticCustomPage.render_template('page.html', self.event, page=page)
         self._addPage(html, 'event_pages.page_display', page)
 
     def _getUrl(self, uh_or_endpoint, target, **params):
@@ -396,7 +383,7 @@ class ConferenceOfflineCreator(OfflineEventCreator):
 
     def _getContrib(self, contrib):
         self._add_from_rh(RHContributionDisplay, WPStaticContributionDisplay,
-                          {'confId': self._conf.id, 'contrib_id': contrib.id},
+                          {'confId': self.event.id, 'contrib_id': contrib.id},
                           contrib)
         self._addPdf(contrib, 'contributions.export_pdf', ContribToPDF, contrib=contrib)
 
@@ -410,21 +397,21 @@ class ConferenceOfflineCreator(OfflineEventCreator):
 
     def _getSubContrib(self, subcontrib):
         self._add_from_rh(RHSubcontributionDisplay, WPStaticSubcontributionDisplay,
-                          {'confId': self._conf.id, 'contrib_id': subcontrib.contribution.id,
+                          {'confId': self.event.id, 'contrib_id': subcontrib.contribution.id,
                            'subcontrib_id': subcontrib.id}, subcontrib)
 
     def _getAuthor(self, contrib, author):
         rh = RHContributionAuthor()
-        params = {'confId': self._conf.id, 'contrib_id': contrib.id, 'person_id': author.id}
+        params = {'confId': self.event.id, 'contrib_id': contrib.id, 'person_id': author.id}
         request.view_args = params
         with _override_request_endpoint('contributions.display_author'):
             rh._process_args()
             html = rh._process()
-        self._addPage(html, 'contributions.display_author', self._conf, contrib_id=contrib.id, person_id=author.id)
+        self._addPage(html, 'contributions.display_author', self.event, contrib_id=contrib.id, person_id=author.id)
 
     def _getSession(self, session):
         self._add_from_rh(RHDisplaySession, WPStaticSessionDisplay,
-                          {'confId': self._conf.id, 'session_id': session.id}, session)
+                          {'confId': self.event.id, 'session_id': session.id}, session)
 
         pdf = get_session_timetable_pdf(session, tz=self._display_tz)
         self._addPdf(session, 'sessions.export_session_timetable', pdf)

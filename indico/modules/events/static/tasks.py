@@ -25,7 +25,7 @@ from indico.core.celery import celery
 from indico.core.db import db
 from indico.core.notifications import email_sender, make_email
 from indico.core.storage import StorageReadOnlyError
-from indico.legacy.common.offlineWebsiteCreator import OfflineEvent
+from indico.legacy.common.offlineWebsiteCreator import create_static_site
 from indico.modules.events.static import logger
 from indico.modules.events.static.models.static import StaticSite, StaticSiteState
 from indico.util.date_time import now_utc
@@ -42,12 +42,10 @@ def build_static_site(static_site):
         logger.info('Building static site: %s', static_site)
         session.lang = static_site.creator.settings.get('lang')
         rh = RH()
-        rh._conf = static_site.event.as_legacy
-
         g.rh = rh
         g.static_site = True
 
-        zip_file_path = OfflineEvent(rh, rh._conf).create()
+        zip_file_path = create_static_site(rh, static_site.event)
         static_site.state = StaticSiteState.success
         static_site.content_type = 'application/zip'
         static_site.filename = 'offline_site_{}.zip'.format(static_site.event.id)
