@@ -29,7 +29,6 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.models.groups import EventRole
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
@@ -152,8 +151,12 @@ class RHPersonsBase(RHManageEventBase):
                 data['roles']['speaker'] = BUILTIN_ROLES['speaker'].copy()
                 data['roles']['speaker']['elements'] = dict(contributions, **subcontributions)
 
+            event_user_roles_data = {}
             for role in event_user_roles[event_person.user]:
-                data['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code, 'css': role.css}
+                event_user_roles_data['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
+                                                                      'css': role.css}
+            event_user_roles_data = OrderedDict(sorted(event_user_roles_data.items(), key=lambda t: t[1]['code']))
+            data['roles'] = OrderedDict(data['roles'].items() + event_user_roles_data.items())
 
             event_person_users.add(event_person.user)
 
@@ -166,6 +169,7 @@ class RHPersonsBase(RHManageEventBase):
                 user_metadata['person'] = user
                 user_metadata['roles']['custom_{}'.format(role.id)] = {'name': role.name, 'code': role.code,
                                                                        'css': role.css}
+            user_metadata['roles'] = OrderedDict(sorted(user_metadata['roles'].items(), key=lambda x: x[1]['code']))
 
         # Some EventPersons will have no roles since they were connected to deleted things
         persons = {email: data for email, data in persons.viewitems() if any(data['roles'].viewvalues())}
