@@ -24,7 +24,7 @@ from indico.modules.events import Event
 from indico.util.i18n import _
 
 
-class RHConferenceBase(RH):
+class RHEventBase(RH):
     def _process_args(self):
         self.event = Event.get(int(request.view_args['confId']))
         if self.event is None:

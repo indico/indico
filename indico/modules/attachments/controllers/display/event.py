@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import redirect, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.attachments.controllers.display.base import DownloadAttachmentMixin
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
@@ -29,9 +29,9 @@ from indico.modules.attachments.views import (WPEventFolderDisplay, WPPackageEve
 from indico.modules.events.models.events import EventType
 
 
-class RHDownloadEventAttachment(DownloadAttachmentMixin, RHConferenceBase):
+class RHDownloadEventAttachment(DownloadAttachmentMixin, RHEventBase):
     def _process_args(self):
-        RHConferenceBase._process_args(self)
+        RHEventBase._process_args(self)
         DownloadAttachmentMixin._process_args(self)
 
 

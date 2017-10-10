@@ -22,7 +22,7 @@ from flask import jsonify, redirect, request, session
 
 from indico.legacy.common.output import outputGenerator
 from indico.legacy.common.xmlGen import XMLGen
-from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.legacy.webinterface.rh.conferenceDisplay import RHConferenceBaseDisplay
 from indico.modules.events.layout.views import WPPage
 from indico.modules.events.models.events import EventType
@@ -77,7 +77,7 @@ class RHDisplayEvent(RHConferenceBaseDisplay):
         return WPSimpleEventDisplay(self, self.event, self.theme_id, self.theme_override).display()
 
 
-class RHEventAccessKey(RHConferenceBase):
+class RHEventAccessKey(RHEventBase):
     NOT_SANITIZED_FIELDS = {'access_key'}
 
     def _process(self):

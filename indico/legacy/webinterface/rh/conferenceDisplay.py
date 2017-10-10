@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from flask import flash, request, session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.modules.events.legacy import LegacyConference
 from indico.modules.events.views import WPAccessKey
 from indico.util.i18n import _
@@ -29,7 +29,7 @@ class AccessKeyRequired(Forbidden):
     pass
 
 
-class RHConferenceBaseDisplay(RHConferenceBase):
+class RHConferenceBaseDisplay(RHEventBase):
     def _forbidden_if_not_admin(self):
         if not request.is_xhr and session.user and session.user.is_admin:
             flash(_('This page is currently not visible by non-admin users (menu entry disabled)!'), 'warning')
@@ -56,6 +56,6 @@ class RHConferenceBaseDisplay(RHConferenceBase):
 
     def _do_process(self):
         try:
-            return RHConferenceBase._do_process(self)
+            return RHEventBase._do_process(self)
         except AccessKeyRequired:
             return self._show_access_key_form()

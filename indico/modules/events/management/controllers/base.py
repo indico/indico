@@ -21,7 +21,7 @@ from collections import defaultdict
 from flask import session
 from werkzeug.exceptions import Forbidden
 
-from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.modules.events.contributions.models.persons import (AuthorType, ContributionPersonLink,
                                                                 SubContributionPersonLink)
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -45,7 +45,7 @@ class ManageEventMixin(object):
         check_event_locked(self, self.event)
 
 
-class RHManageEventBase(RHConferenceBase, ManageEventMixin):
+class RHManageEventBase(RHEventBase, ManageEventMixin):
     """Base class for event management RHs"""
 
     DENY_FRAMES = True

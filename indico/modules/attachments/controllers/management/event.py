@@ -20,7 +20,7 @@ from flask import jsonify, session
 from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.legacy.webinterface.rh.base import RHProtected
-from indico.legacy.webinterface.rh.conferenceBase import RHConferenceBase
+from indico.legacy.webinterface.rh.conferenceBase import RHEventBase
 from indico.modules.attachments.controllers.event_package import AttachmentPackageMixin
 from indico.modules.attachments.controllers.management.base import (AddAttachmentFilesMixin, AddAttachmentLinkMixin,
                                                                     CreateFolderMixin, DeleteAttachmentMixin,
@@ -33,7 +33,7 @@ from indico.modules.events.util import check_event_locked, get_object_from_args
 from indico.web.flask.templating import get_template_module
 
 
-class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
+class RHEventAttachmentManagementBase(RHEventBase, RHProtected):
     normalize_url_spec = {
         'locators': {
             lambda self: self.object
@@ -41,7 +41,7 @@ class RHEventAttachmentManagementBase(RHConferenceBase, RHProtected):
     }
 
     def _process_args(self):
-        RHConferenceBase._process_args(self)
+        RHEventBase._process_args(self)
         self.object_type, self.base_object, self.object = get_object_from_args()
         if self.object is None:
             raise NotFound
