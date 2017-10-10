@@ -19,7 +19,7 @@ from __future__ import print_function, unicode_literals
 import os
 import posixpath
 
-from flask import render_template, render_template_string, request
+from flask import render_template, request
 from sqlalchemy.orm import load_only
 
 from indico.core.config import config
@@ -31,7 +31,6 @@ from indico.modules.events.layout.util import (build_menu_entry_name, get_css_ur
                                                menu_entries_for_event)
 from indico.modules.events.models.events import EventType
 from indico.util.date_time import format_date
-from indico.util.event import unify_event_args
 from indico.util.mathjax import MathjaxMixin
 from indico.util.string import strip_tags, to_unicode, truncate
 from indico.web.flask.util import url_for
@@ -99,7 +98,6 @@ class WPReferenceTypes(WPAdmin):
 
 
 class WPEventBase(WPDecorated):
-    @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
@@ -130,7 +128,6 @@ class WPEventBase(WPDecorated):
 class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
     """Base class for displaying something on a lecture/meeting page"""
 
-    @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         self.event = event_
         WPEventBase.__init__(self, rh, event_, **kwargs)
@@ -215,7 +212,6 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     menu_entry_plugin = None
     menu_entry_name = None
 
-    @unify_event_args
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_

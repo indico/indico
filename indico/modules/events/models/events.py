@@ -448,13 +448,6 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
                                db.or_(Event.visibility.is_(None), Event.visibility > cte.c.level))))
 
     @property
-    @memoize_request
-    def as_legacy(self):
-        """Return a legacy `Conference` object"""
-        from indico.modules.events.legacy import LegacyConference
-        return LegacyConference(self)
-
-    @property
     def event(self):
         """Convenience property so all event entities have it"""
         return self

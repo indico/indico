@@ -55,9 +55,8 @@ def generate_spreadsheet_from_sessions(sessions):
 
 
 class SessionListToPDF(PDFBase):
-    def __init__(self, conf, sessions):
+    def __init__(self, sessions):
         PDFBase.__init__(self, story=[])
-        self.conf = conf
         self.sessions = sessions
         self.PAGE_WIDTH, self.PAGE_HEIGHT = landscape(A4)
 
@@ -98,9 +97,9 @@ class SessionListToPDF(PDFBase):
         return story
 
 
-def generate_pdf_from_sessions(event, sessions):
+def generate_pdf_from_sessions(sessions):
     """Generate a PDF file from a given session list"""
-    pdf = SessionListToPDF(event.as_legacy, sessions)
+    pdf = SessionListToPDF(sessions)
     return BytesIO(pdf.getPDFBin())
 
 

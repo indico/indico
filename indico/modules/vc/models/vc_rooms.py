@@ -30,7 +30,6 @@ from indico.core.logger import Logger
 from indico.modules.vc.notifications import notify_deleted
 from indico.util.caching import memoize_request
 from indico.util.date_time import now_utc
-from indico.util.event import unify_event_args
 from indico.util.string import return_ascii
 from indico.util.struct.enum import IndicoEnum
 
@@ -308,7 +307,6 @@ class VCRoomEventAssociation(db.Model):
         return '<VCRoomEventAssociation({}, {})>'.format(self.event_id, self.vc_room)
 
     @classmethod
-    @unify_event_args
     def find_for_event(cls, event, include_hidden=False, include_deleted=False, only_linked_to_event=False, **kwargs):
         """Returns a Query that retrieves the videoconference rooms for an event
 

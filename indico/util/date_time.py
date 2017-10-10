@@ -451,15 +451,11 @@ def strftime_all_years(dt, fmt):
 
 
 def get_display_tz(obj=None, as_timezone=False):
-    from indico.modules.events.legacy import LegacyConference
     display_tz = session.timezone if has_request_context() else 'LOCAL'
     if display_tz == 'LOCAL':
         if obj is None:
             display_tz = config.DEFAULT_TIMEZONE
         else:
-            # obj can be Event, LegacyConference or Category
-            if isinstance(obj, LegacyConference):
-                obj = obj.as_event
             display_tz = getattr(obj, 'timezone', 'UTC')
     if not display_tz:
         display_tz = config.DEFAULT_TIMEZONE

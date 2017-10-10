@@ -25,7 +25,6 @@ from flask import g
 
 from indico.core.config import config
 from indico.core.logger import Logger
-from indico.util.event import unify_event_args
 from indico.util.string import to_unicode
 
 
@@ -149,7 +148,6 @@ class GenericMailer:
         Logger.get('mail').info('Mail sent to {}'.format(', '.join(to_addrs)))
 
     @classmethod
-    @unify_event_args
     def sendAndLog(cls, notification, event, module=None, user=None, skipQueue=False):
         from indico.modules.events.logs import EventLogRealm, EventLogKind
         if isinstance(notification, dict):

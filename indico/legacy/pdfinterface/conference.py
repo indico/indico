@@ -168,7 +168,7 @@ class AbstractToPDF(PDFLaTeXBase):
         self._args.update({
             'doc_type': 'abstract',
             'abstract': abstract,
-            'conf': event.as_legacy,
+            'event': event,
             'tz': timezone(tz),
             'track_class': self._get_track_classification(abstract),
             'contrib_type': self._get_contrib_type(abstract),
@@ -202,7 +202,7 @@ class AbstractsToPDF(PDFLaTeXBase):
             self._tz = event.timezone
 
         self._args.update({
-            'conf': event.as_legacy,
+            'event': event,
             'doc_type': 'abstract',
             'title': _("Report of Abstracts"),
             'get_track_classification': AbstractToPDF._get_track_classification,
@@ -306,7 +306,7 @@ class ContribToPDF(PDFLaTeXBase):
             'authors_affil': author_mapping,
             'coauthors_affil': coauthor_mapping,
             'contrib': contrib,
-            'conf': event.as_legacy,
+            'event': event,
             'tz': timezone(tz or event.timezone),
             'fields': [f for f in event.contribution_fields if f.is_active]
         })
@@ -327,7 +327,7 @@ class ContribsToPDF(PDFLaTeXBase):
         self._args.update({
             'doc_type': 'contribution',
             'title': _("Report of Contributions"),
-            'conf': event.as_legacy,
+            'event': event,
             'items': contribs,
             'fields': [f for f in event.contribution_fields if f.is_active],
             'url': event.short_external_url,
@@ -385,7 +385,7 @@ class ContributionBook(PDFLaTeXBase):
             'affiliation_contribs': affiliation_contribs,
             'corresp_authors': corresp_authors,
             'contribs': contribs,
-            'conf': event.as_legacy,
+            'event': event,
             'tz': timezone(tz or event.timezone),
             'url': event.url,
             'fields': [f for f in event.contribution_fields if f.is_active],

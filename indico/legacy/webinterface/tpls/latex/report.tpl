@@ -22,14 +22,14 @@
 <%block name="content">
     %% first page
     \frontmatter
-    <%include file="inc/first_page.tpl" args="event=conf.as_event,title=title"/>
+    <%include file="inc/first_page.tpl" args="event=event,title=title"/>
 
     %% body
     \mainmatter
 
     % for item in items:
         \newpage
-        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${conf.as_event.title.encode('utf-8') | latex_escape}}{80pt} / ${title | latex_escape}}
+        \fancyhead[L]{\small \rmfamily \color{gray} \truncateellipses{${event.title.encode('utf-8') | latex_escape}}{80pt} / ${title | latex_escape}}
         \fancyhead[R]{\small \rmfamily \color{gray} \truncateellipses{${item.title | latex_escape}}{150pt}}
         \phantomsection
         \addcontentsline{toc}{section}{${item.title | latex_escape}}
