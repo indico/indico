@@ -46,14 +46,15 @@ from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.util import jsonify_form, jsonify_template
 
+
 BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 'f7b076',
-                                 'css': 'color: #f7b076 !important; border-color: #f7b076 !important'},
-                 'author': {'name': 'Author', 'code': 'AUT', 'color': '7994f7',
-                            'css': 'color: #7994f7 !important; border-color: #7994f7 !important'},
-                 'convener': {'name': 'Convener', 'code': 'CON', 'color': 'dcb1f9',
-                              'css': 'color: #dcb1f9 !important; border-color: #dcb1f9 !important'},
-                 'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '7fd1c8',
-                             'css': 'color: #7fd1c8 !important; border-color: #7fd1c8 !important'}}
+                                 'css': 'background-color: #f7b076 !important; border-color: #f7b076 !important'},
+                 'author': {'name': 'Author', 'code': 'AUT', 'color': '6582e8',
+                            'css': 'background-color: #6582e8 !important; border-color: #6582e8 !important'},
+                 'convener': {'name': 'Convener', 'code': 'CON', 'color': 'ce69e0',
+                              'css': 'background-color: #ce69e0 !important; border-color: #ce69e0 !important'},
+                 'speaker': {'name': 'Speaker', 'code': 'SPK', 'color': '53c7ad',
+                             'css': 'background-color: #53c7ad !important; border-color: #53c7ad !important'}}
 
 
 class RHPersonsBase(RHManageEventBase):

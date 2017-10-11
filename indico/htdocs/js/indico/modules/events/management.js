@@ -144,7 +144,8 @@
             sortList: [[1, 0]]
         });
 
-        $('.js-event-person-list .roles-column > span').qbubble({
+        var $roleLabels = $('.js-event-person-list .roles-column > span');
+        $roleLabels.qbubble({
             show: {
                 event: 'mouseover'
             },
@@ -184,6 +185,12 @@
                     return html;
                 }
             }
+        });
+
+        // Sets background color of custom role labels based on their font color
+        $roleLabels.filter('.custom').each(function() {
+            var $this = $(this);
+            $this.css('background-color', $.Color($this.css('color')).alpha(0.1));
         });
 
         if (options.hasNoAccountFilter) {

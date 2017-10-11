@@ -46,7 +46,7 @@
                           data-role-name="{{ role_data.name }}"
                           data-items="{{ role_data.elements | tojson | forceescape }}">
                         {{- role_data.code -}}
-                        <span class="badge">{{ role_data.elements | length }}</span>
+                        <span class="badge" style="color: #{{ role_data.color }}">{{ role_data.elements | length }}</span>
                     </span>
                 {% else %}
                     <span class="i-tag outline contrast {{ 'custom' if role.startswith('custom_') }}"

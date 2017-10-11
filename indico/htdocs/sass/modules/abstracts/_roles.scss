@@ -151,15 +151,16 @@
 
         .roles-column {
             & > span {
+                color: $light-gray;
                 margin: 0.4em;
+
+                .badge {
+                    background-color: $light-gray;
+                }
             }
 
             & > span:not(.custom) {
                 border-color: $pastel-gray !important;
-            }
-
-            .badge {
-                background-color: $gray;
             }
         }
 
