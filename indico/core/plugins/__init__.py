@@ -362,6 +362,13 @@ class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
 
 class WPJinjaMixinPlugin(WPJinjaMixin):
     render_template_func = staticmethod(render_plugin_template)
+    # This is the same value as in WPJinjaMixin but NOT redundant:
+    # A plugin may have a WP inheriting from `WPJinjaMixinPlugin, WPSomethingElse`
+    # to get the render_template_func from here while `WPSomethingElse`
+    # already sets a template prefix and also inherits from WPJinjaMixin,
+    # in which case the WPJinjaMixin from here would be skipped due to how
+    # Python's MRO works and thus the template prefix would not be cleared.
+    template_prefix = ''
 
 
 @signals.menu.items.connect_via('admin-sidemenu')
