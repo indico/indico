@@ -122,6 +122,8 @@ def get_category_scores(user, debug=False):
                      if 'contribution_submission' in roles)
     event_ids |= get_events_registered(user)
     event_ids |= get_events_with_submitted_surveys(user)
+    if not event_ids:
+        return {}
     attended = (Event.query
                 .filter(Event.id.in_(event_ids), ~Event.is_deleted)
                 .options(joinedload('category'))
