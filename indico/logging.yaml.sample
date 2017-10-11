@@ -8,7 +8,9 @@
 # - The `indico.core.logger.FormattedSubjectSMTPHandler` handler allows formatting
 #   the email subject using a standard python format string (e.g. `%(message)s`).
 #   Besides that it behaves exactly like the normal `SMTPHandler`, including the
-#   Indico-specific default values mentioned above.
+#   Indico-specific default values mentioned above.  It also handles unicode
+#   properly so it is not recommended to use the default SMTPHandler as that one
+#   may silently drop some log messages which contain non-ascii characters.
 # - All log formaters may use `%(request_id)s` to get a random ID unique to each
 #   request which makes it easier to grep for all other log entries that belong to
 #   a specific request.
