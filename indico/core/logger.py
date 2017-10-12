@@ -192,7 +192,7 @@ def init_sentry(app):
     # we get the X-Sentry-ID header which is not populated in the
     # logging handlers
     handler = SentryHandler(sentry.client, level=getattr(logging, config.SENTRY_LOGGING_LEVEL))
-    handler.addFilter(BlacklistFilter({'indico.flask'}))
+    handler.addFilter(BlacklistFilter({'indico.flask', 'celery.redirected'}))
     setup_logging(handler)
     # connect to the celery logger
     register_logger_signal(sentry.client)
