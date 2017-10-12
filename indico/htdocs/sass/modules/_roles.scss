@@ -41,10 +41,6 @@
         display: inline-flex;
         justify-content: center;
         align-items: baseline;
-
-        :not(:first-child) {
-            margin-left: 0.2em;
-        }
     }
 }
 
