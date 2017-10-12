@@ -24,7 +24,9 @@ from indico.util.string import format_repr, return_ascii
 
 class EventRole(db.Model):
     __tablename__ = 'roles'
-    __table_args__ = {'schema': 'events'}
+    __table_args__ = (db.CheckConstraint('code = upper(code)', 'uppercase_code'),
+                      db.Index(None, 'event_id', 'code', unique=True),
+                      {'schema': 'events'})
 
     is_group = False
     is_event_role = True
