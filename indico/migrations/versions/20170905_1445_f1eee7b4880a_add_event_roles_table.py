@@ -24,6 +24,8 @@ def upgrade():
         sa.Column('name', sa.String(), nullable=False),
         sa.Column('code', sa.String(), nullable=False),
         sa.Column('color', sa.String(), nullable=False),
+        sa.Index(None, 'event_id', 'code', unique=True),
+        sa.CheckConstraint('code = upper(code)', name='uppercase_code'),
         sa.ForeignKeyConstraint(['event_id'], ['events.events.id']),
         sa.PrimaryKeyConstraint('id'),
         schema='events'
