@@ -42,7 +42,7 @@ $i-label-color: $light-black;
     }
 }
 
-@mixin _i-label-outlines($color, $dark-color) {
+@mixin _i-label-outlines($color) {
     &.text-color {
         &:not(.color-on-hover) {
             color: $color;
@@ -85,16 +85,15 @@ $i-label-color: $light-black;
 }
 
 @mixin i-label-flavor($flavor-color, $border-color) {
-    $flavor-darkened-color: darken($flavor-color, 5%);
     @include _i-label-states($flavor-color, $border-color, $border-color, $light-gray, white);
     @include _i-label-borderless($flavor-color);
-    @include _i-label-outlines($flavor-color, $flavor-darkened-color);
+    @include _i-label-outlines($flavor-color);
 }
 
 .i-label {
     @extend %label;
     @include _i-label-borderless($light-black);
-    @include _i-label-outlines($light-black, $black);
+    @include _i-label-outlines($light-black);
     background: white;
     margin: 0 5px;
 
