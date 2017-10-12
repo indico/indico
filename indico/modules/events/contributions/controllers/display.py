@@ -35,6 +35,7 @@ from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.util import get_base_ical_parameters
 from indico.web.flask.util import jsonify_data, send_file
 from indico.web.rh import RH
+from indico.web.util import jsonify_template
 
 
 def _get_persons(event, condition):
@@ -207,9 +208,9 @@ class RHContributionListFilter(RHContributionList):
         return RH._process(self)
 
     def _process_GET(self):
-        return WPContributions.render_template('contrib_list_filter.html', self.event,
-                                               filters=self.list_generator.list_config['filters'],
-                                               static_items=self.list_generator.static_items)
+        return jsonify_template('events/contributions/contrib_list_filter.html',
+                                filters=self.list_generator.list_config['filters'],
+                                static_items=self.list_generator.static_items)
 
     def _process_POST(self):
         self.list_generator.store_configuration()

@@ -32,6 +32,7 @@ class AttachmentsMixin(WPJinjaMixin):
 class WPEventAttachments(AttachmentsMixin, WPEventManagement):
     base_wp = WPEventManagement
     sidemenu_option = 'attachments'
+    ALLOW_JSON = True
 
 
 class WPEventFolderDisplay(WPSimpleEventDisplayBase, WPJinjaMixin):

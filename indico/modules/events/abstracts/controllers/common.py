@@ -28,7 +28,7 @@ from indico.modules.events.util import ZipGeneratorMixin
 from indico.util.fs import secure_filename
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.util import send_file
-from indico.web.util import jsonify_data
+from indico.web.util import jsonify_data, jsonify_template
 
 
 class DisplayAbstractListMixin:
@@ -59,12 +59,12 @@ class CustomizeAbstractListMixin:
 
     def _process_GET(self):
         list_config = self.list_generator._get_config()
-        return self.view_class.render_template('management/abstract_list_filter.html', self.event,
-                                               visible_items=list_config['items'],
-                                               static_items=self.list_generator.static_items,
-                                               extra_filters=self.list_generator.extra_filters,
-                                               contrib_fields=self.list_generator.get_all_contribution_fields(),
-                                               filters=list_config['filters'])
+        return jsonify_template('events/abstracts/management/abstract_list_filter.html',
+                                visible_items=list_config['items'],
+                                static_items=self.list_generator.static_items,
+                                extra_filters=self.list_generator.extra_filters,
+                                contrib_fields=self.list_generator.get_all_contribution_fields(),
+                                filters=list_config['filters'])
 
     def _process_POST(self):
         self.list_generator.store_configuration()

@@ -91,12 +91,12 @@ class RHRegistrationsListCustomize(RHManageRegFormBase):
 
     def _process_GET(self):
         reg_list_config = self.list_generator._get_config()
-        return WPManageRegistration.render_template('management/reglist_filter.html', self.event,
-                                                    regform=self.regform,
-                                                    RegistrationFormItemType=RegistrationFormItemType,
-                                                    visible_items=reg_list_config['items'],
-                                                    static_items=self.list_generator.static_items,
-                                                    filters=reg_list_config['filters'])
+        return jsonify_template('events/registration/management/reglist_filter.html',
+                                regform=self.regform,
+                                RegistrationFormItemType=RegistrationFormItemType,
+                                visible_items=reg_list_config['items'],
+                                static_items=self.list_generator.static_items,
+                                filters=reg_list_config['filters'])
 
     def _process_POST(self):
         self.list_generator.store_configuration()
