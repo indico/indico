@@ -296,6 +296,8 @@ ndRegForm.directive('ndRegForm', function($rootScope, url, sortableoptions, regF
                 if (!scope.validate()) {
                     e.preventDefault();
                     scope.dialogs.error = true;
+                } else {
+                    $('#regformSubmit').prop('disabled', true);
                 }
             });
 
