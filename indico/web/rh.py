@@ -281,6 +281,7 @@ class RH(object):
             else:
                 db.session.rollback()
         except DatabaseError:
+            db.session.rollback()
             handle_sqlalchemy_database_error()  # this will re-raise an exception
         logger.debug('Request successful')
 

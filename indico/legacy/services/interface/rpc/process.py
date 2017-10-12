@@ -71,6 +71,7 @@ def invoke_method(method, params):
         signals.after_process.send()
         db.session.commit()
     except DatabaseError:
+        db.session.rollback()
         handle_sqlalchemy_database_error()
     GenericMailer.flushQueue(True)
     return result
