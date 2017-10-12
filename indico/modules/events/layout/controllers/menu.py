@@ -211,6 +211,7 @@ class RHMenuAddEntry(RHMenuBase):
                 self.event.custom_pages.append(page)
                 entry.page = page
 
+            db.session.add(entry)
             db.session.flush()
             return jsonify_data(entry=_render_menu_entry(entry))
         return jsonify_form(form)

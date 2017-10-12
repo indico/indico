@@ -49,9 +49,8 @@ class MenuEntryMixin(object):
     def __init__(self, **kwargs):
         event = kwargs.pop('event', kwargs.get('event'))
         super(MenuEntryMixin, self).__init__(**kwargs)
-        # XXX: not calling this `event` since we'll rename the `event`
-        # relationships in the future and this one should NOT use the
-        # relationship to avoid mixing data from different DB sessions
+        # XXX: not calling this `event` since this one should NOT use
+        # the relationship to avoid mixing data from different DB sessions
         # when updating/populating the menu (which happens in a separate
         # DB session)
         self._event_ref = event
