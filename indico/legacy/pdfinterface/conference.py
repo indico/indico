@@ -1168,7 +1168,7 @@ class SimplifiedTimeTablePlain(PDFBase):
                 escape(to_unicode(format_date(self.event.end_dt, timezone=self._tz)))
             )
             if self.event.venue_name:
-                text = u'%s, %s.' % (text, self.event.venue_name)
+                text = u'%s, %s.' % (text, escape(self.event.venue_name))
             p = Paragraph(text.encode('utf-8'), self._styles["title"])
             story.append(p)
             text2 = u'{}: {}'.format(_(u'Daily Programme'), escape(current_day.strftime("%A %d %B %Y")))
