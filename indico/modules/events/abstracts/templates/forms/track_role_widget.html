@@ -54,8 +54,8 @@
 
 {% block html %}
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}">
-    <div id="role-widget-{{ field.id }}" class="role-widget">
-        <ul class="role-list">
+    <div id="role-widget-{{ field.id }}" class="abstract-role-widget">
+        <ul class="abstract-role-list">
             {% call render_track('*', _("All Tracks"), field.data['*'], user_data, global=true) -%}
                 {% trans %}These users will be able to access/review all tracks in the event.{% endtrans %}
             {%- endcall %}
