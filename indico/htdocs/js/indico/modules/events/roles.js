@@ -15,14 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global updateHtml:false */
 
-(function() {
+(function(global) {
     'use strict';
-
-    $(document).ready(function() {
-        setupToggle();
-        setupButtons();
-    });
 
     function setupToggle() {
         var $roles = $('#event-roles');
@@ -49,7 +45,7 @@
                     $.ajax({
                         url: $this.data('href'),
                         method: $this.data('method'),
-                        data: JSON.stringify({'users': users}),
+                        data: JSON.stringify({users: users}),
                         dataType: 'json',
                         contentType: 'application/json',
                         error: handleAjaxError,
@@ -62,5 +58,9 @@
             }).principalfield('choose');
         });
     }
-})(window);
 
+    global.setupRolesList = function setupRolesList() {
+        setupToggle();
+        setupButtons();
+    };
+})(window);
