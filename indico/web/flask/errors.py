@@ -21,6 +21,7 @@ import re
 
 from flask import current_app, request, send_from_directory, session
 from itsdangerous import BadData
+from sqlalchemy.exc import DatabaseError
 from werkzeug.exceptions import BadRequest, BadRequestKeyError, Forbidden, HTTPException, NotFound
 
 from indico.core.errors import IndicoError, get_error_description
@@ -90,12 +91,18 @@ def handle_indico_exception(exc):
     return render_error(exc, _('Something went wrong'), exc.message, getattr(exc, 'http_status_code', 500))
 
 
+@errors_bp.app_errorhandler(DatabaseError)
+def handle_databaseerror(exc):
+    return handle_exception(exc, _('There was a database error while processing your request.'))
+
+
 @errors_bp.app_errorhandler(Exception)
-def handle_exception(exc):
+def handle_exception(exc, message=None):
     Logger.get('flask').exception(exc.message or 'Uncaught Exception')
     if not current_app.debug or request.is_xhr or request.is_json:
         sentry_log_exception()
-        message = '{}: {}'.format(type(exc).__name__, exc)
+        if message is None:
+            message = '{}: {}'.format(type(exc).__name__, exc)
         return render_error(exc, _('Something went wrong'), message, 500)
     # Let the exception propagate to middleware /the webserver.
     # This triggers the Flask debugger in development and sentry
