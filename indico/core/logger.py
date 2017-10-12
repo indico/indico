@@ -180,7 +180,8 @@ class IndicoSentry(Sentry):
         super(IndicoSentry, self).before_request()
         if not has_request_context():
             return
-        self.client.extra_context({'Endpoint': str(request.url_rule.endpoint) if request.url_rule else None})
+        self.client.extra_context({'Endpoint': str(request.url_rule.endpoint) if request.url_rule else None,
+                                   'Request ID': request.id})
         self.client.tags_context({'locale': set_best_lang()})
 
 
