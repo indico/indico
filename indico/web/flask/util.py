@@ -79,6 +79,8 @@ def discover_blueprints():
 def _convert_request_value(x):
     if isinstance(x, unicode):
         return x.encode('utf-8')
+    elif isinstance(x, FileStorage):
+        return x
     raise TypeError('Unexpected item in request data: %s' % type(x))
 
 
