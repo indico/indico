@@ -24,6 +24,7 @@ from dateutil.relativedelta import relativedelta
 from flask import flash, jsonify, redirect, request, session
 from markupsafe import Markup, escape
 from sqlalchemy.orm import joinedload, load_only, subqueryload, undefer
+from sqlalchemy.orm.exc import StaleDataError
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core import signals
@@ -46,7 +47,7 @@ from indico.modules.users.operations import create_user
 from indico.modules.users.util import (get_linked_events, get_related_categories, get_suggested_categories, merge_users,
                                        search_users, serialize_user)
 from indico.modules.users.views import WPUser, WPUsersAdmin
-from indico.util.date_time import get_display_tz, now_utc, timedelta_split
+from indico.util.date_time import now_utc, timedelta_split
 from indico.util.event import truncate_path
 from indico.util.i18n import _
 from indico.util.signals import values_from_signal
@@ -195,8 +196,12 @@ class RHUserFavoritesUsersAdd(RHUserBase):
 class RHUserFavoritesUserRemove(RHUserBase):
     def _process(self):
         user = User.get(int(request.view_args['fav_user_id']))
-        if user in self.user.favorite_users:
-            self.user.favorite_users.remove(user)
+        self.user.favorite_users.discard(user)
+        try:
+            db.session.flush()
+        except StaleDataError:
+            # Deleted in another transaction
+            db.session.rollback()
         return jsonify(success=True)
 
 
@@ -217,7 +222,12 @@ class RHUserFavoritesCategoryAPI(RHUserBase):
 
     def _process_DELETE(self):
         if self.category in self.user.favorite_categories:
-            self.user.favorite_categories.remove(self.category)
+            self.user.favorite_categories.discard(self.category)
+            try:
+                db.session.flush()
+            except StaleDataError:
+                # Deleted in another transaction
+                db.session.rollback()
             suggestion = self.user.suggested_categories.filter_by(category=self.category).first()
             if suggestion:
                 self.user.suggested_categories.remove(suggestion)
