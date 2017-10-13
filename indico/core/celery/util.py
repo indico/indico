@@ -35,7 +35,7 @@ def locked_task(f):
                                          'To manually unlock it, run `indico celery unlock %s`',
                                          name, name)
             return
-        cache.set(name, True)
+        cache.set(name, True, 86400)
         try:
             return f(*args, **kwargs)
         finally:
