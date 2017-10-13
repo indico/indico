@@ -23,6 +23,7 @@ from io import BytesIO
 from flask import flash, jsonify, redirect, render_template, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 from werkzeug.exceptions import BadRequest, Forbidden, NotFound
+from wtforms.fields import BooleanField
 
 from indico.core import signals
 from indico.core.config import config
@@ -51,7 +52,8 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.modules.events.registration.notifications import notify_registration_state_update
 from indico.modules.events.registration.settings import event_badge_settings
 from indico.modules.events.registration.util import (create_registration, generate_spreadsheet_from_registrations,
-                                                     get_event_section_data, get_title_uuid, make_registration_form)
+                                                     get_event_section_data, get_ticket_attachments, get_title_uuid,
+                                                     make_registration_form)
 from indico.modules.events.registration.views import WPManageRegistration
 from indico.modules.events.util import ZipGeneratorMixin
 from indico.modules.users import User
@@ -61,6 +63,7 @@ from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
+from indico.web.forms.widgets import SwitchWidget
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -80,8 +83,7 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        return WPManageRegistration.render_template('management/regform_reglist.html', self.event,
-                                                    regform=self.regform, **reg_list_kwargs)
+        return WPManageRegistration.render_template('management/regform_reglist.html', self.event, **reg_list_kwargs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -206,8 +208,12 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
             template = get_template_module('events/registration/emails/custom_email.html',
                                            email_subject=form.subject.data, email_body=email_body)
             bcc = [session.user.email] if form.copy_for_sender.data else []
+            attachments = (get_ticket_attachments(registration)
+                           if 'attach_ticket' in form and form.attach_ticket.data
+                           else None)
             email = make_email(to_list=registration.email, cc_list=form.cc_addresses.data, bcc_list=bcc,
-                               from_address=form.from_address.data, template=template, html=True)
+                               from_address=form.from_address.data, template=template, html=True,
+                               attachments=attachments)
             send_email(email, self.event, 'Registration')
 
     def _process(self):
@@ -216,6 +222,8 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
         registration_ids = request.form.getlist('registration_id')
         form = EmailRegistrantsForm(body=default_body, regform=self.regform, registration_id=registration_ids,
                                     recipients=[x.email for x in self.registrations])
+        if not self.regform.tickets_enabled:
+            del form.attach_ticket
         if form.validate_on_submit():
             self._send_emails(form)
             num_emails_sent = len(self.registrations)
@@ -528,7 +536,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
     """Bulk apply check-in/not checked-in state to registrations"""
 
     def _process(self):
-        check_in = request.form['check_in'] == '1'
+        check_in = request.form['flag'] == '1'
         msg = 'checked-in' if check_in else 'not checked-in'
         for registration in self.registrations:
             registration.checked_in = check_in
@@ -541,7 +549,7 @@ class RHRegistrationsModifyStatus(RHRegistrationsActionBase):
     """Accept/Reject selected registrations"""
 
     def _process(self):
-        approve = request.form['approve'] == '1'
+        approve = request.form['flag'] == '1'
         for registration in self.registrations:
             _modify_registration_status(registration, approve)
         flash(_("The status of the selected registrations was updated successfully."), 'success')

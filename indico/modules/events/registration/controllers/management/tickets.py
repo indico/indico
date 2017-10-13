@@ -22,16 +22,14 @@ import qrcode
 from flask import json, render_template
 from werkzeug.exceptions import Forbidden, NotFound
 
-from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
 from indico.modules.designer import PageOrientation, PageSize
-from indico.modules.designer.util import get_default_template_on_category
-from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.controllers.display import RHRegistrationFormRegistrationBase
 from indico.modules.events.registration.controllers.management import RHManageRegFormBase
 from indico.modules.events.registration.forms import TicketsForm
 from indico.modules.events.registration.models.registrations import RegistrationState
+from indico.modules.events.registration.util import generate_ticket
 from indico.modules.oauth.models.applications import OAuthApplication, SystemAppType
 from indico.web.flask.util import secure_filename, send_file, url_for
 from indico.web.util import jsonify_data, jsonify_template
@@ -62,15 +60,6 @@ class RHRegistrationFormTickets(RHManageRegFormBase):
             return jsonify_data(flash=False, tickets_enabled=self.regform.tickets_enabled)
 
         return jsonify_template('events/registration/management/regform_tickets.html', regform=self.regform, form=form)
-
-
-def generate_ticket(registration):
-    template = (registration.registration_form.ticket_template or
-                get_default_template_on_category(registration.event.category))
-    signals.event.designer.print_badge_template.send(template, regform=registration.registration_form)
-    pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
-    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, [registration.id])
-    return pdf.get_pdf()
 
 
 class RHTicketDownload(RHRegistrationFormRegistrationBase):

@@ -131,7 +131,7 @@
                             <li>
                                 <a href="#" class="icon-checkmark js-requires-selected-row disabled js-modify-status"
                                    data-href="{{ url_for('.registrations_modify_status', regform) }}"
-                                   data-approve="1"
+                                   data-flag="1"
                                    data-method="POST"
                                    data-confirm="{% trans %}Do you really want to approve the selected registrations?{% endtrans %}">
                                     {%- trans %}Approve registrations{% endtrans -%}
@@ -140,7 +140,7 @@
                             <li>
                                 <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
                                    data-href="{{ url_for('.registrations_modify_status', regform) }}"
-                                   data-approve="0"
+                                   data-flag="0"
                                    data-method="POST"
                                    data-confirm="{% trans %}Do you really want to reject the selected registrations?{% endtrans %}">
                                     {%- trans %}Reject registrations{% endtrans -%}
@@ -156,7 +156,7 @@
                             <li>
                                 <a href="#" class="icon-location js-requires-selected-row disabled js-modify-status"
                                    data-method="POST"
-                                   data-check-in="1"
+                                   data-flag="1"
                                    data-href="{{ url_for('.registrations_check_in', regform) }}">
                                     {%- trans %}Check-in{% endtrans -%}
                                 </a>
@@ -165,7 +165,7 @@
                                 <a href="#" class="icon-close js-requires-selected-row disabled js-modify-status"
                                    data-href="{{ url_for('.registrations_check_in', regform) }}"
                                    data-method="POST"
-                                   data-check-in="0"
+                                   data-flag="0"
                                    data-confirm="{% trans %}Are you sure you want to reset the check-in info? The original check-in time will be lost.{% endtrans %}"
                                    data-title="{% trans %}Reset check-in{% endtrans %}">
                                     {%- trans %}Reset check-in{% endtrans -%}
@@ -173,6 +173,7 @@
                             </li>
                         </ul>
                     {% endif %}
+                    {{ template_hook('registration-status-action-button', regform=regform) }}
                 </div>
                 <div class="group">
                     <a class="i-button button change-columns-width" title="{% trans %}Adapt columns width{% endtrans %}"></a>
@@ -195,7 +196,7 @@
             </div>
         </div>
         <div class="list-content" id="registration-list">
-            {{ render_registration_list(registrations, dynamic_columns, static_columns, total_registrations) }}
+            {{ render_registration_list(regform, registrations, dynamic_columns, static_columns, total_registrations) }}
         </div>
         <div class="toolbar right">
             <a href="{{ url_for('.manage_regform', regform) }}" class="i-button big">

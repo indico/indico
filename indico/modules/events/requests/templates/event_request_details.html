@@ -85,7 +85,7 @@
 
     {% call form_footer(form) %}
         <input id="send-request" class="i-button big highlight" type="submit"
-               value="{{ button_title }}" data-disabled-until-change>
+               value="{{ button_title }}">
         {% if not protection_overridden and req and req.state.name in ('pending', 'accepted') %}
             <input type="button" class="i-button big warning" id="withdraw-request"
                data-href="{{ url_for('.event_requests_withdraw', req) }}"

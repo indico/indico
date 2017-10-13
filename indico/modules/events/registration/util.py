@@ -31,6 +31,7 @@ from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.payment.models.transactions import TransactionStatus
 from indico.modules.events.registration import logger
+from indico.modules.events.registration.badges import RegistrantsListToBadgesPDF, RegistrantsListToBadgesPDFFoldable
 from indico.modules.events.registration.fields.choices import (AccommodationField, ChoiceBaseField,
                                                                get_field_merged_options)
 from indico.modules.events.registration.models.form_fields import (RegistrationFormFieldData,
@@ -476,3 +477,18 @@ def get_event_regforms(event, user, with_registrations=False):
                                                       Registration.user == user,
                                                       Registration.is_active))
     return query.all()
+
+
+def generate_ticket(registration):
+    from indico.modules.designer.util import get_default_template_on_category
+    from indico.modules.events.registration.controllers.management.tickets import DEFAULT_TICKET_PRINTING_SETTINGS
+    template = (registration.registration_form.ticket_template or
+                get_default_template_on_category(registration.event.category))
+    signals.event.designer.print_badge_template.send(template, regform=registration.registration_form)
+    pdf_class = RegistrantsListToBadgesPDFFoldable if template.backside_template else RegistrantsListToBadgesPDF
+    pdf = pdf_class(template, DEFAULT_TICKET_PRINTING_SETTINGS, registration.event, [registration.id])
+    return pdf.get_pdf()
+
+
+def get_ticket_attachments(registration):
+    return [('Ticket.pdf', generate_ticket(registration).getvalue())]
