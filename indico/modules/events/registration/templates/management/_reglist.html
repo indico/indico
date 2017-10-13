@@ -1,6 +1,6 @@
 {% from 'message_box.html' import message_box %}
 
-{% macro render_registration_list(registrations, dynamic_columns, static_columns, total_registrations) %}
+{% macro render_registration_list(regform, registrations, dynamic_columns, static_columns, total_registrations) %}
     {% if registrations %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
@@ -19,6 +19,7 @@
                     <thead>
                         <tr class="i-table">
                             <th class="i-table thin-column"></th>
+                            {{ template_hook('registration-status-flag', regform=regform, registration=none, header=true) }}
                             <th class="i-table id-column">{% trans %}ID{% endtrans %}</th>
                             <th class="i-table">{% trans %}Full name{% endtrans %}</th>
 
@@ -28,7 +29,6 @@
                             {% for item in dynamic_columns %}
                                 <th class="i-table">{{ item.title }}</th>
                             {% endfor %}
-                            <th> Access state</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -40,11 +40,12 @@
                                            value="{{ registration.id }}"
                                            data-has-files="{{ registration.has_files | tojson }}">
                                 </td>
+                                {{ template_hook('registration-status-flag', regform=regform, registration=registration, header=false) }}
                                 <td class="i-table">
                                     #{{ registration.friendly_id }}
                                 </td>
                                 <td class="i-table">
-                                    <a href="{{ url_for('.registration_details', registration) }}">
+                                    <a href="{{ url_for('event_registration.registration_details', registration) }}">
                                         {{- registration.display_full_name -}}
                                     </a>
                                 </td>
@@ -111,7 +112,6 @@
                                         </td>
                                     {% endif %}
                                 {% endfor %}
-                                {{ template_hook('registration_access_status', registration=registration) }}
                             </tr>
                         {% endfor %}
                     </tbody>

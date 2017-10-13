@@ -183,6 +183,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         static_columns = self._get_static_columns(static_item_ids)
         regform_items = self._get_sorted_regform_items(dynamic_item_ids)
         return {
+            'regform': self.regform,
             'registrations': registrations,
             'total_registrations': total_entries,
             'static_columns': static_columns,

@@ -25,7 +25,8 @@
 
         function handleRegListRowSelection() {
             $('table.i-table input.select-row').on('change', function() {
-                $('.regform-download-attachments').toggleClass('disabled', !$('.list input:checkbox:checked[data-has-files=true]').length);
+                $('.regform-download-attachments').toggleClass('disabled',
+                    !$('.list input:checkbox:checked[data-has-files=true]').length);
             }).trigger('change');
         }
 
@@ -80,8 +81,7 @@
                 method: $this.data('method'),
                 data: {
                     registration_id: selectedRows,
-                    approve: $this.data('approve'),
-                    check_in: $this.data('check-in')
+                    flag: $this.data('flag')
                 },
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,

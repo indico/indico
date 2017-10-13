@@ -122,8 +122,10 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
         else:
             req = self.request
             new = False
+
         try:
-            self.definition.send(req, form.data)
+            with db.session.no_autoflush:
+                self.definition.send(req, form.data)
         except RequestModuleError:
             self.commit = False
             flash_msg = _('There was a problem sending your request ({0}). Please contact support.')
@@ -190,7 +192,8 @@ class RHRequestsEventRequestWithdraw(EventOrRequestManagerMixin, RHRequestsEvent
         if self.request.state not in {RequestState.pending, RequestState.accepted}:
             raise BadRequest
         try:
-            self.definition.withdraw(self.request)
+            with db.session.no_autoflush:
+                self.definition.withdraw(self.request)
         except RequestModuleError:
             self.commit = False
             flash_msg = _('There was a problem withdrawing your request ({0}). Please contact support.')

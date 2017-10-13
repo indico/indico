@@ -36,6 +36,7 @@ def notify_invitation(invitation, email_subject, email_body, from_address):
 
 
 def _notify_registration(registration, template, to_managers=False):
+    from indico.modules.events.registration.util import get_ticket_attachments
     attachments = None
     regform = registration.registration_form
     tickets_handled = values_from_signal(signals.event.is_ticketing_handled.send(regform), single_value=True)
@@ -44,7 +45,7 @@ def _notify_registration(registration, template, to_managers=False):
             regform.ticket_on_email and
             not any(tickets_handled) and
             registration.state == RegistrationState.complete):
-        attachments = get_ticket_attachment(registration)
+        attachments = get_ticket_attachments(registration)
 
     template = get_template_module('events/registration/emails/{}'.format(template), registration=registration)
     to_list = registration.email if not to_managers else registration.registration_form.manager_notification_recipients
@@ -71,8 +72,3 @@ def notify_registration_state_update(registration):
     _notify_registration(registration, 'registration_state_update_to_registrant.html')
     if registration.registration_form.manager_notifications_enabled:
         _notify_registration(registration, 'registration_state_update_to_managers.html', to_managers=True)
-
-
-def get_ticket_attachment(registration):
-    from indico.modules.events.registration.controllers.management.tickets import generate_ticket
-    return [('Ticket.pdf', generate_ticket(registration).getvalue())]
