@@ -10,6 +10,7 @@ PostgreSQL is installed from its upstream repos to get a much more recent versio
 
 .. code-block:: shell
 
+    apt install -y lsb-release wget
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
     apt update
@@ -35,8 +36,15 @@ If you use Ubuntu, run this instead:
 2. Create a Database
 --------------------
 
-We create a user and database for indico and enable the necessary
-Postgres extensions (which can only be done by the Postgres superuser)
+First of all let's make sure we've started the database:
+
+.. code-block:: shell
+
+    service postgresql start
+
+
+Then let's create a user and database for indico and enable the necessary Postgres extensions (which can only be done
+by the Postgres superuser)
 
 .. code-block:: shell
 
@@ -294,7 +302,7 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service apache2.service indico-celery.service
+    systemctl restart uwsgi.service apache2.service redis-server.service indico-celery.service
     systemctl enable uwsgi.service apache2.service postgresql.service redis-server.service indico-celery.service
 
 

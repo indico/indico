@@ -13,7 +13,7 @@ much more recent versions.
 
 .. code-block:: shell
 
-    apt install lsb-release wget
+    apt install -y lsb-release wget
     echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list
     echo "deb http://nginx.org/packages/$(lsb_release -is | tr '[:upper:]' '[:lower:]')/ $(lsb_release -cs) nginx" > /etc/apt/sources.list.d/nginx.list
     wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
@@ -41,8 +41,15 @@ If you use Ubuntu, run this instead:
 2. Create a Database
 --------------------
 
-We create a user and database for indico and enable the necessary
-Postgres extensions (which can only be done by the Postgres superuser)
+First of all let's make sure we've started the database:
+
+.. code-block:: shell
+
+    service postgresql start
+
+
+Then let's create a user and database for indico and enable the necessary Postgres extensions (which can only be done
+by the Postgres superuser)
 
 .. code-block:: shell
 
@@ -311,7 +318,7 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service nginx.service indico-celery.service
+    systemctl restart uwsgi.service nginx.service redis-server.service indico-celery.service
     systemctl enable uwsgi.service nginx.service postgresql.service redis-server.service indico-celery.service
 
 
