@@ -20,10 +20,10 @@ from uuid import uuid4
 
 from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.hybrid import hybrid_property
+from werkzeug.exceptions import ServiceUnavailable
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum, UTCDateTime
-from indico.core.errors import IndicoError
 from indico.util.date_time import now_utc
 from indico.util.i18n import _
 from indico.util.string import return_ascii
@@ -228,11 +228,14 @@ class Agreement(db.Model):
     def render(self, form, **kwargs):
         definition = self.definition
         if definition is None:
-            raise IndicoError(_('This agreement type is currently not available.'))
+            raise ServiceUnavailable('This agreement type is currently not available.')
         return definition.render_form(self, form, **kwargs)
 
     def belongs_to(self, person):
         return self.identifier == person.identifier
 
     def is_orphan(self):
-        return self.definition.is_agreement_orphan(self.event, self)
+        definition = self.definition
+        if definition is None:
+            raise ServiceUnavailable('This agreement type is currently not available.')
+        return definition.is_agreement_orphan(self.event, self)

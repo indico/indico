@@ -17,8 +17,8 @@
 import pytest
 from freezegun import freeze_time
 from mock import MagicMock
+from werkzeug.exceptions import ServiceUnavailable
 
-from indico.core.errors import IndicoError
 from indico.modules.events.agreements.models.agreements import Agreement, AgreementState
 from indico.util.date_time import now_utc
 
@@ -170,7 +170,7 @@ def test_render():
 def test_render_no_definition(monkeypatch):
     monkeypatch.setattr(Agreement, 'definition', property(lambda s: None))
     agreement = Agreement()
-    with pytest.raises(IndicoError):
+    with pytest.raises(ServiceUnavailable):
         agreement.render(None)
 
 
@@ -185,3 +185,10 @@ def test_is_orphan(dummy_event):
     agreement = Agreement(event=dummy_event)
     agreement.is_orphan()
     agreement.definition.is_agreement_orphan(agreement.event, agreement)
+
+
+def test_is_orphan_no_definition(monkeypatch):
+    monkeypatch.setattr(Agreement, 'definition', property(lambda s: None))
+    agreement = Agreement()
+    with pytest.raises(ServiceUnavailable):
+        agreement.is_orphan()
