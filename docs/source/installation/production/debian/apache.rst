@@ -30,21 +30,20 @@ If you use Ubuntu, run this instead:
 
     apt install -y libjpeg-turbo8-dev zlib1g-dev
 
+Afterwards, make sure the services you just installed are running:
+
+.. code-block:: shell
+
+    systemctl start postgresql.service redis-server.service
+
 
 .. _deb-apache-db:
 
 2. Create a Database
 --------------------
 
-First of all let's make sure we've started the database:
-
-.. code-block:: shell
-
-    service postgresql start
-
-
-Then let's create a user and database for indico and enable the necessary Postgres extensions (which can only be done
-by the Postgres superuser)
+Let's create a user and database for indico and enable the necessary Postgres
+extensions (which can only be done by the Postgres superuser).
 
 .. code-block:: shell
 
@@ -302,7 +301,7 @@ server is rebooted:
 
 .. code-block:: shell
 
-    systemctl restart uwsgi.service apache2.service redis-server.service indico-celery.service
+    systemctl restart uwsgi.service apache2.service indico-celery.service
     systemctl enable uwsgi.service apache2.service postgresql.service redis-server.service indico-celery.service
 
 
