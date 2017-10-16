@@ -45,10 +45,29 @@ def get_error_description(exception):
 
 
 class IndicoError(Exception):
-    pass
+    """A generic error that results in a HTTP 500 error.
+
+    This error is not logged, so it should only be used rarely and in
+    cases where none of the default HTTP errors from werkzeug make
+    sense and the error is not exceptional enough to be logged to
+    the log file and/or Sentry.
+
+    Users can send an error report when encountering this error.
+    """
 
 
 class NoReportError(IndicoError):
+    """A generic error that cannot be reported by users.
+
+    This behaves exactly like :exc:`IndicoError` except that users
+    cannot sent an error report.
+
+    Its `wrap_exc` method can be wrapped to raise any other HTTP error
+    from werkzeug without allowing the user to report it::
+
+        raise NoReportError.wrap_exc(Forbidden('You shall not pass.'))
+    """
+
     @classmethod
     def wrap_exc(cls, exc):
         assert isinstance(exc, HTTPException)
