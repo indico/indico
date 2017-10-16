@@ -72,6 +72,15 @@ API reference
     api/index.rst
 
 
+What's New
+++++++++++
+
+.. toctree::
+    :maxdepth: 2
+
+    changelog.rst
+
+
 Indices and tables
 ++++++++++++++++++
 

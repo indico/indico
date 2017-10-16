@@ -46,7 +46,11 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
               'sphinx.ext.imgmath',
+              'sphinx_issues',
               'exec_directive']
+
+# sphinx-issues config
+issues_github_path = 'indico/indico'
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

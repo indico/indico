@@ -3,3 +3,4 @@ babel
 repoze.sphinx.autointerface
 flask
 Flask-BabelEx
+sphinx-issues
