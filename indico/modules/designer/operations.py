@@ -39,9 +39,9 @@ def update_template(template, title, data, is_clonable, backside_template_id=Non
             tpl.backside_template = None
             if tpl.event:
                 tpl.event.log(EventLogRealm.event, EventLogKind.negative, 'Designer', 'Backside removed',
-                                  session.user, data={'Template': tpl.title,
-                                                      'Reason': 'Dimensions of backside changed',
-                                                      'Backside': template.title})
+                              session.user, data={'Template': tpl.title,
+                                                  'Reason': 'Dimensions of backside changed',
+                                                  'Backside': template.title})
     template.title = title
     template.data = dict({'background_position': 'stretch', 'items': []}, **data)
     template.backside_template = DesignerTemplate.get(backside_template_id) if backside_template_id else None
@@ -52,4 +52,4 @@ def update_template(template, title, data, is_clonable, backside_template_id=Non
 
     if template.event:
         template.event.log(EventLogRealm.event, EventLogKind.positive, 'Designer', 'Badge template updated',
-                               session.user, data={'Template': template.title})
+                           session.user, data={'Template': template.title})

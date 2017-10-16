@@ -81,8 +81,8 @@ def create_timetable_entry(event, data, parent=None, extend_parent=False):
     signals.event.timetable_entry_created.send(entry)
     logger.info('Timetable entry %s created by %s', entry, session.user)
     entry.event.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
-                        "Entry for {} '{}' created".format(object_type, object_title), session.user,
-                        data={'Time': format_datetime(entry.start_dt)})
+                    "Entry for {} '{}' created".format(object_type, object_title), session.user,
+                    data={'Time': format_datetime(entry.start_dt)})
     if extend_parent:
         entry.extend_parent()
     return entry
@@ -107,8 +107,8 @@ def update_timetable_entry(entry, data):
         signals.event.timetable_entry_updated.send(entry, changes=changes)
         logger.info('Timetable entry %s updated by %s', entry, session.user)
         entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
-                            "Entry for {} '{}' modified".format(object_type, object_title), session.user,
-                            data={'Time': format_datetime(entry.start_dt)})
+                        "Entry for {} '{}' modified".format(object_type, object_title), session.user,
+                        data={'Time': format_datetime(entry.start_dt)})
 
 
 def delete_timetable_entry(entry, log=True):
@@ -119,8 +119,8 @@ def delete_timetable_entry(entry, log=True):
     if log:
         logger.info('Timetable entry %s deleted by %s', entry, session.user)
         entry.event.log(EventLogRealm.management, EventLogKind.negative, 'Timetable',
-                            "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
-                            data={'Time': format_datetime(entry.start_dt)})
+                        "Entry for {} '{}' deleted".format(object_type, object_title), session.user,
+                        data={'Time': format_datetime(entry.start_dt)})
 
 
 def fit_session_block_entry(entry, log=True):
@@ -134,8 +134,8 @@ def fit_session_block_entry(entry, log=True):
     db.session.flush()
     if log:
         entry.event.log(EventLogRealm.management, EventLogKind.change, 'Timetable',
-                            "Session block fitted to contents", session.user,
-                            data={'Session block': entry.session_block.full_title})
+                        "Session block fitted to contents", session.user,
+                        data={'Session block': entry.session_block.full_title})
 
 
 def move_timetable_entry(entry, parent=None, day=None):

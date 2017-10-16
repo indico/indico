@@ -40,7 +40,7 @@ def update_track(track, data):
     db.session.flush()
     logger.info('Track %r modified by %r', track, session.user)
     track.event.log(EventLogRealm.management, EventLogKind.change, 'Tracks',
-                        'Track "{}" has been modified.'.format(track.title), session.user)
+                    'Track "{}" has been modified.'.format(track.title), session.user)
 
 
 def delete_track(track):

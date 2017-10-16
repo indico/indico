@@ -44,8 +44,8 @@ def create_session_block(session_, data):
     block.populate_from_dict(data)
     db.session.flush()
     session_.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
-                           'Session block "{}" for session "{}" has been created'
-                           .format(block.title, session_.title), session.user)
+                       'Session block "{}" for session "{}" has been created'
+                       .format(block.title, session_.title), session.user)
     logger.info("Session block %s created by %s", block, session.user)
     return block
 
@@ -56,7 +56,7 @@ def update_session(event_session, data):
     db.session.flush()
     signals.event.session_updated.send(event_session)
     event_session.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                                'Session "{}" has been updated'.format(event_session.title), session.user)
+                            'Session "{}" has been updated'.format(event_session.title), session.user)
     logger.info('Session %s modified by %s', event_session, session.user)
 
 
@@ -93,7 +93,7 @@ def update_session_block(session_block, data):
     session_block.populate_from_dict(data)
     db.session.flush()
     session_block.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
-                                'Session block "{}" has been updated'.format(session_block.title), session.user)
+                            'Session block "{}" has been updated'.format(session_block.title), session.user)
     logger.info('Session block %s modified by %s', session_block, session.user)
 
 

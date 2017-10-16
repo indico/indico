@@ -30,4 +30,4 @@ def update_person(person, data):
     signals.event.person_updated.send(person)
     logger.info('Person %s updated by %s', person, session.user)
     person.event.log(EventLogRealm.management, EventLogKind.change, 'Persons',
-                         "Person with email '{}' has been updated".format(person.email), session.user)
+                     "Person with email '{}' has been updated".format(person.email), session.user)
