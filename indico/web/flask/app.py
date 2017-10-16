@@ -304,15 +304,20 @@ def inject_current_url(response):
     # Make the current URL available. This is useful e.g. in case of
     # AJAX requests that were redirected due to url normalization if
     # we need to know the actual URL
+    url = request.relative_url
+    # Headers cannot continue linebreaks; and while Flask rejects such
+    # headers on its own it comes with a ValueError.
+    if '\r' in url or '\n' in url:
+        return response
     try:
         # Werkzeug encodes header values as latin1 in Python2.
         # In case of URLs containing utter garbage (usually a 404
         # anyway) they may not be latin1-compatible so let's not
         # add the header at all in this case instead of failing later
-        request.relative_url.encode('latin1')
+        url.encode('latin1')
     except UnicodeEncodeError:
         return response
-    response.headers['X-Indico-URL'] = request.relative_url
+    response.headers['X-Indico-URL'] = url
     return response
 
 
