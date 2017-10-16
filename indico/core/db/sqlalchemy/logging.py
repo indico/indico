@@ -59,8 +59,8 @@ def _fix_param(param):
     return '<binary>' if param.__class__.__name__ == 'Binary' else param
 
 
-def apply_db_loggers(app):
-    if not config.DB_LOG or getattr(db, '_loggers_applied', False):
+def apply_db_loggers(app, force=False):
+    if not (force or config.DB_LOG) or getattr(db, '_loggers_applied', False):
         return
     db._loggers_applied = True
     from indico.core.logger import Logger
