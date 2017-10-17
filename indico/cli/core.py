@@ -39,7 +39,18 @@ cli_group = _cli.group
 del _cli
 
 
+def _get_indico_version(ctx, param, value):
+    if not value or ctx.resilient_parsing:
+        return
+    import indico
+    message = 'Indico v{}'.format(indico.__version__)
+    click.echo(message, ctx.color)
+    ctx.exit()
+
+
 @click.group(cls=IndicoFlaskGroup)
+@click.option('--version', '-v', expose_value=False, callback=_get_indico_version, is_flag=True, is_eager=True,
+              help='Show the flask version',)
 def cli():
     """
     This script lets you control various aspects of Indico from the
