@@ -42,6 +42,14 @@
         {%- endtrans %}
     {%- endcall %}
 
+    {% call message_box('highlight', classes='js-indico-plugins-version-message', style='display: none;') -%}
+        {% trans -%}
+            A new version (<strong id="new-indico-plugins-version"></strong>) of the official
+            Indico plugin package is available!
+            Your current version is <strong id="cur-indico-plugins-version"></strong>.
+        {%- endtrans %}
+    {%- endcall %}
+
     {% call simple_form(form, back_button=false) %}
         {% set legend %}
             {% trans %}System{% endtrans %}
@@ -92,10 +100,15 @@
                 url: {{ url_for('.version_check')|tojson }},
                 cache: false,
                 success: function(data) {
-                    if (data.outdated) {
-                        $('#cur-indico-version').text(data.current_version);
-                        $('#new-indico-version').text(data.latest_version);
+                    if (data.indico && data.indico.outdated) {
+                        $('#cur-indico-version').text(data.indico.current_version);
+                        $('#new-indico-version').text(data.indico.latest_version);
                         $('.js-indico-version-message').show();
+                    }
+                    if (data.plugins && data.plugins.outdated) {
+                        $('#cur-indico-plugins-version').text(data.plugins.current_version);
+                        $('#new-indico-plugins-version').text(data.plugins.latest_version);
+                        $('.js-indico-plugins-version-message').show();
                     }
                 }
             });

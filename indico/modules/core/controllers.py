@@ -21,6 +21,7 @@ import re
 import requests
 from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
+from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
 from werkzeug.exceptions import NotFound
 from werkzeug.urls import url_join, url_parse
@@ -174,9 +175,18 @@ class RHChangeLanguage(RH):
 class RHVersionCheck(RHAdminBase):
     """Check the installed indico version against pypi"""
 
-    def _process(self):
-        data = requests.get('https://pypi.python.org/pypi/indico/json').json()
-        current_version = Version(indico.__version__)
+    def _check_version(self, distribution, current_version=None):
+        response = requests.get('https://pypi.python.org/pypi/{}/json'.format(distribution))
+        try:
+            data = response.json()
+        except ValueError:
+            return None
+        if current_version is None:
+            try:
+                current_version = get_distribution(distribution).version
+            except DistributionNotFound:
+                return None
+        current_version = Version(current_version)
         if current_version.is_prerelease:
             # if we are on a prerelease, get the latest one even if it's also a prerelease
             latest_version = Version(data['info']['version'])
@@ -184,5 +194,10 @@ class RHVersionCheck(RHAdminBase):
             # if we are stable, get the latest stable version
             versions = map(Version, data['releases'])
             latest_version = max(v for v in versions if not v.is_prerelease)
-        return jsonify(current_version=unicode(current_version), latest_version=unicode(latest_version),
-                       outdated=(current_version < latest_version))
+        return {'current_version': unicode(current_version),
+                'latest_version': unicode(latest_version),
+                'outdated': (current_version < latest_version)}
+
+    def _process(self):
+        return jsonify(indico=self._check_version('indico', indico.__version__),
+                       plugins=self._check_version('indico-plugins'))
