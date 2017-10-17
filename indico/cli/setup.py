@@ -21,11 +21,13 @@ import re
 import shutil
 import socket
 import sys
+from operator import attrgetter
 from smtplib import SMTP
 
 import click
 from click import wrap_text
 from flask.helpers import get_root_path
+from pkg_resources import iter_entry_points
 from prompt_toolkit import prompt
 from prompt_toolkit.contrib.completers import PathCompleter, WordCompleter
 from prompt_toolkit.layout.lexers import SimpleLexer
@@ -36,6 +38,7 @@ from redis import RedisError, StrictRedis
 from sqlalchemy import create_engine
 from sqlalchemy.exc import OperationalError
 from sqlalchemy.pool import NullPool
+from terminaltables import AsciiTable
 from werkzeug.urls import url_parse
 
 from indico.util.console import cformat
@@ -181,6 +184,17 @@ def _confirm(message, default=False, abort=False, help=None):
 @click.group()
 def cli():
     """This script helps with the initial steps of installing Indico"""
+
+
+@cli.command()
+def list_plugins():
+    """Lists the available indico plugins."""
+    table_data = [['Name', 'Title']]
+    for ep in sorted(iter_entry_points('indico.plugins'), key=attrgetter('name')):
+        plugin = ep.load()
+        table_data.append([ep.name, plugin.title])
+    table = AsciiTable(table_data, cformat('%{white!}Available Plugins%{reset}'))
+    click.echo(table.table)
 
 
 @cli.command()
