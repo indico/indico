@@ -49,7 +49,7 @@ ipaddress
 blinker==1.4
 alembic==0.9.6
 Flask-Migrate==2.1.1
-Flask-PluginEngine==0.3
+Flask-PluginEngine==0.3.1
 Flask-Multipass==0.1
 click==6.7
 colorclass==2.2.0
