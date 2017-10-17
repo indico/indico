@@ -10,3 +10,4 @@ Installation guides
     Upgrade <upgrade.rst>
     Migration from 1.2 <upgrade_legacy.rst>
     Development <development.rst>
+    Plugins <plugins.rst>
