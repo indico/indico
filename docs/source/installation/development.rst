@@ -77,7 +77,7 @@ clone your own `GitHub fork of the project <https://help.github.com/articles/for
 
     git clone --recursive git@github.com:<your-github-username>/indico.git src
     cd src
-    git remote add upstream https://github.com/indico/indico.git src
+    git remote add upstream https://github.com/indico/indico.git
     cd ..
 
 Otherwise, cloning the upstream repository as the origin should be enough::
