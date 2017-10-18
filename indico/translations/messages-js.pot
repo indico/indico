@@ -6,16 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.0.dev0\n"
+"Project-Id-Version: indico 2.0.dev1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-29 12:18+0200\n"
+"POT-Creation-Date: 2017-10-18 11:54+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.4.0\n"
+"Generated-By: Babel 2.5.1\n"
 
 #: indico/htdocs/js/indico/Common/Export.js:65
 msgid "Would you like to export private information to your calendar?"
@@ -25,58 +25,7 @@ msgstr ""
 msgid "Would you like to create a persistent URL for use with your calendaring application?"
 msgstr ""
 
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:128 indico/htdocs/js/indico/Core/Dialogs/Base.js:134
-#: indico/htdocs/js/indico/RoomBooking/validation.js:215 indico/htdocs/js/indico/RoomBooking/validation.js:234
-#: indico/htdocs/js/indico/modules/designer.js:749 indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:237
-#: indico/legacy/webinterface/tpls/RoomBookingSearchRooms.tpl:324
-msgid "Error"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:128
-msgid "Unable to send your error report: "
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:132
-msgid "Success"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:132
-msgid "Your report has been sent. Thank you!"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:134
-msgid "Your report could not be sent to the support address."
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:152
-msgid ""
-"An error has occurred while processing your request. We advise you to submit an error report, by clicking \"Send "
-"report\"."
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:155
-msgid "Your e-mail: "
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:165
-msgid "Send report"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:168
-msgid "Do not send report"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:185 indico/htdocs/js/indico/Core/Dialogs/Users.js:878
-#: indico/htdocs/js/indico/modules/designer.js:466 indico/htdocs/js/indico/modules/designer.js:470
-#: indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:114
-msgid "Warning"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:195
-msgid "Go to login page"
-msgstr ""
-
-#: indico/htdocs/js/indico/Core/Dialogs/Base.js:220 indico/htdocs/js/indico/jquery/ajaxqbubble.js:30
+#: indico/htdocs/js/indico/Core/Dialogs/Base.js:72 indico/htdocs/js/indico/jquery/ajaxqbubble.js:30
 #: indico/htdocs/js/indico/modules/timetable/timetable/Draw.js:689
 msgid "Loading..."
 msgstr ""
@@ -302,6 +251,11 @@ msgstr ""
 msgid "Save"
 msgstr ""
 
+#: indico/htdocs/js/indico/Core/Dialogs/Users.js:878 indico/htdocs/js/indico/modules/designer.js:466
+#: indico/htdocs/js/indico/modules/designer.js:470 indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:114
+msgid "Warning"
+msgstr ""
+
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:878
 msgid "It is not possible to grant submission rights to a participant without an email address. Please set an email address."
 msgstr ""
@@ -378,6 +332,23 @@ msgstr ""
 
 #: indico/htdocs/js/indico/Core/Dialogs/Users.js:1348
 msgid "Grant all these users with privileges: "
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Util.js:42
+msgid "Please reload the page and report this error to us if it persists."
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Util.js:43
+msgid "Report Error"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Util.js:44 indico/htdocs/js/indico/jquery/ajaxdialog.js:164
+#: indico/htdocs/js/indico/modules/timetable/timetable/Management.js:227
+msgid "Close"
+msgstr ""
+
+#: indico/htdocs/js/indico/Core/Dialogs/Util.js:50
+msgid "Thanks for your error report!"
 msgstr ""
 
 #: indico/htdocs/js/indico/Core/Widgets/Base.js:449 indico/htdocs/js/indico/Core/Widgets/Base.js:453
@@ -775,6 +746,12 @@ msgstr ""
 msgid "Unable to book for the selected day(s)."
 msgstr ""
 
+#: indico/htdocs/js/indico/RoomBooking/validation.js:215 indico/htdocs/js/indico/RoomBooking/validation.js:234
+#: indico/htdocs/js/indico/modules/designer.js:749 indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:237
+#: indico/legacy/webinterface/tpls/RoomBookingSearchRooms.tpl:324
+msgid "Error"
+msgstr ""
+
 #: indico/htdocs/js/indico/RoomBooking/validation.js:215 indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:241
 msgid "Please select a room (or several rooms)."
 msgstr ""
@@ -804,20 +781,8 @@ msgstr ""
 msgid "Unsaved changes"
 msgstr ""
 
-#: indico/htdocs/js/indico/jquery/ajaxdialog.js:164 indico/htdocs/js/indico/modules/timetable/timetable/Management.js:227
-msgid "Close"
-msgstr ""
-
 #: indico/htdocs/js/indico/jquery/ajaxform.js:260
 msgid "You have unsaved changes that will be lost."
-msgstr ""
-
-#: indico/htdocs/js/indico/jquery/authors.js:38
-msgid "author"
-msgstr ""
-
-#: indico/htdocs/js/indico/jquery/authors.js:38
-msgid "authors"
 msgstr ""
 
 #: indico/htdocs/js/indico/jquery/categorynavigator.js:33
@@ -936,6 +901,10 @@ msgstr ""
 
 #: indico/htdocs/js/indico/jquery/defaults.js:42
 msgid "Choose the end date"
+msgstr ""
+
+#: indico/htdocs/js/indico/jquery/errors.js:38
+msgid "Something went wrong"
 msgstr ""
 
 #: indico/htdocs/js/indico/jquery/global.js:248
@@ -1333,11 +1302,11 @@ msgstr ""
 msgid "Terms and Conditions"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/registration/reglists.js:34
+#: indico/htdocs/js/indico/modules/registration/reglists.js:36
 msgid "Email Preview"
 msgstr ""
 
-#: indico/htdocs/js/indico/modules/registration/reglists.js:50
+#: indico/htdocs/js/indico/modules/registration/reglists.js:52
 msgid "Do you really want to delete the selected registration?"
 msgid_plural "Do you really want to delete the {0} selected registrations?"
 msgstr[0] ""
@@ -2149,10 +2118,6 @@ msgstr ""
 msgid "You cannot have users in the Other section, please make them authors or co-authors"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/ConfDetailsFull.tpl:81
-msgid "Login to see email address"
-msgstr ""
-
 #: indico/legacy/webinterface/tpls/RoomBookingAdminLocation.tpl:259
 msgid "Delete room"
 msgstr ""
@@ -2189,67 +2154,67 @@ msgstr ""
 msgid "Processing..."
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:21
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:22
 msgid "This applies to all the following occurrences ({0} in total):"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:34
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:35
 msgid "Are you sure you want to <strong>cancel the whole booking</strong>?"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:35
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:36
 msgid "Cancel booking"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:41 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:50
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:61 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:73
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:83 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:92
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:42 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:51
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:62 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:74
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:84 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:93
 msgid "Yes"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:41 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:50
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:61 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:73
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:83 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:92
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:42 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:51
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:62 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:74
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:84 indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:93
 msgid "No"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:44
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:45
 msgid "Accept booking"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:44
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:45
 msgid "Are you sure you want to <strong>accept</strong> this booking?"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:53
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:54
 msgid "Are you sure you want to <strong>reject the whole booking</strong>?"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:54
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:55
 msgid "Reject booking"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:65
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:66
 msgid "Are you sure you want to <strong>reject</strong> the booking for the selected date"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:66
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:67
 msgid "Reject occurrence"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:76
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:77
 msgid "Are you sure you want to <strong>cancel</strong> the booking for the selected date"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:77
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:78
 msgid "Cancel occurrence"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:86
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:87
 msgid "This action is irreversible. Are you sure you want to <strong>delete</strong> the booking?"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:87
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:88
 msgid "Delete booking"
 msgstr ""
 
