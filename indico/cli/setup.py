@@ -285,7 +285,17 @@ class SetupWizard(object):
             _prompt_abort()
 
     def _prompt_root_path(self, dev=False):
-        default_root = os.getcwd().decode(sys.getfilesystemencoding()) if dev else '/opt/indico'
+        if dev:
+            default_root = os.getcwd()
+            if os.path.exists(os.path.join(default_root, '.git')):
+                # based on the setup guide the most likely location to run
+                # this commanad from is `~/dev/indico/src`, in which case
+                # we want to go up a level since the data dir should not be
+                # created inside the source directory
+                default_root = os.path.dirname(default_root)
+            default_root = default_root.decode(sys.getfilesystemencoding())
+        else:
+            default_root = '/opt/indico'
         self.root_path = _prompt('Indico root path', default=default_root, path=True,
                                  help='Enter the base directory where Indico will be installed.')
         # The root needs to exist (ideally created during `useradd`)
