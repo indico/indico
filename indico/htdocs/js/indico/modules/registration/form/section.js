@@ -222,11 +222,15 @@ ndRegForm.directive("ndGeneralSection", function($timeout, url, sortableoptions)
             scope.tplGeneralField = url.tpl('sections/generalfield.tpl.html');
 
             scope.sectionApi.removeNewField = function() {
-                if (scope.section.items[scope.section.items.length-1].id == -1) {
-                    $timeout(function() {
-                        scope.section.items.pop();
-                    }, 0);
-                }
+                $.each(scope.section.items, function(index, item) {
+                    if (item.id === -1) {
+                        $timeout(function() {
+                            scope.section.items.splice(index, 1);
+                        }, 0);
+
+                        return false;
+                    }
+                });
             };
 
             scope.fieldSortableOptions = {
