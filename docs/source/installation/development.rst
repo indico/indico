@@ -101,6 +101,7 @@ unnecessarily. This is why we advise that you include a fake SMTP server in your
 to set up::
 
     virtualenv maildump -p /usr/bin/python2.7
+    ./maildump/bin/pip install -U pip setuptools
     ./maildump/bin/pip install maildump
     ./maildump/bin/maildump -p /tmp/maildump.pid
 
@@ -124,6 +125,7 @@ Configuring
 Let's get into the Indico virtualenv::
 
     source ./env/bin/activate
+    pip install -U pip setuptools
 
     cd src
     pip install -r requirements.dev.txt
