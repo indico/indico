@@ -22,6 +22,7 @@ from indico.core import signals
 from indico.core.db import db
 from indico.modules.events.logs.models.entries import EventLogKind, EventLogRealm
 from indico.modules.events.logs.util import make_diff_log
+from indico.modules.events.models.events import EventType
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, COORDINATOR_PRIV_TITLES, logger, session_settings
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
@@ -98,11 +99,16 @@ def update_session_block(session_block, data):
 
 
 def delete_session_block(session_block):
+    from indico.modules.events.contributions.operations import delete_contribution
     from indico.modules.events.timetable.operations import delete_timetable_entry
     session_ = session_block.session
+    unschedule_contribs = session_.event.type_ == EventType.conference
     for contribution in session_block.contributions[:]:
         contribution.session_block = None
-        delete_timetable_entry(contribution.timetable_entry, log=False)
+        if unschedule_contribs:
+            delete_timetable_entry(contribution.timetable_entry, log=False)
+        else:
+            delete_contribution(contribution)
     for entry in session_block.timetable_entry.children[:]:
         delete_timetable_entry(entry, log=False)
     delete_timetable_entry(session_block.timetable_entry, log=False)
