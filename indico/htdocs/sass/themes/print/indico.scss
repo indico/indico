@@ -104,3 +104,30 @@ body {
     @extend %no-shadow;
     border: none;
 }
+
+.flexrow, .flexcol {
+    // XXX: this is awful and while making some things in the header look
+    // slightly ugly, it fixes both the IE11 crash and firefox only printing
+    // the first page.
+    display: block !important;
+}
+
+.event-date > * {
+    float: left;
+}
+
+.event-location {
+    clear: both;
+}
+
+// this would re-introduce the IE crash so we limit it to modern browsers
+// http://browserhacks.com/#hack-8a0d11a6b2e3d172711eed35cb7237b9
+@supports (-webkit-appearance:none) {
+    .timetable-item-body {
+        margin-top: 0.5em;
+    }
+}
+
+.main-action-bar, .footer {
+    display: none !important;
+}
