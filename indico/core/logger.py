@@ -147,6 +147,9 @@ class Logger(object):
         if config.DB_LOG:
             data['loggers']['indico._db'] = {'level': 'DEBUG', 'propagate': False, 'handlers': ['_db']}
             data['handlers']['_db'] = {'class': 'logging.handlers.SocketHandler', 'host': '127.0.0.1', 'port': 9020}
+        # If customization debugging is enabled, ensure we get the debug log messages from it
+        if config.CUSTOMIZATION_DEBUG and config.CUSTOMIZATION_DIR:
+            data['loggers'].setdefault('indico.customization', {})['level'] = 'DEBUG'
         logging.config.dictConfig(data)
         if config.SENTRY_DSN:
             if not has_sentry:

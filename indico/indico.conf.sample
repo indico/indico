@@ -380,8 +380,7 @@ MAX_UPLOAD_FILE_SIZE = 0
 #CUSTOMIZATION_DIR = '/opt/indico/custom'
 #
 # By enabling customization debugging indico will log all customizable
-# templates the first time they are accessed (note that you need to enable the
-# 'DEBUG' log level in your logging.yaml for this).
+# templates the first time they are accessed.
 # The log message contains the path where you need to store the template. This
 # path is relative to `<CustomizationDir>/templates/`.
 # It will also log the full path of the original template in case you decide to
