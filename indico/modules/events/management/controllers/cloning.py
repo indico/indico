@@ -73,10 +73,16 @@ class CloneCalculator(object):
     def __init__(self, event):
         self.event = event
 
+    def _naivify(self, dt):
+        return dt.astimezone(self.event.tzinfo).replace(tzinfo=None)
+
+    def _tzify(self, dates):
+        return [self.event.tzinfo.localize(dt) for dt in dates]
+
     def _calc_stop_criteria(self, form):
         args = {}
         if form.stop_criterion.data == 'day':
-            args['until'] = utc.localize(datetime.combine(form.until_dt.data, form.start_dt.data.time()))
+            args['until'] = datetime.combine(form.until_dt.data, form.start_dt.data.time())
         else:
             args['count'] = form.num_times.data
         return args
@@ -93,20 +99,23 @@ class PatternCloneCalculator(CloneCalculator):
     form_class = CloneRepeatPatternForm
 
     def _calculate(self, form):
-        args = {'dtstart': form.start_dt.data}
+        args = {'dtstart': self._naivify(form.start_dt.data)}
         args.update(self._calc_stop_criteria(form))
-        return list(rrule.rrule(rrule.MONTHLY, interval=form.num_months.data, byweekday=form.week_day.week_day_data,
-                                bysetpos=form.week_day.day_number_data, **args))
+        return self._tzify(rrule.rrule(rrule.MONTHLY,
+                                       interval=form.num_months.data,
+                                       byweekday=form.week_day.week_day_data,
+                                       bysetpos=form.week_day.day_number_data,
+                                       **args))
 
 
 class IntervalCloneCalculator(CloneCalculator):
     form_class = CloneRepeatIntervalForm
 
     def _calculate(self, form):
-        args = {'dtstart': form.start_dt.data}
+        args = {'dtstart': self._naivify(form.start_dt.data)}
         args.update(self._calc_stop_criteria(form))
         freq, interval = relativedelta_to_rrule_interval(form.recurrence.data)
-        return list(rrule.rrule(freq, interval=interval, **args))
+        return self._tzify(rrule.rrule(freq, interval=interval, **args))
 
 
 class RHClonePreview(RHManageEventBase):

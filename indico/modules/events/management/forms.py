@@ -331,15 +331,19 @@ class CloneCategorySelectForm(CloneContentsForm):
 class CloneRepeatFormBase(CloneCategorySelectForm):
     def _calc_start_dt(self, event):
         local_now_date = now_utc().astimezone(event.tzinfo).date()
+        local_now_naive = now_utc().astimezone(event.tzinfo).replace(tzinfo=None)
         if event.start_dt_local.date() >= local_now_date:
-            start_dt = event.start_dt_local + timedelta(days=7)
+            # we have to add the timedelta to the naive datetime to avoid
+            # dst changes between the old and new dates to change the time
+            # of the event
+            start_dt = event.start_dt_local.replace(tzinfo=None) + timedelta(days=7)
         else:
-            start_dt = event.tzinfo.localize(datetime.combine(local_now_date, event.start_dt_local.time()))
-        if start_dt < now_utc():
+            start_dt = datetime.combine(local_now_date, event.start_dt_local.time())
+        if start_dt < local_now_naive:
             # if the combination of 'today' with the original start time is
             # still in the past, then let's set it for tomorrow instead
             start_dt += timedelta(days=1)
-        return start_dt
+        return event.tzinfo.localize(start_dt)
 
     def __init__(self, event, **kwargs):
         kwargs['start_dt'] = self._calc_start_dt(event)
