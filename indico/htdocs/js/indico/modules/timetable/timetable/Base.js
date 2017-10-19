@@ -626,7 +626,6 @@ type("IntervalTimeTableMixin", [], {
     },
 
     _getInfoBoxContent: function() {
-
         return Html.div({}, Html.span({style: {fontStyle: 'italic', fontSize: '0.9em'}},
             $T('You are viewing the contents of the session block:')),
             Html.div({style: {fontWeight: 'bold', marginTop: '5px', fontSize: '1.3em'}},
@@ -945,7 +944,7 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
 
         var self = this;
 
-        this.infoBox = Html.div({className: 'timetableInfoBox'});
+        this.infoBox = Html.div({ className: 'toolbar f-j-end', style: {'margin': '5px'}});
 
         this.addMenuLink = this.contextInfo.isPoster ?
             $('<a href="#" data-toggle="menu_select"/>').text($T('Add poster')).bind('menu_select', function() {
@@ -1020,7 +1019,8 @@ type("ManagementTimeTable",["TimeTable", "UndoMixin"], {
             this.warningArea.dom,
             $('<div id="headPanel" class="ui-follow-scroll"></div>').append($('<div class="toolbar f-j-end" id="tt_menu"/>').
                 append(this.menu.dropdown({effect_on: 'slideDown'}),
-                        tt_status_info, this.infoBox.dom)),
+                        tt_status_info)),
+            this.infoBox.dom,
             tt_hour_tip);
 
         var extra = this.getTTMenu();
