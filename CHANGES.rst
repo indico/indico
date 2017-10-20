@@ -2,6 +2,12 @@ Changelog
 =========
 
 
+Version 2.0a2
+-------------
+
+*Unreleased*
+
+
 Version 2.0a1
 -------------
 
