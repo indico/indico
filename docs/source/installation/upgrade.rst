@@ -77,6 +77,23 @@ Upgrading from 1.9.11 to 2.0
 Make sure that you have the latest 1.9.11 version installed and that you used
 ``indico db upgrade`` to have the most recent database structure.
 
+First of all, if you had installed any plugins manually, you need to uninstall
+them first as we changed some of the Python distribution names so if you do
+not uninstall them, you will get errors about duplicate plugins.
+
+.. code-block:: shell
+
+    pip freeze | grep -Po 'indico(?!-fonts).+(?===)' | pip uninstall -y
+
+
+.. note::
+
+    If you used ``pip install -e`` to install the plugins, the command
+    above will not work and you need to manually uninstall them.  All
+    the plugin packages have names like ``indico_chat`` or ``indico_payment_manual``.
+    If you are unsure about what to uninstall here, please contact us.
+
+
 To upgrade to 2.0, follow the upgrade instructions above.
 After successfully running the upgrade, use ``indico db reset_alembic`` to clear
 pre-2.0 database migration information, since all the old migration steps from
