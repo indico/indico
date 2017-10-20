@@ -39,6 +39,15 @@ payment plugins:
     PLUGINS = {'payment_manual', 'payment_paypal'}
 
 
+Some plugins contain additional database tables. Run the plugin database
+migrations to create them (if you do not have any plugins with custom
+tables, the command will simply do nothing):
+
+.. code-block:: shell
+
+    indico db --all-plugins upgrade
+
+
 After any change to the config file, you need to reload uWSGI:
 
 .. code-block:: shell
