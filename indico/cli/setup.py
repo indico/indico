@@ -613,7 +613,7 @@ class SetupWizard(object):
 
         _echo()
         _echo(cformat('%{green}Indico has been configured successfully!'))
-        if not create_config_link:
+        if not dev and not create_config_link:
             _echo(cformat('Run %{green!}export INDICO_CONFIG={}%{reset} to use your config file')
                   .format(self.config_path))
 
