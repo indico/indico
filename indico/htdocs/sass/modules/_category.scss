@@ -157,9 +157,12 @@
         margin-top: 20px;
         margin-bottom: 10px;
         padding-bottom: 0.2em;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
 
         h2 {
-            display: inline;
+            margin: 0;
             color: #999;
             font-weight: normal;
 
