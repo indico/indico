@@ -31,16 +31,16 @@
 
 .category-container {
     font-family: 'Helvetica Neue', Helvetica, Verdana, Arial, Sans;
-    background: #FFFFFF;
+    background: #fff;
     margin-bottom: 10px;
     overflow: hidden;
 }
 
 .category-header {
-    @include background-image(linear-gradient(top, #FCFCFC, #F2F2F2));
-    border-bottom: 1px solid #E6E6E6;
-    border-top: 1px solid #FFFFFF;
-    padding: 20px 20px 20px 20px;
+    @include background-image(linear-gradient(top, #fcfcfc, #f2f2f2));
+    border-bottom: 1px solid #e6e6e6;
+    border-top: 1px solid #fff;
+    padding: 20px;
 
     .back-button {
         margin-top: 0.4em;
@@ -53,7 +53,7 @@
     font-weight: normal;
     margin: auto;
     max-width: 850px;
-    margin-left: 0px;
+    margin-left: 0;
     text-align: left;
 
     &.sidebar-padding {
@@ -68,7 +68,7 @@
 
 .category-content-wrapper {
     overflow: hidden;
-    padding: 2em 2em;
+    padding: 2em;
 }
 
 .category-content {
@@ -126,7 +126,7 @@
 
 .category-sidebar {
     @include box-sizing(border-box);
-    background: #FAFAFA;
+    background: #fafafa;
     background-image: linear-gradient(top, #fafafa 95%, #fff 100%);
     background-image: -o-linear-gradient(top, #fafafa 95%, #fff 100%);
     background-image: -moz-linear-gradient(top, #fafafa 95%, #fff 100%);
@@ -137,10 +137,10 @@
         left top,
         left bottom,
         color-stop(0.95, #fafafa),
-        color-stop(1, rgb(255,255,255))
+        color-stop(1, rgb(255, 255, 255))
     );
 
-    border-left: 1px solid #F2F2F2;
+    border-left: 1px solid #f2f2f2;
     color: #666;
     float: right;
     height: 100%;
@@ -152,8 +152,8 @@
     }
 
     > .title {
-        border-bottom: 1px solid #EBEBEB;
-        box-shadow: 0 1px 0 #FAFAFA;
+        border-bottom: 1px solid #ebebeb;
+        box-shadow: 0 1px 0 #fafafa;
         margin-top: 20px;
         margin-bottom: 10px;
         padding-bottom: 0.2em;
@@ -163,7 +163,7 @@
             color: #999;
             font-weight: normal;
 
-            &:before {
+            &::before {
                 margin-right: 0.5em;
                 vertical-align: -10%;
             }
