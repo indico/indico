@@ -147,6 +147,10 @@
     padding: 1em;
     width: 340px;
 
+    &:empty {
+        padding: 0;
+    }
+
     > .title {
         border-bottom: 1px solid #EBEBEB;
         box-shadow: 0 1px 0 #FAFAFA;
