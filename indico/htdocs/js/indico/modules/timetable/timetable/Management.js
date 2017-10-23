@@ -682,19 +682,20 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
 type("FitInnerTimetableDialog", ["ConfirmPopup"], {
 
     /**
-     * Returns the title of the timetable/session/entry
+     * Returns the title of the session block
      */
-    __getSessionTitle: function(){
-        return '"' + this.tt.contextInfo.title + '"';
+    __generateSessionBlockTitle: function() {
+        return '"' + this.tt.contextInfo.title +
+            (this.tt.contextInfo.slotTitle ? ': ' + this.tt.contextInfo.slotTitle : '') + '"';
     },
 
     /**
      * Builds the content for the ConfirmPopup
      */
     __getContent: function() {
-        var msg = $T.gettext("This will change the starting and ending times of the Session {0} so that it encompasses all entries defined in its timetable.");
+        var msg = $T.gettext("This will change the starting and ending times of the session block {0} so that it encompasses all entries defined in its timetable.");
         return Html.div("fitInnerTimetableDialog",
-                msg.format(this.__getSessionTitle()),
+                msg.format(this.__generateSessionBlockTitle()),
                 Html.br(),
                 $T.gettext("Are you sure you want to proceed?"));
     },

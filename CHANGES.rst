@@ -25,6 +25,7 @@ Bugfixes
 - Fix alignment of info-grid items on main conference page (:issue:`3126`)
 - Properly align the label of the attachment folder title field
 - Fix some rare unicode errors during exception handling/logging
+- Clarify message when fitting session block to its contents (:issue:`3080`)
 
 
 Version 2.0a1
