@@ -22,7 +22,7 @@ import re
 from flask import current_app, request, send_from_directory, session
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
-from werkzeug.exceptions import BadRequest, BadRequestKeyError, Forbidden, HTTPException, NotFound
+from werkzeug.exceptions import BadRequest, BadRequestKeyError, Forbidden, HTTPException, NotFound, Unauthorized
 
 from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger, sentry_log_exception
@@ -58,7 +58,9 @@ def handle_notfound(exc):
 
 @errors_bp.app_errorhandler(Forbidden)
 def handle_forbidden(exc):
-    if session.user is None and not request.is_xhr and not exc.response and request.blueprint != 'auth':
+    if exc.response:
+        return exc
+    if session.user is None and not request.is_xhr and request.blueprint != 'auth':
         return redirect_to_login(reason=_('Please log in to access this page.'))
     return render_error(exc, _('Access Denied'), get_error_description(exc), exc.code)
 
@@ -77,6 +79,10 @@ def handle_http_exception(exc):
         # if it's not an actual error, use it as a response.
         # this is needed e.g. for the 301 redirects that are raised
         # as routing exceptions and thus end up here
+        return exc
+    elif exc.response:
+        # if the exception has a custom response, we always use that
+        # one instead of showing the default error page
         return exc
     return render_error(exc, exc.name, get_error_description(exc), exc.code)
 
