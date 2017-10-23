@@ -554,12 +554,17 @@ def register_all_css(env):
         filters=('csscompressor', 'indico_cssrewrite'),
         output='css/base_%(version)s.min.css')
 
+    conference_css = Bundle('css/Conf_Basic.css',
+                            filters=('csscompressor', 'indico_cssrewrite'),
+                            output='css/conference_%(version)s.min.css')
+
     screen_sass = Bundle('sass/screen.scss',
                          filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
                          output="sass/screen_sass_%(version)s.css",
                          depends=SASS_BASE_MODULES)
 
     env.register('base_css', base_css)
+    env.register('conference_css', conference_css)
     env.register('jqplot_css', jqplot_css)
     env.register('dropzone_css', dropzone_css)
     env.register('selectize_css', selectize_css)

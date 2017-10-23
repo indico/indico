@@ -16,13 +16,11 @@
 
 from __future__ import print_function, unicode_literals
 
-import os
 import posixpath
 
 from flask import render_template, request
 from sqlalchemy.orm import load_only
 
-from indico.core.config import config
 from indico.modules.admin.views import WPAdmin
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.events import Event
@@ -249,18 +247,13 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             return entry.id
 
     def _getHeadContent(self):
-        path = config.BASE_URL
-        try:
-            timestamp = os.stat(__file__).st_mtime
-        except OSError:
-            timestamp = 0
-        css = '<link rel="stylesheet" type="text/css" href="{}/css/Conf_Basic.css?{}">'.format(path, timestamp)
-
         return '\n'.join([
-            css,
             MathjaxMixin._getHeadContent(self),
             WPEventBase._getHeadContent(self)
         ])
+
+    def getCSSFiles(self):
+        return self._asset_env['conference_css'].urls() + WPEventBase.getCSSFiles(self)
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
