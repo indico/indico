@@ -7,6 +7,12 @@ Version 2.0a2
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Hide category field in event creation dialog if there are no
+  subcategories (:issue:`3112`)
+
 
 Version 2.0a1
 -------------

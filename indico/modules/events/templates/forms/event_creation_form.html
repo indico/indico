@@ -1,9 +1,10 @@
-{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_fieldset %}
+{% from 'forms/_form.html' import form_header, form_footer, form_rows, form_row, form_fieldset %}
 {% set category = {'id': form.category.data.id,
                    'is_protected': form.category.data.is_protected,
                    'title': form.category.data.title} if form.category.data else none %}
 
 {{ form_header(form, action=url_for('events.create', event_type=event_type)) }}
+{{ form_row(form.category, orientation=('hidden' if single_category else '')) }}
 {{ form_rows(form, fields=form._field_order) }}
 {% if form._advanced_field_order %}
     {% call form_fieldset(_('Advanced'), collapsible=true) %}
