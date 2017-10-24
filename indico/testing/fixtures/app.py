@@ -35,7 +35,8 @@ def app(request):
         'STORAGE_BACKENDS': {'default': 'mem:'},
         'PLUGINS': request.config.indico_plugins,
         'ENABLE_ROOMBOOKING': True,
-        'SECRET_KEY': os.urandom(16)
+        'SECRET_KEY': os.urandom(16),
+        'SMTP_USE_CELERY': False,
     }
     return make_app(set_path=True, testing=True, config_override=config_override)
 

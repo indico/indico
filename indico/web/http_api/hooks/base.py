@@ -29,7 +29,7 @@ from flask import current_app, request
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.common.mail import GenericMailer
+from indico.core.notifications import flush_email_queue
 from indico.util.date_time import now_utc
 from indico.web.http_api.exceptions import ArgumentParseError, LimitExceededException
 from indico.web.http_api.metadata import Serializer
@@ -190,10 +190,9 @@ class HTTPAPIHook(object):
             db.session.rollback()
         else:
             try:
-                GenericMailer.flushQueue(False)
                 is_response, resultList, complete, extra = self._perform(user, func, extra_func)
                 db.session.commit()
-                GenericMailer.flushQueue(True)
+                flush_email_queue()
             except Exception:
                 db.session.rollback()
                 raise

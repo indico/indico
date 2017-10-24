@@ -795,6 +795,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         :param type_: The type of the log entry. This is used for custom
                       rendering of the log message/data
         :param data: JSON-serializable data specific to the log type.
+        :return: The newly created `EventLogEntry`
 
         In most cases the ``simple`` log type is fine. For this type,
         any items from data will be shown in the detailed view of the
@@ -807,6 +808,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
         entry = EventLogEntry(user=user, realm=realm, kind=kind, module=module, type=type_, summary=summary,
                               data=data or {})
         self.log_entries.append(entry)
+        return entry
 
     def get_contribution_field(self, field_id):
         return next((v for v in self.contribution_fields if v.id == field_id), '')

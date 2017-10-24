@@ -23,7 +23,7 @@ from werkzeug.exceptions import BadRequest
 from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
-from indico.legacy.common.mail import GenericMailer
+from indico.core.notifications import flush_email_queue
 from indico.legacy.services.interface.rpc import handlers
 from indico.util import fossilize
 
@@ -65,7 +65,6 @@ def _process_request(method, params):
 def invoke_method(method, params):
     result = None
     fossilize.clearCache()
-    GenericMailer.flushQueue(False)
     try:
         result = _process_request(method, copy.deepcopy(params))
         signals.after_process.send()
@@ -73,5 +72,5 @@ def invoke_method(method, params):
     except DatabaseError:
         db.session.rollback()
         handle_sqlalchemy_database_error()
-    GenericMailer.flushQueue(True)
+    flush_email_queue()
     return result

@@ -67,6 +67,11 @@
         background-color: $yellow;
     }
 
+    &.qtip-success {
+        border-color: $green;
+        background-color: $green;
+    }
+
     &.qtip-popup {
         @extend %qtip-light;
         border: solid 1px #e2e2e2;

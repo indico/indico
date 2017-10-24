@@ -18,6 +18,9 @@ Improvements
   Excel (:issue:`3060`)
 - Use custom site title in page title (:issue:`3018`)
 - Allow manually entering dates in datetime fields (:issue:`3136`)
+- Send emails through a celery task. This ensures users do not get
+  an error if the mail server is temporarily unavailable. Sending an
+  email is also retried for a while in case of failure (:issue:`3121`)
 
 Bugfixes
 ^^^^^^^^

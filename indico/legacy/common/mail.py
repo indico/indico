@@ -21,8 +21,6 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.utils import formatdate
 
-from flask import g
-
 from indico.core.config import config
 from indico.core.logger import Logger
 from indico.util.string import to_unicode
@@ -33,54 +31,19 @@ charset.add_charset('utf-8', charset.SHORTEST)
 
 
 class GenericMailer:
-    @classmethod
-    def send(cls, notification, skipQueue=False):
-        if isinstance(notification, dict):
-            # Wrap a raw dictionary in a notification class
-            from indico.legacy.webinterface.mail import GenericNotification
-            notification = GenericNotification(notification)
-        # enqueue emails if we have a rh and do not skip queuing, otherwise send immediately
-        rh = g.get('rh')
-        mailData = cls._prepare(notification)
-
-        if mailData:
-            if skipQueue or not rh:
-                cls._send(mailData)
-            else:
-                g.setdefault('email_queue', []).append(mailData)
-
-    @classmethod
-    def has_queue(cls):
-        return bool(g.get('email_queue'))
-
-    @classmethod
-    def flushQueue(cls, send):
-        queue = g.get('email_queue', None)
-        if not queue:
-            return
-        if send:
-            # send all emails
-            for mail in queue:
-                cls._send(mail)
-        # clear the queue no matter if emails were sent or not
-        del queue[:]
-
     @staticmethod
-    def _prepare(notification):
-        fromAddr = notification.getFromAddr()
-        replyAddr = getattr(notification, '_replyAddr', None)
-        toList = set(filter(None, notification.getToList()))
-        ccList = set(filter(None, notification.getCCList()))
-        if hasattr(notification, "getBCCList"):
-            bccList = set(notification.getBCCList())
-        else:
-            bccList = set()
+    def _prepare(email):
+        fromAddr = email['from']
+        replyAddr = email['reply_to']
+        toList = set(filter(None, email['to']))
+        ccList = set(filter(None, email['cc']))
+        bccList = set(filter(None, email['bcc']))
 
         if not toList and not ccList and not bccList:
             return
 
         msg = MIMEMultipart()
-        msg["Subject"] = to_unicode(notification.getSubject()).strip()
+        msg["Subject"] = to_unicode(email['subject']).strip()
         msg["From"] = fromAddr
         msg["To"] = ', '.join(toList) if toList else 'Undisclosed-recipients:;'
         if ccList:
@@ -89,27 +52,18 @@ class GenericMailer:
             msg['Reply-to'] = replyAddr
         msg["Date"] = formatdate()
 
-        try:
-            ct = notification.getContentType()
-        except Exception:
-            ct = "text/plain"
-
-        body = notification.getBody()
-        if ct == "text/plain":
-            part1 = MIMEText(body, "plain", "utf-8")
-        elif ct == "text/html":
+        body = email['body']
+        if email['html']:
             part1 = MIMEText(body, "html", "utf-8")
         else:
-            raise ValueError('Unknown MIME type: {}'.format(ct))
+            part1 = MIMEText(body, "plain", "utf-8")
         msg.attach(part1)
 
-        if hasattr(notification, 'getAttachments'):
-            attachments = notification.getAttachments() or []
-            for attachment in attachments:
-                part2 = MIMEApplication(attachment["binary"])
-                part2.add_header("Content-Disposition",
-                                 'attachment;filename="%s"' % (attachment["name"]))
-                msg.attach(part2)
+        for attachment in email['attachments']:
+            part2 = MIMEApplication(attachment["binary"])
+            part2.add_header("Content-Disposition",
+                             'attachment;filename="%s"' % (attachment["name"]))
+            msg.attach(part2)
 
         return {
             'msg': msg.as_string(),
@@ -136,34 +90,13 @@ class GenericMailer:
 
         to_addrs = msgData['toList'] | msgData['ccList'] | msgData['bccList']
         try:
-            Logger.get('mail').info('Sending email: To: {} / CC: {} / BCC: {}'.format(
-                ', '.join(msgData['toList']) or 'None',
-                ', '.join(msgData['ccList']) or 'None',
-                ', '.join(msgData['bccList']) or 'None'))
+            Logger.get('mail').info(u'Sending email: To: {} / CC: {} / BCC: {}'.format(
+                u', '.join(msgData['toList']) or 'None',
+                u', '.join(msgData['ccList']) or 'None',
+                u', '.join(msgData['bccList']) or 'None'))
             server.sendmail(msgData['fromAddr'], to_addrs, msgData['msg'])
         except smtplib.SMTPRecipientsRefused as e:
             raise ValueError('Email address is not valid: {}'.format(e.recipients))
         finally:
             server.quit()
         Logger.get('mail').info('Mail sent to {}'.format(', '.join(to_addrs)))
-
-    @classmethod
-    def sendAndLog(cls, notification, event, module=None, user=None, skipQueue=False):
-        from indico.modules.events.logs import EventLogRealm, EventLogKind
-        if isinstance(notification, dict):
-            # Wrap a raw dictionary in a notification class
-            from indico.legacy.webinterface.mail import GenericNotification
-            notification = GenericNotification(notification)
-        cls.send(notification, skipQueue=skipQueue)
-        log_data = {
-            u'content_type': to_unicode(notification.getContentType()),
-            u'from': to_unicode(notification.getFromAddr()),
-            u'to': map(to_unicode, notification.getToList()),
-            u'cc': map(to_unicode, notification.getCCList()),
-            u'bcc': map(to_unicode, notification.getBCCList()),
-            u'subject': to_unicode(notification.getSubject()).strip(),
-            u'body': to_unicode(notification.getBody()).strip()
-        }
-        summary = u'Sent email: {}'.format(log_data[u'subject'])
-        event.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or u'Unknown'), summary, user,
-                  type_=u'email', data=log_data)

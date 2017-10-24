@@ -112,7 +112,7 @@ class AbstractEmailLogEntry(db.Model):
         :param user: the user who performed the action causing the
                      notification
         """
-        recipients = sorted(email_data['toList'] | email_data['ccList'] | email_data['bccList'])
+        recipients = sorted(email_data['to'] | email_data['cc'] | email_data['bcc'])
         data = {'template_name': email_tpl.title}
         return cls(email_template=email_tpl, user=user, recipients=recipients, subject=email_data['subject'],
                    body=email_data['body'], data=data)

@@ -14,11 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+from __future__ import unicode_literals
+
 from functools import wraps
 from types import GeneratorType
 
+from flask import g
+
 from indico.core.config import config
-from indico.legacy.common.mail import GenericMailer
+from indico.core.logger import Logger
+from indico.util.string import to_unicode
+
+
+logger = Logger.get('emails')
 
 
 def email_sender(fn):
@@ -36,22 +44,61 @@ def email_sender(fn):
     return wrapper
 
 
-def send_email(email, event=None, module='', user=None, skip_queue=False):
+def send_email(email, event=None, module=None, user=None):
     """Sends an email created by :func:`make_email`.
+
+    When called while inside a RH, the email will be queued and only
+    sent or passed on to celery once the database commit succeeded.
 
     :param email: The email object returned by :func:`make_email`
     :param event: If specified, the email will be saved in that
                   event's log
     :param module: The module name to show in the email log
     :param user: The user to show in the email log
-    :param skip_queue: If true, the email will be sent immediately
-                       instead of being queued until after commit even
-                       while inside a RH context
     """
-    if event is not None:
-        GenericMailer.sendAndLog(email, event, module=module, user=user, skipQueue=skip_queue)
+    from indico.core.emails import do_send_email, send_email_task
+    fn = send_email_task.delay if config.SMTP_USE_CELERY else do_send_email
+    # we log the email immediately (as pending).  if we don't commit,
+    # the log message will simply be thrown away later
+    args = (email, _log_email(email, event, module, user))
+    if g.get('rh'):
+        g.setdefault('email_queue', []).append(lambda: fn(*args))
     else:
-        GenericMailer.send(email, skipQueue=skip_queue)
+        fn(*args)
+
+
+def _log_email(email, event, module, user):
+    from indico.modules.events.logs import EventLogKind, EventLogRealm
+    if not event:
+        return None
+    log_data = {
+        'content_type': 'text/html' if email['html'] else 'text/plain',
+        'from': email['from'],
+        'to': sorted(email['to']),
+        'cc': sorted(email['cc']),
+        'bcc': sorted(email['bcc']),
+        'subject': email['subject'],
+        'body': email['body'].strip(),
+        'state': 'pending',
+        'sent_dt': None,
+    }
+    return event.log(EventLogRealm.emails, EventLogKind.other, to_unicode(module or 'Unknown'), log_data['subject'],
+                     user, type_='email', data=log_data)
+
+
+def has_email_queue():
+    """Check whether there are any emails queued"""
+    return bool(g.get('email_queue'))
+
+
+def flush_email_queue():
+    """Send all the emails in the queue"""
+    queue = g.pop('email_queue', [])
+    if not queue:
+        return
+    logger.debug('Sending %d queued emails', len(queue))
+    for fn in queue:
+        fn()
 
 
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,
@@ -91,13 +138,13 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     cc_list = {cc_list} if isinstance(cc_list, basestring) else cc_list
     bcc_list = {bcc_list} if isinstance(bcc_list, basestring) else bcc_list
     return {
-        'toList': set(to_list),
-        'ccList': set(cc_list),
-        'bccList': set(bcc_list),
-        'fromAddr': from_address or config.NO_REPLY_EMAIL,
-        'replyAddr': reply_address,
-        'attachments': attachments,
-        'subject': subject,
-        'body': body,
-        'content-type': 'text/html' if html else 'text/plain'
+        'to': set(map(to_unicode, to_list)),
+        'cc': set(map(to_unicode, cc_list)),
+        'bcc': set(map(to_unicode, bcc_list)),
+        'from': to_unicode(from_address or config.NO_REPLY_EMAIL),
+        'reply_to': to_unicode(reply_address),
+        'attachments': attachments or [],
+        'subject': to_unicode(subject).strip(),
+        'body': to_unicode(body).strip(),
+        'html': html,
     }

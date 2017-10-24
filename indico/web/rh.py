@@ -36,8 +36,8 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.logger import Logger, sentry_set_tags
+from indico.core.notifications import flush_email_queue, has_email_queue
 from indico.legacy.common import fossilize
-from indico.legacy.common.mail import GenericMailer
 from indico.legacy.common.security import Sanitization
 from indico.util.i18n import _
 from indico.util.locators import get_locator
@@ -265,17 +265,16 @@ class RH(object):
 
         try:
             fossilize.clearCache()
-            GenericMailer.flushQueue(False)
             self._check_csrf()
             res = self._do_process()
             signals.after_process.send()
 
             if self.commit:
-                if GenericMailer.has_queue():
+                if has_email_queue():
                     # ensure we fail early (before sending out e-mails)
                     # in case there are DB constraint violations, etc...
                     db.enforce_constraints()
-                    GenericMailer.flushQueue(True)
+                    flush_email_queue()
 
                 db.session.commit()
             else:

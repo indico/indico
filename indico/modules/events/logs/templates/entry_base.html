@@ -7,6 +7,9 @@
     <td class="i-table log-module searchable" title="{{ entry.module }}">
         {{ entry.module }}
     </td>
+    <td class="i-table log-icon-custom">
+        {% block entry_icons %}{% endblock %}
+    </td>
     <td class="i-table log-subject searchable" title="{{ entry.summary }}">
         {{ entry.summary }}
     </td>

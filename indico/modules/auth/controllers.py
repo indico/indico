@@ -25,8 +25,7 @@ from indico.core import signals
 from indico.core.auth import multipass
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.notifications import make_email
-from indico.legacy.common.mail import GenericMailer
+from indico.core.notifications import make_email, send_email
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity, logger, login_user
 from indico.modules.auth.forms import (AddLocalIdentityForm, EditLocalIdentityForm, LocalRegistrationForm,
@@ -130,7 +129,7 @@ def _send_confirmation(email, salt, endpoint, template, template_args=None, url_
     token = secure_serializer.dumps(data or email, salt=salt)
     url = url_for(endpoint, token=token, _external=True, **url_args)
     template_module = get_template_module(template, email=email, url=url, **template_args)
-    GenericMailer.send(make_email(email, template=template_module))
+    send_email(make_email(email, template=template_module))
     flash(_('We have sent you a verification email. Please check your mailbox within the next hour and open '
             'the link in that email.'))
     return redirect(url_for(endpoint, **url_args))

@@ -32,7 +32,6 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy.util.queries import get_n_matching
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
-from indico.legacy.common.mail import GenericMailer
 from indico.modules.admin import RHAdminBase
 from indico.modules.auth import Identity
 from indico.modules.auth.models.registration_requests import RegistrationRequest
@@ -248,8 +247,8 @@ class RHUserEmails(RHUserBase):
         data = {'email': email, 'user_id': self.user.id}
         token = make_unique_token(lambda t: not token_storage.get(t))
         token_storage.set(token, data, 24 * 3600)
-        GenericMailer.send(make_email(email, template=get_template_module('users/emails/verify_email.txt',
-                                                                          user=self.user, email=email, token=token)))
+        send_email(make_email(email, template=get_template_module('users/emails/verify_email.txt',
+                                                                  user=self.user, email=email, token=token)))
 
     def _process(self):
         form = UserEmailsForm()

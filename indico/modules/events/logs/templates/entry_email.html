@@ -1,5 +1,21 @@
 {% extends 'events/logs/entry_base.html' %}
 
+{% block entry_icons %}
+    {% if data.state == 'pending' %}
+        <span class="icon-alarm semantic-text warning"
+              title="{% trans %}This email is pending and will be sent soon.{% endtrans %}"
+              data-qtip-style="warning"></span>
+    {% elif data.state == 'sent' %}
+        <span class="icon-mail semantic-text success"
+              title="{% trans %}This email has been sent.{% endtrans %}"
+              data-qtip-style="success"></span>
+    {% elif data.state == 'failed' %}
+        <span class="icon-warning semantic-text error"
+              title="{% trans %}Sending this email failed.{% endtrans %}"
+              data-qtip-style="danger"></span>
+    {% endif %}
+{% endblock %}
+
 {% block entry_detail_rows %}
     {% if data.from %}
         <tr class="i-table content">
