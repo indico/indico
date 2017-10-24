@@ -24,6 +24,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
+from indico.util.emails.message import EmailMessage
 from indico.util.string import truncate
 
 
@@ -59,8 +60,14 @@ def send_email_task(task, email, log_entry=None):
 
 def do_send_email(email, log_entry=None):
     """Send an email"""
-    from indico.legacy.common.mail import GenericMailer
-    GenericMailer._send(GenericMailer._prepare(email))
+    attachments = [(a['name'], a['binary']) for a in email['attachments']]
+    msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
+                       to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
+                       attachments=attachments)
+    if email['html']:
+        msg.content_subtype = 'html'
+    msg.send()
+    # TODO: log errors
     if log_entry:
         _update_email_log_state(log_entry)
 

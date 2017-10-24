@@ -114,7 +114,8 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     :param cc_list: The CC email or a collection of emails
     :param bcc_list: The BCC email or a collection of emails
     :param from_address: The sender address. Defaults to noreply.
-    :param reply_address: The reply-to address. Defaults to empty.
+    :param reply_address: The reply-to address or a collection of addresses.
+                          Defaults to empty.
     :param attachments: A list of attachments, consisting of dicts
                         containing ``name`` and ``binary`` keys.
     :param subject: The subject of the email.
@@ -137,12 +138,13 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     to_list = {to_list} if isinstance(to_list, basestring) else to_list
     cc_list = {cc_list} if isinstance(cc_list, basestring) else cc_list
     bcc_list = {bcc_list} if isinstance(bcc_list, basestring) else bcc_list
+    reply_address = {reply_address} if isinstance(reply_address, basestring) else (reply_address or set())
     return {
         'to': set(map(to_unicode, to_list)),
         'cc': set(map(to_unicode, cc_list)),
         'bcc': set(map(to_unicode, bcc_list)),
         'from': to_unicode(from_address or config.NO_REPLY_EMAIL),
-        'reply_to': to_unicode(reply_address),
+        'reply_to': set(map(to_unicode, reply_address)),
         'attachments': attachments or [],
         'subject': to_unicode(subject).strip(),
         'body': to_unicode(body).strip(),
