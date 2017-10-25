@@ -36,7 +36,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.logger import Logger, sentry_set_tags
-from indico.core.notifications import flush_email_queue, has_email_queue
+from indico.core.notifications import flush_email_queue
 from indico.legacy.common import fossilize
 from indico.legacy.common.security import Sanitization
 from indico.util.i18n import _
@@ -270,13 +270,8 @@ class RH(object):
             signals.after_process.send()
 
             if self.commit:
-                if has_email_queue():
-                    # ensure we fail early (before sending out e-mails)
-                    # in case there are DB constraint violations, etc...
-                    db.enforce_constraints()
-                    flush_email_queue()
-
                 db.session.commit()
+                flush_email_queue()
             else:
                 db.session.rollback()
         except DatabaseError:

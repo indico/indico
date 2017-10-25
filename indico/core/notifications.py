@@ -86,11 +86,6 @@ def _log_email(email, event, module, user):
                      user, type_='email', data=log_data)
 
 
-def has_email_queue():
-    """Check whether there are any emails queued"""
-    return bool(g.get('email_queue'))
-
-
 def flush_email_queue():
     """Send all the emails in the queue"""
     queue = g.pop('email_queue', [])
