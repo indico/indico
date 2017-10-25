@@ -49,7 +49,7 @@ else:
 class AddRequestIDFilter(object):
     def filter(self, record):
         # Add our request ID if available
-        record.request_id = request.id if has_request_context() else '0' * 12
+        record.request_id = request.id if has_request_context() else '0' * 16
         return True
 
 
