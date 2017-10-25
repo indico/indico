@@ -12,6 +12,7 @@ Improvements
 
 - Hide category field in event creation dialog if there are no
   subcategories (:issue:`3112`)
+- Remove length limit from registration form field captions (:issue:`3119`)
 
 Bugfixes
 ^^^^^^^^
