@@ -35,10 +35,10 @@ DELAYS = [30, 60, 120, 300, 600, 1800, 3600, 3600, 7200]
 
 @celery.task(name='send_email', bind=True, max_retries=None)
 def send_email_task(task, email, log_entry=None):
+    attempt = task.request.retries + 1
     try:
-        do_send_email(email, log_entry)
+        do_send_email(email, log_entry, _from_task=True)
     except Exception as exc:
-        attempt = task.request.retries + 1
         delay = (DELAYS + [0])[task.request.retries] if not config.DEBUG else 1
         try:
             task.retry(countdown=delay, max_retries=(MAX_TRIES - 1))
@@ -53,12 +53,16 @@ def send_email_task(task, email, log_entry=None):
                            truncate(email['subject'], 50), attempt, MAX_TRIES, delay, exc)
             raise
     else:
+        if task.request.retries:
+            logger.info('Sent email "%s" (attempt %d/%d)', truncate(email['subject'], 50), attempt, MAX_TRIES)
+        else:
+            logger.info('Sent email "%s"', truncate(email['subject'], 50))
         # commit the log entry state change
         if log_entry:
             db.session.commit()
 
 
-def do_send_email(email, log_entry=None):
+def do_send_email(email, log_entry=None, _from_task=False):
     """Send an email"""
     msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
                        to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
@@ -66,7 +70,8 @@ def do_send_email(email, log_entry=None):
     if email['html']:
         msg.content_subtype = 'html'
     msg.send()
-    # TODO: log errors
+    if not _from_task:
+        logger.info('Sent email "%s"', truncate(email['subject'], 50))
     if log_entry:
         _update_email_log_state(log_entry)
 
