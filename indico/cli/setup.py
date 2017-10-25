@@ -580,7 +580,8 @@ class SetupWizard(object):
                 b'',
                 b'# Development options',
                 b'DB_LOG = True',
-                b'DEBUG = True'
+                b'DEBUG = True',
+                b'SMTP_USE_CELERY = False'
             ]
 
         config = b'\n'.join(x for x in config_data if x is not None)
