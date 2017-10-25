@@ -24,6 +24,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
 from indico.util.date_time import now_utc
+from indico.util.emails.backend import EmailBackend
 from indico.util.emails.message import EmailMessage
 from indico.util.string import truncate
 
@@ -64,12 +65,13 @@ def send_email_task(task, email, log_entry=None):
 
 def do_send_email(email, log_entry=None, _from_task=False):
     """Send an email"""
-    msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
-                       to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
-                       attachments=email['attachments'])
-    if email['html']:
-        msg.content_subtype = 'html'
-    msg.send()
+    with EmailBackend(timeout=config.SMTP_TIMEOUT) as conn:
+        msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
+                           to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
+                           attachments=email['attachments'], connection=conn)
+        if email['html']:
+            msg.content_subtype = 'html'
+        msg.send()
     if not _from_task:
         logger.info('Sent email "%s"', truncate(email['subject'], 50))
     if log_entry:
