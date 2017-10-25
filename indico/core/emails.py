@@ -60,10 +60,9 @@ def send_email_task(task, email, log_entry=None):
 
 def do_send_email(email, log_entry=None):
     """Send an email"""
-    attachments = [(a['name'], a['binary']) for a in email['attachments']]
     msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
                        to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
-                       attachments=attachments)
+                       attachments=email['attachments'])
     if email['html']:
         msg.content_subtype = 'html'
     msg.send()

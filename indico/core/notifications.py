@@ -116,8 +116,11 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     :param from_address: The sender address. Defaults to noreply.
     :param reply_address: The reply-to address or a collection of addresses.
                           Defaults to empty.
-    :param attachments: A list of attachments, consisting of dicts
-                        containing ``name`` and ``binary`` keys.
+    :param attachments: A list of attachments. Each attachment can be
+                        a `MIMEBase` subclass, a 3-tuple of the form
+                        ``(filename, content, mimetype)``, or a 2-tuple
+                        ``(filename, content)`` in which case the mime
+                        type will be guessed from the file name.
     :param subject: The subject of the email.
     :param body: The body of the email:
     :param template: A template module containing ``get_subject`` and

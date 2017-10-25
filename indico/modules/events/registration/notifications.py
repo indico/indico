@@ -75,7 +75,4 @@ def notify_registration_state_update(registration):
 
 def get_ticket_attachment(registration):
     from indico.modules.events.registration.controllers.management.tickets import generate_ticket
-    return [{
-        'name': 'Ticket.pdf',
-        'binary': generate_ticket(registration).getvalue()
-    }]
+    return [('Ticket.pdf', generate_ticket(registration).getvalue())]
