@@ -664,7 +664,6 @@ ndRegForm.directive('ndRadioField', function(url) {
                     edittype: "text",
                     editoptions: {
                         size: "30",
-                        maxlength: "50"
                     }
                 }, {
                     name: 'isBillable',
@@ -1005,7 +1004,7 @@ ndRegForm.directive('ndAccommodationField', function(url) {
                         index: 'caption',
                         align: 'center',
                         width: 100,
-                        editoptions: {size: "30", maxlength: "50"},
+                        editoptions: {size: "30"},
                         editable: true,
                         edittype: "text"
                     },
@@ -1087,8 +1086,7 @@ ndRegForm.directive('ndMultiChoiceField', function(url) {
                         editable: true,
                         edittype: 'text',
                         editoptions: {
-                            size: '30',
-                            maxlength: '50'
+                            size: '30'
                         }
                     },
                     {
