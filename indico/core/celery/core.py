@@ -34,6 +34,7 @@ from terminaltables import AsciiTable
 from indico.core.celery.util import locked_task
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.core.plugins import plugin_engine
 from indico.util.console import cformat
 from indico.util.fossilize import clearCache
@@ -151,7 +152,10 @@ class IndicoCelery(Celery):
                 clearCache()
                 with stack:
                     request_stats_request_started()
-                    return super(IndicoTask, s).__call__(*args, **kwargs)
+                    init_email_queue()
+                    rv = super(IndicoTask, s).__call__(*args, **kwargs)
+                    flush_email_queue()
+                    return rv
 
         self.Task = IndicoTask
 

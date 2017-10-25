@@ -110,13 +110,11 @@ def roombooking_occurrences(debug=False):
                    .options(contains_eager('reservation').contains_eager('room'))
                    .all())
 
-    try:
-        for user, user_occurrences in groupby(occurrences, key=attrgetter('reservation.booked_for_user')):
-            user_occurrences = list(user_occurrences)
-            if debug:
-                _print_occurrences(user, user_occurrences)
-            else:
-                _notify_occurrences(user, user_occurrences)
-    finally:
-        if not debug:
-            db.session.commit()
+    for user, user_occurrences in groupby(occurrences, key=attrgetter('reservation.booked_for_user')):
+        user_occurrences = list(user_occurrences)
+        if debug:
+            _print_occurrences(user, user_occurrences)
+        else:
+            _notify_occurrences(user, user_occurrences)
+    if not debug:
+        db.session.commit()

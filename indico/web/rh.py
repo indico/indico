@@ -36,7 +36,7 @@ from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.core import handle_sqlalchemy_database_error
 from indico.core.logger import Logger, sentry_set_tags
-from indico.core.notifications import flush_email_queue
+from indico.core.notifications import flush_email_queue, init_email_queue
 from indico.legacy.common import fossilize
 from indico.legacy.common.security import Sanitization
 from indico.util.i18n import _
@@ -265,6 +265,7 @@ class RH(object):
 
         try:
             fossilize.clearCache()
+            init_email_queue()
             self._check_csrf()
             res = self._do_process()
             signals.after_process.send()

@@ -31,12 +31,7 @@ def send_event_reminders():
     reminders = EventReminder.find_all(~EventReminder.is_sent, ~Event.is_deleted,
                                        EventReminder.scheduled_dt <= now_utc(),
                                        _join=EventReminder.event)
-    try:
-        for reminder in reminders:
-            logger.info('Sending event reminder: %s', reminder)
-            reminder.send()
-    finally:
-        # If we fail at any point during the loop, we'll still commit
-        # the is_sent change for already-sent reminders instead of
-        # sending them over and over and thus spamming people.
-        db.session.commit()
+    for reminder in reminders:
+        logger.info('Sending event reminder: %s', reminder)
+        reminder.send()
+    db.session.commit()

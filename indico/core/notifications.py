@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import time
 from functools import wraps
 from types import GeneratorType
 
@@ -61,8 +62,8 @@ def send_email(email, event=None, module=None, user=None):
     # we log the email immediately (as pending).  if we don't commit,
     # the log message will simply be thrown away later
     args = (email, _log_email(email, event, module, user))
-    if g.get('rh'):
-        g.setdefault('email_queue', []).append(lambda: fn(*args))
+    if 'email_queue' in g:
+        g.email_queue.append(lambda: fn(*args))
     else:
         fn(*args)
 
@@ -86,14 +87,29 @@ def _log_email(email, event, module, user):
                      user, type_='email', data=log_data)
 
 
+def init_email_queue():
+    """Enable email queueing for the current context."""
+    g.setdefault('email_queue', [])
+
+
 def flush_email_queue():
     """Send all the emails in the queue"""
-    queue = g.pop('email_queue', [])
+    queue = g.get('email_queue', [])
     if not queue:
         return
     logger.debug('Sending %d queued emails', len(queue))
     for fn in queue:
-        fn()
+        try:
+            fn()
+        except Exception:
+            # Flushing the email queue happens after a commit.
+            # If anything goes wrong here we keep going and just log
+            # it to avoid losing emails in case celery is not used for
+            # email sending or there is a temporary issue with celery.
+            logger.exception('Flushing queued email failed')
+            # Wait for a short moment in case it's a very temporary issue
+            time.sleep(0.25)
+    del queue[:]
 
 
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,

@@ -48,6 +48,13 @@ SECRET_KEY = ''
 # sqlalchemy logging and run the `bin/utils/db_log.py` script in a separate
 # terminal window.
 #DB_LOG = False
+#
+# During development it is often more convenient to not have to run celery
+# and still receive emails. To do so, you can disable celery usage for emails.
+# Note that this is not suitable for a production setup, as it may result
+# in emails not being sent if the mail server is unavailable or sending e.g.
+# a reminder email fails for some reason.
+#SMTP_USE_CELERY = True
 
 #------------------------------------------------------------------------------
 # URLs
