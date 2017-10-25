@@ -258,6 +258,8 @@ Celery runs as a background daemon. Add a systemd unit file for it:
     Group=apache
     UMask=0027
     Type=simple
+    KillMode=mixed
+    TimeoutStopSec=300
 
     [Install]
     WantedBy=multi-user.target
