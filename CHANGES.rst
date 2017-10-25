@@ -23,6 +23,11 @@ Improvements
   (:issue:`3446`)
 - Add edit button to custom conference pages (:issue:`3284`)
 
+Bugfixes
+^^^^^^^^
+
+- Fix incorrect order of session blocks inside timetable (:issue:`2999`)
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 

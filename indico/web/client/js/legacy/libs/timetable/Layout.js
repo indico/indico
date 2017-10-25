@@ -164,7 +164,8 @@ type("TimetableLayoutManager", [],
                  }
 
                  if (exists(lastAssigned[getLastAssignedId(block)])) {
-                     lastAssign(block);
+                     assigned[block.assigned] = block;
+                     lastAssign(block, block.assigned);
                  } else {
                      // This block has never been assigned before. Just update the lastAssigned.
                      lastAssign(block, block.assigned);
@@ -351,7 +352,6 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                      block = self.getBlock(algData.blocks, point[0]);
 
                      block.end = algData.topPx;
-
                      if (algData.assigned[block.assigned]) {
                          algData.active--;
                          // this means it has been started in a previous timeslot
@@ -402,7 +402,7 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                  algData.grid.push([startMin/60%24, algData.topPx]);
              }
 
-             if (!algData.active) {
+             if (algData.active === 0) {
                  if (algData.currentGroup.length > 0) {
                      algData.groups.push([algData.currentGroup, keys(algData.assigned).length]);
                      algData.currentGroup = [];
@@ -419,8 +419,8 @@ type("CompactLayoutManager", ["IncrementalLayoutManager"],
                      block = self.getBlock(algData.blocks, point[0]);
                      block.sessionId = point[2];
                      block.sessionSlotId = point[3];
-
                      block.start = algData.topPx;
+
                      algData.active++;
                      self.assign(algData.assigned, block);
                      algData.currentGroup.push(block);
@@ -471,7 +471,6 @@ type("ProportionalLayoutManager", ["IncrementalLayoutManager"],
              var smallBlocks = [];
 
              each(points, function(point) {
-
                  if (point[1] == 'end') {
                      block = self.getBlock(algData.blocks, point[0]);
 

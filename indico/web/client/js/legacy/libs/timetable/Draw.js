@@ -1010,7 +1010,6 @@ type("TimetableDrawer", ["IWidget", "DroppableTimetableMixin"],
              this._blockMap = {};
 
              each(blocks, function(blockData) {
-
                  var nCol = self.layoutChooser.get().getNumColumnsForGroup(groups[blockData.group]);
                  self.maxCol = ((self.maxCol == null) || (self.maxCol < nCol)) ? nCol : self.maxCol;
 
