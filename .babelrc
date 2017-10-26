@@ -1,0 +1,10 @@
+{
+  "presets": [
+    ["env", {
+      "targets": {
+        "browsers": ["last 2 versions", "firefox esr", "not ie<11", "not ie_mob>0"]
+      }
+    }]
+  ],
+  "plugins": ["transform-runtime"]
+}

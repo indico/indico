@@ -26,6 +26,10 @@
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
+    <!-- Webpack bundles -->
+    {{ webpack['main.js'] }}
+    <!-- end -->
+
     {% for url in js_files -%}
         <script type="text/javascript" src="{{ url }}"></script>
     {% endfor %}
