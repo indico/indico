@@ -295,7 +295,6 @@ def register_all_js(env):
     palette = rjs_bundle('palette', 'js/palette.js')
 
     _jquery_files = namespace('js/jquery',
-                              'jquery-migrate.js',
                               'jquery.form.js',
                               'jquery.custom.js',
                               'jquery.daterange.js',
@@ -306,8 +305,6 @@ def register_all_js(env):
                               'jquery-extra-selectors.js',
                               'jstorage.js')
     jquery = rjs_bundle('jquery', *filter(None, [
-        'js/lib/underscore.js',
-        'js/lib/jquery.js',
         'js/lib/jquery.qtip.js',
         'js/jquery/jquery-ui.js',
         'js/lib/jquery.multiselect.js',
