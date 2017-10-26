@@ -23,6 +23,7 @@ from types import GeneratorType
 from flask import g
 
 from indico.core.config import config
+from indico.core.db import db
 from indico.core.logger import Logger
 from indico.util.string import to_unicode, truncate
 
@@ -93,8 +94,15 @@ def init_email_queue():
 
 
 def flush_email_queue():
-    """Send all the emails in the queue"""
-    from indico.core.emails import store_failed_email
+    """Send all the emails in the queue.
+
+    Note: This function does a database commit to update states
+    in case of failures or immediately-sent emails.  It should only
+    be called if the session is in a state safe to commit or after
+    doing a commit/rollback of any other changes that might have
+    been pending.
+    """
+    from indico.core.emails import store_failed_email, update_email_log_state
     queue = g.get('email_queue', [])
     if not queue:
         return
@@ -103,16 +111,20 @@ def flush_email_queue():
         try:
             fn(email, log_entry)
         except Exception:
-            path = store_failed_email(email, log_entry)
             # Flushing the email queue happens after a commit.
             # If anything goes wrong here we keep going and just log
-            # it to avoid losing emails in case celery is not used for
-            # email sending or there is a temporary issue with celery.
+            # it to avoid losing (more) emails in case celery is not
+            # used for email sending or there is a temporary issue
+            # with celery.
+            if log_entry:
+                update_email_log_state(log_entry, failed=True)
+            path = store_failed_email(email, log_entry)
             logger.exception('Flushing queued email "%s" failed; stored data in %s',
                              truncate(email['subject'], 50), path)
             # Wait for a short moment in case it's a very temporary issue
             time.sleep(0.25)
     del queue[:]
+    db.session.commit()
 
 
 def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, reply_address=None, attachments=None,

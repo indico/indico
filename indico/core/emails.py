@@ -51,7 +51,7 @@ def send_email_task(task, email, log_entry=None):
             task.retry(countdown=delay, max_retries=(MAX_TRIES - 1))
         except MaxRetriesExceededError:
             if log_entry:
-                _update_email_log_state(log_entry, failed=True)
+                update_email_log_state(log_entry, failed=True)
                 db.session.commit()
             # store the email in case the mail server is  unavailable for an
             # extended period so someone can recover it using `indico shell`
@@ -85,10 +85,10 @@ def do_send_email(email, log_entry=None, _from_task=False):
     if not _from_task:
         logger.info('Sent email "%s"', truncate(email['subject'], 50))
     if log_entry:
-        _update_email_log_state(log_entry)
+        update_email_log_state(log_entry)
 
 
-def _update_email_log_state(log_entry, failed=False):
+def update_email_log_state(log_entry, failed=False):
     if failed:
         log_entry.data['state'] = 'failed'
     else:
