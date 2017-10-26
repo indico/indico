@@ -28,6 +28,7 @@ from indico.core.config import config
 from indico.core.logger import Logger
 from indico.legacy.common.utils import OSSpecific
 from indico.util.fs import silentremove
+from indico.util.string import truncate
 
 
 # To cache `None` we need to actually store something else since memcached
@@ -139,7 +140,8 @@ class RedisCacheClient(CacheClient):
             else:
                 self._client.set(key, pickle.dumps(val))
         except redis.RedisError:
-            Logger.get('cache.redis').exception('set(%r, %r, %r) failed', key, val, ttl)
+            val_repr = truncate(repr(val), 1000)
+            Logger.get('cache.redis').exception('set(%r, %s, %r) failed', key, val_repr, ttl)
 
     def get(self, key):
         try:
