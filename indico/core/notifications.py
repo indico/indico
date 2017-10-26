@@ -103,7 +103,7 @@ def flush_email_queue():
         try:
             fn(email, log_entry)
         except Exception:
-            path = store_failed_email(email)
+            path = store_failed_email(email, log_entry)
             # Flushing the email queue happens after a commit.
             # If anything goes wrong here we keep going and just log
             # it to avoid losing emails in case celery is not used for

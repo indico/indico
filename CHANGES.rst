@@ -20,7 +20,10 @@ Improvements
 - Allow manually entering dates in datetime fields (:issue:`3136`)
 - Send emails through a celery task. This ensures users do not get
   an error if the mail server is temporarily unavailable. Sending an
-  email is also retried for a while in case of failure (:issue:`3121`)
+  email is also retried for a while in case of failure. In case of a
+  persistent failure the email is dumped to the temp directory and
+  can be re-sent manually using the new ``indico resend_email``
+  command (:issue:`3121`)
 
 Bugfixes
 ^^^^^^^^

@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import os
+
 import click
 from flask.cli import AppGroup, pass_script_info
 
@@ -96,6 +98,23 @@ def celery(ctx):
     """Manage the Celery task daemon."""
     from indico.core.celery.cli import celery_cmd
     celery_cmd(ctx.args)
+
+
+@cli.command(short_help='Re-send a failed email.')
+@click.argument('paths', type=click.Path(exists=True, dir_okay=False), metavar='PATH...', nargs=-1, required=True)
+def resend_email(paths):
+    """Re-send failed emails.
+
+    If sending emails failed for some reason and you want to retry
+    sending them, use this command and specify the path(s) to the
+    `failed-email-*` file(s) mentioned in the log.
+
+    If sending an email succeeds, the file is deleted; otherwise it
+    is kept and this command terminates with the exception that caused
+    the sending to fail.
+    """
+    from indico.core.emails import resend_failed_emails_cmd
+    resend_failed_emails_cmd(paths)
 
 
 @cli.command(short_help='Delete old temporary files.')

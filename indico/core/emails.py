@@ -21,6 +21,7 @@ import os
 import tempfile
 from datetime import date
 
+import click
 from celery.exceptions import MaxRetriesExceededError, Retry
 from sqlalchemy.orm.attributes import flag_modified
 
@@ -55,7 +56,7 @@ def send_email_task(task, email, log_entry=None):
             # store the email in case the mail server is  unavailable for an
             # extended period so someone can recover it using `indico shell`
             # and possibly retry sending it
-            path = store_failed_email(email)
+            path = store_failed_email(email, log_entry)
             logger.error('Could not send email "%s" (attempt %d/%d); giving up [%s]; stored data in %s',
                          truncate(email['subject'], 50), attempt, MAX_TRIES, exc, path)
         except Retry:
@@ -96,9 +97,27 @@ def _update_email_log_state(log_entry, failed=False):
     flag_modified(log_entry, 'data')
 
 
-def store_failed_email(email):
+def store_failed_email(email, log_entry=None):
     prefix = 'failed-email-{}-'.format(date.today().isoformat())
     fd, name = tempfile.mkstemp(prefix=prefix, dir=config.TEMP_DIR)
     with os.fdopen(fd, 'wb') as f:
-        cPickle.dump(email, f)
+        cPickle.dump((email, log_entry.id if log_entry else None), f)
     return name
+
+
+def resend_failed_email(path):
+    """Try re-sending an email that previously failed."""
+    from indico.modules.events.logs import EventLogEntry
+    with open(path, 'rb') as f:
+        email, log_entry_id = cPickle.load(f)
+    log_entry = EventLogEntry.get(log_entry_id) if log_entry_id is not None else None
+    do_send_email(email, log_entry)
+    db.session.commit()
+    os.remove(path)
+    return email
+
+
+def resend_failed_emails_cmd(paths):
+    for path in paths:
+        email = resend_failed_email(path)
+        click.secho('Email sent: "{}" ({})'.format(truncate(email['subject'], 50), os.path.basename(path)), fg='green')
