@@ -20,6 +20,8 @@ Bugfixes
 - Do not intercept HTTP exceptions containing a custom response.
   When raising such exceptions we do not want the default handling
   but rather send the custom response to the client.
+- Do not apply margin for empty root category sidebar (:issue:`3116`,
+  thanks :user:`nop33`)
 
 
 Version 2.0a1
