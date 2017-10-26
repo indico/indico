@@ -189,17 +189,6 @@ def install_compass():
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
 
 
-@recipe('jquery')
-def install_jquery():
-    with node_env():
-        with lcd(os.path.join(env.ext_dir, 'jquery')):
-            local('npm install')
-            grunt('uglify dist')
-            dest_dir = lib_dir(env.src_dir, 'js')
-            local('mkdir -p {0}'.format(dest_dir))
-            local('cp dist/jquery.js {0}/'.format(dest_dir))
-
-
 @recipe('jed')
 def install_jed():
     with lcd(os.path.join(env.ext_dir, 'Jed')):
@@ -224,14 +213,6 @@ def install_jqplot():
             dest = os.path.join(dest_dir_js_plugins, plugin_name)
             local('mkdir -p {0}'.format(dest))
             local('cp src/plugins/{0}/* {1}'.format(plugin_name, dest))
-
-
-@recipe('underscore')
-def install_underscore():
-    """
-    Install underscore from Git
-    """
-    _install_dependencies('underscore', 'underscore.js', 'js')
 
 
 @recipe('rrule')  # rrule.js

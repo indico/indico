@@ -21,9 +21,12 @@ import uuid
 
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
+from flask.helpers import get_root_path
 from flask_pluginengine import plugins_loaded
 from flask_sqlalchemy import models_committed
+from flask_webpackext import FlaskWebpackExt, current_webpack
 from markupsafe import Markup
+from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import BadRequest
@@ -241,6 +244,35 @@ def setup_assets():
     register_all_css(core_env)
 
 
+def _get_webpack_config(app):
+    return {
+        'build': {
+            'debug': app.debug,
+            'assetsPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
+            'assetsURL': app.config['WEBPACKEXT_PROJECT_DISTURL']
+        }
+    }
+
+
+def setup_webpack(app):
+    pkg_path = os.path.dirname(get_root_path('indico'))
+    project = WebpackBundleProject(
+        pkg_path,
+        config=lambda: _get_webpack_config(app),
+        config_path=os.path.join(pkg_path, 'config.json')
+    )
+    app.config.update({
+        'WEBPACKEXT_PROJECT': project,
+        'WEBPACKEXT_STATIC_DIR': app.config['INDICO']['ASSETS_DIR'],
+        'WEBPACKEXT_STATIC_URL_PATH': '/static/assets/',
+        'WEBPACKEXT_PROJECT_DISTDIR': os.path.join(app.config['INDICO']['ASSETS_DIR'], 'webpack'),
+        'WEBPACKEXT_PROJECT_DISTURL': '/static/assets/webpack/',
+        'WEBPACKEXT_MANIFEST_PATH': 'webpack/manifest.json'
+    })
+
+    FlaskWebpackExt(app)
+
+
 def configure_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
@@ -359,6 +391,7 @@ def make_app(set_path=False, testing=False, config_override=None):
 
         core_env.init_app(app)
         setup_assets()
+        setup_webpack(app)
 
         configure_db(app)
         mm.init_app(app)
