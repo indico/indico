@@ -1,3 +1,4 @@
+CHANGES.rst merge=union
 *.tpl linguist-language=mako
 doc/* linguist-documentation
 indico/htdocs/js/calendar/* linguist-vendored
