@@ -89,24 +89,26 @@
         margin-top: 2em;
     }
 
-    .infoline {
-        .text {
-            padding-left: 0;
+    .session-conveners {
+        color: $light-black;
+
+        .header {
+            margin-bottom: 0;
+        }
+
+        .header-row h4 {
+            margin-top: 1.25em;
         }
 
         ul {
             padding: 0;
+            margin: 0.5em 1em 0 1em;
             list-style-type: none;
 
             li {
                 @include ellipsis();
 
-                margin: 5px 0;
-                padding: 0 5px;
-
-                a {
-                    padding: 5px;
-                }
+                margin: 0.5em 0;
             }
         }
     }

@@ -61,20 +61,20 @@
 
             padding: 0.2rem 0.3rem;
             &:first-child {
-                @include icon-before('icon-none');
                 @include ellipsis;
 
                 max-width: 1px;
 
                 &:before {
                     display: inline-block;
-
                 }
+
                 > .custom-protection:before {
                     @extend %attachment-icon;
 
                     color: $pastel-red;
                 }
+
                 > a.icon-file-pdf {
                     @include colored-icon($red);
                 }
@@ -176,7 +176,6 @@
             cursor: pointer;
             > td {
                 &:first-child {
-                    @include icon-before('icon-arrow-down');
                     @include border-top-left-radius(2px);
                     @include border-bottom-left-radius(2px);
 
@@ -200,13 +199,10 @@
                 > span {
                     @include icon-before('icon-folder');
                 }
-                &:before {
-                    @include rotate(-90deg);
-                }
             }
         }
         &.sub-tree > td {
-            padding: 0 0 0 2.8em;
+            padding: 0 0 0 1.4em;
             &:first-child:before {
                 display: none; // no icon space for nested files
             }

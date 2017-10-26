@@ -37,6 +37,8 @@
     overflow: auto;
     width: 50%;
     margin-top: 1em;
+    display: flex;
+    flex-flow: row nowrap;
 
     &, &:after, &:before {
         @include box-sizing(border-box);
@@ -44,9 +46,16 @@
 
     i, .icon {
         color: $gray;
-        float: left;
         font-size: 2rem;
         padding-right: 0.5em;
+    }
+
+    .text {
+        flex-grow: 1;
+    }
+
+    .attachments-box {
+        padding: 0;
     }
 
     .toolbar {
@@ -60,10 +69,6 @@
             font-size: 1rem;
             line-height: 2rem;
         }
-    }
-
-    .text {
-        padding-left: 3rem;
     }
 }
 
@@ -98,8 +103,6 @@
 }
 
 .infoline.material {
-    padding: 5px;
-
     > ul {
         margin: 0;
         padding: 0 3rem 0 3rem;

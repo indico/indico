@@ -22,6 +22,7 @@ Bugfixes
   but rather send the custom response to the client.
 - Do not apply margin for empty root category sidebar (:issue:`3116`,
   thanks :user:`nop33`)
+- Fix alignment of info-grid items on main conference page (:issue:`3126`)
 
 
 Version 2.0a1
