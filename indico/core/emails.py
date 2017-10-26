@@ -16,7 +16,10 @@
 
 from __future__ import absolute_import, unicode_literals
 
-from uuid import uuid4
+import cPickle
+import os
+import tempfile
+from datetime import date
 
 from celery.exceptions import MaxRetriesExceededError, Retry
 from sqlalchemy.orm.attributes import flag_modified
@@ -25,7 +28,6 @@ from indico.core.celery import celery
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.logger import Logger
-from indico.legacy.common.cache import GenericCache
 from indico.util.date_time import now_utc
 from indico.util.emails.backend import EmailBackend
 from indico.util.emails.message import EmailMessage
@@ -50,13 +52,12 @@ def send_email_task(task, email, log_entry=None):
             if log_entry:
                 _update_email_log_state(log_entry, failed=True)
                 db.session.commit()
-            # store the email in the cache in case the mail server is
-            # unavailable for an extended period so someone can recover
-            # it using `indico shell` and possibly retry sending it
-            uuid = unicode(uuid4())
-            GenericCache('failed-emails').set(uuid, email, 86400*31)
+            # store the email in case the mail server is  unavailable for an
+            # extended period so someone can recover it using `indico shell`
+            # and possibly retry sending it
+            path = store_failed_email(email)
             logger.error('Could not send email "%s" (attempt %d/%d); giving up [%s]; stored data in %s',
-                         truncate(email['subject'], 50), attempt, MAX_TRIES, exc, uuid)
+                         truncate(email['subject'], 50), attempt, MAX_TRIES, exc, path)
         except Retry:
             logger.warning('Could not send email "%s" (attempt %d/%d); retry in %ds [%s]',
                            truncate(email['subject'], 50), attempt, MAX_TRIES, delay, exc)
@@ -93,3 +94,11 @@ def _update_email_log_state(log_entry, failed=False):
         log_entry.data['state'] = 'sent'
         log_entry.data['sent_dt'] = now_utc(False).isoformat()
     flag_modified(log_entry, 'data')
+
+
+def store_failed_email(email):
+    prefix = 'failed-email-{}-'.format(date.today().isoformat())
+    fd, name = tempfile.mkstemp(prefix=prefix, dir=config.TEMP_DIR)
+    with os.fdopen(fd, 'wb') as f:
+        cPickle.dump(email, f)
+    return name
