@@ -2,6 +2,40 @@ Changelog
 =========
 
 
+Version 2.1
+-----------
+
+*Unreleased*
+
+Major Features
+^^^^^^^^^^^^^^
+
+- Add event roles, which are similar to local groups but within the
+  scope of an event. They can be used both for assigning permissions
+  within the event and also for quickly seeing which user has which
+  role (such as "Program Committee" in the event
+- Add new *List of Participants* (previously called *Roles*) which
+  now shows each person's custom event roles and whether they have
+  registered for the event in addition to the the default roles
+  (speaker, chairperson, etc.)
+
+Improvements
+^^^^^^^^^^^^
+
+- Allow specifying a default session for a track which will then be
+  used by default when accepting an abstract in that track (:issue:`3069`)
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Rename *Roles* in ACL entries to *Permissions*.  This especially affects
+  the ``can_manage`` method whose ``role`` argument has been renamed to
+  ``permission`` (:issue:`3057`)
+
+
+----
+
+
 Version 2.0a2
 -------------
 
