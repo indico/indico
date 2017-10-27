@@ -26,11 +26,11 @@ from indico.util.struct.enum import RichEnum
 from indico.web.forms.fields import (IndicoEnumRadioField, IndicoQuerySelectMultipleCheckboxField,
                                      IndicoSelectMultipleCheckboxField)
 from indico.web.forms.validators import ConfirmPassword, HiddenUnless, IndicoRegexp, SoftLength, WordCount
-from indico.web.forms.widgets import SelectizeWidget
+from indico.web.forms.widgets import SelectizeWidget, TypeaheadWidget
 
 
 def is_single_line_field(field):
-    if isinstance(field.widget, SelectizeWidget):
+    if isinstance(field.widget, (SelectizeWidget, TypeaheadWidget)):
         return True
     if isinstance(field.widget, Select):
         return not field.widget.multiple

@@ -23,6 +23,7 @@ Bugfixes
 - Do not apply margin for empty root category sidebar (:issue:`3116`,
   thanks :user:`nop33`)
 - Fix alignment of info-grid items on main conference page (:issue:`3126`)
+- Properly align the label of the attachment folder title field
 
 
 Version 2.0a1
