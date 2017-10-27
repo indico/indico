@@ -30,30 +30,42 @@
             this.$dataField.val(JSON.stringify(this.data));
         },
         _renderLabel: function(principal) {
-            var $labelBox = $('<div class="label-box">');
+            var $labelBox = $('<div>', {class: 'label-box'});
             if (principal.type === 'role') {
-                var $code = $('<span class="role-code">').text(principal.code)
-                    .css({'border-color': '#' + principal.color, 'color': '#' + principal.color});
-                var $text = $('<span class="text-normal">').text(principal.name);
-                return $labelBox.append($('<span class="flexrow f-a-center">').append($code).append($text));
+                var $text = $('<span>', {class: 'text-normal', text: principal.name});
+                var $code = $('<span>', {
+                    class: 'role-code',
+                    text: principal.code,
+                    css: {
+                        'border-color': '#' + principal.color,
+                        'color': '#' + principal.color
+                    }
+                });
+
+                return $labelBox.append($('<span>', {class: 'flexrow f-a-center'}).append($code).append($text));
             } else {
                 var iconClass = principal.type === 'user' ? 'icon-user' : 'icon-users';
                 var text = principal.type === 'user' ? principal.name : principal.id;
-                return $labelBox.append($('<span class="label-icon text-normal">').addClass(iconClass).text(text));
+                return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
         },
         _renderPermissions: function(permissions) {
-            var $permissions = $('<div class="permissions-box flexrow f-a-center f-self-stretch">');
+            var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
             permissions.forEach(function(item) {
-                $permissionsList.append($('<li class="i-label bold">').addClass(permissionClasses[item]).append(item));
+                $permissionsList.append($('<li>', {class: 'i-label bold ' + permissionClasses[item]}).append(item));
             });
-            var $editButton = $('<button class="i-button text-color borderless icon-only icon-edit">')
-                .appendTo($permissions);
+
+            var $permissionsEditBtn = $('<button>', {
+                type: 'button',
+                class: 'i-button text-color borderless icon-only icon-edit',
+            });
+
+            $permissionsEditBtn.appendTo($permissions);
             return $permissions;
         },
         _renderItem: function(item) {
-            var $item = $('<li class="flexrow f-a-center">');
+            var $item = $('<li>', {class: 'flexrow f-a-center'});
             $item.append(this._renderLabel(item[0]));
             $item.append(this._renderPermissions(item[1]));
             return $item;
