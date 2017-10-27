@@ -69,6 +69,7 @@ class RHDisplaySession(RHDisplaySessionBase):
         _contrib_tte_strategy = contributions_strategy.joinedload('timetable_entry')
         _contrib_tte_strategy.lazyload('*')
         contributions_strategy.joinedload('person_links')
+        contributions_strategy.subqueryload('references')
         blocks_strategy = joinedload('blocks')
         blocks_strategy.joinedload('person_links')
         _block_tte_strategy = blocks_strategy.joinedload('timetable_entry')
