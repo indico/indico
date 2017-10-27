@@ -66,6 +66,7 @@ def generate_global_file():
             'FontSassBundle': core_env['fonts_sass'].urls(),
 
             'EventCreation': url_rule_to_js('events.create'),
+            'EventPermissions': url_rule_to_js('event_management.event_permissions'),
 
             'RegistrationForm': {
                 'section': {

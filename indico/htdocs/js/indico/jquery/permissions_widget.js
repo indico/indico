@@ -26,6 +26,10 @@
     };
 
     $.widget('indico.permissionswidget', {
+        options: {
+            event_id: null
+        },
+
         _update: function() {
             this.$dataField.val(JSON.stringify(this.data));
         },
@@ -61,6 +65,50 @@
                 class: 'i-button text-color borderless icon-only icon-edit',
             });
 
+            $permissionsEditBtn.ajaxDialog({
+                url: build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
+                title: $T.gettext('Assign Permissions'),
+                // TODO: Provide real data & decide structure
+                data: {
+                    permissions: JSON.stringify([{
+                        title: 'Event Management',
+                        selected: false,
+                        children: [
+                            {
+                                title: 'View',
+                                selected: true
+                            },
+                            {
+                                title: 'Manage Material',
+                                selected: false
+                            },
+                            {
+                                title: 'Manage Contributions',
+                                selected: false
+                            },
+                            {
+                                title: 'Manage Timetable',
+                                selected: false
+                            },
+                            {
+                                title: 'Manage Call for Abstracts',
+                                selected: false,
+                                children: [
+                                    {
+                                        title: 'Manage Programme',
+                                        selected: false
+                                    }
+                                ]
+                            },
+                            {
+                                title: 'Manage Call for Papers',
+                                selected: false
+                            }
+                        ]
+                    }])
+                }
+            });
+
             $permissionsEditBtn.appendTo($permissions);
             return $permissions;
         },
@@ -72,7 +120,7 @@
         },
         _render: function() {
             var self = this;
-            this.data.forEach(function(item) {
+            this.data.permissions.forEach(function(item) {
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
         },

@@ -1,0 +1,14 @@
+<div>
+    <ul>
+        {% for permission in permissions recursive %}
+            <li>
+                <input type="checkbox" id=""><label for="">{{ permission.title }}</label>
+            </li>
+            {% if permission.children %}
+                <ul class="subpermission">
+                    {{ loop(permission.children) }}
+                </ul>
+            {% endif %}
+        {% endfor %}
+    </ul>
+</div>

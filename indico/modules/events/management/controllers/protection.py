@@ -27,6 +27,7 @@ from indico.modules.events.operations import update_event_protection
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
 from indico.modules.events.util import get_object_from_args, update_object_principals
+from indico.util import json
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -94,15 +95,24 @@ class RHEventProtection(RHManageEventBase):
         event_session_settings = session_settings.get_all(self.event)
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
-        permissions = [[{'id': 91138, 'name': 'Marco Vidal', 'type': 'user'}, ['edit']],
-                       [{'id': 'indico-team', 'type': 'group'}, ['access', 'timetable']],
-                       [{'id': 3, 'name': 'Program Committee', 'code': 'PC', 'type': 'role', 'color': '882211'}, ['access', 'submit']]]
+        permissions_data = {'event_id': self.event.id, 'permissions': [
+            [{'id': 91138, 'name': 'Marco Vidal', 'type': 'user'}, ['edit']],
+            [{'id': 'indico-team', 'type': 'group'}, ['access', 'timetable']],
+            [{'id': 3, 'name': 'Program Committee', 'code': 'PC', 'type': 'role', 'color': '882211'},
+             ['access', 'submit']]]}
         return dict({'protection_mode': self.event.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
-                     'own_no_access_contact': self.event.own_no_access_contact, 'permissions': permissions},
+                     'own_no_access_contact': self.event.own_no_access_contact, 'permissions': permissions_data},
                     **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):
         data = {field: getattr(form, field).data for field in form.priv_fields}
         update_session_coordinator_privs(self.event, data)
+
+
+class RHEventPermissions(RHManageEventBase):
+    def _process(self):
+        permissions = json.loads(request.args['permissions'])
+        return jsonify_template('events/management/event_permissions_dialog.html', event=self.event,
+                                permissions=permissions)
