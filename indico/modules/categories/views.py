@@ -42,7 +42,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
         self.atom_feed_url = kwargs.get('atom_feed_url')
         self.atom_feed_title = kwargs.get('atom_feed_title')
         if category:
-            self._setTitle('Indico [{}]'.format(category.title))
+            self.title = category.title
         WPDecorated.__init__(self, rh, **kwargs)
         self._mathjax = kwargs.pop('mathjax', False)
 

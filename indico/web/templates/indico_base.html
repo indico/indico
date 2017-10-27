@@ -4,13 +4,13 @@
 <html prefix="og: http://ogp.me/ns#"
       data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
 <head>
-    <title>{{ page_title }}</title>
+    <title>{{ page_title }} · {{ site_name }}{% if site_name != 'Indico' %} (Indico){% endif %}</title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
     <link rel="shortcut icon" type="image/x-icon" href="{{ indico_config.IMAGES_BASE_URL }}/indico.ico">
 
-    <meta property="og:site_name" content="{% if site_name != 'Indico' %}Indico - {% endif %}{{ site_name }}">
+    <meta property="og:site_name" content="{{ site_name }}{% if site_name != 'Indico' %} (Indico){% endif %}">
     {% if social.facebook_app_id -%}
         <meta property="fb:app_id" content="{{ social.facebook_app_id }}">
     {% endif %}

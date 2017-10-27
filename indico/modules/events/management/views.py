@@ -20,7 +20,7 @@ from flask import render_template_string
 
 from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.events.models.events import EventType
-from indico.util.string import to_unicode
+from indico.util.string import strip_tags, to_unicode
 from indico.web.breadcrumbs import render_breadcrumbs
 from indico.web.flask.templating import get_template_module
 from indico.web.views import WPDecorated, WPJinjaMixin
@@ -54,6 +54,7 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
+        self.title = strip_tags(self.event.title)
         kwargs['base_layout_params'] = {
             'active_menu_item': active_menu_item or self.sidemenu_option,
             'event_types': [(et.name, et.title) for et in EventType]

@@ -109,7 +109,7 @@ class WPEventBase(WPDecorated):
             else:
                 dates = ' ({} - {})'.format(to_unicode(format_date(start_dt_local, format='long')),
                                             to_unicode(format_date(end_dt_local, format='long')))
-        self._setTitle('{} {}'.format(strip_tags(self.event.title), dates))
+        self.title = '{} {}'.format(strip_tags(self.event.title), dates)
 
     def _getHeader(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs

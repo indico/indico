@@ -16,6 +16,7 @@ Improvements
 - Use semicolons instead of commas as separator when exporting list
   values (such as multi-select registration form fields) to CSV or
   Excel (:issue:`3060`)
+- Use custom site title in page title (:issue:`3018`)
 
 Bugfixes
 ^^^^^^^^

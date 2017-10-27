@@ -146,7 +146,7 @@ class WPJinjaMixin(object):
 
 
 class WPBase(object):
-    _title = 'Indico'
+    title = ''
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
@@ -156,12 +156,6 @@ class WPBase(object):
         self._rh = rh
         self._kwargs = kwargs
         self._asset_env = core_env
-
-    def _getTitle(self):
-        return self._title
-
-    def _setTitle(self, newTitle):
-        self._title = newTitle.strip()
 
     def getPrintCSSFiles(self):
         return []
@@ -213,11 +207,11 @@ class WPBase(object):
         from indico.modules.admin import RHAdminBase
         from indico.modules.core.settings import core_settings, social_settings
 
-        title_parts = [to_unicode(self._getTitle())]
+        title_parts = [self.title]
         if self.MANAGEMENT:
-            title_parts.append(_('Management area'))
+            title_parts.insert(0, _('Management'))
         elif isinstance(self._rh, RHAdminBase):
-            title_parts.append(_('Administration area'))
+            title_parts.insert(0, _('Administration'))
 
         plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
                                         multi_value_types=list)
@@ -235,7 +229,7 @@ class WPBase(object):
                                css_files=css_files, print_css_files=print_css_files, js_files=js_files,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
-                               page_title=' - '.join(title_parts),
+                               page_title=' - '.join(unicode(x) for x in title_parts if x),
                                head_content=to_unicode(self._getHeadContent()),
                                body=body)
 

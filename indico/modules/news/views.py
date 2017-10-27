@@ -23,12 +23,10 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 
 class WPNews(WPJinjaMixin, WPDecorated):
     template_prefix = 'news/'
+    title = _('News')
 
     def _getBody(self, params):
         return self._getPageContent(params)
-
-    def _getTitle(self):
-        return WPDecorated._getTitle(self) + ' - ' + _("News")
 
 
 class WPManageNews(WPAdmin):
