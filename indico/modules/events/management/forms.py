@@ -106,8 +106,8 @@ class EventDatesForm(IndicoForm):
     _override_date_fields = ('start_dt_override', 'end_dt_override')
 
     timezone = IndicoTimezoneSelectField(_('Timezone'), [DataRequired()])
-    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], allow_clear=False)
-    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt', not_equal=True)],
+    start_dt = IndicoDateTimeField(_("Start"), [InputRequired()], allow_clear=False)
+    end_dt = IndicoDateTimeField(_("End"), [InputRequired(), LinkedDateTime('start_dt', not_equal=True)],
                                  allow_clear=False)
     update_timetable = BooleanField(_('Update timetable'), widget=SwitchWidget(),
                                     description=_("Move sessions/contributions/breaks in the timetable according "
@@ -134,8 +134,10 @@ class EventDatesForm(IndicoForm):
         # displayed dates
         self.has_displayed_dates = (self.event.type_ == EventType.conference)
         if self.has_displayed_dates:
-            self.start_dt_override.default_time = self.start_dt.data.astimezone(timezone(self.timezone.data)).time()
-            self.end_dt_override.default_time = self.end_dt.data.astimezone(timezone(self.timezone.data)).time()
+            start_dt = self.start_dt.data or self.start_dt.object_data
+            end_dt = self.end_dt.data or self.end_dt.object_data
+            self.start_dt_override.default_time = start_dt.astimezone(timezone(self.timezone.data)).time()
+            self.end_dt_override.default_time = end_dt.astimezone(timezone(self.timezone.data)).time()
         else:
             del self.start_dt_override
             del self.end_dt_override

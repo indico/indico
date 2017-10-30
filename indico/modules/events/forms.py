@@ -21,7 +21,7 @@ from datetime import time, timedelta
 from flask import session
 from wtforms.fields import StringField, TextAreaField
 from wtforms.fields.html5 import URLField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms.validators import DataRequired, InputRequired, ValidationError
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -75,8 +75,8 @@ class EventCreationFormBase(IndicoForm):
 class EventCreationForm(EventCreationFormBase):
     _field_order = ('title', 'start_dt', 'end_dt', 'timezone', 'location_data', 'protection_mode')
     _advanced_field_order = ()
-    start_dt = IndicoDateTimeField(_("Start"), [DataRequired()], default_time=time(8), allow_clear=False)
-    end_dt = IndicoDateTimeField(_("End"), [DataRequired(), LinkedDateTime('start_dt', not_equal=True)],
+    start_dt = IndicoDateTimeField(_("Start"), [InputRequired()], default_time=time(8), allow_clear=False)
+    end_dt = IndicoDateTimeField(_("End"), [InputRequired(), LinkedDateTime('start_dt', not_equal=True)],
                                  default_time=time(18), allow_clear=False)
 
 

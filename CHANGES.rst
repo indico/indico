@@ -17,6 +17,7 @@ Improvements
   values (such as multi-select registration form fields) to CSV or
   Excel (:issue:`3060`)
 - Use custom site title in page title (:issue:`3018`)
+- Allow manually entering dates in datetime fields (:issue:`3136`)
 
 Bugfixes
 ^^^^^^^^

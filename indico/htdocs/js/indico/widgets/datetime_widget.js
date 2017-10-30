@@ -133,11 +133,6 @@
         ]).on('change', function(e) {
             updateTimeRequired(e);
             updateResetFieldAction();
-        }).on('keydown', function(e) {
-            if (e.which === K.BACKSPACE) {
-                e.preventDefault();
-                clearDate();
-            }
         });
 
         timeField.on('change', function applyOnChangeHandlers() {
