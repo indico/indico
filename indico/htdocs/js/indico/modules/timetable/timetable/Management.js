@@ -335,7 +335,11 @@ type("RescheduleDialog", ["ExclusivePopupWithButtons"], {
      * For an interval timetable, returns the title of the interval
      */
     __getIntervalTitle: function(){
-        return '"' + this.tt.contextInfo.title + '"';
+        if (this.tt.contextInfo.slotTitle) {
+            return '"{0}: {1}"'.format(this.tt.contextInfo.title, this.tt.contextInfo.slotTitle);
+        } else {
+            return '"{0}"'.format(this.tt.contextInfo.title);
+        }
     },
 
     /**
@@ -685,8 +689,11 @@ type("FitInnerTimetableDialog", ["ConfirmPopup"], {
      * Returns the title of the session block
      */
     __generateSessionBlockTitle: function() {
-        return '"' + this.tt.contextInfo.title +
-            (this.tt.contextInfo.slotTitle ? ': ' + this.tt.contextInfo.slotTitle : '') + '"';
+        if (this.tt.contextInfo.slotTitle) {
+            return '"{0}: {1}"'.format(this.tt.contextInfo.title, this.tt.contextInfo.slotTitle);
+        } else {
+            return '"{0}"'.format(this.tt.contextInfo.title);
+        }
     },
 
     /**
