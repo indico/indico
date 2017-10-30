@@ -41,7 +41,7 @@ Flask-BabelEx==0.9.3
 SQLAlchemy==1.1.14
 WTForms==2.1
 WTForms-Components==0.10.3
-psycopg2==2.7.3.1
+psycopg2==2.7.3.2
 redis==2.10.6
 hiredis==0.2.0
 enum34
@@ -50,7 +50,7 @@ blinker==1.4
 alembic==0.9.6
 Flask-Migrate==2.1.1
 Flask-PluginEngine==0.3.1
-Flask-Multipass==0.1
+Flask-Multipass==0.1.1
 click==6.7
 colorclass==2.2.0
 itsdangerous==0.24
@@ -65,8 +65,8 @@ Jinja2==2.9.6
 xlsxwriter==1.0.2
 jsonschema==2.6.0
 html2text==2017.10.4
-marshmallow==2.13.6
-marshmallow-sqlalchemy==0.13.1
+marshmallow==2.14.0
+marshmallow-sqlalchemy==0.13.2
 marshmallow-enum==1.4.1
 flask-marshmallow==0.8.0
 ipython<6,>=5.4.1
