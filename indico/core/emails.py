@@ -74,7 +74,22 @@ def send_email_task(task, email, log_entry=None):
 
 
 def do_send_email(email, log_entry=None, _from_task=False):
-    """Send an email"""
+    """Send an email.
+
+    This function should not be called directly unless your
+    goal is to send an email *right now* without nice error
+    handling or retrying.  For pretty much all cases where
+    you just want to send an email, use `send_email` instead.
+
+    :param email: The data describign the email, as created by
+                  `make_email`
+    :param log_entry: An `EventLogEntry` for the email in case it was
+                      sent in the context of an event.  After sending
+                      the email, the log entry's state will be updated
+                      to indicate that the email has been sent.
+    :param _from_task: Indicates that this function is called from
+                       the celery task responsible for sending emails.
+    """
     with EmailBackend(timeout=config.SMTP_TIMEOUT) as conn:
         msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
                            to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
