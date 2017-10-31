@@ -13,6 +13,9 @@ Improvements
 - Hide category field in event creation dialog if there are no
   subcategories (:issue:`3112`)
 - Remove length limit from registration form field captions (:issue:`3119`)
+- Use semicolons instead of commas as separator when exporting list
+  values (such as multi-select registration form fields) to CSV or
+  Excel (:issue:`3060`)
 
 Bugfixes
 ^^^^^^^^

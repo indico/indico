@@ -54,9 +54,9 @@ _prepare_header_utf8 = partial(_prepare_header, as_unicode=False)
 
 def _prepare_csv_data(data, _linebreak_re=re.compile(ur'(\r?\n)+')):
     if isinstance(data, (list, tuple)):
-        data = ', '.join(data)
+        data = '; '.join(data)
     elif isinstance(data, set):
-        data = ', '.join(sorted(data, key=unicode.lower))
+        data = '; '.join(sorted(data, key=unicode.lower))
     elif isinstance(data, bool):
         data = 'Yes' if data else 'No'
     elif data is None:
@@ -90,9 +90,9 @@ def generate_csv(headers, rows):
 
 def _prepare_excel_data(data, tz=None):
     if isinstance(data, (list, tuple)):
-        data = ', '.join(data)
+        data = '; '.join(data)
     elif isinstance(data, set):
-        data = ', '.join(sorted(data, key=unicode.lower))
+        data = '; '.join(sorted(data, key=unicode.lower))
     elif is_lazy_string(data) or isinstance(data, Markup):
         data = unicode(data)
     elif isinstance(data, datetime):
