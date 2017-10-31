@@ -30,6 +30,7 @@ Bugfixes
 - Properly align the label of the attachment folder title field
 - Fix some rare unicode errors during exception handling/logging
 - Clarify messages in session block rescheduling dialogs (:issue:`3080`)
+- Fix event header bar in IE11 (:issue:`3135`)
 
 
 Version 2.0a1
