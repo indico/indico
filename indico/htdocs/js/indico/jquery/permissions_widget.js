@@ -73,36 +73,73 @@
                     permissions: JSON.stringify([{
                         title: 'Event Management',
                         selected: false,
+                        code: 'event_mgmt',
                         children: [
                             {
                                 title: 'View',
-                                selected: true
+                                selected: true,
+                                code: 'event_view'
                             },
                             {
                                 title: 'Manage Material',
-                                selected: false
+                                selected: false,
+                                code: 'material'
                             },
                             {
                                 title: 'Manage Contributions',
-                                selected: false
+                                selected: false,
+                                code: 'contributions'
                             },
                             {
                                 title: 'Manage Timetable',
-                                selected: false
+                                selected: false,
+                                code: 'timetable'
                             },
                             {
                                 title: 'Manage Call for Abstracts',
                                 selected: false,
+                                code: 'cfa',
                                 children: [
                                     {
                                         title: 'Manage Programme',
-                                        selected: false
+                                        selected: true,
+                                        code: 'programme'
                                     }
                                 ]
                             },
                             {
                                 title: 'Manage Call for Papers',
-                                selected: false
+                                selected: false,
+                                code: 'cfp'
+                            },
+                            {
+                                title: 'Manage Registration',
+                                selected: true,
+                                code: 'registration',
+                                children: [
+                                    {
+                                        title: 'Manage List of Participants',
+                                        selected: true,
+                                        code: 'participants_mgmt',
+                                        children: [
+                                            {
+                                                title: 'View List of Participants',
+                                                selected: true,
+                                                code: 'participants_view'
+                                            }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                title: 'Manage Surveys',
+                                selected: false,
+                                code: 'surveys'
+                            },
+                            {
+                                title: 'Manage Layout',
+                                selected: false,
+                                code: 'layout'
                             }
                         ]
                     }])

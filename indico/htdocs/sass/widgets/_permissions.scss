@@ -1,3 +1,20 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
 .permissions-widget-list {
     @include border-left($width: 3px);
     padding-left: 1em;
@@ -47,6 +64,72 @@
 
         button {
             margin-left: auto;
+        }
+    }
+}
+
+@mixin circle-checkbox-checked() {
+    background-color: $pastel-blue;
+    border: 2px solid $darker-blue;
+}
+
+.permissions-dialog {
+    .permissions {
+        list-style-type: none;
+        padding: 0.25em 1em;
+
+        label {
+            color: $light-black;
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+            font-weight: normal;
+        }
+
+        .item {
+            padding: 0.25em 1em;
+        }
+
+        .permissions > .item {
+            @include border-left(lighten($pastel-gray, 7%), $width: 2px);
+        }
+
+        .circle-checkbox {
+            display: none;
+
+            & + label::before {
+                @include border-all($gray, $width: 2px);
+                border-radius: 3em;
+                content: '';
+                display: inline-block;
+                margin-right: 0.25em;
+                vertical-align: middle;
+                height: 23px;
+                width: 23px;
+            }
+
+            &:hover:not(:checked) + label::before {
+                background-color: $light-blue;
+            }
+
+            &:checked + label::before {
+                @include circle-checkbox-checked();
+            }
+
+            &:hover:checked + label::before {
+                background-color: $light-blue;
+                border-color: $dark-blue;
+            }
+
+            &:checked ~ ul {
+                label {
+                    opacity: 0.5;
+                }
+
+                label::before {
+                    @include circle-checkbox-checked();
+                }
+            }
         }
     }
 }
