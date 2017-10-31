@@ -141,9 +141,10 @@
             trackSessionMap: {}
         }, options);
 
-        $('#accepted_track').on('change', function() {
+        $('body').on('change', '#accepted_track', function() {
             var sessionId = options.trackSessionMap[$(this).val()];
             $('#session').val(sessionId || "__None");
-        }).trigger('change');
+        });
+        $('#accepted_track').trigger('change');
     };
 })(window);

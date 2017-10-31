@@ -95,6 +95,10 @@ class RHAbstractList(DisplayAbstractListMixin, RHAbstractListBase):
     template = 'management/abstract_list.html'
     view_class = WPManageAbstracts
 
+    def _render_template(self, **kwargs):
+        kwargs['track_session_map'] = {track.id: track.default_session_id for track in self.event.tracks}
+        return super(RHAbstractList, self)._render_template(**kwargs)
+
 
 class RHAbstractListCustomize(CustomizeAbstractListMixin, RHAbstractListBase):
     view_class = WPManageAbstracts
