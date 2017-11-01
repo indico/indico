@@ -43,12 +43,16 @@
                         <span class="i-label small">
                             {{ track.code }}
                         </span>
-                        {% set session = track.default_session %}
-                        {% if session %}
+                        {% if track.default_session %}
+                            {% set default_session_tooltip %}
+                                {%- trans title=track.default_session.title -%}
+                                    Indico will preselect the session "{{ title }}" whenever an abstract is accepted for
+                                    this track.
+                                {%- endtrans -%}
+                            {% endset %}
                             <span class="i-label small default-session"
-                                  title='{% trans title=session.title %}Indico will preselect the session "{{ title }}"
-                                         whenever an abstract is accepted for this track{% endtrans %}'
-                                  style="{{ session.colors.css }}">
+                                  title='{{ default_session_tooltip }}'
+                                  style="{{ track.default_session.colors.css }}">
                                 {{ track.default_session.title }}
                             </span>
                         {% endif %}
