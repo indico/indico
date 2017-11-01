@@ -4,7 +4,7 @@
 # Interesting post on max line length:
 # http://stackoverflow.com/questions/88942/why-should-python-pep-8-specify-a-maximum-line-length-of-79-characters
 
-PEP8_CMD='pep8'
+PEP8_CMD='pycodestyle'
 PEP8_OPTIONS='--max-line-length=120'
 ESLINT_CMD='eslint'
 SASSLINT_CMD='sass-lint'
