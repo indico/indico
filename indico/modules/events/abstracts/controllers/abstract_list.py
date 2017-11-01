@@ -117,7 +117,7 @@ class RHAbstractListStaticURL(RHAbstractListBase):
 class RHCreateAbstract(RHAbstractListBase):
     def _process(self):
         abstract_form_class = make_abstract_form(self.event, notification_option=True, management=self.management)
-        form = abstract_form_class(event=self.event)
+        form = abstract_form_class(event=self.event, management=self.management)
         if form.validate_on_submit():
             data = form.data
             send_notifications = data.pop('send_notifications')
