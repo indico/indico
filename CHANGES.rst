@@ -39,6 +39,7 @@ Bugfixes
 - Clarify messages in session block rescheduling dialogs (:issue:`3080`)
 - Fix event header bar in IE11 (:issue:`3135`)
 - Fix footer on login page (:issue:`3132`)
+- Use correct module name for abstract notification emails in the event log
 
 
 Version 2.0a1
