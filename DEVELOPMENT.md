@@ -23,7 +23,7 @@ acceptable as long as it's data that didn't exist before that revision. Please m
 directions!
 
 When adding a new column that is not nullable, you need to add it in two steps: First create it with a `server_default`
-value set to whatever default value you want. Afterwars, use the `alter_column` operation to remove the default value.
+value set to whatever default value you want. Afterwards, use the `alter_column` operation to remove the default value.
 While keeping it would not hurt, it's better to stay in sync with the SQLAlchemy model!
 
 
