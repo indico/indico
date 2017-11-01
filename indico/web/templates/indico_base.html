@@ -4,7 +4,11 @@
 <html prefix="og: http://ogp.me/ns#"
       data-static-site="{{ g.get('static_site', false)|tojson|forceescape }}">
 <head>
-    <title>{{ page_title }} · {{ site_name }}{% if site_name != 'Indico' %} (Indico){% endif %}</title>
+    <title>
+        {%- if page_title %}{{ page_title }} · {% endif %}
+        {{- site_name -}}
+        {% if site_name != 'Indico' %} (Indico){% endif -%}
+    </title>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="csrf-token" id="csrf-token" content="{{ session.csrf_token }}">
