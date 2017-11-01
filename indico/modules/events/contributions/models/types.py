@@ -51,6 +51,11 @@ class ContributionType(db.Model):
         nullable=False,
         default=''
     )
+    is_private = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
 
     event = db.relationship(
         'Event',

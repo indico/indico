@@ -24,6 +24,8 @@ Improvements
 
 - Allow specifying a default session for a track which will then be
   used by default when accepting an abstract in that track (:issue:`3069`)
+- Allow marking contribution types as private so they cannot be selected
+  by users submitting an abstract (:issue:`3138`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

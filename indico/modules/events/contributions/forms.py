@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import StringField, TextAreaField
+from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
 from indico.core.db import db
@@ -36,6 +36,7 @@ from indico.web.forms.base import IndicoForm, generated_data
 from indico.web.forms.fields import (AccessControlListField, IndicoDateTimeField, IndicoLocationField,
                                      IndicoProtectionField, IndicoTagListField, PrincipalListField, TimeDeltaField)
 from indico.web.forms.validators import DateTimeRange, MaxDuration, UsedIf
+from indico.web.forms.widgets import SwitchWidget
 
 
 class ContributionForm(IndicoForm):
@@ -187,6 +188,9 @@ class ContributionTypeForm(IndicoForm):
     """Form to create or edit a ContributionType"""
 
     name = StringField(_("Name"), [DataRequired()])
+    is_private = BooleanField(_("Private"), widget=SwitchWidget(),
+                              description=_("If selected, this contribution type cannot be chosen by users "
+                                            "submitting an abstract."))
     description = TextAreaField(_("Description"))
 
     def __init__(self, *args, **kwargs):

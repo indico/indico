@@ -2,6 +2,7 @@
     <tr class="i-table">
         <td class="i-table name-column">{{ contrib_type.name }}</td>
         <td class="i-table">{{ contrib_type.description }}</td>
+        <td class="i-table">{{ _('Yes') if contrib_type.is_private else _('No') }}</td>
         <td class="i-table action-column hide-if-locked">
             <a class="js-edit-contribution-type icon-edit"
                data-ajax-dialog
