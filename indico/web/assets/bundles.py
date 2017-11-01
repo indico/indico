@@ -349,8 +349,6 @@ def register_all_js(env):
     statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
 
     jed = rjs_bundle('jed', 'js/lib/jed.js')
-    moment = rjs_bundle('moment', *namespace('js/lib/moment.js', 'moment.js', 'locale/en-gb.js', 'locale/es.js',
-                                             'locale/fr.js'))
 
     jqplot_js = rjs_bundle('jqplot',
                            *namespace('js/lib/jqplot',
@@ -462,7 +460,7 @@ def register_all_js(env):
                                                   'synced_input_widget.js',
                                                   'typeahead_widget.js'))
 
-    base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, indico_jquery, moment,
+    base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, indico_jquery,
                      indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
                      outdated_browser_js, widgets_js, module_js['event_creation'], module_js['global'])
 

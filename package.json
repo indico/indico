@@ -11,6 +11,7 @@
     "babel-runtime": "^6.26.0",
     "jquery": "^3.2.1",
     "jquery-migrate": "^3.0.1",
+    "moment": "^2.19.1",
     "underscore": "^1.8.3"
   },
   "devDependencies": {

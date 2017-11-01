@@ -35,8 +35,11 @@ module.exports = {
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',
-            _: 'underscore'
-        })
+            _: 'underscore',
+            moment: 'moment'
+        }),
+        // Do not load moment locales (we'll load them explicitly)
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
     ],
     resolve: {
         alias: {
