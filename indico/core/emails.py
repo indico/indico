@@ -94,6 +94,8 @@ def do_send_email(email, log_entry=None, _from_task=False):
         msg = EmailMessage(subject=email['subject'], body=email['body'], from_email=email['from'],
                            to=email['to'], cc=email['cc'], bcc=email['bcc'], reply_to=email['reply_to'],
                            attachments=email['attachments'], connection=conn)
+        if not msg.to:
+            msg.extra_headers['To'] = 'Undisclosed-recipients:;'
         if email['html']:
             msg.content_subtype = 'html'
         msg.send()
