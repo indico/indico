@@ -62,7 +62,7 @@ fi
 
 
 # PEP8
-if ! RESULT=$(git diff -U0 --staged | $PEP8_CMD --diff $PEP8_OPTIONS); then
+if ! RESULT=$(git diff -U0 --staged --no-prefix | $PEP8_CMD --diff $PEP8_OPTIONS); then
     echo "${RED}There are PEP8 issues in your code:${RESET}"
     STATUS=1
 fi
