@@ -58,16 +58,16 @@ def send_email_task(task, email, log_entry=None):
             # and possibly retry sending it
             path = store_failed_email(email, log_entry)
             logger.error('Could not send email "%s" (attempt %d/%d); giving up [%s]; stored data in %s',
-                         truncate(email['subject'], 50), attempt, MAX_TRIES, exc, path)
+                         truncate(email['subject'], 100), attempt, MAX_TRIES, exc, path)
         except Retry:
             logger.warning('Could not send email "%s" (attempt %d/%d); retry in %ds [%s]',
-                           truncate(email['subject'], 50), attempt, MAX_TRIES, delay, exc)
+                           truncate(email['subject'], 100), attempt, MAX_TRIES, delay, exc)
             raise
     else:
         if task.request.retries:
-            logger.info('Sent email "%s" (attempt %d/%d)', truncate(email['subject'], 50), attempt, MAX_TRIES)
+            logger.info('Sent email "%s" (attempt %d/%d)', truncate(email['subject'], 100), attempt, MAX_TRIES)
         else:
-            logger.info('Sent email "%s"', truncate(email['subject'], 50))
+            logger.info('Sent email "%s"', truncate(email['subject'], 100))
         # commit the log entry state change
         if log_entry:
             db.session.commit()
@@ -100,7 +100,7 @@ def do_send_email(email, log_entry=None, _from_task=False):
             msg.content_subtype = 'html'
         msg.send()
     if not _from_task:
-        logger.info('Sent email "%s"', truncate(email['subject'], 50))
+        logger.info('Sent email "%s"', truncate(email['subject'], 100))
     if log_entry:
         update_email_log_state(log_entry)
 
@@ -137,4 +137,4 @@ def resend_failed_email(path):
 def resend_failed_emails_cmd(paths):
     for path in paths:
         email = resend_failed_email(path)
-        click.secho('Email sent: "{}" ({})'.format(truncate(email['subject'], 50), os.path.basename(path)), fg='green')
+        click.secho('Email sent: "{}" ({})'.format(truncate(email['subject'], 100), os.path.basename(path)), fg='green')

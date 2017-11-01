@@ -120,7 +120,7 @@ def flush_email_queue():
                 update_email_log_state(log_entry, failed=True)
             path = store_failed_email(email, log_entry)
             logger.exception('Flushing queued email "%s" failed; stored data in %s',
-                             truncate(email['subject'], 50), path)
+                             truncate(email['subject'], 100), path)
             # Wait for a short moment in case it's a very temporary issue
             time.sleep(0.25)
     del queue[:]
