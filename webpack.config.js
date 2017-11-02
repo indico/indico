@@ -64,6 +64,9 @@ module.exports = {
             _: 'underscore',
             moment: 'moment'
         }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: 'common' // Specify the common bundle's name.
+        }),
         // Do not load moment locales (we'll load them explicitly)
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
     ],
