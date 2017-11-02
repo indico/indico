@@ -17,8 +17,9 @@
 from datetime import datetime, timedelta
 
 import pytest
+from pytz import timezone
 
-from indico.util.date_time import format_human_timedelta, strftime_all_years
+from indico.util.date_time import as_utc, format_human_timedelta, iterdays, strftime_all_years
 
 
 @pytest.mark.parametrize(('delta', 'granularity', 'expected'), (
@@ -51,3 +52,28 @@ def test_format_human_timedelta(delta, granularity, expected):
 ))
 def test_strftime_all_years(dt, fmt, expected):
     assert strftime_all_years(dt, fmt) == expected
+
+
+dt = datetime
+tz = timezone('Europe/Zurich')
+iterdays_test_data = (
+    (dt(2015, 1, 1, 10, 30).date(), dt(2015, 1, 1, 12, 30), True, None, None, 1),
+    (dt(2015, 1, 1, 10, 30), dt(2014, 1, 1, 12, 30), True, None, None, 0),
+    (dt(2015, 1, 1, 10, 30), dt(2015, 1, 1, 12, 30), True, None, None, 1),
+    (dt(2017, 10, 13), dt(2017, 10, 19), True, None, None, 5),
+    (dt(2017, 10, 13), dt(2017, 10, 19), False, None, None, 7),
+    (dt(2017, 10, 13), dt(2017, 10, 19), True, [dt(2017, 10, 17).date()], None, 1),
+    (dt(2017, 10, 13), dt(2017, 10, 19), True, [dt(2017, 10, 14).date()], None, 0),
+    (dt(2017, 10, 13), dt(2017, 10, 19), False, [dt(2017, 10, 14).date()], None, 1),
+    (dt(2017, 10, 13), dt(2017, 10, 19), False, None, [dt(2017, 10, 14).date(), dt(2017, 10, 16).date()], 5),
+    (dt(2017, 10, 13), dt(2017, 10, 19), False, [dt(2017, 10, 15).date()], [dt(2017, 10, 14).date()], 1),
+    (dt(2017, 10, 28, 10, 30), dt(2017, 10, 31, 12, 30), True, None, [dt(2017, 10, 28, 10, 30)], 2),
+    (as_utc(dt(2017, 10, 28)).astimezone(tz), as_utc(dt(2017, 10, 31)).astimezone(tz), True, None, None, 2),
+    (as_utc(dt(2017, 3, 26)).astimezone(tz), as_utc(dt(2017, 3, 28)).astimezone(tz), True, None, None, 2),
+)
+
+
+@pytest.mark.parametrize(('from_', 'to', 'skip_weekends', 'day_whitelist', 'day_blacklist', 'expected'),
+                         iterdays_test_data)
+def test_iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist, expected):
+    assert len(list(iterdays(from_, to, skip_weekends, day_whitelist, day_blacklist))) == expected
