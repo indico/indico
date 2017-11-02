@@ -19,7 +19,7 @@ from __future__ import absolute_import, unicode_literals
 import posixpath
 from urlparse import urlparse
 
-from flask import g, render_template, request, session
+from flask import g, render_template, request, session, current_app
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
@@ -152,6 +152,7 @@ class WPJinjaMixin(object):
 
 class WPBase(object):
     title = ''
+    bundles = ('main',)
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
@@ -229,9 +230,11 @@ class WPBase(object):
         js_files = map(self._fix_path, self.getJSFiles() + plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
+        webpack = current_app.extensions['flask-webpackext']
 
         return render_template('indico_base.html',
                                css_files=css_files, print_css_files=print_css_files, js_files=js_files,
+                               bundles=map(lambda x: webpack.manifest[x + u'.js'], self.bundles),
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(unicode(x) for x in title_parts if x),
