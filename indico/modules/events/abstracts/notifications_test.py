@@ -233,8 +233,9 @@ def test_notification_stop_on_match(mocker, abstract_objects, create_email_templ
 
 @pytest.mark.usefixtures('request_context')
 def test_email_content(monkeypatch, abstract_objects, create_email_template, dummy_user):
-    def _mock_send_email(email, event, user):
+    def _mock_send_email(email, event, module, user):
         assert event == ev
+        assert module == 'Abstracts'
         assert email['subject'] == '[Indico] Abstract Acceptance notification (#314)'
         assert_text_equal(email['body'], """
             Dear Guinea Pig,
