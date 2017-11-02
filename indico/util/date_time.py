@@ -347,10 +347,13 @@ def get_overlap(range1, range2):
 
 
 def iterdays(start, end, skip_weekends=False, day_whitelist=None, day_blacklist=None):
+    tzinfo = start.tzinfo if isinstance(start, datetime) else None
     weekdays = (MO, TU, WE, TH, FR) if skip_weekends else None
-    start = get_day_start(start) if isinstance(start, datetime) else start
-    end = get_day_end(end) if isinstance(end, datetime) else end
+    start = get_day_start(start).replace(tzinfo=None) if isinstance(start, datetime) else start
+    end = get_day_end(end).replace(tzinfo=None) if isinstance(end, datetime) else end
     for day in rrule(DAILY, dtstart=start, until=end, byweekday=weekdays):
+        if tzinfo:
+            day = tzinfo.localize(day)
         if day_whitelist and day.date() not in day_whitelist:
             continue
         if day_blacklist and day.date() in day_blacklist:
