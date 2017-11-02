@@ -152,7 +152,7 @@ class WPJinjaMixin(object):
 
 class WPBase(object):
     title = ''
-    bundles = ('main',)
+    bundles = ('common', 'main',)
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
