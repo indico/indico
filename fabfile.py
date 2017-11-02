@@ -189,32 +189,6 @@ def install_compass():
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
 
 
-@recipe('jed')
-def install_jed():
-    with lcd(os.path.join(env.ext_dir, 'Jed')):
-        dest_dir = lib_dir(env.src_dir, 'js')
-        local('mkdir -p {0}'.format(dest_dir))
-        local('cp jed.js {0}/'.format(dest_dir))
-
-
-@recipe('jqplot')
-def install_jqplot():
-    """Install jQPlot from Git"""
-    plugins = ['axis', 'bar', 'cursor', 'highlighter', 'points', 'text']
-    with lcd(os.path.join(env.ext_dir, 'jqplot')):
-        dest_dir_js = os.path.join(lib_dir(env.src_dir, 'js'), 'jqplot')
-        dest_dir_css = lib_dir(env.src_dir, 'css')
-        dest_dir_js_core = os.path.join(dest_dir_js, 'core')
-        dest_dir_js_plugins = os.path.join(dest_dir_js, 'plugins')
-        local('mkdir -p {0} {1}'.format(dest_dir_js_core, dest_dir_css))
-        local('cp src/core/*.js {0}'.format(dest_dir_js_core))
-        local('cp src/core/*.css {0}'.format(dest_dir_css))
-        for plugin_name in plugins:
-            dest = os.path.join(dest_dir_js_plugins, plugin_name)
-            local('mkdir -p {0}'.format(dest))
-            local('cp src/plugins/{0}/* {1}'.format(plugin_name, dest))
-
-
 @recipe('rrule')  # rrule.js
 def install_rrule():
     """
