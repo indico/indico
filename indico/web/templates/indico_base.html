@@ -27,7 +27,9 @@
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
     <!-- Webpack bundles -->
-    {{ webpack['main.js'] }}
+    {% for bundle in bundles %}
+        {{ bundle }}
+    {% endfor %}
     <!-- end -->
 
     {% for url in js_files -%}
