@@ -46,10 +46,7 @@ class WPManageRegistration(WPEventManagement):
 
 
 class WPManageRegistrationStats(WPManageRegistration):
-    def getJSFiles(self):
-        return (WPManageRegistration.getJSFiles(self) +
-                self._asset_env['statistics_js'].urls() +
-                self._includeJSPackage('jqplot_js', prefix=''))
+    bundles = WPManageRegistration.bundles + ('statistics',)
 
 
 class WPManageParticipants(WPManageRegistration):

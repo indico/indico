@@ -95,11 +95,4 @@ class WPCategoryManagement(WPCategory):
 
 
 class WPCategoryStatistics(WPCategory):
-    def getJSFiles(self):
-        return (WPCategory.getJSFiles(self) +
-                self._includeJSPackage('jqplot_js', prefix='') +
-                self._asset_env['statistics_js'].urls() +
-                self._asset_env['modules_category_statistics_js'].urls())
-
-    def getCSSFiles(self):
-        return WPCategory.getCSSFiles(self) + self._asset_env['jqplot_css'].urls()
+    bundles = WPCategory.bundles + ('statistics',)

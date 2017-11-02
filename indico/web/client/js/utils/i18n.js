@@ -15,27 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global Jed:false */
+import Jed from 'jed';
+import _ from 'underscore';
 
-(function(global) {
-    "use strict";
+export const defaultI18n = new Jed({
+    locale_data: global.TRANSLATIONS,
+    domain: "indico"
+});
 
-    var defaultI18n = new Jed({
+export const $T = _.bind(defaultI18n.gettext, defaultI18n);
+
+['gettext', 'ngettext', 'pgettext', 'npgettext', 'translate'].forEach(function(name) {
+    $T[name] = _.bind(defaultI18n[name], defaultI18n);
+});
+
+$T.domain = _.memoize(function(domain) {
+    return new Jed({
         locale_data: global.TRANSLATIONS,
-        domain: "indico"
+        domain: domain
     });
-
-    global.i18n = defaultI18n;
-    global.$T = _.bind(defaultI18n.gettext, defaultI18n);
-
-    ['gettext', 'ngettext', 'pgettext', 'npgettext', 'translate'].forEach(function(name) {
-        global.$T[name] = _.bind(defaultI18n[name], defaultI18n);
-    });
-
-    global.$T.domain = _.memoize(function(domain) {
-        return new Jed({
-            locale_data: global.TRANSLATIONS,
-            domain: domain
-        });
-    });
-})(window);
+});

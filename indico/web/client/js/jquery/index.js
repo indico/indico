@@ -15,7 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+const global = window;
 
-import './jquery';
+// moment.js locales
+import 'moment/locale/en-gb.js';
+import 'moment/locale/fr.js';
+import 'moment/locale/es.js';
 
-console.log('Hello from Webpack!')
+require('jquery-migrate');
+
+// i18n (Jed)
+import {defaultI18n, $T} from '../utils/i18n';
+
+// These global definitions are needed until everything is on webpack
+Object.assign(global, {
+    $, jQuery, _, moment, $T,
+
+    i18n: defaultI18n
+});
+
+import './modules/categories';
