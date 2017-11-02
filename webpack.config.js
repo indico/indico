@@ -1,3 +1,21 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+
 var ManifestPlugin = require('webpack-manifest-plugin');
 var config = require('./config');
 var webpack = require('webpack')
@@ -6,10 +24,13 @@ var webpack = require('webpack')
 module.exports = {
     devtool: 'source-map',
     context: __dirname + "/indico/web/client",
-    entry: "./js/index.js",
+    entry: {
+        main: './js/index.js',
+        statistics: './js/jquery/statistics.js'
+    },
     output: {
         path: config.build.assetsPath,
-        filename: "bundle.js",
+        filename: "[name].bundle.js",
         publicPath: config.build.assetsURL
     },
     module: {
@@ -24,6 +45,10 @@ module.exports = {
                 parser: {
                     amd: false
                 }
+            },
+            {
+                test: /\.css$/,
+                loader: ['style-loader', 'css-loader']
             }
         ]
     },
@@ -35,6 +60,7 @@ module.exports = {
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',
+            jQuery: 'jquery',
             _: 'underscore',
             moment: 'moment'
         }),

@@ -15,8 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
+// jqplot isn't a real JS module. We have to explicitly load the files we need
+
+import './compat/jqplot';
+
+(function setupStatistics(global) {
     'use strict';
+
 
     global.processJqPlotOptions = function processJqPlotOptions(options) {
         var jqPlotDefaultOptions = {

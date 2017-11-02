@@ -313,7 +313,7 @@ def register_all_js(env):
         'js/lib/jquery.tablesorter.js',
         'js/jquery/jquery-migrate-silencer.js' if not config.DEBUG else None] + _jquery_files))
 
-    utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'i18n.js', 'misc.js', 'forms.js'))
+    utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'misc.js', 'forms.js'))
     calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
     presentation = rjs_bundle(
@@ -346,43 +346,6 @@ def register_all_js(env):
                    'Ui/Widgets/WidgetComponents.js',
                    'Ui/Widgets/WidgetControl.js'))
 
-    statistics_js = rjs_bundle('statistics_js', 'js/statistics.js')
-
-    jed = rjs_bundle('jed', 'js/lib/jed.js')
-
-    jqplot_js = rjs_bundle('jqplot',
-                           *namespace('js/lib/jqplot',
-                                      'core/jqplot.core.js',
-                                      'core/jqplot.linearTickGenerator.js',
-                                      'core/jqplot.linearAxisRenderer.js',
-                                      'core/jqplot.axisTickRenderer.js',
-                                      'core/jqplot.axisLabelRenderer.js',
-                                      'core/jqplot.tableLegendRenderer.js',
-                                      'core/jqplot.lineRenderer.js',
-                                      'core/jqplot.markerRenderer.js',
-                                      'core/jqplot.divTitleRenderer.js',
-                                      'core/jqplot.canvasGridRenderer.js',
-                                      'core/jqplot.linePattern.js',
-                                      'core/jqplot.shadowRenderer.js',
-                                      'core/jqplot.shapeRenderer.js',
-                                      'core/jqplot.sprintf.js',
-                                      'core/jsdate.js',
-                                      'core/jqplot.themeEngine.js',
-                                      'core/jqplot.toImage.js',
-                                      'core/jqplot.effects.core.js',
-                                      'core/jqplot.effects.blind.js',
-                                      # hardcoded list since globbing doesn't have a fixed order across machines
-                                      'plugins/axis/jqplot.canvasAxisLabelRenderer.js',
-                                      'plugins/axis/jqplot.canvasAxisTickRenderer.js',
-                                      'plugins/axis/jqplot.categoryAxisRenderer.js',
-                                      'plugins/axis/jqplot.dateAxisRenderer.js',
-                                      'plugins/axis/jqplot.logAxisRenderer.js',
-                                      'plugins/bar/jqplot.barRenderer.js',
-                                      'plugins/cursor/jqplot.cursor.js',
-                                      'plugins/highlighter/jqplot.highlighter.js',
-                                      'plugins/points/jqplot.pointLabels.js',
-                                      'plugins/text/jqplot.canvasTextRenderer.js'))
-
     mathjax_js = rjs_bundle('mathjax', 'js/lib/mathjax/MathJax.js', 'js/custom/pagedown_mathjax.js')
 
     markdown_js = rjs_bundle(
@@ -401,7 +364,6 @@ def register_all_js(env):
                                                                   'calendar.js')),
         'categories_management': rjs_bundle('modules_categories_management',
                                             'js/indico/modules/categories/management.js'),
-        'category_statistics': rjs_bundle('modules_category_statistics', 'js/indico/modules/categories/statistics.js'),
         'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
         'event_creation': rjs_bundle('modules_event_creation', 'js/indico/modules/events/creation.js'),
         'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'events/display.js',
@@ -460,7 +422,7 @@ def register_all_js(env):
                                                   'synced_input_widget.js',
                                                   'typeahead_widget.js'))
 
-    base_js = Bundle(palette, jquery, angular, jed, utils, presentation, calendar, indico_jquery,
+    base_js = Bundle(palette, jquery, angular, utils, presentation, calendar, indico_jquery,
                      indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
                      outdated_browser_js, widgets_js, module_js['event_creation'], module_js['global'])
 
@@ -475,10 +437,8 @@ def register_all_js(env):
     env.register('indico_jquery', indico_jquery)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
-    env.register('statistics_js', statistics_js)
     env.register('mathjax_js', mathjax_js)
     env.register('markdown_js', markdown_js)
-    env.register('jqplot_js', jqplot_js)
     env.register('clipboard_js', clipboard_js)
     env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
@@ -531,11 +491,6 @@ def register_all_css(env):
                            'css/lib/selectize.js/selectize.default.css',
                            filters='csscompressor', output='css/selectize_css_%(version)s.min.css')
 
-    jqplot_css = Bundle(
-        'css/lib/jquery.jqplot.css',
-        filters='csscompressor', output='css/jqplot_%(version)s.min.css'
-    )
-
     base_css = Bundle(
         *namespace('css',
                    'Default.css',
@@ -566,7 +521,6 @@ def register_all_css(env):
 
     env.register('base_css', base_css)
     env.register('conference_css', conference_css)
-    env.register('jqplot_css', jqplot_css)
     env.register('dropzone_css', dropzone_css)
     env.register('selectize_css', selectize_css)
     env.register('chartist_css', chartist_css)
