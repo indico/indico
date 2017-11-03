@@ -168,7 +168,6 @@ class WPBase(object):
 
     def getCSSFiles(self):
         return (self._asset_env['base_css'].urls() +
-                self._asset_env['dropzone_css'].urls() +
                 self._asset_env['screen_sass'].urls())
 
     def get_extra_css_files(self):
@@ -179,7 +178,6 @@ class WPBase(object):
         ckeditor_js = self._asset_env['ckeditor'].urls() if not g.get('static_site') else []
         return (self._asset_env['base_js'].urls() +
                 ckeditor_js +
-                self._asset_env['dropzone_js'].urls() +
                 self._asset_env['modules_attachments_js'].urls())
 
     def _includeJSPackage(self, pkg_names, prefix='indico_'):

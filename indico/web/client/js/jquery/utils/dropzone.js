@@ -18,6 +18,9 @@
 /* global Dropzone:false */
 /* eslint no-shadow: ['warn', {allow: ['file']}] */
 
+import Dropzone from 'dropzone';
+import 'dropzone/dist/dropzone.css';
+
 (function(global) {
     'use strict';
 
