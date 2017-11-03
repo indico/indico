@@ -197,18 +197,6 @@ def install_rrule():
     _install_dependencies('rrule', 'lib/rrule.js', 'js')
 
 
-@recipe('qtip2')
-def install_qtip2():
-    with node_env():
-        with lcd(os.path.join(env.ext_dir, 'qtip2')):
-            local('npm install')
-            grunt('--plugins="tips modal viewport svg" init clean concat:dist concat:css concat:libs replace')
-            dest_dir_js, dest_dir_css = lib_dir(env.src_dir, 'js'), lib_dir(env.src_dir, 'css')
-            local('mkdir -p {0} {1}'.format(dest_dir_js, dest_dir_css))
-            local('cp dist/jquery.qtip.js {0}/'.format(dest_dir_js))
-            local('cp dist/jquery.qtip.css {0}/'.format(dest_dir_css))
-
-
 @recipe('jquery-ui-multiselect')
 def install_jquery_ui_multiselect():
     with node_env():
