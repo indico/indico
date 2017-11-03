@@ -281,10 +281,6 @@ def register_all_js(env):
                               'js/lib/clipboard.js/clipboard.js',
                               'js/custom/clipboard.js')
 
-    dropzone_js = rjs_bundle('dropzone_js',
-                             'js/custom/dropzone.js',
-                             'js/lib/dropzone.js/dropzone.js')
-
     selectize_js = rjs_bundle('selectize_js',
                               'js/lib/selectize.js/selectize.js')
     taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
@@ -439,7 +435,6 @@ def register_all_js(env):
     env.register('mathjax_js', mathjax_js)
     env.register('markdown_js', markdown_js)
     env.register('clipboard_js', clipboard_js)
-    env.register('dropzone_js', dropzone_js)
     env.register('selectize_js', selectize_js)
     env.register('ckeditor', ckeditor)
     env.register('chartist_js', chartist_js)
@@ -482,10 +477,6 @@ def register_all_css(env):
                           'css/lib/chartist.js/settings/_chartist-settings.scss',
                           filters=('pyscss', 'csscompressor'), output='css/chartist_css_%(version)s.min.css')
 
-    dropzone_css = Bundle('css/lib/dropzone.js/dropzone.css',
-                          'sass/custom/_dropzone.scss',
-                          filters=('pyscss', 'csscompressor'), output='css/dropzone_css_%(version)s.min.css')
-
     selectize_css = Bundle('css/lib/selectize.js/selectize.css',
                            'css/lib/selectize.js/selectize.default.css',
                            filters='csscompressor', output='css/selectize_css_%(version)s.min.css')
@@ -519,7 +510,6 @@ def register_all_css(env):
 
     env.register('base_css', base_css)
     env.register('conference_css', conference_css)
-    env.register('dropzone_css', dropzone_css)
     env.register('selectize_css', selectize_css)
     env.register('chartist_css', chartist_css)
 

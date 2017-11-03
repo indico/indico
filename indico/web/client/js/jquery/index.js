@@ -37,4 +37,5 @@ Object.assign(global, {
 import 'qtip2';
 import 'qtip2/dist/jquery.qtip.css';
 
+import './utils/dropzone';
 import './modules/categories';
