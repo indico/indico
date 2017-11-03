@@ -238,7 +238,6 @@ def register_all_js(env):
                    'principalfield.js',
                    'qbubble.js',
                    'ajaxqbubble.js',
-                   'realtimefilter.js',
                    'scrollblocker.js',
                    'timerange.js',
                    'tooltips.js',
@@ -286,7 +285,6 @@ def register_all_js(env):
     taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
     fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
     outdated_browser_js = rjs_bundle('outdated_browser_js', 'js/lib/outdatedbrowser.js')
-    typewatch_js = rjs_bundle('typewatch_js', 'js/lib/jquery.typewatch.js')
 
     palette = rjs_bundle('palette', 'js/palette.js')
 
@@ -301,7 +299,6 @@ def register_all_js(env):
                               'jquery-extra-selectors.js',
                               'jstorage.js')
     jquery = rjs_bundle('jquery', *filter(None, [
-        'js/jquery/jquery-ui.js',
         'js/lib/jquery.multiselect.js',
         'js/lib/jquery.multiselect.filter.js',
         'js/lib/jquery.typeahead.js',
@@ -418,7 +415,7 @@ def register_all_js(env):
                                                   'typeahead_widget.js'))
 
     base_js = Bundle(palette, jquery, angular, utils, presentation, calendar, indico_jquery,
-                     indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, typewatch_js, fullcalendar_js,
+                     indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, fullcalendar_js,
                      outdated_browser_js, widgets_js, module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
@@ -486,7 +483,6 @@ def register_all_css(env):
                    'Default.css',
                    'timetable.css',
                    'calendar-blue.css',
-                   'jquery-ui.css',
                    'lib/angular.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
@@ -494,7 +490,6 @@ def register_all_css(env):
                    'lib/fullcalendar.css',
                    'lib/outdatedbrowser.css',
                    'jquery.colorbox.css',
-                   'jquery-ui-custom.css',
                    'jquery.colorpicker.css'),
         filters=('csscompressor', 'indico_cssrewrite'),
         output='css/base_%(version)s.min.css')
