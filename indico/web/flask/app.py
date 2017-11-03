@@ -248,8 +248,10 @@ def _get_webpack_config(app):
     return {
         'build': {
             'debug': app.debug,
-            'assetsPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
-            'assetsURL': app.config['WEBPACKEXT_PROJECT_DISTURL']
+            'webpackPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
+            'webpackURL': app.config['WEBPACKEXT_PROJECT_DISTURL'],
+            'staticURL': app.config['WEBPACKEXT_STATIC_URL_PATH'],
+            'imagePath': os.path.join(app.root_path, 'htdocs', 'images')
         }
     }
 
