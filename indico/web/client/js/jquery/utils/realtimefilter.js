@@ -21,8 +21,10 @@ import 'jquery.typewatch';
     $.widget("indico.realtimefilter", {
 
         options: {
-            callback: function(value) {},
-            validation: function(e) { return true; },
+            callback: function() {},
+            validation: function() {
+                return true;
+            },
             clearable: true,
             disableenter: true,
             emptyvalue: "",
@@ -65,7 +67,7 @@ import 'jquery.typewatch';
 
             if (opt.disableenter) {
                 element.on('keydown', function(e) {
-                    if (e.which == K.ENTER) {
+                    if (e.which === K.ENTER) {
                         e.preventDefault();
                     }
                 });

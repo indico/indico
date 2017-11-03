@@ -20,9 +20,6 @@
 import './compat/jqplot';
 
 (function setupStatistics(global) {
-    'use strict';
-
-
     global.processJqPlotOptions = function processJqPlotOptions(options) {
         var jqPlotDefaultOptions = {
             animate: !$.jqplot.use_excanvas,

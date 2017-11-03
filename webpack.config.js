@@ -89,7 +89,7 @@ module.exports = {
         // Do not load moment locales (we'll load them explicitly)
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new ExtractTextPlugin({
-          filename: '[name].css'
+            filename: '[name].css'
         })
     ],
     resolve: {

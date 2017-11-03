@@ -59,4 +59,4 @@ import 'jqplot/src/plugins/jqplot.logAxisRenderer.js';
 import 'jqplot/src/plugins/jqplot.pointLabels';
 import 'jqplot/src/plugins/jqplot.pointLabels.js';
 
-import 'jqplot/src/jquery.jqplot.css'
+import 'jqplot/src/jquery.jqplot.css';
