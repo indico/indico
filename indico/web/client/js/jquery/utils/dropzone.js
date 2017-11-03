@@ -75,7 +75,8 @@ import 'dropzone/dist/dropzone.css';
                     }
                 }
 
-                $form.on('submit', function(e) {
+                // We'll first remove the default 'submit' handler
+                $form.off('submit').on('submit', function(e) {
                     var evt = $.Event('ajaxForm:validateBeforeSubmit');
                     $(this).trigger(evt);
                     if (!evt.isDefaultPrevented()) {
@@ -132,9 +133,6 @@ import 'dropzone/dist/dropzone.css';
                 });
 
                 self.on('success', function(e, response) {
-                    if (options.submitForm) {
-                        $form.submit();
-                    }
                     if (options.handleFlashes) {
                         handleFlashes(response, true, $flashArea);
                     }
