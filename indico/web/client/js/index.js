@@ -17,5 +17,3 @@
 
 
 import './jquery';
-
-console.log('Hello from Webpack!')

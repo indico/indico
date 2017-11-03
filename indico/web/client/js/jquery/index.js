@@ -22,7 +22,7 @@ import 'moment/locale/en-gb.js';
 import 'moment/locale/fr.js';
 import 'moment/locale/es.js';
 
-require('jquery-migrate');
+import 'jquery-migrate';
 
 // i18n (Jed)
 import {defaultI18n, $T} from '../utils/i18n';

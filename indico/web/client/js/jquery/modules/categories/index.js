@@ -15,9 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function (global) {
-    'use strict';
-
+(function(global) {
     global.setupCategoryStats = () => {
         $(document).ready(() => {
             $('.plot-container .plot').each((__, element) => {
