@@ -15,9 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
-    'use strict';
+import Chartist from 'chartist';
+import 'chartist/dist/chartist.css';
 
+(function(global) {
     $(document).ready(function() {
         setupSurveyScheduleWindows();
         setupSurveyResultCharts();
@@ -160,7 +161,6 @@
                     _disableButtons();
                 }
             });
-
         });
 
         $('#delete-submissions').on('indico:confirmed', function(evt) {
@@ -197,6 +197,8 @@
     }
 
     global.setupQuestionnaireSorter = function setupQuestionnaireSorter() {
+        var container = $('#survey-questionnaire-preview');
+
         function _save(mode, data) {
             $.ajax({
                 url: container.data('sort-url'),
@@ -207,7 +209,6 @@
             });
         }
 
-        var container = $('#survey-questionnaire-preview');
         // sort sections
         container.sortable({
             items: '.js-sortable-survey-section',
@@ -216,10 +217,10 @@
             tolerance: 'pointer',
             distance: 10,
             axis: 'y',
-            start: function(e, ui){
+            start: function(e, ui) {
                 ui.placeholder.height(ui.helper.outerHeight());
             },
-            update: function(e, ui) {
+            update: function() {
                 var sectionIds = container.find('.js-sortable-survey-section').map(function() {
                     return $(this).data('sectionId');
                 }).get();

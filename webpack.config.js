@@ -26,7 +26,8 @@ module.exports = {
     context: __dirname + "/indico/web/client",
     entry: {
         main: './js/index.js',
-        statistics: './js/jquery/statistics.js'
+        statistics: './js/jquery/statistics.js',
+        modules_surveys: './js/jquery/modules/surveys.js'
     },
     output: {
         path: config.build.webpackPath,
