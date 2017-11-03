@@ -46,7 +46,7 @@ class WPManageRegistration(WPEventManagement):
 
 
 class WPManageRegistrationStats(WPManageRegistration):
-    bundles = WPManageRegistration.bundles + ('statistics',)
+    bundles = WPManageRegistration.bundles + ('statistics.js', 'statistics.css')
 
 
 class WPManageParticipants(WPManageRegistration):
