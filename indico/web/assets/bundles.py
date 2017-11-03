@@ -305,7 +305,6 @@ def register_all_js(env):
                               'jquery-extra-selectors.js',
                               'jstorage.js')
     jquery = rjs_bundle('jquery', *filter(None, [
-        'js/lib/jquery.qtip.js',
         'js/jquery/jquery-ui.js',
         'js/lib/jquery.multiselect.js',
         'js/lib/jquery.multiselect.filter.js',
@@ -498,7 +497,6 @@ def register_all_css(env):
                    'calendar-blue.css',
                    'jquery-ui.css',
                    'lib/angular.css',
-                   'lib/jquery.qtip.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
                    'lib/jquery.typeahead.css',
