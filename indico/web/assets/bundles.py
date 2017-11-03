@@ -273,9 +273,6 @@ def register_all_js(env):
 
     ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
-    chartist_js = rjs_bundle('chartist_js',
-                             'js/lib/chartist.js/chartist.js')
-
     clipboard_js = rjs_bundle('clipboard_js',
                               'js/lib/clipboard.js/clipboard.js',
                               'js/custom/clipboard.js')
@@ -366,7 +363,6 @@ def register_all_js(env):
                                        *namespace('js/indico/modules', 'events/management.js', 'events/badges.js',
                                                   'list_generator.js', 'static_filters.js')),
         'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
-        'surveys': rjs_bundle('modules_surveys', 'js/indico/modules/surveys.js'),
         'registration': rjs_bundle('modules_registration',
                                    'js/indico/modules/registration/registration.js',
                                    'js/indico/modules/registration/invitations.js',
@@ -434,7 +430,6 @@ def register_all_js(env):
     env.register('clipboard_js', clipboard_js)
     env.register('selectize_js', selectize_js)
     env.register('ckeditor', ckeditor)
-    env.register('chartist_js', chartist_js)
     env.register('taggle_js', taggle_js)
     env.register('widgets_js', widgets_js)
     for key, bundle in module_js.iteritems():
@@ -470,10 +465,6 @@ def register_all_css(env):
     fonts_sass = Bundle('sass/partials/_fonts.scss',
                         filters=('pyscss', 'csscompressor'), output='css/indico_fonts_%(version)s.min.css')
 
-    chartist_css = Bundle('css/lib/chartist.js/chartist.scss',
-                          'css/lib/chartist.js/settings/_chartist-settings.scss',
-                          filters=('pyscss', 'csscompressor'), output='css/chartist_css_%(version)s.min.css')
-
     selectize_css = Bundle('css/lib/selectize.js/selectize.css',
                            'css/lib/selectize.js/selectize.default.css',
                            filters='csscompressor', output='css/selectize_css_%(version)s.min.css')
@@ -506,7 +497,6 @@ def register_all_css(env):
     env.register('base_css', base_css)
     env.register('conference_css', conference_css)
     env.register('selectize_css', selectize_css)
-    env.register('chartist_css', chartist_css)
 
     # SASS/SCSS
     env.register('screen_sass', screen_sass)
