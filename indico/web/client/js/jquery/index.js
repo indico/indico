@@ -34,8 +34,13 @@ Object.assign(global, {
     i18n: defaultI18n
 });
 
+import './contrib/jquery-ui.css';
+import './contrib/jquery-ui';
+import '../../styles/custom/jquery-ui.css';
+
 import 'qtip2';
 import 'qtip2/dist/jquery.qtip.css';
 
 import './utils/dropzone';
+import './utils/realtimefilter';
 import './modules/categories';

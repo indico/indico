@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'jquery.typewatch';
+
 (function($) {
     $.widget("indico.realtimefilter", {
 
