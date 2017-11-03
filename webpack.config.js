@@ -15,10 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-
-var ManifestPlugin = require('webpack-manifest-plugin');
-var config = require('./config');
-var webpack = require('webpack')
+const config = require('./config');
+const webpack = require('webpack')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+const ManifestPlugin = require('webpack-manifest-plugin');
 
 
 module.exports = {
@@ -29,15 +29,15 @@ module.exports = {
         statistics: './js/jquery/statistics.js'
     },
     output: {
-        path: config.build.assetsPath,
+        path: config.build.webpackPath,
         filename: "[name].bundle.js",
-        publicPath: config.build.assetsURL
+        publicPath: config.build.webpackURL
     },
     module: {
         rules: [
             {
                 test: /\.js$/,
-                loader: 'babel-loader',
+                use: 'babel-loader',
                 exclude: /node_modules/
             },
             {
@@ -48,7 +48,26 @@ module.exports = {
             },
             {
                 test: /\.css$/,
-                loader: ['style-loader', 'css-loader']
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: {
+                        loader: 'css-loader',
+                        options: {
+                            alias: {
+                                '../images': config.build.imagePath
+                            }
+                        }
+                    }
+                })
+            },
+            {
+                test: /\.(jpe?g|png|gif|svg)$/,
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: config.build.staticURL + '[name].[ext]'
+                    }
+                }
             }
         ]
     },
@@ -56,7 +75,7 @@ module.exports = {
         new ManifestPlugin({
             fileName: 'manifest.json',
             stripSrc: true,
-            publicPath: config.build.assetsURL
+            publicPath: config.build.webpackURL
         }),
         new webpack.ProvidePlugin({
             $: 'jquery',
@@ -68,7 +87,10 @@ module.exports = {
             name: 'common' // Specify the common bundle's name.
         }),
         // Do not load moment locales (we'll load them explicitly)
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/)
+        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+        new ExtractTextPlugin({
+          filename: '[name].css'
+        })
     ],
     resolve: {
         alias: {

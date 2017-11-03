@@ -152,7 +152,7 @@ class WPJinjaMixin(object):
 
 class WPBase(object):
     title = ''
-    bundles = ('common', 'main',)
+    bundles = ('common.js', 'main.js', 'main.css')
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
@@ -232,7 +232,7 @@ class WPBase(object):
 
         return render_template('indico_base.html',
                                css_files=css_files, print_css_files=print_css_files, js_files=js_files,
-                               bundles=map(lambda x: webpack.manifest[x + u'.js'], self.bundles),
+                               bundles=map(lambda x: webpack.manifest[x], self.bundles),
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(unicode(x) for x in title_parts if x),

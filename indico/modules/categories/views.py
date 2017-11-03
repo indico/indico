@@ -95,4 +95,4 @@ class WPCategoryManagement(WPCategory):
 
 
 class WPCategoryStatistics(WPCategory):
-    bundles = WPCategory.bundles + ('statistics',)
+    bundles = WPCategory.bundles + ('statistics.js', 'statistics.css')
