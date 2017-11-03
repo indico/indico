@@ -15,15 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global Dropzone:false */
 /* eslint no-shadow: ['warn', {allow: ['file']}] */
 
 import Dropzone from 'dropzone';
 import 'dropzone/dist/dropzone.css';
 
 (function(global) {
-    'use strict';
-
     $(document).ready(function() {
         Dropzone.autoDiscover = false;
     });
