@@ -24,6 +24,7 @@ Improvements
   persistent failure the email is dumped to the temp directory and
   can be re-sent manually using the new ``indico resend_email``
   command (:issue:`3121`)
+- Reject requests containing NUL bytes in the query string (:issue:`3142`)
 
 Bugfixes
 ^^^^^^^^

@@ -26,6 +26,7 @@ from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
+from werkzeug.exceptions import BadRequest
 from werkzeug.local import LocalProxy
 from werkzeug.urls import url_parse
 from wtforms.widgets import html_params
@@ -272,6 +273,7 @@ def extend_url_map(app):
 
 
 def add_handlers(app):
+    app.before_request(reject_nuls)
     app.after_request(inject_current_url)
     app.register_blueprint(errors_bp)
 
@@ -298,6 +300,12 @@ def add_plugin_blueprints(app):
         blueprint_names.add(blueprint.name)
         with plugin.plugin_context():
             app.register_blueprint(blueprint)
+
+
+def reject_nuls():
+    for key, values in request.args.iterlists():
+        if '\0' in key or any('\0' in x for x in values):
+            raise BadRequest('NUL byte found in query data')
 
 
 def inject_current_url(response):
