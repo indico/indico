@@ -44,6 +44,7 @@ Bugfixes
 - Fix extra padding in the CFA roles dialog (:issue:`3129`)
 - Do not show an extra day in timetable management if an event begins
   before a DST change
+- Disable caching when retrieving the list of unscheduled contributions
 
 
 Version 2.0a1

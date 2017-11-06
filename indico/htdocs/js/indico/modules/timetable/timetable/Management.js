@@ -151,6 +151,7 @@ type("AddContributionDialog", ["ExclusivePopupWithButtons", "PreLoadHandler"], {
             }
             $.ajax({
                 url: build_url(Indico.Urls.Timetable.contributions.notScheduled, args),
+                cache: false,
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: function(data) {
