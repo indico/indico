@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import re
 import time
 from functools import wraps
 from types import GeneratorType
@@ -155,9 +156,13 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
     """
     if template is not None and (subject is not None or body is not None):
         raise ValueError("Only subject/body or template can be passed")
+
     if template:
         subject = template.get_subject()
         body = template.get_body()
+    if config.DEBUG and '\n' in subject:
+        raise ValueError('Email subject contains linebreaks')
+    subject = re.sub(r'\s+', ' ', subject)
     if to_list is None:
         to_list = set()
     if cc_list is None:

@@ -1,11 +1,11 @@
 {% extends 'events/papers/emails/base.html' %}
 
 {% block subject_message %}
-    {% if assign -%}
+    {%- if assign -%}
         New paper review assignment
     {%- else -%}
         Removed from paper review assignment
-    {%- endif %}
+    {%- endif -%}
 {% endblock %}
 
 {% block header_subtitle %}
