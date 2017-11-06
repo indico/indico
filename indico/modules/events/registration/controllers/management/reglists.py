@@ -63,7 +63,6 @@ from indico.util.placeholders import replace_placeholders
 from indico.util.spreadsheets import send_csv, send_xlsx
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
-from indico.web.forms.widgets import SwitchWidget
 from indico.web.util import jsonify_data, jsonify_template
 
 
@@ -189,7 +188,9 @@ class RHRegistrationEmailRegistrantsPreview(RHRegistrationsActionBase):
         registration = self.registrations[0]
         email_body = replace_placeholders('registration-email', request.form['body'], regform=self.regform,
                                           registration=registration)
-        tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=request.form['subject'],
+        email_subject = replace_placeholders('registration-email', request.form['subject'], regform=self.regform,
+                                             registration=registration)
+        tpl = get_template_module('events/registration/emails/custom_email.html', email_subject=email_subject,
                                   email_body=email_body)
         html = render_template('events/registration/management/email_preview.html', subject=tpl.get_subject(),
                                body=tpl.get_body())
@@ -205,8 +206,10 @@ class RHRegistrationEmailRegistrants(RHRegistrationsActionBase):
         for registration in self.registrations:
             email_body = replace_placeholders('registration-email', form.body.data, regform=self.regform,
                                               registration=registration)
+            email_subject = replace_placeholders('registration-email', form.subject.data, regform=self.regform,
+                                                 registration=registration)
             template = get_template_module('events/registration/emails/custom_email.html',
-                                           email_subject=form.subject.data, email_body=email_body)
+                                           email_subject=email_subject, email_body=email_body)
             bcc = [session.user.email] if form.copy_for_sender.data else []
             attachments = (get_ticket_attachments(registration)
                            if 'attach_ticket' in form and form.attach_ticket.data

@@ -46,6 +46,7 @@ Bugfixes
 - Do not show an extra day in timetable management if an event begins
   before a DST change
 - Disable caching when retrieving the list of unscheduled contributions
+- Process placeholders in the subject when emailing registrants
 
 
 Version 2.0a1
