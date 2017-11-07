@@ -15,8 +15,6 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-const global = window;
-
 // moment.js locales
 import 'moment/locale/en-gb.js';
 import 'moment/locale/fr.js';
@@ -28,9 +26,8 @@ import 'jquery-migrate';
 import {defaultI18n, $T} from '../utils/i18n';
 
 // These global definitions are needed until everything is on webpack
-Object.assign(global, {
+Object.assign(window, {
     $, jQuery, _, moment, $T,
-
     i18n: defaultI18n
 });
 

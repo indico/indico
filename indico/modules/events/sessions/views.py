@@ -32,9 +32,6 @@ class WPDisplaySession(WPConferenceDisplayBase):
     template_prefix = 'events/sessions/'
     menu_entry_name = 'timetable'
 
-    def getJSFiles(self):
-        return WPConferenceDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
-
 
 class WPDisplayMySessionsConference(WPDisplaySession):
     menu_entry_name = 'my_sessions'

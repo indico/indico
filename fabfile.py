@@ -176,14 +176,6 @@ def install_compass():
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
 
 
-@recipe('rrule')  # rrule.js
-def install_rrule():
-    """
-    Install rrule from Git
-    """
-    _install_dependencies('rrule', 'lib/rrule.js', 'js')
-
-
 @recipe('jquery-ui-multiselect')
 def install_jquery_ui_multiselect():
     with node_env():

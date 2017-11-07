@@ -16,7 +16,7 @@
  */
 
 // Place where to put page-wide Indico-related global variables
-var IndicoGlobalVars = {};
+window.IndicoGlobalVars = {};
 
 var Util = {
     parseId: function(id){

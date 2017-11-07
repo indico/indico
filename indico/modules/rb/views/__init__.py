@@ -27,13 +27,11 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 class WPRoomBookingBase(WPJinjaMixin, WPDecorated):
     template_prefix = 'rb/'
     title = _('Room Booking')
+    bundles = WPDecorated.bundles + ('modules_rb.js',)
 
     def __init__(self, rh, **kwargs):
         kwargs['active_menu_item'] = self.sidemenu_option
         WPDecorated.__init__(self, rh, **kwargs)
-
-    def getJSFiles(self):
-        return WPDecorated.getJSFiles(self) + self._includeJSPackage(['Management', 'RoomBooking'])
 
     def _get_breadcrumbs(self):
         return render_breadcrumbs(_('Room Booking'))

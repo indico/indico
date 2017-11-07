@@ -63,7 +63,6 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
 
     def getJSFiles(self):
         return (WPDecorated.getJSFiles(self) +
-                self._includeJSPackage('Management') +
                 self._asset_env['modules_event_cloning_js'].urls() +
                 self._asset_env['modules_event_management_js'].urls())
 

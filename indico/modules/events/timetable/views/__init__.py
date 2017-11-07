@@ -45,17 +45,10 @@ class WPManageTimetable(WPEventManagement):
         custom_links = dict(values_from_signal(signals.event.timetable_buttons.send(self)))
         WPEventManagement.__init__(self, rh, event_, custom_links=custom_links, **kwargs)
 
-    def getJSFiles(self):
-        return (WPEventManagement.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls() +
-                self._asset_env['modules_contributions_js'].urls())
-
 
 class WPDisplayTimetable(WPConferenceDisplayBase):
     template_prefix = 'events/timetable/'
     menu_entry_name = 'timetable'
-
-    def getJSFiles(self):
-        return WPConferenceDisplayBase.getJSFiles(self) + self._asset_env['modules_timetable_js'].urls()
 
 
 @template_hook('meeting-body')
