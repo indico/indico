@@ -27,6 +27,7 @@ module.exports = {
     entry: {
         main: './js/index.js',
         statistics: './js/jquery/statistics.js',
+        modules_rb: './js/legacy/room_booking.js',
         modules_surveys: './js/jquery/modules/surveys.js'
     },
     output: {
@@ -40,6 +41,10 @@ module.exports = {
                 test: /\.js$/,
                 use: 'babel-loader',
                 exclude: /node_modules/
+            },
+            {
+                test: /client\/js\/legacy\/libs\/.*$/,
+                use: 'script-loader'
             },
             {
                 include: /jquery-migrate/,

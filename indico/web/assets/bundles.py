@@ -167,58 +167,6 @@ def _get_custom_files(subdir, pattern):
 
 
 def register_all_js(env):
-    indico_core = rjs_bundle(
-        'indico_core',
-        *namespace('js/indico/Core',
-                   'Presentation.js',
-                   'Data.js',
-                   'Components.js',
-                   'Auxiliar.js',
-                   'Buttons.js',
-                   'Effects.js',
-                   'Interaction/Base.js',
-                   'Widgets/Base.js',
-                   'Widgets/Inline.js',
-                   'Widgets/Menu.js',
-                   'Widgets/RichText.js',
-                   'Dialogs/Popup.js',
-                   'Dialogs/PopupWidgets.js',
-                   'Dialogs/Base.js',
-                   'Dialogs/Util.js',
-                   'Dialogs/Users.js',
-                   'Dialogs/PopupWidgets.js',
-                   'Browser.js',
-                   'Util.js',
-                   'Dragndrop.js',
-                   'keymap.js'))
-
-    indico_management = rjs_bundle(
-        'indico_management',
-        *namespace('js/indico/Management',
-                   'RoomBooking.js',
-                   'RoomBookingMapOfRooms.js'))
-
-    indico_room_booking = rjs_bundle(
-        'indico_room_booking',
-        'js/lib/rrule.js',
-        *namespace('js/indico/RoomBooking',
-                   'util.js',
-                   'MapOfRooms.js',
-                   'BookingForm.js',
-                   'RoomBookingCalendar.js',
-                   'roomselector.js',
-                   'validation.js'))
-
-    indico_legacy = rjs_bundle(
-        'indico_legacy',
-        *namespace('js/indico/Legacy',
-                   'Widgets.js',
-                   'Util.js'))
-
-    indico_common = rjs_bundle(
-        'indico_common',
-        *namespace('js/indico/Common',
-                   'Export.js'))
 
     indico_jquery = rjs_bundle(
         'indico_jquery',
@@ -305,36 +253,6 @@ def register_all_js(env):
     utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'misc.js', 'forms.js'))
     calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
-    presentation = rjs_bundle(
-        'presentation',
-        *namespace('js/presentation',
-
-                   'Core/Primitives.js',
-                   'Core/Iterators.js',
-                   'Core/Tools.js',
-                   'Core/String.js',
-                   'Core/Type.js',
-                   'Core/Interfaces.js',
-                   'Core/Commands.js',
-                   'Core/MathEx.js',
-                   'Data/Bag.js',
-                   'Data/WatchValue.js',
-                   'Data/WatchList.js',
-                   'Data/WatchObject.js',
-                   'Data/Binding.js',
-                   'Data/Logic.js',
-                   'Data/Json.js',
-                   'Data/Remote.js',
-                   'Data/DateTime.js',
-                   'Ui/XElement.js',
-                   'Ui/Html.js',
-                   'Ui/Dom.js',
-                   'Ui/Extensions/Layout.js',
-                   'Ui/Text.js',
-                   'Ui/Widgets/WidgetBase.js',
-                   'Ui/Widgets/WidgetComponents.js',
-                   'Ui/Widgets/WidgetControl.js'))
-
     mathjax_js = rjs_bundle('mathjax', 'js/lib/mathjax/MathJax.js', 'js/custom/pagedown_mathjax.js')
 
     markdown_js = rjs_bundle(
@@ -379,10 +297,6 @@ def register_all_js(env):
                                 'js/indico/jquery/rulelistwidget.js'),
         'papers': rjs_bundle('modules_papers', 'js/indico/modules/papers.js'),
         'reviews': rjs_bundle('modules_reviews', 'js/indico/modules/reviews.js'),
-        'timetable': rjs_bundle('modules_timetable',
-                                *namespace('js/indico/modules/timetable/timetable', 'Management.js', 'Filter.js',
-                                           'Layout.js', 'Undo.js', 'Base.js', 'DragAndDrop.js', 'Draw.js',
-                                           'Actions.js')),
         'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions/common.js',
                                'js/indico/modules/types_dialog.js'),
         'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
@@ -410,18 +324,12 @@ def register_all_js(env):
                                                   'synced_input_widget.js',
                                                   'typeahead_widget.js'))
 
-    base_js = Bundle(palette, jquery, angular, utils, presentation, calendar, indico_jquery,
-                     indico_core, indico_legacy, indico_common, clipboard_js, taggle_js, fullcalendar_js,
+    base_js = Bundle(palette, jquery, angular, utils, calendar, indico_jquery,
+                     clipboard_js, taggle_js, fullcalendar_js,
                      outdated_browser_js, widgets_js, module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
     env.register('utils', utils)
-    env.register('presentation', presentation)
-    env.register('indico_core', indico_core)
-    env.register('indico_management', indico_management)
-    env.register('indico_roombooking', indico_room_booking)
-    env.register('indico_legacy', indico_legacy)
-    env.register('indico_common', indico_common)
     env.register('indico_jquery', indico_jquery)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)

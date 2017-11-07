@@ -461,7 +461,7 @@ type("DroppableTimetableMixin", ["TimeDisplacementManager"],
                          // Prevent firing the same request many times
                          // It may happen for huge blocks that span multiple hourLines
                          if (event.target.id === 'hourLine_' + hour.toString().replace(/^0/, '')) {
-                             self.release(hour, minute, null, null, $(ui.draggable.context).data("eventData"), ui.helper,
+                             self.release(hour, minute, null, null, $(ui.draggable).data("eventData"), ui.helper,
                                           "placementChange");
                          }
                      });
