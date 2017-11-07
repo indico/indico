@@ -111,16 +111,16 @@ def i18n_locale(locale_name):
                      no_cache=False, conditional=True)
 
 
-@assets_blueprint.route('!/static/assets/core/<path:path>')
+@assets_blueprint.route('!/static/assets/<folder>/<path:path>')
 @assets_blueprint.route('!/static/assets/plugin-<plugin>/<path:path>')
 @assets_blueprint.route('!/static/assets/theme-<theme>/<path:path>')
-def static_asset(path, plugin=None, theme=None):
+def static_asset(path, folder=None, plugin=None, theme=None):
     # Ensure there's no weird stuff in the plugin/theme name
     if plugin and not plugin_engine.get_plugin(plugin):
         raise NotFound
     elif theme and theme not in theme_settings.themes:
         raise NotFound
-    return send_from_directory(config.ASSETS_DIR, get_asset_path(path, plugin=plugin, theme=theme))
+    return send_from_directory(config.ASSETS_DIR, get_asset_path(path, folder=folder, plugin=plugin, theme=theme))
 
 
 @assets_blueprint.route('!/static/custom/<path:filename>', endpoint='custom')
