@@ -19,6 +19,8 @@ import os
 import re
 import subprocess
 import sys
+from contextlib import contextmanager
+from datetime import datetime
 
 import click
 from setuptools import find_packages
@@ -39,8 +41,9 @@ def noop(message, *args):
     click.echo(click.style(message.format(*args), fg='green'), err=True)
 
 
-def info(message, *args):
-    click.echo(click.style(message.format(*args), fg='green', bold=True), err=True)
+def info(message, *args, **kwargs):
+    unimportant = kwargs.pop('unimportant', False)
+    click.echo(click.style(message.format(*args), fg='green', bold=(not unimportant)), err=True)
 
 
 def step(message, *args):
@@ -149,6 +152,28 @@ def git_is_clean_plugin():
     return True, None
 
 
+@contextmanager
+def patch_indico_version(add_version_suffix):
+    if not add_version_suffix:
+        yield
+        return
+    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d.%H%M'), rev)
+    info('adding version suffix: ' + suffix, unimportant=True)
+    with open('indico/__init__.py', 'rb+') as f:
+        old_content = f.read()
+        f.seek(0)
+        f.truncate()
+        f.write(re.sub(r"^__version__ = '([^']+)'$", r"__version__ = '\1{}'".format(suffix), old_content, flags=re.M))
+        f.flush()
+        try:
+            yield
+        finally:
+            f.seek(0)
+            f.truncate()
+            f.write(old_content)
+
+
 @click.group()
 @click.option('--target-dir', '-d', type=click.Path(exists=True, file_okay=False, resolve_path=True), default='dist/',
               help='target dir for build wheels relative to the current dir')
@@ -159,8 +184,9 @@ def cli(obj, target_dir):
 
 @cli.command('indico')
 @click.option('--no-deps', 'deps', is_flag=True, flag_value=False, default=True, help='skip setup_deps')
+@click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
 @click.pass_obj
-def build_indico(obj, deps):
+def build_indico(obj, deps, add_version_suffix):
     """Builds the indico wheel."""
     target_dir = obj['target_dir']
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
@@ -172,7 +198,8 @@ def build_indico(obj, deps):
     else:
         warn('building deps disabled')
     clean_build_dirs()
-    build_wheel(target_dir)
+    with patch_indico_version(add_version_suffix):
+        build_wheel(target_dir)
     clean_build_dirs()
 
 
