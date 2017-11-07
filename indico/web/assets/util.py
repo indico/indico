@@ -19,11 +19,11 @@ from __future__ import unicode_literals
 import os
 
 
-def get_asset_path(path, plugin=None, theme=None):
+def get_asset_path(path, folder=None, plugin=None, theme=None):
     if plugin:
         base = 'plugin-{}'.format(plugin)
     elif theme:
         base = 'theme-{}'.format(theme)
     else:
-        base = 'core'
+        base = folder
     return os.path.join(base, path)
