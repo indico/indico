@@ -15,7 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import './jquery';
-import './legacy/presentation.js';
-import './legacy/indico.js';
-import './legacy/timetable.js';
+import './libs/timetable/Management.js';
+import './libs/timetable/Filter.js';
+import './libs/timetable/Layout.js';
+import './libs/timetable/Undo.js';
+import './libs/timetable/Base.js';
+import './libs/timetable/DragAndDrop.js';
+import './libs/timetable/Draw.js';
+import './libs/timetable/Actions.js';

@@ -27,9 +27,7 @@ from indico.web.flask.util import url_for
 
 class WPRoomBookingEventBase(WPEventManagementLegacy):
     sidemenu_option = 'room_booking'
-
-    def getJSFiles(self):
-        return WPEventManagementLegacy.getJSFiles(self) + self._includeJSPackage('RoomBooking')
+    bundles = WPEventManagementLegacy.bundles + ('modules_rb.js',)
 
     def _createTabCtrl(self):
         self._tabCtrl = TabControl()
