@@ -38,7 +38,7 @@ from indico.modules.events.registration.models.registrations import Registration
 from indico.util.i18n import _
 from indico.util.placeholders import get_missing_placeholders, render_placeholder_info
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (EmailListField, IndicoDateTimeField, IndicoEnumSelectField, JSONField,
+from indico.web.forms.fields import (EmailListField, FileField, IndicoDateTimeField, IndicoEnumSelectField, JSONField,
                                      PrincipalListField)
 from indico.web.forms.fields.simple import HiddenFieldList, IndicoEmailRecipientsField
 from indico.web.forms.validators import HiddenUnless, IndicoEmail, LinkedDateTime
@@ -396,3 +396,17 @@ class BadgeSettingsForm(IndicoForm):
 
     def is_submitted(self):
         return super(BadgeSettingsForm, self).is_submitted() and 'submitted' in request.form
+
+
+class ImportRegistrationsForm(IndicoForm):
+    source_file = FileField(_("Source File"), accepted_file_types='.csv')
+    skip_moderation = BooleanField(_("Skip Moderation"), widget=SwitchWidget(), default=True,
+                                   description=_("If enabled, the registration will be immediately accepted"))
+    notify_users = BooleanField(_("E-mail users"), widget=SwitchWidget(),
+                                description=_("Whether the imported users should receive an e-mail notification"))
+
+    def __init__(self, *args, **kwargs):
+        self.regform = kwargs.pop('regform')
+        super(ImportRegistrationsForm, self).__init__(*args, **kwargs)
+        if not self.regform.moderation_enabled:
+            del self.skip_moderation

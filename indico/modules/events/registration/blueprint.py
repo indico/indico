@@ -86,6 +86,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email', '
                  reglists.RHRegistrationEmailRegistrants, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/email-preview', 'email_registrants_preview',
                  reglists.RHRegistrationEmailRegistrantsPreview, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/import', 'registrations_import',
+                 reglists.RHRegistrationsImport, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/table.pdf', 'registrations_pdf_export_table',
                  reglists.RHRegistrationsExportPDFTable, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/book.pdf', 'registrations_pdf_export_book',

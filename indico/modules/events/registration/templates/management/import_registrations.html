@@ -1,0 +1,36 @@
+{% from 'forms/_form.html' import simple_form  %}
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('highlight', large_icon=true) %}
+    {% trans -%}
+        You should upload a CSV (comma-separated values) file with exactly 6 columns in the
+        following order:
+    {% endtrans %}
+    <ul>
+        <li>
+            {%- trans %}First Name{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Last Name{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Affiliation{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Position{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Phone Number{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}E-mail{% endtrans -%}
+        </li>
+    </ul>
+    {% trans -%}
+        The fields "First Name", "Last Name" and "E-mail" are mandatory. Users will be matched with existing
+        Indico identities through their e-mail.
+    {%- endtrans %}
+{% endcall %}
+
+{{ simple_form(form, back=_('Cancel'), footer_align_right=true,
+               form_header_kwargs={'multipart': true, 'action': url_for('.registrations_import', regform)}) }}

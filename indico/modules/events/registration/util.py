@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+import csv
 import itertools
 from collections import OrderedDict
 from operator import attrgetter
@@ -29,6 +30,7 @@ from wtforms import BooleanField, ValidationError
 from indico.core import signals
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.models.events import Event
 from indico.modules.events.payment.models.transactions import TransactionStatus
@@ -49,6 +51,7 @@ from indico.modules.users.util import get_user_by_email
 from indico.util.date_time import format_date
 from indico.util.i18n import _
 from indico.util.spreadsheets import unique_col
+from indico.util.string import to_unicode
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import SwitchWidget
 
@@ -201,10 +204,12 @@ def url_rule_to_angular(endpoint):
     return prefix + ''.join(segments).split('|', 1)[-1]
 
 
-def create_registration(regform, data, invitation=None, management=False, notify_user=True):
+def create_registration(regform, data, invitation=None, management=False, notify_user=True, skip_moderation=None):
     user = session.user if session else None
     registration = Registration(registration_form=regform, user=get_user_by_email(data['email']),
                                 base_price=regform.base_price, currency=regform.currency)
+    if skip_moderation is None:
+        skip_moderation = management
     for form_item in regform.active_fields:
         if form_item.parent.is_manager_only:
             with db.session.no_autoflush:
@@ -228,7 +233,7 @@ def create_registration(regform, data, invitation=None, management=False, notify
     if invitation:
         invitation.state = InvitationState.accepted
         invitation.registration = registration
-    registration.sync_state(_skip_moderation=management)
+    registration.sync_state(_skip_moderation=skip_moderation)
     db.session.flush()
     notify_registration_creation(registration, notify_user)
     logger.info('New registration %s by %s', registration, user)
@@ -510,3 +515,31 @@ def update_regform_item_positions(regform):
         for child in section.children:
             child_active = child.is_enabled and not child.is_deleted
             child.position = next(positions if child_active else disabled_positions)
+
+
+def import_registrations_from_csv(regform, fileobj, skip_moderation=True, notify_users=False):
+    """Import event registrants from a CSV file into a form."""
+    reader = csv.reader(fileobj)
+    registrations = []
+    for row_num, row in enumerate(reader, 1):
+        try:
+            first_name, last_name, affiliation, position, phone, email = [to_unicode(value).strip() for value in row]
+        except ValueError:
+            raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
+                                 .format(row_num))
+
+        if not email:
+            raise UserValueError(_('Row {}: missing e-mail address').format(row_num))
+        if not first_name or not last_name:
+            raise UserValueError(_('Row {}: missing first or last name').format(row_num))
+
+        with db.session.no_autoflush:
+            registrations.append(create_registration(regform, {
+                'email': email,
+                'first_name': first_name.title(),
+                'last_name': last_name.title(),
+                'affiliation': affiliation,
+                'phone': phone,
+                'position': position
+            }, notify_user=notify_users, skip_moderation=skip_moderation))
+    return registrations

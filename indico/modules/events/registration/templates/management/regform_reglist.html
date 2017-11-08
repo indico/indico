@@ -90,6 +90,12 @@
                                data-href="{{ url_for('.registrations_excel_export', regform) }}">XLSX (Excel)</a>
                         </li>
                     </ul>
+                    <a href="#" class="i-button"
+                       data-href="{{ url_for('.registrations_import', regform) }}"
+                       data-title="{% trans %}Import Registrants from CSV File{% endtrans %}"
+                       data-ajax-dialog>
+                        {%- trans %}Import{% endtrans -%}
+                    </a>
                     <a href="#" class="i-button arrow button js-requires-selected-row disabled" data-toggle="dropdown">
                         {%- trans %}Actions{% endtrans -%}
                     </a>
