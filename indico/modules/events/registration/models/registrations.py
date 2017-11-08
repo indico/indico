@@ -41,6 +41,7 @@ from indico.util.date_time import now_utc
 from indico.util.decorators import classproperty
 from indico.util.i18n import L_
 from indico.util.locators import locator_property
+from indico.util.signals import values_from_signal
 from indico.util.string import format_full_name, format_repr, return_ascii, strict_unicode
 from indico.util.struct.enum import RichIntEnum
 
@@ -305,6 +306,11 @@ class Registration(db.Model):
     def display_full_name(self):
         """Return the full name using the user's preferred name format."""
         return format_display_full_name(session.user, self)
+
+    @property
+    def is_ticket_blocked(self):
+        """Check whether the ticket is blocked by a plugin"""
+        return any(values_from_signal(signals.event.is_ticket_blocked.send(self), single_value=True))
 
     @property
     def is_paid(self):

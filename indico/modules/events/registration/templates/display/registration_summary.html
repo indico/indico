@@ -48,7 +48,8 @@
                    </a>
                </div>
            {% endif %}
-           {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and registration.registration_form.ticket_on_summary_page %}
+           {% if registration.state.name == 'complete' and registration.registration_form.tickets_enabled and
+                 registration.registration_form.ticket_on_summary_page and not registration.is_ticket_blocked %}
                 <div class="group">
                     <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                         {% trans %}Get ticket{% endtrans %}

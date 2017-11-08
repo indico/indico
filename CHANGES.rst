@@ -49,6 +49,12 @@ Bugfixes
 - Process placeholders in the subject when emailing registrants
 - Fix Shibboleth login with non-ascii names (:issue:`3143`)
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Add new ``is_ticket_blocked`` signal that can be used by plugins to
+  disable ticket downloads for a registration.
+
 
 Version 2.0a1
 -------------

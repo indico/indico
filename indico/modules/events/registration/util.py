@@ -340,14 +340,15 @@ def generate_spreadsheet_from_registrations(registrations, regform_items, static
 
 
 def get_registrations_with_tickets(user, event):
-    return Registration.find(Registration.user == user,
-                             Registration.state == RegistrationState.complete,
-                             RegistrationForm.event_id == event.id,
-                             RegistrationForm.tickets_enabled,
-                             RegistrationForm.ticket_on_event_page,
-                             ~RegistrationForm.is_deleted,
-                             ~Registration.is_deleted,
-                             _join=Registration.registration_form).all()
+    query = (Registration.query.with_parent(event)
+             .filter(Registration.user == user,
+                     Registration.state == RegistrationState.complete,
+                     RegistrationForm.tickets_enabled,
+                     RegistrationForm.ticket_on_event_page,
+                     ~RegistrationForm.is_deleted,
+                     ~Registration.is_deleted)
+             .join(Registration.registration_form))
+    return [r for r in query if not r.is_ticket_blocked]
 
 
 def get_published_registrations(event):

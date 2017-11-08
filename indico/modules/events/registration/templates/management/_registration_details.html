@@ -145,7 +145,7 @@
             Submitted: {{ submitted }}
         {%- endtrans %}
     </div>
-    {% if registration.registration_form.tickets_enabled %}
+    {% if registration.registration_form.tickets_enabled and not registration.is_ticket_blocked %}
         <div class="toolbar">
             <a href="{{ url_for('.ticket_download', registration.locator.registrant) }}" class="i-button accept icon-ticket">
                 {% trans %}Get ticket{% endtrans %}

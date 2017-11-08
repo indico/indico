@@ -78,6 +78,8 @@ class RHTicketDownload(RHRegistrationFormRegistrationBase):
             raise Forbidden
         if not self.regform.ticket_on_event_page and not self.regform.ticket_on_summary_page:
             raise Forbidden
+        if self.registration.is_ticket_blocked:
+            raise Forbidden
 
     def _process(self):
         filename = secure_filename('{}-Ticket.pdf'.format(self.event.title), 'ticket.pdf')
