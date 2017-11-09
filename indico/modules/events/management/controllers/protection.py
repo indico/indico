@@ -72,6 +72,7 @@ class RHEventProtection(RHManageEventBase):
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         if form.validate_on_submit():
+            # TODO: Save new permissions in DB (form.permissions.data)
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
                                                  'own_no_access_contact': form.own_no_access_contact.data,
                                                  'access_key': form.access_key.data,
@@ -95,11 +96,12 @@ class RHEventProtection(RHManageEventBase):
         event_session_settings = session_settings.get_all(self.event)
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
+        # TODO: Change for real data
         permissions_data = {'event_id': self.event.id, 'permissions': [
             [{'id': 91138, 'name': 'Marco Vidal', 'type': 'user'}, ['edit']],
             [{'id': 'indico-team', 'type': 'group'}, ['access', 'timetable']],
             [{'id': 3, 'name': 'Program Committee', 'code': 'PC', 'type': 'role', 'color': '882211'},
-             ['access', 'submit']]]}
+             ['access', 'material']]]}
         return dict({'protection_mode': self.event.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,

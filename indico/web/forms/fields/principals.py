@@ -129,4 +129,4 @@ class PermissionsField(JSONField):
         super(PermissionsField, self).__init__(*args, **kwargs)
 
     def _value(self):
-        return super(PermissionsField, self)._value() if self.data else '[]'
+        return json.dumps(self.data, separators=(',', ':')) if self.data else '[]'

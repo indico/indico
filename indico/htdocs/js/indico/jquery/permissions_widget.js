@@ -22,7 +22,7 @@
         access: 'accept',
         timetable: 'highlight',
         edit: 'danger',
-        submit: 'warning'
+        material: 'warning'
     };
 
     $.widget('indico.permissionswidget', {
@@ -80,15 +80,27 @@
         },
         _render: function() {
             var self = this;
+            this.$permissionsWidgetList.empty();
             this.data.permissions.forEach(function(item) {
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
         },
         _create: function() {
+            var self = this;
             this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
             this.$dataField = this.element.find('input[type=hidden]');
             this.data = JSON.parse(this.$dataField.val());
             this._render();
+
+            $('#permissions-widget-permissions').on('indico:permissionsChanged', function(evt, permissions, principal) {
+                var idx = _.findIndex(self.data.permissions, function(item) {
+                    return _.isMatch(item[0], principal);
+                });
+                self.data.permissions[idx][1] = permissions;
+                self._update();
+                self._render();
+                $(this).trigger('change');
+            });
         }
     });
 })(jQuery);

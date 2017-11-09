@@ -23,3 +23,31 @@
         </div>
     </div>
 </form>
+<script>
+    (function () {
+        'use strict';
+
+        function updateHiddenField() {
+            var data = [];
+            var $form = $('#js-permissions-dialog-form');
+            $form.find('[type=checkbox]:checked').each(function() {
+                var $this = $(this);
+                // Only take into account the checked parents of the permissions tree
+                if (!$this.parents('ul').siblings('[type=checkbox]:checked').length) {
+                    data.push($(this).data('code'));
+                }
+            });
+            $form.find('#selected_permissions').val(JSON.stringify(data));
+        }
+
+        $('#js-permissions-dialog-form').on('submit', function(evt) {
+            evt.preventDefault();
+            var selectedPermissions = JSON.parse($('#selected_permissions').val());
+            var principal = JSON.parse($('#principal').val());
+            $('#permissions-widget-permissions').trigger('indico:permissionsChanged', [selectedPermissions, principal]);
+            $('#js-permissions-dialog-form').trigger('ajaxDialog:close');
+        }).on('change', function() {
+            updateHiddenField();
+        });
+    })();
+</script>

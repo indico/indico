@@ -3,7 +3,7 @@
 {% block html %}
     <h3>Permissions</h3>
     <div id="permissions-widget-{{ field.id }}" class="js-permissions-widget">
-        <input type="hidden" value="{{ field._value() }}">
+        <input type="hidden" value='{{ field._value() }}' name="permissions">
         <ul class="permissions-widget-list"></ul>
         <div class="toolbars">
             <div class="toolbar">
