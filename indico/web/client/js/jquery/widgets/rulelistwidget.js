@@ -16,8 +16,6 @@
  */
 
 (function($) {
-    'use strict';
-
     function _listValue(option) {
         if (option === '') {
             return [];
