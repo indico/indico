@@ -15,26 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import './clearableinput';
-import './actioninput';
-import './ajaxcheckbox';
-import './ajaxqbubble';
-import './categorynavigator';
-import './colorpicker';
-import './dropdown';
-import './itempicker';
-import './multitextfield';
-import './nullableselector';
-import './palettepicker';
-import './paper_email_settings_widget';
-import './principalfield';
-import './qbubble';
-import './realtimefilter';
-import './rulelistwidget';
-import './scrollblocker';
-import './sticky_tooltip';
-import './timerange';
-import './track_role_widget';
-
-// JS code for Jinja Widgets
-import './jinja';
+import './category_picker_widget';
+import './ckeditor_widget';
+import './color_picker_widget';
+import './datetime_widget';
+import './linking_widget';
+import './location_widget';
+import './markdown_widget';
+import './multiple_items_widget';
+import './occurrences_widget';
+import './override_multiple_items_widget';
+import './person_link_widget';
+import './principal_list_widget';
+import './principal_widget';
+import './protection_widget';
+import './selectize_widget';
+import './synced_input_widget';
+import './typeahead_widget';
+import './permissions_widget';
