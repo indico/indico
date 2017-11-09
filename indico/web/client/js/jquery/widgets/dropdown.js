@@ -84,6 +84,7 @@
                                 self._open($this);
                             }
                             e.preventDefault();
+                            e.stopPropagation();
                         } else {
                             var result = $this.triggerHandler('menu_select', self.element);
                             if (!result) {
