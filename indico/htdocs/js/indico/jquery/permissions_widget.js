@@ -53,7 +53,7 @@
                 return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
         },
-        _renderPermissions: function(permissions) {
+        _renderPermissions: function(principal, permissions) {
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
             permissions.forEach(function(item) {
@@ -61,89 +61,12 @@
             });
 
             var $permissionsEditBtn = $('<button>', {
-                type: 'button',
-                class: 'i-button text-color borderless icon-only icon-edit',
-            });
-
-            $permissionsEditBtn.ajaxDialog({
-                url: build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
-                title: $T.gettext('Assign Permissions'),
-                // TODO: Provide real data & decide structure
-                data: {
-                    permissions: JSON.stringify([{
-                        title: 'Event Management',
-                        selected: false,
-                        code: 'event_mgmt',
-                        children: [
-                            {
-                                title: 'View',
-                                selected: true,
-                                code: 'event_view'
-                            },
-                            {
-                                title: 'Manage Material',
-                                selected: false,
-                                code: 'material'
-                            },
-                            {
-                                title: 'Manage Contributions',
-                                selected: false,
-                                code: 'contributions'
-                            },
-                            {
-                                title: 'Manage Timetable',
-                                selected: false,
-                                code: 'timetable'
-                            },
-                            {
-                                title: 'Manage Call for Abstracts',
-                                selected: false,
-                                code: 'cfa',
-                                children: [
-                                    {
-                                        title: 'Manage Programme',
-                                        selected: true,
-                                        code: 'programme'
-                                    }
-                                ]
-                            },
-                            {
-                                title: 'Manage Call for Papers',
-                                selected: false,
-                                code: 'cfp'
-                            },
-                            {
-                                title: 'Manage Registration',
-                                selected: true,
-                                code: 'registration',
-                                children: [
-                                    {
-                                        title: 'Manage List of Participants',
-                                        selected: true,
-                                        code: 'participants_mgmt',
-                                        children: [
-                                            {
-                                                title: 'View List of Participants',
-                                                selected: true,
-                                                code: 'participants_view'
-                                            }
-                                        ]
-                                    }
-                                ]
-                            },
-                            {
-                                title: 'Manage Surveys',
-                                selected: false,
-                                code: 'surveys'
-                            },
-                            {
-                                title: 'Manage Layout',
-                                selected: false,
-                                code: 'layout'
-                            }
-                        ]
-                    }])
-                }
+                'type': 'button',
+                'class': 'i-button text-color borderless icon-only icon-edit',
+                'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
+                'data-title': $T.gettext('Assign Permissions'),
+                'data-ajax-dialog': '',
+                'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
             });
 
             $permissionsEditBtn.appendTo($permissions);
@@ -152,7 +75,7 @@
         _renderItem: function(item) {
             var $item = $('<li>', {class: 'flexrow f-a-center'});
             $item.append(this._renderLabel(item[0]));
-            $item.append(this._renderPermissions(item[1]));
+            $item.append(this._renderPermissions(item[0], item[1]));
             return $item;
         },
         _render: function() {

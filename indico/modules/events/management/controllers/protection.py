@@ -113,6 +113,38 @@ class RHEventProtection(RHManageEventBase):
 
 class RHEventPermissions(RHManageEventBase):
     def _process(self):
-        permissions = json.loads(request.args['permissions'])
+        permissions_tree = {
+            'edit': {
+                'title': _('Event Management'),
+                'children': {
+                    'access': {'title': _('View')},
+                    'material': {'title': _('Manage Material')},
+                    'contributions': {'title': _('Manage Contributions')},
+                    'timetable': {'title': _('Manage Timetable')},
+                    'cfa': {
+                        'title': _('Manage Call for Abstracts'),
+                        'children': {
+                            'programme': {'title': _('Manage Programme')}
+                        }
+                    },
+                    'cfp': {'title': _('Manage Call for Papers')},
+                    'registration': {
+                        'title': _('Manage Registration'),
+                        'children': {
+                            'participants_mgmt': {
+                                'title': _('Manage List of Participants'),
+                                'children': {
+                                    'participants_view': {'title': _('View List of Participants')}
+                                }
+                            }
+                        }
+                    },
+                    'surveys': {'title': _('Manage Surveys')},
+                    'layout': {'title': _('Manage Layout')}
+                }
+            }
+        }
+        principal = json.loads(request.args.get('principal'))
         return jsonify_template('events/management/event_permissions_dialog.html', event=self.event,
-                                permissions=permissions)
+                                permissions_tree=permissions_tree, permissions=request.args.getlist('permissions'),
+                                principal=principal)

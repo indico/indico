@@ -1,19 +1,25 @@
-<div class="permissions-dialog">
-    <ul class="permissions">
-        {% for permission in permissions recursive %}
-            <li class="item">
-                <input type="checkbox" id="cb-{{ permission.code }}" class="circle-checkbox">
-                <label for="cb-{{ permission.code }}">{{ permission.title }}</label>
-                {% if permission.children %}
-                    <ul class="permissions">
-                        {{ loop(permission.children) }}
-                    </ul>
-                {% endif %}
-            </li>
-        {% endfor %}
-    </ul>
-    <div class="toolbar f-j-end">
-        <button class="i-button big">Cancel</button>
-        <button class="i-button big highlight">Save</button>
+<form id="js-permissions-dialog-form">
+    <input type="hidden" id="selected_permissions" value='{{ permissions|tojson }}' name="selected_permissions">
+    <input type="hidden" id="principal" value='{{ principal|tojson }}'>
+    <div class="permissions-dialog">
+        <ul class="permissions">
+            {% for code, tree_elem in permissions_tree.viewitems() recursive %}
+                <li class="item">
+                    <input type="checkbox" id="cb-{{ code }}"
+                           class="circle-checkbox" {{ 'checked' if code in permissions }}
+                           data-code="{{ code }}">
+                    <label for="cb-{{ code }}">{{ tree_elem.title }}</label>
+                    {% if tree_elem.children %}
+                        <ul class="permissions">
+                            {{ loop(tree_elem.children.viewitems()) }}
+                        </ul>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        </ul>
+        <div class="toolbar f-j-end">
+            <button type="submit" class="i-button big highlight" data-disabled-until-change>{% trans %}Save{% endtrans %}</button>
+            <button class="i-button big" data-button-back>{% trans %}Cancel{% endtrans %}</button>
+        </div>
     </div>
-</div>
+</form>
