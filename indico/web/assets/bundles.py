@@ -284,28 +284,9 @@ def register_all_js(env):
         'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
-    widgets_js = rjs_bundle('widgets', *namespace('js/indico/widgets',
-                                                  'category_picker_widget.js',
-                                                  'ckeditor_widget.js',
-                                                  'color_picker_widget.js',
-                                                  'datetime_widget.js',
-                                                  'linking_widget.js',
-                                                  'location_widget.js',
-                                                  'markdown_widget.js',
-                                                  'multiple_items_widget.js',
-                                                  'occurrences_widget.js',
-                                                  'override_multiple_items_widget.js',
-                                                  'person_link_widget.js',
-                                                  'principal_list_widget.js',
-                                                  'principal_widget.js',
-                                                  'protection_widget.js',
-                                                  'selectize_widget.js',
-                                                  'synced_input_widget.js',
-                                                  'typeahead_widget.js'))
-
     base_js = Bundle(palette, jquery, angular, utils, calendar, indico_jquery,
                      clipboard_js, taggle_js, fullcalendar_js,
-                     outdated_browser_js, widgets_js, module_js['event_creation'], module_js['global'])
+                     outdated_browser_js, module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
     env.register('utils', utils)
@@ -318,7 +299,6 @@ def register_all_js(env):
     env.register('selectize_js', selectize_js)
     env.register('ckeditor', ckeditor)
     env.register('taggle_js', taggle_js)
-    env.register('widgets_js', widgets_js)
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
     # Build a bundle with customization JS if enabled
