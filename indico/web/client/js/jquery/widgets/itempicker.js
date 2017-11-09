@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import {$T} from '../../utils/i18n';
+
 (function($) {
     'use strict';
 

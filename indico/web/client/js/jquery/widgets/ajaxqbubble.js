@@ -17,9 +17,9 @@
 
 /* global showFormErrors:false, initForms:false */
 
-(function($) {
-    'use strict';
+import {$T} from '../../utils/i18n';
 
+(function($) {
     $.widget('indico.ajaxqbubble', {
         options: {
             qBubbleOptions: {
