@@ -15,9 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function($) {
-    'use strict';
+import {$T} from '../../utils/i18n';
 
+(function($) {
     $.widget('indico.timerange', {
         options: {
             label: $T('Time'),

@@ -18,9 +18,9 @@
 /* global Palette:false */
 /* eslint-disable max-len */
 
-(function($) {
-    'use strict';
+import {$T} from '../../utils/i18n';
 
+(function($) {
     $.widget('indico.categorynavigator', {
         options: {
             // ID or serialized data of the current category

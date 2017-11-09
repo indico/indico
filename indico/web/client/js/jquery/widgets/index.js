@@ -15,30 +15,23 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-// moment.js locales
-import 'moment/locale/en-gb.js';
-import 'moment/locale/fr.js';
-import 'moment/locale/es.js';
-
-import 'jquery-migrate';
-
-// i18n (Jed)
-import {defaultI18n, $T} from '../utils/i18n';
-
-// These global definitions are needed until everything is on webpack
-Object.assign(window, {
-    $, jQuery, _, moment, $T,
-    i18n: defaultI18n
-});
-
-import './contrib/jquery-ui.css';
-import './contrib/jquery-ui';
-import '../../styles/custom/jquery-ui.css';
-
-import 'qtip2';
-import 'qtip2/dist/jquery.qtip.css';
-
-import './widgets';
-
-import './utils/dropzone';
-import './modules/categories';
+import './clearableinput';
+import './actioninput';
+import './ajaxcheckbox';
+import './ajaxqbubble';
+import './categorynavigator';
+import './colorpicker';
+import './dropdown';
+import './itempicker';
+import './multitextfield';
+import './nullableselector';
+import './palettepicker';
+import './paper_email_settings_widget';
+import './principalfield';
+import './qbubble';
+import './realtimefilter';
+import './rulelistwidget';
+import './scrollblocker';
+import './sticky_tooltip';
+import './timerange';
+import './track_role_widget';

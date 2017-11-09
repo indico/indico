@@ -16,8 +16,6 @@
  */
 
 (function($) {
-    'use strict';
-
     $.widget('indico.dropdown', {
         options: {
             selector: '.i-button[data-toggle]',
