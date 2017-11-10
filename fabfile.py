@@ -202,16 +202,6 @@ def install_selectize_js():
         local('cp dist/css/selectize.default.css {0}/'.format(dest_css_dir))
 
 
-@recipe('jquery-typeahead')
-def install_jquery_typeahead():
-    with lcd(os.path.join(env.ext_dir, 'jquery-typeahead')):
-        dest_js_dir = lib_dir(env.src_dir, 'js')
-        dest_css_dir = lib_dir(env.src_dir, 'css')
-        local('mkdir -p {0} {1}'.format(dest_js_dir, dest_css_dir))
-        local('cp src/jquery.typeahead.js {0}'.format(dest_js_dir))
-        local('cp src/jquery.typeahead.css {0}'.format(dest_css_dir))
-
-
 @recipe('jquery-tablesorter')
 def install_jquery_tablesorter():
     with lcd(os.path.join(env.ext_dir, 'jquery-tablesorter')):

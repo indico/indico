@@ -15,9 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-(function(global) {
-    'use strict';
+import 'jquery-typeahead';
+import 'jquery-typeahead/src/jquery.typeahead.css';
 
+(function(global) {
     global.setupTypeaheadWidget = function setupTypeaheadWidget(options) {
         options = $.extend(true, {
             fieldId: null,
