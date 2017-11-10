@@ -40,5 +40,7 @@ import 'qtip2/dist/jquery.qtip.css';
 
 import './widgets';
 
+import './utils/clipboard';
 import './utils/dropzone';
+
 import './modules/categories';
