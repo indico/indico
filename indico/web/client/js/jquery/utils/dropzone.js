@@ -21,6 +21,8 @@ import Dropzone from 'dropzone';
 import 'dropzone/dist/dropzone.css';
 
 (function(global) {
+    global.Dropzone = Dropzone;
+
     $(document).ready(function() {
         Dropzone.autoDiscover = false;
     });
