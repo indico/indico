@@ -2,10 +2,10 @@ Changelog
 =========
 
 
-Version 2.0a2
--------------
+Version 2.0rc1
+--------------
 
-*Unreleased*
+*Released on November 10, 2017*
 
 Improvements
 ^^^^^^^^^^^^
