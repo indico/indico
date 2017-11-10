@@ -188,17 +188,6 @@ def register_all_js(env):
                    'sectiontoolbar.js',
                    'table.js'))
 
-    angular = rjs_bundle(
-        'angular',
-        'js/lib/angular.js',
-        'js/lib/angular-resource.js',
-        'js/lib/angular-sanitize.js',
-        'js/lib/sortable.js',
-        'js/indico/angular/app.js',
-        'js/indico/angular/directives.js',
-        'js/indico/angular/filters.js',
-        'js/indico/angular/services.js')
-
     ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
     clipboard_js = rjs_bundle('clipboard_js',
@@ -284,7 +273,7 @@ def register_all_js(env):
         'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
-    base_js = Bundle(palette, jquery, angular, utils, calendar, indico_jquery,
+    base_js = Bundle(palette, jquery, utils, calendar, indico_jquery,
                      clipboard_js, taggle_js, fullcalendar_js,
                      outdated_browser_js, module_js['event_creation'], module_js['global'])
 
@@ -341,7 +330,6 @@ def register_all_css(env):
                    'Default.css',
                    'timetable.css',
                    'calendar-blue.css',
-                   'lib/angular.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
                    'lib/jquery.typeahead.css',

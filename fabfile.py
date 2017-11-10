@@ -146,31 +146,6 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
         dest_dir))
 
 
-# Recipes
-@recipe('angular')
-def install_angular():
-    with node_env():
-        with lcd(os.path.join(env.ext_dir, 'angular')):
-            local('npm install')
-            grunt('clean buildall copy write compress')
-            dest_dir_js = lib_dir(env.src_dir, 'js')
-            dest_dir_css = lib_dir(env.src_dir, 'css')
-            local('mkdir -p {0}'.format(dest_dir_js))
-            local('cp build/angular.js {0}/'.format(dest_dir_js))
-            local('cp build/angular-resource.js {0}/'.format(dest_dir_js))
-            local('cp build/angular-sanitize.js {0}/'.format(dest_dir_js))
-            local('cp css/angular.css {0}'.format(dest_dir_css))
-
-
-@recipe('ui-sortable')
-def install_ui_sortable():
-    with node_env():
-        with lcd(os.path.join(env.ext_dir, 'ui-sortable')):
-            dest_dir_js = lib_dir(env.src_dir, 'js')
-            local('mkdir -p {0}'.format(dest_dir_js))
-            local('cp src/sortable.js {0}/'.format(dest_dir_js))
-
-
 @recipe('compass')
 def install_compass():
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
