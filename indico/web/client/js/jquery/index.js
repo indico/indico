@@ -42,5 +42,8 @@ import './widgets';
 
 import './utils/clipboard';
 import './utils/dropzone';
+import Taggle from 'taggle';
+
+window.Taggle = Taggle;
 
 import './modules/categories';
