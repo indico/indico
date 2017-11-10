@@ -14,9 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
+import 'AngularJS/dist/angular';
+import 'AngularJS/dist/angular-resource';
+import 'AngularJS/dist/angular-sanitize';
+import 'AngularJS/css/angular.css';
+import 'angular-ui-sortable';
 
-import './jquery';
-import './legacy/presentation.js';
-import './legacy/indico.js';
-import './legacy/timetable.js';
-import './legacy/angular';
+import './app.js';
+import './directives';
+import './filters';
+import './services';
