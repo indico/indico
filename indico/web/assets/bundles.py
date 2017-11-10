@@ -210,7 +210,6 @@ def register_all_js(env):
     jquery = rjs_bundle('jquery', *filter(None, [
         'js/lib/jquery.multiselect.js',
         'js/lib/jquery.multiselect.filter.js',
-        'js/lib/jquery.typeahead.js',
         'js/lib/jquery.tablesorter.js',
         'js/jquery/jquery-migrate-silencer.js' if not config.DEBUG else None] + _jquery_files))
 
@@ -324,7 +323,6 @@ def register_all_css(env):
                    'calendar-blue.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
-                   'lib/jquery.typeahead.css',
                    'lib/fullcalendar.css',
                    'lib/outdatedbrowser.css',
                    'jquery.colorbox.css',
