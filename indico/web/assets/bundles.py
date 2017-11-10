@@ -192,7 +192,6 @@ def register_all_js(env):
 
     selectize_js = rjs_bundle('selectize_js',
                               'js/lib/selectize.js/selectize.js')
-    taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
     fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
     outdated_browser_js = rjs_bundle('outdated_browser_js', 'js/lib/outdatedbrowser.js')
 
@@ -269,8 +268,7 @@ def register_all_js(env):
         'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
-    base_js = Bundle(palette, jquery, utils, calendar, indico_jquery,
-                     taggle_js, fullcalendar_js,
+    base_js = Bundle(palette, jquery, utils, calendar, indico_jquery, fullcalendar_js,
                      outdated_browser_js, module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
@@ -282,7 +280,6 @@ def register_all_js(env):
     env.register('markdown_js', markdown_js)
     env.register('selectize_js', selectize_js)
     env.register('ckeditor', ckeditor)
-    env.register('taggle_js', taggle_js)
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
     # Build a bundle with customization JS if enabled
