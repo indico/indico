@@ -190,10 +190,6 @@ def register_all_js(env):
 
     ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
-    clipboard_js = rjs_bundle('clipboard_js',
-                              'js/lib/clipboard.js/clipboard.js',
-                              'js/custom/clipboard.js')
-
     selectize_js = rjs_bundle('selectize_js',
                               'js/lib/selectize.js/selectize.js')
     taggle_js = rjs_bundle('taggle_js', 'js/lib/taggle.js')
@@ -274,7 +270,7 @@ def register_all_js(env):
     }
 
     base_js = Bundle(palette, jquery, utils, calendar, indico_jquery,
-                     clipboard_js, taggle_js, fullcalendar_js,
+                     taggle_js, fullcalendar_js,
                      outdated_browser_js, module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
@@ -284,7 +280,6 @@ def register_all_js(env):
     env.register('base_js', base_js)
     env.register('mathjax_js', mathjax_js)
     env.register('markdown_js', markdown_js)
-    env.register('clipboard_js', clipboard_js)
     env.register('selectize_js', selectize_js)
     env.register('ckeditor', ckeditor)
     env.register('taggle_js', taggle_js)

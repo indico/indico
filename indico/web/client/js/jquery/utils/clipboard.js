@@ -15,11 +15,10 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global Clipboard:false */
+import Clipboard from 'clipboard';
+
 
 $(document).ready(function() {
-    'use strict';
-
     /* Show a qTip with the given text under the given element. The qTip is
      * destroyed when hidden and thus will be shown only once. */
     function showQTip(element, text, hideAfterDelay) {
