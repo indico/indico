@@ -17,7 +17,7 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from dateutil import rrule
 from flask import flash, jsonify, request, session
@@ -111,9 +111,17 @@ class IntervalCloneCalculator(CloneCalculator):
     form_class = CloneRepeatIntervalForm
 
     def _calculate(self, form):
-        args = {'dtstart': self._naivify(form.start_dt.data)}
-        args.update(self._calc_stop_criteria(form))
         freq, interval = relativedelta_to_rrule_interval(form.recurrence.data)
+        # check if last day of month
+        dtstart = self._naivify(form.start_dt.data)
+        next_day = dtstart + timedelta(days=1)
+        if freq == rrule.MONTHLY and next_day.day == 1:
+            args = {'dtstart': next_day}
+            args.update(self._calc_stop_criteria(form))
+            dates = rrule.rrule(freq, interval=interval, **args)
+            return self._tzify([date - timedelta(days=1) for date in dates])
+        args = {'dtstart': dtstart}
+        args.update(self._calc_stop_criteria(form))
         return self._tzify(rrule.rrule(freq, interval=interval, **args))
 
 
