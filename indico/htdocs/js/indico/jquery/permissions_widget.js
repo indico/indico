@@ -35,7 +35,8 @@
         },
         _renderLabel: function(principal) {
             var $labelBox = $('<div>', {class: 'label-box'});
-            if (principal.type === 'role') {
+            var type = principal._type;
+            if (type === 'EventRole') {
                 var $text = $('<span>', {class: 'text-normal', text: principal.name});
                 var $code = $('<span>', {
                     class: 'role-code',
@@ -48,8 +49,8 @@
 
                 return $labelBox.append($('<span>', {class: 'flexrow f-a-center'}).append($code).append($text));
             } else {
-                var iconClass = principal.type === 'user' ? 'icon-user' : 'icon-users';
-                var text = principal.type === 'user' ? principal.name : principal.id;
+                var iconClass = type === 'Avatar' || type === 'Email' ? 'icon-user' : 'icon-users';
+                var text = type === 'Avatar' ? principal.name : principal.id;
                 return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
         },

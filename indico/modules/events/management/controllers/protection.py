@@ -31,6 +31,7 @@ from indico.util import json
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_template
 
 
@@ -64,7 +65,44 @@ class RHEventACLMessage(RHManageEventBase):
                                 endpoint='event_management.acl')
 
 
-class RHEventProtection(RHManageEventBase):
+class RHEventProtectionBase(RHManageEventBase):
+    def __init__(self):
+        super(RHEventProtectionBase, self).__init__()
+        self.permissions_tree = {
+            'edit': {
+                'title': _('Event Management'),
+                'children': {
+                    'access': {'title': _('View')},
+                    'submit': {'title': _('Submit')},
+                    'material': {'title': _('Manage Material')},
+                    'contributions': {'title': _('Manage Contributions')},
+                    'timetable': {'title': _('Manage Timetable')},
+                    'cfa': {
+                        'title': _('Manage Call for Abstracts'),
+                        'children': {
+                            'programme': {'title': _('Manage Programme')}
+                        }
+                    },
+                    'cfp': {'title': _('Manage Call for Papers')},
+                    'registration': {
+                        'title': _('Manage Registration'),
+                        'children': {
+                            'participants_mgmt': {
+                                'title': _('Manage List of Participants'),
+                                'children': {
+                                    'participants_view': {'title': _('View List of Participants')}
+                                }
+                            }
+                        }
+                    },
+                    'surveys': {'title': _('Manage Surveys')},
+                    'layout': {'title': _('Manage Layout')}
+                }
+            }
+        }
+
+
+class RHEventProtection(RHEventProtectionBase):
     """Show event protection"""
 
     NOT_SANITIZED_FIELDS = {'access_key'}
@@ -96,12 +134,13 @@ class RHEventProtection(RHManageEventBase):
         event_session_settings = session_settings.get_all(self.event)
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
-        # TODO: Change for real data
-        permissions_data = {'event_id': self.event.id, 'permissions': [
-            [{'id': 91138, 'name': 'Marco Vidal', 'type': 'user'}, ['edit']],
-            [{'id': 'indico-team', 'type': 'group'}, ['access', 'timetable']],
-            [{'id': 3, 'name': 'Program Committee', 'code': 'PC', 'type': 'role', 'color': '882211'},
-             ['access', 'material']]]}
+        permissions_data = {
+            'event_id': self.event.id,
+            'permissions': [[serialize_principal(p.principal),
+                             list(self._get_principal_permissions(p))] for p in self.event.acl_entries
+                            if self._get_principal_permissions(p)]
+        }
+
         return dict({'protection_mode': self.event.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
@@ -112,41 +151,36 @@ class RHEventProtection(RHManageEventBase):
         data = {field: getattr(form, field).data for field in form.priv_fields}
         update_session_coordinator_privs(self.event, data)
 
+    def _get_principal_permissions(self, principal):
+        """Retrieve a set containing the valid permissions of a principal."""
+        permissions = set()
+        valid_labels = self._get_valid_permissions_labels()
+        if principal.full_access:
+            permissions.add('edit')
+        elif principal.read_access:
+            permissions.add('access')
+        return permissions | (set(principal.permissions) & valid_labels)
 
-class RHEventPermissions(RHManageEventBase):
+    def _get_valid_permissions_labels(self):
+        """Retrieves a set containing all the valid permission labels
+        in the permissions widget.
+        """
+        permissions = set()
+
+        def iterate_recursively(elem):
+            for k, v in elem.iteritems():
+                if isinstance(v, dict):
+                    iterate_recursively(v)
+                    if k != 'children':
+                        permissions.add(k)
+
+        iterate_recursively(self.permissions_tree)
+        return permissions
+
+
+class RHEventPermissions(RHEventProtectionBase):
     def _process(self):
-        permissions_tree = {
-            'edit': {
-                'title': _('Event Management'),
-                'children': {
-                    'access': {'title': _('View')},
-                    'material': {'title': _('Manage Material')},
-                    'contributions': {'title': _('Manage Contributions')},
-                    'timetable': {'title': _('Manage Timetable')},
-                    'cfa': {
-                        'title': _('Manage Call for Abstracts'),
-                        'children': {
-                            'programme': {'title': _('Manage Programme')}
-                        }
-                    },
-                    'cfp': {'title': _('Manage Call for Papers')},
-                    'registration': {
-                        'title': _('Manage Registration'),
-                        'children': {
-                            'participants_mgmt': {
-                                'title': _('Manage List of Participants'),
-                                'children': {
-                                    'participants_view': {'title': _('View List of Participants')}
-                                }
-                            }
-                        }
-                    },
-                    'surveys': {'title': _('Manage Surveys')},
-                    'layout': {'title': _('Manage Layout')}
-                }
-            }
-        }
         principal = json.loads(request.args.get('principal'))
         return jsonify_template('events/management/event_permissions_dialog.html', event=self.event,
-                                permissions_tree=permissions_tree, permissions=request.args.getlist('permissions'),
+                                permissions_tree=self.permissions_tree, permissions=request.args.getlist('permissions'),
                                 principal=principal)
