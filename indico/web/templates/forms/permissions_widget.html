@@ -17,9 +17,10 @@
                 </ul>
             </div>
             <div class="toolbar">
-                <button class="i-button icon-medal text-color borderless">
+                <a href="{{ url_for('event_roles.manage', field.event) }}"
+                   class="i-button icon-medal text-color borderless">
                     {%- trans %}Manage roles{% endtrans -%}
-                </button>
+                </a>
             </div>
         </div>
     </div>
