@@ -132,5 +132,9 @@ class PermissionsField(JSONField):
     def __init__(self, *args, **kwargs):
         super(PermissionsField, self).__init__(*args, **kwargs)
 
+    @property
+    def event(self):
+        return self.get_form().event
+
     def _value(self):
         return json.dumps(self.data, separators=(',', ':')) if self.data else '[]'

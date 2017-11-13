@@ -28,7 +28,7 @@
 {% block javascript %}
     <script>
         $('#permissions-widget-{{ field.id }}').permissionswidget({
-            event_id: {{ field.data.event_id }}
+            event_id: {{ field.event.id }}
         });
     </script>
 {% endblock %}

@@ -134,17 +134,14 @@ class RHEventProtection(RHEventProtectionBase):
         event_session_settings = session_settings.get_all(self.event)
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
-        permissions_data = {
-            'event_id': self.event.id,
-            'permissions': [[serialize_principal(p.principal),
-                             list(self._get_principal_permissions(p))] for p in self.event.acl_entries
-                            if self._get_principal_permissions(p)]
-        }
+        # TODO: Keep order (alphabetically?)
+        permissions = [[serialize_principal(p.principal), list(self._get_principal_permissions(p))]
+                       for p in self.event.acl_entries if self._get_principal_permissions(p)]
 
         return dict({'protection_mode': self.event.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
-                     'own_no_access_contact': self.event.own_no_access_contact, 'permissions': permissions_data},
+                     'own_no_access_contact': self.event.own_no_access_contact, 'permissions': permissions},
                     **coordinator_privs)
 
     def _update_session_coordinator_privs(self, form):

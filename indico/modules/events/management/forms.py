@@ -251,7 +251,7 @@ class EventProtectionForm(IndicoForm):
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):
-        self.protected_object = event = kwargs.pop('event')
+        self.protected_object = event = self.event = kwargs.pop('event')
         super(EventProtectionForm, self).__init__(*args, **kwargs)
         self._init_visibility(event)
 
