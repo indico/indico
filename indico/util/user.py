@@ -40,6 +40,7 @@ def iter_acl(acl):
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_missing_groups=False,
                           allow_emails=False, allow_networks=False, existing_data=None):
     from indico.modules.networks.models.networks import IPNetworkGroup
+    from indico.modules.events.models.groups import EventRole
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
@@ -96,6 +97,8 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
         if group.group is None and not allow_missing_groups:
             raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
         return group
+    elif type_ == 'EventRole':
+        return EventRole.get(id_)
     else:
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 

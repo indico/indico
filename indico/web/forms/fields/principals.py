@@ -21,6 +21,7 @@ import json
 from wtforms import HiddenField
 
 from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.modules.events.roles.util import serialize_role
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
@@ -29,6 +30,21 @@ from indico.modules.users.util import serialize_user
 from indico.util.user import principal_from_fossil
 from indico.web.forms.fields import JSONField
 from indico.web.forms.widgets import JinjaWidget
+
+
+def serialize_principal(principal):
+    if principal.principal_type == PrincipalType.email:
+        return principal.fossilize()
+    elif principal.principal_type == PrincipalType.network:
+        return serialize_ip_network_group(principal)
+    elif principal.principal_type == PrincipalType.user:
+        return serialize_user(principal)
+    elif principal.principal_type == PrincipalType.event_role:
+        return serialize_role(principal)
+    elif principal.is_group:
+        return serialize_group(principal)
+    else:
+        raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
 
 
 class PrincipalListField(HiddenField):
@@ -72,18 +88,6 @@ class PrincipalListField(HiddenField):
         if not self.groups and any(isinstance(p, GroupProxy) for p in self._get_data()):
             raise ValueError('You cannot select groups')
 
-    def _serialize_principal(self, principal):
-        if principal.principal_type == PrincipalType.email:
-            return principal.fossilize()
-        elif principal.principal_type == PrincipalType.network:
-            return serialize_ip_network_group(principal)
-        elif principal.principal_type == PrincipalType.user:
-            return serialize_user(principal)
-        elif principal.is_group:
-            return serialize_group(principal)
-        else:
-            raise ValueError('Invalid principal: {} ({})'.format(principal, principal.principal_type))
-
     def _value(self):
         from indico.modules.events.models.persons import PersonLinkBase
 
@@ -93,7 +97,7 @@ class PrincipalListField(HiddenField):
             return obj.principal_type, obj.name.lower()
 
         principals = sorted(self._get_data(), key=key)
-        return map(self._serialize_principal, principals)
+        return map(serialize_principal, principals)
 
     def _get_data(self):
         return sorted(self.data) if self.data else []
