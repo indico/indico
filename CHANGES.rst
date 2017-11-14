@@ -7,6 +7,11 @@ Version 2.0rc2
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Allow changing the reloader used by the dev server (:issue:`3150`)
+
 Bugfixes
 ^^^^^^^^
 

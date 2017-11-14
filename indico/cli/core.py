@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-import os
-
 import click
 from flask.cli import AppGroup, pass_script_info
 
@@ -146,6 +144,8 @@ def cleanup(temp, cache, assets, verbose, dry_run, min_age):
 @click.option('--evalex-from', multiple=True,
               help='Restrict the debugger shell to the given ips (can be used multiple times)')
 @click.option('--proxy', is_flag=True, help='Use the ip and protocol provided by the proxy.')
+@click.option('--reloader', type=click.Choice(['auto', 'stat', 'watchdog']), default='auto',
+              help='Use specific reloader type for your devserver.')
 @pass_script_info
 def run(info, **kwargs):
     """Run the development webserver.
