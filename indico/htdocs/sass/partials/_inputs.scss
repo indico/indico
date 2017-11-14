@@ -311,14 +311,6 @@ $dropdown-transition: $dropdown-transition-step ease-out;
     }
 }
 
-.required {
-    position: absolute;
-    right: 0.1em;
-    color: #af0000;
-    font-size: 1.4em;
-    top: 0.03em;
-}
-
 %tilted-strips-bg {
     @include placeholder-color($color: $light-black);
     background-color: lighten($gray, $light-color-variation);
