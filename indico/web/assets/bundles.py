@@ -190,8 +190,6 @@ def register_all_js(env):
 
     ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
-    selectize_js = rjs_bundle('selectize_js',
-                              'js/lib/selectize.js/selectize.js')
     fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
     outdated_browser_js = rjs_bundle('outdated_browser_js', 'js/lib/outdatedbrowser.js')
 
@@ -234,7 +232,6 @@ def register_all_js(env):
                                                                   'calendar.js')),
         'categories_management': rjs_bundle('modules_categories_management',
                                             'js/indico/modules/categories/management.js'),
-        'vc': rjs_bundle('modules_vc', 'js/indico/modules/vc.js'),
         'event_creation': rjs_bundle('modules_event_creation', 'js/indico/modules/events/creation.js'),
         'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'events/display.js',
                                                                         'list_generator.js', 'static_filters.js',
@@ -254,9 +251,6 @@ def register_all_js(env):
         'contributions': rjs_bundle('modules_contributions', 'js/indico/modules/contributions/common.js',
                                     'js/indico/modules/types_dialog.js'),
         'tracks': rjs_bundle('modules_tracks', 'js/indico/modules/tracks.js'),
-        'abstracts': rjs_bundle('modules_abstracts',
-                                'js/indico/modules/abstracts.js',
-                                'js/indico/modules/types_dialog.js'),
         'papers': rjs_bundle('modules_papers', 'js/indico/modules/papers.js'),
         'reviews': rjs_bundle('modules_reviews', 'js/indico/modules/reviews.js'),
         'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions/common.js',
@@ -277,7 +271,6 @@ def register_all_js(env):
     env.register('base_js', base_js)
     env.register('mathjax_js', mathjax_js)
     env.register('markdown_js', markdown_js)
-    env.register('selectize_js', selectize_js)
     env.register('ckeditor', ckeditor)
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
@@ -312,10 +305,6 @@ def register_all_css(env):
     fonts_sass = Bundle('sass/partials/_fonts.scss',
                         filters=('pyscss', 'csscompressor'), output='css/indico_fonts_%(version)s.min.css')
 
-    selectize_css = Bundle('css/lib/selectize.js/selectize.css',
-                           'css/lib/selectize.js/selectize.default.css',
-                           filters='csscompressor', output='css/selectize_css_%(version)s.min.css')
-
     base_css = Bundle(
         *namespace('css',
                    'Default.css',
@@ -341,7 +330,6 @@ def register_all_css(env):
 
     env.register('base_css', base_css)
     env.register('conference_css', conference_css)
-    env.register('selectize_css', selectize_css)
 
     # SASS/SCSS
     env.register('screen_sass', screen_sass)

@@ -27,8 +27,10 @@ module.exports = {
     entry: {
         main: './js/index.js',
         statistics: './js/jquery/statistics.js',
+        modules_abstracts: './js/jquery/modules/abstracts.js',
         modules_rb: './js/legacy/room_booking.js',
-        modules_surveys: './js/jquery/modules/surveys.js'
+        modules_surveys: './js/jquery/modules/surveys.js',
+        modules_vc: './js/jquery/modules/vc.js'
     },
     output: {
         path: config.build.webpackPath,
