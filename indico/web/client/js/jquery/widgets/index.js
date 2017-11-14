@@ -23,6 +23,7 @@ import './categorynavigator';
 import './colorpicker';
 import './dropdown';
 import './itempicker';
+import './multiselect';
 import './multitextfield';
 import './nullableselector';
 import './palettepicker';

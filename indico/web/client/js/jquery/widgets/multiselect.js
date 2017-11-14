@@ -15,6 +15,11 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'jquery-ui-multiselect-widget';
+import 'jquery-ui-multiselect-widget/src/jquery.multiselect.filter';
+import 'jquery-ui-multiselect-widget/jquery.multiselect.css';
+import 'jquery-ui-multiselect-widget/jquery.multiselect.filter.css';
+
 var oldcreate = $.ech.multiselect.prototype._create;
 
 $.extend($.ech.multiselect.prototype, {
@@ -124,4 +129,3 @@ $.extend($.ech.multiselectfilter.prototype, {
         });
     }
 });
-

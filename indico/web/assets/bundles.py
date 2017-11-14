@@ -176,8 +176,7 @@ def register_all_js(env):
                    'declarative.js',
                    'errors.js',
                    'ajaxdialog.js',
-                   'ajaxform.js',
-                   'multiselect.js'))
+                   'ajaxform.js'))
 
     indico_regform = rjs_bundle(
         'indico_regform',
@@ -203,8 +202,6 @@ def register_all_js(env):
                               'jquery-extra-selectors.js',
                               'jstorage.js')
     jquery = rjs_bundle('jquery', *filter(None, [
-        'js/lib/jquery.multiselect.js',
-        'js/lib/jquery.multiselect.filter.js',
         'js/lib/jquery.tablesorter.js',
         'js/jquery/jquery-migrate-silencer.js' if not config.DEBUG else None] + _jquery_files))
 
@@ -307,8 +304,6 @@ def register_all_css(env):
                    'Default.css',
                    'timetable.css',
                    'calendar-blue.css',
-                   'lib/jquery.multiselect.css',
-                   'lib/jquery.multiselect.filter.css',
                    'jquery.colorbox.css',
                    'jquery.colorpicker.css'),
         filters=('csscompressor', 'indico_cssrewrite'),
