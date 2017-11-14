@@ -190,8 +190,6 @@ def register_all_js(env):
 
     ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
-    fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
-
     palette = rjs_bundle('palette', 'js/palette.js')
 
     _jquery_files = namespace('js/jquery',
@@ -260,7 +258,7 @@ def register_all_js(env):
         'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
-    base_js = Bundle(palette, jquery, utils, calendar, indico_jquery, fullcalendar_js,
+    base_js = Bundle(palette, jquery, utils, calendar, indico_jquery,
                      module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
@@ -311,7 +309,6 @@ def register_all_css(env):
                    'calendar-blue.css',
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
-                   'lib/fullcalendar.css',
                    'jquery.colorbox.css',
                    'jquery.colorpicker.css'),
         filters=('csscompressor', 'indico_cssrewrite'),
