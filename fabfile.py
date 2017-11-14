@@ -199,18 +199,6 @@ def install_jquery_tablesorter():
         local('cp dist/js/jquery.tablesorter.js {0}'.format(dest_js_dir))
 
 
-@recipe('fullcalendar.js')
-def install_fullcalendar_js():
-    with node_env(), lcd(os.path.join(env.ext_dir, 'fullcalendar')):
-        local('npm install')
-        grunt('lumbar:build')
-        dest_js_dir = lib_dir(env.src_dir, 'js')
-        dest_css_dir = lib_dir(env.src_dir, 'css')
-        local('mkdir -p {0}'.format(dest_js_dir))
-        local('cp dist/fullcalendar.js {0}'.format(dest_js_dir))
-        local('cp dist/fullcalendar.css {0}'.format(dest_css_dir))
-
-
 @recipe('ckeditor')
 def install_ckeditor():
     src_dir = os.path.join(env.ext_dir, 'ckeditor')
