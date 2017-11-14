@@ -16,6 +16,7 @@
     "dropzone": "^5.2.0",
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^1.1.5",
+    "fullcalendar": "^3.7.0",
     "jed": "^1.1.1",
     "jqplot": "github:jqplot/jqplot#d96a669fbb729f4f51e2214688e54320411219af",
     "jquery": "^3.2.1",

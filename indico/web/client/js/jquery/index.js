@@ -38,6 +38,9 @@ import '../../styles/custom/jquery-ui.css';
 import 'qtip2';
 import 'qtip2/dist/jquery.qtip.css';
 
+import 'fullcalendar';
+import 'fullcalendar/dist/fullcalendar.css';
+
 import './widgets';
 
 import './utils/clipboard';
