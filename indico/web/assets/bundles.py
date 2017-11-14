@@ -191,7 +191,6 @@ def register_all_js(env):
     ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
 
     fullcalendar_js = rjs_bundle('fullcalendar_js', 'js/lib/fullcalendar.js')
-    outdated_browser_js = rjs_bundle('outdated_browser_js', 'js/lib/outdatedbrowser.js')
 
     palette = rjs_bundle('palette', 'js/palette.js')
 
@@ -262,7 +261,7 @@ def register_all_js(env):
     }
 
     base_js = Bundle(palette, jquery, utils, calendar, indico_jquery, fullcalendar_js,
-                     outdated_browser_js, module_js['event_creation'], module_js['global'])
+                     module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
     env.register('utils', utils)
@@ -313,7 +312,6 @@ def register_all_css(env):
                    'lib/jquery.multiselect.css',
                    'lib/jquery.multiselect.filter.css',
                    'lib/fullcalendar.css',
-                   'lib/outdatedbrowser.css',
                    'jquery.colorbox.css',
                    'jquery.colorpicker.css'),
         filters=('csscompressor', 'indico_cssrewrite'),

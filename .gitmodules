@@ -71,9 +71,6 @@
 [submodule "ext_modules/fullcalendar"]
 	path = ext_modules/fullcalendar
 	url = https://github.com/fullcalendar/fullcalendar.git
-[submodule "ext_modules/outdated-browser"]
-	path = ext_modules/outdated-browser
-	url = https://github.com/burocratik/outdated-browser.git
 [submodule "ext_modules/ckeditor"]
 	path = ext_modules/ckeditor
 	url = https://github.com/ckeditor/ckeditor-dev.git
