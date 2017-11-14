@@ -151,19 +151,6 @@ def install_compass():
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
 
 
-@recipe('jquery-ui-multiselect')
-def install_jquery_ui_multiselect():
-    with node_env():
-        with lcd(os.path.join(env.ext_dir, 'jquery-ui-multiselect')):
-            dest_dir_js = lib_dir(env.src_dir, 'js')
-            dest_dir_css = lib_dir(env.src_dir, 'css')
-            local('mkdir -p {0} {1}'.format(dest_dir_js, dest_dir_css))
-            local('cp src/jquery.multiselect.js {0}/'.format(dest_dir_js))
-            local('cp src/jquery.multiselect.filter.js {0}/'.format(dest_dir_js))
-            local('cp jquery.multiselect.css {0}/'.format(dest_dir_css))
-            local('cp jquery.multiselect.filter.css {0}/'.format(dest_dir_css))
-
-
 @recipe('MathJax')
 def install_mathjax():
     dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'mathjax/')
