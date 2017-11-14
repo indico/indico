@@ -141,6 +141,8 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
+    bundles = WPSimpleEventDisplayBase.bundles + ('modules_vc.js', 'modules_vc.css')
+
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)
         self.theme_id = theme_id
@@ -163,8 +165,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 
     def getJSFiles(self):
         return (WPSimpleEventDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_event_cloning_js'].urls() +
-                self._asset_env['modules_vc_js'].urls())
+                self._asset_env['modules_event_cloning_js'].urls())
 
     def _applyDecoration(self, body):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':

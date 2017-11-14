@@ -17,9 +17,11 @@
 
 /* global setupListGenerator:false, setupSearchBox:false */
 
-(function(global) {
-    'use strict';
+import 'selectize';
+import 'selectize/dist/css/selectize.css';
+import 'selectize/dist/css/selectize.default.css';
 
+(function(global) {
     global.setupAbstractList = function setupAbstractList() {
         var abstractListContainer = $('#abstract-list');
 

@@ -17,9 +17,14 @@
 
 /* global choiceConfirmPrompt:false */
 
-(function(global) {
-    'use strict';
+import 'selectize';
+import 'selectize/dist/css/selectize.css';
+import 'selectize/dist/css/selectize.default.css';
 
+import {$T} from '../../utils/i18n';
+
+
+(function(global) {
     // TODO: Add plugin i18n
     var $t = $T;
 
@@ -97,9 +102,9 @@
                 }
             });
         }).filter('.vc-room-entry:not(.deleted) .toggle-details')
-          .qtip({content: $T('Click to toggle collapse status')});
+            .qtip({content: $T('Click to toggle collapse status')});
 
-        $('.toggle .i-button').on('click', function(){
+        $('.toggle .i-button').on('click', function() {
             var toggle = $(this);
             toggle.toggleClass('icon-eye icon-eye-blocked');
             var $input = toggle.siblings('input');
