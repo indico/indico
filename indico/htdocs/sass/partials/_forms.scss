@@ -172,6 +172,14 @@ form {
     position: relative;
     word-wrap: break-word;
 
+    > .required {
+        position: absolute;
+        right: 0.1em;
+        color: #af0000;
+        font-size: 1.4em;
+        top: 0.03em;
+    }
+
     &.form-label-empty {
         height: 1px;
     }
