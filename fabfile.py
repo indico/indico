@@ -191,17 +191,6 @@ def install_pagedown():
         local('cp *.js {0}'.format(dest_dir))
 
 
-@recipe('selectize.js')
-def install_selectize_js():
-    with lcd(os.path.join(env.ext_dir, 'selectize.js')):
-        dest_js_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'selectize.js/')
-        dest_css_dir = os.path.join(lib_dir(env.src_dir, 'css'), 'selectize.js/')
-        local('mkdir -p {0} {1}'.format(dest_js_dir, dest_css_dir))
-        local('cp dist/js/standalone/selectize.js {0}/'.format(dest_js_dir))
-        local('cp dist/css/selectize.css {0}/'.format(dest_css_dir))
-        local('cp dist/css/selectize.default.css {0}/'.format(dest_css_dir))
-
-
 @recipe('jquery-tablesorter')
 def install_jquery_tablesorter():
     with lcd(os.path.join(env.ext_dir, 'jquery-tablesorter')):
