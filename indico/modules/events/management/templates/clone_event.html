@@ -91,8 +91,13 @@
                             {% set count %}
                                 <span class="count"></span>
                             {% endset %}
-                            {% trans link='<a class="event-list">'|safe, endlink="</a>"|safe -%}
-                                {{ count }} new events will be created. {{ link }}When?{{ endlink}}
+                            {% trans link='<a class="event-list">'|safe, endlink='</a>'|safe,
+                                     lastday='<span class="last-day">'|safe, endlastday='</span>'|safe -%}
+                                {{ count }} new events will be created.
+                                {{ lastday -}}
+                                    <strong>All cloned events will occur on the last day of the month.</strong>
+                                {{- endlastday }}
+                                {{ link }}When?{{ endlink }}
                             {%- endtrans %}
                         {%- endcall %}
                         {{ message_box('error', '-', fixed_width=true, id='clone-errors') }}

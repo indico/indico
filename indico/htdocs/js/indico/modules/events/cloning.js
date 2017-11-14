@@ -61,13 +61,14 @@
                 success: function(data) {
                     if (data.success) {
                         var $countNumber = $eventCount.find('.count');
+                        var $lastDay = $eventCount.find('.last-day');
                         $countNumber.text(data.count);
                         $cloneErrors.hide();
                         $eventCount.show();
-
                         $eventList.toggle(!!data.count);
                         $cloneButton.prop('disabled', !data.count);
                         $eventCount.data('event-dates', data.dates);
+                        $lastDay.toggle(data.last_day_of_month);
                     } else {
                         $cloneErrors.show().find('.message-text').html(errorToHTML(data.error.message));
                         $eventCount.hide();

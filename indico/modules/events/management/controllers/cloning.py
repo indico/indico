@@ -87,6 +87,10 @@ class CloneCalculator(object):
         return args
 
     def calculate(self, formdata):
+        """Calculate dates of cloned events
+
+        :return: a ``(dates, last_day_of_month)`` tuple
+        """
         form = self.form_class(self.event, formdata=formdata)
         if form.validate():
             return self._calculate(form)
@@ -100,11 +104,12 @@ class PatternCloneCalculator(CloneCalculator):
     def _calculate(self, form):
         args = {'dtstart': self._naivify(form.start_dt.data)}
         args.update(self._calc_stop_criteria(form))
-        return self._tzify(rrule.rrule(rrule.MONTHLY,
-                                       interval=form.num_months.data,
-                                       byweekday=form.week_day.week_day_data,
-                                       bysetpos=form.week_day.day_number_data,
-                                       **args))
+        dates = self._tzify(rrule.rrule(rrule.MONTHLY,
+                                        interval=form.num_months.data,
+                                        byweekday=form.week_day.week_day_data,
+                                        bysetpos=form.week_day.day_number_data,
+                                        **args))
+        return dates, False
 
 
 class IntervalCloneCalculator(CloneCalculator):
@@ -119,10 +124,14 @@ class IntervalCloneCalculator(CloneCalculator):
             args = {'dtstart': next_day}
             args.update(self._calc_stop_criteria(form))
             dates = rrule.rrule(freq, interval=interval, **args)
-            return self._tzify([date - timedelta(days=1) for date in dates])
-        args = {'dtstart': dtstart}
-        args.update(self._calc_stop_criteria(form))
-        return self._tzify(rrule.rrule(freq, interval=interval, **args))
+            dates = self._tzify([date - timedelta(days=1) for date in dates])
+            last_day_of_month = True
+        else:
+            args = {'dtstart': dtstart}
+            args.update(self._calc_stop_criteria(form))
+            dates = self._tzify(rrule.rrule(freq, interval=interval, **args))
+            last_day_of_month = False
+        return dates, last_day_of_month
 
 
 class RHClonePreview(RHManageEventBase):
@@ -132,12 +141,12 @@ class RHClonePreview(RHManageEventBase):
         form = CloneRepeatabilityForm()
         clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
         try:
-            dates = clone_calculator.calculate(request.form)
+            dates, last_day_of_month = clone_calculator.calculate(request.form)
             if len(dates) > 100:
                 raise ValueError(_("You can clone maximum of 100 times at once"))
         except ValueError as e:
             return jsonify(error={'message': e.message})
-        return jsonify_data(count=len(dates), dates=dates, flash=False)
+        return jsonify_data(count=len(dates), dates=dates, last_day_of_month=last_day_of_month, flash=False)
 
 
 class RHCloneEvent(RHManageEventBase):
@@ -182,7 +191,7 @@ class RHCloneEvent(RHManageEventBase):
                     dates = [form.start_dt.data]
                 else:
                     clone_calculator = get_clone_calculator(form.repeatability.data, self.event)
-                    dates = clone_calculator.calculate(request.form)
+                    dates = clone_calculator.calculate(request.form)[0]
                 clones = [clone_event(self.event, start_dt, set(form.selected_items.data), form.category.data)
                           for start_dt in dates]
                 if len(clones) == 1:
