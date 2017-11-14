@@ -544,7 +544,7 @@ class RegistrationData(StoredFileMixin, db.Model):
 
     @locator.file
     def locator(self):
-        """A locator that pointsto the associated file."""
+        """A locator that points to the associated file."""
         if not self.filename:
             raise Exception('The file locator is only available if there is a file.')
         return dict(self.registration.locator, field_data_id=self.field_data_id, filename=self.filename)

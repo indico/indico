@@ -25,7 +25,7 @@
             </h3>
         </div>
         <div class="content" style="padding: 10px 20px; color: #555;">
-            <div style="border-bottom: 1px solid #EBEBEB;">
+            <div style="{{ 'border-bottom: 1px solid #ebebeb;' if self.registration_header()|trim and self.registration_body()|trim }}">
                 {% block registration_header %}{% endblock %}
             </div>
             {% block registration_body %}{% endblock %}
