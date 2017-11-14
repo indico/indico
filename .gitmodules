@@ -22,10 +22,6 @@
 	path = ext_modules/pagedown
 	url = git://github.com/balpha/pagedown.git
 	ignore = dirty
-[submodule "ext_modules/jquery-ui-multiselect"]
-	path = ext_modules/jquery-ui-multiselect
-	url = git://github.com/ehynds/jquery-ui-multiselect-widget.git
-	ignore = dirty
 [submodule "ext_modules/ui-sortable"]
 	path = ext_modules/ui-sortable
 	url = git://github.com/angular-ui/ui-sortable

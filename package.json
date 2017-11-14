@@ -22,6 +22,7 @@
     "jquery": "^3.2.1",
     "jquery-migrate": "^3.0.1",
     "jquery-typeahead": "^2.10.4",
+    "jquery-ui-multiselect-widget": "^2.0.1",
     "jquery.typewatch": "github:dennyferra/typewatch#3.0.0",
     "moment": "^2.19.1",
     "outdatedbrowser": "^1.0.2",
