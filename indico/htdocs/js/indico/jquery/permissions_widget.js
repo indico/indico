@@ -97,7 +97,11 @@
                 var idx = _.findIndex(self.data, function(item) {
                     return _.isMatch(item[0], principal);
                 });
-                self.data[idx][1] = permissions;
+                if (permissions.length) {
+                    self.data[idx][1] = permissions;
+                } else {
+                    self.data.splice(idx, 1);
+                }
                 self._update();
                 self._render();
                 $(this).trigger('change');
