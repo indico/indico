@@ -115,6 +115,7 @@ class SurveysPermission(ManagementPermission):
     name = 'surveys'
     friendly_name = _('Surveys')
     description = _('Grants management access to surveys.')
+    user_selectable = True
 
 
 @signals.get_placeholders.connect_via('survey-link-email')

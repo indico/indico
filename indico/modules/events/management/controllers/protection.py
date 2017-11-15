@@ -16,10 +16,14 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
 from flask import flash, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
+from indico.core.permissions import get_available_permissions
+from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
 from indico.modules.events.management.views import WPEventProtection
@@ -29,6 +33,7 @@ from indico.modules.events.sessions.operations import update_session_coordinator
 from indico.modules.events.util import get_object_from_args, update_object_principals
 from indico.util import json
 from indico.util.i18n import _
+from indico.util.user import principal_from_fossil
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import serialize_principal
@@ -68,38 +73,17 @@ class RHEventACLMessage(RHManageEventBase):
 class RHEventProtectionBase(RHManageEventBase):
     def __init__(self):
         super(RHEventProtectionBase, self).__init__()
+        selectable_permissions = {k: v for k, v in get_available_permissions(Event).viewitems() if v.user_selectable}
+        self.whitelisted_permissions = set(selectable_permissions.keys()) | {'edit', 'access'}
         self.permissions_tree = {
             'edit': {
                 'title': _('Event Management'),
                 'children': {
-                    'access': {'title': _('View')},
-                    'submit': {'title': _('Submit')},
-                    'material': {'title': _('Manage Material')},
-                    'contributions': {'title': _('Manage Contributions')},
-                    'timetable': {'title': _('Manage Timetable')},
-                    'cfa': {
-                        'title': _('Manage Call for Abstracts'),
-                        'children': {
-                            'programme': {'title': _('Manage Programme')}
-                        }
-                    },
-                    'cfp': {'title': _('Manage Call for Papers')},
-                    'registration': {
-                        'title': _('Manage Registration'),
-                        'children': {
-                            'participants_mgmt': {
-                                'title': _('Manage List of Participants'),
-                                'children': {
-                                    'participants_view': {'title': _('View List of Participants')}
-                                }
-                            }
-                        }
-                    },
-                    'surveys': {'title': _('Manage Surveys')},
-                    'layout': {'title': _('Manage Layout')}
+                    v.name: {'title': v.friendly_name} for k, v in selectable_permissions.viewitems()
                 }
             }
         }
+        self.permissions_tree['edit']['children']['access'] = {'title': _('Access')}
 
 
 class RHEventProtection(RHEventProtectionBase):
@@ -110,14 +94,26 @@ class RHEventProtection(RHEventProtectionBase):
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         if form.validate_on_submit():
-            # TODO: Save new permissions in DB (form.permissions.data)
+            permission_principals = defaultdict(set)
+            for principal_data in form.permissions.data:
+                for permission in principal_data[1]:
+                    permission_principals[permission].add(principal_from_fossil(principal_data[0], allow_emails=True))
+            for permission in self.whitelisted_permissions:
+                if permission == 'edit':
+                    update_object_principals(self.event, permission_principals.get(permission, set()), full_access=True)
+                elif permission == 'access':
+                    update_object_principals(self.event, permission_principals.get(permission, set()), read_access=True)
+                else:
+                    update_object_principals(self.event, permission_principals.get(permission, set()),
+                                             permission=permission)
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
                                                  'own_no_access_contact': form.own_no_access_contact.data,
                                                  'access_key': form.access_key.data,
                                                  'visibility': form.visibility.data})
-            update_object_principals(self.event, form.acl.data, read_access=True)
-            update_object_principals(self.event, form.managers.data, full_access=True)
-            update_object_principals(self.event, form.submitters.data, permission='submit')
+            # TODO: Remove ACL, Managers and submitters fields from form
+            # update_object_principals(self.event, form.acl.data, read_access=True)
+            # update_object_principals(self.event, form.managers.data, full_access=True)
+            # update_object_principals(self.event, form.submitters.data, permission='submit')
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event))
@@ -151,28 +147,11 @@ class RHEventProtection(RHEventProtectionBase):
     def _get_principal_permissions(self, principal):
         """Retrieve a set containing the valid permissions of a principal."""
         permissions = set()
-        valid_labels = self._get_valid_permissions_labels()
         if principal.full_access:
             permissions.add('edit')
         elif principal.read_access:
             permissions.add('access')
-        return permissions | (set(principal.permissions) & valid_labels)
-
-    def _get_valid_permissions_labels(self):
-        """Retrieves a set containing all the valid permission labels
-        in the permissions widget.
-        """
-        permissions = set()
-
-        def iterate_recursively(elem):
-            for k, v in elem.iteritems():
-                if isinstance(v, dict):
-                    iterate_recursively(v)
-                    if k != 'children':
-                        permissions.add(k)
-
-        iterate_recursively(self.permissions_tree)
-        return permissions
+        return permissions | (set(principal.permissions) & self.whitelisted_permissions)
 
 
 class RHEventPermissions(RHEventProtectionBase):

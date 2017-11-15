@@ -191,6 +191,7 @@ class SubmitterPermission(ManagementPermission):
     name = 'submit'
     friendly_name = _('Submission')
     description = _('Grants access to materials and minutes.')
+    user_selectable = True
 
 
 @signals.menu.items.connect_via('admin-sidemenu')

@@ -35,6 +35,8 @@ class ManagementPermission(object):
     friendly_name = None
     #: description of the permission (optional)
     description = None
+    #: whether permission can be set in the permissions widget (protection page) or not
+    user_selectable = False
 
 
 @memoize_request

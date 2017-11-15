@@ -128,6 +128,7 @@ class PrincipalField(PrincipalListField):
 
 class PermissionsField(JSONField):
     widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
+    # TODO: Add validation
 
     def __init__(self, *args, **kwargs):
         super(PermissionsField, self).__init__(*args, **kwargs)

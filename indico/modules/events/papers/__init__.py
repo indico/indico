@@ -73,6 +73,7 @@ class PaperManagerPermission(ManagementPermission):
     name = 'paper_manager'
     friendly_name = _('Paper Manager')
     description = _('Grants management rights for paper reviewing on an event.')
+    user_selectable = True
 
 
 class PaperJudgePermission(ManagementPermission):
