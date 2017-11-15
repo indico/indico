@@ -28,6 +28,18 @@
             selectedRooms: null
         },
 
+        _getList: function() {
+            return this.widget.find(".ui-multiselect-checkboxes").scrollblocker();
+        },
+
+        _getHeader: function() {
+            return this.widget.find(".ui-widget-header");
+        },
+
+        _getFooter: function() {
+            return this.widget.find(".ui-widget-footer");
+        },
+
         _create: function() {
             var self = this;
 
@@ -73,7 +85,7 @@
         },
 
         scrollToFirstSelected: function() {
-            var element = this.parts.list.find(':checkbox:checked').first();
+            var element = this._getList().find(':checkbox:checked').first();
             if (!element.length) {
                 return;
             }
@@ -129,11 +141,6 @@
             self.element.addClass('roomselector');
             self.element.find("button").css("display", "none");
             self.widget = self.select.multiselect("widget");
-            self.parts = {
-                list: self.widget.find(".ui-multiselect-checkboxes").scrollblocker(),
-                header: self.widget.find(".ui-widget-header")
-            };
-
             if (self.options.simpleMode) {
                 self.element.addClass('simple');
             }
@@ -147,6 +154,7 @@
                 self._drawHeader();
                 self._drawRooms();
                 self._drawFooter();
+                self.select.multiselect({height: 355});
             });
 
             self.select.multiselect("refresh");
@@ -161,7 +169,7 @@
             var select = self.select;
 
             select.on("multiselectclick", function(event, ui) {
-                self._changestyle(self.parts.list.find('input[value="' + ui.value + '"]'));
+                self._changestyle(self._getList().find('input[value="' + ui.value + '"]'));
                 self._updateSelectionCounter();
             });
 
@@ -175,17 +183,17 @@
                 self._updateSelectionCounter();
             });
 
-            self.parts.list.on("click", ".attributes", function(e) {
+            self._getList().on("click", ".attributes", function(e) {
                 e.preventDefault();
             });
 
-            self.parts.list.on("mouseleave", function() {
+            self._getList().on("mouseleave", function() {
                 $(this).find('label').removeClass('ui-state-hover');
             });
         },
 
         _applyShowMine: function(key, toggle) {
-            var filterIcon = this.parts.header.addClass("toolbar thin").find('.icon-filter');
+            var filterIcon = this._getHeader().addClass("toolbar thin").find('.icon-filter');
             var state = $.jStorage.get(key, false);
 
             if (toggle) {
@@ -200,7 +208,7 @@
 
         _drawHeader: function() {
             var self = this;
-            var header = self.parts.header.addClass("toolbar thin");
+            var header = self._getHeader().addClass("toolbar thin");
             var myRooms = self.options.myRooms;
 
             // Create filters
@@ -359,10 +367,11 @@
                                   $T("Private room")];
 
             var userId = $('body').data('userId');
+
             self.select.find("option").each(function(index) {
                 var labelparts = $(this).attr('label').split(":");
                 var roomId = Number($(this).val());
-                var item = self.parts.list.find('input[value="' + roomId +'"]').parent();
+                var item = self._getList().find('input[value="' + roomId +'"]').parent();
                 if(!_.contains(myRooms, roomId)) {
                     item.addClass('room-not-mine');
                 }
@@ -422,8 +431,7 @@
         _drawFooter: function() {
             var self = this;
 
-            self.parts.footer = $('<div class="ui-widget-footer"/>')
-                .append($('<div/>').addClass('ui-multiselect-selection-counter'))
+            $('<div class="ui-widget-footer"/>').append($('<div/>').addClass('ui-multiselect-selection-counter'))
                 .append($('<div/>').addClass('ui-multiselect-selection-summary'))
                 .appendTo(self.widget);
 
@@ -443,7 +451,7 @@
             self.scrollToFirstSelected();
 
             function restoreSelection(selectedRooms) {
-                self.parts.list.find(":checkbox").each(function(index) {
+                self._getList().find(":checkbox").each(function(index) {
                     if (_.contains(selectedRooms, index)) {
                         this.click();
                     }
@@ -453,7 +461,7 @@
             }
 
             function restoreSelectedRooms() {
-                self.parts.list.find(':checkbox:not(:checked)').each(function() {
+                self._getList().find(':checkbox:not(:checked)').each(function() {
                     if (_.contains(self.options.selectedRooms, +this.value)) {
                         this.click();
                     }
@@ -487,15 +495,15 @@
                 capacity.val(ui.value);
             }
 
-            self.parts.header.find(".ui-slider").slider('value', capacity.val());
+            self._getHeader().find(".ui-slider").slider('value', capacity.val());
         },
 
         _updateSelectionCounter: _.debounce(function() {
             var self = this;
             var opt = self.select.multiselect("option");
 
-            var counter = self.parts.footer.find(".ui-multiselect-selection-counter");
-            var count = self.parts.list.find("input:checked").length;
+            var counter = self._getFooter().find(".ui-multiselect-selection-counter");
+            var count = self._getList().find("input:checked").length;
             var str = opt.selectedText.replace("#", count);
 
             counter
@@ -513,9 +521,9 @@
                                filter.capacity.val();
             self.select.multiselectfilter('advancedFilter', filterString);
 
-            var total = self.parts.list.find("li").length;
-            var displayed = self.parts.list.find('li:visible').length;
-            self.parts.footer.find(".ui-multiselect-selection-summary")
+            var total = self._getList().find("li").length;
+            var displayed = self._getList().find('li:visible').length;
+            self._getFooter().find(".ui-multiselect-selection-summary")
                 .text(displayed + " / " + total + " rooms")
                 .effect("pulsate", {times: 1});
         },
@@ -523,7 +531,7 @@
         _changeSelectedStyleAll: function() {
             var self = this;
 
-            self.parts.list.find("input").each(function() {
+            self._getList().find("input").each(function() {
                 self._changestyle($(this));
             });
         },

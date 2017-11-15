@@ -56,6 +56,7 @@ type("ExclusivePopup", ["Printable"], {
     _makeCanvas: function() {
         if(!this.canvas) {
             var opts = $.extend(true, {
+                closeText: null,
                 autoOpen: false,
                 draggable: true,
                 modal: true,

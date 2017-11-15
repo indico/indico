@@ -31,15 +31,13 @@ Object.assign(window, {
     i18n: defaultI18n
 });
 
-import './contrib/jquery-ui.css';
-import './contrib/jquery-ui';
-import '../../styles/custom/jquery-ui.css';
-
 import 'qtip2';
 import 'qtip2/dist/jquery.qtip.css';
 
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
+
+import './compat/jquery-ui';
 
 import './widgets';
 
