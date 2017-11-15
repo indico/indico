@@ -108,12 +108,12 @@
                     groupOrder.push(options.venueNames[i]);
                 }
             }
-            global.Typeahead[roomInput.selector].options.groupOrder = groupOrder;
+            global.Typeahead['#' + roomInput.get(0).id].options.groupOrder = groupOrder;
         }
 
         function updateVenueOnRoomChange(item) {
             /* Override the venue based on the room selection */
-            if (item.venue_id != hiddenData.venue_id) {
+            if (item.venue_id !== hiddenData.venue_id) {
                 venueJustChanged = true;
                 var venueName = item.group || options.venueMap[item.venue_id];
                 var data = {item_name: venueName, venue_id: item.venue_id, room_id: item.id};
@@ -292,6 +292,7 @@
         }
 
         venueInput.typeahead({
+            input: '#location-venue-' + options.fieldId,
             source: options.venues,
             minLength: 0,
             searchOnFocus: true,
@@ -358,6 +359,7 @@
         });
 
         roomInput.typeahead({
+            input: '#location-room-' + options.fieldId,
             source: options.rooms,
             minLength: 0,
             searchOnFocus: true,
