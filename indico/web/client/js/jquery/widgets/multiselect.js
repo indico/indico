@@ -29,6 +29,11 @@ $.extend($.ech.multiselect.prototype, {
         this._fixEventBindings();
     },
 
+    _setMenuHeight: function() {
+        // the new height calculation algorithm doesn't suit us
+        this.menu.children(".ui-multiselect-checkboxes").height(this.options.height);
+    },
+
     _fixEventBindings: function() {
         this.header.delegate('input[type="checkbox"], input[type="radio"]', 'click.multiselect', function(e) {
             e.stopPropagation();

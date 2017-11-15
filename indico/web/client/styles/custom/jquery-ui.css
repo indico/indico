@@ -161,7 +161,7 @@
     margin: 0;
 }
 
-.ui-tabs .ui-tabs-nav li a {
+.ui-tabs .ui-tabs-nav li a.ui-tabs-anchor {
     float: left;
     padding: 6px 8px 3px 8px;
     text-decoration: none;
@@ -182,7 +182,7 @@
 
 .ui-widget-content {
     background: #FFFFFF;
-    border: none;
+    border: none !important;
 }
 
 .ui-widget-overlay {

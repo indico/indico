@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -15,12 +15,18 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-.ui-multiselect-widget {
-    background: none repeat scroll 0 0 #FAFAFA;
-    border: 1px solid #DADADA;
-}
+import 'jquery-ui';
+import 'jquery-ui/ui/effect';
+import 'jquery-ui/ui/effects/effect-pulsate';
+import 'jquery-ui/ui/effects/effect-highlight';
+import 'jquery-ui/ui/widgets/datepicker';
+import 'jquery-ui/ui/widgets/dialog';
+import 'jquery-ui/ui/widgets/draggable';
+import 'jquery-ui/ui/widgets/droppable';
+import 'jquery-ui/ui/widgets/resizable';
+import 'jquery-ui/ui/widgets/sortable';
+import 'jquery-ui/ui/widgets/slider';
+import 'jquery-ui/ui/widgets/tabs';
 
-.ui-multiselect-checkboxes {
-    position: relative;
-    overflow-y: scroll;
-}
+import 'jquery-ui/themes/base/all.css';
+import '../../../styles/custom/jquery-ui.css';
