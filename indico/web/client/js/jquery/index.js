@@ -16,9 +16,9 @@
  */
 
 // moment.js locales
-import 'moment/locale/en-gb.js';
-import 'moment/locale/fr.js';
-import 'moment/locale/es.js';
+import 'moment/locale/en-gb';
+import 'moment/locale/fr';
+import 'moment/locale/es';
 
 import 'jquery-migrate';
 
