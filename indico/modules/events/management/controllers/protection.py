@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
+from collections import OrderedDict, defaultdict
 
 from flask import flash, redirect, request
 from werkzeug.exceptions import NotFound
@@ -84,6 +84,8 @@ class RHEventProtectionBase(RHManageEventBase):
             }
         }
         self.permissions_tree['edit']['children']['access'] = {'title': _('Access')}
+        self.permissions_tree['edit']['children'] = OrderedDict(sorted(
+            self.permissions_tree['edit']['children'].items(), key=lambda t: t[0]))
 
 
 class RHEventProtection(RHEventProtectionBase):
