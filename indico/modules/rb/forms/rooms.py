@@ -15,6 +15,7 @@
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
 import itertools
+from datetime import datetime
 from operator import itemgetter
 
 from wtforms import Form
@@ -31,7 +32,7 @@ from indico.modules.rb.models.locations import Location
 from indico.util.i18n import _
 from indico.util.struct.iterables import group_nested
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import IndicoQuerySelectMultipleCheckboxField, PrincipalField
+from indico.web.forms.fields import IndicoDateField, IndicoQuerySelectMultipleCheckboxField, PrincipalField
 from indico.web.forms.validators import UsedIf
 from indico.web.forms.widgets import ConcatWidget
 
@@ -86,14 +87,31 @@ class _TimePair(Form):
     validate_end = validate_start
 
 
-class _DateTimePair(Form):
-    start = DateTimeField(_(u'from'), [UsedIf(lambda form, field: form.end.data)], display_format='%d/%m/%Y %H:%M',
-                          parse_kwargs={'dayfirst': True})
-    end = DateTimeField(_(u'to'), [UsedIf(lambda form, field: form.start.data)], display_format='%d/%m/%Y %H:%M',
-                        parse_kwargs={'dayfirst': True})
+class _DateTimePair(IndicoForm):
+    class Meta:
+        csrf = False
+
+    start_date = IndicoDateField(_(u'from'), [UsedIf(lambda form, field: form.end_date.data)])
+    start_time = TimeField(None, [Optional()])
+    end_date = IndicoDateField(_(u'to'), [UsedIf(lambda form, field: form.start_date.data)])
+    end_time = TimeField(None, [Optional()])
+
+    @property
+    def start_dt(self):
+        if self.start_date.data:
+            return datetime.combine(self.start_date.data, self.start_time.data)
+        else:
+            return None
+
+    @property
+    def end_dt(self):
+        if self.end_date.data:
+            return datetime.combine(self.end_date.data, self.end_time.data)
+        else:
+            return None
 
     def validate_start(self, field):
-        if self.start.data and self.end.data and self.start.data >= self.end.data:
+        if self.start_dt and self.end_dt and self.start_dt >= self.end_dt:
             raise ValidationError('The start date must be earlier than the end date.')
 
     validate_end = validate_start
