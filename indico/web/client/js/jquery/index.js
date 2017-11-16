@@ -26,6 +26,8 @@ import 'qtip2/dist/jquery.qtip.css';
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
 
+import 'tablesorter';
+
 import Taggle from 'taggle';
 
 import './compat/jquery-ui';
