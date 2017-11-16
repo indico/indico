@@ -14,14 +14,6 @@
 	path = ext_modules/underscore
 	url = git://github.com/documentcloud/underscore.git
 	ignore = dirty
-[submodule "ext_modules/mathjax"]
-	path = ext_modules/mathjax
-	url = git://github.com/mathjax/MathJax.git
-	ignore = dirty
-[submodule "ext_modules/pagedown"]
-	path = ext_modules/pagedown
-	url = git://github.com/balpha/pagedown.git
-	ignore = dirty
 [submodule "ext_modules/ui-sortable"]
 	path = ext_modules/ui-sortable
 	url = git://github.com/angular-ui/ui-sortable

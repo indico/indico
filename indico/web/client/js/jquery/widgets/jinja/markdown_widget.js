@@ -18,8 +18,6 @@
 /* global countWords:false */
 
 (function(global) {
-    'use strict';
-
     function getLimitClass(remaining, max) {
         if (remaining < 0) {
             return 'limit-exceeded';

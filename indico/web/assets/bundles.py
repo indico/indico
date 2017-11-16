@@ -208,15 +208,6 @@ def register_all_js(env):
     utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'misc.js', 'forms.js'))
     calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
-    mathjax_js = rjs_bundle('mathjax', 'js/lib/mathjax/MathJax.js', 'js/custom/pagedown_mathjax.js')
-
-    markdown_js = rjs_bundle(
-        'markdown',
-        *namespace('js/lib/pagedown',
-                   'Markdown.Converter.js',
-                   'Markdown.Editor.js',
-                   'Markdown.Sanitizer.js'))
-
     module_js = {
         'global': rjs_bundle('modules_global', *namespace('js/indico/modules/global',
                                                           'session_bar.js', 'impersonation.js')),
@@ -263,8 +254,6 @@ def register_all_js(env):
     env.register('indico_jquery', indico_jquery)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
-    env.register('mathjax_js', mathjax_js)
-    env.register('markdown_js', markdown_js)
     env.register('ckeditor', ckeditor)
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
