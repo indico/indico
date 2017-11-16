@@ -144,8 +144,8 @@ def cleanup(temp, cache, assets, verbose, dry_run, min_age):
 @click.option('--evalex-from', multiple=True,
               help='Restrict the debugger shell to the given ips (can be used multiple times)')
 @click.option('--proxy', is_flag=True, help='Use the ip and protocol provided by the proxy.')
-@click.option('--reloader', type=click.Choice(['auto', 'stat', 'watchdog']), default='auto',
-              help='Use specific reloader type for your devserver.')
+@click.option('--reloader', 'reloader_type', type=click.Choice(['auto', 'none', 'stat', 'watchdog']), default='auto',
+              help='The type of auto-reloader to use.')
 @pass_script_info
 def run(info, **kwargs):
     """Run the development webserver.

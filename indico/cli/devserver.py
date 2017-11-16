@@ -27,7 +27,7 @@ from werkzeug.urls import url_parse
 from werkzeug.wsgi import DispatcherMiddleware
 
 
-def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader):
+def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_evalex, evalex_from, reloader_type):
     if port is None:
         port = 8443 if ssl else 8000
 
@@ -80,8 +80,9 @@ def run_cmd(info, host, port, url, ssl, ssl_key, ssl_cert, quiet, proxy, enable_
     werkzeug_logger.addHandler(logging.StreamHandler())
 
     app = _make_wsgi_app(info, url, evalex_whitelist, proxy)
-    run_simple(host, port, app, reloader_type=reloader,
-               use_reloader=True, use_debugger=False, use_evalex=False, threaded=True, ssl_context=ssl_ctx,
+    run_simple(host, port, app,
+               reloader_type=reloader_type, use_reloader=(reloader_type != 'none'),
+               use_debugger=False, use_evalex=False, threaded=True, ssl_context=ssl_ctx,
                extra_files=extra_files, request_handler=QuietWSGIRequestHandler if quiet else None)
 
 
