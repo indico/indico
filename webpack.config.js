@@ -24,7 +24,7 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 
 const modulesDir = path.join(__dirname, 'node_modules');
 
-module.exports = {
+module.exports = env => ({
     devtool: 'source-map',
     context: __dirname + "/indico/web/client",
     entry: {
@@ -106,11 +106,14 @@ module.exports = {
         }),
         new CopyWebpackPlugin([
             {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax'}
-        ])
+        ]),
+        new webpack.EnvironmentPlugin({
+            NODE_ENV: (env ? env.NODE_ENV : null) || 'development'
+        })
     ],
     resolve: {
         alias: {
             jquery: 'jquery/src/jquery'
         }
     }
-};
+});
