@@ -86,8 +86,10 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
             for i, nbd in enumerate(room.nonbookable_periods.all()):
                 if i >= len(form.nonbookable_periods.entries):
                     form.nonbookable_periods.append_entry()
-                form.nonbookable_periods[i].start.data = nbd.start_dt
-                form.nonbookable_periods[i].end.data = nbd.end_dt
+                form.nonbookable_periods[i].start_date.data = nbd.start_dt.date()
+                form.nonbookable_periods[i].start_time.data = nbd.start_dt.time()
+                form.nonbookable_periods[i].end_date.data = nbd.end_dt.date()
+                form.nonbookable_periods[i].end_time.data = nbd.end_dt.time()
 
             for i, bt in enumerate(room.bookable_hours.all()):
                 if i >= len(form.bookable_hours.entries):
@@ -124,9 +126,10 @@ class RHRoomBookingCreateModifyRoomBase(RHRoomBookingAdminBase):
         # Bookable times
         room.bookable_hours = [BookableHours(start_time=bt['start'], end_time=bt['end'])
                                for bt in form.bookable_hours.data if all(x is not None for x in bt.viewvalues())]
+
         # Nonbookable dates
-        room.nonbookable_periods = [NonBookablePeriod(start_dt=nbd['start'], end_dt=nbd['end'])
-                                    for nbd in form.nonbookable_periods.data if all(nbd.viewvalues())]
+        room.nonbookable_periods = [NonBookablePeriod(start_dt=nbd.start_dt, end_dt=nbd.end_dt)
+                                    for nbd in form.nonbookable_periods if (nbd.start_dt and nbd.end_dt)]
 
     def _process(self):
         if self._form.validate_on_submit():
