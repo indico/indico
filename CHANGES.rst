@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+Version 2.0rc2
+--------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Do not show borders above/below the message in registration emails
+  unless both the header and body blocks are used (:issue:`3151`)
+
+
 Version 2.0rc1
 --------------
 

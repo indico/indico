@@ -1,7 +1,7 @@
 .. _install-dev:
 
 Installation guide (development)
-===============================
+================================
 
 Installing System Packages
 --------------------------
