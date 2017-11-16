@@ -20,10 +20,34 @@ import 'moment/locale/en-gb';
 import 'moment/locale/fr';
 import 'moment/locale/es';
 
-import 'jquery-migrate';
+import 'qtip2';
+import 'qtip2/dist/jquery.qtip.css';
+
+import 'fullcalendar';
+import 'fullcalendar/dist/fullcalendar.css';
+
+import Taggle from 'taggle';
+
+import './compat/jquery-ui';
+
+import './widgets';
 
 // i18n (Jed)
 import {defaultI18n, $T} from '../utils/i18n';
+
+import './utils/clipboard';
+import './utils/dropzone';
+
+import './modules/categories';
+
+
+// jQuery-migrate should be muted when in production
+if (process.env.NODE_ENV !== 'development') {
+    $.migrateMute = true;
+}
+// explicit tracebacks are not needed
+$.migrateTrace = false;
+require('jquery-migrate');
 
 // These global definitions are needed until everything is on webpack
 Object.assign(window, {
@@ -31,20 +55,4 @@ Object.assign(window, {
     i18n: defaultI18n
 });
 
-import 'qtip2';
-import 'qtip2/dist/jquery.qtip.css';
-
-import 'fullcalendar';
-import 'fullcalendar/dist/fullcalendar.css';
-
-import './compat/jquery-ui';
-
-import './widgets';
-
-import './utils/clipboard';
-import './utils/dropzone';
-import Taggle from 'taggle';
-
 window.Taggle = Taggle;
-
-import './modules/categories';
