@@ -51,8 +51,14 @@
 
     .permissions-box {
         @include border-all($style: dashed);
+        @include transition(background-color 0.25s);
+        cursor: initial;
         padding: 0.3em 0.5em;
         width: 100%;
+
+        &:hover {
+            background-color: $light-gray;
+        }
 
         ul {
             li {
@@ -63,8 +69,13 @@
             }
         }
 
-        button {
+        .group {
             margin-left: auto;
+
+            & > button {
+                margin: 0;
+                padding: 0.2em 0.7em;
+            }
         }
     }
 }

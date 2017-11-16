@@ -55,12 +55,14 @@
             }
         },
         _renderPermissions: function(principal, permissions) {
+            var self = this;
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
             permissions.forEach(function(item) {
                 $permissionsList.append($('<li>', {class: 'i-label bold ' + permissionClasses[item]}).append(item));
             });
 
+            var $buttonsGroup = $('<div>', {class: 'group flexrow'});
             var $permissionsEditBtn = $('<button>', {
                 'type': 'button',
                 'class': 'i-button text-color borderless icon-only icon-edit',
@@ -70,7 +72,21 @@
                 'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
             });
 
-            $permissionsEditBtn.appendTo($permissions);
+            var $entryDeleteBtn = $('<button>', {
+                'type': 'button',
+                'class': 'i-button text-color borderless icon-only icon-remove',
+                'data-principal': JSON.stringify(principal)
+            }).on('click', function() {
+                var $this = $(this);
+                var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
+                var message = $T.gettext("Are you sure you want to permanently delete this entry?");
+                confirmPrompt(message, title).then(function() {
+                    self._updateItem($this.data('principal'), []);
+                });
+            });
+
+            $buttonsGroup.append($permissionsEditBtn, $entryDeleteBtn);
+            $buttonsGroup.appendTo($permissions);
             return $permissions;
         },
         _renderItem: function(item) {
@@ -86,6 +102,23 @@
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
         },
+        _findEntryIndex: function(principal) {
+            var idx = _.findIndex(this.data, function(item) {
+                return _.isMatch(item[0], principal);
+            });
+            return idx;
+        },
+        _updateItem: function(principal, newPermissions) {
+            var idx = this._findEntryIndex(principal);
+            if (newPermissions.length) {
+                this.data[idx][1] = newPermissions;
+            } else {
+                this.data.splice(idx, 1);
+            }
+            this._update();
+            this._render();
+            $('#permissions-widget-permissions').trigger('change');
+        },
         _create: function() {
             var self = this;
             this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
@@ -94,17 +127,7 @@
             this._render();
 
             $('#permissions-widget-permissions').on('indico:permissionsChanged', function(evt, permissions, principal) {
-                var idx = _.findIndex(self.data, function(item) {
-                    return _.isMatch(item[0], principal);
-                });
-                if (permissions.length) {
-                    self.data[idx][1] = permissions;
-                } else {
-                    self.data.splice(idx, 1);
-                }
-                self._update();
-                self._render();
-                $(this).trigger('change');
+                self._updateItem(principal, permissions);
             });
         }
     });
