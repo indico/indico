@@ -28,10 +28,10 @@ from indico.util.mathjax import MathjaxMixin
 class WPManagePapers(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/papers/'
     sidemenu_option = 'papers'
+    bundles = WPEventManagement.bundles + ('markdown.js',)
 
     def getJSFiles(self):
         return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_papers_js'].urls())
 
     def _getHeadContent(self):

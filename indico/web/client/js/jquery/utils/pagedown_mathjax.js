@@ -3,15 +3,12 @@
 
 // General MathJax configuration
 (function() {
-    'use strict';
     if (!$('html').data('static-site')) {
-        MathJax.Ajax.config.root = Indico.Urls.Base + "/js/lib/mathjax";
+        MathJax.Ajax.config.root = Indico.Urls.Base + "/static/assets/webpack/mathjax";
     }
 })();
 
 (function() {
-    "use strict";
-
     var DELIMITERS = [["$", "$"], ["$$", "$$"]];
 
     window.PageDownMathJax = (function() {

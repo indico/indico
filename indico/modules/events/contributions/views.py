@@ -24,11 +24,11 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageContributions(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/contributions/'
     sidemenu_option = 'contributions'
+    bundles = WPEventManagement.bundles + ('markdown.js',)
 
     def getJSFiles(self):
         return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['modules_contributions_js'].urls() +
-                self._asset_env['markdown_js'].urls())
+                self._asset_env['modules_contributions_js'].urls())
 
     def _getHeadContent(self):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)

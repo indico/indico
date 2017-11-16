@@ -16,16 +16,21 @@
  */
 
 const config = require('./config');
+const path = require('path');
 const webpack = require('webpack')
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
 
+const modulesDir = path.join(__dirname, 'node_modules');
 
 module.exports = {
     devtool: 'source-map',
     context: __dirname + "/indico/web/client",
     entry: {
         main: './js/index.js',
+        markdown: './js/jquery/markdown.js',
+        mathjax: './js/jquery/compat/mathjax.js',
         statistics: './js/jquery/statistics.js',
         modules_abstracts: './js/jquery/modules/abstracts.js',
         modules_rb: './js/legacy/room_booking.js',
@@ -98,7 +103,10 @@ module.exports = {
         new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
         new ExtractTextPlugin({
             filename: '[name].css'
-        })
+        }),
+        new CopyWebpackPlugin([
+            {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax'}
+        ])
     ],
     resolve: {
         alias: {

@@ -21,7 +21,6 @@ fabfile for Indico development operations
 import glob
 import json
 import os
-import re
 import shutil
 import sys
 from contextlib import contextmanager
@@ -149,33 +148,6 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
 @recipe('compass')
 def install_compass():
     _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
-
-
-@recipe('MathJax')
-def install_mathjax():
-    dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'mathjax/')
-    mathjax_js = os.path.join(dest_dir, 'MathJax.js')
-
-    with lcd(os.path.join(env.ext_dir, 'mathjax')):
-        local('rm -rf {0}'.format(os.path.join(dest_dir)))
-        _cp_tree('unpacked/', dest_dir, exclude=["AM*", "MML*", "Accessible*", "Safe*"])
-        _cp_tree('fonts/', os.path.join(dest_dir, 'fonts'), exclude=["png"])
-
-    with open(mathjax_js, 'r') as f:
-        data = f.read()
-        # Uncomment 'isPacked = true' line
-        data = re.sub(r'//\s*(MathJax\.isPacked\s*=\s*true\s*;)', r'\1', data, re.MULTILINE)
-
-    with open(mathjax_js, 'w') as f:
-        f.write(data)
-
-
-@recipe('PageDown')
-def install_pagedown():
-    with lcd(os.path.join(env.ext_dir, 'pagedown')):
-        dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'pagedown/')
-        local('mkdir -p {0}'.format(dest_dir))
-        local('cp *.js {0}'.format(dest_dir))
 
 
 @recipe('jquery-tablesorter')

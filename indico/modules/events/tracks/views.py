@@ -24,10 +24,10 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageTracks(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/tracks/'
     sidemenu_option = 'program'
+    bundles = WPEventManagement.bundles + ('markdown.js',)
 
     def getJSFiles(self):
         return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
 
     def _getHeadContent(self):
@@ -37,8 +37,8 @@ class WPManageTracks(MathjaxMixin, WPEventManagement):
 class WPDisplayTracks(WPConferenceDisplayBase):
     template_prefix = 'events/tracks/'
     menu_entry_name = 'program'
+    bundles = WPConferenceDisplayBase.bundles + ('markdown.js',)
 
     def getJSFiles(self):
         return (WPConferenceDisplayBase.getJSFiles(self) +
-                self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_tracks_js'].urls())
