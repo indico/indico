@@ -201,9 +201,7 @@ def register_all_js(env):
                               'jquery.colorpicker.js',
                               'jquery-extra-selectors.js',
                               'jstorage.js')
-    jquery = rjs_bundle('jquery', *filter(None, [
-        'js/lib/jquery.tablesorter.js',
-        'js/jquery/jquery-migrate-silencer.js' if not config.DEBUG else None] + _jquery_files))
+    jquery = rjs_bundle('jquery', *filter(None, ['js/lib/jquery.tablesorter.js'] + _jquery_files))
 
     utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'misc.js', 'forms.js'))
 
