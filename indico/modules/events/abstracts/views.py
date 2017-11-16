@@ -28,11 +28,10 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageAbstracts(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/abstracts/'
     sidemenu_option = 'abstracts'
-    bundles = WPEventManagement.bundles + ('modules_abstracts.js', 'modules_abstracts.css')
+    bundles = WPEventManagement.bundles + ('modules_abstracts.js', 'modules_abstracts.css', 'markdown.js')
 
     def getJSFiles(self):
         return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_reviews_js'].urls())
 
     def _getHeadContent(self):
@@ -41,11 +40,10 @@ class WPManageAbstracts(MathjaxMixin, WPEventManagement):
 
 class WPDisplayAbstractsBase(WPConferenceDisplayBase):
     template_prefix = 'events/abstracts/'
-    bundles = WPConferenceDisplayBase.bundles + ('modules_abstracts.js', 'modules_abstracts.css')
+    bundles = WPConferenceDisplayBase.bundles + ('modules_abstracts.js', 'modules_abstracts.css', 'markdown.js')
 
     def getJSFiles(self):
         return (WPConferenceDisplayBase.getJSFiles(self) +
-                self._asset_env['markdown_js'].urls() +
                 self._asset_env['modules_reviews_js'].urls())
 
 
