@@ -6,5 +6,10 @@
       }
     }]
   ],
-  "plugins": ["transform-runtime"]
+  "plugins": ["transform-runtime"],
+  "env": {
+    "production": {
+      "presets": ["minify"]
+    }
+  }
 }
