@@ -246,6 +246,8 @@ type ("RoomBookingCalendarDrawer", [],
                 var diff = ( bar.endDT.getHours() - bar.startDT.getHours() + (startHour<0?startHour:0) ) * 60 + ( bar.endDT.getMinutes() - bar.startDT.getMinutes() );
                 var width = diff / (24*60) * DAY_WIDTH_PX - 1;
                 var resvInfo;
+                var startDT = moment(bar.startDT);
+                var endDT = moment(bar.endDT);
 
                 // TODO: This shouldn't happen! See ticket #942
                 if (width < 0) {
@@ -254,7 +256,7 @@ type ("RoomBookingCalendarDrawer", [],
 
                 if (bar.type == "barCand") {
                     if (showCandidateTip) {
-                        resvInfo = $T("Click to book it") + '<br>' + bar.startDT.print("%H:%M") + "  -  " + bar.endDT.print("%H:%M");
+                        resvInfo = $T("Click to book it") + '<br>' + startDT.format('HH:mm') + "  -  " + endDT.format('HH:mm');
                     }
                     else {
                         resvInfo = $T('This bar indicates the time which will be booked.');
@@ -270,8 +272,8 @@ type ("RoomBookingCalendarDrawer", [],
                 } else if (bar.type == 'barOutOfRange') {
                     resvInfo = $T('Booking not allowed for this period.<br>This room can only be booked {0} days in advance.').format(bar.room.max_advance_days)
                 } else {
-                    resvInfo = bar.startDT.print("%H:%M") + "  -  " +
-                               bar.endDT.print("%H:%M") + "<br />" +
+                    resvInfo = startDT.format('HH:mm') + "  -  " +
+                               endDT.format('HH:mm') + "<br />" +
                                bar.owner + "<br />" +
                                bar.reason;
                 }
@@ -375,8 +377,8 @@ type ("RoomBookingCalendarDrawer", [],
                 indicoRequest("roomBooking.room.bookingPermission", {
                     room_id: room_id,
                     blocking_id: blocking_id,
-                    start_dt: bar.resvStartDT.print('%H:%M %Y-%m-%d'),
-                    end_dt: bar.resvEndDT.print('%H:%M %Y-%m-%d')
+                    start_dt: moment(bar.resvStartDT).format('HH:mm Y-MM-DD'),
+                    end_dt: moment(bar.resvEndDT).format('HH:mm Y-MM-DD')
                 }, function(result, error) {
                     if (!error && !exists(result.error)) {
                         if (!result.can_book) {
@@ -717,10 +719,10 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                     return 0;
                 },
                 date: function(elem1, elem2){
-                    return compare_alphanum(elem1.startDT.print("%y%m%d"), elem2.startDT.print("%y%m%d"));
+                    return compare_alphanum(moment(elem1.startDT).format("YMMDD"), moment(elem2.startDT).format("YMMDD"));
                 },
                 time: function(elem1, elem2){
-                    return compare_alphanum(elem1.startDT.print("%H%M"), elem2.startDT.print("%H%M"));
+                    return compare_alphanum(moment(elem1.startDT).format("HHmm"), moment(elem2.startDT).format("HHmm"));
                 },
                 owner: function(elem1, elem2) {
                     return compare_alphanum(elem1.owner, elem2.owner);
@@ -751,6 +753,8 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                 // Conflict, prebooking conflict and concurrent prebooking bars don't represent bookings.
                 // They're added to the calendar to highlight some events.
                 if(!(bar.type == 'barPreC' || bar.type == 'barConf' || bar.type == 'barPreConc' || bar.type == 'barCand')) {
+                    var startDT = moment(bar.startDT);
+                    var endDT = moment(bar.endDT);
                     var showBookingLink = Html.a({href:bar.url}, $T("Show"));
                     var rejectionLink;
                     // XXX is this still used?
@@ -760,7 +764,7 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                             var textArea = Html.textarea({rows:4, cols:40});
                             var popup = new ConfirmPopup($T("Rejecting a booking"),
                                     Html.div({style:{textAlign:'center'}},
-                                            Html.p({},$T('Are you sure you want to REJECT the booking for ' + bar.startDT.print("%H:%M %d/%m/%Y") + '?')),
+                                            Html.p({},$T('Are you sure you want to REJECT the booking for ' + startDT.format("H:mm d/M/Y") + '?')),
                                             Html.p({},$T('If so, please give a reason:')), textArea),
                                     function(value) {
                                         if(value) {
@@ -779,8 +783,8 @@ type ("RoomBookingCalendarSummaryDrawer", [],
                                 Html.div(attrs,
                                     Html.p({style:{cssFloat:'left', width: pixels(175), height:pixels(40)}},bar.room.getFullNameHtml(true)),
                                     Html.p({style:{cssFloat:'left', width: pixels(350), height:'auto'}},bar.reason, Html.br(), bar.owner ),
-                                    Html.p({style:{cssFloat:'left', width: pixels(90), height:pixels(40)}},bar.startDT.print("%d/%m/%Y")),
-                                    Html.p({style:{cssFloat:'left', width: pixels(75), height:pixels(40)}},bar.startDT.print("%H:%M"), Html.br(), bar.endDT.print("%H:%M"))),
+                                    Html.p({style:{cssFloat:'left', width: pixels(90), height:pixels(40)}},startDT.format("d/M/Y")),
+                                    Html.p({style:{cssFloat:'left', width: pixels(75), height:pixels(40)}},startDT.format("H:mm"), Html.br(), endDT.format("H:mm"))),
                                 Html.p({style:{cssFloat:'left', width: pixels(40), height:pixels(40)}},showBookingLink, rejectionLink));
                 } else {
                     return null;

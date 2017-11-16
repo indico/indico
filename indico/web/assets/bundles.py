@@ -206,7 +206,6 @@ def register_all_js(env):
         'js/jquery/jquery-migrate-silencer.js' if not config.DEBUG else None] + _jquery_files))
 
     utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'misc.js', 'forms.js'))
-    calendar = rjs_bundle('calendar', *namespace('js/calendar', 'calendar.js', 'calendar-setup.js'))
 
     module_js = {
         'global': rjs_bundle('modules_global', *namespace('js/indico/modules/global',
@@ -246,8 +245,7 @@ def register_all_js(env):
         'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
-    base_js = Bundle(palette, jquery, utils, calendar, indico_jquery,
-                     module_js['event_creation'], module_js['global'])
+    base_js = Bundle(palette, jquery, utils, indico_jquery, module_js['event_creation'], module_js['global'])
 
     env.register('jquery', jquery)
     env.register('utils', utils)
@@ -292,7 +290,6 @@ def register_all_css(env):
         *namespace('css',
                    'Default.css',
                    'timetable.css',
-                   'calendar-blue.css',
                    'jquery.colorbox.css',
                    'jquery.colorpicker.css'),
         filters=('csscompressor', 'indico_cssrewrite'),
