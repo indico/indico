@@ -96,6 +96,12 @@ class EventReminder(db.Model):
         nullable=False,
         default=False
     )
+    #: If the notofication should include the events description.
+    include_description = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
+    )
     #: The address to use as Reply-To in the notification email.
     reply_to_address = db.Column(
         db.String,
@@ -164,7 +170,7 @@ class EventReminder(db.Model):
         if not recipients:
             logger.info('Notification %s has no recipients; not sending anything', self)
             return
-        email_tpl = make_reminder_email(self.event, self.include_summary, self.message)
+        email_tpl = make_reminder_email(self.event, self.include_summary, self.include_description, self.message)
         email = make_email(bcc_list=recipients, from_address=self.reply_to_address, template=email_tpl)
         send_email(email, self.event, 'Reminder', self.creator)
 

@@ -23,6 +23,14 @@ It will take place at {{ render_location() }}
 You can access the full event here:
 {{ url }}
 
+{%- if with_description and event.description %}
+
+{% filter underline %}Description{% endfilter %}
+
+{{event.description|striptags}}
+
+{%- endif -%}
+
 {#- Blank lines are intended #}
 {%- if note %}
 
