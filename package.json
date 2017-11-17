@@ -60,6 +60,7 @@
   "scripts": {
     "watch": "webpack --watch",
     "build": "webpack -p --env.NODE_ENV=production",
+    "profile": "webpack --profile --json -p --env.NODE_ENV=production > webpack-stats.json",
     "postinstall": "patch -p0 -d node_modules/jquery-ui < indico/web/client/js/jquery/contrib/jquery-ui-changes.diff"
   },
   "repository": {
