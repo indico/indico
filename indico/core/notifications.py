@@ -134,7 +134,7 @@ def make_email(to_list=None, cc_list=None, bcc_list=None, from_address=None, rep
 
     The preferred way to specify the email content is using the
     `template` argument. To do so, use :func:`.get_template_module` on
-    a template inheriting from ``emails/base.txt`` for test emails or
+    a template inheriting from ``emails/base.txt`` for text emails or
     ``emails/base.html`` for HTML emails.
 
     :param to_list: The recipient email or a collection of emails
