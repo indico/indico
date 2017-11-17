@@ -28,7 +28,11 @@ def make_reminder_email(event, with_agenda, note):
     :param note: A custom message to include in the email
     """
     if event.type_ == EventType.lecture:
+        with_description = with_agenda
         with_agenda = False
+    else:
+        with_description = False
     return get_template_module('events/reminders/emails/event_reminder.txt', event=event,
                                url=event.short_external_url, note=note, with_agenda=with_agenda,
+                               with_description = with_description,
                                agenda=event.timetable_entries.filter_by(parent_id=None))

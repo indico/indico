@@ -64,8 +64,6 @@ class ReminderForm(IndicoForm):
         self.reply_to_address.choices = (self.event
                                          .get_allowed_sender_emails(extra=self.reply_to_address.object_data)
                                          .items())
-        if self.event.type_ == EventType.lecture:
-            del self.include_summary
 
     def validate_recipients(self, field):
         if not field.data and not self.send_to_participants.data:
