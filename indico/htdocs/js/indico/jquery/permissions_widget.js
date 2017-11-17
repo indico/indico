@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global ChooseUsersPopup:false */
+
 (function($) {
     'use strict';
 
@@ -32,6 +34,7 @@
 
         _update: function() {
             this.$dataField.val(JSON.stringify(this.data));
+            $('#permissions-widget-permissions').trigger('change');
         },
         _renderLabel: function(principal) {
             var $labelBox = $('<div>', {class: 'label-box'});
@@ -103,10 +106,9 @@
             });
         },
         _findEntryIndex: function(principal) {
-            var idx = _.findIndex(this.data, function(item) {
-                return _.isMatch(item[0], principal);
+            return _.findIndex(this.data, function(item) {
+                return item[0].identifier === principal.identifier;
             });
-            return idx;
         },
         _updateItem: function(principal, newPermissions) {
             var idx = this._findEntryIndex(principal);
@@ -117,7 +119,37 @@
             }
             this._update();
             this._render();
-            $('#permissions-widget-permissions').trigger('change');
+        },
+        _addItem: function(principal, permissions) {
+            if (this._findEntryIndex(principal) === -1) {
+                this.data.push([principal, permissions]);
+                this._update();
+                this._render();
+            } else {
+                var text = $T("The User / Group '{0}' is already present as an entry.".format(principal.name));
+                $('#flashed-messages').append(
+                    $('<div>', {class: 'error-message-box'}).append(
+                        $('<div>', {class: 'message-text', text: text})
+                    )
+                );
+            }
+        },
+        _addUserGroup: function() {
+            var self = this;
+            function _addPrincipals(principals) {
+                $('#flashed-messages').empty();
+                principals.forEach(function(principal) {
+                    // Grant 'access' permissions when a user/group is added for the first time.
+                    self._addItem(principal, ['access']);
+                });
+            }
+
+            var dialog = new ChooseUsersPopup(
+                $T("Select a user or group to add"),
+                true, null, true, true, null, false, false, false, _addPrincipals, null, true
+            );
+
+            dialog.execute();
         },
         _create: function() {
             var self = this;
@@ -128,6 +160,10 @@
 
             $('#permissions-widget-permissions').on('indico:permissionsChanged', function(evt, permissions, principal) {
                 self._updateItem(principal, permissions);
+            });
+
+            $('.js-add-user-group').on('click', function() {
+                self._addUserGroup();
             });
         }
     });
