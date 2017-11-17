@@ -39,6 +39,8 @@ Improvements
 - Add support for custom session types (:issue:`3189`)
 - Move poster session flag from session settings to session type settings
 - Add contribution cloning within an event (:issue:`3207`)
+- Add option to include the event description in reminder emails
+  (:issue:`3157`, thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

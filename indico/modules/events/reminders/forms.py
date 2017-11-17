@@ -56,6 +56,8 @@ class ReminderForm(IndicoForm):
     message = TextAreaField(_('Note'), description=_('A custom message to include in the email.'))
     include_summary = BooleanField(_('Include agenda'),
                                    description=_("Includes a simple text version of the event's agenda in the email."))
+    include_description = BooleanField(_('Include description'),
+                                       description=_("Includes the event's description in the email."))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
