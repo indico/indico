@@ -145,11 +145,6 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
         dest_dir))
 
 
-@recipe('compass')
-def install_compass():
-    _install_dependencies('compass', 'frameworks/compass/stylesheets/*', 'sass', 'compass')
-
-
 @recipe('ckeditor')
 def install_ckeditor():
     src_dir = os.path.join(env.ext_dir, 'ckeditor')

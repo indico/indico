@@ -10,6 +10,12 @@
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
+    <!-- Webpack bundles -->
+        {{ webpack['common.js'] }}
+        {{ webpack['main.js'] }}
+        {{ webpack['main.css'] }}
+    <!-- end -->
+
     <script>
         window.CKEDITOR_BASEPATH = {{ url_for('assets.js', filename='lib/ckeditor/')|tojson() }};
     </script>
@@ -18,7 +24,7 @@
     <script src="{{ ASSET_URL }}"></script>
     {% endassets %}
 
-    {% assets 'base_css', 'screen_sass' -%}
+    {% assets 'base_css' -%}
         <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
     {% endassets %}
 
