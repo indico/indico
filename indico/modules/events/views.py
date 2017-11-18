@@ -215,6 +215,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     menu_entry_plugin = None
     menu_entry_name = None
+    bundles = WPEventBase.bundles + ('conferences.css',)
 
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -266,9 +267,6 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             MathjaxMixin._getHeadContent(self),
             WPEventBase._getHeadContent(self)
         ])
-
-    def getCSSFiles(self):
-        return self._asset_env['conference_css'].urls() + WPEventBase.getCSSFiles(self)
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)

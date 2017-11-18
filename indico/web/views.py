@@ -147,6 +147,8 @@ class WPJinjaMixin(object):
         if html is not None:
             return html
         template = params.pop('_jinja_template')
+        webpack = current_app.extensions['flask-webpackext']
+        params['bundles'] = map(lambda x: webpack.manifest[x], self.bundles)
         return self.render_template_func(template, **params)
 
 
@@ -167,8 +169,7 @@ class WPBase(object):
         return []
 
     def getCSSFiles(self):
-        return (self._asset_env['base_css'].urls() +
-                self._asset_env['screen_sass'].urls())
+        return (self._asset_env['base_css'].urls())
 
     def get_extra_css_files(self):
         """Return CSS urls that will be included after all other CSS"""

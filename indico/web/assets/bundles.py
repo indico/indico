@@ -286,27 +286,14 @@ def register_all_css(env):
 
     base_css = Bundle(
         *namespace('css',
-                   'Default.css',
-                   'timetable.css',
                    'jquery.colorbox.css',
                    'jquery.colorpicker.css'),
         filters=('csscompressor', 'indico_cssrewrite'),
         output='css/base_%(version)s.min.css')
 
-    conference_css = Bundle('css/Conf_Basic.css',
-                            filters=('csscompressor', 'indico_cssrewrite'),
-                            output='css/conference_%(version)s.min.css')
-
-    screen_sass = Bundle('sass/screen.scss',
-                         filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
-                         output="sass/screen_sass_%(version)s.css",
-                         depends=SASS_BASE_MODULES)
-
     env.register('base_css', base_css)
-    env.register('conference_css', conference_css)
 
     # SASS/SCSS
-    env.register('screen_sass', screen_sass)
     env.register('fonts_sass', fonts_sass)
 
     # Build a bundle with customization CSS if enabled
