@@ -24,11 +24,19 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 
 const modulesDir = path.join(__dirname, 'node_modules');
 
+const _cssLoaderOptions = {
+    alias: {
+        '../images': config.build.imagePath
+    },
+    sourceMap: true
+};
+
 module.exports = env => ({
     devtool: 'source-map',
     context: __dirname + "/indico/web/client",
     entry: {
         main: './js/index.js',
+        conferences: './styles/legacy/Conf_Basic.css',
         markdown: './js/jquery/markdown.js',
         mathjax: './js/jquery/compat/mathjax.js',
         statistics: './js/jquery/statistics.js',
@@ -65,12 +73,23 @@ module.exports = env => ({
                     fallback: 'style-loader',
                     use: {
                         loader: 'css-loader',
-                        options: {
-                            alias: {
-                                '../images': config.build.imagePath
-                            }
-                        }
+                        options: _cssLoaderOptions
                     }
+                })
+            },
+            {
+                test: /\.scss$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [{
+                        loader: 'css-loader',
+                        options: _cssLoaderOptions
+                    }, {
+                        loader: 'sass-loader',
+                        options: {
+                            sourceMap: true
+                        }
+                    }, 'postcss-loader'],
                 })
             },
             {
