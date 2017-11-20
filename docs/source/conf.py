@@ -46,6 +46,7 @@ extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.todo',
               'sphinx.ext.coverage',
               'sphinx.ext.imgmath',
+              'sphinx.ext.intersphinx',
               'sphinx_issues',
               'exec_directive']
 
@@ -115,6 +116,12 @@ pygments_style = 'sphinx'
 # include __init__() as well
 autoclass_content = "both"
 autodoc_default_flags = ['show-inheritance']
+
+# Intersphinx urls
+intersphinx_mapping = {
+    'python': ('https://docs.python.org/2.7/', None),
+    'celery': ('http://docs.celeryproject.org/en/stable/', None),
+}
 
 # -- Options for HTML output ---------------------------------------------------
 
