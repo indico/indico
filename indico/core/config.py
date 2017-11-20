@@ -78,7 +78,6 @@ DEFAULTS = {
     'REDIS_CACHE_URL': None,
     'ROUTE_OLD_URLS': False,
     'SCHEDULED_TASK_OVERRIDE': {},
-    'SCSS_DEBUG_INFO': True,
     'SECRET_KEY': None,
     'SENTRY_DSN': None,
     'SENTRY_LOGGING_LEVEL': 'WARNING',
@@ -163,7 +162,6 @@ def _convert_key(name):
     name = re.sub(r'([A-Z])([A-Z]+)', lambda m: m.group(1) + m.group(2).lower(), name)
     name = snakify(name).upper()
     special_cases = {'PDFLATEX_PROGRAM': 'XELATEX_PATH',
-                     'SCSSDEBUG_INFO': 'SCSS_DEBUG_INFO',
                      'IS_ROOM_BOOKING_ACTIVE': 'ENABLE_ROOMBOOKING'}
     return special_cases.get(name, name)
 

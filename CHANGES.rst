@@ -29,6 +29,11 @@ Bugfixes
 - Show correct review indicators when a reviewer still has to review
   an abstract in a different track
 
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Remove `SCSS_DEBUG_INFO` config option.
+
 
 Version 2.0rc1
 --------------
