@@ -266,9 +266,9 @@ def setup_webpack(app):
     app.config.update({
         'WEBPACKEXT_PROJECT': project,
         'WEBPACKEXT_STATIC_DIR': app.config['INDICO']['ASSETS_DIR'],
-        'WEBPACKEXT_STATIC_URL_PATH': '/static/assets/',
+        'WEBPACKEXT_STATIC_URL_PATH': '/static/assets',
         'WEBPACKEXT_PROJECT_DISTDIR': os.path.join(app.config['INDICO']['ASSETS_DIR'], 'webpack'),
-        'WEBPACKEXT_PROJECT_DISTURL': '/static/assets/webpack/',
+        'WEBPACKEXT_PROJECT_DISTURL': '/static/assets/webpack',
         'WEBPACKEXT_MANIFEST_PATH': 'webpack/manifest.json'
     })
 
