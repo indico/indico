@@ -86,43 +86,52 @@
                    data-href="{{ url_for('.material_package', event) }}">
                     {%- trans %}Material package{% endtrans -%}
                 </a>
-                <a class="i-button js-enable-if-checked arrow disabled"
-                   title="{% trans %}Export data{% endtrans %}"
-                   data-toggle="dropdown">
-                    {%- trans %}Export{% endtrans -%}
-                </a>
-                <ul class="dropdown">
-                    <li>
-                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                           data-href="{{ url_for('.contributions_pdf_export', event) }}">
-                            {%- trans %}PDF{% endtrans -%}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                           data-href="{{ url_for('.contributions_pdf_export_book', event) }}">
-                            {%- trans %}PDF (book of abstracts){% endtrans -%}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
-                           data-href="{{ url_for('.contributions_pdf_export_book_sorted', event) }}">
-                            {%- trans %}PDF (book of abstracts - sorted by board number){% endtrans -%}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
-                           data-href="{{ url_for('.contributions_csv_export', event) }}">
-                            {%- trans %}CSV{% endtrans -%}
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
-                           data-href="{{ url_for('.contributions_excel_export', event) }}">
-                            {%- trans %}XLSX (Excel){% endtrans -%}
-                        </a>
-                    </li>
-                </ul>
+                <div class="group">
+                    <a class="i-button js-enable-if-checked arrow disabled"
+                       title="{% trans %}Export data{% endtrans %}"
+                       data-toggle="dropdown">
+                        {%- trans %}Export{% endtrans -%}
+                    </a>
+                    <ul class="dropdown">
+                        <li>
+                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_pdf_export', event) }}">
+                                {%- trans %}PDF{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_pdf_export_book', event) }}">
+                                {%- trans %}PDF (book of abstracts){% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-pdf js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_pdf_export_book_sorted', event) }}">
+                                {%- trans %}PDF (book of abstracts - sorted by board number){% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-spreadsheet js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_csv_export', event) }}">
+                                {%- trans %}CSV{% endtrans -%}
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="icon-file-excel js-submit-form js-enable-if-checked disabled"
+                               data-href="{{ url_for('.contributions_excel_export', event) }}">
+                                {%- trans %}XLSX (Excel){% endtrans -%}
+                            </a>
+                        </li>
+                    </ul>
+                    <a class="i-button"
+                       title="{% trans %}Import contributions from CSV file{% endtrans %}"
+                       data-href="{{ url_for('.contributions_import', event) }}"
+                       data-title="{% trans %}Import Registrants from CSV File{% endtrans %}"
+                       data-ajax-dialog>
+                        {%- trans %}Import{% endtrans -%}
+                    </a>
+                </div>
             </div>
             <div class="toolbar">
                 <div class="group" id="filter-statistics">

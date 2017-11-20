@@ -32,7 +32,7 @@ from indico.modules.events.timetable.util import find_next_start_dt
 from indico.util.i18n import _
 from indico.web.forms.base import FormDefaults, IndicoForm, generated_data
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import (IndicoLocationField, IndicoPalettePickerField,
+from indico.web.forms.fields import (FileField, IndicoLocationField, IndicoPalettePickerField,
                                      IndicoSelectMultipleCheckboxBooleanField, TimeDeltaField)
 from indico.web.forms.util import get_form_field_names
 from indico.web.forms.validators import HiddenUnless, MaxDuration
@@ -209,3 +209,7 @@ class TimetablePDFExportForm(IndicoForm):
         for fieldname in fields:
             data.update(getattr(self, fieldname).data)
         return data
+
+
+class ImportContributionsForm(IndicoForm):
+    source_file = FileField(_("Source File"), accepted_file_types='.csv')

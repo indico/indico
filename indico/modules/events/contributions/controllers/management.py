@@ -44,7 +44,7 @@ from indico.modules.events.contributions.operations import (create_contribution,
                                                             delete_contribution, delete_subcontribution,
                                                             update_contribution, update_subcontribution)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
-                                                      make_contribution_form)
+                                                      import_contributions_from_csv, make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
 from indico.modules.events.logs import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -52,6 +52,7 @@ from indico.modules.events.management.controllers.base import RHContributionPers
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
 from indico.modules.events.sessions import Session
+from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.events.util import (check_event_locked, get_field_values, track_time_changes,
@@ -470,6 +471,24 @@ class RHContributionsExportPDFBookSorted(RHManageContributionsExportActionsBase)
         pdf = ContributionBook(self.event, session.user, self.contribs, tz=self.event.timezone,
                                sort_by='board_number')
         return send_file('book-of-abstracts.pdf', pdf.generate(), 'application/pdf')
+
+
+class RHContributionsImportCSV(RHManageContributionsActionsBase):
+    """Import contributions from a CSV file"""
+
+    def _process(self):
+        form = ImportContributionsForm()
+
+        if form.validate_on_submit():
+            contributions, changes = import_contributions_from_csv(self.event, form.source_file.data)
+            flash(ngettext("{} contribution has been imported.",
+                           "{} contributions have been imported.",
+                           len(contributions)).format(len(contributions)), 'success')
+            if changes:
+                flash(_("Event dates/times adjusted due to imported data."), 'warning')
+            return jsonify_data(flash=False, redirect=url_for('.manage_contributions', self.event))
+        return jsonify_template('events/contributions/management/import_contributions.html', form=form,
+                                event=self.event)
 
 
 class RHManageContributionTypes(RHManageContributionsBase):

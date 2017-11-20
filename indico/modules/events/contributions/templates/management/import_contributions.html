@@ -1,0 +1,43 @@
+{% from 'forms/_form.html' import simple_form  %}
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('highlight', large_icon=true) %}
+    {% trans -%}
+        You should upload a CSV (comma-separated values) file with exactly 7 columns in the
+        following order:
+    {%- endtrans %}
+    <ul>
+        <li>
+            {%- trans link='<a href="https://en.wikipedia.org/wiki/ISO_8601">'|safe, endlink='</a>'|safe,
+                      subitem='<ul><li><em>'|safe, endsubitem='</em></li></ul>'|safe -%}
+                Start date/time in {{ link }}ISO 8601{{ endlink }} format
+                {{ subitem }}e.g. 2017-12-03T12:00:00{{ endsubitem }}
+            {%- endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Duration (minutes){% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Title{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Speaker - First name{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Speaker - Last name{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Speaker - Affiliation{% endtrans -%}
+        </li>
+        <li>
+            {%- trans %}Speaker - E-mail address{% endtrans -%}
+        </li>
+    </ul>
+    {% trans -%}
+        Only the field "Title" is mandatory. Users will be matched with existing
+        Indico identities through their e-mail.
+    {%- endtrans %}
+{% endcall %}
+
+{{ simple_form(form, back=_('Cancel'), footer_align_right=true,
+               form_header_kwargs={'multipart': true, 'action': url_for('.contributions_import', event)}) }}

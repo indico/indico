@@ -16,22 +16,29 @@
 
 from __future__ import unicode_literals
 
+import csv
 from collections import defaultdict
+from datetime import timedelta
 from io import BytesIO
 from operator import attrgetter
 
+import dateutil.parser
 from sqlalchemy.orm import contains_eager, joinedload, load_only, noload
 
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink, SubContributionPersonLink
 from indico.modules.events.contributions.models.principals import ContributionPrincipal
 from indico.modules.events.contributions.models.subcontributions import SubContribution
+from indico.modules.events.contributions.operations import create_contribution
 from indico.modules.events.models.events import Event
 from indico.modules.events.models.persons import EventPerson
-from indico.modules.events.util import serialize_person_link
+from indico.modules.events.persons.util import get_event_person
+from indico.modules.events.util import serialize_person_link, track_time_changes
 from indico.util.date_time import format_human_timedelta
+from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
 from indico.web.http_api.metadata.serializer import Serializer
@@ -189,3 +196,60 @@ def get_contribution_ical_file(contrib):
     data = {'results': serialize_contribution_for_ical(contrib)}
     serializer = Serializer.create('ics')
     return BytesIO(serializer(data))
+
+
+def import_contributions_from_csv(event, f):
+    """Import timetable contributions from a CSV file into an event."""
+    reader = csv.reader(f)
+    contributions = []
+    all_changes = defaultdict(list)
+    for num_row, row in enumerate(reader, 1):
+        try:
+            start_dt, duration, title, first_name, last_name, affiliation, email = row
+        except ValueError:
+            raise UserValueError(_('Row {}: malformed CSV data - please check that the number of columns is correct')
+                                 .format(num_row))
+        try:
+            parsed_start_dt = event.tzinfo.localize(dateutil.parser.parse(start_dt)) if start_dt else None
+        except ValueError:
+            raise UserValueError(_("Row {}: can't parse date: \"{}\"").format(num_row, start_dt))
+
+        try:
+            parsed_duration = timedelta(minutes=int(duration)) if duration else None
+        except ValueError:
+            raise UserValueError(_("Row {}: can't parse duration: {}").format(num_row, duration))
+
+        if not title:
+            raise UserValueError(_("Row {}: contribution title is required").format(num_row))
+
+        with track_time_changes() as changes:
+            contribution = create_contribution(event, {
+                'start_dt': parsed_start_dt,
+                'duration': parsed_duration or timedelta(minutes=20),
+                'title': title
+            }, extend_parent=True)
+
+        contributions.append(contribution)
+        for key, val in changes[event].viewitems():
+            all_changes[key].append(val)
+
+        if not email:
+            continue
+
+        # set the information of the speaker
+        person = get_event_person(event, {
+            'firstName': first_name,
+            'familyName': last_name,
+            'affiliation': affiliation,
+            'email': email
+        })
+        link = ContributionPersonLink(person=person, is_speaker=True)
+        link.populate_from_dict({
+            'first_name': first_name,
+            'last_name': last_name,
+            'affiliation': affiliation,
+            'email': email
+        })
+        contribution.person_links.append(link)
+
+    return contributions, all_changes

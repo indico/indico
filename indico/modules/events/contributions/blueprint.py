@@ -50,6 +50,8 @@ _bp.add_url_rule('/manage/contributions/book.pdf', 'contributions_pdf_export_boo
                  management.RHContributionsExportPDFBook, methods=('POST',))
 _bp.add_url_rule('/manage/contributions/book-sorted.pdf', 'contributions_pdf_export_book_sorted',
                  management.RHContributionsExportPDFBookSorted, methods=('POST',))
+_bp.add_url_rule('/manage/contributions/import', 'contributions_import',
+                 management.RHContributionsImportCSV, methods=('GET', 'POST'))
 
 # Single contribution
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>', 'manage_contrib_rest', management.RHContributionREST,
