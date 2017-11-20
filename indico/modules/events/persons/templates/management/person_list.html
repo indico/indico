@@ -199,10 +199,13 @@
                 {% endcall %}
             {% endif %}
             <table class="i-table-widget tablesorter">
+                {% set event_has_registration_forms = event.registration_forms != [] %}
                 <thead>
                     <tr class="i-table">
                         <th class="i-table thin-column hide-if-locked" data-sorter="false"></th>
-                        <th class="i-table" data-sorter="false"></th>
+                        {% if event_has_registration_forms %}
+                            <th class="i-table registration-column thin-column" data-sorter="false"></th>
+                        {% endif %}
                         <th class="i-table name-column">{% trans %}Name{% endtrans %}</th>
                         <th class="i-table email-column">{% trans %}Email{% endtrans %}</th>
                         <th class="i-table affiliation-column">{% trans %}Affiliation{% endtrans %}</th>
@@ -218,7 +221,7 @@
                             class="i-table {{ 'untrusted' if person_data.person.is_untrusted }}"
                             data-person-roles="{{ person_data.roles | tojson | forceescape }}"
                             {{ 'data-no-account' if person_data.roles.no_account }}>
-                            {{ render_person_row(person_data) }}
+                            {{ render_person_row(person_data, event_has_registration_forms) }}
                         </tr>
                     {%- else -%}
                         <tr class="i-table">
