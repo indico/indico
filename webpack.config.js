@@ -31,6 +31,9 @@ const _cssLoaderOptions = {
     sourceMap: true
 };
 
+// Make sure path has a single trailing slash
+config.build.webpackURL = config.build.webpackURL.replace(/\/$/, '') + '/';
+
 module.exports = env => ({
     devtool: 'source-map',
     context: __dirname + "/indico/web/client",
@@ -97,7 +100,7 @@ module.exports = env => ({
                 use: {
                     loader: 'file-loader',
                     options: {
-                        name: config.build.staticURL + '[name].[ext]'
+                        name: 'images/[name].[ext]'
                     }
                 }
             }
