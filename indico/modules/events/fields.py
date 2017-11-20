@@ -27,8 +27,8 @@ from indico.core.errors import UserValueError
 from indico.modules.events.layout import theme_settings
 from indico.modules.events.models.persons import EventPerson, EventPersonLink, PersonLinkBase
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.persons.util import get_event_person
 from indico.modules.events.util import serialize_person_link
-from indico.modules.users import User
 from indico.modules.users.models.users import UserTitle
 from indico.modules.users.util import get_user_by_email
 from indico.util.i18n import _
@@ -98,46 +98,14 @@ class EventPersonListField(PrincipalListField):
         return getattr(self.get_form(), 'event', None)
 
     def _convert_data(self, data):
-        return map(self._get_event_person, data)
-
-    def _create_event_person(self, data):
-        title = next((x.value for x in UserTitle if data.get('title') == x.title), None)
-        person = EventPerson(event=self.event, email=data.get('email', '').lower(), _title=title,
-                             first_name=data.get('firstName'), last_name=data['familyName'],
-                             affiliation=data.get('affiliation'), address=data.get('address'),
-                             phone=data.get('phone'), is_untrusted=self.create_untrusted_persons)
-        # Keep the original data to cancel the conversion if the person is not persisted to the db
-        self.event_person_conversions[person] = data
-        return person
-
-    def _get_event_person_for_user(self, user):
-        person = EventPerson.for_user(user, self.event, is_untrusted=self.create_untrusted_persons)
-        # Keep a reference to the user to cancel the conversion if the person is not persisted to the db
-        self.event_person_conversions[person] = user
-        return person
-
-    def _get_event_person(self, data):
-        person_type = data.get('_type')
-        if person_type is None:
-            if data.get('email'):
-                email = data['email'].lower()
-                user = User.find_first(~User.is_deleted, User.all_emails.contains(email))
-                if user:
-                    return self._get_event_person_for_user(user)
-                elif self.event:
-                    person = self.event.persons.filter_by(email=email).first()
-                    if person:
-                        return person
-            # We have no way to identify an existing event person with the provided information
-            return self._create_event_person(data)
-        elif person_type == 'Avatar':
-            return self._get_event_person_for_user(self._convert_principal(data))
-        elif person_type == 'EventPerson':
-            return self.event.persons.filter_by(id=data['id']).one()
-        elif person_type == 'PersonLink':
-            return self.event.persons.filter_by(id=data['personId']).one()
-        else:
-            raise ValueError(_("Unknown person type '{}'").format(person_type))
+        result = []
+        for person_data in data:
+            person = get_event_person(person_data, create_untrusted_persons=self.create_untrusted_persons,
+                                      allow_pending=self.allow_external, allow_emails=self.allow_emails,
+                                      allow_networks=self.allow_networks, existing_data=self.object_data)
+            self.event_person_conversions[person] = data
+            result.append(person)
+        return map(get_event_person, data)
 
     def _serialize_principal(self, principal):
         from indico.modules.events.util import serialize_event_person
@@ -182,7 +150,7 @@ class PersonLinkListFieldBase(EventPersonListField):
     @no_autoflush
     def _get_person_link(self, data, extra_data=None):
         extra_data = extra_data or {}
-        person = self._get_event_person(data)
+        person = get_event_person(self.event, data, create_untrusted_persons=self.create_untrusted_persons)
         person_data = {'title': next((x.value for x in UserTitle if data.get('title') == x.title), UserTitle.none),
                        'first_name': data.get('firstName', ''), 'last_name': data['familyName'],
                        'affiliation': data.get('affiliation', ''), 'address': data.get('address', ''),
