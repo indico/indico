@@ -20,36 +20,280 @@ config options, their name should be prefixed with an underscore; otherwise
 you will get a warning about unknowing config options being defined.
 
 
-Directories
------------
+Authentication
+--------------
 
-.. data:: ASSETS_DIR
+.. data:: LOCAL_IDENTITIES
 
-    The directory in which built assets are stored. Must be accessible
-    by the web server.
+    This setting controls whether local Indico accounts are available.
+    If no centralized authentication infrastructure (e.g. LDAP, OAuth,
+    or another kind of SSO) is used, local accounts are the only way
+    of logging in to Indico.
 
-    Default: ``'/opt/indico/assets'``
+    Default: ``True``
 
-.. data:: CACHE_DIR
+.. data:: LOCAL_REGISTRATION
 
-    The directory in which various data is cached temporarily. Must be
-    accessible by the web server.
+    This setting controls whether people accessing Indico can create a
+    new account.  Admins can always create new local accounts, regardless
+    of this setting.
 
-    Default: ``'/opt/indico/cache'``
+    This setting is only taken into account if :data:`LOCAL_IDENTITIES`
+    are enabled.
 
-.. data:: LOG_DIR
+    Default: ``True``
 
-    The directory in which log files are stored. Can be overridden by
-    using absolute paths in ``logging.yaml``.
+.. data:: LOCAL_MODERATION
 
-    Default: ``'/opt/indico/log'``
+    This setting controls whether a new registration needs to be approved
+    by an admin before the account is actually created.
 
-.. data:: TEMP_DIR
+    This setting is only taken into account if :data:`LOCAL_IDENTITIES`
+    and :data:`LOCAL_REGISTRATION` are enabled.
 
-    The directory in which various temporary files are stored. Must be
-    accessible by the web server.
+    Default: ``False``
 
-    Default: ``'/opt/indico/cache'``
+.. data:: EXTERNAL_REGISTRATION_URL
+
+    The URL to an external page where people can register an account that
+    can then be used to login to Indico (usually via LDAP/SSO).
+
+    This setting is only taken into account if :data:`LOCAL_IDENTITIES`
+    are disabled.
+
+    Default: ``None``
+
+.. data:: AUTH_PROVIDERS
+
+    A dict defining `Flask-Multipass`_ authentication providers used
+    by Indico.  The dict specified here is passed to the
+    ``MULTIPASS_AUTH_PROVIDERS`` setting of Flask-Multipass.
+
+    Default: ``{}``
+
+.. data:: IDENTITY_PROVIDERS
+
+    A dict defining `Flask-Multipass`_ identity providers used by Indico
+    to look up user information based on the data provided by an
+    authentication provider.  The dict specified here is passed to the
+    ``MULTIPASS_IDENTITY_PROVIDERS`` setting of Flask-Multipass.
+
+    Default: ``{}``
+
+.. data:: PROVIDER_MAP
+
+    If not specified, authentication and identity providers with the
+    same name are linked automatically.  The dict specified here is
+    passed to the ``MULTIPASS_PROVIDER_MAP`` setting of Flask-Multipass.
+
+    Default: ``{}``
+
+
+Cache
+-----
+
+.. data:: CACHE_BACKEND
+
+    The backend used for caching. Valid backends are ``redis``,
+    ``files``, and ``memcached``.
+
+    To use the ``redis`` backend (recommended), you need to set
+    :data:`REDIS_CACHE_URL` to the URL of your Redis instance.
+
+    With the ``files`` backend, cache data is stored in :data:`CACHE_DIR`,
+    which always needs to be set, even when using a different cache
+    backend since Indico needs to cache some data on disk.
+
+    To use the ``memcached`` backend, you need to install the
+    ``python-memcached`` package from PyPI and set :data:`MEMCACHED_SERVERS`
+    to a list containing at least one memcached server.
+
+    .. note::
+
+        We only test Indico with the ``redis`` cache backend. While
+        the other backends should work, we make no guarantees as
+        they are not actively being used or tested.
+
+    Default: ``'files'``
+
+.. data:: REDIS_CACHE_URL
+
+    The URL of the redis server to use with the ``redis`` cache backend.
+
+    If the Redis server requires authentication, use a URL like this:
+    ``redis://unused:password@127.0.0.1:6379/1``
+
+    If no authentication is used (usually the case with a local Redis
+    server), you can omit the user/password part:
+    ``redis://127.0.0.1:6379/1``
+
+    Default: ``None``
+
+.. data:: MEMCACHED_SERVERS
+
+    The list of memcached servers (each entry is an ``ip:port`` string)
+    to use with the ``memcached`` cache backend.
+
+    Default: ``[]``
+
+
+Celery
+------
+
+.. data:: CELERY_BROKER
+
+    The URL of the Celery broker (usually Redis of AMQP) used for
+    communication between Indico and the Celery background workers.
+
+    We recommend using Redis as it is the easiest option, but you can
+    check the `Celery documentation on brokers`_ for more information
+    on the other possible brokers.
+
+    Default: ``None``
+
+.. data:: CELERY_RESULT_BACKEND
+
+    The URL of the Celery result backend. If not set, the same backend
+    as the broker is used.  Indico currently does not use task results,
+    and we recommend leaving this setting at its default.
+
+    Default: ``None``
+
+.. data:: CELERY_CONFIG
+
+    A dict containing additional Celery settings.
+
+    .. warning::
+
+        This is an advanced setting that is rarely needed and we do not
+        recommend using it unless you know exactly what you are doing!
+        Changing Celery settings may break things or result in tasks not
+        being executed without other changes (such as running additional
+        celery workers on different queues).
+
+    One use case for this setting is routing certain tasks to a different
+    queue, and then running multiple Celery workers for these queues.
+
+    .. code-block:: python
+
+        CELERY_CONFIG = {
+            'task_routes': {
+                'indico_livesync.task.scheduled_update': {'queue': 'livesync'},
+            }
+        }
+
+    Default: ``{}``
+
+.. data:: SCHEDULED_TASK_OVERRIDE
+
+    A dict overriding the task schedule for specific tasks.
+
+    By default, all periodic tasks are enabled and use a schedule which
+    we consider useful for most cases.  Using this setting, you can
+    override the default schedule.
+
+    The dict key is the name of the task and the value can be one of
+    the following:
+
+    - ``None`` or ``False`` -- disables the task completely
+    - A dictionary, as described in the `Celery documentation on periodic tasks`_.
+      The ``task`` should not be specified, as it is set automatically.
+    - A :class:`~datetime.timedelta` or :class:`~celery.schedules.crontab`
+      object which will just override the schedule without changing any
+      other options of the task.  Both classes are available in the config
+      file by default.
+
+    .. note::
+
+        Use ``indico celery inspect registered`` to get a list of task
+        names.  Celery must be running for this command to work.
+
+    Default: ``{}``
+
+
+Customization
+-------------
+
+.. data:: CUSTOMIZATION_DIR
+
+    The base path to the directory containing customizations for your
+    Indico instance.
+
+    It is possible to override specific templates and add CSS and
+    JavaScript for advanced customizations.  When using this, be
+    advised that depending on the modifications you perform things
+    may break after an Indico update.  Make sure to test all your
+    modifications whenever you update Indico!
+
+    To include custom CSS and JavaScript, simply put ``*.scss`` and
+    ``*.js`` files into ``<CUSTOMIZATION_DIR>/scss`` / ``<CUSTOMIZATION_DIR>/js``.
+    If there are multiple files, they will be included in alphabetical
+    order, so prefixing them with a number (e.g. ``00-base.scss``, ``10-events.scss``)
+    is a good idea.
+
+    Static files may be added in ``<CUSTOMIZATION_DIR>/static``.  They can be
+    referenced in templates through the ``assets.custom`` endpoint.
+
+    For template customizations, see the description of :data:`CUSTOMIZATION_DEBUG`
+    as this setting is highly recommended to figure out where exactly to
+    put customized templates.
+
+    Here is an example for a template customization that includes a
+    custom asset and uses inheritance to avoid having to replace the
+    whole template:
+
+    .. code-block:: jinja
+
+        {% extends '~footer.html' %}
+
+        {% block footer_logo %}
+            {%- set filename = 'cern_small_light.png' if dark else 'cern_small.png' -%}
+            <a href="https://home.cern/" class="footer-logo">
+                <img src="{{ url_for('assets.custom', filename=filename) }}" alt="CERN">
+            </a>
+        {% endblock %}
+
+    Default: ``None``
+
+.. data:: CUSTOMIZATION_DEBUG
+
+    Whether to log details for all customizable templates the first time
+    they are accessed.  The log message contains the path where you need
+    to store the template; this path is relative to
+    ``<CUSTOMIZATION_DIR>/templates/``.
+
+    The log message also contains the full path of the original template
+    in case you decide to copy it.
+    However, instead of copying templates it is better to use Jinja
+    inheritance where possible.  To make this easier the log entry contains
+    a "reference" path that can be used to reference the original template
+    from the customized one.
+
+    Default: ``False``
+
+.. data:: HELP_URL
+
+    The URL used for the "Help" link in the footer.
+
+    Default: ``'https://learn.getindico.io'``
+
+.. data:: LOGO_URL
+
+    The URL to a custom logo.  If unset, the default Indico logo is used.
+
+    Default: ``None``
+
+.. data:: CUSTOM_COUNTRIES
+
+    A dict with country name overrides.  This can be useful if the official
+    ISO name of a country does not match what your Indico instance's target
+    audience expects for a country, e.g. due to political situations.
+
+    .. code-block:: python
+
+        CUSTOM_COUNTRIES = {'KP': 'North Korea'}
+
+    Default: ``{}``
 
 
 Database
@@ -84,6 +328,95 @@ Database
     For details, check the `Flask-SQLAlchemy documentation`_.
 
     Default: ``10``
+
+
+Development
+-----------
+
+.. warning::
+
+    Do not turn on development settings in production.  While we are not
+    aware of serious security issues caused by these settings, they may
+    slow down Indico or remove redundancies and thus make Indico not as
+    stable as one would expect it to be in a production environment.
+
+.. data:: DEBUG
+
+    Enables debugging mode.  If enabled, assets are not minified, error
+    messages are more verbose and various other features are configured
+    in a developer-friendly way.
+
+    **Do not enable debug mode in production.**
+
+    Default: ``False``
+
+.. data:: DB_LOG
+
+    Enables real-time database query logging.  When enabled, all database
+    queries are sent to a socket where they can be read by the ``db_log.py``
+    script.  To use the database logger, run ``bin/utils/db_log.py`` (only
+    available when running Indico from a Git clone) in a separate terminal
+    and all requests and verbose queries will be displayed there.
+
+    Default: ``False``
+
+.. data:: PROFILE
+
+    Enables the Python profiler.  The profiler output is stored in
+    ``<TEMP_DIR>/*.prof``.
+
+    Default: ``False``
+
+.. data:: SMTP_USE_CELERY
+
+    If disabled, emails will be send immediately instead of being
+    handed to a Celery background worker.  This is often more convenient
+    during development as you do not need to run a Celery worker while still
+    receiving emails sent from Indico.
+    Disabling it may result in emails not being sent if the mail server is
+    unavailable or some other failure happens during email sending.  Because
+    of this, the setting should never be disabled in a production environment.
+
+    Default: ``True``
+
+.. data:: COMMUNITY_HUB_URL
+
+    The URL of the community hub. This should only be changed when using a local
+    instance of Mereswine to debug the interface between Indico and Mereswine.
+
+    Default: ``'https://hub.getindico.io'``
+
+
+Directories
+-----------
+
+.. data:: ASSETS_DIR
+
+    The directory in which built assets are stored. Must be accessible
+    by the web server.
+
+    Default: ``'/opt/indico/assets'``
+
+.. data:: CACHE_DIR
+
+    The directory in which various data is cached temporarily. Must be
+    accessible by the web server.
+
+    Default: ``'/opt/indico/cache'``
+
+.. data:: LOG_DIR
+
+    The directory in which log files are stored. Can be overridden by
+    using absolute paths in ``logging.yaml``.
+
+    Default: ``'/opt/indico/log'``
+
+.. data:: TEMP_DIR
+
+    The directory in which various temporary files are stored. Must be
+    accessible by the web server.
+
+    Default: ``'/opt/indico/cache'``
 
 
 Emails
@@ -137,6 +470,131 @@ Emails
 
     The email address of the technical manager of the Indico instance.
     Emails about unhandled errors/exceptions are sent to this address.
+
+    Default: ``None``
+
+
+LaTeX
+-----
+
+.. data:: XELATEX_PATH
+
+    The full path to the ``xelatex`` program of `TeXLive`_.
+
+    If it is installed in a directory in your ``$PATH``, specifying its
+    name without a path is sufficient.
+
+    Default: ``xelatex``
+
+.. data:: STRICT_LATEX
+
+    Enables strict mode for LaTeX rendering, in which case a non-zero
+    status code is considered failure.
+
+    LaTeX is rather generous when it comes to using a non-zero exit code.
+    For example, having an oversized image in an abstract is enough to
+    cause one.  It is generally not a good idea to enable strict mode as
+    this will result in PDF generation to fail instead of creating a PDF
+    that looks slightly uglier (e.g. a truncated image) than one that would
+    succeed without a non-zero status code.
+
+    Default: ``False``
+
+
+Logging
+-------
+
+.. data:: LOGGING_CONFIG_FILE
+
+    The path to the logging config file.  Unless an absolute path is specified,
+    the path is relative to the location of the Indico config file after
+    resolving symlinks.
+
+    Default: ``'logging.yaml'``
+
+.. data:: SENTRY_DSN
+
+    If you use `Sentry`_ for logging warnings/errors, you can specify the
+    connection string here.
+
+    Default: ``None``
+
+.. data:: SENTRY_LOGGING_LEVEL
+
+    The minimum level a log record needs to have to be sent to Sentry.
+    If you do not care about warnings, set this to ``'ERROR'``.
+
+    Default: ``'WARNING'``
+
+
+Security
+--------
+
+.. data:: SECRET_KEY
+
+    The secret key used to sign tokens in URLs.  It must be kept secret
+    under all circumstances.
+
+    When using Indico on a cluster of more than one worker, all machines
+    need to have the same secret key.
+
+    The initial key is generated by the setup wizard, but if you have to
+    regenerate it, the best way of doing so is running this snippet on a
+    shell:  ``python -c 'import os; print repr(os.urandom(32))'``
+
+    Default: ``None``
+
+.. data:: SESSION_LIFETIME
+
+    The duration of inactivity after which a session and its session cookie
+    expires.  If set to ``0``, the session cookie will be cleared when the
+    browser is closed.
+
+    Default: ``86400 * 31``
+
+
+Storage
+-------
+
+.. data:: STORAGE_BACKENDS
+
+    The list of backends that can be used to store/retrieve files.
+
+    Indico needs to store various files such as event attachments somewhere.
+    By default only a filesystem based storage backend is available, but
+    plugins could add additional backends.  You can define multiple backends,
+    but once a backend has been used, you **MUST NOT** remove it or all
+    files stored in that backend will become unavailable.
+
+    To define a filesystem-based backend, use the string ``fs:/base/path``.
+    If you stopped using a backend, you can switch it to read-only mode by
+    using ``fs-readonly:`` instead of ``fs:``
+
+    Other backends may accept different options - see the documentation of these
+    backends for details.
+
+    Default: ``{'default': 'fs:/opt/indico/archive'}``
+
+.. data:: ATTACHMENT_STORAGE
+
+    The name of the storage backend used to store all kinds of attachments.
+    Anything in this backend is write-once, i.e. once stored, files in it
+    are never modified or deleted.
+
+    Changing this only affects new uploads; existing files are taken from
+    the backend that was active when they were uploaded -- which is also
+    why you must not remove a backend from :data:`STORAGE_BACKENDS` once
+    it has been used.
+
+    Default: ``'default'``
+
+.. data:: STATIC_SITE_STORAGE
+
+    The name of the storage backend used to store "offline copies" of
+    events.  Files are written to this backend when generating an offline
+    copy and deleted after a certain amount of time.
+
+    If not set, the :data:`ATTACHMENT_STORAGE` backend is used.
 
     Default: ``None``
 
@@ -312,465 +770,6 @@ System
         Unless you are very curious it is usually not worth using it.
 
     Default: ``None``
-
-
-LaTeX
------
-
-.. data:: XELATEX_PATH
-
-    The full path to the ``xelatex`` program of `TeXLive`_.
-
-    If it is installed in a directory in your ``$PATH``, specifying its
-    name without a path is sufficient.
-
-    Default: ``xelatex``
-
-.. data:: STRICT_LATEX
-
-    Enables strict mode for LaTeX rendering, in which case a non-zero
-    status code is considered failure.
-
-    LaTeX is rather generous when it comes to using a non-zero exit code.
-    For example, having an oversized image in an abstract is enough to
-    cause one.  It is generally not a good idea to enable strict mode as
-    this will result in PDF generation to fail instead of creating a PDF
-    that looks slightly uglier (e.g. a truncated image) than one that would
-    succeed without a non-zero status code.
-
-    Default: ``False``
-
-
-Storage
--------
-
-.. data:: STORAGE_BACKENDS
-
-    The list of backends that can be used to store/retrieve files.
-
-    Indico needs to store various files such as event attachments somewhere.
-    By default only a filesystem based storage backend is available, but
-    plugins could add additional backends.  You can define multiple backends,
-    but once a backend has been used, you **MUST NOT** remove it or all
-    files stored in that backend will become unavailable.
-
-    To define a filesystem-based backend, use the string ``fs:/base/path``.
-    If you stopped using a backend, you can switch it to read-only mode by
-    using ``fs-readonly:`` instead of ``fs:``
-
-    Other backends may accept different options - see the documentation of these
-    backends for details.
-
-    Default: ``{'default': 'fs:/opt/indico/archive'}``
-
-.. data:: ATTACHMENT_STORAGE
-
-    The name of the storage backend used to store all kinds of attachments.
-    Anything in this backend is write-once, i.e. once stored, files in it
-    are never modified or deleted.
-
-    Changing this only affects new uploads; existing files are taken from
-    the backend that was active when they were uploaded -- which is also
-    why you must not remove a backend from :data:`STORAGE_BACKENDS` once
-    it has been used.
-
-    Default: ``'default'``
-
-.. data:: STATIC_SITE_STORAGE
-
-    The name of the storage backend used to store "offline copies" of
-    events.  Files are written to this backend when generating an offline
-    copy and deleted after a certain amount of time.
-
-    If not set, the :data:`ATTACHMENT_STORAGE` backend is used.
-
-    Default: ``None``
-
-
-Celery
-------
-
-.. data:: CELERY_BROKER
-
-    The URL of the Celery broker (usually Redis of AMQP) used for
-    communication between Indico and the Celery background workers.
-
-    We recommend using Redis as it is the easiest option, but you can
-    check the `Celery documentation on brokers`_ for more information
-    on the other possible brokers.
-
-    Default: ``None``
-
-.. data:: CELERY_RESULT_BACKEND
-
-    The URL of the Celery result backend. If not set, the same backend
-    as the broker is used.  Indico currently does not use task results,
-    and we recommend leaving this setting at its default.
-
-    Default: ``None``
-
-.. data:: CELERY_CONFIG
-
-    A dict containing additional Celery settings.
-
-    .. warning::
-
-        This is an advanced setting that is rarely needed and we do not
-        recommend using it unless you know exactly what you are doing!
-        Changing Celery settings may break things or result in tasks not
-        being executed without other changes (such as running additional
-        celery workers on different queues).
-
-    One use case for this setting is routing certain tasks to a different
-    queue, and then running multiple Celery workers for these queues.
-
-    .. code-block:: python
-
-        CELERY_CONFIG = {
-            'task_routes': {
-                'indico_livesync.task.scheduled_update': {'queue': 'livesync'},
-            }
-        }
-
-    Default: ``{}``
-
-.. data:: SCHEDULED_TASK_OVERRIDE
-
-    A dict overriding the task schedule for specific tasks.
-
-    By default, all periodic tasks are enabled and use a schedule which
-    we consider useful for most cases.  Using this setting, you can
-    override the default schedule.
-
-    The dict key is the name of the task and the value can be one of
-    the following:
-
-    - ``None`` or ``False`` -- disables the task completely
-    - A dictionary, as described in the `Celery documentation on periodic tasks`_.
-      The ``task`` should not be specified, as it is set automatically.
-    - A :class:`~datetime.timedelta` or :class:`~celery.schedules.crontab`
-      object which will just override the schedule without changing any
-      other options of the task.  Both classes are available in the config
-      file by default.
-
-    .. note::
-
-        Use ``indico celery inspect registered`` to get a list of task
-        names.  Celery must be running for this command to work.
-
-    Default: ``{}``
-
-
-Authentication
---------------
-
-.. data:: LOCAL_IDENTITIES
-
-    This setting controls whether local Indico accounts are available.
-    If no centralized authentication infrastructure (e.g. LDAP, OAuth,
-    or another kind of SSO) is used, local accounts are the only way
-    of logging in to Indico.
-
-    Default: ``True``
-
-.. data:: LOCAL_REGISTRATION
-
-    This setting controls whether people accessing Indico can create a
-    new account.  Admins can always create new local accounts, regardless
-    of this setting.
-
-    This setting is only taken into account if :data:`LOCAL_IDENTITIES`
-    are enabled.
-
-    Default: ``True``
-
-.. data:: LOCAL_MODERATION
-
-    This setting controls whether a new registration needs to be approved
-    by an admin before the account is actually created.
-
-    This setting is only taken into account if :data:`LOCAL_IDENTITIES`
-    and :data:`LOCAL_REGISTRATION` are enabled.
-
-    Default: ``False``
-
-.. data:: EXTERNAL_REGISTRATION_URL
-
-    The URL to an external page where people can register an account that
-    can then be used to login to Indico (usually via LDAP/SSO).
-
-    This setting is only taken into account if :data:`LOCAL_IDENTITIES`
-    are disabled.
-
-    Default: ``None``
-
-
-.. data:: AUTH_PROVIDERS
-
-    A dict defining `Flask-Multipass`_ authentication providers used
-    by Indico.  The dict specified here is passed to the
-    ``MULTIPASS_AUTH_PROVIDERS`` setting of Flask-Multipass.
-
-    Default: ``{}``
-
-.. data:: IDENTITY_PROVIDERS
-
-    A dict defining `Flask-Multipass`_ identity providers used by Indico
-    to look up user information based on the data provided by an
-    authentication provider.  The dict specified here is passed to the
-    ``MULTIPASS_IDENTITY_PROVIDERS`` setting of Flask-Multipass.
-
-    Default: ``{}``
-
-.. data:: PROVIDER_MAP
-
-    If not specified, authentication and identity providers with the
-    same name are linked automatically.  The dict specified here is
-    passed to the ``MULTIPASS_PROVIDER_MAP`` setting of Flask-Multipass.
-
-    Default: ``{}``
-
-
-Cache
------
-
-.. data:: CACHE_BACKEND
-
-    The backend used for caching. Valid backends are ``redis``,
-    ``files``, and ``memcached``.
-
-    To use the ``redis`` backend (recommended), you need to set
-    :data:`REDIS_CACHE_URL` to the URL of your Redis instance.
-
-    With the ``files`` backend, cache data is stored in :data:`CACHE_DIR`,
-    which always needs to be set, even when using a different cache
-    backend since Indico needs to cache some data on disk.
-
-    To use the ``memcached`` backend, you need to install the
-    ``python-memcached`` package from PyPI and set :data:`MEMCACHED_SERVERS`
-    to a list containing at least one memcached server.
-
-    .. note::
-
-        We only test Indico with the ``redis`` cache backend. While
-        the other backends should work, we make no guarantees as
-        they are not actively being used or tested.
-
-    Default: ``'files'``
-
-.. data:: REDIS_CACHE_URL
-
-    The URL of the redis server to use with the ``redis`` cache backend.
-
-    If the Redis server requires authentication, use a URL like this:
-    ``redis://unused:password@127.0.0.1:6379/1``
-
-    If no authentication is used (usually the case with a local Redis
-    server), you can omit the user/password part:
-    ``redis://127.0.0.1:6379/1``
-
-    Default: ``None``
-
-.. data:: MEMCACHED_SERVERS
-
-    The list of memcached servers (each entry is an ``ip:port`` string)
-    to use with the ``memcached`` cache backend.
-
-    Default: ``[]``
-
-
-Security
---------
-
-.. data:: SECRET_KEY
-
-    The secret key used to sign tokens in URLs.  It must be kept secret
-    under all circumstances.
-
-    When using Indico on a cluster of more than one worker, all machines
-    need to have the same secret key.
-
-    The initial key is generated by the setup wizard, but if you have to
-    regenerate it, the best way of doing so is running this snippet on a
-    shell:  ``python -c 'import os; print repr(os.urandom(32))'``
-
-    Default: ``None``
-
-.. data:: SESSION_LIFETIME
-
-    The duration of inactivity after which a session and its session cookie
-    expires.  If set to ``0``, the session cookie will be cleared when the
-    browser is closed.
-
-    Default: ``86400 * 31``
-
-
-Customization
--------------
-
-.. data:: CUSTOMIZATION_DIR
-
-    The base path to the directory containing customizations for your
-    Indico instance.
-
-    It is possible to override specific templates and add CSS and
-    JavaScript for advanced customizations.  When using this, be
-    advised that depending on the modifications you perform things
-    may break after an Indico update.  Make sure to test all your
-    modifications whenever you update Indico!
-
-    To include custom CSS and JavaScript, simply put ``*.scss`` and
-    ``*.js`` files into ``<CUSTOMIZATION_DIR>/scss`` / ``<CUSTOMIZATION_DIR>/js``.
-    If there are multiple files, they will be included in alphabetical
-    order, so prefixing them with a number (e.g. ``00-base.scss``, ``10-events.scss``)
-    is a good idea.
-
-    Static files may be added in ``<CUSTOMIZATION_DIR>/static``.  They can be
-    referenced in templates through the ``assets.custom`` endpoint.
-
-    For template customizations, see the description of :data:`CUSTOMIZATION_DEBUG`
-    as this setting is highly recommended to figure out where exactly to
-    put customized templates.
-
-    Here is an example for a template customization that includes a
-    custom asset and uses inheritance to avoid having to replace the
-    whole template:
-
-    .. code-block:: jinja
-
-        {% extends '~footer.html' %}
-
-        {% block footer_logo %}
-            {%- set filename = 'cern_small_light.png' if dark else 'cern_small.png' -%}
-            <a href="https://home.cern/" class="footer-logo">
-                <img src="{{ url_for('assets.custom', filename=filename) }}" alt="CERN">
-            </a>
-        {% endblock %}
-
-    Default: ``None``
-
-.. data:: CUSTOMIZATION_DEBUG
-
-    Whether to log details for all customizable templates the first time
-    they are accessed.  The log message contains the path where you need
-    to store the template; this path is relative to
-    ``<CUSTOMIZATION_DIR>/templates/``.
-
-    The log message also contains the full path of the original template
-    in case you decide to copy it.
-    However, instead of copying templates it is better to use Jinja
-    inheritance where possible.  To make this easier the log entry contains
-    a "reference" path that can be used to reference the original template
-    from the customized one.
-
-    Default: ``False``
-
-.. data:: HELP_URL
-
-    The URL used for the "Help" link in the footer.
-
-    Default: ``'https://learn.getindico.io'``
-
-.. data:: LOGO_URL
-
-    The URL to a custom logo.  If unset, the default Indico logo is used.
-
-    Default: ``None``
-
-.. data:: CUSTOM_COUNTRIES
-
-    A dict with country name overrides.  This can be useful if the official
-    ISO name of a country does not match what your Indico instance's target
-    audience expects for a country, e.g. due to political situations.
-
-    .. code-block:: python
-
-        CUSTOM_COUNTRIES = {'KP': 'North Korea'}
-
-    Default: ``{}``
-
-
-Logging
--------
-
-.. data:: LOGGING_CONFIG_FILE
-
-    The path to the logging config file.  Unless an absolute path is specified,
-    the path is relative to the location of the Indico config file after
-    resolving symlinks.
-
-    Default: ``'logging.yaml'``
-
-.. data:: SENTRY_DSN
-
-    If you use `Sentry`_ for logging warnings/errors, you can specify the
-    connection string here.
-
-    Default: ``None``
-
-.. data:: SENTRY_LOGGING_LEVEL
-
-    The minimum level a log record needs to have to be sent to Sentry.
-    If you do not care about warnings, set this to ``'ERROR'``.
-
-    Default: ``'WARNING'``
-
-
-Development
------------
-
-.. warning::
-
-    Do not turn on development settings in production.  While we are not
-    aware of serious security issues caused by these settings, they may
-    slow down Indico or remove redundancies and thus make Indico not as
-    stable as one would expect it to be in a production environment.
-
-.. data:: DEBUG
-
-    Enables debugging mode.  If enabled, assets are not minified, error
-    messages are more verbose and various other features are configured
-    in a developer-friendly way.
-
-    **Do not enable debug mode in production.**
-
-    Default: ``False``
-
-.. data:: DB_LOG
-
-    Enables real-time database query logging.  When enabled, all database
-    queries are sent to a socket where they can be read by the ``db_log.py``
-    script.  To use the database logger, run ``bin/utils/db_log.py`` (only
-    available when running Indico from a Git clone) in a separate terminal
-    and all requests and verbose queries will be displayed there.
-
-    Default: ``False``
-
-.. data:: PROFILE
-
-    Enables the Python profiler.  The profiler output is stored in
-    ``<TEMP_DIR>/*.prof``.
-
-    Default: ``False``
-
-.. data:: SMTP_USE_CELERY
-
-    If disabled, emails will be send immediately instead of being
-    handed to a Celery background worker.  This is often more convenient
-    during development as you do not need to run a Celery worker while still
-    receiving emails sent from Indico.
-    Disabling it may result in emails not being sent if the mail server is
-    unavailable or some other failure happens during email sending.  Because
-    of this, the setting should never be disabled in a production environment.
-
-    Default: ``True``
-
-.. data:: COMMUNITY_HUB_URL
-
-    The URL of the community hub. This should only be changed when using a local
-    instance of Mereswine to debug the interface between Indico and Mereswine.
-
-    Default: ``'https://hub.getindico.io'``
 
 
 .. _Flask-SQLAlchemy documentation: https://flask-sqlalchemy.readthedocs.io/en/stable/config/#configuration-keys
