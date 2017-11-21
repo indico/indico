@@ -62,6 +62,7 @@ def _ensure_consistency(contrib):
 
 
 def create_contribution(event, contrib_data, custom_fields_data=None, session_block=None, extend_parent=False):
+    user = session.user if session else None
     start_dt = contrib_data.pop('start_dt', None)
     contrib = Contribution(event=event)
     contrib.populate_from_dict(contrib_data)
@@ -71,9 +72,9 @@ def create_contribution(event, contrib_data, custom_fields_data=None, session_bl
         set_custom_fields(contrib, custom_fields_data)
     db.session.flush()
     signals.event.contribution_created.send(contrib)
-    logger.info('Contribution %s created by %s', contrib, session.user)
+    logger.info('Contribution %s created by %s', contrib, user)
     contrib.event.log(EventLogRealm.management, EventLogKind.positive, 'Contributions',
-                      'Contribution "{}" has been created'.format(contrib.title), session.user)
+                      'Contribution "{}" has been created'.format(contrib.title), user)
     return contrib
 
 

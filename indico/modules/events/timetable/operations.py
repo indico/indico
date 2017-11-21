@@ -74,15 +74,16 @@ def create_session_block_entry(session_, data):
 
 
 def create_timetable_entry(event, data, parent=None, extend_parent=False):
+    user = session.user if session else None
     entry = TimetableEntry(event=event, parent=parent)
     entry.populate_from_dict(data)
     object_type, object_title = _get_object_info(entry)
     db.session.flush()
     signals.event.timetable_entry_created.send(entry)
-    logger.info('Timetable entry %s created by %s', entry, session.user)
+    logger.info('Timetable entry %s created by %s', entry, user)
     entry.event.log(EventLogRealm.management, EventLogKind.positive, 'Timetable',
-                    "Entry for {} '{}' created".format(object_type, object_title), session.user,
-                    data={'Time': format_datetime(entry.start_dt)})
+                    "Entry for {} '{}' created".format(object_type, object_title), user,
+                    data={'Time': format_datetime(entry.start_dt, timezone=event.tzinfo)})
     if extend_parent:
         entry.extend_parent()
     return entry
