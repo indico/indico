@@ -27,9 +27,14 @@ Called when the registration personal data is modified. The `sender` is the
 """)
 
 registration_state_updated = _signals.signal('registration-state-updated', """
-Called when the state of registration changes. The `sender` is the
+Called when the state of a registration changes. The `sender` is the
 `Registration` object; the previous state is passed in the `previous_state`
 kwarg.
+""")
+
+registration_checkin_updated = _signals.signal('registration-checkin-updated', """
+Called when the checkin state of a registration changes. The `sender` is the
+`Registration` object.
 """)
 
 registration_deleted = _signals.signal('registration-deleted', """
