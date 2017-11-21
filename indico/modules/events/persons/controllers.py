@@ -95,10 +95,13 @@ class RHPersonsBase(RHManageEventBase):
         chairpersons = {link.person for link in self.event.person_links}
         persons = defaultdict(lambda: {'roles': OrderedDict(), 'registrations': [], 'has_event_person': True})
 
+        _reg_person_join = db.or_((EventPerson.user_id == Registration.user_id),
+                                  db.and_(EventPerson.user_id.is_(None),
+                                          Registration.user_id.is_(None),
+                                          EventPerson.email == Registration.email))
         event_persons_query = (db.session.query(EventPerson, Registration)
                                .filter(EventPerson.event_id == self.event.id)
-                               .outerjoin(Registration, (EventPerson.user_id == Registration.user_id) &
-                                                        (Registration.event_id == self.event.id))
+                               .outerjoin(Registration, (Registration.event_id == self.event.id) & _reg_person_join)
                                .options(abstract_strategy,
                                         event_strategy,
                                         contribution_strategy,
