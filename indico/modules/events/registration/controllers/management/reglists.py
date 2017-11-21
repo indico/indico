@@ -573,10 +573,12 @@ class RHRegistrationCheckIn(RHManageRegistrationBase):
 
     def _process_PUT(self):
         self.registration.checked_in = True
+        signals.event.registration_checkin_updated.send(self.registration)
         return jsonify_data(html=_render_registration_details(self.registration))
 
     def _process_DELETE(self):
         self.registration.checked_in = False
+        signals.event.registration_checkin_updated.send(self.registration)
         return jsonify_data(html=_render_registration_details(self.registration))
 
 
@@ -588,6 +590,7 @@ class RHRegistrationBulkCheckIn(RHRegistrationsActionBase):
         msg = 'checked-in' if check_in else 'not checked-in'
         for registration in self.registrations:
             registration.checked_in = check_in
+            signals.event.registration_checkin_updated.send(registration)
             logger.info('Registration %s marked as %s by %s', registration, msg, session.user)
         flash(_("Selected registrations marked as {} successfully.").format(msg), 'success')
         return jsonify_data(**self.list_generator.render_list())
