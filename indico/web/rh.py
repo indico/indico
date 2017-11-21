@@ -278,6 +278,11 @@ class RH(object):
         except DatabaseError:
             db.session.rollback()
             handle_sqlalchemy_database_error()  # this will re-raise an exception
+        except Exception:
+            # rollback to avoid errors as rendering the error page
+            # within the indico layout may trigger an auto-flush
+            db.session.rollback()
+            raise
         logger.debug('Request successful')
 
         if res is None:

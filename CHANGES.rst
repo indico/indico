@@ -17,6 +17,7 @@ Bugfixes
 
 - Do not show borders above/below the message in registration emails
   unless both the header and body blocks are used (:issue:`3151`)
+- Roll-back the database transaction when an error occurs.
 
 
 Version 2.0rc1

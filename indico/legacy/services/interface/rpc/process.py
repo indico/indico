@@ -73,5 +73,8 @@ def invoke_method(method, params):
     except DatabaseError:
         db.session.rollback()
         handle_sqlalchemy_database_error()
+    except Exception:
+        db.session.rollback()
+        raise
     flush_email_queue()
     return result
