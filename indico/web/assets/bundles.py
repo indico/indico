@@ -196,7 +196,6 @@ def register_all_js(env):
                               'jquery.dttbutton.js',
                               'jquery.colorbox.js',
                               'date.js',
-                              'jquery.colorpicker.js',
                               'jquery-extra-selectors.js',
                               'jstorage.js')
     jquery = rjs_bundle('jquery', *filter(None, _jquery_files))
@@ -283,8 +282,7 @@ def register_all_css(env):
 
     base_css = Bundle(
         *namespace('css',
-                   'jquery.colorbox.css',
-                   'jquery.colorpicker.css'),
+                   'jquery.colorbox.css'),
         filters=('csscompressor', 'indico_cssrewrite'),
         output='css/base_%(version)s.min.css')
 
