@@ -34,11 +34,14 @@ const _cssLoaderOptions = {
 // Make sure path has a single trailing slash
 config.build.webpackURL = config.build.webpackURL.replace(/\/$/, '') + '/';
 
+const modulesDir = path.join(__dirname, 'node_modules');
+
 module.exports = env => ({
     devtool: 'source-map',
     context: __dirname + "/indico/web/client",
     entry: {
         main: './js/index.js',
+        ckeditor: './js/jquery/ckeditor.js',
         conferences: './styles/legacy/Conf_Basic.css',
         markdown: './js/jquery/markdown.js',
         mathjax: './js/jquery/compat/mathjax.js',
@@ -109,7 +112,6 @@ module.exports = env => ({
     plugins: [
         new ManifestPlugin({
             fileName: 'manifest.json',
-            stripSrc: true,
             publicPath: config.build.webpackURL
         }),
         new webpack.ProvidePlugin({
@@ -126,12 +128,13 @@ module.exports = env => ({
         new ExtractTextPlugin({
             filename: '[name].css'
         }),
-        new CopyWebpackPlugin([
-            {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax'}
-        ]),
         new webpack.EnvironmentPlugin({
             NODE_ENV: (env ? env.NODE_ENV : null) || 'development'
-        })
+        }),
+        new CopyWebpackPlugin([
+            {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'ckeditor'},
+            {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax'}
+        ])
     ],
     resolve: {
         alias: {

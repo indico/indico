@@ -27,6 +27,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.legal import legal_settings
+from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
@@ -154,7 +155,6 @@ class WPJinjaMixin(object):
 
 class WPBase(object):
     title = ''
-    bundles = ('common.js', 'main.js', 'main.css')
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
@@ -175,10 +175,16 @@ class WPBase(object):
         """Return CSS urls that will be included after all other CSS"""
         return []
 
+    @classproperty
+    @classmethod
+    def bundles(self):
+        _bundles = ('common.js', 'main.js', 'main.css')
+        if not g.get('static_site'):
+            _bundles += ('ckeditor.js',)
+        return _bundles
+
     def getJSFiles(self):
-        ckeditor_js = self._asset_env['ckeditor'].urls() if not g.get('static_site') else []
         return (self._asset_env['base_js'].urls() +
-                ckeditor_js +
                 self._asset_env['modules_attachments_js'].urls())
 
     def _includeJSPackage(self, pkg_names, prefix='indico_'):

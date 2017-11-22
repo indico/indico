@@ -187,8 +187,6 @@ def register_all_js(env):
                    'sectiontoolbar.js',
                    'table.js'))
 
-    ckeditor = rjs_bundle('ckeditor', 'js/lib/ckeditor/ckeditor.js', filters=None)
-
     palette = rjs_bundle('palette', 'js/palette.js')
 
     _jquery_files = namespace('js/jquery',
@@ -250,7 +248,6 @@ def register_all_js(env):
     env.register('indico_jquery', indico_jquery)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
-    env.register('ckeditor', ckeditor)
     for key, bundle in module_js.iteritems():
         env.register('modules_{}_js'.format(key), bundle)
     # Build a bundle with customization JS if enabled
