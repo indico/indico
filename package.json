@@ -12,6 +12,7 @@
     "babel-polyfill": "^6.26.0",
     "babel-runtime": "^6.26.0",
     "chartist": "^0.11.0",
+    "ckeditor": "github:indico/indico-ckeditor#build-4.7.3",
     "clipboard": "^1.7.1",
     "dropzone": "^5.2.0",
     "extract-text-webpack-plugin": "^3.0.2",

@@ -35,24 +35,6 @@ ASSET_TYPES = ['js', 'sass', 'css']
 RECIPES = {}
 SOURCE_DIR = os.path.dirname(__file__)
 
-CKBUILDER_CONFIG = {
-    'skin': 'moono-lisa',
-    'languages': {'en': 1, 'es': 1, 'fr': 1},
-    'plugins': {
-        'a11yhelp': 1, 'basicstyles': 1, 'blockquote': 1, 'clipboard': 1, 'colorbutton': 1, 'colordialog': 1,
-        'contextmenu': 1, 'elementspath': 1, 'enterkey': 1, 'entities': 1, 'find': 1, 'floatingspace': 1, 'font': 1,
-        'format': 1, 'horizontalrule': 1, 'htmlwriter': 1, 'image': 1, 'indentlist': 1, 'justify': 1, 'link': 1,
-        'list': 1, 'magicline': 1, 'maximize': 1, 'pastefromword': 1, 'pastetext': 1, 'removeformat': 1, 'resize': 1,
-        'showborders': 1, 'sourcearea': 1, 'specialchar': 1, 'stylescombo': 1, 'tab': 1, 'table': 1, 'tabletools': 1,
-        'toolbar': 1, 'undo': 1, 'wysiwygarea': 1
-    },
-    'ignore': [
-        '.DS_Store', '.bender', '.editorconfig', '.gitattributes', '.gitignore', '.idea', '.jscsrc', '.jshintignore',
-        '.jshintrc', '.mailmap', 'README.md', 'bender-err.log', 'bender-out.log', 'bender.js', 'dev', 'gruntfile.js',
-        'less', 'node_modules', 'package.json', 'tests'
-    ],
-}
-
 env.update({
     'src_dir': SOURCE_DIR,
     'ext_dir': os.path.join(SOURCE_DIR, 'ext_modules'),
@@ -143,23 +125,6 @@ def _install_dependencies(mod_name, sub_path, dtype, dest_subpath=None):
     local('cp -R {0} {1}/'.format(
         os.path.join(env.ext_dir, mod_name, sub_path),
         dest_dir))
-
-
-@recipe('ckeditor')
-def install_ckeditor():
-    src_dir = os.path.join(env.ext_dir, 'ckeditor')
-    dest_dir = os.path.join(lib_dir(env.src_dir, 'js'), 'ckeditor')
-    with open(os.path.join(src_dir, 'build-config.js'), 'w') as f:
-        f.write('var CKBUILDER_CONFIG = ')
-        json.dump(CKBUILDER_CONFIG, f, indent=4, separators=(', ', ': '))
-        f.write(';\n')
-    with lcd(os.path.join(src_dir, 'dev', 'builder')):
-        local('./build.sh --skip-omitted-in-build-config --no-zip --no-tar --build-config ../../build-config.js')
-        with settings(warn_only=True):
-            local('rm -rf {}'.format(dest_dir))
-        local('mv release/ckeditor {}'.format(dest_dir))
-    with lcd(dest_dir):
-        local('rm -rf config.js bender.ci.js .travis.yml samples')
 
 
 # Tasks
