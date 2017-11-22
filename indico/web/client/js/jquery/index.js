@@ -32,6 +32,9 @@ import Taggle from 'taggle';
 
 import './compat/jquery-ui';
 
+import 'vanderlee-colorpicker';
+import 'vanderlee-colorpicker/jquery.colorpicker.css';
+
 import './widgets';
 
 // i18n (Jed)

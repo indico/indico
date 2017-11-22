@@ -16,7 +16,6 @@
  */
 
 (function(global) {
-    'use strict';
 
     global.setupColorPickerWidget = function setupColorPickerWidget(options) {
         options = $.extend(true, {
@@ -24,12 +23,26 @@
             showField: true
         }, options);
 
-        var field = $('#' + options.fieldId);
-        field.closest('.i-color-field').colorpicker();
+        var $formField = $('#' + options.fieldId);
+        var $colorField = $formField.closest('.i-color-field');
+
+        $colorField.indicoColorpicker();
         if (options.showField) {
-            field.clearableinput();
+            $formField.clearableinput({
+                focusOnClear: false,
+                onClear: () => {
+                    $colorField.indicoColorpicker('updateWidget');
+                }
+            });
         } else {
-            field.hide();
+            $formField.hide();
         }
+
+        // Hack to set clearable input whenever the color changes
+        $formField.on('change', () => {
+            $formField.clearableinput('setValue', $formField.val());
+        }).on('cancel', () => {
+            $formField.clearableinput('setValue', $formField.val());
+        });
     };
 })(window);
