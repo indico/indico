@@ -16,62 +16,41 @@
  */
 
 (function($) {
-    'use strict';
-
-    $.widget("indico.colorpicker", {
-
-        options: {
-            defaultColor: "ffffff"
+    $.widget("indico.indicoColorpicker", {
+        updateWidget: function() {
+            this.$preview.toggleClass('no-value', !this.$colorInput.val().length);
+            const val = this.$colorInput.val();
+            if (!val) {
+                this.$preview.attr('style', null);
+            }
         },
 
         _create: function() {
-            var self = this;
-            var element = self.element;
-            var opt = self.options;
-            var clickableWrapper = element.find('.clickable-wrapper');
-            var preview = element.find('.color-preview');
-            var colorInput = element.find('input');
+            let oldValue;
+            const $element = this.element;
+            const $preview = this.$preview = $element.find('.color-preview');
+            const $colorInput = this.$colorInput = $element.find('input');
 
-            function updateColorPreview(color) {
-                preview.css('background', color).removeClass('no-value');
-            }
-
-            function updateWidget() {
-                preview.toggleClass('no-value', !colorInput.val().length);
-                if (colorInput.val()) {
-                    updateColorPreview(colorInput.val());
-                    clickableWrapper.ColorPickerSetColor(colorInput.val());
-                }
-                else {
-                    preview.attr('style', null);
-                }
-            }
-
-            colorInput.on('input change', updateWidget);
-
-            clickableWrapper.ColorPicker({
-                color: opt.defaultColor,
-                onSubmit: function(hsb, hex, rgb, el) {
-                    $(el).val(hex);
-                    updateColorPreview('#' + hex);
-                    $(el).ColorPickerHide();
+            $colorInput.colorpicker({
+                colorFormat: '#HEX',
+                altField: $preview,
+                open: () => {
+                    oldValue = $colorInput.val();
                 },
-                onChange: function(hsb, hex) {
-                    colorInput.val('#' + hex);
-                    updateColorPreview('#' + hex);
-                    colorInput.trigger('input');
+                ok: () => {
+                    this.updateWidget();
                 },
-                onShow: function(colorpicker) {
-                    $(colorpicker).fadeIn(500);
-                    return false;
+                select: () => {
+                    this.updateWidget();
                 },
-                onHide: function(colorpicker) {
-                    $(colorpicker).fadeOut(500);
-                    return false;
+                cancel: () => {
+                    $colorInput.val(oldValue);
+                    this.updateWidget();
+                    $colorInput.trigger('cancel');
                 }
             });
 
-            updateWidget();
+            this.updateWidget();
         }
     });
 })(jQuery);
