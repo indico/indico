@@ -20,7 +20,7 @@
     {% endif %}
 
     <script>
-        window.CKEDITOR_BASEPATH = {{ url_for('assets.js', filename='lib/ckeditor/')|tojson() }};
+        window.CKEDITOR_BASEPATH = {{ url_for('assets.static_asset', folder='webpack', path='ckeditor/')|tojson() }};
     </script>
 
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
