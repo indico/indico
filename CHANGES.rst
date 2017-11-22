@@ -48,6 +48,9 @@ Internal Changes
 - Rename *Roles* in ACL entries to *Permissions*.  This especially affects
   the ``can_manage`` method whose ``role`` argument has been renamed to
   ``permission`` (:issue:`3057`)
+- Add new ``registration_checkin_updated`` signal that can be used by
+  plugins to perform an action when the checkin state of a registration
+  changes (:issue:`3161`, thanks :user:`bpedersen2`)
 
 
 ----
