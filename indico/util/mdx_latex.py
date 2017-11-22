@@ -223,11 +223,8 @@ def latex_render_error(message):
     :returns: LaTeX code for error box
     """
     return textwrap.dedent(r"""
-       \begin{tcolorbox}[width=\textwidth,colback=red!5!white,colframe=red!75!black,
-                         title={Indico rendering error}]
-          \begin{verbatim}
-            %s
-          \end{verbatim}
+       \begin{tcolorbox}[width=\textwidth,colback=red!5!white,colframe=red!75!black,title={Indico rendering error}]
+          \begin{verbatim}%s\end{verbatim}
        \end{tcolorbox}""" % message)
 
 
