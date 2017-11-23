@@ -196,8 +196,7 @@ def register_all_js(env):
                               'jquery.dttbutton.js',
                               'jquery.colorbox.js',
                               'date.js',
-                              'jquery-extra-selectors.js',
-                              'jstorage.js')
+                              'jquery-extra-selectors.js')
     jquery = rjs_bundle('jquery', *filter(None, _jquery_files))
 
     utils = rjs_bundle('utils', *namespace('js/utils', 'routing.js', 'misc.js', 'forms.js'))
