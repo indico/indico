@@ -41,7 +41,7 @@ definitions:
     title: Compact style
     user_visible: true
 
-  indico-weeks-view:
+  indico_weeks_view:
     event_types: [conference, meeting]
     stylesheet: weeks.scss
     template: weeks.html
