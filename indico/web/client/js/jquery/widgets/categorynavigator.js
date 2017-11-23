@@ -19,6 +19,7 @@
 /* eslint-disable max-len */
 
 import {$T} from '../../utils/i18n';
+import Palette from '../../utils/palette';
 
 (function($) {
     $.widget('indico.categorynavigator', {

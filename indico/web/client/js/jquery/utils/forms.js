@@ -18,8 +18,6 @@
 /* global countWords:false, initForms:false, showFormErrors:false, toggleAclField:false */
 
 (function(global) {
-    'use strict';
-
     function validatePasswordConfirmation(passwordField, confirmField) {
         if ('setCustomValidity' in confirmField[0]) {
             passwordField.add(confirmField).on('change input', function() {
