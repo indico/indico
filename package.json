@@ -26,6 +26,7 @@
     "jquery-ui": "^1.12.1",
     "jquery-ui-multiselect-widget": "^2.0.1",
     "jquery.typewatch": "github:dennyferra/typewatch#3.0.0",
+    "jstorage": "github:andris9/jStorage#c0285fa354a5060b97f5d7c4d03bf37841eee67e",
     "mathjax": "^2.7.2",
     "moment": "^2.19.1",
     "outdatedbrowser": "^1.0.2",

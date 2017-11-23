@@ -15,22 +15,24 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import './compat/jquery-ui';
+
+import 'fullcalendar';
+import 'fullcalendar/dist/fullcalendar.css';
+
+import 'jstorage';
+
 // moment.js locales
 import 'moment/locale/en-gb';
 import 'moment/locale/fr';
 import 'moment/locale/es';
 
-import 'qtip2';
-import 'qtip2/dist/jquery.qtip.css';
-
-import 'fullcalendar';
-import 'fullcalendar/dist/fullcalendar.css';
-
 import 'tablesorter';
 
 import Taggle from 'taggle';
 
-import './compat/jquery-ui';
+import 'qtip2';
+import 'qtip2/dist/jquery.qtip.css';
 
 import 'vanderlee-colorpicker';
 import 'vanderlee-colorpicker/jquery.colorpicker.css';
