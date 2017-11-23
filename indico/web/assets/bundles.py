@@ -29,7 +29,6 @@ from webassets.filter import Filter, register_filter
 from webassets.filter.cssrewrite import CSSRewrite
 
 from indico.core.config import config
-from indico.modules.events.layout import theme_settings
 
 
 SASS_BASE_MODULES = ["sass/*.scss", "sass/base/*.scss", "sass/custom/*.scss", "sass/partials/*.scss",
@@ -117,23 +116,6 @@ class IndicoEnvironment(LazyCacheEnvironment):
         self.append_path(_get_htdocs_path(), '/')
         self.append_path(os.path.join(_get_htdocs_path(), 'css'), '{0}/css'.format(url_path))
         self.append_path(os.path.join(_get_htdocs_path(), 'js'), '{0}/js'.format(url_path))
-
-
-class ThemeEnvironment(LazyCacheEnvironment):
-    def __init__(self, theme_id, theme):
-        plugin = theme.get('plugin')
-        url_path = urlparse(config.BASE_URL).path
-        output_dir = os.path.join(config.ASSETS_DIR, 'theme-{}'.format(theme_id))
-        output_url = '{}/static/assets/theme-{}'.format(url_path, theme_id)
-        theme_root = plugin.root_path if plugin else os.path.join(_get_htdocs_path(), 'sass')
-        static_dir = os.path.join(theme_root, 'themes')
-        static_url = '{}/static/themes/{}'.format(url_path, theme_id)
-        cache_dir = get_webassets_cache_dir(plugin.name if plugin else None)
-        super(ThemeEnvironment, self).__init__(output_dir, output_url, debug=config.DEBUG, cache=cache_dir)
-        self.append_path(output_dir, output_url)
-        self.append_path(static_dir, static_url)
-        self.append_path(_get_htdocs_path(), '/')
-        configure_pyscss(self)
 
 
 def namespace(dir_ns, *list_files):
@@ -250,27 +232,6 @@ def register_all_js(env):
     custom_js_files = _get_custom_files('js', '*.js')
     if custom_js_files:
         env.register('custom_js', rjs_bundle('custom', *custom_js_files))
-
-
-def register_theme_sass():
-    for theme_id, data in theme_settings.themes.viewitems():
-        stylesheet = data['stylesheet']
-        if stylesheet:
-            bundle = Bundle('css/events/common.css',
-                            stylesheet,
-                            filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
-                            output='{}_%(version)s.css'.format(theme_id),
-                            depends=SASS_BASE_MODULES)
-            data['asset_env'] = env = ThemeEnvironment(theme_id, data)
-            env.register('display_sass', bundle)
-
-            print_stylesheet = data.get('print_stylesheet')
-            if print_stylesheet:
-                print_bundle = Bundle(bundle, print_stylesheet,
-                                      filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
-                                      output="{}_print_%(version)s.css".format(theme_id),
-                                      depends=SASS_BASE_MODULES)
-                env.register('print_sass', print_bundle)
 
 
 def register_all_css(env):

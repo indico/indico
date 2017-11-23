@@ -34,24 +34,41 @@ const _cssLoaderOptions = {
 // Make sure path has a single trailing slash
 config.build.webpackURL = config.build.webpackURL.replace(/\/$/, '') + '/';
 
+const entryPoints = {
+    main: './js/index.js',
+    ckeditor: './js/jquery/ckeditor.js',
+    conferences: './styles/legacy/Conf_Basic.css',
+    map_of_rooms: './styles/legacy/mapofrooms.css',
+    markdown: './js/jquery/markdown.js',
+    mathjax: './js/jquery/compat/mathjax.js',
+    statistics: './js/jquery/statistics.js',
+    modules_abstracts: './js/jquery/modules/abstracts.js',
+    modules_rb: './js/legacy/room_booking.js',
+    modules_surveys: './js/jquery/modules/surveys.js',
+    modules_vc: './js/jquery/modules/vc.js'
+};
+
+const objs = Object.keys(config.themes).map((k) => {
+    const returnValue = {};
+    const prefix = './styles/themes/';
+    const escapedKey = k.replace('-', '_');
+
+    returnValue['themes_' + escapedKey] = prefix + config.themes[k].stylesheet;
+    if (config.themes[k].print_stylesheet) {
+        returnValue['themes_' + escapedKey + '.print'] = prefix + config.themes[k].print_stylesheet;
+    }
+    return returnValue;
+});
+
+Object.assign(entryPoints, ...objs);
+
+const clientDir = __dirname + "/indico/web/client";
 const modulesDir = path.join(__dirname, 'node_modules');
 
 module.exports = env => ({
     devtool: 'source-map',
-    context: __dirname + "/indico/web/client",
-    entry: {
-        main: './js/index.js',
-        ckeditor: './js/jquery/ckeditor.js',
-        conferences: './styles/legacy/Conf_Basic.css',
-        map_of_rooms: './styles/legacy/mapofrooms.css',
-        markdown: './js/jquery/markdown.js',
-        mathjax: './js/jquery/compat/mathjax.js',
-        statistics: './js/jquery/statistics.js',
-        modules_abstracts: './js/jquery/modules/abstracts.js',
-        modules_rb: './js/legacy/room_booking.js',
-        modules_surveys: './js/jquery/modules/surveys.js',
-        modules_vc: './js/jquery/modules/vc.js'
-    },
+    context: clientDir,
+    entry: entryPoints,
     output: {
         path: config.build.webpackPath,
         filename: "[name].bundle.js",
@@ -94,7 +111,8 @@ module.exports = env => ({
                     }, {
                         loader: 'sass-loader',
                         options: {
-                            sourceMap: true
+                            sourceMap: true,
+                            includePaths: [clientDir + '/styles']
                         }
                     }, 'postcss-loader'],
                 })

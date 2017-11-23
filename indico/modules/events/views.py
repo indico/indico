@@ -141,27 +141,30 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
-    bundles = WPSimpleEventDisplayBase.bundles + ('modules_vc.js', 'modules_vc.css')
-
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)
         self.theme_id = theme_id
+        self.theme_file_name = theme_id.replace('-', '_')
         self.theme = theme_settings.themes[theme_id]
         self.theme_override = theme_override
+
+    @property
+    def bundles(self):
+        return WPSimpleEventDisplayBase.bundles + ('themes_{}.css'.format(self.theme_file_name),
+                                                   'modules_vc.js', 'modules_vc.css')
+
+    @property
+    def print_bundles(self):
+        print_stylesheet = self.theme.get('print_stylesheet')
+        return (WPSimpleEventDisplayBase.print_bundles +
+                (('themes_{}.print.css'.format(self.theme_file_name),) if print_stylesheet else ()))
 
     def _getHeadContent(self):
         return MathjaxMixin._getHeadContent(self) + WPEventBase._getHeadContent(self)
 
     def get_extra_css_files(self):
-        theme_urls = self.theme['asset_env']['display_sass'].urls() if self.theme.get('asset_env') else []
         custom_url = get_css_url(self.event)
-        return theme_urls + ([custom_url] if custom_url else [])
-
-    def getPrintCSSFiles(self):
-        theme_print_sass = (self.theme['asset_env']['print_sass'].urls()
-                            if 'print_sass' in self.theme.get('asset_env', [])
-                            else [])
-        return WPEventBase.getPrintCSSFiles(self) + theme_print_sass
+        return [custom_url] if custom_url else []
 
     def getJSFiles(self):
         return (WPSimpleEventDisplayBase.getJSFiles(self) +

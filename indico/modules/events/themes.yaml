@@ -23,7 +23,7 @@ definitions:
     # XXX: this maybe be inherited by custom themes in plugins so we
     # need to use path relative to the main htdocs folder which is
     # always included in the assets env
-    print_stylesheet: sass/themes/print/indico.scss
+    print_stylesheet: print/indico.scss
     template: indico/meeting.html
     title: Indico style
     user_visible: true
