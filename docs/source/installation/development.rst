@@ -16,6 +16,9 @@ You can find instructions on how to install it on Fedora/CentOS
     brew install postgresql
     brew services start postgresql
 
+Web assets such as JavaScript and SCSS files are compiled using `Webpack <https://webpack.js.org>`_, which
+requires NodeJS to be present. You can find information on how to install NodeJS
+`here <https://nodejs.org/en/download/package-manager/>`_.
 
 CentOS/Fedora
 +++++++++++++
@@ -130,7 +133,7 @@ Let's get into the Indico virtualenv::
     cd src
     pip install -r requirements.dev.txt
     pip install -e .
-    fab setup_deps
+    npm install
 
 Then, follow the instructions given by the wizard::
 
@@ -143,6 +146,14 @@ You can then initialize the DB::
 
 Running Indico
 --------------
+
+You will need two shells running in parallel. The first one will run the webpack watcher, which compiles
+the JavaScript and style assets every time you change them:
+
+.. code-block:: shell
+    indico webpack watch
+
+On the second one we'll run the Indico Development server:
 
 .. code-block:: shell
 
