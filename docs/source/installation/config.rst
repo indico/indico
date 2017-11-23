@@ -369,7 +369,7 @@ Development
 
 .. data:: SMTP_USE_CELERY
 
-    If disabled, emails will be send immediately instead of being
+    If disabled, emails will be sent immediately instead of being
     handed to a Celery background worker.  This is often more convenient
     during development as you do not need to run a Celery worker while still
     receiving emails sent from Indico.
@@ -629,8 +629,8 @@ System
         accessible directly by untrusted clients without going through
         the proxy or users will be able to spoof their IP address by
         sending a custom ``X-Forwarded-For`` header.  You need to
-        configure your firewall so only requests coming your proxy or load
-        balancer are allowed.
+        configure your firewall so only requests coming from your proxy
+        or load balancer are allowed.
 
     Default: ``False``
 
