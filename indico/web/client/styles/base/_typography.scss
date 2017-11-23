@@ -55,8 +55,10 @@
     font-size: 13px;
 }
 
-@mixin ellipsis {
-    white-space: nowrap;
+@mixin ellipsis($no-wrap: true) {
+    @if ($no-wrap) {
+        white-space: nowrap;
+    }
     overflow: hidden;
     text-overflow: ellipsis;
 }
