@@ -168,9 +168,6 @@ class WPBase(object):
     def getPrintCSSFiles(self):
         return []
 
-    def getCSSFiles(self):
-        return (self._asset_env['base_css'].urls())
-
     def get_extra_css_files(self):
         """Return CSS urls that will be included after all other CSS"""
         return []
