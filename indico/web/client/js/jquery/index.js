@@ -46,6 +46,9 @@ import {defaultI18n, $T} from '../utils/i18n';
 
 import './utils/clipboard';
 import './utils/dropzone';
+import './utils/forms';
+import './utils/misc';
+import './utils/routing';
 
 import './modules/categories';
 

@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global Palette:false */
+import Palette from '../../utils/palette';
 
 (function(global) {
     'use strict';
