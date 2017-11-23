@@ -16,6 +16,7 @@
  */
 
 import './compat/jquery-ui';
+import './contrib/jquery-extra-selectors';
 
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
@@ -23,6 +24,7 @@ import 'fullcalendar/dist/fullcalendar.css';
 import 'jquery-colorbox';
 import 'jquery-colorbox/example1/colorbox.css';
 
+import 'jquery-form';
 import 'jstorage';
 
 // moment.js locales
@@ -44,12 +46,24 @@ import './widgets';
 // i18n (Jed)
 import {defaultI18n, $T} from '../utils/i18n';
 
-import './utils/clipboard';
+// Constructs that extend the behaviour
+// of the HTML
+import './extensions/clipboard';
+import './extensions/global';
+
+// Utility global functions
+import './utils/ajaxdialog';
+import './utils/ajaxform';
+import './utils/declarative';
+import './utils/defaults';
 import './utils/dropzone';
+import './utils/errors';
 import './utils/forms';
 import './utils/misc';
 import './utils/routing';
+import './utils/sortablelist';
 
+// Modules that are bundled by default
 import './modules/categories';
 
 

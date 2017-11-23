@@ -20,8 +20,6 @@
 /* eslint-disable max-len */
 
 $(document).ready(function() {
-    'use strict';
-
     // Create static tabs. They just load the target URL and use no ajax whatsoever
     $('.static-tabs').each(function() {
         var tabCtrl = $(this);
