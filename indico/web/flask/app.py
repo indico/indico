@@ -49,14 +49,14 @@ from indico.core.plugins import include_plugin_css_assets, include_plugin_js_ass
 from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
+from indico.modules.events.layout import theme_settings
 from indico.modules.oauth import oauth
 from indico.util import date_time as date_time_util
 from indico.util.i18n import _, babel, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
-from indico.web.assets import (core_env, include_css_assets, include_js_assets, register_all_css, register_all_js,
-                               register_theme_sass)
+from indico.web.assets import core_env, include_css_assets, include_js_assets, register_all_css, register_all_js
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
@@ -252,7 +252,8 @@ def _get_webpack_config(app):
             'webpackURL': app.config['WEBPACKEXT_PROJECT_DISTURL'],
             'staticURL': app.config['WEBPACKEXT_STATIC_URL_PATH'],
             'imagePath': os.path.join(app.root_path, 'htdocs', 'images')
-        }
+        },
+        'themes': theme_settings.themes
     }
 
 
@@ -407,6 +408,5 @@ def make_app(set_path=False, testing=False, config_override=None):
         # Below this points plugins are available, i.e. sending signals makes sense
         add_plugin_blueprints(app)
         # themes can be provided by plugins
-        register_theme_sass()
         signals.app_created.send(app)
     return app

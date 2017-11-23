@@ -30,6 +30,12 @@
     {% for bundle in bundles %}
         {{ bundle }}
     {% endfor %}
+    <!-- Printing -->
+    {% for bundle in print_bundles %}
+        {% for path in bundle._paths %}
+            <link rel="stylesheet" type="text/css" media="print" href="{{ path }}">
+        {% endfor %}
+    {% endfor %}
     <!-- end -->
 
     {% for url in js_files -%}
@@ -50,7 +56,7 @@
     {% endfor %}
 
     {% for url in print_css_files -%}
-        <link rel="stylesheet" type="text/css" media="print" href="{{ url }}">
+
     {% endfor %}
 
     {{ template_hook('html-head') }}
