@@ -246,6 +246,13 @@ div.event-header {
 
 // Meeting Timetable-specific
 
+ul.day-list {
+    list-style-type: none;
+    padding-left: 0px;
+    margin-left: 0px;
+    margin-top: 10px;
+}
+
 .day-header {
     margin-top: 25px;
     position: relative;
@@ -353,6 +360,11 @@ div.event-header {
     .material-list {
         padding-top: 0.4em;
     }
+}
+
+.event-manage-button {
+    margin-top: 10px;
+    font-size: 10pt;
 }
 
 .meeting-sub-timetable {

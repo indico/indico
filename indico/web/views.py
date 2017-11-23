@@ -158,15 +158,13 @@ class WPBase(object):
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
+    print_bundles = tuple()
 
     def __init__(self, rh, **kwargs):
         from indico.web.assets import core_env
         self._rh = rh
         self._kwargs = kwargs
         self._asset_env = core_env
-
-    def getPrintCSSFiles(self):
-        return []
 
     def get_extra_css_files(self):
         """Return CSS urls that will be included after all other CSS"""
@@ -228,15 +226,17 @@ class WPBase(object):
         custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
         custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
         css_files = map(self._fix_path, plugin_css + self.get_extra_css_files() + custom_css)
-        print_css_files = map(self._fix_path, self.getPrintCSSFiles())
         js_files = map(self._fix_path, self.getJSFiles() + plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
         webpack = current_app.extensions['flask-webpackext']
 
+        bundles = map(lambda x: webpack.manifest[x], self.bundles)
+        print_bundles = map(lambda x: webpack.manifest[x], self.print_bundles)
+
         return render_template('indico_base.html',
-                               css_files=css_files, print_css_files=print_css_files, js_files=js_files,
-                               bundles=map(lambda x: webpack.manifest[x], self.bundles),
+                               css_files=css_files, js_files=js_files,
+                               bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(unicode(x) for x in title_parts if x),
