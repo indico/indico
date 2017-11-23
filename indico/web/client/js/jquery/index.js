@@ -20,6 +20,9 @@ import './compat/jquery-ui';
 import 'fullcalendar';
 import 'fullcalendar/dist/fullcalendar.css';
 
+import 'jquery-colorbox';
+import 'jquery-colorbox/example1/colorbox.css';
+
 import 'jstorage';
 
 // moment.js locales
@@ -28,7 +31,6 @@ import 'moment/locale/fr';
 import 'moment/locale/es';
 
 import 'tablesorter';
-
 import Taggle from 'taggle';
 
 import 'qtip2';

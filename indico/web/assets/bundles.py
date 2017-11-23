@@ -194,7 +194,6 @@ def register_all_js(env):
                               'jquery.custom.js',
                               'jquery.daterange.js',
                               'jquery.dttbutton.js',
-                              'jquery.colorbox.js',
                               'date.js',
                               'jquery-extra-selectors.js')
     jquery = rjs_bundle('jquery', *filter(None, _jquery_files))
@@ -278,14 +277,6 @@ def register_theme_sass():
 def register_all_css(env):
     fonts_sass = Bundle('sass/partials/_fonts.scss',
                         filters=('pyscss', 'csscompressor'), output='css/indico_fonts_%(version)s.min.css')
-
-    base_css = Bundle(
-        *namespace('css',
-                   'jquery.colorbox.css'),
-        filters=('csscompressor', 'indico_cssrewrite'),
-        output='css/base_%(version)s.min.css')
-
-    env.register('base_css', base_css)
 
     # SASS/SCSS
     env.register('fonts_sass', fonts_sass)
