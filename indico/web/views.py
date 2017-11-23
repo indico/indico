@@ -227,7 +227,7 @@ class WPBase(object):
                                        multi_value_types=list)
         custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
         custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
-        css_files = map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files() + custom_css)
+        css_files = map(self._fix_path, plugin_css + self.get_extra_css_files() + custom_css)
         print_css_files = map(self._fix_path, self.getPrintCSSFiles())
         js_files = map(self._fix_path, self.getJSFiles() + plugin_js + custom_js)
 
