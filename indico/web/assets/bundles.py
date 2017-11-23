@@ -194,7 +194,6 @@ def register_all_js(env):
                               'jquery.custom.js',
                               'jquery.daterange.js',
                               'jquery.dttbutton.js',
-                              'date.js',
                               'jquery-extra-selectors.js')
     jquery = rjs_bundle('jquery', *filter(None, _jquery_files))
 
