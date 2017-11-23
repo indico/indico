@@ -150,16 +150,6 @@ def _get_custom_files(subdir, pattern):
 
 def register_all_js(env):
 
-    indico_jquery = rjs_bundle(
-        'indico_jquery',
-        *namespace('js/indico/jquery',
-                   'defaults.js',
-                   'global.js',
-                   'declarative.js',
-                   'errors.js',
-                   'ajaxdialog.js',
-                   'ajaxform.js'))
-
     indico_regform = rjs_bundle(
         'indico_regform',
         *namespace('js/indico/modules/registration/form',
@@ -168,14 +158,6 @@ def register_all_js(env):
                    'field.js',
                    'sectiontoolbar.js',
                    'table.js'))
-
-    _jquery_files = namespace('js/jquery',
-                              'jquery.form.js',
-                              'jquery.custom.js',
-                              'jquery.daterange.js',
-                              'jquery.dttbutton.js',
-                              'jquery-extra-selectors.js')
-    jquery = rjs_bundle('jquery', *filter(None, _jquery_files))
 
     module_js = {
         'global': rjs_bundle('modules_global', *namespace('js/indico/modules/global',
@@ -215,10 +197,8 @@ def register_all_js(env):
         'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
     }
 
-    base_js = Bundle(jquery, indico_jquery, module_js['event_creation'], module_js['global'])
+    base_js = Bundle(module_js['event_creation'], module_js['global'])
 
-    env.register('jquery', jquery)
-    env.register('indico_jquery', indico_jquery)
     env.register('indico_regform', indico_regform)
     env.register('base_js', base_js)
     for key, bundle in module_js.iteritems():

@@ -18,9 +18,9 @@
 /* eslint-disable max-len */
 /* global getParamsFromSelectors:false, inlineAjaxForm:false, updateHtml:false */
 
-(function(global) {
-    'use strict';
+import {$T} from '../../utils/i18n';
 
+(function(global) {
     $(document).ready(function() {
         setupActionLinks();
         setupAjaxForms();

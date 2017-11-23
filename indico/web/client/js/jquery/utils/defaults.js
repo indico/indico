@@ -19,6 +19,8 @@
 // Indico-specific settings
 // -----------------------------------------------------------------------------
 
+import {$T} from '../../utils/i18n';
+
 $.datepicker.setDefaults({
     autoSize: true,
     buttonText: '',

@@ -22,6 +22,7 @@
     "jqplot": "github:jqplot/jqplot#d96a669fbb729f4f51e2214688e54320411219af",
     "jquery": "^3.2.1",
     "jquery-colorbox": "^1.6.4",
+    "jquery-form": "^4.2.2",
     "jquery-migrate": "^3.0.1",
     "jquery-typeahead": "^2.10.0",
     "jquery-ui": "^1.12.1",

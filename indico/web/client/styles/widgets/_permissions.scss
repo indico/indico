@@ -17,7 +17,7 @@
 
 @mixin role-code() {
     @include border-all();
-    @include border-radius();
+    @extend %default-border-radius;
     padding: 0.3em 0.1em;
     font-size: 0.8em;
     font-weight: bold;
@@ -40,7 +40,7 @@
             padding: 0.25em 0;
 
             &.disabled {
-                @include opacity(0.5);
+                opacity: 0.5;
             }
         }
 

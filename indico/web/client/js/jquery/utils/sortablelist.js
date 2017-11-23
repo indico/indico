@@ -16,8 +16,6 @@
  */
 
 (function(global) {
-    'use strict';
-
     global.setupSortableList = function setupSortableList($wrapper) {
         /* Works with the sortable_lists and sortable_list macros defined in
          * web/templates/_sortable_list.html

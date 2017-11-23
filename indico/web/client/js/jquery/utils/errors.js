@@ -18,8 +18,6 @@
 /* global showErrorDialog:false */
 
 (function(global) {
-    'use strict';
-
     global.handleAjaxError = function handleAjaxError(data) {
         if ('responseText' in data && data.readyState === 0 && data.status === 0 && !data.responseText) {
             // if data is an XHR object and we don't have any readyState, status or response text
