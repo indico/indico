@@ -1,5 +1,4 @@
 (function(global) {
-    'use strict';
     // rule-based url building is based on werkzeug.contrib.jsrouting
 
     function BuildError(message) {

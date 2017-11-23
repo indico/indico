@@ -18,8 +18,6 @@
 /* global ConfirmPopup:false, SpecialRemovePopup:false, AlertPopup:false, Palette:false */
 
 (function(global) {
-    'use strict';
-
     global.confirmPrompt = function confirmPrompt(message, title) {
         var dfd = $.Deferred();
         message = $('<div>', {width: 400, html: message});

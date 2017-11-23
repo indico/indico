@@ -15,16 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global Palette:false */
+// base colors (must match entries in _palette.scss)
+const Palette = {
+    blue: '#5d95ea'
+};
 
-(function(global) {
-    'use strict';
+// colors for specific purposes
+Palette.highlight = Palette.blue;
 
-    // base colors (must match entries in _palette.scss)
-    global.Palette = {
-        blue: '#5d95ea'
-    };
-
-    // colors for specific purposes
-    Palette.highlight = Palette.blue;
-})(window);
+export default Palette;
