@@ -41,6 +41,10 @@
 
     var DEFAULT_PIXEL_CM = 50;
 
+    function _needsParam(field) {
+        return field.type === "fixed" | field.type === "custom_field";
+    }
+
     function zoom(val) {
         return val * zoomFactor;
     }
@@ -107,7 +111,7 @@
                                      color: this.color,
                                  })
                                 .attr('data-type', this.type)
-                                .text(this.type === "fixed" ? this.text : itemTitles[this.type]);
+                                .text(_needsParam(this) ? this.text : itemTitles[this.type]);
             return html;
         }).bind(item);
 
@@ -224,7 +228,7 @@
         $('.element-tools').removeClass('hidden');
         $('.second-row').removeClass('disappear');
 
-        $('.selection-text').html(item.type === 'fixed' ? $T.gettext('Fixed text') : itemTitles[item.type]);
+        $('.selection-text').html(item.type === "fixed"  ? $T.gettext('Fixed text') : itemTitles[item.type]);
 
         deselectItem($('.designer-item.selected'));
         item.selected = true;
@@ -241,19 +245,29 @@
         $('.js-element-width').val(item.width / pixelsPerCm);
 
         var $fixedTextField = $('#fixed-text-field');
+        var $paramTextField = $('#param-text-field');
         var $fontTools = $('.font-tools');
 
-        if (item.type === 'fixed') {
+        if (item.type === "fixed") {
             $fontTools.fadeIn();
             $fixedTextField.closest('.tool').fadeIn();
+            $paramTextField.closest('.tool').fadeOut();
             $fixedTextField.val(item.text);
+        } else if (item.type === "custom_field") {
+            $fontTools.fadeIn();
+            $fixedTextField.closest('.tool').fadeOut();
+            $paramTextField.closest('.tool').fadeIn();
+            $paramTextField.val(item.text);
         } else if (item.type === 'ticket_qr_code') {
             $fontTools.fadeOut();
             $fixedTextField.closest('.tool').fadeOut();
+            $paramTextField.closest('.tool').fadeOut();
         } else {
             $fontTools.fadeIn();
             $fixedTextField.closest('.tool').fadeOut();
+            $paramTextField.closest('.tool').fadeOut();
             $fixedTextField.val('');
+            $paramTextField.val('');
         }
     }
 
@@ -261,8 +275,9 @@
         var item = getItemData($item);
 
         // Handle the individual cases as required.
-        if (item.type === "fixed") {
-            var text = prompt("Enter fixed-text value", item.text);  // eslint-disable-line no-alert
+        if (_needsParam(item)) {
+            var promptText = (item.type === 'fixed-text' ? "Enter fixed-text value" : "Enter parameter id")
+            var text = prompt(promptText, item.text);  // eslint-disable-line no-alert
 
             if (text) {
                 var div = $item.parent('.ui-draggable');
@@ -446,9 +461,16 @@
                 }
             },
             text: function() {
-                var $fixedTextField = $('#fixed-text-field');
-                selectedItem.text = unescapeHTML($fixedTextField.val());
-                $fixedTextField.val(selectedItem.text);
+                if (selectedItem.type === 'fixed-text') {
+                    var $fixedTextField = $('#fixed-text-field');
+                    selectedItem.text = unescapeHTML($fixedTextField.val());
+                    $fixedTextField.val(selectedItem.text);
+                } else if (selectedItem.type === 'generic_field') {
+                    var $paramTextField = $('#param-text-field');
+                    selectedItem.text = unescapeHTML($paramTextField.val());
+                    $paramTextField.val(selectedItem.text);
+
+                }
             },
             width: function() {
                 selectedItem.width = Math.round($('.js-element-width').val() * pixelsPerCm);
@@ -806,6 +828,10 @@
             });
 
             $('#fixed-text-field').on('keyup', function() {
+                setSelectedItemAttribute('text', config);
+            });
+
+            $('#param-text-field').on('keyup', function() {
                 setSelectedItemAttribute('text', config);
             });
 

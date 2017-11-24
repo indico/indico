@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from babel.numbers import format_currency
 
+from indico.modules.events.registration.placeholders.registrations import FieldPlaceholder
 from indico.modules.events.registration.util import generate_ticket_qr_code
 from indico.util.date_time import format_date, format_datetime
 from indico.util.i18n import _
@@ -34,13 +35,15 @@ __all__ = ('EventDatesPlaceholder', 'EventDescriptionPlaceholder', 'Registration
            'RegistrationEmailPlaceholder', 'RegistrationAmountPlaceholder', 'RegistrationPricePlaceholder',
            'RegistrationAffiliationPlaceholder',
            'RegistrationPositionPlaceholder', 'RegistrationAddressPlaceholder', 'RegistrationCountryPlaceholder',
-           'RegistrationPhonePlaceholder', 'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
+           'RegistrationPhonePlaceholder', 'RegistrationFieldPlaceholder',
+           'EventTitlePlaceholder', 'CategoryTitlePlaceholder', 'EventRoomPlaceholder',
            'EventVenuePlaceholder', 'EventSpeakersPlaceholder')
 
 
 GROUP_TITLES = {
     'registrant': _("Registrant Data"),
-    'event': _("Event Data")
+    'event': _("Event Data"),
+    'registration': _("Registration Data"),
 }
 
 
@@ -297,3 +300,11 @@ class RegistrationTicketQRPlaceholder(Placeholder):
     @classmethod
     def render(cls, registration):
         return generate_ticket_qr_code(registration)
+
+
+class RegistrationFieldPlaceholder(FieldPlaceholder):
+    group = 'registration'
+    name = 'custom_field'
+    description = 'Generic registration field'
+
+    pass

@@ -26,6 +26,8 @@ Improvements
   used by default when accepting an abstract in that track (:issue:`3069`)
 - Allow marking contribution types as private so they cannot be selected
   by users submitting an abstract (:issue:`3138`)
+- Allow using any registration field in the badge designer (:issue:`3146`,
+  thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

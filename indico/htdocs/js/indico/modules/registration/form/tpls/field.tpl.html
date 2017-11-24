@@ -7,7 +7,7 @@
             <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
                     <label for="field-{{ section.id }}-{{ field.id }}">
-                        {{ field.title }}
+                        {{ field.title }}  <span ng-if="editMode" >"field-{{ section.id }}-{{ field.id }}"</span>
                     </label>
                     <span ng-show="field.isRequired" class="regFormMandatoryField">*</span>
                 </div>
