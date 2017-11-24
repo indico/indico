@@ -34,22 +34,24 @@
 
         _update: function() {
             this.$dataField.val(JSON.stringify(this.data));
-            $('#permissions-widget-permissions').trigger('change');
+            this.element.trigger('change');
+        },
+        _renderRoleCode: function(code, color) {
+            return $('<span>', {
+                class: 'role-code',
+                text: code,
+                css: {
+                    'border-color': '#' + color,
+                    'color': '#' + color
+                }
+            });
         },
         _renderLabel: function(principal) {
             var $labelBox = $('<div>', {class: 'label-box'});
             var type = principal._type;
             if (type === 'EventRole') {
                 var $text = $('<span>', {class: 'text-normal', text: principal.name});
-                var $code = $('<span>', {
-                    class: 'role-code',
-                    text: principal.code,
-                    css: {
-                        'border-color': '#' + principal.color,
-                        'color': '#' + principal.color
-                    }
-                });
-
+                var $code = this._renderRoleCode(principal.code, principal.color);
                 return $labelBox.append($('<span>', {class: 'flexrow f-a-center'}).append($code).append($text));
             } else {
                 var iconClass = type === 'Avatar' || type === 'Email' ? 'icon-user' : 'icon-users';
@@ -98,12 +100,44 @@
             $item.append(this._renderPermissions(item[0], item[1]));
             return $item;
         },
+        _renderRoleDropdown: function() {
+            var self = this;
+            self.$roleDropdown.empty();
+            var $roleDropdownLink = self.$roleDropdown.siblings('.js-dropdown');
+            var eventRoles = self.$roleDropdown.data('event-roles');
+            if (eventRoles.length) {
+                eventRoles.forEach(function(role) {
+                    if (self._findEntryIndex(role) === -1) {
+                        self.$roleDropdown.append(self._renderRoleDropdownItem(role));
+                    }
+                });
+                if (!self.$roleDropdown.children().length) {
+                    $roleDropdownLink.addClass('disabled').attr('title', $T('All event roles were added'));
+                } else {
+                    $roleDropdownLink.removeClass('disabled');
+                }
+            } else {
+                $roleDropdownLink.addClass('disabled').attr('title', $T('No roles created in this event'));
+            }
+        },
+        _renderRoleDropdownItem: function(role) {
+            var self = this;
+            var $roleDropdownItem = $('<li>', {'class': 'role-item js-add-role', 'data-role': JSON.stringify(role) });
+            var $code = this._renderRoleCode(role.code, role.color);
+            var $text = $('<span>', {text: role.name});
+            $roleDropdownItem.append($('<a>').append($code).append($text)).on('click', function() {
+                self._addRole($(this).data('role'));
+                $('#permissions-add-entry-menu-target').qbubble('hide');
+            });
+            return $roleDropdownItem;
+        },
         _render: function() {
             var self = this;
             this.$permissionsWidgetList.empty();
             this.data.forEach(function(item) {
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
+            this._renderRoleDropdown();
         },
         _findEntryIndex: function(principal) {
             return _.findIndex(this.data, function(item) {
@@ -151,19 +185,37 @@
 
             dialog.execute();
         },
+        _addRole: function(role) {
+            // Grant 'access' permissions when a role is added for the first time.
+            this._addItem(role, ['access']);
+        },
         _create: function() {
             var self = this;
             this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
             this.$dataField = this.element.find('input[type=hidden]');
+            this.$roleDropdown = this.element.find('.entry-role-dropdown');
             this.data = JSON.parse(this.$dataField.val());
             this._render();
 
-            $('#permissions-widget-permissions').on('indico:permissionsChanged', function(evt, permissions, principal) {
+            this.element.on('indico:permissionsChanged', function(evt, permissions, principal) {
                 self._updateItem(principal, permissions);
             });
 
             $('.js-add-user-group').on('click', function() {
                 self._addUserGroup();
+            });
+
+            $('#permissions-add-entry-menu-target').qbubble({
+                content: {
+                    text: $('#permissions-add-entry-menu')
+                },
+                style: {
+                    classes: 'qtip-allow-overflow'
+                },
+                position: {
+                    my: 'top right',
+                    at: 'bottom right'
+                }
             });
         }
     });

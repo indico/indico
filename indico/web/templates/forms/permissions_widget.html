@@ -7,14 +7,21 @@
         <ul class="permissions-widget-list"></ul>
         <div class="toolbars">
             <div class="toolbar">
-                <button class="i-button icon-plus highlight js-dropdown arrow" data-toggle="dropdown">
+                <a class="i-button icon-plus highlight arrow" id="permissions-add-entry-menu-target">
                     {%- trans %}Add entry{% endtrans -%}
-                </button>
-                <ul class="dropdown">
-                    <li><a href="#" class="js-add-user-group">{% trans %}User / Group{% endtrans %}</a></li>
-                    <li><a href="#">{% trans %}Role{% endtrans %}</a></li>
-                    <li><a href="#">{% trans %}IP Network{% endtrans %}</a></li>
-                </ul>
+                </a>
+                <div id="permissions-add-entry-menu">
+                    <div class="flexcol f-a-start">
+                        <a href="#" class="i-button borderless js-add-user-group">
+                            {%- trans %}User / Group{% endtrans -%}
+                        </a>
+                        <a href="#" class="i-button borderless ">{% trans %}IP Network{% endtrans %}</a>
+                        <a href="#" class="i-button borderless arrow js-dropdown" data-toggle="dropdown">
+                            {%- trans %}Role{% endtrans -%}
+                        </a>
+                        <ul class="dropdown entry-role-dropdown" data-event-roles='{{ field.roles|tojson }}'></ul>
+                    </div>
+                </div>
             </div>
             <div class="toolbar">
                 <a href="{{ url_for('event_roles.manage', field.event) }}"

@@ -15,6 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+@mixin role-code() {
+    @include border-all();
+    @include border-radius();
+    padding: 0.1em;
+}
+
 .permissions-widget-list {
     @include border-left($width: 3px);
     padding-left: 1em;
@@ -43,9 +49,7 @@
         }
 
         .role-code {
-            @include border-all();
-            @include border-radius();
-            padding: 0.1em;
+            @include role-code();
         }
     }
 
@@ -75,6 +79,25 @@
             & > button {
                 margin: 0;
                 padding: 0.2em 0.7em;
+            }
+        }
+    }
+}
+
+#permissions-add-entry-menu {
+    display: none;
+
+    a {
+        margin-left: 0;
+    }
+
+    .dropdown {
+        .role-item {
+            white-space: nowrap;
+
+            .role-code {
+                @include role-code();
+                margin-right: 0.5em;
             }
         }
     }

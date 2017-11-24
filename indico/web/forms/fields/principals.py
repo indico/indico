@@ -137,5 +137,9 @@ class PermissionsField(JSONField):
     def event(self):
         return self.get_form().event
 
+    @property
+    def roles(self):
+        return [serialize_role(role) for role in self.get_form().event.roles]
+
     def _value(self):
-        return json.dumps(self.data, separators=(',', ':')) if self.data else '[]'
+        return json.dumps(self.data, separators=(',', ':'), ensure_ascii=False).encode('utf-8') if self.data else '[]'
