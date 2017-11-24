@@ -7,7 +7,7 @@
             <td ng-if="!settings.singleColumn" class="field-caption">
                 <div>
                     <label for="field-{{ section.id }}-{{ field.id }}">
-                        {{ field.title }}  <span ng-if="editMode" >"field-{{ section.id }}-{{ field.id }}"</span>
+                        {{ field.title }}
                     </label>
                     <span ng-show="field.isRequired" class="regFormMandatoryField">*</span>
                 </div>
@@ -41,6 +41,7 @@
             <td ng-if="field.billableDisabled" class="icon-lock billable-disabled-warning"
                 title="{{ 'This option is locked since changing it could trigger a price change.' | i18n }}{{ regMetadata.manager ? (' ' + ('But as a manager you can still modify it.' | i18n)) : '' }}">
             </td>
+            <td ng-if="editMode" class="field-id">"field-{{ section.id }}-{{ field.id }}"</td>
         </tr>
     </table>
 
