@@ -28,6 +28,9 @@ Improvements
   by users submitting an abstract (:issue:`3138`)
 - Allow using any registration field in the badge designer (:issue:`3146`,
   thanks :user:`bpedersen2`)
+- Registration form fields now have a semantic name field, that allow to access
+  fields from generic templates. (:issue:`3146`,
+  thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
