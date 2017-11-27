@@ -41,7 +41,7 @@
             <td ng-if="field.billableDisabled" class="icon-lock billable-disabled-warning"
                 title="{{ 'This option is locked since changing it could trigger a price change.' | i18n }}{{ regMetadata.manager ? (' ' + ('But as a manager you can still modify it.' | i18n)) : '' }}">
             </td>
-            <td ng-if="editMode" class="field-id">"field-{{ section.id }}-{{ field.id }}"</td>
+            <td ng-if="editMode" class="field-id">"{{ field.id }}" "{{ field.semanticName }}</td>
         </tr>
     </table>
 

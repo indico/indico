@@ -1,10 +1,11 @@
-<ng-form name="nestedAdvancedConfigForm">
 <div class="regFormEditLine">
     <label class="regFormDialogCaption">
         {{ 'Semantic Name '| i18n }}
+
+        {{ field }}
     </label>
-    <input name="semanticName " ng-model="formData.semanticName"
-            ng-init="formData.semanticName=field.semanticName" />
+
+    <input name="semanticName " ng-model="this.formData.semanticName"
+            ng-init="formData.semanticName=data.semanticName" />
       <i class="info-helper" title="{{ 'A semantic name for the field, unique across the system' | i18n }}"></i>
 </div>
-</ng-form>
