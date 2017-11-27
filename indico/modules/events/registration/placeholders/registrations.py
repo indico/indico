@@ -95,7 +95,12 @@ class FieldPlaceholder(ParametrizedPlaceholder):
         else:
             field_id = param
             key = None
-        data = registration.data_by_field.get(int(field_id))
+
+        try:
+            field_id = int(field_id)
+        except ValueError:
+            field_id = regform.get_field_by_semantic_name(field_id)
+        data = registration.data_by_field.get(field_id)
         if data is None:
             return ''
         rv = data.field_data.field.field_impl.render_placeholder(data, key)

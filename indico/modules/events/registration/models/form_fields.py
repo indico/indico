@@ -49,7 +49,6 @@ class RegistrationFormFieldData(db.Model):
         JSON,
         nullable=False
     )
-
     # relationship backrefs:
     # - field (RegistrationFormItem.data_versions)
     # - registration_data (RegistrationData.field_data)
@@ -59,12 +58,44 @@ class RegistrationFormFieldData(db.Model):
         return '<RegistrationFormFieldData({}, {})>'.format(self.id, self.field_id)
 
 
+class RegistrationFormFieldSemanticNames(db.Model):
+    """Semantic name for a formfield"""
+
+    __tablename__ = 'semantic_names'
+    __table_args__ = {'schema': 'event_registration'}
+
+    #: The ID of the object
+    id = db.Column(
+        db.Integer,
+        primary_key=True
+    )
+    #: The semantic name
+    name = db.Column(
+        db.String,
+        index=True,
+        nullable=False,
+        unique=True
+    )
+
+
 class RegistrationFormField(RegistrationFormItem):
     """A registration form field"""
 
     __mapper_args__ = {
         'polymorphic_identity': RegistrationFormItemType.field
     }
+
+    #: Semantic name id for the field
+    semantic_name_id = db.Column(
+        db.Integer,
+        db.ForeignKey('event_registration.semantic_names.id'),
+        nullable=True
+    )
+    #: Semantic name for the field
+    semantic_name = db.relationship(
+        'RegistrationFormFieldSemanticNames',
+    )
+
 
     @property
     def locator(self):
@@ -127,7 +158,6 @@ class RegistrationFormPersonalDataField(RegistrationFormField):
     @property
     def html_field_name(self):
         return self.personal_data_type.name
-
 
 @listens_for(RegistrationFormField.current_data, 'set')
 @listens_for(RegistrationFormPersonalDataField.current_data, 'set')

@@ -22,6 +22,11 @@
                 {{ 'Edit accommodations' | i18n }}
             </a>
         </li>
+        <li ng-class="{active: isTabSelected('tab-advanced-options')}">
+            <a ng-click="setSelectedTab('tab-advanced-options')">
+                {{ 'Edit advanced options' | i18n }}
+            </a>
+        </li>
     </ul>
 
     <div class="tab-content regFormDialogTabContent">
@@ -92,5 +97,9 @@
             ng-if="settings.accommodationField"
             ng-include="getTpl('fields/accommodation-editionTable.tpl.html')"
             ng-class="{active: isTabSelected('tab-accommodation-options')}"></div>
+        <div class="tab-pane"
+            ng-include="getTpl('fields/dialogs/advanced.tpl.html')"
+            ng-class="{active: isTabSelected('tab-advanced-options')}"></div>
+
     </div>
 </div>

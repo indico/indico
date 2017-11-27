@@ -465,7 +465,7 @@
                     var $fixedTextField = $('#fixed-text-field');
                     selectedItem.text = unescapeHTML($fixedTextField.val());
                     $fixedTextField.val(selectedItem.text);
-                } else if (selectedItem.type === 'generic_field') {
+                } else if (selectedItem.type === 'custom_field') {
                     var $paramTextField = $('#param-text-field');
                     selectedItem.text = unescapeHTML($paramTextField.val());
                     $paramTextField.val(selectedItem.text);

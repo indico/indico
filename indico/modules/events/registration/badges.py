@@ -103,7 +103,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
                 if placeholder.group == 'registrant':
                     text = placeholder.render(registration)
                 elif placeholder.group == 'registration':
-                    text = placeholder.render(item['text'],registration.regform, registration)
+                    text = placeholder.render(item['text'], registration.registration_form, registration)
                 else:
                     text = placeholder.render(registration.event)
             elif item['text']:

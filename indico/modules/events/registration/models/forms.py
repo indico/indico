@@ -417,6 +417,12 @@ class RegistrationForm(db.Model):
                     field.personal_data_type == personal_data_type):
                 return field.id
 
+    def get_field_by_semantic_name(self, semname):
+        for field in self.active_fields:
+            field_semname = field.data.get('semantic_name', None)
+            if field_semname and field_semname == semname:
+                return field.id
+
 
 @listens_for(orm.mapper, 'after_configured', once=True)
 def _mappers_configured():

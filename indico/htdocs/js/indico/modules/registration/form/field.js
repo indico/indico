@@ -131,10 +131,12 @@ ndRegForm.controller('FieldCtrl', function($scope, regFormFactory) {
         rowsAndColumns: false,
         size: false,
         withExtraSlots: false,
+        semanticName: null,
         formData: [
             'title',
             'description',
-            'isRequired'
+            'isRequired',
+            'semanticName'
         ]
     };
 
@@ -336,7 +338,6 @@ ndRegForm.directive('ndField', function($rootScope, url, regFormFactory) {
                     scope.dialog.open = true;
                     scope.$parent.dialogs.newfield = false;
                 }
-
                 // After the field is loaded, we can check whether it's billable, etc
                 // and disable it if needed
                 scope.field.billableDisabled =
