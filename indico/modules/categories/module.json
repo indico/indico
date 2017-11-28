@@ -1,0 +1,6 @@
+{
+    "name": "categories",
+    "partials": {
+        "management": "./management.js"
+    }
+}

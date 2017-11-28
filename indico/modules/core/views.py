@@ -24,9 +24,7 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 
 class WPSettings(WPAdmin):
     template_prefix = 'core/'
-
-    def getJSFiles(self):
-        return WPAdmin.getJSFiles(self) + self._asset_env['modules_cephalopod_js'].urls()
+    bundles = WPAdmin.bundles + ('module_cephalopod.js',)
 
 
 class WPContact(WPJinjaMixin, WPDecorated):

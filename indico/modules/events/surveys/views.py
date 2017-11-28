@@ -24,7 +24,7 @@ from indico.web.views import WPJinjaMixin
 class WPManageSurvey(WPEventManagement):
     template_prefix = 'events/surveys/'
     sidemenu_option = 'surveys'
-    bundles = WPEventManagement.bundles + ('modules_surveys.js', 'modules_surveys.css')
+    bundles = WPEventManagement.bundles + ('module_events.surveys.js', 'module_events.surveys.css')
 
 
 class WPSurveyResults(WPManageSurvey):
@@ -43,10 +43,10 @@ class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDisplayBase):
     template_prefix = 'events/surveys/'
     base_class = WPConferenceDisplayBase
     menu_entry_name = 'surveys'
-    bundles = WPConferenceDisplayBase.bundles + ('modules_surveys.js', 'modules_surveys.css')
+    bundles = WPConferenceDisplayBase.bundles + ('module_events.surveys.js', 'module_events.surveys.css')
 
 
 class WPDisplaySurveySimpleEvent(DisplaySurveyMixin, WPSimpleEventDisplayBase):
     template_prefix = 'events/surveys/'
     base_class = WPSimpleEventDisplayBase
-    bundles = WPSimpleEventDisplayBase.bundles + ('modules_surveys.js', 'modules_surveys.css')
+    bundles = WPSimpleEventDisplayBase.bundles + ('module_events.surveys.js', 'module_events.surveys.css')

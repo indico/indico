@@ -19,7 +19,6 @@ import './jquery';
 import './legacy/presentation.js';
 import './legacy/indico.js';
 import './legacy/timetable.js';
-import './legacy/angular';
 
 import '../styles/screen.scss';
 

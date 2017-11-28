@@ -21,8 +21,7 @@ const webpack = require('webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
-
-const modulesDir = path.join(__dirname, 'node_modules');
+const glob = require('glob');
 
 const _cssLoaderOptions = {
     alias: {
@@ -34,6 +33,9 @@ const _cssLoaderOptions = {
 // Make sure path has a single trailing slash
 config.build.webpackURL = config.build.webpackURL.replace(/\/$/, '') + '/';
 
+const clientDir = path.join(__dirname, 'indico', 'web', 'client');
+const modulesDir = path.join(__dirname, 'node_modules');
+
 const entryPoints = {
     main: './js/index.js',
     ckeditor: './js/jquery/ckeditor.js',
@@ -41,14 +43,38 @@ const entryPoints = {
     map_of_rooms: './styles/legacy/mapofrooms.css',
     markdown: './js/jquery/markdown.js',
     mathjax: './js/jquery/compat/mathjax.js',
-    statistics: './js/jquery/statistics.js',
-    modules_abstracts: './js/jquery/modules/abstracts.js',
-    modules_rb: './js/legacy/room_booking.js',
-    modules_surveys: './js/jquery/modules/surveys.js',
-    modules_vc: './js/jquery/modules/vc.js'
+    statistics: './js/jquery/statistics.js'
 };
 
-const objs = Object.keys(config.themes).map((k) => {
+const resolveAlias = [
+    {name: 'jquery', alias: 'jquery/src/jquery', onlyModule: false},
+];
+
+// Add Module Bundles
+glob.sync(path.join(__dirname, 'indico/modules/**/module.json')).forEach((file) => {
+    const module = Object.assign({produceBundle: true, partials: {}}, require(file));
+    const moduleName = 'module_' + (module.parent ? (module.parent + '.') : '') + module.name;
+    const dirName = path.join(path.dirname(file), 'js');
+
+    if (module.produceBundle) {
+        entryPoints[moduleName] = dirName;
+    }
+    const modulePath = 'indico/modules/' + (module.parent ? (module.parent + '/') : '') + module.name;
+    resolveAlias.push({name: modulePath, alias: dirName, onlyModule: false});
+
+    if (module.partials) {
+        for (const partial of Object.entries(module.partials)) {
+            entryPoints[moduleName + '.' + partial[0]] = path.resolve(dirName, partial[1]);
+        }
+    }
+});
+
+// This has to be last in the array, since it's the most general alias.
+// Otherwise, it would be caught before 'indico/modules/...'
+resolveAlias.push({name: 'indico', alias: path.join(clientDir, 'js/'), onlyModule: false});
+
+// Add Meeting Themes
+Object.assign(entryPoints, ...Object.keys(config.themes).map((k) => {
     const returnValue = {};
     const prefix = './styles/themes/';
     const escapedKey = k.replace('-', '_');
@@ -58,12 +84,7 @@ const objs = Object.keys(config.themes).map((k) => {
         returnValue['themes_' + escapedKey + '.print'] = prefix + config.themes[k].print_stylesheet;
     }
     return returnValue;
-});
-
-Object.assign(entryPoints, ...objs);
-
-const clientDir = __dirname + "/indico/web/client";
-const modulesDir = path.join(__dirname, 'node_modules');
+}));
 
 module.exports = env => ({
     devtool: 'source-map',
@@ -84,6 +105,15 @@ module.exports = env => ({
             {
                 test: /client\/js\/legacy\/libs\/.*$/,
                 use: 'script-loader'
+            },
+            {
+                test: /\.tpl\.html$/,
+                use: {
+                    loader: 'file-loader',
+                    options: {
+                        name: '[path][name].[ext]'
+                    }
+                }
             },
             {
                 include: /jquery-migrate/,
@@ -112,7 +142,7 @@ module.exports = env => ({
                         loader: 'sass-loader',
                         options: {
                             sourceMap: true,
-                            includePaths: [clientDir + '/styles']
+                            includePaths: [path.join(clientDir, 'styles')]
                         }
                     }, 'postcss-loader'],
                 })
@@ -156,8 +186,6 @@ module.exports = env => ({
         ])
     ],
     resolve: {
-        alias: {
-            jquery: 'jquery/src/jquery'
-        }
+        alias: resolveAlias
     }
 });

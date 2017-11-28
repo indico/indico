@@ -99,6 +99,7 @@ class WPReferenceTypes(WPAdmin):
 
 class WPEventBase(WPDecorated):
     ALLOW_JSON = False
+    bundles = WPDecorated.bundles + ('module_events.display.js',)
 
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -117,9 +118,6 @@ class WPEventBase(WPDecorated):
 
     def _getHeader(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
-
-    def getJSFiles(self):
-        return WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
 
     def _getHeadContent(self):
         site_name = core_settings.get('site_title')
@@ -153,7 +151,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
     @property
     def bundles(self):
         return WPSimpleEventDisplayBase.bundles + ('themes_{}.css'.format(self.theme_file_name),
-                                                   'modules_vc.js', 'modules_vc.css')
+                                                   'module_vc.js', 'module_vc.css', 'module_events.cloning.js')
 
     @property
     def print_bundles(self):
@@ -167,10 +165,6 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
     def get_extra_css_files(self):
         custom_url = get_css_url(self.event)
         return [custom_url] if custom_url else []
-
-    def getJSFiles(self):
-        return (WPSimpleEventDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_event_cloning_js'].urls())
 
     def _applyDecoration(self, body):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':

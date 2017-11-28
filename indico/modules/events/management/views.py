@@ -51,6 +51,8 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
     MANAGEMENT = True
     ALLOW_JSON = False
 
+    bundles = WPDecorated.bundles + ('module_events.cloning.js', 'module_events.management.js')
+
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
@@ -60,11 +62,6 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
             'event_types': [(et.name, et.title) for et in EventType]
         }
         WPDecorated.__init__(self, rh, **kwargs)
-
-    def getJSFiles(self):
-        return (WPDecorated.getJSFiles(self) +
-                self._asset_env['modules_event_cloning_js'].urls() +
-                self._asset_env['modules_event_management_js'].urls())
 
     def _getHeader(self):
         return render_header(category=self.event.category, local_tz=self.event.timezone, force_local_tz=True)

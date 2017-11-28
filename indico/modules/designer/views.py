@@ -22,13 +22,9 @@ from indico.modules.events.management.views import WPEventManagement
 
 class WPEventManagementDesigner(WPEventManagement):
     template_prefix = 'designer'
-
-    def getJSFiles(self):
-        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_designer_js'].urls()
+    bundles = WPEventManagement.bundles + ('module_designer.js',)
 
 
 class WPCategoryManagementDesigner(WPCategoryManagement):
     template_prefix = 'designer'
-
-    def getJSFiles(self):
-        return WPCategoryManagement.getJSFiles(self) + self._asset_env['modules_designer_js'].urls()
+    bundles = WPEventManagement.bundles + ('module_designer.js',)
