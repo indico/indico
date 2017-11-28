@@ -28,11 +28,7 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageAbstracts(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/abstracts/'
     sidemenu_option = 'abstracts'
-    bundles = WPEventManagement.bundles + ('modules_abstracts.js', 'modules_abstracts.css', 'markdown.js')
-
-    def getJSFiles(self):
-        return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['modules_reviews_js'].urls())
+    bundles = WPEventManagement.bundles + ('module_events.abstracts.js', 'module_events.abstracts.css', 'markdown.js')
 
     def _getHeadContent(self):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
@@ -40,11 +36,8 @@ class WPManageAbstracts(MathjaxMixin, WPEventManagement):
 
 class WPDisplayAbstractsBase(WPConferenceDisplayBase):
     template_prefix = 'events/abstracts/'
-    bundles = WPConferenceDisplayBase.bundles + ('modules_abstracts.js', 'modules_abstracts.css', 'markdown.js')
-
-    def getJSFiles(self):
-        return (WPConferenceDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_reviews_js'].urls())
+    bundles = WPConferenceDisplayBase.bundles + ('module_events.abstracts.js', 'module_events.abstracts.css',
+                                                 'markdown.js')
 
 
 class WPDisplayAbstracts(WPDisplayAbstractsBase):
@@ -52,15 +45,12 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
 
 
 class WPDisplayCallForAbstracts(WPDisplayAbstracts):
-    def getJSFiles(self):
-        return WPDisplayAbstractsBase.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
+    bundles = WPDisplayAbstracts.bundles + ('module_events.display.js',)
 
 
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
     menu_entry_name = 'abstract_reviewing_area'
-
-    def getJSFiles(self):
-        return WPDisplayAbstracts.getJSFiles(self) + self._asset_env['modules_event_management_js'].urls()
+    bundles = WPDisplayAbstracts.bundles + ('module_events.management.js',)
 
 
 def render_abstract_page(abstract, view_class=None, management=False):

@@ -149,60 +149,6 @@ def _get_custom_files(subdir, pattern):
 
 
 def register_all_js(env):
-
-    indico_regform = rjs_bundle(
-        'indico_regform',
-        *namespace('js/indico/modules/registration/form',
-                   'form.js',
-                   'section.js',
-                   'field.js',
-                   'sectiontoolbar.js',
-                   'table.js'))
-
-    module_js = {
-        'global': rjs_bundle('modules_global', *namespace('js/indico/modules/global',
-                                                          'session_bar.js', 'impersonation.js')),
-        'bootstrap': rjs_bundle('modules_bootstrap', 'js/indico/modules/bootstrap.js'),
-        'cephalopod': rjs_bundle('modules_cephalopod', 'js/indico/modules/cephalopod.js'),
-        'categories': rjs_bundle('modules_categories', *namespace('js/indico/modules/categories', 'display.js',
-                                                                  'calendar.js')),
-        'categories_management': rjs_bundle('modules_categories_management',
-                                            'js/indico/modules/categories/management.js'),
-        'event_creation': rjs_bundle('modules_event_creation', 'js/indico/modules/events/creation.js'),
-        'event_display': rjs_bundle('modules_event_display', *namespace('js/indico/modules', 'events/display.js',
-                                                                        'list_generator.js', 'static_filters.js',
-                                                                        'social.js')),
-        'event_layout': rjs_bundle('modules_event_layout', 'js/indico/modules/events/layout.js'),
-        'event_management': rjs_bundle('modules_event_management',
-                                       *namespace('js/indico/modules', 'events/management.js', 'events/badges.js',
-                                                  'list_generator.js', 'static_filters.js')),
-        'attachments': rjs_bundle('modules_attachments', 'js/indico/modules/attachments.js'),
-        'registration': rjs_bundle('modules_registration',
-                                   'js/indico/modules/registration/registration.js',
-                                   'js/indico/modules/registration/invitations.js',
-                                   'js/indico/modules/registration/reglists.js',
-                                   *namespace('js/indico/modules/registration/form', 'form.js', 'section.js',
-                                              'field.js',
-                                              'sectiontoolbar.js', 'table.js')),
-        'contributions': rjs_bundle('modules_contributions', 'js/indico/modules/contributions/common.js',
-                                    'js/indico/modules/types_dialog.js'),
-        'tracks': rjs_bundle('modules_tracks', 'js/indico/modules/tracks.js'),
-        'papers': rjs_bundle('modules_papers', 'js/indico/modules/papers.js'),
-        'reviews': rjs_bundle('modules_reviews', 'js/indico/modules/reviews.js'),
-        'sessions': rjs_bundle('modules_sessions', 'js/indico/modules/sessions/common.js',
-                               'js/indico/modules/types_dialog.js'),
-        'users': rjs_bundle('modules_users', 'js/indico/modules/users.js'),
-        'designer': rjs_bundle('modules_designer', 'js/indico/modules/designer.js'),
-        'event_cloning': rjs_bundle('modules_event_cloning', 'js/indico/modules/events/cloning.js'),
-        'event_roles': rjs_bundle('modules_event_roles', 'js/indico/modules/events/roles.js')
-    }
-
-    base_js = Bundle(module_js['event_creation'], module_js['global'])
-
-    env.register('indico_regform', indico_regform)
-    env.register('base_js', base_js)
-    for key, bundle in module_js.iteritems():
-        env.register('modules_{}_js'.format(key), bundle)
     # Build a bundle with customization JS if enabled
     custom_js_files = _get_custom_files('js', '*.js')
     if custom_js_files:

@@ -19,7 +19,7 @@ from __future__ import absolute_import, unicode_literals
 import posixpath
 from urlparse import urlparse
 
-from flask import g, render_template, request, session, current_app
+from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
@@ -149,7 +149,7 @@ class WPJinjaMixin(object):
             return html
         template = params.pop('_jinja_template')
         webpack = current_app.extensions['flask-webpackext']
-        params['bundles'] = map(lambda x: webpack.manifest[x], self.bundles)
+        params['bundles'] = (webpack.manifest[x] for x in self.bundles)
         return self.render_template_func(template, **params)
 
 
@@ -173,22 +173,13 @@ class WPBase(object):
     @classproperty
     @classmethod
     def bundles(self):
-        _bundles = ('common.js', 'main.js', 'main.css')
+        _bundles = ('common.js', 'main.js', 'main.css', 'module_core.js', 'module_events.creation.js',
+                    'module_attachments.js')
         if not g.get('static_site'):
             _bundles += ('ckeditor.js',)
+        if config.DEBUG and len(_bundles) != len(set(_bundles)):
+            raise Exception('Duplicate bundles found')
         return _bundles
-
-    def getJSFiles(self):
-        return (self._asset_env['base_js'].urls() +
-                self._asset_env['modules_attachments_js'].urls())
-
-    def _includeJSPackage(self, pkg_names, prefix='indico_'):
-        if not isinstance(pkg_names, list):
-            pkg_names = [pkg_names]
-
-        return [url
-                for pkg_name in pkg_names
-                for url in self._asset_env[prefix + pkg_name.lower()].urls()]
 
     def _getHeadContent(self):
         """
@@ -226,13 +217,13 @@ class WPBase(object):
         custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
         custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
         css_files = map(self._fix_path, plugin_css + self.get_extra_css_files() + custom_css)
-        js_files = map(self._fix_path, self.getJSFiles() + plugin_js + custom_js)
+        js_files = map(self._fix_path, plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
         webpack = current_app.extensions['flask-webpackext']
 
-        bundles = map(lambda x: webpack.manifest[x], self.bundles)
-        print_bundles = map(lambda x: webpack.manifest[x], self.print_bundles)
+        bundles = (webpack.manifest[x] for x in self.bundles)
+        print_bundles = (webpack.manifest[x] for x in self.print_bundles)
 
         return render_template('indico_base.html',
                                css_files=css_files, js_files=js_files,

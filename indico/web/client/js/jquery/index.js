@@ -63,9 +63,6 @@ import './utils/misc';
 import './utils/routing';
 import './utils/sortablelist';
 
-// Modules that are bundled by default
-import './modules/categories';
-
 
 // jQuery-migrate should be muted when in production
 if (process.env.NODE_ENV !== 'development') {

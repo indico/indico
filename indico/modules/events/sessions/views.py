@@ -23,9 +23,7 @@ from indico.modules.events.views import WPConferenceDisplayBase
 class WPManageSessions(WPEventManagement):
     template_prefix = 'events/sessions/'
     sidemenu_option = 'sessions'
-
-    def getJSFiles(self):
-        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_sessions_js'].urls()
+    bundles = WPEventManagement.bundles + ('module_events.sessions.js',)
 
 
 class WPDisplaySession(WPConferenceDisplayBase):

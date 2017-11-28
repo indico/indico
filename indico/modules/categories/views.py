@@ -35,6 +35,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
 
     template_prefix = 'categories/'
     ALLOW_JSON = False
+    bundles = WPDecorated.bundles + ('module_categories.js',)
 
     def __init__(self, rh, category, **kwargs):
         kwargs['category'] = category
@@ -45,9 +46,6 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
             self.title = category.title
         WPDecorated.__init__(self, rh, **kwargs)
         self._mathjax = kwargs.pop('mathjax', False)
-
-    def getJSFiles(self):
-        return WPDecorated.getJSFiles(self) + self._asset_env['modules_categories_js'].urls()
 
     def _getHeader(self):
         return render_header(category=self.category, protected_object=self.category,
@@ -76,6 +74,7 @@ class WPCategoryManagement(WPCategory):
     """WP for category management pages"""
 
     MANAGEMENT = True
+    bundles = WPCategory.bundles + ('module_categories.management.js',)
 
     def __init__(self, rh, category, active_menu_item, **kwargs):
         kwargs['active_menu_item'] = active_menu_item
@@ -84,9 +83,6 @@ class WPCategoryManagement(WPCategory):
     def _getHeader(self):
         return render_header(category=self.category, protected_object=self.category,
                              local_tz=self.category.timezone, force_local_tz=True)
-
-    def getJSFiles(self):
-        return WPCategory.getJSFiles(self) + self._asset_env['modules_categories_management_js'].urls()
 
     def _get_breadcrumbs(self):
         if self.category.is_root:
