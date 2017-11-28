@@ -28,9 +28,7 @@ class WPLayoutEdit(WPEventManagement):
 class WPMenuEdit(WPEventManagement):
     template_prefix = 'events/layout/'
     sidemenu_option = 'menu'
-
-    def getJSFiles(self):
-        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_event_layout_js'].urls()
+    bundles = WPEventManagement.bundles + ('module_events.layout.js',)
 
 
 class WPImages(WPEventManagement):

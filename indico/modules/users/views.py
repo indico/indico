@@ -54,6 +54,4 @@ class WPUser(WPJinjaMixin, WPDecorated):
 
 class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
-
-    def getJSFiles(self):
-        return WPAdmin.getJSFiles(self) + self._asset_env['modules_users_js'].urls()
+    bundles = WPAdmin.bundles + ('module_users.js',)
