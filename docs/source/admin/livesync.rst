@@ -1,4 +1,0 @@
-Livesync
-========
-
-.. todo:: Complete page

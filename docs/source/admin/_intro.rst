@@ -1,1 +1,0 @@
-Indico uses `Celery <http://www.celeryproject.org>`_ for task management and scheduling and the Livesync Flask plugin for search integration. This part of the documentation explains how to set them up and run automatically.

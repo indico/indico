@@ -17,8 +17,8 @@ Welcome to Indico's documentation. This documentation is split into several part
 To dive into the internals of Indico, check out the `API documentation <api>`_. Read more about Indico in our `official website <https://getindico.io>`_.
 
 
-Installation / Configuration
-++++++++++++++++++++++++++++
+Installation
+++++++++++++
 
 .. include:: installation/_intro.rst
 
@@ -28,15 +28,15 @@ Installation / Configuration
     installation/index.rst
 
 
-Server administration
-+++++++++++++++++++++
+Configuration
++++++++++++++
 
-.. include:: admin/_intro.rst
+.. include:: config/_intro.rst
 
 .. toctree::
     :maxdepth: 2
 
-    admin/index.rst
+    config/index.rst
 
 
 Plugins

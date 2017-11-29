@@ -1,5 +1,5 @@
-Configuration
-=============
+Settings
+========
 
 ``indico.conf`` is Indico's main configuration file. Its initial version
 is usually generated when running ``indico setup wizard`` as described in
