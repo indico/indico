@@ -358,7 +358,6 @@ class IndicoWeekDayRepetitionField(Field):
         locale = get_current_locale()
         self.day_number_options = self.WEEK_DAY_NUMBER_CHOICES
         self.week_day_options = [(n, locale.weekday(n, short=False)) for n in xrange(7)]
-        self.week_day_options.append((-1, _('Any day')))
         self.day_number_missing = False
         self.week_day_missing = False
         super(IndicoWeekDayRepetitionField, self).__init__(*args, **kwargs)
