@@ -22,6 +22,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
 const glob = require('glob');
+const uglify = require('uglify-js');
 
 const _cssLoaderOptions = {
     alias: {
@@ -47,7 +48,7 @@ const entryPoints = {
 };
 
 const resolveAlias = [
-    {name: 'jquery', alias: 'jquery/src/jquery', onlyModule: false},
+    {name: 'jquery', alias: 'jquery/src/jquery', onlyModule: false}
 ];
 
 // Add Module Bundles
@@ -86,106 +87,118 @@ Object.assign(entryPoints, ...Object.keys(config.themes).map((k) => {
     return returnValue;
 }));
 
-module.exports = env => ({
-    devtool: 'source-map',
-    context: clientDir,
-    entry: entryPoints,
-    output: {
-        path: config.build.webpackPath,
-        filename: "[name].bundle.js",
-        publicPath: config.build.webpackURL
-    },
-    module: {
-        rules: [
-            {
-                test: /\.js$/,
-                use: 'babel-loader',
-                exclude: /node_modules/
-            },
-            {
-                test: /client\/js\/legacy\/libs\/.*$/,
-                use: 'script-loader'
-            },
-            {
-                test: /\.tpl\.html$/,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        name: '[path][name].[ext]'
-                    }
-                }
-            },
-            {
-                include: /jquery-migrate/,
-                parser: {
-                    amd: false
-                }
-            },
-            {
-                test: /\.css$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: {
-                        loader: 'css-loader',
-                        options: _cssLoaderOptions
-                    }
-                })
-            },
-            {
-                test: /\.scss$/,
-                use: ExtractTextPlugin.extract({
-                    fallback: 'style-loader',
-                    use: [{
-                        loader: 'css-loader',
-                        options: _cssLoaderOptions
-                    }, {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true,
-                            includePaths: [path.join(clientDir, 'styles')]
-                        }
-                    }, 'postcss-loader'],
-                })
-            },
-            {
-                test: /\.(jpe?g|png|gif|svg)$/,
-                use: {
-                    loader: 'file-loader',
-                    options: {
-                        name: '[path]/[name].[ext]'
-                    }
-                }
-            }
-        ]
-    },
-    plugins: [
-        new ManifestPlugin({
-            fileName: 'manifest.json',
+module.exports = env => {
+    const currentEnv = (env ? env.NODE_ENV : null) || 'development';
+
+    // Minification of copied files (CKEditor and MathJax)
+    const transform = currentEnv === 'development' ? null : (content, path) => {
+        if (!path.match(/\.js$/)) {
+            return content;
+        }
+        return uglify.minify(content.toString(), {fromString: true}).code;
+    };
+
+    return {
+        devtool: 'source-map',
+        context: clientDir,
+        entry: entryPoints,
+        output: {
+            path: config.build.webpackPath,
+            filename: "[name].bundle.js",
             publicPath: config.build.webpackURL
-        }),
-        new webpack.ProvidePlugin({
-            $: 'jquery',
-            jQuery: 'jquery',
-            _: 'underscore',
-            moment: 'moment'
-        }),
-        new webpack.optimize.CommonsChunkPlugin({
-            name: 'common' // Specify the common bundle's name.
-        }),
-        // Do not load moment locales (we'll load them explicitly)
-        new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
-        new ExtractTextPlugin({
-            filename: '[name].css'
-        }),
-        new webpack.EnvironmentPlugin({
-            NODE_ENV: (env ? env.NODE_ENV : null) || 'development'
-        }),
-        new CopyWebpackPlugin([
-            {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'ckeditor'},
-            {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax'}
-        ])
-    ],
-    resolve: {
-        alias: resolveAlias
-    }
-});
+        },
+        module: {
+            rules: [
+                {
+                    test: /\.js$/,
+                    use: 'babel-loader',
+                    exclude: /node_modules/
+                },
+                {
+                    test: /client\/js\/legacy\/libs\/.*$/,
+                    use: 'script-loader'
+                },
+                {
+                    test: /\.tpl\.html$/,
+                    use: {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]'
+                        }
+                    }
+                },
+                {
+                    include: /jquery-migrate/,
+                    parser: {
+                        amd: false
+                    }
+                },
+                {
+                    test: /\.css$/,
+                    use: ExtractTextPlugin.extract({
+                        fallback: 'style-loader',
+                        use: {
+                            loader: 'css-loader',
+                            options: _cssLoaderOptions
+                        }
+                    })
+                },
+                {
+                    test: /\.scss$/,
+                    use: ExtractTextPlugin.extract({
+                        fallback: 'style-loader',
+                        use: [{
+                            loader: 'css-loader',
+                            options: _cssLoaderOptions
+                        }, {
+                            loader: 'sass-loader',
+                            options: {
+                                sourceMap: currentEnv === 'development',
+                                includePaths: [path.join(clientDir, 'styles')]
+                            }
+                        }, 'postcss-loader'],
+                    })
+                },
+                {
+                    test: /\.(jpe?g|png|gif|svg)$/,
+                    use: {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path]/[name].[ext]'
+                        }
+                    }
+                }
+            ]
+        },
+        plugins: [
+            new ManifestPlugin({
+                fileName: 'manifest.json',
+                publicPath: config.build.webpackURL
+            }),
+            new webpack.ProvidePlugin({
+                $: 'jquery',
+                jQuery: 'jquery',
+                _: 'underscore',
+                moment: 'moment'
+            }),
+            new webpack.optimize.CommonsChunkPlugin({
+                name: 'common' // Specify the common bundle's name.
+            }),
+            // Do not load moment locales (we'll load them explicitly)
+            new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+            new ExtractTextPlugin({
+                filename: '[name].css'
+            }),
+            new webpack.EnvironmentPlugin({
+                NODE_ENV: currentEnv
+            }),
+            new CopyWebpackPlugin([
+                {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'ckeditor', transform},
+                {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax', transform}
+            ])
+        ],
+        resolve: {
+            alias: resolveAlias
+        }
+    };
+};
