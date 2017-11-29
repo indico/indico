@@ -134,6 +134,7 @@
         _render: function() {
             var self = this;
             this.$permissionsWidgetList.empty();
+            // TODO: Sort list properly
             this.data.forEach(function(item) {
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
@@ -155,23 +156,44 @@
             this._render();
         },
         _addItem: function(principal, permissions) {
-            if (this._findEntryIndex(principal) === -1) {
+            var idx = this._findEntryIndex(principal);
+            if (idx === -1) {
                 this.data.push([principal, permissions]);
                 this._update();
                 this._render();
             } else {
-                var text = $T("The User / Group '{0}' is already present as an entry.".format(principal.name));
-                $('#flashed-messages').append(
-                    $('<div>', {class: 'error-message-box'}).append(
-                        $('<div>', {class: 'message-text', text: text})
-                    )
-                );
+                this.$permissionsWidgetList.find('>li').eq(idx).qtip({
+                    content: {
+                        text: $T('This entry was already added')
+                    },
+                    show: {
+                        ready: true,
+                        effect: function() {
+                            $(this).fadeIn(300);
+                        }
+                    },
+                    hide: {
+                        event: 'unfocused click'
+                    },
+                    events: {
+                        hide: function() {
+                            $(this).fadeOut(300);
+                            $(this).qtip('destroy');
+                        }
+                    },
+                    position: {
+                        my: 'center left',
+                        at: 'center right'
+                    },
+                    style: {
+                        classes: 'qtip-danger'
+                    }
+                });
             }
         },
         _addUserGroup: function() {
             var self = this;
             function _addPrincipals(principals) {
-                $('#flashed-messages').empty();
                 principals.forEach(function(principal) {
                     // Grant 'access' permissions when a user/group is added for the first time.
                     self._addItem(principal, ['access']);
