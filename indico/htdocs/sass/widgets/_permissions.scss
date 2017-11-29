@@ -35,7 +35,7 @@
     }
 
     .label-box {
-        flex-basis: 25%;
+        width: 25%;
         margin-right: 1em;
 
         .label-icon::before,
@@ -55,6 +55,10 @@
         .role-code {
             @include role-code();
         }
+    }
+
+    .entry-label {
+        @include ellipsis($no-wrap: false);
     }
 
     .permissions-box {

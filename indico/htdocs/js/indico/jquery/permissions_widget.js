@@ -50,7 +50,7 @@
             var $labelBox = $('<div>', {class: 'label-box'});
             var type = principal._type;
             if (type === 'EventRole') {
-                var $text = $('<span>', {class: 'text-normal', text: principal.name});
+                var $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
                 var $code = this._renderRoleCode(principal.code, principal.color);
                 return $labelBox.append($('<span>', {class: 'flexrow f-a-center'}).append($code).append($text));
             } else {
@@ -63,6 +63,7 @@
                     iconClass = 'icon-users';
                 }
                 var text = type === 'Avatar' ? principal.name : principal.id;
+                $labelBox.addClass('entry-label');
                 return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
         },
@@ -232,6 +233,13 @@
 
             $('.js-add-user-group').on('click', function() {
                 self._addUserGroup();
+            });
+
+            this.$permissionsWidgetList.on('mouseenter', '.entry-label', function() {
+                var $this = $(this);
+                if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
+                    $this.attr('title', $this.text());
+                }
             });
 
             $('#permissions-add-entry-menu-target').qbubble({
