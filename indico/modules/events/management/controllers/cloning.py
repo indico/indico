@@ -121,15 +121,13 @@ class IntervalCloneCalculator(CloneCalculator):
         dtstart = self._naivify(form.start_dt.data)
         next_day = dtstart + timedelta(days=1)
         if freq == rrule.MONTHLY and next_day.day == 1:
-            args = {'dtstart': next_day}
-            args.update(self._calc_stop_criteria(form))
-            dates = rrule.rrule(freq, interval=interval, **args)
+            kwargs = dict(self._calc_stop_criteria(form), dtstart=next_day)
+            dates = rrule.rrule(freq, interval=interval, **kwargs)
             dates = self._tzify([date - timedelta(days=1) for date in dates])
             last_day_of_month = True
         else:
-            args = {'dtstart': dtstart}
-            args.update(self._calc_stop_criteria(form))
-            dates = self._tzify(rrule.rrule(freq, interval=interval, **args))
+            kwargs = dict(self._calc_stop_criteria(form), dtstart=dtstart)
+            dates = self._tzify(rrule.rrule(freq, interval=interval, **kwargs))
             last_day_of_month = False
         return dates, last_day_of_month
 
