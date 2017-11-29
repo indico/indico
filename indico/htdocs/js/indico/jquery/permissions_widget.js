@@ -54,7 +54,14 @@
                 var $code = this._renderRoleCode(principal.code, principal.color);
                 return $labelBox.append($('<span>', {class: 'flexrow f-a-center'}).append($code).append($text));
             } else {
-                var iconClass = type === 'Avatar' || type === 'Email' ? 'icon-user' : 'icon-users';
+                var iconClass;
+                if (type === 'Avatar') {
+                    iconClass = 'icon-user';
+                } else if (type === 'Email') {
+                    iconClass = 'icon-mail';
+                } else {
+                    iconClass = 'icon-users';
+                }
                 var text = type === 'Avatar' ? principal.name : principal.id;
                 return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
