@@ -16,7 +16,8 @@
 
 from __future__ import unicode_literals
 
-from flask import render_template
+from flask import current_app, render_template
+from flask_webpackext import current_webpack
 from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
@@ -63,7 +64,7 @@ def generate_global_file():
 
             'APIKeyCreate': url_for('api.key_create'),
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
-            'FontSassBundle': core_env['fonts_sass'].urls(),
+            'FontSassBundle': current_webpack.manifest['fonts.css']._paths,
 
             'EventCreation': url_rule_to_js('events.create'),
             'PermissionsDialog': url_rule_to_js('event_management.permissions_dialog'),

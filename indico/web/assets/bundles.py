@@ -156,12 +156,6 @@ def register_all_js(env):
 
 
 def register_all_css(env):
-    fonts_sass = Bundle('sass/partials/_fonts.scss',
-                        filters=('pyscss', 'csscompressor'), output='css/indico_fonts_%(version)s.min.css')
-
-    # SASS/SCSS
-    env.register('fonts_sass', fonts_sass)
-
     # Build a bundle with customization CSS if enabled
     custom_css_files = _get_custom_files('scss', '*.scss')
     if custom_css_files:
