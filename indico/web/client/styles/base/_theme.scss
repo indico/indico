@@ -15,6 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+$semantic-color-map: (
+    highlight: $blue,
+    success: $green,
+    error: $red,
+    warning: $yellow,
+    visited: $purple,
+    strong: $black
+);
+
+$semantic-styles: (highlight, success, error, warning, visited, strong);
+
 @mixin _semantic-background($color) {
     @include border-all($color);
     background: $color;
@@ -25,60 +36,40 @@
     color: $color;
 }
 
+@mixin _semantic_versions {
+    @each $style in $semantic-styles {
+        &.#{$style} {
+            @content;
+        }
+    }
+}
+
+@mixin _semantic_colors {
+    @each $style in $semantic-styles {
+        &.#{$style} {
+            color: map-get($semantic-color-map, $style);
+        }
+    }
+}
+
 %semantic-background {
     @include _semantic-background($dark-gray);
     color: white;
 
-    &.highlight {
-        @include _semantic-background($blue);
-    }
-
-    &.success {
-        @include _semantic-background($green);
-    }
-
-    &.error {
-        @include _semantic-background($red);
-    }
-
-    &.warning {
-        @include _semantic-background($yellow);
-    }
-
-    &.visited {
-        @include _semantic-background($purple);
-    }
-
-    &.strong {
-        @include _semantic-background($black);
+    @each $style in $semantic-styles {
+        &.#{$style} {
+            @include _semantic-background(map-get($semantic-color-map, $style));
+        }
     }
 }
 
 %semantic-outline {
     @include _semantic-outline($dark-gray);
 
-    &.highlight {
-        @include _semantic-outline($blue);
-    }
-
-    &.success {
-        @include _semantic-outline($green);
-    }
-
-    &.error {
-        @include _semantic-outline($red);
-    }
-
-    &.warning {
-        @include _semantic-outline($yellow);
-    }
-
-    &.visited {
-        @include _semantic-outline($purple);
-    }
-
-    &.strong {
-        @include _semantic-outline($black);
+    @each $style in $semantic-styles {
+        &.#{$style} {
+            @include _semantic-outline(map-get($semantic-color-map, $style));
+        }
     }
 }
 
@@ -90,22 +81,7 @@
         &:active,
         &.active {
             color: $black;
-
-            &.highlight {
-                color: $blue;
-            }
-
-            &.accept {
-                color: $green;
-            }
-
-            &.danger {
-                color: $red;
-            }
-
-            &.warning {
-                color: $yellow;
-            }
+            @include _semantic_colors;
         }
     }
 
@@ -116,34 +92,7 @@
 
 .semantic-text {
     color: $dark-gray;
-
-    &.highlight {
-        color: $blue;
-    }
-
-    &.success {
-        color: $green;
-    }
-
-    &.error {
-        color: $red;
-    }
-
-    &.warning {
-        color: $yellow;
-    }
-
-    &.visited {
-        color: $purple;
-    }
-
-    &.strong {
-        color: $black;
-    }
-
-    &.disabled {
-        color: $gray;
-    }
+    @include _semantic_colors;
 }
 
 .semantic-background {
