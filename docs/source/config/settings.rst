@@ -20,6 +20,8 @@ config options, their name should be prefixed with an underscore; otherwise
 you will get a warning about unknowing config options being defined.
 
 
+.. _settings-auth:
+
 Authentication
 --------------
 
