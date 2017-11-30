@@ -24,6 +24,11 @@
     &.outline {
         @extend %semantic-outline;
         background: transparent;
+
+        @include _semantic_versions {
+            background: transparent;
+        }
+
         &.dashed {
             border-style: dashed;
         }
