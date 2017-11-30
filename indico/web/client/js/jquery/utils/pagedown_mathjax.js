@@ -4,7 +4,7 @@
 // General MathJax configuration
 (function() {
     if (!$('html').data('static-site')) {
-        MathJax.Ajax.config.root = Indico.Urls.Base + "/static/assets/webpack/mathjax";
+        MathJax.Ajax.config.root = Indico.Urls.Base + "/dist/js/mathjax";
     }
 })();
 

@@ -24,7 +24,7 @@ from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
 from flask_pluginengine import plugins_loaded
 from flask_sqlalchemy import models_committed
-from flask_webpackext import FlaskWebpackExt, current_webpack
+from flask_webpackext import FlaskWebpackExt
 from markupsafe import Markup
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
@@ -245,12 +245,14 @@ def setup_assets():
 
 
 def _get_webpack_config(app):
+    static_url_path = os.path.join(app.config['APPLICATION_ROOT'] or '/', app.static_url_path)
     return {
         'build': {
             'debug': app.debug,
-            'webpackPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
-            'webpackURL': app.config['WEBPACKEXT_PROJECT_DISTURL'],
-            'staticURL': app.config['WEBPACKEXT_STATIC_URL_PATH'],
+            'staticPath': app.static_folder,
+            'staticURL': static_url_path,
+            'distPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
+            'distURL': os.path.join(static_url_path, 'dist/'),
             'imagePath': os.path.join(app.root_path, 'htdocs', 'images')
         },
         'themes': theme_settings.themes
@@ -266,11 +268,7 @@ def setup_webpack(app):
     )
     app.config.update({
         'WEBPACKEXT_PROJECT': project,
-        'WEBPACKEXT_STATIC_DIR': app.config['INDICO']['ASSETS_DIR'],
-        'WEBPACKEXT_STATIC_URL_PATH': '/static/assets',
-        'WEBPACKEXT_PROJECT_DISTDIR': os.path.join(app.config['INDICO']['ASSETS_DIR'], 'webpack'),
-        'WEBPACKEXT_PROJECT_DISTURL': '/static/assets/webpack',
-        'WEBPACKEXT_MANIFEST_PATH': 'webpack/manifest.json'
+        'WEBPACKEXT_MANIFEST_PATH': os.path.join('dist', 'manifest.json')
     })
 
     FlaskWebpackExt(app)

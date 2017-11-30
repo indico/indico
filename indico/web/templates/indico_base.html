@@ -20,23 +20,20 @@
     {% endif %}
 
     <script>
-        window.CKEDITOR_BASEPATH = {{ url_for('assets.static_asset', folder='webpack', path='ckeditor/')|tojson() }};
+        window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
     </script>
 
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
-    <!-- Webpack bundles -->
     {% for bundle in bundles %}
         {{ bundle }}
     {% endfor %}
-    <!-- Printing -->
     {% for bundle in print_bundles %}
         {% for path in bundle._paths %}
             <link rel="stylesheet" type="text/css" media="print" href="{{ path }}">
         {% endfor %}
     {% endfor %}
-    <!-- end -->
 
     {% for url in js_files -%}
         <script type="text/javascript" src="{{ url }}"></script>
