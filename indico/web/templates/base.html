@@ -10,15 +10,13 @@
     <script type="text/javascript" src="{{ url_for('assets.i18n_locale', locale_name=session.lang) }}"></script>
     <script type="text/javascript" src="{{ url_for('assets.js_vars_global') }}"></script>
 
-    <!-- Webpack bundles -->
-        {{ webpack['common.js'] }}
-        {{ webpack['main.js'] }}
-        {{ webpack['main.css'] }}
-    <!-- end -->
-
     <script>
-        window.CKEDITOR_BASEPATH = {{ url_for('assets.static_asset', folder='webpack', path='ckeditor/')|tojson() }};
+        window.CKEDITOR_BASEPATH = {{ url_for('assets.dist', filename='js/ckeditor/')|tojson() }};
     </script>
+
+    {{ webpack['common.js'] }}
+    {{ webpack['main.js'] }}
+    {{ webpack['main.css'] }}
 
     {% assets 'base_js' -%}
     <script src="{{ ASSET_URL }}"></script>

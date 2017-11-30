@@ -114,6 +114,14 @@ class IndicoFlask(PluginFlaskMixin, Flask):
                 if handler is not None:
                     return handler
 
+    @property
+    def static_folder(self):
+        return os.path.join(self.root_path, 'web', 'static')
+
+    @property
+    def static_url_path(self):
+        return ''
+
 
 class IndicoBlueprintSetupState(BlueprintSetupState):
     @contextmanager

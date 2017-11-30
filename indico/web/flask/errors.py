@@ -16,13 +16,10 @@
 
 from __future__ import unicode_literals
 
-import os
-import re
-
-from flask import current_app, request, send_from_directory, session
+from flask import current_app, request, session
 from itsdangerous import BadData
 from sqlalchemy.exc import DatabaseError
-from werkzeug.exceptions import BadRequest, BadRequestKeyError, Forbidden, HTTPException, NotFound
+from werkzeug.exceptions import BadRequestKeyError, Forbidden, HTTPException
 
 from indico.core.errors import IndicoError, get_error_description
 from indico.core.logger import Logger, sentry_log_exception
@@ -34,26 +31,6 @@ from indico.web.flask.wrappers import IndicoBlueprint
 
 
 errors_bp = IndicoBlueprint('errors', __name__)
-
-
-@errors_bp.app_errorhandler(NotFound)
-def handle_notfound(exc):
-    try:
-        if re.search(r'\.py(?:/\S+)?$', request.path):
-            # While not dangerous per se, we never serve *.py files as static
-            raise NotFound
-        htdocs = os.path.join(current_app.root_path, 'htdocs')
-        try:
-            return send_from_directory(htdocs, request.path[1:], conditional=True)
-        except (UnicodeEncodeError, BadRequest):
-            raise NotFound
-    except NotFound:
-        if exc.description == NotFound.description:
-            # The default reason is too long and not localized
-            description = get_error_description(exc)
-        else:
-            description = exc.description
-        return render_error(exc, _('Not Found'), description, exc.code)
 
 
 @errors_bp.app_errorhandler(Forbidden)

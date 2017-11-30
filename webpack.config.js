@@ -24,18 +24,13 @@ const ManifestPlugin = require('webpack-manifest-plugin');
 const glob = require('glob');
 const uglify = require('uglify-js');
 
-const _cssLoaderOptions = {
-    alias: {
-        '../images': config.build.imagePath
-    },
-    sourceMap: true
-};
-
-// Make sure path has a single trailing slash
-config.build.webpackURL = config.build.webpackURL.replace(/\/$/, '') + '/';
-
 const clientDir = path.join(__dirname, 'indico', 'web', 'client');
 const modulesDir = path.join(__dirname, 'node_modules');
+
+const _cssLoaderOptions = {
+    root: config.build.staticPath,
+    sourceMap: true
+};
 
 const entryPoints = {
     main: './js/index.js',
@@ -44,7 +39,8 @@ const entryPoints = {
     map_of_rooms: './styles/legacy/mapofrooms.css',
     markdown: './js/jquery/markdown.js',
     mathjax: './js/jquery/compat/mathjax.js',
-    statistics: './js/jquery/statistics.js'
+    statistics: './js/jquery/statistics.js',
+    fonts: './styles/partials/_fonts.scss'
 };
 
 const resolveAlias = [
@@ -103,9 +99,9 @@ module.exports = env => {
         context: clientDir,
         entry: entryPoints,
         output: {
-            path: config.build.webpackPath,
-            filename: "[name].bundle.js",
-            publicPath: config.build.webpackURL
+            path: config.build.distPath,
+            filename: "js/[name].bundle.js",
+            publicPath: config.build.distURL
         },
         module: {
             rules: [
@@ -123,7 +119,9 @@ module.exports = env => {
                     use: {
                         loader: 'file-loader',
                         options: {
-                            name: '[path][name].[ext]'
+                            name: '[path][name].[ext]',
+                            context: config.build.distPath,
+                            outputPath: 'mod_assets/'
                         }
                     }
                 },
@@ -160,11 +158,24 @@ module.exports = env => {
                     })
                 },
                 {
-                    test: /\.(jpe?g|png|gif|svg)$/,
+                    test: /\/static\/(images|fonts)\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|svg|eot)$/,
                     use: {
                         loader: 'file-loader',
                         options: {
-                            name: '[path]/[name].[ext]'
+                            name: '[path][name].[ext]',
+                            context: config.build.staticPath,
+                            emitFile: false
+                        }
+                    }
+                },
+                {
+                    test: /\/node_modules\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|svg|eot)$/,
+                    use: {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]',
+                            context: config.build.distPath,
+                            outputPath: 'mod_assets/'
                         }
                     }
                 }
@@ -173,7 +184,7 @@ module.exports = env => {
         plugins: [
             new ManifestPlugin({
                 fileName: 'manifest.json',
-                publicPath: config.build.webpackURL
+                publicPath: config.build.distURL
             }),
             new webpack.ProvidePlugin({
                 $: 'jquery',
@@ -187,14 +198,14 @@ module.exports = env => {
             // Do not load moment locales (we'll load them explicitly)
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
             new ExtractTextPlugin({
-                filename: '[name].css'
+                filename: 'css/[name].css'
             }),
             new webpack.EnvironmentPlugin({
                 NODE_ENV: currentEnv
             }),
             new CopyWebpackPlugin([
-                {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'ckeditor', transform},
-                {from: path.resolve(modulesDir, 'mathjax'), to: 'mathjax', transform}
+                {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'js/ckeditor', transform},
+                {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}
             ])
         ],
         resolve: {

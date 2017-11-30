@@ -60,7 +60,7 @@ ndRegForm.value('fieldDefaults', {
 });
 
 ndRegForm.config(function(urlProvider) {
-    urlProvider.setModulePath('/static/assets/webpack/_/_/modules/events/registration/js/form');
+    urlProvider.setModulePath('/dist/mod_assets/_/_/_/modules/events/registration/js/form');
 });
 
 ndRegForm.factory('regFormFactory', function($resource, $http, editionURL, displayurl, fieldDefaults) {

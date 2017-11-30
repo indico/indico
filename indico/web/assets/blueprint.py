@@ -30,11 +30,24 @@ from indico.web.assets.vars_js import generate_global_file
 from indico.web.flask.util import send_file, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
-
 assets_blueprint = IndicoBlueprint('assets', __name__, url_prefix='/assets')
+
 assets_blueprint.add_url_rule('!/css/<path:filename>', 'css', build_only=True)
 assets_blueprint.add_url_rule('!/images/<path:filename>', 'image', build_only=True)
-assets_blueprint.add_url_rule('!/js/<path:filename>', 'js', build_only=True)
+assets_blueprint.add_url_rule('!/fonts/<path:filename>', 'fonts', build_only=True)
+assets_blueprint.add_url_rule('!/dist/<path:filename>', 'dist', build_only=True)
+
+
+@assets_blueprint.route('!/<folder>/<path:filename>')
+def folder_file(folder, filename):
+    assets_dir = os.path.join(current_app.root_path, 'web', 'static')
+    return send_from_directory(assets_dir, os.path.join(folder, filename))
+
+
+@assets_blueprint.route('!/<filename>')
+def root(filename):
+    assets_dir = os.path.join(current_app.root_path, 'web', 'static')
+    return send_from_directory(assets_dir, filename)
 
 
 @assets_blueprint.route('/js-vars/global.js')
