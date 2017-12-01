@@ -15,7 +15,7 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global ChooseUsersPopup:false */
+/* global ChooseUsersPopup:false, Palette:false */
 
 (function($) {
     'use strict';
@@ -185,8 +185,11 @@
                 this.data.push([principal, permissions]);
                 this._update();
                 this._render();
+                var newIdx = this._findEntryIndex(principal);
+                this.$permissionsWidgetList.find('>li').not('.disabled').eq(newIdx)
+                    .effect('highlight', {color: Palette.highlight}, 'slow');
             } else {
-                this.$permissionsWidgetList.find('>li').eq(idx).qtip({
+                this.$permissionsWidgetList.find('>li').not('.disabled').eq(idx).qtip({
                     content: {
                         text: $T('This entry was already added')
                     },
