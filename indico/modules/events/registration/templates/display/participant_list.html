@@ -7,7 +7,7 @@
 {% from 'message_box.html' import message_box %}
 
 {% block title %}
-    {% trans %}Participant List{% endtrans %}
+    {% if page_title %}{{ page_title }}{% else %}{% trans %}Participant List{% endtrans %}{% endif %}
 {% endblock %}
 
 {% block subtitle %}

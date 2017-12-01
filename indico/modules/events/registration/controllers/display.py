@@ -25,6 +25,7 @@ from werkzeug.exceptions import Forbidden, NotFound
 
 from indico.modules.auth.util import redirect_to_login
 from indico.modules.events.controllers.base import RHDisplayEventBase
+from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.models.events import EventType
 from indico.modules.events.payment import payment_event_settings
 from indico.modules.events.registration import registration_settings
@@ -164,6 +165,7 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
                 'show_checkin': any(registration['checked_in'] for registration in registrations)}
 
     def _process(self):
+        page_title = get_menu_entry_by_name('participants', self.event).localized_title
         regforms = (RegistrationForm.query.with_parent(self.event)
                     .filter(RegistrationForm.publish_registrations_enabled,
                             ~RegistrationForm.is_deleted)
@@ -196,7 +198,8 @@ class RHParticipantList(RHRegistrationFormDisplayBase):
             regforms=regforms,
             tables=tables,
             published=published,
-            num_participants=num_participants
+            num_participants=num_participants,
+            page_title=page_title
         )
 
 
