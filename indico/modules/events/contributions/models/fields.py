@@ -20,8 +20,11 @@ from sqlalchemy.dialects.postgresql import JSON
 from sqlalchemy.ext.declarative import declared_attr
 
 from indico.core.db import db
+from indico.core.db.sqlalchemy import PyIntEnum
+from indico.util.i18n import _
 from indico.util.locators import locator_property
 from indico.util.string import format_repr, return_ascii, text_to_repr
+from indico.util.struct.enum import RichIntEnum
 
 
 def _get_next_position(context):
@@ -29,6 +32,13 @@ def _get_next_position(context):
     event_id = context.current_parameters['event_id']
     res = db.session.query(db.func.max(ContributionField.position)).filter_by(event_id=event_id).one()
     return (res[0] or 0) + 1
+
+
+class FieldVisibility(RichIntEnum):
+    __titles__ = [None, _('Everyone'), _('Managers and submitters'), _('Only managers')]
+    public = 1
+    managers_and_submitters = 2
+    managers_only = 3
 
 
 class ContributionField(db.Model):
@@ -70,6 +80,16 @@ class ContributionField(db.Model):
         default=False
     )
     is_active = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
+    visibility = db.Column(
+        PyIntEnum(FieldVisibility),
+        nullable=False,
+        default=FieldVisibility.public
+    )
+    user_editable = db.Column(
         db.Boolean,
         nullable=False,
         default=True

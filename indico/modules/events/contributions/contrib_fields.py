@@ -19,12 +19,13 @@ from __future__ import unicode_literals
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
-from indico.modules.events.contributions.models.fields import ContributionField
+from indico.modules.events.contributions.models.fields import ContributionField, FieldVisibility
 from indico.util.i18n import _
 from indico.web.fields import BaseField, get_field_definitions
 from indico.web.fields.choices import SingleChoiceField
 from indico.web.fields.simple import TextField
 from indico.web.forms.base import IndicoForm
+from indico.web.forms.fields import IndicoEnumRadioField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -41,11 +42,17 @@ class ContribFieldConfigForm(IndicoForm):
     is_active = BooleanField(_('Active'), widget=SwitchWidget(),
                              description=_("Whether the field is available."),
                              default=True)
+    user_editable = BooleanField(_('User editable'), widget=SwitchWidget(),
+                                 description=_("Whether the field is filled by user on abstract submission."),
+                                 default=True)
+    visibility = IndicoEnumRadioField(_('Visibility'), [DataRequired()], default=FieldVisibility.public,
+                                      enum=FieldVisibility,
+                                      description=_('Who will be able to see the field'))
 
 
 class ContribField(BaseField):
     config_form_base = ContribFieldConfigForm
-    common_settings = ('title', 'description', 'is_required', 'is_active')
+    common_settings = ('title', 'description', 'is_required', 'is_active', 'user_editable', 'visibility')
 
     def __init__(self, obj, management=True):
         super(ContribField, self).__init__(obj)
