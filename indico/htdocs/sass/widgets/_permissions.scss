@@ -27,6 +27,10 @@
 
     & > li {
         padding: 0.25em 0;
+
+        &.disabled {
+            @include opacity(0.5);
+        }
     }
 
     ul {

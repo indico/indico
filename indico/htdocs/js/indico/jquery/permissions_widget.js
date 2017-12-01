@@ -59,10 +59,12 @@
                     iconClass = 'icon-user';
                 } else if (type === 'Email') {
                     iconClass = 'icon-mail';
+                } else if (type === 'DefaultEntry' && principal.id === 'anonymous') {
+                    iconClass = 'icon-question';
                 } else {
                     iconClass = 'icon-users';
                 }
-                var text = type === 'Avatar' ? principal.name : principal.id;
+                var text = _.contains(['Avatar', 'DefaultEntry'], type) ? principal.name : principal.id;
                 $labelBox.addClass('entry-label');
                 return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
@@ -75,37 +77,42 @@
                 $permissionsList.append($('<li>', {class: 'i-label bold ' + permissionClasses[item]}).append(item));
             });
 
-            var $buttonsGroup = $('<div>', {class: 'group flexrow'});
-            var $permissionsEditBtn = $('<button>', {
-                'type': 'button',
-                'class': 'i-button text-color borderless icon-only icon-edit',
-                'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
-                'data-title': $T.gettext('Assign Permissions'),
-                'data-ajax-dialog': '',
-                'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
-            });
-
-            var $entryDeleteBtn = $('<button>', {
-                'type': 'button',
-                'class': 'i-button text-color borderless icon-only icon-remove',
-                'data-principal': JSON.stringify(principal)
-            }).on('click', function() {
-                var $this = $(this);
-                var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
-                var message = $T.gettext("Are you sure you want to permanently delete this entry?");
-                confirmPrompt(message, title).then(function() {
-                    self._updateItem($this.data('principal'), []);
+            if (principal._type !== 'DefaultEntry') {
+                var $buttonsGroup = $('<div>', {class: 'group flexrow'});
+                var $permissionsEditBtn = $('<button>', {
+                    'type': 'button',
+                    'class': 'i-button text-color borderless icon-only icon-edit',
+                    'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
+                    'data-title': $T.gettext('Assign Permissions'),
+                    'data-ajax-dialog': '',
+                    'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
                 });
-            });
 
-            $buttonsGroup.append($permissionsEditBtn, $entryDeleteBtn);
-            $buttonsGroup.appendTo($permissions);
+                var $entryDeleteBtn = $('<button>', {
+                    'type': 'button',
+                    'class': 'i-button text-color borderless icon-only icon-remove',
+                    'data-principal': JSON.stringify(principal)
+                }).on('click', function() {
+                    var $this = $(this);
+                    var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
+                    var message = $T.gettext("Are you sure you want to permanently delete this entry?");
+                    confirmPrompt(message, title).then(function() {
+                        self._updateItem($this.data('principal'), []);
+                    });
+                });
+
+                $buttonsGroup.append($permissionsEditBtn, $entryDeleteBtn);
+                $buttonsGroup.appendTo($permissions);
+            }
             return $permissions;
         },
         _renderItem: function(item) {
             var $item = $('<li>', {class: 'flexrow f-a-center'});
-            $item.append(this._renderLabel(item[0]));
-            $item.append(this._renderPermissions(item[0], item[1]));
+            var principal = item[0];
+            var permissions = item[1];
+            $item.append(this._renderLabel(principal));
+            $item.append(this._renderPermissions(principal, permissions));
+            $item.toggleClass('disabled ' + principal.id, principal._type === 'DefaultEntry');
             return $item;
         },
         _renderRoleDropdown: function() {
@@ -146,6 +153,15 @@
             this.data.forEach(function(item) {
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
+            // Add default entries
+            var categoryManagers = [{
+                _type: 'DefaultEntry', name: $T('Category Managers'), id: 'category-managers'
+            }, ['edit']];
+            var anonymous = [{_type: 'DefaultEntry', name: $T('Anonymous'), id: 'anonymous'}, ['access']];
+            self.$permissionsWidgetList.prepend(self._renderItem(categoryManagers));
+            self.$permissionsWidgetList.append(self._renderItem(anonymous));
+            self.$permissionsWidgetList.find('.anonymous').toggle(!self.isEventProtected);
+
             this._renderRoleDropdown();
         },
         _findEntryIndex: function(principal) {
@@ -229,6 +245,11 @@
 
             this.element.on('indico:permissionsChanged', function(evt, permissions, principal) {
                 self._updateItem(principal, permissions);
+            });
+
+            this.element.on('indico:protectionModeChanged', function(evt, isProtected) {
+                self.isEventProtected = isProtected;
+                self._render();
             });
 
             $('.js-add-user-group').on('click', function() {
