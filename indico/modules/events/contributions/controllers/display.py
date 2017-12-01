@@ -105,8 +105,10 @@ class RHContributionList(RHDisplayProtectionBase):
         self.list_generator = ContributionDisplayListGenerator(event=self.event)
 
     def _process(self):
+        page_title = get_menu_entry_by_name(self.MENU_ENTRY_NAME, self.event).localized_title
+
         return self.view_class.render_template('display/contribution_list.html', self.event,
-                                               timezone=self.event.display_tzinfo,
+                                               timezone=self.event.display_tzinfo, page_title=page_title,
                                                **self.list_generator.get_list_kwargs())
 
 

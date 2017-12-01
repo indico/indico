@@ -4,7 +4,7 @@
 {% from 'events/management/_lists.html' import render_displayed_entries_fragment %}
 
 {% block title %}
-    {% trans %}Contribution List{% endtrans %}
+    {% if page_title %}{{ page_title }}{% else %}{% trans %}Contribution List{% endtrans %}{% endif %}
 {% endblock %}
 
 {% block content -%}
