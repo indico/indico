@@ -20,6 +20,7 @@ import posixpath
 
 from flask import render_template, request
 from sqlalchemy.orm import load_only
+from werkzeug.utils import cached_property
 
 from indico.modules.admin.views import WPAdmin
 from indico.modules.core.settings import core_settings, social_settings
@@ -216,6 +217,7 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_
         kwargs['conf_layout_params'] = self._get_layout_params()
+        kwargs['page_title'] = self.sidemenu_title
         WPEventBase.__init__(self, rh, event_, **kwargs)
 
     def _get_layout_params(self):
@@ -239,14 +241,22 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     def _getHeader(self):
         return render_event_header(self.event, conference_layout=True).encode('utf-8')
 
-    @property
-    def sidemenu_option(self):
+    @cached_property
+    def sidemenu_entry(self):
         if not self.menu_entry_name:
             return None
         name = build_menu_entry_name(self.menu_entry_name, self.menu_entry_plugin)
-        entry = get_menu_entry_by_name(name, self.event)
-        if entry:
-            return entry.id
+        return get_menu_entry_by_name(name, self.event)
+
+    @cached_property
+    def sidemenu_option(self):
+        entry = self.sidemenu_entry
+        return entry.id if entry else None
+
+    @cached_property
+    def sidemenu_title(self):
+        entry = self.sidemenu_entry
+        return entry.localized_title if entry else ''
 
     def _getHeadContent(self):
         return '\n'.join([

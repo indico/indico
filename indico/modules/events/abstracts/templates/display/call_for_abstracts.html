@@ -6,7 +6,7 @@
 {% from 'events/reviews/_common.html' import render_timeline_section %}
 
 {% block title %}
-    {%- trans %}Call for Abstracts{% endtrans -%}
+    {{- page_title -}}
 {% endblock %}
 
 {% macro render_user_abstract_list(event, abstracts) %}

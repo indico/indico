@@ -6,10 +6,6 @@
 {% from 'events/reviews/_common.html' import render_timeline_section %}
 {% from 'message_box.html' import message_box %}
 
-{% block title %}
-    {%- trans %}Call for Papers{% endtrans -%}
-{% endblock %}
-
 {% block content %}
     <div class="call-for-papers">
         {% set cfp = event.cfp %}

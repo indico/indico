@@ -48,6 +48,7 @@ Improvements
 - Add user setting whether to show future events or not by default in a
   category. Also keep the per-category status in the session (:issue:`3233`,
   thanks :user:`bpedersen2`)
+- Keep page titles in sync with conference menu item titles (:issue:`3236`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -25,7 +25,6 @@ from indico.legacy.pdfinterface.conference import ContribsToPDF, ContribToPDF
 from indico.modules.events.abstracts.util import filter_field_values
 from indico.modules.events.contributions.lists import ContributionDisplayListGenerator
 from indico.modules.events.contributions.models.contributions import Contribution
-from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
 from indico.modules.events.contributions.models.persons import AuthorType, ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.util import (get_contribution_ical_file,
