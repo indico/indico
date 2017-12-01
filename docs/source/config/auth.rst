@@ -124,5 +124,161 @@ provider that can use the username from either SSO or the LDAP login.
 In this case you would link both authentication providers to the same
 identity provider.
 
+Specific providers
+------------------
+
+LDAP
+^^^^
+
+The ``ldap`` authentication/identity providers are available by default,
+but to use them you need to install the ``python-ldap`` library using
+``pip install python-ldap``.
+
+.. note::
+
+    ``python-ldap`` has some extra system dependencies (openldap and
+    libsasl). How to install them (apt, yum, etc.) depends on your linux
+    distribution.  The package names are usually ``libsasl2-dev`` or
+    ``libsasl-dev`` and ``openldap-dev`` (or ``-devel`` on some distros).
+    If one of these libraries is missing, ``pip`` will fail when
+    installing ``python-ldap``. Simply re-run the command after
+    installing the missing library.
+
+Once everything is installed, you can add the LDAP-related settings to
+your ``indico.conf``. Below is an example based on the LDAP config we
+use at CERN with Active Directory; you can copy this as a starting point
+for your own config and then adapt it to your own environment:
+
+.. code-block:: python
+
+    _ldap_config = {
+        'uri': 'ldaps://...',
+        'bind_dn': 'cn=***,OU=Users,OU=Organic Units,DC=cern,DC=ch',
+        'bind_password': '***',
+        'timeout': 30,
+        'verify_cert': True,
+        'page_size': 1500,
+
+        'uid': 'cn',
+        'user_base': 'DC=cern,DC=ch',
+        'user_filter': '(objectCategory=user)',
+
+        'gid': 'cn',
+        'group_base': 'OU=Workgroups, DC=cern, DC=ch',
+        'group_filter': '(objectCategory=group)',
+        'member_of_attr': 'memberOf',
+        'ad_group_style': True
+    }
+
+
+    AUTH_PROVIDERS = {
+        'ldap': {
+            'type': 'ldap',
+            'title': 'LDAP',
+            'ldap': _ldap_config,
+            'default': True
+        }
+    }
+
+    IDENTITY_PROVIDERS = {
+        'ldap': {
+            'type': 'ldap',
+            'title': 'LDAP',
+            'ldap': _ldap_config,
+            'mapping': {
+                'first_name': 'givenName',
+                'last_name': 'sn',
+                'email': 'mail',
+                'affiliation': 'company',
+                'phone': 'telephoneNumber'
+            },
+            'trusted_email': True,
+            'default_group_provider': True,
+            'synced_fields': {'first_name', 'last_name', 'affiliation', 'phone', 'address'}
+        }
+    }
+
+The LDAP-specific config uses the following keys:
+
+- ``uri`` -- **Required.**
+  The URI referring to the LDAP server including the protocol and the
+  port.  Use ``ldaps://`` for LDAP over SSL/TLS and ``ldap://`` with
+  the ``starttls`` option for a plain LDAP connection with TLS negotiation.
+  The port can be omitted if the LDAP server listens on the default port
+  (636 for LDAP over SSL and 389 for a plain LDAP connection with TLS
+  negotiation).
+- ``bind_dn`` -- **Required.**
+  The distinguished name to bind to the LDAP directory.
+- ``bind_password`` -- **Required**.
+  The password to use together with the ``bind_dn`` to login to the
+  LDAP server.
+- ``timeout`` --
+  The delay in seconds to wait for a reply from the LDAP server (set
+  to ``-1`` to disable).
+  Default: ``30``
+- ``verify_cert`` --
+  Whether to verify the TLS certificate of the LDAP server.
+  Default: ``True``
+- ``starttls`` --
+  Whether to use STARTTLS to switch to an encrypted connection.
+  Ignored with an ``ldaps://`` URI.
+  Default: ``False``
+- ``page_size`` --
+  The limit of entries to retrieve at once for a search.
+  ``0`` means no size limit.  It is recommended to have at most the
+  size limit imposed by the server.
+  Default: ``1000``
+- ``uid`` --
+  The attribute whose value is used as an identifier for the user
+  (typically the username).  This attribute must be a single-valued
+  attribute whose value is unique for each user. If the attribute is
+  multi-valued, only the first one retrieved will be returned.
+  Default: ``'uid'``
+- ``user_base`` -- **Required.**
+  The base node for all the nodes which might contain a user.
+- ``user_filter`` --
+  A valid LDAP filter which will select exclusively all users in the
+  subtree from the ``user_base``.  The combination of the ``user_base``
+  and the ``user_filter`` must match exclusively all the users.
+  Default: ``'(objectClass=person)'``
+- ``gid`` --
+  The attribute whose value is used as an identifier for the group
+  (typically the group's name).  This attribute must be a single-valued
+  attribute whose value is unique for each group. If the attribute is
+  multi-valued, only the first one retrieved will be returned.
+  Default: ``'cn'``
+- ``group_base`` -- **Required.**
+  The base node for all the nodes which might contain a group.
+- ``group_filter`` --
+  A valid LDAP filter which will select exclusively all groups in the
+  subtree from the ``group_base``.  The combination of the ``group_base``
+  and the ``group_filter`` must match exclusively all the groups.
+  Default: ``'(objectClass=groupOfNames)'``
+- ``member_of_attr`` --
+  The multi-valued attribute of a user containing the list of groups
+  the user is a member of.
+  Default: ``'memberOf'``
+
+  .. note::
+
+      In case of SLAPD/OpenLDAP, the *member of* attribute must be enabled.
+      While it is not enabled by default, the majority of servers will
+      have it enabled.  A simple ``ldapsearch`` for a user member of any
+      group should show if that is the case.  If not, you can check
+      `this article`_ on information how to enable it on your LDAP server.
+      Note that unless you manage the LDAP server, you need to ask the
+      administrator of that server to do that.
+- ``ad_group_style`` --
+  Whether the server uses Active-Directory-style groups or not.
+  This is only used when checking if a user is a member of a group.
+  If enabled, the code will take advantage of the ``tokenGroups``
+  attribute of a user to check for nested group membership.
+  Otherwise, it will only look through the values of the ``member_of_attr``,
+  which should also work for Active Directory, but only for direct
+  membership.
+  Default: ``False``
+
+
 
 .. _Flask-Multipass: https://flask-multipass.readthedocs.io
+.. _this article: https://www.adimian.com/blog/2014/10/how-to-enable-memberof-using-openldap/
