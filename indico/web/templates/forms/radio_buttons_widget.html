@@ -3,7 +3,7 @@
 {% set vertical_alignment = field.option_orientation == 'vertical' %}
 
 {% block html %}
-    <div class="{{ 'i-group' if vertical_alignment else 'group i-selection' }}">
+    <div id="{{ field.id }}" class="{{ 'i-group' if vertical_alignment else 'group i-selection' }}">
         {% for subfield in field %}
             <div class="{{ 'i-radio' if vertical_alignment else 'inline-vcentered'}} radio-item-{{ loop.index0 }}">
                 {{ subfield(**input_args) }}
@@ -11,4 +11,18 @@
             </div>
         {% endfor %}
     </div>
+{% endblock %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+
+            $('#{{ field.id }} input').on('invalid', function(evt) {
+                evt.preventDefault();
+
+                $('#{{ field.id }} div:last-child').stickyTooltip('warning', this.validationMessage);
+            });
+        })();
+    </script>
 {% endblock %}
