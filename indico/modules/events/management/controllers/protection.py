@@ -99,7 +99,8 @@ class RHEventProtection(RHEventProtectionBase):
             permission_principals = defaultdict(set)
             for principal_data in form.permissions.data:
                 for permission in principal_data[1]:
-                    permission_principals[permission].add(principal_from_fossil(principal_data[0], allow_emails=True))
+                    permission_principals[permission].add(principal_from_fossil(principal_data[0], allow_emails=True,
+                                                                                allow_networks=True))
             for permission in self.whitelisted_permissions:
                 if permission == 'edit':
                     update_object_principals(self.event, permission_principals.get(permission, set()), full_access=True)

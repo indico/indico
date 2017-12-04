@@ -15,11 +15,14 @@
                         <a href="#" class="i-button borderless js-add-user-group">
                             {%- trans %}User / Group{% endtrans -%}
                         </a>
-                        <a href="#" class="i-button borderless ">{% trans %}IP Network{% endtrans %}</a>
                         <a href="#" class="i-button borderless arrow js-dropdown" data-toggle="dropdown">
                             {%- trans %}Role{% endtrans -%}
                         </a>
-                        <ul class="dropdown entry-role-dropdown" data-event-roles='{{ field.roles|tojson }}'></ul>
+                        <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson }}'></ul>
+                        <a href="#" class="i-button borderless arrow js-dropdown" data-toggle="dropdown">
+                            {%- trans %}IP Network{% endtrans -%}
+                        </a>
+                        <ul class="dropdown entry-ip-network-dropdown" data-items='{{ field.ip_networks|tojson }}'></ul>
                     </div>
                 </div>
             </div>

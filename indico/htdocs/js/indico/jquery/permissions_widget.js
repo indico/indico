@@ -61,10 +61,13 @@
                     iconClass = 'icon-mail';
                 } else if (type === 'DefaultEntry' && principal.id === 'anonymous') {
                     iconClass = 'icon-question';
+                } else if (type === 'IPNetworkGroup') {
+                    iconClass = 'icon-lan';
                 } else {
                     iconClass = 'icon-users';
                 }
-                var text = _.contains(['Avatar', 'DefaultEntry'], type) ? principal.name : principal.id;
+                var labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
+                var text = labelIsName ? principal.name : principal.id;
                 $labelBox.addClass('entry-label');
                 return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
             }
@@ -79,14 +82,17 @@
 
             if (principal._type !== 'DefaultEntry') {
                 var $buttonsGroup = $('<div>', {class: 'group flexrow'});
-                var $permissionsEditBtn = $('<button>', {
-                    'type': 'button',
-                    'class': 'i-button text-color borderless icon-only icon-edit',
-                    'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
-                    'data-title': $T.gettext('Assign Permissions'),
-                    'data-ajax-dialog': '',
-                    'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
-                });
+                if (principal._type !== 'IPNetworkGroup') {
+                    var $permissionsEditBtn = $('<button>', {
+                        'type': 'button',
+                        'class': 'i-button text-color borderless icon-only icon-edit',
+                        'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
+                        'data-title': $T.gettext('Assign Permissions'),
+                        'data-ajax-dialog': '',
+                        'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
+                    });
+                    $buttonsGroup.append($permissionsEditBtn);
+                }
 
                 var $entryDeleteBtn = $('<button>', {
                     'type': 'button',
@@ -101,7 +107,7 @@
                     });
                 });
 
-                $buttonsGroup.append($permissionsEditBtn, $entryDeleteBtn);
+                $buttonsGroup.append($entryDeleteBtn);
                 $buttonsGroup.appendTo($permissions);
             }
             return $permissions;
@@ -115,36 +121,45 @@
             $item.toggleClass('disabled ' + principal.id, principal._type === 'DefaultEntry');
             return $item;
         },
-        _renderRoleDropdown: function() {
+        _renderDropdown: function($dropdown) {
             var self = this;
-            self.$roleDropdown.empty();
-            var $roleDropdownLink = self.$roleDropdown.siblings('.js-dropdown');
-            var eventRoles = self.$roleDropdown.data('event-roles');
-            if (eventRoles.length) {
-                eventRoles.forEach(function(role) {
-                    if (self._findEntryIndex(role) === -1) {
-                        self.$roleDropdown.append(self._renderRoleDropdownItem(role));
+            $dropdown.empty();
+            var $dropdownLink = $dropdown.prev('.js-dropdown');
+            var items = $dropdown.data('items');
+            var isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
+            var tooltip;
+            if (items.length) {
+                items.forEach(function(item) {
+                    if (self._findEntryIndex(item) === -1) {
+                        $dropdown.append(self._renderDropdownItem(item));
                     }
                 });
-                if (!self.$roleDropdown.children().length) {
-                    $roleDropdownLink.addClass('disabled').attr('title', $T('All event roles were added'));
+                if (!$dropdown.children().length) {
+                    tooltip = isRoleDropdown ? $T('All event roles were added') : $T('All IP Networks were added');
+                    $dropdownLink.addClass('disabled').attr('title', tooltip);
                 } else {
-                    $roleDropdownLink.removeClass('disabled');
+                    $dropdownLink.removeClass('disabled');
                 }
             } else {
-                $roleDropdownLink.addClass('disabled').attr('title', $T('No roles created in this event'));
+                tooltip = isRoleDropdown ? $T('No roles created in this event') : $T('No IP Networks created');
+                $dropdownLink.addClass('disabled').attr('title', tooltip);
             }
         },
-        _renderRoleDropdownItem: function(role) {
+        _renderDropdownItem: function(principal) {
             var self = this;
-            var $roleDropdownItem = $('<li>', {'class': 'role-item js-add-role', 'data-role': JSON.stringify(role) });
-            var $code = this._renderRoleCode(role.code, role.color);
-            var $text = $('<span>', {text: role.name});
-            $roleDropdownItem.append($('<a>').append($code).append($text)).on('click', function() {
-                self._addRole($(this).data('role'));
+            var $dropdownItem = $('<li>', {'class': 'entry-item', 'data-principal': JSON.stringify(principal)});
+            var $itemContent = $('<a>');
+            if (principal._type === 'EventRole') {
+                var $code = this._renderRoleCode(principal.code, principal.color);
+                $itemContent.append($code);
+            }
+            var $text = $('<span>', {text: principal.name});
+            $dropdownItem.append($itemContent.append($text)).on('click', function() {
+                // Grant 'access' permissions when a role / IP Network is added.
+                self._addItem($(this).data('principal'), ['access']);
                 $('#permissions-add-entry-menu-target').qbubble('hide');
             });
-            return $roleDropdownItem;
+            return $dropdownItem;
         },
         _render: function() {
             var self = this;
@@ -162,7 +177,8 @@
             self.$permissionsWidgetList.append(self._renderItem(anonymous));
             self.$permissionsWidgetList.find('.anonymous').toggle(!self.isEventProtected);
 
-            this._renderRoleDropdown();
+            this._renderDropdown(this.$roleDropdown);
+            this._renderDropdown(this.$ipNetworkDropdown);
         },
         _findEntryIndex: function(principal) {
             return _.findIndex(this.data, function(item) {
@@ -234,15 +250,12 @@
 
             dialog.execute();
         },
-        _addRole: function(role) {
-            // Grant 'access' permissions when a role is added for the first time.
-            this._addItem(role, ['access']);
-        },
         _create: function() {
             var self = this;
             this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
             this.$dataField = this.element.find('input[type=hidden]');
             this.$roleDropdown = this.element.find('.entry-role-dropdown');
+            this.$ipNetworkDropdown = this.element.find('.entry-ip-network-dropdown');
             this.data = JSON.parse(this.$dataField.val());
             this._render();
 

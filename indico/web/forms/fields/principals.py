@@ -132,6 +132,7 @@ class PermissionsField(JSONField):
 
     def __init__(self, *args, **kwargs):
         super(PermissionsField, self).__init__(*args, **kwargs)
+        self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
 
     @property
     def event(self):
