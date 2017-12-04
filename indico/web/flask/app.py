@@ -24,7 +24,6 @@ from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
 from flask_pluginengine import plugins_loaded
 from flask_sqlalchemy import models_committed
-from flask_webpackext import FlaskWebpackExt
 from markupsafe import Markup
 from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
@@ -46,10 +45,10 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
+from indico.core.webpack import _get_webpack_config, webpack
 from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
-from indico.modules.events.layout import theme_settings
 from indico.modules.oauth import oauth
 from indico.util import date_time as date_time_util
 from indico.util.i18n import _, babel, get_current_locale, gettext_context, ngettext_context
@@ -102,6 +101,7 @@ def configure_app(app, set_path=False):
     configure_xsendfile(app, config.STATIC_FILE_METHOD)
     if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app)
+    configure_webpack(app)
 
 
 def configure_multipass(app, config):
@@ -132,6 +132,19 @@ def configure_multipass_local(app):
         'identity_info_keys': {}
     }
     app.config['MULTIPASS_PROVIDER_MAP']['indico'] = 'indico'
+
+
+def configure_webpack(app):
+    pkg_path = os.path.dirname(get_root_path('indico'))
+    project = WebpackBundleProject(
+        pkg_path,
+        config=lambda: _get_webpack_config(app),
+        config_path=os.path.join(pkg_path, 'config.json')
+    )
+    app.config.update({
+        'WEBPACKEXT_PROJECT': project,
+        'WEBPACKEXT_MANIFEST_PATH': os.path.join('dist', 'manifest.json')
+    })
 
 
 def configure_xsendfile(app, method):
@@ -242,36 +255,6 @@ def setup_assets():
     ASSETS_REGISTERED = True
     register_all_js(core_env)
     register_all_css(core_env)
-
-
-def _get_webpack_config(app):
-    static_url_path = os.path.join(app.config['APPLICATION_ROOT'] or '/', app.static_url_path)
-    return {
-        'build': {
-            'debug': app.debug,
-            'staticPath': app.static_folder,
-            'staticURL': static_url_path,
-            'distPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
-            'distURL': os.path.join(static_url_path, 'dist/'),
-            'imagePath': os.path.join(app.root_path, 'htdocs', 'images')
-        },
-        'themes': theme_settings.themes
-    }
-
-
-def setup_webpack(app):
-    pkg_path = os.path.dirname(get_root_path('indico'))
-    project = WebpackBundleProject(
-        pkg_path,
-        config=lambda: _get_webpack_config(app),
-        config_path=os.path.join(pkg_path, 'config.json')
-    )
-    app.config.update({
-        'WEBPACKEXT_PROJECT': project,
-        'WEBPACKEXT_MANIFEST_PATH': os.path.join('dist', 'manifest.json')
-    })
-
-    FlaskWebpackExt(app)
 
 
 def configure_db(app):
@@ -392,7 +375,6 @@ def make_app(set_path=False, testing=False, config_override=None):
 
         core_env.init_app(app)
         setup_assets()
-        setup_webpack(app)
 
         configure_db(app)
         mm.init_app(app)
@@ -401,6 +383,7 @@ def make_app(set_path=False, testing=False, config_override=None):
         setup_request_stats(app)
         add_blueprints(app)
         plugin_engine.init_app(app, Logger.get('plugins'))
+        webpack.init_app(app)
         if not plugin_engine.load_plugins(app):
             raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
         # Below this points plugins are available, i.e. sending signals makes sense

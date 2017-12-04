@@ -15,17 +15,22 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-const config = require('./config');
+const crypto = require('crypto');
+const fs = require('fs');
 const path = require('path');
+const glob = require('glob');
+
+const uglify = require('uglify-js');
 const webpack = require('webpack')
+
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
-const glob = require('glob');
-const uglify = require('uglify-js');
 
-const clientDir = path.join(__dirname, 'indico', 'web', 'client');
-const modulesDir = path.join(__dirname, 'node_modules');
+const config = require('./config');
+
+const clientDir = path.join(config.build.rootPath, 'web', 'client');
+const modulesDir = path.join(config.build.rootPath, '..', 'node_modules');
 
 const _cssLoaderOptions = {
     root: config.build.staticPath,
@@ -47,8 +52,40 @@ const resolveAlias = [
     {name: 'jquery', alias: 'jquery/src/jquery', onlyModule: false}
 ];
 
+function hashFile(filePath) {
+    // Return the md5 hash of the file's contents
+    const h = crypto.createHash('md5');
+    h.update(fs.readFileSync(filePath));
+    return h.digest('hex').slice(0, 8);
+}
+
+function fileLoaderPublicPathGenerator(_prefix, nodeModules) {
+    return (filePath) => {
+        let pathParts = filePath.split(path.sep);
+        let prefix = _prefix;
+
+        // if no prefix specified, take the first parh segment
+        if (!prefix) {
+            prefix = pathParts[0];
+            pathParts = pathParts.slice(1);
+        }
+
+        let sourcePath = null;
+        if (nodeModules) {
+            // this is kind of ugly, but we can't access the actual source file at this point
+            sourcePath = path.resolve(modulesDir, filePath.replace(/mod_assets\/(?:_\/)+node_modules\//, ''));
+        } else {
+            sourcePath = path.resolve(config.build.staticPath, _prefix || '', filePath);
+        }
+
+        const hash = hashFile(sourcePath);
+        const newPath = path.join(prefix, 'v', hash, ...pathParts);
+        return config.build.staticURL + newPath;
+    };
+}
+
 // Add Module Bundles
-glob.sync(path.join(__dirname, 'indico/modules/**/module.json')).forEach((file) => {
+glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((file) => {
     const module = Object.assign({produceBundle: true, partials: {}}, require(file));
     const moduleName = 'module_' + (module.parent ? (module.parent + '.') : '') + module.name;
     const dirName = path.join(path.dirname(file), 'js');
@@ -164,7 +201,8 @@ module.exports = env => {
                         options: {
                             name: '[path][name].[ext]',
                             context: config.build.staticPath,
-                            emitFile: false
+                            emitFile: false,
+                            publicPath: fileLoaderPublicPathGenerator()
                         }
                     }
                 },
@@ -175,7 +213,8 @@ module.exports = env => {
                         options: {
                             name: '[path][name].[ext]',
                             context: config.build.distPath,
-                            outputPath: 'mod_assets/'
+                            outputPath: 'mod_assets/',
+                            publicPath: fileLoaderPublicPathGenerator('dist', true)
                         }
                     }
                 }
@@ -184,7 +223,15 @@ module.exports = env => {
         plugins: [
             new ManifestPlugin({
                 fileName: 'manifest.json',
-                publicPath: config.build.distURL
+                publicPath: config.build.distURL,
+                map: (file) => {
+                    // change only files that are part of chunks
+                    if (file.chunk) {
+                        const hash = file.chunk.renderedHash.slice(0, 8);
+                        file.path = file.path.replace(/\/dist\//, `/dist/v/${hash}/`);
+                    }
+                    return file;
+                }
             }),
             new webpack.ProvidePlugin({
                 $: 'jquery',
