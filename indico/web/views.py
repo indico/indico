@@ -19,7 +19,8 @@ from __future__ import absolute_import, unicode_literals
 import posixpath
 from urlparse import urlparse
 
-from flask import current_app, g, render_template, request, session
+from flask import g, render_template, request, session
+from flask_webpackext import current_webpack
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
@@ -148,8 +149,7 @@ class WPJinjaMixin(object):
         if html is not None:
             return html
         template = params.pop('_jinja_template')
-        webpack = current_app.extensions['flask-webpackext']
-        params['bundles'] = (webpack.manifest[x] for x in self.bundles)
+        params['bundles'] = (current_webpack.manifest[x] for x in self.bundles)
         return self.render_template_func(template, **params)
 
 
@@ -220,10 +220,8 @@ class WPBase(object):
         js_files = map(self._fix_path, plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
-        webpack = current_app.extensions['flask-webpackext']
-
-        bundles = (webpack.manifest[x] for x in self.bundles)
-        print_bundles = (webpack.manifest[x] for x in self.print_bundles)
+        bundles = (current_webpack.manifest[x] for x in self.bundles)
+        print_bundles = (current_webpack.manifest[x] for x in self.print_bundles)
 
         return render_template('indico_base.html',
                                css_files=css_files, js_files=js_files,
