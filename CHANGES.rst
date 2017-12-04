@@ -19,6 +19,10 @@ Bugfixes
   unless both the header and body blocks are used (:issue:`3151`)
 - Roll-back the database transaction when an error occurs.
 - Fix rendering of the LaTeX error box (:issue:`3163`)
+- Fix "N/A" being displayed in a survey result if 0 is entered in
+  a number field
+- Fix "N/A" not being displayed in a survey result if nothing is
+  selected in a multi-choice select field
 
 
 Version 2.0rc1

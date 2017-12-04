@@ -51,14 +51,15 @@
 
 {% macro _render_answer(answer) %}
     {%- set answer_data = answer.answer_data -%}
-    {%- if answer_data is sequence and answer_data is not string -%}
+    {%- if answer_data and answer_data is sequence and answer_data is not string -%}
         <ul class="answer-data">
             {% for item in answer_data %}
                 <li>{{ item }}</li>
             {% endfor -%}
         </ul>
     {%- else %}
-        {% if answer_data %}
+        {#- explicitly check for empty string/list. 0 in a number field isn't "no value" -#}
+        {% if answer_data not in ('', []) %}
             {{ answer_data|replace('\n', '<br>'|safe) }}
         {% else %}
             <em>{% trans %}N/A{% endtrans %}</em>
