@@ -68,8 +68,8 @@ register_filter(CSSCompressor)
 register_filter(IndicoCSSRewrite)
 
 
-def _get_htdocs_path():
-    return os.path.join(get_root_path('indico'), 'htdocs')
+def _get_client_path():
+    return os.path.join(get_root_path('indico'), 'web', 'client')
 
 
 def configure_pyscss(environment):
@@ -78,8 +78,7 @@ def configure_pyscss(environment):
     environment.config['PYSCSS_DEBUG_INFO'] = False
     environment.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(base_url_path)
     environment.config['PYSCSS_LOAD_PATHS'] = [
-        os.path.join(_get_htdocs_path(), 'sass', 'lib', 'compass'),
-        os.path.join(_get_htdocs_path(), 'sass')
+        os.path.join(_get_client_path(), 'sass')
     ]
 
 
@@ -113,13 +112,9 @@ class IndicoEnvironment(LazyCacheEnvironment):
         self.url = '{0}/static/assets/core/'.format(url_path)
         self.debug = app.debug
         configure_pyscss(self)
-        self.append_path(_get_htdocs_path(), '/')
-        self.append_path(os.path.join(_get_htdocs_path(), 'css'), '{0}/css'.format(url_path))
-        self.append_path(os.path.join(_get_htdocs_path(), 'js'), '{0}/js'.format(url_path))
-
-
-def namespace(dir_ns, *list_files):
-    return [os.path.join(dir_ns, f) for f in list_files]
+        self.append_path(_get_client_path(), '/')
+        self.append_path(os.path.join(_get_client_path(), 'css'), '{0}/css'.format(url_path))
+        self.append_path(os.path.join(_get_client_path(), 'js'), '{0}/js'.format(url_path))
 
 
 def include_js_assets(bundle_name):
@@ -131,11 +126,6 @@ def include_css_assets(bundle_name):
     """Jinja template function to generate HTML tags for a CSS asset bundle."""
     return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
                             for url in core_env[bundle_name].urls()))
-
-
-def rjs_bundle(name, *files, **kwargs):
-    filters = kwargs.pop('filters', 'rjsmin')
-    return Bundle(*files, filters=filters, output='js/{}_%(version)s.min.js'.format(name))
 
 
 def _get_custom_files(subdir, pattern):
@@ -152,7 +142,8 @@ def register_all_js(env):
     # Build a bundle with customization JS if enabled
     custom_js_files = _get_custom_files('js', '*.js')
     if custom_js_files:
-        env.register('custom_js', rjs_bundle('custom', *custom_js_files))
+        bundle = Bundle(*custom_js_files, filters='rjsmin', output='js/custom_%(version)s.min.js')
+        env.register('custom_js', bundle)
 
 
 def register_all_css(env):
