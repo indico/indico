@@ -182,9 +182,16 @@
                                             {{- rating.question.text -}}
                                         </div>
                                         <div>
-                                            <span class="rating-scale flexrow f-a-center">
-                                                {{ _render_rating(proposal.cfp.rating_range, rating.value) }}
-                                                <span class="score">{{ rating.value }}</span>
+                                            {% if rating.question.field_type == 'rating' %}
+                                                <span class="rating-scale flexrow f-a-center">
+                                                    {{ _render_rating(proposal.cfp.rating_range, rating.value) }}
+                                                    <span class="score">{{ rating.value if rating.value is not none else '-' }}</span>
+                                                </span>
+                                            {% elif rating.question.field_type == 'bool' %}
+                                                {{ _('Yes') if rating.value else _('No') }}
+                                            {% else %}
+                                                {{ rating.value|safe }}
+                                            {% endif %}
                                             </span>
                                         </div>
                                     </li>

@@ -71,6 +71,16 @@ _bp.add_url_rule('/manage/abstracts/settings', 'manage_submission_settings', man
                  methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/abstracts/review-settings', 'manage_reviewing_settings', management.RHManageAbstractReviewing,
                  methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/questions', 'manage_reviewing_questions',
+                 management.RHManageAbstractReviewingQuestions, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/questions/sort', 'sort_reviewing_questions',
+                 management.RHSortReviewingQuestions, methods=('POST',))
+_bp.add_url_rule('/manage/abstracts/questions/create', 'create_reviewing_question',
+                 management.RHCreateAbstractReviewingQuestion, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/abstracts/questions/<int:question_id>/edit', 'edit_reviewing_question',
+                 management.RHEditAbstractReviewingQuestion, methods=('POST', 'GET'))
+_bp.add_url_rule('/manage/abstracts/questions/<int:question_id>', 'delete_reviewing_question',
+                 management.RHDeleteAbstractReviewingQuestion, methods=('DELETE',))
 _bp.add_url_rule('/manage/abstracts/teams', 'manage_reviewing_roles', management.RHManageReviewingRoles,
                  methods=('GET', 'POST'))
 

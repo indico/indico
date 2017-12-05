@@ -1,6 +1,6 @@
 {% from 'events/abstracts/reviewing/_common.html' import render_track %}
 {% from 'events/reviews/_common.html' import render_instruction_box, render_group %}
-{% from 'forms/_form.html' import form_header, form_rows, form_footer %}
+{% from 'forms/_form.html' import form_header, form_rows, form_footer, form_row %}
 
 
 {% macro render_review_form(form, proposal=none, group=none, on_pageload=false, review=none) %}
@@ -26,7 +26,6 @@
        {%- endtrans %}
     {% endcall %}
 
-    {% set review_question_rows = form_rows(form, skip=form._order, skip_labels=true) | trim %}
     {% if not review %}
         {% if proposal.proposal_type == 'abstract' %}
             {% set group_title = render_track(group) %}
@@ -38,16 +37,16 @@
                 Reviewing in {{ group_title }}
             {%- endtrans %}
         </div>
-        {% if review_question_rows %}
+        {% if form.has_questions %}
             <div class="titled-rule">
                 {%- trans %}Ratings{% endtrans -%}
             </div>
         {% endif %}
     {% endif %}
 
-    {% if review_question_rows %}
+    {% if form.has_questions %}
         <div class="review-questions">
-            {{ review_question_rows }}
+            {{ render_question_rows(form) }}
         </div>
     {% endif %}
 
@@ -103,4 +102,25 @@
             {% trans %}Cancel{% endtrans %}
         </button>
     {% endcall %}
+{% endmacro %}
+
+{% macro render_question_rows(form) %}
+    {% for field in _iter_form_fields(form) if 'question_' in field.name %}
+        <div class="flexrow question-row">
+            <div>
+                <span class="question-index">
+                    {{ loop.index }}
+                </span>
+            </div>
+            <div class="question-text f-self-stretch">
+                {{- field.label.text }}
+                {%- if field.flags.required -%}
+                    <i class="question-required" title="{% trans %}Rating this question is mandatory{% endtrans %}"> *</i>
+                {% endif -%}
+            </div>
+            <div class="flexrow f-a-start">
+                {{ form_row(field, skip_label=true) }}
+            </div>
+        </div>
+    {% endfor %}
 {% endmacro %}

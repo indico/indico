@@ -79,6 +79,12 @@
                    data-ajax-dialog>
                     {%- trans %}Settings{% endtrans -%}
                 </a>
+                <a href="#" class="i-button icon-question"
+                   data-href="{{ url_for('.manage_reviewing_questions', event) }}"
+                   data-title="{% trans %}Configure abstract reviewing questions{% endtrans %}"
+                   data-ajax-dialog>
+                 {%- trans %}Questions{% endtrans -%}
+                </a>
             </div>
         </div>
 

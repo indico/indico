@@ -16,27 +16,30 @@
 
 from __future__ import unicode_literals
 
-from operator import itemgetter
+from operator import attrgetter, itemgetter
 
-from flask import flash, redirect, session
+from flask import flash, redirect, request, session
+from werkzeug.exceptions import NotFound
 
 from indico.modules.events.abstracts import logger
 from indico.modules.events.abstracts.controllers.base import RHManageAbstractsBase
 from indico.modules.events.abstracts.forms import (AbstractReviewingRolesForm, AbstractReviewingSettingsForm,
                                                    AbstractsScheduleForm, AbstractSubmissionSettingsForm)
 from indico.modules.events.abstracts.models.abstracts import Abstract
+from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.operations import close_cfa, open_cfa, schedule_cfa
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
 from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _
 from indico.util.string import handle_legacy_description
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_data, jsonify_form
+from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
 class RHAbstractsDashboard(RHManageAbstractsBase):
@@ -94,8 +97,7 @@ class RHManageAbstractSubmission(RHManageAbstractsBase):
 
     def _process(self):
         settings = abstracts_settings.get_all(self.event)
-        form = AbstractSubmissionSettingsForm(event=self.event,
-                                              obj=FormDefaults(**settings))
+        form = AbstractSubmissionSettingsForm(event=self.event, obj=FormDefaults(**settings))
         if form.validate_on_submit():
             abstracts_settings.set_multi(self.event, form.data)
             flash(_('Abstract submission settings have been saved'), 'success')
@@ -114,18 +116,14 @@ class RHManageAbstractReviewing(RHManageAbstractsBase):
         has_ratings = (AbstractReviewRating.query
                        .join(AbstractReviewRating.review)
                        .join(AbstractReview.abstract)
-                       .filter(~Abstract.is_deleted, Abstract.event == self.event)
+                       .join(AbstractReviewRating.question)
+                       .filter(~Abstract.is_deleted, Abstract.event == self.event,
+                               AbstractReviewQuestion.field_type == 'rating')
                        .has_rows())
-        defaults = FormDefaults(abstract_review_questions=self.event.abstract_review_questions,
-                                **abstracts_reviewing_settings.get_all(self.event))
+        defaults = FormDefaults(**abstracts_reviewing_settings.get_all(self.event))
         form = AbstractReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=has_ratings)
         if form.validate_on_submit():
             data = form.data
-            # XXX: we need to do this assignment for new questions,
-            # but editing or deleting existing questions changes an
-            # object that is already in the session so it's updated
-            # in any case
-            self.event.abstract_review_questions = data.pop('abstract_review_questions')
             abstracts_reviewing_settings.set_multi(self.event, data)
             flash(_('Abstract reviewing settings have been saved'), 'success')
             return jsonify_data()
@@ -159,3 +157,72 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
             return jsonify_data()
         return jsonify_form(form, skip_labels=True, form_header_kwargs={'id': 'reviewing-role-form'},
                             disabled_until_change=True)
+
+
+class RHManageAbstractReviewingQuestions(RHManageAbstractsBase):
+    def _process(self):
+        return jsonify_template('events/abstracts/management/abstract_reviewing_questions.html', event=self.event,
+                                reviewing_questions=self.event.abstract_review_questions,
+                                field_types=get_reviewing_field_types('abstracts'))
+
+
+class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
+    def _process_args(self):
+        RHManageAbstractsBase._process_args(self)
+        try:
+            self.field_cls = get_reviewing_field_types()['abstracts'][request.args['field_type']]
+        except KeyError:
+            raise NotFound
+
+    def _process(self):
+        form = self.field_cls.create_config_form()
+        if form.validate_on_submit():
+            new_question = AbstractReviewQuestion()
+            new_question.field_type = self.field_cls.name
+            new_question.no_score = True if self.field_cls.name != 'rating' else form.no_score
+            new_question.field_data = form.field_data
+            form.populate_obj(new_question, skip={'is_required'})
+            self.event.abstract_review_questions.append(new_question)
+            return jsonify_data(flash=False)
+        return jsonify_form(form, fields=getattr(form, '_order', None))
+
+
+class RHSortReviewingQuestions(RHManageAbstractsBase):
+    def _process(self):
+        questions_by_id = {q.id: q for q in self.event.abstract_review_questions}
+        question_ids = map(int, request.form.getlist('field_ids'))
+        for index, question_id in enumerate(question_ids, 0):
+            questions_by_id[question_id].position = index
+            del questions_by_id[question_id]
+
+        for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(question_ids)):
+            field.position = index
+        return jsonify_data(flash=False)
+
+
+class RHReviewingQuestionBase(RHManageAbstractsBase):
+    locator_args = {
+        lambda self: self.question
+    }
+
+    def _process_args(self):
+        RHManageAbstractsBase._process_args(self)
+        self.question = AbstractReviewQuestion.get_one(request.view_args['question_id'])
+
+
+class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):
+    def _process(self):
+        defaults = FormDefaults(obj=self.question, **self.question.field_data)
+        field_cls = self.question.field_type(self.question)
+        form = field_cls.create_config_form(obj=defaults)
+        if form.validate_on_submit():
+            self.question.field_data = form.field_data
+            form.populate_obj(self.question, skip={'is_required'})
+            return jsonify_data(flash=False)
+        return jsonify_form(form, fields=getattr(form, '_order', None))
+
+
+class RHDeleteAbstractReviewingQuestion(RHReviewingQuestionBase):
+    def _process(self):
+        self.question.is_deleted = True
+        return jsonify_data(flash=False)

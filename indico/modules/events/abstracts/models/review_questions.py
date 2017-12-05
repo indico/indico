@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
+from indico.util.locators import locator_property
 
 
 class AbstractReviewQuestion(ReviewQuestionMixin, db.Model):
@@ -28,3 +29,7 @@ class AbstractReviewQuestion(ReviewQuestionMixin, db.Model):
 
     # relationship backrefs:
     # - ratings (AbstractReviewRating.question)
+
+    @locator_property
+    def locator(self):
+        return dict(self.event.locator, question_id=self.id)

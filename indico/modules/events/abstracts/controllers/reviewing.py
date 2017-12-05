@@ -39,7 +39,7 @@ from indico.modules.events.abstracts.views import WPDisplayAbstractsReviewing, r
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify_data, jsonify_template
+from indico.web.util import _pop_injected_js, jsonify_data, jsonify_template
 
 
 class RHListOtherAbstracts(RHAbstractsBase):
@@ -161,7 +161,8 @@ class RHSubmitAbstractReview(RHAbstractBase):
             create_abstract_review(self.abstract, self.track, session.user, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/reviews/forms.html')
-        return jsonify(html=tpl.render_review_form(form, proposal=self.abstract, group=self.track))
+        return jsonify(html=tpl.render_review_form(form, proposal=self.abstract, group=self.track),
+                       js=_pop_injected_js())
 
 
 class RHEditAbstractReview(RHAbstractBase):
@@ -184,7 +185,7 @@ class RHEditAbstractReview(RHAbstractBase):
             update_abstract_review(self.review, **form.split_data)
             return jsonify_data(flash=False, html=render_abstract_page(self.abstract, management=self.management))
         tpl = get_template_module('events/reviews/forms.html')
-        return jsonify(html=tpl.render_review_form(form, review=self.review))
+        return jsonify(html=tpl.render_review_form(form, review=self.review), js=_pop_injected_js())
 
 
 class RHSubmitAbstractComment(RHAbstractBase):

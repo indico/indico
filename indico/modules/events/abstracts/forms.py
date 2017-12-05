@@ -20,7 +20,7 @@ from datetime import time
 
 from flask import request, session
 from wtforms.ext.sqlalchemy.fields import QuerySelectField
-from wtforms.fields import BooleanField, HiddenField, IntegerField, RadioField, SelectField, StringField, TextAreaField
+from wtforms.fields import BooleanField, HiddenField, IntegerField, SelectField, StringField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired, NumberRange, Optional, ValidationError
 from wtforms.widgets import Select
 
@@ -29,12 +29,10 @@ from indico.core.db.sqlalchemy.descriptions import RenderMode
 from indico.modules.events.abstracts.fields import (AbstractField, AbstractPersonLinkListField, EmailRuleListField,
                                                     TrackRoleField)
 from indico.modules.events.abstracts.models.abstracts import EditTrackMode
-from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.reviews import AbstractAction, AbstractCommentVisibility
 from indico.modules.events.abstracts.settings import BOACorrespondingAuthorType, BOASortField, abstracts_settings
 from indico.modules.events.contributions.models.persons import AuthorType
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.fields import ReviewQuestionsField
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.tracks.models.tracks import Track
 from indico.util.i18n import _
@@ -46,7 +44,7 @@ from indico.web.forms.fields import (EditableFileField, EmailListField, HiddenEn
                                      PrincipalListField)
 from indico.web.forms.util import inject_validators
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime, SoftLength, UsedIf, WordCount
-from indico.web.forms.widgets import JinjaWidget, SwitchWidget
+from indico.web.forms.widgets import SwitchWidget
 
 
 def make_review_form(event):
@@ -58,15 +56,9 @@ def make_review_form(event):
     :return: An `AbstractForm` subclass.
     """
     form_class = type(b'_AbstractReviewForm', (AbstractReviewForm,), {})
-    for idx, question in enumerate(event.abstract_review_questions, start=1):
+    for question in event.abstract_review_questions:
         name = 'question_{}'.format(question.id)
-        range_ = event.cfa.rating_range
-        field = RadioField(question.text, validators=[DataRequired()],
-                           choices=[(unicode(n), unicode(n)) for n in range(range_[0], range_[1] + 1)],
-                           widget=JinjaWidget('events/reviews/rating_widget.html',
-                                              question=question, rating_range=event.cfa.rating_range, inline_js=True,
-                                              question_idx=idx))
-        setattr(form_class, name, field)
+        setattr(form_class, name, question.field_type(question).create_wtf_field())
     return form_class
 
 
@@ -74,6 +66,7 @@ def build_review_form(abstract=None, track=None, review=None):
     if review:
         abstract = review.abstract
         track = review.track
+
     review_form_class = make_review_form(abstract.event)
     reviews_for_track = abstract.get_reviews(user=session.user, group=track)
     review_for_track = reviews_for_track[0] if reviews_for_track else None
@@ -165,10 +158,6 @@ class AbstractReviewingSettingsForm(IndicoForm):
                                                   widget=SwitchWidget(),
                                                   description=_("Enabling this allows submitters, authors, and "
                                                                 "speakers to also participate in the comments."))
-    abstract_review_questions = ReviewQuestionsField(_("Review questions"), question_model=AbstractReviewQuestion,
-                                                     extra_fields=[{'id': 'no_score',
-                                                                    'caption': _("Exclude from score"),
-                                                                    'type': 'checkbox'}])
     reviewing_instructions = IndicoMarkdownField(_('Reviewing Instructions'), editor=True,
                                                  description=_("These instructions will be displayed right before the "
                                                                "reviewing form."))
@@ -334,6 +323,10 @@ class AbstractReviewForm(IndicoForm):
         data = self.data
         return {'questions_data': {k: v for k, v in data.iteritems() if k.startswith('question_')},
                 'review_data': {k: v for k, v in data.iteritems() if not k.startswith('question_')}}
+
+    @property
+    def has_questions(self):
+        return any(x.startswith('question_') for x in self.data)
 
 
 class BulkAbstractJudgmentForm(AbstractJudgmentFormBase):

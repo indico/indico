@@ -452,6 +452,11 @@
         margin-top: 1em;
     }
 
+    .question-row:not(:first-child) {
+        margin-top: 1em;
+        align-items: center;
+    }
+
     .form-group .rating-scale {
         flex-direction: row-reverse;
 
