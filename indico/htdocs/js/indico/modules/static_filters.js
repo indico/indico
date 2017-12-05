@@ -34,7 +34,7 @@
 
     function _applySearchFilters(searchBoxConfig) {
         var $items = $(searchBoxConfig.listItems);
-        var term = $(searchBoxConfig.term).val().trim();
+        var term = $(searchBoxConfig.term).val();
         var $state = $(searchBoxConfig.state);
         var $visibleEntries, m;
         var $filterPlaceholder = $(searchBoxConfig.placeholder);
@@ -52,11 +52,11 @@
         }
 
         // quick search of contribution by ID
+        term = term.trim();
         if ((m = term.match(/^#(\d+)$/))) {
             $visibleEntries = $items.filter('[data-friendly-id="' + m[1] + '"]');
         } else {
-            $visibleEntries = $items.find('[data-searchable*="' + term.toLowerCase() + '"]')
-                                            .closest(searchBoxConfig.itemHandle);
+            $visibleEntries = $items.find('[data-searchable*="' + term.toLowerCase() + '"]').closest(searchBoxConfig.itemHandle);
         }
 
         if ($visibleEntries.length === 0) {
@@ -77,11 +77,14 @@
     }
 
     global.setupSearchBox = function setupSearchBox(config) {
-        var applySearchFilters = _.partial(_applySearchFilters, config);
+        var applySearchFilters = _.partial(_applySearchFilters, config),
+            $term = $(config.term);
 
-        $(config.term).realtimefilter({
-            callback: applySearchFilters
-        });
+        if ($term.length) {
+            $term.realtimefilter({
+                callback: applySearchFilters
+            });
+        }
 
         // make sure that filters are applied when e.g. going back in
         // browser history, this is needed since typewatch, which is used internally
