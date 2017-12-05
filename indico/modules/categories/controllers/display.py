@@ -39,7 +39,7 @@ from indico.modules.categories.models.categories import Category
 from indico.modules.categories.serialize import (serialize_categories_ical, serialize_category, serialize_category_atom,
                                                  serialize_category_chain)
 from indico.modules.categories.util import get_category_stats, get_upcoming_events
-from indico.modules.categories.views import WPCategory, WPCategoryStatistics
+from indico.modules.categories.views import WPCategory, WPCategoryCalendar, WPCategoryStatistics
 from indico.modules.events.models.events import Event
 from indico.modules.events.timetable.util import get_category_timetable
 from indico.modules.events.util import get_base_ical_parameters
@@ -627,8 +627,8 @@ class _EventProxy(object):
 class RHCategoryCalendarView(RHDisplayCategoryBase):
     def _process(self):
         if not request.is_xhr:
-            return WPCategory.render_template('display/calendar.html', self.category,
-                                              start_dt=request.args.get('start_dt'))
+            return WPCategoryCalendar.render_template('display/calendar.html', self.category,
+                                                      start_dt=request.args.get('start_dt'))
         tz = self.category.display_tzinfo
         start = tz.localize(dateutil.parser.parse(request.args['start'])).astimezone(utc)
         end = tz.localize(dateutil.parser.parse(request.args['end'])).astimezone(utc)
