@@ -16,20 +16,23 @@
 
 from __future__ import unicode_literals
 
-from collections import defaultdict
+from operator import attrgetter
 
 from flask import flash, render_template, request, session
+from werkzeug.exceptions import NotFound
 
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import (DeadlineForm, PaperReviewingSettingsForm, PapersScheduleForm,
                                                 PaperTeamsForm, make_competences_form)
+from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
 from indico.modules.events.papers.models.reviews import PaperReviewType
 from indico.modules.events.papers.operations import (close_cfp, create_competences, open_cfp, schedule_cfp,
                                                      set_deadline, set_reviewing_state, update_competences,
                                                      update_team_members)
 from indico.modules.events.papers.settings import PaperReviewingRole, paper_reviewing_settings
 from indico.modules.events.papers.views import WPManagePapers
+from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
 from indico.modules.users.models.users import User
 from indico.util.i18n import _, ngettext
 from indico.web.forms.base import FormDefaults
@@ -184,14 +187,6 @@ class RHManageReviewingSettings(RHManagePapersBase):
         form = PaperReviewingSettingsForm(event=self.event, obj=defaults)
         if form.validate_on_submit():
             data = form.data
-            content_review_questions = data.pop('content_review_questions', None)
-            layout_review_questions = data.pop('layout_review_questions', None)
-            if content_review_questions is None:
-                content_review_questions = self.event.cfp.content_review_questions
-            if layout_review_questions is None:
-                layout_review_questions = self.event.cfp.layout_review_questions
-            self.event.paper_review_questions = content_review_questions + layout_review_questions
-
             email_settings = data.pop('email_settings')
             data.update(email_settings)
 
@@ -219,3 +214,89 @@ class RHSetDeadline(RHManagePapersBase):
             flash(messages[role], 'success')
             return jsonify_data(html=_render_paper_dashboard(self.event))
         return jsonify_form(form)
+
+
+class RHManageReviewingQuestions(RHManagePapersBase):
+    def _process(self):
+        review_type = request.view_args['review_type']
+        if review_type == 'layout':
+            questions = self.event.cfp.layout_review_questions
+        else:
+            questions = self.event.cfp.content_review_questions
+        return jsonify_template('events/papers/management/paper_reviewing_questions.html', event=self.event,
+                                review_type=review_type, questions=questions,
+                                field_types=get_reviewing_field_types('papers'))
+
+
+class RHReviewingQuestionsActionsBase(RHManagePapersBase):
+    def _process_args(self):
+        RHManagePapersBase._process_args(self)
+        try:
+            self.review_type = request.view_args['review_type']
+        except KeyError:
+            raise NotFound
+
+
+class RHCreateReviewingQuestion(RHReviewingQuestionsActionsBase):
+    def _process_args(self):
+        RHReviewingQuestionsActionsBase._process_args(self)
+        try:
+            self.field_cls = get_reviewing_question_types()[request.args['field_type']]
+        except KeyError:
+            raise NotFound
+
+    def _process(self):
+        form = self.field_cls.create_config_form()
+        if form.validate_on_submit():
+            new_question = PaperReviewQuestion()
+            new_question.field_type = self.field_cls.name
+            new_question.field_data = form.field_data
+            new_question.type = PaperReviewType.get(self.review_type)
+            form.populate_obj(new_question)
+            self.event.paper_review_questions.append(new_question)
+            return jsonify_data(flash=False)
+        return jsonify_form(form, fields=getattr(form, '_order', None))
+
+
+class RHManageQuestionBase(RHReviewingQuestionsActionsBase):
+    def _process_args(self):
+        RHReviewingQuestionsActionsBase._process_args(self)
+        self.question = (PaperReviewQuestion.query.with_parent(self.event)
+                         .filter_by(id=request.view_args['question_id'])
+                         .one())
+
+
+class RHEditReviewingQuestion(RHManageQuestionBase):
+    def _process(self):
+        defaults = FormDefaults(obj=self.question, **self.question.field_data)
+        field_cls = self.question.field_type(self.question)
+        form = field_cls.create_config_form(obj=defaults)
+        if form.validate_on_submit():
+            self.question.field_data = form.field_data
+            form.populate_obj(self.question)
+            return jsonify_data(flash=False)
+        return jsonify_form(form, fields=getattr(form, '_order', None))
+
+
+class RHDeleteReviewingQuestion(RHManageQuestionBase):
+    def _process(self):
+        self.question.is_deleted = True
+        return jsonify_data(flash=False)
+
+
+class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
+    def _process(self):
+        if self.review_type == 'layout':
+            questions = self.event.cfp.layout_review_questions
+        else:
+            questions = self.event.cfp.content_review_questions
+
+        questions_by_id = {q.id: q for q in questions}
+        question_ids = map(int, request.form.getlist('field_ids'))
+        for index, question_id in enumerate(question_ids, 0):
+            questions_by_id[question_id].position = index
+            del questions_by_id[question_id]
+
+        for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(question_ids)):
+            field.position = index
+        return jsonify_data(flash=False)

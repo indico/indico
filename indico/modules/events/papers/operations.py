@@ -270,7 +270,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
     review.populate_from_dict(review_data)
     log_data = {}
     for question in paper.event.cfp.get_questions_for_review_type(review_type.instance):
-        value = int(questions_data['question_{}'.format(question.id)])
+        value = questions_data['question_{}'.format(question.id)]
         review.ratings.append(PaperReviewRating(question=question, value=value))
         log_data[question.text] = value
     db.session.flush()
@@ -297,12 +297,12 @@ def update_review(review, review_data, questions_data):
         field_name = 'question_{}'.format(question.id)
         rating = question.get_review_rating(review, allow_create=True)
         old_value = rating.value
-        rating.value = int(questions_data[field_name])
+        rating.value = questions_data[field_name]
         if old_value != rating.value:
             changes[field_name] = (old_value, rating.value)
             log_fields[field_name] = {
                 'title': question.text,
-                'type': 'number'
+                'type': question.field_type
             }
     db.session.flush()
     notify_paper_review_submission(review)

@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from indico.core.db.sqlalchemy import PyIntEnum, db
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
 from indico.modules.events.papers.models.reviews import PaperReviewType
+from indico.util.locators import locator_property
 
 
 class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
@@ -34,3 +35,7 @@ class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
 
     # relationship backrefs:
     # - ratings (PaperReviewRating.question)
+
+    @locator_property
+    def locator(self):
+        return dict(self.event.locator, question_id=self.id)

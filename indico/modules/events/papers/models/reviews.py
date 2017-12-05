@@ -185,7 +185,8 @@ class PaperReview(ProposalReviewMixin, RenderModeMixin, db.Model):
 
     @property
     def score(self):
-        ratings = [r for r in self.ratings]
+        ratings = [r for r in self.ratings
+                   if not r.question.is_deleted and r.question.field_type == 'rating' and r.value is not None]
         if not ratings:
             return None
         return sum(x.value for x in ratings) / len(ratings)

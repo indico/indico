@@ -36,7 +36,7 @@ from indico.modules.events.papers.util import (get_contributions_with_paper_subm
 from indico.modules.events.papers.views import WPDisplayCallForPapers, WPDisplayReviewingArea, render_paper_page
 from indico.util.i18n import _
 from indico.web.flask.templating import get_template_module
-from indico.web.util import jsonify, jsonify_data, jsonify_form, jsonify_template
+from indico.web.util import _pop_injected_js, jsonify, jsonify_data, jsonify_form, jsonify_template
 
 
 class RHSubmitPaper(RHPaperBase):
@@ -117,7 +117,7 @@ class RHSubmitPaperReview(RHPaperBase):
             create_review(self.paper, self.type, session.user, **form.split_data)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
-        return jsonify(html=tpl.render_review_form(form, proposal=self.paper, group=self.type))
+        return jsonify(html=tpl.render_review_form(form, proposal=self.paper, group=self.type), js=_pop_injected_js())
 
 
 class RHEditPaperReview(RHPaperBase):
@@ -140,7 +140,7 @@ class RHEditPaperReview(RHPaperBase):
             update_review(self.review, **form.split_data)
             return jsonify_data(flash=False, html=render_paper_page(self.paper))
         tpl = get_template_module('events/reviews/forms.html')
-        return jsonify(html=tpl.render_review_form(form, review=self.review))
+        return jsonify(html=tpl.render_review_form(form, review=self.review), js=_pop_injected_js())
 
 
 class RHSubmitPaperComment(RHPaperBase):

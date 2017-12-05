@@ -255,7 +255,7 @@
 
 
 {% macro render_paper_revision_submission_form(paper, form) %}
-    {%if paper.state.name == 'to_be_corrected' %}
+    {% if paper.state.name == 'to_be_corrected' %}
         <div class="i-timeline-item" id="proposal-revision-submission-box">
             {{ render_user_avatar(session.user) }}
             <div class="i-timeline-item-box header-indicator-left">

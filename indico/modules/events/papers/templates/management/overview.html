@@ -47,6 +47,12 @@
                        data-replace-update>
                         {%- trans %}Disable{% endtrans -%}
                     </a>
+                    <a href="#" class="i-button icon-question"
+                       data-href="{{ url_for('.manage_reviewing_questions', event, review_type='content') }}"
+                       data-title="{% trans %}Configure content reviewing questions{% endtrans %}"
+                       data-ajax-dialog>
+                        {%- trans %}Questions{% endtrans -%}
+                    </a>
                 {% else %}
                     <a href="#" class="i-button icon-switchon"
                        data-href="{{ url_for('papers.switch', event, reviewing_type='content') }}"
@@ -92,6 +98,12 @@
                        data-update="#paper-page"
                        data-replace-update>
                         {%- trans %}Disable{% endtrans -%}
+                    </a>
+                    <a href="#" class="i-button icon-question"
+                       data-href="{{ url_for('.manage_reviewing_questions', event, review_type='layout') }}"
+                       data-title="{% trans %}Configure layout reviewing questions{% endtrans %}"
+                       data-ajax-dialog>
+                        {%- trans %}Questions{% endtrans -%}
                     </a>
                 {% else %}
                     <a href="#" class="i-button icon-switchon"
