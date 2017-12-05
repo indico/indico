@@ -16,7 +16,6 @@
  */
 
 import './display';
-import './calendar';
 
 (function(global) {
     global.setupCategoryStats = function setupCategoryStats() {

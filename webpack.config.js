@@ -240,7 +240,8 @@ module.exports = env => {
                 moment: 'moment'
             }),
             new webpack.optimize.CommonsChunkPlugin({
-                name: 'common' // Specify the common bundle's name.
+                name: 'common',
+                minChunks: 3
             }),
             // Do not load moment locales (we'll load them explicitly)
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),

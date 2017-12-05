@@ -18,9 +18,6 @@
 import './compat/jquery-ui';
 import './contrib/jquery-extra-selectors';
 
-import 'fullcalendar';
-import 'fullcalendar/dist/fullcalendar.css';
-
 import 'jquery-colorbox';
 import 'jquery-colorbox/example1/colorbox.css';
 
