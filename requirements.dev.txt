@@ -3,6 +3,7 @@ pojson>=0.4
 termcolor
 sphinx
 sphinx-autobuild
+sphinx-issues
 repoze.sphinx.autointerface
 pygments
 sqlparse
