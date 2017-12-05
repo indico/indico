@@ -25,6 +25,7 @@ Bugfixes
   selected in a multi-choice select field
 - Fix error when using ``target_*`` placeholders in abstract
   notification emails for actions other than "Merged" (:issue:`3171`)
+- Show full track title in tooltips on abstract pages
 
 
 Version 2.0rc1

@@ -15,12 +15,12 @@
     {% endif %}
 {% endmacro %}
 
-{% macro render_group(title, url=none) %}
+{% macro render_group(title, url=none, long_title=none) %}
     <div class="review-group truncate-text">
         {% if url %}
-            <a href="{{ url }}" title="{{ title }}">{{ title }}</a>
+            <a href="{{ url }}" title="{{ long_title or title }}">{{ title }}</a>
         {% else %}
-            <span title="{{ title }}">{{ title }}</span>
+            <span title="{{ long_title or title }}">{{ title }}</span>
         {% endif %}
     </div>
 {% endmacro %}
