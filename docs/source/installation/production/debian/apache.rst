@@ -360,6 +360,8 @@ Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
 Indico can generate PDF files in various places.
 
 
+.. _deb-apache-shib:
+
 Optional: Shibboleth
 --------------------
 

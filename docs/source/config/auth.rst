@@ -279,6 +279,22 @@ The LDAP-specific config uses the following keys:
   Default: ``False``
 
 
+SAML / Shibboleth
+^^^^^^^^^^^^^^^^^
+
+The ``shibboleth`` authentication/identity providers are available by
+default, but due to how the protocol works you need to use the Apache
+webserver to use SAML atuhentication provider.
+
+You can find guides on how to set it up for :ref:`CentOS <centos-apache-shib>`
+and :ref:`Debian <deb-apache-shib>`.
+
+If you also have an LDAP server, it may be a good idea to use the
+``shibboleth`` authentication provider and connect it to an ``ldap``
+identity provider. This way the user information is retrieved from LDAP
+based on a unique identifier of the user that comes from SAML, and you
+can still use the search and group functionality provided by LDAP.
+
 
 .. _Flask-Multipass: https://flask-multipass.readthedocs.io
 .. _this article: https://www.adimian.com/blog/2014/10/how-to-enable-memberof-using-openldap/
