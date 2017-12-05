@@ -51,6 +51,13 @@ class ReviewQuestionMixin(object):
         )
 
     @declared_attr
+    def field_type(cls):
+        return db.Column(
+            db.String,
+            nullable=False
+        )
+
+    @declared_attr
     def text(cls):
         return db.Column(
             db.Text,
@@ -79,6 +86,22 @@ class ReviewQuestionMixin(object):
             db.Boolean,
             nullable=False,
             default=False
+        )
+
+    @declared_attr
+    def is_required(self):
+        return db.Column(
+            db.Boolean,
+            nullable=False,
+            default=False
+        )
+
+    @declared_attr
+    def field_data(cls):
+        return db.Column(
+            db.JSON,
+            nullable=False,
+            default={}
         )
 
     @declared_attr
@@ -111,3 +134,12 @@ class ReviewQuestionMixin(object):
             rating_class = type(self).ratings.prop.mapper.class_
             rating = rating_class(question=self, review=review)
         return rating
+
+    @property
+    def title(self):
+        return self.text
+
+    @property
+    def description(self):
+        """Required by BaseField while creating an instance of WTForms field"""
+        return None

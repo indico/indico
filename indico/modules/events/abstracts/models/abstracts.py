@@ -605,10 +605,12 @@ class Abstract(ProposalMixin, ProposalRevisionMixin, DescriptionMixin, CustomFie
     def get_track_question_scores(self):
         query = (db.session.query(AbstractReview.track_id,
                                   AbstractReviewQuestion,
-                                  db.func.avg(AbstractReviewRating.value))
+                                  db.func.avg(AbstractReviewRating.value.op('#>>')('{}').cast(db.Integer)))
                  .join(AbstractReviewRating.review)
                  .join(AbstractReviewRating.question)
                  .filter(AbstractReview.abstract == self,
+                         AbstractReviewQuestion.field_type == 'rating',
+                         AbstractReviewRating.value.cast(db.String) != db.text("'null'"),
                          ~AbstractReviewQuestion.is_deleted,
                          ~AbstractReviewQuestion.no_score)
                  .group_by(AbstractReview.track_id, AbstractReviewQuestion.id))

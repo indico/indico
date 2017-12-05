@@ -54,7 +54,7 @@ class ReviewRatingMixin(object):
     @declared_attr
     def value(cls):
         return db.Column(
-            db.Integer,
+            db.JSON,
             nullable=False
         )
 
