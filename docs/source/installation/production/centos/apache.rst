@@ -383,6 +383,15 @@ Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
+.. _centos-apache-latex:
+
+14. Install TeXLive
+-------------------
+
+Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
+Indico can generate PDF files in various places.
+
+
 Optional: Shibboleth
 --------------------
 

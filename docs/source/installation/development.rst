@@ -151,6 +151,14 @@ Running Indico
 Double-check that your hostname matches that which has been set in the config file (by the wizard).
 
 
+Installing TeXLive (optional)
+-----------------------------
+
+If you need PDF generation in certain parts of Indico to work (e.g.
+for contributions and the Book of Abstracts), you need LaTeX.  To
+install it, follow the :ref:`LaTeX install guide <latex>`.
+
+
 Using HTTPS through nginx (optional)
 ------------------------------------
 
