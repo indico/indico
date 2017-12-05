@@ -70,6 +70,12 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
         return render_breadcrumbs(category=self.category)
 
 
+class WPCategoryCalendar(WPCategory):
+    """WP for category calendar page"""
+
+    bundles = WPCategory.bundles + ('module_categories.calendar.js', 'module_categories.calendar.css')
+
+
 class WPCategoryManagement(WPCategory):
     """WP for category management pages"""
 

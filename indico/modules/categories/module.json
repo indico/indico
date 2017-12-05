@@ -1,6 +1,7 @@
 {
     "name": "categories",
     "partials": {
-        "management": "./management.js"
+        "management": "./management.js",
+        "calendar": "./calendar.js"
     }
 }

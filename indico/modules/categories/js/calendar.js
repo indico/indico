@@ -15,6 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'fullcalendar';
+import 'fullcalendar/dist/fullcalendar.css';
+
 (function(global) {
     global.setupCategoryCalendar = function setupCategoryCalendar(elementId, categoryURL) {
         var cachedEvents = {};
