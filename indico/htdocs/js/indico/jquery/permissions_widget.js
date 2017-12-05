@@ -33,6 +33,12 @@
         },
 
         _update: function() {
+            this.data = _(this.data).chain().sortBy(function(item) {
+                return item[0].name || item[0].id;
+            }).sortBy(function(item) {
+                return item[0]._type;
+            }).value();
+
             this.$dataField.val(JSON.stringify(this.data));
             this.element.trigger('change');
         },
@@ -164,7 +170,7 @@
         _render: function() {
             var self = this;
             this.$permissionsWidgetList.empty();
-            // TODO: Sort list properly
+
             this.data.forEach(function(item) {
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
@@ -257,6 +263,7 @@
             this.$roleDropdown = this.element.find('.entry-role-dropdown');
             this.$ipNetworkDropdown = this.element.find('.entry-ip-network-dropdown');
             this.data = JSON.parse(this.$dataField.val());
+            this._update();
             this._render();
 
             this.element.on('indico:permissionsChanged', function(evt, permissions, principal) {

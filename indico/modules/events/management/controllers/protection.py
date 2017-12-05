@@ -134,8 +134,7 @@ class RHEventProtection(RHEventProtectionBase):
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
         permissions = [[serialize_principal(p.principal), list(self._get_principal_permissions(p))]
-                       for p in sorted(self.event.acl_entries, key=lambda p: p.principal.name.lower())
-                       if self._get_principal_permissions(p)]
+                       for p in self.event.acl_entries if self._get_principal_permissions(p)]
 
         return dict({'protection_mode': self.event.protection_mode, 'acl': acl, 'managers': managers,
                      'registration_managers': registration_managers, 'submitters': submitters,
