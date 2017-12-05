@@ -26,6 +26,8 @@ Bugfixes
 - Fix error when using ``target_*`` placeholders in abstract
   notification emails for actions other than "Merged" (:issue:`3171`)
 - Show full track title in tooltips on abstract pages
+- Show correct review indicators when a reviewer still has to review
+  an abstract in a different track
 
 
 Version 2.0rc1

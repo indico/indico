@@ -276,7 +276,8 @@ def get_track_reviewer_abstract_counts(event, user):
                             count_reviewable - count_reviewable_reviewed)
              .outerjoin(Track.abstracts_reviewed)
              .outerjoin(AbstractReview, db.and_(AbstractReview.abstract_id == Abstract.id,
-                                                AbstractReview.user_id == user.id))
+                                                AbstractReview.user_id == user.id,
+                                                AbstractReview.track_id == Track.id))
              .group_by(Track.id))
     return {track: {'total': total, 'reviewed': reviewed, 'unreviewed': unreviewed}
             for track, total, reviewed, unreviewed in query}
