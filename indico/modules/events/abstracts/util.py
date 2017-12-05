@@ -33,6 +33,7 @@ from indico.modules.events.abstracts.models.email_templates import AbstractEmail
 from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.abstracts.settings import abstracts_settings, boa_settings
+from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.tracks.models.tracks import Track
 from indico.modules.users import User
@@ -161,16 +162,17 @@ def create_mock_abstract(event):
     return abstract
 
 
-def make_abstract_form(event, notification_option=False, management=False):
+def make_abstract_form(event, user, notification_option=False, management=False):
     """Extends the abstract WTForm to add the extra fields.
 
     Each extra field will use a field named ``custom_ID``.
 
     :param event: The `Event` for which to create the abstract form.
+    :param user: The user who is going to use the form.
     :param notification_option: Whether to add a field to the form to
                                 disable triggering notifications for
                                 the abstract submission.
-    :param management Whether it's a manager using the abstract form
+    :param management: Whether the form is used in the management area
     :return: An `AbstractForm` subclass.
     """
     from indico.modules.events.abstracts.forms import (AbstractForm, MultiTrackMixin, SingleTrackMixin, NoTrackMixin,
@@ -186,13 +188,15 @@ def make_abstract_form(event, notification_option=False, management=False):
     if notification_option:
         mixins.append(SendNotificationsMixin)
     form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
+    managers = {x.principal for x in event.acl_entries if x.full_access}
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:
             # field definition is not available anymore
             continue
-        name = 'custom_{}'.format(custom_field.id)
-        setattr(form_class, name, field_impl.create_wtf_field())
+        if custom_field.user_editable or user in managers:
+            name = 'custom_{}'.format(custom_field.id)
+            setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
 
 
@@ -379,3 +383,15 @@ def get_events_with_abstract_persons(user, dt=None):
     for person in query:
         data[person.event_id].add('abstract_person')
     return data
+
+
+def filter_field_values(fields, user, managers, submitter):
+    if user in managers:
+        return {field for field in fields if field.contribution_field.is_active}
+    if user == submitter:
+        return {field for field in fields
+                if (field.contribution_field.is_active
+                    and field.contribution_field.visibility != ContributionFieldVisibility.managers_only)}
+    return {field for field in fields if
+            (field.contribution_field.is_active
+             and field.contribution_field.visibility == ContributionFieldVisibility.public)}

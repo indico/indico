@@ -68,7 +68,7 @@ class RHSubmitAbstract(RHAbstractsBase):
         RHAbstractsBase._check_access(self)
 
     def _process(self):
-        abstract_form_class = make_abstract_form(self.event, management=self.management)
+        abstract_form_class = make_abstract_form(self.event, session.user, management=self.management)
         form = abstract_form_class(event=self.event)
         if form.validate_on_submit():
             abstract = create_abstract(self.event, *get_field_values(form.data), send_notifications=True)

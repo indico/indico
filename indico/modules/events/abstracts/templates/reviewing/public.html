@@ -144,7 +144,7 @@
 {% endmacro %}
 
 
-{% macro render_submission_info(abstract) %}
+{% macro render_submission_info(abstract, field_values) %}
     <div class="i-timeline">
         <div class="i-timeline-item">
             {{ render_user_avatar(abstract.submitter) }}
@@ -161,7 +161,7 @@
                     {% endif %}
                 </div>
                 <div class="i-box-content submission-info">
-                    {{ _render_submission_info(abstract) }}
+                    {{ _render_submission_info(abstract, field_values) }}
                     {% if abstract.event.cfa.allow_attachments %}
                         <div class="attachment-list">
                             {{ _render_attachments(abstract) }}
@@ -254,7 +254,7 @@
 {% endmacro %}
 
 
-{% macro _render_submission_info(abstract) %}
+{% macro _render_submission_info(abstract, field_values) %}
     {% if abstract.submitted_contrib_type %}
         <div class="info-line">
             <label>
@@ -350,7 +350,6 @@
             </ul>
         </div>
     {% endif %}
-    {% set field_values = abstract.field_values|selectattr('contribution_field.is_active')|list %}
     {% if field_values %}
         <div class="titled-rule">
             {%- trans %}More information{% endtrans -%}

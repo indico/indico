@@ -18,7 +18,8 @@ from __future__ import unicode_literals
 
 from flask import render_template, session
 
-from indico.modules.events.abstracts.util import get_visible_reviewed_for_tracks
+from indico.modules.events.abstracts.util import filter_field_values, get_visible_reviewed_for_tracks
+from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
 from indico.modules.events.management.views import WPEventManagement
 from indico.modules.events.views import WPConferenceDisplayBase
 from indico.util.mathjax import MathjaxMixin
@@ -83,6 +84,8 @@ def render_abstract_page(abstract, view_class=None, management=False):
     judgment_form = AbstractJudgmentForm(abstract=abstract, formdata=None)
     review_track_list_form = AbstractReviewedForTracksForm(event=abstract.event, obj=abstract, formdata=None)
     track_session_map = {track.id: track.default_session_id for track in abstract.event.tracks}
+    managers = {x.principal for x in abstract.event.acl_entries if x.full_access}
+    field_values = filter_field_values(abstract.field_values, session.user, managers, abstract.submitter)
     params = {'abstract': abstract,
               'comment_form': comment_form,
               'review_form': review_form,
@@ -90,7 +93,9 @@ def render_abstract_page(abstract, view_class=None, management=False):
               'judgment_form': judgment_form,
               'visible_tracks': get_visible_reviewed_for_tracks(abstract, session.user),
               'management': management,
-              'track_session_map': track_session_map}
+              'track_session_map': track_session_map,
+              'field_values': field_values}
+
     if view_class:
         return view_class.render_template('abstract.html', abstract.event, **params)
     else:

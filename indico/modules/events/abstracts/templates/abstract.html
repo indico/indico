@@ -27,7 +27,7 @@
             {{ render_multiple_review_group_text(abstract) }}
         {% endif %}
         {% if block == 'revision-info' %}
-            {{ render_submission_info(abstract) }}
+            {{ render_submission_info(abstract, field_values) }}
         {% endif %}
     {% endcall %}
 

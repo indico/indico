@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, Optional
 
-from indico.modules.events.contributions.models.fields import ContributionField, FieldVisibility
+from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldVisibility
 from indico.util.i18n import _
 from indico.web.fields import BaseField, get_field_definitions
 from indico.web.fields.choices import SingleChoiceField
@@ -38,15 +38,15 @@ class ContribFieldConfigForm(IndicoForm):
     title = StringField(_('Title'), [DataRequired()], description=_("The title of the field"))
     description = TextAreaField(_('Description'), description=_("The description of the field"))
     is_required = BooleanField(_('Required'), widget=SwitchWidget(),
-                               description=_("Whether the user has to fill out the field"))
+                               description=_("Whether the field has to be filled out"))
     is_active = BooleanField(_('Active'), widget=SwitchWidget(),
                              description=_("Whether the field is available."),
                              default=True)
     user_editable = BooleanField(_('User editable'), widget=SwitchWidget(),
                                  description=_("Whether the field is filled by user on abstract submission."),
                                  default=True)
-    visibility = IndicoEnumRadioField(_('Visibility'), [DataRequired()], default=FieldVisibility.public,
-                                      enum=FieldVisibility,
+    visibility = IndicoEnumRadioField(_('Visibility'), [DataRequired()], default=ContributionFieldVisibility.public,
+                                      enum=ContributionFieldVisibility,
                                       description=_('Who will be able to see the field'))
 
 

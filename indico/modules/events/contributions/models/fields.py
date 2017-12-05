@@ -34,7 +34,7 @@ def _get_next_position(context):
     return (res[0] or 0) + 1
 
 
-class FieldVisibility(RichIntEnum):
+class ContributionFieldVisibility(RichIntEnum):
     __titles__ = [None, _('Everyone'), _('Managers and submitters'), _('Only managers')]
     public = 1
     managers_and_submitters = 2
@@ -85,9 +85,9 @@ class ContributionField(db.Model):
         default=True
     )
     visibility = db.Column(
-        PyIntEnum(FieldVisibility),
+        PyIntEnum(ContributionFieldVisibility),
         nullable=False,
-        default=FieldVisibility.public
+        default=ContributionFieldVisibility.public
     )
     user_editable = db.Column(
         db.Boolean,

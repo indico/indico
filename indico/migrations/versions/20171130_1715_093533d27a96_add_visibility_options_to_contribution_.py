@@ -9,7 +9,7 @@ import sqlalchemy as sa
 from alembic import op
 
 from indico.core.db.sqlalchemy import PyIntEnum
-from indico.modules.events.contributions.models.fields import FieldVisibility
+from indico.modules.events.contributions.models.fields import ContributionFieldVisibility
 
 
 # revision identifiers, used by Alembic.
@@ -24,7 +24,7 @@ def upgrade():
                   sa.Column('user_editable', sa.Boolean(), nullable=False, server_default='true'),
                   schema='events')
     op.add_column('contribution_fields',
-                  sa.Column('visibility', PyIntEnum(FieldVisibility),
+                  sa.Column('visibility', PyIntEnum(ContributionFieldVisibility),
                             nullable=False, server_default='1'),
                   schema='events')
     op.alter_column('contribution_fields', 'user_editable', server_default=None, schema='events')
