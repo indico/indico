@@ -243,7 +243,15 @@ module.exports = env => {
             }),
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'common',
-                minChunks: 3
+                minChunks: (mod, count) => {
+                    // Let's not extract theme SCSS into the common chunk
+                    // Otherwise we will have no theme SCSS files.
+                    if (mod.resource.match(/styles\/themes\//)) {
+                        return false;
+                    } else {
+                        return count >= 3;
+                    }
+                }
             }),
             // Do not load moment locales (we'll load them explicitly)
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
