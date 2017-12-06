@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 import json
 
 from sqlalchemy import inspect
-from wtforms import SelectField
+from wtforms import RadioField, SelectField
 
 from indico.core import signals
 from indico.core.db.sqlalchemy.util.session import no_autoflush
@@ -261,3 +261,12 @@ class IndicoThemeSelectField(SelectField):
         if allow_default:
             self.choices.insert(0, ('', _('Category default')))
         self.default = '' if allow_default else theme_settings.defaults[event_type]
+
+
+class RatingReviewField(RadioField):
+    widget = JinjaWidget('events/reviews/rating_widget.html', inline_js=True)
+
+    def __init__(self, *args, **kwargs):
+        self.question = kwargs.pop('question')
+        self.rating_range = kwargs.pop('rating_range')
+        super(RatingReviewField, self).__init__(*args, **kwargs)

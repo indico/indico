@@ -241,7 +241,7 @@ class RHCreateReviewingQuestion(RHReviewingQuestionsActionsBase):
     def _process_args(self):
         RHReviewingQuestionsActionsBase._process_args(self)
         try:
-            self.field_cls = get_reviewing_question_types()[request.args['field_type']]
+            self.field_cls = get_reviewing_field_types()['papers'][request.args['field_type']]
         except KeyError:
             raise NotFound
 

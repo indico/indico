@@ -181,7 +181,7 @@ class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
             new_question.field_type = self.field_cls.name
             new_question.no_score = True if self.field_cls.name != 'rating' else form.no_score
             new_question.field_data = form.field_data
-            form.populate_obj(new_question, skip={'is_required'})
+            form.populate_obj(new_question)
             self.event.abstract_review_questions.append(new_question)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
@@ -217,7 +217,7 @@ class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):
         form = field_cls.create_config_form(obj=defaults)
         if form.validate_on_submit():
             self.question.field_data = form.field_data
-            form.populate_obj(self.question, skip={'is_required'})
+            form.populate_obj(self.question)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 

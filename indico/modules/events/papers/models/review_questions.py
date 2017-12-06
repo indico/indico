@@ -39,3 +39,8 @@ class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
     @locator_property
     def locator(self):
         return dict(self.event.locator, question_id=self.id)
+
+    @property
+    def field_type(self):
+        from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
+        return get_reviewing_field_types()['papers'][self.field_type]

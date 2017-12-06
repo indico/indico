@@ -16,13 +16,14 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, RadioField, StringField
+from wtforms.fields import BooleanField, StringField
 from wtforms.validators import DataRequired
 
+from indico.modules.events.fields import RatingReviewField
 from indico.util.i18n import _
 from indico.web.fields.base import BaseField, IndicoForm
 from indico.web.fields.simple import BoolField, TextField
-from indico.web.forms.widgets import JinjaWidget, SwitchWidget
+from indico.web.forms.widgets import SwitchWidget
 
 
 class BaseReviewingQuestionConfigForm(IndicoForm):
@@ -31,45 +32,48 @@ class BaseReviewingQuestionConfigForm(IndicoForm):
 
     @property
     def field_data(self):
-        return {'is_required': self.is_required.data}
+        return {}
 
 
-class RatingReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
+class AbstractRatingReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
     no_score = BooleanField(_('Exclude from score'), widget=SwitchWidget())
 
 
-class RatingReviewField(RadioField):
-    widget = None
-
-    def __init__(self, *args, **kwargs):
-        question = kwargs.pop('question')
-        event = question.event
-        self.widget = JinjaWidget('events/reviews/rating_widget.html', question=question, inline_js=True,
-                                  rating_range=event.cfa.rating_range)
-        super(RatingReviewField, self).__init__(*args, **kwargs)
+class PaperRatingReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
+    pass
 
 
-class RatingReviewingQuestion(BaseField):
+class AbstractRatingReviewingQuestion(BaseField):
     name = 'rating'
     friendly_name = _('Rating')
-    common_settings = ('text', 'no_score')
-    config_form_base = RatingReviewingQuestionConfigForm
+    common_settings = ('text', 'no_score', 'is_required')
+    config_form_base = AbstractRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
 
     @property
     def wtf_field_kwargs(self):
         range_ = self.object.event.cfa.rating_range
-        return {'coerce': int, 'choices': [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)],
-                'question': self.object}
+        choices = [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)]
+        return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 
-class BoolReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
-    pass
+class PaperRatingReviewingQuestion(BaseField):
+    name = 'rating'
+    friendly_name = _('Rating')
+    common_settings = ('text', 'no_score', 'is_required')
+    config_form_base = PaperRatingReviewingQuestionConfigForm
+    wtf_field_class = RatingReviewField
+
+    @property
+    def wtf_field_kwargs(self):
+        range_ = self.object.event.cfp.rating_range
+        choices = [(n, unicode(n)) for n in range(range_[0], range_[1] + 1)]
+        return {'coerce': int, 'choices': choices, 'rating_range': range_, 'question': self.object}
 
 
 class BoolReviewingQuestion(BoolField, BaseField):
-    common_settings = ('text',)
-    config_form_base = BoolReviewingQuestionConfigForm
+    common_settings = ('text', 'is_required')
+    config_form_base = BaseReviewingQuestionConfigForm
 
 
 class TextReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
@@ -83,9 +87,13 @@ class TextReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
 
 
 class TextReviewingQuestion(TextField, BaseField):
-    common_settings = ('text',)
+    common_settings = ('text', 'is_required')
     config_form_base = TextReviewingQuestionConfigForm
 
 
 def get_reviewing_field_types():
-    return {field.name: field for field in [RatingReviewingQuestion, BoolReviewingQuestion, TextReviewingQuestion]}
+    return {
+        'abstracts': {f.name: f for f in [AbstractRatingReviewingQuestion, BoolReviewingQuestion,
+                                          TextReviewingQuestion]},
+        'papers': {f.name: f for f in [PaperRatingReviewingQuestion, BoolReviewingQuestion, TextReviewingQuestion]},
+    }

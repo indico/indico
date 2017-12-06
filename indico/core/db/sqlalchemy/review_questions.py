@@ -136,11 +136,6 @@ class ReviewQuestionMixin(object):
         return rating
 
     @property
-    def field_type(self):
-        from indico.modules.events.reviewing_questions_fields import get_reviewing_question_types
-        return get_reviewing_question_types()[self.question_type]
-
-    @property
     def title(self):
         return self.text
 
