@@ -22,9 +22,9 @@
 
     var permissionClasses = {
         access: 'accept',
-        timetable: 'highlight',
+        registration: 'highlight',
         edit: 'danger',
-        material: 'warning'
+        submit: 'warning'
     };
 
     $.widget('indico.permissionswidget', {
@@ -53,12 +53,12 @@
             });
         },
         _renderLabel: function(principal) {
-            var $labelBox = $('<div>', {class: 'label-box'});
+            var $labelBox = $('<div>', {class: 'label-box flexrow f-a-center'});
             var type = principal._type;
             if (type === 'EventRole') {
                 var $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
                 var $code = this._renderRoleCode(principal.code, principal.color);
-                return $labelBox.append($('<span>', {class: 'flexrow f-a-center'}).append($code).append($text));
+                return $labelBox.append($code).append($text);
             } else {
                 var iconClass;
                 if (type === 'Avatar') {
@@ -74,8 +74,8 @@
                 }
                 var labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
                 var text = labelIsName ? principal.name : principal.id;
-                $labelBox.addClass('entry-label');
-                return $labelBox.append($('<span>', {class: 'label-icon text-normal ' + iconClass, text: text}));
+                return $labelBox.append($('<span>', {class: 'entry-icon '  + iconClass}),
+                    $('<span>', {class: 'text-normal entry-label', text: text}));
             }
         },
         _renderPermissions: function(principal, permissions) {
