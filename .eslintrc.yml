@@ -1,11 +1,11 @@
 env:
   browser: true
   jquery: true
+  es6: true
 
 extends: 'eslint:recommended'
 
 parserOptions:
-  ecmaVersion: 6
   sourceType: module
 
 rules:
@@ -13,6 +13,14 @@ rules:
     - error
     - 4
     - SwitchCase: 1
+      FunctionExpression:
+        parameters: first
+      CallExpression:
+        arguments: first
+      ArrayExpression: first
+      ObjectExpression: first
+      ImportDeclaration: first
+
   linebreak-style:
     - error
     - unix

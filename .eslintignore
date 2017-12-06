@@ -1,13 +1,12 @@
-indico/htdocs/js/lib/
-indico/htdocs/js/calendar/
-indico/htdocs/js/presentation/
-indico/htdocs/js/jquery/
-indico/htdocs/js/indico/Common/
-indico/htdocs/js/indico/Core/
-indico/htdocs/js/indico/Legacy/
-indico/htdocs/js/indico/Management/
-indico/htdocs/js/indico/RoomBooking/
-indico/htdocs/js/indico/angular/
-indico/htdocs/js/indico/modules/timetable/timetable/*.js
-indico/web/client/js/jquery/contrib/*.js
-indico/web/templates/assets/*.js
+# Legacy
+indico/web/client/js/legacy/
+indico/modules/events/registration/js/form
+
+# Not legacy, but not tidy either
+indico/web/client/js/jquery/
+
+# Not actually JavaScript
+indico/web/templates/assets
+
+# Generated content
+indico/web/static/dist/
