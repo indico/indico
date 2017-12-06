@@ -20,12 +20,14 @@ const fs = require('fs');
 const path = require('path');
 const glob = require('glob');
 
+const chalk = require('chalk');
 const uglify = require('uglify-js');
 const webpack = require('webpack')
 
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const ManifestPlugin = require('webpack-manifest-plugin');
+const ProgressBarPlugin = require('progress-bar-webpack-plugin');
 
 const config = require('./config');
 
@@ -254,10 +256,23 @@ module.exports = env => {
             new CopyWebpackPlugin([
                 {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'js/ckeditor', transform},
                 {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}
-            ])
+            ]),
+            new ProgressBarPlugin({
+                format: chalk.cyan('Code being sent to the moon and back \u{1f680} \u{1f311}') + '  [:bar] ' +
+                    chalk.green.bold(':percent') + ' (:elapsed seconds)'
+            })
         ],
         resolve: {
             alias: resolveAlias
+        },
+        stats: {
+            assets: false,
+            children: false,
+            modules: false,
+            chunks: true,
+            chunkModules: false,
+            chunkOrigins: false,
+            chunksSort: 'name'
         }
     };
 };
