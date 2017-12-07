@@ -146,9 +146,6 @@
                 } else {
                     $dropdownLink.removeClass('disabled');
                 }
-            } else {
-                tooltip = isRoleDropdown ? $T('No roles created in this event') : $T('No IP Networks created');
-                $dropdownLink.addClass('disabled').attr('title', tooltip);
             }
         },
         _renderDropdownItem: function(principal) {
@@ -293,19 +290,6 @@
                 var $this = $(this);
                 if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
                     $this.attr('title', $this.text());
-                }
-            });
-
-            $('#permissions-add-entry-menu-target').qbubble({
-                content: {
-                    text: $('#permissions-add-entry-menu')
-                },
-                style: {
-                    classes: 'qtip-allow-overflow'
-                },
-                position: {
-                    my: 'top right',
-                    at: 'bottom right'
                 }
             });
         }

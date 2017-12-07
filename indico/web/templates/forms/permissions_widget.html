@@ -2,28 +2,24 @@
 
 {% block html %}
     <h3>Permissions</h3>
-    <div id="permissions-widget-{{ field.id }}" class="js-permissions-widget">
+    <div id="permissions-widget-{{ field.id }}" class="permissions-widget">
         <input type="hidden" value='{{ field._value() }}' name="permissions">
         <ul class="permissions-widget-list"></ul>
         <div class="toolbars">
             <div class="toolbar">
-                <a class="i-button icon-plus highlight arrow" id="permissions-add-entry-menu-target">
-                    {%- trans %}Add entry{% endtrans -%}
-                </a>
-                <div id="permissions-add-entry-menu">
-                    <div class="flexcol f-a-start">
-                        <a href="#" class="i-button borderless js-add-user-group">
-                            {%- trans %}User / Group{% endtrans -%}
-                        </a>
-                        <a href="#" class="i-button borderless arrow js-dropdown" data-toggle="dropdown">
-                            {%- trans %}Role{% endtrans -%}
-                        </a>
+                <div class="group">
+                    <a href="#" class="i-button label text-color outline add-entry-decoration icon-plus"></a>
+                    <a class="i-button js-add-user-group">{% trans %}User / Group{% endtrans %}</a>
+                    {% if field.roles %}
+                        <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Role{% endtrans %}</a>
                         <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson }}'></ul>
-                        <a href="#" class="i-button borderless arrow js-dropdown" data-toggle="dropdown">
+                    {% endif %}
+                    {% if field.ip_networks %}
+                        <a class="i-button arrow js-dropdown" data-toggle="dropdown">
                             {%- trans %}IP Network{% endtrans -%}
                         </a>
                         <ul class="dropdown entry-ip-network-dropdown" data-items='{{ field.ip_networks|tojson }}'></ul>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
             <div class="toolbar">
