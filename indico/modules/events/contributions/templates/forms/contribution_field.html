@@ -1,0 +1,20 @@
+{% extends 'forms/form_common_fields_first.html' %}
+
+{% block javascript %}
+    <script>
+        var $userEditable = $('#user_editable');
+        var $managers = $('#visibility').find('.managers').find('input');
+        if ($userEditable[0].checked){
+            $managers.prop('disabled', true);
+        } else {
+            $managers.prop('disabled', false);
+        }
+        $userEditable.on('change', function() {
+            if (this.checked) {
+                $managers.prop('disabled', true);
+            } else {
+                $managers.prop('disabled', false);
+            }
+        });
+    </script>
+{% endblock %}

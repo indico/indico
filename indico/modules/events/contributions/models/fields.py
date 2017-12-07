@@ -36,6 +36,7 @@ def _get_next_position(context):
 
 class ContributionFieldVisibility(RichIntEnum):
     __titles__ = [None, _('Everyone'), _('Managers and submitters'), _('Only managers')]
+    __css_classes__ = [None, 'public', 'submitters', 'managers']
     public = 1
     managers_and_submitters = 2
     managers_only = 3
