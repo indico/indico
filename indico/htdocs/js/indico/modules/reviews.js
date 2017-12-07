@@ -53,7 +53,10 @@
                 $item.addClass('header-indicator-left');
             }
             if ($item.data('no-comment') !== undefined) {
-                $item.addClass('header-only');
+                var $ratingsDetails = $item.find('.ratings-details');
+                if (!$ratingsDetails.length || !$ratingsDetails.is(':visible')) {
+                    $item.addClass('header-only');
+                }
             }
         }).on('focus', '.new-comment textarea', function() {
             var $box = $('#review-timeline-input');
