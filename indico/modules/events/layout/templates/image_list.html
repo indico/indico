@@ -2,9 +2,13 @@
     <ul class="image-list">
     {% for image in images %}
         <li>
+            {%- if image.content_type.startswith('image/') -%}
             <a href="{{ url_for('event_images.image_display', image) }}" class="js-lightbox">
                 <img src="{{ url_for('event_images.image_display', image) }}" alt="{% trans %}Image{% endtrans %}">
             </a>
+            {%- else -%}
+            <a href="{{ url_for('event_images.image_display', image) }}"><span class="nonimage">{{ image.filename }}</span></a>
+            {%- endif -%}
             <span class="menu">
                 <a class="icon-link js-copy-to-clipboard" title="{% trans %}Get link to image{% endtrans %}"
                    href="{{ url_for('event_images.image_display', image, _external=true) }}"

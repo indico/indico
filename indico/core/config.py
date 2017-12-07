@@ -40,6 +40,8 @@ from indico.util.string import crc32, snakify
 DEFAULTS = {
     'ASSETS_DIR': '/opt/indico/assets',
     'ATTACHMENT_STORAGE': 'default',
+    'ALLOWED_IMAGE_MIME_TYPES': ['image/jpeg', 'image/jpg', 'image/gif', 'image/png'],
+    'ALLOWED_IMAGE_TYPES': ['jpeg', 'gif', 'png'],
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,
     'CACHE_BACKEND': 'files',

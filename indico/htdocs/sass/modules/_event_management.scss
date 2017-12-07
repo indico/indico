@@ -383,6 +383,15 @@
             height: 200px;
         }
 
+        span {
+            .nonimage {
+                margin: 2px;
+                height: 200px;
+                display: inline-block;
+                vertical-align: bottom;
+            }
+        }
+
         .menu {
             color: white;
             text-align: right;

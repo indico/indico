@@ -18,11 +18,14 @@ from __future__ import unicode_literals
 
 import shutil
 from io import BytesIO
+from mimetypes import guess_type
 
 from flask import flash, render_template, request, session
 from PIL import Image
+from pyPdf import PdfFileReader
 
 from indico.core import signals
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import logger
@@ -56,24 +59,36 @@ class RHImageUpload(RHManageImagesBase):
         files = request.files.getlist('image')
         num = 0
         for f in files:
+
             filename = secure_filename(f.filename, 'image')
+            mtype = guess_type(filename)[0]
+            if mtype not in config.ALLOWED_IMAGE_MIME_TYPES:
+                continue
             data = BytesIO()
             shutil.copyfileobj(f, data)
             data.seek(0)
-            try:
-                image_type = Image.open(data).format.lower()
-            except IOError:
-                # Invalid image data
-                continue
+            if mtype == 'application/pdf':
+                try:
+                    _pdf = PdfFileReader(data)
+                    image_type = 'pdf'
+                    content_type = mtype
+                except Exception:
+                    continue
+            else:
+                try:
+                    image_type = Image.open(data).format.lower()
+                    # XXX: mpo is basically JPEG and JPEGs from some cameras are (wrongfully) detected as mpo
+                    if image_type == 'mpo':
+                       image_type = 'jpeg'
+                       content_type = 'image/' + image_type
+                except IOError:
+                    # Invalid image data
+                    continue
             data.seek(0)
-            # XXX: mpo is basically JPEG and JPEGs from some cameras are (wrongfully) detected as mpo
-            if image_type == 'mpo':
-                image_type = 'jpeg'
-            elif image_type not in {'jpeg', 'gif', 'png'}:
-                flash(_("The image '{name}' has an invalid type ({type}); only JPG, GIF and PNG are allowed.")
+            if image_type not in config.ALLOWED_IMAGE_TYPES:
+                flash(_("The image '{name}' has an invalid type ({type})."  )
                       .format(name=f.filename, type=image_type), 'error')
                 continue
-            content_type = 'image/' + image_type
             image = ImageFile(event=self.event, filename=filename, content_type=content_type)
             image.save(data)
             num += 1

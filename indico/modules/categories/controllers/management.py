@@ -24,6 +24,7 @@ from PIL import Image
 from sqlalchemy.orm import joinedload, load_only, undefer_group
 from werkzeug.exceptions import BadRequest, Forbidden
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.categories import logger
 from indico.modules.categories.controllers.base import RHManageCategoryBase
@@ -121,7 +122,7 @@ class RHCategoryImageUploadBase(RHManageCategoryBase):
         except IOError:
             flash(_('You cannot upload this file as an icon/logo.'), 'error')
             return jsonify_data(content=None)
-        if img.format.lower() not in {'jpeg', 'png', 'gif'}:
+        if img.format.lower() not in config.ALLOWED_IMAGE_TYPES:
             flash(_('The file has an invalid format ({format})').format(format=img.format), 'error')
             return jsonify_data(content=None)
         if img.mode == 'CMYK':

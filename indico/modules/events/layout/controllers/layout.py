@@ -25,6 +25,7 @@ from werkzeug.exceptions import NotFound
 from wtforms import fields as wtforms_fields
 from wtforms.validators import DataRequired
 
+from indico.core.config import config
 from indico.core.db import db
 from indico.modules.events.controllers.base import RHDisplayEventBase
 from indico.modules.events.layout import layout_settings, logger, theme_settings
