@@ -170,7 +170,7 @@ class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
     def _process_args(self):
         RHManageAbstractsBase._process_args(self)
         try:
-            self.field_cls = get_reviewing_field_types()['abstracts'][request.args['field_type']]
+            self.field_cls = get_reviewing_field_types('abstracts')[request.args['field_type']]
         except KeyError:
             raise NotFound
 
@@ -213,8 +213,7 @@ class RHReviewingQuestionBase(RHManageAbstractsBase):
 class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):
     def _process(self):
         defaults = FormDefaults(obj=self.question, **self.question.field_data)
-        field_cls = self.question.field_type(self.question)
-        form = field_cls.create_config_form(obj=defaults)
+        form = self.question.field.create_config_form(obj=defaults)
         if form.validate_on_submit():
             self.question.field_data = form.field_data
             form.populate_obj(self.question)

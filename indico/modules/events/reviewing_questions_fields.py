@@ -91,9 +91,8 @@ class TextReviewingQuestion(TextField, BaseField):
     config_form_base = TextReviewingQuestionConfigForm
 
 
-def get_reviewing_field_types():
-    return {
-        'abstracts': {f.name: f for f in [AbstractRatingReviewingQuestion, BoolReviewingQuestion,
-                                          TextReviewingQuestion]},
-        'papers': {f.name: f for f in [PaperRatingReviewingQuestion, BoolReviewingQuestion, TextReviewingQuestion]},
-    }
+def get_reviewing_field_types(type_):
+    if type_ == 'abstracts':
+        return {f.name: f for f in [AbstractRatingReviewingQuestion, BoolReviewingQuestion, TextReviewingQuestion]}
+    elif type_ == 'papers':
+        return {f.name: f for f in [PaperRatingReviewingQuestion, BoolReviewingQuestion, TextReviewingQuestion]}

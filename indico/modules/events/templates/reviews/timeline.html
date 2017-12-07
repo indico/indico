@@ -188,9 +188,11 @@
                                                     <span class="score">{{ rating.value if rating.value is not none else '-' }}</span>
                                                 </span>
                                             {% elif rating.question.field_type == 'bool' %}
-                                                {{ _('Yes') if rating.value else _('No') }}
+                                                {% if rating.value is not none %}
+                                                    {{ _('Yes') if rating.value else _('No') }}
+                                                {% endif %}
                                             {% else %}
-                                                {{ rating.value|safe }}
+                                                {{ rating.value }}
                                             {% endif %}
                                             </span>
                                         </div>

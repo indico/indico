@@ -48,7 +48,7 @@ def make_review_form(event, review_type):
     form_class = type(b'_PaperReviewForm', (PaperReviewForm,), {})
     for question in event.cfp.get_questions_for_review_type(review_type):
         name = 'question_{}'.format(question.id)
-        setattr(form_class, name, question.field_type(question).create_wtf_field())
+        setattr(form_class, name, question.field.create_wtf_field())
     return form_class
 
 

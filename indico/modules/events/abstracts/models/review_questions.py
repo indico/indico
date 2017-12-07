@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from indico.core.db.sqlalchemy import db
 from indico.core.db.sqlalchemy.review_questions import ReviewQuestionMixin
+from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
 from indico.util.locators import locator_property
 
 
@@ -35,6 +36,9 @@ class AbstractReviewQuestion(ReviewQuestionMixin, db.Model):
         return dict(self.event.locator, question_id=self.id)
 
     @property
-    def field_type(self):
-        from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
-        return get_reviewing_field_types()['abstracts'][self.field_type]
+    def field(self):
+        try:
+            impl = get_reviewing_field_types('abstracts')[self.field_type]
+        except KeyError:
+            return None
+        return impl(self)

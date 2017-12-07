@@ -58,7 +58,7 @@ def make_review_form(event):
     form_class = type(b'_AbstractReviewForm', (AbstractReviewForm,), {})
     for question in event.abstract_review_questions:
         name = 'question_{}'.format(question.id)
-        setattr(form_class, name, question.field_type(question).create_wtf_field())
+        setattr(form_class, name, question.field.create_wtf_field())
     return form_class
 
 
