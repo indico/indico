@@ -22,4 +22,4 @@ from indico.modules.events.management.views import WPEventManagement
 class WPEventRoles(WPEventManagement):
     template_prefix = 'events/roles/'
     sidemenu_option = 'roles'
-    bundles = WPEventManagement.bundles + ('module_events.roles.js',)
+    bundles = ('module_events.roles.js',)

@@ -54,4 +54,4 @@ class WPUser(WPJinjaMixin, WPDecorated):
 
 class WPUsersAdmin(WPAdmin):
     template_prefix = 'users/'
-    bundles = WPAdmin.bundles + ('module_users.js',)
+    bundles = ('module_users.js',)

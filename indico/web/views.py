@@ -149,7 +149,7 @@ class WPJinjaMixin(object):
         if html is not None:
             return html
         template = params.pop('_jinja_template')
-        params['bundles'] = (current_webpack.manifest[x] for x in self.bundles)
+        params['bundles'] = (current_webpack.manifest[x] for x in self._resolve_bundles())
         return self.render_template_func(template, **params)
 
 
@@ -172,14 +172,28 @@ class WPBase(object):
 
     @classproperty
     @classmethod
-    def bundles(self):
+    def bundles(cls):
         _bundles = ('common.js', 'main.js', 'main.css', 'module_core.js', 'module_events.creation.js',
                     'module_attachments.js')
         if not g.get('static_site'):
             _bundles += ('ckeditor.js',)
-        if config.DEBUG and len(_bundles) != len(set(_bundles)):
-            raise Exception('Duplicate bundles found')
         return _bundles
+
+    def _resolve_bundles(self):
+        """Add up all bundles, following the MRO."""
+        seen_bundles = set()
+        for class_ in reversed(self.__class__.mro()[:-1]):
+            attr = class_.__dict__.get('bundles', ())
+            if isinstance(attr, classproperty):
+                attr = attr.__get__(None, class_)
+            elif isinstance(attr, property):
+                attr = attr.fget(self)
+
+            for bundle in attr:
+                if config.DEBUG and bundle in seen_bundles:
+                    raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
+                seen_bundles.add(bundle)
+                yield bundle
 
     def _getHeadContent(self):
         """
@@ -220,7 +234,7 @@ class WPBase(object):
         js_files = map(self._fix_path, plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
-        bundles = (current_webpack.manifest[x] for x in self.bundles)
+        bundles = (current_webpack.manifest[x] for x in self._resolve_bundles())
         print_bundles = (current_webpack.manifest[x] for x in self.print_bundles)
 
         return render_template('indico_base.html',

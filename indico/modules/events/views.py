@@ -98,7 +98,7 @@ class WPReferenceTypes(WPAdmin):
 
 class WPEventBase(WPDecorated):
     ALLOW_JSON = False
-    bundles = WPDecorated.bundles + ('module_events.display.js',)
+    bundles = ('module_events.display.js',)
 
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -148,8 +148,8 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 
     @property
     def bundles(self):
-        return WPSimpleEventDisplayBase.bundles + ('themes_{}.css'.format(self.theme_file_name),
-                                                   'module_vc.js', 'module_vc.css', 'module_events.cloning.js')
+        return ('themes_{}.css'.format(self.theme_file_name), 'module_vc.js', 'module_vc.css',
+                'module_events.cloning.js')
 
     @property
     def print_bundles(self):
@@ -210,7 +210,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     menu_entry_plugin = None
     menu_entry_name = None
-    bundles = WPEventBase.bundles + ('conferences.css',)
+    bundles = ('conferences.css',)
 
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)

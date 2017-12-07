@@ -35,7 +35,7 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
 
     template_prefix = 'categories/'
     ALLOW_JSON = False
-    bundles = WPDecorated.bundles + ('module_categories.js',)
+    bundles = ('module_categories.js',)
 
     def __init__(self, rh, category, **kwargs):
         kwargs['category'] = category
@@ -73,14 +73,14 @@ class WPCategory(MathjaxMixin, WPJinjaMixin, WPDecorated):
 class WPCategoryCalendar(WPCategory):
     """WP for category calendar page"""
 
-    bundles = WPCategory.bundles + ('module_categories.calendar.js', 'module_categories.calendar.css')
+    bundles = ('module_categories.calendar.js', 'module_categories.calendar.css')
 
 
 class WPCategoryManagement(WPCategory):
     """WP for category management pages"""
 
     MANAGEMENT = True
-    bundles = WPCategory.bundles + ('module_categories.management.js',)
+    bundles = ('module_categories.management.js',)
 
     def __init__(self, rh, category, active_menu_item, **kwargs):
         kwargs['active_menu_item'] = active_menu_item
@@ -97,4 +97,4 @@ class WPCategoryManagement(WPCategory):
 
 
 class WPCategoryStatistics(WPCategory):
-    bundles = WPCategory.bundles + ('statistics.js', 'statistics.css')
+    bundles = ('statistics.js', 'statistics.css')
