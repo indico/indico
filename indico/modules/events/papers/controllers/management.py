@@ -249,9 +249,9 @@ class RHCreateReviewingQuestion(RHReviewingQuestionsActionsBase):
         form = self.field_cls.create_config_form()
         if form.validate_on_submit():
             new_question = PaperReviewQuestion()
-            new_question.field_type = self.field_cls.name
-            new_question.field_data = form.field_data
             new_question.type = PaperReviewType.get(self.review_type)
+            field = self.field_cls(new_question)
+            field.update_object(form.data)
             form.populate_obj(new_question)
             self.event.paper_review_questions.append(new_question)
             return jsonify_data(flash=False)
@@ -271,7 +271,7 @@ class RHEditReviewingQuestion(RHManageQuestionBase):
         defaults = FormDefaults(obj=self.question, **self.question.field_data)
         form = self.question.field.create_config_form(obj=defaults)
         if form.validate_on_submit():
-            self.question.field_data = form.field_data
+            self.question.field.update_object(form.data)
             form.populate_obj(self.question)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))

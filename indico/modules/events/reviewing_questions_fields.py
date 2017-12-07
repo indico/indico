@@ -60,7 +60,7 @@ class AbstractRatingReviewingQuestion(BaseField):
 class PaperRatingReviewingQuestion(BaseField):
     name = 'rating'
     friendly_name = _('Rating')
-    common_settings = ('text', 'no_score', 'is_required')
+    common_settings = ('text', 'is_required')
     config_form_base = PaperRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
 
