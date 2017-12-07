@@ -33,7 +33,7 @@ Bugfixes
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
-- Remove `SCSS_DEBUG_INFO` config option.
+- Remove ``SCSS_DEBUG_INFO`` config option.
 
 
 Version 2.0rc1
