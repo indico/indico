@@ -24,7 +24,7 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 
 class WPSettings(WPAdmin):
     template_prefix = 'core/'
-    bundles = WPAdmin.bundles + ('module_cephalopod.js',)
+    bundles = ('module_cephalopod.js',)
 
 
 class WPContact(WPJinjaMixin, WPDecorated):

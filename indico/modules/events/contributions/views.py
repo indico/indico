@@ -24,7 +24,7 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageContributions(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/contributions/'
     sidemenu_option = 'contributions'
-    bundles = WPEventManagement.bundles + ('markdown.js', 'module_events.contributions.js')
+    bundles = ('markdown.js', 'module_events.contributions.js')
 
     def _getHeadContent(self):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
@@ -32,7 +32,7 @@ class WPManageContributions(MathjaxMixin, WPEventManagement):
 
 class WPContributionsDisplayBase(WPConferenceDisplayBase):
     template_prefix = 'events/contributions/'
-    bundles = WPConferenceDisplayBase.bundles + ('markdown.js', 'module_events.contributions.js',
+    bundles = ('markdown.js', 'module_events.contributions.js',
                                                  'module_events.display.js')
 
 
