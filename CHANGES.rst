@@ -28,6 +28,7 @@ Bugfixes
 - Show full track title in tooltips on abstract pages
 - Show correct review indicators when a reviewer still has to review
   an abstract in a different track
+- Fix unicode error when searching external users in an LDAP backend
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
