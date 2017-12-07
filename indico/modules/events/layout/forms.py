@@ -152,7 +152,7 @@ class MenuPageForm(MenuUserEntryFormBase):
 
 
 class AddImagesForm(IndicoForm):
-    image = FileField("Image", multiple_files=True, accepted_file_types='image/jpeg,image/jpg,image/png,image/gif')
+    image = FileField("Image", multiple_files=True, accepted_file_types=','.join(config.ALLOWED_IMAGE_MIME_TYPES))
 
 
 class CSSSelectionForm(IndicoForm):
