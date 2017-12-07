@@ -162,10 +162,38 @@
             var $text = $('<span>', {text: principal.name});
             $dropdownItem.append($itemContent.append($text)).on('click', function() {
                 // Grant 'access' permissions when a role / IP Network is added.
-                self._addItem($(this).data('principal'), ['access']);
-                $('#permissions-add-entry-menu-target').qbubble('hide');
+                self._addItems([$(this).data('principal')], ['access']);
             });
             return $dropdownItem;
+        },
+        _renderTooltip: function(idx) {
+            this.$permissionsWidgetList.find('>li').not('.disabled').eq(idx).qtip({
+                content: {
+                    text: $T('This entry was already added')
+                },
+                show: {
+                    ready: true,
+                    effect: function() {
+                        $(this).fadeIn(300);
+                    }
+                },
+                hide: {
+                    event: 'unfocus click'
+                },
+                events: {
+                    hide: function() {
+                        $(this).fadeOut(300);
+                        $(this).qtip('destroy');
+                    }
+                },
+                position: {
+                    my: 'center left',
+                    at: 'center right'
+                },
+                style: {
+                    classes: 'qtip-danger'
+                }
+            });
         },
         _render: function() {
             var self = this;
@@ -201,52 +229,34 @@
             this._update();
             this._render();
         },
-        _addItem: function(principal, permissions) {
-            var idx = this._findEntryIndex(principal);
-            if (idx === -1) {
-                this.data.push([principal, permissions]);
-                this._update();
-                this._render();
-                var newIdx = this._findEntryIndex(principal);
-                this.$permissionsWidgetList.find('>li').not('.disabled').eq(newIdx)
+        _addItems: function(principals, permissions) {
+            var self = this;
+            var news = [];
+            var repeated = [];
+            principals.forEach(function(principal) {
+                var idx = self._findEntryIndex(principal);
+                if (idx === -1) {
+                    self.data.push([principal, permissions]);
+                    news.push(principal);
+                } else {
+                    repeated.push(principal);
+                }
+            });
+            this._update();
+            this._render();
+            news.forEach(function(principal) {
+                self.$permissionsWidgetList.find('>li').not('.disabled').eq(self._findEntryIndex(principal))
                     .effect('highlight', {color: Palette.highlight}, 'slow');
-            } else {
-                this.$permissionsWidgetList.find('>li').not('.disabled').eq(idx).qtip({
-                    content: {
-                        text: $T('This entry was already added')
-                    },
-                    show: {
-                        ready: true,
-                        effect: function() {
-                            $(this).fadeIn(300);
-                        }
-                    },
-                    hide: {
-                        event: 'unfocused click'
-                    },
-                    events: {
-                        hide: function() {
-                            $(this).fadeOut(300);
-                            $(this).qtip('destroy');
-                        }
-                    },
-                    position: {
-                        my: 'center left',
-                        at: 'center right'
-                    },
-                    style: {
-                        classes: 'qtip-danger'
-                    }
-                });
-            }
+            });
+            repeated.forEach(function(principal) {
+                self._renderTooltip(self._findEntryIndex(principal));
+            });
         },
         _addUserGroup: function() {
             var self = this;
             function _addPrincipals(principals) {
-                principals.forEach(function(principal) {
-                    // Grant 'access' permissions when a user/group is added for the first time.
-                    self._addItem(principal, ['access']);
-                });
+                // Grant 'access' permissions when a user/group is added for the first time.
+                self._addItems(principals, ['access']);
             }
 
             var dialog = new ChooseUsersPopup(
