@@ -51,7 +51,7 @@ class WPEventManagement(WPJinjaMixin, WPDecorated):
     MANAGEMENT = True
     ALLOW_JSON = False
 
-    bundles = WPDecorated.bundles + ('module_events.cloning.js', 'module_events.management.js')
+    bundles = ('module_events.cloning.js', 'module_events.management.js')
 
     def __init__(self, rh, event_, active_menu_item=None, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)

@@ -40,7 +40,7 @@ class WPRoomBookingMapOfRooms(WPRoomBookingBase):
 class WPRoomBookingMapOfRoomsWidget(WPNotDecorated):
     sidemenu_option = 'map'
     cache = GenericCache('MapOfRooms')
-    bundles = WPNotDecorated.bundles + ('modules_rb.js', 'map_of_rooms.css')
+    bundles = ('modules_rb.js', 'map_of_rooms.css')
 
     def _get_widget_params(self):
         default_location = Location.default_location

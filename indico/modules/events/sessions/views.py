@@ -23,7 +23,7 @@ from indico.modules.events.views import WPConferenceDisplayBase
 class WPManageSessions(WPEventManagement):
     template_prefix = 'events/sessions/'
     sidemenu_option = 'sessions'
-    bundles = WPEventManagement.bundles + ('module_events.sessions.js',)
+    bundles = ('module_events.sessions.js',)
 
 
 class WPDisplaySession(WPConferenceDisplayBase):

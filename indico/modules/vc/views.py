@@ -26,13 +26,13 @@ from indico.web.views import WPDecorated, WPJinjaMixin
 class WPVCManageEvent(WPEventManagement):
     sidemenu_option = 'videoconference'
     template_prefix = 'vc/'
-    bundles = WPEventManagement.bundles + ('module_vc.js', 'module_vc.css')
+    bundles = ('module_vc.js', 'module_vc.css')
 
 
 class WPVCEventPage(WPConferenceDisplayBase):
     menu_entry_name = 'videoconference_rooms'
     template_prefix = 'vc/'
-    bundles = WPConferenceDisplayBase.bundles + ('module_vc.js', 'module_vc.css')
+    bundles = ('module_vc.js', 'module_vc.css')
 
 
 class WPVCService(WPJinjaMixin, WPDecorated):

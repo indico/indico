@@ -28,7 +28,7 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageAbstracts(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/abstracts/'
     sidemenu_option = 'abstracts'
-    bundles = WPEventManagement.bundles + ('module_events.abstracts.js', 'module_events.abstracts.css', 'markdown.js')
+    bundles = ('module_events.abstracts.js', 'module_events.abstracts.css', 'markdown.js')
 
     def _getHeadContent(self):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
@@ -36,7 +36,7 @@ class WPManageAbstracts(MathjaxMixin, WPEventManagement):
 
 class WPDisplayAbstractsBase(WPConferenceDisplayBase):
     template_prefix = 'events/abstracts/'
-    bundles = WPConferenceDisplayBase.bundles + ('module_events.abstracts.js', 'module_events.abstracts.css',
+    bundles = ('module_events.abstracts.js', 'module_events.abstracts.css',
                                                  'markdown.js')
 
 
@@ -45,12 +45,12 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
 
 
 class WPDisplayCallForAbstracts(WPDisplayAbstracts):
-    bundles = WPDisplayAbstracts.bundles + ('module_events.display.js',)
+    bundles = ('module_events.display.js',)
 
 
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
     menu_entry_name = 'abstract_reviewing_area'
-    bundles = WPDisplayAbstracts.bundles + ('module_events.management.js',)
+    bundles = ('module_events.management.js',)
 
 
 def render_abstract_page(abstract, view_class=None, management=False):

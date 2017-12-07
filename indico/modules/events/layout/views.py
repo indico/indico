@@ -28,7 +28,7 @@ class WPLayoutEdit(WPEventManagement):
 class WPMenuEdit(WPEventManagement):
     template_prefix = 'events/layout/'
     sidemenu_option = 'menu'
-    bundles = WPEventManagement.bundles + ('module_events.layout.js',)
+    bundles = ('module_events.layout.js',)
 
 
 class WPImages(WPEventManagement):
