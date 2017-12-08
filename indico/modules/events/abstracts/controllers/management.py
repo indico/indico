@@ -183,6 +183,7 @@ class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
             field.update_object(form.data)
             form.populate_obj(new_question)
             self.event.abstract_review_questions.append(new_question)
+            logger.info("New abstract reviewing question %s has been created by %s", new_question, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 
@@ -191,12 +192,14 @@ class RHSortReviewingQuestions(RHManageAbstractsBase):
     def _process(self):
         questions_by_id = {q.id: q for q in self.event.abstract_review_questions}
         question_ids = map(int, request.form.getlist('field_ids'))
+
         for index, question_id in enumerate(question_ids, 0):
             questions_by_id[question_id].position = index
             del questions_by_id[question_id]
-
         for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(question_ids)):
             field.position = index
+
+        logger.info("Abstract reviewing questions of %s have been reordered by %s", self.event, session.user)
         return jsonify_data(flash=False)
 
 
@@ -217,6 +220,7 @@ class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):
         if form.validate_on_submit():
             self.question.field.update_object(form.data)
             form.populate_obj(self.question)
+            logger.info("Abstract reviewing question %s has been updated by %s", self.question, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 
@@ -224,4 +228,5 @@ class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):
 class RHDeleteAbstractReviewingQuestion(RHReviewingQuestionBase):
     def _process(self):
         self.question.is_deleted = True
+        logger.info("Abstract reviewing question %s has been deleted by %s", self.question, session.user)
         return jsonify_data(flash=False)
