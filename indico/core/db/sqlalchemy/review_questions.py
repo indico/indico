@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from sqlalchemy.ext.declarative import declared_attr
+from sqlalchemy.ext.hybrid import hybrid_property
 
 from indico.core.db import db
 from indico.util.string import format_repr, return_ascii
@@ -65,8 +66,9 @@ class ReviewQuestionMixin(object):
         )
 
     @declared_attr
-    def no_score(cls):
+    def _no_score(cls):
         return db.Column(
+            'no_score',
             db.Boolean,
             nullable=False,
             default=False
@@ -143,3 +145,15 @@ class ReviewQuestionMixin(object):
     def description(self):
         """Required by BaseField while creating an instance of WTForms field"""
         return None
+
+    @hybrid_property
+    def no_score(self):
+        return self.field_type != 'rating' or self._no_score
+
+    @no_score.expression
+    def no_score(cls):
+        return (cls.field_type != 'rating') | cls._no_score
+
+    @no_score.setter
+    def no_score(self, value):
+        self._no_score = value
