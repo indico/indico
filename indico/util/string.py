@@ -558,10 +558,6 @@ def sanitize_html(string):
                         styles=BLEACH_ALLOWED_STYLES_HTML)
 
 
-def trim_inner_whitespace(string, _ws_re=re.compile(r'\s*\n\s*')):
-    return _ws_re.sub(' ', string.strip())
-
-
 def inject_unicode_debug(s, level=1):
     """
     Wrap a string in invisible unicode characters to trigger a unicode

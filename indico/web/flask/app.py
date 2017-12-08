@@ -156,6 +156,7 @@ def setup_mako(app):
 
 
 def setup_jinja(app):
+    app.jinja_env.policies['ext.i18n.trimmed'] = True
     # Unicode hack
     app.jinja_env.add_extension(EnsureUnicodeExtension)
     app.add_template_filter(EnsureUnicodeExtension.ensure_unicode)
