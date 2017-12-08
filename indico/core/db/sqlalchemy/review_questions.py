@@ -143,7 +143,7 @@ class ReviewQuestionMixin(object):
 
     @property
     def description(self):
-        """Required by BaseField while creating an instance of WTForms field"""
+        # Required by BaseField for creating an instance of WTForms field
         return None
 
     @hybrid_property

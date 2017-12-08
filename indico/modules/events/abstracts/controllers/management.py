@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter, itemgetter
+from operator import itemgetter
 
 from flask import flash, redirect, request, session
 from werkzeug.exceptions import NotFound
@@ -33,6 +33,8 @@ from indico.modules.events.abstracts.operations import close_cfa, open_cfa, sche
 from indico.modules.events.abstracts.settings import abstracts_reviewing_settings, abstracts_settings
 from indico.modules.events.abstracts.util import get_roles_for_event
 from indico.modules.events.abstracts.views import WPManageAbstracts
+from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
+                                              sort_reviewing_questions, update_reviewing_question)
 from indico.modules.events.reviewing_questions_fields import get_reviewing_field_types
 from indico.modules.events.util import update_object_principals
 from indico.util.i18n import _
@@ -180,30 +182,11 @@ class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):
     def _process(self):
         form = self.field_cls.create_config_form()
         if form.validate_on_submit():
-            new_question = AbstractReviewQuestion()
-            new_question.no_score = True if self.field_cls.name != 'rating' else form.no_score
-            field = self.field_cls(new_question)
-            field.update_object(form.data)
-            form.populate_obj(new_question)
+            new_question = create_reviewing_question(self.event, AbstractReviewQuestion, self.field_cls, form)
             self.event.abstract_review_questions.append(new_question)
-            logger.info("New abstract reviewing question %s has been created by %s", new_question, session.user)
+            logger.info("Abstract reviewing question %r created by %r", new_question, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
-
-
-class RHSortReviewingQuestions(RHManageAbstractsBase):
-    def _process(self):
-        questions_by_id = {q.id: q for q in self.event.abstract_review_questions}
-        question_ids = map(int, request.form.getlist('field_ids'))
-
-        for index, question_id in enumerate(question_ids, 0):
-            questions_by_id[question_id].position = index
-            del questions_by_id[question_id]
-        for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(question_ids)):
-            field.position = index
-
-        logger.info("Abstract reviewing questions of %s have been reordered by %s", self.event, session.user)
-        return jsonify_data(flash=False)
 
 
 class RHReviewingQuestionBase(RHManageAbstractsBase):
@@ -221,15 +204,19 @@ class RHEditAbstractReviewingQuestion(RHReviewingQuestionBase):
         defaults = FormDefaults(obj=self.question, **self.question.field_data)
         form = self.question.field.create_config_form(obj=defaults)
         if form.validate_on_submit():
-            self.question.field.update_object(form.data)
-            form.populate_obj(self.question)
-            logger.info("Abstract reviewing question %s has been updated by %s", self.question, session.user)
+            update_reviewing_question(self.question, form)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 
 
 class RHDeleteAbstractReviewingQuestion(RHReviewingQuestionBase):
     def _process(self):
-        self.question.is_deleted = True
-        logger.info("Abstract reviewing question %s has been deleted by %s", self.question, session.user)
+        delete_reviewing_question(self.question)
+        return jsonify_data(flash=False)
+
+
+class RHSortReviewingQuestions(RHManageAbstractsBase):
+    def _process(self):
+        question_ids = map(int, request.form.getlist('field_ids'))
+        sort_reviewing_questions(self.event.abstract_review_questions, question_ids)
         return jsonify_data(flash=False)

@@ -16,11 +16,11 @@
 
 from __future__ import unicode_literals
 
-from operator import attrgetter
-
 from flask import flash, render_template, request, session
 from werkzeug.exceptions import NotFound
 
+from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
+                                              sort_reviewing_questions, update_reviewing_question)
 from indico.modules.events.papers import logger
 from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import (DeadlineForm, PaperReviewingSettingsForm, PapersScheduleForm,
@@ -253,13 +253,10 @@ class RHCreateReviewingQuestion(RHReviewingQuestionsActionsBase):
     def _process(self):
         form = self.field_cls.create_config_form()
         if form.validate_on_submit():
-            new_question = PaperReviewQuestion()
-            new_question.type = PaperReviewType.get(self.review_type)
-            field = self.field_cls(new_question)
-            field.update_object(form.data)
-            form.populate_obj(new_question)
+            new_question = create_reviewing_question(self.event, PaperReviewQuestion, self.field_cls, form,
+                                                     {'type': PaperReviewType[self.review_type]})
             self.event.paper_review_questions.append(new_question)
-            logger.info("Paper reviewing question %s has been created by %s", new_question, session.user)
+            logger.info("Reviewing question %r created by %r", new_question, session.user)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 
@@ -277,34 +274,24 @@ class RHEditReviewingQuestion(RHManageQuestionBase):
         defaults = FormDefaults(obj=self.question, **self.question.field_data)
         form = self.question.field.create_config_form(obj=defaults)
         if form.validate_on_submit():
-            self.question.field.update_object(form.data)
-            form.populate_obj(self.question)
-            logger.info("Paper reviewing question %s has been updated by %s", self.question, session.user)
+            update_reviewing_question(self.question, form)
             return jsonify_data(flash=False)
         return jsonify_form(form, fields=getattr(form, '_order', None))
 
 
 class RHDeleteReviewingQuestion(RHManageQuestionBase):
     def _process(self):
-        self.question.is_deleted = True
-        logger.info("Paper reviewing question %s has been deleted by %s", self.question, session.user)
+        delete_reviewing_question(self.question)
         return jsonify_data(flash=False)
 
 
 class RHSortReviewingQuestions(RHReviewingQuestionsActionsBase):
     def _process(self):
+        question_ids = map(int, request.form.getlist('field_ids'))
         if self.review_type == 'layout':
             questions = self.event.cfp.layout_review_questions
         else:
             questions = self.event.cfp.content_review_questions
 
-        questions_by_id = {q.id: q for q in questions}
-        question_ids = map(int, request.form.getlist('field_ids'))
-        for index, question_id in enumerate(question_ids, 0):
-            questions_by_id[question_id].position = index
-            del questions_by_id[question_id]
-        for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(question_ids)):
-            field.position = index
-
-        logger.info("Paper reviewing questions of %s have been reordered by %s", self.event, session.user)
+        sort_reviewing_questions(questions, question_ids)
         return jsonify_data(flash=False)

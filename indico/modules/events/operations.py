@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+from operator import attrgetter
+
 from flask import session
 
 from indico.core import signals
@@ -278,3 +280,41 @@ def unlock_event(event):
     db.session.flush()
     logger.info('Event %r unlocked by %r', event, session.user)
     event.log(EventLogRealm.event, EventLogKind.change, 'Event', 'Event unlocked', session.user)
+
+
+def create_reviewing_question(event, question_model, wtf_field_cls, form, data=None):
+    new_question = question_model()
+    new_question.no_score = True
+    if 'no_score' in form:
+        new_question.no_score = form.no_score.data
+
+    field = wtf_field_cls(new_question)
+    field.update_object(form.data)
+    form.populate_obj(new_question)
+    if data is not None:
+        new_question.populate_from_dict(data)
+    return new_question
+
+
+def update_reviewing_question(question, form):
+    question.field.update_object(form.data)
+    form.populate_obj(question)
+    db.session.flush()
+    logger.info("Reviewing question %r updated by %r", question, session.user)
+
+
+def delete_reviewing_question(question):
+    question.is_deleted = True
+    db.session.flush()
+    logger.info("Reviewing question %r deleted by %r", question, session.user)
+
+
+def sort_reviewing_questions(questions, new_positions):
+    questions_by_id = {q.id: q for q in questions}
+    for index, new_position in enumerate(new_positions, 0):
+        questions_by_id[new_position].position = index
+        del questions_by_id[new_position]
+    for index, field in enumerate(sorted(questions_by_id.values(), key=attrgetter('position')), len(new_positions)):
+        field.position = index
+    db.session.flush()
+    logger.info("Reviewing questions of %r reordered by %r", questions[0].event, session.user)
