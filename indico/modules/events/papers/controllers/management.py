@@ -223,9 +223,14 @@ class RHManageReviewingQuestions(RHManagePapersBase):
             questions = self.event.cfp.layout_review_questions
         else:
             questions = self.event.cfp.content_review_questions
-        return jsonify_template('events/papers/management/paper_reviewing_questions.html', event=self.event,
-                                review_type=review_type, questions=questions,
-                                field_types=get_reviewing_field_types('papers'))
+
+        endpoints = {'create': 'papers.create_reviewing_question', 'edit': 'papers.edit_reviewing_question',
+                     'delete': 'papers.delete_reviewing_question', 'sort': 'papers.sort_reviewing_questions'}
+        common_url_args = {'review_type': review_type}
+        return jsonify_template('events/reviewing_questions_management.html', event=self.event,
+                                reviewing_questions=questions, endpoints=endpoints,
+                                field_types=get_reviewing_field_types('papers'),
+                                common_url_args=common_url_args)
 
 
 class RHReviewingQuestionsActionsBase(RHManagePapersBase):

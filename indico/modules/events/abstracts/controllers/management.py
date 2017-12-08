@@ -161,9 +161,12 @@ class RHManageReviewingRoles(RHManageAbstractsBase):
 
 class RHManageAbstractReviewingQuestions(RHManageAbstractsBase):
     def _process(self):
-        return jsonify_template('events/abstracts/management/abstract_reviewing_questions.html', event=self.event,
+        endpoints = {'create': 'abstracts.create_reviewing_question', 'edit': 'abstracts.edit_reviewing_question',
+                     'delete': 'abstracts.delete_reviewing_question', 'sort': 'abstracts.sort_reviewing_questions'}
+        return jsonify_template('events/reviewing_questions_management.html', event=self.event,
                                 reviewing_questions=self.event.abstract_review_questions,
-                                field_types=get_reviewing_field_types('abstracts'))
+                                field_types=get_reviewing_field_types('abstracts'), endpoints=endpoints,
+                                common_url_args={})
 
 
 class RHCreateAbstractReviewingQuestion(RHManageAbstractsBase):

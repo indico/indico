@@ -39,7 +39,7 @@ class PaperReviewQuestion(ReviewQuestionMixin, db.Model):
 
     @locator_property
     def locator(self):
-        return dict(self.event.locator, question_id=self.id)
+        return dict(self.event.locator, question_id=self.id, review_type=self.type.name)
 
     @property
     def field(self):
