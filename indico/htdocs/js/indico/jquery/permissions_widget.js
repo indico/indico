@@ -79,17 +79,29 @@
             }
         },
         _renderPermissions: function(principal, permissions) {
-            var self = this;
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
+
             permissions.forEach(function(item) {
                 $permissionsList.append($('<li>', {class: 'i-label bold ' + permissionClasses[item]}).append(item));
             });
 
+            $permissions.append(this._renderPermissionsButtons(principal, permissions));
+            return $permissions;
+        },
+        _renderPermissionsButtons: function(principal, permissions) {
+            var self = this;
+            var $permissionsEditBtn;
             if (principal._type !== 'DefaultEntry') {
                 var $buttonsGroup = $('<div>', {class: 'group flexrow'});
-                if (principal._type !== 'IPNetworkGroup') {
-                    var $permissionsEditBtn = $('<button>', {
+                if (principal._type === 'IPNetworkGroup') {
+                    $permissionsEditBtn = $('<button>', {
+                        type: 'button',
+                        class: 'i-button text-color borderless icon-only icon-edit disabled',
+                        title: $T('IP Networks can only have access permission')
+                    });
+                } else {
+                    $permissionsEditBtn = $('<button>', {
                         'type': 'button',
                         'class': 'i-button text-color borderless icon-only icon-edit',
                         'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
@@ -97,7 +109,6 @@
                         'data-ajax-dialog': '',
                         'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
                     });
-                    $buttonsGroup.append($permissionsEditBtn);
                 }
 
                 var $entryDeleteBtn = $('<button>', {
@@ -113,10 +124,9 @@
                     });
                 });
 
-                $buttonsGroup.append($entryDeleteBtn);
-                $buttonsGroup.appendTo($permissions);
+                $buttonsGroup.append($permissionsEditBtn, $entryDeleteBtn);
+                return $buttonsGroup;
             }
-            return $permissions;
         },
         _renderItem: function(item) {
             var $item = $('<li>', {class: 'flexrow f-a-center'});
@@ -208,8 +218,12 @@
             self.$permissionsWidgetList.append(self._renderItem(anonymous));
             self.$permissionsWidgetList.find('.anonymous').toggle(!self.isEventProtected);
 
-            this._renderDropdown(this.$roleDropdown);
-            this._renderDropdown(this.$ipNetworkDropdown);
+            if (this.$roleDropdown.length) {
+                this._renderDropdown(this.$roleDropdown);
+            }
+            if (this.$ipNetworkDropdown.length) {
+                this._renderDropdown(this.$ipNetworkDropdown);
+            }
         },
         _findEntryIndex: function(principal) {
             return _.findIndex(this.data, function(item) {
