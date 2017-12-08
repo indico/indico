@@ -114,4 +114,4 @@ your new TeXLive installation:
     XELATEX_PATH = '/opt/texlive/bin/x86_64-linux/xelatex'
 
 If you are in a production setup, reload uWSGI using
-`touch /opt/indico/web/indico.wsgi`` to reload the config file.
+``touch /opt/indico/web/indico.wsgi`` to reload the config file.
