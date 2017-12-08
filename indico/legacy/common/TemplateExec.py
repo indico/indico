@@ -33,7 +33,6 @@ from indico.legacy.common.utils import formatDate, formatDateTime, formatDuratio
 FILTER_IMPORTS = [
     'from indico.util.json import dumps as j',
     'from indico.util.string import encode_if_unicode, sanitize_html',
-    'from indico.util.string import html_line_breaks as html_breaks',
     'from indico.util.string import render_markdown_utf8 as m',
     'from indico.util.i18n import _'
 ]

@@ -88,23 +88,11 @@ def encode_if_unicode(s):
     return s.encode('utf-8') if isinstance(s, unicode) else s
 
 
-def unicodeOrNone(s):
-    return None if s is None else s.decode('utf-8')
-
-
 def safe_upper(text):
     if isinstance(text, unicode):
         return text.upper()
     else:
         return text.decode('utf-8').upper().encode('utf-8')
-
-
-def safe_slice(text, start, stop=None):
-    slice_ = slice(start, stop)
-    if isinstance(text, unicode):
-        return text[slice_]
-    else:
-        return text.decode('utf-8')[slice_].encode('utf-8')
 
 
 def remove_accents(text, reencode=True):
@@ -204,10 +192,6 @@ def return_ascii(f):
     return wrapper
 
 
-def html_line_breaks(text):
-    return '<p>' + text.replace('\n\n', '</p><p>').replace('\n', '<br/>') + '</p>'
-
-
 def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
     """
     Truncate text, taking unicode chars into account
@@ -225,15 +209,6 @@ def truncate(text, max_size, ellipsis='...', encoding='utf-8'):
         text = text.encode(encoding)
 
     return text
-
-
-def remove_extra_spaces(text):
-    """
-    Removes multiple spaces within text and removes whitespace around the text
-    'Text     with    spaces ' becomes 'Text with spaces'
-    """
-    pattern = re.compile(r"  +")
-    return pattern.sub(' ', text).strip()
 
 
 def strip_tags(text):
