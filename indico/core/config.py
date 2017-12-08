@@ -57,7 +57,7 @@ DEFAULTS = {
     'DEFAULT_LOCALE': 'en_GB',
     'DEFAULT_TIMEZONE': 'UTC',
     'ENABLE_ROOMBOOKING': False,
-    'EXTERNAL_REGISTRATION_URL': '',
+    'EXTERNAL_REGISTRATION_URL': None,
     'FLOWER_URL': None,
     'HELP_URL': 'https://learn.getindico.io',
     'IDENTITY_PROVIDERS': {},
@@ -78,13 +78,12 @@ DEFAULTS = {
     'REDIS_CACHE_URL': None,
     'ROUTE_OLD_URLS': False,
     'SCHEDULED_TASK_OVERRIDE': {},
-    'SCSS_DEBUG_INFO': True,
     'SECRET_KEY': None,
     'SENTRY_DSN': None,
     'SENTRY_LOGGING_LEVEL': 'WARNING',
     'SESSION_LIFETIME': 86400 * 31,
-    'SMTP_LOGIN': '',
-    'SMTP_PASSWORD': '',
+    'SMTP_LOGIN': None,
+    'SMTP_PASSWORD': None,
     'SMTP_SERVER': ('localhost', 25),
     'SMTP_TIMEOUT': 30,
     'SMTP_USE_CELERY': True,
@@ -163,7 +162,6 @@ def _convert_key(name):
     name = re.sub(r'([A-Z])([A-Z]+)', lambda m: m.group(1) + m.group(2).lower(), name)
     name = snakify(name).upper()
     special_cases = {'PDFLATEX_PROGRAM': 'XELATEX_PATH',
-                     'SCSSDEBUG_INFO': 'SCSS_DEBUG_INFO',
                      'IS_ROOM_BOOKING_ACTIVE': 'ENABLE_ROOMBOOKING'}
     return special_cases.get(name, name)
 

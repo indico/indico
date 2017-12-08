@@ -96,6 +96,8 @@ class WPReferenceTypes(WPAdmin):
 
 
 class WPEventBase(WPDecorated):
+    ALLOW_JSON = False
+
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
         self.event = event_

@@ -94,7 +94,12 @@ class WPJinjaMixin(object):
     template namespace!
     """
 
-    ALLOW_JSON = True  # whether XHRs automatically get a jsonified version
+    # you can set `ALLOW_JSON = False` to disable sending a jsonified
+    # version for XHR requests.  the attribute is not set here on the class
+    # because the current inheritance chain would make it impossible to
+    # change it on some base classes such as `WPEventBase` as this mixin
+    # is used deeper down in the hierarchy
+
     template_prefix = ''
     render_template_func = staticmethod(render_template)
 
@@ -111,7 +116,7 @@ class WPJinjaMixin(object):
                         the template
         """
         template = cls._prefix_template(template_name_or_list or cls._template)
-        if cls.ALLOW_JSON and request.is_xhr:
+        if getattr(cls, 'ALLOW_JSON', True) and request.is_xhr:
             return jsonify_template(template, _render_func=cls.render_template_func, **context)
         else:
             context['_jinja_template'] = template

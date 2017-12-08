@@ -1,0 +1,5 @@
+requirements_file: docs/requirements.txt
+python:
+  version: 2.7
+  setup_py_install: false
+  pip_install: true

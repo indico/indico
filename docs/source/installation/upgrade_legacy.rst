@@ -219,6 +219,7 @@ nginx                          Apache
 :ref:`deb-launch`              :ref:`deb-apache-launch`
 :ref:`deb-letsencrypt`         :ref:`deb-apache-letsencrypt`
 :ref:`deb-user`                :ref:`deb-apache-user`
+:ref:`deb-latex`               :ref:`deb-apache-latex`
 =============================  =============================
 
 
@@ -231,6 +232,7 @@ nginx                             Apache
 :ref:`centos-firewall`            :ref:`centos-apache-firewall`
 :ref:`centos-letsencrypt`         :ref:`centos-apache-letsencrypt`
 :ref:`centos-user`                :ref:`centos-apache-user`
+:ref:`centos-latex`               :ref:`centos-apache-latex`
 ================================  ================================
 
 

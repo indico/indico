@@ -76,7 +76,7 @@ def _get_htdocs_path():
 def configure_pyscss(environment):
     base_url_path = urlparse(config.BASE_URL).path
     environment.config['PYSCSS_STYLE'] = 'compact'
-    environment.config['PYSCSS_DEBUG_INFO'] = environment.debug and config.SCSS_DEBUG_INFO
+    environment.config['PYSCSS_DEBUG_INFO'] = False
     environment.config['PYSCSS_STATIC_URL'] = '{0}/static/'.format(base_url_path)
     environment.config['PYSCSS_LOAD_PATHS'] = [
         os.path.join(_get_htdocs_path(), 'sass', 'lib', 'compass'),

@@ -213,14 +213,14 @@ def create_symlinks(target_dir):
 
 @cli.command()
 @click.argument('target_dir')
-def create_configs(target_dir):
-    """Creates the initial config files for Indico.
+def create_logging_config(target_dir):
+    """Creates the default logging config file for Indico.
 
     If a file already exists it is left untouched. This command is
-    usually only used when doing a fresh indico installation.
+    usually only used when doing a fresh indico installation when
+    not using the setup wizard.
     """
     root_dir, target_dir = _get_dirs(target_dir)
-    _copy(os.path.normpath(os.path.join(root_dir, 'indico.conf.sample')), os.path.join(target_dir, 'indico.conf'))
     _copy(os.path.normpath(os.path.join(root_dir, 'logging.yaml.sample')), os.path.join(target_dir, 'logging.yaml'))
 
 

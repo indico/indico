@@ -28,6 +28,7 @@ from werkzeug.urls import url_join, url_parse
 
 import indico
 from indico.core.config import config
+from indico.core.errors import UserValueError
 from indico.core.logger import Logger
 from indico.core.notifications import make_email, send_email
 from indico.core.settings import PrefixSettingsProxy
@@ -36,7 +37,7 @@ from indico.modules.cephalopod import cephalopod_settings
 from indico.modules.core.forms import ReportErrorForm, SettingsForm
 from indico.modules.core.settings import core_settings, social_settings
 from indico.modules.core.views import WPContact, WPSettings
-from indico.util.i18n import _
+from indico.util.i18n import _, get_all_locales
 from indico.web.errors import load_error_data
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
@@ -166,6 +167,8 @@ class RHChangeLanguage(RH):
 
     def _process(self):
         language = request.form['lang']
+        if language not in get_all_locales():
+            raise UserValueError('Invalid language')
         session.lang = language
         if session.user:
             session.user.settings.set('lang', language)

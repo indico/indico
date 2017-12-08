@@ -351,6 +351,17 @@ Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
+.. _deb-apache-latex:
+
+11. Install TeXLive
+-------------------
+
+Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
+Indico can generate PDF files in various places.
+
+
+.. _deb-apache-shib:
+
 Optional: Shibboleth
 --------------------
 

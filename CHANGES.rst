@@ -41,7 +41,7 @@ Internal Changes
 Version 2.0rc2
 --------------
 
-*Unreleased*
+*Released on December 8, 2017*
 
 Improvements
 ^^^^^^^^^^^^
@@ -53,6 +53,23 @@ Bugfixes
 
 - Do not show borders above/below the message in registration emails
   unless both the header and body blocks are used (:issue:`3151`)
+- Roll-back the database transaction when an error occurs.
+- Fix rendering of the LaTeX error box (:issue:`3163`)
+- Fix "N/A" being displayed in a survey result if 0 is entered in
+  a number field
+- Fix "N/A" not being displayed in a survey result if nothing is
+  selected in a multi-choice select field
+- Fix error when using ``target_*`` placeholders in abstract
+  notification emails for actions other than "Merged" (:issue:`3171`)
+- Show full track title in tooltips on abstract pages
+- Show correct review indicators when a reviewer still has to review
+  an abstract in a different track
+- Fix unicode error when searching external users in an LDAP backend
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- Remove ``SCSS_DEBUG_INFO`` config option.
 
 
 Version 2.0rc1

@@ -1,4 +1,0 @@
-Celery
-======
-
-.. todo:: Complete page

@@ -184,50 +184,55 @@ class ContributionURLPlaceholder(Placeholder):
 
 class TargetAbstractIDPlaceholder(Placeholder):
     name = 'target_abstract_id'
-    description = _("The ID of the target abstract (merge)")
+    description = _("The ID of the target abstract (merge or duplicate)")
 
     @classmethod
     def render(cls, abstract):
-        return unicode(abstract.merged_into.friendly_id)
+        target = abstract.merged_into or abstract.duplicate_of
+        return unicode(target.friendly_id) if target else ''
 
 
 class TargetAbstractTitlePlaceholder(Placeholder):
     name = 'target_abstract_title'
-    description = _("The title of the target abstract (merge)")
+    description = _("The title of the target abstract (merge or duplicate)")
 
     @classmethod
     def render(cls, abstract):
-        return abstract.merged_into.title
+        target = abstract.merged_into or abstract.duplicate_of
+        return target.title if target else ''
 
 
 class TargetSubmitterNamePlaceholder(Placeholder):
     advanced = True
     name = 'target_submitter_name'
-    description = _("The full name of the target abstract's submitter, no title (merge)")
+    description = _("The full name of the target abstract's submitter, no title (merge or duplicate)")
 
     @classmethod
     def render(cls, abstract):
-        return abstract.merged_into.submitter.full_name
+        target = abstract.merged_into or abstract.duplicate_of
+        return target.submitter.full_name if target else ''
 
 
 class TargetSubmitterFirstNamePlaceholder(Placeholder):
     advanced = True
     name = 'target_submitter_first_name'
-    description = _("The first name of the target abstract's submitter (merge)")
+    description = _("The first name of the target abstract's submitter (merge or duplicate)")
 
     @classmethod
     def render(cls, abstract):
-        return abstract.merged_into.submitter.first_name
+        target = abstract.merged_into or abstract.duplicate_of
+        return target.submitter.first_name if target else ''
 
 
 class TargetSubmitterLastNamePlaceholder(Placeholder):
     advanced = True
     name = 'target_submitter_last_name'
-    description = _("The last name of the target abstract's submitter (merge)")
+    description = _("The last name of the target abstract's submitter (merge or duplicate)")
 
     @classmethod
     def render(cls, abstract):
-        return abstract.merged_into.submitter.last_name
+        target = abstract.merged_into or abstract.duplicate_of
+        return target.submitter.last_name if target else ''
 
 
 class JudgmentCommentPlaceholder(Placeholder):

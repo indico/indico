@@ -396,5 +396,14 @@ Access ``https://YOURHOSTNAME`` in your browser and follow the steps
 displayed there to create your initial user.
 
 
+.. _centos-latex:
+
+14. Install TeXLive
+-------------------
+
+Follow the :ref:`LaTeX install guide <latex>` to install TeXLive so
+Indico can generate PDF files in various places.
+
+
 .. _PostgreSQL wiki: https://wiki.postgresql.org/wiki/YUM_Installation#Configure_your_YUM_repository
 .. _Let's Encrypt: https://letsencrypt.org/
