@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+Version 2.0
+-----------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Fix unicode error when searching external users from the "Search
+  Users" dialog
+
+
 Version 2.0rc2
 --------------
 
