@@ -22,6 +22,8 @@ Major Features
   so they can be restricted to be editable/visible only for event
   managers or authors/submitters instad of anyone who can see the
   abstract/contribution
+- Provide new interface to import registations/contributions from a CSV
+  file (:issue:`3144`)
 
 Improvements
 ^^^^^^^^^^^^
