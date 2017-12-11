@@ -125,9 +125,9 @@ class RHContributionDisplay(RHContributionDisplayBase):
                             joinedload('subcontributions'),
                             joinedload('timetable_entry').lazyload('*'))
                    .one())
-        managers = {x.principal for x in contrib.event.acl_entries if x.full_access}
-        submitter = contrib.abstract.submitter if contrib.abstract else None
-        field_values = filter_field_values(contrib.field_values, session.user, managers, submitter)
+        can_manage = self.event.can_manage(session.user)
+        owns_abstract = contrib.abstract.user_owns(session.user) if contrib.abstract else None
+        field_values = filter_field_values(contrib.field_values, can_manage, owns_abstract)
         return self.view_class.render_template('display/contribution_display.html', self.event,
                                                contribution=contrib,
                                                show_author_link=_author_page_active(self.event),

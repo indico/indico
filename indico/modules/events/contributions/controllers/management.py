@@ -586,7 +586,7 @@ class RHCreateContributionField(RHManageContributionsBase):
                            'Added field: {}'.format(contrib_field.title), session.user)
 
             return jsonify_data(flash=False)
-        return jsonify_template('events/contributions/forms/contribution_field.html', form=form)
+        return jsonify_template('events/contributions/forms/contribution_field_form.html', form=form)
 
 
 class RHManageContributionFieldBase(RHManageContributionsBase):
@@ -616,7 +616,7 @@ class RHEditContributionField(RHManageContributionFieldBase):
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Contributions',
                            'Modified field: {}'.format(old_title), session.user)
             return jsonify_data(flash=False)
-        return jsonify_template('events/contributions/forms/contribution_field.html', form=form)
+        return jsonify_template('events/contributions/forms/contribution_field_form.html', form=form)
 
 
 class RHDeleteContributionField(RHManageContributionFieldBase):

@@ -1,0 +1,19 @@
+{% extends 'forms/form_common_fields_first.html' %}
+
+{% block javascript %}
+    <script>
+        (function() {
+            'use strict';
+            var $userEditable = $('#{{ form.user_editable.id }}');
+            var $managers = $('#{{ form.visibility.id }}').find('.managers input');
+            var $visibility = $("input[name=visibility]");
+            $visibility.on('change', function() {
+                var isManagersChecked = $managers[0].checked;
+                $userEditable.prop('disabled', isManagersChecked);
+                if (isManagersChecked) {
+                    $userEditable.prop('checked', false);
+                }
+            });
+        })();
+    </script>
+{% endblock %}

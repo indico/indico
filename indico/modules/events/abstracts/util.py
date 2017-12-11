@@ -188,13 +188,12 @@ def make_abstract_form(event, user, notification_option=False, management=False)
     if notification_option:
         mixins.append(SendNotificationsMixin)
     form_class = type(b'_AbstractForm', tuple(mixins) + (AbstractForm,), {})
-    managers = {x.principal for x in event.acl_entries if x.full_access}
     for custom_field in event.contribution_fields:
         field_impl = custom_field.mgmt_field if management else custom_field.field
         if field_impl is None:
             # field definition is not available anymore
             continue
-        if custom_field.user_editable or user in managers:
+        if custom_field.user_editable or event.can_manage(user):
             name = 'custom_{}'.format(custom_field.id)
             setattr(form_class, name, field_impl.create_wtf_field())
     return form_class
@@ -385,13 +384,12 @@ def get_events_with_abstract_persons(user, dt=None):
     return data
 
 
-def filter_field_values(fields, user, managers, submitter):
-    if user in managers:
-        return {field for field in fields if field.contribution_field.is_active}
-    if user == submitter:
-        return {field for field in fields
-                if (field.contribution_field.is_active
-                    and field.contribution_field.visibility != ContributionFieldVisibility.managers_only)}
-    return {field for field in fields if
-            (field.contribution_field.is_active
-             and field.contribution_field.visibility == ContributionFieldVisibility.public)}
+def filter_field_values(fields, can_manage, owns_abstract):
+    active_fields = {field for field in fields if field.contribution_field.is_active}
+    if can_manage:
+        return active_fields
+    if owns_abstract:
+        return {field for field in active_fields
+                if field.contribution_field.visibility != ContributionFieldVisibility.managers_only}
+    return {field for field in active_fields
+            if field.contribution_field.visibility == ContributionFieldVisibility.public}
