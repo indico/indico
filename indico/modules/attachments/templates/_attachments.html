@@ -64,6 +64,14 @@
                    title="{% trans %}The access to this folder is restricted, regardless of the protection scheme of
                           the parent.{% endtrans %}"></i>
             {% endif %}
+            {% if folder.is_hidden and management %}
+                <i class="icon-eye-blocked"
+                   title="{% trans %}This folder is always hidden in the frontend.{% endtrans %}"></i>
+            {% endif %}
+            {% if folder.is_always_visible and management %}
+                <i class="icon-eye"
+                   title="{% trans %}This folder is always visible in the frontend.{% endtrans %}"></i>
+            {% endif %}
         </td>
         {% if management -%}
             <td class="actions hide-if-locked">
