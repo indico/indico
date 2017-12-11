@@ -15,12 +15,12 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import './libs/room_booking/booking_calendar';
-import './libs/room_booking/booking_form';
-import './libs/room_booking/map_of_rooms';
-import './libs/room_booking/room_selector';
-import './libs/room_booking/util';
-import './libs/room_booking/validation';
+import 'indico/legacy/libs/room_booking/booking_calendar';
+import 'indico/legacy/libs/room_booking/booking_form';
+import 'indico/legacy/libs/room_booking/map_of_rooms';
+import 'indico/legacy/libs/room_booking/room_selector';
+import 'indico/legacy/libs/room_booking/util';
+import 'indico/legacy/libs/room_booking/validation';
 
 import {RRule} from 'rrule';
 
