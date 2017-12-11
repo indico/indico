@@ -20,7 +20,7 @@ from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, TextAreaField
 from wtforms.fields.html5 import URLField
 from wtforms.fields.simple import HiddenField, StringField
-from wtforms.validators import DataRequired, Optional
+from wtforms.validators import DataRequired, Optional, ValidationError
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode
@@ -101,10 +101,18 @@ class AttachmentFolderForm(IndicoForm):
     acl = AccessControlListField(_("Access control list"), [UsedIf(lambda form, field: form.protected.data)],
                                  groups=True, allow_external=True, default_text=_('Restrict access to this folder'),
                                  description=_("The list of users and groups allowed to access the folder"))
-    is_always_visible = BooleanField(_("Always Visible"), widget=SwitchWidget(),
+    is_always_visible = BooleanField(_("Always Visible"),
+                                     [HiddenUnless('is_hidden', value=False)],
+                                     widget=SwitchWidget(),
                                      description=_("By default, folders are always visible, even if a user cannot "
                                                    "access them. You can disable this behavior here, hiding the folder "
                                                    "for anyone who does not have permission to access it."))
+    is_hidden = BooleanField(_("Always Hidden in Event page"),
+                             [HiddenUnless('is_always_visible', value=False), ],
+                             widget=SwitchWidget(),
+                             description=_("Always hide the folder in the event page materials listing. "
+                                           "You can use this for folders to store non-image files used "
+                                           "in e.g. in download links. The access permissions still apply."))
 
     def __init__(self, *args, **kwargs):
         self.linked_object = kwargs.pop('linked_object')
@@ -119,6 +127,12 @@ class AttachmentFolderForm(IndicoForm):
         if self.title.data:
             suggestions.add(self.title.data)
         return sorted(suggestions)
+
+    def validate_is_always_visible(self, field):
+        if self.is_always_visible.data and self.is_hidden.data:
+            raise ValidationError('These two options cannot be used at the same time')
+
+    validate_is_hidden = validate_is_always_visible
 
     @generated_data
     def protection_mode(self):

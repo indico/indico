@@ -50,6 +50,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         return (db.CheckConstraint(default_inheriting, 'default_inheriting'),
                 db.CheckConstraint('is_default = (title IS NULL)', 'default_or_title'),
                 db.CheckConstraint('not (is_default and is_deleted)', 'default_not_deleted'),
+                db.CheckConstraint('not (is_hidden and is_always_visible)', 'is_hidden_not_is_always_visible'),
                 {'schema': 'attachments'})
 
     @declared_attr
@@ -89,6 +90,12 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         db.Boolean,
         nullable=False,
         default=True
+    )
+    #: If the folder is never shown in the frontend (even if you can access it)
+    is_hidden = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=False
     )
 
     acl_entries = db.relationship(
@@ -159,6 +166,8 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
         This does not mean the user can actually access its contents.
         It just determines if it is visible to him or not.
         """
+        if self.is_hidden:
+            return False
         if not self.object.can_access(user):
             return False
         return self.is_always_visible or super(AttachmentFolder, self).can_access(user)
@@ -213,6 +222,7 @@ class AttachmentFolder(LinkMixin, ProtectionMixin, db.Model):
             self.title,
             ', is_default=True' if self.is_default else '',
             ', is_always_visible=False' if not self.is_always_visible else '',
+            ', is_hidden=True' if self.is_hidden else '',
             ', is_deleted=True' if self.is_deleted else '',
             self.protection_repr,
             self.link_repr
