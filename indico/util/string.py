@@ -558,6 +558,10 @@ def sanitize_html(string):
                         styles=BLEACH_ALLOWED_STYLES_HTML)
 
 
+def html_to_plaintext(string):
+    return html.html5parser.fromstring(string).xpath('string()')
+
+
 def inject_unicode_debug(s, level=1):
     """
     Wrap a string in invisible unicode characters to trigger a unicode

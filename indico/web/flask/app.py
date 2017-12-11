@@ -51,7 +51,7 @@ from indico.util import date_time as date_time_util
 from indico.util.i18n import _, babel, get_current_locale, gettext_context, ngettext_context
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
-from indico.util.string import RichMarkup, alpha_enum, crc32, sanitize_html, slugify
+from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
 from indico.web.assets import (core_env, include_css_assets, include_js_assets, register_all_css, register_all_js,
                                register_theme_sass)
 from indico.web.flask.errors import errors_bp
@@ -208,6 +208,7 @@ def setup_jinja(app):
     app.add_template_filter(underline)
     app.add_template_filter(markdown)
     app.add_template_filter(dedent)
+    app.add_template_filter(html_to_plaintext)
     app.add_template_filter(natsort)
     app.add_template_filter(groupby)
     app.add_template_filter(any)

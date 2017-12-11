@@ -19,9 +19,9 @@ from itertools import count
 
 import pytest
 
-from indico.util.string import (camelize, camelize_keys, crc32, format_repr, make_unique_token, normalize_phone_number,
-                                render_markdown, sanitize_email, seems_html, slugify, snakify, snakify_keys, strip_tags,
-                                text_to_repr, to_unicode)
+from indico.util.string import (camelize, camelize_keys, crc32, format_repr, html_to_plaintext, make_unique_token,
+                                normalize_phone_number, render_markdown, sanitize_email, seems_html, slugify, snakify,
+                                snakify_keys, strip_tags, text_to_repr, to_unicode)
 
 
 def test_seems_html():
@@ -205,6 +205,16 @@ def test_normalize_phone_number(input, output):
 ))
 def test_sanitize_email(input, output):
     assert sanitize_email(input) == output
+
+
+@pytest.mark.parametrize(('input', 'output'), (
+    ('Simple text', 'Simple text'),
+    ('<h1>Some html</h1>', 'Some html'),
+    ('foo &amp; bar <a href="test">xxx</a> 1<2 <test>', 'foo & bar xxx 1<2 '),
+    (u'<strong>m\xf6p</strong> test', u'm\xf6p test')
+))
+def test_html_to_plaintext(input, output):
+    assert html_to_plaintext(input) == output
 
 
 @pytest.mark.parametrize(('input', 'output'), (
