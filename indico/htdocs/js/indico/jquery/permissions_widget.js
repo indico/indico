@@ -166,7 +166,7 @@
             var $dropdownItem = $('<li>', {'class': 'entry-item', 'data-principal': JSON.stringify(principal)});
             var $itemContent = $('<a>');
             if (principal._type === 'EventRole') {
-                var $code = this._renderRoleCode(principal.code, principal.color);
+                var $code = this._renderRoleCode(principal.code, principal.color).addClass('dropdown-icon');
                 $itemContent.append($code);
             }
             var $text = $('<span>', {text: principal.name});
@@ -201,7 +201,7 @@
                     at: 'center right'
                 },
                 style: {
-                    classes: 'qtip-danger'
+                    classes: 'qtip-warning'
                 }
             });
         },

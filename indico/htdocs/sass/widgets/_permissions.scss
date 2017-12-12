@@ -49,10 +49,13 @@
 
             .entry-icon,
             .role-code {
-                margin-right: 0.75em;
                 flex-shrink: 0;
                 text-align: center;
                 width: 35px;
+            }
+
+            .entry-icon {
+                margin-right: 0.75em;
             }
 
             .entry-icon::before {
@@ -66,11 +69,13 @@
 
             .role-code {
                 @include role-code();
+                margin-right: 0.9em;
             }
         }
 
         .entry-label {
             @include ellipsis($no-wrap: false);
+            white-space: nowrap;
         }
 
         .permissions-box {

@@ -9,7 +9,9 @@
         <div class="toolbars">
             <div class="toolbar">
                 <div class="group">
-                    <a href="#" class="i-button label text-color outline add-entry-decoration icon-plus"></a>
+                    <a href="#" class="i-button label text-color outline add-entry-decoration">
+                        {%- trans %}Add{% endtrans -%}
+                    </a>
                     <a class="i-button js-add-user-group">{% trans %}User / Group{% endtrans %}</a>
                     <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Role{% endtrans %}</a>
                     <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson }}'>
