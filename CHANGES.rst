@@ -12,6 +12,8 @@ Bugfixes
 
 - Fix unicode error when searching external users from the "Search
   Users" dialog
+- Fix missing event management menu/layout when creating a material
+  package from the event management area
 
 
 Version 2.0rc2
