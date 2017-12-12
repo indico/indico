@@ -3,6 +3,7 @@
 {% block html %}
     <h3>Permissions</h3>
     <div id="permissions-widget-{{ field.id }}" class="permissions-widget">
+        {% set event = field.event %}
         <input type="hidden" value='{{ field._value() }}' name="permissions">
         <ul class="permissions-widget-list"></ul>
         <div class="toolbars">
@@ -10,10 +11,18 @@
                 <div class="group">
                     <a href="#" class="i-button label text-color outline add-entry-decoration icon-plus"></a>
                     <a class="i-button js-add-user-group">{% trans %}User / Group{% endtrans %}</a>
-                    {% if field.roles %}
-                        <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Role{% endtrans %}</a>
-                        <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson }}'></ul>
-                    {% endif %}
+                    <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Role{% endtrans %}</a>
+                    <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson }}'>
+                        <li class="separator default"></li>
+                        <li class="entry-item new-role-btn default">
+                            <a data-href="{{ url_for('event_roles.add_role', event) }}"
+                               data-title="{% trans %}Add a new role{% endtrans %}"
+                               data-ajax-dialog>
+                                <span class="icon-medal dropdown-icon"></span>
+                                <span>{% trans %}New role{% endtrans %}</span>
+                            </a>
+                        </li>
+                    </ul>
                     {% if field.ip_networks %}
                         <a class="i-button arrow js-dropdown" data-toggle="dropdown">
                             {%- trans %}IP Network{% endtrans -%}
@@ -23,7 +32,7 @@
                 </div>
             </div>
             <div class="toolbar">
-                <a href="{{ url_for('event_roles.manage', field.event) }}"
+                <a href="{{ url_for('event_roles.manage', event) }}"
                    class="i-button icon-medal text-color borderless">
                     {%- trans %}Manage roles{% endtrans -%}
                 </a>

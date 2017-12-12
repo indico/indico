@@ -109,18 +109,34 @@
     }
 
     .dropdown {
+        .separator {
+            @include border-bottom();
+            height: 0;
+            margin: 0.3em 1em 0;
+        }
+
         .entry-item {
             height: auto;
 
-            .role-code {
-                @include role-code();
+            .dropdown-icon {
                 display: inline-block;
+                font-size: 1.2em;
                 margin-right: 0.75em;
                 line-height: normal;
                 text-align: center;
+                vertical-align: middle;
                 width: 35px;
+
+                &.role-code {
+                    @include role-code();
+                }
             }
 
+            &.new-role-btn {
+                .dropdown-icon {
+                    margin-right: 0.25em;
+                }
+            }
         }
     }
 

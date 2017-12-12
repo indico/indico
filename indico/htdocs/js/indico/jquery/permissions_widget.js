@@ -139,23 +139,26 @@
         },
         _renderDropdown: function($dropdown) {
             var self = this;
-            $dropdown.empty();
+            $dropdown.children().not('.default').remove();
             var $dropdownLink = $dropdown.prev('.js-dropdown');
             var items = $dropdown.data('items');
             var isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
-            var tooltip;
-            if (items.length) {
-                items.forEach(function(item) {
-                    if (self._findEntryIndex(item) === -1) {
+            items.forEach(function(item) {
+                if (self._findEntryIndex(item) === -1) {
+                    if (isRoleDropdown) {
+                        $dropdown.find('.separator').before(self._renderDropdownItem(item));
+                    } else {
                         $dropdown.append(self._renderDropdownItem(item));
                     }
-                });
-                if (!$dropdown.children().length) {
-                    tooltip = isRoleDropdown ? $T('All event roles were added') : $T('All IP Networks were added');
-                    $dropdownLink.addClass('disabled').attr('title', tooltip);
-                } else {
-                    $dropdownLink.removeClass('disabled');
                 }
+            });
+            if (isRoleDropdown) {
+                var isEmpty = !$dropdown.children().not('.default').length;
+                $('.entry-role-dropdown .separator').toggleClass('hidden', isEmpty);
+            } else if (!$dropdown.children().length) {
+                $dropdownLink.addClass('disabled').attr('title', $T('All IP Networks were added'));
+            } else {
+                $dropdownLink.removeClass('disabled');
             }
         },
         _renderDropdownItem: function(principal) {
@@ -218,9 +221,7 @@
             self.$permissionsWidgetList.append(self._renderItem(anonymous));
             self.$permissionsWidgetList.find('.anonymous').toggle(!self.isEventProtected);
 
-            if (this.$roleDropdown.length) {
-                this._renderDropdown(this.$roleDropdown);
-            }
+            this._renderDropdown(this.$roleDropdown);
             if (this.$ipNetworkDropdown.length) {
                 this._renderDropdown(this.$ipNetworkDropdown);
             }
@@ -296,10 +297,20 @@
                 self._render();
             });
 
+            // Manage the addition to users/groups to the acl
             $('.js-add-user-group').on('click', function() {
                 self._addUserGroup();
             });
 
+            // Manage the creation of new roles
+            $('body').on('ajaxForm:success', function(evt, data) {
+                if (data.role) {
+                    self.$roleDropdown.data('items').push(data.role);
+                    self._addItems([data.role], ['access']);
+                }
+            });
+
+            // Apply ellipsis + tooltip on long names
             this.$permissionsWidgetList.on('mouseenter', '.entry-label', function() {
                 var $this = $(this);
                 if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {

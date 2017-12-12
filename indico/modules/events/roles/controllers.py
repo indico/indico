@@ -29,6 +29,7 @@ from indico.modules.events.roles.views import WPEventRoles
 from indico.modules.users import User
 from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
+from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form
 
 
@@ -67,7 +68,7 @@ class RHAddEventRole(RHManageEventBase):
             logger.info('Event role %r created by %r', role, session.user)
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Roles',
                            'Added role: "{}"'.format(role.name), session.user)
-            return jsonify_data(html=_render_roles(self.event))
+            return jsonify_data(html=_render_roles(self.event), role=serialize_principal(role))
         return jsonify_form(form)
 
 
