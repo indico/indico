@@ -12,7 +12,6 @@
             fieldName: {{ field.name | tojson }},
             parentProtected: {{ (field.get_form().protected_object.protection_parent.is_protected
                                  if field.can_inherit_protection else false) | tojson }},
-            aclFieldId: {{ field.get_form().acl.id | tojson }},
             aclMessageUrl: {{ field.acl_message_url | tojson }},
             hasInheritedAcl: {{ (field.acl_message_url and field.protected_object.get_inherited_acl()) | bool | tojson }}
         });

@@ -42,16 +42,17 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import EventReference
 from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.timetable.util import get_top_level_entries
+from indico.modules.networks import IPNetworkGroup
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
 from indico.util.i18n import _
 from indico.util.string import is_valid_mail, to_unicode
+from indico.util.user import principal_from_fossil
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.fields import (AccessControlListField, IndicoDateField, IndicoDateTimeField,
-                                     IndicoEnumSelectField, IndicoLocationField, IndicoPasswordField,
-                                     IndicoProtectionField, IndicoRadioField, IndicoSelectMultipleCheckboxField,
-                                     IndicoTagListField, IndicoTimezoneSelectField, IndicoWeekDayRepetitionField,
-                                     MultiStringField, PrincipalListField, RelativeDeltaField)
+from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
+                                     IndicoPasswordField, IndicoProtectionField, IndicoRadioField,
+                                     IndicoSelectMultipleCheckboxField, IndicoTagListField, IndicoTimezoneSelectField,
+                                     IndicoWeekDayRepetitionField, MultiStringField, RelativeDeltaField)
 from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.validators import HiddenUnless, LinkedDateTime
 from indico.web.forms.widgets import CKEditorWidget, SwitchWidget
@@ -229,9 +230,6 @@ class EventProtectionForm(IndicoForm):
                                             protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('event_management.acl_message',
                                                                                  form.protected_object))
-    acl = AccessControlListField(_('Access control list'), groups=True, allow_emails=True, allow_networks=True,
-                                 allow_external=True, default_text=_('Restrict access to this event'),
-                                 description=_('List of users allowed to access the event.'))
     access_key = IndicoPasswordField(_('Access key'), toggle=True,
                                      description=_('It is more secure to use only the ACL and not set an access key. '
                                                    '<strong>It will have no effect if the event is not '
@@ -239,10 +237,6 @@ class EventProtectionForm(IndicoForm):
     own_no_access_contact = StringField(_('No access contact'),
                                         description=_('Contact information shown when someone lacks access to the '
                                                       'event'))
-    managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True, allow_external=True,
-                                  description=_('List of users allowed to modify the event'))
-    submitters = PrincipalListField(_('Submitters'), groups=True, allow_emails=True, allow_external=True,
-                                    description=_('List of users with submission rights'))
     visibility = SelectField(_("Visibility"), [Optional()], coerce=lambda x: None if x == '' else int(x),
                              description=_("""From which point in the category tree this event will be visible from """
                                            """(number of categories upwards). Applies to "Today's events" and """

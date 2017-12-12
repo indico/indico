@@ -23,7 +23,6 @@
             fieldId: null,
             fieldName: null,
             parentProtected: false,
-            aclFieldId: null,
             aclMessageUrl: null,
             hasInheritedAcl: false
         }, options);

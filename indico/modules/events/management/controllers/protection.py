@@ -113,21 +113,12 @@ class RHEventProtection(RHEventProtectionBase):
                                                  'own_no_access_contact': form.own_no_access_contact.data,
                                                  'access_key': form.access_key.data,
                                                  'visibility': form.visibility.data})
-            # TODO: Remove ACL, Managers and submitters fields from form
-            # update_object_principals(self.event, form.acl.data, read_access=True)
-            # update_object_principals(self.event, form.managers.data, full_access=True)
-            # update_object_principals(self.event, form.submitters.data, permission='submit')
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
             return redirect(url_for('.protection', self.event))
         return WPEventProtection.render_template('event_protection.html', self.event, 'protection', form=form)
 
     def _get_defaults(self):
-        acl = {p.principal for p in self.event.acl_entries if p.read_access}
-        submitters = {p.principal
-                      for p in self.event.acl_entries
-                      if p.has_management_permission('submit', explicit=True)}
-        managers = {p.principal for p in self.event.acl_entries if p.full_access}
         registration_managers = {p.principal for p in self.event.acl_entries
                                  if p.has_management_permission('registration', explicit=True)}
         event_session_settings = session_settings.get_all(self.event)
@@ -136,8 +127,7 @@ class RHEventProtection(RHEventProtectionBase):
         permissions = [[serialize_principal(p.principal), list(self._get_principal_permissions(p))]
                        for p in self.event.acl_entries if self._get_principal_permissions(p)]
 
-        return dict({'protection_mode': self.event.protection_mode, 'acl': acl, 'managers': managers,
-                     'registration_managers': registration_managers, 'submitters': submitters,
+        return dict({'protection_mode': self.event.protection_mode, 'registration_managers': registration_managers,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
                      'own_no_access_contact': self.event.own_no_access_contact, 'permissions': permissions},
                     **coordinator_privs)
