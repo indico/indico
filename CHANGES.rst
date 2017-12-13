@@ -28,6 +28,8 @@ Improvements
   by users submitting an abstract (:issue:`3138`)
 - Add support for boolean (yes/no) and freetext questions in abstract
   reviewing (:issue:`3175`)
+- Support event cloning with monthly recurrence on the last day of the
+  month (:issue:`1580`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
