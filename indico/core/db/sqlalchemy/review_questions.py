@@ -59,7 +59,7 @@ class ReviewQuestionMixin(object):
         )
 
     @declared_attr
-    def text(cls):
+    def title(cls):
         return db.Column(
             db.Text,
             nullable=False
@@ -107,6 +107,14 @@ class ReviewQuestionMixin(object):
         )
 
     @declared_attr
+    def description(cls):
+        return db.Column(
+            db.Text,
+            nullable=False,
+            default=''
+        )
+
+    @declared_attr
     def event(cls):
         return db.relationship(
             'Event',
@@ -122,7 +130,7 @@ class ReviewQuestionMixin(object):
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.text)
+        return format_repr(self, 'id', 'event_id', no_score=False, is_deleted=False, _text=self.title)
 
     def get_review_rating(self, review, allow_create=False):
         """Get the rating given in particular review.
@@ -136,15 +144,6 @@ class ReviewQuestionMixin(object):
             rating_class = type(self).ratings.prop.mapper.class_
             rating = rating_class(question=self, review=review)
         return rating
-
-    @property
-    def title(self):
-        return self.text
-
-    @property
-    def description(self):
-        # Required by BaseField for creating an instance of WTForms field
-        return None
 
     @hybrid_property
     def no_score(self):

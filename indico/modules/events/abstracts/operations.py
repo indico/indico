@@ -338,7 +338,7 @@ def create_abstract_review(abstract, track, user, review_data, questions_data):
     for question in abstract.event.abstract_review_questions:
         value = questions_data['question_{}'.format(question.id)]
         review.ratings.append(AbstractReviewRating(question=question, value=value))
-        log_data[question.text] = question.field.get_friendly_value(value)
+        log_data[question.title] = question.field.get_friendly_value(value)
     db.session.flush()
     logger.info("Abstract %s received a review by %s for track %s", abstract, user, track)
     log_data.update({
@@ -373,7 +373,7 @@ def update_abstract_review(review, review_data, questions_data):
             changes[field_name] = (question.field.get_friendly_value(old_value),
                                    question.field.get_friendly_value(rating.value))
             log_fields[field_name] = {
-                'title': question.text,
+                'title': question.title,
                 'type': field_type if field_type != 'rating' else 'number'
             }
 

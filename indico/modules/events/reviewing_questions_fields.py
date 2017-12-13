@@ -16,37 +16,27 @@
 
 from __future__ import unicode_literals
 
-from wtforms.fields import BooleanField, StringField
-from wtforms.validators import DataRequired
+from wtforms.fields import BooleanField
 
 from indico.modules.events.fields import RatingReviewField
 from indico.util.i18n import _
-from indico.web.fields.base import BaseField, IndicoForm
+from indico.web.fields.base import BaseField, FieldConfigForm
 from indico.web.fields.simple import BoolField, TextField
 from indico.web.forms.widgets import SwitchWidget
 
 
-class BaseReviewingQuestionConfigForm(IndicoForm):
-    text = StringField(_('Question'), [DataRequired()])
-    is_required = BooleanField(_('Required'), widget=SwitchWidget())
-
-    @property
-    def field_data(self):
-        return {}
-
-
-class AbstractRatingReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
+class AbstractRatingReviewingQuestionConfigForm(FieldConfigForm):
     no_score = BooleanField(_('Exclude from score'), widget=SwitchWidget())
 
 
-class PaperRatingReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
+class PaperRatingReviewingQuestionConfigForm(FieldConfigForm):
     pass
 
 
 class AbstractRatingReviewingQuestion(BaseField):
     name = 'rating'
     friendly_name = _('Rating')
-    common_settings = ('text', 'no_score', 'is_required')
+    common_settings = BaseField.common_settings + ('no_score',)
     config_form_base = AbstractRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
 
@@ -60,7 +50,6 @@ class AbstractRatingReviewingQuestion(BaseField):
 class PaperRatingReviewingQuestion(BaseField):
     name = 'rating'
     friendly_name = _('Rating')
-    common_settings = ('text', 'is_required')
     config_form_base = PaperRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
 
@@ -72,22 +61,14 @@ class PaperRatingReviewingQuestion(BaseField):
 
 
 class BoolReviewingQuestion(BoolField, BaseField):
-    common_settings = ('text', 'is_required')
-    config_form_base = BaseReviewingQuestionConfigForm
+    pass
 
 
-class TextReviewingQuestionConfigForm(BaseReviewingQuestionConfigForm):
-    _order = ('text', 'is_required', 'max_length', 'max_words', 'multiline')
-
-    @property
-    def field_data(self):
-        base = super(TextReviewingQuestionConfigForm, self).field_data
-        return dict(base, multiline=self.multiline.data, max_words=self.max_words.data,
-                    max_length=self.max_length.data)
+class TextReviewingQuestionConfigForm(FieldConfigForm):
+    _order = ('title', 'is_required', 'description', 'max_length', 'max_words', 'multiline')
 
 
 class TextReviewingQuestion(TextField, BaseField):
-    common_settings = ('text', 'is_required')
     config_form_base = TextReviewingQuestionConfigForm
 
 

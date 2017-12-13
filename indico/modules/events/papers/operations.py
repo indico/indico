@@ -272,7 +272,7 @@ def create_review(paper, review_type, user, review_data, questions_data):
     for question in paper.event.cfp.get_questions_for_review_type(review_type.instance):
         value = questions_data['question_{}'.format(question.id)]
         review.ratings.append(PaperReviewRating(question=question, value=value))
-        log_data[question.text] = question.field.get_friendly_value(value)
+        log_data[question.title] = question.field.get_friendly_value(value)
     db.session.flush()
     notify_paper_review_submission(review)
     logger.info("Paper %r received a review of type %s by %r", paper, review_type.instance.name, user)
@@ -303,7 +303,7 @@ def update_review(review, review_data, questions_data):
             changes[field_name] = (question.field.get_friendly_value(old_value),
                                    question.field.get_friendly_value(rating.value))
             log_fields[field_name] = {
-                'title': question.text,
+                'title': question.title,
                 'type': field_type if field_type != 'rating' else 'number'
             }
     db.session.flush()
