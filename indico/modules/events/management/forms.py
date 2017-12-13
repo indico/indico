@@ -30,6 +30,7 @@ from wtforms.validators import DataRequired, InputRequired, NumberRange, Optiona
 
 from indico.core.config import config
 from indico.core.db import db
+from indico.core.db.sqlalchemy.principals import EmailPrincipal
 from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
@@ -265,6 +266,23 @@ class EventProtectionForm(IndicoForm):
         if own_horizon and real_horizon and real_horizon.is_descendant_of(own_horizon):
             self.visibility.warning = _("This event's visibility is currently limited by that of '{}'.").format(
                 real_horizon.title)
+
+    def validate_permissions(self, field):
+        entries = [{
+            'principal': principal_from_fossil(entry[0], allow_emails=True, allow_networks=True),
+            'permissions': entry[1]
+        } for entry in field.data]
+        for e in entries:
+            principal = e['principal']
+            permissions = e['permissions']
+            if isinstance(principal, IPNetworkGroup):
+                if permissions != ['access']:
+                    msg = 'IP Networks can only have "access" permissions: {}:{}'
+                    raise ValidationError(msg.format(principal.name, principal.id))
+            if 'edit' in permissions and len(permissions) != 1:
+                principal_id = principal.email if isinstance(principal, EmailPrincipal) else principal.id
+                msg = '"Edit" permission must be unique: {}:{}'
+                raise ValidationError(msg.format(principal.name, principal_id))
 
     @classmethod
     def _create_coordinator_priv_fields(cls):

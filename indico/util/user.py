@@ -98,7 +98,11 @@ def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_
             raise ValueError('Multipass group does not exist: {}:{}'.format(provider, id_))
         return group
     elif type_ == 'EventRole':
-        return EventRole.get(id_)
+        role = EventRole.get(id_)
+        if role is None:
+            role_name = fossil.get('name')
+            raise ValueError('Role does not exist: {}:{}'.format(role_name, id_))
+        return role
     else:
         raise ValueError('Unexpected fossil type: {}'.format(type_))
 
