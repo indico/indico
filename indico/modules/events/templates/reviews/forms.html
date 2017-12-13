@@ -106,7 +106,7 @@
 
 {% macro render_question_rows(form) %}
     {% for field in _iter_form_fields(form) if 'question_' in field.name %}
-        <div class="flexrow question-row">
+        <div class="flexrow question-row" title="{{ field.description }}">
             <div>
                 <span class="question-index">
                     {{ loop.index }}
@@ -119,7 +119,7 @@
                 {% endif -%}
             </div>
             <div class="flexrow f-a-start">
-                {{ form_row(field, skip_label=true) }}
+                {{ form_row(field, skip_label=true, hide_description=true) }}
             </div>
         </div>
     {% endfor %}
