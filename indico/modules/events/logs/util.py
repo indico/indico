@@ -89,7 +89,7 @@ def render_changes(a, b, type_):
     :param b: new value
     :param type_: the type determining how the values should be compared
     """
-    if type_ in ('number', 'enum', 'bool', 'datetime', 'rating'):
+    if type_ in ('number', 'enum', 'bool', 'datetime'):
         if a in (None, ''):
             a = '\N{EMPTY SET}'
         if b in (None, ''):

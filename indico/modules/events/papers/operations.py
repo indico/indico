@@ -299,11 +299,12 @@ def update_review(review, review_data, questions_data):
         old_value = rating.value
         rating.value = questions_data[field_name]
         if old_value != rating.value:
+            field_type = question.field_type
             changes[field_name] = (question.field.get_friendly_value(old_value),
                                    question.field.get_friendly_value(rating.value))
             log_fields[field_name] = {
                 'title': question.text,
-                'type': question.field_type
+                'type': field_type if field_type != 'rating' else 'number'
             }
     db.session.flush()
     notify_paper_review_submission(review)
