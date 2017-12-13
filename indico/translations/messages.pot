@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.0a2\n"
+"Project-Id-Version: indico 2.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-09 11:04+0100\n"
+"POT-Creation-Date: 2017-12-13 16:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -459,7 +459,7 @@ msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingAdmin.tpl:42
 #: indico/modules/events/abstracts/templates/forms/track_role_widget.html:34 indico/modules/users/templates/emails.html:36
-#: indico/web/templates/forms/multiple_items_widget.html:24
+#: indico/web/templates/forms/multiple_items_widget.html:25
 msgid "Add"
 msgstr ""
 
@@ -2236,7 +2236,7 @@ msgid "Homepage"
 msgstr ""
 
 #: indico/modules/admin/__init__.py:43 indico/modules/admin/views.py:34 indico/modules/api/templates/user_profile.html:98
-#: indico/modules/rb/__init__.py:141 indico/web/views.py:214
+#: indico/modules/rb/__init__.py:141 indico/web/views.py:219
 msgid "Administration"
 msgstr ""
 
@@ -2250,7 +2250,7 @@ msgstr ""
 msgid "Announcement"
 msgstr ""
 
-#: indico/modules/announcement/controllers.py:35 indico/modules/core/controllers.py:127
+#: indico/modules/announcement/controllers.py:35 indico/modules/core/controllers.py:128
 #: indico/modules/news/controllers.py:67
 msgid "Settings have been saved"
 msgstr ""
@@ -2547,7 +2547,7 @@ msgstr ""
 
 #: indico/modules/attachments/__init__.py:50 indico/modules/attachments/__init__.py:62
 #: indico/modules/attachments/clone.py:32 indico/modules/attachments/templates/attachments.html:4
-#: indico/modules/attachments/templates/generate_package.html:15 indico/modules/categories/templates/display/sidebar.html:7
+#: indico/modules/attachments/templates/generate_package.html:14 indico/modules/categories/templates/display/sidebar.html:7
 #: indico/modules/categories/templates/management/attachments.html:5
 #: indico/modules/events/templates/display/conference.html:82
 msgid "Materials"
@@ -2838,8 +2838,8 @@ msgstr ""
 msgid "You can generate a ZIP file containing materials from the event."
 msgstr ""
 
-#: indico/modules/attachments/templates/_attachments.html:186 indico/modules/attachments/templates/generate_package.html:17
-#: indico/modules/attachments/templates/generate_package.html:29
+#: indico/modules/attachments/templates/_attachments.html:186 indico/modules/attachments/templates/generate_package.html:16
+#: indico/modules/attachments/templates/generate_package.html:28
 msgid "Material Package"
 msgstr ""
 
@@ -2897,11 +2897,11 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: indico/modules/attachments/templates/generate_package.html:33 indico/modules/designer/templates/template.html:14
+#: indico/modules/attachments/templates/generate_package.html:32 indico/modules/designer/templates/template.html:14
 msgid "Go back"
 msgstr ""
 
-#: indico/modules/attachments/templates/generate_package.html:52
+#: indico/modules/attachments/templates/generate_package.html:51
 msgid "Download package"
 msgstr ""
 
@@ -5691,26 +5691,26 @@ msgid "Contribution URL"
 msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py:187
-msgid "The ID of the target abstract (merge)"
+msgid "The ID of the target abstract (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:196
-msgid "The title of the target abstract (merge)"
+#: indico/modules/events/abstracts/placeholders.py:197
+msgid "The title of the target abstract (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:206
-msgid "The full name of the target abstract's submitter, no title (merge)"
+#: indico/modules/events/abstracts/placeholders.py:208
+msgid "The full name of the target abstract's submitter, no title (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:216
-msgid "The first name of the target abstract's submitter (merge)"
+#: indico/modules/events/abstracts/placeholders.py:219
+msgid "The first name of the target abstract's submitter (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:226
-msgid "The last name of the target abstract's submitter (merge)"
+#: indico/modules/events/abstracts/placeholders.py:230
+msgid "The last name of the target abstract's submitter (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:235
+#: indico/modules/events/abstracts/placeholders.py:240
 msgid "Comments written by event organizer (upon final decision)"
 msgstr ""
 
@@ -8215,7 +8215,7 @@ msgstr ""
 msgid "Add spacer"
 msgstr ""
 
-#: indico/modules/events/logs/models/entries.py:30 indico/web/views.py:212
+#: indico/modules/events/logs/models/entries.py:30 indico/web/views.py:217
 msgid "Management"
 msgstr ""
 
@@ -10802,12 +10802,12 @@ msgid "Download ticket for the '%(title)s' registration form"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:42
-msgid "You have registered for this event, but there are more registration forms available."
+msgid "You are registered for this event, but there are more registration forms available."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:47
 #: indico/modules/events/registration/templates/display/event_header.html:13
-msgid "You have registered for this event."
+msgid "You are registered for this event."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:52
@@ -12738,7 +12738,7 @@ msgstr ""
 msgid "Date of submission: %(submission_dt)s"
 msgstr ""
 
-#: indico/modules/events/surveys/templates/management/survey_submission.html:64
+#: indico/modules/events/surveys/templates/management/survey_submission.html:65
 msgid "N/A"
 msgstr ""
 
@@ -15635,7 +15635,7 @@ msgstr ""
 msgid "This is not a string"
 msgstr ""
 
-#: indico/util/string.py:686
+#: indico/util/string.py:661
 msgid "This text has been automatically converted from HTML to Markdown. Please double-check that it's properly displayed."
 msgstr ""
 
