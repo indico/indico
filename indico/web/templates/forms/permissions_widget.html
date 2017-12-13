@@ -4,7 +4,7 @@
     <h3>Permissions</h3>
     <div id="permissions-widget-{{ field.id }}" class="permissions-widget">
         {% set event = field.event %}
-        <input type="hidden" value='{{ field._value() }}' name="permissions">
+        <input type="hidden" value='{{ field._value()|tojson|forceescape }}' name="{{ field.name }}">
         <ul class="permissions-widget-list"></ul>
         <div class="toolbars">
             <div class="toolbar">
@@ -14,10 +14,11 @@
                     </a>
                     <a class="i-button js-add-user-group">{% trans %}User / Group{% endtrans %}</a>
                     <a class="i-button arrow js-dropdown" data-toggle="dropdown">{% trans %}Role{% endtrans %}</a>
-                    <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson }}'>
+                    <ul class="dropdown entry-role-dropdown" data-items='{{ field.roles|tojson|forceescape }}'>
                         <li class="separator default"></li>
                         <li class="entry-item new-role-btn default">
-                            <a data-href="{{ url_for('event_roles.add_role', event) }}"
+                            <a class="js-new-role"
+                               data-href="{{ url_for('event_roles.add_role', event) }}"
                                data-title="{% trans %}Add a new role{% endtrans %}"
                                data-ajax-dialog>
                                 <span class="icon-medal dropdown-icon"></span>
@@ -29,7 +30,8 @@
                         <a class="i-button arrow js-dropdown" data-toggle="dropdown">
                             {%- trans %}IP Network{% endtrans -%}
                         </a>
-                        <ul class="dropdown entry-ip-network-dropdown" data-items='{{ field.ip_networks|tojson }}'></ul>
+                        <ul class="dropdown entry-ip-network-dropdown"
+                            data-items='{{ field.ip_networks|tojson|forceescape }}'></ul>
                     {% endif %}
                 </div>
             </div>
@@ -46,7 +48,8 @@
 {% block javascript %}
     <script>
         $('#permissions-widget-{{ field.id }}').permissionswidget({
-            event_id: {{ field.event.id }}
+            eventId: {{ field.event.id }},
+            permissionsInfo: {{ field.permissions_info|tojson }}
         });
     </script>
 {% endblock %}

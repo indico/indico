@@ -1,6 +1,6 @@
 <form id="js-permissions-dialog-form">
-    <input type="hidden" id="selected_permissions" value='{{ permissions|tojson }}' name="selected_permissions">
-    <input type="hidden" id="principal" value='{{ principal|tojson }}'>
+    <input type="hidden" id="selected_permissions" value='{{ permissions|tojson|forceescape }}' name="selected_permissions">
+    <input type="hidden" id="principal" value='{{ principal|tojson|forceescape }}'>
     <div class="permissions-dialog">
         <ul class="permissions">
             {% for code, tree_elem in permissions_tree.viewitems() recursive %}
@@ -44,7 +44,7 @@
             evt.preventDefault();
             var selectedPermissions = JSON.parse($('#selected_permissions').val());
             var principal = JSON.parse($('#principal').val());
-            $('#permissions-widget-permissions').trigger('indico:permissionsChanged', [selectedPermissions, principal]);
+            $('.permissions-widget').trigger('indico:permissionsChanged', [selectedPermissions, principal]);
             $('#js-permissions-dialog-form').trigger('ajaxDialog:close');
         }).on('change', function() {
             updateHiddenField();

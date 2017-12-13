@@ -24,7 +24,8 @@
             fieldName: null,
             parentProtected: false,
             aclMessageUrl: null,
-            hasInheritedAcl: false
+            hasInheritedAcl: false,
+            permissionsFieldId: null
         }, options);
 
         var inputs = $('input[name=' + options.fieldName + '][id^=' + options.fieldId + ']');
@@ -51,7 +52,8 @@
                 }
                 $aclListField.toggleClass('hidden', !isProtected);
                 $enableAclLink.toggleClass('hidden', isProtected);
-                $('#permissions-widget-permissions').trigger('indico:protectionModeChanged', [isProtected]);
+                $('#permissions-widget-{0}'.format(options.permissionsFieldId))
+                    .trigger('indico:protectionModeChanged', [isProtected]);
             }
         });
 

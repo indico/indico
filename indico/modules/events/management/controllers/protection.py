@@ -40,6 +40,29 @@ from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_template
 
 
+FULL_ACCESS_PERMISSION = '_full_access'
+READ_ACCESS_PERMISSION = '_read_access'
+
+
+def get_permissions_info():
+    selectable_permissions = {k: v for k, v in get_available_permissions(Event).viewitems() if v.user_selectable}
+    special_permissions = {FULL_ACCESS_PERMISSION: _('Manage'), READ_ACCESS_PERMISSION: _('Access')}
+    permissions_tree = {
+        FULL_ACCESS_PERMISSION: {
+            'title': special_permissions[FULL_ACCESS_PERMISSION],
+            'children': {
+                v.name: {'title': v.friendly_name} for k, v in selectable_permissions.viewitems()
+            }
+        }
+    }
+    full_access_children = permissions_tree[FULL_ACCESS_PERMISSION]['children']
+    full_access_children[READ_ACCESS_PERMISSION] = {'title': special_permissions[READ_ACCESS_PERMISSION]}
+    full_access_children = OrderedDict(sorted(full_access_children.items()))
+    available_permissions = dict({k: v.friendly_name for k, v in selectable_permissions.viewitems()},
+                                 **special_permissions)
+    return available_permissions, permissions_tree
+
+
 class RHShowNonInheriting(RHManageEventBase):
     """Show a list of non-inheriting child objects"""
 
@@ -70,25 +93,7 @@ class RHEventACLMessage(RHManageEventBase):
                                 endpoint='event_management.acl')
 
 
-class RHEventProtectionBase(RHManageEventBase):
-    def __init__(self):
-        super(RHEventProtectionBase, self).__init__()
-        selectable_permissions = {k: v for k, v in get_available_permissions(Event).viewitems() if v.user_selectable}
-        self.whitelisted_permissions = set(selectable_permissions.keys()) | {'edit', 'access'}
-        self.permissions_tree = {
-            'edit': {
-                'title': _('Event Management'),
-                'children': {
-                    v.name: {'title': v.friendly_name} for k, v in selectable_permissions.viewitems()
-                }
-            }
-        }
-        self.permissions_tree['edit']['children']['access'] = {'title': _('Access')}
-        self.permissions_tree['edit']['children'] = OrderedDict(sorted(
-            self.permissions_tree['edit']['children'].items(), key=lambda t: t[0]))
-
-
-class RHEventProtection(RHEventProtectionBase):
+class RHEventProtection(RHManageEventBase):
     """Show event protection"""
 
     NOT_SANITIZED_FIELDS = {'access_key'}
@@ -97,14 +102,15 @@ class RHEventProtection(RHEventProtectionBase):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         if form.validate_on_submit():
             permission_principals = defaultdict(set)
-            for principal_data in form.permissions.data:
-                for permission in principal_data[1]:
-                    permission_principals[permission].add(principal_from_fossil(principal_data[0], allow_emails=True,
+            for principal, permissions in form.permissions.data:
+                for permission in permissions:
+                    permission_principals[permission].add(principal_from_fossil(principal, allow_emails=True,
                                                                                 allow_networks=True))
-            for permission in self.whitelisted_permissions:
-                if permission == 'edit':
+            available_permissions = get_permissions_info()[0]
+            for permission in set(available_permissions):
+                if permission == FULL_ACCESS_PERMISSION:
                     update_object_principals(self.event, permission_principals.get(permission, set()), full_access=True)
-                elif permission == 'access':
+                elif permission == READ_ACCESS_PERMISSION:
                     update_object_principals(self.event, permission_principals.get(permission, set()), read_access=True)
                 else:
                     update_object_principals(self.event, permission_principals.get(permission, set()),
@@ -140,15 +146,16 @@ class RHEventProtection(RHEventProtectionBase):
         """Retrieve a set containing the valid permissions of a principal."""
         permissions = set()
         if principal.full_access:
-            permissions.add('edit')
-        elif principal.read_access:
-            permissions.add('access')
-        return permissions | (set(principal.permissions) & self.whitelisted_permissions)
+            permissions.add(FULL_ACCESS_PERMISSION)
+        if principal.read_access:
+            permissions.add(READ_ACCESS_PERMISSION)
+        available_permissions = get_permissions_info()[0]
+        return permissions | (set(principal.permissions) & set(available_permissions))
 
 
-class RHEventPermissions(RHEventProtectionBase):
+class RHEventPermissionsDialog(RHManageEventBase):
     def _process(self):
-        principal = json.loads(request.args.get('principal'))
-        return jsonify_template('events/management/event_permissions_dialog.html', event=self.event,
-                                permissions_tree=self.permissions_tree, permissions=request.args.getlist('permissions'),
-                                principal=principal)
+        principal = json.loads(request.args['principal'])
+        permissions_tree = get_permissions_info()[1]
+        return jsonify_template('events/management/event_permissions_dialog.html', permissions_tree=permissions_tree,
+                                permissions=request.args.getlist('permissions'), principal=principal)

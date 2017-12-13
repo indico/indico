@@ -227,6 +227,7 @@ class EventClassificationForm(IndicoForm):
 
 
 class EventProtectionForm(IndicoForm):
+    permissions = PermissionsField(_("Permissions"))
     protection_mode = IndicoProtectionField(_('Protection mode'),
                                             protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('event_management.acl_message',
@@ -242,13 +243,12 @@ class EventProtectionForm(IndicoForm):
                              description=_("""From which point in the category tree this event will be visible from """
                                            """(number of categories upwards). Applies to "Today's events" and """
                                            """Calendar only. If the event is moved, this number will be preserved."""))
-    permissions = PermissionsField(_("Permissions"))
     priv_fields = set()
 
     def __init__(self, *args, **kwargs):
-        self.protected_object = event = self.event = kwargs.pop('event')
+        self.protected_object = self.event = kwargs.pop('event')
         super(EventProtectionForm, self).__init__(*args, **kwargs)
-        self._init_visibility(event)
+        self._init_visibility(self.event)
 
     def _get_event_own_visibility_horizon(self, event):
         if self.visibility.data is None:  # unlimited
@@ -269,20 +269,19 @@ class EventProtectionForm(IndicoForm):
 
     def validate_permissions(self, field):
         entries = [{
-            'principal': principal_from_fossil(entry[0], allow_emails=True, allow_networks=True),
-            'permissions': entry[1]
-        } for entry in field.data]
-        for e in entries:
-            principal = e['principal']
-            permissions = e['permissions']
+            'principal': principal_from_fossil(principal, allow_emails=True, allow_networks=True),
+            'permissions': permissions
+        } for principal, permissions in field.data]
+        for entry in entries:
+            principal = entry['principal']
+            permissions = entry['permissions']
             if isinstance(principal, IPNetworkGroup):
-                if permissions != ['access']:
-                    msg = 'IP Networks can only have "access" permissions: {}:{}'
-                    raise ValidationError(msg.format(principal.name, principal.id))
-            if 'edit' in permissions and len(permissions) != 1:
-                principal_id = principal.email if isinstance(principal, EmailPrincipal) else principal.id
-                msg = '"Edit" permission must be unique: {}:{}'
-                raise ValidationError(msg.format(principal.name, principal_id))
+                if set(permissions) - {'_read_access'}:
+                    msg = _('IP networks cannot have management permissions: {}')
+                    raise ValidationError(msg.format(principal.name))
+            if '_full_access' in permissions and len(permissions) != 1:
+                msg = _('"Manage" permission must be unique: {}')
+                raise ValidationError(msg.format(principal.name))
 
     @classmethod
     def _create_coordinator_priv_fields(cls):

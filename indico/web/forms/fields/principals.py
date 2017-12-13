@@ -128,11 +128,12 @@ class PrincipalField(PrincipalListField):
 
 class PermissionsField(JSONField):
     widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
-    # TODO: Add validation
 
     def __init__(self, *args, **kwargs):
+        from indico.modules.events.management.controllers.protection import get_permissions_info
         super(PermissionsField, self).__init__(*args, **kwargs)
         self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
+        self.permissions_info = get_permissions_info()[0]
 
     @property
     def event(self):
@@ -143,4 +144,4 @@ class PermissionsField(JSONField):
         return [serialize_role(role) for role in self.get_form().event.roles]
 
     def _value(self):
-        return json.dumps(self.data, separators=(',', ':'), ensure_ascii=False).encode('utf-8') if self.data else '[]'
+        return self.data if self.data else '[]'

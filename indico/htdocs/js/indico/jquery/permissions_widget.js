@@ -21,19 +21,20 @@
     'use strict';
 
     var permissionClasses = {
-        access: 'accept',
+        _full_access: 'danger',
+        _read_access: 'accept',
         registration: 'highlight',
-        edit: 'danger',
         submit: 'warning'
     };
 
     $.widget('indico.permissionswidget', {
         options: {
-            event_id: null
+            eventId: null,
+            permissionsInfo: null
         },
 
         _update: function() {
-            this.data = _(this.data).chain().sortBy(function(item) {
+            this.data = _.chain(this.data).sortBy(function(item) {
                 return item[0].name || item[0].id;
             }).sortBy(function(item) {
                 return item[0]._type;
@@ -47,8 +48,8 @@
                 class: 'role-code',
                 text: code,
                 css: {
-                    'border-color': '#' + color,
-                    'color': '#' + color
+                    borderColor: '#' + color,
+                    color: '#' + color
                 }
             });
         },
@@ -56,77 +57,89 @@
             var $labelBox = $('<div>', {class: 'label-box flexrow f-a-center'});
             var type = principal._type;
             if (type === 'EventRole') {
-                var $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
-                var $code = this._renderRoleCode(principal.code, principal.color);
-                return $labelBox.append($code).append($text);
+                $labelBox.append(this._renderRoleLabel(principal));
             } else {
-                var iconClass;
-                if (type === 'Avatar') {
-                    iconClass = 'icon-user';
-                } else if (type === 'Email') {
-                    iconClass = 'icon-mail';
-                } else if (type === 'DefaultEntry' && principal.id === 'anonymous') {
-                    iconClass = 'icon-question';
-                } else if (type === 'IPNetworkGroup') {
-                    iconClass = 'icon-lan';
-                } else {
-                    iconClass = 'icon-users';
-                }
-                var labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
-                var text = labelIsName ? principal.name : principal.id;
-                return $labelBox.append($('<span>', {class: 'entry-icon '  + iconClass}),
-                    $('<span>', {class: 'text-normal entry-label', text: text}));
+                $labelBox.append(this._renderOtherLabel(principal, type));
             }
+            return $labelBox;
+        },
+        _renderRoleLabel: function(principal) {
+            var $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
+            var $code = this._renderRoleCode(principal.code, principal.color);
+            return [$code, $text];
+        },
+        _renderOtherLabel: function(principal, type) {
+            var iconClass;
+            if (type === 'Avatar') {
+                iconClass = 'icon-user';
+            } else if (type === 'Email') {
+                iconClass = 'icon-mail';
+            } else if (type === 'DefaultEntry' && principal.id === 'anonymous') {
+                iconClass = 'icon-question';
+            } else if (type === 'IPNetworkGroup') {
+                iconClass = 'icon-lan';
+            } else {
+                iconClass = 'icon-users';
+            }
+            var labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
+            var text = labelIsName ? principal.name : principal.id;
+            return [
+                $('<span>', {class: 'entry-icon '  + iconClass}),
+                $('<span>', {class: 'text-normal entry-label', text: text})
+            ];
         },
         _renderPermissions: function(principal, permissions) {
+            var self = this;
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
-
             permissions.forEach(function(item) {
-                $permissionsList.append($('<li>', {class: 'i-label bold ' + permissionClasses[item]}).append(item));
+                $permissionsList.append(
+                    $('<li>', {class: 'i-label bold ' + permissionClasses[item]})
+                        .append(self.options.permissionsInfo[item])
+                );
             });
-
-            $permissions.append(this._renderPermissionsButtons(principal, permissions));
+            if (principal._type !== 'DefaultEntry') {
+                $permissions.append(this._renderPermissionsButtons(principal, permissions));
+            }
             return $permissions;
         },
         _renderPermissionsButtons: function(principal, permissions) {
-            var self = this;
-            var $permissionsEditBtn;
-            if (principal._type !== 'DefaultEntry') {
-                var $buttonsGroup = $('<div>', {class: 'group flexrow'});
-                if (principal._type === 'IPNetworkGroup') {
-                    $permissionsEditBtn = $('<button>', {
-                        type: 'button',
-                        class: 'i-button text-color borderless icon-only icon-edit disabled',
-                        title: $T('IP Networks can only have access permission')
-                    });
-                } else {
-                    $permissionsEditBtn = $('<button>', {
-                        'type': 'button',
-                        'class': 'i-button text-color borderless icon-only icon-edit',
-                        'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.event_id}),
-                        'data-title': $T.gettext('Assign Permissions'),
-                        'data-ajax-dialog': '',
-                        'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
-                    });
-                }
-
-                var $entryDeleteBtn = $('<button>', {
-                    'type': 'button',
-                    'class': 'i-button text-color borderless icon-only icon-remove',
-                    'data-principal': JSON.stringify(principal)
-                }).on('click', function() {
-                    var $this = $(this);
-                    var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
-                    var message = $T.gettext("Are you sure you want to permanently delete this entry?");
-                    confirmPrompt(message, title).then(function() {
-                        self._updateItem($this.data('principal'), []);
-                    });
+            var $buttonsGroup = $('<div>', {class: 'group flexrow'});
+            $buttonsGroup.append(this._renderEditBtn(principal, permissions), this._renderDeleteBtn(principal));
+            return $buttonsGroup;
+        },
+        _renderEditBtn: function(principal, permissions) {
+            if (principal._type === 'IPNetworkGroup') {
+                return $('<button>', {
+                    type: 'button',
+                    class: 'i-button text-color borderless icon-only icon-edit disabled',
+                    title: $T.gettext('IP networks cannot have management permissions')
                 });
-
-                $buttonsGroup.append($permissionsEditBtn, $entryDeleteBtn);
-                return $buttonsGroup;
+            } else {
+                return $('<button>', {
+                    'type': 'button',
+                    'class': 'i-button text-color borderless icon-only icon-edit',
+                    'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.eventId}),
+                    'data-title': $T.gettext('Assign Permissions'),
+                    'data-ajax-dialog': '',
+                    'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
+                });
             }
+        },
+        _renderDeleteBtn: function(principal) {
+            var self = this;
+            return $('<button>', {
+                'type': 'button',
+                'class': 'i-button text-color borderless icon-only icon-remove',
+                'data-principal': JSON.stringify(principal)
+            }).on('click', function() {
+                var $this = $(this);
+                var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
+                var message = $T.gettext("Are you sure you want to permanently delete this entry?");
+                confirmPrompt(message, title).then(function() {
+                    self._updateItem($this.data('principal'), []);
+                });
+            });
         },
         _renderItem: function(item) {
             var $item = $('<li>', {class: 'flexrow f-a-center'});
@@ -139,7 +152,7 @@
         },
         _renderDropdown: function($dropdown) {
             var self = this;
-            $dropdown.children().not('.default').remove();
+            $dropdown.children(':not(.default)').remove();
             var $dropdownLink = $dropdown.prev('.js-dropdown');
             var items = $dropdown.data('items');
             var isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
@@ -156,7 +169,7 @@
                 var isEmpty = !$dropdown.children().not('.default').length;
                 $('.entry-role-dropdown .separator').toggleClass('hidden', isEmpty);
             } else if (!$dropdown.children().length) {
-                $dropdownLink.addClass('disabled').attr('title', $T('All IP Networks were added'));
+                $dropdownLink.addClass('disabled').attr('title', $T.gettext('All IP Networks were added'));
             } else {
                 $dropdownLink.removeClass('disabled');
             }
@@ -166,20 +179,19 @@
             var $dropdownItem = $('<li>', {'class': 'entry-item', 'data-principal': JSON.stringify(principal)});
             var $itemContent = $('<a>');
             if (principal._type === 'EventRole') {
-                var $code = this._renderRoleCode(principal.code, principal.color).addClass('dropdown-icon');
-                $itemContent.append($code);
+                $itemContent.append(this._renderRoleCode(principal.code, principal.color).addClass('dropdown-icon'));
             }
             var $text = $('<span>', {text: principal.name});
             $dropdownItem.append($itemContent.append($text)).on('click', function() {
-                // Grant 'access' permissions when a role / IP Network is added.
-                self._addItems([$(this).data('principal')], ['access']);
+                // Grant read access by default
+                self._addItems([$(this).data('principal')], ['_read_access']);
             });
             return $dropdownItem;
         },
-        _renderTooltip: function(idx) {
+        _renderDuplicatesTooltip: function(idx) {
             this.$permissionsWidgetList.find('>li').not('.disabled').eq(idx).qtip({
                 content: {
-                    text: $T('This entry was already added')
+                    text: $T.gettext('This entry was already added')
                 },
                 show: {
                     ready: true,
@@ -214,12 +226,12 @@
             });
             // Add default entries
             var categoryManagers = [{
-                _type: 'DefaultEntry', name: $T('Category Managers'), id: 'category-managers'
-            }, ['edit']];
-            var anonymous = [{_type: 'DefaultEntry', name: $T('Anonymous'), id: 'anonymous'}, ['access']];
-            self.$permissionsWidgetList.prepend(self._renderItem(categoryManagers));
-            self.$permissionsWidgetList.append(self._renderItem(anonymous));
-            self.$permissionsWidgetList.find('.anonymous').toggle(!self.isEventProtected);
+                _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
+            }, ['_full_access']];
+            var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'}, ['_read_access']];
+            this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
+            this.$permissionsWidgetList.append(this._renderItem(anonymous));
+            this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
             this._renderDropdown(this.$roleDropdown);
             if (this.$ipNetworkDropdown.length) {
@@ -257,22 +269,22 @@
             this._update();
             this._render();
             news.forEach(function(principal) {
-                self.$permissionsWidgetList.find('>li').not('.disabled').eq(self._findEntryIndex(principal))
+                self.$permissionsWidgetList.children('li:not(.disabled)').eq(self._findEntryIndex(principal))
                     .effect('highlight', {color: Palette.highlight}, 'slow');
             });
             repeated.forEach(function(principal) {
-                self._renderTooltip(self._findEntryIndex(principal));
+                self._renderDuplicatesTooltip(self._findEntryIndex(principal));
             });
         },
         _addUserGroup: function() {
             var self = this;
             function _addPrincipals(principals) {
-                // Grant 'access' permissions when a user/group is added for the first time.
-                self._addItems(principals, ['access']);
+                /// Grant read access by default
+                self._addItems(principals, ['_read_access']);
             }
 
             var dialog = new ChooseUsersPopup(
-                $T("Select a user or group to add"),
+                $T.gettext("Select a user or group to add"),
                 true, null, true, true, null, false, false, false, _addPrincipals, null, true
             );
 
@@ -288,10 +300,12 @@
             this._update();
             this._render();
 
+            // Manage changes on the permissions dialog
             this.element.on('indico:permissionsChanged', function(evt, permissions, principal) {
                 self._updateItem(principal, permissions);
             });
 
+            // Manage changes on the event protection mode field
             this.element.on('indico:protectionModeChanged', function(evt, isProtected) {
                 self.isEventProtected = isProtected;
                 self._render();
@@ -303,10 +317,10 @@
             });
 
             // Manage the creation of new roles
-            $('body').on('ajaxForm:success', function(evt, data) {
-                if (data.role) {
+            $('.js-new-role').on('ajaxDialog:closed', function(evt, data) {
+                if (data && data.role) {
                     self.$roleDropdown.data('items').push(data.role);
-                    self._addItems([data.role], ['access']);
+                    self._addItems([data.role], ['_read_access']);
                 }
             });
 
