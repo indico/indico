@@ -37,5 +37,6 @@ def _get_webpack_config(app):
             'distPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
             'distURL': os.path.join(static_url_path, 'dist/')
         },
-        'themes': theme_settings.themes
+        # ignore plugins, those are generated in their own webpack process
+        'themes': {key: theme for key, theme in theme_settings.themes.viewitems() if not theme.get('plugin')}
     }

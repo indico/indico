@@ -20,9 +20,10 @@ import os
 from contextlib import contextmanager
 from uuid import uuid4
 
-from flask import Blueprint, Flask, request
+from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
+from flask_webpackext import current_webpack
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
 from jinja2 import FileSystemLoader, TemplateNotFound
@@ -121,6 +122,12 @@ class IndicoFlask(PluginFlaskMixin, Flask):
     @property
     def static_url_path(self):
         return ''
+
+    @property
+    def manifest(self):
+        if 'custom_manifest' in g:
+            return g.custom_manifest
+        return current_webpack.manifest
 
 
 class IndicoBlueprintSetupState(BlueprintSetupState):

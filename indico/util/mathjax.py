@@ -16,11 +16,11 @@
 
 from __future__ import absolute_import
 
-from flask_webpackext import current_webpack
+from flask import current_app
 
 from indico.legacy.common.TemplateExec import render
 
 
 class MathjaxMixin(object):
     def _getHeadContent(self):
-        return render('js/mathjax.config.js.tpl') + unicode(current_webpack.manifest['mathjax.js'])
+        return render('js/mathjax.config.js.tpl') + unicode(current_app.manifest['mathjax.js'])
