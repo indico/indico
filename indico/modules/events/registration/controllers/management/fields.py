@@ -75,8 +75,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
                 self.field.personal_data_type.is_required):
             raise BadRequest
         if not enabled:
-            _remove_regform_item_gaps(self.regform.form_items, self.field.position)
-        positions = [x.position for x in self.regform.form_items if x.is_enabled == enabled]
+            _remove_regform_item_gaps(self.field.parent.fields, self.field.position)
+        positions = [x.position for x in self.field.parent.fields if x.is_enabled == enabled]
         self.field.position = max(positions) + 1 if positions else FIRST_DISABLED_POSITION
         self.field.is_enabled = enabled
         db.session.flush()
