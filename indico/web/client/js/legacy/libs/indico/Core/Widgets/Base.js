@@ -514,33 +514,18 @@ type("JTabWidget", ["IWidget"], {
             // Yuck! Since tabs have different sizes (due to content and also selected/unselected) we need to test how far we need to scroll.
             // Would be much nicer if we could calculate it but the width is not available at all for hidden elements.
             var nav = $('.ui-tabs-nav:first', self.widget);
-            if(!$.browser.msie) {
-                var origIdx = idx;
-                while(idx >= 0) {
-                    self.scrollToTab(idx - 1); // try scrolling left 1 tab
-                    if(nav.find(' > li').eq(origIdx).is(':hidden')) { // if our tab is now hidden, scroll one tab forward again and stop
-                        self.scrollToTab(idx);
-                        return;
-                    }
-                    idx--;
+
+            var origIdx = idx;
+            while(idx >= 0) {
+                self.scrollToTab(idx - 1); // try scrolling left 1 tab
+                if(nav.find(' > li').eq(origIdx).is(':hidden')) { // if our tab is now hidden, scroll one tab forward again and stop
+                    self.scrollToTab(idx);
+                    return;
                 }
-                // if we did not break before, something probably went wrong - let's scroll to the tab directly
-                self.scrollToTab(origIdx);
-                return;
+                idx--;
             }
-            else {
-                // In IE it's too slow. Let's use a less perfect match that is much faster though.
-                var allTabs = nav.find('> li');
-                var totalWidth = 0;
-                $.each(allTabs, function() {
-                    totalWidth += $(this).outerWidth(true);
-                });
-                var avgTabWidth = Math.ceil(totalWidth / allTabs.length);
-                var avgVisibleTabs = Math.floor(nav.width() / avgTabWidth);
-                if(idx + avgVisibleTabs >= allTabs.length) {
-                    idx = allTabs.length - avgVisibleTabs + 1;
-                }
-            }
+            // if we did not break before, something probably went wrong - let's scroll to the tab directly
+            self.scrollToTab(origIdx);
         }
 
         // Here we perform the actual "scrolling" (which is actually just hiding the "scrolled out" tabs)
