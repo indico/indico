@@ -16,17 +16,59 @@
 
 from __future__ import unicode_literals
 
-from flask import current_app, render_template
-from flask_webpackext import current_webpack
+import os
+
+from flask import current_app, json, render_template, session
 from werkzeug.urls import url_parse
 
 from indico.core.auth import multipass
 from indico.core.config import config
+from indico.core.plugins import plugin_engine
 from indico.modules.auth.util import url_for_login
 from indico.modules.events.registration.util import url_rule_to_angular
 from indico.modules.rb.models.locations import Location
-from indico.web.assets import core_env
+from indico.modules.users.util import serialize_user
+from indico.util.i18n import po_to_json
 from indico.web.flask.util import url_for, url_rule_to_js
+
+
+def get_locale_data(path, name, domain):
+    po_file = os.path.join(path, name, 'LC_MESSAGES', 'messages-js.po')
+    return po_to_json(po_file, domain=domain, locale=name) if os.access(po_file, os.R_OK) else {}
+
+
+def generate_i18n_file(locale_name):
+    root_path = os.path.join(current_app.root_path, 'translations')
+    i18n_data = get_locale_data(root_path, locale_name, 'indico')
+    if not i18n_data:
+        # Dummy data, not having the indico domain would cause lots of failures
+        i18n_data = {'indico': {'': {'domain': 'indico',
+                                        'lang': locale_name}}}
+
+    for pid, plugin in plugin_engine.get_active_plugins().iteritems():
+        data = {}
+        if plugin.translation_path:
+            data = get_locale_data(plugin.translation_path, locale_name, pid)
+        if not data:
+            # Dummy entry so we can still load the domain
+            data = {pid: {'': {'domain': pid,
+                                'lang': locale_name}}}
+        i18n_data.update(data)
+    return json.dumps(i18n_data)
+
+
+def generate_user_file(user=None):
+    user = user or session.user
+    if user is None:
+        user_vars = {}
+    else:
+        user_vars = {
+            'id': user.id,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users}
+        }
+    return render_template('assets/vars_user.js', user_vars=user_vars, user=user)
 
 
 def generate_global_file():
@@ -64,7 +106,7 @@ def generate_global_file():
 
             'APIKeyCreate': url_for('api.key_create'),
             'APIKeyTogglePersistent': url_for('api.key_toggle_persistent'),
-            'FontSassBundle': current_webpack.manifest['fonts.css']._paths,
+            'FontSassBundle': current_app.manifest['fonts.css']._paths,
 
             'EventCreation': url_rule_to_js('events.create'),
             'PermissionsDialog': url_rule_to_js('event_management.permissions_dialog'),

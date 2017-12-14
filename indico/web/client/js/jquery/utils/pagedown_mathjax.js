@@ -3,9 +3,7 @@
 
 // General MathJax configuration
 (function() {
-    if (!$('html').data('static-site')) {
-        MathJax.Ajax.config.root = Indico.Urls.Base + "/dist/js/mathjax";
-    }
+    MathJax.Ajax.config.root = ($('html').data('static-site') ? 'static/' : Indico.Urls.Base) + "/dist/js/mathjax";
 })();
 
 (function() {

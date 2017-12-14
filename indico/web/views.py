@@ -19,8 +19,7 @@ from __future__ import absolute_import, unicode_literals
 import posixpath
 from urlparse import urlparse
 
-from flask import g, render_template, request, session
-from flask_webpackext import current_webpack
+from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
@@ -149,7 +148,7 @@ class WPJinjaMixin(object):
         if html is not None:
             return html
         template = params.pop('_jinja_template')
-        params['bundles'] = (current_webpack.manifest[x] for x in self._resolve_bundles())
+        params['bundles'] = (current_app.manifest[x] for x in self._resolve_bundles())
         return self.render_template_func(template, **params)
 
 
@@ -207,7 +206,9 @@ class WPBase(object):
 
     def _fix_path(self, path):
         url_path = urlparse(config.BASE_URL).path or '/'
-        if path[0] != '/':
+        # append base path only if not absolute already
+        # and not in 'static site' mode (has to be relative)
+        if path[0] != '/' and not g.get('static_site'):
             path = posixpath.join(url_path, path)
         return path
 
@@ -234,8 +235,8 @@ class WPBase(object):
         js_files = map(self._fix_path, plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
-        bundles = (current_webpack.manifest[x] for x in self._resolve_bundles())
-        print_bundles = (current_webpack.manifest[x] for x in self.print_bundles)
+        bundles = (current_app.manifest[x] for x in self._resolve_bundles())
+        print_bundles = (current_app.manifest[x] for x in self.print_bundles)
 
         return render_template('indico_base.html',
                                css_files=css_files, js_files=js_files,

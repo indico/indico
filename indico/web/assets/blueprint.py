@@ -16,17 +16,15 @@
 
 import os
 
-from flask import Response, current_app, json, redirect, render_template, send_from_directory, session
+from flask import Response, current_app, redirect, send_from_directory
 from werkzeug.exceptions import NotFound
 
 import indico
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
 from indico.modules.events.layout import theme_settings
-from indico.modules.users.util import serialize_user
-from indico.util.i18n import po_to_json
 from indico.web.assets.util import get_asset_path
-from indico.web.assets.vars_js import generate_global_file
+from indico.web.assets.vars_js import generate_global_file, generate_i18n_file, generate_user_file
 from indico.web.flask.util import send_file, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -74,23 +72,7 @@ def js_vars_user():
     Provides a JS file with user-specific definitions
     Useful for favorites, settings etc.
     """
-    user = session.user
-    if user is None:
-        user_vars = {}
-    else:
-        user_vars = {
-            'id': user.id,
-            'first_name': user.first_name,
-            'last_name': user.last_name,
-            'favorite_users': {u.id: serialize_user(u) for u in user.favorite_users}
-        }
-    data = render_template('assets/vars_user.js', user_vars=user_vars, user=user)
-    return Response(data, mimetype='application/javascript')
-
-
-def locale_data(path, name, domain):
-    po_file = os.path.join(path, name, 'LC_MESSAGES', 'messages-js.po')
-    return po_to_json(po_file, domain=domain, locale=name) if os.access(po_file, os.R_OK) else {}
+    return Response(generate_user_file(), mimetype='application/javascript')
 
 
 @assets_blueprint.route('/i18n/<locale_name>.js')
@@ -98,29 +80,13 @@ def i18n_locale(locale_name):
     """
     Retrieve a locale in a Jed-compatible format
     """
-    root_path = os.path.join(current_app.root_path, 'translations')
     cache_file = os.path.join(config.CACHE_DIR, 'assets_i18n_{}_{}_{}.js'.format(
         locale_name, indico.__version__, config.hash))
 
     if not os.path.exists(cache_file):
-        i18n_data = locale_data(root_path, locale_name, 'indico')
-        if not i18n_data:
-            # Dummy data, not having the indico domain would cause lots of failures
-            i18n_data = {'indico': {'': {'domain': 'indico',
-                                         'lang': locale_name}}}
-
-        for pid, plugin in plugin_engine.get_active_plugins().iteritems():
-            data = {}
-            if plugin.translation_path:
-                data = locale_data(plugin.translation_path, locale_name, pid)
-            if not data:
-                # Dummy entry so we can still load the domain
-                data = {pid: {'': {'domain': pid,
-                                   'lang': locale_name}}}
-            i18n_data.update(data)
-
+        i18n_data = generate_i18n_file(locale_name)
         with open(cache_file, 'wb') as f:
-            f.write("window.TRANSLATIONS = {};".format(json.dumps(i18n_data)))
+            f.write("window.TRANSLATIONS = {};".format(i18n_data))
 
     return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/javascript',
                      no_cache=False, conditional=True)
