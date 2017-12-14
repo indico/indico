@@ -19,9 +19,11 @@ from __future__ import unicode_literals
 from datetime import timedelta
 
 from wtforms.fields import BooleanField, StringField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, ValidationError
 
+from indico.core.db import db
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
+from indico.modules.events.sessions.models.types import SessionType
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -100,3 +102,24 @@ class MeetingSessionBlockForm(IndicoForm):
     @property
     def block_fields(self):
         return [field_name for field_name in self._fields if field_name.startswith('block_')]
+
+
+class SessionTypeForm(IndicoForm):
+    """Form to create or edit a SessionType"""
+
+    name = StringField(_("Name"), [DataRequired()])
+    is_poster = BooleanField(_("Poster"), widget=SwitchWidget(),
+                             description=_("If selected, this session type will appear in timetable "
+                                           "as a poster session."))
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        self.session_type = kwargs.get('obj')
+        super(SessionTypeForm, self).__init__(*args, **kwargs)
+
+    def validate_name(self, field):
+        query = self.event.session_types.filter(db.func.lower(SessionType.name) == field.data.lower())
+        if self.session_type:
+            query = query.filter(SessionType.id != self.session_type.id)
+        if query.count():
+            raise ValidationError(_("A session type with this name already exists"))

@@ -7,6 +7,33 @@
     {%- trans %}Sessions{% endtrans -%}
 {% endblock %}
 
+{% block title_actions %}
+    {%- if event.type == 'conference' -%}
+        <a id="contributions-settings-dropdown"
+           class="i-button borderless icon-settings arrow js-dropdown"
+           data-toggle="dropdown">{% trans %}Settings{% endtrans %}</a>
+        <ul class="dropdown">
+            <li>
+                <a href="#"
+                   title="{% trans %}Manage session types{% endtrans %}"
+                   data-reload-after="customData"
+                   data-title="{% trans %}Manage session types{% endtrans %}"
+                   data-href="{{ url_for('.manage_types', event) }}"
+                   data-qtip-position="right"
+                   data-ajax-dialog>
+                    {% trans %}Session types{% endtrans %}</a>
+            </li>
+        </ul>
+    {%- endif -%}
+{% endblock %}
+
+{% block description %}
+    {%- trans -%}
+        Manage the sessions of the event from the list below or configure the <strong>session types</strong>
+        from the settings menu above.
+    {%- endtrans -%}
+{% endblock %}
+
 {% block content %}
     <div id="sessions">
         <div class="toolbars space-after">

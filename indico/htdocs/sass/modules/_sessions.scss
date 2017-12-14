@@ -20,3 +20,26 @@
         cursor: pointer;
     }
 }
+
+.manage-session-types {
+    max-width: 600px;
+
+    table.i-table {
+        table-layout: auto;
+        min-width: 360px;
+        margin-bottom: 1.5em;
+
+        th, td {
+            white-space: normal;
+
+            &.name-column {
+                white-space: nowrap;
+            }
+        }
+
+        .action-column {
+            white-space: nowrap;
+            width: 1px;
+        }
+    }
+}

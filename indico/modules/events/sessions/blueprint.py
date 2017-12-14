@@ -21,9 +21,11 @@ from functools import partial
 from indico.modules.events.sessions.controllers.compat import compat_session
 from indico.modules.events.sessions.controllers.display import (RHDisplaySession, RHDisplaySessionList,
                                                                 RHExportSessionTimetableToPDF, RHExportSessionToICAL)
-from indico.modules.events.sessions.controllers.management.sessions import (RHCreateSession, RHDeleteSessions,
-                                                                            RHExportSessionsCSV, RHExportSessionsExcel,
-                                                                            RHExportSessionsPDF, RHManageSessionBlock,
+from indico.modules.events.sessions.controllers.management.sessions import (RHCreateSession, RHCreateSessionType,
+                                                                            RHDeleteSessions, RHDeleteSessionType,
+                                                                            RHEditSessionType, RHExportSessionsCSV,
+                                                                            RHExportSessionsExcel, RHExportSessionsPDF,
+                                                                            RHManageSessionBlock, RHManageSessionTypes,
                                                                             RHModifySession, RHSessionACL,
                                                                             RHSessionACLMessage, RHSessionBlocks,
                                                                             RHSessionPersonList, RHSessionProtection,
@@ -51,6 +53,14 @@ _bp.add_url_rule('/manage/sessions/<int:session_id>/blocks/<int:block_id>', 'man
                  RHManageSessionBlock, methods=('GET', 'POST'))
 _bp.add_url_rule('/manage/sessions/<int:session_id>/acl', 'acl', RHSessionACL)
 _bp.add_url_rule('/manage/sessions/<int:session_id>/acl-message', 'acl_message', RHSessionACLMessage)
+
+# Session types
+_bp.add_url_rule('/manage/sessions/types/', 'manage_types', RHManageSessionTypes)
+_bp.add_url_rule('/manage/sessions/types/create', 'create_type', RHCreateSessionType, methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/sessions/types/<int:session_type_id>', 'manage_type', RHEditSessionType,
+                 methods=('GET', 'POST'))
+_bp.add_url_rule('/manage/sessions/types/<int:session_type_id>/delete', 'delete_type', RHDeleteSessionType,
+                 methods=('POST',))
 
 
 # Display

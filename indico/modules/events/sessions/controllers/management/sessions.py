@@ -16,23 +16,27 @@
 
 from __future__ import unicode_literals
 
-from flask import jsonify, request
+from flask import jsonify, request, session
 from sqlalchemy.orm import subqueryload, undefer
 from werkzeug.exceptions import BadRequest
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
+from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
                                                                    RHManageSessionsBase)
-from indico.modules.events.sessions.forms import MeetingSessionBlockForm, SessionForm, SessionProtectionForm
+from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionForm, SessionProtectionForm,
+                                                  SessionTypeForm)
 from indico.modules.events.sessions.models.blocks import SessionBlock
 from indico.modules.events.sessions.models.sessions import Session
+from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
                                                        update_session_block)
-from indico.modules.events.sessions.util import generate_pdf_from_sessions, generate_spreadsheet_from_sessions
+from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
+                                                 session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import get_random_color, update_object_principals
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -245,3 +249,68 @@ class RHManageSessionBlock(RHManageSessionBase):
 class RHSessionBlocks(RHManageSessionBase):
     def _process(self):
         return jsonify_template('events/sessions/management/session_blocks.html', sess=self.session)
+
+
+class RHManageSessionTypes(RHManageSessionsBase):
+    """Dialog to manage the SessionTypes of an event"""
+
+    def _process(self):
+        session_types = self.event.session_types.all()
+        return jsonify_template('events/sessions/management/types_dialog.html', event=self.event,
+                                session_types=session_types)
+
+
+class RHManageSessionTypeBase(RHManageSessionsBase):
+    """Manage a session type of an event"""
+
+    normalize_url_spec = {
+        'locators': {
+            lambda self: self.session_type
+        }
+    }
+
+    def _process_args(self):
+        RHManageSessionsBase._process_args(self)
+        self.session_type = SessionType.get_one(request.view_args['session_type_id'])
+
+
+class RHEditSessionType(RHManageSessionTypeBase):
+    """Dialog to edit a SessionType"""
+
+    def _process(self):
+        form = SessionTypeForm(event=self.event, obj=self.session_type)
+        if form.validate_on_submit():
+            old_name = self.session_type.name
+            form.populate_obj(self.session_type)
+            db.session.flush()
+            self.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
+                           'Updated type: {}'.format(old_name), session.user)
+            return session_type_row(self.session_type)
+        return jsonify_form(form)
+
+
+class RHCreateSessionType(RHManageSessionsBase):
+    """Dialog to add a SessionType"""
+
+    def _process(self):
+        form = SessionTypeForm(event=self.event)
+        if form.validate_on_submit():
+            session_type = SessionType()
+            form.populate_obj(session_type)
+            self.event.session_types.append(session_type)
+            db.session.flush()
+            self.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
+                           'Added type: {}'.format(session_type.name), session.user)
+            return session_type_row(session_type)
+        return jsonify_form(form)
+
+
+class RHDeleteSessionType(RHManageSessionTypeBase):
+    """Dialog to delete a SessionType"""
+
+    def _process(self):
+        db.session.delete(self.session_type)
+        db.session.flush()
+        self.event.log(EventLogRealm.management, EventLogKind.negative, 'Sessions',
+                       'Deleted type: {}'.format(self.session_type.name), session.user)
+        return jsonify_data(flash=False)

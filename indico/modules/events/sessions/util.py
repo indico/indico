@@ -33,7 +33,9 @@ from indico.modules.events import Event
 from indico.modules.events.sessions.models.principals import SessionPrincipal
 from indico.modules.events.sessions.models.sessions import Session
 from indico.util.i18n import _
+from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import url_for
+from indico.web.util import jsonify_data
 
 
 def can_manage_sessions(user, event, permission=None):
@@ -195,3 +197,9 @@ def get_session_timetable_pdf(sess, **kwargs):
     return TimeTablePlain(sess.event, session.user, showSessions=[sess.id], showDays=[],
                           sortingCrit=None, ttPDFFormat=pdf_format, pagesize='A4', fontsize='normal',
                           firstPageNumber=1, showSpeakerAffiliation=False, **kwargs)
+
+
+def session_type_row(session_type):
+    template = get_template_module('events/sessions/management/_types_table.html')
+    html = template.types_table_row(session_type=session_type)
+    return jsonify_data(html_row=html, flash=False)
