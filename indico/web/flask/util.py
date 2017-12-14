@@ -27,7 +27,7 @@ from flask import Blueprint, current_app, g, redirect, request
 from flask.helpers import get_root_path
 from werkzeug.datastructures import FileStorage, Headers
 from werkzeug.exceptions import NotFound
-from werkzeug.routing import BaseConverter, BuildError, UnicodeConverter
+from werkzeug.routing import BaseConverter, BuildError, MethodNotAllowed, NotFound, RequestRedirect, UnicodeConverter
 from werkzeug.wrappers import Response as WerkzeugResponse
 
 from indico.util.caching import memoize
@@ -195,6 +195,8 @@ def url_for(endpoint, *targets, **values):
         # related to offline site urls...
         from indico.modules.events.static.util import url_to_static_filename
         url = url_to_static_filename(endpoint, url)
+        # mark asset as used so that generator can include it
+        g.used_url_for_assets.add(url)
     return url
 
 
@@ -318,6 +320,21 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         rv.cache_control.no_cache = True
     return rv
 
+
+def find_url_endpoint(url):
+    """Return the endpoint that corresponds to a URL path segment.
+
+    Credits go to https://stackoverflow.com/a/38488506/682095
+    """
+    adapter = current_app.url_map.bind_to_environ(request.environ)
+    try:
+        endpoint, data = adapter.match(url)
+    except RequestRedirect as e:
+        return find_url_endpoint(e.new_url)
+    except (MethodNotAllowed, NotFound):
+        return None
+
+    return endpoint, data
 
 # Note: When adding custom converters please do not forget to add them to converter_functions in routing.js
 # if they need any custom processing (i.e. not just encodeURIComponent) in JavaScript.

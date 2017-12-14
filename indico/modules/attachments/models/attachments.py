@@ -285,15 +285,15 @@ def _offline_download_url(attachment):
     # Legacy offline download link generation
     if attachment.type == AttachmentType.file:
         if isinstance(attachment.folder.object, db.m.Event):
-            path = "events/conference"
+            path = ""
         elif isinstance(attachment.folder.object, db.m.Session):
-            path = "agenda/{}-session".format(attachment.folder.session_id)
+            path = "{}-session".format(attachment.folder.session.friendly_id)
         elif isinstance(attachment.folder.object, db.m.Contribution):
-            path = "agenda/{}-contribution".format(attachment.folder.contribution_id)
+            path = "{}-contribution".format(attachment.folder.contribution.friendly_id)
         elif isinstance(attachment.folder.object, db.m.SubContribution):
-            path = "agenda/{}-subcontribution".format(attachment.folder.subcontribution_id)
+            path = "{}-subcontribution".format(attachment.folder.subcontribution.friendly_id)
         else:
             return ''
-        return posixpath.join("files", path, str(attachment.id) + "-" + attachment.file.filename)
+        return posixpath.join("material", path, str(attachment.id) + "-" + attachment.file.filename)
     else:
         return attachment.link_url
