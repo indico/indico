@@ -43,6 +43,7 @@ div.timetableFullScreenHeader {
 }
 
 .timetableBlock {
+    cursor: pointer;
     border: 1px solid #bbb;
     border-radius: 3px;
     -moz-border-radius: 3px;
