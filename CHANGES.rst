@@ -51,6 +51,8 @@ Improvements
 - Keep page titles in sync with conference menu item titles (:issue:`3236`)
 - Add option to hide an attachment folder in the display areas of an event
   (:issue:`3181`, thanks :user:`bpedersen2`)
+- Improve flower redirect URI generation (:issue:`3187`, thanks
+  :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

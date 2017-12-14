@@ -67,11 +67,19 @@ class FlowerAuthHandler(BaseHandler, OAuth2Mixin):
     def get_auth_http_client(self):
         return AsyncHTTPClient()
 
+    @property
+    def uri_base(self):
+        try:
+            return os.environ['INDICO_FLOWER_URL']
+        except KeyError:
+            return 'http{}://{}{}{}'.format('s' if 'ssl_options' in settings else '',
+                                            options.address or 'localhost',
+                                            ':{}'.format(options.port) if not options.unix_socket else '',
+                                            '/{}'.format(options.url_prefix) if options.url_prefix else '')
+
     @asynchronous
     def get(self):
-        redirect_uri = 'http{}://{}:{}/login'.format('s' if 'ssl_options' in settings else '',
-                                                     options.address or 'localhost',
-                                                     options.port)
+        redirect_uri = '{}/login'.format(self.uri_base.rstrip('/'))
         if self.get_argument('code', False):
             self.get_authenticated_user(
                 redirect_uri=redirect_uri,
@@ -100,4 +108,4 @@ class FlowerAuthHandler(BaseHandler, OAuth2Mixin):
         if not payload or not payload['admin']:
             raise HTTPError(403, 'Access denied')
         self.set_secure_cookie('user', 'Indico Admin')
-        self.redirect(self.get_argument('next', '/'))
+        self.redirect(self.get_argument('next', self.uri_base))
