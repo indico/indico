@@ -14,6 +14,7 @@ Bugfixes
   Users" dialog
 - Fix missing event management menu/layout when creating a material
   package from the event management area
+- Fix error when viewing a contribution with co-authors
 
 
 Version 2.0rc2
