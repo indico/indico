@@ -91,7 +91,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
         self.field.is_deleted = True
-        _remove_regform_item_gaps(self.regform.form_items, self.field.position)
+        _remove_regform_item_gaps(self.field.parent.fields, self.field.position)
         db.session.flush()
         logger.info('Field %s deleted by %s', self.field, session.user)
         return jsonify()
