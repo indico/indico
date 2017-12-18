@@ -78,7 +78,7 @@ from urlparse import urlparse
 import markdown
 import requests
 from PIL import Image
-from requests.exceptions import InvalidURL
+from requests.exceptions import InvalidURL, ConnectionError
 
 
 __version__ = '2.1'
@@ -251,8 +251,8 @@ def latex_render_image(src, alt, strict=False):
                 resp = requests.get(src, verify=False, timeout=5)
             except InvalidURL:
                 raise ImageURLException("Cannot understand URL '{}'".format(src))
-            except requests.Timeout:
-                raise ImageURLException("Loading image timed out ({})".format(src))
+            except (requests.Timeout, ConnectionError):
+                raise ImageURLException("Problem downloading image ({})".format(src))
             extension = None
 
             if resp.status_code != 200:
