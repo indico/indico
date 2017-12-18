@@ -134,7 +134,9 @@ class Rescheduler(object):
             # if we have a session block we reschedule the entries inside that block
             for entry in self.session_block.timetable_entry.children:
                 # the block should only have entries on the same day
-                assert entry.start_dt.astimezone(self.event.tzinfo).date() == self.day
+                if entry.start_dt.astimezone(self.event.tzinfo).date() != self.day:
+                    raise NoReportError.wrap_exc(BadRequest(_('This action cannot be completed because the event dates'
+                                                              ' have changed. Please reload the page and try again.')))
                 yield entry
         elif self.session:
             # if we have a session we reschedule the blocks of that session on the day
