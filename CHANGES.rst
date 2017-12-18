@@ -17,6 +17,8 @@ Bugfixes
 - Fix error when viewing a contribution with co-authors
 - Fix sorting of registration form items not working anymore after
   moving/disabling some items
+- Fix error after updating from 2.0rc1 if there are cached Mako
+  templates
 
 
 Version 2.0rc2

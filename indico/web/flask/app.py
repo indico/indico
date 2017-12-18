@@ -152,7 +152,7 @@ def configure_xsendfile(app, method):
 
 
 def setup_mako(app):
-    mako.template_args['module_directory'] = os.path.join(config.TEMP_DIR, 'mako_modules')
+    mako.template_args['module_directory'] = os.path.join(config.TEMP_DIR, 'mako_modules', indico.__version__)
 
 
 def setup_jinja(app):
