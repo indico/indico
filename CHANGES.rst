@@ -15,6 +15,8 @@ Bugfixes
 - Fix missing event management menu/layout when creating a material
   package from the event management area
 - Fix error when viewing a contribution with co-authors
+- Fix sorting of registration form items not working anymore after
+  moving/disabling some items
 
 
 Version 2.0rc2
