@@ -3,9 +3,10 @@
 
 <div class="manage-contribution-types">
     <div class="toolbar space-after hide-if-locked">
-        <button id="js-new-contribution-type" class="i-button icon-plus highlight" data-ajax-dialog
+        <button class="i-button js-new-contribution-type icon-plus highlight"
                 data-href="{{ url_for('.create_type', event) }}"
-                data-title="{% trans %}Add new contribution type{% endtrans %}">
+                data-title="{% trans %}Add new contribution type{% endtrans %}"
+                data-ajax-dialog>
             {% trans %}New contribution type{% endtrans %}
         </button>
     </div>
@@ -47,9 +48,10 @@
     (function() {
         'use strict';
 
+        var $manageContributionTypes = $('.manage-contribution-types');
         /* Set the customData to true indicating that the contribution list needs to be refreshed */
         function dialogModified() {
-            $('.manage-contribution-types').trigger('ajaxDialog:setData', [true]);
+            $manageContributionTypes.trigger('ajaxDialog:setData', [true]);
         }
 
         $('.manage-contribution-types table').tablesorter({
@@ -61,19 +63,19 @@
             }
         });
 
-        $('#js-new-contribution-type').on('ajaxDialog:closed', function(evt, data) {
+        $('.js-new-contribution-type').on('ajaxDialog:closed', function(evt, data) {
             evt.preventDefault();
             if (data) {
                 var $lastRow = $('.manage-contribution-types table tr:last');
                 if ($lastRow.length) {
                     $lastRow.after(data.html_row);
                 } else {
-                    $('.manage-contribution-types').trigger('ajaxDialog:reload');
+                    $manageContributionTypestrigger('ajaxDialog:reload');
                 }
             }
         });
 
-        $('.manage-contribution-types').on('ajaxDialog:closed', '.js-edit-contribution-type', function(evt, data) {
+        $manageContributionTypes.on('ajaxDialog:closed', '.js-edit-contribution-type', function(evt, data) {
             evt.preventDefault();
             var $row = $(this).closest('tr');
             if (data) {
@@ -82,7 +84,7 @@
             }
         });
 
-        $('.manage-contribution-types').on('indico:confirmed', '.js-delete-contribution-type', function(evt) {
+        $manageContributionTypes.on('indico:confirmed', '.js-delete-contribution-type', function(evt) {
             evt.preventDefault();
             var $this = $(this);
             var $row = $this.closest('tr');
@@ -94,8 +96,8 @@
                 success: function() {
                     $row.remove();
                     dialogModified();
-                    if ($('.manage-contribution-types table tbody tr').length == 0) {
-                        $('.manage-contribution-types').trigger('ajaxDialog:reload');
+                    if ($('.manage-contribution-types table tbody tr').length === 0) {
+                        $manageContributionTypes.trigger('ajaxDialog:reload');
                     }
                 }
             });
