@@ -78,7 +78,7 @@ from urlparse import urlparse
 import markdown
 import requests
 from PIL import Image
-from requests.exceptions import InvalidURL, ConnectionError
+from requests.exceptions import ConnectionError, InvalidURL
 
 
 __version__ = '2.1'

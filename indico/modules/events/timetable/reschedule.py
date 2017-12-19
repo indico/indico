@@ -20,10 +20,11 @@ from datetime import datetime, timedelta
 
 from flask import session
 from pytz import utc
+from werkzeug.exceptions import BadRequest
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
-from indico.core.errors import UserValueError
+from indico.core.errors import NoReportError, UserValueError
 from indico.modules.events import EventLogRealm
 from indico.modules.events.logs.models.entries import EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
