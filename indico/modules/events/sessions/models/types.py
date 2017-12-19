@@ -58,7 +58,7 @@ class SessionType(db.Model):
         backref=db.backref(
             'session_types',
             cascade='all, delete-orphan',
-            lazy='dynamic'
+            lazy=True
         )
     )
 

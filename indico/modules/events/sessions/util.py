@@ -199,6 +199,6 @@ def get_session_timetable_pdf(sess, **kwargs):
                           firstPageNumber=1, showSpeakerAffiliation=False, **kwargs)
 
 
-def session_type_row(session_type):
+def render_session_type_row(session_type):
     template = get_template_module('events/sessions/management/_types_table.html')
     return template.types_table_row(session_type=session_type)

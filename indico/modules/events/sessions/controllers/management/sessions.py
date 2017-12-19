@@ -36,7 +36,7 @@ from indico.modules.events.sessions.models.types import SessionType
 from indico.modules.events.sessions.operations import (create_session, delete_session, update_session,
                                                        update_session_block)
 from indico.modules.events.sessions.util import (generate_pdf_from_sessions, generate_spreadsheet_from_sessions,
-                                                 session_type_row)
+                                                 render_session_type_row)
 from indico.modules.events.sessions.views import WPManageSessions
 from indico.modules.events.util import get_random_color, update_object_principals
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -54,7 +54,7 @@ def _get_session_list_args(event):
                          subqueryload('blocks').undefer('contribution_count'))
                 .order_by(db.func.lower(Session.title))
                 .all())
-    types = [{'id': int(t.id), 'title': t.name} for t in event.session_types]
+    types = [{'id': t.id, 'title': t.name} for t in SessionType.query.with_parent(event)]
     return {'sessions': sessions, 'default_colors': get_colors(), 'types': types}
 
 
@@ -267,10 +267,10 @@ class RHSessionBlocks(RHManageSessionBase):
 
 
 class RHManageSessionTypes(RHManageSessionsBase):
-    """Dialog to manage the SessionTypes of an event"""
+    """Dialog to manage the session types of an event"""
 
     def _process(self):
-        types = self.event.session_types.all()
+        types = SessionType.query.with_parent(self.event).all()
         return jsonify_template('events/sessions/management/types_dialog.html', event=self.event,
                                 types=types)
 
@@ -300,7 +300,7 @@ class RHEditSessionType(RHManageSessionTypeBase):
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.change, 'Sessions',
                            'Updated type: {}'.format(old_name), session.user)
-            return jsonify_data(html_row=session_type_row(self.session_type), flash=False)
+            return jsonify_data(html_row=render_session_type_row(self.session_type), flash=False)
         return jsonify_form(form)
 
 
@@ -308,9 +308,9 @@ class RHCreateSessionType(RHManageSessionsBase):
     """Dialog to add a SessionType"""
 
     def _get_response(self, new_type):
-        types = [{'id': t.id, 'title': t.name} for t in self.event.session_types]
+        types = [{'id': t.id, 'title': t.name} for t in SessionType.query.with_parent(self.event)]
         return jsonify_data(types=types, new_type_id=new_type.id,
-                            html_row=session_type_row(new_type))
+                            html_row=render_session_type_row(new_type))
 
     def _process(self):
         form = SessionTypeForm(event=self.event)

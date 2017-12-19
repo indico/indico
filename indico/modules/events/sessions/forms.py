@@ -55,7 +55,7 @@ class SessionForm(IndicoForm):
         if event.type != 'conference':
             del self.is_poster
             del self.code
-        self.type.query = event.session_types
+        self.type.query = SessionType.query.with_parent(event)
         if not self.type.query.count():
             del self.type
 
@@ -120,7 +120,7 @@ class SessionTypeForm(IndicoForm):
         super(SessionTypeForm, self).__init__(*args, **kwargs)
 
     def validate_name(self, field):
-        query = self.event.session_types.filter(db.func.lower(SessionType.name) == field.data.lower())
+        query = SessionType.query.with_parent(self.event).filter(db.func.lower(SessionType.name) == field.data.lower())
         if self.session_type:
             query = query.filter(SessionType.id != self.session_type.id)
         if query.count():
