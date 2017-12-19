@@ -3,9 +3,10 @@
 
 <div class="manage-session-types">
     <div class="toolbar space-after hide-if-locked">
-        <button id="js-new-session-type" class="i-button icon-plus highlight" data-ajax-dialog
+        <button class="i-button js-new-session-type icon-plus highlight"
                 data-href="{{ url_for('.create_type', event) }}"
-                data-title="{% trans %}Add new session type{% endtrans %}">
+                data-title="{% trans %}Add new session type{% endtrans %}"
+                data-ajax-dialog>
             {% trans %}New session type{% endtrans %}
         </button>
     </div>
@@ -58,7 +59,7 @@
             }
         });
 
-        $('#js-new-session-type').on('ajaxDialog:closed', function(evt, data) {
+        $('.js-new-session-type').on('ajaxDialog:closed', function(evt, data) {
             evt.preventDefault();
             if (data) {
                 var $lastRow = $('.manage-session-types table tr:last');
@@ -93,7 +94,7 @@
                 success: function() {
                     $row.remove();
                     dialogModified();
-                    if ($('.manage-session-types table tbody tr').length == 0) {
+                    if ($('.manage-session-types table tbody tr').length === 0) {
                         $manageSessionTypes.trigger('ajaxDialog:reload');
                     }
                 }
