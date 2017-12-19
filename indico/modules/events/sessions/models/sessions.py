@@ -82,6 +82,12 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         index=True,
         nullable=False
     )
+    type_id = db.Column(
+        db.Integer,
+        db.ForeignKey('events.session_types.id'),
+        index=True,
+        nullable=True
+    )
     title = db.Column(
         db.String,
         nullable=False
@@ -131,6 +137,14 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         backref=db.backref(
             'session',
             lazy=False
+        )
+    )
+    type = db.relationship(
+        'SessionType',
+        lazy=True,
+        backref=db.backref(
+            'sessions',
+            lazy=True
         )
     )
 

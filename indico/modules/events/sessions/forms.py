@@ -18,6 +18,7 @@ from __future__ import unicode_literals
 
 from datetime import timedelta
 
+from wtforms.ext.sqlalchemy.fields import QuerySelectField
 from wtforms.fields import BooleanField, StringField, TextAreaField
 from wtforms.validators import DataRequired, ValidationError
 
@@ -43,11 +44,10 @@ class SessionForm(IndicoForm):
                                                    description=_('Duration that a contribution created within this '
                                                                  'session will have by default.'),
                                                    default=timedelta(minutes=20))
+    type = QuerySelectField(_("Type"), get_label='name', allow_blank=True, blank_text=_("No type selected"))
     location_data = IndicoLocationField(_("Default location"),
                                         description=_("Default location for blocks inside the session."))
     colors = IndicoPalettePickerField(_('Colours'), color_list=get_colors())
-    is_poster = BooleanField(_('Poster session'), widget=SwitchWidget(),
-                             description=_('Whether the session is a poster session or contains normal presentations.'))
 
     def __init__(self, *args, **kwargs):
         event = kwargs.pop('event')
@@ -55,6 +55,9 @@ class SessionForm(IndicoForm):
         if event.type != 'conference':
             del self.is_poster
             del self.code
+        self.type.query = event.session_types
+        if not self.type.query.count():
+            del self.type
 
 
 class SessionProtectionForm(IndicoForm):
@@ -109,8 +112,7 @@ class SessionTypeForm(IndicoForm):
 
     name = StringField(_("Name"), [DataRequired()])
     is_poster = BooleanField(_("Poster"), widget=SwitchWidget(),
-                             description=_("If selected, this session type will appear in timetable "
-                                           "as a poster session."))
+                             description=_("Whether the session is a poster session or contains normal presentations"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')

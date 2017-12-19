@@ -10,7 +10,7 @@
         </button>
     </div>
 
-    {% if session_types %}
+    {% if types %}
         <table class="i-table">
             <thead>
                 <tr class="i-table">
@@ -24,7 +24,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for session_type in session_types %}
+                {% for session_type in types %}
                     {{ types_table_row(session_type) }}
                 {% endfor %}
             </tbody>

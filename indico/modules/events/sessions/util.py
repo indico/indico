@@ -83,7 +83,7 @@ class SessionListToPDF(PDFBase):
         for sess in self.sessions:
             rows.append([
                 Paragraph(sess.friendly_id, text_style),
-                Paragraph(_('Poster') if sess.is_poster else _('Standard'), text_style),
+                Paragraph(sess.type.name.encode('utf-8') if sess.type else '', text_style),
                 Paragraph(sess.title.encode('utf-8'), text_style),
                 Paragraph(sess.code.encode('utf-8'), text_style),
                 Paragraph(sess.description.encode('utf-8'), text_style)
@@ -201,5 +201,4 @@ def get_session_timetable_pdf(sess, **kwargs):
 
 def session_type_row(session_type):
     template = get_template_module('events/sessions/management/_types_table.html')
-    html = template.types_table_row(session_type=session_type)
-    return jsonify_data(html_row=html, flash=False)
+    return template.types_table_row(session_type=session_type)

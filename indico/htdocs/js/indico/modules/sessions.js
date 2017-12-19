@@ -39,7 +39,7 @@
                     $.ajax({
                         url: $(this).data('href'),
                         method: $(this).data('method'),
-                        data: JSON.stringify({'colors': {'text': text, 'background': background}}),
+                        data: JSON.stringify({colors: {text: text, background: background}}),
                         dataType: 'json',
                         contentType: 'application/json',
                         error: handleAjaxError,
@@ -47,6 +47,18 @@
                     });
                 }
             });
+        });
+    }
+
+    function patchObject(url, method, data) {
+        return $.ajax({
+            url: url,
+            method: method,
+            data: JSON.stringify(data),
+            dataType: 'json',
+            contentType: 'application/json',
+            error: handleAjaxError,
+            complete: IndicoUI.Dialogs.Util.progress()
         });
     }
 
@@ -58,7 +70,11 @@
         placeholder: '#filter-placeholder'
     };
 
-    global.setupSessionsList = function setupSessionsList() {
+    global.setupSessionsList = function setupSessionsList(options) {
+        options = $.extend({
+            createTypeURL: null
+        }, options);
+        setupTypePicker(options.createTypeURL);
         enableIfChecked('#sessions-wrapper', '.select-row', '#sessions .js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
@@ -95,4 +111,45 @@
             }
         });
     };
+
+    function setupTypePicker(createURL) {
+        $('#sessions').on('click', '.session-type-picker', function() {
+            $(this).itempicker({
+                filterPlaceholder: $T.gettext('Filter types'),
+                containerClasses: 'session-type-container',
+                uncheckedItemIcon: '',
+                footerElements: [{
+                    title: $T.gettext('Add new type'),
+                    onClick: function(sessionTypePicker) {
+                        ajaxDialog({
+                            title: $T.gettext('Add new type'),
+                            url: createURL,
+                            onClose: function(data) {
+                                if (data) {
+                                    $('.session-type-picker').each(function() {
+                                        var $this = $(this);
+                                        if ($this.data('indicoItempicker')) {
+                                            $this.itempicker('updateItemList', data.types);
+                                        } else {
+                                            $this.data('items', data.types);
+                                        }
+                                    });
+                                    sessionTypePicker.itempicker('selectItem', data.new_type_id);
+                                }
+                            }
+                        });
+                    }
+                }],
+                onSelect: function(newType) {
+                    var $this = $(this);
+                    var postData = {type_id: newType ? newType.id : null};
+
+                    return patchObject($this.data('href'), $this.data('method'), postData).then(function() {
+                        var label = newType ? newType.title : $T.gettext('No type');
+                        $this.find('.label').text(label);
+                    });
+                }
+            });
+        });
+    }
 })(window);

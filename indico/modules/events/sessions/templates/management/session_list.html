@@ -118,13 +118,15 @@
             </div>
         </div>
         <div class="list" id="sessions-wrapper">
-            {{- render_session_list(event, sessions, default_colors) -}}
+            {{- render_session_list(event, sessions, default_colors, types) -}}
         </div>
         <div id="filter-placeholder"></div>
     </div>
 
     <script>
-        setupSessionsList();
+        setupSessionsList({
+           createTypeURL: {{ url_for('sessions.create_type', event) | tojson }},
+        });
         {% if selected_entry %}
             $('#search-input').val('#{{ selected_entry }}').trigger('change');
         {% endif %}
