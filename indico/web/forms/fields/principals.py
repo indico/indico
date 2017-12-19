@@ -20,7 +20,7 @@ import json
 
 from wtforms import HiddenField
 
-from indico.core.db.sqlalchemy.principals import PrincipalType
+from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_principal
 from indico.modules.events.roles.util import serialize_role
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
@@ -34,7 +34,7 @@ from indico.web.forms.widgets import JinjaWidget
 
 def serialize_principal(principal):
     if principal.principal_type == PrincipalType.email:
-        return principal.fossilize()
+        return serialize_email_principal(principal)
     elif principal.principal_type == PrincipalType.network:
         return serialize_ip_network_group(principal)
     elif principal.principal_type == PrincipalType.user:

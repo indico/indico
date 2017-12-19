@@ -55,6 +55,16 @@ def _make_check(type_, allow_emails, allow_networks, allow_event_roles, *cols):
     return db.CheckConstraint(condition, 'valid_{}'.format(type_.name))
 
 
+def serialize_email_principal(email):
+    """Serialize email principal to a simple dict"""
+    return {
+        '_type': 'Email',
+        'email': email.email,
+        'id': email.name,
+        'identifier': 'Email:{}'.format(email.email)
+    }
+
+
 class IEmailPrincipalFossil(IFossil):
     def getId(self):
         pass
