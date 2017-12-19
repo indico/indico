@@ -101,20 +101,15 @@ class RHEventProtection(RHManageEventBase):
     def _process(self):
         form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
         if form.validate_on_submit():
-            permission_principals = defaultdict(set)
-            for principal, permissions in form.permissions.data:
-                for permission in permissions:
-                    permission_principals[permission].add(principal_from_fossil(principal, allow_emails=True,
-                                                                                allow_networks=True))
-            available_permissions = get_permissions_info()[0]
-            for permission in set(available_permissions):
-                if permission == FULL_ACCESS_PERMISSION:
-                    update_object_principals(self.event, permission_principals.get(permission, set()), full_access=True)
-                elif permission == READ_ACCESS_PERMISSION:
-                    update_object_principals(self.event, permission_principals.get(permission, set()), read_access=True)
-                else:
-                    update_object_principals(self.event, permission_principals.get(permission, set()),
-                                             permission=permission)
+            current_principal_permissions = {p.principal: self._get_principal_permissions(p)
+                                             for p in self.event.acl_entries}
+            current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
+            new_principal_permissions = {
+                principal_from_fossil(fossil, allow_emails=True, allow_networks=True): set(permissions)
+                for fossil, permissions in form.permissions.data
+            }
+            self._update_permissions(current_principal_permissions, new_principal_permissions)
+
             update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
                                                  'own_no_access_contact': form.own_no_access_contact.data,
                                                  'access_key': form.access_key.data,
@@ -131,7 +126,8 @@ class RHEventProtection(RHManageEventBase):
         coordinator_privs = {name: event_session_settings[val] for name, val in COORDINATOR_PRIV_SETTINGS.iteritems()
                              if event_session_settings.get(val)}
         permissions = [[serialize_principal(p.principal), list(self._get_principal_permissions(p))]
-                       for p in self.event.acl_entries if self._get_principal_permissions(p)]
+                       for p in self.event.acl_entries]
+        permissions = [item for item in permissions if item[1]]
 
         return dict({'protection_mode': self.event.protection_mode, 'registration_managers': registration_managers,
                      'access_key': self.event.access_key, 'visibility': self.event.visibility,
@@ -151,6 +147,36 @@ class RHEventProtection(RHManageEventBase):
             permissions.add(READ_ACCESS_PERMISSION)
         available_permissions = get_permissions_info()[0]
         return permissions | (set(principal.permissions) & set(available_permissions))
+
+    def _update_permissions(self, current, new):
+        """Handle the updates of permissions and creations/deletions of acl principals.
+
+        :param current: A dict mapping principals and a set with its current permissions
+        :param new: A dict mapping principals and a set with its new permissions
+        """
+        def _get_splitted_permissions(_permissions):
+            full_access_permission = FULL_ACCESS_PERMISSION in _permissions
+            if full_access_permission:
+                _permissions.remove(FULL_ACCESS_PERMISSION)
+            read_access_permission = READ_ACCESS_PERMISSION in _permissions
+            if read_access_permission:
+                _permissions.remove(READ_ACCESS_PERMISSION)
+            return full_access_permission, read_access_permission, _permissions
+
+        for principal, permissions in current.viewitems():
+            if principal not in new:
+                self.event.update_principal(principal, False, False, del_permissions=current[principal])
+            elif permissions != new[principal]:
+                full_access, read_access, new_permissions = _get_splitted_permissions(new[principal])
+                current_permissions = current[principal] - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
+                add_permissions = new_permissions - current_permissions
+                del_permissions = current_permissions - new_permissions
+                self.event.update_principal(principal, read_access, full_access, add_permissions=add_permissions,
+                                            del_permissions=del_permissions)
+        new_principals = set(new) - set(current)
+        for p in new_principals:
+            full_access, read_access, permissions = _get_splitted_permissions(new[p])
+            self.event.update_principal(p, read_access, full_access, add_permissions=permissions)
 
 
 class RHEventPermissionsDialog(RHManageEventBase):
