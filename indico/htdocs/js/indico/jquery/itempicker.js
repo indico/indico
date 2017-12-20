@@ -16,6 +16,8 @@
  */
 
 (function($) {
+    'use strict';
+
     $.widget('indico.itempicker', {
 
         options: {
@@ -50,27 +52,26 @@
                     at: 'left top'
                 },
                 events: {
-                    show: function() {
-                        _.defer(function() {
-                            function handleInput() {
-                                var $this = $(this);
-                                var textTyped = $this.val().trim().toLowerCase();
-                                var dropdownContainer = $this.closest('.dropdown-container');
-
-                                dropdownContainer.find('.dropdown-item').each(function() {
-                                    var $item = $(this);
-                                    var found = $item.data('filter').toLowerCase().indexOf(textTyped) !== -1;
-
-                                    $item.toggle(found);
-                                });
-                            }
-
-                            qbubbleContent.find('.filter-input')
-                                .clearableinput({'onInput': handleInput, 'onClear': handleInput, 'focusOnStart': true})
-                                .focus();
-                        });
-                    }
+                    show: this._filter(qbubbleContent)
                 }
+            });
+        },
+
+        _filter: function(qbubbleContent) {
+            _.defer(function() {
+                function handleInput() {
+                    var $this = $(this);
+                    var textTyped = $this.val().trim().toLowerCase();
+                    var dropdownContainer = $this.closest('.dropdown-container');
+                    dropdownContainer.find('.dropdown-item').each(function() {
+                        var $item = $(this);
+                        var found = $item.data('filter').toLowerCase().indexOf(textTyped) !== -1;
+                        $item.toggle(found);
+                    });
+                }
+                qbubbleContent.find('.filter-input')
+                    .clearableinput({'onInput': handleInput, 'onClear': handleInput, 'focusOnStart': true})
+                    .focus();
             });
         },
 
@@ -145,7 +146,9 @@
 
         updateItemList: function(items) {
             this._createItemsDict(items);
-            this.element.qbubble('option', 'content.text', this._createQbubbleContent(this.itemsDict));
+            var qbubbleContent = this._createQbubbleContent(this.itemsDict);
+            this.element.qbubble('option', 'content.text', qbubbleContent);
+            this.element.qbubble('option', 'show', this._filter(qbubbleContent));
         },
 
         selectItem: function(id) {
