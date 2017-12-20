@@ -34,11 +34,17 @@
         },
 
         _update: function() {
+            // Sort entries aphabetically and by type
             this.data = _.chain(this.data).sortBy(function(item) {
                 return item[0].name || item[0].id;
             }).sortBy(function(item) {
                 return item[0]._type;
             }).value();
+
+            // Sort permissions alphabetically
+            this.data.forEach(function(item) {
+                item[1].sort();
+            });
 
             this.$dataField.val(JSON.stringify(this.data));
             this.element.trigger('change');
