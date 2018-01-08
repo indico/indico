@@ -75,6 +75,7 @@ def find_event_day_bounds(obj, day):
 class EventTimeTableHook(HTTPAPIHook):
     TYPES = ('timetable',)
     RE = r'(?P<idlist>\w+(?:-\w+)*)'
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
         super(EventTimeTableHook, self)._getParams()

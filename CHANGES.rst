@@ -21,6 +21,7 @@ Bugfixes
   templates
 - Fix error when retrieving an image referenced in an abstract fails
 - Fix rendering of time pickers in recent Firefox versions (:issue:`3194`)
+- Fix error when trying to use the html serializer with the timetable API
 
 
 Version 2.0rc2
