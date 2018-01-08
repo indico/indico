@@ -21,11 +21,11 @@ from marshmallow.fields import Float, Nested
 from indico.core.marshmallow import mm
 from indico.modules.events.abstracts.models.abstracts import Abstract
 from indico.modules.events.abstracts.models.comments import AbstractComment
+from indico.modules.events.abstracts.models.persons import AbstractPersonLink
 from indico.modules.events.abstracts.models.review_questions import AbstractReviewQuestion
 from indico.modules.events.abstracts.models.review_ratings import AbstractReviewRating
 from indico.modules.events.abstracts.models.reviews import AbstractReview
 from indico.modules.events.contributions.schemas import ContributionFieldValueSchema, contribution_type_schema_basic
-from indico.modules.events.schemas import PersonLinkSchema
 from indico.modules.events.tracks.schemas import track_schema_basic
 from indico.modules.users.schemas import UserSchema
 
@@ -71,6 +71,13 @@ class AbstractReviewSchema(mm.ModelSchema):
                   'ratings')
 
 
+class AbstractPersonLinkSchema(mm.ModelSchema):
+    class Meta:
+        model = AbstractPersonLink
+        fields = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'address', 'phone',
+                  'is_speaker', 'author_type')
+
+
 class AbstractSchema(mm.ModelSchema):
     submitter = Nested(UserSchema)
     judge = Nested(UserSchema)
@@ -82,7 +89,7 @@ class AbstractSchema(mm.ModelSchema):
     accepted_track = Nested(track_schema_basic)
     submitted_for_tracks = Nested(track_schema_basic, many=True)
     reviewed_for_tracks = Nested(track_schema_basic, many=True)
-    persons = Nested(PersonLinkSchema, attribute='person_links', many=True)
+    persons = Nested(AbstractPersonLinkSchema, attribute='person_links', many=True)
     custom_fields = Nested(ContributionFieldValueSchema, attribute='field_values', many=True)
     score = Float()
     comments = Nested(AbstractCommentSchema, many=True)

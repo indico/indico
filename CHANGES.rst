@@ -7,6 +7,12 @@ Version 2.0
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Add ``author_type`` and ``is_speaker`` fields for persons in the JSON
+  abstract export
+
 Bugfixes
 ^^^^^^^^
 
