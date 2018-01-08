@@ -16,9 +16,15 @@
 
 from __future__ import unicode_literals
 
+from marshmallow_enum import EnumField
+
 from indico.core.marshmallow import mm
+from indico.modules.events.contributions.models.persons import AuthorType
 
 
 class PersonLinkSchema(mm.Schema):
+    author_type = EnumField(AuthorType)
+
     class Meta:
-        fields = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'address', 'phone')
+        additional = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'address',
+                      'phone', 'is_speaker')
