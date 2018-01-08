@@ -28,6 +28,7 @@ Bugfixes
 - Fix error when retrieving an image referenced in an abstract fails
 - Fix rendering of time pickers in recent Firefox versions (:issue:`3194`)
 - Fix error when trying to use the html serializer with the timetable API
+- Fix error when receiving invalid payment events that should be ignored
 
 
 Version 2.0rc2

@@ -232,7 +232,6 @@ class PaymentTransaction(db.Model):
         previous_transaction = registration.transaction
         new_transaction = PaymentTransaction(amount=amount, currency=currency,
                                              provider=provider, data=data)
-        registration.transaction = new_transaction
         try:
             next_status = TransactionStatusTransition.next(previous_transaction, action, provider)
         except InvalidTransactionStatus as e:
@@ -251,5 +250,6 @@ class PaymentTransaction(db.Model):
         except DoublePaymentTransaction:
             next_status = TransactionStatus.successful
             Logger.get('payment').info("Received successful payment for an already paid registration")
+        registration.transaction = new_transaction
         new_transaction.status = next_status
         return new_transaction
