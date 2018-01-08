@@ -11,7 +11,6 @@
         <div class="occurrence">
             <input type="text" class="datepicker" readonly>{#--#}
             <input type="time" class="timepicker" placeholder="HH:MM" pattern="{{ time_regex_hhmm }}">{#--#}
-            <i class="timezone"></i>{#--#}
             <input type="number" class="durationpicker" step="1" min="1">{#--#}
             <i class="duration-info" title="{% trans %}Duration in minutes{% endtrans %}"></i>{#--#}
             <span class="icon-remove remove-occurrence" title="{% trans %}Remove occurrence{% endtrans %}"></span>
@@ -24,9 +23,7 @@
         setupOccurrencesWidget({
             fieldId: {{ field.id | tojson }},
             defaultTime: {{ field.default_time | format_time('code', timezone=field.timezone) | tojson }},
-            defaultDuration: {{ (field.default_duration.total_seconds() // 60) | int | tojson }},
-            timezone: {{ field.timezone | tojson }},
-            timezoneFieldId: {{ (field.timezone_field.id if field.timezone_field else none) | tojson }}
+            defaultDuration: {{ (field.default_duration.total_seconds() // 60) | int | tojson }}
         });
     </script>
 {% endblock %}

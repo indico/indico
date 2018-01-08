@@ -272,15 +272,11 @@ $dropdown-transition: $dropdown-transition-step ease-out;
         width: 40% !important;
     }
 
-    .timepicker {
-        width: 30% !important;
-    }
-
     .timezone {
         @include icon-before('icon-earth');
         color: $light-black;
         position: relative;
-        right: 24px;
+        left: 15px;
         top: 2px;
     }
 

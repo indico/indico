@@ -30,6 +30,19 @@
 
     .durationpicker {
         width: 20% !important;
+
+        &::-webkit-inner-spin-button,
+        &::-webkit-outer-spin-button {
+            display: none;
+        }
+    }
+
+    .ui-datepicker-trigger {
+        width: 0;
+    }
+
+    input ~ input {
+        margin-left: 1em;
     }
 
     .timezone {

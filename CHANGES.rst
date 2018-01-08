@@ -19,6 +19,7 @@ Bugfixes
   moving/disabling some items
 - Fix error after updating from 2.0rc1 if there are cached Mako
   templates
+- Fix rendering of time pickers in recent Firefox versions (:issue:`3194`)
 
 
 Version 2.0rc2
