@@ -12,6 +12,7 @@ Improvements
 
 - Add ``author_type`` and ``is_speaker`` fields for persons in the JSON
   abstract export
+- Add legacy redirect for ``conferenceTimeTable.py``
 
 Bugfixes
 ^^^^^^^^
