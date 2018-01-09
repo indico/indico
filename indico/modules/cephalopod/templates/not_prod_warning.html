@@ -1,0 +1,8 @@
+{% from 'message_box.html' import message_box %}
+
+{% call message_box('warning') %}
+    {% trans -%}
+        It seems like you are using a local URL for Indico or running in debug mode.<br>
+        We recommend registering only production instances with the Community Hub.
+    {%- endtrans %}
+{% endcall %}

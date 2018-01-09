@@ -43,12 +43,7 @@
         </div>
     </div>
     {% if show_local_warning %}
-        {% call message_box('warning') %}
-            {% trans -%}
-                It seems like you're using a local URL for Indico.
-                We recommend registering only production instances with the Community Hub.
-            {%- endtrans %}
-        {% endcall %}
+        {% include 'cephalopod/not_prod_warning.html' %}
     {% endif %}
     <div class="i-box">
         {{ form_header(form, id='cephalopod-form')}}
