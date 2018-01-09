@@ -32,6 +32,7 @@ from indico.modules.cephalopod.util import register_instance
 from indico.modules.core.settings import core_settings
 from indico.modules.users import User
 from indico.util.i18n import _, get_all_locales
+from indico.util.network import is_private_url
 from indico.util.string import to_unicode
 from indico.util.system import get_os
 from indico.web.flask.templating import get_template_module
@@ -51,7 +52,8 @@ class RHBootstrap(RH):
                                operating_system=get_os(),
                                postgres_version=get_postgres_version(),
                                indico_version=indico.__version__,
-                               python_version=python_version())
+                               python_version=python_version(),
+                               show_local_warning=(config.DEBUG or is_private_url(request.url_root)))
 
     def _process_POST(self):
         if User.query.filter_by(is_system=False).has_rows():

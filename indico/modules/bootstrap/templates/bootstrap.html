@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% from 'forms/_form.html' import form_header, form_row, form_rows, form_fieldset, form_footer %}
+{% from 'message_box.html' import message_box %}
 
 {% block title %}{% trans %}Hello there!{% endtrans %}{% endblock %}
 
@@ -61,7 +62,7 @@
                 </div>
                 <div class="fields-container">
                     {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'username', 'password',
-                                               'confirm_password'), placeholder=True) }}
+                                               'confirm_password'), placeholder=true) }}
                 </div>
             </div>
         </div>
@@ -88,7 +89,7 @@
                     </div>
                 </div>
                 <div class="fields-container">
-                    {{ form_rows(form, fields=('affiliation',), placeholder=True) }}
+                    {{ form_rows(form, fields=('affiliation',), placeholder=true) }}
                 </div>
             </div>
         </div>
@@ -103,7 +104,7 @@
                     <div>
                         {%- trans -%}
                             Be part of the ever growing Indico community! Choose to receive news on the latest
-                            releases (2&ndash;3 times per year) as well as important security advisories.
+                            releases (2–3 times per year) as well as important security advisories.
                         {%- endtrans -%}
                     </div>
                     <div>
@@ -134,7 +135,15 @@
                     </div>
                 </div>
                 <div class="fields-container">
-                    {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=True) }}
+                    {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=true) }}
+                    {% if show_local_warning %}
+                        {% call message_box('warning') %}
+                            {% trans -%}
+                                It seems like you're using a local URL for Indico.
+                                We recommend registering only production instances with the Community Hub.
+                            {%- endtrans %}
+                        {% endcall %}
+                    {% endif %}
                 </div>
             </div>
         </div>

@@ -18,7 +18,7 @@ from __future__ import unicode_literals
 
 import platform
 
-from flask import flash, jsonify, redirect
+from flask import flash, jsonify, redirect, request
 from requests.exceptions import HTTPError, RequestException, Timeout
 from werkzeug.urls import url_join
 
@@ -32,6 +32,7 @@ from indico.modules.cephalopod.util import register_instance, sync_instance, unr
 from indico.modules.cephalopod.views import WPCephalopod
 from indico.modules.core.settings import core_settings
 from indico.util.i18n import _
+from indico.util.network import is_private_url
 from indico.util.system import get_os
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
@@ -59,7 +60,8 @@ class RHCephalopod(RHCephalopodBase):
                                             operating_system=get_os(),
                                             postgres_version=get_postgres_version(),
                                             python_version=platform.python_version(),
-                                            hub_url=hub_url)
+                                            hub_url=hub_url,
+                                            show_local_warning=(config.DEBUG or is_private_url(request.url_root)))
 
     def _process_form(self, form):
         name = form.contact_name.data
