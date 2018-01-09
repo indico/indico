@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-09 17:57+0100\n"
+"POT-Creation-Date: 2018-01-09 18:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,8 @@ msgstr ""
 msgid "every %(interval)s"
 msgstr ""
 
-#: indico/core/celery/templates/celery_tasks.html:53 indico/modules/cephalopod/templates/cephalopod.html:24
+#: indico/core/celery/templates/celery_tasks.html:53 indico/modules/bootstrap/templates/bootstrap.html:117
+#: indico/modules/cephalopod/templates/cephalopod.html:24
 #: indico/modules/events/payment/templates/management/payments.html:63
 msgid "disabled"
 msgstr ""
@@ -3320,6 +3321,121 @@ msgstr ""
 msgid "Some fields are invalid. Please, correct them and submit the form again."
 msgstr ""
 
+#: indico/modules/bootstrap/templates/bootstrap.html:5 indico/modules/bootstrap/templates/bootstrap.html:16
+msgid "Hello there!"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:17
+msgid "Indico needs just a little bit more data from you..."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:26 indico/web/templates/_session_bar.html:179
+msgid "This is your current language."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:52
+msgid "Administrator Account"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:54
+msgid "Insert here all basic information needed to create your account."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:56
+msgid ""
+"You can change any extra parameters (like your address or phone number) afterwards by accessing \"Account Details\" "
+"(from \"My Profile\")."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:74
+msgid "Site configuration"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:76
+msgid "These are the default parameters for your Indico site."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:78
+msgid "Please note that this information will also be used for your own user profile. You can change it later."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:84
+#, python-format
+msgid ""
+"The time zone for the server has been set to %(timezone)s and can be modified in <span "
+"class=\"mono\">indico.conf</span>."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:101
+msgid "Let us know you exist!"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:104
+msgid ""
+"Be part of the ever growing Indico community! Choose to receive news on the latest releases (2–3 times per year) as "
+"well as important security advisories."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:110
+msgid "The following data will be sent to the Community Hub:"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:112
+msgid "Server URL"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:113 indico/modules/cephalopod/templates/cephalopod.html:20
+msgid "Indico version installed"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:114 indico/modules/cephalopod/templates/cephalopod.html:21
+msgid "Python version used"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:115 indico/modules/cephalopod/templates/cephalopod.html:22
+msgid "Postgres version used"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:116 indico/modules/cephalopod/templates/cephalopod.html:23
+msgid "Operating system used"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:117 indico/modules/cephalopod/templates/cephalopod.html:24
+msgid "Debug mode"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:117 indico/modules/cephalopod/templates/cephalopod.html:24
+#: indico/modules/events/payment/templates/management/payments.html:45
+#: indico/modules/events/payment/templates/management/payments.html:62
+msgid "enabled"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:119 indico/modules/cephalopod/templates/cephalopod.html:25
+msgid "Basic statistics (number of events, contributions and users)"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:123 indico/modules/cephalopod/templates/cephalopod.html:19
+msgid "Server default language"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:124
+msgid "Contact person"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:125 indico/modules/cephalopod/templates/cephalopod.html:58
+msgid "Affiliation of your Indico server"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:129
+msgid ""
+"Please note that <strong>no private information</strong> will ever be sent to the Community Hub or the Indico Project"
+" and that you can disable it any time (from the \"Community Hub\" section of the administrative area)."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:147
+msgid "Finish"
+msgstr ""
+
 #: indico/modules/bootstrap/templates/flash_messages.html:2
 #, python-format
 msgid ""
@@ -4219,40 +4335,6 @@ msgstr ""
 msgid "Alongside, the following public information will be periodically collected as well:"
 msgstr ""
 
-#: indico/modules/cephalopod/templates/cephalopod.html:19
-msgid "Server default language"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:20
-msgid "Indico version installed"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:21
-msgid "Python version used"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:22
-msgid "Postgres version used"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:23
-msgid "Operating system used"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:24
-msgid "Debug mode"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:24
-#: indico/modules/events/payment/templates/management/payments.html:45
-#: indico/modules/events/payment/templates/management/payments.html:62
-msgid "enabled"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:25
-msgid "Basic statistics (number of events, contributions and users)"
-msgstr ""
-
 #: indico/modules/cephalopod/templates/cephalopod.html:33
 msgid "Loading&hellip;"
 msgstr ""
@@ -4267,10 +4349,6 @@ msgstr ""
 
 #: indico/modules/cephalopod/templates/cephalopod.html:53
 msgid "URL of your Indico server"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:58
-msgid "Affiliation of your Indico server"
 msgstr ""
 
 #: indico/modules/cephalopod/templates/not_prod_warning.html:4
@@ -16086,10 +16164,6 @@ msgstr ""
 #: indico/web/templates/_session_bar.html:168
 #, python-format
 msgid "My language (%(lang)s)"
-msgstr ""
-
-#: indico/web/templates/_session_bar.html:179
-msgid "This is your current language."
 msgstr ""
 
 #: indico/web/templates/_session_bar.html:227
