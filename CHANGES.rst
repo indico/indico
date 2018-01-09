@@ -5,7 +5,7 @@ Changelog
 Version 2.0
 -----------
 
-*Unreleased*
+*Released on January 12, 2018*
 
 Improvements
 ^^^^^^^^^^^^

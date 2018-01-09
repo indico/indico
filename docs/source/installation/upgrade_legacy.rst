@@ -1,12 +1,6 @@
 Upgrade Indico from 1.2
 =======================
 
-.. warning::
-    **ATTENTION: This process is not yet fully tested, use it at your own risk!**
-    We are currently working with some of our users running Indico 1.2 in order to ensure migration works reliably
-    and without any data loss. If you'd like to help, please `let us know <https://getindico.io/contact/>`_!
-
-
 If you're running a version that is lower than 2.0, you will have to run a special migration command provided by the
 ``indico-migrate`` package. This document will guide you over the steps needed to perform the upgrade.
 

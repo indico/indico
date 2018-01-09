@@ -15,7 +15,7 @@ Now install the package which will automatically install our plugins:
 
 .. code-block:: shell
 
-    pip install --pre indico-plugins
+    pip install indico-plugins
 
 
 .. note::
