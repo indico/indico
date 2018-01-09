@@ -29,7 +29,6 @@ from uuid import uuid4
 import click
 import dateutil.parser
 import yaml
-import yaml.resolver
 from flask import current_app
 from sqlalchemy import inspect
 from terminaltables import AsciiTable
