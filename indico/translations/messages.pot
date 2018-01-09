@@ -1,14 +1,14 @@
 # Translations template for indico.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: indico 2.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-13 16:51+0100\n"
+"POT-Creation-Date: 2018-01-09 17:57+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -181,7 +181,7 @@ msgstr ""
 #: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:428 indico/modules/api/templates/admin_settings.html:10
 #: indico/modules/attachments/templates/upload.html:20
 #: indico/modules/categories/templates/management/category_protection.html:19
-#: indico/modules/categories/templates/management/settings.html:35 indico/modules/cephalopod/templates/cephalopod.html:59
+#: indico/modules/categories/templates/management/settings.html:35 indico/modules/cephalopod/templates/cephalopod.html:62
 #: indico/modules/events/abstracts/templates/management/notification_tpl_form.html:12
 #: indico/modules/events/abstracts/templates/management/notification_tpl_text_form.html:8
 #: indico/modules/events/contributions/templates/forms/contribution.html:14
@@ -2592,7 +2592,7 @@ msgstr ""
 msgid "Already uploaded file. Replace it by adding a new file."
 msgstr ""
 
-#: indico/modules/attachments/forms.py:85 indico/modules/cephalopod/templates/cephalopod.html:48
+#: indico/modules/attachments/forms.py:85 indico/modules/cephalopod/templates/cephalopod.html:51
 #: indico/modules/events/layout/forms.py:147 indico/modules/events/templates/admin/_reference_type_list.html:7
 msgid "URL"
 msgstr ""
@@ -3040,7 +3040,7 @@ msgstr ""
 msgid "Family name"
 msgstr ""
 
-#: indico/modules/auth/forms.py:90 indico/modules/auth/forms.py:96 indico/modules/cephalopod/templates/cephalopod.html:52
+#: indico/modules/auth/forms.py:90 indico/modules/auth/forms.py:96 indico/modules/cephalopod/templates/cephalopod.html:55
 #: indico/modules/events/management/templates/_event_person_list.html:16 indico/modules/events/persons/forms.py:58
 #: indico/modules/events/persons/templates/management/person_list.html:171 indico/modules/events/registration/forms.py:184
 #: indico/modules/users/forms.py:44 indico/modules/users/forms.py:91
@@ -3316,7 +3316,7 @@ msgid ""
 "simply use the following link within an hour:"
 msgstr ""
 
-#: indico/modules/bootstrap/controllers.py:61
+#: indico/modules/bootstrap/controllers.py:63
 msgid "Some fields are invalid. Please, correct them and submit the form again."
 msgstr ""
 
@@ -4173,27 +4173,27 @@ msgstr ""
 msgid "Community Hub"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:77
+#: indico/modules/cephalopod/controllers.py:79
 msgid "Operation failed, the community hub returned: {err.message}"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:79
+#: indico/modules/cephalopod/controllers.py:81
 msgid "The operation timed-out. Please try again in a while."
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:81 indico/modules/cephalopod/controllers.py:102
+#: indico/modules/cephalopod/controllers.py:83 indico/modules/cephalopod/controllers.py:104
 msgid "Unexpected exception while contacting the Community Hub: {err.message}"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:89
+#: indico/modules/cephalopod/controllers.py:91
 msgid "Synchronization is not possible if you don't join the community first."
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:97
+#: indico/modules/cephalopod/controllers.py:99
 msgid "Synchronization failed, the community hub returned: {err.message}"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:100
+#: indico/modules/cephalopod/controllers.py:102
 msgid "Synchronization timed-out. Please try again in a while."
 msgstr ""
 
@@ -4265,12 +4265,18 @@ msgstr ""
 msgid "Synchronize"
 msgstr ""
 
-#: indico/modules/cephalopod/templates/cephalopod.html:50
+#: indico/modules/cephalopod/templates/cephalopod.html:53
 msgid "URL of your Indico server"
 msgstr ""
 
-#: indico/modules/cephalopod/templates/cephalopod.html:55
+#: indico/modules/cephalopod/templates/cephalopod.html:58
 msgid "Affiliation of your Indico server"
+msgstr ""
+
+#: indico/modules/cephalopod/templates/not_prod_warning.html:4
+msgid ""
+"It seems like you are using a local URL for Indico or running in debug mode.<br> We recommend registering only "
+"production instances with the Community Hub."
 msgstr ""
 
 #: indico/modules/core/__init__.py:30 indico/modules/core/templates/admin/settings.html:6
@@ -8545,15 +8551,15 @@ msgstr ""
 msgid "You are not authorized to manage this event."
 msgstr ""
 
-#: indico/modules/events/management/controllers/cloning.py:130
+#: indico/modules/events/management/controllers/cloning.py:129
 msgid "You can clone maximum of 100 times at once"
 msgstr ""
 
-#: indico/modules/events/management/controllers/cloning.py:182
+#: indico/modules/events/management/controllers/cloning.py:181
 msgid "Welcome to your cloned event!"
 msgstr ""
 
-#: indico/modules/events/management/controllers/cloning.py:185
+#: indico/modules/events/management/controllers/cloning.py:184
 msgid "{} new events created."
 msgstr ""
 
@@ -13417,10 +13423,14 @@ msgstr ""
 msgid "Session block cannot span more than one day"
 msgstr ""
 
-#: indico/modules/events/timetable/reschedule.py:112
+#: indico/modules/events/timetable/reschedule.py:113
 msgid ""
 "The chosen time gap would result in an entry with a duration of less than a minute. Please choose a smaller gap "
 "between entries."
+msgstr ""
+
+#: indico/modules/events/timetable/reschedule.py:139
+msgid "This action cannot be completed because the event dates have changed. Please reload the page and try again."
 msgstr ""
 
 #: indico/modules/events/timetable/util.py:329
@@ -16232,11 +16242,11 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: indico/web/templates/forms/occurrences_widget.html:16
+#: indico/web/templates/forms/occurrences_widget.html:15
 msgid "Duration in minutes"
 msgstr ""
 
-#: indico/web/templates/forms/occurrences_widget.html:17
+#: indico/web/templates/forms/occurrences_widget.html:16
 msgid "Remove occurrence"
 msgstr ""
 
