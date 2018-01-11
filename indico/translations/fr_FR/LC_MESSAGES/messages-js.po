@@ -1,5 +1,5 @@
 # Translations template for indico.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the indico project.
 # 
 # Translators:
@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Indico\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-09 11:04+0100\n"
+"POT-Creation-Date: 2018-01-09 18:03+0100\n"
 "PO-Revision-Date: 2017-11-09 10:29+0000\n"
 "Last-Translator: Thomas Baron <thomas.baron@cern.ch>\n"
 "Language-Team: French (France) (http://www.transifex.com/indico/indico/language/fr_FR/)\n"
