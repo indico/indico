@@ -20,9 +20,10 @@ import os
 import re
 import sys
 from datetime import date
-from subprocess import check_output, CalledProcessError
+from subprocess import CalledProcessError, check_output
 
 from indico.util.console import cformat
+
 
 HEADER = """
  {comment_start} This file is part of Indico.
@@ -106,9 +107,14 @@ def _update_header(file_path, year, substring, regex, data):
         content = orig_content = file_read.read()
         if not content.strip():
             return
+        shebang_line = None
+        if content.startswith('#!/'):
+            shebang_line, content = content.split('\n', 1)
         for match in regex.finditer(content):
             if substring in match.group():
                 content = content[:match.start()] + gen_header(data, year) + content[match.end():]
+        if shebang_line:
+            content = shebang_line + '\n' + content
     if content != orig_content:
         print(cformat('%{green}Updating header of %{green!}{}').format(os.path.relpath(file_path)))
         with open(file_path, 'w') as file_write:

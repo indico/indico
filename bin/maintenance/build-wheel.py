@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # This file is part of Indico.
 # Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
