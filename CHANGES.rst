@@ -31,6 +31,8 @@ Bugfixes
 - Fix error when trying to use the html serializer with the timetable API
 - Fix error when receiving invalid payment events that should be ignored
 - Fix last occurrence not being created when cloning events (:issue:`3192`)
+- Fix multiple links in the same line being replaced with the first one
+  when converting abstracts/contributions to PDF (:issue:`2816`)
 
 
 Version 2.0rc2

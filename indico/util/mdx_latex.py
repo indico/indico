@@ -628,18 +628,8 @@ class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
     def run(self, instr):
         # Process all hyperlinks
         converter = Link2Latex()
-        new_blocks = []
-        for block in instr.split("\n\n"):
-            stripped = block.strip()
-            match = re.search(r'<a[^>]*>([^<]+)</a>', stripped)
-            # <table catches modified verions (e.g. <table class="..">
-            if match:
-                latex_link = re.sub(r'<a[^>]*>([^<]+)</a>',
-                                    converter.convert(match.group(0)).strip(),
-                                    stripped)
-                new_blocks.append(latex_link)
-            else:
-                new_blocks.append(block)
+        new_blocks = [re.sub(r'<a[^>]*>([^<]+)</a>', lambda m: converter.convert(m.group(0)).strip(), block)
+                      for block in instr.split("\n\n")]
         return '\n\n'.join(new_blocks)
 
 
