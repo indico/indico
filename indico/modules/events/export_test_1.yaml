@@ -1,4 +1,4 @@
-!!python/unicode 'indico_version': {version}
+!!python/unicode 'indico_version': 1.3.3.7
 !!python/unicode 'objects':
 - !!python/tuple
   - !!python/unicode 'events.events'

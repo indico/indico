@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -75,6 +75,7 @@ def find_event_day_bounds(obj, day):
 class EventTimeTableHook(HTTPAPIHook):
     TYPES = ('timetable',)
     RE = r'(?P<idlist>\w+(?:-\w+)*)'
+    VALID_FORMATS = ('json', 'jsonp', 'xml')
 
     def _getParams(self):
         super(EventTimeTableHook, self)._getParams()

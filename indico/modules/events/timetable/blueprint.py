@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -35,6 +35,7 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableSwapEntries)
 from indico.modules.events.timetable.controllers.manage import (RHManageSessionTimetable, RHManageTimetable,
                                                                 RHManageTimetableEntryInfo, RHTimetableREST)
+from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -80,3 +81,8 @@ _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)
 _bp.add_url_rule('/timetable/pdf', 'export_pdf', RHTimetableExportPDF, methods=('GET', 'POST'))
 _bp.add_url_rule('/timetable/timetable.pdf', 'export_default_pdf', RHTimetableExportDefaultPDF)
 _bp.add_url_rule('/timetable/entry/<int:entry_id>/info', 'entry_info', RHTimetableEntryInfo)
+
+
+# Legacy URLs
+_compat_bp = IndicoBlueprint('compat_timetable', __name__)
+_compat_bp.add_url_rule('/conferenceTimeTable.py', 'timetable_modpython', make_compat_redirect_func(_bp, 'timetable'))

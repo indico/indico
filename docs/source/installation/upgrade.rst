@@ -28,13 +28,13 @@ You are now ready to install the latest version of Indico:
 
 .. code-block:: shell
 
-    pip install -U --pre indico
+    pip install -U indico
 
 If you installed the official plugins, update them too:
 
 .. code-block:: shell
 
-    pip install -U --pre indico-plugins
+    pip install -U indico-plugins
 
 Some versions may include database schema upgrades.  Make sure to
 perform them immediately after upgrading.  If there are no schema
@@ -94,10 +94,11 @@ not uninstall them, you will get errors about duplicate plugins.
     If you are unsure about what to uninstall here, please contact us.
 
 
-To upgrade to 2.0, follow the upgrade instructions above.
-After successfully running the upgrade, use ``indico db reset_alembic`` to clear
-pre-2.0 database migration information, since all the old migration steps from
-the 1.9.x version line have been removed in 2.0.
+To upgrade to 2.0, follow the upgrade instructions above, but skip the DB
+upgrade commands.  After successfully running the upgrade, use
+``indico db reset_alembic`` to clear pre-2.0 database migration information,
+since all the old migration steps from the 1.9.x version line have been
+removed in 2.0.
 
 The names of all settings changed in 2.0; instead of using ``CamelCased`` names
 they now use ``UPPER_SNAKE_CASE``. The old names still work, but we recommend

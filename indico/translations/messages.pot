@@ -1,14 +1,14 @@
 # Translations template for indico.
-# Copyright (C) 2017 ORGANIZATION
+# Copyright (C) 2018 ORGANIZATION
 # This file is distributed under the same license as the indico project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2018.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.0a2\n"
+"Project-Id-Version: indico 2.0rc2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-11-09 11:04+0100\n"
+"POT-Creation-Date: 2018-01-09 18:03+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -93,7 +93,8 @@ msgstr ""
 msgid "every %(interval)s"
 msgstr ""
 
-#: indico/core/celery/templates/celery_tasks.html:53 indico/modules/cephalopod/templates/cephalopod.html:24
+#: indico/core/celery/templates/celery_tasks.html:53 indico/modules/bootstrap/templates/bootstrap.html:117
+#: indico/modules/cephalopod/templates/cephalopod.html:24
 #: indico/modules/events/payment/templates/management/payments.html:63
 msgid "disabled"
 msgstr ""
@@ -181,7 +182,7 @@ msgstr ""
 #: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:428 indico/modules/api/templates/admin_settings.html:10
 #: indico/modules/attachments/templates/upload.html:20
 #: indico/modules/categories/templates/management/category_protection.html:19
-#: indico/modules/categories/templates/management/settings.html:35 indico/modules/cephalopod/templates/cephalopod.html:59
+#: indico/modules/categories/templates/management/settings.html:35 indico/modules/cephalopod/templates/cephalopod.html:62
 #: indico/modules/events/abstracts/templates/management/notification_tpl_form.html:12
 #: indico/modules/events/abstracts/templates/management/notification_tpl_text_form.html:8
 #: indico/modules/events/contributions/templates/forms/contribution.html:14
@@ -459,7 +460,7 @@ msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingAdmin.tpl:42
 #: indico/modules/events/abstracts/templates/forms/track_role_widget.html:34 indico/modules/users/templates/emails.html:36
-#: indico/web/templates/forms/multiple_items_widget.html:24
+#: indico/web/templates/forms/multiple_items_widget.html:25
 msgid "Add"
 msgstr ""
 
@@ -2236,7 +2237,7 @@ msgid "Homepage"
 msgstr ""
 
 #: indico/modules/admin/__init__.py:43 indico/modules/admin/views.py:34 indico/modules/api/templates/user_profile.html:98
-#: indico/modules/rb/__init__.py:141 indico/web/views.py:214
+#: indico/modules/rb/__init__.py:141 indico/web/views.py:219
 msgid "Administration"
 msgstr ""
 
@@ -2250,7 +2251,7 @@ msgstr ""
 msgid "Announcement"
 msgstr ""
 
-#: indico/modules/announcement/controllers.py:35 indico/modules/core/controllers.py:127
+#: indico/modules/announcement/controllers.py:35 indico/modules/core/controllers.py:128
 #: indico/modules/news/controllers.py:67
 msgid "Settings have been saved"
 msgstr ""
@@ -2547,7 +2548,7 @@ msgstr ""
 
 #: indico/modules/attachments/__init__.py:50 indico/modules/attachments/__init__.py:62
 #: indico/modules/attachments/clone.py:32 indico/modules/attachments/templates/attachments.html:4
-#: indico/modules/attachments/templates/generate_package.html:15 indico/modules/categories/templates/display/sidebar.html:7
+#: indico/modules/attachments/templates/generate_package.html:14 indico/modules/categories/templates/display/sidebar.html:7
 #: indico/modules/categories/templates/management/attachments.html:5
 #: indico/modules/events/templates/display/conference.html:82
 msgid "Materials"
@@ -2592,7 +2593,7 @@ msgstr ""
 msgid "Already uploaded file. Replace it by adding a new file."
 msgstr ""
 
-#: indico/modules/attachments/forms.py:85 indico/modules/cephalopod/templates/cephalopod.html:48
+#: indico/modules/attachments/forms.py:85 indico/modules/cephalopod/templates/cephalopod.html:51
 #: indico/modules/events/layout/forms.py:147 indico/modules/events/templates/admin/_reference_type_list.html:7
 msgid "URL"
 msgstr ""
@@ -2838,8 +2839,8 @@ msgstr ""
 msgid "You can generate a ZIP file containing materials from the event."
 msgstr ""
 
-#: indico/modules/attachments/templates/_attachments.html:186 indico/modules/attachments/templates/generate_package.html:17
-#: indico/modules/attachments/templates/generate_package.html:29
+#: indico/modules/attachments/templates/_attachments.html:186 indico/modules/attachments/templates/generate_package.html:16
+#: indico/modules/attachments/templates/generate_package.html:28
 msgid "Material Package"
 msgstr ""
 
@@ -2897,11 +2898,11 @@ msgstr ""
 msgid "Submit"
 msgstr ""
 
-#: indico/modules/attachments/templates/generate_package.html:33 indico/modules/designer/templates/template.html:14
+#: indico/modules/attachments/templates/generate_package.html:32 indico/modules/designer/templates/template.html:14
 msgid "Go back"
 msgstr ""
 
-#: indico/modules/attachments/templates/generate_package.html:52
+#: indico/modules/attachments/templates/generate_package.html:51
 msgid "Download package"
 msgstr ""
 
@@ -3040,7 +3041,7 @@ msgstr ""
 msgid "Family name"
 msgstr ""
 
-#: indico/modules/auth/forms.py:90 indico/modules/auth/forms.py:96 indico/modules/cephalopod/templates/cephalopod.html:52
+#: indico/modules/auth/forms.py:90 indico/modules/auth/forms.py:96 indico/modules/cephalopod/templates/cephalopod.html:55
 #: indico/modules/events/management/templates/_event_person_list.html:16 indico/modules/events/persons/forms.py:58
 #: indico/modules/events/persons/templates/management/person_list.html:171 indico/modules/events/registration/forms.py:184
 #: indico/modules/users/forms.py:44 indico/modules/users/forms.py:91
@@ -3316,8 +3317,123 @@ msgid ""
 "simply use the following link within an hour:"
 msgstr ""
 
-#: indico/modules/bootstrap/controllers.py:61
+#: indico/modules/bootstrap/controllers.py:63
 msgid "Some fields are invalid. Please, correct them and submit the form again."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:5 indico/modules/bootstrap/templates/bootstrap.html:16
+msgid "Hello there!"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:17
+msgid "Indico needs just a little bit more data from you..."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:26 indico/web/templates/_session_bar.html:179
+msgid "This is your current language."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:52
+msgid "Administrator Account"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:54
+msgid "Insert here all basic information needed to create your account."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:56
+msgid ""
+"You can change any extra parameters (like your address or phone number) afterwards by accessing \"Account Details\" "
+"(from \"My Profile\")."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:74
+msgid "Site configuration"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:76
+msgid "These are the default parameters for your Indico site."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:78
+msgid "Please note that this information will also be used for your own user profile. You can change it later."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:84
+#, python-format
+msgid ""
+"The time zone for the server has been set to %(timezone)s and can be modified in <span "
+"class=\"mono\">indico.conf</span>."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:101
+msgid "Let us know you exist!"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:104
+msgid ""
+"Be part of the ever growing Indico community! Choose to receive news on the latest releases (2–3 times per year) as "
+"well as important security advisories."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:110
+msgid "The following data will be sent to the Community Hub:"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:112
+msgid "Server URL"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:113 indico/modules/cephalopod/templates/cephalopod.html:20
+msgid "Indico version installed"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:114 indico/modules/cephalopod/templates/cephalopod.html:21
+msgid "Python version used"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:115 indico/modules/cephalopod/templates/cephalopod.html:22
+msgid "Postgres version used"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:116 indico/modules/cephalopod/templates/cephalopod.html:23
+msgid "Operating system used"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:117 indico/modules/cephalopod/templates/cephalopod.html:24
+msgid "Debug mode"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:117 indico/modules/cephalopod/templates/cephalopod.html:24
+#: indico/modules/events/payment/templates/management/payments.html:45
+#: indico/modules/events/payment/templates/management/payments.html:62
+msgid "enabled"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:119 indico/modules/cephalopod/templates/cephalopod.html:25
+msgid "Basic statistics (number of events, contributions and users)"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:123 indico/modules/cephalopod/templates/cephalopod.html:19
+msgid "Server default language"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:124
+msgid "Contact person"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:125 indico/modules/cephalopod/templates/cephalopod.html:58
+msgid "Affiliation of your Indico server"
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:129
+msgid ""
+"Please note that <strong>no private information</strong> will ever be sent to the Community Hub or the Indico Project"
+" and that you can disable it any time (from the \"Community Hub\" section of the administrative area)."
+msgstr ""
+
+#: indico/modules/bootstrap/templates/bootstrap.html:147
+msgid "Finish"
 msgstr ""
 
 #: indico/modules/bootstrap/templates/flash_messages.html:2
@@ -4173,27 +4289,27 @@ msgstr ""
 msgid "Community Hub"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:77
+#: indico/modules/cephalopod/controllers.py:79
 msgid "Operation failed, the community hub returned: {err.message}"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:79
+#: indico/modules/cephalopod/controllers.py:81
 msgid "The operation timed-out. Please try again in a while."
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:81 indico/modules/cephalopod/controllers.py:102
+#: indico/modules/cephalopod/controllers.py:83 indico/modules/cephalopod/controllers.py:104
 msgid "Unexpected exception while contacting the Community Hub: {err.message}"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:89
+#: indico/modules/cephalopod/controllers.py:91
 msgid "Synchronization is not possible if you don't join the community first."
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:97
+#: indico/modules/cephalopod/controllers.py:99
 msgid "Synchronization failed, the community hub returned: {err.message}"
 msgstr ""
 
-#: indico/modules/cephalopod/controllers.py:100
+#: indico/modules/cephalopod/controllers.py:102
 msgid "Synchronization timed-out. Please try again in a while."
 msgstr ""
 
@@ -4219,40 +4335,6 @@ msgstr ""
 msgid "Alongside, the following public information will be periodically collected as well:"
 msgstr ""
 
-#: indico/modules/cephalopod/templates/cephalopod.html:19
-msgid "Server default language"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:20
-msgid "Indico version installed"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:21
-msgid "Python version used"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:22
-msgid "Postgres version used"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:23
-msgid "Operating system used"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:24
-msgid "Debug mode"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:24
-#: indico/modules/events/payment/templates/management/payments.html:45
-#: indico/modules/events/payment/templates/management/payments.html:62
-msgid "enabled"
-msgstr ""
-
-#: indico/modules/cephalopod/templates/cephalopod.html:25
-msgid "Basic statistics (number of events, contributions and users)"
-msgstr ""
-
 #: indico/modules/cephalopod/templates/cephalopod.html:33
 msgid "Loading&hellip;"
 msgstr ""
@@ -4265,12 +4347,14 @@ msgstr ""
 msgid "Synchronize"
 msgstr ""
 
-#: indico/modules/cephalopod/templates/cephalopod.html:50
+#: indico/modules/cephalopod/templates/cephalopod.html:53
 msgid "URL of your Indico server"
 msgstr ""
 
-#: indico/modules/cephalopod/templates/cephalopod.html:55
-msgid "Affiliation of your Indico server"
+#: indico/modules/cephalopod/templates/not_prod_warning.html:4
+msgid ""
+"It seems like you are using a local URL for Indico or running in debug mode.<br> We recommend registering only "
+"production instances with the Community Hub."
 msgstr ""
 
 #: indico/modules/core/__init__.py:30 indico/modules/core/templates/admin/settings.html:6
@@ -5691,26 +5775,26 @@ msgid "Contribution URL"
 msgstr ""
 
 #: indico/modules/events/abstracts/placeholders.py:187
-msgid "The ID of the target abstract (merge)"
+msgid "The ID of the target abstract (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:196
-msgid "The title of the target abstract (merge)"
+#: indico/modules/events/abstracts/placeholders.py:197
+msgid "The title of the target abstract (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:206
-msgid "The full name of the target abstract's submitter, no title (merge)"
+#: indico/modules/events/abstracts/placeholders.py:208
+msgid "The full name of the target abstract's submitter, no title (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:216
-msgid "The first name of the target abstract's submitter (merge)"
+#: indico/modules/events/abstracts/placeholders.py:219
+msgid "The first name of the target abstract's submitter (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:226
-msgid "The last name of the target abstract's submitter (merge)"
+#: indico/modules/events/abstracts/placeholders.py:230
+msgid "The last name of the target abstract's submitter (merge or duplicate)"
 msgstr ""
 
-#: indico/modules/events/abstracts/placeholders.py:235
+#: indico/modules/events/abstracts/placeholders.py:240
 msgid "Comments written by event organizer (upon final decision)"
 msgstr ""
 
@@ -8215,7 +8299,7 @@ msgstr ""
 msgid "Add spacer"
 msgstr ""
 
-#: indico/modules/events/logs/models/entries.py:30 indico/web/views.py:212
+#: indico/modules/events/logs/models/entries.py:30 indico/web/views.py:217
 msgid "Management"
 msgstr ""
 
@@ -8545,15 +8629,15 @@ msgstr ""
 msgid "You are not authorized to manage this event."
 msgstr ""
 
-#: indico/modules/events/management/controllers/cloning.py:130
+#: indico/modules/events/management/controllers/cloning.py:129
 msgid "You can clone maximum of 100 times at once"
 msgstr ""
 
-#: indico/modules/events/management/controllers/cloning.py:182
+#: indico/modules/events/management/controllers/cloning.py:181
 msgid "Welcome to your cloned event!"
 msgstr ""
 
-#: indico/modules/events/management/controllers/cloning.py:185
+#: indico/modules/events/management/controllers/cloning.py:184
 msgid "{} new events created."
 msgstr ""
 
@@ -10802,12 +10886,12 @@ msgid "Download ticket for the '%(title)s' registration form"
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:42
-msgid "You have registered for this event, but there are more registration forms available."
+msgid "You are registered for this event, but there are more registration forms available."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:47
 #: indico/modules/events/registration/templates/display/event_header.html:13
-msgid "You have registered for this event."
+msgid "You are registered for this event."
 msgstr ""
 
 #: indico/modules/events/registration/templates/display/conference_home.html:52
@@ -12738,7 +12822,7 @@ msgstr ""
 msgid "Date of submission: %(submission_dt)s"
 msgstr ""
 
-#: indico/modules/events/surveys/templates/management/survey_submission.html:64
+#: indico/modules/events/surveys/templates/management/survey_submission.html:65
 msgid "N/A"
 msgstr ""
 
@@ -13417,10 +13501,14 @@ msgstr ""
 msgid "Session block cannot span more than one day"
 msgstr ""
 
-#: indico/modules/events/timetable/reschedule.py:112
+#: indico/modules/events/timetable/reschedule.py:113
 msgid ""
 "The chosen time gap would result in an entry with a duration of less than a minute. Please choose a smaller gap "
 "between entries."
+msgstr ""
+
+#: indico/modules/events/timetable/reschedule.py:139
+msgid "This action cannot be completed because the event dates have changed. Please reload the page and try again."
 msgstr ""
 
 #: indico/modules/events/timetable/util.py:329
@@ -15635,7 +15723,7 @@ msgstr ""
 msgid "This is not a string"
 msgstr ""
 
-#: indico/util/string.py:686
+#: indico/util/string.py:661
 msgid "This text has been automatically converted from HTML to Markdown. Please double-check that it's properly displayed."
 msgstr ""
 
@@ -16078,10 +16166,6 @@ msgstr ""
 msgid "My language (%(lang)s)"
 msgstr ""
 
-#: indico/web/templates/_session_bar.html:179
-msgid "This is your current language."
-msgstr ""
-
 #: indico/web/templates/_session_bar.html:227
 msgid "Login"
 msgstr ""
@@ -16232,11 +16316,11 @@ msgstr ""
 msgid "Action"
 msgstr ""
 
-#: indico/web/templates/forms/occurrences_widget.html:16
+#: indico/web/templates/forms/occurrences_widget.html:15
 msgid "Duration in minutes"
 msgstr ""
 
-#: indico/web/templates/forms/occurrences_widget.html:17
+#: indico/web/templates/forms/occurrences_widget.html:16
 msgid "Remove occurrence"
 msgstr ""
 

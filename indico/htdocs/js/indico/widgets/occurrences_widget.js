@@ -1,5 +1,5 @@
 /* This file is part of Indico.
- * Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
  *
  * Indico is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -22,15 +22,12 @@
         options = $.extend(true, {
             fieldId: null,
             defaultTime: null,
-            defaultDuration: null,
-            timezone: null,
-            timezoneFieldId: null
+            defaultDuration: null
         }, options);
 
         var rowTemplate = $($.parseHTML($('#' + options.fieldId + '-template').html())).filter('.occurrence');
         var container = $('#' + options.fieldId + '-container');
         var dataField = $('#' + options.fieldId + '');
-        var timezone = options.timezone;
 
         function createRow(data) {
             var row = rowTemplate.clone().insertBefore(container.find('.add-occurrence'));
@@ -45,14 +42,6 @@
 
             row.find('.remove-occurrence').on('click', function() {
                 removeRow(row);
-            });
-
-            row.find('.timezone').qtip({
-                content: {
-                    text: function() {
-                        return timezone;
-                    }
-                }
             });
 
             dateField.datepicker({
@@ -141,12 +130,6 @@
                 return rv;
             }).get();
             dataField.val(JSON.stringify(data)).trigger('change');
-        }
-
-        if (options.timezoneFieldId) {
-            $('#' + options.timezoneFieldId).on('change', function() {
-                timezone = $(this).val();
-            });
         }
 
         container.find('.add-occurrence').on('click', function(evt) {

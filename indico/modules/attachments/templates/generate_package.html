@@ -1,5 +1,5 @@
 {% if management %}
-    {% extends 'layout/base.html' %}
+    {% extends 'events/management/base.html' %}
 {% elif event.type == 'conference' %}
     {% extends 'events/display/conference/base.html' %}
 {% else %}
@@ -7,7 +7,6 @@
 {% endif %}
 
 {% from 'forms/_form.html' import form_header, form_footer, form_rows %}
-
 
 
 {% block title %}

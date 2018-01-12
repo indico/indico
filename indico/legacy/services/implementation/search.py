@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -13,6 +13,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
+
+from __future__ import unicode_literals
 
 from itertools import chain
 
@@ -30,6 +32,7 @@ from indico.util.string import sanitize_email, to_unicode
 
 class SearchBase(LoggedOnlyService):
     CHECK_HTML = False
+    UNICODE_PARAMS = True
 
     def _process_args(self):
         self._searchExt = self._params.get('search-ext', False)
@@ -69,7 +72,6 @@ class SearchUsers(SearchBase):
 
 
 class SearchGroups(SearchBase):
-
     def _process_args(self):
         SearchBase._process_args(self)
         self._group = self._params.get("group", "").strip()

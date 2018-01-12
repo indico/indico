@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -25,7 +25,6 @@ from io import BytesIO
 import pytest
 import yaml
 
-import indico
 from indico.core.db.sqlalchemy.links import LinkType
 from indico.modules.attachments.util import get_attached_items
 from indico.modules.events.contributions import Contribution
@@ -50,7 +49,12 @@ def reproducible_uuids(monkeypatch):
     monkeypatch.setattr('indico.modules.events.export.uuid4', muid.uuid4)
 
 
-@pytest.mark.usefixtures('reproducible_uuids')
+@pytest.fixture
+def static_indico_version(monkeypatch):
+    monkeypatch.setattr('indico.__version__', b'1.3.3.7')
+
+
+@pytest.mark.usefixtures('reproducible_uuids', 'static_indico_version')
 def test_event_export(db, dummy_event, monkeypatch):
     monkeypatch.setattr('indico.modules.events.export.now_utc', lambda: as_utc(datetime(2017, 8, 24, 9, 0, 0)))
 
@@ -67,7 +71,7 @@ def test_event_export(db, dummy_event, monkeypatch):
     f.seek(0)
 
     with open(os.path.join(os.path.dirname(__file__), 'export_test_1.yaml'), 'r') as ref_file:
-        data_yaml_content = ref_file.read().format(version=indico.__version__)
+        data_yaml_content = ref_file.read()
 
     # check composition of tarfile and data.yaml content
     with tarfile.open(fileobj=f) as tarf:
@@ -117,9 +121,10 @@ def test_event_attachment_export(db, dummy_event, dummy_attachment):
         assert tarf.extractfile('00000000-0000-4000-8000-000000000013').read() == 'hello world'
 
 
+@pytest.mark.usefixtures('static_indico_version')
 def test_event_import(db, dummy_user):
     with open(os.path.join(os.path.dirname(__file__), 'export_test_2.yaml'), 'r') as ref_file:
-        data_yaml_content = ref_file.read().replace('{version}', indico.__version__)
+        data_yaml_content = ref_file.read()
 
     data_yaml = BytesIO(data_yaml_content.encode('utf-8'))
     tar_buffer = BytesIO()

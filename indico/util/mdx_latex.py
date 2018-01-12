@@ -1,4 +1,3 @@
-#!/usr/bin/env python2
 """Extension to python-markdown to support LaTeX (rather than html) output.
 
 Authored by Rufus Pollock: <http://www.rufuspollock.org/>
@@ -67,7 +66,6 @@ Version 2.1: (August 2013)
 from __future__ import absolute_import
 
 import re
-import sys
 import textwrap
 import xml.dom.minidom
 from io import BytesIO
@@ -77,8 +75,9 @@ from urlparse import urlparse
 
 import markdown
 import requests
+from lxml.html import html5parser
 from PIL import Image
-from requests.exceptions import InvalidURL
+from requests.exceptions import ConnectionError, InvalidURL
 
 
 __version__ = '2.1'
@@ -251,8 +250,8 @@ def latex_render_image(src, alt, strict=False):
                 resp = requests.get(src, verify=False, timeout=5)
             except InvalidURL:
                 raise ImageURLException("Cannot understand URL '{}'".format(src))
-            except requests.Timeout:
-                raise ImageURLException("Loading image timed out ({})".format(src))
+            except (requests.Timeout, ConnectionError):
+                raise ImageURLException("Problem downloading image ({})".format(src))
             extension = None
 
             if resp.status_code != 200:
@@ -624,81 +623,12 @@ class Table2Latex:
 # ========================== LINKS =================================
 
 class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
-
     def run(self, instr):
-        # Process all hyperlinks
-        converter = Link2Latex()
-        new_blocks = []
-        for block in instr.split("\n\n"):
-            stripped = block.strip()
-            match = re.search(r'<a[^>]*>([^<]+)</a>', stripped)
-            # <table catches modified verions (e.g. <table class="..">
-            if match:
-                latex_link = re.sub(r'<a[^>]*>([^<]+)</a>',
-                                    converter.convert(match.group(0)).strip(),
-                                    stripped)
-                new_blocks.append(latex_link)
-            else:
-                new_blocks.append(block)
+        new_blocks = [re.sub(ur'<a[^>]*>([^<]+)</a>', lambda m: convert_link_to_latex(m.group(0)).strip(), block)
+                      for block in instr.split("\n\n")]
         return '\n\n'.join(new_blocks)
 
 
-class Link2Latex(object):
-    def convert(self, instr):
-        dom = xml.dom.minidom.parseString(instr.encode('utf-8'))
-        link = dom.documentElement
-        href = link.getAttribute('href')
-
-        desc = re.search(r'>([^<]+)', instr)
-        out = \
-            """
-            \\href{%s}{%s}
-            """ % (href, desc.group(0)[1:])
-        return out
-
-
-def template(template_fo, latex_to_insert):
-    tmpl = template_fo.read()
-    tmpl = tmpl.replace('INSERT-TEXT-HERE', latex_to_insert)
-    return tmpl
-    # title_items = [ '\\title', '\\end{abstract}', '\\thanks', '\\author' ]
-    # has_title_stuff = False
-    # for it in title_items:
-    #    has_title_stuff = has_title_stuff or (it in tmpl)
-
-
-def main():
-    import optparse
-    usage = \
-        """usage: %prog [options] <in-file-path>
-
-        Given a file path, process it using markdown2latex and print the result on
-        stdout.
-
-        If using template option template should place text INSERT-TEXT-HERE in the
-        template where text should be inserted.
-        """
-    parser = optparse.OptionParser(usage)
-    parser.add_option('-t', '--template', dest='template',
-                      default='',
-                      help='path to latex template file (optional)')
-    (options, args) = parser.parse_args()
-    if not len(args) > 0:
-        parser.print_help()
-        sys.exit(1)
-    inpath = args[0]
-    infile = file(inpath)
-
-    md = markdown.Markdown()
-    mkdn2latex = LaTeXExtension()
-    mkdn2latex.extendMarkdown(md, markdown.__dict__)
-    out = md.convert(infile.read())
-
-    if options.template:
-        tmpl_fo = file(options.template)
-        out = template(tmpl_fo, out)
-
-    print out
-
-if __name__ == '__main__':
-    main()
+def convert_link_to_latex(instr):
+    dom = html5parser.fragment_fromstring(instr)
+    return ur'\href{%s}{%s}' % (dom.get('href'), dom.text)

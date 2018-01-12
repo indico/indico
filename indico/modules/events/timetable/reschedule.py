@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -20,10 +20,11 @@ from datetime import datetime, timedelta
 
 from flask import session
 from pytz import utc
+from werkzeug.exceptions import BadRequest
 from werkzeug.utils import cached_property
 
 from indico.core.db import db
-from indico.core.errors import UserValueError
+from indico.core.errors import NoReportError, UserValueError
 from indico.modules.events import EventLogRealm
 from indico.modules.events.logs.models.entries import EventLogKind
 from indico.modules.events.timetable.models.entries import TimetableEntry, TimetableEntryType
@@ -134,7 +135,9 @@ class Rescheduler(object):
             # if we have a session block we reschedule the entries inside that block
             for entry in self.session_block.timetable_entry.children:
                 # the block should only have entries on the same day
-                assert entry.start_dt.astimezone(self.event.tzinfo).date() == self.day
+                if entry.start_dt.astimezone(self.event.tzinfo).date() != self.day:
+                    raise NoReportError.wrap_exc(BadRequest(_('This action cannot be completed because the event dates'
+                                                              ' have changed. Please reload the page and try again.')))
                 yield entry
         elif self.session:
             # if we have a session we reschedule the blocks of that session on the day

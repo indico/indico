@@ -282,7 +282,7 @@ You are now ready to install Indico:
     virtualenv ~/.venv
     source ~/.venv/bin/activate
     pip install -U pip setuptools
-    pip install --pre indico
+    pip install indico
 
 
 .. _centos-apache-config:

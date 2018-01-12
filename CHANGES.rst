@@ -38,6 +38,41 @@ Internal Changes
 ----
 
 
+Version 2.0
+-----------
+
+*Released on January 12, 2018*
+
+Improvements
+^^^^^^^^^^^^
+
+- Add ``author_type`` and ``is_speaker`` fields for persons in the JSON
+  abstract export
+- Add legacy redirect for ``conferenceTimeTable.py``
+
+Bugfixes
+^^^^^^^^
+
+- Fix unicode error when searching external users from the "Search
+  Users" dialog
+- Fix missing event management menu/layout when creating a material
+  package from the event management area
+- Fix error when viewing a contribution with co-authors
+- Fix sorting of registration form items not working anymore after
+  moving/disabling some items
+- Fix error after updating from 2.0rc1 if there are cached Mako
+  templates
+- Fix error when retrieving an image referenced in an abstract fails
+- Fix rendering of time pickers in recent Firefox versions (:issue:`3194`)
+- Fix error when trying to use the html serializer with the timetable API
+- Fix error when receiving invalid payment events that should be ignored
+- Fix last occurrence not being created when cloning events (:issue:`3192`)
+- Fix multiple links in the same line being replaced with the first one
+  when converting abstracts/contributions to PDF (:issue:`2816`)
+- Fix PDF generation when there are links with ``&`` in the URL
+- Fix incorrect spacing in abstract author/speaker lists (:issue:`3205`)
+
+
 Version 2.0rc2
 --------------
 

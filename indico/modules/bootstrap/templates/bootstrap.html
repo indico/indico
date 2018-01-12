@@ -61,7 +61,7 @@
                 </div>
                 <div class="fields-container">
                     {{ form_rows(form, fields=('first_name', 'last_name', 'email', 'username', 'password',
-                                               'confirm_password'), placeholder=True) }}
+                                               'confirm_password'), placeholder=true) }}
                 </div>
             </div>
         </div>
@@ -88,7 +88,7 @@
                     </div>
                 </div>
                 <div class="fields-container">
-                    {{ form_rows(form, fields=('affiliation',), placeholder=True) }}
+                    {{ form_rows(form, fields=('affiliation',), placeholder=true) }}
                 </div>
             </div>
         </div>
@@ -100,41 +100,44 @@
             <div class="center step-container">
                 <h1 class="step-title">{% trans %}Let us know you exist!{% endtrans %}</h1>
                 <div class="step-description">
-                        <div>
-                            {%- trans -%}
-                                Be part of the ever growing Indico community! Choose to receive news on the latest
-                                releases (2&ndash;3 times per year) as well as important security advisories.
-                            {%- endtrans -%}
-                        </div>
-                        <div>
-                            {% trans %}The the following data will be sent to the Community Hub:{% endtrans %}
-                            <ul>
-                                <li>{% trans %}Server URL{% endtrans %}</li>
-                                <li>{% trans %}Indico version installed{% endtrans %} ({{ indico_version }})</li>
-                                <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
-                                <li>{% trans %}Postgres version used{% endtrans %} ({{ postgres_version }})</li>
-                                <li>{% trans %}Operating system used{% endtrans %} ({{ operating_system }})</li>
-                                <li>{% trans %}Debug mode{% endtrans %} ({{ _('enabled') if config.DEBUG else _('disabled') }})</li>
-                                <li>
-                                    {%- trans -%}
-                                        Basic statistics (number of events, contributions and users)
-                                    {%- endtrans -%}
-                                </li>
-                                <li>{% trans %}Server default language{% endtrans %}</li>
-                                <li>{% trans %}Contact person{% endtrans %}</li>
-                                <li>{% trans %}Affiliation of your Indico server{% endtrans %}</li>
-                            </ul>
-                        </div>
-                        <div>
-                            {%- trans -%}
-                                Please note that <strong>no private information</strong> will ever be sent to the
-                                Community Hub or the Indico Project and that you can disable it any time (from the
-                                "Community Hub" section of the administrative area).
-                            {%- endtrans -%}
-                        </div>
+                    <div>
+                        {%- trans -%}
+                            Be part of the ever growing Indico community! Choose to receive news on the latest
+                            releases (2–3 times per year) as well as important security advisories.
+                        {%- endtrans -%}
+                    </div>
+                    <div>
+                        {% trans %}The following data will be sent to the Community Hub:{% endtrans %}
+                        <ul>
+                            <li>{% trans %}Server URL{% endtrans %}</li>
+                            <li>{% trans %}Indico version installed{% endtrans %} ({{ indico_version }})</li>
+                            <li>{% trans %}Python version used{% endtrans %} ({{ python_version }})</li>
+                            <li>{% trans %}Postgres version used{% endtrans %} ({{ postgres_version }})</li>
+                            <li>{% trans %}Operating system used{% endtrans %} ({{ operating_system }})</li>
+                            <li>{% trans %}Debug mode{% endtrans %} ({{ _('enabled') if config.DEBUG else _('disabled') }})</li>
+                            <li>
+                                {%- trans -%}
+                                    Basic statistics (number of events, contributions and users)
+                                {%- endtrans -%}
+                            </li>
+                            <li>{% trans %}Server default language{% endtrans %}</li>
+                            <li>{% trans %}Contact person{% endtrans %}</li>
+                            <li>{% trans %}Affiliation of your Indico server{% endtrans %}</li>
+                        </ul>
+                    </div>
+                    <div>
+                        {%- trans -%}
+                            Please note that <strong>no private information</strong> will ever be sent to the
+                            Community Hub or the Indico Project and that you can disable it any time (from the
+                            "Community Hub" section of the administrative area).
+                        {%- endtrans -%}
+                    </div>
                 </div>
                 <div class="fields-container">
-                    {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=True) }}
+                    {{ form_rows(form, fields=('enable_tracking', 'contact_name', 'contact_email'), placeholder=true) }}
+                    {% if show_local_warning %}
+                        {% include 'cephalopod/not_prod_warning.html' %}
+                    {% endif %}
                 </div>
             </div>
         </div>

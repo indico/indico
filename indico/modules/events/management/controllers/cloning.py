@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -21,7 +21,6 @@ from datetime import datetime
 
 from dateutil import rrule
 from flask import flash, jsonify, request, session
-from pytz import utc
 from werkzeug.exceptions import BadRequest
 
 from indico.modules.events.cloning import EventCloner
@@ -82,7 +81,7 @@ class CloneCalculator(object):
     def _calc_stop_criteria(self, form):
         args = {}
         if form.stop_criterion.data == 'day':
-            args['until'] = datetime.combine(form.until_dt.data, form.start_dt.data.time())
+            args['until'] = datetime.combine(form.until_dt.data, self._naivify(form.start_dt.data).time())
         else:
             args['count'] = form.num_times.data
         return args

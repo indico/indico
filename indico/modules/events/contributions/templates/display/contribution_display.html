@@ -194,7 +194,7 @@
             <div class="header">
                 <div class="header-row">
                     <h3>
-                        {% trans count=contribution.secondary_authors -%}
+                        {% trans count=contribution.secondary_authors|length -%}
                             Co-author
                         {%- pluralize -%}
                             Co-authors

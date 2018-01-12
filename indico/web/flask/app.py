@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -152,7 +152,7 @@ def configure_xsendfile(app, method):
 
 
 def setup_mako(app):
-    mako.template_args['module_directory'] = os.path.join(config.TEMP_DIR, 'mako_modules')
+    mako.template_args['module_directory'] = os.path.join(config.TEMP_DIR, 'mako_modules', indico.__version__)
 
 
 def setup_jinja(app):

@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -14,11 +14,19 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from __future__ import unicode_literals
+import pytest
 
-from indico.core.marshmallow import mm
+from indico.util.network import is_private_url
 
 
-class PersonLinkSchema(mm.Schema):
-    class Meta:
-        fields = ('id', 'person_id', 'email', 'first_name', 'last_name', 'title', 'affiliation', 'address', 'phone')
+@pytest.mark.parametrize(('url', 'expected'), (
+    ('http://127.0.0.1', True),
+    ('https://[::1]', True),
+    ('https://localhost', True),
+    ('http://192.168.0.12', True),
+    ('https://indico.cern.ch', False),
+    ('https://[2001:1458:201:87::100:c]', False),
+    ('https://indico.local', True)
+))
+def test_is_private_url(url, expected):
+    assert is_private_url(url) == expected

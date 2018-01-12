@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -24,10 +24,8 @@ from indico.modules.events.registration import logger
 from indico.modules.events.registration.controllers.management.sections import RHManageRegFormSectionBase
 from indico.modules.events.registration.models.form_fields import RegistrationFormField
 from indico.modules.events.registration.models.items import RegistrationFormItemType, RegistrationFormText
+from indico.modules.events.registration.util import update_regform_item_positions
 from indico.util.string import snakify_keys
-
-
-FIRST_DISABLED_POSITION = 1000
 
 
 def _fill_form_field_with_data(field, field_data, set_data=True):
@@ -42,13 +40,6 @@ def _fill_form_field_with_data(field, field_data, set_data=True):
         else:
             field.data, field.versioned_data = field.field_impl.process_field_data(field_data, field.data,
                                                                                    field.versioned_data)
-
-
-def _remove_regform_item_gaps(form_items, from_position):
-    """Update positions when deleting/disabling an item in order to prevent gaps"""
-    for item in form_items:
-        if item.position > from_position and item.is_enabled:
-            item.position -= 1
 
 
 class RHManageRegFormFieldBase(RHManageRegFormSectionBase):
@@ -74,11 +65,8 @@ class RHRegistrationFormToggleFieldState(RHManageRegFormFieldBase):
         if (not enabled and self.field.type == RegistrationFormItemType.field_pd and
                 self.field.personal_data_type.is_required):
             raise BadRequest
-        if not enabled:
-            _remove_regform_item_gaps(self.regform.form_items, self.field.position)
-        positions = [x.position for x in self.regform.form_items if x.is_enabled == enabled]
-        self.field.position = max(positions) + 1 if positions else FIRST_DISABLED_POSITION
         self.field.is_enabled = enabled
+        update_regform_item_positions(self.regform)
         db.session.flush()
         logger.info('Field %s modified by %s', self.field, session.user)
         return jsonify(view_data=self.field.view_data)
@@ -91,7 +79,7 @@ class RHRegistrationFormModifyField(RHManageRegFormFieldBase):
         if self.field.type == RegistrationFormItemType.field_pd:
             raise BadRequest
         self.field.is_deleted = True
-        _remove_regform_item_gaps(self.regform.form_items, self.field.position)
+        update_regform_item_positions(self.regform)
         db.session.flush()
         logger.info('Field %s deleted by %s', self.field, session.user)
         return jsonify()
