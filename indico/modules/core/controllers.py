@@ -195,11 +195,11 @@ class RHVersionCheck(RHAdminBase):
             latest_version = Version(data['info']['version'])
         else:
             # if we are stable, get the latest stable version
-            versions = map(Version, data['releases'])
-            latest_version = max(v for v in versions if not v.is_prerelease)
+            versions = [v for v in map(Version, data['releases']) if not v.is_prerelease]
+            latest_version = max(versions) if versions else None
         return {'current_version': unicode(current_version),
-                'latest_version': unicode(latest_version),
-                'outdated': (current_version < latest_version)}
+                'latest_version': unicode(latest_version) if latest_version else None,
+                'outdated': (current_version < latest_version) if latest_version else False}
 
     def _process(self):
         return jsonify(indico=self._check_version('indico', indico.__version__),
