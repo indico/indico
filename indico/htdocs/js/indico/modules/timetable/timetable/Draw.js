@@ -598,6 +598,31 @@ function loadBalloonContent(self, api, editable) {
                 evt.preventDefault();
                 self.managementActions.deleteEntry(self.eventData);
             })
+            .on('click', '.js-clone', function(evt) {
+                evt.preventDefault();
+                hideBalloon();
+            })
+            .on('indico:confirmed', '.js-clone', function(evt) {
+                evt.preventDefault();
+
+                var cloneUrlParams = $.extend({}, urlParams, {
+                    'contrib_id': self.eventData.contributionId
+                });
+
+                $.ajax({
+                    url: build_url(Indico.Urls.Timetable.contributions.clone, cloneUrlParams),
+                    method: 'POST',
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    complete: IndicoUI.Dialogs.Util.progress(),
+                    error: handleAjaxError,
+                    success: function(data) {
+                        if (data) {
+                            self.timetable._updateDay(data.update);
+                        }
+                    }
+                });
+            })
             .on('ajaxDialog:closed', '.js-manage-attachments, .js-manage-subcontribs', function(e) {
                 api.set('content.text', function(evt, api) {
                     loadBalloonContent(self, api, editable);

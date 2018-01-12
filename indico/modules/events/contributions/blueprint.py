@@ -65,6 +65,8 @@ _bp.add_url_rule('/manage/contributions/<int:contrib_id>/duration', 'manage_dura
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/acl', 'acl', management.RHContributionACL)
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/acl-message', 'acl_message',
                  management.RHContributionACLMessage)
+_bp.add_url_rule('/manage/contributions/<int:contrib_id>/clone', 'clone_contribution', management.RHCloneContribution,
+                 methods=('POST',))
 
 # Contribution RESTful endpoints
 _bp.add_url_rule('/manage/contributions/<int:contrib_id>/references/', 'create_contrib_reference_rest',

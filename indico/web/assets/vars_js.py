@@ -100,7 +100,8 @@ def generate_global_file():
                     'add': url_rule_to_js('timetable.add_contribution'),
                     'notScheduled': url_rule_to_js('timetable.not_scheduled'),
                     'schedule': url_rule_to_js('timetable.schedule'),
-                    'protection': url_rule_to_js('contributions.manage_contrib_protection')
+                    'protection': url_rule_to_js('contributions.manage_contrib_protection'),
+                    'clone': url_rule_to_js('timetable.clone_contribution')
                 },
                 'sessionBlocks': {
                     'add': url_rule_to_js('timetable.add_session_block'),

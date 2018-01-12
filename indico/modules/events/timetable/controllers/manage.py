@@ -20,13 +20,15 @@ import dateutil.parser
 from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
 
+from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.contributions.operations import delete_contribution
+from indico.modules.events.contributions.operations import clone_contribution, delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
-from indico.modules.events.timetable.legacy import TimetableSerializer, serialize_event_info, serialize_session
+from indico.modules.events.timetable.legacy import (TimetableSerializer, serialize_entry_update, serialize_event_info,
+                                                    serialize_session)
 from indico.modules.events.timetable.models.entries import TimetableEntryType
 from indico.modules.events.timetable.operations import (create_timetable_entry, delete_timetable_entry,
                                                         update_timetable_entry)
@@ -34,6 +36,7 @@ from indico.modules.events.timetable.util import render_entry_info_balloon
 from indico.modules.events.timetable.views import WPManageTimetable
 from indico.modules.events.util import track_time_changes
 from indico.web.forms.colors import get_colors
+from indico.web.util import jsonify_data
 
 
 class RHManageTimetable(RHManageTimetableBase):
@@ -167,3 +170,16 @@ class RHBreakREST(RHManageTimetableBase):
             if colors not in get_colors():
                 raise BadRequest
             self.break_.colors = colors
+
+
+class RHCloneContribution(RHManageTimetableBase):
+    def _process_args(self):
+        RHManageTimetableBase._process_args(self)
+        self.contribution = (Contribution.query.with_parent(self.event)
+                             .filter_by(id=request.args['contrib_id'])
+                             .first())
+
+    def _process(self):
+        clone_contribution(self.event, self.contribution, preserve_session=True)
+        return jsonify_data(update=serialize_entry_update(self.contribution.timetable_entry,
+                                                          session_=self.contribution.session))

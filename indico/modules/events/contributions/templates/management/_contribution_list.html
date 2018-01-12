@@ -186,6 +186,13 @@
                                        data-title="{% trans title=contrib.title %}Edit contribution '{{ title }}'{% endtrans %}"
                                        data-update='{"html": "#contribution-list", "filter_statistics": "#filter-statistics"}'
                                        data-ajax-dialog></a>
+                                    <a href ="#" class="icon-copy i-link highlight"
+                                       title="{% trans %}Clone contribution{% endtrans %}"
+                                       data-title="{% trans title=contrib.title %}Clone contribution '{{ title }}' {% endtrans %}"
+                                       data-href="{{ url_for('.clone_contribution', contrib) }}"
+                                       data-method="POST"
+                                       data-update="#contribution-list"
+                                       data-confirm="{% trans %}Are you sure you want to clone this contribution?{% endtrans %}"></a>
                                     <a href="#" class="icon-shield i-link highlight"
                                        title="{% trans %}Manage contribution protection{% endtrans %}"
                                        data-href="{{ url_for('.manage_contrib_protection', contrib) }}"

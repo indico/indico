@@ -22,7 +22,7 @@ from importlib import import_module
 
 from flask import g
 from flask_sqlalchemy import BaseQuery, Model, Pagination
-from sqlalchemy import inspect, orm
+from sqlalchemy import Column, inspect, orm
 from sqlalchemy.event import listen, listens_for
 from sqlalchemy.ext.hybrid import hybrid_property
 from sqlalchemy.orm import contains_eager, joinedload
@@ -300,7 +300,7 @@ def get_simple_column_attrs(model):
     attributes which map to a table column and are neither primary
     key nor foreign key.
 
-    This is useful if you want to get a list of attributes are are
+    This is useful if you want to get a list of attributes that are
     usually safe to copy without extra processing when creating a
     copy of a database object.
 
@@ -309,7 +309,8 @@ def get_simple_column_attrs(model):
     """
     return {attr.key
             for attr in inspect(model).column_attrs
-            if len(attr.columns) == 1 and not attr.columns[0].primary_key and not attr.columns[0].foreign_keys}
+            if len(attr.columns) == 1 and isinstance(attr.columns[0], Column) and not attr.columns[0].primary_key
+            and not attr.columns[0].foreign_keys}
 
 
 def auto_table_args(cls, **extra_kwargs):

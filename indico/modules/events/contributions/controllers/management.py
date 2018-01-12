@@ -39,9 +39,10 @@ from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.contributions.operations import (create_contribution, create_subcontribution,
-                                                            delete_contribution, delete_subcontribution,
-                                                            update_contribution, update_subcontribution)
+from indico.modules.events.contributions.operations import (clone_contribution, create_contribution,
+                                                            create_subcontribution, delete_contribution,
+                                                            delete_subcontribution, update_contribution,
+                                                            update_subcontribution)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
@@ -680,3 +681,9 @@ class RHCreateSubContributionReferenceREST(RHCreateReferenceMixin, RHManageSubCo
         self.subcontrib.references.append(reference)
         db.session.flush()
         return self.jsonify_reference(reference)
+
+
+class RHCloneContribution(RHManageContributionBase):
+    def _process(self):
+        clone_contribution(self.event, self.contrib)
+        return jsonify_data(**self.list_generator.render_list())

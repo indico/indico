@@ -33,8 +33,9 @@ from indico.modules.events.timetable.controllers.legacy import (RHLegacyTimetabl
                                                                 RHLegacyTimetableScheduleContribution,
                                                                 RHLegacyTimetableShiftEntries,
                                                                 RHLegacyTimetableSwapEntries)
-from indico.modules.events.timetable.controllers.manage import (RHManageSessionTimetable, RHManageTimetable,
-                                                                RHManageTimetableEntryInfo, RHTimetableREST)
+from indico.modules.events.timetable.controllers.manage import (RHCloneContribution, RHManageSessionTimetable,
+                                                                RHManageTimetable, RHManageTimetableEntryInfo,
+                                                                RHTimetableREST)
 from indico.web.flask.util import make_compat_redirect_func
 from indico.web.flask.wrappers import IndicoBlueprint
 
@@ -75,6 +76,7 @@ with _bp.add_prefixed_rules('/manage/timetable/session/<int:session_id>', '/mana
     _bp.add_url_rule('/add-contribution', 'add_contribution', RHLegacyTimetableAddContribution, methods=('GET', 'POST'))
     _bp.add_url_rule('/add-session-block', 'add_session_block', RHLegacyTimetableAddSessionBlock,
                      methods=('GET', 'POST'))
+    _bp.add_url_rule('/clone-contribution', 'clone_contribution', RHCloneContribution, methods=('POST',))
 
 # Display
 _bp.add_url_rule('/timetable/', 'timetable', RHTimetable)

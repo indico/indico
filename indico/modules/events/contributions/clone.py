@@ -31,6 +31,7 @@ from indico.modules.events.contributions.models.principals import ContributionPr
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
+from indico.modules.events.timetable.operations import schedule_contribution
 from indico.util.i18n import _
 
 
@@ -90,6 +91,11 @@ class ContributionCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
+    def __init__(self, *args, **kwargs):
+        self.contribution = kwargs.pop('contribution', None)
+        self.preserve_session = kwargs.pop('preserve_session', True)
+        super(ContributionCloner, self).__init__(*args, **kwargs)
+
     def run(self, new_event, cloners, shared_data):
         self._person_map = shared_data['event_persons']['person_map']
         self._session_map = shared_data['sessions']['session_map']
@@ -98,14 +104,47 @@ class ContributionCloner(EventCloner):
         self._contrib_field_map = shared_data['contribution_fields']['contrib_field_map']
         self._contrib_map = {}
         self._subcontrib_map = {}
+
         with db.session.no_autoflush:
-            self._clone_contribs(new_event)
-        self._synchronize_friendly_id(new_event)
+            if new_event == self.old_event:
+                self._clone_contrib(new_event)
+            else:
+                self._clone_contribs(new_event)
+                self._synchronize_friendly_id(new_event)
+
         db.session.flush()
         return {'contrib_map': self._contrib_map, 'subcontrib_map': self._subcontrib_map}
 
-    def _clone_contribs(self, new_event):
+    def _create_new_contribution(self, event, old_contrib, excluded_attrs=None):
         attrs = (get_simple_column_attrs(Contribution) | {'own_room', 'own_venue'}) - {'abstract_id'}
+        if excluded_attrs is not None:
+            attrs -= excluded_attrs
+        new_contrib = Contribution()
+        new_contrib.populate_from_attrs(old_contrib, attrs)
+        new_contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions))
+        new_contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries)
+        new_contrib.references = list(self._clone_references(ContributionReference, old_contrib.references))
+        new_contrib.person_links = list(self._clone_person_links(ContributionPersonLink, old_contrib.person_links))
+        new_contrib.field_values = list(self._clone_fields(old_contrib.field_values))
+        if old_contrib.type is not None:
+            new_contrib.type = self._contrib_type_map[old_contrib.type]
+        if self.preserve_session:
+            if old_contrib.session is not None:
+                new_contrib.session = self._session_map[old_contrib.session]
+            if old_contrib.session_block is not None:
+                new_contrib.session_block = self._session_block_map[old_contrib.session_block]
+        event.contributions.append(new_contrib)
+        return new_contrib
+
+    def _clone_contrib(self, new_event):
+        new_contribution = self._create_new_contribution(new_event, self.contribution, {'friendly_id'})
+        if self.preserve_session:
+            entry = schedule_contribution(new_contribution, self.contribution.timetable_entry.start_dt,
+                                          session_block=new_contribution.session_block)
+            new_event.timetable_entries.append(entry)
+        new_event.contributions.append(new_contribution)
+
+    def _clone_contribs(self, new_event):
         query = (Contribution.query.with_parent(self.old_event)
                  .options(undefer('_last_friendly_subcontribution_id'),
                           joinedload('own_venue'),
@@ -119,21 +158,7 @@ class ContributionCloner(EventCloner):
                           subqueryload('person_links'),
                           subqueryload('field_values')))
         for old_contrib in query:
-            contrib = Contribution()
-            contrib.populate_from_attrs(old_contrib, attrs)
-            contrib.subcontributions = list(self._clone_subcontribs(old_contrib.subcontributions))
-            contrib.acl_entries = clone_principals(ContributionPrincipal, old_contrib.acl_entries)
-            contrib.references = list(self._clone_references(ContributionReference, old_contrib.references))
-            contrib.person_links = list(self._clone_person_links(ContributionPersonLink, old_contrib.person_links))
-            contrib.field_values = list(self._clone_fields(old_contrib.field_values))
-            if old_contrib.type is not None:
-                contrib.type = self._contrib_type_map[old_contrib.type]
-            if old_contrib.session is not None:
-                contrib.session = self._session_map[old_contrib.session]
-            if old_contrib.session_block is not None:
-                contrib.session_block = self._session_block_map[old_contrib.session_block]
-            new_event.contributions.append(contrib)
-            self._contrib_map[old_contrib] = contrib
+            self._contrib_map[old_contrib] = self._create_new_contribution(new_event, old_contrib)
 
     def _clone_subcontribs(self, subcontribs):
         attrs = get_simple_column_attrs(SubContribution)
