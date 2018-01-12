@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+Version 2.0.1
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Fix LaTeX rendering issue when consecutive lines starting with ``[``
+  were present (:issue:`3203`)
+
+
 Version 2.0
 -----------
 
