@@ -287,12 +287,14 @@
             <ul class="author-list">
                 {% for user in abstract.primary_authors -%}
                     <li class="event-user">
-                        {{ user.full_name }}
-                        {% if user.affiliation %}
-                            <span class="affiliation">
-                                (<span class="text">{{ user.affiliation }}</span>)
-                            </span>
-                        {% endif %}
+                        <span>
+                            {{ user.full_name }}
+                            {% if user.affiliation %}
+                                <span class="affiliation">
+                                    (<span class="text">{{ user.affiliation }}</span>)
+                                </span>
+                            {% endif %}
+                        </span>
                     </li>
                 {%- endfor %}
             </ul>
@@ -310,12 +312,14 @@
             <ul class="author-list">
                 {% for user in abstract.secondary_authors -%}
                     <li class="event-user">
-                        {{ user.full_name }}
-                        {% if user.affiliation %}
-                            <span class="affiliation">
-                                (<span class="text">{{ user.affiliation }}</span>)
-                            </span>
-                        {% endif %}
+                        <span>
+                            {{ user.full_name }}
+                            {% if user.affiliation %}
+                                <span class="affiliation">
+                                    (<span class="text">{{ user.affiliation }}</span>)
+                                </span>
+                            {% endif %}
+                        </span>
                     </li>
                 {%- endfor %}
             </ul>
@@ -333,12 +337,14 @@
             <ul class="author-list">
                 {% for user in abstract.speakers -%}
                     <li class="event-user">
-                        {{ user.full_name }}
-                        {% if user.affiliation %}
-                            <span class="affiliation">
-                                (<span class="text">{{ user.affiliation }}</span>)
-                            </span>
-                        {% endif %}
+                        <span>
+                            {{ user.full_name }}
+                            {% if user.affiliation %}
+                                <span class="affiliation">
+                                    (<span class="text">{{ user.affiliation }}</span>)
+                                </span>
+                            {% endif %}
+                        </span>
                     </li>
                 {%- endfor %}
             </ul>

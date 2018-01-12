@@ -34,6 +34,7 @@ Bugfixes
 - Fix multiple links in the same line being replaced with the first one
   when converting abstracts/contributions to PDF (:issue:`2816`)
 - Fix PDF generation when there are links with ``&`` in the URL
+- Fix incorrect spacing in abstract author/speaker lists (:issue:`3205`)
 
 
 Version 2.0rc2
