@@ -207,3 +207,4 @@ class RegistrationPermission(ManagementPermission):
     friendly_name = _('Registration')
     description = _('Grants management access to the registration form.')
     user_selectable = True
+    css_class = 'highlight'

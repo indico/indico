@@ -37,6 +37,8 @@ class ManagementPermission(object):
     description = None
     #: whether the permission can be set in the permissions widget (protection page)
     user_selectable = False
+    #: CSS class assigned to permission label
+    css_class = None
 
 
 @memoize_request

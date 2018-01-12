@@ -20,13 +20,6 @@
 (function($) {
     'use strict';
 
-    var permissionClasses = {
-        _full_access: 'danger',
-        _read_access: 'accept',
-        registration: 'highlight',
-        submit: 'warning'
-    };
-
     $.widget('indico.permissionswidget', {
         options: {
             eventId: null,
@@ -100,8 +93,8 @@
             var $permissionsList = $('<ul>').appendTo($permissions);
             permissions.forEach(function(item) {
                 $permissionsList.append(
-                    $('<li>', {class: 'i-label bold ' + permissionClasses[item]})
-                        .append(self.options.permissionsInfo[item])
+                    $('<li>', {class: 'i-label bold ' + self.options.permissionsInfo[item].css_class})
+                        .append(self.options.permissionsInfo[item].title)
                 );
             });
             if (principal._type !== 'DefaultEntry') {
