@@ -77,6 +77,7 @@ from urlparse import urlparse
 
 import markdown
 import requests
+from lxml.html import html5parser
 from PIL import Image
 from requests.exceptions import ConnectionError, InvalidURL
 
@@ -624,27 +625,15 @@ class Table2Latex:
 # ========================== LINKS =================================
 
 class LinkTextPostProcessor(markdown.postprocessors.Postprocessor):
-
     def run(self, instr):
-        # Process all hyperlinks
-        converter = Link2Latex()
-        new_blocks = [re.sub(r'<a[^>]*>([^<]+)</a>', lambda m: converter.convert(m.group(0)).strip(), block)
+        new_blocks = [re.sub(ur'<a[^>]*>([^<]+)</a>', lambda m: convert_link_to_latex(m.group(0)).strip(), block)
                       for block in instr.split("\n\n")]
         return '\n\n'.join(new_blocks)
 
 
-class Link2Latex(object):
-    def convert(self, instr):
-        dom = xml.dom.minidom.parseString(instr.encode('utf-8'))
-        link = dom.documentElement
-        href = link.getAttribute('href')
-
-        desc = re.search(r'>([^<]+)', instr)
-        out = \
-            """
-            \\href{%s}{%s}
-            """ % (href, desc.group(0)[1:])
-        return out
+def convert_link_to_latex(instr):
+    dom = html5parser.fragment_fromstring(instr)
+    return ur'\href{%s}{%s}' % (dom.get('href'), dom.text)
 
 
 def template(template_fo, latex_to_insert):
@@ -689,6 +678,7 @@ def main():
         out = template(tmpl_fo, out)
 
     print out
+
 
 if __name__ == '__main__':
     main()

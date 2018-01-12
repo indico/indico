@@ -33,6 +33,7 @@ Bugfixes
 - Fix last occurrence not being created when cloning events (:issue:`3192`)
 - Fix multiple links in the same line being replaced with the first one
   when converting abstracts/contributions to PDF (:issue:`2816`)
+- Fix PDF generation when there are links with ``&`` in the URL
 
 
 Version 2.0rc2
