@@ -102,11 +102,6 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
         nullable=False,
         default=timedelta(minutes=20)
     )
-    is_poster = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=False
-    )
     is_deleted = db.Column(
         db.Boolean,
         nullable=False,
