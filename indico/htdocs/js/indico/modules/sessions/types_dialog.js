@@ -24,6 +24,7 @@
                 var $lastRow = $('.manage-session-types table tr:last');
                 if ($lastRow.length) {
                     $lastRow.after(data.html_row);
+                    dialogModified();
                 } else {
                     $manageSessionTypes.trigger('ajaxDialog:reload');
                 }
