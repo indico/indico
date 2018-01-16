@@ -51,8 +51,12 @@ def generate_spreadsheet_from_sessions(sessions):
 
     :param sessions: The sessions to include in the spreadsheet
     """
-    column_names = ['ID', 'Title', 'Description', 'Code']
-    rows = [{'ID': sess.friendly_id, 'Title': sess.title, 'Description': sess.description, 'Code': sess.code}
+    column_names = ['ID', 'Title', 'Description', 'Type', 'Code']
+    rows = [{'ID': sess.friendly_id,
+             'Title': sess.title,
+             'Description': sess.description,
+             'Type': sess.type.name if sess.type else None,
+             'Code': sess.code}
             for sess in sessions]
     return column_names, rows
 
