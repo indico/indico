@@ -234,6 +234,7 @@ class SerializerBase(object):
             'description': session_.description,
             'material': build_material_legacy_api_data(session_),
             'isPoster': session_.is_poster,
+            'type': session_.type.name if session_.type else None,
             'url': url_for('sessions.display_session', session_, _external=True),
             'roomFullname': session_.room_name,
             'location': session_.venue_name,

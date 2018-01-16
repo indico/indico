@@ -151,7 +151,7 @@ class RHSessionREST(RHManageSessionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if set(data.viewkeys()) > {'colors', 'type_id'}:
+        if set(data.viewkeys()) - {'colors', 'type_id'}:
             raise BadRequest
         if 'colors' in data:
             colors = ColorTuple(**data['colors'])
@@ -168,8 +168,8 @@ class RHSessionREST(RHManageSessionBase):
         if type_id is None:
             updates['type_id'] = None
         else:
-            type = SessionType.get(type_id)
-            if not type:
+            type_ = SessionType.query.with_parent(self.event).filter_by(id=type_id).first()
+            if not type_:
                 raise BadRequest('Invalid type id')
             if not self.session.type or type_id != self.session.type.id:
                 updates['type_id'] = type_id
@@ -307,11 +307,6 @@ class RHEditSessionType(RHManageSessionTypeBase):
 class RHCreateSessionType(RHManageSessionsBase):
     """Dialog to add a SessionType"""
 
-    def _get_response(self, new_type):
-        types = [{'id': t.id, 'title': t.name} for t in SessionType.query.with_parent(self.event)]
-        return jsonify_data(types=types, new_type_id=new_type.id,
-                            html_row=render_session_type_row(new_type))
-
     def _process(self):
         form = SessionTypeForm(event=self.event)
         if form.validate_on_submit():
@@ -321,7 +316,9 @@ class RHCreateSessionType(RHManageSessionsBase):
             db.session.flush()
             self.event.log(EventLogRealm.management, EventLogKind.positive, 'Sessions',
                            'Added type: {}'.format(session_type.name), session.user)
-            return self._get_response(session_type)
+            types = [{'id': t.id, 'title': t.name} for t in self.event.session_types]
+            return jsonify_data(types=types, new_type_id=session_type.id,
+                                html_row=render_session_type_row(session_type))
         return jsonify_form(form)
 
 

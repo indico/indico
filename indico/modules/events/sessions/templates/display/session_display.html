@@ -75,7 +75,6 @@
 
 {% block content -%}
     {% if sess.blocks and sess.conveners -%}
-    {% set is_poster = sess.type and sess.type.is_poster %}
         <section>
             <div class="flexrow">
                 <div class="session-conveners">
@@ -132,7 +131,7 @@
                     {%- trans %}Contribution list{% endtrans -%}
                 </a>
             {% endif %}
-            {% if not is_poster %}
+            {% if not sess.is_poster %}
                 <a href="#" class="i-button icon-time highlight js-switch-view" data-show="session-timetable">
                     {%- trans %}Timetable{% endtrans -%}
                 </a>
@@ -147,7 +146,7 @@
             </div>
         {% endif %}
 
-        {% if not is_poster -%}
+        {% if not sess.is_poster -%}
             <div id="session-timetable" class="js-view">
                 {% set timetable_html = template_hook('session-timetable', session=sess, timetable_layout=none) %}
                 {% if timetable_html %}

@@ -205,6 +205,10 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
                 .distinct(SessionBlockPersonLink.person_id)
                 .all())
 
+    @property
+    def is_poster(self):
+        return self.type and self.type.is_poster
+
     @locator_property
     def locator(self):
         return dict(self.event.locator, session_id=self.id)

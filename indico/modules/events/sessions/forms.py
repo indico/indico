@@ -53,10 +53,9 @@ class SessionForm(IndicoForm):
         event = kwargs.pop('event')
         super(SessionForm, self).__init__(*args, **kwargs)
         if event.type != 'conference':
-            del self.is_poster
             del self.code
         self.type.query = SessionType.query.with_parent(event)
-        if not self.type.query.count():
+        if not self.type.query.has_rows():
             del self.type
 
 

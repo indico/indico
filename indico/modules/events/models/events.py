@@ -405,6 +405,7 @@ class Event(SearchableTitleMixin, DescriptionMixin, LocationMixin, ProtectionMan
     # - reservations (Reservation.event)
     # - roles (EventRole.event)
     # - sessions (Session.event)
+    # - session_types (SessionType.event)
     # - settings (EventSetting.event)
     # - settings_principals (EventSettingPrincipal.event)
     # - static_list_links (StaticListLink.event)
