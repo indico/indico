@@ -40,9 +40,11 @@
                                 </div>
                             </div>
                         </div>
-                        <span class="i-label small">
-                            {{ track.code }}
-                        </span>
+                        {% if track.code %}
+                            <span class="i-label small">
+                                {{ track.code }}
+                            </span>
+                        {% endif %}
                         {% if track.default_session %}
                             {% set default_session_tooltip %}
                                 {%- trans title=track.default_session.title -%}
