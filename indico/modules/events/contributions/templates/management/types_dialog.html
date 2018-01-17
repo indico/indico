@@ -1,9 +1,9 @@
 {% from 'message_box.html' import message_box %}
 {% from 'events/contributions/management/_types_table.html' import types_table_row %}
 
-<div class="manage-contribution-types">
+<div class="manage-types">
     <div class="toolbar space-after hide-if-locked">
-        <button class="i-button js-new-contribution-type icon-plus highlight"
+        <button class="i-button js-new-type icon-plus highlight"
                 data-href="{{ url_for('.create_type', event) }}"
                 data-title="{% trans %}Add new contribution type{% endtrans %}"
                 data-ajax-dialog>
@@ -44,5 +44,5 @@
     </div>
 </div>
 <script>
-    setupContributionTypesDialog();
+    setupTypesDialog();
 </script>

@@ -17,6 +17,7 @@
 
 @import "contributions/display";
 @import "contributions/editor";
+@import "types_dialog";
 
 @mixin picker-root-element-label() {
     .label {
@@ -119,25 +120,6 @@
 
 .qbubble-contrib-duration {
     max-width: 420px !important;
-}
-
-.manage-contribution-types {
-    max-width: 600px;
-
-    table.i-table {
-        table-layout: auto;
-        min-width: 360px;
-        margin-bottom: 1.5em;
-
-        th, td {
-            white-space: normal;
-        }
-
-        .action-column {
-            white-space: nowrap;
-            width: 1px;
-        }
-    }
 }
 
 #contributions-fixed-fields {

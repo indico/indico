@@ -1,15 +1,15 @@
 (function(global) {
     'use strict';
 
-    global.setupSessionTypesDialog = function setupSessionTypesDialog() {
-        var $manageSessionTypes = $('.manage-session-types');
+    global.setupTypesDialog = function setupTypesDialog() {
+        var $manageTypes = $('.manage-types');
 
-        /* Set the customData to true indicating that the session list needs to be refreshed */
+        /* Set the customData to true indicating that the list needs to be refreshed */
         function dialogModified() {
-            $manageSessionTypes.trigger('ajaxDialog:setData', [true]);
+            $manageTypes.trigger('ajaxDialog:setData', [true]);
         }
 
-        $('.manage-session-types table').tablesorter({
+        $('.manage-types table').tablesorter({
             sortList: [[0, 0]],
             headers: {
                 2: {
@@ -18,42 +18,42 @@
             }
         });
 
-        $('.js-new-session-type').on('ajaxDialog:closed', function(evt, data) {
+        $('.js-new-type').on('ajaxDialog:closed', function(evt, data) {
             evt.preventDefault();
             if (data) {
-                var $lastRow = $('.manage-session-types table tr:last');
+                var $lastRow = $('.manage-types table tr:last');
                 if ($lastRow.length) {
                     $lastRow.after(data.html_row);
                     dialogModified();
                 } else {
-                    $manageSessionTypes.trigger('ajaxDialog:reload');
+                    $manageTypes.trigger('ajaxDialog:reload');
                 }
             }
         });
 
-        $manageSessionTypes.on('ajaxDialog:closed', '.js-edit-session-type', function(evt, data) {
+        $manageTypes.on('ajaxDialog:closed', '.js-edit-type', function(evt, data) {
             evt.preventDefault();
-            var $row = $(this).closest('tr');
             if (data) {
+                var $row = $(this).closest('tr');
                 $row.replaceWith(data.html_row);
                 dialogModified();
             }
         });
 
-        $manageSessionTypes.on('indico:confirmed', '.js-delete-session-type', function(evt) {
+        $manageTypes.on('indico:confirmed', '.js-delete-type', function(evt) {
             evt.preventDefault();
             var $this = $(this);
-            var $row = $this.closest('tr');
             $.ajax({
                 url: $this.data('href'),
                 method: $this.data('method'),
                 complete: IndicoUI.Dialogs.Util.progress(),
                 error: handleAjaxError,
                 success: function() {
+                    var $row = $this.closest('tr');
                     $row.remove();
                     dialogModified();
-                    if ($('.manage-session-types table tbody tr').length === 0) {
-                        $manageSessionTypes.trigger('ajaxDialog:reload');
+                    if ($('.manage-types table tbody tr').length === 0) {
+                        $manageTypes.trigger('ajaxDialog:reload');
                     }
                 }
             });

@@ -14,10 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
-@import "types_dialog";
 
-#sessions {
-    .show-session-blocks {
-        cursor: pointer;
+.manage-types {
+    max-width: 600px;
+
+    table.i-table {
+        table-layout: auto;
+        min-width: 360px;
+        margin-bottom: 1.5em;
+
+        th, td {
+            white-space: normal;
+
+            &.name-column {
+                white-space: nowrap;
+            }
+        }
+
+        .action-column {
+            white-space: nowrap;
+            width: 1px;
+        }
     }
 }
