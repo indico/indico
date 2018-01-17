@@ -113,7 +113,8 @@ class PapersScheduleForm(IndicoForm):
 
 
 class PaperJudgmentFormBase(IndicoForm):
-    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
+    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter..."),
+                                                              'class': 'grow'})
 
 
 class PaperJudgmentForm(PaperJudgmentFormBase):
@@ -179,7 +180,8 @@ class PaperTemplateForm(IndicoForm):
 
 
 class PaperCommentForm(IndicoForm):
-    text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment...")})
+    text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment..."),
+                                                                    'class': 'grow'})
     visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=PaperCommentVisibility,
                                        skip={PaperCommentVisibility.users})
 
@@ -200,7 +202,8 @@ class PaperReviewForm(IndicoForm):
     _order = ('proposed_action', 'comment')
 
     comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("You may leave a comment (only visible to "
-                                                                      "reviewers and judges)...")})
+                                                                      "reviewers and judges)..."),
+                                                     'class': 'grow'})
     proposed_action = IndicoEnumSelectField(_("Proposed Action"), [DataRequired()], enum=PaperAction)
 
     def __init__(self, edit=False, *args, **kwargs):

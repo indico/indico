@@ -219,7 +219,8 @@ class AbstractJudgmentFormBase(IndicoForm):
     merge_persons = BooleanField(_("Merge persons"), [HiddenUnless('judgment', AbstractAction.merge)],
                                  description=_("Authors and speakers of the current abstract will be added to the "
                                                "selected one"))
-    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter...")})
+    judgment_comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("Leave a comment for the submitter..."),
+                                                              'class': 'grow'})
     # TODO: show only if notifications apply?
     send_notifications = BooleanField(_("Send notifications to submitter"), default=True)
 
@@ -278,7 +279,8 @@ class AbstractReviewForm(IndicoForm):
               'comment')
 
     comment = TextAreaField(_("Comment"), render_kw={'placeholder': _("You may leave a comment (only visible to "
-                                                                      "conveners and judges)...")})
+                                                                      "conveners and judges)..."),
+                                                     'class': 'grow'})
     proposed_action = IndicoEnumSelectField(_("Proposed Action"), [DataRequired()], enum=AbstractAction)
     proposed_related_abstract = AbstractField(
         _("Target Abstract"),
@@ -569,7 +571,8 @@ class AbstractsScheduleForm(IndicoForm):
 
 
 class AbstractCommentForm(IndicoForm):
-    text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment...")})
+    text = TextAreaField(_("Comment"), [DataRequired()], render_kw={'placeholder': _("Leave a comment..."),
+                                                                    'class': 'grow'})
     visibility = IndicoEnumSelectField(_("Visibility"), [DataRequired()], enum=AbstractCommentVisibility,
                                        skip={AbstractCommentVisibility.users})
 
