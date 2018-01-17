@@ -1,6 +1,6 @@
 {% macro types_table_row(session_type) %}
     <tr class="i-table">
-        <td class="i-table name-column">{{ session_type.name }}</td>
+        <td class="i-table">{{ session_type.name }}</td>
         <td class="i-table">{{ _('Yes') if session_type.is_poster else _('No') }}</td>
         <td class="i-table action-column hide-if-locked">
             <a class="js-edit-type icon-edit"

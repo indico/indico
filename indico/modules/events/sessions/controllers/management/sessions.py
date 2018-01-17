@@ -54,7 +54,7 @@ def _get_session_list_args(event):
                          subqueryload('blocks').undefer('contribution_count'))
                 .order_by(db.func.lower(Session.title))
                 .all())
-    types = [{'id': t.id, 'title': t.name} for t in SessionType.query.with_parent(event)]
+    types = [{'id': t.id, 'title': t.name} for t in event.session_types]
     return {'sessions': sessions, 'default_colors': get_colors(), 'types': types}
 
 
@@ -151,7 +151,7 @@ class RHSessionREST(RHManageSessionBase):
     def _process_PATCH(self):
         data = request.json
         updates = {}
-        if set(data.viewkeys()) - {'colors', 'type_id'}:
+        if set(data) - {'colors', 'type_id'}:
             raise BadRequest
         if 'colors' in data:
             colors = ColorTuple(**data['colors'])
@@ -166,13 +166,13 @@ class RHSessionREST(RHManageSessionBase):
     def _get_session_type_updates(self, type_id):
         updates = {}
         if type_id is None:
-            updates['type_id'] = None
+            updates['type'] = None
         else:
             type_ = SessionType.query.with_parent(self.event).filter_by(id=type_id).first()
             if not type_:
                 raise BadRequest('Invalid type id')
             if not self.session.type or type_id != self.session.type.id:
-                updates['type_id'] = type_id
+                updates['type'] = type_
         return updates
 
 
@@ -270,9 +270,8 @@ class RHManageSessionTypes(RHManageSessionsBase):
     """Dialog to manage the session types of an event"""
 
     def _process(self):
-        types = SessionType.query.with_parent(self.event).all()
         return jsonify_template('events/sessions/management/types_dialog.html', event=self.event,
-                                types=types)
+                                types=self.event.session_types)
 
 
 class RHManageSessionTypeBase(RHManageSessionsBase):

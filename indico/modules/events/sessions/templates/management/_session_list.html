@@ -47,7 +47,7 @@
                                    data-items="{{ types | tojson | forceescape }}"
                                    data-href="{{ url_for('.session_rest', sess) }}"
                                    data-method="PATCH"
-                                   data-selected-item-id="{{ (sess.type.id if sess.type else None) | tojson }}">
+                                   data-selected-item-id="{{ (sess.type.id if sess.type else none) | tojson }}">
                                     <span class="label">
                                         {% if sess.type %}
                                             {{ sess.type.name }}

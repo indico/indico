@@ -207,7 +207,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     @property
     def is_poster(self):
-        return self.type and self.type.is_poster
+        return self.type.is_poster if self.type else False
 
     @locator_property
     def locator(self):
