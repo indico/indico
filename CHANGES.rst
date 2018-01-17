@@ -26,6 +26,8 @@ Improvements
   used by default when accepting an abstract in that track (:issue:`3069`)
 - Allow marking contribution types as private so they cannot be selected
   by users submitting an abstract (:issue:`3138`)
+- Add support for boolean (yes/no) and freetext questions in abstract
+  reviewing (:issue:`3175`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
