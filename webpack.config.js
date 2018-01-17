@@ -19,14 +19,13 @@ const path = require('path');
 const glob = require('glob');
 
 const config = require('./config');
+const base = require('./webpack');
 
-const webpackBase = require('./webpack.base.js');
-const webpackDefaults = webpackBase.webpackDefaults;
-const resolveAlias = webpackBase.resolveAlias;
+const merge = require('webpack-merge');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
+const uglify = require('uglify-js');
 
-const clientDir = path.join(config.build.rootPath, 'web', 'client');
-
-const entryPoints = {
+let entryPoints = {
     main: './js/index.js',
     ckeditor: './js/jquery/ckeditor.js',
     conferences: './styles/legacy/Conf_Basic.css',
@@ -36,6 +35,9 @@ const entryPoints = {
     statistics: './js/jquery/statistics.js',
     fonts: './styles/partials/_fonts.scss'
 };
+
+const extraResolveAliases = [];
+const modulesDir = path.join(config.build.rootPath, '..', 'node_modules');
 
 // Add Module Bundles
 glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((file) => {
@@ -47,7 +49,7 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
         entryPoints[moduleName] = dirName;
     }
     const modulePath = 'indico/modules/' + (module.parent ? (module.parent + '/') : '') + module.name;
-    resolveAlias.push({name: modulePath, alias: dirName, onlyModule: false});
+    extraResolveAliases.push({name: modulePath, alias: dirName, onlyModule: false});
 
     if (module.partials) {
         for (const partial of Object.entries(module.partials)) {
@@ -58,21 +60,72 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
 
 // This has to be last in the array, since it's the most general alias.
 // Otherwise, it would be caught before 'indico/modules/...'
-resolveAlias.push({name: 'indico', alias: path.join(clientDir, 'js/'), onlyModule: false});
+extraResolveAliases.push({name: 'indico', alias: path.join(config.build.clientPath, 'js/'), onlyModule: false});
 
 // Add Meeting Themes
-Object.assign(entryPoints, ...Object.keys(config.themes).map((k) => {
-    const returnValue = {};
-    const prefix = './styles/themes/';
-    const escapedKey = k.replace('-', '_');
-
-    returnValue['themes_' + escapedKey] = prefix + config.themes[k].stylesheet;
-    if (config.themes[k].print_stylesheet) {
-        returnValue['themes_' + escapedKey + '.print'] = prefix + config.themes[k].print_stylesheet;
-    }
-    return returnValue;
-}));
+entryPoints = Object.assign(entryPoints, base.getThemeEntryPoints(config, './themes/'));
 
 module.exports = env => {
-    return webpackDefaults(env, config, clientDir, entryPoints);
+    const currentEnv = (env ? env.NODE_ENV : null) || 'development';
+
+    // Minification of copied files (e.g. CKEditor and MathJax)
+    const transform = currentEnv === 'development' ? null : (content) => {
+        if (!path.match(/\.js$/)) {
+            return content;
+        }
+        return uglify.minify(content.toString(), {fromString: true}).code;
+    };
+
+    const m = merge(base.webpackDefaults(env, config), {
+        entry: entryPoints,
+        module: {
+            rules: [
+                {
+                    test: /client\/js\/legacy\/libs\/.*$/,
+                    use: 'script-loader'
+                },
+                {
+                    test: /\.tpl\.html$/,
+                    use: {
+                        loader: 'file-loader',
+                        options: {
+                            name: '[path][name].[ext]',
+                            context: config.build.distPath,
+                            outputPath: 'mod_assets/'
+                        }
+                    }
+                },
+                {
+                    include: /jquery-migrate/,
+                    parser: {
+                        amd: false
+                    }
+                },
+                base.indicoStaticLoader(config),
+                {
+                    test: /\/node_modules\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|svg|eot)$/,
+                    use: {
+                        loader: 'file-loader',
+                        options: {
+                            name: base.generateAssetPath(config),
+                            context: config.build.distPath,
+                            outputPath: 'mod_assets/',
+                            publicPath: '/dist/'
+                        }
+                    }
+                }
+            ]
+        },
+        plugins: [
+            new CopyWebpackPlugin([
+                {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'js/ckeditor', transform},
+                {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}
+            ])
+        ],
+        resolve: {
+            alias: extraResolveAliases
+        }
+    });
+
+    return m;
 };

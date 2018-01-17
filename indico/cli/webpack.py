@@ -16,23 +16,85 @@
 
 from __future__ import unicode_literals
 
+import os
+
+import click
+from flask import current_app, json
+from flask.helpers import get_root_path
 from flask_webpackext import current_webpack
 
+from indico.core.plugins import plugin_engine
+from indico.core.webpack import get_webpack_config
 from indico.cli.core import cli_group
+from indico.modules.events.layout import theme_settings
+
+
+def _generate_webpack_config(plugin):
+    url_base_path = current_app.config['APPLICATION_ROOT'] or '/'
+    static_path = os.path.join(plugin.root_path, 'static')
+    static_url = os.path.join('{}/static/plugins/{}'.format(url_base_path, plugin.name))
+
+    return {
+        'indico': get_webpack_config(current_app),
+        'build': {
+            'debug': current_app.debug,
+            'indicoRootPath': os.path.dirname(get_root_path('indico')),
+            'clientPath': os.path.join(current_app.root_path, 'web', 'client'),
+            'rootPath': plugin.root_path,
+            'staticPath': static_path,
+            'staticURL': static_url,
+            'distPath': os.path.join(static_path, 'dist'),
+            'distURL': os.path.join(static_url, 'dist')
+        },
+        # include themes that belong to this plugin
+        'themes': {key: theme for key, theme in theme_settings.themes.viewitems()
+                   if theme.pop('plugin', '') == plugin}
+    }
+
+
+def _webpack_build_plugin(project, plugin_name, watch=False):
+    plugin = plugin_engine.get_plugin(plugin_name)
+    plugin_path = os.path.dirname(plugin.root_path)
+    webpack_config = os.path.join(plugin_path, 'webpack.config.js')
+
+    with open(os.path.join(plugin_path, 'config.json'), 'w') as f:
+        json.dump(_generate_webpack_config(plugin), f)
+
+    # set NODE_PATH to Indico's node_modules
+    os.environ['NODE_PATH'] = os.path.normpath(os.path.join(current_app.root_path, '..', 'node_modules'))
+    project.run('watch' if watch else 'build', '--', '--config={}'.format(webpack_config))
+
+
+def _generate_plugin_config(plugin):
+    return {
+        'indico_base_path': os.path.dirname(get_root_path('indico'))
+    }
 
 
 @cli_group()
-def cli():
+@click.option('--plugin', metavar='PLUGIN', help='Execute the command for the given plugin')
+@click.pass_context
+def cli(ctx, plugin=None):
     pass
 
 
 @cli.command()
-def build():
-    """Create Webpack project"""
-    current_webpack.project.build()
+@click.pass_context
+def build(ctx):
+    """Build Webpack bundles"""
+    plugin = ctx.parent.params['plugin']
+    if plugin:
+        _webpack_build_plugin(current_webpack.project, plugin)
+    else:
+        current_webpack.project.build()
 
 
 @cli.command()
-def watch():
+@click.pass_context
+def watch(ctx):
     """Start up Webpack in --watch mode"""
-    current_webpack.project.run('watch')
+    plugin = ctx.parent.params['plugin']
+    if plugin:
+        _webpack_build_plugin(current_webpack.project, plugin, watch=True)
+    else:
+        current_webpack.project.run('watch')

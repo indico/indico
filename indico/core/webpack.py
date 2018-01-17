@@ -26,11 +26,12 @@ from indico.modules.events.layout import theme_settings
 webpack = FlaskWebpackExt()
 
 
-def _get_webpack_config(app):
+def get_webpack_config(app):
     static_url_path = os.path.join(app.config['APPLICATION_ROOT'] or '/', app.static_url_path)
     return {
         'build': {
             'debug': app.debug,
+            'clientPath': os.path.join(app.root_path, 'web', 'client'),
             'rootPath': app.root_path,
             'staticPath': app.static_folder,
             'staticURL': static_url_path,
