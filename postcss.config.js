@@ -1,6 +1,6 @@
-module.exports = {
-    parser: 'postcss-scss',
-    plugins: {
-        autoprefixer: {}
-    }
-};
+module.exports = ({options}) => ({
+    plugins: [
+        require('autoprefixer'),
+        require('postcss-url-namespaces')(options.urlnamespaces || {})
+    ]
+});
