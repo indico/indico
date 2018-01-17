@@ -18,14 +18,6 @@
     {{ webpack['main.js'] }}
     {{ webpack['main.css'] }}
 
-    {% assets 'base_js' -%}
-    <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
-
-    {% assets 'base_css' -%}
-        <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}">
-    {% endassets %}
-
     {% if has_custom_js() %}
         {% assets 'custom_js' -%}
             <script src="{{ ASSET_URL }}"></script>
