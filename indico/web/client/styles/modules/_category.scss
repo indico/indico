@@ -37,7 +37,7 @@
 }
 
 .category-header {
-    background-image: linear-gradient(top, #fcfcfc, #f2f2f2);
+    background-image: linear-gradient(to bottom, #fcfcfc, #f2f2f2);
     border-bottom: 1px solid #e6e6e6;
     border-top: 1px solid #fff;
     padding: 20px;
@@ -127,19 +127,7 @@
 .category-sidebar {
     box-sizing: border-box;
     background: #fafafa;
-    background-image: linear-gradient(top, #fafafa 95%, #fff 100%);
-    background-image: -o-linear-gradient(top, #fafafa 95%, #fff 100%);
-    background-image: -moz-linear-gradient(top, #fafafa 95%, #fff 100%);
-    background-image: -webkit-linear-gradient(top, #fafafa 95%, #fff 100%);
-    background-image: -ms-linear-gradient(top, #fafafa 95%, #fff 100%);
-    background-image: -webkit-gradient(
-        linear,
-        left top,
-        left bottom,
-        color-stop(0.95, #fafafa),
-        color-stop(1, rgb(255, 255, 255))
-    );
-
+    background-image: linear-gradient(to bottom, #fafafa 95%, #fff 100%);
     border-left: 1px solid #f2f2f2;
     color: #666;
     float: right;
