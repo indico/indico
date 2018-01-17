@@ -92,6 +92,8 @@ export:
     fks:
       - SessionBlockPersonLink.session_block_id
 
+  SessionType: {}
+
   Contribution:
     cols:
       venue_id: venue_name = Location.get(VALUE).name

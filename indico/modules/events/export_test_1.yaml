@@ -44,12 +44,12 @@
     !!python/unicode 'id': !!python/tuple [!!python/unicode 'idref_set', !!python/unicode '00000000-0000-4000-8000-000000000003']
     !!python/unicode 'inherit_location': true
     !!python/unicode 'is_deleted': true
-    !!python/unicode 'is_poster': false
     !!python/unicode 'protection_mode': !!python/object/apply:indico.core.db.sqlalchemy.protection.ProtectionMode [
       1]
     !!python/unicode 'room_name': !!python/unicode ''
     !!python/unicode 'text_color': !!python/unicode '202020'
     !!python/unicode 'title': !!python/unicode 'sd'
+    !!python/unicode 'type_id': null
     !!python/unicode 'venue_name': !!python/unicode ''
 - !!python/tuple
   - !!python/unicode 'events.contributions'
