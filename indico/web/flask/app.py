@@ -45,7 +45,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
-from indico.core.webpack import _get_webpack_config, webpack
+from indico.core.webpack import get_webpack_config, webpack
 from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -138,7 +138,7 @@ def configure_webpack(app):
     pkg_path = os.path.dirname(get_root_path('indico'))
     project = WebpackBundleProject(
         pkg_path,
-        config=lambda: _get_webpack_config(app),
+        config=lambda: get_webpack_config(app),
         config_path=os.path.join(pkg_path, 'config.json')
     )
     app.config.update({
