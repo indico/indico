@@ -17,6 +17,7 @@
 from __future__ import unicode_literals
 
 from wtforms.fields import BooleanField
+from wtforms.validators import InputRequired
 
 from indico.modules.events.fields import RatingReviewField
 from indico.util.i18n import _
@@ -39,6 +40,7 @@ class AbstractRatingReviewingQuestion(BaseField):
     common_settings = BaseField.common_settings + ('no_score',)
     config_form_base = AbstractRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
+    required_validator = InputRequired
 
     @property
     def wtf_field_kwargs(self):
@@ -52,6 +54,7 @@ class PaperRatingReviewingQuestion(BaseField):
     friendly_name = _('Rating')
     config_form_base = PaperRatingReviewingQuestionConfigForm
     wtf_field_class = RatingReviewField
+    required_validator = InputRequired
 
     @property
     def wtf_field_kwargs(self):
