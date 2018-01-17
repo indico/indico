@@ -311,12 +311,7 @@ button::-moz-focus-inner {
 
 .fav-button.enabled {
     background-color: #FAD74C;
-    background-image: -ms-linear-gradient(top, #FAD74C, #DAC34A);
-    background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#FAD74C), to(#DAC34A));
-    background-image: -webkit-linear-gradient(top, #FAD74C, #DAC34A);
-    background-image: -o-linear-gradient(top, #FAD74C, #DAC34A);
-    background-image: -moz-linear-gradient(top, #FAD74C, #DAC34A);
-    background-image: linear-gradient(top, #FAD74C, #DAC34A);
+    background-image: linear-gradient(to bottom, #FAD74C, #DAC34A);
 
     border-color: #B6AD6F;
     color: #E2E28B !important;
