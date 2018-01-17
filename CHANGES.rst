@@ -12,6 +12,8 @@ Bugfixes
 
 - Fix LaTeX rendering issue when consecutive lines starting with ``[``
   were present (:issue:`3203`)
+- Do not allow managers to retrieve tickets for registrants for whom
+  ticket access is blocked by a plugin (:issue:`3208`)
 
 
 Version 2.0

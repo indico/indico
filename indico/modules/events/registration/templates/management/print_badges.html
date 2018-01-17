@@ -1,6 +1,18 @@
 {% from 'forms/_form.html' import simple_form, form_fieldset, form_rows, form_row %}
+{% from 'message_box.html' import message_box %}
 
-{% block content %}
+
+{% if registrations != all_registrations %}
+    {% call message_box('warning') -%}
+        {% trans count=(all_registrations|length - registrations|length), total=all_registrations|length -%}
+            Tickets are currently not available for the selected registration.
+        {%- pluralize total -%}
+            Tickets are currently not available for {{ count }} out of the {{ total }} selected registrations.
+        {%- endtrans %}
+    {%- endcall %}
+{% endif %}
+
+{% if registrations %}
     {% call simple_form(settings_form, form_header_kwargs={'id': 'badge-settings-form'}, back=_('Cancel'),
                         submit=_("Download PDF"), disabled_until_change=false, disable_if_locked=false) %}
         {{ form_row(settings_form.template) }}
@@ -51,4 +63,4 @@
             setupBadgePrinting({{ templates | tojson }});
         })();
     </script>
-{% endblock %}
+{% endif %}
