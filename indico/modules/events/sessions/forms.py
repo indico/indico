@@ -54,9 +54,11 @@ class SessionForm(IndicoForm):
         super(SessionForm, self).__init__(*args, **kwargs)
         if event.type != 'conference':
             del self.code
-        self.type.query = SessionType.query.with_parent(event)
-        if not self.type.query.has_rows():
             del self.type
+        else:
+            self.type.query = SessionType.query.with_parent(event)
+            if not self.type.query.has_rows():
+                del self.type
 
 
 class SessionProtectionForm(IndicoForm):
