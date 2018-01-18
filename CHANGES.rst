@@ -16,6 +16,7 @@ Bugfixes
   ticket access is blocked by a plugin (:issue:`3208`)
 - Log a warning instead of an exception if the Indico version check
   fails (:issue:`3209`)
+- Wrap long lines in event log entries instead of truncating them
 
 
 Version 2.0

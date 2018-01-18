@@ -101,6 +101,10 @@
     tr.log-kind-change td.log-icon i.log-kind { color: $blue; }
     tr.log-kind-other td.log-icon i.log-kind { display: none; }
 
+    td {
+        white-space: normal;
+    }
+
     td.log-icon {
         color: $dark-gray;
         font-size: 1.2em;
