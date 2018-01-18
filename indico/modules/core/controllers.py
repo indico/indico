@@ -23,12 +23,12 @@ from flask import flash, jsonify, redirect, request, session
 from packaging.version import Version
 from pkg_resources import DistributionNotFound, get_distribution
 from pytz import common_timezones_set
-from werkzeug.exceptions import NotFound
+from werkzeug.exceptions import NotFound, ServiceUnavailable
 from werkzeug.urls import url_join, url_parse
 
 import indico
 from indico.core.config import config
-from indico.core.errors import UserValueError
+from indico.core.errors import NoReportError, UserValueError
 from indico.core.logger import Logger
 from indico.core.notifications import make_email, send_email
 from indico.core.settings import PrefixSettingsProxy
@@ -179,7 +179,11 @@ class RHVersionCheck(RHAdminBase):
     """Check the installed indico version against pypi"""
 
     def _check_version(self, distribution, current_version=None):
-        response = requests.get('https://pypi.python.org/pypi/{}/json'.format(distribution))
+        try:
+            response = requests.get('https://pypi.python.org/pypi/{}/json'.format(distribution))
+        except requests.RequestException as exc:
+            Logger.get('versioncheck').warning('Version check for %s failed: %s', distribution, exc)
+            raise NoReportError.wrap_exc(ServiceUnavailable())
         try:
             data = response.json()
         except ValueError:

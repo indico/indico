@@ -14,6 +14,8 @@ Bugfixes
   were present (:issue:`3203`)
 - Do not allow managers to retrieve tickets for registrants for whom
   ticket access is blocked by a plugin (:issue:`3208`)
+- Log a warning instead of an exception if the Indico version check
+  fails (:issue:`3209`)
 
 
 Version 2.0
