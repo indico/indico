@@ -16,13 +16,12 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict, defaultdict
-
 from flask import flash, redirect, request
 from werkzeug.exceptions import NotFound
 
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
-from indico.core.permissions import get_available_permissions
+from indico.core.permissions import (FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION, get_available_permissions,
+                                     get_permissions_info)
 from indico.modules.events import Event
 from indico.modules.events.management.controllers.base import RHManageEventBase
 from indico.modules.events.management.forms import EventProtectionForm
@@ -30,7 +29,7 @@ from indico.modules.events.management.views import WPEventProtection
 from indico.modules.events.operations import update_event_protection
 from indico.modules.events.sessions import COORDINATOR_PRIV_SETTINGS, session_settings
 from indico.modules.events.sessions.operations import update_session_coordinator_privs
-from indico.modules.events.util import get_object_from_args, update_object_principals
+from indico.modules.events.util import get_object_from_args
 from indico.util import json
 from indico.util.i18n import _
 from indico.util.user import principal_from_fossil
@@ -38,35 +37,6 @@ from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_template
-
-
-FULL_ACCESS_PERMISSION = '_full_access'
-READ_ACCESS_PERMISSION = '_read_access'
-
-
-def get_permissions_info():
-    selectable_permissions = {k: v for k, v in get_available_permissions(Event).viewitems() if v.user_selectable}
-    special_permissions = {
-        FULL_ACCESS_PERMISSION: {'title': _('Manage'), 'css_class': 'danger'},
-        READ_ACCESS_PERMISSION: {'title': _('Access'), 'css_class': 'accept'}
-    }
-    permissions_tree = {
-        FULL_ACCESS_PERMISSION: {
-            'title': special_permissions[FULL_ACCESS_PERMISSION]['title'],
-            'children': {
-                v.name: {'title': v.friendly_name} for k, v in selectable_permissions.viewitems()
-            }
-        }
-    }
-    full_access_children = permissions_tree[FULL_ACCESS_PERMISSION]['children']
-    full_access_children[READ_ACCESS_PERMISSION] = {
-        'title': special_permissions[READ_ACCESS_PERMISSION]['title'],
-    }
-    full_access_children = OrderedDict(sorted(full_access_children.items()))
-    available_permissions = dict({k: {'title': v.friendly_name, 'css_class': v.css_class}
-                                  for k, v in selectable_permissions.viewitems()},
-                                 **special_permissions)
-    return available_permissions, permissions_tree
 
 
 class RHShowNonInheriting(RHManageEventBase):
@@ -151,43 +121,54 @@ class RHEventProtection(RHManageEventBase):
             permissions.add(FULL_ACCESS_PERMISSION)
         if principal.read_access:
             permissions.add(READ_ACCESS_PERMISSION)
-        available_permissions = get_permissions_info()[0]
+        available_permissions = get_permissions_info(Event)[0]
         return permissions | (set(principal.permissions) & set(available_permissions))
+
+    def _get_split_permissions(self, permissions):
+        full_access_permission = FULL_ACCESS_PERMISSION in permissions
+        read_access_permission = READ_ACCESS_PERMISSION in permissions
+        other_permissions = permissions - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
+        return full_access_permission, read_access_permission, other_permissions
 
     def _update_permissions(self, current, new):
         """Handle the updates of permissions and creations/deletions of acl principals.
-
-        :param current: A dict mapping principals and a set with its current permissions
-        :param new: A dict mapping principals and a set with its new permissions
+        :param current: A dict mapping principals to a set with its current permissions
+        :param new: A dict mapping principals to a set with its new permissions
         """
-        def _get_splitted_permissions(_permissions):
-            full_access_permission = FULL_ACCESS_PERMISSION in _permissions
-            if full_access_permission:
-                _permissions.remove(FULL_ACCESS_PERMISSION)
-            read_access_permission = READ_ACCESS_PERMISSION in _permissions
-            if read_access_permission:
-                _permissions.remove(READ_ACCESS_PERMISSION)
-            return full_access_permission, read_access_permission, _permissions
-
+        user_selectable_permissions = {v.name for k, v in get_available_permissions(Event).viewitems()
+                                       if v.user_selectable}
         for principal, permissions in current.viewitems():
             if principal not in new:
-                self.event.update_principal(principal, False, False, del_permissions=current[principal])
+                permissions_kwargs = {
+                    'full_access': False,
+                    'read_access': False,
+                    'del_permissions': user_selectable_permissions
+                }
+                self.event.update_principal(principal, **permissions_kwargs)
             elif permissions != new[principal]:
-                full_access, read_access, new_permissions = _get_splitted_permissions(new[principal])
-                current_permissions = current[principal] - {FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION}
-                add_permissions = new_permissions - current_permissions
-                del_permissions = current_permissions - new_permissions
-                self.event.update_principal(principal, read_access, full_access, add_permissions=add_permissions,
-                                            del_permissions=del_permissions)
+                full_access, read_access, permissions = self._get_split_permissions(new[principal])
+                all_user_permissions = [set(entry.permissions) for entry in self.event.acl_entries
+                                        if entry.principal == principal][0]
+                permissions_kwargs = {
+                    'full_access': full_access,
+                    'read_access': read_access,
+                    'permissions': (all_user_permissions - user_selectable_permissions) | permissions
+                }
+                self.event.update_principal(principal, **permissions_kwargs)
         new_principals = set(new) - set(current)
         for p in new_principals:
-            full_access, read_access, permissions = _get_splitted_permissions(new[p])
-            self.event.update_principal(p, read_access, full_access, add_permissions=permissions)
+            full_access, read_access, permissions = self._get_split_permissions(new[p])
+            permissions_kwargs = {
+                'full_access': full_access,
+                'read_access': read_access,
+                'add_permissions': permissions & user_selectable_permissions
+            }
+            self.event.update_principal(p, **permissions_kwargs)
 
 
 class RHEventPermissionsDialog(RHManageEventBase):
     def _process(self):
         principal = json.loads(request.args['principal'])
-        permissions_tree = get_permissions_info()[1]
+        permissions_tree = get_permissions_info(Event)[1]
         return jsonify_template('events/management/event_permissions_dialog.html', permissions_tree=permissions_tree,
                                 permissions=request.args.getlist('permissions'), principal=principal)

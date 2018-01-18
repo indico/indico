@@ -21,6 +21,8 @@ import json
 from wtforms import HiddenField
 
 from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_principal
+from indico.core.permissions import get_permissions_info
+from indico.modules.events import Event
 from indico.modules.events.roles.util import serialize_role
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
@@ -130,10 +132,9 @@ class PermissionsField(JSONField):
     widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
 
     def __init__(self, *args, **kwargs):
-        from indico.modules.events.management.controllers.protection import get_permissions_info
         super(PermissionsField, self).__init__(*args, **kwargs)
         self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
-        self.permissions_info = get_permissions_info()[0]
+        self.permissions_info = get_permissions_info(Event)[0]
 
     @property
     def event(self):

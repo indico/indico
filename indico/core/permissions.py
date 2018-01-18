@@ -16,9 +16,16 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
+
 from indico.core import signals
 from indico.util.caching import memoize_request
+from indico.util.i18n import _
 from indico.util.signals import named_objects_from_signal
+
+
+FULL_ACCESS_PERMISSION = '_full_access'
+READ_ACCESS_PERMISSION = '_read_access'
 
 
 class ManagementPermission(object):
@@ -59,3 +66,32 @@ def check_permissions(type_):
     permissions = get_available_permissions(type_)
     if not all(x.islower() for x in permissions):
         raise RuntimeError('Management permissions must be all-lowercase')
+
+
+def get_permissions_info(_type):
+    """Retrieve the permissions that can be set in the protection page and related information
+    :param _type: The type of the permissions retrieved (e.g. Event, Category)
+    :return: A tuple containing a dict with the available permissions and a dict with the permissions tree
+    """
+    selectable_permissions = {k: v for k, v in get_available_permissions(_type).viewitems() if v.user_selectable}
+    special_permissions = {
+        FULL_ACCESS_PERMISSION: {'title': _('Manage'), 'css_class': 'danger'},
+        READ_ACCESS_PERMISSION: {'title': _('Access'), 'css_class': 'accept'}
+    }
+    permissions_tree = {
+        FULL_ACCESS_PERMISSION: {
+            'title': special_permissions[FULL_ACCESS_PERMISSION]['title'],
+            'children': {
+                v.name: {'title': v.friendly_name} for k, v in selectable_permissions.viewitems()
+            }
+        }
+    }
+    full_access_children = permissions_tree[FULL_ACCESS_PERMISSION]['children']
+    full_access_children[READ_ACCESS_PERMISSION] = {
+        'title': special_permissions[READ_ACCESS_PERMISSION]['title'],
+    }
+    full_access_children = OrderedDict(sorted(full_access_children.items()))
+    available_permissions = dict({k: {'title': v.friendly_name, 'css_class': v.css_class}
+                                  for k, v in selectable_permissions.viewitems()},
+                                 **special_permissions)
+    return available_permissions, permissions_tree
