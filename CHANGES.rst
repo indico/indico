@@ -40,6 +40,23 @@ Internal Changes
 ----
 
 
+Version 2.0.1
+-------------
+
+*Unreleased*
+
+Bugfixes
+^^^^^^^^
+
+- Fix LaTeX rendering issue when consecutive lines starting with ``[``
+  were present (:issue:`3203`)
+- Do not allow managers to retrieve tickets for registrants for whom
+  ticket access is blocked by a plugin (:issue:`3208`)
+- Log a warning instead of an exception if the Indico version check
+  fails (:issue:`3209`)
+- Wrap long lines in event log entries instead of truncating them
+
+
 Version 2.0
 -----------
 

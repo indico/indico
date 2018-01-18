@@ -409,7 +409,7 @@ class LaTeXTreeProcessor(markdown.treeprocessors.Treeprocessor):
             buffer += "`%s'" % subcontent.strip()
         elif ournode.tag == 'p':
             if 'apply_br' in self.configs:
-                subcontent = subcontent.replace('\n', '\\\\\n')
+                subcontent = subcontent.replace('\n', '\\\\\\relax\n')
             buffer += '\n%s\n' % subcontent.strip()
         elif ournode.tag == 'strong':
             buffer += '\\textbf{%s}' % subcontent.strip()

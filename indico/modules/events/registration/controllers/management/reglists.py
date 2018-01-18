@@ -449,7 +449,8 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = event_badge_settings.get_all(self.event.id)
         form = BadgeSettingsForm(self.event, template=self.template_id, **settings)
-        registrations = self.registrations or self.regform.registrations
+        all_registrations = self.registrations or self.regform.registrations
+        registrations = [r for r in all_registrations if not r.is_ticket_blocked]
         if self.event.is_locked:
             del form.save_values
 
@@ -475,7 +476,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             return jsonify_data(flash=False, redirect=download_url, redirect_no_loading=True)
         return jsonify_template('events/registration/management/print_badges.html', event=self.event,
                                 regform=self.regform, settings_form=form, templates=badge_templates,
-                                registrations=registrations)
+                                registrations=registrations, all_registrations=all_registrations)
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):
