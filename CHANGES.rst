@@ -30,6 +30,8 @@ Improvements
   reviewing (:issue:`3175`)
 - Support event cloning with monthly recurrence on the last day of the
   month (:issue:`1580`)
+- Add support for custom session types (:issue:`3189`)
+- Move poster session flag from session settings to session type settings
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
