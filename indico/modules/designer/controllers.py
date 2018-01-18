@@ -25,6 +25,7 @@ from PIL import Image
 from werkzeug.exceptions import Forbidden
 
 from indico.core.db import db
+from indico.core.errors import UserValueError
 from indico.modules.categories import Category
 from indico.modules.categories.controllers.management import RHManageCategoryBase
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
@@ -33,7 +34,8 @@ from indico.modules.designer.models.images import DesignerImageFile
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.operations import update_template
 from indico.modules.designer.util import (get_all_templates, get_default_template_on_category, get_inherited_templates,
-                                          get_not_deletable_templates, get_placeholder_options)
+                                          get_nested_placeholder_options, get_not_deletable_templates,
+                                          get_placeholder_options)
 from indico.modules.designer.views import WPCategoryManagementDesigner, WPEventManagementDesigner
 from indico.modules.events import Event
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -260,7 +262,8 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
         related_tpls_per_owner = defaultdict(list)
         for bs_tpl in backside_templates:
             related_tpls_per_owner[bs_tpl.owner].append(bs_tpl)
-        return self._render_template('template.html', template=self.template, placeholders=get_placeholder_options(),
+        return self._render_template('template.html', template=self.template,
+                                     placeholders=get_nested_placeholder_options(),
                                      config=DEFAULT_CONFIG[self.template.type], owner=self.target,
                                      template_data=template_data, backside_template_data=backside_template_data,
                                      related_tpls_per_owner=related_tpls_per_owner, tpls_count=len(backside_templates))
@@ -268,6 +271,9 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
+        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options())
+        if invalid_placeholders:
+            raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
         update_template(self.template, title=request.json['title'], data=data,
                         backside_template_id=request.json['backside_template_id'],
                         is_clonable=request.json['is_clonable'],

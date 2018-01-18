@@ -44,7 +44,14 @@ GROUP_TITLES = {
 }
 
 
-class RegistrationPlaceholder(Placeholder):
+class DesignerPlaceholder(Placeholder):
+    #: The group of the placeholder. Must be a valid key from `GROUP_TITLES`.
+    group = None
+    #: Whether the placeholder can only be added to a template by an admin
+    admin_only = False
+
+
+class RegistrationPlaceholder(DesignerPlaceholder):
     group = 'registrant'
 
     @classmethod
@@ -52,7 +59,7 @@ class RegistrationPlaceholder(Placeholder):
         return getattr(registration, cls.field)
 
 
-class RegistrationPDPlaceholder(Placeholder):
+class RegistrationPDPlaceholder(DesignerPlaceholder):
     group = 'registrant'
 
     @classmethod
@@ -60,7 +67,7 @@ class RegistrationPDPlaceholder(Placeholder):
         return registration.get_personal_data().get(cls.field) or ''
 
 
-class FullNamePlaceholderBase(Placeholder):
+class FullNamePlaceholderBase(DesignerPlaceholder):
     group = 'registrant'
     name_options = None
 
@@ -71,7 +78,7 @@ class FullNamePlaceholderBase(Placeholder):
         return name
 
 
-class EventDatesPlaceholder(Placeholder):
+class EventDatesPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_dates'
     description = _("Event Dates")
@@ -89,7 +96,7 @@ class EventDatesPlaceholder(Placeholder):
         return interval
 
 
-class EventTitlePlaceholder(Placeholder):
+class EventTitlePlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_title'
     description = _("Event Title")
@@ -99,7 +106,7 @@ class EventTitlePlaceholder(Placeholder):
         return event.title
 
 
-class EventDescriptionPlaceholder(Placeholder):
+class EventDescriptionPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_description'
     description = _("Event Description")
@@ -109,7 +116,7 @@ class EventDescriptionPlaceholder(Placeholder):
         return event.description
 
 
-class EventSpeakersPlaceholder(Placeholder):
+class EventSpeakersPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_speakers'
     description = _("Event Speakers/Chairs")
@@ -119,7 +126,7 @@ class EventSpeakersPlaceholder(Placeholder):
         return ', '.join(p.full_name for p in event.person_links)
 
 
-class EventVenuePlaceholder(Placeholder):
+class EventVenuePlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_venue'
     description = _("Event Venue")
@@ -129,7 +136,7 @@ class EventVenuePlaceholder(Placeholder):
         return event.venue_name
 
 
-class EventRoomPlaceholder(Placeholder):
+class EventRoomPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_room'
     description = _("Event Room")
@@ -139,7 +146,7 @@ class EventRoomPlaceholder(Placeholder):
         return event.room_name
 
 
-class EventOrgTextPlaceholder(Placeholder):
+class EventOrgTextPlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'event_organizers'
     description = _("Event Organizers")
@@ -149,7 +156,7 @@ class EventOrgTextPlaceholder(Placeholder):
         return event.organizer_info
 
 
-class CategoryTitlePlaceholder(Placeholder):
+class CategoryTitlePlaceholder(DesignerPlaceholder):
     group = 'event'
     name = 'category_title'
     description = _("Category Title")
@@ -289,7 +296,7 @@ class RegistrationPhonePlaceholder(RegistrationPDPlaceholder):
     field = 'phone'
 
 
-class RegistrationTicketQRPlaceholder(Placeholder):
+class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     group = 'registrant'
     name = 'ticket_qr_code'
     description = _("Ticket QR Code")

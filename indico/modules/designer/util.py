@@ -16,6 +16,7 @@
 
 from __future__ import unicode_literals
 
+from flask import session
 from sqlalchemy.orm import joinedload
 
 from indico.core.db import db
@@ -28,9 +29,15 @@ from indico.util.placeholders import get_placeholders
 
 
 def get_placeholder_options():
+    return {name: placeholder
+            for name, placeholder in get_placeholders('designer-fields').viewitems()
+            if not placeholder.admin_only or session.user.is_admin}
+
+
+def get_nested_placeholder_options():
     groups = {group_id: {'title': group_title, 'options': {}} for group_id, group_title in GROUP_TITLES.viewitems()}
-    for pname, placeholder in get_placeholders('designer-fields').viewitems():
-        groups[placeholder.group]['options'][pname] = placeholder.description
+    for name, placeholder in get_placeholder_options().viewitems():
+        groups[placeholder.group]['options'][name] = placeholder.description
     return groups
 
 
