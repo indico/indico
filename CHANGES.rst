@@ -24,6 +24,8 @@ Bugfixes
 - Log a warning instead of an exception if the Indico version check
   fails (:issue:`3209`)
 - Wrap long lines in event log entries instead of truncating them
+- Properly show message about empty agenda in reminders that have
+  "Include agenda" enabled but an empty timetable
 
 
 Version 2.0
