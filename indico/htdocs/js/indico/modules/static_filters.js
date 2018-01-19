@@ -38,11 +38,13 @@
         var $state = $(searchBoxConfig.state);
         var $visibleEntries, m;
         var $filterPlaceholder = $(searchBoxConfig.placeholder);
-        $filterPlaceholder.hide();
-        $state.removeClass('active');
 
         if (!term) {
-            $items.show();
+            if ($state.hasClass('active')) {
+                $items.show();
+            }
+
+            $state.removeClass('active');
             setState($state, $items, $items);
             if (totalDurationDisplay) {
                 $state.after(totalDurationDisplay);
