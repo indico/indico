@@ -367,7 +367,7 @@ class CloneRepeatUntilFormBase(CloneRepeatOnceForm):
                              default=2)
 
     def __init__(self, event, **kwargs):
-        kwargs['until_dt'] = (self._calc_start_dt(event) + timedelta(days=14)).date()
+        kwargs.setdefault('until_dt', (self._calc_start_dt(event) + timedelta(days=14)).date())
         super(CloneRepeatUntilFormBase, self).__init__(event, **kwargs)
 
 
