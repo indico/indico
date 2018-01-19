@@ -35,14 +35,12 @@
 
             self.buttonBox = $('<span>').addClass('button-box');
             self.clearIcon = $('<a>').addClass('i-link danger icon-close')
-                .css('line-height', self.element.outerHeight() + 'px')
                 .click(function(evt) {
                     self._clear();
                     evt.stopPropagation();
                 });
 
-            var display = self.element.css('display');
-            var wrapper = $('<span>').css('display', display).addClass(self.options.clearClass);
+            var wrapper = $('<span>').addClass(self.options.clearClass);
             self.element.addClass('clearabletext').wrap(wrapper)
                 .on('input', function() {
                     self._handleInput();

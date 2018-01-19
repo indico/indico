@@ -16,6 +16,8 @@
  */
 
 .clearableinput {
+    display: flex;
+    align-items: center;
     position: relative;
 
     .clearabletext {
@@ -35,21 +37,19 @@
         position: absolute;
         padding: 0 2px;
         right: 0;
-        top: 3px;
+        height: 1.1em;
 
         a.i-link {
-            font-size: 1.2em;
             padding-left: 2px;
             visibility: hidden;
+
+            &::before {
+                font-size: 1.1em;
+            }
 
             &:last-child {
                 padding-right: 2px;
             }
         }
     }
-}
-
-// Fix fox clearableinput within qtips
-.qtip .clearableinput {
-    line-height: normal;
 }
