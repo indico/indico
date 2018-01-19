@@ -271,7 +271,7 @@ class RHEditDesignerTemplate(RHModifyDesignerTemplateBase):
     def _process_POST(self):
         data = dict({'background_position': 'stretch', 'items': []}, **request.json['template'])
         self.validate_json(TEMPLATE_DATA_JSON_SCHEMA, data)
-        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options())
+        invalid_placeholders = {x['type'] for x in data['items']} - set(get_placeholder_options()) - {'fixed'}
         if invalid_placeholders:
             raise UserValueError('Invalid item types: {}'.format(', '.join(invalid_placeholders)))
         update_template(self.template, title=request.json['title'], data=data,
