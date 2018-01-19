@@ -78,7 +78,7 @@
         enableIfChecked('#sessions-wrapper', '.select-row', '#sessions .js-requires-selected-row');
         setupTableSorter();
         setupPalettePickers();
-        handleRowSelection();
+        handleRowSelection(false);
         var applySearchFilters = setupSearchBox(filterConfig);
 
         $('#sessions .toolbar').on('click', '.disabled', function(evt) {
@@ -89,7 +89,7 @@
         $('#sessions-wrapper').on('indico:htmlUpdated', function() {
             setupTableSorter();
             setupPalettePickers();
-            handleRowSelection();
+            handleRowSelection(true);
             _.defer(applySearchFilters);
         }).on('click', '.show-session-blocks', function() {
             var $this = $(this);

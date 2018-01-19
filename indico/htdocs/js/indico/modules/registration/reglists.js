@@ -88,7 +88,7 @@
                 success: function(data) {
                     if (data) {
                         $('.list-content').html(data.html);
-                        handleRowSelection();
+                        handleRowSelection(true);
                         handleRegListRowSelection();
                         setupTableSorter();
                     }
@@ -114,7 +114,7 @@
             onClose: function(data) {
                 if (data) {
                     $('.list-content').html(data.html);
-                    handleRowSelection();
+                    handleRowSelection(true);
                     handleRegListRowSelection();
                     setupTableSorter();
                 }

@@ -46,11 +46,15 @@
         });
     }
 
-    global.handleRowSelection = function() {
-        $('table.i-table input.select-row').on('change', function() {
+    global.handleRowSelection = function(trigger) {
+        var $obj = $('table.i-table input.select-row').on('change', function() {
             $(this).closest('tr').toggleClass('selected', this.checked);
             $('.js-requires-selected-row').toggleClass('disabled', !$('.list input:checkbox:checked').length);
-        }).trigger('change');
+        });
+
+        if (trigger) {
+            $obj.trigger('change');
+        }
     };
 
     global.setupTableSorter = function() {
@@ -164,11 +168,11 @@
             applySearchFilters = setupSearchBox(filterConfig);
         }
         setupStaticURLGeneration();
-        handleRowSelection();
+        handleRowSelection(false);
         setupTableSorter();
 
         $('.list').on('indico:htmlUpdated', function() {
-            handleRowSelection();
+            handleRowSelection(true);
             setupTableSorter();
         });
 
