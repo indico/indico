@@ -5,7 +5,8 @@
     {% if contribs %}
         <form method="POST">
             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
-            <table class="i-table tablesorter">
+            <table class="i-table tablesorter" data-session-items="{{ sessions | tojson | forceescape }}"
+                   data-track-items="{{ tracks | tojson | forceescape }}">
                 <thead>
                     <tr class="i-table">
                         <th class="i-table thin-column" data-sorter="false"></th>
@@ -147,7 +148,6 @@
                                    style="{{ contrib.session.colors.css if contrib.session }}"
                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
                                    data-method="PATCH"
-                                   data-items="{{ sessions | tojson | forceescape }}"
                                    data-contrib-id="{{ contrib.id }}"
                                    data-selected-item-id="{{ contrib.session.id or None | tojson }}">
                                     <span class="label">
@@ -164,7 +164,6 @@
                             </td>
                             <td class="i-table">
                                 <a class="i-button {{ 'track-item-picker' if not event.is_locked else 'disabled' }}"
-                                   data-items="{{ tracks | tojson | forceescape }}"
                                    data-href="{{ url_for('.manage_contrib_rest', contrib) }}"
                                    data-method="PATCH"
                                    data-selected-item-id="{{ (contrib.track_id if contrib.track_id is not none else None) | tojson }}">

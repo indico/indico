@@ -44,10 +44,12 @@
     }
 
     function setupSessionPicker(createURL, timetableRESTURL) {
-        $('#contribution-list').on('click', '.session-item-picker', function() {
+        var $contributionList = $('#contribution-list');
+        $contributionList.on('click', '.session-item-picker', function() {
             $(this).itempicker({
                 filterPlaceholder: $T.gettext('Filter sessions'),
                 containerClasses: 'session-item-container',
+                items: $contributionList.find('table').data('session-items'),
                 footerElements: [{
                     title: $T.gettext('Assign new session'),
                     onClick: function(itemPicker) {
@@ -61,7 +63,7 @@
                                         if ($this.data('indicoItempicker')) {
                                             $this.itempicker('updateItemList', data.sessions);
                                         } else {
-                                            $this.data('items', data.sessions);
+                                            $contributionList.find('table').data('session-items', data.sessions);
                                         }
                                     });
                                     itemPicker.itempicker('selectItem', data.new_session_id);
@@ -113,11 +115,13 @@
     }
 
     function setupTrackPicker(createURL) {
-        $('#contribution-list').on('click', '.track-item-picker', function() {
+        var $contributionList = $('#contribution-list');
+        $contributionList.on('click', '.track-item-picker', function() {
             $(this).itempicker({
                 filterPlaceholder: $T.gettext('Filter tracks'),
                 containerClasses: 'track-item-container',
                 uncheckedItemIcon: '',
+                items: $contributionList.find('table').data('track-items'),
                 footerElements: [{
                     title: $T.gettext('Add new track'),
                     onClick: function(trackItemPicker) {
@@ -131,7 +135,7 @@
                                         if ($this.data('indicoItempicker')) {
                                             $this.itempicker('updateItemList', data.tracks);
                                         } else {
-                                            $this.data('items', data.tracks);
+                                            $contributionList.find('table').data('track-items', data.tracks);
                                         }
                                     });
                                     trackItemPicker.itempicker('selectItem', data.new_track_id);
