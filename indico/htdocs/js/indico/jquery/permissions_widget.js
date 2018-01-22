@@ -120,6 +120,7 @@
                     'class': 'i-button text-color borderless icon-only icon-edit',
                     'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.eventId}),
                     'data-title': $T.gettext('Assign Permissions'),
+                    'data-method': 'POST',
                     'data-ajax-dialog': '',
                     'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
                 });

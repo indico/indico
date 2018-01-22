@@ -168,7 +168,7 @@ class RHEventProtection(RHManageEventBase):
 
 class RHEventPermissionsDialog(RHManageEventBase):
     def _process(self):
-        principal = json.loads(request.args['principal'])
+        principal = json.loads(request.form['principal'])
         permissions_tree = get_permissions_info(Event)[1]
         return jsonify_template('events/management/event_permissions_dialog.html', permissions_tree=permissions_tree,
-                                permissions=request.args.getlist('permissions'), principal=principal)
+                                permissions=request.form.getlist('permissions'), principal=principal)
