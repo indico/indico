@@ -31,6 +31,7 @@ from wtforms.validators import DataRequired, InputRequired, NumberRange, Optiona
 from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import EmailPrincipal
+from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
@@ -268,20 +269,14 @@ class EventProtectionForm(IndicoForm):
                 real_horizon.title)
 
     def validate_permissions(self, field):
-        entries = [{
-            'principal': principal_from_fossil(principal, allow_emails=True, allow_networks=True),
-            'permissions': permissions
-        } for principal, permissions in field.data]
-        for entry in entries:
-            principal = entry['principal']
-            permissions = entry['permissions']
-            if isinstance(principal, IPNetworkGroup):
-                if set(permissions) - {'_read_access'}:
-                    msg = _('IP networks cannot have management permissions: {}')
-                    raise ValidationError(msg.format(principal.name))
-            if '_full_access' in permissions and len(permissions) != 1:
-                msg = _('"Manage" permission must be unique: {}')
+        for principal_fossil, permissions in field.data:
+            principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=True)
+            if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
+                msg = _('IP networks cannot have management permissions: {}')
                 raise ValidationError(msg.format(principal.name))
+            if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
+                # when full access permission is set, discard rest of permissions
+                permissions[:] = [FULL_ACCESS_PERMISSION]
 
     @classmethod
     def _create_coordinator_priv_fields(cls):
