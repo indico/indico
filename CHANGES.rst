@@ -31,6 +31,7 @@ Bugfixes
   outside the visible area (:issue:`3215`)
 - Only apply plugin-imposed ticket download restrictions for tickets,
   not for normal badges.
+- Fix switching between badge sides in IE11 (:issue:`3214`)
 
 
 Version 2.0
