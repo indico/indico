@@ -13,6 +13,7 @@ Improvements
 - Add support for admin-only designer placeholders. Such placeholders
   can be provided by custom plugins and only be used in the designer
   by Indico admins (:issue:`3210`)
+- Sort contribution types alphabetically
 
 Bugfixes
 ^^^^^^^^

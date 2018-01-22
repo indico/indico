@@ -473,7 +473,7 @@ class RHManageContributionTypes(RHManageContributionsBase):
     """Dialog to manage the ContributionTypes of an event"""
 
     def _process(self):
-        contrib_types = self.event.contribution_types.all()
+        contrib_types = self.event.contribution_types.order_by(db.func.lower(ContributionType.name)).all()
         return jsonify_template('events/contributions/management/types_dialog.html', event=self.event,
                                 contrib_types=contrib_types)
 

@@ -474,7 +474,7 @@ class AbstractForm(IndicoForm):
         if abstracts_settings.get(self.event, 'contrib_type_required'):
             inject_validators(self, 'submitted_contrib_type', [DataRequired()])
         super(AbstractForm, self).__init__(*args, **kwargs)
-        self.submitted_contrib_type.query = self.event.contribution_types
+        self.submitted_contrib_type.query = self.event.contribution_types.order_by(db.func.lower(ContributionType.name))
         if not self.submitted_contrib_type.query.count():
             del self.submitted_contrib_type
         if not self.event.cfa.allow_attachments:
