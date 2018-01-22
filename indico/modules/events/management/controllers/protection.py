@@ -75,25 +75,26 @@ class RHEventProtection(RHManageEventBase):
     NOT_SANITIZED_FIELDS = {'access_key'}
 
     def _process(self):
-        form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=self.event)
+        event = self.event
+        form = EventProtectionForm(obj=FormDefaults(**self._get_defaults()), event=event)
         if form.validate_on_submit():
             current_principal_permissions = {p.principal: self._get_principal_permissions(p)
-                                             for p in self.event.acl_entries}
+                                             for p in event.acl_entries}
             current_principal_permissions = {k: v for k, v in current_principal_permissions.iteritems() if v}
             new_principal_permissions = {
-                principal_from_fossil(fossil, allow_emails=True, allow_networks=True): set(permissions)
+                principal_from_fossil(fossil, allow_emails=True, allow_networks=True, event=event): set(permissions)
                 for fossil, permissions in form.permissions.data
             }
             self._update_permissions(current_principal_permissions, new_principal_permissions)
 
-            update_event_protection(self.event, {'protection_mode': form.protection_mode.data,
-                                                 'own_no_access_contact': form.own_no_access_contact.data,
-                                                 'access_key': form.access_key.data,
-                                                 'visibility': form.visibility.data})
+            update_event_protection(event, {'protection_mode': form.protection_mode.data,
+                                            'own_no_access_contact': form.own_no_access_contact.data,
+                                            'access_key': form.access_key.data,
+                                            'visibility': form.visibility.data})
             self._update_session_coordinator_privs(form)
             flash(_('Protection settings have been updated'), 'success')
-            return redirect(url_for('.protection', self.event))
-        return WPEventProtection.render_template('event_protection.html', self.event, 'protection', form=form)
+            return redirect(url_for('.protection', event))
+        return WPEventProtection.render_template('event_protection.html', event, 'protection', form=form)
 
     def _get_defaults(self):
         registration_managers = {p.principal for p in self.event.acl_entries

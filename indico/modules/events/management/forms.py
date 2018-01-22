@@ -269,8 +269,9 @@ class EventProtectionForm(IndicoForm):
                 real_horizon.title)
 
     def validate_permissions(self, field):
+        event = self.event
         for principal_fossil, permissions in field.data:
-            principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=True)
+            principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=True, event=event)
             if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
                 msg = _('IP networks cannot have management permissions: {}')
                 raise ValidationError(msg.format(principal.name))
