@@ -26,6 +26,8 @@ Bugfixes
 - Wrap long lines in event log entries instead of truncating them
 - Properly show message about empty agenda in reminders that have
   "Include agenda" enabled but an empty timetable
+- Fix overly long contribution type names pushing edit/delete buttons
+  outside the visible area (:issue:`3215`)
 
 
 Version 2.0
