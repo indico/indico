@@ -387,8 +387,12 @@ class BadgeSettingsForm(IndicoForm):
     def __init__(self, event, **kwargs):
         all_templates = set(event.designer_templates) | get_inherited_templates(event)
         badge_templates = [tpl for tpl in all_templates if tpl.type.name == 'badge']
+        tickets = kwargs.pop('tickets')
         super(BadgeSettingsForm, self).__init__(**kwargs)
-        self.template.choices = sorted(((unicode(tpl.id), tpl.title) for tpl in badge_templates), key=itemgetter(1))
+        self.template.choices = sorted(((unicode(tpl.id), tpl.title)
+                                        for tpl in badge_templates
+                                        if tpl.is_ticket == tickets),
+                                       key=itemgetter(1))
 
     def is_submitted(self):
         return super(BadgeSettingsForm, self).is_submitted() and 'submitted' in request.form

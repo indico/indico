@@ -49,6 +49,8 @@ class DesignerPlaceholder(Placeholder):
     group = None
     #: Whether the placeholder can only be added to a template by an admin
     admin_only = False
+    #: Whether a template containing this placeholder is considered a ticket
+    is_ticket = False
 
 
 class RegistrationPlaceholder(DesignerPlaceholder):
@@ -300,6 +302,7 @@ class RegistrationTicketQRPlaceholder(DesignerPlaceholder):
     group = 'registrant'
     name = 'ticket_qr_code'
     description = _("Ticket QR Code")
+    is_ticket = True
 
     @classmethod
     def render(cls, registration):

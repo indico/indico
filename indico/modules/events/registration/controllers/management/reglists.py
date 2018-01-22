@@ -32,7 +32,7 @@ from indico.core.errors import NoReportError
 from indico.core.notifications import make_email, send_email
 from indico.legacy.common.cache import GenericCache
 from indico.legacy.pdfinterface.conference import RegistrantsListToBookPDF, RegistrantsListToPDF
-from indico.modules.designer import PageLayout
+from indico.modules.designer import PageLayout, TemplateType
 from indico.modules.designer.models.templates import DesignerTemplate
 from indico.modules.designer.util import get_inherited_templates
 from indico.modules.events import EventLogKind, EventLogRealm
@@ -82,7 +82,12 @@ class RHRegistrationsListManage(RHManageRegFormBase):
         if self.list_generator.static_link_used:
             return redirect(self.list_generator.get_list_url())
         reg_list_kwargs = self.list_generator.get_list_kwargs()
-        return WPManageRegistration.render_template('management/regform_reglist.html', self.event, **reg_list_kwargs)
+        badge_templates = [tpl for tpl in set(self.event.designer_templates) | get_inherited_templates(self.event)
+                           if tpl.type == TemplateType.badge]
+        has_tickets = any(tpl.is_ticket for tpl in badge_templates)
+        has_badges = any(not tpl.is_ticket for tpl in badge_templates)
+        return WPManageRegistration.render_template('management/regform_reglist.html', self.event,
+                                                    has_badges=has_badges, has_tickets=has_tickets, **reg_list_kwargs)
 
 
 class RHRegistrationsListCustomize(RHManageRegFormBase):
@@ -407,6 +412,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
     """Print badges for the selected registrations"""
 
     ALLOW_LOCKED = True
+    TICKET_BADGES = False
 
     format_map_portrait = {
         'A0': (84.1, 118.9),
@@ -430,7 +436,7 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
                                       ~Registration.is_deleted)
                               .order_by(*Registration.order_by_name)
                               .all()) if ids else []
-        self.template_id = request.args.get('template_id')
+        self.template_id = request.args.get('template_id', self._default_template_id)
 
     def _get_format(self, tpl):
         from indico.modules.designer.pdf import PIXELS_CM
@@ -438,6 +444,13 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         return next((frm for frm, frm_size in format_map.iteritems()
                      if (frm_size[0] == float(tpl.data['width']) / PIXELS_CM) and
                          frm_size[1] == float(tpl.data['height']) / PIXELS_CM), 'custom')
+
+    @property
+    def _default_template_id(self):
+        return None
+
+    def _filter_registrations(self, registrations):
+        return registrations
 
     def _process(self):
         all_templates = set(self.event.designer_templates) | get_inherited_templates(self.event)
@@ -448,9 +461,9 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
             'format': self._get_format(tpl)
         } for tpl in all_templates if tpl.type.name == 'badge'}
         settings = event_badge_settings.get_all(self.event.id)
-        form = BadgeSettingsForm(self.event, template=self.template_id, **settings)
+        form = BadgeSettingsForm(self.event, template=self.template_id, tickets=self.TICKET_BADGES, **settings)
         all_registrations = self.registrations or self.regform.registrations
-        registrations = [r for r in all_registrations if not r.is_ticket_blocked]
+        registrations = self._filter_registrations(all_registrations)
         if self.event.is_locked:
             del form.save_values
 
@@ -477,6 +490,19 @@ class RHRegistrationsConfigBadges(RHRegistrationsActionBase):
         return jsonify_template('events/registration/management/print_badges.html', event=self.event,
                                 regform=self.regform, settings_form=form, templates=badge_templates,
                                 registrations=registrations, all_registrations=all_registrations)
+
+
+class RHRegistrationsConfigTickets(RHRegistrationsConfigBadges):
+    """Print tickets for selected registrations"""
+
+    TICKET_BADGES = True
+
+    @property
+    def _default_template_id(self):
+        return unicode(self.regform.ticket_template_id) if self.regform.ticket_template_id else None
+
+    def _filter_registrations(self, registrations):
+        return [r for r in registrations if not r.is_ticket_blocked]
 
 
 class RHRegistrationTogglePayment(RHManageRegistrationBase):

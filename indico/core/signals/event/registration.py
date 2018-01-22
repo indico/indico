@@ -64,5 +64,8 @@ Called when resolving whether Indico should let a registrant download
 their ticket.  The `sender` is the registrant's `Registration` object.
 
 If this signal returns ``True``, the user will not be able to download
-their ticket.
+their ticket.  Any badge containing a ticket-specific placeholder such as
+the ticket qr code is considered a ticket, and the restriction applies to
+both users trying to get their own ticket and managers trying to get a
+ticket for a registrant.
 """)

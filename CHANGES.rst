@@ -28,6 +28,8 @@ Bugfixes
   "Include agenda" enabled but an empty timetable
 - Fix overly long contribution type names pushing edit/delete buttons
   outside the visible area (:issue:`3215`)
+- Only apply plugin-imposed ticket download restrictions for tickets,
+  not for normal badges.
 
 
 Version 2.0
