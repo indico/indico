@@ -14,6 +14,7 @@ Improvements
   can be provided by custom plugins and only be used in the designer
   by Indico admins (:issue:`3210`)
 - Sort contribution types alphabetically
+- Add folding indicators when printing foldable badges (:issue:`3216`)
 
 Bugfixes
 ^^^^^^^^

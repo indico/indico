@@ -129,6 +129,14 @@ class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):
                 self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
                                  self.tpl_data.width_cm * cm, y * cm)
 
+            tpl_data = self.tpl_data
+            canvas.saveState()
+            canvas.setDash(1, 5)
+            canvas.setStrokeGray(0.5)
+            canvas.lines([(tpl_data.width_cm * cm, self.height, tpl_data.width_cm * cm, tpl_data.height_cm * cm),
+                          (0, tpl_data.height_cm * cm, self.width, tpl_data.height_cm * cm)])
+            canvas.restoreState()
+
 
 class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):
     def _build_pdf(self, canvas):
