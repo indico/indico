@@ -340,7 +340,7 @@ class RHListBacksideTemplates(RHModifyDesignerTemplateBase, RHListEventTemplates
         inherited_templates = [tpl for tpl in get_inherited_templates(self.target)
                                if not tpl.backside_template and tpl.type == TemplateType.badge]
         custom_templates = [tpl for tpl in self.target.designer_templates
-                            if not tpl.backside_template and tpl != self.template]
+                            if not tpl.backside_template and tpl != self.template and tpl.type == TemplateType.badge]
         return jsonify_template('designer/backside_list.html', target=self.target, custom_templates=custom_templates,
                                 inherited_templates=inherited_templates, current_template=self.template,
                                 width=int(request.args['width']), height=int(request.args['height']))
