@@ -36,6 +36,7 @@ Bugfixes
 - Do not show poster templates as possible backsides for badges
 - Convert alpha-channel transparency to white in PDF backgrounds
 - Make number inputs big enough to show 5 digits in chrome
+- Sort chairperson list on lecture pages
 
 
 Version 2.0
