@@ -219,6 +219,10 @@ form {
         }
     }
 
+    input[type=number] {
+        min-width: 80px;
+    }
+
     input[type=number],
     input[type=time] {
         padding-right: 0 !important;

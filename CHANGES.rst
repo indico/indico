@@ -35,6 +35,7 @@ Bugfixes
 - Fix switching between badge sides in IE11 (:issue:`3214`)
 - Do not show poster templates as possible backsides for badges
 - Convert alpha-channel transparency to white in PDF backgrounds
+- Make number inputs big enough to show 5 digits in chrome
 
 
 Version 2.0
