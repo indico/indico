@@ -159,7 +159,7 @@ class DesignerPDFBase(object):
                 bg_x = pos_x + (page_width - bg_width) / 2.0
                 bg_y = pos_y
 
-        canvas.drawImage(img_reader, bg_x, bg_y, bg_width, bg_height)
+        canvas.drawImage(img_reader, bg_x, bg_y, bg_width, bg_height, mask='auto')
 
     def _build_config(self, config_data):
         """Build a structured configuration object.
