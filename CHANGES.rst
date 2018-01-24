@@ -37,6 +37,7 @@ Bugfixes
 - Convert alpha-channel transparency to white in PDF backgrounds
 - Make number inputs big enough to show 5 digits in chrome
 - Sort chairperson list on lecture pages
+- Remove whitespace before commas in speaker lists
 
 
 Version 2.0
