@@ -1,7 +1,7 @@
-"""add session types table
+"""Add session types table
 
 Revision ID: 9c4418d7a6aa
-Revises: 566d5de4e0e5
+Revises: 2af245be72a6
 Create Date: 2017-12-14 10:59:47.872426
 """
 
@@ -11,7 +11,7 @@ from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = '9c4418d7a6aa'
-down_revision = '566d5de4e0e5'
+down_revision = '2af245be72a6'
 branch_labels = None
 depends_on = None
 
