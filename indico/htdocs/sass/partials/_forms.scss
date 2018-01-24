@@ -222,6 +222,7 @@ form {
     input[type=number],
     input[type=time] {
         padding-right: 0 !important;
+        min-width: 60px;
 
         &::-webkit-inner-spin-button {
             height: 2.3em;
