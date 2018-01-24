@@ -92,7 +92,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
         if template.background_image:
             with template.background_image.open() as f:
-                self._draw_background(canvas, ImageReader(f), tpl_data, *badge_rect)
+                self._draw_background(canvas, ImageReader(self._remove_transparency(f)), tpl_data, *badge_rect)
 
         placeholders = get_placeholders('designer-fields')
 

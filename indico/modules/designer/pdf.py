@@ -20,7 +20,7 @@ import re
 from collections import namedtuple
 from io import BytesIO
 
-from PIL.Image import Image
+from PIL import Image
 from reportlab.lib import colors, pagesizes
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from reportlab.lib.styles import ParagraphStyle
@@ -82,6 +82,20 @@ class DesignerPDFBase(object):
                        height_cm=(float(tpl_data['height']) / PIXELS_CM),
                        **tpl_data)
 
+    def _remove_transparency(self, fd):
+        """Remove transparency from an image and replace it with white"""
+        img = Image.open(fd)
+        # alpha-channel PNG: replace the transparent areas with plain white
+        if img.mode == 'RGBA':
+            new = Image.new(img.mode[:-1], img.size, (255, 255, 255))
+            new.paste(img, img.split()[-1])
+            fd = BytesIO()
+            new.save(fd, 'JPEG')
+        # XXX: this code does not handle palette (type P) images, such as
+        # 8-bit PNGs, but luckily they are somewhat rare nowadays
+        fd.seek(0)
+        return fd
+
     def get_pdf(self):
         data = BytesIO()
         canvas = Canvas(data, pagesize=self.page_size)
@@ -111,7 +125,7 @@ class DesignerPDFBase(object):
         item_width = item['width'] / PIXELS_CM * cm
         item_height = (item['height'] / PIXELS_CM * cm) if item.get('height') is not None else None
 
-        if isinstance(content, Image):
+        if isinstance(content, Image.Image):
             canvas.drawImage(ImageReader(content), margin_x + item_x, self.height - margin_y - item_height - item_y,
                              item_width, item_height)
         else:

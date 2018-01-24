@@ -34,6 +34,7 @@ Bugfixes
   not for normal badges.
 - Fix switching between badge sides in IE11 (:issue:`3214`)
 - Do not show poster templates as possible backsides for badges
+- Convert alpha-channel transparency to white in PDF backgrounds
 
 
 Version 2.0

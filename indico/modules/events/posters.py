@@ -44,8 +44,9 @@ class PosterPDF(DesignerPDFBase):
 
         if self.template.background_image:
             with self.template.background_image.open() as f:
-                self._draw_background(canvas, ImageReader(f), tpl_data, config.margin_horizontal,
-                                      config.margin_vertical, tpl_data.width_cm * cm, tpl_data.height_cm * cm)
+                self._draw_background(canvas, ImageReader(self._remove_transparency(f)), tpl_data,
+                                      config.margin_horizontal, config.margin_vertical,
+                                      tpl_data.width_cm * cm, tpl_data.height_cm * cm)
 
         placeholders = get_placeholders('designer-fields')
 
