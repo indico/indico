@@ -26,7 +26,11 @@ from indico.util.network import is_private_url
     ('http://192.168.0.12', True),
     ('https://indico.cern.ch', False),
     ('https://[2001:1458:201:87::100:c]', False),
-    ('https://indico.local', True)
+    ('https://indico.local', True),
+    ('https://local', True),
+    ('https://testing-instance', True),
+    ('https://indico.dev', True),
+    ('https://indico', True)
 ))
 def test_is_private_url(url, expected):
     assert is_private_url(url) == expected

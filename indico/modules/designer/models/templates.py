@@ -23,6 +23,7 @@ from indico.core.db import db
 from indico.core.db.sqlalchemy import PyIntEnum
 from indico.modules.designer import DEFAULT_CONFIG, TemplateType
 from indico.util.locators import locator_property
+from indico.util.placeholders import get_placeholders
 from indico.util.string import format_repr, return_ascii
 
 
@@ -147,6 +148,16 @@ class DesignerTemplate(db.Model):
     @locator_property
     def locator(self):
         return dict(self.owner.locator, template_id=self.id)
+
+    @property
+    def is_ticket(self):
+        placeholders = get_placeholders('designer-fields')
+        if any(placeholders[item['type']].is_ticket for item in self.data['items'] if item['type'] in placeholders):
+            return True
+        elif self.backside_template and self.backside_template.is_ticket:
+            return True
+        else:
+            return False
 
     @return_ascii
     def __repr__(self):

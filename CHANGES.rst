@@ -47,6 +47,15 @@ Version 2.0.1
 
 *Unreleased*
 
+Improvements
+^^^^^^^^^^^^
+
+- Add support for admin-only designer placeholders. Such placeholders
+  can be provided by custom plugins and only be used in the designer
+  by Indico admins (:issue:`3210`)
+- Sort contribution types alphabetically
+- Add folding indicators when printing foldable badges (:issue:`3216`)
+
 Bugfixes
 ^^^^^^^^
 
@@ -57,6 +66,18 @@ Bugfixes
 - Log a warning instead of an exception if the Indico version check
   fails (:issue:`3209`)
 - Wrap long lines in event log entries instead of truncating them
+- Properly show message about empty agenda in reminders that have
+  "Include agenda" enabled but an empty timetable
+- Fix overly long contribution type names pushing edit/delete buttons
+  outside the visible area (:issue:`3215`)
+- Only apply plugin-imposed ticket download restrictions for tickets,
+  not for normal badges.
+- Fix switching between badge sides in IE11 (:issue:`3214`)
+- Do not show poster templates as possible backsides for badges
+- Convert alpha-channel transparency to white in PDF backgrounds
+- Make number inputs big enough to show 5 digits in chrome
+- Sort chairperson list on lecture pages
+- Remove whitespace before commas in speaker lists
 
 
 Version 2.0

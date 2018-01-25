@@ -102,6 +102,8 @@ _bp.add_url_rule('/manage/registration/<int:reg_form_id>/registrations/attachmen
                  reglists.RHRegistrationsExportAttachments, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/config', 'registrations_config_badges',
                  reglists.RHRegistrationsConfigBadges, methods=('POST',))
+_bp.add_url_rule('/manage/registration/<int:reg_form_id>/tickets/config', 'registrations_config_tickets',
+                 reglists.RHRegistrationsConfigTickets, methods=('POST',))
 _bp.add_url_rule('/manage/registration/<int:reg_form_id>/badges/print/<int:template_id>/<uuid>',
                  'registrations_print_badges', reglists.RHRegistrationsPrintBadges)
 

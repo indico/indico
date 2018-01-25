@@ -92,7 +92,7 @@ class RegistrantsListToBadgesPDF(DesignerPDFBase):
 
         if template.background_image:
             with template.background_image.open() as f:
-                self._draw_background(canvas, ImageReader(f), tpl_data, *badge_rect)
+                self._draw_background(canvas, ImageReader(self._remove_transparency(f)), tpl_data, *badge_rect)
 
         placeholders = get_placeholders('designer-fields')
 
@@ -128,6 +128,14 @@ class RegistrantsListToBadgesPDFFoldable(RegistrantsListToBadgesPDF):
             else:
                 self._draw_badge(canvas, registration, self.template.backside_template, self.backside_tpl_data,
                                  self.tpl_data.width_cm * cm, y * cm)
+
+            tpl_data = self.tpl_data
+            canvas.saveState()
+            canvas.setDash(1, 5)
+            canvas.setStrokeGray(0.5)
+            canvas.lines([(tpl_data.width_cm * cm, self.height, tpl_data.width_cm * cm, tpl_data.height_cm * cm),
+                          (0, tpl_data.height_cm * cm, self.width, tpl_data.height_cm * cm)])
+            canvas.restoreState()
 
 
 class RegistrantsListToBadgesPDFDoubleSided(RegistrantsListToBadgesPDF):

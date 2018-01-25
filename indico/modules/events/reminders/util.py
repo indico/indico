@@ -29,6 +29,6 @@ def make_reminder_email(event, with_agenda, note):
     """
     if event.type_ == EventType.lecture:
         with_agenda = False
+    agenda = event.timetable_entries.filter_by(parent_id=None).all() if with_agenda else None
     return get_template_module('events/reminders/emails/event_reminder.txt', event=event,
-                               url=event.short_external_url, note=note, with_agenda=with_agenda,
-                               agenda=event.timetable_entries.filter_by(parent_id=None))
+                               url=event.short_external_url, note=note, with_agenda=with_agenda, agenda=agenda)

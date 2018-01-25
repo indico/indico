@@ -20,7 +20,6 @@ from flask import session
 
 from indico.core import signals
 from indico.util.i18n import _
-from indico.util.placeholders import Placeholder
 from indico.util.struct.enum import RichIntEnum
 from indico.web.flask.util import url_for
 from indico.web.menu import SideMenuItem
@@ -74,7 +73,7 @@ def _get_notification_placeholders(sender, **kwargs):
     from indico.modules.designer import placeholders
     for name in placeholders.__all__:
         obj = getattr(placeholders, name)
-        if isinstance(obj, type) and issubclass(obj, Placeholder) and hasattr(obj, 'name'):
+        if isinstance(obj, type) and issubclass(obj, placeholders.DesignerPlaceholder) and hasattr(obj, 'name'):
             yield obj
 
 

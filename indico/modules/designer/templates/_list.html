@@ -3,18 +3,22 @@
     {% set no_registrations_msg %}
         {% trans %}Registration Form has no registrations{% endtrans %}
     {% endset %}
+    {% set print_title -%}
+        {%- if tpl.is_ticket -%}
+            {% trans %}Print tickets{% endtrans %}
+        {%- else -%}
+            {% trans %}Print badges{% endtrans %}
+        {%- endif -%}
+    {%- endset %}
+    {% set endpoint = 'registrations_config_tickets' if tpl.is_ticket else 'registrations_config_badges' %}
     {% if format == 'icon' %}
-        <a {% if no_registrations %}
-               title="{{ no_registrations_msg }}"
-           {% else %}
-               title="{% trans %}Print badges{% endtrans %}"
-           {% endif %}
+        <a title="{{ no_registrations_msg if no_registrations else print_title }}"
            class="i-button icon-printer icon-only text-color borderless highlight
                   {% if no_registrations -%}
                       disabled
                   {%- endif %}"
-           data-href="{{ url_for('event_registration.registrations_config_badges', regform, template_id=tpl.id) }}"
-           data-title="{% trans %}Badge Printing Settings{% endtrans %}"
+           data-href="{{ url_for('event_registration.' + endpoint, regform, template_id=tpl.id) }}"
+           data-title="{{ print_title }}"
            data-method="POST"
            data-ajax-dialog>
         </a>
@@ -24,8 +28,8 @@
                 {{ text }}
             </span>
         {% else %}
-            <a data-href="{{ url_for('event_registration.registrations_config_badges', regform, template_id=tpl.id) }}"
-               data-title="{% trans %}Badge Printing Settings{% endtrans %}"
+            <a data-href="{{ url_for('event_registration.' + endpoint, regform, template_id=tpl.id) }}"
+               data-title="{{ print_title }}"
                data-method="POST"
                data-ajax-dialog
                {% if no_registrations %}
@@ -132,10 +136,17 @@
                         {% if single_form %}
                             {{ _render_badge_form_button(single_form, tpl, format='icon') }}
                         {% else %}
+                            {% set print_title -%}
+                                {%- if tpl.is_ticket -%}
+                                    {% trans %}Print tickets{% endtrans %}
+                                {%- else -%}
+                                    {% trans %}Print badges{% endtrans %}
+                                {%- endif -%}
+                            {%- endset %}
                             <a href="#" class="i-button icon-print icon-only highlight text-color js-dropdown borderless
                                               {{ 'disabled' if not event.registration_forms }}"
-                               title="{{ _('Print badges') if event.registration_forms
-                                        else _('There are no registration forms in this event') }}"
+                               title="{{ print_title if event.registration_forms
+                                         else _('There are no registration forms in this event') }}"
                                data-toggle="dropdown">
                             </a>
                             <ul class="dropdown">
