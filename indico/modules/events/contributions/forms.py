@@ -119,7 +119,7 @@ class SubContributionForm(IndicoForm):
     description = TextAreaField(_('Description'))
     duration = TimeDeltaField(_('Duration'), [DataRequired(), MaxDuration(timedelta(hours=24))],
                               default=timedelta(minutes=20), units=('minutes', 'hours'))
-    speakers = SubContributionPersonLinkListField(_('Speakers'), allow_submitters=False,
+    speakers = SubContributionPersonLinkListField(_('Speakers'), allow_submitters=False, allow_authors=False,
                                                   description=_('The speakers of the subcontribution'))
     references = ReferencesField(_("External IDs"), reference_class=SubContributionReference,
                                  description=_("Manage external resources for this sub-contribution"))
