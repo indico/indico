@@ -1,7 +1,7 @@
 """Add visibility options to contribution fields
 
 Revision ID: 093533d27a96
-Revises: 566d5de4e0e5
+Revises: 9c4418d7a6aa
 Create Date: 2017-11-30 17:15:07.141552
 """
 
@@ -14,7 +14,7 @@ from indico.modules.events.contributions.models.fields import ContributionFieldV
 
 # revision identifiers, used by Alembic.
 revision = '093533d27a96'
-down_revision = '566d5de4e0e5'
+down_revision = '9c4418d7a6aa'
 branch_labels = None
 depends_on = None
 
