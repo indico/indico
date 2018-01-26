@@ -429,6 +429,7 @@ def register_all_js(env):
         'tracks': rjs_bundle('modules_tracks', 'js/indico/modules/tracks.js'),
         'abstracts': rjs_bundle('modules_abstracts',
                                 'js/indico/modules/abstracts.js',
+                                'js/indico/modules/types_dialog.js',
                                 'js/indico/jquery/rulelistwidget.js'),
         'papers': rjs_bundle('modules_papers', 'js/indico/modules/papers.js'),
         'reviews': rjs_bundle('modules_reviews', 'js/indico/modules/reviews.js'),
