@@ -4,7 +4,7 @@
     <script>
         (function() {
             'use strict';
-            var $userEditable = $('#{{ form.user_editable.id }}');
+            var $userEditable = $('#{{ form.is_user_editable.id }}');
             var $managers = $('#{{ form.visibility.id }}').find('.managers input');
             var $visibility = $("input[name=visibility]");
             $visibility.on('change', function() {

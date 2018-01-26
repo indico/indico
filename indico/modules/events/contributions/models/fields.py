@@ -85,15 +85,15 @@ class ContributionField(db.Model):
         nullable=False,
         default=True
     )
+    is_user_editable = db.Column(
+        db.Boolean,
+        nullable=False,
+        default=True
+    )
     visibility = db.Column(
         PyIntEnum(ContributionFieldVisibility),
         nullable=False,
         default=ContributionFieldVisibility.public
-    )
-    user_editable = db.Column(
-        db.Boolean,
-        nullable=False,
-        default=True
     )
     field_type = db.Column(
         db.String,

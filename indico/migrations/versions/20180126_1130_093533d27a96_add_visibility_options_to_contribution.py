@@ -21,16 +21,16 @@ depends_on = None
 
 def upgrade():
     op.add_column('contribution_fields',
-                  sa.Column('user_editable', sa.Boolean(), nullable=False, server_default='true'),
+                  sa.Column('is_user_editable', sa.Boolean(), nullable=False, server_default='true'),
                   schema='events')
     op.add_column('contribution_fields',
                   sa.Column('visibility', PyIntEnum(ContributionFieldVisibility),
                             nullable=False, server_default='1'),
                   schema='events')
-    op.alter_column('contribution_fields', 'user_editable', server_default=None, schema='events')
+    op.alter_column('contribution_fields', 'is_user_editable', server_default=None, schema='events')
     op.alter_column('contribution_fields', 'visibility', server_default=None, schema='events')
 
 
 def downgrade():
     op.drop_column('contribution_fields', 'visibility', schema='events')
-    op.drop_column('contribution_fields', 'user_editable', schema='events')
+    op.drop_column('contribution_fields', 'is_user_editable', schema='events')

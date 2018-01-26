@@ -45,15 +45,15 @@ class ContribFieldConfigForm(IndicoForm):
     visibility = IndicoEnumRadioField(_('Visibility'), [DataRequired()], default=ContributionFieldVisibility.public,
                                       enum=ContributionFieldVisibility,
                                       description=_('Who will be able to see the field'))
-    user_editable = BooleanField(_('User editable'), widget=SwitchWidget(),
-                                 description=_("Whether the submitter/author can fill out the field during abstract "
-                                               "submission."),
-                                 default=True)
+    is_user_editable = BooleanField(_('User editable'), widget=SwitchWidget(),
+                                    description=_("Whether the submitter/author can fill out the field during abstract "
+                                                  "submission."),
+                                    default=True)
 
 
 class ContribField(BaseField):
     config_form_base = ContribFieldConfigForm
-    common_settings = ('title', 'description', 'is_required', 'is_active', 'visibility', 'user_editable')
+    common_settings = ('title', 'description', 'is_required', 'is_active', 'visibility', 'is_user_editable')
 
     def __init__(self, obj, management=True):
         super(ContribField, self).__init__(obj)
