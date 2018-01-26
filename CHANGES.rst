@@ -18,9 +18,10 @@ Major Features
   now shows each person's custom event roles and whether they have
   registered for the event in addition to the the default roles
   (speaker, chairperson, etc.)
-- Add visibility options to abstract/contribution custom fields
-  so that it's possible to have fields visible and editable only
-  by managers or managers and submitters
+- Add visibility options to custom abstract/contribution fields
+  so they can be restricted to be editable/visible only for event
+  managers or authors/submitters instad of anyone who can see the
+  abstract/contribution
 
 Improvements
 ^^^^^^^^^^^^
