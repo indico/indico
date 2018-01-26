@@ -27,8 +27,11 @@
         </li>
     </ul>
     {% trans -%}
-        The fields "First Name", "Last Name" and "E-mail" are mandatory. Users will be matched with existing
-        Indico identities through their e-mail.
+        The fields "First Name", "Last Name" and "E-mail" are mandatory.
+    {%- endtrans %}
+    <br>
+    {% trans -%}
+        Users will be matched with existing Indico identities through their e-mail.
     {%- endtrans %}
 {% endcall %}
 

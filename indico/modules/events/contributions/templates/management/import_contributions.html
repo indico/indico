@@ -34,8 +34,11 @@
         </li>
     </ul>
     {% trans -%}
-        Only the field "Title" is mandatory. Users will be matched with existing
-        Indico identities through their e-mail.
+        Only the field "Title" is mandatory.
+    {%- endtrans %}
+    <br>
+    {% trans -%}
+        Users will be matched with existing Indico identities through their e-mail.
     {%- endtrans %}
 {% endcall %}
 
