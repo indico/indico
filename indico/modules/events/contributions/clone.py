@@ -23,6 +23,7 @@ from sqlalchemy.orm import joinedload, subqueryload, undefer
 from indico.core.db import db
 from indico.core.db.sqlalchemy.principals import clone_principals
 from indico.core.db.sqlalchemy.util.models import get_simple_column_attrs
+from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.cloning import EventCloner
 from indico.modules.events.contributions import Contribution
 from indico.modules.events.contributions.models.fields import ContributionField, ContributionFieldValue
@@ -91,10 +92,33 @@ class ContributionCloner(EventCloner):
     # We do not override `is_available` as we have cloners depending
     # on this internal cloner even if it won't clone anything.
 
-    def __init__(self, *args, **kwargs):
-        self.contribution = kwargs.pop('contribution', None)
-        self.preserve_session = kwargs.pop('preserve_session', True)
-        super(ContributionCloner, self).__init__(*args, **kwargs)
+    @classmethod
+    @no_autoflush
+    def clone_single_contribution(cls, contribution, preserve_session=False):
+        """Clone a single contribution within the same event.
+
+        :param contribution: The `Contribution` to clone
+        :param preserve_session: Whether to assign and schedule
+        :return: The newly created contribution
+        """
+        event = contribution.event
+        cloner = cls(event)
+        cloner._person_map = dict(zip(event.persons, event.persons))
+        cloner._session_map = {contribution.session: contribution.session}
+        cloner._session_block_map = {contribution.session_block: contribution.session_block}
+        cloner._contrib_type_map = {contribution.type: contribution.type}
+        cloner._contrib_field_map = dict(zip(event.contribution_fields, event.contribution_fields))
+        cloner._contrib_map = {}
+        cloner._subcontrib_map = {}
+        new_contribution = cloner._create_new_contribution(event, contribution,
+                                                           preserve_session=preserve_session,
+                                                           excluded_attrs={'friendly_id'})
+        if preserve_session:
+            entry = schedule_contribution(new_contribution, contribution.timetable_entry.start_dt,
+                                          session_block=new_contribution.session_block)
+            event.timetable_entries.append(entry)
+        db.session.flush()
+        return new_contribution
 
     def run(self, new_event, cloners, shared_data):
         self._person_map = shared_data['event_persons']['person_map']
@@ -104,18 +128,13 @@ class ContributionCloner(EventCloner):
         self._contrib_field_map = shared_data['contribution_fields']['contrib_field_map']
         self._contrib_map = {}
         self._subcontrib_map = {}
-
         with db.session.no_autoflush:
-            if new_event == self.old_event:
-                self._clone_contrib(new_event)
-            else:
-                self._clone_contribs(new_event)
-                self._synchronize_friendly_id(new_event)
-
+            self._clone_contribs(new_event)
+        self._synchronize_friendly_id(new_event)
         db.session.flush()
         return {'contrib_map': self._contrib_map, 'subcontrib_map': self._subcontrib_map}
 
-    def _create_new_contribution(self, event, old_contrib, excluded_attrs=None):
+    def _create_new_contribution(self, event, old_contrib, preserve_session=True, excluded_attrs=None):
         attrs = (get_simple_column_attrs(Contribution) | {'own_room', 'own_venue'}) - {'abstract_id'}
         if excluded_attrs is not None:
             attrs -= excluded_attrs
@@ -128,21 +147,13 @@ class ContributionCloner(EventCloner):
         new_contrib.field_values = list(self._clone_fields(old_contrib.field_values))
         if old_contrib.type is not None:
             new_contrib.type = self._contrib_type_map[old_contrib.type]
-        if self.preserve_session:
+        if preserve_session:
             if old_contrib.session is not None:
                 new_contrib.session = self._session_map[old_contrib.session]
             if old_contrib.session_block is not None:
                 new_contrib.session_block = self._session_block_map[old_contrib.session_block]
         event.contributions.append(new_contrib)
         return new_contrib
-
-    def _clone_contrib(self, new_event):
-        new_contribution = self._create_new_contribution(new_event, self.contribution, {'friendly_id'})
-        if self.preserve_session:
-            entry = schedule_contribution(new_contribution, self.contribution.timetable_entry.start_dt,
-                                          session_block=new_contribution.session_block)
-            new_event.timetable_entries.append(entry)
-        new_event.contributions.append(new_contribution)
 
     def _clone_contribs(self, new_event):
         query = (Contribution.query.with_parent(self.old_event)

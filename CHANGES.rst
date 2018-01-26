@@ -36,6 +36,7 @@ Improvements
   month (:issue:`1580`)
 - Add support for custom session types (:issue:`3189`)
 - Move poster session flag from session settings to session type settings
+- Add contribution cloning within an event (:issue:`3207`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

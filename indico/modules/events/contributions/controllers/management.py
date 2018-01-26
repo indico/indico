@@ -29,6 +29,7 @@ from indico.modules.attachments.controllers.event_package import AttachmentPacka
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
 from indico.modules.events.abstracts.settings import abstracts_settings
 from indico.modules.events.contributions import get_contrib_field_types
+from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.controllers.common import ContributionListMixin
 from indico.modules.events.contributions.forms import (ContributionDurationForm, ContributionProtectionForm,
                                                        ContributionStartDateForm, ContributionTypeForm,
@@ -39,10 +40,9 @@ from indico.modules.events.contributions.models.fields import ContributionField
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.subcontributions import SubContribution
 from indico.modules.events.contributions.models.types import ContributionType
-from indico.modules.events.contributions.operations import (clone_contribution, create_contribution,
-                                                            create_subcontribution, delete_contribution,
-                                                            delete_subcontribution, update_contribution,
-                                                            update_subcontribution)
+from indico.modules.events.contributions.operations import (create_contribution, create_subcontribution,
+                                                            delete_contribution, delete_subcontribution,
+                                                            update_contribution, update_subcontribution)
 from indico.modules.events.contributions.util import (contribution_type_row, generate_spreadsheet_from_contributions,
                                                       make_contribution_form)
 from indico.modules.events.contributions.views import WPManageContributions
@@ -684,6 +684,10 @@ class RHCreateSubContributionReferenceREST(RHCreateReferenceMixin, RHManageSubCo
 
 
 class RHCloneContribution(RHManageContributionBase):
+    def _check_access(self):
+        # Just like creating contributions, cloning one requires full event management access
+        RHManageContributionsBase._check_access(self)
+
     def _process(self):
-        clone_contribution(self.event, self.contrib)
+        ContributionCloner.clone_single_contribution(self.contrib)
         return jsonify_data(**self.list_generator.render_list())

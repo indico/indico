@@ -20,10 +20,10 @@ import dateutil.parser
 from flask import jsonify, request, session
 from werkzeug.exceptions import BadRequest
 
-from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.modules.events.contributions import Contribution
-from indico.modules.events.contributions.operations import clone_contribution, delete_contribution
+from indico.modules.events.contributions.clone import ContributionCloner
+from indico.modules.events.contributions.operations import delete_contribution
 from indico.modules.events.sessions.operations import delete_session_block
 from indico.modules.events.timetable.controllers import (RHManageTimetableBase, RHManageTimetableEntryBase,
                                                          SessionManagementLevel)
@@ -173,13 +173,14 @@ class RHBreakREST(RHManageTimetableBase):
 
 
 class RHCloneContribution(RHManageTimetableBase):
+    """Clone a contribution and schedule it at the same position"""
+
     def _process_args(self):
         RHManageTimetableBase._process_args(self)
-        self.contribution = (Contribution.query.with_parent(self.event)
-                             .filter_by(id=request.args['contrib_id'])
-                             .first())
+        self.contrib = (Contribution.query.with_parent(self.event)
+                        .filter_by(id=request.args['contrib_id'])
+                        .one())
 
     def _process(self):
-        clone_contribution(self.event, self.contribution, preserve_session=True)
-        return jsonify_data(update=serialize_entry_update(self.contribution.timetable_entry,
-                                                          session_=self.contribution.session))
+        contrib = ContributionCloner.clone_single_contribution(self.contrib, preserve_session=True)
+        return jsonify_data(update=serialize_entry_update(contrib.timetable_entry, session_=contrib.session))

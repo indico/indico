@@ -24,7 +24,6 @@ from indico.core import signals
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.session import no_autoflush
 from indico.modules.events.contributions import logger
-from indico.modules.events.contributions.clone import ContributionCloner
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.contributions.models.persons import ContributionPersonLink
 from indico.modules.events.contributions.models.subcontributions import SubContribution
@@ -182,18 +181,3 @@ def create_contribution_from_abstract(abstract, contrib_session=None):
                                        'session': contrib_session,
                                        'person_link_data': {link: True for link in contrib_person_links}},
                                custom_fields_data=custom_fields_data)
-
-
-def clone_contribution(event, contribution, preserve_session=False):
-    shared_data = {
-        'event_persons': {'person_map': dict(zip(event.persons, event.persons))},
-        'sessions': {
-            'session_map': {contribution.session: contribution.session},
-            'session_block_map': {contribution.session_block: contribution.session_block}
-        },
-        'contribution_fields': {'contrib_field_map': dict(zip(event.contribution_fields, event.contribution_fields))},
-        'contribution_types': {'contrib_type_map': dict(zip(event.contribution_types, event.contribution_types))}
-    }
-
-    cloner = ContributionCloner(event, contribution=contribution, preserve_session=preserve_session)
-    cloner.run(event, set(), shared_data)
