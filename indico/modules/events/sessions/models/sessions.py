@@ -219,7 +219,7 @@ class Session(DescriptionMixin, ColorMixin, ProtectionManagersMixin, LocationMix
 
     @return_ascii
     def __repr__(self):
-        return format_repr(self, 'id', is_poster=False, is_deleted=False, _text=self.title)
+        return format_repr(self, 'id', is_deleted=False, _text=self.title)
 
     def can_manage_contributions(self, user, allow_admin=True):
         """Check whether a user can manage contributions within the session."""
