@@ -31,4 +31,5 @@ logger = Logger.get('events.roles')
 @signals.menu.items.connect_via('event-management-sidemenu')
 def _sidemenu_items(sender, event, **kwargs):
     if event.can_manage(session.user):
-        return SideMenuItem('roles', _('Roles'), url_for('event_roles.manage', event), 65, icon='medal')
+        roles_section = 'organization' if event.type == 'conference' else 'advanced'
+        return SideMenuItem('roles', _('Roles'), url_for('event_roles.manage', event), section=roles_section)
