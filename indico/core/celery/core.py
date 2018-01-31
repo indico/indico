@@ -213,9 +213,10 @@ class _CelerySAWrapper(object):
     __slots__ = ('identity_key',)
 
     def __init__(self, obj):
-        self.identity_key = inspect(obj).identity_key
-        if self.identity_key is None:
+        identity_key = inspect(obj).identity_key
+        if identity_key is None:
             raise ValueError('Cannot pass non-persistent object to Celery. Did you forget to flush?')
+        self.identity_key = identity_key[:2]
 
     @property
     def object(self):
@@ -226,7 +227,7 @@ class _CelerySAWrapper(object):
 
     @return_ascii
     def __repr__(self):
-        model, args = self.identity_key
+        model, args = self.identity_key[:2]
         return '<{}: {}>'.format(model.__name__, ','.join(map(repr, args)))
 
     @classmethod

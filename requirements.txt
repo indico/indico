@@ -37,7 +37,7 @@ bleach==2.1.2
 Flask-SQLAlchemy==2.3.2
 Flask-WTF==0.14.2
 Flask-BabelEx==0.9.3
-SQLAlchemy==1.1.15
+SQLAlchemy==1.2.2
 WTForms==2.1
 WTForms-Components==0.10.3
 psycopg2==2.7.3.2

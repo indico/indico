@@ -246,7 +246,7 @@ class ProtectionMixin(object):
 
     @property
     def _access_key_session_key(self):
-        cls, pks = inspect(self).identity_key
+        cls, pks = inspect(self).identity_key[:2]
         return '{}-{}'.format(cls.__name__, '-'.join(map(unicode, pks)))
 
     def update_principal(self, principal, read_access=None, quiet=False):
