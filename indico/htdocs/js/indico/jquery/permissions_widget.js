@@ -135,9 +135,15 @@
                 'data-principal': JSON.stringify(principal)
             }).on('click', function() {
                 var $this = $(this);
-                var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
-                var message = $T.gettext("Are you sure you want to permanently delete this entry?");
-                confirmPrompt(message, title).then(function() {
+                var confirmed;
+                if (principal._type === 'Avatar' && principal.id === $('body').data('user-id')) {
+                    var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
+                    var message = $T.gettext("Are you sure you want to remove yourself from the list?");
+                    confirmed = confirmPrompt(message, title);
+                } else {
+                    confirmed = $.Deferred().resolve();
+                }
+                confirmed.then(function() {
                     self._updateItem($this.data('principal'), []);
                 });
             });
