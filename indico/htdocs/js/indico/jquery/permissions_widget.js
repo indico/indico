@@ -92,9 +92,10 @@
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
             permissions.forEach(function(item) {
+                var permissionInfo = self.options.permissionsInfo[item];
                 $permissionsList.append(
-                    $('<li>', {class: 'i-label bold ' + self.options.permissionsInfo[item].css_class})
-                        .append(self.options.permissionsInfo[item].title)
+                    $('<li>', {class: 'i-label bold ' + permissionInfo.css_class, title: permissionInfo.description})
+                        .append(permissionInfo.title)
                 );
             });
             if (principal._type !== 'DefaultEntry') {

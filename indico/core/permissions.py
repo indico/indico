@@ -75,23 +75,28 @@ def get_permissions_info(_type):
     """
     selectable_permissions = {k: v for k, v in get_available_permissions(_type).viewitems() if v.user_selectable}
     special_permissions = {
-        FULL_ACCESS_PERMISSION: {'title': _('Manage'), 'css_class': 'danger'},
-        READ_ACCESS_PERMISSION: {'title': _('Access'), 'css_class': 'accept'}
+        FULL_ACCESS_PERMISSION: {'title': _('Manage'), 'css_class': 'danger',
+                                 'description': _('Unrestricted management access for the whole event')},
+        READ_ACCESS_PERMISSION: {'title': _('Access'), 'css_class': 'accept',
+                                 'description': _('Access the public areas of the event')}
     }
     permissions_tree = {
         FULL_ACCESS_PERMISSION: {
             'title': special_permissions[FULL_ACCESS_PERMISSION]['title'],
+            'description': special_permissions[FULL_ACCESS_PERMISSION]['description'],
             'children': {
-                v.name: {'title': v.friendly_name} for k, v in selectable_permissions.viewitems()
+                v.name: {'title': v.friendly_name, 'description': v.description}
+                for k, v in selectable_permissions.viewitems()
             }
         }
     }
     full_access_children = permissions_tree[FULL_ACCESS_PERMISSION]['children']
     full_access_children[READ_ACCESS_PERMISSION] = {
         'title': special_permissions[READ_ACCESS_PERMISSION]['title'],
+        'description': special_permissions[READ_ACCESS_PERMISSION]['description'],
     }
     full_access_children = OrderedDict(sorted(full_access_children.items()))
-    available_permissions = dict({k: {'title': v.friendly_name, 'css_class': v.css_class}
+    available_permissions = dict({k: {'title': v.friendly_name, 'css_class': v.css_class, 'description': v.description}
                                   for k, v in selectable_permissions.viewitems()},
                                  **special_permissions)
     return available_permissions, permissions_tree
