@@ -6,12 +6,13 @@
             {% for code, tree_elem in permissions_tree.viewitems() recursive %}
                 <li class="item">
                     <input type="checkbox" id="cb-{{ code }}"
-                           class="circle-checkbox" {{ 'checked' if code in permissions }}
+                           class="circle-checkbox" {{ 'checked' if code in permissions or code == '_read_access' }}
+                           {{ 'disabled' if code == '_read_access' }}
                            data-code="{{ code }}">
                     <label for="cb-{{ code }}" title="{{ tree_elem.description }}">{{ tree_elem.title }}</label>
                     {% if tree_elem.children %}
                         <ul class="permissions">
-                            {{ loop(tree_elem.children.viewitems()) }}
+                            {{ loop(tree_elem.children|dictsort(by='key')) }}
                         </ul>
                     {% endif %}
                 </li>
@@ -27,27 +28,34 @@
     (function () {
         'use strict';
 
+        var $dialogForm = $('#js-permissions-dialog-form');
         function updateHiddenField() {
             var data = [];
-            var $form = $('#js-permissions-dialog-form');
-            $form.find('[type=checkbox]:checked').each(function() {
+            $dialogForm.find('input[type=checkbox]:checked').each(function() {
                 var $this = $(this);
                 // Only take into account the checked parents of the permissions tree
-                if (!$this.parents('ul').siblings('[type=checkbox]:checked').length) {
+                if (!$this.parents('ul').siblings('input[type=checkbox]:checked').length) {
                     data.push($(this).data('code'));
                 }
             });
-            $form.find('#selected_permissions').val(JSON.stringify(data));
+            $dialogForm.find('#selected_permissions').val(JSON.stringify(data));
         }
 
-        $('#js-permissions-dialog-form').on('submit', function(evt) {
+        $dialogForm.on('submit', function(evt) {
             evt.preventDefault();
             var selectedPermissions = JSON.parse($('#selected_permissions').val());
             var principal = JSON.parse($('#principal').val());
             $('.permissions-widget').trigger('indico:permissionsChanged', [selectedPermissions, principal]);
-            $('#js-permissions-dialog-form').trigger('ajaxDialog:close');
+            $dialogForm.trigger('ajaxDialog:close');
         }).on('change', function() {
             updateHiddenField();
+        });
+
+        // Prevent toggling children elements when parent is checked
+        $dialogForm.find('input[type=checkbox]').on('click', function(evt) {
+           if ($(this).closest('ul').siblings('input[type=checkbox]').is(':checked')) {
+               evt.preventDefault();
+           }
         });
     })();
 </script>

@@ -195,7 +195,7 @@
                 @include circle-checkbox-checked();
             }
 
-            &:hover:checked + label::before {
+            &:hover:checked:not(:disabled) + label::before {
                 background-color: $light-blue;
                 border-color: $dark-blue;
             }
@@ -205,7 +205,7 @@
                     opacity: 0.5;
                 }
 
-                label::before {
+                label::before, .circle-checkbox:hover + label::before {
                     @include circle-checkbox-checked();
                 }
             }
