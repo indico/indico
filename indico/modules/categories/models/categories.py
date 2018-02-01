@@ -532,7 +532,7 @@ def _mappers_configured():
     # parent category
     cte = Category.get_protection_cte()
     query = select([cte.c.protection_mode]).where(cte.c.id == Category.id).correlate_except(cte)
-    Category.effective_protection_mode = column_property(query, deferred=True)
+    Category.effective_protection_mode = column_property(query, deferred=True, expire_on_flush=False)
 
     # Category.effective_icon_data -- the effective icon data of the category,
     # either set on the category itself or inherited from it
