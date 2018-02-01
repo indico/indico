@@ -30,6 +30,7 @@ node_modules
 coverage.xml
 htmlcov/
 /.cache/
+.vagrant
 
 # sphinx
 /docs/build/

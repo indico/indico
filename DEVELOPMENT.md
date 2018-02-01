@@ -2,6 +2,23 @@ Tips for developers
 -------------------
 It's dangerous to go alone. Take these tips in case you need to fit Indico to your particular needs.
 
+## Running a virtual machine
+Install [vagrant](https://www.vagrantup.com/) and [VirtualBox](https://www.virtualbox.org/), install
+[vagrant-vbguest](https://github.com/dotless-de/vagrant-vbguest) plugin with `vagrant plugin install vagrant-vbguest`.
+Simply call `vagrant up` to get your virtual machine running and `vagrant ssh` to jump into the virtual machine.
+
+Next steps:
+```
+indico user create -a
+indico-run
+```
+
+Type `exit` to get back to your host system, use `vagrant rsync` or `vagrant rsync-auto` to synchronize all indico
+files from your host system with your virtual machine.
+
+You can access Indico by poiting your browser to http://localhost:8080/ and a virtual mailbox collecting all outgoing
+mails under http://localhost:8081/.
+
 ## Initializing the database
 Use `indico db prepare` to create your tables based on the SQLAlchemy models and set the migration status to the most
 recent alembic revision.
