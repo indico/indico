@@ -8,7 +8,7 @@ addons:
   postgresql: 9.6
 install:
   - pip install -U pip setuptools
-  - pip install isort
+  - pip install 'isort==4.2.15'
   - pip install -e .
 script:
   - isort -rc --diff --check-only indico/
