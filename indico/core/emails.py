@@ -98,6 +98,8 @@ def do_send_email(email, log_entry=None, _from_task=False):
             msg.extra_headers['To'] = 'Undisclosed-recipients:;'
         if email['html']:
             msg.content_subtype = 'html'
+        if email['from'] != config.NO_REPLY_EMAIL:
+            msg.extra_headers['Sender'] = config.NO_REPLY_EMAIL
         msg.send()
     if not _from_task:
         logger.info('Sent email "%s"', truncate(email['subject'], 100))
