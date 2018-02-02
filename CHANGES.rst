@@ -51,6 +51,9 @@ Internal Changes
 - Add new ``registration_checkin_updated`` signal that can be used by
   plugins to perform an action when the checkin state of a registration
   changes (:issue:`3161`, thanks :user:`bpedersen2`)
+- Add new signals that allow plugins to run custom code at the various
+  stages of the ``RH`` execution and replace/modify the final response
+  (:issue:`3227`)
 
 
 ----

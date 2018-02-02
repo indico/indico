@@ -41,6 +41,7 @@ from indico.legacy.common import fossilize
 from indico.legacy.common.security import Sanitization
 from indico.util.i18n import _
 from indico.util.locators import get_locator
+from indico.util.signals import values_from_signal
 from indico.web.flask.util import ResponseUtil, create_flat_args, url_for
 
 
@@ -227,6 +228,7 @@ class RH(object):
     def _do_process(self):
         try:
             args_result = self._process_args()
+            signals.rh.process_args.send(type(self), rh=self, result=args_result)
             if isinstance(args_result, (current_app.response_class, Response)):
                 return args_result
         except NoResultFound:  # sqlalchemy .one() not finding anything
@@ -237,16 +239,33 @@ class RH(object):
             return rv
 
         self._check_access()
+        signals.rh.check_access.send(type(self), rh=self)
         if self.CHECK_HTML:
             Sanitization.sanitizationCheck(create_flat_args(), self.NOT_SANITIZED_FIELDS)
+
+        signal_rv = values_from_signal(signals.rh.before_process.send(type(self), rh=self),
+                                       single_value=True, as_list=True)
+        if signal_rv and len(signal_rv) != 1:
+            raise Exception('More than one signal handler returned custom RH result')
+        elif signal_rv:
+            return signal_rv[0]
 
         if config.PROFILE:
             result = [None]
             profile_path = os.path.join(config.TEMP_DIR, '{}-{}.prof'.format(type(self).__name__, time.time()))
             cProfile.runctx('result[0] = self._process()', globals(), locals(), profile_path)
-            return result[0]
+            rv = result[0]
         else:
-            return self._process()
+            rv = self._process()
+
+        signal_rv = values_from_signal(signals.rh.process.send(type(self), rh=self, result=rv),
+                                       single_value=True, as_list=True)
+        if signal_rv and len(signal_rv) != 1:
+            raise Exception('More than one signal handler returned new RH result')
+        elif signal_rv:
+            return signal_rv[0]
+        else:
+            return rv
 
     def process(self):
         if request.method not in HTTP_VERBS:

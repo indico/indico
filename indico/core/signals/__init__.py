@@ -14,8 +14,8 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
-from indico.core.signals import acl, agreements, attachments, category, event, event_management, menu, plugin, users
+from indico.core.signals import acl, agreements, attachments, category, event, event_management, menu, plugin, rh, users
 from indico.core.signals.core import *
 
 
-__all__ = ('acl', 'agreements', 'attachments', 'category', 'event', 'event_management', 'menu', 'plugin', 'users', 'rb')
+__all__ = ('acl', 'agreements', 'attachments', 'category', 'event', 'event_management', 'menu', 'plugin', 'rh', 'users')
