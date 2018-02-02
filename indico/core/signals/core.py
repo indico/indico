@@ -32,7 +32,8 @@ only ``import`` these modules and do nothing else.
 """)
 
 after_process = _signals.signal('after-process', """
-Called after an Indico request has been processed.
+Called after an Indico request has been processed.  This signal is
+executed for both RH classes and legacy JSON-RPC services.
 """)
 
 get_storage_backends = _signals.signal('get-storage-backends', """
