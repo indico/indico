@@ -226,6 +226,7 @@ class ThemeSettingsProxy(object):
             # to override a default style so let them do so...
             for name, definition in settings.get('definitions', {}).viewitems():
                 definition['plugin'] = plugin
+                definition.setdefault('user_visible', False)
                 core_settings['definitions'][name] = definition
         return core_settings
 

@@ -44,6 +44,7 @@ Improvements
 - Add contribution cloning within an event (:issue:`3207`)
 - Add option to include the event description in reminder emails
   (:issue:`3157`, thanks :user:`bpedersen2`)
+- Pin default themes to the top for event managers (:issue:`3166`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

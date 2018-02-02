@@ -38,15 +38,20 @@
        title="{% trans %}Change theme{% endtrans %}"></a>
     <ul class="dropdown">
         {% set endpoint = 'timetable.timetable' if event.type == 'conference' else 'events.display' %}
-        {% for id, data in themes.items()|sort(attribute='1.name')
-           if event.can_manage(session.user) or data.user_visible %}
-            <li>
-                {% if id == theme %}
-                    <a class="disabled"><strong>{{ data.name }}</strong></a>
-                {% else %}
-                    <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
-                {% endif %}
-            </li>
+        {% for group in themes.items()|sort(attribute='1.name')|groupby('1.user_visible')|reverse
+           if group.grouper or event.can_manage(session.user) %}
+            {% if not group.grouper %}
+                <li class="themes-separator"></li>
+            {% endif %}
+            {% for id, data in group.list %}
+                <li>
+                    {% if id == theme %}
+                        <a class="disabled"><strong>{{ data.name }}</strong></a>
+                    {% else %}
+                        <a href="{{ url_for(endpoint, event, view=id) }}">{{ data.name }}</a>
+                    {% endif %}
+                </li>
+            {% endfor %}
         {% endfor %}
     </ul>
 {%- endmacro -%}

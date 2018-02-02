@@ -112,6 +112,12 @@
                 font-weight: bold;
             }
         }
+
+        .themes-separator {
+            @include border-bottom($black);
+            height: auto;
+            margin: 0 1em;
+        }
     }
 
     .event-filters {
