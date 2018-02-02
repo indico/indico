@@ -3,7 +3,7 @@
     <input type="hidden" id="principal" value='{{ principal|tojson|forceescape }}'>
     <div class="permissions-dialog">
         <ul class="permissions">
-            {% for code, tree_elem in permissions_tree.viewitems() recursive %}
+            {% for code, tree_elem in permissions_tree|dictsort(reverse=true) recursive %}
                 <li class="item">
                     <input type="checkbox" id="cb-{{ code }}"
                            class="circle-checkbox" {{ 'checked' if code in permissions or code == '_read_access' }}
@@ -12,7 +12,7 @@
                     <label for="cb-{{ code }}" title="{{ tree_elem.description }}">{{ tree_elem.title }}</label>
                     {% if tree_elem.children %}
                         <ul class="permissions">
-                            {{ loop(tree_elem.children|dictsort(by='key')) }}
+                            {{ loop(tree_elem.children|dictsort) }}
                         </ul>
                     {% endif %}
                 </li>

@@ -85,17 +85,15 @@ def get_permissions_info(_type):
             'title': special_permissions[FULL_ACCESS_PERMISSION]['title'],
             'description': special_permissions[FULL_ACCESS_PERMISSION]['description'],
             'children': {
-                v.name: {'title': v.friendly_name, 'description': v.description}
-                for k, v in selectable_permissions.viewitems()
+                perm.name: {'title': perm.friendly_name, 'description': perm.description}
+                for name, perm in selectable_permissions.viewitems()
             }
+        },
+        READ_ACCESS_PERMISSION: {
+            'title': special_permissions[READ_ACCESS_PERMISSION]['title'],
+            'description': special_permissions[READ_ACCESS_PERMISSION]['description']
         }
     }
-    full_access_children = permissions_tree[FULL_ACCESS_PERMISSION]['children']
-    full_access_children[READ_ACCESS_PERMISSION] = {
-        'title': special_permissions[READ_ACCESS_PERMISSION]['title'],
-        'description': special_permissions[READ_ACCESS_PERMISSION]['description'],
-    }
-    full_access_children = OrderedDict(sorted(full_access_children.items()))
     available_permissions = dict({k: {'title': v.friendly_name, 'css_class': v.css_class, 'description': v.description}
                                   for k, v in selectable_permissions.viewitems()},
                                  **special_permissions)
