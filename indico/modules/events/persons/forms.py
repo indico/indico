@@ -37,6 +37,7 @@ class EmailEventPersonsForm(IndicoForm):
                                    description=_('Send copy of each email to my mailbox'))
     person_id = HiddenFieldList()
     user_id = HiddenFieldList()
+    role_id = HiddenFieldList()
     submitted = HiddenField()
 
     def __init__(self, *args, **kwargs):
