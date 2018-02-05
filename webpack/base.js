@@ -125,7 +125,7 @@ export function webpackDefaults(env, config) {
                                     ctx: {
                                         urlnamespaces: {
                                             namespacePaths: (name) => {
-                                                return `${config.indico.build.staticURL}/plugins/${name}`;
+                                                return `${config.indico.build.staticURL}static/plugins/${name}`;
                                             }
                                         }
                                     }
@@ -164,9 +164,14 @@ export function webpackDefaults(env, config) {
             new webpack.optimize.CommonsChunkPlugin({
                 name: 'common',
                 minChunks: (mod, count) => {
-                    // Let's not extract theme SCSS into the common chunk
-                    // Otherwise we will have no theme SCSS files.
-                    if (mod.resource.match(/styles\/themes\//)) {
+                    if (config.isPlugin) {
+                        // Plugin files should be loaded in their entirety
+                        return false;
+                    } else if (mod.resource.match(/\/themes\/.*\.scss/)) {
+                        // Let's not extract theme SCSS into the common chunk
+                        // Otherwise we will have no theme SCSS files.
+                        // This check is quite hacky as it relies of the file path,
+                        // we should find some better way to control this threshold.
                         return false;
                     } else {
                         return count >= 3;

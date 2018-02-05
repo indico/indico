@@ -21,10 +21,11 @@ import os
 import re
 from urlparse import urlparse
 
-from flask import session
+from flask import send_from_directory, session
 from flask_babelex import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
+from flask_webpackext.manifest import JinjaManifestLoader
 from markupsafe import Markup
 from webassets import Bundle
 from werkzeug.utils import cached_property
@@ -105,6 +106,8 @@ class IndicoPlugin(Plugin):
     #: This should not be disabled in most cases; if you need to store arbitrary
     #: keys, consider storing a dict inside a single top-level setting.
     strict_settings = True
+    #: Whether the plugin has its own manifest.json (Webpack)
+    has_manifest = False
 
     def init(self):
         """Called when the plugin is being loaded/initialized.
@@ -179,6 +182,10 @@ class IndicoPlugin(Plugin):
         """Return the domain for this plugin's translation_path"""
         path = self.translation_path
         return Domain(path) if path else NullDomain()
+
+    @cached_property
+    def manifest(self):
+        return JinjaManifestLoader().load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
 
     def register_assets(self):
         """Add assets to the plugin's webassets environment.
@@ -356,6 +363,18 @@ class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
     functions inside the correct plugin context and to make the
     static folder work.
     """
+
+    def __init__(self, name, *args, **kwargs):
+        super(IndicoPluginBlueprint, self).__init__(name, *args, **kwargs)
+        endpoint = 'plugin_{}_static_assets'.format(name)
+        self.add_url_rule('/static/plugins/{}/<folder>/<path:path>'.format(name), endpoint,
+                          self._versioned_static_handler, defaults={'version': None})
+        self.add_url_rule('/static/plugins/{}/<folder>/v/<version>/<path:path>'.format(name), endpoint,
+                          self._versioned_static_handler)
+
+    def _versioned_static_handler(self, folder, version, path):
+        return send_from_directory(self.static_folder, os.path.join(folder, path))
+
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoPluginBlueprintSetupState(self, app, options, first_registration)
 
