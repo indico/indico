@@ -45,7 +45,7 @@ from indico.util.placeholders import replace_placeholders
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import jsonify_data, url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.util import jsonify_form, jsonify_template
+from indico.web.util import jsonify_form
 
 
 BUILTIN_ROLES = {'chairperson': {'name': 'Chairperson', 'code': 'CHR', 'color': 'f7b076',
@@ -252,8 +252,7 @@ class RHEmailEventPersons(RHManageEventBase):
             num = len(recipients)
             flash(ngettext('Your email has been sent.', '{} emails have been sent.', num).format(num))
             return jsonify_data()
-        return jsonify_template('events/persons/email_dialog.html', form=form,
-                                disabled_until_change=disabled_until_change)
+        return jsonify_form(form, disabled_until_change=disabled_until_change, submit=_('Send'), back=_('Cancel'))
 
     def _send_emails(self, form, recipients):
         for recipient in recipients:
