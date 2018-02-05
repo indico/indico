@@ -19,6 +19,7 @@ from __future__ import print_function, unicode_literals
 import posixpath
 
 from flask import render_template, request
+from flask_webpackext import current_webpack
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
 
@@ -139,6 +140,8 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
+    bundles = ('module_vc.js', 'module_vc.css', 'module_events.cloning.js')
+
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)
         self.theme_id = theme_id
@@ -147,15 +150,18 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         self.theme_override = theme_override
 
     @property
-    def bundles(self):
-        return ('themes_{}.css'.format(self.theme_file_name), 'module_vc.js', 'module_vc.css',
-                'module_events.cloning.js')
-
-    @property
-    def print_bundles(self):
+    def additional_bundles(self):
+        plugin = self.theme.get('plugin')
         print_stylesheet = self.theme.get('print_stylesheet')
-        return (WPSimpleEventDisplayBase.print_bundles +
-                (('themes_{}.print.css'.format(self.theme_file_name),) if print_stylesheet else ()))
+        if plugin:
+            manifest = plugin.manifest
+        else:
+            manifest = current_webpack.manifest
+        return {
+            'screen': (manifest['themes_{}.css'.format(self.theme_file_name)],),
+            'print': ((manifest['themes_{}.print.css'.format(self.theme_file_name)],)
+                      if print_stylesheet else ())
+        }
 
     def _getHeadContent(self):
         return MathjaxMixin._getHeadContent(self) + WPEventBase._getHeadContent(self)

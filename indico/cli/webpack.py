@@ -32,19 +32,20 @@ from indico.modules.events.layout import theme_settings
 def _generate_webpack_config(plugin):
     url_base_path = current_app.config['APPLICATION_ROOT'] or '/'
     static_path = os.path.join(plugin.root_path, 'static')
-    static_url = os.path.join('{}/static/plugins/{}'.format(url_base_path, plugin.name))
+    static_url = os.path.join(url_base_path, 'static', 'plugins', plugin.name)
 
     return {
+        'isPlugin': True,
         'indico': get_webpack_config(current_app),
         'build': {
             'debug': current_app.debug,
             'indicoRootPath': os.path.dirname(get_root_path('indico')),
-            'clientPath': os.path.join(current_app.root_path, 'web', 'client'),
+            'clientPath': os.path.join(plugin.root_path, 'client'),
             'rootPath': plugin.root_path,
             'staticPath': static_path,
             'staticURL': static_url,
             'distPath': os.path.join(static_path, 'dist'),
-            'distURL': os.path.join(static_url, 'dist')
+            'distURL': os.path.join(static_url, 'dist/')
         },
         # include themes that belong to this plugin
         'themes': {key: theme for key, theme in theme_settings.themes.viewitems()
