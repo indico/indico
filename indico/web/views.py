@@ -16,6 +16,7 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import itertools
 import posixpath
 from urlparse import urlparse
 
@@ -178,6 +179,14 @@ class WPBase(object):
             _bundles += ('ckeditor.js',)
         return _bundles
 
+    @property
+    def additional_bundles(self):
+        """Additional bundle objects that will be included."""
+        return {
+            'screen': (),
+            'print': ()
+        }
+
     def _resolve_bundles(self):
         """Add up all bundles, following the MRO."""
         seen_bundles = set()
@@ -235,8 +244,10 @@ class WPBase(object):
         js_files = map(self._fix_path, plugin_js + custom_js)
 
         body = to_unicode(self._display(params))
-        bundles = (current_app.manifest[x] for x in self._resolve_bundles())
-        print_bundles = (current_app.manifest[x] for x in self.print_bundles)
+        bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()),
+                                  self.additional_bundles['screen'])
+        print_bundles = itertools.chain((current_app.manifest[x] for x in self.print_bundles),
+                                        self.additional_bundles['print'])
 
         return render_template('indico_base.html',
                                css_files=css_files, js_files=js_files,

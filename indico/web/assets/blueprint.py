@@ -37,6 +37,7 @@ assets_blueprint.add_url_rule('!/fonts/<path:filename>', 'fonts', build_only=Tru
 assets_blueprint.add_url_rule('!/dist/<path:filename>', 'dist', build_only=True)
 
 
+@assets_blueprint.route('!/<folder>/<filename>', defaults={'version': None, 'file_path': ''})
 @assets_blueprint.route('!/<folder>/<path:file_path>/<filename>', defaults={'version': None})
 @assets_blueprint.route('!/<folder>/v/<version>/<path:file_path>/<filename>')
 def folder_file(folder, file_path, filename, version):
@@ -93,15 +94,12 @@ def i18n_locale(locale_name):
 
 
 @assets_blueprint.route('!/static/assets/core/<path:path>')
-@assets_blueprint.route('!/static/assets/plugin-<plugin>/<path:path>')
 @assets_blueprint.route('!/static/assets/theme-<theme>/<path:path>')
-def static_asset(path, plugin=None, theme=None):
+def static_asset(path, theme=None):
     # Ensure there's no weird stuff in the plugin/theme name
-    if plugin and not plugin_engine.get_plugin(plugin):
+    if theme and theme not in theme_settings.themes:
         raise NotFound
-    elif theme and theme not in theme_settings.themes:
-        raise NotFound
-    return send_from_directory(config.ASSETS_DIR, get_asset_path(path, plugin=plugin, theme=theme))
+    return send_from_directory(config.ASSETS_DIR, get_asset_path(path, theme=theme))
 
 
 @assets_blueprint.route('!/static/custom/<path:filename>', endpoint='custom')
