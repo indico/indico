@@ -19,7 +19,7 @@ from __future__ import unicode_literals
 from wtforms.fields.core import StringField
 from wtforms.validators import DataRequired, Length, Regexp
 
-from indico.modules.events.models.groups import EventRole
+from indico.modules.events.models.roles import EventRole
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.widgets import ColorPickerWidget

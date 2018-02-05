@@ -22,7 +22,7 @@ from sqlalchemy.orm import joinedload
 from indico.core.db import db
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.management.controllers import RHManageEventBase
-from indico.modules.events.models.groups import EventRole
+from indico.modules.events.models.roles import EventRole
 from indico.modules.events.roles import logger
 from indico.modules.events.roles.forms import RoleForm
 from indico.modules.events.roles.views import WPEventRoles
