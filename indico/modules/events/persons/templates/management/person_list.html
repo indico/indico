@@ -36,7 +36,7 @@
                        data-href="{{ url_for('persons.email_event_persons', event) }}"
                        data-title="{% trans %}Send email{% endtrans %}"
                        data-method="POST"
-                       data-params-selector="#event-participants-list input[name=person_id]:checkbox:checked:visible"
+                       data-params-selector="#event-participants-list input.id-field:checkbox:checked:visible"
                        data-ajax-dialog
                        data-reload-after>
                         {%- trans %}Send emails{% endtrans -%}
@@ -91,7 +91,7 @@
                             <a href="#"
                                title="{% trans %}Send an email to all users with no Indico account{% endtrans %}"
                                data-href="{{ url_for('persons.email_event_persons', event, no_account=true) }}"
-                               data-params-selector="#event-participants-list [data-no-account] input[name=person_id]:checkbox"
+                               data-params-selector="#event-participants-list [data-no-account] input.id-field:checkbox"
                                data-title="{% trans %}Send email{% endtrans %}"
                                data-method="POST"
                                data-ajax-dialog
@@ -106,7 +106,7 @@
                                          received an invitation email yet{% endtrans %}"
                                    data-href="{{ url_for('persons.email_event_persons', event, no_account=true,
                                                           not_invited_only=true) }}"
-                                   data-params-selector="#event-participants-list [data-no-account] input[name=person_id]:checkbox"
+                                   data-params-selector="#event-participants-list [data-no-account] input.id-field:checkbox"
                                    data-title="{% trans %}Send email{% endtrans %}"
                                    data-method="POST"
                                    data-ajax-dialog

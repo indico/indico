@@ -94,7 +94,10 @@ class RHPersonsBase(RHManageEventBase):
         event_strategy.joinedload('person').joinedload('user')
 
         chairpersons = {link.person for link in self.event.person_links}
-        persons = defaultdict(lambda: {'roles': OrderedDict(), 'registrations': [], 'has_event_person': True})
+        persons = defaultdict(lambda: {'roles': OrderedDict(),
+                                       'registrations': [],
+                                       'has_event_person': True,
+                                       'id_field_name': 'person_id'})
 
         _reg_person_join = db.or_((EventPerson.user_id == Registration.user_id),
                                   db.and_(EventPerson.user_id.is_(None),
@@ -165,7 +168,10 @@ class RHPersonsBase(RHManageEventBase):
 
             event_person_users.add(event_person.user)
 
-        internal_role_users = defaultdict(lambda: {'roles': OrderedDict(), 'person': [], 'has_event_person': False})
+        internal_role_users = defaultdict(lambda: {'roles': OrderedDict(),
+                                                   'person': [],
+                                                   'has_event_person': False,
+                                                   'id_field_name': 'user_id'})
         for user, roles in event_user_roles.viewitems():
             if user in event_person_users:
                 continue
