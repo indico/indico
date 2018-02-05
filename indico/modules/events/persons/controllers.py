@@ -31,6 +31,7 @@ from indico.modules.events.contributions.models.principals import ContributionPr
 from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.persons import EventPerson
 from indico.modules.events.models.principals import EventPrincipal
+from indico.modules.events.models.roles import EventRole
 from indico.modules.events.persons.forms import EmailEventPersonsForm, EventPersonForm
 from indico.modules.events.persons.operations import update_person
 from indico.modules.events.persons.views import WPManagePersons
@@ -227,8 +228,10 @@ class RHEmailEventPersons(RHManageEventBase):
     def _process(self):
         person_ids = request.form.getlist('person_id')
         user_ids = request.form.getlist('user_id')
+        role_ids = request.form.getlist('role_id')
         recipients = set(self._find_event_persons(person_ids, request.args.get('not_invited_only') == '1'))
         recipients |= set(self._find_users(user_ids))
+        recipients |= set(self._find_role_members(role_ids))
         if self.no_account:
             tpl = get_template_module('events/persons/emails/invitation.html', event=self.event)
             disabled_until_change = False
@@ -236,7 +239,7 @@ class RHEmailEventPersons(RHManageEventBase):
             tpl = get_template_module('events/persons/emails/generic.html', event=self.event)
             disabled_until_change = True
         form = EmailEventPersonsForm(person_id=person_ids, user_id=user_ids,
-                                     recipients=[x.email for x in recipients], body=tpl.get_html_body(),
+                                     recipients=sorted(x.email for x in recipients), body=tpl.get_html_body(),
                                      subject=tpl.get_subject(), register_link=self.no_account, event=self.event)
         if form.validate_on_submit():
             self._send_emails(form, recipients)
@@ -273,6 +276,14 @@ class RHEmailEventPersons(RHManageEventBase):
         if not user_ids:
             return []
         return User.query.filter(User.id.in_(user_ids), User.email != '').all()
+
+    def _find_role_members(self, role_ids):
+        if not role_ids:
+            return []
+        query = (EventRole.query.with_parent(self.event)
+                 .filter(EventRole.id.in_(role_ids))
+                 .options(joinedload('members')))
+        return itertools.chain.from_iterable(role.members for role in query)
 
 
 class RHGrantSubmissionRights(RHManageEventBase):
