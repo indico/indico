@@ -99,7 +99,7 @@ def _get_management_permissions(sender, **kwargs):
 class SubmitterPermission(ManagementPermission):
     name = 'submit'
     friendly_name = _('Submission')
-    description = _('Grants access to materials and minutes.')
+    description = _('Grants management rights for materials and minutes.')
 
 
 @signals.event.sidemenu.connect
