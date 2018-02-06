@@ -40,7 +40,7 @@ def iter_acl(acl):
 def principal_from_fossil(fossil, allow_pending=False, allow_groups=True, allow_missing_groups=False,
                           allow_emails=False, allow_networks=False, existing_data=None, event=None):
     from indico.modules.networks.models.networks import IPNetworkGroup
-    from indico.modules.events.models.groups import EventRole
+    from indico.modules.events.models.roles import EventRole
     from indico.modules.groups import GroupProxy
     from indico.modules.users import User
 
