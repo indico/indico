@@ -59,7 +59,7 @@ Internal Changes
 Version 2.0.1
 -------------
 
-*Unreleased*
+*Released on February 6, 2018*
 
 Improvements
 ^^^^^^^^^^^^
@@ -92,6 +92,7 @@ Bugfixes
 - Make number inputs big enough to show 5 digits in chrome
 - Sort chairperson list on lecture pages
 - Remove whitespace before commas in speaker lists
+- Hide author UI for subcontribution speakers (:issue:`3222`)
 
 
 Version 2.0
