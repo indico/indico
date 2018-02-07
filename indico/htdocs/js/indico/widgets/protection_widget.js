@@ -52,8 +52,10 @@
                 }
                 $aclListField.toggleClass('hidden', !isProtected);
                 $enableAclLink.toggleClass('hidden', isProtected);
-                $('#permissions-widget-{0}'.format(options.permissionsFieldId))
-                    .trigger('indico:protectionModeChanged', [isProtected]);
+                if (options.permissionsFieldId) {
+                    $('#permissions-widget-{0}'.format(options.permissionsFieldId))
+                        .trigger('indico:protectionModeChanged', [isProtected]);
+                }
             }
         });
 
