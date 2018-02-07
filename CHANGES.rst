@@ -24,6 +24,9 @@ Major Features
   abstract/contribution
 - Provide new interface to import registations/contributions from a CSV
   file (:issue:`3144`)
+- Rework how access/permissions are managed. Now all access and management
+  privileges can be assigned from a single place on the protection
+  management page.
 
 Improvements
 ^^^^^^^^^^^^
