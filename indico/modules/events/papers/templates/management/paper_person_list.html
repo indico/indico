@@ -21,18 +21,17 @@
 {% endblock %}
 
 {% block table_body %}
-    {% for event_person, person_roles in event_persons.iteritems() -%}
+    {% for user, person_roles in event_persons.iteritems() -%}
         {% set is_judge = person_roles.judge %}
         {% set is_content_reviewer = person_roles.content_reviewer %}
         {% set is_layout_reviewer = person_roles.layout_reviewer %}
         <tr class="i-table" data-person-roles="{{ person_roles | tojson | forceescape }}">
             <td class="i-table thin-column hide-if-locked">
-                <input type="checkbox" value="{{ event_person.id }}" class="select-row"
-                       name={{ 'person_id' if event_person.user_id is defined else 'user_id' }}
-                       {{ 'disabled' if not event_person.email }}>
+                <input type="checkbox" name="user_id" value="{{ user.id }}" class="select-row"
+                       {{ 'disabled' if not user.email }}>
             </td>
-            <td class="i-table name-column">{{ event_person.full_name }}</td>
-            <td class="i-table email-column">{{ event_person.email }}</td>
+            <td class="i-table name-column">{{ user.full_name }}</td>
+            <td class="i-table email-column">{{ user.email }}</td>
             <td class="i-table roles-column">
                 {%- if is_judge %}
                     {% set judge_title = _('This person is a judge') %}
