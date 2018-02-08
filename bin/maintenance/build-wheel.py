@@ -174,6 +174,28 @@ def patch_indico_version(add_version_suffix):
             f.write(old_content)
 
 
+@contextmanager
+def patch_plugin_version(add_version_suffix):
+    if not add_version_suffix:
+        yield
+        return
+    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
+    suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d.%H%M'), rev)
+    info('adding version suffix: ' + suffix, unimportant=True)
+    with open('setup.py', 'rb+') as f:
+        old_content = f.read()
+        f.seek(0)
+        f.truncate()
+        f.write(re.sub(r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3".format(suffix), old_content, flags=re.M))
+        f.flush()
+        try:
+            yield
+        finally:
+            f.seek(0)
+            f.truncate()
+            f.write(old_content)
+
+
 @click.group()
 @click.option('--target-dir', '-d', type=click.Path(exists=True, file_okay=False, resolve_path=True), default='dist/',
               help='target dir for build wheels relative to the current dir')
@@ -185,13 +207,16 @@ def cli(obj, target_dir):
 @cli.command('indico')
 @click.option('--no-deps', 'deps', is_flag=True, flag_value=False, default=True, help='skip setup_deps')
 @click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
+@click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
-def build_indico(obj, deps, add_version_suffix):
+def build_indico(obj, deps, add_version_suffix, ignore_unclean):
     """Builds the indico wheel."""
     target_dir = obj['target_dir']
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     clean, output = git_is_clean_indico()
-    if not clean:
+    if not clean and ignore_unclean:
+        warn('working tree is not clearn, but ignored')
+    elif not clean:
         fail('working tree is not clean', verbose_msg=output)
     if deps:
         setup_deps()
@@ -212,8 +237,10 @@ def _validate_plugin_dir(ctx, param, value):
 @cli.command('plugin', short_help='Builds a plugin wheel.')
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
+@click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
+@click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_obj
-def build_plugin(obj, plugin_dir):
+def build_plugin(obj, plugin_dir, add_version_suffix, ignore_unclean):
     """Builds a plugin wheel.
 
     PLUGIN_DIR is the path to the folder containing the plugin's setup.py
@@ -221,18 +248,23 @@ def build_plugin(obj, plugin_dir):
     target_dir = obj['target_dir']
     os.chdir(plugin_dir)
     clean, output = git_is_clean_plugin()
-    if not clean:
+    if not clean and ignore_unclean:
+        warn('working tree is not clearn, but ignored')
+    elif not clean:
         fail('working tree is not clean', verbose_msg=output)
     compile_catalogs()
     clean_build_dirs()
-    build_wheel(target_dir)
+    with patch_plugin_version(add_version_suffix):
+        build_wheel(target_dir)
     clean_build_dirs()
 
 
 @cli.command('all-plugins', short_help='Builds all plugin wheels in a directory.')
 @click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@click.option('--add-version-suffix', is_flag=True, help='Add a local suffix (+yyyymmdd.hhmm.commit) to the version')
+@click.option('--ignore-unclean', is_flag=True, help='Ignore unclean working tree')
 @click.pass_context
-def build_all_plugins(ctx, plugins_dir):
+def build_all_plugins(ctx, plugins_dir, add_version_suffix, ignore_unclean):
     """Builds all plugin wheels in a directory.
 
     PLUGINS_DIR is the path to the folder containing the plugin directories
@@ -240,7 +272,8 @@ def build_all_plugins(ctx, plugins_dir):
     plugins = sorted(d for d in os.listdir(plugins_dir) if os.path.exists(os.path.join(plugins_dir, d, 'setup.py')))
     for plugin in plugins:
         step('plugin: {}', plugin)
-        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin))
+        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin),
+                   add_version_suffix=add_version_suffix, ignore_unclean=ignore_unclean)
 
 
 if __name__ == '__main__':
