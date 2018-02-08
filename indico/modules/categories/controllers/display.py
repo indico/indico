@@ -318,6 +318,8 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
         future_event_count = future_event_query.count()
         past_event_count = past_event_query.count()
 
+        show_future_events = bool(self.category.id in session.get('fetch_future_events_in', set()) or
+                                  (session.user and session.user.settings.get('show_future_events', False)))
         show_past_events = bool(self.category.id in session.get('fetch_past_events_in', set()) or
                                 (session.user and session.user.settings.get('show_past_events', False)))
 
@@ -328,6 +330,7 @@ class RHDisplayCategory(RHDisplayCategoryEventsBase):
                   'events_by_month': events_by_month,
                   'format_event_date': self.format_event_date,
                   'future_event_count': future_event_count,
+                  'show_future_events': show_future_events,
                   'future_threshold': future_threshold.strftime(threshold_format),
                   'happening_now': self.happening_now,
                   'is_recent': self.is_recent,
@@ -382,22 +385,36 @@ class RHEventList(RHDisplayCategoryEventsBase):
         return jsonify_data(flash=False, html=html)
 
 
-class RHShowPastEventsInCategory(RHDisplayCategoryBase):
-    """Set whether the past events in a category are automatically displayed or not"""
+class RHShowEventsInCategoryBase(RHDisplayCategoryBase):
+    """Set whether the events in a category are automatically displayed or not"""
 
-    def _show_past_events(self, show_past_events):
-        category_ids = session.setdefault('fetch_past_events_in', set())
-        if show_past_events:
+    session_field = ''
+
+    def _show_events(self, show_events):
+        category_ids = session.setdefault(self.session_field, set())
+        if show_events:
             category_ids.add(self.category.id)
         else:
             category_ids.discard(self.category.id)
         session.modified = True
 
     def _process_DELETE(self):
-        self._show_past_events(False)
+        self._show_events(False)
 
     def _process_PUT(self):
-        self._show_past_events(True)
+        self._show_events(True)
+
+
+class RHShowFutureEventsInCategory(RHShowEventsInCategoryBase):
+    """Set whether the past events in a category are automatically displayed or not"""
+
+    session_field = 'fetch_future_events_in'
+
+
+class RHShowPastEventsInCategory(RHShowEventsInCategoryBase):
+    """Set whether the past events in a category are automatically displayed or not"""
+
+    session_field = 'fetch_past_events_in'
 
 
 class RHExportCategoryICAL(RHDisplayCategoryBase):

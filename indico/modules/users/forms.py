@@ -55,6 +55,11 @@ class UserPreferencesForm(IndicoForm):
         widget=SwitchWidget(),
         description=_("Always use my current timezone instead of an event's timezone."))
 
+    show_future_events = BooleanField(
+        _('Show future events'),
+        widget=SwitchWidget(),
+        description=_('Show future events by default.'))
+
     show_past_events = BooleanField(
         _('Show past events'),
         widget=SwitchWidget(),

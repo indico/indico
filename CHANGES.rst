@@ -45,6 +45,9 @@ Improvements
 - Add option to include the event description in reminder emails
   (:issue:`3157`, thanks :user:`bpedersen2`)
 - Pin default themes to the top for event managers (:issue:`3166`)
+- Add user setting whether to show future events or not by default in a
+  category. Also keep the per-category status in the session (:issue:`3233`,
+  thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

@@ -40,6 +40,7 @@ user_settings = UserSettingsProxy('users', {
     'lang': None,
     'timezone': None,
     'force_timezone': False,  # always use the user's timezone instead of an event's timezone
+    'show_future_events': False,
     'show_past_events': False,
     'name_format': NameFormat.first_last,
     'use_previewer_pdf': True,

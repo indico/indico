@@ -24,8 +24,9 @@ from indico.modules.categories.controllers.display import (RHCategoryCalendarVie
                                                            RHCategoryLogo, RHCategoryOverview, RHCategorySearch,
                                                            RHCategoryStatistics, RHDisplayCategory, RHEventList,
                                                            RHExportCategoryAtom, RHExportCategoryICAL,
-                                                           RHReachableCategoriesInfo, RHShowPastEventsInCategory,
-                                                           RHSubcatInfo, RHXMLExportCategoryInfo)
+                                                           RHReachableCategoriesInfo, RHShowFutureEventsInCategory,
+                                                           RHShowPastEventsInCategory, RHSubcatInfo,
+                                                           RHXMLExportCategoryInfo)
 from indico.modules.categories.controllers.management import (RHCreateCategory, RHDeleteCategory, RHDeleteEvents,
                                                               RHDeleteSubcategories, RHManageCategoryContent,
                                                               RHManageCategoryIcon, RHManageCategoryLogo,
@@ -77,6 +78,7 @@ _bp.add_url_rule('/info', 'info', RHCategoryInfo)
 _bp.add_url_rule('/info-from', 'info_from', RHReachableCategoriesInfo, methods=('GET', 'POST'))
 _bp.add_url_rule('/logo-<slug>.png', 'display_logo', RHCategoryLogo)
 _bp.add_url_rule('/overview', 'overview', RHCategoryOverview)
+_bp.add_url_rule('/show-future-events', 'show_future_events', RHShowFutureEventsInCategory, methods=('DELETE', 'PUT'))
 _bp.add_url_rule('/show-past-events', 'show_past_events', RHShowPastEventsInCategory, methods=('DELETE', 'PUT'))
 _bp.add_url_rule('/statistics', 'statistics', RHCategoryStatistics)
 _bp.add_url_rule('/subcat-info', 'subcat_info', RHSubcatInfo)

@@ -38,16 +38,28 @@
         });
     };
 
-    global.setupCategoryDisplayEventList = function setupCategoryDisplayEventList(showPastEvents) {
+    global.setupCategoryDisplayEventList = function setupCategoryDisplayEventList(showFutureEvents, showPastEvents) {
         var $eventList = $('.event-list');
         var $futureEvents = $eventList.find('.future-events');
         var $pastEvents = $eventList.find('.past-events');
 
-        setupToggleEventListButton($futureEvents);
+        setupToggleEventListButton($futureEvents, onToggleFutureEvents);
         setupToggleEventListButton($pastEvents, onTogglePastEvents);
+
+        if (showFutureEvents) {
+            $futureEvents.find('.js-toggle-list').first().trigger('click', true);
+        }
 
         if (showPastEvents) {
             $pastEvents.find('.js-toggle-list').first().trigger('click', true);
+        }
+
+        function onToggleFutureEvents(shown) {
+            $.ajax({
+                url: $eventList.data('show-future-events-url'),
+                method: shown ? 'PUT' : 'DELETE',
+                error: handleAjaxError
+            });
         }
 
         function onTogglePastEvents(shown) {
