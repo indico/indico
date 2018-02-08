@@ -154,39 +154,31 @@ def git_is_clean_plugin():
 
 @contextmanager
 def patch_indico_version(add_version_suffix):
-    if not add_version_suffix:
+    with _patch_version(add_version_suffix, 'indico/__init__.py',
+                        r"^__version__ = '([^']+)'$", r"__version__ = '\1{}'"):
         yield
-        return
-    rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
-    suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d.%H%M'), rev)
-    info('adding version suffix: ' + suffix, unimportant=True)
-    with open('indico/__init__.py', 'rb+') as f:
-        old_content = f.read()
-        f.seek(0)
-        f.truncate()
-        f.write(re.sub(r"^__version__ = '([^']+)'$", r"__version__ = '\1{}'".format(suffix), old_content, flags=re.M))
-        f.flush()
-        try:
-            yield
-        finally:
-            f.seek(0)
-            f.truncate()
-            f.write(old_content)
 
 
 @contextmanager
 def patch_plugin_version(add_version_suffix):
+    with _patch_version(add_version_suffix, 'setup.py',
+                        r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3"):
+        yield
+
+
+@contextmanager
+def _patch_version(add_version_suffix, file_name, search, replace):
     if not add_version_suffix:
         yield
         return
     rev = subprocess.check_output(['git', 'rev-parse', '--short', 'HEAD']).strip()
     suffix = '+{}.{}'.format(datetime.now().strftime('%Y%m%d.%H%M'), rev)
     info('adding version suffix: ' + suffix, unimportant=True)
-    with open('setup.py', 'rb+') as f:
+    with open(file_name, 'rb+') as f:
         old_content = f.read()
         f.seek(0)
         f.truncate()
-        f.write(re.sub(r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3".format(suffix), old_content, flags=re.M))
+        f.write(re.sub(search, replace.format(suffix), old_content, flags=re.M))
         f.flush()
         try:
             yield
@@ -215,7 +207,7 @@ def build_indico(obj, deps, add_version_suffix, ignore_unclean):
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     clean, output = git_is_clean_indico()
     if not clean and ignore_unclean:
-        warn('working tree is not clearn, but ignored')
+        warn('working tree is not clean, but ignored')
     elif not clean:
         fail('working tree is not clean', verbose_msg=output)
     if deps:
@@ -249,7 +241,7 @@ def build_plugin(obj, plugin_dir, add_version_suffix, ignore_unclean):
     os.chdir(plugin_dir)
     clean, output = git_is_clean_plugin()
     if not clean and ignore_unclean:
-        warn('working tree is not clearn, but ignored')
+        warn('working tree is not clean, but ignored')
     elif not clean:
         fail('working tree is not clean', verbose_msg=output)
     compile_catalogs()
