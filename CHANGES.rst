@@ -61,6 +61,8 @@ Internal Changes
 - Add new signals that allow plugins to run custom code at the various
   stages of the ``RH`` execution and replace/modify the final response
   (:issue:`3227`)
+- Add support for building plugin wheels with date/commit-suffixed
+  version numbers (:issue:`3232`, thanks :user:`driehle`)
 
 
 ----
