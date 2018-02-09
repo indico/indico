@@ -121,7 +121,7 @@ class IndicoFlask(PluginFlaskMixin, Flask):
 
     @property
     def static_url_path(self):
-        return ''
+        return '/'
 
     @property
     def manifest(self):
