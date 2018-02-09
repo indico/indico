@@ -66,7 +66,8 @@ export function generateAssetPath(config) {
         const {dir, base} = path.parse(relPath);
         const h = createHash('md5');
         h.update(fs.readFileSync(file));
-        return path.join(dir, 'v', h.digest('hex').slice(0, 8), base);
+        // .. -> _, like file-loader does
+        return path.join(dir.replace(/\.\./g, '_'), 'v', h.digest('hex').slice(0, 8), base);
     };
 }
 
@@ -125,7 +126,7 @@ export function webpackDefaults(env, config) {
                                     ctx: {
                                         urlnamespaces: {
                                             namespacePaths: (name) => {
-                                                return `${config.indico.build.staticURL}static/plugins/${name}`;
+                                                return path.join(config.indico.build.staticURL, 'static/plugins', name);
                                             }
                                         }
                                     }
