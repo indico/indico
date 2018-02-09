@@ -48,7 +48,7 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
     if (module.produceBundle) {
         entryPoints[moduleName] = dirName;
     }
-    const modulePath = 'indico/modules/' + (module.parent ? (module.parent + '/') : '') + module.name;
+    const modulePath = path.join('indico/modules', module.parent || '',  module.name);
     extraResolveAliases.push({name: modulePath, alias: dirName, onlyModule: false});
 
     if (module.partials) {
