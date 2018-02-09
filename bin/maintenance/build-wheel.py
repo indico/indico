@@ -152,18 +152,13 @@ def git_is_clean_plugin():
     return True, None
 
 
-@contextmanager
 def patch_indico_version(add_version_suffix):
-    with _patch_version(add_version_suffix, 'indico/__init__.py',
-                        r"^__version__ = '([^']+)'$", r"__version__ = '\1{}'"):
-        yield
+    return _patch_version(add_version_suffix, 'indico/__init__.py',
+                          r"^__version__ = '([^']+)'$", r"__version__ = '\1{}'")
 
 
-@contextmanager
 def patch_plugin_version(add_version_suffix):
-    with _patch_version(add_version_suffix, 'setup.py',
-                        r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3"):
-        yield
+    return _patch_version(add_version_suffix, 'setup.py', r"^(\s+)version='([^']+)'(,?)$", r"\1version='\2{}'\3")
 
 
 @contextmanager
