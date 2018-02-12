@@ -49,6 +49,8 @@ Improvements
   category. Also keep the per-category status in the session (:issue:`3233`,
   thanks :user:`bpedersen2`)
 - Keep page titles in sync with conference menu item titles (:issue:`3236`)
+- Add option to hide an attachment folder in the display areas of an event
+  (:issue:`3181`, thanks :user:`bpedersen2`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
