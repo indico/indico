@@ -107,12 +107,12 @@ class AttachmentFolderForm(IndicoForm):
                                      description=_("By default, folders are always visible, even if a user cannot "
                                                    "access them. You can disable this behavior here, hiding the folder "
                                                    "for anyone who does not have permission to access it."))
-    is_hidden = BooleanField(_("Always Hidden in Event page"),
-                             [HiddenUnless('is_always_visible', value=False), ],
+    is_hidden = BooleanField(_("Always hidden"),
+                             [HiddenUnless('is_always_visible', value=False)],
                              widget=SwitchWidget(),
-                             description=_("Always hide the folder in the event page materials listing. "
-                                           "You can use this for folders to store non-image files used "
-                                           "in e.g. in download links. The access permissions still apply."))
+                             description=_("Always hide the folder and its contents from public display areas of "
+                                           "the event. You can use this for folders to store non-image files used "
+                                           "e.g. in download links. The access permissions still apply."))
 
     def __init__(self, *args, **kwargs):
         self.linked_object = kwargs.pop('linked_object')
