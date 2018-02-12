@@ -25,6 +25,7 @@ from indico.modules.events.abstracts.controllers.base import RHAbstractsBase
 from indico.modules.events.abstracts.operations import create_abstract
 from indico.modules.events.abstracts.util import get_user_abstracts, make_abstract_form
 from indico.modules.events.abstracts.views import WPDisplayCallForAbstracts
+from indico.modules.events.layout.util import get_menu_entry_by_name
 from indico.modules.events.util import get_field_values
 from indico.util.i18n import _
 from indico.web.flask.util import send_file, url_for
@@ -35,9 +36,10 @@ class RHCallForAbstracts(RHAbstractsBase):
     """Show the main CFA page"""
 
     def _process(self):
+        page_title = get_menu_entry_by_name('call_for_abstracts', self.event).localized_title
         abstracts = get_user_abstracts(self.event, session.user) if session.user else []
         return WPDisplayCallForAbstracts.render_template('display/call_for_abstracts.html', self.event,
-                                                         abstracts=abstracts)
+                                                         abstracts=abstracts, page_title=page_title)
 
 
 class RHMyAbstractsExportPDF(RHAbstractsBase):
