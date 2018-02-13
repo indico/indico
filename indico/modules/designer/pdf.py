@@ -142,10 +142,10 @@ class DesignerPDFBase(object):
                 p.drawOn(canvas, margin_x + item_x, self.height - margin_y - item_y - h)
                 item_y += h
 
-    def _draw_background(self, canvas, img_reader, tpl_data, pos_x, pos_y, width, height, stretch=True):
+    def _draw_background(self, canvas, img_reader, tpl_data, pos_x, pos_y, width, height):
         img_width, img_height = img_reader.getSize()
 
-        if stretch:
+        if tpl_data.background_position == 'stretch':
             bg_x = pos_x
             bg_y = pos_y
             bg_width = width
