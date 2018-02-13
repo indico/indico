@@ -151,23 +151,23 @@ class DesignerPDFBase(object):
             bg_width = width
             bg_height = height
         else:
-            bg_width = img_width / tpl_data.pixels_cm * cm
-            bg_height = img_height / tpl_data.pixels_cm * cm
+            bg_width = img_width
+            bg_height = img_height
             page_width = width
             page_height = height
 
             bg_x = pos_x + (page_width - bg_width) / 2.0
             bg_y = pos_y + (page_height - bg_height) / 2.0
 
-            if width > page_width:
-                ratio = float(page_width) / width
+            if bg_width > page_width:
+                ratio = float(page_width) / bg_width
                 bg_width = page_width
                 bg_height *= ratio
                 bg_x = pos_x
                 bg_y = pos_y + (page_height - bg_height) / 2.0
 
-            if height > page_height:
-                ratio = float(page_height) / height
+            if bg_height > page_height:
+                ratio = float(page_height) / bg_height
                 bg_height = page_height
                 bg_width *= ratio
                 bg_x = pos_x + (page_width - bg_width) / 2.0
