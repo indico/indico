@@ -62,6 +62,7 @@ export:
       - TimetableEntry.event_id
       - ImageFile.event_id
       - AttachmentFolder.event_id
+      - EventRole.event_id
       - EventPrincipal.event_id
       - EventNote.event_id
       - RegistrationForm.event_id
@@ -163,9 +164,17 @@ export:
   EventNoteRevision: {}
 
 
+  # roles
+  events.role_members: {}
+
+  EventRole:
+    fks:
+      - EventRole.members.prop.secondary.c.role_id
+
+
   # acls
   EventPrincipal:
-    skipif: ROW.type.name not in ('user', 'email')
+    skipif: ROW.type.name not in ('user', 'email', 'event_role')
 
   EventSettingPrincipal:
     skipif: ROW.type.name != 'user'
@@ -389,6 +398,7 @@ import:
     AbstractEmailLogEntry.user_id: none
     PaperReviewComment.modified_by_id: none
     # skip row
+    EventRole.members.prop.secondary.c.user_id: skip
     EventPrincipal.user_id: skip
     EventSettingPrincipal.user_id: skip
     SessionPrincipal.user_id: skip
