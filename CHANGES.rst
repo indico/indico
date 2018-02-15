@@ -54,6 +54,12 @@ Improvements
 - Improve flower redirect URI generation (:issue:`3187`, thanks
   :user:`bpedersen2`)
 
+Bugfixes
+^^^^^^^^
+
+- Take 'center' orientation of badge/poster backgrounds into account
+  (:issue:`3238`, thanks :user:`bpedersen2`)
+
 Internal Changes
 ^^^^^^^^^^^^^^^^
 
