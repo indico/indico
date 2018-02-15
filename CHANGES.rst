@@ -12,6 +12,12 @@ Security fixes
 
 - Update `bleach <https://github.com/mozilla/bleach>`_ to fix an XSS vulnerability
 
+Bugfixes
+^^^^^^^^
+
+- Take 'center' orientation of badge/poster backgrounds into account
+  (:issue:`3238`, thanks :user:`bpedersen2`)
+
 
 Version 2.0.1
 -------------
