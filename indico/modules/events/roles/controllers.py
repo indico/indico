@@ -16,6 +16,8 @@
 
 from __future__ import unicode_literals
 
+import random
+
 from flask import request, session
 from sqlalchemy.orm import joinedload
 
@@ -25,7 +27,7 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.models.roles import EventRole
 from indico.modules.events.roles import logger
 from indico.modules.events.roles.forms import RoleForm
-from indico.modules.events.roles.util import serialize_role
+from indico.modules.events.roles.util import get_role_colors, serialize_role
 from indico.modules.events.roles.views import WPEventRoles
 from indico.modules.users import User
 from indico.util.user import principal_from_fossil
@@ -60,7 +62,7 @@ class RHAddEventRole(RHManageEventBase):
     """Add a new event role"""
 
     def _process(self):
-        form = RoleForm(event=self.event)
+        form = RoleForm(event=self.event, color=self._get_color())
         if form.validate_on_submit():
             role = EventRole(event=self.event)
             form.populate_obj(role)
@@ -70,6 +72,11 @@ class RHAddEventRole(RHManageEventBase):
                            'Added role: "{}"'.format(role.name), session.user)
             return jsonify_data(html=_render_roles(self.event), role=serialize_role(role))
         return jsonify_form(form)
+
+    def _get_color(self):
+        used_colors = {role.color for role in self.event.roles}
+        unused_colors = set(get_role_colors()) - used_colors
+        return random.choice(tuple(unused_colors) or get_role_colors())
 
 
 class RHManageEventRole(RHManageEventBase):

@@ -25,7 +25,7 @@ from .simple import (EmailListField, HiddenFieldList, IndicoEmailRecipientsField
                      IndicoSelectMultipleCheckboxBooleanField, IndicoSelectMultipleCheckboxField, IndicoStaticTextField,
                      IndicoTagListField, JSONField, TextListField)
 
-from .colors import IndicoPalettePickerField
+from .colors import IndicoPalettePickerField, IndicoSinglePalettePickerField
 from .datetime import (IndicoDateField, IndicoDateTimeField, IndicoTimezoneSelectField, IndicoWeekDayRepetitionField,
                        OccurrencesField, RelativeDeltaField, TimeDeltaField)
 from .enums import HiddenEnumField, IndicoEnumRadioField, IndicoEnumSelectField
@@ -40,10 +40,10 @@ from .sqlalchemy import IndicoQuerySelectMultipleCheckboxField, IndicoQuerySelec
 
 __all__ = ('IndicoSelectMultipleCheckboxField', 'IndicoRadioField', 'JSONField', 'HiddenFieldList', 'TextListField',
            'EmailListField', 'IndicoPasswordField', 'IndicoStaticTextField', 'IndicoTagListField',
-           'IndicoPalettePickerField', 'TimeDeltaField', 'IndicoDateTimeField', 'OccurrencesField',
-           'IndicoTimezoneSelectField', 'IndicoEnumSelectField', 'IndicoEnumRadioField', 'HiddenEnumField', 'FileField',
-           'MultiStringField', 'MultipleItemsField', 'OverrideMultipleItemsField', 'PrincipalListField',
-           'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField', 'EditableFileField'
-           'IndicoQuerySelectMultipleCheckboxField', 'IndicoLocationField', 'IndicoMarkdownField', 'IndicoDateField',
-           'IndicoProtectionField', 'IndicoSelectMultipleCheckboxBooleanField', 'RelativeDeltaField',
+           'IndicoPalettePickerField', 'IndicoSinglePalettePickerField', 'TimeDeltaField', 'IndicoDateTimeField',
+           'OccurrencesField', 'IndicoTimezoneSelectField', 'IndicoEnumSelectField', 'IndicoEnumRadioField',
+           'HiddenEnumField', 'FileField', 'MultiStringField', 'MultipleItemsField', 'OverrideMultipleItemsField',
+           'PrincipalListField', 'PrincipalField', 'AccessControlListField', 'IndicoQuerySelectMultipleField',
+           'EditableFileField', 'IndicoQuerySelectMultipleCheckboxField', 'IndicoLocationField', 'IndicoMarkdownField',
+           'IndicoDateField', 'IndicoProtectionField', 'IndicoSelectMultipleCheckboxBooleanField', 'RelativeDeltaField',
            'IndicoWeekDayRepetitionField', 'IndicoEmailRecipientsField')

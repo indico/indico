@@ -17,12 +17,13 @@
 from __future__ import unicode_literals
 
 from wtforms.fields.core import StringField
-from wtforms.validators import DataRequired, Length, Regexp
+from wtforms.validators import DataRequired, Length
 
 from indico.modules.events.models.roles import EventRole
+from indico.modules.events.roles.util import get_role_colors
 from indico.util.i18n import _
 from indico.web.forms.base import IndicoForm
-from indico.web.forms.widgets import ColorPickerWidget
+from indico.web.forms.fields import IndicoSinglePalettePickerField
 
 
 class RoleForm(IndicoForm):
@@ -31,10 +32,8 @@ class RoleForm(IndicoForm):
     code = StringField(_('Abbreviation'), [DataRequired(), Length(max=3)], filters=[lambda x: x.upper() if x else ''],
                        render_kw={'style': 'width:60px; text-align:center; text-transform:uppercase;'},
                        description=_('A shortcut (max. 3 characters) for the role'))
-    color = StringField(_('Colour'), [DataRequired(), Regexp(r'^[0-9A-Fa-f]{6}$')],
-                        filters=[lambda x: (x or '').replace('#', '')],
-                        widget=ColorPickerWidget(show_field=False), default='#00a4e4',
-                        description=_('The colour used when displaying the role'))
+    color = IndicoSinglePalettePickerField(_('Colour'), color_list=get_role_colors(), text_color='ffffff',
+                                           description=_('The colour used when displaying the role'))
 
     def __init__(self, *args, **kwargs):
         self.role = kwargs.get('obj')
