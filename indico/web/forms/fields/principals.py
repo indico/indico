@@ -17,6 +17,7 @@
 from __future__ import absolute_import, unicode_literals
 
 import json
+from operator import attrgetter
 
 from wtforms import HiddenField
 
@@ -142,7 +143,7 @@ class PermissionsField(JSONField):
 
     @property
     def roles(self):
-        return [serialize_role(role) for role in self.get_form().event.roles]
+        return [serialize_role(role) for role in sorted(self.get_form().event.roles, key=attrgetter('code'))]
 
     def _value(self):
         return self.data if self.data else '[]'
