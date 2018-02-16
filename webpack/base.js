@@ -79,6 +79,11 @@ export function webpackDefaults(env, config) {
         url: true
     };
 
+    const scssIncludePath = path.join((config.isPlugin ?
+        path.resolve(config.build.indicoSourcePath, './indico/web/client') :
+        path.join(config.build.clientPath)),
+                                      'styles');
+
     return {
         devtool: 'source-map',
         context: config.build.clientPath,
@@ -136,7 +141,7 @@ export function webpackDefaults(env, config) {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: currentEnv === 'development',
-                                includePaths: [path.join(config.build.clientPath, 'styles')]
+                                includePaths: [scssIncludePath]
                             }
                         }],
                     })
