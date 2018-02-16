@@ -73,6 +73,8 @@ export function generateAssetPath(config) {
 
 export function webpackDefaults(env, config) {
     const currentEnv = (env ? env.NODE_ENV : null) || 'development';
+    const nodeModules = path.join(config.build.indicoSourcePath || path.resolve(config.build.rootPath, '..'),
+                                  'node_modules');
 
     const _cssLoaderOptions = {
         root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
@@ -161,29 +163,6 @@ export function webpackDefaults(env, config) {
                     return file;
                 }
             }),
-            new webpack.ProvidePlugin({
-                $: 'jquery',
-                jQuery: 'jquery',
-                _: 'underscore',
-                moment: 'moment'
-            }),
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'common',
-                minChunks: (mod, count) => {
-                    if (config.isPlugin) {
-                        // Plugin files should be loaded in their entirety
-                        return false;
-                    } else if (mod.resource.match(/\/themes\/.*\.scss/)) {
-                        // Let's not extract theme SCSS into the common chunk
-                        // Otherwise we will have no theme SCSS files.
-                        // This check is quite hacky as it relies of the file path,
-                        // we should find some better way to control this threshold.
-                        return false;
-                    } else {
-                        return count >= 3;
-                    }
-                }
-            }),
             // Do not load moment locales (we'll load them explicitly)
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
             new ExtractTextPlugin({
@@ -199,8 +178,11 @@ export function webpackDefaults(env, config) {
         ],
         resolve: {
             alias: [
-                {name: 'jquery', alias: 'jquery/src/jquery', onlyModule: false}
+                {name: 'jquery', alias: path.resolve(nodeModules, 'jquery/src/jquery'), onlyModule: false}
             ]
+        },
+        resolveLoader: {
+            modules: [nodeModules]
         },
         stats: {
             assets: false,
