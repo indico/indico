@@ -234,18 +234,16 @@ class WPBase(object):
         elif isinstance(self._rh, RHAdminBase):
             title_parts.insert(0, _('Administration'))
 
-        plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
-                                        multi_value_types=list)
-        plugin_js = values_from_signal(signals.plugin.inject_js.send(self.__class__), as_list=True,
-                                       multi_value_types=list)
+        injected_bundles = values_from_signal(signals.plugin.inject_bundle.send(self.__class__), as_list=True,
+                                              multi_value_types=list)
         custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
         custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
-        css_files = map(self._fix_path, plugin_css + self.get_extra_css_files() + custom_css)
-        js_files = map(self._fix_path, plugin_js + custom_js)
+        css_files = map(self._fix_path, self.get_extra_css_files() + custom_css)
+        js_files = map(self._fix_path, custom_js)
 
         body = to_unicode(self._display(params))
         bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()),
-                                  self.additional_bundles['screen'])
+                                  self.additional_bundles['screen'], injected_bundles)
         print_bundles = itertools.chain((current_app.manifest[x] for x in self.print_bundles),
                                         self.additional_bundles['print'])
 
