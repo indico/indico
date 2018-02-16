@@ -39,14 +39,9 @@ which will be registered on the application. The Blueprint must be named
 either *PLUGINNAME* or *compat_PLUGINNAME*.
 """)
 
-inject_css = _signals.signal('inject-css', """
-Expected to return a list of CSS URLs which are loaded after all
-other CSS. The *sender* is the WP class of the page.
-""")
-
-inject_js = _signals.signal('inject-js', """
-Expected to return a list of JS URLs which are loaded after all
-other JS. The *sender* is the WP class of the page.
+inject_bundle = _signals.signal('inject-bundle', """
+Expected to return a list of bundle names which are loaded after all
+the rest. The *sender* is the WP class of the page.
 """)
 
 template_hook = _signals.signal('template-hook', """

@@ -106,8 +106,6 @@ class IndicoPlugin(Plugin):
     #: This should not be disabled in most cases; if you need to store arbitrary
     #: keys, consider storing a dict inside a single top-level setting.
     strict_settings = True
-    #: Whether the plugin has its own manifest.json (Webpack)
-    has_manifest = False
 
     def init(self):
         """Called when the plugin is being loaded/initialized.
@@ -210,32 +208,9 @@ class IndicoPlugin(Plugin):
                         depends=SASS_BASE_MODULES)
         self.assets.register(name, bundle)
 
-    def inject_css(self, name, view_class=None, subclasses=True, condition=None):
-        """Injects a CSS bundle into Indico's pages
-
-        :param name: Name of the bundle
-        :param view_class: If a WP class is specified, only inject it into pages using that class
-        :param subclasses: also inject into subclasses of `view_class`
-        :param condition: a callable to determine whether to inject or not. only called, when the
-                          view_class criterion matches
-        """
-        self._inject_asset(signals.plugin.inject_css, name, view_class, subclasses, condition)
-
-    def inject_js(self, name, view_class=None, subclasses=True, condition=None):
-        """Injects a JS bundle into Indico's pages
-
-        :param name: Name of the bundle
-        :param view_class: If a WP class is specified, only inject it into pages using that class
-        :param subclasses: also inject into subclasses of `view_class`
-        :param condition: a callable to determine whether to inject or not. only called, when the
-                          view_class criterion matches
-        """
-        self._inject_asset(signals.plugin.inject_js, name, view_class, subclasses, condition)
-
-    def _inject_asset(self, signal, name, view_class=None, subclasses=True, condition=None):
+    def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages
 
-        :param signal: the signal to use for injection
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
         :param subclasses: also inject into subclasses of `view_class`
@@ -245,18 +220,18 @@ class IndicoPlugin(Plugin):
 
         def _do_inject(sender):
             if condition is None or condition():
-                return self.assets[name].urls()
+                return self.manifest[name]
 
         if view_class is None:
-            self.connect(signal, _do_inject)
+            self.connect(signals.plugin.inject_bundle, _do_inject)
         elif not subclasses:
-            self.connect(signal, _do_inject, sender=view_class)
+            self.connect(signals.plugin.inject_bundle, _do_inject, sender=view_class)
         else:
             def _func(sender):
                 if issubclass(sender, view_class):
                     return _do_inject(sender)
 
-            self.connect(signal, _func)
+            self.connect(signals.plugin.inject_bundle, _func)
 
     def inject_vars_js(self):
         """Returns a string that will define variables for the plugin in the vars.js file"""

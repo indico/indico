@@ -39,7 +39,7 @@ def _generate_webpack_config(plugin):
         'indico': get_webpack_config(current_app),
         'build': {
             'debug': current_app.debug,
-            'indicoRootPath': os.path.dirname(get_root_path('indico')),
+            'indicoSourcePath': os.path.dirname(get_root_path('indico')),
             'clientPath': os.path.join(plugin.root_path, 'client'),
             'rootPath': plugin.root_path,
             'staticPath': static_path,
