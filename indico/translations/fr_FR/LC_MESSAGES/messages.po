@@ -11479,7 +11479,7 @@ msgid "Margin between rows"
 msgstr "Marge entre les lignes"
 
 #: indico/modules/events/registration/lists.py:49
-msgid "Registation Date"
+msgid "Registration Date"
 msgstr "Date d'inscription"
 
 #: indico/modules/events/registration/fields/simple.py:154
