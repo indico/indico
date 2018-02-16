@@ -12,6 +12,11 @@ Security fixes
 
 - Update `bleach <https://github.com/mozilla/bleach>`_ to fix an XSS vulnerability
 
+Improvements
+^^^^^^^^^^^^
+
+- Warn when editing a speaker/author would result in duplicate emails
+
 Bugfixes
 ^^^^^^^^
 

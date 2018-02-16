@@ -880,7 +880,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
                         return;
                     }
                     self.userData.set('name', '{0} {1}'.format(self.userData.get('firstName'), self.userData.get('familyName')));
-                    if (self.parameterManager.check()) {
+                    if (self.parameterManager.check() && self.checkPerson(self.userData)) {
                         self.action(self.userData);
                         if (self.autoClose) {
                             self.close();
@@ -893,7 +893,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
             ];
         }
      },
-     function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail, autoClose) {
+     function(title, userData, action, grantSubmission, grantManagement, grantCoordination, allowEmptyEmail, autoClose, checkPerson) {
          this.userData = userData;
          this.action = action;
          this.grantSubmission = exists(grantSubmission)?grantSubmission:false;
@@ -902,6 +902,7 @@ type("UserDataPopup", ["ExclusivePopupWithButtons"],
          this.allowEmptyEmail = exists(allowEmptyEmail)?allowEmptyEmail:true;
          this.ExclusivePopup(title,  function(){return true;});
          this.autoClose = exists(autoClose) ? autoClose : true;
+         this.checkPerson = checkPerson || function() { return true; };
      }
     );
 
