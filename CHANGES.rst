@@ -2,6 +2,30 @@ Changelog
 =========
 
 
+Version 2.2
+-----------
+
+*Unreleased*
+
+Major Features
+^^^^^^^^^^^^^^
+
+- TODO
+
+Improvements
+^^^^^^^^^^^^
+
+- TODO
+
+Internal Changes
+^^^^^^^^^^^^^^^^
+
+- TODO
+
+
+----
+
+
 Version 2.1
 -----------
 
