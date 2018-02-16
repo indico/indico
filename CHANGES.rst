@@ -55,6 +55,7 @@ Improvements
   :user:`bpedersen2`)
 - When blocking a user account, the user will be forcefully logged out in
   addition to being prevented from logging in
+- Warn when editing a speaker/author would result in duplicate emails
 
 Bugfixes
 ^^^^^^^^

@@ -18,6 +18,33 @@
 (function($) {
     'use strict';
 
+    function getUserId(obj) {
+        if (obj._type === 'Avatar') {
+            return obj.id;
+        } else if (obj._type === 'EventPerson') {
+            return obj.user_id;
+        }
+    }
+
+    function comparePersons(a, b) {
+        var aUserId = getUserId(a);
+        var bUserId = getUserId(b);
+
+
+        if (a._type === b._type
+            && a.id !== undefined && b.id !== undefined
+            && a.id === b.id) {
+            return true;
+        }
+
+        if (aUserId !== undefined && bUserId !== undefined
+            && aUserId === bUserId) {
+            return true;
+        }
+
+        return !!a.email && !!b.email && a.email.toLowerCase() === b.email.toLowerCase();
+    }
+
     $.widget('indico.principalfield', {
         options: {
             eventId: null,
@@ -49,33 +76,6 @@
 
         add: function add(people) {
             var self = this;
-
-            function getUserId(obj) {
-                if (obj._type === 'Avatar') {
-                    return obj.id;
-                } else if (obj._type === 'EventPerson') {
-                    return obj.user_id;
-                }
-            }
-
-            function comparePersons(a, b) {
-                var aUserId = getUserId(a);
-                var bUserId = getUserId(b);
-
-
-                if (a._type === b._type
-                    && a.id !== undefined && b.id !== undefined
-                    && a.id === b.id) {
-                    return true;
-                }
-
-                if (aUserId !== undefined && bUserId !== undefined
-                    && aUserId === bUserId) {
-                    return true;
-                }
-
-                return !!a.email && !!b.email && a.email.toLowerCase() === b.email.toLowerCase();
-            }
 
             function deduplicate(people) {
                 var newPeople = [];
@@ -120,9 +120,23 @@
         edit: function edit(personId) {
             var self = this;
             var person = _.findWhere(self.people, {id: personId});
-            function handle(person) { self.set(person.get('id'), person.getAll()); }
+            function handle(person) {
+                self.set(person.get('id'), person.getAll());
+            }
+            function checkEmail(person) {
+                person = person.getAll();
+                var found = _.find(self.people, function(p) {
+                    return person.id !== p.id && comparePersons(person, p);
+                });
+                if (found) {
+                    alertPopup($T.gettext('There is already another person with this email address.'),
+                               $T.gettext('Warning'));
+                    return false;
+                }
+                return true;
+            }
             var personEditPopup = new UserDataPopup($T("Edit information"), $O(person), handle, false, false, false,
-                                                    self.options.allowEmptyEmail);
+                                                    self.options.allowEmptyEmail, true, checkEmail);
             personEditPopup.open();
         },
 
