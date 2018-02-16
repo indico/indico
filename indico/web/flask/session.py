@@ -73,6 +73,11 @@ class IndicoSession(BaseSession):
                     flash(Markup(msg).format(merged_into_user.full_name), 'warning')
                 else:
                     flash(_('Your profile has been deleted.'), 'error')
+        elif user and user.is_blocked:
+            user = None
+            if not request.is_xhr and request.blueprint != 'assets':
+                self.clear()
+                flash(_('Your Indico profile has been blocked.'), 'error')
         return user
 
     @user.setter

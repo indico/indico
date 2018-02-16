@@ -53,6 +53,8 @@ Improvements
   (:issue:`3181`, thanks :user:`bpedersen2`)
 - Improve flower redirect URI generation (:issue:`3187`, thanks
   :user:`bpedersen2`)
+- When blocking a user account, the user will be forcefully logged out in
+  addition to being prevented from logging in
 
 Bugfixes
 ^^^^^^^^
