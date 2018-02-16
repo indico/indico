@@ -24,6 +24,7 @@ const base = require('./webpack');
 const merge = require('webpack-merge');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const uglify = require('uglify-js');
+const webpack = require('webpack');
 
 let entryPoints = {
     main: './js/index.js',
@@ -120,7 +121,27 @@ module.exports = env => {
             new CopyWebpackPlugin([
                 {from: path.resolve(modulesDir, 'ckeditor/dev/builder/release/ckeditor'), to: 'js/ckeditor', transform},
                 {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}
-            ])
+            ]),
+            new webpack.ProvidePlugin({
+                $: 'jquery',
+                jQuery: 'jquery',
+                _: 'underscore',
+                moment: 'moment'
+            }),
+            new webpack.optimize.CommonsChunkPlugin({
+                name: 'common',
+                minChunks: (mod, count) => {
+                    if (mod.resource.match(/\/themes\/.*\.scss/)) {
+                        // Let's not extract theme SCSS into the common chunk
+                        // Otherwise we will have no theme SCSS files.
+                        // This check is quite hacky as it relies of the file path,
+                        // we should find some better way to control this threshold.
+                        return false;
+                    } else {
+                        return count >= 3;
+                    }
+                }
+            })
         ],
         resolve: {
             alias: extraResolveAliases
