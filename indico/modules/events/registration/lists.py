@@ -46,7 +46,7 @@ class RegistrationListGenerator(ListGeneratorBase):
         }
         self.static_items = OrderedDict([
             ('reg_date', {
-                'title': _('Registation Date'),
+                'title': _('Registration Date'),
             }),
             ('price', {
                 'title': _('Price'),

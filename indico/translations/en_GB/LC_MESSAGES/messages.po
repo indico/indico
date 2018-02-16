@@ -10028,7 +10028,7 @@ msgid "Send email"
 msgstr ""
 
 #: indico/modules/events/registration/util.py:445
-msgid "Registation Date"
+msgid "Registration Date"
 msgstr ""
 
 #: indico/modules/events/registration/controllers/display.py:213

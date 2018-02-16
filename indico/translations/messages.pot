@@ -10612,7 +10612,7 @@ msgid "Margin between rows"
 msgstr ""
 
 #: indico/modules/events/registration/lists.py:49
-msgid "Registation Date"
+msgid "Registration Date"
 msgstr ""
 
 #: indico/modules/events/registration/fields/simple.py:154 indico/modules/events/registration/lists.py:61
