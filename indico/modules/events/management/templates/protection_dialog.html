@@ -1,0 +1,6 @@
+{% from 'forms/_form.html' import simple_form, form_rows, form_row %}
+
+{% call simple_form(form, back=_('Cancel')) %}
+    {{ form_row(form.permissions, skip_label=true, classes='protection-dialog-permissions') }}
+    {{ form_rows(form, skip=('permissions',)) }}
+{% endcall %}

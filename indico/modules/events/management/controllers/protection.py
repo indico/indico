@@ -35,7 +35,8 @@ from indico.util.i18n import _
 from indico.util.user import principal_from_fossil
 from indico.web.flask.util import url_for
 from indico.web.forms.base import FormDefaults
-from indico.web.forms.fields.principals import serialize_principal
+from indico.web.forms.fields.principals import PermissionsField, serialize_principal
+from indico.web.rh import RH
 from indico.web.util import jsonify_template
 
 
@@ -167,9 +168,9 @@ class RHEventProtection(RHManageEventBase):
             self.event.update_principal(p, **permissions_kwargs)
 
 
-class RHEventPermissionsDialog(RHManageEventBase):
+class RHPermissionsDialog(RH):
     def _process(self):
         principal = json.loads(request.form['principal'])
-        permissions_tree = get_permissions_info(Event)[1]
-        return jsonify_template('events/management/event_permissions_dialog.html', permissions_tree=permissions_tree,
+        permissions_tree = get_permissions_info(PermissionsField.type_mapping[request.view_args['type']])[1]
+        return jsonify_template('events/management/permissions_dialog.html', permissions_tree=permissions_tree,
                                 permissions=request.form.getlist('permissions'), principal=principal)

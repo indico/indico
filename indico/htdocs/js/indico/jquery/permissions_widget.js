@@ -22,7 +22,7 @@
 
     $.widget('indico.permissionswidget', {
         options: {
-            eventId: null,
+            objectType: null,
             permissionsInfo: null
         },
 
@@ -119,7 +119,7 @@
                 return $('<button>', {
                     'type': 'button',
                     'class': 'i-button text-color borderless icon-only icon-edit',
-                    'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.eventId}),
+                    'data-href': build_url(Indico.Urls.PermissionsDialog, {type: this.options.objectType}),
                     'data-title': $T.gettext('Assign Permissions'),
                     'data-method': 'POST',
                     'data-ajax-dialog': '',

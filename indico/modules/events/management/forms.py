@@ -228,7 +228,7 @@ class EventClassificationForm(IndicoForm):
 
 
 class EventProtectionForm(IndicoForm):
-    permissions = PermissionsField(_("Permissions"))
+    permissions = PermissionsField(_("Permissions"), object_type='event')
     protection_mode = IndicoProtectionField(_('Protection mode'),
                                             protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('event_management.acl_message',
