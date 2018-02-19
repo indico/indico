@@ -5,9 +5,19 @@
         size="{{ field.length || getDefaultFieldSetting('defaultTextFieldSize') }}"
         ng-model="userdata[fieldName]"
         ng-required="field.isRequired"
+        ng-maxlength="{{ field.maxLength }}"
+        ng-minlength="{{ field.minLength }}"
         ng-class="{
             hasError: validationStarted && nestedForm.$invalid
         }"/>
+
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.minlength" class="error-message-tag">
+     {{ 'Minimum length:' | i18n }} {{ field.minLength }}
+    </span>
+
+    <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.maxlength" class="error-message-tag">
+     {{ 'Maximum length:' | i18n }} {{ field.maxLength }}
+    </span>
 
     <span ng-show="validationStarted && nestedForm.$invalid && nestedForm.$error.required && field.isRequired" class="error-message-tag">
         {{ 'Field is mandatory' | i18n }}

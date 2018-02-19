@@ -60,6 +60,8 @@ Improvements
   defined for the event (:issue:`2813`)
 - Show warning box to inform that reviewer roles do not apply when an event
   has no tracks (:issue:`2919`)
+- Allow specifying min/max length for registration form text fields
+  (:issue:`3193`, thanks :user:`bpedersen2`)
 
 Bugfixes
 ^^^^^^^^

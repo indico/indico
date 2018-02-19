@@ -758,6 +758,8 @@ ndRegForm.directive('ndTextField', function(url) {
             scope.settings.fieldName = $T("Text");
             scope.settings.size = true;
             scope.settings.formData.push('length');
+            scope.settings.formData.push('maxLength');
+            scope.settings.formData.push('minLength');
         }
     };
 });
