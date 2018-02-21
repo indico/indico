@@ -198,7 +198,7 @@ export function webpackDefaults(env, config) {
 
 export function indicoStaticLoader(config) {
     return {
-        test: /\/static\/(images|fonts)\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|svg|eot)$/,
+        test: /\/static\/(images|fonts)\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/,
         use: {
             loader: 'file-loader',
             options: {
