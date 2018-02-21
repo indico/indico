@@ -71,12 +71,29 @@ def get_permissions_info(_type):
     :param _type: The type of the permissions retrieved (e.g. Event, Category)
     :return: A tuple containing a dict with the available permissions and a dict with the permissions tree
     """
+    from indico.modules.events import Event
+    from indico.modules.events.contributions import Contribution
+    from indico.modules.events.sessions import Session
+
+    description_mapping = {
+        FULL_ACCESS_PERMISSION: {
+            Event: _('Unrestricted management access for the whole event'),
+            Session: _('Unrestricted management access for the selected session'),
+            Contribution: _('Unrestricted management access for the selected contribution')
+        },
+        READ_ACCESS_PERMISSION: {
+            Event: _('Access the public areas of the event'),
+            Session: _('Access the public areas of the selected session'),
+            Contribution: _('Access the public areas of the selected contribution')
+        }
+    }
+
     selectable_permissions = {k: v for k, v in get_available_permissions(_type).viewitems() if v.user_selectable}
     special_permissions = {
         FULL_ACCESS_PERMISSION: {'title': _('Manage'), 'css_class': 'danger',
-                                 'description': _('Unrestricted management access for the whole event')},
+                                 'description': description_mapping[FULL_ACCESS_PERMISSION][_type]},
         READ_ACCESS_PERMISSION: {'title': _('Access'), 'css_class': 'accept',
-                                 'description': _('Access the public areas of the event')}
+                                 'description': description_mapping[READ_ACCESS_PERMISSION][_type]}
     }
     permissions_tree = {
         FULL_ACCESS_PERMISSION: {
