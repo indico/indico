@@ -24,6 +24,7 @@ from werkzeug.exceptions import BadRequest, Forbidden, NotFound
 
 from indico.core.db import db
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
+from indico.core.permissions import get_principal_permissions
 from indico.legacy.pdfinterface.conference import ContribsToPDF, ContributionBook
 from indico.modules.attachments.controllers.event_package import AttachmentPackageGeneratorMixin
 from indico.modules.events.abstracts.forms import AbstractContentSettingsForm
@@ -51,12 +52,12 @@ from indico.modules.events.management.controllers import RHManageEventBase
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
 from indico.modules.events.management.util import flash_if_unregistered
 from indico.modules.events.models.references import ReferenceType
+from indico.modules.events.operations import update_permissions
 from indico.modules.events.sessions import Session
 from indico.modules.events.timetable.forms import ImportContributionsForm
 from indico.modules.events.timetable.operations import update_timetable_entry
 from indico.modules.events.tracks.models.tracks import Track
-from indico.modules.events.util import (check_event_locked, get_field_values, track_time_changes,
-                                        update_object_principals)
+from indico.modules.events.util import check_event_locked, get_field_values, track_time_changes
 from indico.util.date_time import format_datetime, format_human_timedelta
 from indico.util.i18n import _, ngettext
 from indico.util.spreadsheets import send_csv, send_xlsx
@@ -64,6 +65,7 @@ from indico.util.string import handle_legacy_description
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.base import FormDefaults
+from indico.web.forms.fields.principals import serialize_principal
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
 
@@ -302,22 +304,16 @@ class RHContributionProtection(RHManageContributionBase):
         form = ContributionProtectionForm(obj=FormDefaults(**self._get_defaults()), contrib=self.contrib,
                                           prefix='contribution-protection-')
         if form.validate_on_submit():
+            update_permissions(self.contrib, form)
             update_contribution(self.contrib, {'protection_mode': form.protection_mode.data})
-            update_object_principals(self.contrib, form.managers.data, full_access=True)
-            if self.contrib.is_protected:
-                update_object_principals(self.contrib, form.acl.data, read_access=True)
-            update_object_principals(self.contrib, form.submitters.data, permission='submit')
             return jsonify_data(flash=False, **self.list_generator.render_list(self.contrib))
-        return jsonify_form(form)
+        return jsonify_template('events/management/protection_dialog.html', form=form)
 
     def _get_defaults(self):
-        managers = {p.principal for p in self.contrib.acl_entries if p.full_access}
-        submitters = {p.principal
-                      for p in self.contrib.acl_entries
-                      if p.has_management_permission('submit', explicit=True)}
-        acl = {p.principal for p in self.contrib.acl_entries if p.read_access}
-        return {'managers': managers, 'submitters': submitters, 'protection_mode': self.contrib.protection_mode,
-                'acl': acl}
+        permissions = [[serialize_principal(p.principal), list(get_principal_permissions(p, Contribution))]
+                       for p in self.contrib.acl_entries]
+        permissions = [item for item in permissions if item[1]]
+        return {'permissions': permissions, 'protection_mode': self.contrib.protection_mode}
 
 
 class RHContributionSubContributions(RHManageContributionBase):

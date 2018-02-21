@@ -33,9 +33,10 @@ from indico.util.date_time import get_day_end
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm, generated_data
-from indico.web.forms.fields import (AccessControlListField, IndicoDateTimeField, IndicoLocationField,
-                                     IndicoProtectionField, IndicoTagListField, PrincipalListField, TimeDeltaField)
-from indico.web.forms.validators import DateTimeRange, MaxDuration, UsedIf
+from indico.web.forms.fields import (IndicoDateTimeField, IndicoLocationField, IndicoProtectionField,
+                                     IndicoTagListField, TimeDeltaField)
+from indico.web.forms.fields.principals import PermissionsField
+from indico.web.forms.validators import DateTimeRange, MaxDuration
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -98,21 +99,19 @@ class ContributionForm(IndicoForm):
 
 
 class ContributionProtectionForm(IndicoForm):
+    permissions = PermissionsField(_("Permissions"), object_type='contribution')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('contributions.acl_message',
                                                                                  form.protected_object))
-    acl = AccessControlListField(_('Access control list'),
-                                 [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                                 groups=True, allow_emails=True, default_text=_('Restrict access to this contribution'),
-                                 description=_('List of users allowed to access the contribution'))
-    managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
-                                  description=_('List of users allowed to modify the contribution'))
-    submitters = PrincipalListField(_('Submitters'), groups=True, allow_emails=True,
-                                    description=_('List of users allowed to submit materials for this contribution'))
 
     def __init__(self, *args, **kwargs):
-        self.protected_object = kwargs.pop('contrib')
+        self.protected_object = contribution = kwargs.pop('contrib')
+        self.event = contribution.event
         super(ContributionProtectionForm, self).__init__(*args, **kwargs)
+
+    def validate_permissions(self, field):
+        # TODO
+        pass
 
 
 class SubContributionForm(IndicoForm):

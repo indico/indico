@@ -147,6 +147,10 @@
 
 }
 
+.protection-dialog-permissions {
+    margin-left: 2.5em;
+}
+
 @mixin circle-checkbox-checked() {
     background-color: $pastel-blue;
     border: 2px solid $darker-blue;

@@ -16,8 +16,6 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict
-
 from indico.core import signals
 from indico.util.caching import memoize_request
 from indico.util.i18n import _
@@ -98,3 +96,14 @@ def get_permissions_info(_type):
                                   for k, v in selectable_permissions.viewitems()},
                                  **special_permissions)
     return available_permissions, permissions_tree
+
+
+def get_principal_permissions(principal, _type):
+    """Retrieve a set containing the valid permissions of a principal."""
+    permissions = set()
+    if principal.full_access:
+        permissions.add(FULL_ACCESS_PERMISSION)
+    if principal.read_access:
+        permissions.add(READ_ACCESS_PERMISSION)
+    available_permissions = get_permissions_info(_type)[0]
+    return permissions | (set(principal.permissions) & set(available_permissions))

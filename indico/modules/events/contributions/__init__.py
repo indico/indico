@@ -100,6 +100,8 @@ class SubmitterPermission(ManagementPermission):
     name = 'submit'
     friendly_name = _('Submission')
     description = _('Grants management rights for materials and minutes.')
+    user_selectable = True
+    css_class = 'warning'
 
 
 @signals.event.sidemenu.connect
