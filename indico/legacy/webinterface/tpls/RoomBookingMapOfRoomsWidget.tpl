@@ -343,4 +343,4 @@ function initMap() {
 }
 </script>
 
-<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap${ ('&key=' + api_key) if api_key else '' }"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?callback=initMap${ ('&key=' + api_key) if api_key else '' }&v=3.31"></script>
