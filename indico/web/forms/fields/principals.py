@@ -78,12 +78,13 @@ class PrincipalListField(HiddenField):
         self.allow_external = kwargs.pop('allow_external', False)
         # Whether the add user dialog is opened immediately when the field is displayed
         self.open_immediately = kwargs.pop('open_immediately', False)
+        self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external,
                                      allow_emails=self.allow_emails, allow_networks=self.allow_networks,
-                                     existing_data=self.object_data)
+                                     existing_data=self.object_data, event=self._event)
 
     def process_formdata(self, valuelist):
         if valuelist:

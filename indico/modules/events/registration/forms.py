@@ -338,7 +338,12 @@ class RegistrationManagersForm(IndicoForm):
     """Form to manage users with privileges to modify registration-related items"""
 
     managers = PrincipalListField(_('Registration managers'), groups=True, allow_emails=True, allow_external=True,
-                                  description=_('List of users allowed to modify registrations'))
+                                  description=_('List of users allowed to modify registrations'),
+                                  event=lambda form: form.event)
+
+    def __init__(self, *args, **kwargs):
+        self.event = kwargs.pop('event')
+        super(RegistrationManagersForm, self).__init__(*args, **kwargs)
 
 
 class CreateMultipleRegistrationsForm(IndicoForm):
