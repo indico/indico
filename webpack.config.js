@@ -70,7 +70,7 @@ module.exports = env => {
     const currentEnv = (env ? env.NODE_ENV : null) || 'development';
 
     // Minification of copied files (e.g. CKEditor and MathJax)
-    const transform = currentEnv === 'development' ? null : (content) => {
+    const transform = currentEnv === 'development' ? null : (content, path) => {
         if (!path.match(/\.js$/)) {
             return content;
         }
@@ -104,7 +104,7 @@ module.exports = env => {
                 },
                 base.indicoStaticLoader(config),
                 {
-                    test: /\/node_modules\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|svg|eot)$/,
+                    test: /\/node_modules\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/,
                     use: {
                         loader: 'file-loader',
                         options: {
