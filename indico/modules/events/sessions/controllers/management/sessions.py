@@ -23,9 +23,11 @@ from werkzeug.exceptions import BadRequest
 from indico.core.db import db
 from indico.core.db.sqlalchemy.colors import ColorTuple
 from indico.core.db.sqlalchemy.protection import ProtectionMode, render_acl
+from indico.core.permissions import get_principal_permissions
 from indico.modules.events import EventLogKind, EventLogRealm
 from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.management.controllers.base import RHContributionPersonListMixin
+from indico.modules.events.operations import update_permissions
 from indico.modules.events.sessions.controllers.management import (RHManageSessionBase, RHManageSessionsActionsBase,
                                                                    RHManageSessionsBase)
 from indico.modules.events.sessions.forms import (MeetingSessionBlockForm, SessionForm, SessionProtectionForm,
@@ -44,6 +46,7 @@ from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file
 from indico.web.forms.base import FormDefaults
 from indico.web.forms.colors import get_colors
+from indico.web.forms.fields.principals import serialize_principal
 from indico.web.forms.util import get_form_field_names
 from indico.web.util import jsonify_data, jsonify_form, jsonify_template
 
@@ -195,21 +198,16 @@ class RHSessionProtection(RHManageSessionBase):
         form = SessionProtectionForm(obj=FormDefaults(**self._get_defaults()), session=self.session,
                                      prefix='session-protection-')
         if form.validate_on_submit():
+            update_permissions(self.session, form)
             update_session(self.session, {'protection_mode': form.protection_mode.data})
-            if self.session.is_protected:
-                update_object_principals(self.session, form.acl.data, read_access=True)
-            update_object_principals(self.session, form.managers.data, full_access=True)
-            update_object_principals(self.session, form.coordinators.data, permission='coordinate')
             return jsonify_data(flash=False, html=_render_session_list(self.event))
-        return jsonify_form(form)
+        return jsonify_template('events/management/protection_dialog.html', form=form)
 
     def _get_defaults(self):
-        acl = {x.principal for x in self.session.acl_entries if x.read_access}
-        managers = {x.principal for x in self.session.acl_entries if x.full_access}
-        coordinators = {x.principal for x in self.session.acl_entries if x.has_management_permission('coordinate',
-                                                                                                     explicit=True)}
-        return {'managers': managers, 'protection_mode': self.session.protection_mode, 'coordinators': coordinators,
-                'acl': acl}
+        permissions = [[serialize_principal(p.principal), list(get_principal_permissions(p, Session))]
+                       for p in self.session.acl_entries]
+        permissions = [item for item in permissions if item[1]]
+        return {'permissions': permissions, 'protection_mode': self.session.protection_mode}
 
 
 class RHSessionACL(RHManageSessionBase):

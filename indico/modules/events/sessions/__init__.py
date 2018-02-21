@@ -93,6 +93,7 @@ class CoordinatorPermission(ManagementPermission):
     name = 'coordinate'
     friendly_name = _('Coordination')
     description = _('Grants coordination access to the session.')
+    user_selectable = True
 
 
 @signals.event.sidemenu.connect
