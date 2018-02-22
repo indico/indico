@@ -232,12 +232,14 @@
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
             // Add default entries
-            var categoryManagers = [{
-                _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
-            }, ['_full_access']];
             var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'}, ['_read_access']];
-            this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
             this.$permissionsWidgetList.append(this._renderItem(anonymous));
+            if (this.options.objectType === 'event') {
+                var categoryManagers = [{
+                    _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
+                }, ['_full_access']];
+                this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
+            }
             this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
             this._renderDropdown(this.$roleDropdown);
