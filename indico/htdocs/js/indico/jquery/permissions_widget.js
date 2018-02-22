@@ -91,10 +91,20 @@
             var self = this;
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
+            // When full access is enabled, always show read access
+            if (_.contains(permissions, '_full_access') && !_.contains(permissions, '_read_access')) {
+                permissions.push('_read_access');
+                if (principal._type !== 'DefaultEntry') {
+                    self._updateItem(principal, permissions);
+                }
+            }
             permissions.forEach(function(item) {
                 var permissionInfo = self.options.permissionsInfo[item];
+                var applyOpacity = item === '_read_access' && _.contains(permissions, '_full_access')
+                    && principal._type !== 'DefaultEntry';
+                var cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
                 $permissionsList.append(
-                    $('<li>', {class: 'i-label bold ' + permissionInfo.css_class, title: permissionInfo.description})
+                    $('<li>', {class: 'i-label bold ' + cssClasses, title: permissionInfo.description})
                         .append(permissionInfo.title)
                 );
             });
