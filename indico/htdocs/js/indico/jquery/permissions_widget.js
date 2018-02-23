@@ -20,6 +20,9 @@
 (function($) {
     'use strict';
 
+    var FULL_ACCESS_PERMISSIONS = '_full_access';
+    var READ_ACCESS_PERMISSIONS = '_read_access';
+
     $.widget('indico.permissionswidget', {
         options: {
             objectType: null,
@@ -92,15 +95,15 @@
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
             // When full access is enabled, always show read access
-            if (_.contains(permissions, '_full_access') && !_.contains(permissions, '_read_access')) {
-                permissions.push('_read_access');
+            if (_.contains(permissions, FULL_ACCESS_PERMISSIONS) && !_.contains(permissions, READ_ACCESS_PERMISSIONS)) {
+                permissions.push(READ_ACCESS_PERMISSIONS);
                 if (principal._type !== 'DefaultEntry') {
                     self._updateItem(principal, permissions);
                 }
             }
             permissions.forEach(function(item) {
                 var permissionInfo = self.options.permissionsInfo[item];
-                var applyOpacity = item === '_read_access' && _.contains(permissions, '_full_access')
+                var applyOpacity = item === READ_ACCESS_PERMISSIONS && _.contains(permissions, FULL_ACCESS_PERMISSIONS)
                     && principal._type !== 'DefaultEntry';
                 var cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
                 $permissionsList.append(
@@ -201,7 +204,7 @@
             var $text = $('<span>', {text: principal.name});
             $dropdownItem.append($itemContent.append($text)).on('click', function() {
                 // Grant read access by default
-                self._addItems([$(this).data('principal')], ['_read_access']);
+                self._addItems([$(this).data('principal')], [READ_ACCESS_PERMISSIONS]);
             });
             return $dropdownItem;
         },
@@ -242,12 +245,13 @@
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
             // Add default entries
-            var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'}, ['_read_access']];
+            var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
+                [READ_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.append(this._renderItem(anonymous));
             if (this.options.objectType === 'event') {
                 var categoryManagers = [{
                     _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
-                }, ['_full_access']];
+                }, [FULL_ACCESS_PERMISSIONS]];
                 this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
             }
             this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
@@ -299,7 +303,7 @@
             var self = this;
             function _addPrincipals(principals) {
                 /// Grant read access by default
-                self._addItems(principals, ['_read_access']);
+                self._addItems(principals, [READ_ACCESS_PERMISSIONS]);
             }
 
             var dialog = new ChooseUsersPopup(
@@ -342,7 +346,7 @@
             $('.js-new-role').on('ajaxDialog:closed', function(evt, data) {
                 if (data && data.role) {
                     self.$roleDropdown.data('items').push(data.role);
-                    self._addItems([data.role], ['_read_access']);
+                    self._addItems([data.role], [READ_ACCESS_PERMISSIONS]);
                 }
             });
 
