@@ -59,15 +59,21 @@ export function getThemeEntryPoints(config, prefix) {
     }));
 }
 
-export function generateAssetPath(config) {
-    // /css/whatever.css => /css/v/123abcde/whatever.css
+export function generateAssetPath(config, virtualVersion = false) {
+    // /css/whatever.css => /css/whatever__v123abcdef.css
     return (file) => {
         const relPath = path.relative(config.build.staticPath, file);
-        const {dir, base} = path.parse(relPath);
+        const {dir, name, ext} = path.parse(relPath);
         const h = createHash('md5');
         h.update(fs.readFileSync(file));
+        const hash = h.digest('hex').slice(0, 8);
+        // the "virtual version" is used for files that are loaded as-is from the
+        // static folder and thus do not actually get the hash in the physical
+        // file name. it is distinct from the normal version style so a rule on
+        // the web server can strip that version segment
+        const fileName = virtualVersion ? `${name}__v${hash}${ext}` : `${name}.${hash}${ext}`;
         // .. -> _, like file-loader does
-        return path.join(dir.replace(/\.\./g, '_'), 'v', h.digest('hex').slice(0, 8), base);
+        return dir.replace(/\.\./g, '_') + path.sep + fileName;
     };
 }
 
@@ -91,8 +97,8 @@ export function webpackDefaults(env, config) {
         context: config.build.clientPath,
         output: {
             path: config.build.distPath,
-            filename: "js/[name].bundle.js",
-            publicPath: config.build.distURL
+            filename: "js/[name].[chunkhash:8].bundle.js",
+            publicPath: config.build.distURL,
         },
         module: {
             rules: [
@@ -120,7 +126,7 @@ export function webpackDefaults(env, config) {
                             options: {
                                 root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
                                 sourceMap: true,
-                                url: false
+                                url: true
                             }
                         }, {
                             loader: 'postcss-loader',
@@ -154,19 +160,11 @@ export function webpackDefaults(env, config) {
             new ManifestPlugin({
                 fileName: 'manifest.json',
                 publicPath: config.build.distURL,
-                map: (file) => {
-                    // change only files that are part of chunks
-                    if (file.chunk) {
-                        const hash = file.chunk.renderedHash.slice(0, 8);
-                        file.path = file.path.replace(/\/dist\//, `/dist/v/${hash}/`);
-                    }
-                    return file;
-                }
             }),
             // Do not load moment locales (we'll load them explicitly)
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
             new ExtractTextPlugin({
-                filename: 'css/[name].css'
+                filename: 'css/[name].[md5:contenthash:hex:8].css'
             }),
             new webpack.EnvironmentPlugin({
                 NODE_ENV: currentEnv
@@ -202,10 +200,10 @@ export function indicoStaticLoader(config) {
         use: {
             loader: 'file-loader',
             options: {
-                name: generateAssetPath(config),
+                name: generateAssetPath(config, true),
                 context: config.build.staticPath,
                 emitFile: false,
-                publicPath: '/'
+                publicPath: config.build.staticURL,
             }
         }
     };

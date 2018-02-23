@@ -18,7 +18,7 @@
 const path = require('path');
 const glob = require('glob');
 
-const config = require('./config');
+const config = require('./webpack-build-config');
 const base = require('./webpack');
 
 const merge = require('webpack-merge');
@@ -111,7 +111,7 @@ module.exports = env => {
                             name: base.generateAssetPath(config),
                             context: config.build.distPath,
                             outputPath: 'mod_assets/',
-                            publicPath: '/dist/'
+                            publicPath: config.build.distURL,
                         }
                     }
                 }
