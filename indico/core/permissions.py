@@ -42,8 +42,6 @@ class ManagementPermission(object):
     description = None
     #: whether the permission can be set in the permissions widget (protection page)
     user_selectable = False
-    #: CSS class assigned to permission label
-    css_class = None
 
 
 @memoize_request
@@ -109,9 +107,11 @@ def get_permissions_info(_type):
             'description': special_permissions[READ_ACCESS_PERMISSION]['description']
         }
     }
-    available_permissions = dict({k: {'title': v.friendly_name, 'css_class': v.css_class, 'description': v.description}
-                                  for k, v in selectable_permissions.viewitems()},
-                                 **special_permissions)
+    available_permissions = dict({k: {
+        'title': v.friendly_name,
+        'css_class': 'permission-{}-{}'.format(_type.__name__.lower(), v.name),
+        'description': v.description
+    } for k, v in selectable_permissions.viewitems()}, **special_permissions)
     return available_permissions, permissions_tree
 
 

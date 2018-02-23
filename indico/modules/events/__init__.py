@@ -192,7 +192,6 @@ class SubmitterPermission(ManagementPermission):
     friendly_name = _('Submission')
     description = _('Grants management rights for event-wide materials and minutes.')
     user_selectable = True
-    css_class = 'warning'
 
 
 @signals.menu.items.connect_via('admin-sidemenu')

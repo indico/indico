@@ -23,6 +23,12 @@
     font-weight: bold;
 }
 
+@mixin permission-label($color) {
+    color: $light-gray;
+    background-color: $color;
+    border-color: darken($color, 5%);
+}
+
 .permissions-widget {
     padding-bottom: 2em;
 
@@ -98,6 +104,31 @@
 
                     &.disabled {
                         @include opacity(0.5);
+                    }
+
+                    // Permission label palette
+                    &.permission-event-submit {
+                        @include permission-label($yellow);
+                    }
+
+                    &.permission-event-paper_manager {
+                        @include permission-label($purple);
+                    }
+
+                    &.permission-event-registration {
+                        @include permission-label($blue);
+                    }
+
+                    &.permission-event-surveys {
+                        @include permission-label($bright-orange);
+                    }
+
+                    &.permission-contribution-submit {
+                        @include permission-label($yellow);
+                    }
+
+                    &.permission-session-coordinate {
+                        @include permission-label($blue);
                     }
                 }
             }
