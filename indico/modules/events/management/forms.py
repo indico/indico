@@ -30,8 +30,6 @@ from wtforms.validators import DataRequired, InputRequired, NumberRange, Optiona
 
 from indico.core.config import config
 from indico.core.db import db
-from indico.core.db.sqlalchemy.principals import EmailPrincipal
-from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.categories import Category
 from indico.modules.categories.fields import CategoryField
 from indico.modules.categories.util import get_visibility_options
@@ -44,11 +42,10 @@ from indico.modules.events.models.events import EventType
 from indico.modules.events.models.references import EventReference
 from indico.modules.events.sessions import COORDINATOR_PRIV_DESCS, COORDINATOR_PRIV_TITLES
 from indico.modules.events.timetable.util import get_top_level_entries
-from indico.modules.networks import IPNetworkGroup
+from indico.modules.events.util import check_permissions
 from indico.util.date_time import format_datetime, format_human_timedelta, now_utc, relativedelta
 from indico.util.i18n import _
 from indico.util.string import is_valid_mail, to_unicode
-from indico.util.user import principal_from_fossil
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.fields import (IndicoDateField, IndicoDateTimeField, IndicoEnumSelectField, IndicoLocationField,
@@ -269,15 +266,9 @@ class EventProtectionForm(IndicoForm):
                 real_horizon.title)
 
     def validate_permissions(self, field):
-        event = self.event
-        for principal_fossil, permissions in field.data:
-            principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=True, event=event)
-            if isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
-                msg = _('IP networks cannot have management permissions: {}')
-                raise ValidationError(msg.format(principal.name))
-            if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
-                # when full access permission is set, discard rest of permissions
-                permissions[:] = [FULL_ACCESS_PERMISSION]
+        except_msg = check_permissions(self.event, field, allow_networks=True)
+        if except_msg:
+            raise ValidationError(except_msg)
 
     @classmethod
     def _create_coordinator_priv_fields(cls):

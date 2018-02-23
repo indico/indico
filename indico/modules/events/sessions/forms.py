@@ -25,6 +25,7 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
 from indico.modules.events.sessions.models.types import SessionType
+from indico.modules.events.util import check_permissions
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
@@ -72,8 +73,7 @@ class SessionProtectionForm(IndicoForm):
         super(SessionProtectionForm, self).__init__(*args, **kwargs)
 
     def validate_permissions(self, field):
-        # TODO
-        pass
+        check_permissions(self.event, field)
 
 
 class SessionBlockForm(IndicoForm):

@@ -29,6 +29,7 @@ from indico.modules.events.contributions.fields import (ContributionPersonLinkLi
 from indico.modules.events.contributions.models.references import ContributionReference, SubContributionReference
 from indico.modules.events.contributions.models.types import ContributionType
 from indico.modules.events.fields import ReferencesField
+from indico.modules.events.util import check_permissions
 from indico.util.date_time import get_day_end
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
@@ -110,8 +111,7 @@ class ContributionProtectionForm(IndicoForm):
         super(ContributionProtectionForm, self).__init__(*args, **kwargs)
 
     def validate_permissions(self, field):
-        # TODO
-        pass
+        check_permissions(self.event, field)
 
 
 class SubContributionForm(IndicoForm):
