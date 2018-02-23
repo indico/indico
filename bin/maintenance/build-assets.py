@@ -44,7 +44,7 @@ def step(message, *args):
     click.echo(click.style(message.format(*args), fg='white', bold=True), err=True)
 
 
-def _get_webpack_config(url_root='/', debug=False):
+def _get_webpack_build_config(url_root='/', debug=False):
     with open('indico/modules/events/themes.yaml') as f:
         themes = yaml.safe_load(f.read())
     root_path = os.path.abspath('indico')
@@ -64,8 +64,8 @@ def _get_webpack_config(url_root='/', debug=False):
     }
 
 
-def _get_plugin_webpack_config(plugin_dir, url_root='/', debug=False):
-    core_config = _get_webpack_config(url_root, debug)
+def _get_plugin_webpack_build_config(plugin_dir, url_root='/', debug=False):
+    core_config = _get_webpack_build_config(url_root, debug)
     packages = find_packages(plugin_dir)
     assert len(packages) == 1
     plugin_root_path = os.path.join(plugin_dir, packages[0])
@@ -112,17 +112,17 @@ def cli():
                                                               '/ and should usually not be changed')
 def build(debug, watch, url_root):
     """Run webpack to build assets"""
-    webpack_config_file = 'webpack-build-config.json'
-    webpack_config = _get_webpack_config(url_root, debug)
-    with open(webpack_config_file, 'w') as f:
-        json.dump(webpack_config, f, indent=2, sort_keys=True)
+    webpack_build_config_file = 'webpack-build-config.json'
+    webpack_build_config = _get_webpack_build_config(url_root, debug)
+    with open(webpack_build_config_file, 'w') as f:
+        json.dump(webpack_build_config, f, indent=2, sort_keys=True)
     args = _get_webpack_args(debug, watch)
     try:
         subprocess.check_call(['npx', 'webpack'] + args)
     except subprocess.CalledProcessError:
         fail('running webpack failed')
     # finally:
-    #     os.unlink(webpack_config_file)
+    #     os.unlink(webpack_build_config_file)
 
 
 def _validate_plugin_dir(ctx, param, value):
@@ -142,19 +142,23 @@ def _validate_plugin_dir(ctx, param, value):
                                                               '/ and should usually not be changed')
 def build_plugin(plugin_dir, debug, watch, url_root):
     """Run webpack to build plugin assets"""
-    webpack_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
-    webpack_config = _get_plugin_webpack_config(plugin_dir, url_root, debug)
-    with open(webpack_config_file, 'w') as f:
-        json.dump(webpack_config, f, indent=2, sort_keys=True)
+    webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
+    webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root, debug)
+    with open(webpack_build_config_file, 'w') as f:
+        json.dump(webpack_build_config, f, indent=2, sort_keys=True)
+    webpack_config_file = '{}/webpack.config.js'.format(plugin_dir)
+    if not os.path.exists(webpack_config_file):
+        webpack_config_file = 'plugin.webpack.config.js'
     args = _get_webpack_args(debug, watch)
-    args += ['--config', '{}/webpack.config.js'.format(plugin_dir)]
+    args += ['--config', webpack_config_file]
     os.environ['NODE_PATH'] = os.path.abspath('node_modules')
+    os.environ['INDICO_PLUGIN_ROOT'] = plugin_dir
     try:
         subprocess.check_call(['npx', 'webpack'] + args)
     except subprocess.CalledProcessError:
         fail('running webpack failed')
     # finally:
-    #     os.unlink(webpack_config_file)
+    #     os.unlink(webpack_build_config_file)
 
 
 if __name__ == '__main__':
