@@ -15,16 +15,17 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-const path = require('path');
-const glob = require('glob');
+import path from 'path';
+import glob from 'glob';
 
-const config = require('./webpack-build-config');
-const base = require('./webpack');
+import config from './webpack-build-config';
+import {getThemeEntryPoints, webpackDefaults, indicoStaticLoader, generateAssetPath} from './webpack';
 
-const merge = require('webpack-merge');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
-const uglify = require('uglify-js');
-const webpack = require('webpack');
+import merge from 'webpack-merge';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
+import {minify} from 'uglify-js';
+import webpack from 'webpack';
+
 
 let entryPoints = {
     main: './js/index.js',
@@ -64,20 +65,20 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
 extraResolveAliases.push({name: 'indico', alias: path.join(config.build.clientPath, 'js/'), onlyModule: false});
 
 // Add Meeting Themes
-entryPoints = Object.assign(entryPoints, base.getThemeEntryPoints(config, './themes/'));
+entryPoints = Object.assign(entryPoints, getThemeEntryPoints(config, './themes/'));
 
-module.exports = env => {
+export default (env) => {
     const currentEnv = (env ? env.NODE_ENV : null) || 'development';
 
     // Minification of copied files (e.g. CKEditor and MathJax)
-    const transform = currentEnv === 'development' ? null : (content, path) => {
-        if (!path.match(/\.js$/)) {
+    const transform = currentEnv === 'development' ? null : (content, filePath) => {
+        if (!filePath.match(/\.js$/)) {
             return content;
         }
-        return uglify.minify(content.toString(), {fromString: true}).code;
+        return minify(content.toString(), {fromString: true}).code;
     };
 
-    const m = merge(base.webpackDefaults(env, config), {
+    return merge(webpackDefaults(env, config), {
         entry: entryPoints,
         module: {
             rules: [
@@ -102,13 +103,13 @@ module.exports = env => {
                         amd: false
                     }
                 },
-                base.indicoStaticLoader(config),
+                indicoStaticLoader(config),
                 {
                     test: /\/node_modules\/.*\.(jpe?g|png|gif|svg|woff2?|ttf|eot)$/,
                     use: {
                         loader: 'file-loader',
                         options: {
-                            name: base.generateAssetPath(config),
+                            name: generateAssetPath(config),
                             context: config.build.distPath,
                             outputPath: 'mod_assets/',
                             publicPath: config.build.distURL,
@@ -147,6 +148,4 @@ module.exports = env => {
             alias: extraResolveAliases
         }
     });
-
-    return m;
 };
