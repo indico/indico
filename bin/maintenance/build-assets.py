@@ -46,13 +46,12 @@ def step(message, *args):
     click.echo(click.style(message.format(*args), fg='white', bold=True), err=True)
 
 
-def _get_webpack_build_config(url_root='/', debug=False):
+def _get_webpack_build_config(url_root='/'):
     with open('indico/modules/events/themes.yaml') as f:
         themes = yaml.safe_load(f.read())
     root_path = os.path.abspath('indico')
     return {
         'build': {
-            'debug': debug,
             'clientPath': os.path.join(root_path, 'web', 'client'),
             'rootPath': root_path,
             'staticPath': os.path.join(root_path, 'web', 'static'),
@@ -99,8 +98,8 @@ def _get_plugin_themes(plugin_dir):
         return _parse_plugin_theme_yaml(f.read())
 
 
-def _get_plugin_webpack_build_config(plugin_dir, url_root='/', debug=False):
-    core_config = _get_webpack_build_config(url_root, debug)
+def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
+    core_config = _get_webpack_build_config(url_root)
     packages = find_packages(plugin_dir)
     assert len(packages) == 1
     plugin_root_path = os.path.join(plugin_dir, packages[0])
@@ -111,7 +110,6 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/', debug=False):
             'build': core_config['build']
         },
         'build': {
-            'debug': debug,
             'indicoSourcePath': os.path.abspath('.'),
             'clientPath': os.path.join(plugin_root_path, 'client'),
             'rootPath': plugin_root_path,
@@ -124,9 +122,9 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/', debug=False):
     }
 
 
-def _get_webpack_args(debug, watch):
+def _get_webpack_args(dev, watch):
     args = []
-    if debug:
+    if dev:
         args.append('--env.NODE_ENV=development')
     else:
         args += ['-p', '--env.NODE_ENV=production']
@@ -141,23 +139,24 @@ def cli():
 
 
 @cli.command()
-@click.option('--debug', is_flag=True, default=False, help="Build in debug mode")
+@click.option('--dev', is_flag=True, default=False, help="Build in dev mode")
 @click.option('--watch', is_flag=True, default=False, help="Run the watcher to rebuild on changes")
 @click.option('--url-root', default='/', metavar='PATH', help='URL root from which the assets are loaded. Defaults to '
                                                               '/ and should usually not be changed')
-def build(debug, watch, url_root):
+def build(dev, watch, url_root):
     """Run webpack to build assets"""
     webpack_build_config_file = 'webpack-build-config.json'
-    webpack_build_config = _get_webpack_build_config(url_root, debug)
+    webpack_build_config = _get_webpack_build_config(url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
-    args = _get_webpack_args(debug, watch)
+    args = _get_webpack_args(dev, watch)
     try:
         subprocess.check_call(['npx', 'webpack'] + args)
     except subprocess.CalledProcessError:
         fail('running webpack failed')
-    # finally:
-    #     os.unlink(webpack_build_config_file)
+    finally:
+        if not dev:
+            os.unlink(webpack_build_config_file)
 
 
 def _validate_plugin_dir(ctx, param, value):
@@ -172,20 +171,20 @@ def _validate_plugin_dir(ctx, param, value):
 @cli.command()
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
-@click.option('--debug', is_flag=True, default=False, help="Build in debug mode")
+@click.option('--dev', is_flag=True, default=False, help="Build in dev mode")
 @click.option('--watch', is_flag=True, default=False, help="Run the watcher to rebuild on changes")
 @click.option('--url-root', default='/', metavar='PATH', help='URL root from which the assets are loaded. Defaults to '
                                                               '/ and should usually not be changed')
-def build_plugin(plugin_dir, debug, watch, url_root):
+def build_plugin(plugin_dir, dev, watch, url_root):
     """Run webpack to build plugin assets"""
     webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
-    webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root, debug)
+    webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
     webpack_config_file = '{}/webpack.config.js'.format(plugin_dir)
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'
-    args = _get_webpack_args(debug, watch)
+    args = _get_webpack_args(dev, watch)
     args += ['--config', webpack_config_file]
     os.environ['NODE_PATH'] = os.path.abspath('node_modules')
     os.environ['INDICO_PLUGIN_ROOT'] = plugin_dir
@@ -193,8 +192,9 @@ def build_plugin(plugin_dir, debug, watch, url_root):
         subprocess.check_call(['npx', 'webpack'] + args)
     except subprocess.CalledProcessError:
         fail('running webpack failed')
-    # finally:
-    #     os.unlink(webpack_build_config_file)
+    finally:
+        if not dev:
+            os.unlink(webpack_build_config_file)
 
 
 if __name__ == '__main__':
