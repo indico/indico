@@ -138,11 +138,20 @@ def cli():
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
 
 
+def _common_build_options(allow_watch=True):
+    def decorator(fn):
+        fn = click.option('--dev', is_flag=True, default=False, help="Build in dev mode")(fn)
+        fn = click.option('--url-root', default='/', metavar='PATH',
+                          help='URL root from which the assets are loaded. '
+                               'Defaults to / and should usually not be changed')(fn)
+        if allow_watch:
+            fn = click.option('--watch', is_flag=True, default=False, help="Run the watcher to rebuild on changes")(fn)
+        return fn
+    return decorator
+
+
 @cli.command()
-@click.option('--dev', is_flag=True, default=False, help="Build in dev mode")
-@click.option('--watch', is_flag=True, default=False, help="Run the watcher to rebuild on changes")
-@click.option('--url-root', default='/', metavar='PATH', help='URL root from which the assets are loaded. Defaults to '
-                                                              '/ and should usually not be changed')
+@_common_build_options()
 def build(dev, watch, url_root):
     """Run webpack to build assets"""
     webpack_build_config_file = 'webpack-build-config.json'
@@ -168,13 +177,19 @@ def _validate_plugin_dir(ctx, param, value):
     return value
 
 
+def _is_plugin_dir(path):
+    try:
+        _validate_plugin_dir(None, None, path)
+    except click.BadParameter:
+        return False
+    else:
+        return True
+
+
 @cli.command()
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
-@click.option('--dev', is_flag=True, default=False, help="Build in dev mode")
-@click.option('--watch', is_flag=True, default=False, help="Run the watcher to rebuild on changes")
-@click.option('--url-root', default='/', metavar='PATH', help='URL root from which the assets are loaded. Defaults to '
-                                                              '/ and should usually not be changed')
+@_common_build_options()
 def build_plugin(plugin_dir, dev, watch, url_root):
     """Run webpack to build plugin assets"""
     webpack_build_config_file = os.path.join(plugin_dir, 'webpack-build-config.json')
@@ -195,6 +210,18 @@ def build_plugin(plugin_dir, dev, watch, url_root):
     finally:
         if not dev:
             os.unlink(webpack_build_config_file)
+
+
+@cli.command()
+@click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
+@_common_build_options(allow_watch=False)
+@click.pass_context
+def build_all_plugins(ctx, plugins_dir, dev, url_root):
+    """Run webpack to build plugin assets"""
+    plugins = sorted(d for d in os.listdir(plugins_dir) if _is_plugin_dir(os.path.join(plugins_dir, d)))
+    for plugin in plugins:
+        step('plugin: {}', plugin)
+        ctx.invoke(build_plugin, plugin_dir=os.path.join(plugins_dir, plugin), dev=dev, watch=False, url_root=url_root)
 
 
 if __name__ == '__main__':
