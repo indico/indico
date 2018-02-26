@@ -58,6 +58,8 @@ Improvements
 - Warn when editing a speaker/author would result in duplicate emails
 - Show track-related columns in abstract list only if there are tracks
   defined for the event (:issue:`2813`)
+- Show warning box to inform that reviewer roles do not apply when an event
+  has no tracks (:issue:`2919`)
 
 Bugfixes
 ^^^^^^^^
