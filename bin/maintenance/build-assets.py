@@ -150,9 +150,9 @@ def _common_build_options(allow_watch=True):
     return decorator
 
 
-@cli.command()
+@cli.command('indico', short_help='Builds assets of Indico.')
 @_common_build_options()
-def build(dev, watch, url_root):
+def build_indico(dev, watch, url_root):
     """Run webpack to build assets"""
     webpack_build_config_file = 'webpack-build-config.json'
     webpack_build_config = _get_webpack_build_config(url_root)
@@ -186,7 +186,7 @@ def _is_plugin_dir(path):
         return True
 
 
-@cli.command()
+@cli.command('plugin', short_help='Builds assets of a plugin.')
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
 @_common_build_options()
@@ -212,7 +212,7 @@ def build_plugin(plugin_dir, dev, watch, url_root):
             os.unlink(webpack_build_config_file)
 
 
-@cli.command()
+@cli.command('all-plugins', short_help='Builds assets of all plugins in a directory.')
 @click.argument('plugins_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True))
 @_common_build_options(allow_watch=False)
 @click.pass_context
