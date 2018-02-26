@@ -15,8 +15,10 @@
 # You should have received a copy of the GNU General Public License
 # along with Indico; if not, see <http://www.gnu.org/licenses/>.
 
+import errno
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -64,6 +66,39 @@ def _get_webpack_build_config(url_root='/', debug=False):
     }
 
 
+def _get_plugin_bundle_config(plugin_dir):
+    try:
+        with open(os.path.join(plugin_dir, 'webpack-bundles.json')) as f:
+            return json.load(f)
+    except IOError as e:
+        if e.errno == errno.ENOENT:
+            return {}
+        raise
+
+
+def _parse_plugin_theme_yaml(plugin_yaml):
+    # This is very similar to what ThemeSettingsProxy does
+    with open('indico/modules/events/themes.yaml') as f:
+        core_data = f.read()
+    core_data = re.sub(r'^(\S+:)$', r'__core_\1', core_data, flags=re.MULTILINE)
+    settings = {k: v
+                for k, v in yaml.safe_load(core_data + '\n' + plugin_yaml).viewitems()
+                if not k.startswith('__core_')}
+    return {name: {'stylesheet': theme['stylesheet'], 'print_stylesheet': theme.get('print_stylesheet')}
+            for name, theme in settings.get('definitions', {}).viewitems()
+            if set(theme) & {'stylesheet', 'print_stylesheet'}}
+
+
+def _get_plugin_themes(plugin_dir):
+    bundle_config = _get_plugin_bundle_config(plugin_dir)
+    try:
+        theme_file = bundle_config['indicoTheme']
+    except KeyError:
+        return {}
+    with open(os.path.join(plugin_dir, theme_file)) as f:
+        return _parse_plugin_theme_yaml(f.read())
+
+
 def _get_plugin_webpack_build_config(plugin_dir, url_root='/', debug=False):
     core_config = _get_webpack_build_config(url_root, debug)
     packages = find_packages(plugin_dir)
@@ -85,7 +120,7 @@ def _get_plugin_webpack_build_config(plugin_dir, url_root='/', debug=False):
             'distPath': os.path.join(plugin_root_path, 'static', 'dist'),
             'distURL': os.path.join(url_root, 'static', 'plugins', plugin_name, 'dist/')
         },
-        # TODO: themes
+        'themes': _get_plugin_themes(plugin_dir),
     }
 
 
@@ -128,8 +163,9 @@ def build(debug, watch, url_root):
 def _validate_plugin_dir(ctx, param, value):
     if not os.path.exists(os.path.join(value, 'setup.py')):
         raise click.BadParameter('no setup.py found in {}'.format(value))
-    if not os.path.exists(os.path.join(value, 'webpack.config.js')):
-        raise click.BadParameter('no webpack.config.js found in {}'.format(value))
+    if (not os.path.exists(os.path.join(value, 'webpack.config.js')) and
+            not os.path.exists(os.path.join(value, 'webpack-bundles.json'))):
+        raise click.BadParameter('no webpack.config.js or webpack-bundles.json found in {}'.format(value))
     return value
 
 
