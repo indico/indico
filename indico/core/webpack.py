@@ -1,5 +1,5 @@
 # This file is part of Indico.
-# Copyright (C) 2002 - 2017 European Organization for Nuclear Research (CERN).
+# Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
 #
 # Indico is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License as
@@ -16,28 +16,7 @@
 
 from __future__ import unicode_literals
 
-import os
-
 from flask_webpackext import FlaskWebpackExt
-
-from indico.modules.events.layout import theme_settings
 
 
 webpack = FlaskWebpackExt()
-
-
-def get_webpack_config(app):
-    static_url_path = os.path.join(app.config['APPLICATION_ROOT'] or '/', app.static_url_path)
-    return {
-        'build': {
-            'debug': app.debug,
-            'clientPath': os.path.join(app.root_path, 'web', 'client'),
-            'rootPath': app.root_path,
-            'staticPath': app.static_folder,
-            'staticURL': static_url_path,
-            'distPath': app.config['WEBPACKEXT_PROJECT_DISTDIR'],
-            'distURL': os.path.join(static_url_path, 'dist/')
-        },
-        # ignore plugins, those are generated in their own webpack process
-        'themes': {key: theme for key, theme in theme_settings.themes.viewitems() if not theme.get('plugin')}
-    }
