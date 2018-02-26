@@ -115,11 +115,6 @@ def resend_email(paths):
     resend_failed_emails_cmd(paths)
 
 
-@cli.group(cls=LazyGroup, import_name='indico.cli.webpack:cli')
-def webpack():
-    """Webpack utilities."""
-
-
 @cli.command(short_help='Delete old temporary files.')
 @click.option('--temp', is_flag=True, help='Delete old files in the temp dir')
 @click.option('--cache', is_flag=True, help='Delete old files in the cache dir')
