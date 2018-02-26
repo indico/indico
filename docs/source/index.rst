@@ -96,3 +96,11 @@ Indices and tables
 .. |license| image:: https://img.shields.io/github/license/indico/indico.png
                    :alt: License
                    :target: https://github.com/indico/indico/blob/master/COPYING
+Contact
++++++++
+
+.. toctree::
+    :maxdepth: 2
+
+    contact/index.rst
+
