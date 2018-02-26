@@ -17,10 +17,18 @@
 
 const process = require('process');
 const merge = require('webpack-merge');
+const _ = require('lodash');
 const config = require(process.env.INDICO_PLUGIN_ROOT + '/webpack-build-config');
 const bundles = require(process.env.INDICO_PLUGIN_ROOT + '/webpack-bundles');
 const base = require(config.build.indicoSourcePath + '/webpack');
 
+const entry = bundles.entry || {};
+if (!_.isEmpty(config.themes)) {
+    Object.assign(entry, base.getThemeEntryPoints(config, './themes/'));
+}
+
 module.exports = env => {
-    return merge(base.webpackDefaults(env, config), bundles);
+    return merge(base.webpackDefaults(env, config), {
+        entry: entry
+    });
 };

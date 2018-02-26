@@ -40,8 +40,8 @@ function _resolveTheme(rootPath, indicoClientPath, filePath) {
 
 export function getThemeEntryPoints(config, prefix) {
     const themes = config.themes;
-    const indicoClientPath = path.join(config.isPlugin ? config.indico.build.clientPath :
-                                       config.build.clientPath, 'styles');
+    const indicoClientPath = path.join(config.isPlugin ? config.indico.build.clientPath : config.build.clientPath,
+                                       'styles');
     const rootPath = path.join(config.build.rootPath);
 
     return Object.assign(...Object.keys(themes).map((k) => {
@@ -126,7 +126,7 @@ export function webpackDefaults(env, config) {
                             options: {
                                 root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
                                 sourceMap: true,
-                                url: true
+                                url: !config.isPlugin, // FIXME: true breaks plugins, false breaks /indico/ in core
                             }
                         }, {
                             loader: 'postcss-loader',
