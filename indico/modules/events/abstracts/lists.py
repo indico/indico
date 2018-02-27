@@ -225,8 +225,9 @@ class AbstractListGeneratorManagement(AbstractListGeneratorBase):
 
     def __init__(self, event):
         super(AbstractListGeneratorManagement, self).__init__(event)
-        self.default_list_config['items'] = ('submitted_contrib_type', 'accepted_contrib_type', 'submitted_for_tracks',
-                                             'reviewed_for_tracks', 'accepted_track', 'state')
+        self.default_list_config['items'] = ('submitted_contrib_type', 'accepted_contrib_type', 'state')
+        if event.tracks:
+            self.default_list_config['items'] += ('submitted_for_tracks', 'reviewed_for_tracks', 'accepted_track')
         self.extra_filters = OrderedDict([
             ('multiple_tracks', {'title': _('Proposed for multiple tracks'), 'type': 'bool'}),
             ('comments', {'title': _('Must have comments'), 'type': 'bool'})
