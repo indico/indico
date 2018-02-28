@@ -37,6 +37,7 @@ import 'jqplot/src/jqplot.sprintf';
 import 'jqplot/src/jqplot.tableLegendRenderer';
 import 'jqplot/src/jqplot.themeEngine';
 import 'jqplot/src/jqplot.toImage';
+import 'jqplot/src/jsdate';
 
 import 'jqplot/src/plugins/jqplot.barRenderer';
 import 'jqplot/src/plugins/jqplot.barRenderer.js';

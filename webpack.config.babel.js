@@ -28,18 +28,20 @@ import webpack from 'webpack';
 
 
 let entryPoints = {
-    main: './js/index.js',
-    ckeditor: './js/jquery/ckeditor.js',
-    conferences: './styles/legacy/Conf_Basic.css',
-    map_of_rooms: './styles/legacy/mapofrooms.css',
-    markdown: './js/jquery/markdown.js',
-    mathjax: './js/jquery/compat/mathjax.js',
-    statistics: './js/jquery/statistics.js',
-    fonts: './styles/partials/_fonts.scss'
+    main: ['./js/index.js'],
+    ckeditor: ['./js/jquery/ckeditor.js'],
+    conferences: ['./styles/legacy/Conf_Basic.css'],
+    map_of_rooms: ['./styles/legacy/mapofrooms.css'],
+    markdown: ['./js/jquery/markdown.js'],
+    mathjax: ['./js/jquery/compat/mathjax.js'],
+    statistics: ['./js/jquery/statistics.js'],
+    fonts: ['./styles/partials/_fonts.scss']
 };
 
-const extraResolveAliases = [];
 const modulesDir = path.join(config.build.rootPath, '..', 'node_modules');
+const extraResolveAliases = [
+    {name: 'jquery', alias: path.resolve(modulesDir, 'jquery/src/jquery')}
+];
 
 // Add Module Bundles
 glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((file) => {
@@ -48,14 +50,14 @@ glob.sync(path.join(config.build.rootPath, 'modules/**/module.json')).forEach((f
     const dirName = path.join(path.dirname(file), 'js');
 
     if (module.produceBundle) {
-        entryPoints[moduleName] = dirName;
+        entryPoints[moduleName] = [dirName];
     }
     const modulePath = path.join('indico/modules', module.parent || '',  module.name);
     extraResolveAliases.push({name: modulePath, alias: dirName, onlyModule: false});
 
     if (module.partials) {
         for (const partial of Object.entries(module.partials)) {
-            entryPoints[moduleName + '.' + partial[0]] = path.resolve(dirName, partial[1]);
+            entryPoints[moduleName + '.' + partial[0]] = [path.resolve(dirName, partial[1])];
         }
     }
 });
@@ -78,7 +80,11 @@ export default (env) => {
         return minify(content.toString(), {fromString: true}).code;
     };
 
-    return merge(webpackDefaults(env, config), {
+    return merge.strategy({
+        // resolve module aliases first, since the ones
+        // in base.js are more general
+        'resolve.alias': 'prepend'
+    })(webpackDefaults(env, config), {
         entry: entryPoints,
         module: {
             rules: [
@@ -124,24 +130,8 @@ export default (env) => {
                 {from: path.resolve(modulesDir, 'mathjax'), to: 'js/mathjax', transform}
             ]),
             new webpack.ProvidePlugin({
-                $: 'jquery',
-                jQuery: 'jquery',
                 _: 'underscore',
                 moment: 'moment'
-            }),
-            new webpack.optimize.CommonsChunkPlugin({
-                name: 'common',
-                minChunks: (mod, count) => {
-                    if (mod.resource.match(/\/themes\/.*\.scss/)) {
-                        // Let's not extract theme SCSS into the common chunk
-                        // Otherwise we will have no theme SCSS files.
-                        // This check is quite hacky as it relies of the file path,
-                        // we should find some better way to control this threshold.
-                        return false;
-                    } else {
-                        return count >= 3;
-                    }
-                }
             })
         ],
         resolve: {
