@@ -25,6 +25,7 @@ import webpack from 'webpack';
 import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import ManifestPlugin from 'webpack-manifest-plugin';
 import ProgressBarPlugin from 'progress-bar-webpack-plugin';
+import importOnce from 'node-sass-import-once';
 
 
 function _resolveTheme(rootPath, indicoClientPath, filePath) {
@@ -149,7 +150,8 @@ export function webpackDefaults(env, config) {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: currentEnv === 'development',
-                                includePaths: [scssIncludePath]
+                                includePaths: [scssIncludePath],
+                                importer: importOnce,
                             }
                         }],
                     })
