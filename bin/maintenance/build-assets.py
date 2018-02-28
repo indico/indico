@@ -100,7 +100,7 @@ def _get_plugin_themes(plugin_dir):
 
 def _get_plugin_webpack_build_config(plugin_dir, url_root='/'):
     core_config = _get_webpack_build_config(url_root)
-    packages = find_packages(plugin_dir)
+    packages = [x for x in find_packages(plugin_dir) if '.' not in x]
     assert len(packages) == 1
     plugin_root_path = os.path.join(plugin_dir, packages[0])
     plugin_name = packages[0].replace('indico_', '')  # XXX: find a better solution for this
