@@ -193,21 +193,6 @@ class IndicoPlugin(Plugin):
         """
         pass
 
-    def register_js_bundle(self, name, *files):
-        """Registers a JS bundle in the plugin's webassets environment"""
-        pretty_name = re.sub(r'_js$', '', name)
-        bundle = Bundle(*files, filters='rjsmin', output='js/{}_%(version)s.min.js'.format(pretty_name))
-        self.assets.register(name, bundle)
-
-    def register_css_bundle(self, name, *files):
-        """Registers an SCSS bundle in the plugin's webassets environment"""
-        pretty_name = re.sub(r'_css$', '', name)
-        bundle = Bundle(*files,
-                        filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
-                        output='css/{}_%(version)s.min.css'.format(pretty_name),
-                        depends=SASS_BASE_MODULES)
-        self.assets.register(name, bundle)
-
     def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages
 
