@@ -62,6 +62,8 @@ Bugfixes
 
 - Take 'center' orientation of badge/poster backgrounds into account
   (:issue:`3238`, thanks :user:`bpedersen2`)
+- Faily nicely when trying to register a local account with an already-used
+  email confirmation link (:issue:`3250`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
