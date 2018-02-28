@@ -102,7 +102,7 @@ class MultipassRegistrationForm(SyncedInputsMixin, IndicoForm):
 
 
 class LocalRegistrationForm(RegistrationForm):
-    email = EmailField(_('Email address'))
+    email = EmailField(_('Email address'), [_check_existing_email])
     username = StringField(_('Username'), [DataRequired(), _check_existing_username], filters=[_tolower])
     password = PasswordField(_('Password'), [DataRequired(), Length(min=5)])
     confirm_password = PasswordField(_('Confirm password'), [DataRequired(), ConfirmPassword('password')])
