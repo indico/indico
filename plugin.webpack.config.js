@@ -29,6 +29,10 @@ if (!_.isEmpty(config.themes)) {
 
 module.exports = env => {
     return merge(base.webpackDefaults(env, config), {
-        entry: entry
+        entry: entry,
+        externals: {
+            jquery: 'jQuery',
+            moment: 'moment'
+        }
     });
 };

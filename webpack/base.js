@@ -50,11 +50,11 @@ export function getThemeEntryPoints(config, prefix) {
         const escapedKey = k.replace('-', '_');
 
         returnValue['themes_' + escapedKey] =
-            _resolveTheme(rootPath, indicoClientPath, prefix + themes[k].stylesheet);
+            [_resolveTheme(rootPath, indicoClientPath, prefix + themes[k].stylesheet)];
 
         if (themes[k].print_stylesheet) {
             returnValue['themes_' + escapedKey + '.print'] =
-                _resolveTheme(rootPath, indicoClientPath, prefix + themes[k].print_stylesheet);
+                [_resolveTheme(rootPath, indicoClientPath, prefix + themes[k].print_stylesheet)];
         }
         return returnValue;
     }));
@@ -80,8 +80,13 @@ export function generateAssetPath(config, virtualVersion = false) {
 
 export function webpackDefaults(env, config) {
     const currentEnv = (env ? env.NODE_ENV : null) || 'development';
-    const nodeModules = path.join(config.build.indicoSourcePath || path.resolve(config.build.rootPath, '..'),
-                                  'node_modules');
+    const nodeModules = [path.join(config.build.indicoSourcePath || path.resolve(config.build.rootPath, '..'),
+                                   'node_modules')];
+
+    if (config.isPlugin) {
+        // add plugin's node_modules in addition to the core's
+        nodeModules.push(path.resolve(config.build.rootPath, '../node_modules'));
+    }
 
     const _cssLoaderOptions = {
         root: config.indico ? config.indico.build.staticPath : config.build.staticPath,
@@ -97,6 +102,7 @@ export function webpackDefaults(env, config) {
         const root = path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath, '..');
         return path.relative(root, info.absoluteResourcePath);
     }
+    const indicoClientPath = config.isPlugin ? config.indico.build.clientPath : config.build.clientPath;
 
     return {
         devtool: 'source-map',
@@ -169,7 +175,7 @@ export function webpackDefaults(env, config) {
         plugins: [
             new ManifestPlugin({
                 fileName: 'manifest.json',
-                publicPath: config.build.distURL,
+                publicPath: config.build.distURL
             }),
             // Do not load moment locales (we'll load them explicitly)
             new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
@@ -186,11 +192,11 @@ export function webpackDefaults(env, config) {
         ],
         resolve: {
             alias: [
-                {name: 'jquery', alias: path.resolve(nodeModules, 'jquery/src/jquery'), onlyModule: false}
+                {name: 'indico', alias: path.join(indicoClientPath, 'js/')}
             ]
         },
         resolveLoader: {
-            modules: [nodeModules]
+            modules: nodeModules
         },
         stats: {
             assets: false,
@@ -200,6 +206,18 @@ export function webpackDefaults(env, config) {
             chunkModules: false,
             chunkOrigins: false,
             chunksSort: 'name'
+        },
+        mode: currentEnv,
+        optimization: {
+            splitChunks: {
+                cacheGroups: {
+                    common: {
+                        name: "common",
+                        chunks: "initial",
+                        minChunks: 2
+                    }
+                }
+            }
         }
     };
 }
