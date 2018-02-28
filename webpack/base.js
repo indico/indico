@@ -93,6 +93,11 @@ export function webpackDefaults(env, config) {
         path.join(config.build.clientPath)),
                                       'styles');
 
+    function getDevtoolFilename(info) {
+        const root = path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath, '..');
+        return path.relative(root, info.absoluteResourcePath);
+    }
+
     return {
         devtool: 'source-map',
         context: config.build.clientPath,
@@ -100,6 +105,8 @@ export function webpackDefaults(env, config) {
             path: config.build.distPath,
             filename: "js/[name].[chunkhash:8].bundle.js",
             publicPath: config.build.distURL,
+            devtoolModuleFilenameTemplate: (info) => `webpack:///${getDevtoolFilename(info)}`,
+            devtoolFallbackModuleFilenameTemplate: (info) => `webpack:///${getDevtoolFilename(info)}?${info.hash}`,
         },
         module: {
             rules: [
@@ -149,8 +156,9 @@ export function webpackDefaults(env, config) {
                         }, {
                             loader: 'sass-loader',
                             options: {
-                                sourceMap: currentEnv === 'development',
+                                sourceMap: true,
                                 includePaths: [scssIncludePath],
+                                outputStyle: 'compact',
                                 importer: importOnce,
                             }
                         }],
