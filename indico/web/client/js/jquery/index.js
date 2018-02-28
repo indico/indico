@@ -69,9 +69,10 @@ if (process.env.NODE_ENV !== 'development') {
 $.migrateTrace = false;
 require('jquery-migrate');
 
-// These global definitions are needed until everything is on webpack
+// These global definitions are needed so that
+// legacy code can access them globally
 Object.assign(window, {
-    $, jQuery, _, moment, $T,
+    _, moment, $T,
     i18n: defaultI18n
 });
 
