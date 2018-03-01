@@ -159,4 +159,4 @@ class PermissionsField(JSONField):
         return get_permissions_info(PermissionsField.type_mapping[self.object_type])[0]
 
     def _value(self):
-        return self.data if self.data else None
+        return self.data if self.data else []

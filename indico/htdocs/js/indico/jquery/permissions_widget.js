@@ -173,6 +173,9 @@
         _renderDropdown: function($dropdown) {
             var self = this;
             $dropdown.children(':not(.default)').remove();
+            $dropdown.parent().dropdown({
+                selector: '.js-dropdown'
+            });
             var $dropdownLink = $dropdown.prev('.js-dropdown');
             var items = $dropdown.data('items');
             var isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
@@ -322,9 +325,6 @@
             this.data = JSON.parse(this.$dataField.val());
             this._update();
             this._render();
-            // Initialize form to enable dropdowns and disabled-until-change if widget is in a dialog
-            this.element.closest('.protection-dialog-permissions').closest('form').parent()
-                .trigger('indico:htmlUpdated');
 
             // Manage changes on the permissions dialog
             this.element.on('indico:permissionsChanged', function(evt, permissions, principal) {
