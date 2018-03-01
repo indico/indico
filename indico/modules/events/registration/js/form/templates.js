@@ -36,6 +36,7 @@ import './tpls/fields/country.tpl.html';
 import './tpls/fields/date.tpl.html';
 import './tpls/fields/dropdown.tpl.html';
 import './tpls/fields/email.tpl.html';
+import './tpls/fields/bool.tpl.html';
 import './tpls/fields/file.tpl.html';
 import './tpls/fields/label.tpl.html';
 import './tpls/fields/multi_choice.tpl.html';
