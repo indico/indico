@@ -198,6 +198,13 @@ export function webpackDefaults(env, config) {
         resolveLoader: {
             modules: nodeModules
         },
+        externals: (context, request, callback) => {
+            // tell webpack to make selectize use window.jQuery (and not load it again)
+            if (/^jquery$/.test(request) && /selectize/.test(context)) {
+                return callback(null, 'jQuery')
+            }
+            return callback();
+        },
         stats: {
             assets: false,
             children: false,
