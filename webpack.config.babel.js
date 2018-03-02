@@ -118,7 +118,7 @@ export default (env) => {
                             name: generateAssetPath(config),
                             context: config.build.distPath,
                             outputPath: 'mod_assets/',
-                            publicPath: config.build.distURL,
+                            publicPath: config.build.distURL + 'mod_assets/',
                         }
                     }
                 }
