@@ -173,7 +173,7 @@ class WPBase(object):
     @classproperty
     @classmethod
     def bundles(cls):
-        _bundles = ('common.js', 'main.js', 'main.css', 'module_core.js', 'module_events.creation.js',
+        _bundles = ('common.css', 'common.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
                     'module_attachments.js')
         if not g.get('static_site'):
             _bundles += ('ckeditor.js',)
@@ -242,7 +242,8 @@ class WPBase(object):
         js_files = map(self._fix_path, custom_js)
 
         body = to_unicode(self._display(params))
-        bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()),
+        bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()
+                                   if x in current_app.manifest._entries),
                                   self.additional_bundles['screen'], injected_bundles)
         print_bundles = itertools.chain((current_app.manifest[x] for x in self.print_bundles),
                                         self.additional_bundles['print'])
