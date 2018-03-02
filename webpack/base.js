@@ -218,10 +218,16 @@ export function webpackDefaults(env, config) {
         optimization: {
             splitChunks: {
                 cacheGroups: {
-                    common: {
-                        name: "common",
-                        chunks: "initial",
-                        minChunks: 2
+                    // 'common' chunk, which should include common dependencies
+                    common: (module) => {
+                        return {
+                            name: "common",
+                            chunks: "initial",
+                            // theme CSS files shouldn't be included in the
+                            // common.css chunk, otherwise they will interfere
+                            // with interface CSS
+                            minChunks: /styles\/themes/.test(module.request) ? 9999 : 2
+                        }
                     }
                 }
             }
