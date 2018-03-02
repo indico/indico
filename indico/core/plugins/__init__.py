@@ -133,7 +133,6 @@ class IndicoPlugin(Plugin):
         self.assets.append_path(output_dir, output_url)
         self.assets.append_path(static_dir, static_url)
         configure_pyscss(self.assets)
-        self.register_assets()
 
     def _import_models(self):
         old_models = set(db.Model._decl_class_registry.items())
@@ -184,14 +183,6 @@ class IndicoPlugin(Plugin):
     @cached_property
     def manifest(self):
         return JinjaManifestLoader().load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
-
-    def register_assets(self):
-        """Add assets to the plugin's webassets environment.
-
-        In most cases the whole method can consist of calls to
-        :meth:`register_js_bundle` and :meth:`register_css_bundle`.
-        """
-        pass
 
     def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages
