@@ -34,13 +34,13 @@ from indico.web.flask.util import find_url_endpoint
 
 _css_url_re = re.compile(r"url\('?([^\)']+)'?\)", re.MULTILINE)
 _event_url_prefix_re = re.compile(r'^/event/\d+')
-_static_url_re = re.compile('^/(css|images|fonts|dist)/(?:v/\w+/)?')
+_static_url_re = re.compile(r'^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$')
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
 
 
 def rewrite_static_url(path):
-    """Remove /v/xxxx prefix from static URLs."""
-    return _static_url_re.sub(r'static/\1/', path)
+    """Remove __vxxx prefix from static URLs."""
+    return _static_url_re.sub(r'static/\1\2/\3.\5', path)
 
 
 def _check_image_ownership(event, image_id):
