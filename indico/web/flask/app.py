@@ -22,7 +22,7 @@ import uuid
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
 from flask.helpers import get_root_path
-from flask_pluginengine import plugins_loaded
+from flask_pluginengine import current_plugin, plugins_loaded
 from flask_sqlalchemy import models_committed
 from markupsafe import Markup
 from pywebpack import WebpackBundleProject
@@ -203,6 +203,7 @@ def setup_jinja(app):
     app.add_template_global(get_request_stats)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
+    app.add_template_global(LocalProxy(lambda: current_plugin.manifest), 'plugin_webpack')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
