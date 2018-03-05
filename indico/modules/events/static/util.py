@@ -34,7 +34,7 @@ from indico.web.flask.util import find_url_endpoint
 
 _css_url_re = re.compile(r"url\('?([^\)']+)'?\)", re.MULTILINE)
 _event_url_prefix_re = re.compile(r'^/event/\d+')
-_static_url_re = re.compile(r'^/(images|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$')
+_static_url_re = re.compile(r'^/(images|dist|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$')
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
 
 
