@@ -105,7 +105,7 @@ def i18n_locale(locale_name):
 @assets_blueprint.route('!/static/assets/core/<path:path>')
 @assets_blueprint.route('!/static/assets/theme-<theme>/<path:path>')
 def static_asset(path, theme=None):
-    # Ensure there's no weird stuff in the plugin/theme name
+    # Ensure there's no weird stuff in the theme name
     if theme and theme not in theme_settings.themes:
         raise NotFound
     return send_from_directory(config.ASSETS_DIR, get_asset_path(path, theme=theme))

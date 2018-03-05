@@ -82,9 +82,8 @@ def configure_pyscss(environment):
     ]
 
 
-def get_webassets_cache_dir(plugin_name=None):
-    suffix = 'core' if not plugin_name else 'plugin-{}'.format(plugin_name)
-    return os.path.join(config.CACHE_DIR, 'webassets-{}-{}'.format(config.WORKER_NAME, suffix))
+def get_webassets_cache_dir():
+    return os.path.join(config.CACHE_DIR, 'webassets-{}-core'.format(config.WORKER_NAME))
 
 
 class LazyCacheEnvironment(Environment):
