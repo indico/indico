@@ -205,7 +205,7 @@ export function webpackDefaults(env, config) {
         externals: (context, request, callback) => {
             // tell webpack to make selectize use window.jQuery (and not load it again)
             if (/^jquery$/.test(request) && /selectize/.test(context)) {
-                return callback(null, 'jQuery')
+                return callback(null, 'jQuery');
             }
             return callback();
         },
@@ -231,7 +231,7 @@ export function webpackDefaults(env, config) {
                             // common.css chunk, otherwise they will interfere
                             // with interface CSS
                             minChunks: /styles\/themes/.test(module.request) ? 9999 : 2
-                        }
+                        };
                     }
                 }
             }
