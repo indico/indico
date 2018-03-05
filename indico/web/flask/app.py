@@ -44,7 +44,7 @@ from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
-from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
+from indico.core.plugins import plugin_engine, url_for_plugin
 from indico.core.webpack import webpack
 from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
@@ -181,8 +181,6 @@ def setup_jinja(app):
     app.add_template_global(IndicoConfig(exc=Exception), 'indico_config')
     app.add_template_global(include_css_assets)
     app.add_template_global(include_js_assets)
-    app.add_template_global(include_plugin_css_assets)
-    app.add_template_global(include_plugin_js_assets)
     app.add_template_global(call_template_hook, 'template_hook')
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     app.add_template_global(render_field, '_render_field')
