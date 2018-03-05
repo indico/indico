@@ -118,8 +118,12 @@ export function webpackDefaults(env, config) {
             rules: [
                 {
                     test: /\.js$/,
-                    use: 'babel-loader',
-                    exclude: /node_modules/
+                    loader: 'babel-loader',
+                    exclude: /node_modules/,
+                    options: {
+                        extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
+                                              '..', '.babelrc'),
+                    }
                 },
                 {
                     test: /\.css$/,
