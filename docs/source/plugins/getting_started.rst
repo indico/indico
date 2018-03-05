@@ -23,8 +23,7 @@ bundles outside of the plugin scope. ::
 
         def init(self):
             super(ExamplePlugin, self).init()
-            self.inject_css('global_css')
-            self.inject_js('global_js')
+            self.inject_bundle('main.js')
 
         def get_blueprints(self):
             return blueprint
@@ -40,12 +39,6 @@ bundles outside of the plugin scope. ::
 
         def extend_shell_context(self, add_to_context):
             add_to_context('bar', name='foo', doc='foobar from example plugin', color='magenta!')
-
-        def register_assets(self):
-            self.register_js_bundle('example_js', 'js/example.js')
-            self.register_js_bundle('global_js', 'js/global.js')
-            self.register_css_bundle('example_css', 'css/example.scss')
-            self.register_css_bundle('global_css', 'css/global.scss')
 
 
 The plugin can specify its settings via a :class:`~indico.web.forms.base.IndicoForm`::
