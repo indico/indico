@@ -19,10 +19,8 @@ from __future__ import unicode_literals
 import os
 
 
-def get_asset_path(path, plugin=None, theme=None):
-    if plugin:
-        base = 'plugin-{}'.format(plugin)
-    elif theme:
+def get_asset_path(path, theme=None):
+    if theme:
         base = 'theme-{}'.format(theme)
     else:
         base = 'core'

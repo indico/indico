@@ -18,8 +18,6 @@ from __future__ import unicode_literals
 
 import json
 import os
-import re
-from urlparse import urlparse
 
 from flask import session
 from flask_babelex import Domain
@@ -27,11 +25,9 @@ from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSet
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from flask_webpackext.manifest import JinjaManifestLoader
 from markupsafe import Markup
-from webassets import Bundle
 from werkzeug.utils import cached_property
 
 from indico.core import signals
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
@@ -41,8 +37,6 @@ from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import NullDomain, _
 from indico.util.struct.enum import IndicoEnum
-from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
-from indico.web.assets.bundles import LazyCacheEnvironment, get_webassets_cache_dir
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -119,20 +113,7 @@ class IndicoPlugin(Plugin):
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
-        self._setup_assets()
         self._import_models()
-
-    def _setup_assets(self):
-        url_base_path = urlparse(config.BASE_URL).path
-        output_dir = os.path.join(config.ASSETS_DIR, 'plugin-{}'.format(self.name))
-        output_url = '{}/static/assets/plugin-{}'.format(url_base_path, self.name)
-        static_dir = os.path.join(self.root_path, 'static')
-        static_url = '{}/static/plugins/{}'.format(url_base_path, self.name)
-        self.assets = LazyCacheEnvironment(output_dir, output_url, debug=config.DEBUG,
-                                           cache=get_webassets_cache_dir(self.name))
-        self.assets.append_path(output_dir, output_url)
-        self.assets.append_path(static_dir, static_url)
-        configure_pyscss(self.assets)
 
     def _import_models(self):
         old_models = set(db.Model._decl_class_registry.items())
@@ -260,18 +241,6 @@ class IndicoPlugin(Plugin):
         with instance.plugin_context():  # in case the default settings come from a property
             return UserSettingsProxy('plugin_{}'.format(cls.name), instance.default_user_settings,
                                      cls.strict_settings, converters=cls.user_settings_converters)
-
-
-def include_plugin_js_assets(bundle_name):
-    """Jinja template function to generate HTML tags for a plugin JS asset bundle."""
-    return Markup('\n'.join('<script src="{}"></script>'.format(url)
-                            for url in current_plugin.assets[bundle_name].urls()))
-
-
-def include_plugin_css_assets(bundle_name):
-    """Jinja template function to generate HTML tags for a plugin CSS asset bundle."""
-    return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
-                            for url in current_plugin.assets[bundle_name].urls()))
 
 
 def plugin_url_rule_to_js(endpoint):
