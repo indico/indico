@@ -43,8 +43,7 @@ def temp_cleanup():
     from indico.core.config import config
     from indico.core.logger import Logger
     logger = Logger.get()
-    deleted = cleanup_dir(config.CACHE_DIR, timedelta(days=1),
-                          exclude=lambda x: x.startswith('webassets-'))
+    deleted = cleanup_dir(config.CACHE_DIR, timedelta(days=1))
     _log_deleted(logger, 'Deleted from cache: %s', deleted)
     deleted = cleanup_dir(config.TEMP_DIR, timedelta(days=1))
     _log_deleted(logger, 'Deleted from temp: %s', deleted)

@@ -23,14 +23,6 @@ from indico.core.config import config
 from indico.web.flask.util import url_for
 
 
-def get_asset_path(path, theme=None):
-    if theme:
-        base = 'theme-{}'.format(theme)
-    else:
-        base = 'core'
-    return os.path.join(base, path)
-
-
 def _get_custom_files(subdir, pattern):
     customization_dir = config.CUSTOMIZATION_DIR
     if not customization_dir:

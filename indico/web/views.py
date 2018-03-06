@@ -162,10 +162,8 @@ class WPBase(object):
     print_bundles = tuple()
 
     def __init__(self, rh, **kwargs):
-        from indico.web.assets import core_env
         self._rh = rh
         self._kwargs = kwargs
-        self._asset_env = core_env
 
     def get_extra_css_files(self):
         """Return CSS urls that will be included after all other CSS"""

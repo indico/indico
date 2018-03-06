@@ -319,7 +319,7 @@ class SetupWizard(object):
             raise click.Abort
 
     def _check_directories(self, dev=False):
-        dirs = ['archive', 'assets', 'cache', 'log', 'tmp']
+        dirs = ['archive', 'cache', 'log', 'tmp']
         if not dev:
             dirs += ['etc', 'web']
 
@@ -559,7 +559,6 @@ class SetupWizard(object):
             b'CACHE_DIR = {!r}'.format(os.path.join(self.data_root_path, 'cache').encode('utf-8')),
             b'TEMP_DIR = {!r}'.format(os.path.join(self.data_root_path, 'tmp').encode('utf-8')),
             b'LOG_DIR = {!r}'.format(os.path.join(self.data_root_path, 'log').encode('utf-8')),
-            b'ASSETS_DIR = {!r}'.format(os.path.join(self.data_root_path, 'assets').encode('utf-8')),
             b'STORAGE_BACKENDS = {!r}'.format({k.encode('utf-8'): v.encode('utf-8')
                                               for k, v in storage_backends.iteritems()}),
             b"ATTACHMENT_STORAGE = 'default'",
