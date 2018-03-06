@@ -55,7 +55,6 @@ from indico.util.i18n import _, babel, get_current_locale, gettext_context, nget
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
-from indico.web.assets import core_env, include_css_assets, include_js_assets, register_all_css, register_all_js
 from indico.web.assets.util import get_custom_assets
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
@@ -180,8 +179,6 @@ def setup_jinja(app):
     app.add_template_global(url_for_plugin)
     app.add_template_global(url_rule_to_js)
     app.add_template_global(IndicoConfig(exc=Exception), 'indico_config')
-    app.add_template_global(include_css_assets)
-    app.add_template_global(include_js_assets)
     app.add_template_global(call_template_hook, 'template_hook')
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     app.add_template_global(render_field, '_render_field')
@@ -234,22 +231,6 @@ def setup_jinja(app):
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
-    # webassets
-    app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
-    app.jinja_env.assets_environment = core_env
-
-
-ASSETS_REGISTERED = False
-
-
-def setup_assets():
-    global ASSETS_REGISTERED
-    if ASSETS_REGISTERED:
-        # Avoid errors when forking after creating an app
-        return
-    ASSETS_REGISTERED = True
-    register_all_js(core_env)
-    register_all_css(core_env)
 
 
 def configure_db(app):
@@ -367,10 +348,6 @@ def make_app(set_path=False, testing=False, config_override=None):
         oauth.init_app(app)
         setup_mako(app)
         setup_jinja(app)
-
-        core_env.init_app(app)
-        setup_assets()
-
         configure_db(app)
         mm.init_app(app)
         extend_url_map(app)

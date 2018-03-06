@@ -38,7 +38,6 @@ from indico.util.string import crc32, snakify
 
 
 DEFAULTS = {
-    'ASSETS_DIR': '/opt/indico/assets',
     'ATTACHMENT_STORAGE': 'default',
     'AUTH_PROVIDERS': {},
     'BASE_URL': None,
