@@ -5,9 +5,7 @@
 {% block title %}{% trans %}Hello there!{% endtrans %}{% endblock %}
 
 {% block head %}
-    {% assets 'modules_bootstrap_js' -%}
-        <script src="{{ ASSET_URL }}"></script>
-    {% endassets %}
+    {{ webpack['module_bootstrap.js'] }}
 {% endblock %}
 
 {% block body %}
