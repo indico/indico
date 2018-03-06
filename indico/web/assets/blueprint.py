@@ -22,8 +22,6 @@ from werkzeug.exceptions import NotFound
 import indico
 from indico.core.config import config
 from indico.core.plugins import plugin_engine
-from indico.modules.events.layout import theme_settings
-from indico.web.assets.util import get_asset_path
 from indico.web.assets.vars_js import generate_global_file, generate_i18n_file, generate_user_file
 from indico.web.flask.util import send_file, url_for
 from indico.web.flask.wrappers import IndicoBlueprint
@@ -100,15 +98,6 @@ def i18n_locale(locale_name):
 
     return send_file('{}.js'.format(locale_name), cache_file, mimetype='application/javascript',
                      no_cache=False, conditional=True)
-
-
-@assets_blueprint.route('!/static/assets/core/<path:path>')
-@assets_blueprint.route('!/static/assets/theme-<theme>/<path:path>')
-def static_asset(path, theme=None):
-    # Ensure there's no weird stuff in the theme name
-    if theme and theme not in theme_settings.themes:
-        raise NotFound
-    return send_from_directory(config.ASSETS_DIR, get_asset_path(path, theme=theme))
 
 
 @assets_blueprint.route('!/static/custom/<any(css,js):folder>/<path:filename>', endpoint='custom')

@@ -392,13 +392,6 @@ Development
 Directories
 -----------
 
-.. data:: ASSETS_DIR
-
-    The directory in which built assets are stored. Must be accessible
-    by the web server.
-
-    Default: ``'/opt/indico/assets'``
-
 .. data:: CACHE_DIR
 
     The directory in which various data is cached temporarily. Must be

@@ -2,9 +2,7 @@ Babel==2.5.3
 Mako==1.0.7
 MarkupSafe==1.0
 indico-fonts==1.1
-csscompressor==0.9.5
 icalendar==4.0.1
-jsmin==2.2.2
 lxml==4.2.1
 pojson==0.7
 pyPdf==1.13
@@ -21,11 +19,9 @@ pytz
 reportlab==3.4.0
 simplejson==3.14.0
 termcolor==1.1.0
-webassets==0.12.1
 wsgiref==0.1.2
 zope.interface==3.8.0
 requests==2.18.4
-pyScss==1.3.5
 Werkzeug==0.14.1
 Flask==0.12.4
 bcrypt==3.1.4
