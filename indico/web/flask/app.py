@@ -56,6 +56,7 @@ from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
 from indico.web.assets import core_env, include_css_assets, include_js_assets, register_all_css, register_all_js
+from indico.web.assets.util import get_custom_assets
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
@@ -196,9 +197,8 @@ def setup_jinja(app):
     app.add_template_global(slugify)
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
     app.add_template_global(render_session_bar)
-    app.add_template_global(lambda: 'custom_js' in core_env, 'has_custom_js')
-    app.add_template_global(lambda: 'custom_sass' in core_env, 'has_custom_sass')
     app.add_template_global(get_request_stats)
+    app.add_template_global(get_custom_assets)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest), 'plugin_webpack')

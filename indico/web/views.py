@@ -32,6 +32,7 @@ from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
+from indico.web.assets.util import get_custom_assets
 from indico.web.flask.templating import get_template_module
 from indico.web.util import jsonify_template
 
@@ -236,8 +237,8 @@ class WPBase(object):
 
         injected_bundles = values_from_signal(signals.plugin.inject_bundle.send(self.__class__), as_list=True,
                                               multi_value_types=list)
-        custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
-        custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
+        custom_js = get_custom_assets('js')
+        custom_css = get_custom_assets('css')
         css_files = map(self._fix_path, self.get_extra_css_files() + custom_css)
         js_files = map(self._fix_path, custom_js)
 

@@ -111,13 +111,13 @@ def static_asset(path, theme=None):
     return send_from_directory(config.ASSETS_DIR, get_asset_path(path, theme=theme))
 
 
-@assets_blueprint.route('!/static/custom/<path:filename>', endpoint='custom')
-def static_custom(filename):
+@assets_blueprint.route('!/static/custom/<any(css,js):folder>/<path:filename>', endpoint='custom')
+@assets_blueprint.route('!/static/custom/files/<path:filename>', endpoint='custom', defaults={'folder': 'files'})
+def static_custom(folder, filename):
     customization_dir = config.CUSTOMIZATION_DIR
     if not customization_dir:
         raise NotFound
-    customization_dir = os.path.join(customization_dir, 'static')
-    return send_from_directory(customization_dir, filename)
+    return send_from_directory(os.path.join(customization_dir, folder), filename)
 
 
 @assets_blueprint.route('!/favicon.ico')
