@@ -71,3 +71,11 @@ stored when the theme is selected in an event.  ``css`` is the location
 of the CSS file, relative to the plugin's ``static`` folder.  ``title``
 is the title displayed to the user when selecting the theme.
 """)
+
+get_template_customization_paths = _signals.signal('get-template-customization-paths', """
+Expected to return the absolute path to a directory containing template overrides.
+This signal is called once during initialization so it should not use any
+data that may change at runtime.  The behavior of a customization path returned
+by this function is exactly like ``<CUSTOMIZATION_DIR>/templates``, but
+it has lower priority than the one from the global customization dir.
+""")
