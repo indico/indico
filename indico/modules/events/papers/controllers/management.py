@@ -19,6 +19,7 @@ from __future__ import unicode_literals
 from flask import flash, render_template, request, session
 from werkzeug.exceptions import NotFound
 
+from indico.modules.events.contributions import Contribution
 from indico.modules.events.operations import (create_reviewing_question, delete_reviewing_question,
                                               sort_reviewing_questions, update_reviewing_question)
 from indico.modules.events.papers import logger
@@ -26,7 +27,9 @@ from indico.modules.events.papers.controllers.base import RHManagePapersBase
 from indico.modules.events.papers.forms import (DeadlineForm, PaperReviewingSettingsForm, PapersScheduleForm,
                                                 PaperTeamsForm, make_competences_form)
 from indico.modules.events.papers.models.review_questions import PaperReviewQuestion
-from indico.modules.events.papers.models.reviews import PaperReviewType
+from indico.modules.events.papers.models.review_ratings import PaperReviewRating
+from indico.modules.events.papers.models.reviews import PaperReview, PaperReviewType
+from indico.modules.events.papers.models.revisions import PaperRevision
 from indico.modules.events.papers.operations import (close_cfp, create_competences, open_cfp, schedule_cfp,
                                                      set_deadline, set_reviewing_state, update_competences,
                                                      update_team_members)
@@ -181,21 +184,29 @@ class RHCloseCFP(RHManagePapersBase):
 
 class RHManageReviewingSettings(RHManagePapersBase):
     def _process(self):
+        has_ratings = (PaperReviewRating.query
+                       .join(PaperReviewRating.review)
+                       .join(PaperReview.revision)
+                       .join(PaperRevision._contribution)
+                       .join(PaperReviewRating.question)
+                       .filter(~Contribution.is_deleted,
+                               Contribution.event == self.event,
+                               PaperReviewQuestion.field_type == 'rating')
+                       .has_rows())
         defaults = FormDefaults(content_review_questions=self.event.cfp.content_review_questions,
                                 layout_review_questions=self.event.cfp.layout_review_questions,
                                 **paper_reviewing_settings.get_all(self.event))
-        form = PaperReviewingSettingsForm(event=self.event, obj=defaults)
+        form = PaperReviewingSettingsForm(event=self.event, obj=defaults, has_ratings=has_ratings)
         if form.validate_on_submit():
             data = form.data
-            email_settings = data.pop('email_settings')
-            data.update(email_settings)
-
+            data.update(data.pop('email_settings'))
             paper_reviewing_settings.set_multi(self.event, data)
             flash(_("The reviewing settings were saved successfully"), 'success')
             logger.info("Paper reviewing settings of %r updated by %r", self.event, session.user)
             return jsonify_data()
         self.commit = False
-        return jsonify_form(form)
+        disabled_fields = form.RATING_FIELDS if has_ratings else ()
+        return jsonify_form(form, disabled_fields=disabled_fields)
 
 
 class RHSetDeadline(RHManagePapersBase):

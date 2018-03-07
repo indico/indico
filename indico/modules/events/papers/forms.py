@@ -19,8 +19,8 @@ from __future__ import unicode_literals
 from datetime import time
 
 from flask import request, session
-from wtforms.fields import BooleanField, HiddenField, StringField, TextAreaField
-from wtforms.validators import DataRequired, Optional
+from wtforms.fields import BooleanField, HiddenField, IntegerField, StringField, TextAreaField
+from wtforms.validators import DataRequired, InputRequired, Optional, ValidationError
 
 from indico.modules.events.papers.fields import PaperEmailSettingsField
 from indico.modules.events.papers.models.reviews import PaperAction, PaperCommentVisibility, PaperTypeProxy
@@ -32,7 +32,7 @@ from indico.web.forms.fields import (EditableFileField, FileField, HiddenEnumFie
                                      IndicoDateTimeField, IndicoEnumSelectField, IndicoMarkdownField,
                                      IndicoTagListField, PrincipalListField)
 from indico.web.forms.util import inject_validators
-from indico.web.forms.validators import HiddenUnless, LinkedDateTime
+from indico.web.forms.validators import HiddenUnless, LinkedDateTime, UsedIf
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -145,12 +145,40 @@ class BulkPaperJudgmentForm(PaperJudgmentFormBase):
 
 
 class PaperReviewingSettingsForm(IndicoForm):
+    """Settings form for paper reviewing"""
+
+    RATING_FIELDS = ('scale_lower', 'scale_upper')
+
     announcement = IndicoMarkdownField(_('Announcement'), editor=True)
+    scale_lower = IntegerField(_("Scale (from)"), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
+    scale_upper = IntegerField(_("Scale (to)"), [UsedIf(lambda form, field: not form.has_ratings), InputRequired()])
     email_settings = PaperEmailSettingsField(_("Email notifications"))
 
     def __init__(self, *args, **kwargs):
         self.event = kwargs.pop('event')
+        self.has_ratings = kwargs.pop('has_ratings', False)
         super(PaperReviewingSettingsForm, self).__init__(*args, **kwargs)
+        if self.has_ratings:
+            self.scale_upper.warning = _("Some reviewers have already submitted ratings so the scale cannot be changed "
+                                         "anymore.")
+
+    def validate_scale_upper(self, field):
+        lower = self.scale_lower.data
+        upper = self.scale_upper.data
+        if lower is None or upper is None:
+            return
+        if lower >= upper:
+            raise ValidationError(_("The scale's 'to' value must be greater than the 'from' value."))
+        if upper - lower > 20:
+            raise ValidationError(_("The difference between 'to' and' from' may not be greater than 20."))
+
+    @property
+    def data(self):
+        data = super(PaperReviewingSettingsForm, self).data
+        if self.has_ratings:
+            for key in self.RATING_FIELDS:
+                del data[key]
+        return data
 
 
 class PaperSubmissionForm(IndicoForm):

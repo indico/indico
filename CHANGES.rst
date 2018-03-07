@@ -62,6 +62,8 @@ Improvements
   has no tracks (:issue:`2919`)
 - Allow specifying min/max length for registration form text fields
   (:issue:`3193`, thanks :user:`bpedersen2`)
+- Add settings to configure the scale of 'rating' questions in paper
+  reviewing
 
 Bugfixes
 ^^^^^^^^
