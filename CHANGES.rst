@@ -55,7 +55,6 @@ Improvements
   :user:`bpedersen2`)
 - When blocking a user account, the user will be forcefully logged out in
   addition to being prevented from logging in
-- Warn when editing a speaker/author would result in duplicate emails
 - Show track-related columns in abstract list only if there are tracks
   defined for the event (:issue:`2813`)
 - Show warning box to inform that reviewer roles do not apply when an event
@@ -64,14 +63,6 @@ Improvements
   (:issue:`3193`, thanks :user:`bpedersen2`)
 - Add settings to configure the scale of 'rating' questions in paper
   reviewing
-
-Bugfixes
-^^^^^^^^
-
-- Take 'center' orientation of badge/poster backgrounds into account
-  (:issue:`3238`, thanks :user:`bpedersen2`)
-- Faily nicely when trying to register a local account with an already-used
-  email confirmation link (:issue:`3250`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
@@ -90,6 +81,30 @@ Internal Changes
 
 
 ----
+
+
+Version 2.0.2
+-------------
+
+*Released on March 07, 2018*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Update `bleach <https://github.com/mozilla/bleach>`_ to fix an XSS vulnerability
+
+Improvements
+^^^^^^^^^^^^
+
+- Warn when editing a speaker/author would result in duplicate emails
+
+Bugfixes
+^^^^^^^^
+
+- Take 'center' orientation of badge/poster backgrounds into account
+  (:issue:`3238`, thanks :user:`bpedersen2`)
+- Faily nicely when trying to register a local account with an already-used
+  email confirmation link (:issue:`3250`)
 
 
 Version 2.0.1
