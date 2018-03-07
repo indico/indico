@@ -5,7 +5,7 @@ Changelog
 Version 2.0.2
 -------------
 
-*Unreleased*
+*Released on March 07, 2018*
 
 Security fixes
 ^^^^^^^^^^^^^^
