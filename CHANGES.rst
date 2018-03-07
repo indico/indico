@@ -2,6 +2,17 @@ Changelog
 =========
 
 
+Version 2.0.2
+-------------
+
+*Unreleased*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Update `bleach <https://github.com/mozilla/bleach>`_ to fix an XSS vulnerability
+
+
 Version 2.0.1
 -------------
 
