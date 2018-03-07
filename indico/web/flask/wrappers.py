@@ -23,9 +23,9 @@ from uuid import uuid4
 from flask import Blueprint, Flask, g, request
 from flask.blueprints import BlueprintSetupState
 from flask.helpers import locked_cached_property
-from flask_webpackext import current_webpack
 from flask.wrappers import Request
 from flask_pluginengine import PluginFlaskMixin
+from flask_webpackext import current_webpack
 from jinja2 import FileSystemLoader, TemplateNotFound
 from werkzeug.datastructures import ImmutableOrderedMultiDict
 from werkzeug.utils import cached_property
@@ -86,11 +86,10 @@ class IndicoFlask(PluginFlaskMixin, Flask):
 
     def create_global_jinja_loader(self):
         default_loader = super(IndicoFlask, self).create_global_jinja_loader()
-        customization_dir = config.CUSTOMIZATION_DIR
-        if not customization_dir:
-            return default_loader
-        return CustomizationLoader(default_loader, os.path.join(customization_dir, 'templates'),
-                                   config.CUSTOMIZATION_DEBUG)
+        # use an empty list if there's no global customization dir so we can
+        # add directories of plugins later once they are available
+        customization_dir = os.path.join(config.CUSTOMIZATION_DIR, 'templates') if config.CUSTOMIZATION_DIR else []
+        return CustomizationLoader(default_loader, customization_dir, config.CUSTOMIZATION_DEBUG)
 
     def add_url_rule(self, rule, endpoint=None, view_func=None, **options):
         from indico.web.rh import RHSimple
