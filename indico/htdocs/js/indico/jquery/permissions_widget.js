@@ -20,9 +20,12 @@
 (function($) {
     'use strict';
 
+    var FULL_ACCESS_PERMISSIONS = '_full_access';
+    var READ_ACCESS_PERMISSIONS = '_read_access';
+
     $.widget('indico.permissionswidget', {
         options: {
-            eventId: null,
+            objectType: null,
             permissionsInfo: null
         },
 
@@ -91,10 +94,20 @@
             var self = this;
             var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
             var $permissionsList = $('<ul>').appendTo($permissions);
+            // When full access is enabled, always show read access
+            if (_.contains(permissions, FULL_ACCESS_PERMISSIONS) && !_.contains(permissions, READ_ACCESS_PERMISSIONS)) {
+                permissions.push(READ_ACCESS_PERMISSIONS);
+                if (principal._type !== 'DefaultEntry') {
+                    self._updateItem(principal, permissions);
+                }
+            }
             permissions.forEach(function(item) {
                 var permissionInfo = self.options.permissionsInfo[item];
+                var applyOpacity = item === READ_ACCESS_PERMISSIONS && _.contains(permissions, FULL_ACCESS_PERMISSIONS)
+                    && principal._type !== 'DefaultEntry';
+                var cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
                 $permissionsList.append(
-                    $('<li>', {class: 'i-label bold ' + permissionInfo.css_class, title: permissionInfo.description})
+                    $('<li>', {class: 'i-label bold ' + cssClasses, title: permissionInfo.description})
                         .append(permissionInfo.title)
                 );
             });
@@ -119,7 +132,7 @@
                 return $('<button>', {
                     'type': 'button',
                     'class': 'i-button text-color borderless icon-only icon-edit',
-                    'data-href': build_url(Indico.Urls.EventPermissions, {confId: this.options.eventId}),
+                    'data-href': build_url(Indico.Urls.PermissionsDialog, {type: this.options.objectType}),
                     'data-title': $T.gettext('Assign Permissions'),
                     'data-method': 'POST',
                     'data-ajax-dialog': '',
@@ -160,6 +173,9 @@
         _renderDropdown: function($dropdown) {
             var self = this;
             $dropdown.children(':not(.default)').remove();
+            $dropdown.parent().dropdown({
+                selector: '.js-dropdown'
+            });
             var $dropdownLink = $dropdown.prev('.js-dropdown');
             var items = $dropdown.data('items');
             var isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
@@ -191,7 +207,7 @@
             var $text = $('<span>', {text: principal.name});
             $dropdownItem.append($itemContent.append($text)).on('click', function() {
                 // Grant read access by default
-                self._addItems([$(this).data('principal')], ['_read_access']);
+                self._addItems([$(this).data('principal')], [READ_ACCESS_PERMISSIONS]);
             });
             return $dropdownItem;
         },
@@ -232,12 +248,15 @@
                 self.$permissionsWidgetList.append(self._renderItem(item));
             });
             // Add default entries
-            var categoryManagers = [{
-                _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
-            }, ['_full_access']];
-            var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'}, ['_read_access']];
-            this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
+            var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
+                [READ_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.append(this._renderItem(anonymous));
+            if (this.options.objectType === 'event') {
+                var categoryManagers = [{
+                    _type: 'DefaultEntry', name: $T.gettext('Category Managers'), id: 'category-managers'
+                }, [FULL_ACCESS_PERMISSIONS]];
+                this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
+            }
             this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
             this._renderDropdown(this.$roleDropdown);
@@ -287,7 +306,7 @@
             var self = this;
             function _addPrincipals(principals) {
                 /// Grant read access by default
-                self._addItems(principals, ['_read_access']);
+                self._addItems(principals, [READ_ACCESS_PERMISSIONS]);
             }
 
             var dialog = new ChooseUsersPopup(
@@ -327,7 +346,7 @@
             $('.js-new-role').on('ajaxDialog:closed', function(evt, data) {
                 if (data && data.role) {
                     self.$roleDropdown.data('items').push(data.role);
-                    self._addItems([data.role], ['_read_access']);
+                    self._addItems([data.role], [READ_ACCESS_PERMISSIONS]);
                 }
             });
 

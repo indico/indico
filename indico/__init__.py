@@ -34,5 +34,10 @@ def _patch_wtforms_sqlalchemy():
     fields.get_pk_from_identity = get_pk_from_identity
 
 
-_patch_wtforms_sqlalchemy()
-del _patch_wtforms_sqlalchemy
+try:
+    _patch_wtforms_sqlalchemy()
+except ImportError as exc:
+    # pip seems to run this sometimes while uninstalling an old sqlalchemy version
+    print 'Could not monkeypatch wtforms', exc
+finally:
+    del _patch_wtforms_sqlalchemy

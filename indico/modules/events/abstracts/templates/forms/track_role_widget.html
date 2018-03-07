@@ -56,6 +56,13 @@
     <input type="hidden" id="{{ field.id }}" name="{{ field.name }}" value="{{ field._value() }}">
     <div id="role-widget-{{ field.id }}" class="abstract-role-widget">
         <ul class="abstract-role-list">
+            {% if not field.tracks %}
+                {% call message_box('warning') %}
+                    {% trans -%}
+                        Since this event has no tracks, reviewer roles are disabled. Only judgment is available.
+                    {%- endtrans %}
+                {% endcall %}
+            {% endif %}
             {% call render_track('*', _("All Tracks"), field.data['*'], user_data, global=true) -%}
                 {% trans %}These users will be able to access/review all tracks in the event.{% endtrans %}
             {%- endcall %}

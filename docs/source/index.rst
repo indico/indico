@@ -87,6 +87,16 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 
+
+Contact
++++++++
+
+.. toctree::
+    :maxdepth: 2
+
+    contact/index.rst
+
+
 .. |build-status| image:: https://travis-ci.org/indico/indico.png?branch=master
                    :alt: Travis Build Status
                    :target: https://travis-ci.org/indico/indico

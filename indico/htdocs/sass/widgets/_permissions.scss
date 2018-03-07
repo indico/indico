@@ -23,6 +23,12 @@
     font-weight: bold;
 }
 
+@mixin permission-label($color) {
+    color: $light-gray;
+    background-color: $color;
+    border-color: darken($color, 5%);
+}
+
 .permissions-widget {
     padding-bottom: 2em;
 
@@ -95,6 +101,35 @@
                     margin: 0.4em 0.5em;
                     padding: 0.6em 1em;
                     text-transform: uppercase;
+
+                    &.disabled {
+                        @include opacity(0.5);
+                    }
+
+                    // Permission label palette
+                    &.permission-event-submit {
+                        @include permission-label($yellow);
+                    }
+
+                    &.permission-event-paper_manager {
+                        @include permission-label($purple);
+                    }
+
+                    &.permission-event-registration {
+                        @include permission-label($blue);
+                    }
+
+                    &.permission-event-surveys {
+                        @include permission-label($bright-orange);
+                    }
+
+                    &.permission-contribution-submit {
+                        @include permission-label($yellow);
+                    }
+
+                    &.permission-session-coordinate {
+                        @include permission-label($blue);
+                    }
                 }
             }
 
@@ -145,6 +180,10 @@
         }
     }
 
+}
+
+.protection-dialog-permissions {
+    margin-left: 2.5em;
 }
 
 @mixin circle-checkbox-checked() {
@@ -202,7 +241,7 @@
 
             &:checked ~ ul {
                 label {
-                    opacity: 0.5;
+                    @include opacity(0.5);
                 }
 
                 label::before, .circle-checkbox:hover + label::before {

@@ -35,6 +35,7 @@ from werkzeug.exceptions import BadRequest, Forbidden
 from indico.core import signals
 from indico.core.config import config
 from indico.core.errors import NoReportError, UserValueError
+from indico.core.permissions import FULL_ACCESS_PERMISSION, READ_ACCESS_PERMISSION
 from indico.modules.api import api_settings
 from indico.modules.events import Event
 from indico.modules.events.contributions.models.contributions import Contribution
@@ -47,8 +48,10 @@ from indico.modules.events.models.static_list_links import StaticListLink
 from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.events.timetable.models.breaks import Break
 from indico.modules.events.timetable.models.entries import TimetableEntry
+from indico.modules.networks import IPNetworkGroup
 from indico.util.fs import chmod_umask, secure_filename
 from indico.util.i18n import _
+from indico.util.user import principal_from_fossil
 from indico.web.flask.templating import get_template_module
 from indico.web.flask.util import send_file, url_for
 from indico.web.forms.colors import get_colors
@@ -564,6 +567,18 @@ def set_custom_fields(obj, custom_fields_data):
         if old_value != custom_field_value:
             changes[custom_field_name] = (old_value, custom_field_value)
     return changes
+
+
+def check_permissions(event, field, allow_networks=False):
+    for principal_fossil, permissions in field.data:
+        principal = principal_from_fossil(principal_fossil, allow_emails=True, allow_networks=allow_networks,
+                                          event=event)
+        if allow_networks and isinstance(principal, IPNetworkGroup) and set(permissions) - {READ_ACCESS_PERMISSION}:
+            msg = _('IP networks cannot have management permissions: {}').format(principal.name)
+            return msg
+        if FULL_ACCESS_PERMISSION in permissions and len(permissions) != 1:
+            # when full access permission is set, discard rest of permissions
+            permissions[:] = [FULL_ACCESS_PERMISSION]
 
 
 class ZipGeneratorMixin:

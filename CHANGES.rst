@@ -80,12 +80,22 @@ Improvements
 - When blocking a user account, the user will be forcefully logged out in
   addition to being prevented from logging in
 - Warn when editing a speaker/author would result in duplicate emails
+- Show track-related columns in abstract list only if there are tracks
+  defined for the event (:issue:`2813`)
+- Show warning box to inform that reviewer roles do not apply when an event
+  has no tracks (:issue:`2919`)
+- Allow specifying min/max length for registration form text fields
+  (:issue:`3193`, thanks :user:`bpedersen2`)
+- Add settings to configure the scale of 'rating' questions in paper
+  reviewing
 
 Bugfixes
 ^^^^^^^^
 
 - Take 'center' orientation of badge/poster backgrounds into account
   (:issue:`3238`, thanks :user:`bpedersen2`)
+- Faily nicely when trying to register a local account with an already-used
+  email confirmation link (:issue:`3250`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^

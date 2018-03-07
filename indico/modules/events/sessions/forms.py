@@ -25,13 +25,13 @@ from wtforms.validators import DataRequired, ValidationError
 from indico.core.db import db
 from indico.modules.events.sessions.fields import SessionBlockPersonLinkListField
 from indico.modules.events.sessions.models.types import SessionType
+from indico.modules.events.util import check_permissions
 from indico.util.i18n import _
 from indico.web.flask.util import url_for
 from indico.web.forms.base import IndicoForm
 from indico.web.forms.colors import get_colors
-from indico.web.forms.fields import (AccessControlListField, IndicoLocationField, IndicoPalettePickerField,
-                                     IndicoProtectionField, PrincipalListField, TimeDeltaField)
-from indico.web.forms.validators import UsedIf
+from indico.web.forms.fields import IndicoLocationField, IndicoPalettePickerField, IndicoProtectionField, TimeDeltaField
+from indico.web.forms.fields.principals import PermissionsField
 from indico.web.forms.widgets import SwitchWidget
 
 
@@ -62,20 +62,18 @@ class SessionForm(IndicoForm):
 
 
 class SessionProtectionForm(IndicoForm):
+    permissions = PermissionsField(_("Permissions"), object_type='session')
     protection_mode = IndicoProtectionField(_('Protection mode'), protected_object=lambda form: form.protected_object,
                                             acl_message_url=lambda form: url_for('sessions.acl_message',
                                                                                  form.protected_object))
-    acl = AccessControlListField(_('Access control list'),
-                                 [UsedIf(lambda form, field: form.protected_object.is_protected)],
-                                 groups=True, allow_emails=True, default_text=_('Restrict access to this session'),
-                                 description=_('List of users allowed to access the session.'))
-    managers = PrincipalListField(_('Managers'), groups=True, allow_emails=True,
-                                  description=_('List of users allowed to modify the session'))
-    coordinators = PrincipalListField(_('Coordinators'), groups=True, allow_emails=True)
 
     def __init__(self, *args, **kwargs):
-        self.protected_object = kwargs.pop('session')
+        self.protected_object = session = kwargs.pop('session')
+        self.event = session.event
         super(SessionProtectionForm, self).__init__(*args, **kwargs)
+
+    def validate_permissions(self, field):
+        check_permissions(self.event, field)
 
 
 class SessionBlockForm(IndicoForm):

@@ -46,8 +46,8 @@ _bp.add_url_rule('/move', 'move', actions.RHMoveEvent, methods=('POST',))
 _bp.add_url_rule('/protection', 'protection', protection.RHEventProtection, methods=('GET', 'POST'))
 _bp.add_url_rule('/protection/acl', 'acl', protection.RHEventACL)
 _bp.add_url_rule('/protection/acl-message', 'acl_message', protection.RHEventACLMessage)
-_bp.add_url_rule('/protection/event-permissions', 'event_permissions', protection.RHEventPermissionsDialog,
-                 methods=('POST',))
+_bp.add_url_rule('!/permissions-dialog/<any(event,session,contribution):type>', 'permissions_dialog',
+                 protection.RHPermissionsDialog, methods=('POST',))
 # Cloning
 _bp.add_url_rule('/clone', 'clone', cloning.RHCloneEvent, methods=('GET', 'POST'))
 _bp.add_url_rule('/clone/preview', 'clone_preview', cloning.RHClonePreview, methods=('GET', 'POST'))

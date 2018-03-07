@@ -24,7 +24,9 @@ from wtforms import HiddenField
 from indico.core.db.sqlalchemy.principals import PrincipalType, serialize_email_principal
 from indico.core.permissions import get_permissions_info
 from indico.modules.events import Event
+from indico.modules.events.contributions.models.contributions import Contribution
 from indico.modules.events.roles.util import serialize_role
+from indico.modules.events.sessions.models.sessions import Session
 from indico.modules.groups import GroupProxy
 from indico.modules.groups.util import serialize_group
 from indico.modules.networks.models.networks import IPNetworkGroup
@@ -76,12 +78,13 @@ class PrincipalListField(HiddenField):
         self.allow_external = kwargs.pop('allow_external', False)
         # Whether the add user dialog is opened immediately when the field is displayed
         self.open_immediately = kwargs.pop('open_immediately', False)
+        self._event = kwargs.pop('event')(kwargs['_form']) if 'event' in kwargs else None
         super(PrincipalListField, self).__init__(*args, **kwargs)
 
     def _convert_principal(self, principal):
         return principal_from_fossil(principal, allow_pending=self.allow_external,
                                      allow_emails=self.allow_emails, allow_networks=self.allow_networks,
-                                     existing_data=self.object_data)
+                                     existing_data=self.object_data, event=self._event)
 
     def process_formdata(self, valuelist):
         if valuelist:
@@ -132,10 +135,16 @@ class PrincipalField(PrincipalListField):
 class PermissionsField(JSONField):
     widget = JinjaWidget('forms/permissions_widget.html', single_kwargs=True, acl=True)
 
+    type_mapping = {
+        'event': Event,
+        'session': Session,
+        'contribution': Contribution
+    }
+
     def __init__(self, *args, **kwargs):
+        self.object_type = kwargs.pop('object_type')
         super(PermissionsField, self).__init__(*args, **kwargs)
         self.ip_networks = map(serialize_ip_network_group, IPNetworkGroup.query.filter_by(hidden=False))
-        self.permissions_info = get_permissions_info(Event)[0]
 
     @property
     def event(self):
@@ -143,7 +152,11 @@ class PermissionsField(JSONField):
 
     @property
     def roles(self):
-        return [serialize_role(role) for role in sorted(self.get_form().event.roles, key=attrgetter('code'))]
+        return [serialize_role(role) for role in sorted(self.event.roles, key=attrgetter('code'))]
+
+    @property
+    def permissions_info(self):
+        return get_permissions_info(PermissionsField.type_mapping[self.object_type])[0]
 
     def _value(self):
-        return self.data if self.data else '[]'
+        return self.data if self.data else []

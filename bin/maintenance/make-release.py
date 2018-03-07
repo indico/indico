@@ -171,8 +171,9 @@ def _build_wheel(no_deps, dry_run):
 @click.argument('version', required=False)
 @click.option('--dry-run', '-n', is_flag=True, help='Do not modify any files or run commands')
 @click.option('--sign', '-s', is_flag=True, help='Sign the Git commit/tag with GPG')
-@click.option('--no-deps', '-D', 'no_deps', is_flag=True, help='Skip setup_deps when building the wheel')
-def cli(version, dry_run, sign, no_deps):
+@click.option('--no-deps', '-D', is_flag=True, help='Skip setup_deps when building the wheel')
+@click.option('--no-changelog', '-C', is_flag=True, help='Do not update the date in the changelog')
+def cli(version, dry_run, sign, no_deps, no_changelog):
     os.chdir(os.path.join(os.path.dirname(__file__), '..', '..'))
     cur_version, new_version, next_version = _get_versions(version)
     _check_tag(new_version)
@@ -183,7 +184,8 @@ def cli(version, dry_run, sign, no_deps):
     info('Going to release {}', new_version)
     if next_version:
         info('Next version will be {}', next_version)
-    _set_changelog_date(new_version, dry_run=dry_run)
+    if not no_changelog:
+        _set_changelog_date(new_version, dry_run=dry_run)
     _set_version(new_version, dry_run=dry_run)
     release_msg = 'Release {}'.format(new_version)
     _git_commit(release_msg, ['CHANGES.rst', 'indico/__init__.py'], dry_run=dry_run)
