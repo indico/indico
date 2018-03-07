@@ -233,6 +233,12 @@ def setup_jinja(app):
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
 
 
+def setup_jinja_customization(app):
+    # add template customization paths provided by plugins
+    paths = values_from_signal(signals.plugin.get_template_customization_paths.send())
+    app.jinja_env.loader.fs_loader.searchpath += sorted(paths)
+
+
 def configure_db(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 
@@ -346,18 +352,19 @@ def make_app(set_path=False, testing=False, config_override=None):
         babel.init_app(app)
         multipass.init_app(app)
         oauth.init_app(app)
+        webpack.init_app(app)
         setup_mako(app)
         setup_jinja(app)
         configure_db(app)
-        mm.init_app(app)
+        mm.init_app(app)  # must be called after `configure_db`!
         extend_url_map(app)
         add_handlers(app)
         setup_request_stats(app)
         add_blueprints(app)
         plugin_engine.init_app(app, Logger.get('plugins'))
-        webpack.init_app(app)
         if not plugin_engine.load_plugins(app):
             raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
+        setup_jinja_customization(app)
         # Below this points plugins are available, i.e. sending signals makes sense
         add_plugin_blueprints(app)
         # themes can be provided by plugins
