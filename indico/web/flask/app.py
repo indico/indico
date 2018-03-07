@@ -198,7 +198,7 @@ def setup_jinja(app):
     app.add_template_global(get_custom_assets)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
-    app.add_template_global(LocalProxy(lambda: current_plugin.manifest), 'plugin_webpack')
+    app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
