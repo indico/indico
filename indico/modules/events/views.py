@@ -18,8 +18,7 @@ from __future__ import print_function, unicode_literals
 
 import posixpath
 
-from flask import render_template, request
-from flask_webpackext import current_webpack
+from flask import current_app, render_template, request
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
 
@@ -156,7 +155,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
         if plugin:
             manifest = plugin.manifest
         else:
-            manifest = current_webpack.manifest
+            manifest = current_app.manifest
         return {
             'screen': (manifest['themes_{}.css'.format(self.theme_file_name)],),
             'print': ((manifest['themes_{}.print.css'.format(self.theme_file_name)],)
