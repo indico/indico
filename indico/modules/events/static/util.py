@@ -27,20 +27,23 @@ from flask import current_app, g, request
 from flask_webpackext import current_webpack
 from flask_webpackext.manifest import JinjaManifestEntry
 from pywebpack import Manifest
+from werkzeug.urls import url_parse
 
+from indico.core.config import config
 from indico.modules.events.layout.models.images import ImageFile
 from indico.web.flask.util import find_url_endpoint
 
 
 _css_url_re = re.compile(r"url\('?([^\)']+)'?\)", re.MULTILINE)
 _event_url_prefix_re = re.compile(r'^/event/\d+')
-_static_url_re = re.compile(r'^/(images|dist|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$')
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
+_static_url_pattern = r'({})?/(images|dist|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$'
 
 
 def rewrite_static_url(path):
     """Remove __vxxx prefix from static URLs."""
-    return _static_url_re.sub(r'static/\1\2/\3.\5', path)
+    pattern = _static_url_pattern.format(url_parse(config.BASE_URL).path).lstrip('/')
+    return re.sub(pattern, r'static/\2\3/\4.\6', path)
 
 
 def _check_image_ownership(event, image_id):
@@ -114,11 +117,11 @@ def url_to_static_filename(endpoint, url):
 
     # get rid of /event/1234
     url = _event_url_prefix_re.sub('', url)
-
-    if _static_url_re.match(url):
+    indico_path = url_parse(config.BASE_URL).path
+    if re.match(_static_url_pattern.format(indico_path).lstrip('/'), url):
         url = rewrite_static_url(url)
     else:
-        url = url.strip('/')
+        url = re.sub(r'{}/(.*)'.format(indico_path).lstrip('/'), r'\1', url.strip('/'))
         if not url.startswith('assets/'):
             # replace all remaining slashes
             url = url.replace('/', '--')
