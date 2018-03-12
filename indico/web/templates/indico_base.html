@@ -52,10 +52,6 @@
         <link rel="stylesheet" type="text/css" href="{{ url }}">
     {% endfor %}
 
-    {% for url in print_css_files -%}
-
-    {% endfor %}
-
     {{ template_hook('html-head') }}
 </head>
 <body data-user-id="{{ session.user.id if session.user else 'null' }}"
