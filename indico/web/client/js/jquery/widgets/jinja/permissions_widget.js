@@ -15,7 +15,9 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-/* global ChooseUsersPopup:false, Palette:false */
+/* global ChooseUsersPopup:false */
+
+import Palette from 'indico/utils/palette';
 
 (function($) {
     'use strict';
