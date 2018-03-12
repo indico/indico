@@ -17,13 +17,8 @@
     {{ webpack['common.js'] }}
     {{ webpack['main.js'] }}
     {{ webpack['main.css'] }}
-
-    {% for url in get_custom_assets('js') -%}
-        <script src="{{ url }}"></script>
-    {% endfor %}
-    {% for url in get_custom_assets('css') -%}
-        <link rel="stylesheet" type="text/css" href="{{ url }}">
-    {% endfor %}
+    {{ webpack['__custom.js'] }}
+    {{ webpack['__custom.css'] }}
 
     {% block head %}{% endblock %}
 </head>
