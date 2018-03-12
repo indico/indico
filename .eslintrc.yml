@@ -66,27 +66,47 @@ rules:
     - warn
     - never
   brace-style:
-      - error
-      - 1tbs
+    - error
+    - 1tbs
   array-callback-return: error
+  arrow-spacing: error
   comma-spacing: error
   comma-style: error
   computed-property-spacing: error
+  constructor-super: error
   curly: error
   func-call-spacing: error
+  generator-star-spacing: error
   key-spacing: error
   keyword-spacing: error
   max-statements-per-line: error
+  object-shorthand: warn
+  prefer-arrow-callback: warn
+  prefer-const: error
+  prefer-numeric-literals: error
+  prefer-rest-params: error
+  prefer-spread: error
+  prefer-template: error
   radix: error
+  require-yield: error
+  rest-spread-spacing: error
   semi-spacing: error
   space-in-parens: error
   space-infix-ops: error
   space-before-blocks: warn
   strict: error
+  symbol-description: error
+  template-curly-spacing: error
+  yield-star-spacing: error
   yoda: error
   no-unmodified-loop-condition: error
   no-unsafe-negation: error
   no-alert: error
+  no-class-assign: error
+  no-confusing-arrow: error
+  no-const-assign: error
+  no-dupe-class-members: error
+  no-duplicate-imports: error
   no-eval: error
   no-implied-eval: error
   no-floating-decimal: warn
@@ -98,6 +118,7 @@ rules:
   no-mixed-operators: error
   no-new-func: error
   no-new-object: error
+  no-new-symbol: error
   no-return-assign: error
   no-octal-escape: warn
   no-new-wrappers: error
@@ -105,9 +126,14 @@ rules:
   no-self-compare: error
   no-sequences: error
   no-tabs: error
+  no-this-before-super: error
   no-throw-literal: error
   no-trailing-spaces: error
   no-unneeded-ternary: error
+  no-useless-computed-key: error
+  no-useless-constructor: error
+  no-useless-rename: error
+  no-var: error
   no-void: error
   no-whitespace-before-property: error
   no-with: error
@@ -135,3 +161,4 @@ globals:
   cornerMessage: false
   enableIfChecked: false
   global: false
+  require: false
