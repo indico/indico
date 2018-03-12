@@ -63,6 +63,8 @@ Improvements
   (:issue:`3193`, thanks :user:`bpedersen2`)
 - Add settings to configure the scale of 'rating' questions in paper
   reviewing
+- Show a nicer error message when entering an excessively high base
+  registration fee (:issue:`3260`)
 
 Internal Changes
 ^^^^^^^^^^^^^^^^
