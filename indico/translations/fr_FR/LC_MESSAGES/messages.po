@@ -11112,8 +11112,7 @@ msgid "Registrations"
 msgstr "Inscriptions"
 
 #: indico/modules/events/registration/forms.py:52
-msgid ""
-"You have to enable payment feature in order to set the registration fee."
+msgid "You have to enable the payment feature in order to set a registration fee."
 msgstr "Vous devez activer la fonctionalité de paiement avant de pouvoir fixer les frais d'inscription."
 
 #: indico/modules/events/registration/forms.py:62

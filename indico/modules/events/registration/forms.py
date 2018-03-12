@@ -49,7 +49,7 @@ def _check_if_payment_required(form, field):
     if not field.data:
         return
     if not is_feature_enabled(form.event, 'payment'):
-        raise ValidationError(_('You have to enable payment feature in order to set the registration fee.'))
+        raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
 
 class RegistrationFormForm(IndicoForm):
