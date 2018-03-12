@@ -49,7 +49,7 @@ def _check_if_payment_required(form, field):
     if not field.data:
         return
     if not is_feature_enabled(form.event, 'payment'):
-        raise ValidationError(_('You have to enable payment feature in order to set the registration fee.'))
+        raise ValidationError(_('You have to enable the payment feature in order to set a registration fee.'))
 
 
 class RegistrationFormForm(IndicoForm):
@@ -85,8 +85,8 @@ class RegistrationFormForm(IndicoForm):
                                                             "the event page"))
     publish_checkin_enabled = BooleanField(_('Publish check-in status'), widget=SwitchWidget(),
                                            description=_("Check-in status will be shown publicly on the event page"))
-    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0), Optional(), _check_if_payment_required],
-                              filters=[lambda x: x if x is not None else 0],
+    base_price = DecimalField(_('Registration fee'), [NumberRange(min=0, max=999999.99), Optional(),
+                              _check_if_payment_required], filters=[lambda x: x if x is not None else 0],
                               widget=NumberInput(step='0.01'),
                               description=_("A fixed fee all users have to pay when registering."))
     currency = SelectField(_('Currency'), [DataRequired()], description=_('The currency for new registrations'))

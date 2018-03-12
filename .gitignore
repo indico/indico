@@ -3,6 +3,7 @@
 .*.swp
 *.py[co]
 __pycache__/
+.pytest_cache/
 
 # configs
 *.conf
