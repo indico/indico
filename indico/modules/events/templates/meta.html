@@ -2,3 +2,6 @@
 <meta property="og:image" content="{{ event.logo_url if event.has_logo else
                                       (indico_config.IMAGES_BASE_URL + '/logo_indico.png') }}">
 <meta property="og:description" content="{{ event.description|striptags|truncate(500) }}">
+{% if event.keywords -%}
+    <meta name="keywords" content="{{ event.keywords|join(',') }}">
+{%- endif %}
