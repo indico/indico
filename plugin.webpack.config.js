@@ -15,6 +15,8 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global module:false */
+
 const process = require('process');
 const merge = require('webpack-merge');
 const _ = require('lodash');
@@ -27,7 +29,7 @@ if (!_.isEmpty(config.themes)) {
     Object.assign(entry, base.getThemeEntryPoints(config, './themes/'));
 }
 
-module.exports = env => {
+module.exports = (env) => {
     return merge(base.webpackDefaults(env, config), {
         entry: entry,
         externals: {
