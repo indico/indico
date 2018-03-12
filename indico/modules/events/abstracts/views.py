@@ -45,7 +45,7 @@ class WPDisplayAbstracts(WPDisplayAbstractsBase):
 
 
 class WPDisplayCallForAbstracts(WPDisplayAbstracts):
-    bundles = ('module_events.display.js',)
+    pass
 
 
 class WPDisplayAbstractsReviewing(WPDisplayAbstracts):
