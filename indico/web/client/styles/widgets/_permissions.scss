@@ -103,7 +103,7 @@
                     text-transform: uppercase;
 
                     &.disabled {
-                        @include opacity(0.5);
+                        opacity: 0.5;
                     }
 
                     // Permission label palette
@@ -241,7 +241,7 @@
 
             &:checked ~ ul {
                 label {
-                    @include opacity(0.5);
+                    opacity: 0.5;
                 }
 
                 label::before, .circle-checkbox:hover + label::before {
