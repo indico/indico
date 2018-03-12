@@ -20,10 +20,8 @@
 import Palette from 'indico/utils/palette';
 
 (function($) {
-    'use strict';
-
-    var FULL_ACCESS_PERMISSIONS = '_full_access';
-    var READ_ACCESS_PERMISSIONS = '_read_access';
+    const FULL_ACCESS_PERMISSIONS = '_full_access';
+    const READ_ACCESS_PERMISSIONS = '_read_access';
 
     $.widget('indico.permissionswidget', {
         options: {
@@ -31,35 +29,33 @@ import Palette from 'indico/utils/palette';
             permissionsInfo: null
         },
 
-        _update: function() {
+        _update() {
             // Sort entries aphabetically and by type
-            this.data = _.chain(this.data).sortBy(function(item) {
-                return item[0].name || item[0].id;
-            }).sortBy(function(item) {
-                return item[0]._type;
-            }).value();
+            this.data = _.chain(this.data).sortBy((item) => item[0].name || item[0].id)
+                .sortBy((item) => item[0]._type)
+                .value();
 
             // Sort permissions alphabetically
-            this.data.forEach(function(item) {
+            this.data.forEach((item) => {
                 item[1].sort();
             });
 
             this.$dataField.val(JSON.stringify(this.data));
             this.element.trigger('change');
         },
-        _renderRoleCode: function(code, color) {
+        _renderRoleCode(code, color) {
             return $('<span>', {
                 class: 'role-code',
                 text: code,
                 css: {
-                    borderColor: '#' + color,
-                    color: '#' + color
+                    borderColor: `#${color}`,
+                    color: `#${color}`
                 }
             });
         },
-        _renderLabel: function(principal) {
-            var $labelBox = $('<div>', {class: 'label-box flexrow f-a-center'});
-            var type = principal._type;
+        _renderLabel(principal) {
+            const $labelBox = $('<div>', {class: 'label-box flexrow f-a-center'});
+            const type = principal._type;
             if (type === 'EventRole') {
                 $labelBox.append(this._renderRoleLabel(principal));
             } else {
@@ -67,13 +63,13 @@ import Palette from 'indico/utils/palette';
             }
             return $labelBox;
         },
-        _renderRoleLabel: function(principal) {
-            var $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
-            var $code = this._renderRoleCode(principal.code, principal.color);
+        _renderRoleLabel(principal) {
+            const $text = $('<span>', {class: 'text-normal entry-label', text: principal.name});
+            const $code = this._renderRoleCode(principal.code, principal.color);
             return [$code, $text];
         },
-        _renderOtherLabel: function(principal, type) {
-            var iconClass;
+        _renderOtherLabel(principal, type) {
+            let iconClass;
             if (type === 'Avatar') {
                 iconClass = 'icon-user';
             } else if (type === 'Email') {
@@ -85,31 +81,31 @@ import Palette from 'indico/utils/palette';
             } else {
                 iconClass = 'icon-users';
             }
-            var labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
-            var text = labelIsName ? principal.name : principal.id;
+            const labelIsName = _.contains(['Avatar', 'DefaultEntry', 'IPNetworkGroup'], type);
+            const text = labelIsName ? principal.name : principal.id;
             return [
-                $('<span>', {class: 'entry-icon '  + iconClass}),
-                $('<span>', {class: 'text-normal entry-label', text: text})
+                $('<span>', {class: `entry-icon ${iconClass}`}),
+                $('<span>', {class: 'text-normal entry-label', text})
             ];
         },
-        _renderPermissions: function(principal, permissions) {
-            var self = this;
-            var $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
-            var $permissionsList = $('<ul>').appendTo($permissions);
+        _renderPermissions(principal, permissions) {
+            const $permissions = $('<div>', {class: 'permissions-box flexrow f-a-center f-self-stretch'});
+            const $permissionsList = $('<ul>').appendTo($permissions);
             // When full access is enabled, always show read access
             if (_.contains(permissions, FULL_ACCESS_PERMISSIONS) && !_.contains(permissions, READ_ACCESS_PERMISSIONS)) {
                 permissions.push(READ_ACCESS_PERMISSIONS);
                 if (principal._type !== 'DefaultEntry') {
-                    self._updateItem(principal, permissions);
+                    this._updateItem(principal, permissions);
                 }
             }
-            permissions.forEach(function(item) {
-                var permissionInfo = self.options.permissionsInfo[item];
-                var applyOpacity = item === READ_ACCESS_PERMISSIONS && _.contains(permissions, FULL_ACCESS_PERMISSIONS)
+            permissions.forEach((item) => {
+                const permissionInfo = this.options.permissionsInfo[item];
+                const applyOpacity = item === READ_ACCESS_PERMISSIONS
+                    && _.contains(permissions, FULL_ACCESS_PERMISSIONS)
                     && principal._type !== 'DefaultEntry';
-                var cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
+                const cssClasses = (applyOpacity ? 'disabled ' : '') + permissionInfo.css_class;
                 $permissionsList.append(
-                    $('<li>', {class: 'i-label bold ' + cssClasses, title: permissionInfo.description})
+                    $('<li>', {class: `i-label bold ${cssClasses}`, title: permissionInfo.description})
                         .append(permissionInfo.title)
                 );
             });
@@ -118,12 +114,12 @@ import Palette from 'indico/utils/palette';
             }
             return $permissions;
         },
-        _renderPermissionsButtons: function(principal, permissions) {
-            var $buttonsGroup = $('<div>', {class: 'group flexrow'});
+        _renderPermissionsButtons(principal, permissions) {
+            const $buttonsGroup = $('<div>', {class: 'group flexrow'});
             $buttonsGroup.append(this._renderEditBtn(principal, permissions), this._renderDeleteBtn(principal));
             return $buttonsGroup;
         },
-        _renderEditBtn: function(principal, permissions) {
+        _renderEditBtn(principal, permissions) {
             if (principal._type === 'IPNetworkGroup') {
                 return $('<button>', {
                     type: 'button',
@@ -138,60 +134,58 @@ import Palette from 'indico/utils/palette';
                     'data-title': $T.gettext('Assign Permissions'),
                     'data-method': 'POST',
                     'data-ajax-dialog': '',
-                    'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions: permissions})
+                    'data-params': JSON.stringify({principal: JSON.stringify(principal), permissions})
                 });
             }
         },
-        _renderDeleteBtn: function(principal) {
-            var self = this;
+        _renderDeleteBtn(principal) {
+            const self = this;
             return $('<button>', {
                 'type': 'button',
                 'class': 'i-button text-color borderless icon-only icon-remove',
                 'data-principal': JSON.stringify(principal)
             }).on('click', function() {
-                var $this = $(this);
-                var confirmed;
+                const $this = $(this);
+                let confirmed;
                 if (principal._type === 'Avatar' && principal.id === $('body').data('user-id')) {
-                    var title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
-                    var message = $T.gettext("Are you sure you want to remove yourself from the list?");
+                    const title = $T.gettext("Delete entry '{0}'".format(principal.name || principal.id));
+                    const message = $T.gettext("Are you sure you want to remove yourself from the list?");
                     confirmed = confirmPrompt(message, title);
                 } else {
                     confirmed = $.Deferred().resolve();
                 }
-                confirmed.then(function() {
+                confirmed.then(() => {
                     self._updateItem($this.data('principal'), []);
                 });
             });
         },
-        _renderItem: function(item) {
-            var $item = $('<li>', {class: 'flexrow f-a-center'});
-            var principal = item[0];
-            var permissions = item[1];
+        _renderItem(item) {
+            const $item = $('<li>', {class: 'flexrow f-a-center'});
+            const [principal, permissions] = item;
             $item.append(this._renderLabel(principal));
             $item.append(this._renderPermissions(principal, permissions));
-            $item.toggleClass('disabled ' + principal.id, principal._type === 'DefaultEntry');
+            $item.toggleClass(`disabled ${principal.id}`, principal._type === 'DefaultEntry');
             return $item;
         },
-        _renderDropdown: function($dropdown) {
-            var self = this;
+        _renderDropdown($dropdown) {
             $dropdown.children(':not(.default)').remove();
             $dropdown.parent().dropdown({
                 selector: '.js-dropdown'
             });
-            var $dropdownLink = $dropdown.prev('.js-dropdown');
-            var items = $dropdown.data('items');
-            var isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
-            items.forEach(function(item) {
-                if (self._findEntryIndex(item) === -1) {
+            const $dropdownLink = $dropdown.prev('.js-dropdown');
+            const items = $dropdown.data('items');
+            const isRoleDropdown = $dropdown.hasClass('entry-role-dropdown');
+            items.forEach((item) => {
+                if (this._findEntryIndex(item) === -1) {
                     if (isRoleDropdown) {
-                        $dropdown.find('.separator').before(self._renderDropdownItem(item));
+                        $dropdown.find('.separator').before(this._renderDropdownItem(item));
                     } else {
-                        $dropdown.append(self._renderDropdownItem(item));
+                        $dropdown.append(this._renderDropdownItem(item));
                     }
                 }
             });
             if (isRoleDropdown) {
-                var isEmpty = !$dropdown.children().not('.default').length;
+                const isEmpty = !$dropdown.children().not('.default').length;
                 $('.entry-role-dropdown .separator').toggleClass('hidden', isEmpty);
             } else if (!$dropdown.children().length) {
                 $dropdownLink.addClass('disabled').attr('title', $T.gettext('All IP Networks were added'));
@@ -199,28 +193,28 @@ import Palette from 'indico/utils/palette';
                 $dropdownLink.removeClass('disabled');
             }
         },
-        _renderDropdownItem: function(principal) {
-            var self = this;
-            var $dropdownItem = $('<li>', {'class': 'entry-item', 'data-principal': JSON.stringify(principal)});
-            var $itemContent = $('<a>');
+        _renderDropdownItem(principal) {
+            const self = this;
+            const $dropdownItem = $('<li>', {'class': 'entry-item', 'data-principal': JSON.stringify(principal)});
+            const $itemContent = $('<a>');
             if (principal._type === 'EventRole') {
                 $itemContent.append(this._renderRoleCode(principal.code, principal.color).addClass('dropdown-icon'));
             }
-            var $text = $('<span>', {text: principal.name});
+            const $text = $('<span>', {text: principal.name});
             $dropdownItem.append($itemContent.append($text)).on('click', function() {
                 // Grant read access by default
                 self._addItems([$(this).data('principal')], [READ_ACCESS_PERMISSIONS]);
             });
             return $dropdownItem;
         },
-        _renderDuplicatesTooltip: function(idx) {
+        _renderDuplicatesTooltip(idx) {
             this.$permissionsWidgetList.find('>li').not('.disabled').eq(idx).qtip({
                 content: {
                     text: $T.gettext('This entry was already added')
                 },
                 show: {
                     ready: true,
-                    effect: function() {
+                    effect() {
                         $(this).fadeIn(300);
                     }
                 },
@@ -228,7 +222,7 @@ import Palette from 'indico/utils/palette';
                     event: 'unfocus click'
                 },
                 events: {
-                    hide: function() {
+                    hide() {
                         $(this).fadeOut(300);
                         $(this).qtip('destroy');
                     }
@@ -242,21 +236,19 @@ import Palette from 'indico/utils/palette';
                 }
             });
         },
-        _render: function() {
-            var self = this;
+        _render() {
             this.$permissionsWidgetList.empty();
-
-            this.data.forEach(function(item) {
-                self.$permissionsWidgetList.append(self._renderItem(item));
+            this.data.forEach((item) => {
+                this.$permissionsWidgetList.append(this._renderItem(item));
             });
             // Add default entries
-            var anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
-                [READ_ACCESS_PERMISSIONS]];
+            const anonymous = [{_type: 'DefaultEntry', name: $T.gettext('Anonymous'), id: 'anonymous'},
+                               [READ_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.append(this._renderItem(anonymous));
 
-            var managersTitle = this.options.objectType === 'event' ?
+            const managersTitle = this.options.objectType === 'event' ?
                 $T.gettext('Category Managers') : $T.gettext('Event Managers');
-            var categoryManagers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
+            const categoryManagers = [{_type: 'DefaultEntry', name: managersTitle}, [FULL_ACCESS_PERMISSIONS]];
             this.$permissionsWidgetList.prepend(this._renderItem(categoryManagers));
             this.$permissionsWidgetList.find('.anonymous').toggle(!this.isEventProtected);
 
@@ -265,13 +257,11 @@ import Palette from 'indico/utils/palette';
                 this._renderDropdown(this.$ipNetworkDropdown);
             }
         },
-        _findEntryIndex: function(principal) {
-            return _.findIndex(this.data, function(item) {
-                return item[0].identifier === principal.identifier;
-            });
+        _findEntryIndex(principal) {
+            return _.findIndex(this.data, (item) => item[0].identifier === principal.identifier);
         },
-        _updateItem: function(principal, newPermissions) {
-            var idx = this._findEntryIndex(principal);
+        _updateItem(principal, newPermissions) {
+            const idx = this._findEntryIndex(principal);
             if (newPermissions.length) {
                 this.data[idx][1] = newPermissions;
             } else {
@@ -280,14 +270,13 @@ import Palette from 'indico/utils/palette';
             this._update();
             this._render();
         },
-        _addItems: function(principals, permissions) {
-            var self = this;
-            var news = [];
-            var repeated = [];
-            principals.forEach(function(principal) {
-                var idx = self._findEntryIndex(principal);
+        _addItems(principals, permissions) {
+            const news = [];
+            const repeated = [];
+            principals.forEach((principal) => {
+                const idx = this._findEntryIndex(principal);
                 if (idx === -1) {
-                    self.data.push([principal, permissions]);
+                    this.data.push([principal, permissions]);
                     news.push(principal);
                 } else {
                     repeated.push(principal);
@@ -295,30 +284,28 @@ import Palette from 'indico/utils/palette';
             });
             this._update();
             this._render();
-            news.forEach(function(principal) {
-                self.$permissionsWidgetList.children('li:not(.disabled)').eq(self._findEntryIndex(principal))
+            news.forEach((principal) => {
+                this.$permissionsWidgetList.children('li:not(.disabled)').eq(this._findEntryIndex(principal))
                     .effect('highlight', {color: Palette.highlight}, 'slow');
             });
-            repeated.forEach(function(principal) {
-                self._renderDuplicatesTooltip(self._findEntryIndex(principal));
+            repeated.forEach((principal) => {
+                this._renderDuplicatesTooltip(this._findEntryIndex(principal));
             });
         },
-        _addUserGroup: function() {
-            var self = this;
-            function _addPrincipals(principals) {
-                /// Grant read access by default
-                self._addItems(principals, [READ_ACCESS_PERMISSIONS]);
-            }
+        _addUserGroup() {
+            const _addPrincipals = (principals) => {
+                // Grant read access by default
+                this._addItems(principals, [READ_ACCESS_PERMISSIONS]);
+            };
 
-            var dialog = new ChooseUsersPopup(
+            const dialog = new ChooseUsersPopup(
                 $T.gettext("Select a user or group to add"),
                 true, null, true, true, null, false, false, false, _addPrincipals, null, true
             );
 
             dialog.execute();
         },
-        _create: function() {
-            var self = this;
+        _create() {
             this.$permissionsWidgetList = this.element.find('.permissions-widget-list');
             this.$dataField = this.element.find('input[type=hidden]');
             this.$roleDropdown = this.element.find('.entry-role-dropdown');
@@ -328,32 +315,32 @@ import Palette from 'indico/utils/palette';
             this._render();
 
             // Manage changes on the permissions dialog
-            this.element.on('indico:permissionsChanged', function(evt, permissions, principal) {
-                self._updateItem(principal, permissions);
+            this.element.on('indico:permissionsChanged', (evt, permissions, principal) => {
+                this._updateItem(principal, permissions);
             });
 
             // Manage changes on the event protection mode field
-            this.element.on('indico:protectionModeChanged', function(evt, isProtected) {
-                self.isEventProtected = isProtected;
-                self._render();
+            this.element.on('indico:protectionModeChanged', (evt, isProtected) => {
+                this.isEventProtected = isProtected;
+                this._render();
             });
 
             // Manage the addition to users/groups to the acl
-            $('.js-add-user-group').on('click', function() {
-                self._addUserGroup();
+            $('.js-add-user-group').on('click', () => {
+                this._addUserGroup();
             });
 
             // Manage the creation of new roles
-            $('.js-new-role').on('ajaxDialog:closed', function(evt, data) {
+            $('.js-new-role').on('ajaxDialog:closed', (evt, data) => {
                 if (data && data.role) {
-                    self.$roleDropdown.data('items').push(data.role);
-                    self._addItems([data.role], [READ_ACCESS_PERMISSIONS]);
+                    this.$roleDropdown.data('items').push(data.role);
+                    this._addItems([data.role], [READ_ACCESS_PERMISSIONS]);
                 }
             });
 
             // Apply ellipsis + tooltip on long names
             this.$permissionsWidgetList.on('mouseenter', '.entry-label', function() {
-                var $this = $(this);
+                const $this = $(this);
                 if (this.offsetWidth < this.scrollWidth && !$this.attr('title')) {
                     $this.attr('title', $this.text());
                 }
