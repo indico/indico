@@ -100,12 +100,11 @@ class StaticEventCreator(object):
             html = self._create_home().encode('utf-8')
 
             # Mathjax plugins can only be known in runtime
-            self._copy_folder(os.path.join(os.path.join(self._content_dir, "static"), 'dist', 'js', 'mathjax'),
+            self._copy_folder(os.path.join(self._content_dir, 'static', 'dist', 'js', 'mathjax'),
                               os.path.join(self._static_dir, 'dist', 'js', 'mathjax'))
-            # Getting all materials
-            self._copy_all_material()
 
-            # Specific changes
+            # Materials and additional pages
+            self._copy_all_material()
             self._create_other_pages()
 
             # Create index.html file (main page for the event)
@@ -116,6 +115,8 @@ class StaticEventCreator(object):
 
         # Copy static assets to ZIP file
         self._copy_static_files(used_assets)
+        if config.CUSTOMIZATION_DIR:
+            self._copy_customization_files(used_assets)
 
         temp_file.delete = False
         chmod_umask(temp_file.name)
@@ -134,6 +135,7 @@ class StaticEventCreator(object):
     def _copy_static_files(self, used_assets):
         # add favicon
         used_assets.add('static/images/indico.ico')
+        # assets
         css_files = {url for url in used_assets if re.match('static/dist/.*\.css$', url)}
         for file_path in css_files:
             with open(os.path.join(self._web_dir, file_path)) as f:
@@ -143,9 +145,25 @@ class StaticEventCreator(object):
         for file_path in used_assets - css_files:
             if not re.match('^static/(images|fonts|dist)/(?!js/ckeditor/)', file_path):
                 continue
-            else:
-                self._copy_file(os.path.join(self._content_dir, file_path),
-                                os.path.join(self._web_dir, file_path))
+            self._copy_file(os.path.join(self._content_dir, file_path),
+                            os.path.join(self._web_dir, file_path))
+
+    def _strip_custom_prefix(self, url):
+        # strip the 'static/custom/' prefix from the given url/path
+        return '/'.join(url.split('/')[2:])
+
+    def _copy_customization_files(self, used_assets):
+        css_files = {url for url in used_assets if re.match('static/custom/.*\.css$', url)}
+        for file_path in css_files:
+            with open(os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))) as f:
+                rewritten_css, used_urls = rewrite_css_urls(self.event, f.read())
+                used_assets |= used_urls
+                self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+        for file_path in used_assets - css_files:
+            if not re.match('^static/custom/', file_path):
+                continue
+            self._copy_file(os.path.join(self._content_dir, file_path),
+                            os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path)))
 
     def _create_home(self):
         return WPStaticSimpleEventDisplay(self._rh, self.event, self.event.theme).display()

@@ -188,7 +188,7 @@ def url_for(endpoint, *targets, **values):
             values[key] = int(value)
 
     url = _url_for(endpoint, **values)
-    if g.get('static_site') and not values.get('_external'):
+    if g.get('static_site') and g.get('custom_manifest') and not values.get('_external'):
         # for static sites we assume all relative urls need to be
         # mangled to a filename
         # we should really fine a better way to handle anything

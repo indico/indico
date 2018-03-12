@@ -38,16 +38,17 @@ _css_url_re = re.compile(r"url\('?([^\)']+)'?\)", re.MULTILINE)
 _event_url_prefix_re = re.compile(r'^/event/\d+')
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
 _static_url_pattern = r'({})?/(images|dist|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$'
+_custom_url_pattern = r'(?:{})?/static/custom/(.+)$'
 
 
 def rewrite_static_url(path):
     """Remove __vxxx prefix from static URLs."""
-    pattern = _static_url_pattern.format(url_parse(config.BASE_URL).path).lstrip('/')
-    return re.sub(pattern, r'static/\2\3/\4.\6', path)
-
-
-def _check_image_ownership(event, image_id):
-    return True
+    static_pattern = _static_url_pattern.format(url_parse(config.BASE_URL).path)
+    custom_pattern = _custom_url_pattern.format(url_parse(config.BASE_URL).path)
+    if re.match(static_pattern, path):
+        return re.sub(static_pattern, r'static/\2\3/\4.\6', path)
+    else:
+        return re.sub(custom_pattern, r'static/custom/\1', path)
 
 
 def _create_data_uri(url, filename):
@@ -118,10 +119,10 @@ def url_to_static_filename(endpoint, url):
     # get rid of /event/1234
     url = _event_url_prefix_re.sub('', url)
     indico_path = url_parse(config.BASE_URL).path
-    if re.match(_static_url_pattern.format(indico_path).lstrip('/'), url):
+    if re.match(_static_url_pattern.format(indico_path), url):
         url = rewrite_static_url(url)
     else:
-        url = re.sub(r'{}/(.*)'.format(indico_path).lstrip('/'), r'\1', url.strip('/'))
+        url = re.sub(r'{}/(.*)'.format(indico_path), r'\1', url)
         if not url.startswith('assets/'):
             # replace all remaining slashes
             url = url.replace('/', '--')

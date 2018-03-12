@@ -45,7 +45,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
 from indico.core.plugins import plugin_engine, url_for_plugin
-from indico.core.webpack import webpack
+from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -55,7 +55,6 @@ from indico.util.i18n import _, babel, get_current_locale, gettext_context, nget
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
-from indico.web.assets.util import get_custom_assets
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
@@ -137,10 +136,9 @@ def configure_multipass_local(app):
 def configure_webpack(app):
     pkg_path = os.path.dirname(get_root_path('indico'))
     project = WebpackBundleProject(pkg_path)
-    app.config.update({
-        'WEBPACKEXT_PROJECT': project,
-        'WEBPACKEXT_MANIFEST_PATH': os.path.join('dist', 'manifest.json')
-    })
+    app.config['WEBPACKEXT_PROJECT'] = project
+    app.config['WEBPACKEXT_MANIFEST_LOADER'] = IndicoManifestLoader
+    app.config['WEBPACKEXT_MANIFEST_PATH'] = os.path.join('dist', 'manifest.json')
 
 
 def configure_xsendfile(app, method):
@@ -195,7 +193,6 @@ def setup_jinja(app):
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
     app.add_template_global(render_session_bar)
     app.add_template_global(get_request_stats)
-    app.add_template_global(get_custom_assets)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
     app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
