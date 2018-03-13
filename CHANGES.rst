@@ -2,6 +2,18 @@ Changelog
 =========
 
 
+Version 2.0.3
+-------------
+
+*Unreleased*
+
+Improvements
+^^^^^^^^^^^^
+
+- Show more suitable message when a service request is auto-accepted
+  (:issue:`3264`)
+
+
 Version 2.0.2
 -------------
 
