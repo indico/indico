@@ -126,6 +126,16 @@ export function webpackDefaults(env, config) {
                     }
                 },
                 {
+                    test: /\.jsx$/,
+                    loader: 'babel-loader',
+                    exclude: /node_modules/,
+                    options: {
+                        extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
+                                              '..', '.babelrc'),
+                        presets: ["react"]
+                    }
+                },
+                {
                     test: /\.css$/,
                     use: ExtractTextPlugin.extract({
                         fallback: 'style-loader',
