@@ -61,6 +61,8 @@ class RequestDefinitionBase(object):
     manager_form = RequestManagerForm
     #: default values to use if there's no existing request
     form_defaults = {}
+    #: whether requests of this type should be automatically accepted
+    auto_accept = False
 
     @classmethod
     def render_form(cls, event, **kwargs):
