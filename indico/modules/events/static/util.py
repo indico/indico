@@ -31,22 +31,25 @@ from werkzeug.urls import url_parse
 
 from indico.core.config import config
 from indico.modules.events.layout.models.images import ImageFile
-from indico.web.flask.util import find_url_endpoint
+from indico.web.flask.util import endpoint_for_url
 
 
-_css_url_re = re.compile(r"url\('?([^\)']+)'?\)", re.MULTILINE)
-_event_url_prefix_re = re.compile(r'^/event/\d+')
+_css_url_pattern = r"""url\((['"]?)({}|https?:)?([^)'"]+)\1\)"""
 _url_has_extension_re = re.compile(r'.*\.([^/]+)$')
-_static_url_pattern = r'({})?/(images|dist|fonts)(.*)/(.+?)(__v[0-9a-f]+)?\.([^.]+)$'
+_plugin_url_pattern = r'(?:{})?/static/plugins/([^/]+)/(.*?)(?:__v[0-9a-f]+)?\.([^.]+)$'
+_static_url_pattern = r'(?:{})?/(images|dist|fonts)(.*)/(.+?)(?:__v[0-9a-f]+)?\.([^.]+)$'
 _custom_url_pattern = r'(?:{})?/static/custom/(.+)$'
 
 
 def rewrite_static_url(path):
     """Remove __vxxx prefix from static URLs."""
+    plugin_pattern = _plugin_url_pattern.format(url_parse(config.BASE_URL).path)
     static_pattern = _static_url_pattern.format(url_parse(config.BASE_URL).path)
     custom_pattern = _custom_url_pattern.format(url_parse(config.BASE_URL).path)
-    if re.match(static_pattern, path):
-        return re.sub(static_pattern, r'static/\2\3/\4.\6', path)
+    if re.match(plugin_pattern, path):
+        return re.sub(plugin_pattern, r'static/plugins/\1/\2.\3', path)
+    elif re.match(static_pattern, path):
+        return re.sub(static_pattern, r'static/\1\2/\3.\4', path)
     else:
         return re.sub(custom_pattern, r'static/custom/\1', path)
 
@@ -69,7 +72,6 @@ def _rewrite_event_asset_url(event, url):
     Only assets contained within the event will be taken into account
     """
     scheme, netloc, path, qs, anchor = urlparse.urlsplit(url)
-
     netloc = netloc or current_app.config['SERVER_NAME']
     scheme = scheme or 'https'
 
@@ -77,13 +79,17 @@ def _rewrite_event_asset_url(event, url):
     if netloc == current_app.config['SERVER_NAME']:
         # this piece of Flask magic finds the endpoint that corresponds to
         # the URL and checks that it points to an image belonging to this event
-        endpoint, data = find_url_endpoint(path)
-        if (endpoint == 'event_images.image_display' and data['confId'] == event.id
-                and ImageFile.get(data['image_id']).event == event):
-            return 'images/{image_id}-{filename}'.format(**data)
+        endpoint_info = endpoint_for_url(path)
+        if endpoint_info:
+            endpoint, data = endpoint_info
+            if endpoint == 'event_images.image_display' and int(data['confId']) == event.id:
+                image_file = ImageFile.get(data['image_id'])
+                if image_file and image_file.event == event:
+                    return 'images/{}-{}'.format(image_file.id, image_file.filename), image_file
     # if the URL is not internal or just not an image,
     # we embed the contents using a data URI
-    return _create_data_uri(urlparse.urlunsplit((scheme, netloc, path, qs, '')), urlparse.urlsplit(path)[-1])
+    data_uri = _create_data_uri(urlparse.urlunsplit((scheme, netloc, path, qs, '')), urlparse.urlsplit(path)[-1])
+    return data_uri, None
 
 
 def _remove_anchor(url):
@@ -96,17 +102,26 @@ def rewrite_css_urls(event, css):
     """Rewrite CSS in order to handle url(...) properly."""
     # keeping track of used URLs
     used_urls = set()
+    used_images = set()
 
     def _replace_url(m):
-        url = m.group(1)
-        if url.startswith('/event/') or re.match('https?:', url):
-            rewritten_url = _rewrite_event_asset_url(event, url)
+        prefix = m.group(2) or ''
+        url = m.group(3)
+        if url.startswith('/event/') or re.match(r'https?:', prefix):
+            rewritten_url, image_file = _rewrite_event_asset_url(event, prefix + url)
+            if image_file:
+                used_images.add(image_file)
             return 'url({})'.format(rewritten_url)
         else:
             rewritten_url = rewrite_static_url(url)
             used_urls.add(_remove_anchor(rewritten_url))
-            return "url('../../../{}')".format(rewritten_url)
-    return _css_url_re.sub(_replace_url, css), used_urls
+            if url.startswith('/static/plugins/'):
+                return "url('../../../../../{}')".format(rewritten_url)
+            else:
+                return "url('../../../{}')".format(rewritten_url)
+
+    indico_path = url_parse(config.BASE_URL).path
+    return re.sub(_css_url_pattern.format(indico_path), _replace_url, css, flags=re.MULTILINE), used_urls, used_images
 
 
 def url_to_static_filename(endpoint, url):
@@ -115,17 +130,18 @@ def url_to_static_filename(endpoint, url):
         return 'index.html'
     elif endpoint == 'event_layout.css_display':
         return 'custom.css'
+    elif endpoint == 'event_images.logo_display':
+        return 'logo.png'
 
-    # get rid of /event/1234
-    url = _event_url_prefix_re.sub('', url)
     indico_path = url_parse(config.BASE_URL).path
     if re.match(_static_url_pattern.format(indico_path), url):
         url = rewrite_static_url(url)
     else:
-        url = re.sub(r'{}/(.*)'.format(indico_path), r'\1', url)
+        # get rid of [/whatever]/event/1234
+        url = re.sub(r'{}(?:/event/\d+)?/(.*)'.format(indico_path), r'\1', url)
         if not url.startswith('assets/'):
             # replace all remaining slashes
-            url = url.replace('/', '--')
+            url = url.rstrip('/').replace('/', '--')
     # it's not executed in a webserver, so we do need a .html extension
     if not _url_has_extension_re.match(url):
         url += '.html'
@@ -168,12 +184,12 @@ class RewrittenManifest(Manifest):
 @contextmanager
 def collect_static_files():
     """Keep track of URLs used by manifest and url_for."""
-    manifest = RewrittenManifest(current_webpack.manifest)
-    g.custom_manifest = manifest
+    g.custom_manifests = {None: RewrittenManifest(current_webpack.manifest)}
     g.used_url_for_assets = set()
     used_assets = set()
     yield used_assets
-    used_assets |= {p for k in manifest.used_assets for p in manifest[k]._paths}
+    for manifest in g.custom_manifests.viewvalues():
+        used_assets |= {p for k in manifest.used_assets for p in manifest[k]._paths}
     used_assets |= {rewrite_static_url(url) for url in g.used_url_for_assets}
-    g.pop('custom_manifest')
-    g.pop('used_url_for_assets')
+    del g.custom_manifests
+    del g.used_url_for_assets
