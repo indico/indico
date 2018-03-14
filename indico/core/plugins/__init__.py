@@ -16,15 +16,15 @@
 
 from __future__ import unicode_literals
 
+import errno
 import json
 import os
 
-from flask import session
+from flask import g, session
 from flask_babelex import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
 from flask_webpackext.manifest import JinjaManifestLoader
-from markupsafe import Markup
 from werkzeug.utils import cached_property
 
 from indico.core import signals
@@ -33,6 +33,7 @@ from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import NullDomain, _
@@ -161,9 +162,24 @@ class IndicoPlugin(Plugin):
         path = self.translation_path
         return Domain(path) if path else NullDomain()
 
-    @cached_property
+    def _get_manifest(self):
+        try:
+            return JinjaManifestLoader().load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
+        except IOError as exc:
+            if exc.errno != errno.ENOENT:
+                raise
+            return None
+
+    @property
     def manifest(self):
-        return JinjaManifestLoader().load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
+        if g.get('static_site') and 'custom_manifests' in g:
+            try:
+                return g.custom_manifests[self.name]
+            except KeyError:
+                manifest = self._get_manifest()
+                g.custom_manifests[self.name] = RewrittenManifest(manifest) if manifest else None
+                return g.custom_manifests[self.name]
+        return self._get_manifest()
 
     def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages

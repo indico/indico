@@ -27,6 +27,7 @@ from flask.helpers import get_root_path
 from werkzeug.utils import secure_filename
 
 from indico.core.config import config
+from indico.core.plugins import plugin_engine
 from indico.legacy.pdfinterface.conference import AbstractBook, ContribsToPDF, ContribToPDF, ProgrammeToPDF
 from indico.legacy.webinterface.pages.static import (WPStaticAuthorList, WPStaticConferenceDisplay,
                                                      WPStaticConferenceProgram, WPStaticContributionDisplay,
@@ -115,6 +116,7 @@ class StaticEventCreator(object):
 
         # Copy static assets to ZIP file
         self._copy_static_files(used_assets)
+        self._copy_plugin_files(used_assets)
         if config.CUSTOMIZATION_DIR:
             self._copy_customization_files(used_assets)
 
@@ -139,7 +141,7 @@ class StaticEventCreator(object):
         css_files = {url for url in used_assets if re.match('static/dist/.*\.css$', url)}
         for file_path in css_files:
             with open(os.path.join(self._web_dir, file_path)) as f:
-                rewritten_css, used_urls = rewrite_css_urls(self.event, f.read())
+                rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
                 used_assets |= used_urls
                 self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
         for file_path in used_assets - css_files:
@@ -147,6 +149,24 @@ class StaticEventCreator(object):
                 continue
             self._copy_file(os.path.join(self._content_dir, file_path),
                             os.path.join(self._web_dir, file_path))
+
+    def _copy_plugin_files(self, used_assets):
+        css_files = {url for url in used_assets if re.match('static/plugins/.*\.css$', url)}
+        for file_path in css_files:
+            plugin_name, path = re.match(r'static/plugins/([^/]+)/(.+.css)', file_path).groups()
+            plugin = plugin_engine.get_plugin(plugin_name)
+            with open(os.path.join(plugin.root_path, 'static', path)) as f:
+                rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
+                used_assets |= used_urls
+                self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
+        for file_path in used_assets - css_files:
+            match = re.match(r'static/plugins/([^/]+)/(.+)', file_path)
+            if not match:
+                continue
+            plugin_name, path = match.groups()
+            plugin = plugin_engine.get_plugin(plugin_name)
+            self._copy_file(os.path.join(self._content_dir, file_path),
+                            os.path.join(plugin.root_path, 'static', path))
 
     def _strip_custom_prefix(self, url):
         # strip the 'static/custom/' prefix from the given url/path
@@ -156,11 +176,11 @@ class StaticEventCreator(object):
         css_files = {url for url in used_assets if re.match('static/custom/.*\.css$', url)}
         for file_path in css_files:
             with open(os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path))) as f:
-                rewritten_css, used_urls = rewrite_css_urls(self.event, f.read())
+                rewritten_css, used_urls, __ = rewrite_css_urls(self.event, f.read())
                 used_assets |= used_urls
                 self._zip_file.writestr(os.path.join(self._content_dir, file_path), rewritten_css)
         for file_path in used_assets - css_files:
-            if not re.match('^static/custom/', file_path):
+            if not file_path.startswith('static/custom/'):
                 continue
             self._copy_file(os.path.join(self._content_dir, file_path),
                             os.path.join(config.CUSTOMIZATION_DIR, self._strip_custom_prefix(file_path)))
@@ -228,13 +248,16 @@ class StaticConferenceCreator(StaticEventCreator):
 
     def _create_home(self):
         if self.event.has_stylesheet:
-            css, used_urls = rewrite_css_urls(self.event, self.event.stylesheet)
+            css, used_urls, used_images = rewrite_css_urls(self.event, self.event.stylesheet)
             g.used_url_for_assets |= used_urls
             self._zip_file.writestr(os.path.join(self._content_dir, 'custom.css'), css)
+            for image_file in used_images:
+                with image_file.open() as f:
+                    self._zip_file.writestr(os.path.join(self._content_dir,
+                                                         'images/{}-{}'.format(image_file.id, image_file.filename)),
+                                            f.read())
         if self.event.has_logo:
-            self._zip_file.writestr(os.path.join(self._content_dir,
-                                                 'logo-{}.png'.format(self.event.logo_metadata['hash'])),
-                                    self.event.logo)
+            self._zip_file.writestr(os.path.join(self._content_dir, 'logo.png'), self.event.logo)
         return WPStaticConferenceDisplay(self._rh, self.event).display()
 
     def _create_other_pages(self):
