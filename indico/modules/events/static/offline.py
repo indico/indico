@@ -194,15 +194,21 @@ class StaticEventCreator(object):
     def _copy_all_material(self):
         self._add_material(self.event, '')
         for contrib in self.event.contributions:
+            if not contrib.can_access(None):
+                continue
             self._add_material(contrib, "%s-contribution" % contrib.friendly_id)
             for sc in contrib.subcontributions:
                 self._add_material(sc, "%s-subcontribution" % sc.friendly_id)
         for session_ in self.event.sessions:
+            if not session.can_access(None):
+                continue
             self._add_material(session_, "%s-session" % session_.friendly_id)
 
     def _add_material(self, target, type_):
         for folder in AttachmentFolder.get_for_linked_object(target, preload_event=True):
             for attachment in folder.attachments:
+                if not attachment.can_access(None):
+                    continue
                 if attachment.type == AttachmentType.file:
                     dst_path = posixpath.join(self._content_dir, "material", type_,
                                               "{}-{}".format(attachment.id, attachment.file.filename))
@@ -268,16 +274,20 @@ class StaticConferenceCreator(StaticEventCreator):
                       get_timetable_offline_pdf_generator(self.event))
         # Generate contributions in PDF
         self._add_pdf(self.event, 'contributions.contribution_list_pdf', ContribsToPDF, event=self.event,
-                      contribs=self.event.contributions)
+                      contribs=[c for c in self.event.contributions if c.can_access(None)])
 
         # Getting specific pages for contributions
         for contrib in self.event.contributions:
+            if not contrib.can_access(None):
+                continue
             self._get_contrib(contrib)
             # Getting specific pages for subcontributions
             for subcontrib in contrib.subcontributions:
                 self._get_sub_contrib(subcontrib)
 
         for session_ in self.event.sessions:
+            if not session_.can_access(None):
+                continue
             self._get_session(session_)
 
     def _get_menu_items(self):
