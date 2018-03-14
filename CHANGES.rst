@@ -7,6 +7,13 @@ Version 2.0.3
 
 *Unreleased*
 
+Security fixes
+^^^^^^^^^^^^^^
+
+- Do not show contribution information (metadata including title, speakers
+  and a partial description) in the contribution list unless the user has
+  access to a contribution
+
 Improvements
 ^^^^^^^^^^^^
 
