@@ -124,8 +124,8 @@ class IndicoFlask(PluginFlaskMixin, Flask):
 
     @property
     def manifest(self):
-        if 'custom_manifest' in g:
-            return g.custom_manifest
+        if 'custom_manifests' in g:
+            return g.custom_manifests[None]
         return current_webpack.manifest
 
 
