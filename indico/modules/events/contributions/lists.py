@@ -20,7 +20,7 @@ from collections import OrderedDict
 from datetime import timedelta
 from operator import attrgetter
 
-from flask import flash, request
+from flask import flash, request, session
 from sqlalchemy.orm import joinedload, subqueryload
 
 from indico.core.db import db
@@ -35,6 +35,7 @@ class ContributionListGenerator(ListGeneratorBase):
 
     endpoint = '.manage_contributions'
     list_link_type = 'contribution'
+    check_access = False
 
     def __init__(self, event):
         super(ContributionListGenerator, self).__init__(event)
@@ -104,9 +105,13 @@ class ContributionListGenerator(ListGeneratorBase):
         return query.filter(*criteria)
 
     def get_list_kwargs(self):
+        if self.check_access:
+            self.event.preload_all_acl_entries()
         contributions_query = self._build_query()
-        total_entries = contributions_query.count()
-        contributions = self._filter_list_entries(contributions_query, self.list_config['filters']).all()
+        total_entries = (sum(1 for c in contributions_query if c.can_access(session.user)) if self.check_access else
+                         contributions_query.count())
+        contributions = [c for c in self._filter_list_entries(contributions_query, self.list_config['filters'])
+                         if not self.check_access or c.can_access(session.user)]
         sessions = [{'id': s.id, 'title': s.title, 'colors': s.colors} for s in self.event.sessions]
         tracks = [{'id': int(t.id), 'title': t.title} for t in self.event.tracks]
         total_duration = (sum((c.duration for c in contributions), timedelta()),
@@ -146,6 +151,7 @@ class ContributionListGenerator(ListGeneratorBase):
 class ContributionDisplayListGenerator(ContributionListGenerator):
     endpoint = '.contribution_list'
     list_link_type = 'contribution_display'
+    check_access = True
 
     def render_contribution_list(self):
         """Render the contribution list template components.

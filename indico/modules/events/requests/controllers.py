@@ -132,7 +132,8 @@ class RHRequestsEventRequestDetails(RHRequestsEventRequestDetailsBase):
             flash(flash_msg.format(self.definition.title), 'error')
         else:
             if new:
-                flash_msg = _("Your request ({0}) has been sent.")
+                flash_msg = (_("Your request ({0}) has been accepted.") if req.state == RequestState.accepted
+                             else _("Your request ({0}) has been sent."))
             else:
                 flash_msg = _("Your request ({0}) has been modified.")
             flash(flash_msg.format(self.definition.title), 'success')
