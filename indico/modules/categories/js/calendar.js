@@ -33,15 +33,18 @@ import 'fullcalendar/dist/fullcalendar.css';
             eventLimitClick: function(cellInfo) {
                 var content = $('<ul>');
                 var events = cellInfo.segs.sort(function(a, b) {
-                    var aTitle = a.event.title.toLowerCase();
-                    var bTitle = b.event.title.toLowerCase();
+                    var aTitle = a.footprint.eventInstance.def.title.toLowerCase();
+                    var bTitle = b.footprint.eventInstance.def.title.toLowerCase();
                     if (aTitle < bTitle) return -1;
                     if (aTitle > bTitle) return 1;
                     return 0;
                 });
                 $.each(events, function(index, hiddenSegment) {
                     var li = $('<li>');
-                    var eventLink = $('<a>', {'href': hiddenSegment.event.url, 'text': hiddenSegment.event.title});
+                    var eventLink = $('<a>', {
+                        'href': hiddenSegment.footprint.eventInstance.def.url,
+                        'text': hiddenSegment.footprint.eventInstance.def.title
+                    });
                     li.append(eventLink);
                     content.append(li);
                 });
