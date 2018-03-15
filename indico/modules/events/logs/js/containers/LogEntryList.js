@@ -15,21 +15,21 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import EventLog from './components/EventLog';
-import { createStore } from 'redux';
-import { Provider } from 'react-redux';
-import globalReducer from './reducers';
+import LogEntryList from '../components/LogEntryList';
+import { connect } from 'react-redux';
 
 
-let store = createStore(globalReducer);
+const mapStateToProps = state => {
+    return {
+        entries: state.entries
+    };
+};
 
-window.addEventListener('load', () => {
-    ReactDOM.render(
-        <Provider store={store}>
-            <EventLog />
-        </Provider>,
-        document.getElementById('event-log')
-    );
-});
+const mapDispatchToProps = dispatch => {
+    return {};
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(LogEntryList);
