@@ -44,9 +44,9 @@ function LogEntry(props) {
                     </span>
                 ) : ''}
                 <span className="text-superfluous"> at </span>
-                <span>
+                <time dateTime={entry.time}>
                     {moment(entry.time).format('HH:mm')}
-                </span>
+                </time>
             </span>
         </li>
     );
