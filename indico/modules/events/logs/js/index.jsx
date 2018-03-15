@@ -22,8 +22,9 @@ import { createStore } from 'redux';
 import { Provider } from 'react-redux';
 import globalReducer from './reducers';
 
+import '../style/logs.scss';
 
-let store = createStore(globalReducer);
+const store = createStore(globalReducer);
 
 window.addEventListener('load', () => {
     ReactDOM.render(

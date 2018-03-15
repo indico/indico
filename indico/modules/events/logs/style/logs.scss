@@ -1,0 +1,70 @@
+/* This file is part of Indico.
+ * Copyright (C) 2002 - 2018 European Organization for Nuclear Research (CERN).
+ *
+ * Indico is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Indico is distributed in the hope that it will be useful, but
+ * WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Indico; if not, see <http://www.gnu.org/licenses/>.
+ */
+
+@import 'base/utilities';
+
+.event-log-list {
+    padding: 0;
+    color: $black;
+
+    li.log-realm-emails span.log-icon i.log-realm { @include icon-before('icon-mail'); }
+    li.log-realm-event span.log-icon i.log-realm { @include icon-before('icon-time'); }
+    li.log-realm-reviewing span.log-icon i.log-realm { @include icon-before('icon-user-reading'); }
+    li.log-realm-participants span.log-icon i.log-realm { @include icon-before('icon-users'); }
+    li.log-realm-management span.log-icon i.log-realm { @include icon-before('icon-medal'); }
+
+    li.log-kind-positive span.log-icon i.log-kind { color: $green; }
+    li.log-kind-negative span.log-icon i.log-kind { color: $red; }
+    li.log-kind-change span.log-icon i.log-kind { color: $blue; }
+    li.log-kind-other span.log-icon i.log-kind { display: none; }
+
+    > li {
+        width: 100%;
+        line-height: 2em;
+        display: flex;
+        list-style-type: none;
+        justify-content: space-between;
+        align-content: baseline;
+        padding: 0.25em 0;
+        border-bottom: 1px solid $pastel-gray;
+
+        > *:not(first-child) {
+            margin-left: 1em;
+        }
+
+        .log-entry-description {
+            flex-grow: 3;
+        }
+
+        .log-icon {
+            color: $dark-gray;
+            font-size: 1.2em;
+            position: relative;
+            width: 1.6em;
+
+            i.log-kind {
+                line-height: 1em;
+                color: $blue;
+                font-size: 0.7em;
+                position: absolute;
+                right: 3px;
+                top: 1px;
+            }
+        }
+
+    }
+}
