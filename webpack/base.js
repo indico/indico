@@ -207,7 +207,8 @@ export function webpackDefaults(env, config) {
         resolve: {
             alias: [
                 {name: 'indico', alias: path.join(indicoClientPath, 'js/')}
-            ]
+            ],
+            extensions: ['.js', '.json', '.jsx']
         },
         resolveLoader: {
             modules: nodeModules
