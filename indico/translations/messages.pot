@@ -6,16 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1-dev\n"
+"Project-Id-Version: indico 2.1a3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-02 09:34+0100\n"
+"POT-Creation-Date: 2018-03-15 14:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.5.3\n"
 
 #: indico/core/__init__.py:27 indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:131
 #: indico/modules/events/management/__init__.py:31 indico/modules/events/requests/templates/event_request_details.html:18
@@ -102,7 +102,7 @@ msgstr ""
 #: indico/legacy/webinterface/tpls/RoomBookingRoomStats.tpl:25 indico/modules/attachments/forms.py:97
 #: indico/modules/designer/templates/template.html:70 indico/modules/events/contributions/forms.py:189
 #: indico/modules/events/contributions/templates/management/types_dialog.html:19 indico/modules/events/forms.py:41
-#: indico/modules/events/management/templates/_event_person_list.html:14 indico/modules/events/papers/forms.py:170
+#: indico/modules/events/management/templates/_event_person_list.html:14 indico/modules/events/papers/forms.py:198
 #: indico/modules/events/papers/templates/assign_role.html:14
 #: indico/modules/events/papers/templates/management/_templates.html:9
 #: indico/modules/events/papers/templates/management/competences.html:18
@@ -218,7 +218,7 @@ msgid "This plugin does not have any settings."
 msgstr ""
 
 #: indico/core/plugins/templates/details.html:32 indico/legacy/webinterface/tpls/RoomBookingBlockingForm.tpl:78
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:428 indico/modules/api/templates/admin_settings.html:10
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:427 indico/modules/api/templates/admin_settings.html:10
 #: indico/modules/attachments/templates/upload.html:20
 #: indico/modules/categories/templates/management/category_protection.html:19
 #: indico/modules/categories/templates/management/settings.html:35 indico/modules/cephalopod/templates/cephalopod.html:62
@@ -352,7 +352,7 @@ msgstr ""
 
 #: indico/legacy/pdfinterface/conference.py:1099 indico/modules/attachments/controllers/management/base.py:57
 #: indico/modules/categories/templates/display/overview/base.html:38 indico/modules/events/abstracts/forms.py:209
-#: indico/modules/events/contributions/lists.py:53
+#: indico/modules/events/contributions/lists.py:54
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:36
 #: indico/modules/events/management/util.py:47 indico/modules/events/papers/lists.py:68
 #: indico/modules/events/sessions/templates/display/session_display.html:11
@@ -555,7 +555,7 @@ msgstr ""
 #: indico/legacy/webinterface/tpls/RoomBookingAdminLocation.tpl:112
 #: indico/legacy/webinterface/tpls/RoomBookingAdminLocation.tpl:200
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:143
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:270
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:269
 msgid "Information"
 msgstr ""
 
@@ -622,7 +622,7 @@ msgstr ""
 #: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:385
 #: indico/legacy/webinterface/tpls/RoomBookingEventBookingList.tpl:19
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:314
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:425
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:424
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRoomsResults.tpl:25 indico/modules/api/templates/admin_keys.html:13
 #: indico/modules/events/registration/templates/management/regform_reglist.html:100
 #: indico/modules/events/templates/admin/_reference_type_list.html:9 indico/modules/groups/templates/_group_members.html:12
@@ -877,7 +877,7 @@ msgid "Owner"
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingBlockingsForMyRooms.tpl:21
-#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:372 indico/modules/events/contributions/lists.py:59
+#: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:372 indico/modules/events/contributions/lists.py:60
 #: indico/modules/events/static/templates/static_sites.html:40
 msgid "Status"
 msgstr ""
@@ -1015,7 +1015,7 @@ msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingDetails.tpl:210
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:153
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:277
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:276
 #: indico/legacy/webinterface/tpls/RoomBookingRoomMiniDetails.tpl:52
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRooms.tpl:183
 msgid "seats"
@@ -1039,7 +1039,7 @@ msgstr ""
 #: indico/legacy/webinterface/tpls/RoomBookingPeriodFormOld.tpl:77
 #: indico/legacy/webinterface/tpls/RoomBookingSearchBookings.tpl:90
 #: indico/legacy/webinterface/tpls/latex/inc/contribution.tpl:11 indico/modules/categories/forms.py:158
-#: indico/modules/events/contributions/forms.py:55 indico/modules/events/contributions/lists.py:57
+#: indico/modules/events/contributions/forms.py:55 indico/modules/events/contributions/lists.py:58
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:30 indico/modules/events/fields.py:44
 #: indico/modules/events/papers/lists.py:70 indico/modules/events/reminders/forms.py:41
 #: indico/modules/events/sessions/forms.py:47 indico/modules/events/sessions/templates/management/_session_list.html:16
@@ -1168,7 +1168,7 @@ msgid "Existing bookings"
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingEventBookingList.tpl:14
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:230
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:229
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRoomsResults.tpl:21
 msgid "Photo"
 msgstr ""
@@ -1245,7 +1245,7 @@ msgstr ""
 #: indico/modules/events/contributions/templates/display/contribution_display.html:147
 #: indico/modules/events/contributions/templates/management/types_dialog.html:22 indico/modules/events/forms.py:90
 #: indico/modules/events/management/forms.py:69 indico/modules/events/management/templates/_settings.html:44
-#: indico/modules/events/papers/forms.py:171 indico/modules/events/papers/templates/management/_templates.html:10
+#: indico/modules/events/papers/forms.py:199 indico/modules/events/papers/templates/management/_templates.html:10
 #: indico/modules/events/sessions/forms.py:42 indico/modules/events/sessions/templates/display/session_display.html:116
 #: indico/modules/events/sessions/util.py:83 indico/modules/events/surveys/fields/base.py:30
 #: indico/modules/events/surveys/forms.py:110 indico/modules/events/templates/display/indico/_details.html:10
@@ -1479,7 +1479,7 @@ msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:31
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:36
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:129 indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:135
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:128 indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:134
 #: indico/legacy/webinterface/tpls/RoomBookingSearchRooms.tpl:105 indico/modules/events/clone.py:32
 #: indico/modules/events/contributions/forms.py:57 indico/modules/events/forms.py:67
 #: indico/modules/events/management/forms.py:177 indico/modules/events/sessions/forms.py:82
@@ -1513,7 +1513,7 @@ msgid "Room Photo"
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:116
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:206 indico/modules/core/templates/contact.html:6
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:205 indico/modules/core/templates/contact.html:6
 #: indico/modules/core/views.py:36 indico/modules/events/papers/templates/management/overview.html:188
 #: indico/web/templates/footer.html:25
 msgid "Contact"
@@ -1563,7 +1563,7 @@ msgid "from {} to {}"
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:211
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:325
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:324
 msgid "Daily availability periods"
 msgstr ""
 
@@ -1600,18 +1600,18 @@ msgid "Bookings for this room are restricted to members of the <strong>{0}</stro
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:270
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:357
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:356
 msgid "Custom attributes"
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:292
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:395 indico/modules/rb/forms/rooms.py:60
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:394 indico/modules/rb/forms/rooms.py:60
 #: indico/modules/rb/forms/rooms.py:133
 msgid "Equipment"
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomDetails.tpl:298
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:404
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:403
 msgid "Room has"
 msgstr ""
 
@@ -1735,24 +1735,20 @@ msgid "Either you upload two photos (large and small) or none."
 msgstr ""
 
 #: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:80
-msgid "Small photo must be 90x60 pixels."
+msgid "A 4:3 aspect ratio is recommended"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:81
-msgid "Large photo may be of any size."
-msgstr ""
-
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:85
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:84
 msgid ""
 "Deletes the current photos. Not necessary if you just want to replace them; the old ones are deleted automatically in"
 " this case."
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:88
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:87
 msgid "Time format: 'HH:MM'"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:99 indico/modules/auth/templates/login_page.html:73
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:98 indico/modules/auth/templates/login_page.html:73
 #: indico/modules/events/payment/templates/event_plugin_edit.html:36
 #: indico/modules/events/registration/templates/management/regform_display.html:95
 #: indico/modules/events/registration/templates/management/regform_edit.html:29
@@ -1771,54 +1767,54 @@ msgstr ""
 msgid "Back"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:107
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:106
 msgid "New Room"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:109
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:108
 msgid "Modify Room"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:116
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:115
 msgid "Saving failed. There is an error"
 msgid_plural "Saving failed. There are {0} errors"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:162 indico/web/fields/choices.py:52
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:161 indico/web/fields/choices.py:52
 #: indico/web/fields/choices.py:101
 msgid "Options"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:278
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:277
 msgid "m<sup>2</sup>"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:279
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:278
 msgid "days"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:300
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:299
 msgid "Unavailable booking periods"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:314 indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:339
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:313 indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:338
 msgid "add period"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:384
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:383
 msgid "There are no custom attributes to pick."
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:385
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:384
 msgid "You may first add some to location, {0}."
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:414
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:413
 msgid "There is no equipment to pick."
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:415
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:414
 msgid "You may add some to location, {0}."
 msgstr ""
 
@@ -2294,7 +2290,7 @@ msgstr ""
 
 #: indico/modules/announcement/__init__.py:47 indico/modules/announcement/templates/settings.html:5
 #: indico/modules/events/abstracts/forms.py:110 indico/modules/events/layout/forms.py:64
-#: indico/modules/events/layout/templates/layout_conference.html:17 indico/modules/events/papers/forms.py:148
+#: indico/modules/events/layout/templates/layout_conference.html:17 indico/modules/events/papers/forms.py:152
 msgid "Announcement"
 msgstr ""
 
@@ -2625,7 +2621,7 @@ msgstr ""
 msgid "The list of users and groups allowed to access the material"
 msgstr ""
 
-#: indico/modules/attachments/forms.py:65 indico/modules/events/papers/forms.py:157
+#: indico/modules/attachments/forms.py:65 indico/modules/events/papers/forms.py:185
 msgid "Files"
 msgstr ""
 
@@ -3135,7 +3131,7 @@ msgstr ""
 #: indico/modules/events/abstracts/templates/reviewing/public.html:365
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:57
 #: indico/modules/events/abstracts/templates/reviewing/timeline.html:75 indico/modules/events/papers/forms.py:116
-#: indico/modules/events/papers/forms.py:183 indico/modules/events/papers/forms.py:204
+#: indico/modules/events/papers/forms.py:211 indico/modules/events/papers/forms.py:232
 #: indico/modules/events/papers/templates/reviewing/timeline.html:233 indico/modules/events/requests/base.py:42
 #: indico/modules/events/requests/templates/event_request_details.html:42
 #: indico/modules/events/requests/templates/event_request_details.html:53
@@ -4562,7 +4558,7 @@ msgid "The template has been deleted"
 msgstr ""
 
 #: indico/modules/designer/forms.py:31 indico/modules/events/management/forms.py:284
-#: indico/modules/events/papers/forms.py:172 indico/modules/events/registration/forms.py:371
+#: indico/modules/events/papers/forms.py:200 indico/modules/events/registration/forms.py:371
 msgid "Template"
 msgstr ""
 
@@ -5360,11 +5356,11 @@ msgstr ""
 msgid "The event has no contribution types defined."
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:148
+#: indico/modules/events/abstracts/forms.py:148 indico/modules/events/papers/forms.py:153
 msgid "Scale (from)"
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:149
+#: indico/modules/events/abstracts/forms.py:149 indico/modules/events/papers/forms.py:154
 msgid "Scale (to)"
 msgstr ""
 
@@ -5408,20 +5404,20 @@ msgstr ""
 msgid "These instructions will be displayed right before the decision box."
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:173
+#: indico/modules/events/abstracts/forms.py:173 indico/modules/events/papers/forms.py:162
 msgid "Some reviewers have already submitted ratings so the scale cannot be changed anymore."
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:182
+#: indico/modules/events/abstracts/forms.py:182 indico/modules/events/papers/forms.py:171
 msgid "The scale's 'to' value must be greater than the 'from' value."
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:184
+#: indico/modules/events/abstracts/forms.py:184 indico/modules/events/papers/forms.py:173
 msgid "The difference between 'to' and' from' may not be greater than 20."
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py:201 indico/modules/events/abstracts/forms.py:530
-#: indico/modules/events/contributions/lists.py:55
+#: indico/modules/events/contributions/lists.py:56
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:39
 #: indico/modules/events/papers/lists.py:66
 msgid "Track"
@@ -5496,7 +5492,7 @@ msgstr ""
 msgid "You may leave a comment (only visible to conveners and judges)..."
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:284 indico/modules/events/papers/forms.py:207
+#: indico/modules/events/abstracts/forms.py:284 indico/modules/events/papers/forms.py:235
 msgid "Proposed Action"
 msgstr ""
 
@@ -5516,7 +5512,7 @@ msgstr ""
 msgid "Propose for tracks"
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:304 indico/modules/events/papers/forms.py:214
+#: indico/modules/events/abstracts/forms.py:304 indico/modules/events/papers/forms.py:242
 msgid "Propose an action..."
 msgstr ""
 
@@ -5656,24 +5652,24 @@ msgstr ""
 msgid "Deadline until which the submitted abstracts can be modified"
 msgstr ""
 
-#: indico/modules/events/abstracts/forms.py:577 indico/modules/events/papers/forms.py:183
+#: indico/modules/events/abstracts/forms.py:577 indico/modules/events/papers/forms.py:211
 msgid "Leave a comment..."
 msgstr ""
 
 #: indico/modules/events/abstracts/forms.py:579 indico/modules/events/contributions/contrib_fields.py:45
-#: indico/modules/events/management/forms.py:240 indico/modules/events/papers/forms.py:185
+#: indico/modules/events/management/forms.py:240 indico/modules/events/papers/forms.py:213
 msgid "Visibility"
 msgstr ""
 
 #: indico/modules/events/abstracts/lists.py:48 indico/modules/events/abstracts/templates/management/_abstract_list.html:27
 #: indico/modules/events/abstracts/templates/management/_abstract_list.html:178
-#: indico/modules/events/contributions/lists.py:44
+#: indico/modules/events/contributions/lists.py:45
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:174
 #: indico/modules/events/papers/lists.py:46 indico/modules/events/papers/templates/_paper_list.html:99
 msgid "No track"
 msgstr ""
 
-#: indico/modules/events/abstracts/lists.py:49 indico/modules/events/contributions/lists.py:45
+#: indico/modules/events/abstracts/lists.py:49 indico/modules/events/contributions/lists.py:46
 #: indico/modules/events/papers/lists.py:48 indico/modules/events/sessions/templates/management/_session_list.html:55
 msgid "No type"
 msgstr ""
@@ -7525,17 +7521,17 @@ msgstr ""
 msgid "A contribution type with this name already exists"
 msgstr ""
 
-#: indico/modules/events/contributions/lists.py:43
+#: indico/modules/events/contributions/lists.py:44
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:159
 #: indico/modules/events/papers/lists.py:47 indico/modules/events/papers/templates/_paper_list.html:112
 msgid "No session"
 msgstr ""
 
-#: indico/modules/events/contributions/lists.py:59
+#: indico/modules/events/contributions/lists.py:60
 msgid "Scheduled"
 msgstr ""
 
-#: indico/modules/events/contributions/lists.py:60
+#: indico/modules/events/contributions/lists.py:61
 #: indico/modules/events/contributions/templates/display/contribution_display.html:62
 #: indico/modules/events/contributions/templates/display/subcontribution_display.html:25
 #: indico/modules/events/contributions/templates/management/_contribution_list.html:96
@@ -7543,7 +7539,7 @@ msgstr ""
 msgid "Not scheduled"
 msgstr ""
 
-#: indico/modules/events/contributions/lists.py:142
+#: indico/modules/events/contributions/lists.py:147
 msgid "The contribution '{}' is not displayed in the list due to the enabled filters"
 msgstr ""
 
@@ -9283,22 +9279,22 @@ msgstr ""
 msgid "The moment the submission process ends"
 msgstr ""
 
-#: indico/modules/events/papers/forms.py:149
+#: indico/modules/events/papers/forms.py:155
 msgid "Email notifications"
 msgstr ""
 
-#: indico/modules/events/papers/forms.py:204
+#: indico/modules/events/papers/forms.py:232
 msgid "You may leave a comment (only visible to reviewers and judges)..."
 msgstr ""
 
-#: indico/modules/events/papers/forms.py:228 indico/modules/events/papers/templates/management/overview.html:38
+#: indico/modules/events/papers/forms.py:256 indico/modules/events/papers/templates/management/overview.html:38
 #: indico/modules/events/papers/templates/management/overview.html:90
 #: indico/modules/events/papers/templates/management/overview.html:139
 #: indico/modules/events/surveys/templates/display/survey_list.html:13
 msgid "Deadline"
 msgstr ""
 
-#: indico/modules/events/papers/forms.py:229
+#: indico/modules/events/papers/forms.py:257
 msgid "Enforce deadline"
 msgstr ""
 
@@ -9322,49 +9318,49 @@ msgstr ""
 msgid "The paper judgment has been reset"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:85
+#: indico/modules/events/papers/controllers/management.py:88
 msgid "The members of the teams were updated successfully"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:89
+#: indico/modules/events/papers/controllers/management.py:92
 msgid "Users have been removed from 1 contribution"
 msgid_plural "Users have been removed from {} contributions"
 msgstr[0] ""
 msgstr[1] ""
 
-#: indico/modules/events/papers/controllers/management.py:125
+#: indico/modules/events/papers/controllers/management.py:128
 msgid "Team competences were updated successfully"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:157
+#: indico/modules/events/papers/controllers/management.py:160
 msgid "Call for papers has been rescheduled"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:159
+#: indico/modules/events/papers/controllers/management.py:162
 msgid "Call for papers has been scheduled"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:169
+#: indico/modules/events/papers/controllers/management.py:172
 msgid "Call for papers is now open"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:178
+#: indico/modules/events/papers/controllers/management.py:181
 msgid "Call for papers is now closed"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:194
+#: indico/modules/events/papers/controllers/management.py:204
 msgid "The reviewing settings were saved successfully"
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:210
+#: indico/modules/events/papers/controllers/management.py:221
 msgid "Content reviewing deadline has been set."
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:211
+#: indico/modules/events/papers/controllers/management.py:222
 msgid "Layout reviewing deadline has been set."
 msgstr ""
 
-#: indico/modules/events/papers/controllers/management.py:212
+#: indico/modules/events/papers/controllers/management.py:223
 msgid "Judging deadline has been set."
 msgstr ""
 
@@ -12099,30 +12095,34 @@ msgid "There was a problem sending your request ({0}). Please contact support."
 msgstr ""
 
 #: indico/modules/events/requests/controllers.py:135
+msgid "Your request ({0}) has been accepted."
+msgstr ""
+
+#: indico/modules/events/requests/controllers.py:136
 msgid "Your request ({0}) has been sent."
 msgstr ""
 
-#: indico/modules/events/requests/controllers.py:137
+#: indico/modules/events/requests/controllers.py:138
 msgid "Your request ({0}) has been modified."
 msgstr ""
 
-#: indico/modules/events/requests/controllers.py:173
+#: indico/modules/events/requests/controllers.py:174
 msgid "You have accepted this request."
 msgstr ""
 
-#: indico/modules/events/requests/controllers.py:176
+#: indico/modules/events/requests/controllers.py:177
 msgid "You have rejected this request."
 msgstr ""
 
-#: indico/modules/events/requests/controllers.py:179
+#: indico/modules/events/requests/controllers.py:180
 msgid "You have updated the request (only management-specific data)."
 msgstr ""
 
-#: indico/modules/events/requests/controllers.py:199
+#: indico/modules/events/requests/controllers.py:200
 msgid "There was a problem withdrawing your request ({0}). Please contact support."
 msgstr ""
 
-#: indico/modules/events/requests/controllers.py:202
+#: indico/modules/events/requests/controllers.py:203
 msgid "You have withdrawn your request ({0})"
 msgstr ""
 

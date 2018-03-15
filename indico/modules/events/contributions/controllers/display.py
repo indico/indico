@@ -100,7 +100,6 @@ class RHContributionList(RHDisplayProtectionBase):
 
     def _process_args(self):
         RHDisplayEventBase._process_args(self)
-        self.contribs = self.event.contributions
         self.list_generator = ContributionDisplayListGenerator(event=self.event)
 
     def _process(self):

@@ -6,16 +6,16 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: indico 2.1-dev\n"
+"Project-Id-Version: indico 2.1a3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-02 09:34+0100\n"
+"POT-Creation-Date: 2018-03-15 14:54+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.5.1\n"
+"Generated-By: Babel 2.5.3\n"
 
 #: indico/htdocs/js/indico/Common/Export.js:65
 msgid "Would you like to export private information to your calendar?"
@@ -2271,7 +2271,7 @@ msgstr ""
 msgid "It is not possible to book room {0}"
 msgstr ""
 
-#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:116
+#: indico/legacy/webinterface/tpls/RoomBookingRoomForm.tpl:115
 msgid "Saving failed. There is an error"
 msgid_plural "Saving failed. There are {0} errors"
 msgstr[0] ""

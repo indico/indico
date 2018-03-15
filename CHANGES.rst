@@ -109,6 +109,25 @@ Internal Changes
 ----
 
 
+Version 2.0.3
+-------------
+
+*Released on March 15, 2018*
+
+Security fixes
+^^^^^^^^^^^^^^
+
+- Do not show contribution information (metadata including title, speakers
+  and a partial description) in the contribution list unless the user has
+  access to a contribution
+
+Improvements
+^^^^^^^^^^^^
+
+- Show more suitable message when a service request is auto-accepted
+  (:issue:`3264`)
+
+
 Version 2.0.2
 -------------
 
