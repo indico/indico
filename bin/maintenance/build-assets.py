@@ -21,6 +21,7 @@ import os
 import re
 import subprocess
 import sys
+from contextlib import contextmanager
 
 import click
 import yaml
@@ -186,6 +187,16 @@ def _is_plugin_dir(path):
         return True
 
 
+@contextmanager
+def _chdir(path):
+    cwd = os.getcwd()
+    os.chdir(path)
+    try:
+        yield
+    finally:
+        os.chdir(cwd)
+
+
 @cli.command('plugin', short_help='Builds assets of a plugin.')
 @click.argument('plugin_dir', type=click.Path(exists=True, file_okay=False, resolve_path=True),
                 callback=_validate_plugin_dir)
@@ -196,9 +207,15 @@ def build_plugin(plugin_dir, dev, watch, url_root):
     webpack_build_config = _get_plugin_webpack_build_config(plugin_dir, url_root)
     with open(webpack_build_config_file, 'w') as f:
         json.dump(webpack_build_config, f, indent=2, sort_keys=True)
-    webpack_config_file = '{}/webpack.config.js'.format(plugin_dir)
+    webpack_config_file = os.path.join(plugin_dir, 'webpack.config.js')
     if not os.path.exists(webpack_config_file):
         webpack_config_file = 'plugin.webpack.config.js'
+    if os.path.exists(os.path.join(plugin_dir, 'package.json')):
+        with _chdir(plugin_dir):
+            try:
+                subprocess.check_call(['npm', 'install', '--quiet'])
+            except subprocess.CalledProcessError:
+                fail('running npm failed')
     args = _get_webpack_args(dev, watch)
     args += ['--config', webpack_config_file]
     os.environ['NODE_PATH'] = os.path.abspath('node_modules')
