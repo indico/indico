@@ -20,7 +20,7 @@ import 'fullcalendar/dist/fullcalendar.css';
 
 (function(global) {
     global.setupCategoryCalendar = function setupCategoryCalendar(elementId, categoryURL) {
-        var cachedEvents = {};
+        const cachedEvents = {};
 
         $(elementId).fullCalendar({
             firstDay: 1,
@@ -30,45 +30,49 @@ import 'fullcalendar/dist/fullcalendar.css';
             timeFormat: 'HH:mm',
             nextDayThreshold: '00:00',
             eventLimit: 5,
-            eventLimitClick: function(cellInfo) {
-                var content = $('<ul>');
-                var events = cellInfo.segs.sort(function(a, b) {
-                    var aTitle = a.footprint.eventInstance.def.title.toLowerCase();
-                    var bTitle = b.footprint.eventInstance.def.title.toLowerCase();
-                    if (aTitle < bTitle) return -1;
-                    if (aTitle > bTitle) return 1;
+            buttonText: {
+                today: $T.gettext('Today')
+            },
+            eventLimitClick(cellInfo) {
+                const content = $('<ul>');
+                const events = cellInfo.segs.sort((a, b) => {
+                    const aTitle = a.footprint.eventInstance.def.title.toLowerCase();
+                    const bTitle = b.footprint.eventInstance.def.title.toLowerCase();
+                    if (aTitle < bTitle) {
+                        return -1;
+                    }
+                    if (aTitle > bTitle) {
+                        return 1;
+                    }
                     return 0;
                 });
-                $.each(events, function(index, hiddenSegment) {
-                    var li = $('<li>');
-                    var eventLink = $('<a>', {
-                        'href': hiddenSegment.footprint.eventInstance.def.url,
-                        'text': hiddenSegment.footprint.eventInstance.def.title
+                events.forEach((hiddenSegment) => {
+                    const li = $('<li>');
+                    const eventLink = $('<a>', {
+                        href: hiddenSegment.footprint.eventInstance.def.url,
+                        text: hiddenSegment.footprint.eventInstance.def.title
                     });
                     li.append(eventLink);
                     content.append(li);
                 });
                 ajaxDialog({
                     dialogClasses: 'all-events-dialog',
-                    title: $T.gettext('Events happening on {0}'.format(cellInfo.date.format('MMMM Do YYYY'))),
-                    content: content
+                    title: $T.gettext('Events happening on {0}').format(cellInfo.date.format('MMMM Do YYYY')),
+                    content
                 });
             },
-            buttonText: {
-                'today': $T.gettext('Today')
-            },
-            events: function(start, end, timezone, callback) {
+            events(start, end, timezone, callback) {
                 function updateCalendar(data) {
                     callback(data.events);
-                    var toolbarGroup = $(elementId).find('.fc-toolbar .fc-right');
-                    var ongoingEventsInfo = $('<a>', {
-                        'href': '#',
-                        'class': 'ongoing-events-info',
-                        'text': $T.ngettext('{0} long-lasting event not shown',
-                                            '{0} long-lasting events not shown', data.ongoing_event_count)
-                                  .format(data.ongoing_event_count),
-                        'on': {
-                            'click': function(evt) {
+                    const toolbarGroup = $(elementId).find('.fc-toolbar .fc-right');
+                    const ongoingEventsInfo = $('<a>', {
+                        href: '#',
+                        class: 'ongoing-events-info',
+                        text: $T.ngettext('{0} long-lasting event not shown',
+                                          '{0} long-lasting events not shown', data.ongoing_event_count)
+                            .format(data.ongoing_event_count),
+                        on: {
+                            click: (evt) => {
                                 evt.preventDefault();
                                 ajaxDialog({
                                     title: $T.gettext('Long lasting events'),
@@ -83,7 +87,7 @@ import 'fullcalendar/dist/fullcalendar.css';
                     toolbarGroup.prepend(ongoingEventsInfo);
                 }
 
-                var key = '{0}-{1}'.format(start, end);
+                const key = `${start}-${end}`;
                 if (cachedEvents[key]) {
                     updateCalendar(cachedEvents[key]);
                 } else {
@@ -94,7 +98,7 @@ import 'fullcalendar/dist/fullcalendar.css';
                         contentType: 'application/json',
                         error: handleAjaxError,
                         complete: IndicoUI.Dialogs.Util.progress(),
-                        success: function(data) {
+                        success(data) {
                             updateCalendar(data);
                             cachedEvents[key] = data;
                         }
