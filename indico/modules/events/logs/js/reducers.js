@@ -40,7 +40,7 @@ export default function globalEventLogReducer(state, action) {
         case actions.SET_KEYWORD:
             return { ...state, keyword: action.keyword };
         case actions.SET_FILTER:
-            return { ...state, filter: action.filter };
+            return { ...state, filters: {...state.filters, ...action.filter} };
         case actions.SET_PAGE:
             return { ...state, page: action.page };
         case actions.UPDATE_ENTRIES:

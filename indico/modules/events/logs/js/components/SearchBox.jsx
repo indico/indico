@@ -16,24 +16,15 @@
  */
 
 import React from 'react';
-import { connect } from 'react-redux';
 
-import Filter from '../containers/Filter';
-import SearchBox from './SearchBox';
-
-// XXX: delete this whenever we can fetch them from server side
-const realms = [{name: 'event', title: 'Event'}, {name: 'management', title: 'Management'},
-                {name: 'email', title: 'Email'}, {name: 'participants', title: 'Participants'}];
-
-class Toolbar extends React.Component {
+export default class SearchBox extends React.Component {
     render() {
         return (
-            <div className="follow-scroll toolbars">
-                <Filter realms={realms}/>
-                <SearchBox/>
+            <div className="toolbar">
+                <div className="group">
+                    SearchBox goes here
+                </div>
             </div>
         );
     }
 }
-
-export default connect()(Toolbar);

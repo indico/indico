@@ -15,25 +15,22 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+import Filter from '../components/Filter';
 import { connect } from 'react-redux';
+import { setFilter } from '../actions';
 
-import Filter from '../containers/Filter';
-import SearchBox from './SearchBox';
 
-// XXX: delete this whenever we can fetch them from server side
-const realms = [{name: 'event', title: 'Event'}, {name: 'management', title: 'Management'},
-                {name: 'email', title: 'Email'}, {name: 'participants', title: 'Participants'}];
+const mapStateToProps = state => {
+    return {
+        filters: state.filters
+    };
+};
 
-class Toolbar extends React.Component {
-    render() {
-        return (
-            <div className="follow-scroll toolbars">
-                <Filter realms={realms}/>
-                <SearchBox/>
-            </div>
-        );
-    }
-}
+const mapDispatchToProps = (dispatch) => ({
+    setFilter: (filter) => dispatch(setFilter(filter))
+});
 
-export default connect()(Toolbar);
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(Filter);
