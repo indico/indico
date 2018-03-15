@@ -34,3 +34,31 @@ window.addEventListener('load', () => {
         document.getElementById('event-log')
     );
 });
+
+// XXX: delete this whenever we have real data
+store.dispatch({
+    type: 'UPDATE_ENTRIES',
+    entries: [
+        {
+            type: ['management', 'negative'],
+            module: 'Contributions',
+            description: 'Deleted type: foobar',
+            time: '2018-03-15T14:21:22.736488+00:00',
+            userFullName: 'Marco Vidal'
+        },
+        {
+            type: ['management', 'positive'],
+            module: 'Contributions',
+            description: 'Added type: barfoo',
+            time: '2018-03-15T15:20:20.716978+00:00',
+            userFullName: 'Pedro Ferreira'
+        },
+        {
+            type: ['management', 'change'],
+            module: 'Contributions',
+            description: 'Added type: barbarbar',
+            time: '2018-03-16T15:20:20.716978+00:00',
+            userFullName: 'Michal Kolodziejski'
+        }
+    ]
+});
