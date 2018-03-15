@@ -67,6 +67,9 @@ SUPPORTED_FILES = {
     'js': {
         'regex': re.compile('/\*(.|[\r\n])*?\*/'),
         'format': {'comment_start': '/*', 'comment_middle': ' *', 'comment_end': ' */'}},
+    'jsx': {
+        'regex': re.compile('/\*(.|[\r\n])*?\*/'),
+        'format': {'comment_start': '/*', 'comment_middle': ' *', 'comment_end': ' */'}},
     'css': {
         'regex': re.compile('/\*(.|[\r\n])*?\*/'),
         'format': {'comment_start': '/*', 'comment_middle': ' *', 'comment_end': ' */'}},
