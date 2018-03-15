@@ -11,6 +11,9 @@ parserOptions:
     experimentalObjectRestSpread: true
     jsx: true
 
+plugins:
+  - react
+
 rules:
   indent:
     - error
@@ -145,6 +148,9 @@ rules:
     - error
     - functions: false
       classes: false
+  # react/jsx stuff
+  react/jsx-uses-react: error
+  react/jsx-uses-vars: error
 
 globals:
   _: false
