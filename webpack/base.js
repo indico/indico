@@ -132,7 +132,7 @@ export function webpackDefaults(env, config) {
                     options: {
                         extends: path.resolve(config.indico ? config.indico.build.rootPath : config.build.rootPath,
                                               '..', '.babelrc'),
-                        presets: ["react"]
+                        presets: ['@babel/react']
                     }
                 },
                 {
