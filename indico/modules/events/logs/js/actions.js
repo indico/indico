@@ -15,21 +15,30 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
-import ReactDOM from 'react-dom';
-import EventLog from './components/EventLog';
-import { createStore } from 'redux';
-import { Provider } from 'react-redux';
-import globalReducer from './reducers';
+
+export const SET_KEYWORD = 'SET_KEYWORD';
+export const SET_FILTER = 'SET_FILTER';
+export const SET_PAGE = 'SET_PAGE';
+export const UPDATE_ENTRIES = 'UPDATE_ENTRIES';
+export const FETCH = 'FETCH';
 
 
-let store = createStore(globalReducer);
+export function setKeyword(keyword) {
+    return { type: SET_KEYWORD, keyword };
+}
 
-window.addEventListener('load', () => {
-    ReactDOM.render(
-        <Provider store={store}>
-            <EventLog />
-        </Provider>,
-        document.getElementById('event-log')
-    );
-});
+export function setFilter(filter) {
+    return { type: SET_FILTER, filter };
+}
+
+export function setPage(page) {
+    return { type: SET_PAGE, page };
+}
+
+export function updateEntries(entries) {
+    return { type: UPDATE_ENTRIES, entries };
+}
+
+export function fetch() {
+    return { type: FETCH };
+}
