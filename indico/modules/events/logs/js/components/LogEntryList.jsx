@@ -37,10 +37,12 @@ function LogEntry(props) {
                 {entry.description}
             </span>
             <span>
-                <span className="text-superfluous">by </span>
-                <span>
-                    {entry.userFullName}
-                </span>
+                {entry.userFullName ? (
+                    <span>
+                        <span className="text-superfluous">by </span>
+                        {entry.userFullName}
+                    </span>
+                ) : ''}
                 <span className="text-superfluous"> at </span>
                 <span>
                     {moment(entry.time).format('HH:mm')}
