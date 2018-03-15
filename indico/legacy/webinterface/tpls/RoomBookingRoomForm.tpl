@@ -77,8 +77,7 @@
         <b> ${ _('WARNING - PLEASE READ.') }</b><br/>
         <ul>
             <li> ${ _('Either you upload two photos (large and small) or none.') }</li>
-            <li> ${ _('Small photo must be 90x60 pixels.') }</li>
-            <li> ${ _('Large photo may be of any size.') }</li>
+            <li> ${ _('A 4:3 aspect ratio is recommended') }</li>
         </ul>
     </div>
     <div id="delete_photosCH" class="tip">
