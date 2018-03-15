@@ -154,7 +154,7 @@ class DebuggedIndico(DebuggedApplication):
 
 class QuietWSGIRequestHandler(WSGIRequestHandler):
     INDICO_URL_PREFIX = ''  # set from outside based on the url path prefix
-    IGNORED_PATH_PREFIXES = {'/vars.js', '/js/', '/css/', '/static/', '/images/', '/assets/'}
+    IGNORED_PATH_PREFIXES = {'/vars.js', '/css/', '/fonts/', '/images/', '/dist/', '/assets/', '/static/'}
 
     def log_request(self, code='-', size='-'):
         if code not in (304, 200):

@@ -118,16 +118,15 @@ def resend_email(paths):
 @cli.command(short_help='Delete old temporary files.')
 @click.option('--temp', is_flag=True, help='Delete old files in the temp dir')
 @click.option('--cache', is_flag=True, help='Delete old files in the cache dir')
-@click.option('--assets', is_flag=True, help='Delete old files in the assets dir.')
 @click.option('--verbose', '-v', is_flag=True, help="Be verbose and show what's being deleted")
 @click.option('--dry-run', '-n', is_flag=True, help="Do not delete anything (implies --verbose)")
 @click.option('--min-age', type=click.IntRange(1), default=1, metavar='N',
               help='Delete files at least N days old (default: 1)')
-def cleanup(temp, cache, assets, verbose, dry_run, min_age):
+def cleanup(temp, cache, verbose, dry_run, min_age):
     from .cleanup import cleanup_cmd
-    if not temp and not cache and not assets:
+    if not temp and not cache:
         raise click.UsageError('You need to specify what to delete')
-    cleanup_cmd(temp, cache, assets, min_age=min_age, dry_run=dry_run, verbose=(verbose or dry_run))
+    cleanup_cmd(temp, cache, min_age=min_age, dry_run=dry_run, verbose=(verbose or dry_run))
 
 
 @cli.command(with_appcontext=False)

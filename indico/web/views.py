@@ -16,10 +16,11 @@
 
 from __future__ import absolute_import, unicode_literals
 
+import itertools
 import posixpath
 from urlparse import urlparse
 
-from flask import g, render_template, request, session
+from flask import current_app, g, render_template, request, session
 from markupsafe import Markup
 from pytz import common_timezones, common_timezones_set
 
@@ -27,6 +28,7 @@ from indico.core import signals
 from indico.core.config import config
 from indico.legacy.webinterface.wcomponents import render_header
 from indico.modules.legal import legal_settings
+from indico.util.decorators import classproperty
 from indico.util.i18n import _, get_all_locales
 from indico.util.signals import values_from_signal
 from indico.util.string import to_unicode
@@ -147,6 +149,7 @@ class WPJinjaMixin(object):
         if html is not None:
             return html
         template = params.pop('_jinja_template')
+        params['bundles'] = (current_app.manifest[x] for x in self._resolve_bundles())
         return self.render_template_func(template, **params)
 
 
@@ -155,39 +158,48 @@ class WPBase(object):
 
     #: Whether the WP is used for management (adds suffix to page title)
     MANAGEMENT = False
+    print_bundles = tuple()
 
     def __init__(self, rh, **kwargs):
-        from indico.web.assets import core_env
         self._rh = rh
         self._kwargs = kwargs
-        self._asset_env = core_env
-
-    def getPrintCSSFiles(self):
-        return []
-
-    def getCSSFiles(self):
-        return (self._asset_env['base_css'].urls() +
-                self._asset_env['dropzone_css'].urls() +
-                self._asset_env['screen_sass'].urls())
 
     def get_extra_css_files(self):
         """Return CSS urls that will be included after all other CSS"""
         return []
 
-    def getJSFiles(self):
-        ckeditor_js = self._asset_env['ckeditor'].urls() if not g.get('static_site') else []
-        return (self._asset_env['base_js'].urls() +
-                ckeditor_js +
-                self._asset_env['dropzone_js'].urls() +
-                self._asset_env['modules_attachments_js'].urls())
+    @classproperty
+    @classmethod
+    def bundles(cls):
+        _bundles = ('common.css', 'common.js', 'main.css', 'main.js', 'module_core.js', 'module_events.creation.js',
+                    'module_attachments.js')
+        if not g.get('static_site'):
+            _bundles += ('ckeditor.js',)
+        return _bundles
 
-    def _includeJSPackage(self, pkg_names, prefix='indico_'):
-        if not isinstance(pkg_names, list):
-            pkg_names = [pkg_names]
+    @property
+    def additional_bundles(self):
+        """Additional bundle objects that will be included."""
+        return {
+            'screen': (),
+            'print': ()
+        }
 
-        return [url
-                for pkg_name in pkg_names
-                for url in self._asset_env[prefix + pkg_name.lower()].urls()]
+    def _resolve_bundles(self):
+        """Add up all bundles, following the MRO."""
+        seen_bundles = set()
+        for class_ in reversed(self.__class__.mro()[:-1]):
+            attr = class_.__dict__.get('bundles', ())
+            if isinstance(attr, classproperty):
+                attr = attr.__get__(None, class_)
+            elif isinstance(attr, property):
+                attr = attr.fget(self)
+
+            for bundle in attr:
+                if config.DEBUG and bundle in seen_bundles:
+                    raise Exception("Duplicate bundle found in {}: '{}'".format(class_.__name__, bundle))
+                seen_bundles.add(bundle)
+                yield bundle
 
     def _getHeadContent(self):
         """
@@ -201,7 +213,9 @@ class WPBase(object):
 
     def _fix_path(self, path):
         url_path = urlparse(config.BASE_URL).path or '/'
-        if path[0] != '/':
+        # append base path only if not absolute already
+        # and not in 'static site' mode (has to be relative)
+        if path[0] != '/' and not g.get('static_site'):
             path = posixpath.join(url_path, path)
         return path
 
@@ -218,20 +232,23 @@ class WPBase(object):
         elif isinstance(self._rh, RHAdminBase):
             title_parts.insert(0, _('Administration'))
 
-        plugin_css = values_from_signal(signals.plugin.inject_css.send(self.__class__), as_list=True,
-                                        multi_value_types=list)
-        plugin_js = values_from_signal(signals.plugin.inject_js.send(self.__class__), as_list=True,
-                                       multi_value_types=list)
-        custom_js = self._asset_env['custom_js'].urls() if 'custom_js' in self._asset_env else []
-        custom_css = self._asset_env['custom_sass'].urls() if 'custom_sass' in self._asset_env else []
-        css_files = map(self._fix_path, self.getCSSFiles() + plugin_css + self.get_extra_css_files() + custom_css)
-        print_css_files = map(self._fix_path, self.getPrintCSSFiles())
-        js_files = map(self._fix_path, self.getJSFiles() + plugin_js + custom_js)
+        injected_bundles = values_from_signal(signals.plugin.inject_bundle.send(self.__class__), as_list=True,
+                                              multi_value_types=list)
+        custom_js = list(current_app.manifest['__custom.js'])
+        custom_css = list(current_app.manifest['__custom.css'])
+        css_files = map(self._fix_path, self.get_extra_css_files() + custom_css)
+        js_files = map(self._fix_path, custom_js)
 
         body = to_unicode(self._display(params))
+        bundles = itertools.chain((current_app.manifest[x] for x in self._resolve_bundles()
+                                   if x in current_app.manifest._entries),
+                                  self.additional_bundles['screen'], injected_bundles)
+        print_bundles = itertools.chain((current_app.manifest[x] for x in self.print_bundles),
+                                        self.additional_bundles['print'])
 
         return render_template('indico_base.html',
-                               css_files=css_files, print_css_files=print_css_files, js_files=js_files,
+                               css_files=css_files, js_files=js_files,
+                               bundles=bundles, print_bundles=print_bundles,
                                site_name=core_settings.get('site_title'),
                                social=social_settings.get_all(),
                                page_title=' - '.join(unicode(x) for x in title_parts if x),

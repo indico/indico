@@ -16,32 +16,28 @@
 
 from __future__ import unicode_literals
 
+import errno
 import json
 import os
-import re
-from urlparse import urlparse
 
-from flask import session
+from flask import g, session
 from flask_babelex import Domain
 from flask_pluginengine import (Plugin, PluginBlueprintMixin, PluginBlueprintSetupStateMixin, PluginEngine,
                                 current_plugin, render_plugin_template, wrap_in_plugin_context)
-from markupsafe import Markup
-from webassets import Bundle
+from flask_webpackext.manifest import JinjaManifestLoader
 from werkzeug.utils import cached_property
 
 from indico.core import signals
-from indico.core.config import config
 from indico.core.db import db
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.settings import SettingsProxy
 from indico.modules.events.settings import EventSettingsProxy
+from indico.modules.events.static.util import RewrittenManifest
 from indico.modules.users import UserSettingsProxy
 from indico.util.decorators import cached_classproperty, classproperty
 from indico.util.i18n import NullDomain, _
 from indico.util.struct.enum import IndicoEnum
-from indico.web.assets import SASS_BASE_MODULES, configure_pyscss
-from indico.web.assets.bundles import LazyCacheEnvironment, get_webassets_cache_dir
 from indico.web.flask.templating import get_template_module, register_template_hook
 from indico.web.flask.util import url_for, url_rule_to_js
 from indico.web.flask.wrappers import IndicoBlueprint, IndicoBlueprintSetupState
@@ -118,21 +114,7 @@ class IndicoPlugin(Plugin):
         self.alembic_versions_path = os.path.join(self.root_path, 'migrations')
         self.connect(signals.plugin.get_blueprints, lambda app: self.get_blueprints())
         self.template_hook('vars-js', self.inject_vars_js)
-        self._setup_assets()
         self._import_models()
-
-    def _setup_assets(self):
-        url_base_path = urlparse(config.BASE_URL).path
-        output_dir = os.path.join(config.ASSETS_DIR, 'plugin-{}'.format(self.name))
-        output_url = '{}/static/assets/plugin-{}'.format(url_base_path, self.name)
-        static_dir = os.path.join(self.root_path, 'static')
-        static_url = '{}/static/plugins/{}'.format(url_base_path, self.name)
-        self.assets = LazyCacheEnvironment(output_dir, output_url, debug=config.DEBUG,
-                                           cache=get_webassets_cache_dir(self.name))
-        self.assets.append_path(output_dir, output_url)
-        self.assets.append_path(static_dir, static_url)
-        configure_pyscss(self.assets)
-        self.register_assets()
 
     def _import_models(self):
         old_models = set(db.Model._decl_class_registry.items())
@@ -180,55 +162,28 @@ class IndicoPlugin(Plugin):
         path = self.translation_path
         return Domain(path) if path else NullDomain()
 
-    def register_assets(self):
-        """Add assets to the plugin's webassets environment.
+    def _get_manifest(self):
+        try:
+            return JinjaManifestLoader().load(os.path.join(self.root_path, 'static', 'dist', 'manifest.json'))
+        except IOError as exc:
+            if exc.errno != errno.ENOENT:
+                raise
+            return None
 
-        In most cases the whole method can consist of calls to
-        :meth:`register_js_bundle` and :meth:`register_css_bundle`.
-        """
-        pass
+    @property
+    def manifest(self):
+        if g.get('static_site') and 'custom_manifests' in g:
+            try:
+                return g.custom_manifests[self.name]
+            except KeyError:
+                manifest = self._get_manifest()
+                g.custom_manifests[self.name] = RewrittenManifest(manifest) if manifest else None
+                return g.custom_manifests[self.name]
+        return self._get_manifest()
 
-    def register_js_bundle(self, name, *files):
-        """Registers a JS bundle in the plugin's webassets environment"""
-        pretty_name = re.sub(r'_js$', '', name)
-        bundle = Bundle(*files, filters='rjsmin', output='js/{}_%(version)s.min.js'.format(pretty_name))
-        self.assets.register(name, bundle)
-
-    def register_css_bundle(self, name, *files):
-        """Registers an SCSS bundle in the plugin's webassets environment"""
-        pretty_name = re.sub(r'_css$', '', name)
-        bundle = Bundle(*files,
-                        filters=('pyscss', 'indico_cssrewrite', 'csscompressor'),
-                        output='css/{}_%(version)s.min.css'.format(pretty_name),
-                        depends=SASS_BASE_MODULES)
-        self.assets.register(name, bundle)
-
-    def inject_css(self, name, view_class=None, subclasses=True, condition=None):
-        """Injects a CSS bundle into Indico's pages
-
-        :param name: Name of the bundle
-        :param view_class: If a WP class is specified, only inject it into pages using that class
-        :param subclasses: also inject into subclasses of `view_class`
-        :param condition: a callable to determine whether to inject or not. only called, when the
-                          view_class criterion matches
-        """
-        self._inject_asset(signals.plugin.inject_css, name, view_class, subclasses, condition)
-
-    def inject_js(self, name, view_class=None, subclasses=True, condition=None):
-        """Injects a JS bundle into Indico's pages
-
-        :param name: Name of the bundle
-        :param view_class: If a WP class is specified, only inject it into pages using that class
-        :param subclasses: also inject into subclasses of `view_class`
-        :param condition: a callable to determine whether to inject or not. only called, when the
-                          view_class criterion matches
-        """
-        self._inject_asset(signals.plugin.inject_js, name, view_class, subclasses, condition)
-
-    def _inject_asset(self, signal, name, view_class=None, subclasses=True, condition=None):
+    def inject_bundle(self, name, view_class=None, subclasses=True, condition=None):
         """Injects an asset bundle into Indico's pages
 
-        :param signal: the signal to use for injection
         :param name: Name of the bundle
         :param view_class: If a WP class is specified, only inject it into pages using that class
         :param subclasses: also inject into subclasses of `view_class`
@@ -238,18 +193,18 @@ class IndicoPlugin(Plugin):
 
         def _do_inject(sender):
             if condition is None or condition():
-                return self.assets[name].urls()
+                return self.manifest[name]
 
         if view_class is None:
-            self.connect(signal, _do_inject)
+            self.connect(signals.plugin.inject_bundle, _do_inject)
         elif not subclasses:
-            self.connect(signal, _do_inject, sender=view_class)
+            self.connect(signals.plugin.inject_bundle, _do_inject, sender=view_class)
         else:
             def _func(sender):
                 if issubclass(sender, view_class):
                     return _do_inject(sender)
 
-            self.connect(signal, _func)
+            self.connect(signals.plugin.inject_bundle, _func)
 
     def inject_vars_js(self):
         """Returns a string that will define variables for the plugin in the vars.js file"""
@@ -304,18 +259,6 @@ class IndicoPlugin(Plugin):
                                      cls.strict_settings, converters=cls.user_settings_converters)
 
 
-def include_plugin_js_assets(bundle_name):
-    """Jinja template function to generate HTML tags for a plugin JS asset bundle."""
-    return Markup('\n'.join('<script src="{}"></script>'.format(url)
-                            for url in current_plugin.assets[bundle_name].urls()))
-
-
-def include_plugin_css_assets(bundle_name):
-    """Jinja template function to generate HTML tags for a plugin CSS asset bundle."""
-    return Markup('\n'.join('<link rel="stylesheet" type="text/css" href="{}">'.format(url)
-                            for url in current_plugin.assets[bundle_name].urls()))
-
-
 def plugin_url_rule_to_js(endpoint):
     """Like :func:`~indico.web.flask.util.url_rule_to_js` but prepending plugin name prefix to the endpoint"""
     if '.' in endpoint[1:]:  # 'foo' or '.foo' should not get the prefix
@@ -356,6 +299,7 @@ class IndicoPluginBlueprint(PluginBlueprintMixin, IndicoBlueprint):
     functions inside the correct plugin context and to make the
     static folder work.
     """
+
     def make_setup_state(self, app, options, first_registration=False):
         return IndicoPluginBlueprintSetupState(self, app, options, first_registration)
 

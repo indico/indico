@@ -16,6 +16,7 @@ logging.yaml
 
 # generated stuff
 *.mo
+indico/web/static/dist
 
 # fetched external dependencies
 indico/htdocs/*/lib/
@@ -25,6 +26,7 @@ node_modules
 # IDE files
 .idea/
 *.sublime-*
+.vscode/
 
 # testing
 .coverage
@@ -37,3 +39,6 @@ htmlcov/
 
 # logs
 *.log
+
+# webpack
+webpack-build-config.json

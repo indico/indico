@@ -6,7 +6,7 @@
 
 PEP8_CMD='pycodestyle'
 PEP8_OPTIONS='--max-line-length=120'
-ESLINT_CMD='eslint'
+ESLINT_CMD='npx eslint'
 SASSLINT_CMD='sass-lint'
 
 
@@ -25,7 +25,7 @@ _get_files() {
     unset FILES
     while IFS= read -r -d $'\0' file; do
         FILES[i++]="$file"
-    done < <(git diff --name-only --diff-filter=ACMR --staged -z "$1")
+    done < <(git diff --name-only --diff-filter=ACMR --staged -z "$@")
 }
 
 # Most spammy checks first so the most likely useful ones are at the
@@ -47,7 +47,7 @@ fi
 
 
 # ESLint
-_get_files '*.js'
+_get_files '*.js' '*.jsx'
 if [[ ${#FILES[@]} -ne 0 ]]; then
     if ! RESULT=$($ESLINT_CMD --color "${FILES[@]}"); then
         STATUS=1

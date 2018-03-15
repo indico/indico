@@ -39,14 +39,9 @@ which will be registered on the application. The Blueprint must be named
 either *PLUGINNAME* or *compat_PLUGINNAME*.
 """)
 
-inject_css = _signals.signal('inject-css', """
-Expected to return a list of CSS URLs which are loaded after all
-other CSS. The *sender* is the WP class of the page.
-""")
-
-inject_js = _signals.signal('inject-js', """
-Expected to return a list of JS URLs which are loaded after all
-other JS. The *sender* is the WP class of the page.
+inject_bundle = _signals.signal('inject-bundle', """
+Expected to return a list of bundle names which are loaded after all
+the rest. The *sender* is the WP class of the page.
 """)
 
 template_hook = _signals.signal('template-hook', """
@@ -75,4 +70,12 @@ Expected to return ``(name, css, title)`` tuples for conference stylesheets.
 stored when the theme is selected in an event.  ``css`` is the location
 of the CSS file, relative to the plugin's ``static`` folder.  ``title``
 is the title displayed to the user when selecting the theme.
+""")
+
+get_template_customization_paths = _signals.signal('get-template-customization-paths', """
+Expected to return the absolute path to a directory containing template overrides.
+This signal is called once during initialization so it should not use any
+data that may change at runtime.  The behavior of a customization path returned
+by this function is exactly like ``<CUSTOMIZATION_DIR>/templates``, but
+it has lower priority than the one from the global customization dir.
 """)

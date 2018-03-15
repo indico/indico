@@ -26,10 +26,12 @@ from flask import url_for as _url_for
 from flask import Blueprint, current_app, g, redirect, request
 from flask.helpers import get_root_path
 from werkzeug.datastructures import FileStorage, Headers
-from werkzeug.exceptions import NotFound
-from werkzeug.routing import BaseConverter, BuildError, UnicodeConverter
+from werkzeug.exceptions import HTTPException, NotFound
+from werkzeug.routing import BaseConverter, BuildError, RequestRedirect, UnicodeConverter
+from werkzeug.urls import url_parse
 from werkzeug.wrappers import Response as WerkzeugResponse
 
+from indico.core.config import config
 from indico.util.caching import memoize
 from indico.util.fs import secure_filename
 from indico.util.locators import get_locator
@@ -188,13 +190,15 @@ def url_for(endpoint, *targets, **values):
             values[key] = int(value)
 
     url = _url_for(endpoint, **values)
-    if g.get('static_site') and not values.get('_external'):
+    if g.get('static_site') and 'custom_manifests' in g and not values.get('_external'):
         # for static sites we assume all relative urls need to be
         # mangled to a filename
         # we should really fine a better way to handle anything
         # related to offline site urls...
         from indico.modules.events.static.util import url_to_static_filename
         url = url_to_static_filename(endpoint, url)
+        # mark asset as used so that generator can include it
+        g.used_url_for_assets.add(url)
     return url
 
 
@@ -317,6 +321,28 @@ def send_file(name, path_or_fd, mimetype, last_modified=None, no_cache=True, inl
         rv.cache_control.private = True
         rv.cache_control.no_cache = True
     return rv
+
+
+def endpoint_for_url(url, base_url=None):
+    if base_url is None:
+        base_url = config.BASE_URL
+    base_url_data = url_parse(base_url)
+    url_data = url_parse(url)
+    netloc = url_data.netloc or base_url_data.netloc
+    # absolute url not matching our hostname
+    if url_data.netloc and url_data.netloc != base_url_data.netloc:
+        return None
+    # application root set but the url doesn't start with it
+    if base_url_data.path and not url_data.path.startswith(base_url_data.path):
+        return None
+    path = url_data.path[len(base_url_data.path):]
+    adapter = current_app.url_map.bind(netloc)
+    try:
+        return adapter.match(path)
+    except RequestRedirect as exc:
+        return endpoint_for_url(exc.new_url)
+    except HTTPException:
+        return None
 
 
 # Note: When adding custom converters please do not forget to add them to converter_functions in routing.js

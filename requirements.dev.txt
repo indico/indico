@@ -1,10 +1,9 @@
 babel
 pojson>=0.4
 termcolor
-nodeenv
-fabric
 sphinx
 sphinx-autobuild
+sphinx-issues
 repoze.sphinx.autointerface
 pygments
 sqlparse

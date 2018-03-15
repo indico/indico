@@ -28,11 +28,7 @@ from indico.util.mathjax import MathjaxMixin
 class WPManagePapers(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/papers/'
     sidemenu_option = 'papers'
-
-    def getJSFiles(self):
-        return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['markdown_js'].urls() +
-                self._asset_env['modules_papers_js'].urls())
+    bundles = ('markdown.js', 'module_events.papers.js')
 
     def _getHeadContent(self):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
@@ -40,12 +36,8 @@ class WPManagePapers(MathjaxMixin, WPEventManagement):
 
 class WPDisplayPapersBase(WPConferenceDisplayBase):
     template_prefix = 'events/papers/'
-
-    def getJSFiles(self):
-        return (WPConferenceDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_event_management_js'].urls() +
-                self._asset_env['modules_reviews_js'].urls() +
-                self._asset_env['modules_papers_js'].urls())
+    bundles = ('markdown.js', 'module_events.management.js',
+                                           'module_events.papers.js')
 
 
 class WPDisplayJudgingArea(WPDisplayPapersBase):

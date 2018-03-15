@@ -24,11 +24,7 @@ from indico.util.mathjax import MathjaxMixin
 class WPManageContributions(MathjaxMixin, WPEventManagement):
     template_prefix = 'events/contributions/'
     sidemenu_option = 'contributions'
-
-    def getJSFiles(self):
-        return (WPEventManagement.getJSFiles(self) +
-                self._asset_env['modules_contributions_js'].urls() +
-                self._asset_env['markdown_js'].urls())
+    bundles = ('markdown.js', 'module_events.contributions.js')
 
     def _getHeadContent(self):
         return WPEventManagement._getHeadContent(self) + MathjaxMixin._getHeadContent(self)
@@ -36,11 +32,7 @@ class WPManageContributions(MathjaxMixin, WPEventManagement):
 
 class WPContributionsDisplayBase(WPConferenceDisplayBase):
     template_prefix = 'events/contributions/'
-
-    def getJSFiles(self):
-        return (WPConferenceDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_contributions_js'].urls() +
-                self._asset_env['modules_event_display_js'].urls())
+    bundles = ('markdown.js', 'module_events.contributions.js')
 
 
 class WPMyContributions(WPContributionsDisplayBase):
@@ -49,12 +41,6 @@ class WPMyContributions(WPContributionsDisplayBase):
 
 class WPContributions(WPContributionsDisplayBase):
     menu_entry_name = 'contributions'
-
-    def getJSFiles(self):
-        return WPContributionsDisplayBase.getJSFiles(self) + self._asset_env['dropzone_js'].urls()
-
-    def getCSSFiles(self):
-        return WPContributionsDisplayBase.getCSSFiles(self) + self._asset_env['dropzone_css'].urls()
 
 
 class WPAuthorList(WPContributionsDisplayBase):

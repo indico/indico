@@ -18,7 +18,7 @@ from __future__ import print_function, unicode_literals
 
 import posixpath
 
-from flask import render_template, request
+from flask import current_app, render_template, request
 from sqlalchemy.orm import load_only
 from werkzeug.utils import cached_property
 
@@ -98,6 +98,7 @@ class WPReferenceTypes(WPAdmin):
 
 class WPEventBase(WPDecorated):
     ALLOW_JSON = False
+    bundles = ('module_events.display.js',)
 
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -116,9 +117,6 @@ class WPEventBase(WPDecorated):
 
     def _getHeader(self):
         raise NotImplementedError  # must be overridden by meeting/lecture and conference WPs
-
-    def getJSFiles(self):
-        return WPDecorated.getJSFiles(self) + self._asset_env['modules_event_display_js'].urls()
 
     def _getHeadContent(self):
         site_name = core_settings.get('site_title')
@@ -141,30 +139,35 @@ class WPSimpleEventDisplayBase(MathjaxMixin, WPEventBase):
 
 
 class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
+    bundles = ('module_vc.js', 'module_vc.css', 'module_events.cloning.js')
+
     def __init__(self, rh, conf, theme_id, theme_override=False):
         WPSimpleEventDisplayBase.__init__(self, rh, conf)
         self.theme_id = theme_id
+        self.theme_file_name = theme_id.replace('-', '_')
         self.theme = theme_settings.themes[theme_id]
         self.theme_override = theme_override
+
+    @property
+    def additional_bundles(self):
+        plugin = self.theme.get('plugin')
+        print_stylesheet = self.theme.get('print_stylesheet')
+        if plugin:
+            manifest = plugin.manifest
+        else:
+            manifest = current_app.manifest
+        return {
+            'screen': (manifest['themes_{}.css'.format(self.theme_file_name)],),
+            'print': ((manifest['themes_{}.print.css'.format(self.theme_file_name)],)
+                      if print_stylesheet else ())
+        }
 
     def _getHeadContent(self):
         return MathjaxMixin._getHeadContent(self) + WPEventBase._getHeadContent(self)
 
     def get_extra_css_files(self):
-        theme_urls = self.theme['asset_env']['display_sass'].urls() if self.theme.get('asset_env') else []
         custom_url = get_css_url(self.event)
-        return theme_urls + ([custom_url] if custom_url else [])
-
-    def getPrintCSSFiles(self):
-        theme_print_sass = (self.theme['asset_env']['print_sass'].urls()
-                            if 'print_sass' in self.theme.get('asset_env', [])
-                            else [])
-        return WPEventBase.getPrintCSSFiles(self) + theme_print_sass
-
-    def getJSFiles(self):
-        return (WPSimpleEventDisplayBase.getJSFiles(self) +
-                self._asset_env['modules_event_cloning_js'].urls() +
-                self._asset_env['modules_vc_js'].urls())
+        return [custom_url] if custom_url else []
 
     def _applyDecoration(self, body):
         if request.args.get('frame') == 'no' or request.args.get('fr') == 'no' or request.args.get('print') == '1':
@@ -212,6 +215,7 @@ class WPSimpleEventDisplay(WPSimpleEventDisplayBase):
 class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
     menu_entry_plugin = None
     menu_entry_name = None
+    bundles = ('conferences.css',)
 
     def __init__(self, rh, event_, **kwargs):
         assert event_ == kwargs.setdefault('event', event_)
@@ -263,9 +267,6 @@ class WPConferenceDisplayBase(WPJinjaMixin, MathjaxMixin, WPEventBase):
             MathjaxMixin._getHeadContent(self),
             WPEventBase._getHeadContent(self)
         ])
-
-    def getCSSFiles(self):
-        return self._asset_env['conference_css'].urls() + WPEventBase.getCSSFiles(self)
 
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)

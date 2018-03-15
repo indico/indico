@@ -302,10 +302,13 @@
                                         <table id="nonBookablePeriodsTable">
                                             % for subform in form.nonbookable_periods:
                                                 <% index = loop.index %>
-                                                <tr class="startEndDate">
+                                                <tr class="non-bookable-period" data-index="${ index }">
                                                     % for field in ['start', 'end']:
-                                                        <td class="startEndDateEntry">${ subform[field].label.text }</td>
-                                                        <td id="${ field }DateNonBookablePeriod${ index }">${ subform[field]() }</td>
+                                                        <td class="label">${ subform[field + '_date'].label.text }</td>
+                                                        <td>
+                                                            ${ subform[field + '_date']() }
+                                                            ${ subform[field + '_time']() }
+                                                        </td>
                                                     % endfor
                                                     % if loop.first:
                                                         <td>
@@ -438,24 +441,17 @@
     var nbpEndLabel = $('#nonBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(1)').text();
     var btStartLabel = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(0)').text();
     var btEndLabel = $('#dailyBookablePeriodsTable tr:eq(0) .startEndDateEntry:eq(1)').text();
+    var opts = {
+        'dateFormat': 'dd/mm/yyyy',
+
+    }
 
     $('#nonBookablePeriodsTable tr').each(function(i) {
-        var startDate = $('input', this).eq(0).val();
-        var endDate = $('input', this).eq(1).val();
-        var startDateField = IndicoUI.Widgets.Generic.dateField(true, {
-            id: 'nonbookable_periods-{0}-start'.format(i),
-            name: 'nonbookable_periods-{0}-start'.format(i)
-        });
-        var endDateField = IndicoUI.Widgets.Generic.dateField(true, {
-            id: 'nonbookable_periods-{0}-end'.format(i),
-            name: 'nonbookable_periods-{0}-end'.format(i)
-        });
+        var startDate = $('input', this).eq(0);
+        var endDate = $('input', this).eq(1);
 
-        $E('startDateNonBookablePeriod' + i).set(startDateField);
-        $E('endDateNonBookablePeriod' + i).set(endDateField);
-
-        startDateField.set(startDate);
-        endDateField.set(endDate);
+        startDate.datepicker();
+        endDate.datepicker();
 
         if (i == 0) {
             nbpStartLabel = $('.startEndDateEntry', this).eq(0).text();
@@ -466,26 +462,26 @@
     function addNonBookablePeriod() {
         var i = $('#nonBookablePeriodsTable tr').length;
         $('#nonBookablePeriodsTable tbody').append(
-            '<tr class="startEndDate"> \
-                <td class="startEndDateEntry">{0}</td> \
-                <td id="startDateNonBookablePeriod{2}"></td> \
-                <td class="startEndDateEntry">{1}</td> \
-                <td id="endDateNonBookablePeriod{2}"></td> \
+            '<tr class="non-bookable-period"> \
+                <td class="label">{0}</td> \
+                <td class="start-date-time"></td> \
+                <td class="label">{1}</td> \
+                <td class="end-date-time"></td> \
             </tr>'.format(nbpStartLabel, nbpEndLabel, i)
         );
 
-        $E('startDateNonBookablePeriod' + i).set(
-            IndicoUI.Widgets.Generic.dateField(true, {
-                id: 'nonbookable_periods-{0}-start'.format(i),
-                name: 'nonbookable_periods-{0}-start'.format(i)
-            })
-        );
-        $E('endDateNonBookablePeriod' + i).set(
-            IndicoUI.Widgets.Generic.dateField(true, {
-                id: 'nonbookable_periods-{0}-end'.format(i),
-                name: 'nonbookable_periods-{0}-end'.format(i)
-            })
-        );
+        var startDateTime = $('.non-bookable-period:last-child .start-date-time');
+        var endDateTime = $('.non-bookable-period:last-child .end-date-time');
+
+        $('<input type="text">').attr({
+            name: 'nonbookable_periods-{0}-start_date'.format(i)
+        }).datepicker().appendTo(startDateTime);
+        $('<input type="time" name="nonbookable_periods-{0}-start_time">'.format(i)).appendTo(startDateTime);
+
+        $('<input type="text">').attr({
+            name: 'nonbookable_periods-{0}-end_date'.format(i)
+        }).datepicker().appendTo(endDateTime);
+        $('<input type="time" name="nonbookable_periods-{0}-end_time">'.format(i)).appendTo(endDateTime);
     }
 
     function addDailyBookablePeriod() {

@@ -24,21 +24,11 @@ from indico.web.views import WPJinjaMixin
 class WPManageSurvey(WPEventManagement):
     template_prefix = 'events/surveys/'
     sidemenu_option = 'surveys'
-
-    def getJSFiles(self):
-        return WPEventManagement.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
+    bundles = ('module_events.surveys.js', 'module_events.surveys.css')
 
 
 class WPSurveyResults(WPManageSurvey):
-    template_prefix = 'events/surveys/'
-
-    def getCSSFiles(self):
-        return (WPManageSurvey.getCSSFiles(self) +
-                self._asset_env['chartist_css'].urls())
-
-    def getJSFiles(self):
-        return (WPManageSurvey.getJSFiles(self) +
-                self._asset_env['chartist_js'].urls())
+    pass
 
 
 class DisplaySurveyMixin(WPJinjaMixin):
@@ -48,16 +38,15 @@ class DisplaySurveyMixin(WPJinjaMixin):
     def _getBody(self, params):
         return WPJinjaMixin._getPageContent(self, params)
 
-    def getJSFiles(self):
-        return self.base_class.getJSFiles(self) + self._asset_env['modules_surveys_js'].urls()
-
 
 class WPDisplaySurveyConference(DisplaySurveyMixin, WPConferenceDisplayBase):
     template_prefix = 'events/surveys/'
     base_class = WPConferenceDisplayBase
     menu_entry_name = 'surveys'
+    bundles = ('module_events.surveys.js', 'module_events.surveys.css')
 
 
 class WPDisplaySurveySimpleEvent(DisplaySurveyMixin, WPSimpleEventDisplayBase):
     template_prefix = 'events/surveys/'
     base_class = WPSimpleEventDisplayBase
+    bundles = ('module_events.surveys.js', 'module_events.surveys.css')

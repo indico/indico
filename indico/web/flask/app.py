@@ -21,9 +21,11 @@ import uuid
 
 from babel.numbers import format_currency, get_currency_name
 from flask import _app_ctx_stack, request
-from flask_pluginengine import plugins_loaded
+from flask.helpers import get_root_path
+from flask_pluginengine import current_plugin, plugins_loaded
 from flask_sqlalchemy import models_committed
 from markupsafe import Markup
+from pywebpack import WebpackBundleProject
 from sqlalchemy.orm import configure_mappers
 from werkzeug.contrib.fixers import ProxyFix
 from werkzeug.exceptions import BadRequest
@@ -42,7 +44,8 @@ from indico.core.db.sqlalchemy.logging import apply_db_loggers
 from indico.core.db.sqlalchemy.util.models import import_all_models
 from indico.core.logger import Logger
 from indico.core.marshmallow import mm
-from indico.core.plugins import include_plugin_css_assets, include_plugin_js_assets, plugin_engine, url_for_plugin
+from indico.core.plugins import plugin_engine, url_for_plugin
+from indico.core.webpack import IndicoManifestLoader, webpack
 from indico.legacy.common.TemplateExec import mako
 from indico.modules.auth.providers import IndicoAuthProvider, IndicoIdentityProvider
 from indico.modules.auth.util import url_for_login, url_for_logout
@@ -52,8 +55,6 @@ from indico.util.i18n import _, babel, get_current_locale, gettext_context, nget
 from indico.util.mimetypes import icon_from_mimetype
 from indico.util.signals import values_from_signal
 from indico.util.string import RichMarkup, alpha_enum, crc32, html_to_plaintext, sanitize_html, slugify
-from indico.web.assets import (core_env, include_css_assets, include_js_assets, register_all_css, register_all_js,
-                               register_theme_sass)
 from indico.web.flask.errors import errors_bp
 from indico.web.flask.stats import get_request_stats, setup_request_stats
 from indico.web.flask.templating import (EnsureUnicodeExtension, call_template_hook, dedent, groupby, instanceof,
@@ -99,6 +100,7 @@ def configure_app(app, set_path=False):
     configure_xsendfile(app, config.STATIC_FILE_METHOD)
     if config.USE_PROXY:
         app.wsgi_app = ProxyFix(app.wsgi_app)
+    configure_webpack(app)
 
 
 def configure_multipass(app, config):
@@ -129,6 +131,14 @@ def configure_multipass_local(app):
         'identity_info_keys': {}
     }
     app.config['MULTIPASS_PROVIDER_MAP']['indico'] = 'indico'
+
+
+def configure_webpack(app):
+    pkg_path = os.path.dirname(get_root_path('indico'))
+    project = WebpackBundleProject(pkg_path)
+    app.config['WEBPACKEXT_PROJECT'] = project
+    app.config['WEBPACKEXT_MANIFEST_LOADER'] = IndicoManifestLoader
+    app.config['WEBPACKEXT_MANIFEST_PATH'] = os.path.join('dist', 'manifest.json')
 
 
 def configure_xsendfile(app, method):
@@ -167,10 +177,6 @@ def setup_jinja(app):
     app.add_template_global(url_for_plugin)
     app.add_template_global(url_rule_to_js)
     app.add_template_global(IndicoConfig(exc=Exception), 'indico_config')
-    app.add_template_global(include_css_assets)
-    app.add_template_global(include_js_assets)
-    app.add_template_global(include_plugin_css_assets)
-    app.add_template_global(include_plugin_js_assets)
     app.add_template_global(call_template_hook, 'template_hook')
     app.add_template_global(is_single_line_field, '_is_single_line_field')
     app.add_template_global(render_field, '_render_field')
@@ -186,11 +192,10 @@ def setup_jinja(app):
     app.add_template_global(slugify)
     app.add_template_global(lambda: date_time_util.now_utc(False), 'now')
     app.add_template_global(render_session_bar)
-    app.add_template_global(lambda: 'custom_js' in core_env, 'has_custom_js')
-    app.add_template_global(lambda: 'custom_sass' in core_env, 'has_custom_sass')
     app.add_template_global(get_request_stats)
     # Global variables
     app.add_template_global(LocalProxy(get_current_locale), 'current_locale')
+    app.add_template_global(LocalProxy(lambda: current_plugin.manifest if current_plugin else None), 'plugin_webpack')
     # Useful constants
     app.add_template_global('^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]$', name='time_regex_hhmm')  # for input[type=time]
     # Filters (indico functions returning UTF8)
@@ -223,22 +228,12 @@ def setup_jinja(app):
     # i18n
     app.jinja_env.add_extension('jinja2.ext.i18n')
     app.jinja_env.install_gettext_callables(gettext_context, ngettext_context, True)
-    # webassets
-    app.jinja_env.add_extension('webassets.ext.jinja2.AssetsExtension')
-    app.jinja_env.assets_environment = core_env
 
 
-ASSETS_REGISTERED = False
-
-
-def setup_assets():
-    global ASSETS_REGISTERED
-    if ASSETS_REGISTERED:
-        # Avoid errors when forking after creating an app
-        return
-    ASSETS_REGISTERED = True
-    register_all_js(core_env)
-    register_all_css(core_env)
+def setup_jinja_customization(app):
+    # add template customization paths provided by plugins
+    paths = values_from_signal(signals.plugin.get_template_customization_paths.send())
+    app.jinja_env.loader.fs_loader.searchpath += sorted(paths)
 
 
 def configure_db(app):
@@ -354,14 +349,11 @@ def make_app(set_path=False, testing=False, config_override=None):
         babel.init_app(app)
         multipass.init_app(app)
         oauth.init_app(app)
+        webpack.init_app(app)
         setup_mako(app)
         setup_jinja(app)
-
-        core_env.init_app(app)
-        setup_assets()
-
         configure_db(app)
-        mm.init_app(app)
+        mm.init_app(app)  # must be called after `configure_db`!
         extend_url_map(app)
         add_handlers(app)
         setup_request_stats(app)
@@ -369,9 +361,9 @@ def make_app(set_path=False, testing=False, config_override=None):
         plugin_engine.init_app(app, Logger.get('plugins'))
         if not plugin_engine.load_plugins(app):
             raise Exception('Could not load some plugins: {}'.format(', '.join(plugin_engine.get_failed_plugins(app))))
+        setup_jinja_customization(app)
         # Below this points plugins are available, i.e. sending signals makes sense
         add_plugin_blueprints(app)
         # themes can be provided by plugins
-        register_theme_sass()
         signals.app_created.send(app)
     return app

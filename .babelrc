@@ -1,0 +1,15 @@
+{
+  "presets": [
+    ["@babel/preset-env", {
+      "targets": {
+        "browsers": ["last 2 versions", "firefox esr", "not ie<11", "not ie_mob>0"]
+      }
+    }]
+  ],
+  "plugins": ["@babel/plugin-transform-runtime", "@babel/plugin-proposal-object-rest-spread"],
+  "env": {
+    "production": {
+      "presets": ["minify"]
+    }
+  }
+}

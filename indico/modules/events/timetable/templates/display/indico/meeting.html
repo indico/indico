@@ -3,7 +3,7 @@
 {% from 'events/timetable/display/indico/_break.html' import render_break %}
 
 {% if entries %}
-    <ul class="dayList">
+    <ul class="day-list">
         {% for item in entries -%}
             {% set date = item.start_dt.astimezone(tz_object).date() %}
             {% set date_changed = loop.changed(date) %}
