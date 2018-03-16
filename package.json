@@ -38,12 +38,14 @@
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
     "rrule": "^2.2.0",
     "selectize": "^0.12.4",
     "tablesorter": "^2.29.0",
     "taggle": "^1.12.0",
     "underscore": "^1.8.3",
-    "vanderlee-colorpicker": "^1.2.13"
+    "vanderlee-colorpicker": "^1.2.13",
+    "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0-beta.41",
