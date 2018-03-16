@@ -83,7 +83,7 @@ export default class LogEntryList extends React.Component {
         return (
             <>
                 <ul className="event-log-list">
-                    {Object.keys(entries).map(date => {
+                    {Object.keys(entries).sort().reverse().map(date => {
                         return <LogDate key={date} date={moment(date)} entries={entries[date]} />;
                     })}
                 </ul>
