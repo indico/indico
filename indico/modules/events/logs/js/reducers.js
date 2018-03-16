@@ -19,7 +19,7 @@ import * as actions from './actions';
 
 
 const initialState = {
-    entries: [],
+    entries: {},
     keyword: null,
     page: 1,
     isFetching: false,
