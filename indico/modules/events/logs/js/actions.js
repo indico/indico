@@ -15,12 +15,13 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+import 'whatwg-fetch';
 
 export const SET_KEYWORD = 'SET_KEYWORD';
 export const SET_FILTER = 'SET_FILTER';
 export const SET_PAGE = 'SET_PAGE';
 export const UPDATE_ENTRIES = 'UPDATE_ENTRIES';
-export const FETCH = 'FETCH';
+export const FETCH_STARTED = 'FETCH_STARTED';
 
 
 export function setKeyword(keyword) {
@@ -39,6 +40,23 @@ export function updateEntries(entries) {
     return { type: UPDATE_ENTRIES, entries };
 }
 
-export function fetch() {
-    return { type: FETCH };
+export function fetchStarted() {
+    return { type: FETCH_STARTED };
+}
+
+export function fetchPosts(url, page = null, pageSize = 10) {
+    return dispatch => {
+        dispatch(fetchStarted());
+
+        var options = {
+            method: 'GET',
+            credentials: 'same-origin', // use cookies for authentication
+        };
+
+        return fetch(url, options)
+            .then(data => data.json())
+            .then(json => {
+                dispatch(updateEntries(json.entries));
+            });
+    };
 }

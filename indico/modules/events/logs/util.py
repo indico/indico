@@ -162,3 +162,14 @@ def _diff_list(a, b):
         else:
             raise RuntimeError('unexpected opcode: ' + opcode)
     return Markup(', ').join(output)
+
+
+def serialize_log_entry(entry):
+    return {
+        'type': [entry.realm.name, entry.kind.name],
+        'module': entry.module,
+        'description': entry.summary,
+        'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
+        'payload': entry.data,
+        'userFullName': entry.user.full_name
+    }

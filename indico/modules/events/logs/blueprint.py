@@ -16,7 +16,7 @@
 
 from __future__ import unicode_literals
 
-from indico.modules.events.logs.controllers import RHEventLogs
+from indico.modules.events.logs.controllers import RHEventLogs, RHEventLogsJSON
 from indico.web.flask.wrappers import IndicoBlueprint
 
 
@@ -24,3 +24,4 @@ _bp = IndicoBlueprint('event_logs', __name__, template_folder='templates', virtu
                       url_prefix='/event/<confId>/manage/logs')
 
 _bp.add_url_rule('/', 'index', RHEventLogs)
+_bp.add_url_rule('/api/logs', 'logs', RHEventLogsJSON)
