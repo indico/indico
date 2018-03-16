@@ -16,14 +16,25 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class IButton extends React.Component {
     render() {
+        const {id, classes, href, title, name, children} = this.props;
         return (
-            <a id={this.props.id} className={`i-button ${this.props.classes || ''}`}
-                href={this.props.href} title={this.props.title}>
-                {this.props.name}{this.props.children}
+            <a id={id} className={`i-button ${classes || ''}`}
+                href={href} title={title}>
+                {name}{children}
             </a>
         );
     }
 }
+
+IButton.propTypes = {
+    id: PropTypes.string,
+    classes: PropTypes.string,
+    href: PropTypes.string,
+    title: PropTypes.string,
+    name: PropTypes.string,
+    children: PropTypes.node
+};
