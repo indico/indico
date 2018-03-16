@@ -15,25 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react';
+import SearchBox from '../components/SearchBox';
 import { connect } from 'react-redux';
+import { setKeyword } from '../actions';
 
-import Filter from '../containers/Filter';
-import SearchBox from '../containers/SearchBox';
+const mapDispatchToProps = (dispatch) => ({
+    setKeyword: (keyword) => dispatch(setKeyword(keyword))
+});
 
-// XXX: delete this whenever we can fetch them from server side
-const realms = [{name: 'event', title: 'Event'}, {name: 'management', title: 'Management'},
-                {name: 'email', title: 'Email'}, {name: 'participants', title: 'Participants'}];
-
-class Toolbar extends React.Component {
-    render() {
-        return (
-            <div className="follow-scroll toolbars">
-                <Filter realms={realms}/>
-                <SearchBox/>
-            </div>
-        );
-    }
-}
-
-export default connect()(Toolbar);
+export default connect(
+    null,
+    mapDispatchToProps
+)(SearchBox);
