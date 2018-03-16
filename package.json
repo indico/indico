@@ -39,6 +39,7 @@
     "react-dom": "^16.2.0",
     "react-redux": "^5.0.7",
     "redux": "^3.7.2",
+    "redux-logger": "^3.0.6",
     "redux-thunk": "^2.2.0",
     "rrule": "^2.2.0",
     "selectize": "^0.12.4",

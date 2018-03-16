@@ -15,12 +15,15 @@
  * along with Indico; if not, see <http://www.gnu.org/licenses/>.
  */
 
+/* global process:false */
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import EventLog from './components/EventLog';
 import {createStore, applyMiddleware} from 'redux';
 import {Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
+import logger from 'redux-logger';
 import globalReducer from './reducers';
 import {fetchPosts} from './actions';
 
@@ -30,7 +33,8 @@ window.addEventListener('load', () => {
     const rootElement = document.getElementById('event-log');
     const fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
     const store = createStore(globalReducer, applyMiddleware(
-        thunkMiddleware.withExtraArgument(fetchLogsUrl)
+        thunkMiddleware.withExtraArgument(fetchLogsUrl),
+        process.env.NODE_ENV === 'development' ? logger : null,
     ));
 
     ReactDOM.render(
