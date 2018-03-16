@@ -26,17 +26,19 @@ import { fetchPosts } from './actions';
 
 import '../style/logs.scss';
 
-const store = createStore(globalReducer, applyMiddleware(thunkMiddleware));
-
 window.addEventListener('load', () => {
     const rootElement = document.getElementById('event-log');
     const fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
+    const store = createStore(globalReducer, applyMiddleware(
+        thunkMiddleware.withExtraArgument(fetchLogsUrl)
+    ));
+
     ReactDOM.render(
         <Provider store={store}>
-            <EventLog fetchLogsUrl={fetchLogsUrl}/>
+            <EventLog />
         </Provider>,
         rootElement
     );
 
-    store.dispatch(fetchPosts(fetchLogsUrl));
+    store.dispatch(fetchPosts());
 });
