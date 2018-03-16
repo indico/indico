@@ -21,15 +21,17 @@ import { connect } from 'react-redux';
 import Filter from '../containers/Filter';
 import SearchBox from '../containers/SearchBox';
 
-// XXX: delete this whenever we can fetch them from server side
-const realms = [{name: 'event', title: 'Event'}, {name: 'management', title: 'Management'},
-                {name: 'email', title: 'Email'}, {name: 'participants', title: 'Participants'}];
 
 class Toolbar extends React.Component {
     render() {
+        const getRealms = () => {
+            const rootElement = document.getElementById('event-log');
+            const realms = rootElement.dataset.realms;
+            return JSON.parse(realms);
+        };
         return (
             <div className="follow-scroll toolbars">
-                <Filter realms={realms}/>
+                <Filter realms={getRealms()}/>
                 <SearchBox/>
             </div>
         );

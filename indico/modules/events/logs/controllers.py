@@ -27,6 +27,7 @@ from indico.modules.events.logs.util import serialize_log_entry
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
 
+
 LOG_PAGE_SIZE = 10
 
 
@@ -41,7 +42,9 @@ class RHEventLogs(RHManageEventBase):
     def _process(self):
         entries = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
         realms = {e.realm for e in entries}
-        return WPEventLogs.render_template('logs.html', self.event, entries=entries, realms=realms)
+        all_realms = [{'name': realm.name, 'title': realm.title} for realm in EventLogRealm]
+        return WPEventLogs.render_template('logs.html', self.event, entries=entries, realms=realms,
+                                           all_realms=all_realms)
 
 
 class RHEventLogsJSON(RHManageEventBase):
