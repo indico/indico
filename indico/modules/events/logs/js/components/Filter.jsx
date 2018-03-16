@@ -27,15 +27,15 @@ export default class Filter extends React.Component {
             <div className="toolbar">
                 <div className={`group i-selection ${realms.length <= 1 ? 'hidden' : ''}`}>
                     <span className="i-button label">Show</span>
-                    {realms.map((realm) => (
-                        <React.Fragment key={realm.name}>
+                    {Object.keys(realms).sort().map((name) => (
+                        <React.Fragment key={name}>
                             <input type="checkbox"
-                                   id={`realm-${realm.name}`}
-                                   data-realm={realm.name}
-                                   defaultChecked={filters[realm.name]}
-                                   onChange={(e) => setFilter({[realm.name]: e.target.checked})} />
-                            <label htmlFor={`realm-${realm.name}`} className="i-button">
-                                {realm.title}
+                                   id={`realm-${name}`}
+                                   data-realm={name}
+                                   defaultChecked={filters[name]}
+                                   onChange={(e) => setFilter({[name]: e.target.checked})} />
+                            <label htmlFor={`realm-${name}`} className="i-button">
+                                {realms[name]}
                             </label>
                         </React.Fragment>
                     ))}
@@ -50,7 +50,7 @@ export default class Filter extends React.Component {
 }
 
 Filter.propTypes = {
-    realms: PropTypes.arrayOf(PropTypes.object).isRequired,
+    realms: PropTypes.object.isRequired,
     filters: PropTypes.object.isRequired,
     setFilter: PropTypes.func.isRequired
 };

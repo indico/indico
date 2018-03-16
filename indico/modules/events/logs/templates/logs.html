@@ -6,7 +6,9 @@
 
 {% block content %}
 
-    <div id="event-log" data-fetch-logs-url="{{ url_for('.logs', event, _external=True) }}" data-realms={{ all_realms|tojson }}>
+    <div id="event-log"
+         data-fetch-logs-url="{{ url_for('.logs', event, _external=true) }}"
+         data-realms={{ all_realms|tojson|forceescape }}>
     </div>
 
     <div class="follow-scroll toolbars">
