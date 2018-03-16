@@ -19,30 +19,30 @@ import React from 'react';
 import PropTypes from 'prop-types';
 
 export default class Paginator extends React.Component {
+    static propTypes = {
+        currentPage: PropTypes.number.isRequired,
+        pages: PropTypes.array.isRequired,
+        changePage: PropTypes.func.isRequired,
+    };
+
     render() {
-        const {pages} = this.props;
+        const {pages, currentPage, changePage} = this.props;
 
         return (
             <ul className="paginator">
-                {pages.map((number, index) =>
-                    <li key={index} className="page-number">
+                {pages.map((number) => (
+                    <li key={number} className="page-number">
                         {(number === null) ? (
                             <span className="superfluous-text">…</span>
                         ) : (
-                            <a className={`i-button ${number === this.props.currentPage ? 'highlight' : ''}`}
-                               onClick={this.props.changePage.bind(undefined, number)}>
+                            <a className={`i-button ${number === currentPage ? 'highlight' : ''}`}
+                               onClick={changePage.bind(undefined, number)}>
                                 {number}
                             </a>
                         )}
                     </li>
-                )}
+                ))}
             </ul>
         );
     }
 }
-
-Paginator.propTypes = {
-    currentPage: PropTypes.number,
-    pages: PropTypes.array,
-    changePage: PropTypes.func
-};

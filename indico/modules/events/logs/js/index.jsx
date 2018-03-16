@@ -18,11 +18,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import EventLog from './components/EventLog';
-import { createStore, applyMiddleware } from 'redux';
-import { Provider } from 'react-redux';
+import {createStore, applyMiddleware} from 'redux';
+import {Provider} from 'react-redux';
 import thunkMiddleware from 'redux-thunk';
 import globalReducer from './reducers';
-import { fetchPosts } from './actions';
+import {fetchPosts} from './actions';
 
 import '../style/logs.scss';
 

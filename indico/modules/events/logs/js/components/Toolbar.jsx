@@ -16,7 +16,7 @@
  */
 
 import React from 'react';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
 
 import Filter from '../containers/Filter';
 import SearchBox from '../containers/SearchBox';
@@ -32,7 +32,7 @@ class Toolbar extends React.Component {
         return (
             <div className="follow-scroll toolbars">
                 <Filter realms={getRealms()}/>
-                <SearchBox/>
+                <SearchBox />
             </div>
         );
     }

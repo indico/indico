@@ -16,8 +16,8 @@
  */
 
 import LogEntryList from '../components/LogEntryList';
-import { connect } from 'react-redux';
-import { setPage, fetchPosts } from '../actions';
+import {connect} from 'react-redux';
+import {setPage, fetchPosts} from '../actions';
 
 const mapStateToProps = state => {
     return {

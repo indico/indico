@@ -33,22 +33,18 @@ const initialState = {
     pages: []
 };
 
-export default function globalEventLogReducer(state, action) {
-    if (state === undefined) {
-        return initialState;
-    }
-
+export default function globalEventLogReducer(state = initialState, action) {
     switch (action.type) {
         case actions.SET_KEYWORD:
-            return { ...state, keyword: action.keyword };
+            return {...state, keyword: action.keyword};
         case actions.SET_FILTER:
-            return { ...state, filters: {...state.filters, ...action.filter} };
+            return {...state, filters: {...state.filters, ...action.filter}};
         case actions.SET_PAGE:
-            return { ...state, currentPage: action.currentPage };
+            return {...state, currentPage: action.currentPage};
         case actions.UPDATE_ENTRIES:
-            return { ...state, entries: action.entries, pages: action.pages, isFetching: false };
+            return {...state, entries: action.entries, pages: action.pages, isFetching: false};
         case actions.FETCH_STARTED:
-            return { ...state, isFetching: true };
+            return {...state, isFetching: true};
         default:
             return state;
     }
