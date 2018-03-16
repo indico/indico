@@ -102,6 +102,7 @@ rules:
   lines-between-class-members: error
   max-statements-per-line: error
   new-cap: error
+  object-curly-spacing: error
   object-property-newline:
     - error
     - allowAllPropertiesOnSameLine: true
