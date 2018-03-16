@@ -21,14 +21,15 @@ import * as actions from './actions';
 const initialState = {
     entries: {},
     keyword: null,
-    page: 1,
+    currentPage: 1,
     isFetching: false,
     filters: {
         event: true,
         management: true,
         email: true,
         participants: true
-    }
+    },
+    pages: []
 };
 
 export default function globalEventLogReducer(state, action) {
@@ -42,9 +43,9 @@ export default function globalEventLogReducer(state, action) {
         case actions.SET_FILTER:
             return { ...state, filters: {...state.filters, ...action.filter} };
         case actions.SET_PAGE:
-            return { ...state, page: action.page };
+            return { ...state, currentPage: action.currentPage };
         case actions.UPDATE_ENTRIES:
-            return { ...state, entries: action.entries, isFetching: false };
+            return { ...state, entries: action.entries, pages: action.pages, isFetching: false };
         case actions.FETCH_STARTED:
             return { ...state, isFetching: true };
         default:
