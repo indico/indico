@@ -171,5 +171,5 @@ def serialize_log_entry(entry):
         'description': entry.summary,
         'time': entry.logged_dt.astimezone(entry.event.tzinfo).isoformat(),
         'payload': entry.data,
-        'userFullName': entry.user.full_name
+        'userFullName': entry.user.full_name if entry.user else None
     }
