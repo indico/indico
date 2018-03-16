@@ -7,13 +7,13 @@ extends:
   - 'eslint:recommended'
   - 'plugin:react/recommended'
 
+parser: babel-eslint
+
 parserOptions:
   sourceType: module
-  ecmaVersion: 2018
-  ecmaFeatures:
-    jsx: true
 
 plugins:
+  - babel
   - react
 
 rules:
