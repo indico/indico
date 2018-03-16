@@ -20,7 +20,7 @@ from collections import defaultdict
 
 from flask import jsonify, request
 
-from indico.modules.events.logs.models.entries import EventLogEntry
+from indico.modules.events.logs.models.entries import EventLogEntry, EventLogRealm
 from indico.modules.events.logs.util import serialize_log_entry
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
@@ -41,9 +41,15 @@ class RHEventLogsJSON(RHManageEventBase):
     def _process(self):
         entries = defaultdict(list)
         page = int(request.args.get('page', 1))
-        query = (self.event.log_entries
-                 .order_by(EventLogEntry.logged_dt.desc())
-                 .paginate(page, LOG_PAGE_SIZE))
+        filters = request.args.getlist('filters')
+        query = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc())
+
+        if filters:
+            realms = {EventLogRealm.get(f) for f in filters if EventLogRealm.get(f)}
+            if realms:
+                query = query.filter(EventLogEntry.realm.in_(realms))
+
+        query = query.paginate(page, LOG_PAGE_SIZE)
 
         for entry in query.items:
             day = entry.logged_dt.date()
