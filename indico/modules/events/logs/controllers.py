@@ -16,7 +16,12 @@
 
 from __future__ import unicode_literals
 
+from collections import defaultdict
+
+from flask import jsonify
+
 from indico.modules.events.logs.models.entries import EventLogEntry
+from indico.modules.events.logs.util import serialize_log_entry
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
 
@@ -28,3 +33,12 @@ class RHEventLogs(RHManageEventBase):
         entries = self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()).all()
         realms = {e.realm for e in entries}
         return WPEventLogs.render_template('logs.html', self.event, entries=entries, realms=realms)
+
+
+class RHEventLogsJSON(RHManageEventBase):
+    def _process(self):
+        entries = defaultdict(list)
+        for entry in self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()):
+            day = entry.logged_dt.date()
+            entries[day.isoformat()].append(serialize_log_entry(entry))
+        return jsonify(entries=entries)

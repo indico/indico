@@ -6,7 +6,7 @@
 
 {% block content %}
 
-    <div id="event-log">
+    <div id="event-log" data-fetch-logs-url="{{ url_for('.logs', event) }}">
     </div>
 
     <div class="follow-scroll toolbars">

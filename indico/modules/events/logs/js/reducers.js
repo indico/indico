@@ -44,7 +44,9 @@ export default function globalEventLogReducer(state, action) {
         case actions.SET_PAGE:
             return { ...state, page: action.page };
         case actions.UPDATE_ENTRIES:
-            return { ...state, entries: action.entries };
+            return { ...state, entries: action.entries, isFetching: false };
+        case actions.FETCH_STARTED:
+            return { ...state, isFetching: true };
         default:
             return state;
     }

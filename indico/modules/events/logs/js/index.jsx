@@ -18,51 +18,25 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import EventLog from './components/EventLog';
-import { createStore } from 'redux';
+import { createStore, applyMiddleware } from 'redux';
 import { Provider } from 'react-redux';
+import thunkMiddleware from 'redux-thunk';
 import globalReducer from './reducers';
+import { fetchPosts } from './actions';
 
 import '../style/logs.scss';
 
-const store = createStore(globalReducer);
+const store = createStore(globalReducer, applyMiddleware(thunkMiddleware));
 
 window.addEventListener('load', () => {
+    var rootElement = document.getElementById('event-log');
+    var fetchLogsUrl = rootElement.dataset.fetchLogsUrl;
     ReactDOM.render(
         <Provider store={store}>
-            <EventLog />
+            <EventLog fetchLogsUrl={fetchLogsUrl}/>
         </Provider>,
-        document.getElementById('event-log')
+        rootElement
     );
-});
 
-// XXX: delete this whenever we have real data
-store.dispatch({
-    type: 'UPDATE_ENTRIES',
-    entries: {
-        '2018-03-15': [
-            {
-                type: ['management', 'negative'],
-                module: 'Contributions',
-                description: 'Deleted type: foobar',
-                time: '2018-03-15T14:21:22.736488+00:00',
-                userFullName: 'Marco Vidal'
-            },
-            {
-                type: ['management', 'positive'],
-                module: 'Contributions',
-                description: 'Added type: barfoo',
-                time: '2018-03-15T15:20:20.716978+00:00',
-                userFullName: 'Pedro Ferreira'
-            }
-        ],
-        '2018-03-16': [
-            {
-                type: ['management', 'change'],
-                module: 'Contributions',
-                description: 'Added type: barbarbar',
-                time: '2018-03-16T15:20:20.716978+00:00',
-                userFullName: 'Michal Kolodziejski'
-            }
-        ]
-    }
+    store.dispatch(fetchPosts(fetchLogsUrl));
 });
