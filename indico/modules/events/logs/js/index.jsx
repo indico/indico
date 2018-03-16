@@ -39,7 +39,7 @@ window.addEventListener('load', () => {
 store.dispatch({
     type: 'UPDATE_ENTRIES',
     entries: {
-        '2018-03-12': [
+        '2018-03-15': [
             {
                 type: ['management', 'negative'],
                 module: 'Contributions',
@@ -53,7 +53,9 @@ store.dispatch({
                 description: 'Added type: barfoo',
                 time: '2018-03-15T15:20:20.716978+00:00',
                 userFullName: 'Pedro Ferreira'
-            },
+            }
+        ],
+        '2018-03-16': [
             {
                 type: ['management', 'change'],
                 module: 'Contributions',
