@@ -26,8 +26,9 @@ const initialState = {
     filters: {
         event: true,
         management: true,
-        email: true,
-        participants: true
+        emails: true,
+        participants: true,
+        reviewing: true
     },
     pages: []
 };
