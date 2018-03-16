@@ -61,9 +61,11 @@ export default class LogEntryList extends React.Component {
     render() {
         return (
             <ul className="event-log-list">
-                {this.props.entries.map((entry, index) => (
-                    <LogEntry key={index} entry={entry} />
-                ))}
+                {Object.keys(this.props.entries).map((date, index) => {
+                    return this.props.entries[date].map((entry, index) => {
+                        return <LogEntry key={index} entry={entry} />
+                    })
+                })}
             </ul>
         );
     }
