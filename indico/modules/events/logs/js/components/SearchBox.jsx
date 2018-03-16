@@ -16,15 +16,23 @@
  */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
 export default class SearchBox extends React.Component {
     render() {
         return (
             <div className="toolbar">
                 <div className="group">
-                    SearchBox goes here
+                    <span className="i-button label">
+                        <span className="icon-search"/>
+                    </span>
+                    <input type="text" onChange={(e) => this.props.setKeyword(e.target.value.trim())}/>
                 </div>
             </div>
         );
     }
 }
+
+SearchBox.propTypes = {
+    setKeyword: PropTypes.func.isRequired
+};
