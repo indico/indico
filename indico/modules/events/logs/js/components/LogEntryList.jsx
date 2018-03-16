@@ -19,9 +19,9 @@ import moment from 'moment';
 import PropTypes from 'prop-types';
 import React from 'react';
 
-function LogEntry(props) {
-    const entry = props.entry;
+import Paginator from 'indico/react/components/Paginator';
 
+function LogEntry({entry}) {
     return (
         <li className={`log-realm-${entry.type[0]} log-kind-${entry.type[1]}`}>
             <span className="flexrow">
@@ -56,14 +56,14 @@ LogEntry.propTypes = {
     entry: PropTypes.object
 };
 
-function LogDate(props) {
+function LogDate({date, entries}) {
     return (
         <li>
             <h3 className="event-log-day-header">
-                {props.date.format('dddd, D MMMM YYYY')}
+                {date.format('dddd, D MMMM YYYY')}
             </h3>
             <ul className="event-log-entry-list">
-                {props.entries.map((entry, index) => {
+                {entries.map((entry, index) => {
                     return <LogEntry key={index} entry={entry} />;
                 })}
             </ul>
@@ -78,16 +78,24 @@ LogDate.propTypes = {
 
 export default class LogEntryList extends React.Component {
     render() {
+        const {entries, pages, currentPage, changePage} = this.props;
+
         return (
-            <ul className="event-log-list">
-                {Object.keys(this.props.entries).map(date => {
-                    return <LogDate key={date} date={moment(date)} entries={this.props.entries[date]} />;
-                })}
-            </ul>
+            <>
+                <ul className="event-log-list">
+                    {Object.keys(entries).map(date => {
+                        return <LogDate key={date} date={moment(date)} entries={entries[date]} />;
+                    })}
+                </ul>
+                <Paginator currentPage={currentPage} pages={pages}
+                           changePage={changePage} />
+            </>
         );
     }
 }
 
 LogEntryList.propTypes = {
-    entries: PropTypes.object
+    entries: PropTypes.object,
+    page: PropTypes.number,
+    changePage: PropTypes.func,
 };

@@ -17,16 +17,23 @@
 
 import LogEntryList from '../components/LogEntryList';
 import { connect } from 'react-redux';
-
+import { setPage, fetchPosts } from '../actions';
 
 const mapStateToProps = state => {
     return {
-        entries: state.entries
+        entries: state.entries,
+        currentPage: state.currentPage,
+        pages: state.pages
     };
 };
 
 const mapDispatchToProps = dispatch => {
-    return {};
+    return {
+        changePage: (page) => {
+            dispatch(setPage(page));
+            dispatch(fetchPosts());
+        }
+    };
 };
 
 export default connect(

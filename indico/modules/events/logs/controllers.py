@@ -18,12 +18,14 @@ from __future__ import unicode_literals
 
 from collections import defaultdict
 
-from flask import jsonify
+from flask import jsonify, request
 
 from indico.modules.events.logs.models.entries import EventLogEntry
 from indico.modules.events.logs.util import serialize_log_entry
 from indico.modules.events.logs.views import WPEventLogs
 from indico.modules.events.management.controllers import RHManageEventBase
+
+LOG_PAGE_SIZE = 10
 
 
 class RHEventLogs(RHManageEventBase):
@@ -38,7 +40,12 @@ class RHEventLogs(RHManageEventBase):
 class RHEventLogsJSON(RHManageEventBase):
     def _process(self):
         entries = defaultdict(list)
-        for entry in self.event.log_entries.order_by(EventLogEntry.logged_dt.desc()):
+        page = int(request.args.get('page', 1))
+        query = (self.event.log_entries
+                 .order_by(EventLogEntry.logged_dt.desc())
+                 .paginate(page, LOG_PAGE_SIZE))
+
+        for entry in query.items:
             day = entry.logged_dt.date()
             entries[day.isoformat()].append(serialize_log_entry(entry))
-        return jsonify(entries=entries)
+        return jsonify(current_page=page, pages=list(query.iter_pages()), entries=entries)

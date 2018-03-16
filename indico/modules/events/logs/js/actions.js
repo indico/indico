@@ -32,31 +32,31 @@ export function setFilter(filter) {
     return { type: SET_FILTER, filter };
 }
 
-export function setPage(page) {
-    return { type: SET_PAGE, page };
+export function setPage(currentPage) {
+    return { type: SET_PAGE, currentPage };
 }
 
-export function updateEntries(entries) {
-    return { type: UPDATE_ENTRIES, entries };
+export function updateEntries(entries, pages) {
+    return { type: UPDATE_ENTRIES, entries, pages };
 }
 
 export function fetchStarted() {
     return { type: FETCH_STARTED };
 }
 
-export function fetchPosts(page = null, pageSize = 10) {
-    return (dispatch, getStore, fetchLogsUrl) => {
+export function fetchPosts() {
+    return async (dispatch, getStore, fetchLogsUrl) => {
         dispatch(fetchStarted());
 
         const options = {
             method: 'GET',
             credentials: 'same-origin', // use cookies for authentication
         };
+        const url = new URL(fetchLogsUrl);
+        url.searchParams.append('page', getStore().currentPage);
 
-        return fetch(fetchLogsUrl, options)
-            .then(data => data.json())
-            .then(json => {
-                dispatch(updateEntries(json.entries));
-            });
+        const data = await fetch(url, options);
+        const json = await data.json();
+        dispatch(updateEntries(json.entries, json.pages));
     };
 }
